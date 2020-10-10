@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
     <string name="keep_dm_verity">Запазване на AVB 2.0/dm-verity</string>
-    <string name="uninstall">Деинсталиране</string>
     <string name="uninstall_magisk_title">Деинсталиране на Magisk</string>
     <string name="uninstall_magisk_msg">Всички модули ще бъдат изключени/премахнати. Руут достъпът ще бъде премахнат и е възможно криптиране на данните Ви.</string>
     <string name="update">Актуализация</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Не е представена информация)</string>
-    <string name="no_modules_found">Няма намерени модули.</string>
     <string name="reboot_recovery">Рестартиране в режима за възстановяване</string>
     <string name="reboot_bootloader">Рестартиране в буутлоудъра</string>
     <string name="reboot_download">Рестартиране в даунлоуд режима</string>
@@ -46,13 +44,10 @@
     <string name="download">Изтегляне</string>
     <string name="reboot">Рестартиране</string>
     <string name="magisk_update_title">Налице е нова версия на Magisk.</string>
-    <string name="settings_reboot_toast">Трябва да рестартирате устройството, за да бъдат приложени настройките.</string>
     <string name="release_notes">Бележки</string>
     <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
     <string name="manager_update_title">Налице е нова версия на Magisk Manager.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
-    <string name="dtbo_patched_title">DTBO беше модифициран!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager модифицира dtbo.img, моля да рестартирате устройството.</string>
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
     <string name="hide_manager_title">Скриване на Magisk Manager…</string>
@@ -93,7 +88,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Потребителски</string>
     <string name="settings_update_custom_msg">Въведете потребителски URL</string>
-    <string name="settings_core_only_summary">Работят само основни функции, като MagiskSU и MagiskHide, без всякакви модули.</string>
     <string name="settings_magiskhide_summary">Скриване на Magisk от различни детектори.</string>
     <string name="settings_hosts_title">Несистемни хостове</string>
     <string name="settings_hosts_summary">Поддръжка на несистемни хостове за използване на приложения, блокиращи реклами.</string>
@@ -146,7 +140,6 @@
     <string name="sixtymin">60 мин</string>
     <string name="su_allow_toast">На %1$s бе разрешен Superuser достъп.</string>
     <string name="su_deny_toast">На %1$s бе отказан Superuser достъп.</string>
-    <string name="no_apps_found">Няма намерени приложения.</string>
     <string name="su_snack_grant">На %1$s е предоставен Superuser достъп.</string>
     <string name="su_snack_deny">На %1$s е отказан Superuser достъп.</string>
     <string name="su_snack_notif_on">Известията за %1$s са включени.</string>

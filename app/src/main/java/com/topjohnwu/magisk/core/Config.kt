@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Environment
 import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
@@ -10,13 +9,13 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.magiskdb.SettingsDao
 import com.topjohnwu.magisk.core.magiskdb.StringDao
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.core.utils.defaultLocale
 import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.data.preference.PreferenceModel
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.inject
-import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
@@ -51,10 +50,12 @@ object Config : PreferenceModel, DBConfig {
         const val DARK_THEME = "dark_theme_extended"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
-        const val DOWNLOAD_PATH = "download_path"
+        const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
+        const val ASKED_HOME = "asked_home"
+        const val DOH = "doh"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -107,9 +108,14 @@ object Config : PreferenceModel, DBConfig {
         else
             Value.DEFAULT_CHANNEL
 
-    var bootId by preference(Key.BOOT_ID, "")
+    @JvmStatic var keepVerity = false
+    @JvmStatic var keepEnc = false
+    @JvmStatic var recovery = false
 
-    var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
+    var bootId by preference(Key.BOOT_ID, "")
+    var askedHome by preference(Key.ASKED_HOME, false)
+
+    var downloadDir by preference(Key.DOWNLOAD_DIR, "")
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
@@ -122,6 +128,7 @@ object Config : PreferenceModel, DBConfig {
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
+    var doh by preference(Key.DOH, defaultLocale.country == "CN")
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
@@ -140,10 +147,6 @@ object Config : PreferenceModel, DBConfig {
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
-
-    // Always return a path in external storage where we can write
-    val downloadDirectory get() =
-        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
@@ -223,7 +226,9 @@ object Config : PreferenceModel, DBConfig {
 
     fun export() {
         // Flush prefs to disk
-        prefs.edit().commit()
+        prefs.edit().apply {
+            remove(Key.ASKED_HOME)
+        }.commit()
         val context = get<Context>(Protected)
         val xml = File(
             "${context.filesDir.parent}/shared_prefs",

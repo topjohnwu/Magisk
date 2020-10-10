@@ -395,6 +395,8 @@ write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, boot.hdr->page_siz
 void repack(const char* src_img, const char* out_img, bool nocomp) {
 	boot_img boot(src_img);
 
+	auto is_flag = [&](unsigned flag) -> bool { return (boot.flags & flag); };
+
 	struct {
 		uint32_t header;
 		uint32_t kernel;
@@ -423,7 +425,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 	// Create new image
 	int fd = creat(out_img, 0644);
 
-	if (boot.flags & DHTB_FLAG) {
+	if (is_flag(DHTB_FLAG)) {
 		// Skip DHTB header
 		write_zero(fd, sizeof(dhtb_hdr));
 	} else if (boot.flags & BLOB_FLAG) {
@@ -440,7 +442,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 
 	// kernel
 	off.kernel = lseek(fd, 0, SEEK_CUR);
-	if (boot.flags & MTK_KERNEL) {
+	if (is_flag(MTK_KERNEL)) {
 		// Copy MTK headers
 		restore_buf(fd, boot.k_hdr, sizeof(mtk_hdr));
 	}
@@ -463,7 +465,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 
 	// ramdisk
 	off.ramdisk = lseek(fd, 0, SEEK_CUR);
-	if (boot.flags & MTK_RAMDISK) {
+	if (is_flag(MTK_RAMDISK)) {
 		// Copy MTK headers
 		restore_buf(fd, boot.r_hdr, sizeof(mtk_hdr));
 	}
@@ -517,11 +519,20 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 	}
 
 	// Append tail info
-	if (boot.flags & SEANDROID_FLAG) {
+	if (is_flag(SEANDROID_FLAG)) {
 		restore_buf(fd, SEANDROID_MAGIC "\xFF\xFF\xFF\xFF", 20);
 	}
-	if (boot.flags & LG_BUMP_FLAG) {
+	if (is_flag(LG_BUMP_FLAG)) {
 		restore_buf(fd, LG_BUMP_MAGIC, 16);
+	}
+
+	// Pad image to at least original size if not chromeos (as it requires post processing)
+	if (!is_flag(CHROMEOS_FLAG)) {
+		auto current_sz = lseek(fd, 0, SEEK_CUR);
+		if (current_sz < boot.map_size) {
+			int padding = boot.map_size - current_sz;
+			write_zero(fd, padding);
+		}
 	}
 
 	close(fd);
@@ -535,12 +546,12 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 	mmap_rw(out_img, boot.map_addr, boot.map_size);
 
 	// MTK headers
-	if (boot.flags & MTK_KERNEL) {
+	if (is_flag(MTK_KERNEL)) {
 		auto hdr = reinterpret_cast<mtk_hdr *>(boot.map_addr + off.kernel);
 		hdr->size = boot.hdr->kernel_size();
 		boot.hdr->kernel_size() += sizeof(*hdr);
 	}
-	if (boot.flags & MTK_RAMDISK) {
+	if (is_flag(MTK_RAMDISK)) {
 		auto hdr = reinterpret_cast<mtk_hdr *>(boot.map_addr + off.ramdisk);
 		hdr->size = boot.hdr->ramdisk_size();
 		boot.hdr->ramdisk_size() += sizeof(*hdr);
@@ -548,7 +559,7 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 
 	// Update checksum
 	HASH_CTX ctx;
-	(boot.flags & SHA256_FLAG) ? SHA256_init(&ctx) : SHA_init(&ctx);
+	is_flag(SHA256_FLAG) ? SHA256_init(&ctx) : SHA_init(&ctx);
 	uint32_t size = boot.hdr->kernel_size();
 	HASH_update(&ctx, boot.map_addr + off.kernel, size);
 	HASH_update(&ctx, &size, sizeof(size));
@@ -584,13 +595,13 @@ void repack(const char* src_img, const char* out_img, bool nocomp) {
 	// Main header
 	memcpy(boot.map_addr + off.header, **boot.hdr, boot.hdr->hdr_size());
 
-	if (boot.flags & DHTB_FLAG) {
+	if (is_flag(DHTB_FLAG)) {
 		// DHTB header
 		auto hdr = reinterpret_cast<dhtb_hdr *>(boot.map_addr);
 		memcpy(hdr, DHTB_MAGIC, 8);
 		hdr->size = boot.map_size - sizeof(dhtb_hdr);
 		SHA256_hash(boot.map_addr + sizeof(dhtb_hdr), hdr->size, hdr->checksum);
-	} else if (boot.flags & BLOB_FLAG) {
+	} else if (is_flag(BLOB_FLAG)) {
 		// Blob header
 		auto hdr = reinterpret_cast<blob_hdr *>(boot.map_addr);
 		hdr->size = boot.map_size - sizeof(blob_hdr);

@@ -16,14 +16,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
     <string name="keep_dm_verity">Zadrži AVB 2.0/dm-verity</string>
-    <string name="uninstall">Deinstaliraj</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi moduli će biti onemogućeni/uklonjeni. Root će biti uklonjen i potencijalno šifrirati Vaše podatke, ukoliko Vaši podaci trenutačno nisu šifrirani</string>
     <string name="update">Ažuriraj</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nema podataka)</string>
-    <string name="no_modules_found">Nijedan modul nije pronađen</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Ažuriranje dostupno</string>
@@ -43,7 +41,6 @@
     <string name="download">Preuzmi</string>
     <string name="reboot">Ponovno podizanje sustava</string>
     <string name="magisk_update_title">Dostupno je novo Magisk ažuriranje!</string>
-    <string name="settings_reboot_toast">Ponovno pokrenite kako biste primjenili postavke</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>
     <string name="repo_cache_cleared">Predmemorija repozitorija izbrisana</string>
     <string name="manager_update_title">Dostupno je novo ažuriranje Magisk Manager aplikacije!</string>
@@ -72,7 +69,6 @@
     <string name="settings_update_stable">Stabilno</string>
     <string name="settings_update_beta">Beta</string>
 
-    <string name="settings_core_only_summary">Omogućite samo osnovne značajke, svi se moduli neće učitati. MagiskSU i MagiskHide će i dalje biti omogućeni</string>
     <string name="settings_magiskhide_summary">Sakrij Magisk od raznih detekcija</string>
     <string name="settings_hosts_title">Systemless hostovi</string>
     <string name="settings_hosts_summary">Systemless hostovi podržavaju Adblock aplikacije</string>
@@ -124,7 +120,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s su dodijeljena Superuser prava</string>
     <string name="su_deny_toast">%1$s su odbijena Superuser prava</string>
-    <string name="no_apps_found">Nisu pronađene aplikacije</string>
     <string name="su_snack_grant">Superuser prava su dodijeljena za %1$s</string>
     <string name="su_snack_deny">Superuser prava su odbijena za %1$s</string>
     <string name="su_snack_notif_on">Obavijesti za %1$s su odobrene</string>

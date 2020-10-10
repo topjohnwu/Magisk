@@ -1,12 +1,6 @@
 package com.topjohnwu.magisk.ktx
 
-import androidx.databinding.ObservableField
 import androidx.databinding.ObservableList
-
-
-fun ObservableField<Boolean>.toggle() {
-    value = !value
-}
 
 fun <T> ObservableList<T>.addOnListChangedCallback(
     onChanged: ((sender: ObservableList<T>) -> Unit)? = null,

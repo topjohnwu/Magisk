@@ -16,31 +16,24 @@
     <string name="app_changelog">Değişiklikler</string>
     <string name="manager">Yönetici</string>
     <string name="loading">Yükleniyor…</string>
-    <string name="info">Bilgi</string>
-    <string name="uninstall">Kaldır</string>
     <string name="update">Güncelle</string>
     <string name="not_available">N/A</string>
     <string name="hide">Gizle</string>
     <string name="status">Durum</string>
     <string name="home_package">Paket</string>
-    <string name="details">Ayrıntılar</string>
 
     <string name="home_notice_content">Her zaman açık kaynaklı Magisk Manager kullandığınızdan emin olun. Bilinmeyen kaynak yöneticisi kötü amaçlı eylemler gerçekleştirebilir.</string>
     <string name="home_support_title">Bizi destekleyin</string>
-    <string name="home_links_project">Proje bağlantıları</string>
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk özgür ve açık kaynaklıdır ve her zaman öyle olacaktır. Ancak küçük bir bağış göndererek bize önem verdiğinizi gösterebilirsiniz.</string>
-    <string name="home_device_title">Cihaz</string>
-    <string name="home_device_extra_manufacturer">Üretici</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Donanım</string>
-    <string name="home_device_system">Sistem</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Güvenli Mod</string>
     <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Yüklendi</string>
+    <string name="home_latest_version">Güncel</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacaktır. Kök erişimi kaldırılacaktır ve verileriniz zaten şifrelenmemişse potansiyel olarak verileriniz şifrelenecektir.</string>
+    <string name="home_check_safetynet">SafetyNet\'i kontrol et</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Şifrelemeyi zorlamayı sürdür</string>
@@ -59,6 +52,7 @@
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir işlenmemiş görüntü (*.img) ya da ODIN tar dosyası (*.tar) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
+    <string name="flash_screen_title">Kurulum</string>
 
     <!--Superuser-->
     <string name="su_request_title">Yetkili Kullanıcı İsteği</string>
@@ -74,7 +68,6 @@
     <string name="sixtymin">60 dakika</string>
     <string name="su_allow_toast">%1$s için yetkili kullanıcı hakları verildi</string>
     <string name="su_deny_toast">%1$s için yetkili kullanıcı hakları reddedildi</string>
-    <string name="no_apps_found">Hiçbir uygulama bulunamadı</string>
     <string name="su_snack_grant">%1$s için yetkili kullanıcı hakları verildi</string>
     <string name="su_snack_deny">%1$s için yetkili kullanıcı hakları reddedildi</string>
     <string name="su_snack_notif_on">%1$s için bildirimler etkin</string>
@@ -106,7 +99,6 @@
     <string name="safetynet_attest_failure">Onaylama başarısız oldu!</string>
     <string name="safetynet_attest_loading">Sadece bir kaç saniye…</string>
     <string name="safetynet_attest_restart">Tekrar deneyin</string>
-    <string name="safetynet_system">Sistem</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Sistem uygulamalarını göster</string>
@@ -117,22 +109,19 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Hiçbir açıklama sağlanmadı)</string>
-    <string name="no_modules_found">Modül yok</string>
     <string name="reboot_recovery">Kurtarma moduna yeniden başlat</string>
     <string name="reboot_bootloader">Ön yükleyici moduna yeniden başlat</string>
     <string name="reboot_download">Yükleme moduna yeniden başlat</string>
     <string name="reboot_edl">EDL moduna yeniden başlat</string>
-    <string name="module_safe_mode_message">Güvenli moddasınız. Hiçbir kullanıcı modülü çalışmaz.\nGüvenli mod devre dışı bırakıldığında bu mesaj kaybolacaktır.</string>
     <string name="module_version_author">%1$s - %2$s</string>
     <string name="module_section_pending">Güncellemeler</string>
     <string name="module_section_pending_action">Tümünü güncelle</string>
-    <string name="module_section_remote">İndirilebilir</string>
     <string name="module_state_remove">Kaldır</string>
     <string name="module_state_restore">Geri yükle</string>
     <string name="module_action_install_external">Depolama alanından yükle</string>
-    <string name="module_update_none">Modülleriniz güncel!</string>
     <string name="update_available">Güncelleme mevcut</string>
-    <string name="home_installed_version">Yüklendi</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sıralama Düzeni</string>
 
     <!--Settings -->
@@ -141,8 +130,6 @@
     <string name="settings_dark_mode_light">Her zaman aydınlık</string>
     <string name="settings_dark_mode_system">Sistemi takip et</string>
     <string name="settings_dark_mode_dark">Her zaman karanlık</string>
-    <string name="settings_safe_mode_title">Güvenli Mod</string>
-    <string name="settings_core_only_summary" deprecated="true">Sadece temel özellikleri etkinleştirin, tüm modüller yüklenmez. MagiskSU ve MagiskHide yine de etkinleştirilecektir</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Depo Önbelleğini Temizle</string>
@@ -203,7 +190,6 @@
     <string name="global_summary">Tüm kök oturumları genel bağlama ad alanını kullanır</string>
     <string name="requester_summary">Kök oturumları, istekte bulunanın ad alanını devralır</string>
     <string name="isolate_summary">Her bir kök oturumunun kendi izole ad alanı olacaktır</string>
-    <string name="settings_download_path_error">Klasör oluşturma hatası. Depolama kök dizininden erişilebilir olmalı ve bir dosya olmamalıdır.</string>
 
     <!-- Notifications -->
     <string name="update_channel">Magisk Güncellemeleri</string>
@@ -222,11 +208,8 @@
     <string name="repo_install_msg">%1$s yüklensin mi?</string>
     <string name="download">İndir</string>
     <string name="reboot">Yeniden başlat</string>
-    <string name="settings_reboot_toast">Ayarları uygulamak için yeniden başlatın</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Depo önbelleği temizlendi</string>
-    <string name="dtbo_patched_title">DTBO yamalandı!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'yi yamaladı, lütfen yeniden başlatın</string>
     <string name="flashing">Yükleniyor...</string>
     <string name="done">Tamamlandı!</string>
     <string name="failure">Başarısız</string>
@@ -247,5 +230,6 @@
     <string name="authenticate">Kimlik doğrulaması</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
     <string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
+    <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
 
 </resources>

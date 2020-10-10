@@ -24,11 +24,9 @@ android {
         versionCode = Config["appVersionCode"]?.toInt()
         buildConfigField("int", "LATEST_MAGISK", Config["versionCode"] ?: "Integer.MAX_VALUE")
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = mapOf("room.incremental" to "true")
-            }
-        }
+        javaCompileOptions.annotationProcessorOptions.arguments(
+                mapOf("room.incremental" to "true")
+        )
     }
 
     buildTypes {
@@ -69,29 +67,36 @@ androidExtensions {
     isExperimental = true
 }
 
+val copyUtils = tasks.register("copyUtils", Copy::class) {
+    from(rootProject.file("scripts/util_functions.sh"))
+    into("src/main/res/raw")
+}
+
+tasks["preBuild"]?.dependsOn(copyUtils)
+
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(kotlin("stdlib"))
     implementation(project(":app:shared"))
     implementation(project(":app:signing"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
+    implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
+    implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
-
-    implementation(kotlin("stdlib"))
-    implementation(kotlin("stdlib-jdk7"))
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vMarkwon = "4.4.0"
+    val vMarkwon = "4.6.0"
     implementation("io.noties.markwon:core:${vMarkwon}")
     implementation("io.noties.markwon:html:${vMarkwon}")
     implementation("io.noties.markwon:image:${vMarkwon}")
     implementation("com.caverock:androidsvg:1.4")
 
-    val vLibsu = "2.5.1"
+    val vLibsu = "3.0.2"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
 
@@ -114,7 +119,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:${vOkHttp}")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
-    val vMoshi = "1.9.3"
+    val vMoshi = "1.11.0"
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
@@ -123,20 +128,21 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:${Deps.vNav}")
-    implementation("androidx.navigation:navigation-ui-ktx:${Deps.vNav}")
+    val vNav: String by rootProject.extra
+    implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
+    implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.0-beta8")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.2.0")
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.work:work-runtime-ktx:2.3.4")
+    implementation("androidx.work:work-runtime-ktx:2.4.0")
     implementation("androidx.transition:transition:1.3.1")
     implementation("androidx.multidex:multidex:2.0.1")
-    implementation("androidx.core:core-ktx:1.3.0")
+    implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
-    implementation("com.google.android.material:material:1.2.0-beta01")
+    implementation("com.google.android.material:material:1.2.1")
 }

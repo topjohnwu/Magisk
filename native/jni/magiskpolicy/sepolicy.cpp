@@ -398,7 +398,6 @@ bool sepol_impl::add_type_rule(const char *s, const char *t, const char *c, cons
 bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o) {
 	type_datum_t *src, *tgt, *def;
 	class_datum_t *cls;
-	filename_trans_datum_t *trans;
 
 	src = hashtab_find(db->p_types.table, s);
 	if (src == nullptr) {
@@ -421,22 +420,37 @@ bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c,
 		return false;
 	}
 
-	filename_trans_t key;
-	key.stype = src->s.value;
+	filename_trans_key_t key;
 	key.ttype = tgt->s.value;
 	key.tclass = cls->s.value;
 	key.name = (char *) o;
 
-	trans = hashtab_find(db->filename_trans, (hashtab_key_t) &key);
+	filename_trans_datum_t *last = nullptr;
+	filename_trans_datum_t *trans = hashtab_find(db->filename_trans, (hashtab_key_t) &key);
+	while (trans) {
+		if (ebitmap_get_bit(&trans->stypes, src->s.value - 1)) {
+			// Duplicate, overwrite existing data and return
+			trans->otype = def->s.value;
+			return true;
+		}
+		if (trans->otype == def->s.value)
+			break;
+		last = trans;
+		trans = trans->next;
+	}
 
 	if (trans == nullptr) {
 		trans = auto_cast(xcalloc(sizeof(*trans), 1));
-		hashtab_insert(db->filename_trans, (hashtab_key_t) &key, trans);
+		filename_trans_key_t *new_key = auto_cast(malloc(sizeof(*new_key)));
+		*new_key = key;
+		new_key->name = strdup(key.name);
+		trans->next = last;
+		trans->otype = def->s.value;
+		hashtab_insert(db->filename_trans, (hashtab_key_t) new_key, trans);
 	}
 
-	// Overwrite existing
-	trans->otype = def->s.value;
-	return true;
+	db->filename_trans_count++;
+	return ebitmap_set_bit(&trans->stypes, src->s.value - 1, 1) == 0;
 }
 
 bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char *context) {

@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.module
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -8,15 +7,14 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.ReselectionTarget
+import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.ktx.hideKeyboard
-import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
-import com.topjohnwu.magisk.model.events.ViewEvent
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.ReselectionTarget
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -40,17 +38,11 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
             }
         }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        InstallExternalModuleEvent.onActivityResult(requestCode, resultCode, data)?.also {
-            it.navigate()
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
         activity.title = resources.getString(R.string.modules)
+        BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,12 +104,7 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override fun onReselected() {
         binding.moduleList
-            .takeIf {
-                (it.layoutManager as? StaggeredGridLayoutManager)?.let {
-                    it.findFirstVisibleItemPositions(IntArray(it.spanCount)).min()
-                } ?: 0 > 10
-            }
-            ?.also { it.scrollToPosition(10) }
+            .also { it.scrollToPosition(10) }
             .let { binding.moduleList }
             .also { it.post { it.smoothScrollToPosition(0) } }
     }

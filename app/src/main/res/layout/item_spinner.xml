@@ -6,11 +6,11 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem" />
+            type="com.topjohnwu.magisk.ui.superuser.SpinnerRvItem" />
 
     </data>
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@android:id/text1"
         style="?android:attr/spinnerItemStyle"
         android:layout_width="match_parent"

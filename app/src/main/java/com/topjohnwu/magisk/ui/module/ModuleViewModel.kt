@@ -5,27 +5,27 @@ import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.download.RemoteFileService
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.Module
-import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
-import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.events.SelectModuleEvent
+import com.topjohnwu.magisk.events.OpenChangelogEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ktx.addOnListChangedCallback
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.ktx.value
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.recycler.*
-import com.topjohnwu.magisk.model.events.InstallExternalModuleEvent
-import com.topjohnwu.magisk.model.events.OpenChangelogEvent
-import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.model.events.dialog.ModuleInstallDialog
-import com.topjohnwu.magisk.ui.base.*
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
-import com.topjohnwu.magisk.utils.observable
-import kotlinx.coroutines.*
+import com.topjohnwu.magisk.utils.set
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 import kotlin.math.roundToInt
 
@@ -54,77 +54,64 @@ class ModuleViewModel(
     private var remoteJob: Job? = null
 
     @get:Bindable
-    var isRemoteLoading by observable(false, BR.remoteLoading)
+    var isRemoteLoading = false
+        set(value) = set(value, field, { field = it }, BR.remoteLoading)
 
     @get:Bindable
-    var query by observable("", BR.query) {
-        submitQuery()
-        // Yes we do lie about the search being loaded
-        searchLoading = true
-    }
+    var query = ""
+        set(value) = set(value, field, { field = it }, BR.query) {
+            submitQuery()
+            // Yes we do lie about the search being loaded
+            searchLoading = true
+        }
 
     @get:Bindable
-    var searchLoading by observable(false, BR.searchLoading)
+    var searchLoading = false
+        set(value) = set(value, field, { field = it }, BR.searchLoading)
+
     val itemsSearch = diffListOf<RepoItem>()
     val itemSearchBinding = itemBindingOf<RepoItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
-    private val itemNoneInstalled = TextItem(R.string.no_modules_found)
-    private val itemNoneUpdatable = TextItem(R.string.module_update_none)
-
-    private val itemsInstalledHelpers = ObservableArrayList<TextItem>()
-    private val itemsUpdatableHelpers = ObservableArrayList<TextItem>()
+    private val installSectionList = ObservableArrayList<RvItem>()
+    private val updatableSectionList = ObservableArrayList<RvItem>()
 
     private val itemsInstalled = diffListOf<ModuleItem>()
     private val itemsUpdatable = diffListOf<RepoItem.Update>()
-    private val itemsRemote = diffListOf<RepoItem.Remote>()
+    private val itemsOnline = diffListOf<RepoItem.Remote>()
 
-    val adapter = adapterOf<ComparableRvItem<*>>()
-    val items = MergeObservableList<ComparableRvItem<*>>()
-        .insertItem(InstallModule)
-        .insertItem(sectionUpdate)
-        .insertList(itemsUpdatableHelpers)
-        .insertList(itemsUpdatable)
-        .insertItem(sectionActive)
-        .insertList(itemsInstalledHelpers)
-        .insertList(itemsInstalled)
-        .insertItem(sectionRemote)
-        .insertList(itemsRemote)!!
-    val itemBinding = itemBindingOf<ComparableRvItem<*>> {
+    private val sectionUpdate = SectionTitle(
+        R.string.module_section_pending,
+        R.string.module_section_pending_action,
+        R.drawable.ic_update_md2
+        // enable with implementation of https://github.com/topjohnwu/Magisk/issues/2036
+    ).also { it.hasButton = false }
+
+    private val sectionInstalled = SectionTitle(
+        R.string.module_installed,
+        R.string.reboot,
+        R.drawable.ic_restart
+    ).also { it.hasButton = false }
+
+    private val sectionOnline = SectionTitle(
+        R.string.module_section_online,
+        R.string.sorting_order
+    ).apply { updateOrderIcon() }
+
+    val adapter = adapterOf<RvItem>()
+    val items = MergeObservableList<RvItem>()
+        .also { if (Info.env.isActive) {
+            it.insertItem(InstallModule)
+              .insertList(updatableSectionList)
+              .insertList(itemsUpdatable)
+              .insertList(installSectionList)
+              .insertList(itemsInstalled)
+        } }
+        .insertItem(sectionOnline)
+        .insertList(itemsOnline)
+    val itemBinding = itemBindingOf<RvItem> {
         it.bindExtra(BR.viewModel, this)
-    }
-
-    companion object {
-        private val sectionRemote = SectionTitle(
-            R.string.module_section_remote,
-            R.string.sorting_order
-        )
-
-        private val sectionUpdate = SectionTitle(
-            R.string.module_section_pending,
-            R.string.module_section_pending_action,
-            R.drawable.ic_update_md2
-            // enable with implementation of https://github.com/topjohnwu/Magisk/issues/2036
-        ).also { it.hasButton = false }
-
-        private val sectionActive = SectionTitle(
-            R.string.module_installed,
-            R.string.reboot,
-            R.drawable.ic_restart
-        ).also { it.hasButton = false }
-
-        init {
-            updateOrderIcon()
-        }
-
-        private fun updateOrderIcon() {
-            sectionRemote.icon = when (Config.repoOrder) {
-                Config.Value.ORDER_NAME -> R.drawable.ic_order_name
-                Config.Value.ORDER_DATE -> R.drawable.ic_order_date
-                else -> return
-            }
-        }
     }
 
     // ---
@@ -140,64 +127,86 @@ class ModuleViewModel(
     // ---
 
     init {
-        RemoteFileService.reset()
-        RemoteFileService.progressBroadcast.observeForever {
-            val (progress, subject) = it ?: return@observeForever
-            if (subject !is DownloadSubject.Module) {
-                return@observeForever
-            }
-            update(subject.module, progress.times(100).roundToInt())
-        }
-
         itemsInstalled.addOnListChangedCallback(
-            onItemRangeInserted = { _, _, _ -> itemsInstalledHelpers.clear() },
-            onItemRangeRemoved = { _, _, _ -> addInstalledEmptyMessage() }
+            onItemRangeInserted = { _, _, _ ->
+                if (installSectionList.isEmpty())
+                    installSectionList.add(sectionInstalled)
+            },
+            onItemRangeRemoved = { list, _, _ ->
+                if (list.isEmpty())
+                    installSectionList.clear()
+            }
         )
         itemsUpdatable.addOnListChangedCallback(
-            onItemRangeInserted = { _, _, _ -> itemsUpdatableHelpers.clear() },
-            onItemRangeRemoved = { _, _, _ -> addUpdatableEmptyMessage() }
+            onItemRangeInserted = { _, _, _ ->
+                if (updatableSectionList.isEmpty())
+                    updatableSectionList.add(sectionUpdate)
+            },
+            onItemRangeRemoved = { list, _, _ ->
+                if (list.isEmpty())
+                    updatableSectionList.clear()
+            }
         )
     }
 
     // ---
 
-    override fun refresh(): Job {
-        if (itemsRemote.isEmpty())
-            loadRemote()
-        return loadInstalled()
-    }
+    fun onProgressUpdate(progress: Float, subject: Subject) {
+        if (subject !is Subject.Module)
+            return
 
-    private suspend fun loadUpdates(installed: List<ModuleItem>) = withContext(Dispatchers.IO) {
-        installed
-            .mapNotNull { dao.getUpdatableRepoById(it.item.id, it.item.versionCode) }
-            .map { RepoItem.Update(it) }
-    }
-
-    private suspend fun List<ModuleItem>.loadDetails() = withContext(Dispatchers.IO) {
-        onEach {
-            launch {
-                it.repo = dao.getRepoById(it.item.id)
+        viewModelScope.launch {
+            val items = withContext(Dispatchers.Default) {
+                val predicate = { it: RepoItem -> it.item.id == subject.module.id }
+                itemsUpdatable.filter(predicate) +
+                        itemsOnline.filter(predicate) +
+                        itemsSearch.filter(predicate)
             }
+            items.forEach { it.progress = progress.times(100).roundToInt() }
         }
     }
 
-    private fun loadInstalled() = viewModelScope.launch {
-        state = State.LOADING
-        val installed = Module.installed().map { ModuleItem(it) }
-        val detailLoad = async { installed.loadDetails() }
-        val updates = loadUpdates(installed)
-        val diff = withContext(Dispatchers.Default) {
-            val i = async { itemsInstalled.calculateDiff(installed) }
-            val u = async { itemsUpdatable.calculateDiff(updates) }
-            awaitAll(i, u)
+    override fun refresh(): Job {
+        return viewModelScope.launch {
+            state = State.LOADING
+            loadInstalled()
+            if (itemsOnline.isEmpty())
+                loadRemote()
+            state = State.LOADED
         }
-        detailLoad.await()
-        itemsInstalled.update(installed, diff[0])
-        itemsUpdatable.update(updates, diff[1])
-        addInstalledEmptyMessage()
-        addUpdatableEmptyMessage()
-        updateActiveState()
-        state = State.LOADED
+    }
+
+    private fun SectionTitle.updateOrderIcon() {
+        hasButton = true
+        icon = when (Config.repoOrder) {
+            Config.Value.ORDER_NAME -> R.drawable.ic_order_name
+            Config.Value.ORDER_DATE -> R.drawable.ic_order_date
+            else -> return
+        }
+    }
+
+    private suspend fun loadInstalled() {
+        val installed = Module.installed().map { ModuleItem(it) }
+        val diff = withContext(Dispatchers.Default) {
+            itemsInstalled.calculateDiff(installed)
+        }
+        itemsInstalled.update(installed, diff)
+    }
+
+    private suspend fun loadUpdatable() {
+        val (updates, diff) = withContext(Dispatchers.IO) {
+            itemsInstalled.forEach {
+                launch {
+                    it.repo = dao.getRepoById(it.item.id)
+                }
+            }
+            val updates = itemsInstalled
+                .mapNotNull { dao.getUpdatableRepoById(it.item.id, it.item.versionCode) }
+                .map { RepoItem.Update(it) }
+            val diff = itemsUpdatable.calculateDiff(updates)
+            return@withContext updates to diff
+        }
+        itemsUpdatable.update(updates, diff)
     }
 
     fun loadRemote() {
@@ -205,7 +214,7 @@ class ModuleViewModel(
         if (remoteJob?.isActive == true)
             return
 
-        if (itemsRemote.isEmpty())
+        if (itemsOnline.isEmpty())
             EndlessRecyclerScrollListener.ResetState().publish()
 
         remoteJob = viewModelScope.launch {
@@ -214,20 +223,22 @@ class ModuleViewModel(
             }
 
             isRemoteLoading = true
-            val repos = if (itemsRemote.isEmpty()) {
-                repoUpdater(refetch)
+            val repos = if (itemsOnline.isEmpty()) {
+                repoUpdater.run(refetch)
+                loadUpdatable()
                 loadRemoteDB(0)
             } else {
-                loadRemoteDB(itemsRemote.size)
+                loadRemoteDB(itemsOnline.size)
             }
             isRemoteLoading = false
             refetch = false
-            queryHandler.post { itemsRemote.addAll(repos) }
+            queryHandler.post { itemsOnline.addAll(repos) }
         }
     }
 
     fun forceRefresh() {
-        itemsRemote.clear()
+        itemsOnline.clear()
+        itemsUpdatable.clear()
         itemsSearch.clear()
         refetch = true
         refresh()
@@ -269,49 +280,23 @@ class ModuleViewModel(
 
     // ---
 
-    private fun update(repo: Repo, progress: Int) = viewModelScope.launch {
-        val items = withContext(Dispatchers.Default) {
-            val predicate = { it: RepoItem -> it.item.id == repo.id }
-            itemsUpdatable.filter(predicate) +
-                itemsRemote.filter(predicate) +
-                itemsSearch.filter(predicate)
-        }
-        items.forEach { it.progress.value = progress }
-    }
-
-    // ---
-
-    private fun addInstalledEmptyMessage() {
-        if (itemsInstalled.isEmpty() && itemsInstalledHelpers.isEmpty()) {
-            itemsInstalledHelpers.add(itemNoneInstalled)
-        }
-    }
-
-    private fun addUpdatableEmptyMessage() {
-        if (itemsUpdatable.isEmpty() && itemsUpdatableHelpers.isEmpty()) {
-            itemsUpdatableHelpers.add(itemNoneUpdatable)
-        }
-    }
-
-    // ---
-
     fun updateActiveState() = viewModelScope.launch {
-        sectionActive.hasButton = withContext(Dispatchers.Default) {
+        sectionInstalled.hasButton = withContext(Dispatchers.Default) {
             itemsInstalled.any { it.isModified }
         }
     }
 
     fun sectionPressed(item: SectionTitle) = when (item) {
-        sectionActive -> reboot() // TODO add reboot picker, regular reboot is not always preferred
-        sectionRemote -> {
+        sectionInstalled -> reboot() // TODO add reboot picker, regular reboot is not always preferred
+        sectionOnline -> {
             Config.repoOrder = when (Config.repoOrder) {
                 Config.Value.ORDER_NAME -> Config.Value.ORDER_DATE
                 Config.Value.ORDER_DATE -> Config.Value.ORDER_NAME
                 else -> Config.Value.ORDER_NAME
             }
-            updateOrderIcon()
+            sectionOnline.updateOrderIcon()
             queryHandler.post {
-                itemsRemote.clear()
+                itemsOnline.clear()
                 loadRemote()
             }
             Unit
@@ -319,27 +304,27 @@ class ModuleViewModel(
         else -> Unit
     }
 
-    fun downloadPressed(item: RepoItem) = withExternalRW {
-        if (it)
-            ModuleInstallDialog(item.item).publish()
-        else
-            permissionDenied()
+    fun downloadPressed(item: RepoItem) = if (isConnected.get()) withExternalRW {
+        ModuleInstallDialog(item.item).publish()
+    } else {
+        SnackbarEvent(R.string.no_connection).publish()
     }
 
     fun installPressed() = withExternalRW {
-        if (it)
-            InstallExternalModuleEvent().publish()
-        else
-            permissionDenied()
+        SelectModuleEvent().publish()
     }
 
-    fun infoPressed(item: RepoItem) = OpenChangelogEvent(item.item).publish()
+    fun infoPressed(item: RepoItem) =
+        if (isConnected.get()) OpenChangelogEvent(item.item).publish()
+        else SnackbarEvent(R.string.no_connection).publish()
+
+
     fun infoPressed(item: ModuleItem) {
-        OpenChangelogEvent(item.repo ?: return).publish()
+        item.repo?.also {
+            if (isConnected.get())
+                OpenChangelogEvent(it).publish()
+            else
+                SnackbarEvent(R.string.no_connection).publish()
+        } ?: return
     }
-
-    private fun permissionDenied() {
-        SnackbarEvent(R.string.module_permission_declined).publish()
-    }
-
 }

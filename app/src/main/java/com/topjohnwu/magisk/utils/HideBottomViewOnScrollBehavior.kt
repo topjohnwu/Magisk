@@ -3,21 +3,29 @@ package com.topjohnwu.magisk.utils
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import kotlin.math.roundToInt
 
 class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
     HideableBehavior<V> {
 
     private var lockState: Boolean = false
+    private var isLaidOut = false
 
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View) =
         super.layoutDependsOn(parent, child, dependency) or (dependency is Snackbar.SnackbarLayout)
+
+    override fun onLayoutChild(parent: CoordinatorLayout, child: V, layoutDirection: Int): Boolean {
+        isLaidOut = true
+        return super.onLayoutChild(parent, child, layoutDirection)
+    }
 
     override fun onDependentViewChanged(
         parent: CoordinatorLayout,
@@ -91,9 +99,16 @@ class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<
             this.lockState = lockState
         }
 
-        if (hide) {
-            slideDown(view)
+        if (hide || !Info.env.isActive) {
+            // view is not laid out and drawn yet properly, so animation will not be attached
+            // hence we just simply hide the view
+            if (!isLaidOut) {
+                view.isGone = true
+            } else {
+                slideDown(view)
+            }
         } else {
+            view.isVisible = Info.env.isActive
             slideUp(view)
         }
 

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ktx
 
 import android.os.Build
+import androidx.collection.SparseArrayCompat
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
@@ -11,7 +12,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.NoSuchElementException
 
 fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     var entry: ZipEntry? = nextEntry
@@ -22,7 +22,7 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
 }
 
 fun InputStream.writeTo(file: File) =
-        withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
+    withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
 
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,
@@ -36,12 +36,18 @@ inline fun <In : InputStream, Out : OutputStream> withStreams(
     }
 }
 
-inline fun <T, R> List<T>.firstMap(mapper: (T) -> R?): R {
-    for (item: T in this) {
-        return mapper(item) ?: continue
-    }
-    throw NoSuchElementException("Collection contains no element matching the predicate.")
+fun <T> MutableList<T>.update(newList: List<T>) {
+    clear()
+    addAll(newList)
 }
+
+operator fun <E> SparseArrayCompat<E>.set(key: Int, value: E) {
+    put(key, value)
+}
+
+fun <T> MutableList<T>.synchronized() = Collections.synchronizedList(this)
+fun <T> MutableSet<T>.synchronized() = Collections.synchronizedSet(this)
+fun <K, V> MutableMap<K, V>.synchronized() = Collections.synchronizedMap(this)
 
 fun String.langTagToLocale(): Locale {
     if (Build.VERSION.SDK_INT >= 21) {

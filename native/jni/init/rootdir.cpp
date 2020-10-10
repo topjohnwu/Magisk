@@ -81,29 +81,10 @@ static void load_overlay_rc(const char *overlay) {
 	}
 }
 
-int raw_data_patch(void *addr, size_t sz, str_pairs list) {
-	int count = 0;
-	for (uint8_t *p = (uint8_t *)addr, *eof = (uint8_t *)addr + sz; p < eof; ++p) {
-		for (auto &[from, to] : list) {
-			if (memcmp(p, from.data(), from.length() + 1) == 0) {
-				LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
-				memset(p, 0, from.length());
-				memcpy(p, to.data(), to.length());
-				++count;
-				p += from.length();
-			}
-		}
-	}
-	return count;
-}
-
 void RootFSInit::setup_rootfs() {
 	if (patch_sepolicy("/sepolicy")) {
-		char *addr;
-		size_t size;
-		mmap_rw("/init", addr, size);
-		raw_data_patch(addr, size, {make_pair(SPLIT_PLAT_CIL, "xxx")});
-		munmap(addr, size);
+		auto init = raw_data::mmap_rw("/init");
+		init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
 	}
 
 	// Handle overlays
@@ -267,10 +248,9 @@ void SARBase::patch_rootdir() {
 		recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
-	raw_data init;
 	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
-	fd_full_read(src, init.buf, init.sz);
-	int patch_count = raw_data_patch(init.buf, init.sz, {
+	auto init = raw_data::read(src);
+	int patch_count = init.patch({
 		make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
 		make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
 	});
@@ -283,9 +263,8 @@ void SARBase::patch_rootdir() {
 
 	if (patch_count != 2 && access(LIBSELINUX, F_OK) == 0) {
 		// init is dynamically linked, need to patch libselinux
-		raw_data lib;
-		full_read(LIBSELINUX, lib.buf, lib.sz);
-		raw_data_patch(lib.buf, lib.sz, {make_pair(MONOPOLICY, sepol)});
+		auto lib = raw_data::read(LIBSELINUX);
+		lib.patch({make_pair(MONOPOLICY, sepol)});
 		xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
 		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
 		xwrite(dest, lib.buf, lib.sz);
@@ -341,11 +320,8 @@ void SARBase::patch_rootdir() {
 int magisk_proxy_main(int argc, char *argv[]) {
 	setup_klog();
 
-	raw_data config;
-	raw_data self;
-
-	full_read("/sbin/magisk", self.buf, self.sz);
-	full_read("/.backup/.magisk", config.buf, config.sz);
+	auto self = raw_data::read("/sbin/magisk");
+	auto config = raw_data::read("/.backup/.magisk");
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 

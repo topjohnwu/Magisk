@@ -42,7 +42,7 @@
             app:layout_constraintStart_toStartOf="@+id/track_bullet"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <ImageView
             android:id="@+id/track_bullet"
             style="@style/WidgetFoundation.Image.Small"
             isSelected="@{isSelected}"

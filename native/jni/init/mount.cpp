@@ -219,7 +219,7 @@ static void mount_persist(const char *dev_base, const char *mnt_base) {
 }
 
 void RootFSInit::early_mount() {
-	full_read("/init", self.buf, self.sz);
+	self = raw_data::read("/init");
 
 	LOGD("Restoring /init\n");
 	rename("/.backup/init", "/init");
@@ -236,19 +236,19 @@ void SARBase::backup_files() {
 	if (access("/overlay.d", F_OK) == 0)
 		backup_folder("/overlay.d", overlays);
 
-	full_read("/proc/self/exe", self.buf, self.sz);
+	self = raw_data::read("/proc/self/exe");
 	if (access("/.backup/.magisk", R_OK) == 0)
-		full_read("/.backup/.magisk", config.buf, config.sz);
+		config = raw_data::read("/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
-	sprintf(blk_info.partname, "system%s", cmd->slot);
+	// Try NVIDIA naming scheme
+	strcpy(blk_info.partname, "APP");
 	strcpy(blk_info.block_dev, "/dev/root");
 	auto dev = setup_block(false);
 	if (dev < 0) {
-		// Try NVIDIA naming scheme
-		strcpy(blk_info.partname, "APP");
+		sprintf(blk_info.partname, "system%s", cmd->slot);
 		dev = setup_block(false);
 		if (dev < 0) {
 			// We don't really know what to do at this point...
@@ -304,14 +304,11 @@ void BaseInit::cleanup() {
 static void patch_socket_name(const char *path) {
 	char rstr[16];
 	gen_rand_str(rstr, sizeof(rstr));
-	char *buf;
-	size_t size;
-	mmap_rw(path, buf, size);
-	raw_data_patch(buf, size, { make_pair(MAIN_SOCKET, rstr) });
-	munmap(buf, size);
+	auto bin = raw_data::mmap_rw(path);
+	bin.patch({ make_pair(MAIN_SOCKET, rstr) });
 }
 
-void setup_tmp(const char *path, const raw_data &self, const raw_data &config) {
+void setup_tmp(const char *path, const data_holder &self, const data_holder &config) {
 	LOGD("Setup Magisk tmp at %s\n", path);
 	xmount("tmpfs", path, "tmpfs", 0, "mode=755");
 

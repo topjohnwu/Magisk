@@ -16,33 +16,24 @@
     <string name="app_changelog">Journal des modifications</string>
     <string name="manager">Manager</string>
     <string name="loading">Chargement…</string>
-    <string name="info">Info</string>
-    <string name="uninstall">Désinstaller</string>
     <string name="update">Mettre à jour</string>
     <string name="not_available">non disponible</string>
     <string name="hide">Masquer</string>
     <string name="status">État</string>
     <string name="home_package">Paquet</string>
-    <string name="details">Détails</string>
 
     <string name="home_notice_content">Assurez‑vous de toujours utiliser la version libre de Magisk Manager. Une version provenant d’une source inconnue peut effectuer des actions malveillantes.</string>
     <string name="home_support_title">Soutenez‑nous</string>
-    <string name="home_links_project">Liens du projet</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
-    <string name="home_device_title">Appareil</string>
-    <string name="home_device_extra_manufacturer">Fabricant</string>
-    <string name="home_device_extra_model">Modèle</string>
-    <string name="home_device_extra_board">Carte</string>
-    <string name="home_device_system">Système</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Mode sans échec</string>
     <string name="home_status_stub">Stub</string>
-    <string name="home_installed_version">Installée</string>
+    <string name="home_installed_version">Installé</string>
     <string name="home_latest_version">Dernière</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
+    <string name="home_check_safetynet">Vérifier SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
@@ -77,7 +68,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s a obtenu les droits de super‑utilisateur</string>
     <string name="su_deny_toast">%1$s s’est vu refuser les droits de super‑utilisateur</string>
-    <string name="no_apps_found">Aucune application trouvée</string>
     <string name="su_snack_grant">Les droits de super‑utilisateur sont accordés à %1$s</string>
     <string name="su_snack_deny">Les droits de super‑utilisateur sont refusés à %1$s</string>
     <string name="su_snack_notif_on">Les notifications sont activées pour %1$s</string>
@@ -109,7 +99,6 @@
     <string name="safetynet_attest_failure">Attestation refusée !</string>
     <string name="safetynet_attest_loading">Une petite seconde…</string>
     <string name="safetynet_attest_restart">Essayer à nouveau</string>
-    <string name="safetynet_system">Système</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
@@ -120,24 +109,20 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(aucune info transmise)</string>
-    <string name="no_modules_found">Aucun module trouvé</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
     <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
-    <string name="module_safe_mode_message">Vous êtes en mode sans échec. Aucun des modules utilisateur ne fonctionnera. Ce message disparaîtra après désactivation du mode sans échec.</string>
     <string name="module_version_author">%1$s, par %2$s</string>
     <string name="module_section_pending">Mises à jour</string>
     <string name="module_section_pending_action">Tout mettre à jour</string>
-    <string name="module_section_remote">À distance</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restorer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
-    <string name="module_update_none">Vos modules sont à jour !</string>
     <string name="update_available">Mise à jour disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">En ligne</string>
     <string name="sorting_order">Classement</string>
-   <string name="module_permission_declined">Autorisez l’accès au stockage pour activer cette fonctionnalité</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
@@ -145,12 +130,6 @@
     <string name="settings_dark_mode_light">Toujours clair</string>
     <string name="settings_dark_mode_system">Identique au système</string>
     <string name="settings_dark_mode_dark">Toujours sombre</string>
-    <string name="settings_safe_mode_title">Mode sans échec</string>
-    <string name="settings_core_only_summary" deprecated="true">Activer uniquement les fonctionnalités de base. MagiskSU et MagiskHide resteront activés, mais aucun module ne sera chargé.</string>
-    <string name="settings_grid_column_count_title">Style d’affichage des listes</string>
-    <string name="settings_grid_column_count_summary">Définit le nombre d’éléments par ligne dans les listes. Redémarrez l’application pour appliquer les changements.</string>
-    <string name="settings_grid_column_count_1">Standard</string>
-    <string name="settings_grid_column_count_2">Compact</string>
     <string name="settings_download_path_title">Répertoire de téléchargement</string>
     <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
     <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
@@ -195,6 +174,9 @@
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
     <string name="settings_customization">Personnalisation</string>
+    <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
+    <string name="settings_doh_title">DNS sur HTTPS</string>
+    <string name="settings_doh_description">Contournement de la censure du DNS dans certains pays</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
@@ -211,7 +193,6 @@
     <string name="global_summary">Toutes les sessions super‑utilisateur utilisent l’espace de noms global du montage.</string>
     <string name="requester_summary">Les sessions super‑utilisateur hériteront de l’espace de noms de leur demandeur.</string>
     <string name="isolate_summary">Chaque session super‑utilisateur aura son propre espace de noms isolé.</string>
-    <string name="settings_download_path_error">Erreur lors de la création du dossier. Ce dernier doit être accessible depuis le répertoire racine du stockage et ne doit pas être un fichier.</string>
 
     <!--Notifications-->
     <string name="update_channel">Mises à jour de Magisk</string>
@@ -230,11 +211,8 @@
     <string name="repo_install_msg">Voulez‑vous installer %1$s maintenant ?</string>
     <string name="download">Télécharger</string>
     <string name="reboot">Redémarrer</string>
-    <string name="settings_reboot_toast">Redémarrer afin d’appliquer les paramètres</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache de dépôt effacé</string>
-    <string name="dtbo_patched_title">L’arborescence matérielle (DTBO) a été modifiée !</string>
-    <string name="dtbo_patched_reboot">Magisk Manager a modifié le fichier dtbo.img. Veuillez redémarrer.</string>
     <string name="flashing">Écriture dans la mémoire Flash…</string>
     <string name="done">Terminé !</string>
     <string name="failure">Erreur</string>
@@ -255,5 +233,8 @@
     <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
     <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
+    <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
+    <string name="add_shortcut_title">Ajouter un raccourcis à l’écran d’accueil</string>
+    <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez-vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
 
 </resources>

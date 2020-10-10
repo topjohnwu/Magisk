@@ -3,6 +3,8 @@
 
 #include "sepolicy.hpp"
 
+using namespace std;
+
 void sepolicy::magisk_rules() {
 	// Temp suppress warnings
 	auto bak = log_cb.w;
@@ -24,9 +26,11 @@ void sepolicy::magisk_rules() {
 
 	// Make our root domain unconstrained
 	allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
-	// Allow us to do any ioctl on all block devices
-	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+	// Allow us to do any ioctl
+	if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
 		allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
+		allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
+	}
 
 	// Create unconstrained file type
 	allow(ALL, SEPOL_FILE_TYPE, "file", ALL);
@@ -35,34 +39,35 @@ void sepolicy::magisk_rules() {
 	allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
 
 	if (new_rules) {
+		// Make client type literally untrusted_app
 		type(SEPOL_CLIENT_DOMAIN, "domain");
+		typeattribute(SEPOL_CLIENT_DOMAIN, "coredomain");
+		typeattribute(SEPOL_CLIENT_DOMAIN, "appdomain");
+		typeattribute(SEPOL_CLIENT_DOMAIN, "untrusted_app_all");
+		typeattribute(SEPOL_CLIENT_DOMAIN, "netdomain");
+		typeattribute(SEPOL_CLIENT_DOMAIN, "bluetoothdomain");
+
 		type(SEPOL_EXEC_TYPE, "file_type");
+		typeattribute(SEPOL_EXEC_TYPE, "exec_type");
 
 		// Basic su client needs
-		allow(SEPOL_CLIENT_DOMAIN, ALL, "fd", "use");
-		allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
 		allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
-		allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-		allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
+		allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
 
-		// Allow su client termios ioctl
 		const char *pts[] {
 			"devpts", "untrusted_app_devpts",
 			"untrusted_app_25_devpts", "untrusted_app_all_devpts" };
 		for (auto type : pts) {
-			if (!exists(type))
-				continue;
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "open");
+			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
 			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
 			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
-			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
 			allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
 			allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5400-0x54FF");
 		}
 
 		// Allow these processes to access MagiskSU
-		const char *clients[] {
-			"init", "shell", "system_app", "priv_app", "platform_app", "untrusted_app",
-			"untrusted_app_25", "untrusted_app_27", "untrusted_app_29", "update_engine" };
+		vector<const char *> clients{ "init", "shell", "update_engine", "appdomain" };
 		for (auto type : clients) {
 			if (!exists(type))
 				continue;
@@ -71,32 +76,43 @@ void sepolicy::magisk_rules() {
 			allow(type, SEPOL_EXEC_TYPE, "file", "open");
 			allow(type, SEPOL_EXEC_TYPE, "file", "getattr");
 			allow(type, SEPOL_EXEC_TYPE, "file", "execute");
+			allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
 
 			// Auto transit to client domain
-			type_transition(type, SEPOL_EXEC_TYPE, "process", SEPOL_CLIENT_DOMAIN);
 			allow(type, SEPOL_CLIENT_DOMAIN, "process", "transition");
 			dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "siginh");
 			dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "rlimitinh");
 			dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "noatsecure");
 
-			allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
-			allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "read");
-			allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "write");
-			allow(SEPOL_CLIENT_DOMAIN, type, "fifo_file", "ioctl");
+			// Kill client process
+			allow(type, SEPOL_CLIENT_DOMAIN, "process", "signal");
+		}
+
+		// type transition require actual types, not attributes
+		const char *app_types[] {
+			"system_app", "priv_app", "platform_app", "untrusted_app",
+			"untrusted_app_25", "untrusted_app_27", "untrusted_app_29" };
+		clients.pop_back();
+		clients.insert(clients.end(), app_types, app_types + std::size(app_types));
+		for (auto type : clients) {
+			// Auto transit to client domain
+			type_transition(type, SEPOL_EXEC_TYPE, "process", SEPOL_CLIENT_DOMAIN);
 		}
 
 		// Allow system_server to manage magisk_client
 		allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "getpgid");
 		allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "sigkill");
 
-		// Don't allow pesky processes to monitor audit deny logs when poking magisk daemon sockets
+		// Don't allow pesky processes to monitor audit deny logs when poking magisk daemon socket
 		dontaudit(ALL, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
+
+		// Only allow client processes to connect to magisk daemon socket
+		allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
 	} else {
 		// Fallback to poking holes in sandbox as Android 4.3 to 7.1 set PR_SET_NO_NEW_PRIVS
 
 		// Allow these processes to access MagiskSU
-		const char *clients[] {
-			"init", "shell", "system_app", "priv_app", "platform_app", "untrusted_app" };
+		const char *clients[] { "init", "shell", "appdomain" };
 		for (auto type : clients) {
 			if (!exists(type))
 				continue;

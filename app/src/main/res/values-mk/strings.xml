@@ -14,14 +14,12 @@
     <string name="safetynet_res_invalid">Одговорот е невалиден.</string>
     <string name="keep_force_encryption">Задржи ја присилната енкрипција</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
-    <string name="uninstall">Деинсталирај</string>
     <string name="uninstall_magisk_title">Деинсталирај го Magisk</string>
     <string name="uninstall_magisk_msg">Сите модули ќе бидат оневозможени/oтстранети. Рут привилегиите ќе бидат отстранети, а вашите податоци може да се енкриптираат ако моментално не се.</string>
     <string name="update">Ажурирај</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Нема информации)</string>
-    <string name="no_modules_found">Не се пронајдени модули.</string>
     <string name="reboot_recovery">Рестартирај во Recovery режим</string>
     <string name="reboot_bootloader">Рестартирај во Bootloader режим</string>
     <string name="reboot_download">Рестартирај во Download режим</string>
@@ -63,12 +61,9 @@
     <string name="repo_install_msg">Дали сакате да го инсталирате %1$s сега?</string>
     <string name="download">Преземи</string>
     <string name="reboot">Рестартирај</string>
-    <string name="settings_reboot_toast">Рестартирајте за да ги примените поставките.</string>
     <string name="release_notes">Белешки за изданието</string>
     <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
 
-    <string name="dtbo_patched_title">DTBO е обновено!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ја обнови dtbo.img датотеката. Ве молиме, рестартирајте.</string>
     <string name="flashing">Применувам</string>
     <string name="hide_manager_title">Сокриј го Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Сокривањето на Magisk Manager е неуспешно.</string>
@@ -101,7 +96,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Прилагодено</string>
     <string name="settings_update_custom_msg">Внеси прилагоден URL линк</string>
-    <string name="settings_core_only_summary">Овозможи ги само основните функционалности. MagiskSU и MagiskHide ќе бидет овозможени, но нема да се вчитаат модули.</string>
     <string name="settings_magiskhide_summary">Сокриј го Magisk од различни форми на откривање.</string>
     <string name="settings_hosts_title">Несистемски хостови</string>
     <string name="settings_hosts_summary">Поддршка за несистемски хостови за Adblock апликации.</string>
@@ -154,7 +148,6 @@
     <string name="sixtymin">60 минути</string>
     <string name="su_allow_toast">На %1$s се доделени правата на супер-корисник</string>
     <string name="su_deny_toast">На %1$s се одбиени правата на супер-корисник</string>
-    <string name="no_apps_found">Не се пронајдени апликации</string>
     <string name="su_snack_grant">Правата за супер-корисник од %1$s се одобрени</string>
     <string name="su_snack_deny">Правата за супер-корисник од %1$s се одбиени</string>
     <string name="su_snack_notif_on">Известувањата од %1$s се овозможени</string>

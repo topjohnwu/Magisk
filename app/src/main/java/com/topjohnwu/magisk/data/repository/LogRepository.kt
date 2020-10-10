@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.data.database.SuLogDao
 import com.topjohnwu.magisk.ktx.await
-import com.topjohnwu.magisk.model.entity.MagiskLog
 import com.topjohnwu.superuser.Shell
 
 
@@ -36,6 +36,6 @@ class LogRepository(
     fun clearMagiskLogs(cb: (Shell.Result) -> Unit) =
         Shell.su("echo -n > ${Const.MAGISK_LOG}").submit(cb)
 
-    suspend fun insert(log: MagiskLog) = logDao.insert(log)
+    suspend fun insert(log: SuLog) = logDao.insert(log)
 
 }

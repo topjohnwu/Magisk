@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
-        <item name="elevation">0dp</item>
-        <item name="android:background">@drawable/bg_appbar</item>
-    </style>
+    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface" />
 
     <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
         <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
@@ -18,10 +15,11 @@
 
 
     <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="android:focusable">auto</item>
         <item name="cardBackgroundColor">?colorSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>
-        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardPreventCornerOverlap">false</item>
     </style>
 
     <style name="WidgetFoundation.Card.Primary">
@@ -32,30 +30,18 @@
         <item name="cardBackgroundColor">?colorSecondary</item>
     </style>
 
-    <style name="WidgetFoundation.Card.Variant">
-        <item name="cardBackgroundColor">?colorSurface</item>
-        <item name="strokeColor">?colorSurfaceVariant</item>
-        <item name="strokeWidth">1.5dp</item>
-    </style>
-
-    <style name="WidgetFoundation.Card.Variant.Primary">
-        <item name="strokeColor">?colorPrimary</item>
-    </style>
-
-    <style name="WidgetFoundation.Card.Elevated" parent="Widget.MaterialComponents.CardView">
+    <style name="WidgetFoundation.Card.Elevated">
         <item name="cardBackgroundColor">?colorSurfaceSurfaceVariant</item>
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">@dimen/l_125</item>
-        <item name="cardPreventCornerOverlap">true</item>
     </style>
 
-    <style name="WidgetFoundation.Card.OnPrimary" parent="Widget.MaterialComponents.CardView">
+    <style name="WidgetFoundation.Card.OnPrimary">
         <item name="cardCornerRadius">@dimen/l_50</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeColor">?colorOnPrimaryVariant</item>
         <item name="strokeWidth">1dp</item>
         <item name="cardBackgroundColor">?colorPrimary</item>
-        <item name="cardPreventCornerOverlap">true</item>
     </style>
 
 
@@ -85,6 +71,13 @@
         <item name="rippleColor">?colorOnPrimary</item>
         <item name="android:textColor">?colorOnPrimary</item>
         <item name="iconTint">?colorOnPrimary</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Outlined.Error">
+        <item name="strokeColor">@color/color_error_transient</item>
+        <item name="rippleColor">@color/color_error_transient</item>
+        <item name="android:textColor">@color/color_error_transient</item>
+        <item name="iconTint">@color/color_error_transient</item>
     </style>
 
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
@@ -163,27 +156,18 @@
     </style>
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
-        <item name="tint">?colorPrimary</item>
-        <item name="buttonCompat">@drawable/ic_compound_checkbox</item>
     </style>
 
     <style name="WidgetFoundation.RadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
-        <item name="tint">?colorPrimary</item>
-        <item name="buttonCompat">@drawable/ic_compound_checkbox</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:indeterminate">false</item>
         <item name="android:layout_height">4dp</item>
-        <item name="android:progressDrawable">@drawable/progress_determinate</item>
     </style>
 
     <style name="WidgetFoundation.ProgressBar.Indeterminate" parent="Widget.AppCompat.ProgressBar.Horizontal">

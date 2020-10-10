@@ -11,14 +11,16 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url = uri("http://storage.googleapis.com/r8-releases/raw") }
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     }
 
+    val vNav = "2.3.0"
+    extra["vNav"] = vNav
+
     dependencies {
-        classpath("com.android.tools.build:gradle:4.0.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Deps.vNav}")
+        classpath("com.android.tools.build:gradle:4.0.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.10")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${vNav}")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -60,7 +62,7 @@ subprojects {
             plugins.hasPlugin("com.android.application")) {
             android.apply {
                 compileSdkVersion(30)
-                buildToolsVersion = "30.0.1"
+                buildToolsVersion = "30.0.2"
 
                 defaultConfig {
                     if (minSdkVersion == null)
@@ -95,7 +97,7 @@ subprojects {
                 signingConfigs {
                     create("config") {
                         Config["keyStore"]?.also {
-                            storeFile = File(it)
+                            storeFile = rootProject.file(it)
                             storePassword = Config["keyStorePass"]
                             keyAlias = Config["keyAlias"]
                             keyPassword = Config["keyPass"]

@@ -25,12 +25,6 @@ import static android.R.string.yes;
 
 public class MainActivity extends Activity {
 
-    private static final boolean CANARY = !BuildConfig.VERSION_NAME.contains(".");
-    private static final String URL =
-            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
-            (BuildConfig.DEBUG ? "canary/debug.json" :
-            (CANARY ? "canary/release.json" : "master/stable.json"));
     private static final String APP_NAME = "Magisk Manager";
 
     private String apkLink;
@@ -39,6 +33,15 @@ public class MainActivity extends Activity {
         finish();
     };
     private Context themed;
+
+    private String URL() {
+        if (BuildConfig.DEV_CHANNEL != null)
+            return BuildConfig.DEV_CHANNEL;
+        else if (BuildConfig.CANARY)
+            return "https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/release.json";
+        else
+            return "https://topjohnwu.github.io/magisk_files/stable.json";
+    }
 
     private void showDialog() {
         ProgressDialog.show(themed,
@@ -66,7 +69,7 @@ public class MainActivity extends Activity {
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         if (Networking.checkNetworkStatus(this)) {
-            Networking.get(URL)
+            Networking.get(URL())
                     .setErrorHandler(err)
                     .getAsJSONObject(new JSONLoader());
         } else {

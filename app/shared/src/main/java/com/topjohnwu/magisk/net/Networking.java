@@ -47,10 +47,9 @@ public class Networking {
         } catch (Exception e) {
             if (Build.VERSION.SDK_INT < 21) {
                 // Failed to update SSL provider, use NoSSLv3SocketFactory on SDK < 21
-                // and return false to notify potential issues
                 HttpsURLConnection.setDefaultSSLSocketFactory(new NoSSLv3SocketFactory());
-                return false;
             }
+            return false;
         }
         return true;
     }

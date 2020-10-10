@@ -64,7 +64,7 @@
             android:layout_gravity="center"
             app:contentPadding="@dimen/l1">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 movieBehavior="@{viewModel.loading}"
                 movieBehaviorText="@{viewModel.behaviorText}"
                 android:layout_width="wrap_content"

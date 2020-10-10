@@ -363,11 +363,12 @@ get_flags() {
       KEEPVERITY=false
     fi
   fi
+  ISENCRYPTED=false
+  grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
+  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   if [ -z $KEEPFORCEENCRYPT ]; then
-    grep ' /data ' /proc/mounts | grep -q 'dm-' && FDE=true || FDE=false
-    [ -d /data/unencrypted ] && FBE=true || FBE=false
     # No data access means unable to decrypt in recovery
-    if $FDE || $FBE || ! $DATA; then
+    if $ISENCRYPTED || ! $DATA; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data, keep forceencrypt"
     else
@@ -446,13 +447,7 @@ install_magisk() {
 
   # Restore the original boot partition path
   [ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
-
-  if ! flash_image new-boot.img "$BOOTIMAGE"; then
-    ui_print "- Compressing ramdisk to fit in partition"
-    ./magiskboot cpio ramdisk.cpio compress
-    ./magiskboot repack "$BOOTIMAGE"
-    flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
-  fi
+  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
 
   ./magiskboot cleanup
   rm -f new-boot.img

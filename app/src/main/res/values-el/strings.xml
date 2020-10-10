@@ -16,14 +16,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση dm-verity</string>
-    <string name="uninstall">Απεγκατάσταση</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα</string>
     <string name="update">Ενημέρωση</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Δεν δόθηκαν πληροφορίες)</string>
-    <string name="no_modules_found">Δεν βρέθηκαν modules</string>
     <string name="reboot_recovery">Επανεκκίνηση στο Recovery</string>
     <string name="reboot_bootloader">Επανεκκίνηση στο Bootloader</string>
     <string name="reboot_download">Επανεκκίνηση για λήψη</string>
@@ -47,13 +45,10 @@
     <string name="download">Λήψη</string>
     <string name="reboot">Επανεκκίνηση</string>
     <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>
-    <string name="settings_reboot_toast">Επανεκκίνηση για εφαρμογή ρυθμίσεων</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
     <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
-    <string name="dtbo_patched_title">Έγινε patch στο DTBO!</string>
-    <string name="dtbo_patched_reboot">Το Magisk Manager έκανε patch το dtbo.img, παρακαλώ κάντε επανεκκίνηση</string>
     <string name="update_channel">Ενημερώσεις Magisk</string>
     <string name="flashing">Γίνεται flash</string>
     <string name="hide_manager_title">Κρύβοντας το Magisk Manager…</string>
@@ -79,7 +74,6 @@
     <string name="settings_update_beta">Δοκιμαστικό</string>
     <string name="settings_update_custom">Custom</string>
     <string name="settings_update_custom_msg">Εισαγωγή ενός custom URL</string>
-    <string name="settings_core_only_summary">Ενεργοποίηση μόνο των λειτουργιών πυρήνα, καμία από τις ενότητες δεν θα ενεργοποιηθεί. Τα MagiskSU και MagiskHide θα παραμείνουν ενεργά</string>
     <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Υποστήριξη Systemless hosts για εφαρμογές Adblock</string>
@@ -131,7 +125,6 @@
     <string name="sixtymin">60 λεπτά</string>
     <string name="su_allow_toast">Παραχωρήθηκαν δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_deny_toast">Απορρίφθηκαν τα δικαιώματα υπερχρήστη του %1$s</string>
-    <string name="no_apps_found">Δεν βρέθηκαν εφαρμογές</string>
     <string name="su_snack_grant">Παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_snack_deny">Δεν παραχορούνται δικαιώματα υπερχρήστη στο %1$s</string>
     <string name="su_snack_notif_on">Οι ειδοποιήσεις του %1$s είναι ενεργοποιημένες</string>

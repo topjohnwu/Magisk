@@ -2,12 +2,9 @@
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.provideDelegate
 import java.io.File
 import java.util.*
-
-object Deps {
-    const val vNav = "2.3.0"
-}
 
 private val props = Properties()
 
@@ -18,8 +15,8 @@ object Config {
 
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val file = project.findProperty("configPath")?.let { File(it as String) }
-            ?: project.file("config.prop")
+        val configPath: String? by project
+        val file = configPath?.let { File(it) } ?: project.file("config.prop")
         if (!file.exists())
             throw GradleException("Please setup config.prop")
 

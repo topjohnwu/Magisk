@@ -4,7 +4,6 @@
 #include <sys/socket.h>
 
 socklen_t setup_sockaddr(sockaddr_un *sun, const char *name);
-int create_app_socket(sockaddr_un *sun);
 int socket_accept(int sockfd, int timeout);
 void get_client_cred(int fd, struct ucred *cred);
 int recv_fd(int sockfd);

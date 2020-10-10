@@ -44,7 +44,7 @@ void FirstStageInit::prepare() {
 	fstab_file[0] = '\0';
 
 	// Find existing fstab file
-	for (const char *hw : { cmd->hardware, cmd->hardware_plat }) {
+	for (const char *hw : { cmd->fstab_suffix, cmd->hardware, cmd->hardware_plat }) {
 		if (hw[0] == '\0')
 			continue;
 		sprintf(fstab_file, "fstab.%s", hw);
@@ -98,24 +98,22 @@ void FirstStageInit::prepare() {
 			}
 		}
 
+		// Dump dt fstab to fstab file in rootfs
 		if (fstab_file[0] == '\0') {
-			const char *hw = cmd->hardware[0] ? cmd->hardware :
-					(cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr);
-			if (hw == nullptr) {
-				LOGE("Cannot determine hardware name!\n");
+			const char *suffix =
+				cmd->fstab_suffix[0] ? cmd->fstab_suffix :
+				(cmd->hardware[0] ? cmd->hardware :
+				(cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr));
+			if (suffix == nullptr) {
+				LOGE("Cannot determine fstab suffix!\n");
 				return;
 			}
-			sprintf(fstab_file, "fstab.%s", hw);
+			sprintf(fstab_file, "fstab.%s", suffix);
 		}
 
-		// Patch init to force ignore dt fstab
-		uint8_t *addr;
-		size_t sz;
-		mmap_rw("/init", addr, sz);
-		raw_data_patch(addr, sz, {
-			make_pair("android,fstab", "xxx")  /* Force IsDtFstabCompatible() to return false */
-		});
-		munmap(addr, sz);
+		// Patch init to force IsDtFstabCompatible() return false
+		auto init = raw_data::mmap_rw("/init");
+		init.patch({ make_pair("android,fstab", "xxx") });
 	}
 
 	{
@@ -150,9 +148,8 @@ void SARFirstStageInit::prepare() {
 	int src = xopen("/init", O_RDONLY);
 	int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
 	{
-		raw_data init;
-		fd_full_read(src, init.buf, init.sz);
-		raw_data_patch(init.buf, init.sz, { make_pair(INIT_PATH, REDIR_PATH) });
+		auto init = raw_data::read(src);
+		init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
 		write(dest, init.buf, init.sz);
 		fclone_attr(src, dest);
 		close(dest);

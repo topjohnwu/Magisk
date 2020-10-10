@@ -18,9 +18,9 @@ val jar by tasks.getting(Jar::class) {
 }
 
 val shadowJar by tasks.getting(ShadowJar::class) {
-    baseName = "zipsigner"
-    classifier = null
-    version = "3.0"
+    archiveBaseName.set("zipsigner")
+    archiveClassifier.set(null as String?)
+    archiveVersion.set("4.0")
 }
 
 repositories {
@@ -30,6 +30,6 @@ repositories {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    api("org.bouncycastle:bcprov-jdk15on:1.65.01")
-    api("org.bouncycastle:bcpkix-jdk15on:1.65")
+    api("org.bouncycastle:bcprov-jdk15on:1.66")
+    api("org.bouncycastle:bcpkix-jdk15on:1.66")
 }

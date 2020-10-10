@@ -3,14 +3,9 @@ package com.topjohnwu.magisk.core
 import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
-import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
-import com.topjohnwu.magisk.core.view.Shortcuts
-import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -45,16 +40,7 @@ open class GeneralReceiver : BaseReceiver() {
                 rmPolicy(pkg)
                 Shell.su("magiskhide --rm $pkg").submit()
             }
-            Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setup(context)
-            Const.Key.BROADCAST_MANAGER_UPDATE -> {
-                intent.getParcelableExtra<ManagerJson>(Const.Key.INTENT_SET_APP)?.let {
-                    Info.remote = Info.remote.copy(app = it)
-                }
-                DownloadService(context) {
-                    subject = DownloadSubject.Manager(Configuration.APK.Upgrade)
-                }
-            }
-            Const.Key.BROADCAST_REBOOT -> reboot()
+            Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
         }
     }
 }

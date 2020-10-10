@@ -11,7 +11,6 @@ LOCAL_SRC_FILES := \
 	misc.cpp \
 	selinux.cpp \
 	logging.cpp \
-	cpio.cpp \
 	xwrap.cpp \
 	stream.cpp
 

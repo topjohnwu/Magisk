@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core.utils
 
-import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FilterInputStream
 import java.io.InputStream
 
@@ -16,7 +15,7 @@ class ProgressInputStream(
         val cur = System.currentTimeMillis()
         if (cur - lastUpdate > 1000) {
             lastUpdate = cur
-            UiThreadHandler.run { progressEmitter(bytesRead) }
+            progressEmitter(bytesRead)
         }
     }
 

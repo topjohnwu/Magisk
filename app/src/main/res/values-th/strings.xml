@@ -13,14 +13,12 @@
     <string name="safetynet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
     <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
     <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
-    <string name="uninstall">ถอนการติดตั้ง</string>
     <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
     <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
     <string name="update">อัพเดต</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(ไม่มีข้อมูล)</string>
-    <string name="no_modules_found">ไม่พบโมดูล</string>
     <string name="reboot_recovery">รีบู๊ตไปโหมดกู้คืน</string>
     <string name="reboot_bootloader">รีบู๊ตไป Bootloader</string>
     <string name="reboot_download">รีบู๊ตไป Download</string>
@@ -51,12 +49,9 @@
     <string name="repo_install_msg">ต้องการติดตั้ง %1$s ตอนนี้หรือไม่?</string>
     <string name="download">ดาวน์โหลด</string>
     <string name="reboot">รีบู๊ต</string>
-    <string name="settings_reboot_toast">รีบู๊ตเพื่อนำการตั้งค่าไปใช้</string>
     <string name="release_notes">-้อมูลเพิ่มเติม</string>
     <string name="repo_cache_cleared">แคช Repo ถูกล้างแล้ว</string>
     <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
-    <string name="dtbo_patched_title">แพตช์ DTBO เรียบร้อย!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ได้แพตช์ไฟล์ dtbo.img แล้ว โปรดรีบู๊ต</string>
     <string name="flashing">กำลังแฟลช</string>
     <string name="hide_manager_title">กำลังซ่อน Magisk Manager…</string>
     <string name="hide_manager_fail_toast">การซ่อน Magisk Manager ล้มเหลว</string>
@@ -94,7 +89,6 @@
     <string name="settings_update_beta">เบต้า</string>
     <string name="settings_update_custom">กำหนดเอง</string>
     <string name="settings_update_custom_msg">ใส่ URL</string>
-    <string name="settings_core_only_summary">ใช้งานฟีเจอร์หลักเท่านั้น MagiskSU และ MagiskHide จะถูกเปิดใช้งาน แต่โมดูลต่างๆจะไม่ถูกโหลด</string>
     <string name="settings_magiskhide_summary">ซ่อน Magisk จากการตรวจสอบในหลากหลายรูปแบบ</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">การรองรับ Systemless hosts เพื่อแอพ Adblock ต่างๆ</string>
@@ -147,7 +141,6 @@
     <string name="sixtymin">60 นาที</string>
     <string name="su_allow_toast">%1$s ถูกอนุญาตสิทธิ์ Superuser</string>
     <string name="su_deny_toast">%1$s ถูกปฏิเสธสิทธิ์ Superuser</string>
-    <string name="no_apps_found">ไม่พบแอป</string>
     <string name="su_snack_grant">สิทธิ์ Superuser ของ %1$s ถูกอนุญาต</string>
     <string name="su_snack_deny">สิทธิ์ Superuser ของ %1$s ถูกปฏิเสธ</string>
     <string name="su_snack_notif_on">การแจ้งเตือนของ %1$s ถูกเปิด</string>

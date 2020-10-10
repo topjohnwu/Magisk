@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.LogItem" />
+            type="com.topjohnwu.magisk.ui.log.LogRvItem" />
 
         <variable
             name="viewModel"
@@ -47,7 +47,7 @@
             app:layout_constraintStart_toEndOf="@+id/log_track_container"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/log_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/app_name" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/log_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/log_app_name"
                 tools:text="06:00 PM, 10 Oct 2019" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/log_app_details"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/log_date"
                 tools:text="PID: 7196  Target UID: 0" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/log_command"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

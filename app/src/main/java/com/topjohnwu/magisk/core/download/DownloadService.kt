@@ -6,158 +6,108 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.webkit.MimeTypeMap
-import com.topjohnwu.magisk.R
+import androidx.core.net.toFile
+import com.topjohnwu.magisk.core.download.Action.*
+import com.topjohnwu.magisk.core.download.Action.Flash.Secondary
+import com.topjohnwu.magisk.core.download.Subject.*
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.tasks.EnvFixTask
-import com.topjohnwu.magisk.ktx.chooser
-import com.topjohnwu.magisk.ktx.exists
-import com.topjohnwu.magisk.ktx.provide
-import com.topjohnwu.magisk.model.entity.internal.Configuration.*
-import com.topjohnwu.magisk.model.entity.internal.Configuration.Flash.Secondary
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.*
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
-import org.koin.core.get
-import java.io.File
 import kotlin.random.Random.Default.nextInt
 
-/* More of a facade for [RemoteFileService], but whatever... */
 @SuppressLint("Registered")
-open class DownloadService : RemoteFileService() {
+open class DownloadService : BaseDownloader() {
 
     private val context get() = this
-    private val File.type
-        get() = MimeTypeMap.getSingleton()
-            .getMimeTypeFromExtension(extension)
-            ?: "resource/folder"
 
-    override suspend fun onFinished(subject: DownloadSubject, id: Int) = when (subject) {
-        is Magisk -> onFinished(subject, id)
-        is Module -> onFinished(subject, id)
-        is Manager -> onFinished(subject, id)
+    override suspend fun onFinish(subject: Subject, id: Int) = when (subject) {
+        is Magisk -> subject.onFinish(id)
+        is Module -> subject.onFinish(id)
+        is Manager -> subject.onFinish(id)
     }
 
-    private suspend fun onFinished(
-        subject: Magisk,
-        id: Int
-    ) = when (val conf = subject.configuration) {
-        Uninstall -> FlashFragment.uninstall(subject.file, id)
+    private suspend fun Magisk.onFinish(id: Int) = when (val action = action) {
+        Uninstall -> FlashFragment.uninstall(file, id)
         EnvFix -> {
             remove(id)
-            EnvFixTask(subject.file).exec()
+            EnvFixTask(file).exec()
             Unit
         }
-        is Patch -> FlashFragment.patch(subject.file, conf.fileUri, id)
-        is Flash -> FlashFragment.flash(subject.file, conf is Secondary, id)
+        is Patch -> FlashFragment.patch(file, action.fileUri, id)
+        is Flash -> FlashFragment.flash(file, action is Secondary, id)
         else -> Unit
     }
 
-    private fun onFinished(
-        subject: Module,
-        id: Int
-    ) = when (subject.configuration) {
-        is Flash -> FlashFragment.install(subject.file, id)
+    private fun Module.onFinish(id: Int) = when (action) {
+        is Flash -> FlashFragment.install(file, id)
         else -> Unit
     }
 
-    private suspend fun onFinished(
-        subject: Manager,
-        id: Int
-    ) {
-        handleAPK(subject)
+    private fun Manager.onFinish(id: Int) {
         remove(id)
-        when (subject.configuration)  {
-            is APK.Upgrade -> APKInstall.install(this, subject.file)
-            is APK.Restore -> Unit
-        }
+        APKInstall.install(context, file.toFile())
     }
 
-    // ---
+    // --- Customize finish notification
 
-    override fun Notification.Builder.addActions(subject: DownloadSubject)
+    override fun Notification.Builder.setIntent(subject: Subject)
     = when (subject) {
-        is Magisk -> addActions(subject)
-        is Module -> addActions(subject)
-        is Manager -> addActions(subject)
+        is Magisk -> setIntent(subject)
+        is Module -> setIntent(subject)
+        is Manager -> setIntent(subject)
     }
 
-    private fun Notification.Builder.addActions(subject: Magisk)
-    = when (val conf = subject.configuration) {
-        Download -> apply {
-            fileIntent(subject.file.parentFile!!)
-                .takeIf { it.exists(get()) }
-                ?.let { addAction(0, R.string.download_open_parent, it.chooser()) }
-            fileIntent(subject.file)
-                .takeIf { it.exists(get()) }
-                ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
-        }
+    private fun Notification.Builder.setIntent(subject: Magisk)
+    = when (val action = subject.action) {
         Uninstall -> setContentIntent(FlashFragment.uninstallIntent(context, subject.file))
-        is Flash -> setContentIntent(FlashFragment.flashIntent(context, subject.file, conf is Secondary))
-        is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, conf.fileUri))
-        else -> this
+        is Flash -> setContentIntent(FlashFragment.flashIntent(context, subject.file, action is Secondary))
+        is Patch -> setContentIntent(FlashFragment.patchIntent(context, subject.file, action.fileUri))
+        else -> setContentIntent(Intent())
     }
 
-    private fun Notification.Builder.addActions(subject: Module)
-    = when (subject.configuration) {
-        Download -> this.apply {
-            fileIntent(subject.file.parentFile!!)
-                .takeIf { it.exists(get()) }
-                ?.let { addAction(0, R.string.download_open_parent, it.chooser()) }
-            fileIntent(subject.file)
-                .takeIf { it.exists(get()) }
-                ?.let { addAction(0, R.string.download_open_self, it.chooser()) }
-        }
+    private fun Notification.Builder.setIntent(subject: Module)
+    = when (subject.action) {
         is Flash -> setContentIntent(FlashFragment.installIntent(context, subject.file))
-        else -> this
+        else -> setContentIntent(Intent())
     }
 
-    private fun Notification.Builder.addActions(subject: Manager)
-    = when (subject.configuration) {
-        APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file))
-        else -> this
+    private fun Notification.Builder.setIntent(subject: Manager)
+    = when (subject.action) {
+        APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file.toFile()))
+        else -> setContentIntent(Intent())
     }
 
-    @Suppress("ReplaceSingleLineLet")
     private fun Notification.Builder.setContentIntent(intent: Intent) =
         setContentIntent(
             PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
         )
 
-    @Suppress("ReplaceSingleLineLet")
-    private fun Notification.Builder.addAction(icon: Int, title: Int, intent: Intent) =
-        addAction(icon, getString(title),
-            PendingIntent.getActivity(context, nextInt(), intent, PendingIntent.FLAG_ONE_SHOT)
-        )
-
     // ---
-
-    private fun fileIntent(file: File): Intent {
-        return Intent(Intent.ACTION_VIEW)
-            .setDataAndType(file.provide(this), file.type)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-
-    class Builder {
-        lateinit var subject: DownloadSubject
-    }
 
     companion object {
 
-        inline operator fun invoke(context: Context, argBuilder: Builder.() -> Unit) {
-            val app = context.applicationContext
-            val builder = Builder().apply(argBuilder)
-            val intent = app.intent<DownloadService>().putExtra(ARG_URL, builder.subject)
+        private fun intent(context: Context, subject: Subject) =
+            context.intent<DownloadService>().putExtra(ACTION_KEY, subject)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                app.startForegroundService(intent)
+        fun pendingIntent(context: Context, subject: Subject): PendingIntent {
+            return if (Build.VERSION.SDK_INT >= 26) {
+                PendingIntent.getForegroundService(context, nextInt(),
+                    intent(context, subject), PendingIntent.FLAG_UPDATE_CURRENT)
             } else {
-                app.startService(intent)
+                PendingIntent.getService(context, nextInt(),
+                    intent(context, subject), PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
 
+        fun start(context: Context, subject: Subject) {
+            val app = context.applicationContext
+            if (Build.VERSION.SDK_INT >= 26) {
+                app.startForegroundService(intent(app, subject))
+            } else {
+                app.startService(intent(app, subject))
+            }
+        }
     }
 
 }

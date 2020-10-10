@@ -3,15 +3,9 @@ package com.topjohnwu.magisk.ui.safetynet
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.model.events.CheckSafetyNetEvent
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.safetynet.SafetyNetState.*
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.utils.set
 import org.json.JSONObject
-
-enum class SafetyNetState {
-    LOADING, PASS, FAILED, IDLE
-}
 
 data class SafetyNetResult(
     val response: JSONObject? = null,
@@ -21,22 +15,31 @@ data class SafetyNetResult(
 class SafetynetViewModel : BaseViewModel() {
 
     @get:Bindable
-    var safetyNetTitle by observable(R.string.empty, BR.safetyNetTitle)
-    @get:Bindable
-    var ctsState by observable(false, BR.ctsState)
-    @get:Bindable
-    var basicIntegrityState by observable(false, BR.basicIntegrityState)
-    @get:Bindable
-    var evalType by observable("")
+    var safetyNetTitle = R.string.empty
+        set(value) = set(value, field, { field = it }, BR.safetyNetTitle)
 
     @get:Bindable
-    val isChecking get() = currentState == LOADING
-    @get:Bindable
-    val isFailed get() = currentState == FAILED
-    @get:Bindable
-    val isSuccess get() = currentState == PASS
+    var ctsState = false
+        set(value) = set(value, field, { field = it }, BR.ctsState)
 
-    private var currentState by observable(IDLE, BR.checking, BR.failed, BR.success)
+    @get:Bindable
+    var basicIntegrityState = false
+        set(value) = set(value, field, { field = it }, BR.basicIntegrityState)
+
+    @get:Bindable
+    var evalType = ""
+        set(value) = set(value, field, { field = it }, BR.evalType)
+
+    @get:Bindable
+    var isChecking = false
+        set(value) = set(value, field, { field = it }, BR.checking)
+
+    @get:Bindable
+    var isSuccess = false
+        set(value) = set(value, field, { field = it }, BR.success, BR.textColorAttr)
+
+    @get:Bindable
+    val textColorAttr get() = if (isSuccess) R.attr.colorOnPrimary else R.attr.colorOnError
 
     init {
         cachedResult?.also {
@@ -45,8 +48,8 @@ class SafetynetViewModel : BaseViewModel() {
     }
 
     private fun attest() {
-        currentState = LOADING
-        CheckSafetyNetEvent() {
+        isChecking = true
+        CheckSafetyNetEvent {
             resolveResponse(it)
         }.publish()
     }
@@ -54,6 +57,8 @@ class SafetynetViewModel : BaseViewModel() {
     fun reset() = attest()
 
     private fun resolveResponse(response: SafetyNetResult) {
+        isChecking = false
+
         if (response.dismiss) {
             back()
             return
@@ -69,19 +74,19 @@ class SafetynetViewModel : BaseViewModel() {
                 ctsState = cts
                 basicIntegrityState = basic
                 evalType = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
-                currentState = if (result) PASS else FAILED
+                isSuccess = result
                 safetyNetTitle =
                     if (result) R.string.safetynet_attest_success
                     else R.string.safetynet_attest_failure
             }.onFailure {
-                currentState = FAILED
+                isSuccess = false
                 ctsState = false
                 basicIntegrityState = false
                 evalType = "N/A"
                 safetyNetTitle = R.string.safetynet_res_invalid
             }
         } ?: {
-            currentState = FAILED
+            isSuccess = false
             ctsState = false
             basicIntegrityState = false
             evalType = "N/A"

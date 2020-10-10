@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core.su
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.LocalServerSocket
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
 import androidx.collection.ArrayMap
@@ -10,8 +9,8 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.MagiskPolicy
-import com.topjohnwu.magisk.core.model.toPolicy
+import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -19,23 +18,18 @@ import java.io.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 
-abstract class SuRequestHandler(
-    private val packageManager: PackageManager,
+class SuRequestHandler(
+    private val pm: PackageManager,
     private val policyDB: PolicyDao
-) {
-    private lateinit var socket: LocalSocket
-    private lateinit var output: DataOutputStream
-    private lateinit var input: DataInputStream
+) : Closeable {
 
-    protected lateinit var policy: MagiskPolicy
+    private lateinit var output: DataOutputStream
+    lateinit var policy: SuPolicy
         private set
 
-    abstract fun onStart()
-
+    // Return true to indicate undetermined policy, require user interaction
     suspend fun start(intent: Intent): Boolean {
-        val name = intent.getStringExtra("socket") ?: return false
-
-        if (!init(name))
+        if (!init(intent))
             return false
 
         // Never allow com.topjohnwu.magisk (could be malware)
@@ -44,16 +38,15 @@ abstract class SuRequestHandler(
 
         when (Config.suAutoReponse) {
             Config.Value.SU_AUTO_DENY -> {
-                respond(MagiskPolicy.DENY, 0)
-                return true
+                respond(SuPolicy.DENY, 0)
+                return false
             }
             Config.Value.SU_AUTO_ALLOW -> {
-                respond(MagiskPolicy.ALLOW, 0)
-                return true
+                respond(SuPolicy.ALLOW, 0)
+                return false
             }
         }
 
-        onStart()
         return true
     }
 
@@ -63,30 +56,37 @@ abstract class SuRequestHandler(
         }
     }
 
-    private class SocketError : IOException()
+    @Throws(IOException::class)
+    override fun close() {
+        if (::output.isInitialized)
+            output.close()
+    }
 
-    private suspend fun init(name: String) = withContext(Dispatchers.IO) {
+    private class SuRequestError : IOException()
+
+    private suspend fun init(intent: Intent) = withContext(Dispatchers.IO) {
         try {
-            if (Const.Version.atLeastCanary()) {
-                LocalServerSocket(name).use {
-                    socket = async { it.accept() }.timedAwait() ?: throw SocketError()
-                }
+            val uid: Int
+            if (Const.Version.atLeast_21_0()) {
+                val name = intent.getStringExtra("fifo") ?: throw SuRequestError()
+                uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
+                output = DataOutputStream(FileOutputStream(name).buffered())
             } else {
-                socket = LocalSocket()
+                val name = intent.getStringExtra("socket") ?: throw SuRequestError()
+                val socket = LocalSocket()
                 socket.connect(LocalSocketAddress(name, LocalSocketAddress.Namespace.ABSTRACT))
+                output = DataOutputStream(BufferedOutputStream(socket.outputStream))
+                val input = DataInputStream(BufferedInputStream(socket.inputStream))
+                val map = async { input.readRequest() }.timedAwait() ?: throw SuRequestError()
+                uid = map["uid"]?.toIntOrNull() ?: throw SuRequestError()
             }
-            output = DataOutputStream(BufferedOutputStream(socket.outputStream))
-            input = DataInputStream(BufferedInputStream(socket.inputStream))
-            val map = async { readRequest() }.timedAwait() ?: throw SocketError()
-            val uid = map["uid"]?.toIntOrNull() ?: throw SocketError()
-            policy = uid.toPolicy(packageManager)
+            policy = uid.toPolicy(pm)
             true
         } catch (e: Exception) {
             when (e) {
                 is IOException, is PackageManager.NameNotFoundException -> {
                     Timber.e(e)
-                    if (::socket.isInitialized)
-                        socket.close()
+                    runCatching { close() }
                     false
                 }
                 else -> throw e  // Unexpected error
@@ -111,11 +111,7 @@ abstract class SuRequestHandler(
             } catch (e: IOException) {
                 Timber.e(e)
             } finally {
-                runCatching {
-                    input.close()
-                    output.close()
-                    socket.close()
-                }
+                runCatching { close() }
                 if (until >= 0)
                     policyDB.update(policy)
             }
@@ -123,11 +119,11 @@ abstract class SuRequestHandler(
     }
 
     @Throws(IOException::class)
-    private fun readRequest(): Map<String, String> {
+    private fun DataInputStream.readRequest(): Map<String, String> {
         fun readString(): String {
-            val len = input.readInt()
+            val len = readInt()
             val buf = ByteArray(len)
-            input.readFully(buf)
+            readFully(buf)
             return String(buf, Charsets.UTF_8)
         }
         val ret = ArrayMap<String, String>()

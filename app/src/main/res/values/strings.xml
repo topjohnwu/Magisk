@@ -16,33 +16,24 @@
     <string name="app_changelog">Changelog</string>
     <string name="manager">Manager</string>
     <string name="loading">Loading…</string>
-    <string name="info">Info</string>
-    <string name="uninstall">Uninstall</string>
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Hide</string>
     <string name="status">Status</string>
     <string name="home_package">Package</string>
-    <string name="details">Details</string>
 
     <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
     <string name="home_support_title">Support Us</string>
-    <string name="home_links_project">Project links</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
-    <string name="home_device_title">Device</string>
-    <string name="home_device_extra_manufacturer">Manufacturer</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Board</string>
-    <string name="home_device_system">System</string>
     <string name="home_status_normal">Normal</string>
-    <string name="home_status_safe">Safe Mode</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
+    <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
@@ -77,7 +68,6 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s was granted Superuser rights</string>
     <string name="su_deny_toast">%1$s was denied Superuser rights</string>
-    <string name="no_apps_found">No apps found</string>
     <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
     <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
     <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
@@ -109,7 +99,6 @@
     <string name="safetynet_attest_failure">Attestation failed!</string>
     <string name="safetynet_attest_loading">Just a sec…</string>
     <string name="safetynet_attest_restart">Try again</string>
-    <string name="safetynet_system">System</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Show system apps</string>
@@ -118,26 +107,22 @@
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(No info provided)</string>
-    <string name="no_modules_found">No modules found</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
     <string name="reboot_download">Reboot to Download</string>
     <string name="reboot_edl">Reboot to EDL</string>
-    <string name="module_safe_mode_message">You\'re in safe mode. None of user modules will work.\nThis message will disappear once safe mode is disabled.</string>
     <string name="module_version_author">%1$s by %2$s</string>
     <string name="module_section_pending">Updates</string>
     <string name="module_section_pending_action">Update all</string>
-    <string name="module_section_remote">Remote</string>
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
-    <string name="module_update_none">Your modules are up to date!</string>
     <string name="update_available">Update Available</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
-    <string name="module_permission_declined">Grant storage permission to enable this functionality</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -145,12 +130,6 @@
     <string name="settings_dark_mode_light">Always Light</string>
     <string name="settings_dark_mode_system">Follow System</string>
     <string name="settings_dark_mode_dark">Always Dark</string>
-    <string name="settings_safe_mode_title">Safe Mode</string>
-    <string name="settings_core_only_summary" deprecated="true">Enable only core features. MagiskSU and MagiskHide will still be enabled, but no modules will be loaded</string>
-    <string name="settings_grid_column_count_title">List arrangement</string>
-    <string name="settings_grid_column_count_summary">Sets item width in a list. Restart app to apply changes.</string>
-    <string name="settings_grid_column_count_1">Standard</string>
-    <string name="settings_grid_column_count_2">Squished</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
@@ -195,6 +174,9 @@
     <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
     <string name="settings_customization">Customization</string>
+    <string name="setting_add_shortcut_summary">Add a pretty shortcut in the home screen in case the name and icon are difficult to recognize after hiding the app</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
@@ -211,7 +193,6 @@
     <string name="global_summary">All root sessions use the global mount namespace</string>
     <string name="requester_summary">Root sessions will inherit their requester\'s namespace</string>
     <string name="isolate_summary">Each root session will have its own isolated namespace</string>
-    <string name="settings_download_path_error">Error creating folder. It must be accessible from storage root directory and must not be a file.</string>
 
     <!--Notifications-->
     <string name="update_channel">Magisk Updates</string>
@@ -230,11 +211,8 @@
     <string name="repo_install_msg">Do you want to install %1$s now?</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
-    <string name="settings_reboot_toast">Reboot to apply settings</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo cache cleared</string>
-    <string name="dtbo_patched_title">DTBO was patched!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager has patched dtbo.img. Please reboot.</string>
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>
     <string name="failure">Failed</string>
@@ -255,5 +233,9 @@
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
     <string name="unsupport_magisk_msg">This version of Magisk Manager does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
+    <string name="add_shortcut_title">Add shortcut to home screen</string>
+    <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
+    <string name="app_not_found">No application found to handle this action</string>
 
 </resources>

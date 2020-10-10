@@ -4,29 +4,27 @@ import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.Bindable
-import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.diffListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.view.Notifications
+import com.topjohnwu.magisk.databinding.RvBindingAdapter
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.model.binding.BindingAdapter
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.diffListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.magisk.utils.observable
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.*
 
 class FlashViewModel(
     args: FlashFragmentArgs,
@@ -34,21 +32,27 @@ class FlashViewModel(
 ) : BaseViewModel() {
 
     @get:Bindable
-    var showReboot by observable(Shell.rootAccess(), BR.showReboot)
-    @get:Bindable
-    var behaviorText by observable(resources.getString(R.string.flashing), BR.behaviorText)
+    var showReboot = Shell.rootAccess()
+        set(value) = set(value, field, { field = it }, BR.showReboot)
 
-    val adapter = BindingAdapter<ConsoleItem>()
+    @get:Bindable
+    var behaviorText = resources.getString(R.string.flashing)
+        set(value) = set(value, field, { field = it }, BR.behaviorText)
+
+    val adapter = RvBindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
     val itemBinding = itemBindingOf<ConsoleItem>()
 
-    private val outItems = ObservableArrayList<String>()
-    private val logItems = Collections.synchronizedList(mutableListOf<String>())
+    private val logItems = mutableListOf<String>().synchronized()
+    private val outItems = object : CallbackList<String>() {
+        override fun onAddElement(e: String?) {
+            e ?: return
+            items.add(ConsoleItem(e))
+            logItems.add(e)
+        }
+    }
 
     init {
-        outItems.sendUpdatesTo(items, viewModelScope) { it.map { ConsoleItem(it) } }
-        outItems.copyNewInputInto(logItems)
-
         args.dismissId.takeIf { it != -1 }?.also {
             Notifications.mgr.cancel(it)
         }
@@ -102,20 +106,18 @@ class FlashViewModel(
     }
 
     private fun savePressed() = withExternalRW {
-        if (!it)
-            return@withExternalRW
         viewModelScope.launch {
-            val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
-            val file = File(Config.downloadDirectory, name)
             withContext(Dispatchers.IO) {
-                file.bufferedWriter().use { writer ->
+                val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
+                val file = MediaStoreUtils.getFile(name)
+                file.uri.outputStream().bufferedWriter().use { writer ->
                     logItems.forEach {
                         writer.write(it)
                         writer.newLine()
                     }
                 }
+                SnackbarEvent(file.toString()).publish()
             }
-            SnackbarEvent(file.path).publish()
         }
     }
 

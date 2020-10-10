@@ -16,27 +16,17 @@
     <string name="app_changelog">تفاصيل التحديث</string>
     <string name="manager">المدير</string>
     <string name="loading">جارٍ التحميل...</string>
-    <string name="info">معلومات</string>
-    <string name="uninstall">إلغاء التثبيت</string>
     <string name="update">تحديث</string>
     <string name="not_available">غير/متوفر</string>
     <string name="hide">إخفاء</string>
     <string name="status">الحالة</string>
     <string name="home_package">الحزمة</string>
-    <string name="details">التفاصيل</string>
 
     <string name="home_notice_content">تأكد دوما أنك تستعمل إصدار ماجسيك رسمي، التطبيقات المثبتة من الجهات الخارجية ستسبب لك أضراراً</string>
     <string name="home_support_title">تبرع لنا</string>
-    <string name="home_links_project">روابط المشروع</string>
     <string name="home_item_source">الكود المصدري للتطبيق</string>
     <string name="home_support_content">مـاجـيسك هي، وستظل دوماً، مجانيةً و مفتوحة المصدر، اظهر اهتمامك لنا لكي نبقيها هكذا بدعم مالي صغير</string>
-    <string name="home_device_title">الجهاز</string>
-    <string name="home_device_extra_manufacturer">الشركة</string>
-    <string name="home_device_extra_model">الموديل</string>
-    <string name="home_device_extra_board">اللوحة</string>
-    <string name="home_device_system">النظـام</string>
     <string name="home_status_normal"> الوضـع الطبيعي</string>
-    <string name="home_status_safe">الوضـع الآمن</string>
     <string name="home_status_stub"> وضـع STUB</string>
     <string name="home_installed_version">تم التثبيت</string>
     <string name="home_latest_version">آخر إصدار</string>
@@ -77,7 +67,6 @@
     <string name="sixtymin">60 دقيقة</string>
     <string name="su_allow_toast">تم منح صلاحيات الروت لـ%1$s</string>
     <string name="su_deny_toast">تم رفض صلاحيات الروت لـ%1$s </string>
-    <string name="no_apps_found">لا توجد تطبيقات</string>
     <string name="su_snack_grant">تم منح صلاحيات الروت لـ%1$s</string>
     <string name="su_snack_deny">تم رفض صلاحيات الروت لـ%1$s</string>
     <string name="su_snack_notif_on">تم تفعيل الإشعارات لـ%1$s</string>
@@ -109,7 +98,6 @@
     <string name="safetynet_attest_failure">فشل التوثيق</string>
     <string name="safetynet_attest_loading">أعطني ثانية...</string>
     <string name="safetynet_attest_restart">حاول من جديد</string>
-    <string name="safetynet_system">النظام</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">إظهار برامج النظام</string>
@@ -120,24 +108,20 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(لم توفر معلومات)</string>
-    <string name="no_modules_found">لا توجد أية إضافات</string>
     <string name="reboot_recovery">إعادة التشغيل إلى Recovery</string>
     <string name="reboot_bootloader">إعادة التشغيل إلى Bootloader</string>
     <string name="reboot_download">إعادة التشغيل إلى وضـع Odin</string>
     <string name="reboot_edl">إعادة التشغيل إلى وضـعية EDL</string>
-    <string name="module_safe_mode_message">لقد دخلت الوضـع الأمن.\nسيختفي الرسالة هذا عند إطفاء الوضـع الأمن</string>
     <string name="module_version_author">%1$sبواسطة%2$s</string>
     <string name="module_section_pending">التحديثات</string>
     <string name="module_section_pending_action">تحديث الكل</string>
-    <string name="module_section_remote">السيرفر</string>
     <string name="module_state_remove">إزالة </string>
     <string name="module_state_restore">إسترجاع</string>
     <string name="module_action_install_external">اختر من الذاكرة الداخلية</string>
-    <string name="module_update_none">الاضافات محدثة</string>
     <string name="update_available">التحديث متوفر</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">تسلسل الترتيب</string>
-    <string name="module_permission_declined">امنحني إذن الولوج للذاكرة الداخلية</string>
+    <string name="external_rw_permission_denied">امنحني إذن الولوج للذاكرة الداخلية</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">وضـعية الِسمات</string>
@@ -145,12 +129,6 @@
     <string name="settings_dark_mode_light">الوضـع المضيء</string>
     <string name="settings_dark_mode_system">اتبّع النظام</string>
     <string name="settings_dark_mode_dark">وضـع الظلام</string>
-    <string name="settings_safe_mode_title">وضـع الآمن</string>
-    <string name="settings_core_only_summary" deprecated="true">تمكين الميزات الأساسية فقط، سيُشغل الإضافات روت ماجـيسك و اخفاء ماجـيسك فقط و لا غيرها.</string>
-    <string name="settings_grid_column_count_title">شكل فقاعات الأعدادات</string>
-    <string name="settings_grid_column_count_summary">ضبط توسعة الأزرار في اللوائح، أغلق التطبيق و افتحه لكي ينطبق التغييرات</string>
-    <string name="settings_grid_column_count_1">الافتراضي</string>
-    <string name="settings_grid_column_count_2">مُصَغَّر</string>
     <string name="settings_download_path_title">مسار التحميل</string>
     <string name="settings_download_path_message">ستحمل الملفات إلى %1$s</string>
     <string name="settings_clear_cache_title">حذف الذاكرة المؤقتة للإضافات</string>
@@ -211,7 +189,6 @@
     <string name="global_summary">جميع الجلسات الروت تستخدم NameSpace العام</string>
     <string name="requester_summary">جميع الجلسات الروت تستخدم NameSpace المتوارث</string>
     <string name="isolate_summary">جميع الجلسات الروت تستخدم NameSpace المعزول</string>
-    <string name="settings_download_path_error">خطأ عند إنشاء مجلد. يجب أن يكون قابلا للولوج من المسار الاساسي للذاكرة..و ألا يكون ملفا.</string>
 
     <!--Notifications-->
     <string name="update_channel">تحديثات Magisk</string>
@@ -230,11 +207,8 @@
     <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
     <string name="download">تنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
-    <string name="settings_reboot_toast">إعادة التشغيل لتطبيق الإعدادات</string>
     <string name="release_notes">معلومات الأصدار الجديد</string>
     <string name="repo_cache_cleared">تم مسح الذاكرة المؤقتة للإضافات</string>
-    <string name="dtbo_patched_title">تم تعديل DTBO!</string>
-    <string name="dtbo_patched_reboot">لقد عدل مـاجـيسك الملف dtbo.img. يرجى إعادة التشغيل</string>
     <string name="flashing">يتم الحرق...</string>
     <string name="done">تم!</string>
     <string name="failure">فشل!</string>

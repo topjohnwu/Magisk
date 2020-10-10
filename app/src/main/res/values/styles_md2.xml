@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-    </style>
-
-    <style name="SplashThemeBase.V19" parent="SplashThemeBase">
-        <item name="android:windowTranslucentStatus" tools:targetApi="19">true</item>
-        <item name="android:windowTranslucentNavigation" tools:targetApi="19">true</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="SplashTheme" parent="SplashThemeBase" />
 
-    <style name="Foundation" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <!--This should be overridden in v19 for transparency, etc-->
+    <!--This should be overridden in v21 for transparency, etc-->
     <style name="Foundation.Compat" />
 
     <!--region Do not remove-->
@@ -24,35 +21,17 @@
 
     <style name="WidgetFoundation" parent="android:Widget" />
 
-    <!-- {@deprecated Use WidgetFoundation instead.} -->
-    <style name="Widget" parent="WidgetFoundation" />
-
-    <style name="AppearanceFoundation">
-        <item name="android:fontFamily">@font/exo</item>
-    </style>
     <!--endregion-->
 
-    <style name="Foundation.PopupMenu" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">?colorOnSurface</item>
-        <item name="android:itemBackground">?colorSurfaceVariant</item>
+    <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
         <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Foundation.Base" parent="Foundation.Compat">
-        <item name="android:fontFamily">@font/exo</item>
+    <style name="Foundation.Default" parent="Foundation.Compat">
         <item name="android:includeFontPadding">false</item>
-
-        <!--///-->
-
-        <item name="selectableItemBackground">@drawable/bg_selectable</item>
-        <item name="selectableItemBackgroundBorderless">@drawable/bg_selectable_borderless</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
         <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
-    </style>
-
-    <style name="Foundation.Default" parent="Foundation.Base">
-        <item name="android:windowBackground">?colorSurface</item>
     </style>
 
     <style name="Foundation.Floating" parent="Empty">
