@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.network.GithubRawServices
+import com.topjohnwu.magisk.data.network.RawServices
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.view.Notifications
@@ -55,7 +55,7 @@ open class SplashActivity : Activity() {
         Shortcuts.setupDynamic(this)
 
         // Pre-fetch network stuffs
-        get<GithubRawServices>()
+        get<RawServices>()
 
         DONE = true
 

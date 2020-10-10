@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.model.module
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.model.ModuleJson
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.legalFilename
@@ -15,34 +15,40 @@ import java.util.*
 @Parcelize
 data class Repo(
     @PrimaryKey override var id: String,
-    override var name: String,
-    override var author: String,
-    override var version: String,
-    override var versionCode: Int,
-    override var description: String,
-    var last_update: Long
+    override var name: String = "",
+    override var author: String = "",
+    override var version: String = "",
+    override var versionCode: Int = -1,
+    override var description: String = "",
+    val last_update: Long,
+    val prop_url: String,
+    val zip_url: String,
+    val notes_url: String
 ) : BaseModule(), Parcelable {
 
     private val svc: NetworkService get() = get()
 
+    constructor(info: ModuleJson) : this(
+        id = info.id,
+        last_update = info.last_update,
+        prop_url = info.prop_url,
+        zip_url = info.zip_url,
+        notes_url = info.notes_url
+    )
+
     val lastUpdate get() = Date(last_update)
+    val lastUpdateString get() = DATE_FORMAT.format(lastUpdate)
+    val downloadFilename get() = "$name-$version($versionCode).zip".legalFilename()
 
-    val lastUpdateString: String get() = dateFormat.format(lastUpdate)
-
-    val downloadFilename: String get() = "$name-$version($versionCode).zip".legalFilename()
-
-    suspend fun readme() = svc.fetchReadme(this)
-
-    val zipUrl: String get() = Const.Url.ZIP_URL.format(id)
-
-    constructor(id: String) : this(id, "", "", "", -1, "", 0)
+    suspend fun notes() = svc.fetchString(notes_url)
 
     @Throws(IllegalRepoException::class)
-    private fun loadProps(props: String) {
+    suspend fun load() {
+        val props = svc.fetchString(prop_url)
         props.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.runCatching {
             parseProps(this)
         }.onFailure {
-            throw IllegalRepoException("Repo [$id] parse error: " + it.message)
+            throw IllegalRepoException("Repo [$id] parse error: ", it)
         }
 
         if (versionCode < 0) {
@@ -50,15 +56,10 @@ data class Repo(
         }
     }
 
-    @Throws(IllegalRepoException::class)
-    suspend fun update(lastUpdate: Date? = null) {
-        lastUpdate?.let { last_update = it.time }
-        loadProps(svc.fetchMetadata(this))
-    }
-
-    class IllegalRepoException(message: String) : Exception(message)
+    class IllegalRepoException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 
     companion object {
-        val dateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
+        private val DATE_FORMAT = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
     }
+
 }

@@ -22,10 +22,10 @@ class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), Activi
     override fun invoke(activity: BaseUIActivity<*, *>) = action(activity)
 }
 
-class OpenChangelogEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
+class OpenReadmeEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
     override fun invoke(context: Context) {
         scope.launch {
-            MarkDownWindow.show(context, null, item::readme)
+            MarkDownWindow.show(context, null, item::notes)
         }
     }
 }

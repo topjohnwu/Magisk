@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.core.model.module.Repo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@Database(version = 6, entities = [Repo::class, RepoEtag::class], exportSchema = false)
+@Database(version = 7, entities = [Repo::class], exportSchema = false)
 abstract class RepoDatabase : RoomDatabase() {
 
     abstract fun repoDao() : RepoDao
@@ -17,16 +17,10 @@ abstract class RepoDatabase : RoomDatabase() {
 @Dao
 abstract class RepoDao(private val db: RepoDatabase) {
 
-    val repoIDList get() = getRepoID().map { it.id }
-
     val repos: List<Repo> get() = when (Config.repoOrder) {
             Config.Value.ORDER_NAME -> getReposNameOrder()
             else -> getReposDateOrder()
         }
-
-    var etagKey: String
-        set(value) = addEtagRaw(RepoEtag(0, value))
-        get() = etagRaw()?.key.orEmpty()
 
     suspend fun clear() = withContext(Dispatchers.IO) { db.clearAllTables() }
 
@@ -42,8 +36,8 @@ abstract class RepoDao(private val db: RepoDatabase) {
     @Query("SELECT * FROM repos WHERE id = :id")
     abstract fun getRepo(id: String): Repo?
 
-    @Query("SELECT id FROM repos")
-    protected abstract fun getRepoID(): List<RepoID>
+    @Query("SELECT id, last_update FROM repos")
+    abstract fun getRepoStubs(): List<RepoStub>
 
     @Delete
     abstract fun removeRepo(repo: Repo)
@@ -53,21 +47,9 @@ abstract class RepoDao(private val db: RepoDatabase) {
 
     @Query("DELETE FROM repos WHERE id IN (:idList)")
     abstract fun removeRepos(idList: Collection<String>)
-
-    @Query("SELECT * FROM etag")
-    protected abstract fun etagRaw(): RepoEtag?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract fun addEtagRaw(etag: RepoEtag)
 }
 
-data class RepoID(
-    @PrimaryKey val id: String
+data class RepoStub(
+    @PrimaryKey val id: String,
+    val last_update: Long
 )
-
-@Entity(tableName = "etag")
-data class RepoEtag(
-    @PrimaryKey val id: Int,
-    val key: String
-)
-

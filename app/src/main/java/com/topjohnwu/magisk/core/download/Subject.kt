@@ -29,7 +29,7 @@ sealed class Subject : Parcelable {
         val module: Repo,
         override val action: Action
     ) : Subject() {
-        override val url: String get() = module.zipUrl
+        override val url: String get() = module.zip_url
         override val title: String get() = module.downloadFilename
 
         @IgnoredOnParcel

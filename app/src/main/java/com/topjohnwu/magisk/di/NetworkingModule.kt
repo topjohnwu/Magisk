@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.GithubApiServices
 import com.topjohnwu.magisk.data.network.GithubPageServices
-import com.topjohnwu.magisk.data.network.GithubRawServices
 import com.topjohnwu.magisk.data.network.JSDelivrServices
+import com.topjohnwu.magisk.data.network.RawServices
 import com.topjohnwu.magisk.ktx.precomputedText
 import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.net.NoSSLv3SocketFactory
@@ -30,7 +30,7 @@ import java.net.UnknownHostException
 val networkingModule = module {
     single { createOkHttpClient(get()) }
     single { createRetrofit(get()) }
-    single { createApiService<GithubRawServices>(get(), Const.Url.GITHUB_RAW_URL) }
+    single { createApiService<RawServices>(get(), Const.Url.GITHUB_RAW_URL) }
     single { createApiService<GithubApiServices>(get(), Const.Url.GITHUB_API_URL) }
     single { createApiService<GithubPageServices>(get(), Const.Url.GITHUB_PAGE_URL) }
     single { createApiService<JSDelivrServices>(get(), Const.Url.JS_DELIVR_URL) }

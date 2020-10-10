@@ -14,8 +14,8 @@ import com.topjohnwu.magisk.core.tasks.RepoUpdater
 import com.topjohnwu.magisk.data.database.RepoByNameDao
 import com.topjohnwu.magisk.data.database.RepoByUpdatedDao
 import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.events.OpenReadmeEvent
 import com.topjohnwu.magisk.events.SelectModuleEvent
-import com.topjohnwu.magisk.events.OpenChangelogEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import com.topjohnwu.magisk.ktx.addOnListChangedCallback
@@ -315,14 +315,14 @@ class ModuleViewModel(
     }
 
     fun infoPressed(item: RepoItem) =
-        if (isConnected.get()) OpenChangelogEvent(item.item).publish()
+        if (isConnected.get()) OpenReadmeEvent(item.item).publish()
         else SnackbarEvent(R.string.no_connection).publish()
 
 
     fun infoPressed(item: ModuleItem) {
         item.repo?.also {
             if (isConnected.get())
-                OpenChangelogEvent(it).publish()
+                OpenReadmeEvent(it).publish()
             else
                 SnackbarEvent(R.string.no_connection).publish()
         } ?: return
