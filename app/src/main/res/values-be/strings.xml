@@ -31,6 +31,7 @@
     <string name="invalid_update_channel">Хібны канал абнаўлення</string>
     <string name="uninstall_magisk_title">Выдаліць Magisk</string>
     <string name="uninstall_magisk_msg">Усе модулі будуць адключаныя/выдаленыя!\nRoot будзе выдалены!\nВашыя даныя будуць зашыфраваныя!</string>
+    <string name="home_check_safetynet">Check SafetyNet</string>
     <!--Install-->
     <string name="keep_force_encryption">Прымусова захаваць шыфраванне</string>
     <string name="keep_dm_verity">Захаваць AVB 2.0/dm-verity</string>
@@ -97,7 +98,7 @@
     <string name="hide_scroll_up">Уверх</string>
     <string name="hide_filters">Фільтры</string>
     <string name="hide_search">Пошук</string>
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(Няма інфармацыі)</string>
     <string name="reboot_recovery">Перазапуск у Recovery</string>
     <string name="reboot_bootloader">Перазапуск у Bootloader</string>
@@ -111,8 +112,8 @@
     <string name="module_action_install_external">Усталяваць са сховішча</string>
     <string name="update_available">Даступныя абнаўленні</string>
     <string name="module_installed">Усталяваныя</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Парадак сартавання</string>
-    <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
     <!--Settings -->
     <string name="settings_dark_mode_title">Рэжым афармлення</string>
     <string name="settings_dark_mode_message">Абярыце рэжым, які вам больш даспадобы!</string>
@@ -163,6 +164,9 @@
     <string name="settings_su_biometric_summary">Выкарыстанне біяметрычнай аўтэнтыфікацыі для запытаў правоў суперкарыстальніка</string>
     <string name="no_biometric">Не падтрымліваецца прыладай альбо не ўключана ў наладах</string>
     <string name="settings_customization">Персаналізацыя</string>
+    <string name="setting_add_shortcut_summary">Add a pretty shortcut in the home screen in case the name and icon are difficult to recognize after hiding the app</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
     <string name="multiuser_mode">Шматкарыстальніцкі рэжым</string>
     <string name="settings_owner_only">Толькі ўладальнік</string>
     <string name="settings_owner_manage">Кіраванне ўладальнікам</string>
@@ -215,4 +219,8 @@
     <string name="authenticate">Аўтэнтыфікацыя</string>
     <string name="unsupport_magisk_title">Непадтрымліваемая версія Magisk</string>
     <string name="unsupport_magisk_msg">Гэтая версія Magisk Manager не падтрымлівае Magisk версіі ніжэй за %1$s.\n\nПраграма будзе працаваць так, як быццам Magisk не ўсталяваны. Як мага хутчэй абнавіце Magisk.</string>
+    <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
+    <string name="add_shortcut_title">Add shortcut to home screen</string>
+    <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
+    <string name="app_not_found">No application found to handle this action</string>
 </resources>
