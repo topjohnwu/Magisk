@@ -60,7 +60,7 @@
     <string name="grant">Toestaan</string>
     <string name="su_warning">Verleent volledige toegang tot je apparaat.\nBij twijfel, altijd weigeren!</string>
     <string name="forever">Permanent</string>
-    <string name="once">Eénmalig</string>
+    <string name="once">Eenmalig</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
@@ -102,14 +102,14 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
-    <string name="hide_scroll_up">Omhoogscrollen</string>
+    <string name="hide_scroll_up">Omhoog scrollen</string>
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Zoeken</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(geen informatie verstrekt)</string>
-    <string name="reboot_recovery">Herstelmodus starten</string>
-    <string name="reboot_bootloader">Opstartlader starten</string>
+    <string name="reboot_recovery">Recovery starten</string>
+    <string name="reboot_bootloader">Bootloader starten</string>
     <string name="reboot_download">Downloadmodus starten</string>
     <string name="reboot_edl">EDL starten</string>
     <string name="module_version_author">%1$s van %2$s</string>
