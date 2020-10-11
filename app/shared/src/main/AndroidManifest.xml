@@ -16,6 +16,7 @@
         <provider
             android:name="a.p"
             android:authorities="${applicationId}.provider"
+            android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true">
         </provider>
