@@ -51,7 +51,7 @@
     <string name="setup_title">Ek kurulum</string>
     <string name="select_patch_file">Dosya seçin ve yamalayın</string>
     <string name="patch_file_msg">Bir raw imaj (*.img) veya ODIN tar dosyası (*.tar) seçin</string>
-    <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak...</string>
+    <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılacak…</string>
     <string name="flash_screen_title">Kurulum</string>
 
     <!--Superuser-->
@@ -213,7 +213,7 @@
     <string name="reboot">Yeniden başlat</string>
     <string name="release_notes">Sürüm notları</string>
     <string name="repo_cache_cleared">Depo önbelleği temizlendi</string>
-    <string name="flashing">Yükleniyor...</string>
+    <string name="flashing">Yükleniyor…</string>
     <string name="done">Tamamlandı!</string>
     <string name="failure">Başarısız</string>
     <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
@@ -235,7 +235,7 @@
     <string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
     <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
     <string name="add_shortcut_title">Ana ekrana kısayol ekle</string>
-    <string name="add_shortcut_msg">Magisk Manager'ı gizledikten sonra, ismini ve simgesini tanıması güç olabilir. Ana ekrana güzel bir kısayol eklemek ister misin??</string>
+    <string name="add_shortcut_msg">Magisk Manager\'ı gizledikten sonra, ismini ve simgesini tanıması güç olabilir. Ana ekrana güzel bir kısayol eklemek ister misin??</string>
     <string name="app_not_found">Bu işlemi yapabilecek bir uygulama bulunamadı</string>
 
 </resources>
