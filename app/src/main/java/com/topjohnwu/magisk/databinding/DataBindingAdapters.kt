@@ -200,12 +200,12 @@ fun RecyclerView.setDividers(dividerVertical: Drawable?, dividerHorizontal: Draw
     }
 }
 
-@BindingAdapter("app:icon")
+@BindingAdapter("icon")
 fun Button.setIconRes(res: Int) {
     (this as MaterialButton).setIconResource(res)
 }
 
-@BindingAdapter("app:icon")
+@BindingAdapter("icon")
 fun Button.setIcon(drawable: Drawable) {
     (this as MaterialButton).icon = drawable
 }

@@ -74,6 +74,13 @@ val copyUtils = tasks.register("copyUtils", Copy::class) {
 
 tasks["preBuild"]?.dependsOn(copyUtils)
 
+configurations.all {
+    resolutionStrategy {
+        force("org.antlr:antlr4-runtime:4.7.1")
+        force("org.antlr:antlr4-tool:4.7.1")
+    }
+}
+
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib"))
