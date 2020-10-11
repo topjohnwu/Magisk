@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.di
 import android.content.Context
 import android.os.Build
 import com.squareup.moshi.Moshi
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -20,6 +21,7 @@ import okhttp3.Dns
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -39,8 +41,6 @@ val networkingModule = module {
 
 private class DnsResolver(client: OkHttpClient) : Dns {
 
-    private var dohError = false
-    private val poisonedHosts = listOf("raw.githubusercontent.com")
     private val doh by lazy {
         DnsOverHttps.Builder().client(client)
             .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"))
@@ -60,16 +60,12 @@ private class DnsResolver(client: OkHttpClient) : Dns {
     }
 
     override fun lookup(hostname: String): List<InetAddress> {
-        return if (!dohError && Config.doh && poisonedHosts.contains(hostname)) {
+        if (Config.doh) {
             try {
-                doh.lookup(hostname)
-            } catch (e: UnknownHostException) {
-                dohError = true
-                Dns.SYSTEM.lookup(hostname)
-            }
-        } else {
-            Dns.SYSTEM.lookup(hostname)
+                return doh.lookup(hostname)
+            } catch (e: UnknownHostException) {}
         }
+        return Dns.SYSTEM.lookup(hostname)
     }
 }
 
@@ -77,10 +73,11 @@ private class DnsResolver(client: OkHttpClient) : Dns {
 fun createOkHttpClient(context: Context): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
-//    val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-//        level = HttpLoggingInterceptor.Level.HEADERS
-//    }
-//    builder.addInterceptor(httpLoggingInterceptor)
+    if (BuildConfig.DEBUG) {
+        builder.addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BASIC
+        })
+    }
 
     if (!Networking.init(context)) {
         Info.hasGMS = false

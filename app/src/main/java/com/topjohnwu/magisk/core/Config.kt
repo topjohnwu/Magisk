@@ -128,7 +128,7 @@ object Config : PreferenceModel, DBConfig {
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    var doh by preference(Key.DOH, defaultLocale.country == "CN")
+    var doh by preference(Key.DOH, false)
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
