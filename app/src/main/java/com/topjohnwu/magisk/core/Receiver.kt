@@ -11,7 +11,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.koin.core.inject
 
-open class GeneralReceiver : BaseReceiver() {
+open class Receiver : BaseReceiver() {
 
     private val policyDB: PolicyDao by inject()
 

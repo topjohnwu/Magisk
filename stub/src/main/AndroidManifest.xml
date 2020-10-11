@@ -10,12 +10,19 @@
         android:allowBackup="true"
         tools:ignore="AllowBackup">
 
-        <activity android:name="a.a">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name=".FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
 
     </application>
 

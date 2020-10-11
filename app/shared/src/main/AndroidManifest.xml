@@ -12,12 +12,6 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
         tools:ignore="UnusedAttribute">
-
-        <provider
-            android:name="a.p"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-        </provider>
     </application>
+
 </manifest>

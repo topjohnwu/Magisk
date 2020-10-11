@@ -149,7 +149,7 @@ private object ClassMap {
         App::class.java to a.e::class.java,
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
-        GeneralReceiver::class.java to a.h::class.java,
+        Receiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
         SuRequestActivity::class.java to a.m::class.java
     )

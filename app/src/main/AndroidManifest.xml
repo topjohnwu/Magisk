@@ -65,6 +65,14 @@
         <!-- DownloadService -->
         <service android:name="a.j" />
 
+        <!-- FileProvider -->
+        <provider
+            android:name="a.p"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
+
         <!-- Hardcode GMS version -->
         <meta-data
             android:name="com.google.android.gms.version"
