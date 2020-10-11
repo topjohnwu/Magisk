@@ -1,0 +1,3 @@
+files:
+  - source: /*/src/main/res/values/strings.xml
+    translation: /%original_path%-%two_letters_code%/strings.xml
