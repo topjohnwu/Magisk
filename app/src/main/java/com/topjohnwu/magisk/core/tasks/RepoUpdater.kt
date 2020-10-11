@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.tasks
 
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.synchronized
@@ -18,7 +18,7 @@ class RepoUpdater(
 
     suspend fun run(forced: Boolean) = withContext(Dispatchers.IO) {
         val cachedMap = HashMap<String, Date>().also { map ->
-            repoDB.getRepoStubs().forEach { map[it.id] = Date(it.last_update) }
+            repoDB.getModuleStubs().forEach { map[it.id] = Date(it.last_update) }
         }.synchronized()
         val info = svc.fetchRepoInfo()
         coroutineScope {
@@ -27,15 +27,15 @@ class RepoUpdater(
                     val lastUpdated = cachedMap.remove(it.id)
                     if (forced || lastUpdated?.before(Date(it.last_update)) != false) {
                         try {
-                            val repo = Repo(it).apply { load() }
-                            repoDB.addRepo(repo)
-                        } catch (e: Repo.IllegalRepoException) {
+                            val repo = OnlineModule(it).apply { load() }
+                            repoDB.addModule(repo)
+                        } catch (e: OnlineModule.IllegalRepoException) {
                             Timber.e(e)
                         }
                     }
                 }
             }
         }
-        repoDB.removeRepos(cachedMap.keys)
+        repoDB.removeModules(cachedMap.keys)
     }
 }

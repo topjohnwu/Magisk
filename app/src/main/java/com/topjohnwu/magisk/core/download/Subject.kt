@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.StubJson
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
@@ -26,7 +26,7 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Module(
-        val module: Repo,
+        val module: OnlineModule,
         override val action: Action
     ) : Subject() {
         override val url: String get() = module.zip_url

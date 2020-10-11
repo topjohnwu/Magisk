@@ -2,54 +2,89 @@ package com.topjohnwu.magisk.data.database
 
 import androidx.room.*
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@Database(version = 7, entities = [Repo::class], exportSchema = false)
+@Database(version = 8, entities = [OnlineModule::class], exportSchema = false)
 abstract class RepoDatabase : RoomDatabase() {
-
     abstract fun repoDao() : RepoDao
-    abstract fun repoByUpdatedDao(): RepoByUpdatedDao
-    abstract fun repoByNameDao(): RepoByNameDao
 }
 
 @Dao
 abstract class RepoDao(private val db: RepoDatabase) {
 
-    val repos: List<Repo> get() = when (Config.repoOrder) {
-            Config.Value.ORDER_NAME -> getReposNameOrder()
-            else -> getReposDateOrder()
-        }
-
     suspend fun clear() = withContext(Dispatchers.IO) { db.clearAllTables() }
 
-    @Query("SELECT * FROM repos ORDER BY last_update DESC")
-    protected abstract fun getReposDateOrder(): List<Repo>
-
-    @Query("SELECT * FROM repos ORDER BY name COLLATE NOCASE")
-    protected abstract fun getReposNameOrder(): List<Repo>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun addRepo(repo: Repo)
-
-    @Query("SELECT * FROM repos WHERE id = :id")
-    abstract fun getRepo(id: String): Repo?
-
-    @Query("SELECT id, last_update FROM repos")
-    abstract fun getRepoStubs(): List<RepoStub>
+    abstract fun addModule(repo: OnlineModule)
 
     @Delete
-    abstract fun removeRepo(repo: Repo)
+    abstract fun removeModule(repo: OnlineModule)
 
-    @Query("DELETE FROM repos WHERE id = :id")
-    abstract fun removeRepo(id: String)
+    @Query("DELETE FROM modules WHERE id = :id")
+    abstract fun removeModule(id: String)
 
-    @Query("DELETE FROM repos WHERE id IN (:idList)")
-    abstract fun removeRepos(idList: Collection<String>)
+    @Query("DELETE FROM modules WHERE id IN (:idList)")
+    abstract fun removeModules(idList: Collection<String>)
+
+    @Query("SELECT * FROM modules WHERE id = :id")
+    abstract fun getModule(id: String): OnlineModule?
+
+    @Query("SELECT id, last_update FROM modules")
+    abstract fun getModuleStubs(): List<ModuleStub>
+
+    fun getModules(offset: Int, limit: Int = LIMIT) = when (Config.repoOrder) {
+        Config.Value.ORDER_NAME -> getNameOrder(offset, limit)
+        else -> getDateOrder(offset, limit)
+    }
+
+    fun searchModules(query: String, offset: Int, limit: Int = LIMIT) = when (Config.repoOrder) {
+        Config.Value.ORDER_NAME -> searchNameOrder(query, offset, limit)
+        else -> searchDateOrder(query, offset, limit)
+    }
+
+    @Query("SELECT * FROM modules WHERE id = :id AND versionCode > :versionCode LIMIT 1")
+    abstract fun getUpdatableModule(id: String, versionCode: Int): OnlineModule?
+
+    @Query("SELECT * FROM modules ORDER BY last_update DESC LIMIT :limit OFFSET :offset")
+    protected abstract fun getDateOrder(offset: Int, limit: Int): List<OnlineModule>
+
+    @Query("SELECT * FROM modules ORDER BY name COLLATE NOCASE LIMIT :limit OFFSET :offset")
+    protected abstract fun getNameOrder(offset: Int, limit: Int): List<OnlineModule>
+
+    @Query(
+        """SELECT * 
+        FROM modules
+        WHERE 
+            (author LIKE '%' || :query || '%') ||
+            (name LIKE '%' || :query || '%') ||
+            (description LIKE '%' || :query || '%')
+        ORDER BY last_update DESC
+        LIMIT :limit 
+        OFFSET :offset"""
+    )
+    protected abstract fun searchDateOrder(query: String, offset: Int, limit: Int): List<OnlineModule>
+
+    @Query(
+        """SELECT * 
+        FROM modules
+        WHERE 
+            (author LIKE '%' || :query || '%') ||
+            (name LIKE '%' || :query || '%') ||
+            (description LIKE '%' || :query || '%')
+        ORDER BY name COLLATE NOCASE
+        LIMIT :limit 
+        OFFSET :offset"""
+    )
+    protected abstract fun searchNameOrder(query: String, offset: Int, limit: Int): List<OnlineModule>
+
+    companion object {
+        const val LIMIT = 10
+    }
 }
 
-data class RepoStub(
+data class ModuleStub(
     @PrimaryKey val id: String,
     val last_update: Long
 )

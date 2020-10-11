@@ -11,9 +11,9 @@ import kotlinx.android.parcel.Parcelize
 import java.text.DateFormat
 import java.util.*
 
-@Entity(tableName = "repos")
+@Entity(tableName = "modules")
 @Parcelize
-data class Repo(
+data class OnlineModule(
     @PrimaryKey override var id: String,
     override var name: String = "",
     override var author: String = "",
@@ -24,7 +24,7 @@ data class Repo(
     val prop_url: String,
     val zip_url: String,
     val notes_url: String
-) : BaseModule(), Parcelable {
+) : Module(), Parcelable {
 
     private val svc: NetworkService get() = get()
 

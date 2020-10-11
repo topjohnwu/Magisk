@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.ActivityResultCallback
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.Shortcuts
@@ -22,7 +22,7 @@ class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), Activi
     override fun invoke(activity: BaseUIActivity<*, *>) = action(activity)
 }
 
-class OpenReadmeEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
+class OpenReadmeEvent(val item: OnlineModule) : ViewEventWithScope(), ContextExecutor {
     override fun invoke(context: Context) {
         scope.launch {
             MarkDownWindow.show(context, null, item::notes)
