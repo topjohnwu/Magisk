@@ -44,6 +44,8 @@ format_t check_fmt(const void *buf, size_t len) {
 		return LZ4_LEGACY;
 	} else if (MATCH(MTK_MAGIC)) {
 		return MTK;
+	} else if (MATCH(DTB_MAGIC)) {
+		return DTB;
 	} else if (MATCH(DHTB_MAGIC)) {
 		return DHTB;
 	} else if (MATCH(TEGRABLOB_MAGIC)) {
@@ -75,6 +77,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
 			return "lz4_legacy";
 		case MTK:
 			return "mtk";
+		case DTB:
+			return "dtb";
 		default:
 			return "raw";
 	}

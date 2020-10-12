@@ -351,9 +351,9 @@ struct boot_img {
 	uint16_t flags = 0;
 
 	// The format of kernel, ramdisk and extra
-	format_t k_fmt;
-	format_t r_fmt;
-	format_t e_fmt;
+	format_t k_fmt = UNKNOWN;
+	format_t r_fmt = UNKNOWN;
+	format_t e_fmt = UNKNOWN;
 
 	/***************************************************
 	 * Following pointers points within the mmap region

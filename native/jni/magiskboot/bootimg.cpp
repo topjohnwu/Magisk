@@ -20,6 +20,8 @@ using namespace std;
 uint32_t dyn_img_hdr::j32 = 0;
 uint64_t dyn_img_hdr::j64 = 0;
 
+#define PADDING 15
+
 static void decompress(format_t type, int fd, const void *in, size_t size) {
 	auto ptr = get_decoder(type, make_unique<fd_stream>(fd));
 	ptr->write(in, size);
@@ -58,41 +60,40 @@ static void restore_buf(int fd, const void *buf, size_t size) {
 
 void dyn_img_hdr::print() {
 	uint32_t ver = header_version();
-	fprintf(stderr, "HEADER_VER      [%u]\n", ver);
-	fprintf(stderr, "KERNEL_SZ       [%u]\n", kernel_size());
-	fprintf(stderr, "RAMDISK_SZ      [%u]\n", ramdisk_size());
+	fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);
+	fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_SZ", kernel_size());
+	fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK_SZ", ramdisk_size());
 	if (ver < 3)
-		fprintf(stderr, "SECOND_SZ       [%u]\n", second_size());
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "SECOND_SZ", second_size());
 	if (ver == 0)
-		fprintf(stderr, "EXTRA_SZ        [%u]\n", extra_size());
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "EXTRA_SZ", extra_size());
 	if (ver == 1 || ver == 2)
-		fprintf(stderr, "RECOV_DTBO_SZ   [%u]\n", recovery_dtbo_size());
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
 	if (ver == 2)
-		fprintf(stderr, "DTB_SZ          [%u]\n", dtb_size());
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
 
-	ver = os_version();
-	if (ver) {
+	if (uint32_t os_ver = os_version()) {
 		int a,b,c,y,m = 0;
-		int version, patch_level;
-		version = ver >> 11;
-		patch_level = ver & 0x7ff;
+		int version = os_ver >> 11;
+		int patch_level = os_ver & 0x7ff;
 
 		a = (version >> 14) & 0x7f;
 		b = (version >> 7) & 0x7f;
 		c = version & 0x7f;
-		fprintf(stderr, "OS_VERSION      [%d.%d.%d]\n", a, b, c);
+		fprintf(stderr, "%-*s [%d.%d.%d]\n", PADDING, "OS_VERSION", a, b, c);
 
 		y = (patch_level >> 4) + 2000;
 		m = patch_level & 0xf;
-		fprintf(stderr, "OS_PATCH_LEVEL  [%d-%02d]\n", y, m);
+		fprintf(stderr, "%-*s [%d-%02d]\n", PADDING, "OS_PATCH_LEVEL", y, m);
 	}
 
-	fprintf(stderr, "PAGESIZE        [%u]\n", page_size());
+	fprintf(stderr, "%-*s [%u]\n", PADDING, "PAGESIZE", page_size());
 	if (ver < 3)
-		fprintf(stderr, "NAME            [%s]\n", name());
-	fprintf(stderr, "CMDLINE         [%.*s%.*s]\n", BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
+		fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", name());
+	fprintf(stderr, "%-*s [%.*s%.*s]\n", PADDING, "CMDLINE",
+			BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
 	if (auto chksum = reinterpret_cast<uint8_t*>(id())) {
-		fprintf(stderr, "CHECKSUM        [");
+		fprintf(stderr, "%-*s [", PADDING, "CHECKSUM");
 		for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
 			fprintf(stderr, "%02hhx", chksum[i]);
 		fprintf(stderr, "]\n");
@@ -267,35 +268,38 @@ void boot_img::parse_image(uint8_t *addr) {
 
 	find_kernel_dtb();
 
-	k_fmt = check_fmt(kernel, hdr->kernel_size());
-	r_fmt = check_fmt(ramdisk, hdr->ramdisk_size());
-	e_fmt = check_fmt(extra, hdr->extra_size());
-
-	// Check MTK
-	if (k_fmt == MTK) {
-		fprintf(stderr, "MTK_KERNEL_HDR\n");
-		flags |= MTK_KERNEL;
-		k_hdr = reinterpret_cast<mtk_hdr *>(kernel);
-		fprintf(stderr, "KERNEL          [%u]\n", k_hdr->size);
-		fprintf(stderr, "NAME            [%s]\n", k_hdr->name);
-		kernel += sizeof(mtk_hdr);
-		hdr->kernel_size() -= sizeof(mtk_hdr);
-		k_fmt = check_fmt(kernel, hdr->kernel_size());
+	if (auto size = hdr->kernel_size()) {
+		k_fmt = check_fmt(kernel, size);
+		if (k_fmt == MTK) {
+			fprintf(stderr, "MTK_KERNEL_HDR\n");
+			flags |= MTK_KERNEL;
+			k_hdr = reinterpret_cast<mtk_hdr *>(kernel);
+			fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL", k_hdr->size);
+			fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", k_hdr->name);
+			kernel += sizeof(mtk_hdr);
+			hdr->kernel_size() -= sizeof(mtk_hdr);
+			k_fmt = check_fmt(kernel, hdr->kernel_size());
+		}
+		fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
 	}
-	if (r_fmt == MTK) {
-		fprintf(stderr, "MTK_RAMDISK_HDR\n");
-		flags |= MTK_RAMDISK;
-		r_hdr = reinterpret_cast<mtk_hdr *>(ramdisk);
-		fprintf(stderr, "RAMDISK         [%u]\n", r_hdr->size);
-		fprintf(stderr, "NAME            [%s]\n", r_hdr->name);
-		ramdisk += sizeof(mtk_hdr);
-		hdr->ramdisk_size() -= sizeof(mtk_hdr);
-		r_fmt = check_fmt(ramdisk, hdr->ramdisk_size());
+	if (auto size = hdr->ramdisk_size()) {
+		r_fmt = check_fmt(ramdisk, size);
+		if (r_fmt == MTK) {
+			fprintf(stderr, "MTK_RAMDISK_HDR\n");
+			flags |= MTK_RAMDISK;
+			r_hdr = reinterpret_cast<mtk_hdr *>(ramdisk);
+			fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK", r_hdr->size);
+			fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
+			ramdisk += sizeof(mtk_hdr);
+			hdr->ramdisk_size() -= sizeof(mtk_hdr);
+			r_fmt = check_fmt(ramdisk, hdr->ramdisk_size());
+		}
+		fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
 	}
-
-	fprintf(stderr, "KERNEL_FMT      [%s]\n", fmt2name[k_fmt]);
-	fprintf(stderr, "RAMDISK_FMT     [%s]\n", fmt2name[r_fmt]);
-	fprintf(stderr, "EXTRA_FMT       [%s]\n", fmt2name[e_fmt]);
+	if (auto size = hdr->extra_size()) {
+		e_fmt = check_fmt(extra, size);
+		fprintf(stderr, "%-*s [%s]\n", PADDING, "EXTRA_FMT", fmt2name[e_fmt]);
+	}
 }
 
 static int find_dtb_offset(uint8_t *buf, int sz) {
@@ -329,7 +333,7 @@ void boot_img::find_kernel_dtb() {
 		kernel_dtb = kernel + off;
 		kernel_dt_size = hdr->kernel_size() - off;
 		hdr->kernel_size() = off;
-		fprintf(stderr, "KERNEL_DTB      [%u]\n", kernel_dt_size);
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_DTB", kernel_dt_size);
 	}
 }
 
@@ -593,12 +597,13 @@ void repack(const char* src_img, const char* out_img, bool skip_comp) {
 			HASH_update(&ctx, boot.map_addr + off.extra, size);
 			HASH_update(&ctx, &size, sizeof(size));
 		}
-		if (boot.hdr->header_version() >= 1) {
+		uint32_t ver = boot.hdr->header_version();
+		if (ver == 1 || ver == 2) {
 			size = boot.hdr->recovery_dtbo_size();
 			HASH_update(&ctx, boot.map_addr + boot.hdr->recovery_dtbo_offset(), size);
 			HASH_update(&ctx, &size, sizeof(size));
 		}
-		if (boot.hdr->header_version() >= 2) {
+		if (ver == 2) {
 			size = boot.hdr->dtb_size();
 			HASH_update(&ctx, boot.map_addr + off.dtb, size);
 			HASH_update(&ctx, &size, sizeof(size));
