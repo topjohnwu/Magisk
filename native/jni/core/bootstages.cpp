@@ -306,7 +306,7 @@ void post_fs_data(int client) {
 	if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
 		safe_mode = true;
 		// Disable all modules and magiskhide so next boot will be clean
-		foreach_modules("disable");
+		disable_modules();
 		stop_magiskhide();
 	} else {
 		exec_common_scripts("post-fs-data");

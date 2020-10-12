@@ -53,7 +53,7 @@ static void request_handler(int client, int req_code, ucred cred) {
 		exec_sql(client);
 		break;
 	case REMOVE_MODULES:
-		foreach_modules("remove");
+		remove_modules();
 		write_int(client, 0);
 		close(client);
 		reboot();
