@@ -9,6 +9,8 @@
 #include <zlib.h>
 #include <bzlib.h>
 #include <lzma.h>
+
+#define LZ4_HC_STATIC_LINKING_ONLY
 #include <lz4.h>
 #include <lz4frame.h>
 #include <lz4hc.h>
@@ -490,7 +492,6 @@ public:
 	~LZ4_encoder() override {
 		if (buf_off)
 			write_block();
-		bwrite(&in_total, sizeof(in_total));
 		delete[] outbuf;
 		delete[] buf;
 	}
@@ -502,8 +503,16 @@ private:
 	int buf_off;
 	unsigned in_total;
 
+    int LZ4_compress_HC_decSpeed(const char *src, char *dst, int srcSize, int capacity, int level) {
+        LZ4_streamHC_t *const statePtr = (LZ4_streamHC_t *) malloc(sizeof(LZ4_streamHC_t));
+        LZ4_favorDecompressionSpeed(statePtr, 1);
+        int const cSize = LZ4_compress_HC_extStateHC(statePtr, src, dst, srcSize, capacity, level);
+        free(statePtr);
+        return cSize;
+    }
+
 	int write_block() {
-		int written = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, 9);
+		int written = LZ4_compress_HC_decSpeed(buf, outbuf, buf_off, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
 		if (written == 0) {
 			LOGW("LZ4HC compression failure\n");
 			return -1;
