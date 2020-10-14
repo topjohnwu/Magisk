@@ -45,7 +45,6 @@ object Notifications {
                 setChannelId(UPDATE_NOTIFICATION_CHANNEL)
             } else {
                 setSmallIcon(R.drawable.ic_magisk_outline)
-                setVibrate(longArrayOf(0, 100, 100, 100))
             }
         }
     }
