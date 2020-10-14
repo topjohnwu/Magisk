@@ -114,7 +114,7 @@ ensure_bb() {
   # Find our current arguments
   # Run in busybox environment to ensure consistent results
   # /proc/<pid>/cmdline shall be <interpreter> <script> <arguments...>
-  local cmds=$($bb sh -o standalone -c "
+  local cmds="$($bb sh -o standalone -c "
   for arg in \$(tr '\0' '\n' < /proc/$$/cmdline); do
     if [ -z \"\$cmds\" ]; then
       # Skip the first argument as we want to change the interpreter
@@ -123,7 +123,7 @@ ensure_bb() {
       cmds=\"\$cmds '\$arg'\"
     fi
   done
-  echo \$cmds")
+  echo \$cmds")"
 
   # Re-exec our script
   echo $cmds | $bb xargs $bb
