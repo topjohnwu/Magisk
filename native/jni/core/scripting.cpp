@@ -90,7 +90,9 @@ void install_apk(const char *apk) {
 	};
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
-	exec_command_sync(exec, BBEXEC_CMD, "-c", cmds);
+	if (exec_command_sync(exec, BBEXEC_CMD, "-c", cmds) != 0) {
+		exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+	}
 }
 
 [[noreturn]] static void abort(const char *msg) {

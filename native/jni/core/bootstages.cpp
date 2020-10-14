@@ -43,6 +43,39 @@ if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
 	LOGI("link: %s\n", buf1); \
 }
 
+static void mount_mirrors() {
+	LOGI("* Mounting mirrors");
+
+	char buf1[4096];
+	char buf2[4096];
+
+	sprintf(buf1, "%s/" MODULEMNT, MAGISKTMP.data());
+	xmkdir(buf1, 0755);
+
+	parse_mnt("/proc/mounts", [&](mntent *me) {
+		struct stat st;
+		if (0) {}
+		mount_mirror(system, MS_RDONLY)
+		mount_mirror(vendor, MS_RDONLY)
+		mount_mirror(product, MS_RDONLY)
+		mount_mirror(system_ext, MS_RDONLY)
+		mount_mirror(data, 0)
+		else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
+			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
+		}
+		return true;
+	});
+	SETMIR(buf1, system);
+	SETMIR(buf2, system_root);
+	if (access(buf1, F_OK) != 0 && access(buf2, F_OK) == 0) {
+		xsymlink("./system_root/system", buf1);
+		LOGI("link: %s\n", buf1);
+	}
+	link_mirror(vendor);
+	link_mirror(product);
+	link_mirror(system_ext);
+}
+
 static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
 
@@ -50,7 +83,6 @@ static bool magisk_env() {
 	check_manager(&pkg);
 
 	char buf1[4096];
-	char buf2[4096];
 
 	sprintf(buf1, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
 
@@ -79,39 +111,13 @@ static bool magisk_env() {
 	unlink("/data/magisk_merge.img");
 	unlink("/data/magisk_debug.log");
 
-	sprintf(buf1, "%s/" MODULEMNT, MAGISKTMP.data());
-	xmkdir(buf1, 0755);
-
 	// Directories in /data/adb
 	xmkdir(DATABIN, 0755);
 	xmkdir(MODULEROOT, 0755);
 	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
 	xmkdir(SECURE_DIR "/service.d", 0755);
 
-	LOGI("* Mounting mirrors");
-
-	parse_mnt("/proc/mounts", [&](mntent *me) {
-		struct stat st;
-		if (0) {}
-		mount_mirror(system, MS_RDONLY)
-		mount_mirror(vendor, MS_RDONLY)
-		mount_mirror(product, MS_RDONLY)
-		mount_mirror(system_ext, MS_RDONLY)
-		mount_mirror(data, 0)
-		else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
-			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-		}
-		return true;
-	});
-	SETMIR(buf1, system);
-	SETMIR(buf2, system_root);
-	if (access(buf1, F_OK) != 0 && access(buf2, F_OK) == 0) {
-		xsymlink("./system_root/system", buf1);
-		LOGI("link: %s\n", buf1);
-	}
-	link_mirror(vendor);
-	link_mirror(product);
-	link_mirror(system_ext);
+	mount_mirrors();
 
 	// Disable/remove magiskhide, resetprop
 	if (SDK_INT < 19) {
@@ -294,13 +300,14 @@ void post_fs_data(int client) {
 			 * do NOT proceed further. Manual creation of the folder
 			 * will cause bootloops on FBE devices. */
 			LOGE(SECURE_DIR " is not present, abort...\n");
-			goto unblock_init;
+			mount_mirrors();
+			goto magic_mount;
 		}
 	}
 
 	if (!magisk_env()) {
 		LOGE("* Magisk environment setup incomplete, abort\n");
-		goto unblock_init;
+		goto magic_mount;
 	}
 
 	if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
@@ -314,9 +321,11 @@ void post_fs_data(int client) {
 		handle_modules();
 	}
 
+	pfs_done = true;
+
+magic_mount:
 	// We still do magic mount because root itself might need it
 	magic_mount();
-	pfs_done = true;
 
 unblock_init:
 	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
