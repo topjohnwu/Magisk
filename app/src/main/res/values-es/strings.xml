@@ -175,6 +175,8 @@
     <string name="no_biometric">Dispositivo no compatible o las configuraciones biométricas no están habilitadas</string>
     <string name="settings_customization">Personalización</string>
     <string name="setting_add_shortcut_summary">Añade un bonito atajo en la pantalla de inicio en caso de que el nombre y el icono sean difíciles de reconocer después de ocultar la aplicación</string>
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Evitar envenenamiento de DNS en algunos países</string>
 
     <string name="multiuser_mode">Modo multiusuario</string>
     <string name="settings_owner_only">Sólo administrador del dispositivo</string>
@@ -234,5 +236,6 @@
     <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
     <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
     <string name="add_shortcut_msg">Después de esconder el Magisk Manager, su nombre e icono podría ser difícil de reconocer. ¿Quieres añadir un bonito atajo a la pantalla de inicio?</string>
+    <string name="app_not_found">No se ha encontrado ninguna app para manejar esta acción</string>
 
 </resources>
