@@ -109,6 +109,7 @@
 
     <!--Module -->
     <string name="no_info_provided">(No info provided)</string>
+    <string name="reboot_userspace">Soft reboot</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
     <string name="reboot_download">Reboot to Download</string>
