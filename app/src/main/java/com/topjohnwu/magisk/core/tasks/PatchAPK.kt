@@ -46,7 +46,7 @@ object PatchAPK {
         var next: Char
         var prev = 0.toChar()
         for (i in 0 until len) {
-            next = if (prev == '.' || i == len - 1) {
+            next = if (prev == '.' || prev == 0.toChar() || i == len - 1) {
                 ALPHA[random.nextInt(ALPHA.length)]
             } else {
                 ALPHADOTS[random.nextInt(ALPHADOTS.length)]
