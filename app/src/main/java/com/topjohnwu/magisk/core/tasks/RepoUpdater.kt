@@ -20,22 +20,23 @@ class RepoUpdater(
         val cachedMap = HashMap<String, Date>().also { map ->
             repoDB.getModuleStubs().forEach { map[it.id] = Date(it.last_update) }
         }.synchronized()
-        val info = svc.fetchRepoInfo()
-        coroutineScope {
-            info.modules.forEach {
-                launch {
-                    val lastUpdated = cachedMap.remove(it.id)
-                    if (forced || lastUpdated?.before(Date(it.last_update)) != false) {
-                        try {
-                            val repo = OnlineModule(it).apply { load() }
-                            repoDB.addModule(repo)
-                        } catch (e: OnlineModule.IllegalRepoException) {
-                            Timber.e(e)
+        svc.fetchRepoInfo()?.let { info ->
+            coroutineScope {
+                info.modules.forEach {
+                    launch {
+                        val lastUpdated = cachedMap.remove(it.id)
+                        if (forced || lastUpdated?.before(Date(it.last_update)) != false) {
+                            try {
+                                val repo = OnlineModule(it).apply { load() }
+                                repoDB.addModule(repo)
+                            } catch (e: OnlineModule.IllegalRepoException) {
+                                Timber.e(e)
+                            }
                         }
                     }
                 }
             }
+            repoDB.removeModules(cachedMap.keys)
         }
-        repoDB.removeModules(cachedMap.keys)
     }
 }
