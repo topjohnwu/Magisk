@@ -75,6 +75,8 @@ class InstallViewModel(
         this.progress = progress.times(100).roundToInt()
         if (this.progress >= 100) {
             state = State.LOADED
+        } else if (this.progress < -150) {
+            state = State.LOADING_FAILED
         }
     }
 
