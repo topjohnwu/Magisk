@@ -384,5 +384,4 @@ struct boot_img {
 	~boot_img();
 
 	void parse_image(uint8_t *addr);
-	void find_kernel_dtb();
 };

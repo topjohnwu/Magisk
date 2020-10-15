@@ -193,16 +193,42 @@ boot_img::~boot_img() {
 	delete hdr;
 }
 
-static format_t check_fmt_lg(uint8_t *buf, unsigned size) {
-	format_t fmt = check_fmt(buf, size);
+static int find_dtb_offset(uint8_t *buf, unsigned sz) {
+	for (int off = 0; off + sizeof(fdt_header) < sz; ++off) {
+		auto fdt_hdr = reinterpret_cast<fdt_header *>(buf + off);
+		if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
+			continue;
+
+		// Check that fdt_header.totalsize does not overflow kernel image size
+		uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
+		if (totalsize + off > sz)
+			continue;
+
+		// Check that fdt_header.off_dt_struct does not overflow kernel image size
+		uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
+		if (off_dt_struct + off > sz)
+			continue;
+
+		// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
+		auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(buf + off + off_dt_struct);
+		if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
+			continue;
+
+		return off;
+	}
+	return -1;
+}
+
+static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
+	format_t fmt = check_fmt(buf, sz);
 	if (fmt == LZ4_LEGACY) {
 		// We need to check if it is LZ4_LG
 		unsigned off = 4;
 		unsigned block_sz;
-		while (off + sizeof(block_sz) <= size) {
+		while (off + sizeof(block_sz) <= sz) {
 			memcpy(&block_sz, buf + off, sizeof(block_sz));
 			off += sizeof(block_sz);
-			if (off + block_sz > size)
+			if (off + block_sz > sz)
 				return LZ4_LG;
 			off += block_sz;
 		}
@@ -284,7 +310,12 @@ void boot_img::parse_image(uint8_t *addr) {
 		flags |= LG_BUMP_FLAG;
 	}
 
-	find_kernel_dtb();
+	if (int dtb_off = find_dtb_offset(kernel, hdr->kernel_size()); dtb_off > 0) {
+		kernel_dtb = kernel + dtb_off;
+		kernel_dt_size = hdr->kernel_size() - dtb_off;
+		hdr->kernel_size() = dtb_off;
+		fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_DTB", kernel_dt_size);
+	}
 
 	if (auto size = hdr->kernel_size()) {
 		k_fmt = check_fmt_lg(kernel, size);
@@ -317,41 +348,6 @@ void boot_img::parse_image(uint8_t *addr) {
 	if (auto size = hdr->extra_size()) {
 		e_fmt = check_fmt_lg(extra, size);
 		fprintf(stderr, "%-*s [%s]\n", PADDING, "EXTRA_FMT", fmt2name[e_fmt]);
-	}
-}
-
-static int find_dtb_offset(uint8_t *buf, int sz) {
-	for (int off = 0; off < sz - (int) sizeof(fdt_header); ++off) {
-		auto fdt_hdr = reinterpret_cast<fdt_header *>(buf + off);
-		if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
-			continue;
-
-		// Check that fdt_header.totalsize does not overflow kernel image size
-		uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-		if (totalsize + off > sz)
-			continue;
-
-		// Check that fdt_header.off_dt_struct does not overflow kernel image size
-		uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-		if (off_dt_struct + off > sz)
-			continue;
-
-		// Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-		auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(buf + off + off_dt_struct);
-		if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
-			continue;
-
-		return off;
-	}
-	return -1;
-}
-
-void boot_img::find_kernel_dtb() {
-	if (int off = find_dtb_offset(kernel, hdr->kernel_size()); off > 0) {
-		kernel_dtb = kernel + off;
-		kernel_dt_size = hdr->kernel_size() - off;
-		hdr->kernel_size() = off;
-		fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_DTB", kernel_dt_size);
 	}
 }
 
