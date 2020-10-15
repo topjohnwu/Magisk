@@ -14,7 +14,7 @@ buildscript {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     }
 
-    val vNav = "2.3.0"
+    val vNav = "2.3.1"
     extra["vNav"] = vNav
 
     dependencies {

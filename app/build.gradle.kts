@@ -51,11 +51,12 @@ android {
 
     packagingOptions {
         exclude("/META-INF/**")
-        exclude("/androidsupportmultidexversion.txt")
-        exclude("/org/bouncycastle/**")
+        exclude("/org/**")
         exclude("/kotlin/**")
         exclude("/kotlinx/**")
         exclude("/okhttp3/**")
+        exclude("/*.txt")
+        exclude("/*.bin")
     }
 
     kotlinOptions {
@@ -140,7 +141,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.2")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.2.0")
     implementation("androidx.preference:preference:1.1.1")
