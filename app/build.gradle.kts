@@ -74,13 +74,6 @@ val copyUtils = tasks.register("copyUtils", Copy::class) {
 
 tasks["preBuild"]?.dependsOn(copyUtils)
 
-configurations.all {
-    resolutionStrategy {
-        force("org.antlr:antlr4-runtime:4.7.1")
-        force("org.antlr:antlr4-tool:4.7.1")
-    }
-}
-
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib"))
@@ -130,7 +123,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.2.5"
+    val vRoom = "2.3.0-alpha03"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
