@@ -17,6 +17,7 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
+	LZ4_LG,
 /* Unsupported compression */
 	LZOP,
 /* Misc */

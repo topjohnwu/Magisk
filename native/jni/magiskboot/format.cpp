@@ -15,6 +15,7 @@ public:
 		name2fmt["bzip2"] = BZIP2;
 		name2fmt["lz4"] = LZ4;
 		name2fmt["lz4_legacy"] = LZ4_LEGACY;
+		name2fmt["lz4_lg"] = LZ4_LG;
 	}
 };
 
@@ -75,6 +76,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
 			return "lz4";
 		case LZ4_LEGACY:
 			return "lz4_legacy";
+		case LZ4_LG:
+			return "lz4_lg";
 		case MTK:
 			return "mtk";
 		case DTB:
@@ -98,6 +101,7 @@ const char *Fmt2Ext::operator[](format_t fmt) {
 			return ".bz2";
 		case LZ4:
 		case LZ4_LEGACY:
+		case LZ4_LG:
 			return ".lz4";
 		default:
 			return "";

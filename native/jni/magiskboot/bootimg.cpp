@@ -88,8 +88,9 @@ void dyn_img_hdr::print() {
 	}
 
 	fprintf(stderr, "%-*s [%u]\n", PADDING, "PAGESIZE", page_size());
-	if (ver < 3)
+	if (ver < 3) {
 		fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", name());
+	}
 	fprintf(stderr, "%-*s [%.*s%.*s]\n", PADDING, "CMDLINE",
 			BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
 	if (auto chksum = reinterpret_cast<uint8_t*>(id())) {
@@ -192,6 +193,23 @@ boot_img::~boot_img() {
 	delete hdr;
 }
 
+static format_t check_fmt_lg(uint8_t *buf, unsigned size) {
+	format_t fmt = check_fmt(buf, size);
+	if (fmt == LZ4_LEGACY) {
+		// We need to check if it is LZ4_LG
+		unsigned off = 4;
+		unsigned block_sz;
+		while (off + sizeof(block_sz) <= size) {
+			memcpy(&block_sz, buf + off, sizeof(block_sz));
+			off += sizeof(block_sz);
+			if (off + block_sz > size)
+				return LZ4_LG;
+			off += block_sz;
+		}
+	}
+	return fmt;
+}
+
 #define get_block(name) {\
 name = addr + off; \
 off += hdr->name##_size(); \
@@ -269,7 +287,7 @@ void boot_img::parse_image(uint8_t *addr) {
 	find_kernel_dtb();
 
 	if (auto size = hdr->kernel_size()) {
-		k_fmt = check_fmt(kernel, size);
+		k_fmt = check_fmt_lg(kernel, size);
 		if (k_fmt == MTK) {
 			fprintf(stderr, "MTK_KERNEL_HDR\n");
 			flags |= MTK_KERNEL;
@@ -278,12 +296,12 @@ void boot_img::parse_image(uint8_t *addr) {
 			fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", k_hdr->name);
 			kernel += sizeof(mtk_hdr);
 			hdr->kernel_size() -= sizeof(mtk_hdr);
-			k_fmt = check_fmt(kernel, hdr->kernel_size());
+			k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
 		}
 		fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
 	}
 	if (auto size = hdr->ramdisk_size()) {
-		r_fmt = check_fmt(ramdisk, size);
+		r_fmt = check_fmt_lg(ramdisk, size);
 		if (r_fmt == MTK) {
 			fprintf(stderr, "MTK_RAMDISK_HDR\n");
 			flags |= MTK_RAMDISK;
@@ -292,12 +310,12 @@ void boot_img::parse_image(uint8_t *addr) {
 			fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
 			ramdisk += sizeof(mtk_hdr);
 			hdr->ramdisk_size() -= sizeof(mtk_hdr);
-			r_fmt = check_fmt(ramdisk, hdr->ramdisk_size());
+			r_fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
 		}
 		fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
 	}
 	if (auto size = hdr->extra_size()) {
-		e_fmt = check_fmt(extra, size);
+		e_fmt = check_fmt_lg(extra, size);
 		fprintf(stderr, "%-*s [%s]\n", PADDING, "EXTRA_FMT", fmt2name[e_fmt]);
 	}
 }
@@ -344,7 +362,7 @@ int split_image_dtb(const char *filename) {
 	run_finally f([=]{ munmap(buf, sz); });
 
 	if (int off = find_dtb_offset(buf, sz); off > 0) {
-		format_t fmt = check_fmt(buf, sz);
+		format_t fmt = check_fmt_lg(buf, sz);
 		if (COMPRESSED(fmt)) {
 			int fd = creat(KERNEL_FILE, 0644);
 			decompress(fmt, fd, buf, off);
