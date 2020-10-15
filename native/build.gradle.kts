@@ -4,8 +4,6 @@ plugins {
 
 android {
 
-    ndkVersion = "99.99.99"
-
     externalNativeBuild {
         ndkBuild {
             path("jni/Android.mk")

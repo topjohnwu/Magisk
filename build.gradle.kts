@@ -37,7 +37,7 @@ fun Task.applyOptimize() = doLast {
     val aapt2 = Paths.get(project.android.sdkDirectory.path,
         "build-tools", project.android.buildToolsVersion, "aapt2")
     val zip = Paths.get(project.buildDir.path, "intermediates",
-        "processed_res", "release", "out", "resources-release.ap_")
+        "shrunk_processed_res", "release", "resources-release-stripped.ap_")
     val optimized = File("${zip}.opt")
     val cmd = exec {
         commandLine(aapt2, "optimize", "--collapse-resource-names",
@@ -45,6 +45,7 @@ fun Task.applyOptimize() = doLast {
         isIgnoreExitValue = true
     }
     if (cmd.exitValue == 0) {
+        zip.toFile().delete()
         optimized.renameTo(zip.toFile())
     }
 }
@@ -63,6 +64,7 @@ subprojects {
             android.apply {
                 compileSdkVersion(30)
                 buildToolsVersion = "30.0.2"
+                ndkVersion = "99.99.99"
 
                 defaultConfig {
                     if (minSdkVersion == null)
@@ -87,7 +89,7 @@ subprojects {
         }
 
         tasks.whenTaskAdded {
-            if (name == "processReleaseResources") {
+            if (name == "shrinkReleaseRes") {
                 finalizedBy(tasks.create("optimizeReleaseResources").applyOptimize())
             }
         }

@@ -59,7 +59,7 @@ ndk_ver = '21c'
 ndk_ver_full = '21.2.6472646'
 
 ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
-ndk_path = op.join(ndk_root, 'magisk')
+ndk_path = op.join(ndk_root, '99.99.99')
 ndk_build = op.join(ndk_path, 'ndk-build')
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
 
