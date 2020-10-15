@@ -290,7 +290,7 @@ abstract class MagiskInstallImpl : KoinComponent {
             srcBoot = File(installDir, "boot.img").path
         }
 
-        var isSigned = false
+        var isSigned: Boolean
         try {
             SuFileInputStream(srcBoot).use {
                 isSigned = SignBoot.verifySignature(it, null)

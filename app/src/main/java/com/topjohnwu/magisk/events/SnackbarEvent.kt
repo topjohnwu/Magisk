@@ -35,11 +35,9 @@ class SnackbarEvent private constructor(
     ) = Snackbar.make(view, message, length).apply(builder).show()
 
     override fun invoke(activity: BaseUIActivity<*, *>) {
-        if (activity is BaseUIActivity<*, *>) {
-            snackbar(activity.snackbarView,
-                msg.getText(activity.resources).toString(),
-                length, builder)
-        }
+        snackbar(activity.snackbarView,
+            msg.getText(activity.resources).toString(),
+            length, builder)
     }
 
 }
