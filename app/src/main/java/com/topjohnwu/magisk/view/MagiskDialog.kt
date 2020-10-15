@@ -228,7 +228,7 @@ class MagiskDialog(
                     dismiss()
                 }
             }
-            val items = list.mapIndexed { i, it -> DialogItem(it, i) }
+            val items = list.mapIndexed { i, cs -> DialogItem(cs, i) }
             val binding = itemBindingOf<DialogItem> { it.bindExtra(BR.listener, actualListener) }
                 .let { ItemBinding.of(it) }
 

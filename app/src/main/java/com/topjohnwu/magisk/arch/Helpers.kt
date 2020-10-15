@@ -9,18 +9,18 @@ import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind
 
-inline fun <T : ComparableRvItem<*>> diffListOf(
+fun <T : ComparableRvItem<*>> diffListOf(
     vararg newItems: T
 ) = diffListOf(newItems.toList())
 
-inline fun <T : ComparableRvItem<*>> diffListOf(
+fun <T : ComparableRvItem<*>> diffListOf(
     newItems: List<T>
 ) = DiffObservableList(object : DiffObservableList.Callback<T> {
     override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)
     override fun areContentsTheSame(oldItem: T, newItem: T) = oldItem.genericContentSameAs(newItem)
 }).also { it.update(newItems) }
 
-inline fun <T : ComparableRvItem<*>> filterableListOf(
+fun <T : ComparableRvItem<*>> filterableListOf(
     vararg newItems: T
 ) = FilterableDiffObservableList(object : DiffObservableList.Callback<T> {
     override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem.genericItemSameAs(newItem)
