@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.hide
 
+import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.databinding.Bindable
@@ -27,14 +28,20 @@ class HideViewModel : BaseViewModel(), Queryable {
 
     @get:Bindable
     var isShowSystem = Config.showSystemApp
-        set(value) = set(value, field, { field = it }, BR.showSystem){
+        set(value) = set(value, field, { field = it }, BR.showSystem) {
             Config.showSystemApp = it
             submitQuery()
         }
 
     @get:Bindable
+    var isShowOS = false
+        set(value) = set(value, field, { field = it }, BR.showOS) {
+            submitQuery()
+        }
+
+    @get:Bindable
     var query = ""
-        set(value) = set(value, field, { field = it }, BR.query){
+        set(value) = set(value, field, { field = it }, BR.query) {
             submitQuery()
         }
 
@@ -46,6 +53,7 @@ class HideViewModel : BaseViewModel(), Queryable {
         it.bindExtra(BR.viewModel, this)
     }
 
+    @SuppressLint("InlinedApi")
     override fun refresh() = viewModelScope.launch {
         if (!Utils.showSuperUser()) {
             state = State.LOADING_FAILED
@@ -55,9 +63,9 @@ class HideViewModel : BaseViewModel(), Queryable {
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = get<PackageManager>()
             val hides = Shell.su("magiskhide --ls").exec().out.map { HideTarget(it) }
-            val apps = pm.getInstalledApplications(0)
+            val apps = pm.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES)
                 .asSequence()
-                .filter { it.enabled && it.uid >= 10000 && !blacklist.contains(it.packageName) }
+                .filter { it.enabled && !blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm) }
                 .map { createTarget(it, hides) }
                 .filter { it.processes.isNotEmpty() }
@@ -88,8 +96,9 @@ class HideViewModel : BaseViewModel(), Queryable {
         items.filter {
             fun showHidden() = it.itemsChecked != 0
 
-            fun filterSystem() =
-                isShowSystem || it.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
+            fun filterSystem() = isShowSystem || it.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
+
+            fun filterOS() = (isShowSystem && isShowOS) || it.info.uid >= 10000
 
             fun filterQuery(): Boolean {
                 fun inName() = it.info.label.contains(query, true)
@@ -98,7 +107,7 @@ class HideViewModel : BaseViewModel(), Queryable {
                 return inName() || inPackage() || inProcesses()
             }
 
-            showHidden() || (filterSystem() && filterQuery())
+            showHidden() || (filterSystem() && filterOS() && filterQuery())
         }
         state = State.LOADED
     }
@@ -121,4 +130,3 @@ class HideViewModel : BaseViewModel(), Queryable {
         ) }
     }
 }
-

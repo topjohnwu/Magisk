@@ -102,6 +102,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Show system apps</string>
+    <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_scroll_up">Scroll up</string>
     <string name="hide_filters">Filters</string>

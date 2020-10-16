@@ -47,7 +47,7 @@
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_filter">
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/hide_filter_chip"
+                android:id="@+id/hide_filter_system_chip"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -55,6 +55,20 @@
                 android:nextFocusRight="@id/hide_filter_chip_data"
                 android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@string/show_system_app"
+                android:textAppearance="@style/AppearanceFoundation.Caption"
+                app:checkedIcon="@drawable/ic_check_md2"
+                app:chipBackgroundColor="?colorSurfaceVariant"
+                tools:checked="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/hide_filter_os_chip"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={viewModel.showOS}"
+                android:nextFocusRight="@id/hide_filter_chip_data"
+                android:nextFocusDown="@id/hide_filter_search_field"
+                android:text="@string/show_os_app"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
                 app:checkedIcon="@drawable/ic_check_md2"
                 app:chipBackgroundColor="?colorSurfaceVariant"
@@ -136,7 +150,7 @@
             android:id="@+id/hide_filter_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:nextFocusLeft="@id/hide_filter_chip"
+            android:nextFocusLeft="@id/hide_filter_system_chip"
             app:backgroundTint="?colorPrimary"
             app:elevation="0dp"
             app:fabSize="mini"
