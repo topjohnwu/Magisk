@@ -16,15 +16,6 @@ sealed class Action : Parcelable {
 
     }
 
-    sealed class APK : Action() {
-
-        @Parcelize
-        object Upgrade : APK()
-
-        @Parcelize
-        object Restore : APK()
-    }
-
     @Parcelize
     object Download : Action()
 
