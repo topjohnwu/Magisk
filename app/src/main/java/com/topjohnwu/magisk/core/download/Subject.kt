@@ -40,16 +40,12 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Manager(
-        override val action: Action.APK,
         private val app: ManagerJson = Info.remote.app,
         val stub: StubJson = Info.remote.stub
     ) : Subject() {
-
-        override val title: String
-            get() = "MagiskManager-${app.version}(${app.versionCode})"
-
-        override val url: String
-            get() = app.link
+        override val action get() = Action.Download
+        override val title: String get() = "MagiskManager-${app.version}(${app.versionCode})"
+        override val url: String get() = app.link
 
         @IgnoredOnParcel
         override val file by lazy {

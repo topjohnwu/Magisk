@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.ktx.res
@@ -16,7 +15,7 @@ class ManagerInstallDialog : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
         with(dialog) {
-            val subject = Subject.Manager(Action.APK.Upgrade)
+            val subject = Subject.Manager()
 
             applyTitle(R.string.repo_install_title.res(R.string.app_name.res()))
             applyMessage(R.string.repo_install_msg.res(subject.title))

@@ -46,7 +46,6 @@ object Const {
     }
 
     object Url {
-        const val ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip"
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
@@ -58,11 +57,9 @@ object Const {
     }
 
     object Key {
-        // others
-        const val LINK_KEY = "Link"
-        const val ETAG_KEY = "ETag"
         // intents
         const val OPEN_SECTION = "section"
+        const val HIDDEN_PKG = "hidden_pkg"
     }
 
     object Value {

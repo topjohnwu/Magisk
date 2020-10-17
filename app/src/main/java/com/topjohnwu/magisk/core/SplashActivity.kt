@@ -3,9 +3,9 @@ package com.topjohnwu.magisk.core
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.data.network.RawServices
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.view.Notifications
@@ -29,18 +29,18 @@ open class SplashActivity : Activity() {
         }
     }
 
-    private fun handleRepackage() {
-        val pkg = Config.suManager
-        if (Config.suManager.isNotEmpty() && packageName == BuildConfig.APPLICATION_ID) {
-            Config.suManager = ""
-            Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
-        }
-        if (pkg == packageName) {
+    private fun handleRepackage(pkg: String?) {
+        if (packageName != APPLICATION_ID) {
             runCatching {
-                // We are the manager, remove com.topjohnwu.magisk as it could be malware
-                packageManager.getApplicationInfo(BuildConfig.APPLICATION_ID, 0)
-                Shell.su("(pm uninstall ${BuildConfig.APPLICATION_ID})& >/dev/null 2>&1").exec()
+                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
+                packageManager.getApplicationInfo(APPLICATION_ID, 0)
+                Shell.su("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
             }
+        } else {
+            if (Config.suManager.isNotEmpty())
+                Config.suManager = ""
+            pkg ?: return
+            Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
         }
     }
 
@@ -48,14 +48,16 @@ open class SplashActivity : Activity() {
         // Pre-initialize root shell
         Shell.getShell()
 
-        Config.initialize()
-        handleRepackage()
+        val hiddenPackage = intent.getStringExtra(Const.Key.HIDDEN_PKG)
+
+        Config.load(hiddenPackage ?: APPLICATION_ID)
+        handleRepackage(hiddenPackage)
         Notifications.setup(this)
         UpdateCheckService.schedule(this)
         Shortcuts.setupDynamic(this)
 
-        // Pre-fetch network stuffs
-        get<RawServices>()
+        // Pre-fetch network services
+        get<NetworkService>()
 
         DONE = true
 

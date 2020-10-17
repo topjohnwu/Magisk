@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
-import com.topjohnwu.magisk.core.tasks.PatchAPK
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.availableLocales
@@ -90,7 +90,7 @@ object Hide : BaseSettingsItem.Input() {
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     val maxLength
-        get() = PatchAPK.MAX_LABEL_LENGTH
+        get() = HideAPK.MAX_LABEL_LENGTH
 
     @get:Bindable
     val isError
@@ -288,9 +288,9 @@ object AutomaticResponse : BaseSettingsItem.Selector() {
     override val entryRes = R.array.auto_response
     override val entryValRes = R.array.value_array
 
-    override var value = Config.suAutoReponse
+    override var value = Config.suAutoResponse
         set(value) = setV(value, field, { field = it }) {
-            Config.suAutoReponse = entryValues[it].toInt()
+            Config.suAutoResponse = entryValues[it].toInt()
         }
 }
 

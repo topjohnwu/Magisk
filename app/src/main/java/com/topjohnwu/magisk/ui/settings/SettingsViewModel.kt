@@ -15,11 +15,8 @@ import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Action
-import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.tasks.PatchAPK
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
@@ -104,7 +101,7 @@ class SettingsViewModel(
         is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
         is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
-        is Restore -> restoreManager()
+        is Restore -> HideAPK.restore(view.context)
         is AddShortcut -> AddHomeIconEvent().publish()
         else -> callback()
     }
@@ -112,7 +109,7 @@ class SettingsViewModel(
     override fun onItemChanged(view: View, item: BaseSettingsItem) = when (item) {
         is Language -> RecreateEvent().publish()
         is UpdateChannel -> openUrlIfNecessary(view)
-        is Hide -> PatchAPK.hideManager(view.context, item.value)
+        is Hide -> HideAPK.hide(view.context, item.value)
         else -> Unit
     }
 
@@ -142,9 +139,4 @@ class SettingsViewModel(
             Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
         }
     }
-
-    private fun restoreManager() {
-        DownloadService.start(get(), Subject.Manager(Action.APK.Restore))
-    }
-
 }

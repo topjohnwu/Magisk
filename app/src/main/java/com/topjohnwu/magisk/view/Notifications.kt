@@ -15,7 +15,6 @@ import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.SplashActivity
 import com.topjohnwu.magisk.core.cmp
-import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.intent
@@ -70,7 +69,7 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = DownloadService.pendingIntent(context, Subject.Manager(Action.APK.Upgrade))
+        val intent = DownloadService.pendingIntent(context, Subject.Manager())
 
         val builder = updateBuilder(context)
             .setContentTitle(context.getString(R.string.manager_update_title))
