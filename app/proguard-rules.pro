@@ -35,12 +35,6 @@
   void onResponse(org.json.JSONObject);
 }
 
-# Fragments
-# TODO: Remove when AGP 4.1 release
-# https://issuetracker.google.com/issues/142601969
--keep,allowobfuscation class * extends androidx.fragment.app.Fragment
--keepnames class androidx.navigation.fragment.NavHostFragment
-
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber.Tree {
   public void v(**);

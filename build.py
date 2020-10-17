@@ -55,8 +55,8 @@ arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
-ndk_ver = '21c'
-ndk_ver_full = '21.2.6472646'
+ndk_ver = '21d'
+ndk_ver_full = '21.3.6528147'
 
 ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
@@ -285,8 +285,8 @@ def dump_bin_headers():
 def build_binary(args):
     # Verify NDK install
     props = parse_props(op.join(ndk_path, 'source.properties'))
-    if 'Pkg.Revision.orig' not in props or props['Pkg.Revision.orig'] != ndk_ver_full:
-        error('Incorrect NDK. Please setup NDK with "build.py ndk"')
+    if props['Pkg.Revision'] != ndk_ver_full:
+        error('Incorrect NDK. Please install/upgrade NDK with "build.py ndk"')
 
     if args.target:
         args.target = set(args.target) & set(support_targets)
@@ -549,15 +549,6 @@ def setup_ndk(args):
       rm(op.join(src_dir, '.DS_Store'))
       for path in copy_tree(src_dir, lib_dir):
           vprint(f'Replaced {path}')
-
-    # Rewrite source.properties
-    src_prop = op.join(ndk_path, 'source.properties')
-    props = parse_props(src_prop)
-    props['Pkg.Revision.orig'] = props['Pkg.Revision']
-    props['Pkg.Revision'] = '99.99.99'
-    with open(src_prop, 'w') as p:
-        for key, val in props.items():
-            print(f'{key} = {val}', file=p)
 
 
 def build_all(args):
