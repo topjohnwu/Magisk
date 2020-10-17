@@ -18,7 +18,6 @@ object Const {
     // Misc
     const val ANDROID_MANIFEST = "AndroidManifest.xml"
     const val MAGISK_INSTALL_LOG_FILENAME = "magisk_install_log_%s.log"
-    const val MANAGER_CONFIGS = ".tmp.magisk.config"
     val USER_ID = Process.myUid() / 100000
 
     object Version {

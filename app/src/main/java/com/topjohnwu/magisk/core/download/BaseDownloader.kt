@@ -69,8 +69,8 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
     // -- Download logic
 
     private suspend fun Subject.startDownload() {
-        val skipDl = this is Subject.Magisk && file.checkSum("MD5", magisk.md5)
-        if (!skipDl) {
+        val skip = this is Subject.Magisk && file.checkSum("MD5", magisk.md5)
+        if (!skip) {
             val stream = service.fetchFile(url).toProgressStream(this)
             when (this) {
                 is Subject.Module ->  // Download and process on-the-fly
