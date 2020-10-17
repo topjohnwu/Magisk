@@ -64,7 +64,7 @@ subprojects {
             android.apply {
                 compileSdkVersion(30)
                 buildToolsVersion = "30.0.2"
-                ndkPath = "${System.getenv("ANDROID_HOME")}/ndk/magisk"
+                ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
 
                 defaultConfig {
                     if (minSdkVersion == null)

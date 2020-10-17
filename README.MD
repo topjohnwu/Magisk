@@ -56,7 +56,7 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
 	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
-- Set environment variable `ANDROID_HOME` to the Android SDK folder (can be found in Android Studio settings)
+- Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)
 - Run `./build.py ndk` to let the script download and install NDK for you
 - Set configurations in `config.prop`. A sample `config.prop.sample` is provided.
 - To start building, run `build.py` to see your options. \

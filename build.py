@@ -27,8 +27,8 @@ def vprint(str):
 if not sys.version_info >= (3, 6):
     error('Requires Python 3.6+')
 
-if 'ANDROID_HOME' not in os.environ:
-    error('Please add Android SDK path to ANDROID_HOME environment variable!')
+if 'ANDROID_SDK_ROOT' not in os.environ:
+    error('Please add Android SDK path to ANDROID_SDK_ROOT environment variable!')
 
 try:
     subprocess.run(['javac', '-version'],
@@ -58,7 +58,7 @@ default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 ndk_ver = '21d'
 ndk_ver_full = '21.3.6528147'
 
-ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
+ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
