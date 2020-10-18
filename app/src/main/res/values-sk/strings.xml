@@ -102,6 +102,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
+    <string name="show_os_app">Zobraziť aplikácie OS</string>
     <string name="hide_filter_hint">Filtrovať podľa názvu</string>
     <string name="hide_scroll_up">Posunúť nahor</string>
     <string name="hide_filters">Filtre</string>
@@ -109,6 +110,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>
+    <string name="reboot_userspace">Softvérový reštart</string>
     <string name="reboot_recovery">Reštartovať do Recovery</string>
     <string name="reboot_bootloader">Reštartovať do Bootloader</string>
     <string name="reboot_download">Reštartovať do Download</string>
@@ -218,8 +220,9 @@
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Zlyhalo</string>
-    <string name="hide_manager_title">Skrytie Magisk Managera…</string>
-    <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo.</string>
+    <string name="hide_manager_title">Skrývanie Magisk Managera…</string>
+    <string name="hide_manager_fail_toast">Skrytie Magisk Managera zlyhalo</string>
+    <string name="restore_manager_fail_toast">Obnovenie Magisk Managera zlyhalo</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
