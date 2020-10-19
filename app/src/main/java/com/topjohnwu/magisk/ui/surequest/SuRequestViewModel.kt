@@ -1,11 +1,20 @@
 package com.topjohnwu.magisk.ui.surequest
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityNodeProvider
+import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -50,6 +59,20 @@ class SuRequestViewModel(
     @get:Bindable
     var grantEnabled = false
         set(value) = set(value, field, { field = it }, BR.grantEnabled)
+
+    @SuppressLint("ClickableViewAccessibility")
+    val grantTouchListener = View.OnTouchListener { v: View, event: MotionEvent ->
+        // Filter obscured touches by consuming them.
+        if (event.flags and MotionEvent.FLAG_WINDOW_IS_OBSCURED != 0
+            || event.flags and MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED != 0) {
+            if (event.action == MotionEvent.ACTION_UP) {
+                Toast.makeText(v.context, R.string.touch_filtered_warning,
+                    Toast.LENGTH_SHORT).show() // Always warning
+            }
+            if (Config.suTapjack) return@OnTouchListener true
+        }
+        false
+    }
 
     private val items = res.getStringArray(R.array.allow_timeout).map { SpinnerRvItem(it) }
     val adapter = BindingListViewAdapter<SpinnerRvItem>(1).apply {
@@ -104,7 +127,7 @@ class SuRequestViewModel(
         timer = SuTimer(millis, 1000).apply { start() }
 
         // Actually show the UI
-        ShowUIEvent().publish()
+        ShowUIEvent(if (Config.suTapjack) EmptyAccessibilityDelegate else null).publish()
     }
 
     private fun respond(action: Int) {
@@ -140,5 +163,19 @@ class SuRequestViewModel(
             respond(DENY)
         }
 
+    }
+
+    // Invisible for accessibility services
+    object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {
+        override fun sendAccessibilityEvent(host: View?, eventType: Int) {}
+        override fun performAccessibilityAction(host: View?, action: Int, args: Bundle?) = true
+        override fun sendAccessibilityEventUnchecked(host: View?, event: AccessibilityEvent?) {}
+        override fun dispatchPopulateAccessibilityEvent(host: View?, event: AccessibilityEvent?) = true
+        override fun onPopulateAccessibilityEvent(host: View?, event: AccessibilityEvent?) {}
+        override fun onInitializeAccessibilityEvent(host: View?, event: AccessibilityEvent?) {}
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {}
+        override fun addExtraDataToAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo, extraDataKey: String, arguments: Bundle?) {}
+        override fun onRequestSendAccessibilityEvent(host: ViewGroup?, child: View?, event: AccessibilityEvent?): Boolean = false
+        override fun getAccessibilityNodeProvider(host: View?): AccessibilityNodeProvider? = null
     }
 }

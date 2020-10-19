@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.view.View
 import android.widget.Toast
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
@@ -58,9 +59,11 @@ class DieEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class ShowUIEvent : ViewEvent(), ActivityExecutor {
+class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
+    : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.setContentView()
+        activity.setAccessibilityDelegate(delegate)
     }
 }
 

@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
+    <string name="touch_filtered_warning">Because an app is obscuring a superuser request, Magisk can’t verify your response</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Grant</string>
@@ -172,6 +173,8 @@
     <string name="superuser_notification">Superuser Notification</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
     <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
+    <string name="settings_su_tapjack_title">Enable Tapjacking Protection</string>
+    <string name="settings_su_tapjack_summary">The superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
     <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
     <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>

@@ -70,6 +70,10 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         ensureInsets()
     }
 
+    fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
+        viewRoot.rootView.accessibilityDelegate = delegate
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.requestRefresh()
@@ -79,7 +83,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
     }
 
-    override fun onEventDispatched(event: ViewEvent) = when(event) {
+    override fun onEventDispatched(event: ViewEvent) = when (event) {
         is ContextExecutor -> event(this)
         is ActivityExecutor -> event(this)
         else -> Unit
