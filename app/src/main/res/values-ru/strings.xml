@@ -102,6 +102,7 @@
 
     <!--MagiskHide-->
     <string name="show_system_app">Системные приложения</string>
+    <string name="show_os_app">Встроенные приложения</string>
     <string name="hide_filter_hint">Введите имя</string>
     <string name="hide_scroll_up">Вверх</string>
     <string name="hide_filters">Сортировка</string>
@@ -109,6 +110,7 @@
 
     <!--Module-->
     <string name="no_info_provided">(Нет информации)</string>
+    <string name="reboot_userspace">Перезагрузка оболочки</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
@@ -218,6 +220,7 @@
     <string name="failure">Ошибка!</string>
     <string name="hide_manager_title">Скрытие Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не удалось пересобрать Magisk Manager</string>
+    <string name="restore_manager_fail_toast">Не удалось восстановить Magisk Manager</string>
     <string name="open_link_failed_toast">Приложения для открытия ссылки не найдены</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
@@ -236,5 +239,6 @@
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
     <string name="add_shortcut_title">Создание ярлыка</string>
     <string name="add_shortcut_msg">После скрытия Magisk Manager его имя и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
+    <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
 
 </resources>
