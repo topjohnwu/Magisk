@@ -108,7 +108,7 @@
     <string name="hide_search">Rechercher</string>
 
     <!--Module -->
-    <string name="no_info_provided">(Aucune info transmise)</string>
+    <string name="no_info_provided">(aucune info transmise)</string>
     <string name="reboot_userspace">Redémarrage en douceur</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
