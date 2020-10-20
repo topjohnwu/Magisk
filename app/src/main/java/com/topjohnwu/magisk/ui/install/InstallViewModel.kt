@@ -18,6 +18,8 @@ import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import org.koin.core.get
+import timber.log.Timber
+import java.io.IOException
 import kotlin.math.roundToInt
 
 class InstallViewModel(
@@ -64,7 +66,11 @@ class InstallViewModel(
 
     init {
         viewModelScope.launch {
-            notes = svc.fetchString(Info.remote.magisk.note)
+            try {
+                notes = svc.fetchString(Info.remote.magisk.note)
+            } catch (e: IOException) {
+                Timber.e(e)
+            }
         }
     }
 
