@@ -20,7 +20,7 @@ class RepoUpdater(
         val cachedMap = HashMap<String, Date>().also { map ->
             repoDB.getModuleStubs().forEach { map[it.id] = Date(it.last_update) }
         }.synchronized()
-        svc.fetchRepoInfo()?.also { info ->
+        svc.fetchRepoInfo()?.let { info ->
             coroutineScope {
                 info.modules.forEach {
                     launch {
@@ -36,7 +36,7 @@ class RepoUpdater(
                     }
                 }
             }
+            repoDB.removeModules(cachedMap.keys)
         }
-        repoDB.removeModules(cachedMap.keys)
     }
 }

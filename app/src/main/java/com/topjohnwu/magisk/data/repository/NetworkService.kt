@@ -20,7 +20,7 @@ class NetworkService(
     private val jsd: JSDelivrServices,
     private val api: GithubApiServices
 ) {
-    suspend fun fetchUpdate() = try {
+    suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
             DEFAULT_CHANNEL, STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
@@ -36,12 +36,6 @@ class NetworkService(
         }
         Info.remote = info
         info
-    } catch (e: IOException) {
-        Timber.e(e)
-        null
-    } catch (e: HttpException) {
-        Timber.e(e)
-        null
     }
 
     // UpdateInfo
@@ -69,7 +63,7 @@ class NetworkService(
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
             factory()
-        } catch (e: HttpException) {
+        } catch (e: Exception) {
             Timber.e(e)
             null
         }
