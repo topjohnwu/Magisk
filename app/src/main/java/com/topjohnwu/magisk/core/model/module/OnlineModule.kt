@@ -44,11 +44,12 @@ data class OnlineModule(
 
     @Throws(IllegalRepoException::class)
     suspend fun load() {
-        val props = svc.fetchString(prop_url)
-        props.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.runCatching {
-            parseProps(this)
-        }.onFailure {
-            throw IllegalRepoException("Repo [$id] parse error: ", it)
+        try {
+            val rawProps = svc.fetchString(prop_url)
+            val props = rawProps.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }
+            parseProps(props)
+        } catch (e: Exception) {
+            throw IllegalRepoException("Repo [$id] parse error:", e)
         }
 
         if (versionCode < 0) {
