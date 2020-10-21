@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="upgrade_msg">सेटअप को पूरा करने के लिए पूर्ण Magisk Manager में अपग्रेड करें. डाउनलोड करके स्थापित करें ?</string>
-    <string name="no_internet_msg">कृपया इन्टरनेट से जुड़िये! पूर्ण Magisk Manager के उन्नयन की आवश्यकता है.</string>
+    <string name="upgrade_msg">सेटअप को पूरा करने के लिए पूर्ण मैजिस्क मैनेजर में अपग्रेड करें. डाउनलोड करके इंस्टॉल करें?</string>
+    <string name="no_internet_msg">कृपया इन्टरनेट से जुड़िये! पूर्ण मैजिस्क मैनेजर में अपग्रेड की आवश्यकता है।</string>
+    <string name="dling">डाउनलोड हो रहा है</string>
+    <string name="relaunch_app">कृपया ऐप को फिर से शुरू करें</string>
 </resources>
