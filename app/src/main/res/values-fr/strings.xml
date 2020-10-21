@@ -107,8 +107,9 @@
     <string name="hide_filters">Filtres</string>
     <string name="hide_search">Rechercher</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(aucune info transmise)</string>
+    <string name="reboot_userspace">Redémarrage en douceur</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
@@ -219,6 +220,7 @@
     <string name="hide_manager_title">Masquage de Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Le masquage de Magisk Manager a échoué.</string>
     <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée</string>
+    <string name="restore_manager_fail_toast">Échec de la restauration de Magisk Manager</string>
     <string name="complete_uninstall">Désinstallation complète</string>
     <string name="restore_img">Restauration des images</string>
     <string name="restore_img_msg">Restauration…</string>
@@ -236,5 +238,6 @@
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
+    <string name="app_not_found">Aucune application trouvée pour traiter cette action</string>
 
 </resources>
