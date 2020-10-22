@@ -195,6 +195,13 @@ object SystemlessHosts : BaseSettingsItem.Blank() {
     override val description = R.string.settings_hosts_summary.asTransitive()
 }
 
+object Tapjack : BaseSettingsItem.Toggle() {
+    override val title = R.string.settings_su_tapjack_title.asTransitive()
+    override var description = R.string.settings_su_tapjack_summary.asTransitive()
+    override var value = Config.suTapjack
+        set(value) = setV(value, field, { field = it }) { Config.suTapjack = it }
+}
+
 object Biometrics : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_su_biometric_title.asTransitive()
     override var value = Config.suBiometric
