@@ -1,43 +1,47 @@
 package com.topjohnwu.magisk.ui.hide
 
+import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.Queryable
+import com.topjohnwu.magisk.arch.filterableListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.data.repository.MagiskRepository
-import com.topjohnwu.magisk.model.entity.HideAppInfo
-import com.topjohnwu.magisk.model.entity.HideTarget
-import com.topjohnwu.magisk.model.entity.ProcessHideApp
-import com.topjohnwu.magisk.model.entity.StatefulProcess
-import com.topjohnwu.magisk.model.entity.recycler.HideItem
-import com.topjohnwu.magisk.model.entity.recycler.HideProcessItem
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.Queryable
-import com.topjohnwu.magisk.ui.base.filterableListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.packageInfo
+import com.topjohnwu.magisk.ktx.packageName
+import com.topjohnwu.magisk.ktx.processes
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class HideViewModel(
-    private val magiskRepo: MagiskRepository
-) : BaseViewModel(), Queryable {
+class HideViewModel : BaseViewModel(), Queryable {
 
     override val queryDelay = 1000L
 
     @get:Bindable
     var isShowSystem = Config.showSystemApp
-        set(value) = set(value, field, { field = it }, BR.showSystem){
+        set(value) = set(value, field, { field = it }, BR.showSystem) {
             Config.showSystemApp = it
             submitQuery()
         }
 
     @get:Bindable
+    var isShowOS = false
+        set(value) = set(value, field, { field = it }, BR.showOS) {
+            submitQuery()
+        }
+
+    @get:Bindable
     var query = ""
-        set(value) = set(value, field, { field = it }, BR.query){
+        set(value) = set(value, field, { field = it }, BR.query) {
             submitQuery()
         }
 
@@ -49,61 +53,80 @@ class HideViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
+    @SuppressLint("InlinedApi")
     override fun refresh() = viewModelScope.launch {
-        state = State.LOADING
-        val apps = magiskRepo.fetchApps()
-        val hides = magiskRepo.fetchHideTargets()
-        val (appList, diff) = withContext(Dispatchers.Default) {
-            val list = apps.map { mergeAppTargets(it, hides) }.map { HideItem(it) }.sort()
-            list to items.calculateDiff(list)
+        if (!Utils.showSuperUser()) {
+            state = State.LOADING_FAILED
+            return@launch
         }
-        items.update(appList, diff)
+        state = State.LOADING
+        val (apps, diff) = withContext(Dispatchers.Default) {
+            val pm = get<PackageManager>()
+            val hides = Shell.su("magiskhide --ls").exec().out.map { HideTarget(it) }
+            val apps = pm.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES)
+                .asSequence()
+                .filter { it.enabled && !blacklist.contains(it.packageName) }
+                .map { HideAppInfo(it, pm) }
+                .map { createTarget(it, hides) }
+                .filter { it.processes.isNotEmpty() }
+                .map { HideItem(it) }
+                .toList()
+                .sorted()
+            apps to items.calculateDiff(apps)
+        }
+        items.update(apps, diff)
         submitQuery()
+    }
+
+    // ---
+
+    private fun createTarget(info: HideAppInfo, hideList: List<HideTarget>): HideAppTarget {
+        val pkg = info.packageName
+        val hidden = hideList.filter { it.packageName == pkg }
+        val processNames = info.packageInfo.processes.distinct()
+        val processes = processNames.map { name ->
+            HideProcessInfo(name, pkg, hidden.any { name == it.process })
+        }
+        return HideAppTarget(info, processes)
+    }
+
+    // ---
+
+    override fun query() {
+        items.filter {
+            fun showHidden() = it.itemsChecked != 0
+
+            fun filterSystem() = isShowSystem || it.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
+
+            fun filterOS() = (isShowSystem && isShowOS) || it.info.uid >= 10000
+
+            fun filterQuery(): Boolean {
+                fun inName() = it.info.label.contains(query, true)
+                fun inPackage() = it.info.packageName.contains(query, true)
+                fun inProcesses() = it.processes.any { p -> p.process.name.contains(query, true) }
+                return inName() || inPackage() || inProcesses()
+            }
+
+            showHidden() || (filterSystem() && filterOS() && filterQuery())
+        }
         state = State.LOADED
     }
 
     // ---
 
-    private fun mergeAppTargets(a: HideAppInfo, ts: List<HideTarget>): ProcessHideApp {
-        val relevantTargets = ts.filter { it.packageName == a.info.packageName }
-        val packageName = a.info.packageName
-        val processes = a.processes
-            .map { StatefulProcess(it, packageName, relevantTargets.any { i -> it == i.process }) }
-        return ProcessHideApp(a, processes)
-    }
-
-    private fun List<HideItem>.sort() = compareByDescending<HideItem> { it.itemsChecked != 0 }
-        .thenBy { it.item.info.name.toLowerCase(currentLocale) }
-        .thenBy { it.item.info.info.packageName }
-        .let { sortedWith(it) }
-
-    // ---
-
-    override fun query() = items.filter {
-        fun showHidden()= it.itemsChecked != 0
-
-        fun filterSystem(): Boolean {
-            return isShowSystem || it.item.info.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
-        }
-
-        fun filterQuery(): Boolean {
-            fun inName() = it.item.info.name.contains(query, true)
-            fun inPackage() = it.item.info.info.packageName.contains(query, true)
-            fun inProcesses() = it.item.processes.any { it.name.contains(query, true) }
-            return inName() || inPackage() || inProcesses()
-        }
-
-        showHidden() || (filterSystem() && filterQuery())
-    }
-
-    // ---
-
-    fun toggleItem(item: HideProcessItem) {
-        magiskRepo.toggleHide(item.isHidden, item.item.packageName, item.item.name)
-    }
-
     fun resetQuery() {
         query = ""
     }
-}
 
+    companion object {
+        private val blacklist by lazy { listOf(
+            packageName,
+            "com.android.chrome",
+            "com.chrome.beta",
+            "com.chrome.dev",
+            "com.chrome.canary",
+            "com.android.webview",
+            "com.google.android.webview"
+        ) }
+    }
+}

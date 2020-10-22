@@ -14,14 +14,12 @@
     <string name="safetynet_res_invalid">Odpověď je neplatná.</string>
     <string name="keep_force_encryption">Udržet "force encryption"</string>
     <string name="keep_dm_verity">Udržet "AVB 2.0/dm-verity"</string>
-    <string name="uninstall">Odinstalovat</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
     <string name="uninstall_magisk_msg">Všechny moduly budou zakázány/odstraněny. Root bude odstraněn a pokud jsou data dešifrována, můžou být zašifrována.</string>
     <string name="update">Aktualizovat</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Žádné informace)</string>
-    <string name="no_modules_found">Nebyly nalezeny žádné moduly.</string>
     <string name="reboot_recovery">Restartovat do Recovery</string>
     <string name="reboot_bootloader">Restartovat do Bootloaderu</string>
     <string name="reboot_download">Restartovat do Download</string>
@@ -63,12 +61,9 @@
     <string name="repo_install_msg">Chcete nyní nainstalovat %1$s?</string>
     <string name="download">Stáhnout</string>
     <string name="reboot">Restartovat</string>
-    <string name="settings_reboot_toast">Restartovat pro použití nastavení.</string>
     <string name="release_notes">Poznámky k vydání</string>
     <string name="repo_cache_cleared">Mezipaměť smazána</string>
 
-    <string name="dtbo_patched_title">DTBO opraveno!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager opravil dtbo.img, restartujte prosím</string>
     <string name="flashing">Instalování</string>
     <string name="hide_manager_title">Skrytí Magisk Manageru…</string>
     <string name="hide_manager_fail_toast">Skrytí Magisk Manageru selhalo.</string>
@@ -101,7 +96,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
-    <string name="settings_core_only_summary">Povolit pouze funkce jádra. MagiskSU, MagiskHide a nesystémoví hostitelé budou stále povoleni, ale žádné moduly nebudou načteny.</string>
     <string name="settings_magiskhide_summary">Skrýt Magisk z různých detekcí.</string>
     <string name="settings_hosts_title">Nesystémoví hostitelé</string>
     <string name="settings_hosts_summary">Podpora nesystémových hostitelů pro aplikace Adblock.</string>
@@ -154,7 +148,6 @@
     <string name="sixtymin">60 minut</string>
     <string name="su_allow_toast">Pro %1$s bylo oprávnění Superuser povoleno</string>
     <string name="su_deny_toast">Pro %1$s bylo oprávnění Superuser zamítnuto</string>
-    <string name="no_apps_found">Zatím zde není žádná aplikace</string>
     <string name="su_snack_grant">Superuser oprávnění pro %1$s je povoleno</string>
     <string name="su_snack_deny">Superuser oprávnění pro %1$s je zamítnuto</string>
     <string name="su_snack_notif_on">Oznámení pro %1$s jsou povolena</string>

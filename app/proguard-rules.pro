@@ -29,14 +29,11 @@
 -keep class a.* { *; }
 
 # Snet
--keepclassmembers class com.topjohnwu.magisk.core.utils.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.core.utils.SafetyNetHelper$Callback {
-  void onResponse(int);
+-keepclassmembers class com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper { *; }
+-keep,allowobfuscation interface com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback
+-keepclassmembers class * implements com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback {
+  void onResponse(org.json.JSONObject);
 }
-
-# Fragments
--keep,allowobfuscation class * extends androidx.fragment.app.Fragment
 
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber.Tree {

@@ -8,12 +8,10 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Field
 import java.lang.reflect.Method
-import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.experimental.and
 
 fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     var entry: ZipEntry? = nextEntry
@@ -25,23 +23,6 @@ fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
 
 fun InputStream.writeTo(file: File) =
     withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
-
-fun File.checkSum(alg: String, reference: String) = runCatching {
-    inputStream().use {
-        val digest = MessageDigest.getInstance(alg)
-        it.copyTo(object : OutputStream() {
-            override fun write(b: Int) {
-                digest.update(b.toByte())
-            }
-            override fun write(b: ByteArray, off: Int, len: Int) {
-                digest.update(b, off, len)
-            }
-        })
-        val sb = StringBuilder()
-        digest.digest().forEach { b -> sb.append("%02x".format(b and 0xff.toByte())) }
-        sb.toString() == reference
-    }
-}.getOrElse { false }
 
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,

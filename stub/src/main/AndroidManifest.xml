@@ -10,18 +10,19 @@
         android:allowBackup="true"
         tools:ignore="AllowBackup">
 
-        <activity
-            android:name="a.a"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="a.r"
-            tools:node="remove"/>
+        <provider
+            android:name=".FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
 
     </application>
 

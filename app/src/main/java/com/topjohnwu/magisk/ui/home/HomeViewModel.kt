@@ -5,26 +5,22 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.core.download.RemoteFileService
+import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
-import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.events.OpenInappLinkEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.events.dialog.EnvFixDialog
+import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
+import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.res
-import com.topjohnwu.magisk.model.entity.IconLink
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject.Manager
-import com.topjohnwu.magisk.model.events.ActivityExecutor
-import com.topjohnwu.magisk.model.events.OpenInappLinkEvent
-import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.model.events.dialog.EnvFixDialog
-import com.topjohnwu.magisk.model.events.dialog.ManagerInstallDialog
-import com.topjohnwu.magisk.model.events.dialog.UninstallDialog
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -36,7 +32,7 @@ enum class MagiskState {
 }
 
 class HomeViewModel(
-    private val repoMagisk: MagiskRepository
+    private val svc: NetworkService
 ) : BaseViewModel() {
 
     @get:Bindable
@@ -57,7 +53,6 @@ class HomeViewModel(
 
     val magiskInstalledVersion get() =
         "${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})"
-    val magiskMode get() = R.string.home_status_normal.res()
 
     @get:Bindable
     var managerRemoteVersion = R.string.loading.res()
@@ -76,23 +71,21 @@ class HomeViewModel(
     val showUninstall get() =
         Info.env.magiskVersionCode > 0 && stateMagisk != MagiskState.LOADING && isConnected.get()
 
+    @get:Bindable
+    val showSafetyNet get() = Info.hasGMS && isConnected.get()
+
     val itemBinding = itemBindingOf<IconLink> {
         it.bindExtra(BR.viewModel, this)
     }
 
     private var shownDialog = false
 
-    init {
-        RemoteFileService.progressBroadcast.observeForever {
-            when (it?.second) {
-                is Manager -> stateManagerProgress = it.first.times(100f).roundToInt()
-            }
-        }
-    }
-
     override fun refresh() = viewModelScope.launch {
+        state = State.LOADING
         notifyPropertyChanged(BR.showUninstall)
-        repoMagisk.fetchUpdate()?.apply {
+        notifyPropertyChanged(BR.showSafetyNet)
+        svc.fetchUpdate()?.apply {
+            state = State.LOADED
             stateMagisk = when {
                 !Info.env.isActive -> MagiskState.NOT_INSTALLED
                 magisk.isObsolete -> MagiskState.OBSOLETE
@@ -113,25 +106,35 @@ class HomeViewModel(
             launch {
                 ensureEnv()
             }
-        }
+        } ?: apply { state = State.LOADING_FAILED }
     }
 
     val showTest = false
 
     fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
-        override fun invoke(activity: BaseActivity) {
+        override fun invoke(activity: BaseUIActivity<*, *>) {
             /* Entry point to trigger test events within the app */
         }
     }.publish()
+
+    fun onProgressUpdate(progress: Float, subject: Subject) {
+        when (subject) {
+            is Manager -> stateManagerProgress = progress.times(100f).roundToInt()
+        }
+    }
 
     fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
 
     fun onDeletePressed() = UninstallDialog().publish()
 
-    fun onManagerPressed() = ManagerInstallDialog().publish()
+    fun onManagerPressed() =
+        if (isConnected.get()) ManagerInstallDialog().publish()
+        else SnackbarEvent(R.string.no_connection).publish()
 
-    fun onMagiskPressed() = withExternalRW {
+    fun onMagiskPressed() = if (isConnected.get()) withExternalRW {
         HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+    } else {
+        SnackbarEvent(R.string.no_connection).publish()
     }
 
     fun onSafetyNetPressed() =

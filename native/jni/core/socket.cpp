@@ -15,7 +15,7 @@ static size_t socket_len(sockaddr_un *sun) {
 
 socklen_t setup_sockaddr(sockaddr_un *sun, const char *name) {
 	memset(sun, 0, sizeof(*sun));
-	sun->sun_family = AF_LOCAL;
+	sun->sun_family = AF_UNIX;
 	strcpy(sun->sun_path + 1, name);
 	return socket_len(sun);
 }

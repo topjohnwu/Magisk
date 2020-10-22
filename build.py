@@ -27,8 +27,8 @@ def vprint(str):
 if not sys.version_info >= (3, 6):
     error('Requires Python 3.6+')
 
-if 'ANDROID_HOME' not in os.environ:
-    error('Please add Android SDK path to ANDROID_HOME environment variable!')
+if 'ANDROID_SDK_ROOT' not in os.environ:
+    error('Please add Android SDK path to ANDROID_SDK_ROOT environment variable!')
 
 try:
     subprocess.run(['javac', '-version'],
@@ -55,10 +55,10 @@ arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
-ndk_ver = '21c'
-ndk_ver_full = '21.2.6472646'
+ndk_ver = '21d'
+ndk_ver_full = '21.3.6528147'
 
-ndk_root = op.join(os.environ['ANDROID_HOME'], 'ndk')
+ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
@@ -285,8 +285,8 @@ def dump_bin_headers():
 def build_binary(args):
     # Verify NDK install
     props = parse_props(op.join(ndk_path, 'source.properties'))
-    if 'Pkg.Revision.orig' not in props or props['Pkg.Revision.orig'] != ndk_ver_full:
-        error('Incorrect NDK. Please setup NDK with "build.py ndk"')
+    if props['Pkg.Revision'] != ndk_ver_full:
+        error('Incorrect NDK. Please install/upgrade NDK with "build.py ndk"')
 
     if args.target:
         args.target = set(args.target) & set(support_targets)
@@ -358,8 +358,9 @@ def build_stub(args):
     build_apk(args, 'stub')
 
 
-# Bind mount snet package on top of the stub folder
 def build_snet(args):
+    if not op.exists(op.join('snet', 'src', 'main', 'java', 'com', 'topjohnwu', 'snet')):
+        error('snet sources have to be bind mounted on top of the stub folder')
     header('* Building snet extension')
     proc = execv([gradlew, 'stub:assembleRelease'])
     if proc.returncode != 0:
@@ -549,15 +550,6 @@ def setup_ndk(args):
       for path in copy_tree(src_dir, lib_dir):
           vprint(f'Replaced {path}')
 
-    # Rewrite source.properties
-    src_prop = op.join(ndk_path, 'source.properties')
-    props = parse_props(src_prop)
-    props['Pkg.Revision.orig'] = props['Pkg.Revision']
-    props['Pkg.Revision'] = '99.99.99'
-    with open(src_prop, 'w') as p:
-        for key, val in props.items():
-            print(f'{key} = {val}', file=p)
-
 
 def build_all(args):
     vars(args)['target'] = []
@@ -593,6 +585,12 @@ app_parser.set_defaults(func=build_app)
 stub_parser = subparsers.add_parser(
     'stub', help='build stub Magisk Manager')
 stub_parser.set_defaults(func=build_stub)
+
+# Need to bind mount snet sources on top of stub folder
+# Note: source code for the snet extension is *NOT* public
+snet_parser = subparsers.add_parser(
+    'snet', help='build snet extension')
+snet_parser.set_defaults(func=build_snet)
 
 zip_parser = subparsers.add_parser(
     'zip', help='zip Magisk into a flashable zip')

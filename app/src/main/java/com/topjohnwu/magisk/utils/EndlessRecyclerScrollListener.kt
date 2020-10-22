@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.topjohnwu.magisk.model.events.ViewEvent
+import com.topjohnwu.magisk.arch.ViewEvent
 
 class EndlessRecyclerScrollListener(
     private val layoutManager: RecyclerView.LayoutManager,
@@ -55,15 +55,15 @@ class EndlessRecyclerScrollListener(
         val visibleItemPosition = if (direction == Direction.BOTTOM) {
             when (layoutManager) {
                 is StaggeredGridLayoutManager ->
-                    layoutManager.findLastVisibleItemPositions(null).max() ?: 0
+                    layoutManager.findLastVisibleItemPositions(null).maxOrNull() ?: 0
                 is GridLayoutManager -> layoutManager.findLastVisibleItemPosition()
                 is LinearLayoutManager -> layoutManager.findLastVisibleItemPosition()
                 else -> throw IllegalArgumentException("Only LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager are supported")
             }
         } else {
             when (layoutManager) {
-                is StaggeredGridLayoutManager -> layoutManager.findFirstVisibleItemPositions(null).min()
-                    ?: 0
+                is StaggeredGridLayoutManager ->
+                    layoutManager.findFirstVisibleItemPositions(null).minOrNull() ?: 0
                 is GridLayoutManager -> layoutManager.findFirstVisibleItemPosition()
                 is LinearLayoutManager -> layoutManager.findFirstVisibleItemPosition()
                 else -> throw IllegalArgumentException("Only LinearLayoutManager, GridLayoutManager and StaggeredGridLayoutManager are supported")

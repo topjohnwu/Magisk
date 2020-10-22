@@ -16,33 +16,24 @@
     <string name="app_changelog">Zoznam zmien</string>
     <string name="manager">Správca</string>
     <string name="loading">Načítava sa…</string>
-    <string name="info">Info</string>
-    <string name="uninstall">Odinštalovať</string>
     <string name="update">Aktualizovať</string>
     <string name="not_available">N/A</string>
     <string name="hide">Skryť</string>
     <string name="status">Stav</string>
     <string name="home_package">Balíček</string>
-    <string name="details">Podrobnosti</string>
 
     <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
     <string name="home_support_title">Podporte nás</string>
-    <string name="home_links_project">Odkazy projektu</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
-    <string name="home_device_title">Zariadenie</string>
-    <string name="home_device_extra_manufacturer">Výrobca</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Platforma</string>
-    <string name="home_device_system">Systém</string>
     <string name="home_status_normal">Normálny</string>
-    <string name="home_status_safe">Núdzový režim</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Nainštalované</string>
     <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
     <string name="uninstall_magisk_title">Odinštalovať Magisk</string>
     <string name="uninstall_magisk_msg">Všetky moduly budú zakázané/odstránené!\nRoot bude odstránený!\nMôže dôjsť k zašifrovaniu vašich dát, ak už nie sú zašifrované!</string>
+    <string name="home_check_safetynet">Skontrolovať SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
@@ -77,7 +68,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s boli udelené práva Superužívateľa</string>
     <string name="su_deny_toast">%1$s boli zamietnuté práva Superužívateľa</string>
-    <string name="no_apps_found">Nebola nájdená žiadna aplikácia</string>
     <string name="su_snack_grant">Práva Superužívateľa pre %1$s sú udelené</string>
     <string name="su_snack_deny">Práva Superužívateľa pre %1$s sú zamietnuté</string>
     <string name="su_snack_notif_on">Upozornenia pre %1$s sú povolené</string>
@@ -109,10 +99,10 @@
     <string name="safetynet_attest_failure">Overenie zlyhalo!</string>
     <string name="safetynet_attest_loading">Momentík ...</string>
     <string name="safetynet_attest_restart">Skúste to znova</string>
-    <string name="safetynet_system">Systém</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
+    <string name="show_os_app">Zobraziť aplikácie OS</string>
     <string name="hide_filter_hint">Filtrovať podľa názvu</string>
     <string name="hide_scroll_up">Posunúť nahor</string>
     <string name="hide_filters">Filtre</string>
@@ -120,24 +110,23 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>
-    <string name="no_modules_found">Neboli nájdené žiadne moduly</string>
+    <string name="reboot_userspace">Softvérový reštart</string>
     <string name="reboot_recovery">Reštartovať do Recovery</string>
     <string name="reboot_bootloader">Reštartovať do Bootloader</string>
     <string name="reboot_download">Reštartovať do Download</string>
     <string name="reboot_edl">Reštartovať do EDL</string>
-    <string name="module_safe_mode_message">Nachádzate sa v núdzovom režime. Žiadny z používateľských modulov nebude fungovať.\nTáto správa zmizne po vypnutí núdzového režimu.</string>
     <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_section_pending">Aktualizácie</string>
     <string name="module_section_pending_action">Aktualizovať všetko</string>
-    <string name="module_section_remote">Vzdialené</string>
     <string name="module_state_remove">Odstrániť</string>
     <string name="module_state_restore">Obnoviť</string>
     <string name="module_action_install_external">Inštalácia z úložiska</string>
-    <string name="module_update_none">Vaše moduly sú aktuálne!</string>
     <string name="update_available">Dostupná aktualizácia</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Zoradenie</string>
-    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+
+    
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -145,12 +134,6 @@
     <string name="settings_dark_mode_light">Vždy svetlý</string>
     <string name="settings_dark_mode_system">Podľa systému</string>
     <string name="settings_dark_mode_dark">Vždy tmavý</string>
-    <string name="settings_safe_mode_title">Núdzový režim</string>
-    <string name="settings_core_only_summary" deprecated="true">Povolí iba hlavné funkcie. Stále budú povolené MagiskSU a MagiskHide, ale žiadne moduly nebudú zavedené</string>
-    <string name="settings_grid_column_count_title">Usporiadanie zoznamu</string>
-    <string name="settings_grid_column_count_summary">Nastaví šírku položky v zozname. Ak chcete aplikovať zmeny, reštartujte aplikáciu.</string>
-    <string name="settings_grid_column_count_1">Štandardný</string>
-    <string name="settings_grid_column_count_2">Stlačený</string>
     <string name="settings_download_path_title">Cesta na sťahovanie</string>
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>
@@ -195,6 +178,9 @@
     <string name="settings_su_biometric_summary">Použije biometrickú autentifikáciu na povolenie žiadostí Superužívateľa</string>
     <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
     <string name="settings_customization">Prispôsobenie</string>
+    <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
@@ -211,7 +197,6 @@
     <string name="global_summary">Všetky relácie root použijú globálny mount namespace</string>
     <string name="requester_summary">Relácie root zdedia namespace od žiadateľa</string>
     <string name="isolate_summary">Každá relácia root bude mať vlastný izolovaný namespace</string>
-    <string name="settings_download_path_error">Chyba pri vytváraní priečinka. Priečinok musí byť prístupný z koreňového adresára a nemôže to byť súbor.</string>
 
     <!--Notifications-->
     <string name="update_channel">Aktualizácie Magisku</string>
@@ -230,16 +215,14 @@
     <string name="repo_install_msg">Chcete teraz nainštalovať %1$s?</string>
     <string name="download">Stiahnuť</string>
     <string name="reboot">Reštartovať</string>
-    <string name="settings_reboot_toast">Pre aplikovanie nastavení je potrebný reštart</string>
     <string name="release_notes">Poznámky k vydaniu</string>
     <string name="repo_cache_cleared">Cache repo odstránená</string>
-    <string name="dtbo_patched_title">DTBO bol zaplátaný!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager zaplátal dtbo.img. Reštartujte, prosím.</string>
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Zlyhalo</string>
-    <string name="hide_manager_title">Skrytie Magisk Managera…</string>
-    <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo.</string>
+    <string name="hide_manager_title">Skrývanie Magisk Managera…</string>
+    <string name="hide_manager_fail_toast">Skrytie Magisk Managera zlyhalo</string>
+    <string name="restore_manager_fail_toast">Obnovenie Magisk Managera zlyhalo</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
@@ -255,5 +238,9 @@
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
     <string name="unsupport_magisk_msg">Táto verzia aplikácie Magisk Managera nepodporuje verziu Magisku nižšiu ako %1$s.\n\nAplikácia sa bude správať, ako keby Magisk nebol nainštalovaný, upgradnite Magisk čo najskôr.</string>
+    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
+    <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
+    <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
 
 </resources>

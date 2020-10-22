@@ -3,6 +3,7 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
@@ -15,7 +16,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.ProcessPhoenix
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
@@ -52,6 +52,10 @@ fun Class<*>.cmp(pkg: String): ComponentName {
     val name = ClassMap[this].name
     return ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
 }
+
+inline fun <reified T> Activity.redirect() = Intent(intent)
+    .setComponent(T::class.java.cmp(packageName))
+    .setFlags(0)
 
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
@@ -131,7 +135,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stub!!.classToComponent[name] ?: name
+            Info.stubChk.classToComponent[name] ?: name
         )
 
         javaClass.forceGetDeclaredField("service")?.set(this, component)
@@ -145,24 +149,25 @@ private object ClassMap {
         App::class.java to a.e::class.java,
         MainActivity::class.java to a.b::class.java,
         SplashActivity::class.java to a.c::class.java,
-        GeneralReceiver::class.java to a.h::class.java,
+        Receiver::class.java to a.h::class.java,
         DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java,
-        ProcessPhoenix::class.java to a.r::class.java
+        SuRequestActivity::class.java to a.m::class.java
     )
 
     operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }
 
-/*
-* Keep a reference to these resources to prevent it from
-* being removed when running "remove unused resources" */
+// Keep a reference to these resources to prevent it from
+// being removed when running "remove unused resources"
 val shouldKeepResources = listOf(
-    /* TODO: The following strings should be used somewhere */
-    R.string.no_apps_found,
     R.string.no_info_provided,
     R.string.release_notes,
-    R.string.settings_download_path_error,
     R.string.invalid_update_channel,
-    R.string.update_available
+    R.string.update_available,
+    R.string.safetynet_api_error,
+    R.raw.changelog,
+    R.drawable.ic_device,
+    R.drawable.ic_hide_select_md2,
+    R.drawable.ic_more,
+    R.drawable.ic_magisk_delete
 )

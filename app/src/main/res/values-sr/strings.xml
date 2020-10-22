@@ -16,14 +16,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Задржи форсирану енкрипцију</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
-    <string name="uninstall">Унинсталирај</string>
     <string name="uninstall_magisk_title">Унинсталирај Магиск</string>
     <string name="uninstall_magisk_msg">Сви модули ће бити онеспособљени/уклоњени. Корен ће бити уклоњен, и потенцијално енкриптовати твоје податке уколико већ нису енкриптовани</string>
     <string name="update">Ажурирање</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Без информација)</string>
-    <string name="no_modules_found">Нема пронађених модула</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Ажурирање доступно</string>
@@ -43,13 +41,10 @@
     <string name="download">Преузми</string>
     <string name="reboot">Рестартуј</string>
     <string name="magisk_update_title">Нови Адбејт Магиска Доступан!</string>
-    <string name="settings_reboot_toast">Рестартуј да примениш подешавања</string>
     <string name="release_notes">Белешке обљављивања</string>
     <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
     <string name="manager_update_title">Ново Ажурирање Магиск Менаџера Доступно!</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
-    <string name="dtbo_patched_title">DTBO је закрпљен!</string>
-    <string name="dtbo_patched_reboot">Магиск Менаџер је закрпио dtbo.img, рестартујте телефон</string>
     <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
     <string name="hide_manager_title">Сакривам Магиск Менаџер…</string>
@@ -75,7 +70,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">По наруџби</string>
     <string name="settings_update_custom_msg">Унеси наруџбени УРЛ</string>
-    <string name="settings_core_only_summary">Омогућава само основне карактеристике, сви модули неће бити учитани. МагискСК и МагискСакриј ће бити омогућени</string>
     <string name="settings_magiskhide_summary">Сакриј Магиск од разних детекција</string>
     <string name="settings_hosts_title">Без-системски домаћини (hosts)</string>
     <string name="settings_hosts_summary">Подршка без-системских домаћина за апликације за блокирање реклама</string>
@@ -127,7 +121,6 @@
     <string name="sixtymin">60 мин</string>
     <string name="su_allow_toast">%1$s је добио права на Супер-корисника</string>
     <string name="su_deny_toast">%1$s није добио права на Супер-корисника</string>
-    <string name="no_apps_found">Нема пронађених апликација</string>
     <string name="su_snack_grant">Супер-корисничка права од %1$s су пружена</string>
     <string name="su_snack_deny">Супер-корисничка права од %1$s су одбијена</string>
     <string name="su_snack_notif_on">Нотификације од %1$s су омогућене</string>

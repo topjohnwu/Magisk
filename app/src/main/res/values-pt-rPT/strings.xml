@@ -15,13 +15,11 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Manter encriptação forçada</string>
     <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
-    <string name="uninstall">Desinstalar</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="update">Atualizar</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
-    <string name="no_modules_found">Nenhum módulo encontrado</string>
 
     <!--Repo Fragment-->
     <string name="update_available">Atualização disponível</string>
@@ -41,7 +39,6 @@
     <string name="download">Transferir</string>
     <string name="reboot">Reiniciar</string>
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
-    <string name="settings_reboot_toast">Reinicie para aplicar definições</string>
     <string name="release_notes">Notas da atualização</string>
     <string name="repo_cache_cleared">Cache do repositório apagado</string>
     <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
@@ -64,7 +61,6 @@
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update_stable">Estável</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_core_only_summary">Ativar somente funcionalidades principais, todos os módulos não serão carregados. MagiskSU e MagiskHide ainda estará ativado</string>
     <string name="settings_magiskhide_summary">Oculta Magisk de várias deteções</string>
     <string name="settings_hosts_title">Ativar systemless hosts</string>
     <string name="settings_hosts_summary">Suporte de systemless para aplicações Adblock</string>
@@ -117,7 +113,6 @@
     <string name="sixtymin">60 minutos</string>
     <string name="su_allow_toast">%1$s foi permitido o acesso de root</string>
     <string name="su_deny_toast">%1$s foi negado o acesso de root</string>
-    <string name="no_apps_found">Não foram encontrados aplicações</string>
     <string name="su_snack_grant">Acesso de root a %1$s foi permitido</string>
     <string name="su_snack_deny">Acesso de root a %1$s foi negado</string>
     <string name="su_snack_notif_on">Notificações de %1$s está ativado</string>

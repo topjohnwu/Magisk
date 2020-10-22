@@ -6,18 +6,16 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
-import androidx.core.net.toUri
 import androidx.navigation.NavDeepLinkBuilder
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.BaseUIActivity
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import java.io.File
 import com.topjohnwu.magisk.MainDirections.Companion.actionFlashFragment as toFlash
 import com.topjohnwu.magisk.ui.flash.FlashFragmentArgs as args
 
@@ -89,29 +87,29 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flashIntent(context: Context, file: File, isSecondSlot: Boolean, id: Int = -1) = args(
-            installer = file.toUri(),
+        fun flashIntent(context: Context, file: Uri, isSecondSlot: Boolean, id: Int = -1) = args(
+            installer = file,
             action = flashType(isSecondSlot),
             dismissId = id
         ).let { createIntent(context, it) }
 
-        fun flash(file: File, isSecondSlot: Boolean, id: Int) = toFlash(
-            installer = file.toUri(),
+        fun flash(file: Uri, isSecondSlot: Boolean, id: Int) = toFlash(
+            installer = file,
             action = flashType(isSecondSlot),
             dismissId = id
         ).let { BaseUIActivity.postDirections(it) }
 
         /* Patching is understood as injecting img files with magisk */
 
-        fun patchIntent(context: Context, file: File, uri: Uri, id: Int = -1) = args(
-            installer = file.toUri(),
+        fun patchIntent(context: Context, file: Uri, uri: Uri, id: Int = -1) = args(
+            installer = file,
             action = Const.Value.PATCH_FILE,
             additionalData = uri,
             dismissId = id
         ).let { createIntent(context, it) }
 
-        fun patch(file: File, uri: Uri, id: Int) = toFlash(
-            installer = file.toUri(),
+        fun patch(file: Uri, uri: Uri, id: Int) = toFlash(
+            installer = file,
             action = Const.Value.PATCH_FILE,
             additionalData = uri,
             dismissId = id
@@ -119,28 +117,28 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         /* Uninstalling is understood as removing magisk entirely */
 
-        fun uninstallIntent(context: Context, file: File, id: Int = -1) = args(
-            installer = file.toUri(),
+        fun uninstallIntent(context: Context, file: Uri, id: Int = -1) = args(
+            installer = file,
             action = Const.Value.UNINSTALL,
             dismissId = id
         ).let { createIntent(context, it) }
 
-        fun uninstall(file: File, id: Int) = toFlash(
-            installer = file.toUri(),
+        fun uninstall(file: Uri, id: Int) = toFlash(
+            installer = file,
             action = Const.Value.UNINSTALL,
             dismissId = id
         ).let { BaseUIActivity.postDirections(it) }
 
         /* Installing is understood as flashing modules / zips */
 
-        fun installIntent(context: Context, file: File, id: Int = -1) = args(
-            installer = file.toUri(),
+        fun installIntent(context: Context, file: Uri, id: Int = -1) = args(
+            installer = file,
             action = Const.Value.FLASH_ZIP,
             dismissId = id
         ).let { createIntent(context, it) }
 
-        fun install(file: File, id: Int) = toFlash(
-            installer = file.toUri(),
+        fun install(file: Uri, id: Int) = toFlash(
+            installer = file,
             action = Const.Value.FLASH_ZIP,
             dismissId = id
         ).let { BaseUIActivity.postDirections(it) }

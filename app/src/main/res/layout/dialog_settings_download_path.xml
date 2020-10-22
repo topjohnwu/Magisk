@@ -17,7 +17,7 @@
         android:orientation="vertical"
         android:padding="@dimen/margin_generic">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:id="@+id/dialog_custom_download_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

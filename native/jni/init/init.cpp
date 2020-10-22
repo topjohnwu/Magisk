@@ -7,7 +7,6 @@
 
 #include <xz.h>
 #include <magisk.hpp>
-#include <cpio.hpp>
 #include <utils.hpp>
 
 #include "binaries.h"
@@ -23,6 +22,61 @@ using namespace std;
 
 constexpr int (*init_applet_main[])(int, char *[]) =
 		{ magiskpolicy_main, magiskpolicy_main, nullptr };
+
+int data_holder::patch(str_pairs list) {
+	int count = 0;
+	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+		for (auto [from, to] : list) {
+			if (memcmp(p, from.data(), from.length() + 1) == 0) {
+				LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
+				memset(p, 0, from.length());
+				memcpy(p, to.data(), to.length());
+				++count;
+				p += from.length();
+			}
+		}
+	}
+	return count;
+}
+
+bool data_holder::contains(string_view pattern) {
+	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0)
+			return true;
+	}
+	return false;
+}
+
+void data_holder::consume(data_holder &other) {
+	buf = other.buf;
+	sz = other.sz;
+	other.buf = nullptr;
+	other.sz = 0;
+}
+
+auto_data<HEAP> raw_data::read(int fd) {
+	auto_data<HEAP> data;
+	fd_full_read(fd, data.buf, data.sz);
+	return data;
+}
+
+auto_data<HEAP> raw_data::read(const char *name) {
+	auto_data<HEAP> data;
+	full_read(name, data.buf, data.sz);
+	return data;
+}
+
+auto_data<MMAP> raw_data::mmap_rw(const char *name) {
+	auto_data<MMAP> data;
+	::mmap_rw(name, data.buf, data.sz);
+	return data;
+}
+
+auto_data<MMAP> raw_data::mmap_ro(const char *name) {
+	auto_data<MMAP> data;
+	::mmap_ro(name, data.buf, data.sz);
+	return data;
+}
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -45,25 +99,6 @@ static bool unxz(int fd, const uint8_t *buf, size_t size) {
 		b.out_pos = 0;
 	} while (b.in_pos != size);
 	return true;
-}
-
-static void decompress_ramdisk() {
-	constexpr char tmp[] = "tmp.cpio";
-	constexpr char ramdisk_xz[] = "ramdisk.cpio.xz";
-	if (access(ramdisk_xz, F_OK))
-		return;
-	LOGD("Decompressing ramdisk from %s\n", ramdisk_xz);
-	uint8_t *buf;
-	size_t sz;
-	mmap_ro(ramdisk_xz, buf, sz);
-	int fd = xopen(tmp, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
-	unxz(fd, buf, sz);
-	munmap(buf, sz);
-	close(fd);
-	cpio_mmap cpio(tmp);
-	cpio.extract();
-	unlink(tmp);
-	unlink(ramdisk_xz);
 }
 
 int dump_magisk(const char *path, mode_t mode) {
@@ -174,14 +209,13 @@ int main(int argc, char *argv[]) {
 		// This will also mount /sys and /proc
 		load_kernel_info(&cmd);
 
-		bool two_stage = access("/apex", F_OK) == 0;
+		bool two_stage = check_two_stage();
 		if (cmd.skip_initramfs) {
 			if (two_stage)
 				init = new SARFirstStageInit(argv, &cmd);
 			else
 				init = new SARInit(argv, &cmd);
 		} else {
-			decompress_ramdisk();
 			if (cmd.force_normal_boot)
 				init = new FirstStageInit(argv, &cmd);
 			else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)

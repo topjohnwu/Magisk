@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.core
 import android.content.Context
 import androidx.work.*
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.view.Notifications
-import com.topjohnwu.magisk.data.repository.MagiskRepository
+import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit
 class UpdateCheckService(context: Context, workerParams: WorkerParameters)
     : CoroutineWorker(context, workerParams), KoinComponent {
 
-    private val magiskRepo: MagiskRepository by inject()
+    private val svc: NetworkService by inject()
 
     override suspend fun doWork(): Result {
         // Make sure shell initializer was ran
         withContext(Dispatchers.IO) {
             Shell.getShell()
         }
-        return magiskRepo.fetchUpdate()?.let {
+        return svc.fetchUpdate()?.let {
             if (BuildConfig.VERSION_CODE < it.app.versionCode)
                 Notifications.managerUpdate(applicationContext)
             else if (Info.env.isActive && Info.env.magiskVersionCode < it.magisk.versionCode)

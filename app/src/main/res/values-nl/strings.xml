@@ -16,27 +16,17 @@
     <string name="app_changelog">Wijzigingslog</string>
     <string name="manager">Beheer</string>
     <string name="loading">Bezig met laden…</string>
-    <string name="info">Informatie</string>
-    <string name="uninstall">Deïnstalleren</string>
     <string name="update">Update</string>
     <string name="not_available">Niet beschikbaar</string>
     <string name="hide">Verbergen</string>
     <string name="status">Status</string>
     <string name="home_package">Pakket</string>
-    <string name="details">Details</string>
 
-    <string name="home_notice_content">Zorg er voor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
+    <string name="home_notice_content">Zorg ervoor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
     <string name="home_support_title">Ondersteun ons</string>
-    <string name="home_links_project">Projectlinks</string>
     <string name="home_item_source">Broncode</string>
     <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt kun je een kleine donatie doen.</string>
-    <string name="home_device_title">Apparaat</string>
-    <string name="home_device_extra_manufacturer">Fabrikant</string>
-    <string name="home_device_extra_model">Model</string>
-    <string name="home_device_extra_board">Bord</string>
-    <string name="home_device_system">Systeem</string>
     <string name="home_status_normal">Normaal</string>
-    <string name="home_status_safe">Veilige modus</string>
     <string name="home_status_stub">Inactief</string>
     <string name="home_installed_version">Geïnstalleerd</string>
     <string name="home_latest_version">Actueel</string>
@@ -70,14 +60,13 @@
     <string name="grant">Toestaan</string>
     <string name="su_warning">Verleent volledige toegang tot je apparaat.\nBij twijfel, altijd weigeren!</string>
     <string name="forever">Permanent</string>
-    <string name="once">Eénmalig</string>
+    <string name="once">Eenmalig</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s beschikt nu over superuserrechten</string>
     <string name="su_deny_toast">Superusermachtiging van %1$s geweigerd</string>
-    <string name="no_apps_found">Geen apps aangetroffen</string>
     <string name="su_snack_grant">%1$s beschikt nu over superuserrechten</string>
     <string name="su_snack_deny">Superusermachtiging van %1$s geweigerd</string>
     <string name="su_snack_notif_on">%1$s-meldingen ingeschakeld</string>
@@ -109,31 +98,26 @@
     <string name="safetynet_attest_failure">Verklaring mislukt!</string>
     <string name="safetynet_attest_loading">Even geduld…</string>
     <string name="safetynet_attest_restart">Opnieuw proberen</string>
-    <string name="safetynet_system">Systeem</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
-    <string name="hide_scroll_up">Omhoogscrollen</string>
+    <string name="hide_scroll_up">Omhoog scrollen</string>
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Zoeken</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(geen informatie verstrekt)</string>
-    <string name="no_modules_found">Geen modules aangetroffen</string>
-    <string name="reboot_recovery">Herstelmodus starten</string>
-    <string name="reboot_bootloader">Opstartlader starten</string>
+    <string name="reboot_recovery">Recovery starten</string>
+    <string name="reboot_bootloader">Bootloader starten</string>
     <string name="reboot_download">Downloadmodus starten</string>
     <string name="reboot_edl">EDL starten</string>
-    <string name="module_safe_mode_message">Je bevindt je in de veilige modus. Geen enkele gebruikersmodule werkt in deze modus.\nDit bericht verdwijnt zodra je de veilige modus uitschakelt.</string>
     <string name="module_version_author">%1$s van %2$s</string>
     <string name="module_section_pending">Updates</string>
     <string name="module_section_pending_action">Alles updaten</string>
-    <string name="module_section_remote">Extern</string>
     <string name="module_state_remove">Verwijderen</string>
     <string name="module_state_restore">Herstellen</string>
     <string name="module_action_install_external">Gedownloade module installeren</string>
-    <string name="module_update_none">Al je modules zijn up-to-date!</string>
     <string name="update_available">Update beschikbaar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sorteervolgorde</string>
@@ -142,14 +126,8 @@
     <string name="settings_dark_mode_title">Thema</string>
     <string name="settings_dark_mode_message">Kies het thema dat het best bij je past!</string>
     <string name="settings_dark_mode_light">Licht</string>
-    <string name="settings_dark_mode_system">Ingesteld door Batterijbesparing</string>
+    <string name="settings_dark_mode_system">Systeemstandaard</string>
     <string name="settings_dark_mode_dark">Donker</string>
-    <string name="settings_safe_mode_title">Veilige modus</string>
-    <string name="settings_core_only_summary" deprecated="true">Schakelt alleen kernfunctionaliteit in. MagiskSU en MagiskHide werken nog steeds, maar er worden geen modules geladen.</string>
-    <string name="settings_grid_column_count_title">Lijstindeling</string>
-    <string name="settings_grid_column_count_summary">Stelt de itembreedte van lijstes in. Herstart de app om de wijzigingen toe te passen.</string>
-    <string name="settings_grid_column_count_1">Standaard</string>
-    <string name="settings_grid_column_count_2">Compact</string>
     <string name="settings_download_path_title">Downloadpad</string>
     <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
     <string name="settings_clear_cache_title">Pakketbroncache wissen</string>
@@ -210,7 +188,6 @@
     <string name="global_summary">Alle rootsessies gebruiken de globale naamruimte</string>
     <string name="requester_summary">Rootsessies gebruiken de naamruimte van de verzoeker</string>
     <string name="isolate_summary">Elke rootsessie heeft zijn eigen geïsoleerde naamruimte</string>
-    <string name="settings_download_path_error">De map kan niet worden aangemaakt. Deze moet toegankelijk zijn middels de hoofdmap en mag geen bestand zijn.</string>
 
     <!--Notifications-->
     <string name="update_channel">Magisk-updates</string>
@@ -229,11 +206,8 @@
     <string name="repo_install_msg">Wil je %1$s nu installeren?</string>
     <string name="download">Downloaden</string>
     <string name="reboot">Herstarten</string>
-    <string name="settings_reboot_toast">Herstart om de instellingen toe te passen</string>
     <string name="release_notes">Wijzigingslog</string>
     <string name="repo_cache_cleared">De pakketbroncache is gewist</string>
-    <string name="dtbo_patched_title">DTBO is gepatcht!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager heeft dtbo.img gepatcht. Herstart je apparaat.</string>
     <string name="flashing">Bezig met flashen…</string>
     <string name="done">Voltooid!</string>
     <string name="failure">Mislukt</string>

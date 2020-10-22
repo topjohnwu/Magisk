@@ -9,20 +9,16 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.navigation.NavController
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.model.events.DieEvent
-import com.topjohnwu.magisk.model.events.ViewActionEvent
-import com.topjohnwu.magisk.model.events.ViewEvent
-import com.topjohnwu.magisk.ui.base.BaseUIActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
     override val layoutRes: Int = R.layout.activity_request
     override val viewModel: SuRequestViewModel by viewModel()
-
     override val navigation: NavController? = null
 
     override fun onBackPressed() {
@@ -33,7 +29,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         lockOrientation()
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE)
+            WindowManager.LayoutParams.FLAG_SECURE)
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
@@ -63,14 +59,6 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         val theme = super.getTheme()
         theme.applyStyle(R.style.Foundation_Floating, true)
         return theme
-    }
-
-    override fun onEventDispatched(event: ViewEvent) {
-        super.onEventDispatched(event)
-        when (event) {
-            is ViewActionEvent -> event.action(this)
-            is DieEvent -> finish()
-        }
     }
 
     private fun lockOrientation() {

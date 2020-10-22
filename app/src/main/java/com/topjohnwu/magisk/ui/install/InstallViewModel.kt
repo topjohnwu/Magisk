@@ -1,45 +1,50 @@
 package com.topjohnwu.magisk.ui.install
 
+import android.app.Activity
 import android.net.Uri
-import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.RemoteFileService
-import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.data.repository.StringRepository
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.events.RequestFileEvent
-import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
-import com.topjohnwu.magisk.ui.base.BaseViewModel
+import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.events.MagiskInstallFileEvent
+import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import org.koin.core.get
+import timber.log.Timber
+import java.io.IOException
 import kotlin.math.roundToInt
 
 class InstallViewModel(
-    stringRepo: StringRepository
+    svc: NetworkService
 ) : BaseViewModel(State.LOADED) {
 
-    val isRooted get() = Shell.rootAccess()
-    val isAB get() = Info.isAB
+    val isRooted = Shell.rootAccess()
+    val skipOptions = Info.ramdisk && !Info.isFDE && Info.isSAR
 
     @get:Bindable
-    var step = 0
+    var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
+    var _method = -1
+
     @get:Bindable
-    var method = -1
-        set(value) = set(value, field, { field = it }, BR.method) {
+    var method
+        get() = _method
+        set(value) = set(value, _method, { _method = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
-                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
-                    RequestFileEvent().publish()
+                    MagiskInstallFileEvent { code, intent ->
+                        if (code == Activity.RESULT_OK)
+                            data = intent?.data
+                    }.publish()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().publish()
@@ -60,19 +65,24 @@ class InstallViewModel(
         set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
-        RemoteFileService.reset()
-        RemoteFileService.progressBroadcast.observeForever {
-            val (progress, subject) = it ?: return@observeForever
-            if (subject !is DownloadSubject.Magisk) {
-                return@observeForever
-            }
-            this.progress = progress.times(100).roundToInt()
-            if (this.progress >= 100) {
-                state = State.LOADED
+        viewModelScope.launch {
+            try {
+                notes = svc.fetchString(Info.remote.magisk.note)
+            } catch (e: IOException) {
+                Timber.e(e)
             }
         }
-        viewModelScope.launch {
-            notes = stringRepo.getString(Info.remote.magisk.note)
+    }
+
+    fun onProgressUpdate(progress: Float, subject: Subject) {
+        if (subject !is Subject.Magisk) {
+            return
+        }
+        this.progress = progress.times(100).roundToInt()
+        if (this.progress >= 100) {
+            state = State.LOADED
+        } else if (this.progress < -150) {
+            state = State.LOADING_FAILED
         }
     }
 
@@ -80,17 +90,18 @@ class InstallViewModel(
         step = nextStep
     }
 
-    fun install() = DownloadService(get()) {
-        subject = DownloadSubject.Magisk(resolveConfiguration())
-    }.also { state = State.LOADING }
+    fun install() {
+        DownloadService.start(get(), Subject.Magisk(resolveAction()))
+        state = State.LOADING
+    }
 
     // ---
 
-    private fun resolveConfiguration() = when (method) {
-        R.id.method_download -> Configuration.Download
-        R.id.method_patch -> Configuration.Patch(data!!)
-        R.id.method_direct -> Configuration.Flash.Primary
-        R.id.method_inactive_slot -> Configuration.Flash.Secondary
-        else -> throw IllegalArgumentException("Unknown value")
+    private fun resolveAction() = when (method) {
+        R.id.method_download -> Action.Download
+        R.id.method_patch -> Action.Patch(data!!)
+        R.id.method_direct -> Action.Flash.Primary
+        R.id.method_inactive_slot -> Action.Flash.Secondary
+        else -> error("Unknown value")
     }
 }

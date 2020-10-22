@@ -15,17 +15,17 @@ Here are some feature highlights:
 
 ## Downloads
 
-[![](https://img.shields.io/badge/Magisk%20Manager-v7.5.1-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v7.5.1/MagiskManager-v7.5.1.apk)
+[![](https://img.shields.io/badge/Magisk%20Manager-v8.0.2-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v8.0.2/MagiskManager-v8.0.2.apk)
 [![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
 <br>
 [![](https://img.shields.io/badge/Magisk-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v20.4)
-[![](https://img.shields.io/badge/Magisk%20Beta-v20.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v20.4)
+[![](https://img.shields.io/badge/Magisk%20Beta-v21.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.0)
 
 ## Useful Links
 
 - [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
-- [OTA Upgrade Guide](https://topjohnwu.github.io/Magisk/ota.html)
-- [Full Official Docs](https://topjohnwu.github.io/Magisk/)
+- [Frequently Asked Questions](https://topjohnwu.github.io/Magisk/faq.html)
+- [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 - [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
 
 ## Android Version Support
@@ -56,7 +56,7 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
 	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
-- Set environment variable `ANDROID_HOME` to the Android SDK folder (can be found in Android Studio settings)
+- Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)
 - Run `./build.py ndk` to let the script download and install NDK for you
 - Set configurations in `config.prop`. A sample `config.prop.sample` is provided.
 - To start building, run `build.py` to see your options. \

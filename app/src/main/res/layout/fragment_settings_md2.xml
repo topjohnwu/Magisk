@@ -30,9 +30,8 @@
         android:paddingEnd="@dimen/l_50"
         android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:spanCount="1"
         tools:layout_marginTop="24dp"
-        tools:listitem="@layout/item_settings_toggle"
+        tools:listitem="@layout/item_settings"
         tools:paddingTop="@dimen/l1" />
 
 </layout>

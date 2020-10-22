@@ -7,25 +7,24 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.diffListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
-import com.topjohnwu.magisk.core.view.Notifications
+import com.topjohnwu.magisk.databinding.RvBindingAdapter
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.model.binding.BindingAdapter
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.diffListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class FlashViewModel(
     args: FlashFragmentArgs,
@@ -40,7 +39,7 @@ class FlashViewModel(
     var behaviorText = resources.getString(R.string.flashing)
         set(value) = set(value, field, { field = it }, BR.behaviorText)
 
-    val adapter = BindingAdapter<ConsoleItem>()
+    val adapter = RvBindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
     val itemBinding = itemBindingOf<ConsoleItem>()
 
@@ -108,17 +107,17 @@ class FlashViewModel(
 
     private fun savePressed() = withExternalRW {
         viewModelScope.launch {
-            val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
-            val file = File(Config.downloadDirectory, name)
             withContext(Dispatchers.IO) {
-                file.bufferedWriter().use { writer ->
+                val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
+                val file = MediaStoreUtils.getFile(name)
+                file.uri.outputStream().bufferedWriter().use { writer ->
                     logItems.forEach {
                         writer.write(it)
                         writer.newLine()
                     }
                 }
+                SnackbarEvent(file.toString()).publish()
             }
-            SnackbarEvent(file.path).publish()
         }
     }
 

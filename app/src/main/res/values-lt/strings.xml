@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Palikti priverstinį šifravimą</string>
     <string name="keep_dm_verity">Palikti dm-verity</string>
-    <string name="uninstall">Pašalinti</string>
     <string name="uninstall_magisk_title">Pašalinti Magisk</string>
     <string name="uninstall_magisk_msg">Visi papildiniai bus išjungti/pašalinti. Root bus panaikintas. Yra galimybė, kad duomenys bus užšifruoti…</string>
     <string name="update">Atnaujinti</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nėra informacijos)</string>
-    <string name="no_modules_found">Papildinių nesurasta</string>
     <string name="reboot_recovery">Perkrauti į Recovery</string>
     <string name="reboot_bootloader">Perkrauti į Bootloader</string>
     <string name="reboot_download">Perkrauti į Download režimą</string>
@@ -46,13 +44,10 @@
     <string name="download">Atsisiųsti</string>
     <string name="reboot">Perkrauti</string>
     <string name="magisk_update_title">Atsirado nauja Magisk versija!</string>
-    <string name="settings_reboot_toast">Nustatymų įgalinimui prašome perkrauti telefoną</string>
     <string name="release_notes">Pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
     <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
-    <string name="dtbo_patched_title">DTBO buvo ištaisytas!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ištaisė dtbo.img, prašome perkrauti telefoną</string>
     <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
     <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
@@ -89,7 +84,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Pasirinktiniai</string>
     <string name="settings_update_custom_msg">Įvesti pasirinktinį URL</string>
-    <string name="settings_core_only_summary">Įgalinti tik pagrindines funkcijas, išjungti visus papildinius. MagiskSU ir Magisk Hide liks įgalinti</string>
     <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Įgalinti sistemos padejėjus Adblock programėlėms</string>
@@ -141,7 +135,6 @@
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s gavo supervartotojo teises</string>
     <string name="su_deny_toast">%1$s negavo supervartotojo teisių</string>
-    <string name="no_apps_found">Nėra surastų programėlių</string>
     <string name="su_snack_grant">%1$s supervartotojo teisių prašymas buvo atsakytas teigiamai</string>
     <string name="su_snack_deny">%1$s supervartotojo teisių prašymas buvo atmestas</string>
     <string name="su_snack_notif_on">Buvo įjungta %1$s pranešimai</string>

@@ -7,9 +7,9 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

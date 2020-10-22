@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-    <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
     <string name="update">Cập nhật</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
-    <string name="no_modules_found">Không tìm thấy mô-đun</string>
     <string name="reboot_recovery">Khởi động vào Recovery</string>
     <string name="reboot_bootloader">Khởi động vào Bootloader</string>
     <string name="reboot_download">Khởi động vào Download</string>
@@ -46,13 +44,10 @@
     <string name="download">Tải xuống</string>
     <string name="reboot">Khởi động lại</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
-    <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
     <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
-    <string name="dtbo_patched_title">DTBO đã được vá!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager đã vá dtbo.img. Hãy khởi động lại.</string>
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="flashing">Đang flash</string>
     <string name="hide_manager_title">Ẩn Magisk Manager…</string>
@@ -92,7 +87,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_core_only_summary">Chỉ bật các tính năng chính. MagiskSU và MagiskHide sẽ vẫn được kích hoạt, nhưng sẽ không có mô-đun nào được tải.</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
@@ -142,7 +136,6 @@
     <string name="sixtymin">60 phút</string>
     <string name="su_allow_toast">%1$s đã được cấp quyền Superuser</string>
     <string name="su_deny_toast">Đã từ chối cấp quyền Superuser cho %1$s</string>
-    <string name="no_apps_found">Không tìm thấy ứng dụng</string>
     <string name="su_snack_grant">Quyền Superuser của %1$s đã được cấp</string>
     <string name="su_snack_deny">Quyền Superuser của %1$s đã bị từ chối</string>
     <string name="su_snack_notif_on">Thông báo của %1$s đã được kích hoạt</string>

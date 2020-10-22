@@ -35,8 +35,35 @@ data class ManagerJson(
     val note: String = ""
 ) : Parcelable
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class StubJson(
     val versionCode: Int = -1,
     val link: String = ""
+) : Parcelable
+
+@JsonClass(generateAdapter = true)
+data class ModuleJson(
+    val id: String,
+    val last_update: Long,
+    val prop_url: String,
+    val zip_url: String,
+    val notes_url: String
+)
+
+@JsonClass(generateAdapter = true)
+data class RepoJson(
+    val name: String,
+    val last_update: Long,
+    val modules: List<ModuleJson>
+)
+
+@JsonClass(generateAdapter = true)
+data class CommitInfo(
+    val sha: String
+)
+
+@JsonClass(generateAdapter = true)
+data class BranchInfo(
+    val commit: CommitInfo
 )

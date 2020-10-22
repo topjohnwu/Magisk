@@ -10,8 +10,6 @@ import androidx.multidex.MultiDex
 import androidx.work.WorkManager
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.FileProvider
-import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
 import com.topjohnwu.magisk.core.utils.RootInit
 import com.topjohnwu.magisk.core.utils.updateConfig
@@ -36,7 +34,6 @@ open class App() : Application() {
             .setInitializers(RootInit::class.java)
             .setTimeout(2))
         Shell.EXECUTOR = IODispatcherExecutor()
-        FileProvider.callHandler = SuCallbackHandler
 
         // Always log full stack trace with Timber
         Timber.plant(Timber.DebugTree())

@@ -4,10 +4,13 @@
     package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
     <application
+        android:icon="@drawable/ic_launcher"
         android:name="a.e"
         android:allowBackup="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
@@ -42,11 +45,6 @@
             </intent-filter>
         </activity>
 
-        <!-- ProcessPhoenix -->
-        <activity
-            android:name="a.r"
-            android:process=":remote" />
-
         <!-- Receiver -->
         <receiver
             android:name="a.h"
@@ -65,6 +63,15 @@
 
         <!-- DownloadService -->
         <service android:name="a.j" />
+
+        <!-- FileProvider -->
+        <provider
+            android:name="a.p"
+            android:authorities="${applicationId}.provider"
+            android:directBootAware="true"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
 
         <!-- Hardcode GMS version -->
         <meta-data

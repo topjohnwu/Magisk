@@ -1,77 +1,41 @@
 package com.topjohnwu.magisk.core.model.module
 
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+abstract class Module : Comparable<Module> {
+    abstract var id: String
+        protected set
+    abstract var name: String
+        protected set
+    abstract var author: String
+        protected set
+    abstract var version: String
+        protected set
+    abstract var versionCode: Int
+        protected set
+    abstract var description: String
+        protected set
 
-class Module(path: String) : BaseModule() {
-    override var id: String = ""
-    override var name: String = ""
-    override var author: String = ""
-    override var version: String = ""
-    override var versionCode: Int = -1
-    override var description: String = ""
+    @Throws(NumberFormatException::class)
+    protected fun parseProps(props: List<String>) {
+        for (line in props) {
+            val prop = line.split("=".toRegex(), 2).map { it.trim() }
+            if (prop.size != 2)
+                continue
 
-    private val removeFile = SuFile(path, "remove")
-    private val disableFile = SuFile(path, "disable")
-    private val updateFile = SuFile(path, "update")
-    private val ruleFile = SuFile(path, "sepolicy.rule")
+            val key = prop[0]
+            val value = prop[1]
+            if (key.isEmpty() || key[0] == '#')
+                continue
 
-    val updated: Boolean get() = updateFile.exists()
-
-    var enable: Boolean
-        get() = !disableFile.exists()
-        set(enable) {
-            val dir = "$PERSIST/$id"
-            if (enable) {
-                Shell.su("mkdir -p $dir", "cp -af $ruleFile $dir").submit()
-                disableFile.delete()
-            } else {
-                Shell.su("rm -rf $dir").submit()
-                !disableFile.createNewFile()
+            when (key) {
+                "id" -> id = value
+                "name" -> name = value
+                "version" -> version = value
+                "versionCode" -> versionCode = value.toInt()
+                "author" -> author = value
+                "description" -> description = value
             }
-        }
-
-    var remove: Boolean
-        get() = removeFile.exists()
-        set(remove) {
-            if (remove) {
-                Shell.su("rm -rf $PERSIST/$id").submit()
-                removeFile.createNewFile()
-            } else {
-                Shell.su("cp -af $ruleFile $PERSIST/$id").submit()
-                !removeFile.delete()
-            }
-        }
-
-    init {
-        runCatching {
-            parseProps(Shell.su("dos2unix < $path/module.prop").exec().out)
-        }
-
-        if (id.isEmpty()) {
-            val sep = path.lastIndexOf('/')
-            id = path.substring(sep + 1)
-        }
-
-        if (name.isEmpty()) {
-            name = id
         }
     }
 
-    companion object {
-
-        private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
-
-        suspend fun installed() = withContext(Dispatchers.IO) {
-            SuFile(Const.MAGISK_PATH)
-                .listFiles { _, name -> name != "lost+found" && name != ".core" }
-                .orEmpty()
-                .filter { !it.isFile }
-                .map { Module("${Const.MAGISK_PATH}/${it.name}") }
-                .sortedBy { it.name.toLowerCase() }
-        }
-    }
+    override operator fun compareTo(other: Module) = name.compareTo(other.name, true)
 }

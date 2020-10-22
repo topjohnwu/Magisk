@@ -1,36 +1,37 @@
 package com.topjohnwu.magisk.ui.settings
 
+import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.adapterOf
+import com.topjohnwu.magisk.arch.diffListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.utils.PatchAPK
-import com.topjohnwu.magisk.core.utils.Utils
+import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.data.database.RepoDao
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.entity.recycler.SettingsItem
-import com.topjohnwu.magisk.model.events.RecreateEvent
-import com.topjohnwu.magisk.model.events.dialog.BiometricDialog
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.adapterOf
-import com.topjohnwu.magisk.ui.base.diffListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
+import com.topjohnwu.magisk.events.AddHomeIconEvent
+import com.topjohnwu.magisk.events.RecreateEvent
+import com.topjohnwu.magisk.events.dialog.BiometricEvent
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import org.koin.core.get
 
 class SettingsViewModel(
     private val repositoryDao: RepoDao
-) : BaseViewModel(), SettingsItem.Callback {
+) : BaseViewModel(), BaseSettingsItem.Callback {
 
-    val adapter = adapterOf<SettingsItem>()
-    val itemBinding = itemBindingOf<SettingsItem> { it.bindExtra(BR.callback, this) }
+    val adapter = adapterOf<BaseSettingsItem>()
+    val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
     val items = diffListOf(createItems())
 
     init {
@@ -39,27 +40,27 @@ class SettingsViewModel(
         }
     }
 
-    private fun createItems(): List<SettingsItem> {
+    private fun createItems(): List<BaseSettingsItem> {
+        val context = get<Context>()
+        val hidden = context.packageName != BuildConfig.APPLICATION_ID
+
         // Customization
         val list = mutableListOf(
             Customization,
             Theme, Language
         )
-        if (Build.VERSION.SDK_INT < 21) {
-            // Pre 5.0 does not support getting colors from attributes,
-            // making theming a pain in the ass. Just forget about it
-            list.remove(Theme)
-        }
+        if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
+            list.add(AddShortcut)
 
         // Manager
         list.addAll(listOf(
             Manager,
-            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
             list.add(ClearRepoCache)
             if (Const.USER_ID == 0 && Info.isConnected.get())
-                list.add(HideOrRestore())
+                list.add(if (hidden) Restore else Hide)
         }
 
         // Magisk
@@ -68,6 +69,10 @@ class SettingsViewModel(
                 Magisk,
                 MagiskHide, SystemlessHosts
             ))
+            if (Build.VERSION.SDK_INT < 19) {
+                // MagiskHide is only available on 4.4+
+                list.remove(MagiskHide)
+            }
         }
 
         // Superuser
@@ -90,20 +95,21 @@ class SettingsViewModel(
         return list
     }
 
-    override fun onItemPressed(view: View, item: SettingsItem, callback: () -> Unit) = when (item) {
+    override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) = when (item) {
         is DownloadPath -> withExternalRW(callback)
         is Biometrics -> authenticate(callback)
         is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
         is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
-        is Restore -> restoreManager()
+        is Restore -> HideAPK.restore(view.context)
+        is AddShortcut -> AddHomeIconEvent().publish()
         else -> callback()
     }
 
-    override fun onItemChanged(view: View, item: SettingsItem) = when (item) {
+    override fun onItemChanged(view: View, item: BaseSettingsItem) = when (item) {
         is Language -> RecreateEvent().publish()
         is UpdateChannel -> openUrlIfNecessary(view)
-        is Hide -> PatchAPK.hideManager(view.context, item.value)
+        is Hide -> HideAPK.hide(view.context, item.value)
         else -> Unit
     }
 
@@ -115,7 +121,7 @@ class SettingsViewModel(
     }
 
     private fun authenticate(callback: () -> Unit) {
-        BiometricDialog {
+        BiometricEvent {
             // allow the change on success
             onSuccess { callback() }
         }.publish()
@@ -133,11 +139,4 @@ class SettingsViewModel(
             Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
         }
     }
-
-    private fun restoreManager() {
-        DownloadService(get()) {
-            subject = DownloadSubject.Manager(Configuration.APK.Restore)
-        }
-    }
-
 }

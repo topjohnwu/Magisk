@@ -17,7 +17,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/hide_content"
-            dividerVertical="@{@drawable/divider_l1}"
+            dividerVertical="@{@drawable/divider_l_50}"
             invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
@@ -35,6 +35,7 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/hide_filter_toggle"
+            invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
@@ -42,13 +43,13 @@
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
-            app:srcCompat="@drawable/ic_filter"
+            app:srcCompat="@drawable/ic_search_md2"
             app:tint="?colorPrimary"
             tools:layout_marginBottom="64dp" />
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
             android:id="@+id/hide_filter"
-            style="@style/WidgetFoundation.Card.Variant"
+            style="@style/WidgetFoundation.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -70,18 +71,37 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:visibility="gone">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/safetynet_attest_loading"
+                android:text="@string/loading"
                 android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textStyle="bold" />
 
             <ProgressBar
                 style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                 android:layout_marginTop="@dimen/l1" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            goneUnless="@{viewModel.loadFailed}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_available"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

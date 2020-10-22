@@ -2,16 +2,14 @@ package com.topjohnwu.magisk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
-import com.topjohnwu.magisk.net.ErrorHandler;
 import com.topjohnwu.magisk.net.Networking;
-import com.topjohnwu.magisk.net.ResponseListener;
+import com.topjohnwu.magisk.net.Request;
 import com.topjohnwu.magisk.utils.APKInstall;
 
 import org.json.JSONException;
@@ -22,42 +20,19 @@ import java.io.File;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
+import static com.topjohnwu.magisk.R.string.dling;
+import static com.topjohnwu.magisk.R.string.no_internet_msg;
+import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
 public class MainActivity extends Activity {
 
-    private static final boolean CANARY = !BuildConfig.VERSION_NAME.contains(".");
-    private static final String URL =
-            BuildConfig.DEV_CHANNEL != null ? BuildConfig.DEV_CHANNEL :
-            "https://raw.githubusercontent.com/topjohnwu/magisk_files/" +
-            (BuildConfig.DEBUG ? "canary/debug.json" :
-            (CANARY ? "canary/release.json" : "master/stable.json"));
     private static final String APP_NAME = "Magisk Manager";
+    private static final String CDN_URL = "https://cdn.jsdelivr.net/gh/topjohnwu/magisk_files@%s/%s";
 
     private String apkLink;
-    private ErrorHandler err = (conn, e) -> {
-        Log.e(getClass().getSimpleName(), "", e);
-        finish();
-    };
+    private String sha;
     private Context themed;
-
-    private void showDialog() {
-        ProgressDialog.show(themed,
-            getString(R.string.dling),
-            getString(R.string.dling) + " " + APP_NAME,
-            true);
-    }
-
-    private void dlAPK() {
-        showDialog();
-        // Download and upgrade the app
-        Application app = getApplication();
-        Networking.get(apkLink)
-                .setErrorHandler(err)
-                .getAsFile(
-                        new File(getCacheDir(), "manager.apk"),
-                        apk -> APKInstall.install(app, apk)
-                );
-    }
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,36 +41,77 @@ public class MainActivity extends Activity {
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         if (Networking.checkNetworkStatus(this)) {
-            Networking.get(URL)
-                    .setErrorHandler(err)
-                    .getAsJSONObject(new JSONLoader());
+            fetchAPKURL();
         } else {
             new AlertDialog.Builder(themed)
                     .setCancelable(false)
                     .setTitle(APP_NAME)
-                    .setMessage(getString(R.string.no_internet_msg))
+                    .setMessage(getString(no_internet_msg))
                     .setNegativeButton(ok, (d, w) -> finish())
                     .show();
         }
     }
 
-    class JSONLoader implements ResponseListener<JSONObject> {
-
-        @Override
-        public void onResponse(JSONObject json) {
-            try {
-                JSONObject manager = json.getJSONObject("app");
-                apkLink = manager.getString("link");
-                new AlertDialog.Builder(themed)
-                        .setCancelable(false)
-                        .setTitle(APP_NAME)
-                        .setMessage(getString(R.string.upgrade_msg))
-                        .setPositiveButton(yes, (d, w) -> dlAPK())
-                        .setNegativeButton(no, (d, w) -> finish())
-                        .show();
-            } catch (JSONException e) {
-                finish();
-            }
+    private void fetchAPKURL() {
+        dialog = ProgressDialog.show(themed, "", "", true);
+        String url;
+        if (BuildConfig.DEV_CHANNEL != null) {
+            url = BuildConfig.DEV_CHANNEL;
+        } else if (!BuildConfig.CANARY) {
+            url = "https://topjohnwu.github.io/magisk_files/stable.json";
+        } else {
+            url = "https://api.github.com/repos/topjohnwu/magisk_files/branches/canary";
+            request(url).getAsJSONObject(this::handleCanary);
+            return;
         }
+        request(url).getAsJSONObject(this::handleJSON);
+    }
+
+    private void error(Throwable e) {
+        Log.e(getClass().getSimpleName(), "", e);
+        finish();
+    }
+
+    private Request request(String url) {
+        return Networking.get(url).setErrorHandler((conn, e) -> error(e));
+    }
+
+    private void handleCanary(JSONObject json) {
+        try {
+            sha = json.getJSONObject("commit").getString("sha");
+            String url = String.format(CDN_URL, sha, "canary.json");
+            request(url).getAsJSONObject(this::handleJSON);
+        } catch (JSONException e) {
+            error(e);
+        }
+    }
+
+    private void handleJSON(JSONObject json) {
+        dialog.dismiss();
+        try {
+            apkLink = json.getJSONObject("app").getString("link");
+            if (!apkLink.startsWith("http"))
+                apkLink = String.format(CDN_URL, sha, apkLink);
+            new AlertDialog.Builder(themed)
+                    .setCancelable(false)
+                    .setTitle(APP_NAME)
+                    .setMessage(getString(upgrade_msg))
+                    .setPositiveButton(yes, (d, w) -> dlAPK())
+                    .setNegativeButton(no, (d, w) -> finish())
+                    .show();
+        } catch (JSONException e) {
+            error(e);
+        }
+    }
+
+    private void dlAPK() {
+        dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
+        // Download and upgrade the app
+        File apk = new File(getCacheDir(), "manager.apk");
+        request(apkLink).getAsFile(apk, file -> {
+            dialog.dismiss();
+            APKInstall.install(this, file);
+            finish();
+        });
     }
 }

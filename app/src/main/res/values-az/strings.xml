@@ -14,14 +14,12 @@
     <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
-    <string name="uninstall">Sil</string>
     <string name="uninstall_magisk_title">Magisk\'i Sil</string>
     <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
     <string name="update">Yenilə</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Məlumat təmin edilməyib)</string>
-    <string name="no_modules_found">Əlavələr yoxdur.</string>
     <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
     <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
@@ -55,12 +53,9 @@
     <string name="repo_install_msg">%1$s faylını indi yükləmək istəyirsiniz?</string>
     <string name="download">Yüklə</string>
     <string name="reboot">Yenidən Başlat</string>
-    <string name="settings_reboot_toast">Tənzimləmələri saxlamaq üçün yenidən başladın.</string>
     <string name="release_notes">Yeniliklər</string>
     <string name="repo_cache_cleared">Repo keşi silindi</string>
     <string name="manager_download_install">Yükləyib quraşdırmaq üçün toxun.</string>
-    <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
     <string name="flashing">Qurulur</string>
     <string name="hide_manager_title">Magisk Manager gizlədilir…</string>
     <string name="hide_manager_fail_toast">Magisk Manager\'i gizlətmək alınmadı.</string>
@@ -99,7 +94,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özəl</string>
     <string name="settings_update_custom_msg">Özəl URL daxil edin</string>
-    <string name="settings_core_only_summary">Yalnız nüvə xüsusiyyətlərini aç. MagiskSU və MagiskHide hələ də açıq qalacaq, amma əlavələr yüklənməyəcək.</string>
     <string name="settings_magiskhide_summary">Magisk\'i fərqli növdə aşkarlamalardan gizləyin.</string>
     <string name="settings_hosts_title">Sistemsiz host\'lar</string>
     <string name="settings_hosts_summary">Adblock tətbiqləri üçün Sistemsiz host dəstəyi.</string>
@@ -149,7 +143,6 @@
     <string name="sixtymin">60 dəq</string>
     <string name="su_allow_toast">%1$s SuperUser icazəsi ilə təmin edildi</string>
     <string name="su_deny_toast">%1$s SuperUser icazəsi ilə təmin edilmədi</string>
-    <string name="no_apps_found">Tətbiq yoxdur</string>
     <string name="su_snack_grant">%1$s üçün Superuser icazəsi verilib</string>
     <string name="su_snack_deny">%1$s üçün Superuser icazəsi verilməyib</string>
     <string name="su_snack_notif_on">%1$s üçün bildirişlər açıqdır</string>

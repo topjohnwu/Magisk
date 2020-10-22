@@ -7,36 +7,29 @@ import android.os.Bundle
 import android.os.Process
 import android.widget.Toast
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.ProviderCallHandler
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.intent
-import com.topjohnwu.magisk.core.model.MagiskPolicy
-import com.topjohnwu.magisk.core.model.toPolicy
-import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.core.wrap
+import com.topjohnwu.magisk.core.model.su.SuPolicy
+import com.topjohnwu.magisk.core.model.su.toLog
+import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.startActivity
 import com.topjohnwu.magisk.ktx.startActivityWithRoot
-import com.topjohnwu.magisk.model.entity.toLog
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-object SuCallbackHandler : ProviderCallHandler {
+object SuCallbackHandler {
 
     const val REQUEST = "request"
     const val LOG = "log"
     const val NOTIFY = "notify"
     const val TEST = "test"
-
-    override fun call(context: Context, method: String, arg: String?, extras: Bundle?): Bundle? {
-        invoke(context.wrap(), method, extras)
-        return Bundle.EMPTY
-    }
 
     operator fun invoke(context: Context, action: String?, data: Bundle?) {
         data ?: return
@@ -132,9 +125,9 @@ object SuCallbackHandler : ProviderCallHandler {
         }
     }
 
-    private fun notify(context: Context, policy: MagiskPolicy) {
+    private fun notify(context: Context, policy: SuPolicy) {
         if (policy.notification && Config.suNotification == Config.Value.NOTIFICATION_TOAST) {
-            val resId = if (policy.policy == MagiskPolicy.ALLOW)
+            val resId = if (policy.policy == SuPolicy.ALLOW)
                 R.string.su_allow_toast
             else
                 R.string.su_deny_toast

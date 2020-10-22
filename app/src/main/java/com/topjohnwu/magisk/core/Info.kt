@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
-import com.topjohnwu.magisk.core.net.NetworkObserver
+import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
@@ -11,6 +11,7 @@ import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.FileInputStream
 import java.io.IOException
+import java.util.*
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -18,25 +19,28 @@ object Info {
 
     val envRef = CachedValue { loadState() }
 
-    @JvmStatic val env by envRef              // Local
-    @JvmStatic var stub: DynAPK.Data? = null  // Stub
-    var remote = UpdateInfo()      // Remote
+    @JvmStatic val env by envRef
 
-    // Toggle-able options
-    @JvmStatic var keepVerity = false
-    @JvmStatic var keepEnc = false
-    @JvmStatic var recovery = false
+    var stub: DynAPK.Data? = null
+    val stubChk: DynAPK.Data
+        get() = stub as DynAPK.Data
 
-    // Immutable device state
+    var remote = UpdateInfo()
+
+    // Device state
+    var crypto = ""
     @JvmStatic var isSAR = false
     @JvmStatic var isAB = false
+    @JvmStatic val isFDE get() = crypto == "block"
     @JvmStatic var ramdisk = false
     @JvmStatic var hasGMS = true
+    @JvmStatic var isPixel = false
+    @JvmStatic val cryptoText get() = crypto.capitalize(Locale.US)
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->
             NetworkObserver.observe(get()) {
-                UiThreadHandler.run { field.set(it.isAvailable) }
+                UiThreadHandler.run { field.set(it) }
             }
         }
     }

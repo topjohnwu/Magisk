@@ -7,8 +7,8 @@
 
         <import type="android.os.Build" />
         <import type="com.topjohnwu.magisk.core.Info" />
-
         <import type="com.topjohnwu.magisk.BuildConfig" />
+        <import type="com.topjohnwu.magisk.R" />
 
         <variable
             name="viewModel"
@@ -40,7 +40,7 @@
                 android:textAppearance="@style/AppearanceFoundation.Title" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                invisibleUnless="@{viewModel.success || viewModel.failed}"
+                invisible="@{viewModel.checking}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingTop="@dimen/l1"
@@ -49,6 +49,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/safetynet_attestation"
                     style="@style/WidgetFoundation.Card.Elevated"
+                    cardBackgroundColorAttr="@{viewModel.success ? R.attr.colorPrimary : R.attr.colorError}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
@@ -62,29 +63,12 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias=".35"
-                    app:layout_constraintWidth_max="300dp">
+                    app:layout_constraintWidth_max="300dp"
+                    tools:cardBackgroundColor="?colorPrimary">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
-
-                        <View
-                            goneUnless="@{viewModel.failed}"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:alpha=".5"
-                            android:background="?colorError"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <View
-                            goneUnless="@{viewModel.success}"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:alpha=".5"
-                            android:background="?colorPrimary"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/safetynet_title"
@@ -97,21 +81,24 @@
                             android:text="@{viewModel.safetyNetTitle}"
                             android:textAppearance="@style/AppearanceFoundation.Display.OnPrimary"
                             android:textStyle="bold"
+                            app:textColorAttr="@{viewModel.textColorAttr}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="@string/safetynet_attest_success" />
 
-                        <View
+                        <ImageView
                             android:id="@+id/safetynet_divider"
                             android:layout_width="50dp"
                             android:layout_height="4dp"
                             android:layout_marginTop="@dimen/l2"
-                            android:background="@drawable/bg_divider_rounded_on_primary"
+                            app:srcCompat="@drawable/bg_divider_rounded_on_primary"
+                            app:tintAttr="@{viewModel.textColorAttr}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title" />
+                            app:layout_constraintTop_toBottomOf="@+id/safetynet_title"
+                            tools:tint="?colorOnPrimary"/>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/checkbox_layout"
@@ -132,6 +119,7 @@
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
                                 android:layout_marginTop="@dimen/l2"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -147,6 +135,7 @@
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
                                 android:layout_marginTop="@dimen/l2"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toBottomOf="@id/basic_text"
@@ -164,18 +153,22 @@
                                 isSelected="@{viewModel.basicIntegrityState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:tintAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/basic_text"
-                                app:layout_constraintBottom_toBottomOf="@id/basic_text"/>
+                                app:layout_constraintBottom_toBottomOf="@id/basic_text"
+                                tools:tint="?colorOnPrimary"/>
 
                             <ImageView
                                 style="@style/WidgetFoundation.Icon.OnPrimary"
                                 isSelected="@{viewModel.ctsState}"
                                 android:layout_gravity="center"
                                 app:srcCompat="@drawable/ic_check_circle_md2"
+                                app:tintAttr="@{viewModel.textColorAttr}"
                                 app:layout_constraintStart_toEndOf="@id/snet_barrier"
                                 app:layout_constraintTop_toTopOf="@id/cts_text"
-                                app:layout_constraintBottom_toBottomOf="@id/cts_text"/>
+                                app:layout_constraintBottom_toBottomOf="@id/cts_text"
+                                tools:tint="?colorOnPrimary"/>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -196,6 +189,7 @@
                                 android:text="evalType"
                                 android:textAppearance="@style/AppearanceFoundation.Body.OnPrimary"
                                 android:textStyle="bold"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 tools:ignore="HardcodedText" />
 
                             <TextView
@@ -206,6 +200,7 @@
                                 android:textStyle="bold"
                                 android:layout_marginStart="@dimen/l1"
                                 android:text="@{viewModel.evalType}"
+                                app:textColorAttr="@{viewModel.textColorAttr}"
                                 tools:text="HARDWARE"/>
 
                         </LinearLayout>
@@ -214,7 +209,7 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

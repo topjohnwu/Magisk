@@ -4,9 +4,9 @@
 #include <utility>
 #include "format.hpp"
 
-/****************
- * Other Headers
- ****************/
+/******************
+ * Special Headers
+ *****************/
 
 struct mtk_hdr {
 	uint32_t magic;         /* MTK magic */
@@ -45,8 +45,39 @@ struct blob_hdr {
  * Boot Image Headers
  *********************/
 
-struct boot_img_hdr_base {
-	char magic[8];
+#define BOOT_MAGIC_SIZE 8
+#define BOOT_NAME_SIZE 16
+#define BOOT_ID_SIZE 32
+#define BOOT_ARGS_SIZE 512
+#define BOOT_EXTRA_ARGS_SIZE 1024
+
+/*
+ * +-----------------+
+ * | boot header     | 1 page
+ * +-----------------+
+ * | kernel          | n pages
+ * +-----------------+
+ * | ramdisk         | m pages
+ * +-----------------+
+ * | second stage    | o pages
+ * +-----------------+
+ * | extra blob      | x pages (non standard)
+ * +-----------------+
+ * | recovery dtbo   | p pages
+ * +-----------------+
+ * | dtb             | q pages
+ * +-----------------+
+ *
+ * n = (kernel_size + page_size - 1) / page_size
+ * m = (ramdisk_size + page_size - 1) / page_size
+ * o = (second_size + page_size - 1) / page_size
+ * p = (recovery_dtbo_size + page_size - 1) / page_size
+ * q = (dtb_size + page_size - 1) / page_size
+ * x = (extra_size + page_size - 1) / page_size
+ */
+
+struct boot_img_hdr_common {
+	char magic[BOOT_MAGIC_SIZE];
 
 	uint32_t kernel_size;  /* size in bytes */
 	uint32_t kernel_addr;  /* physical load addr */
@@ -58,32 +89,31 @@ struct boot_img_hdr_base {
 	uint32_t second_addr;  /* physical load addr */
 } __attribute__((packed));
 
-struct boot_img_hdr_v0 : public boot_img_hdr_base {
+struct boot_img_hdr_v0 : public boot_img_hdr_common {
 	uint32_t tags_addr;    /* physical addr for kernel tags */
 	uint32_t page_size;    /* flash page size we assume */
 
-	/* In header v1, this field is used for header version
-	 * However, on some devices like Samsung, this field is used to store DTB
-	 * We will treat this field differently based on its value */
+	// In header v1, this field is used for header version
+	// However, on some devices like Samsung, this field is used to store DTB
+	// We treat this field differently based on its value
 	union {
 		uint32_t header_version;  /* the version of the header */
 		uint32_t extra_size;      /* extra blob size in bytes */
 	};
 
-	/* operating system version and security patch level; for
-	 * version "A.B.C" and patch level "Y-M-D":
-	 * ver = A << 14 | B << 7 | C         (7 bits for each of A, B, C)
-	 * lvl = ((Y - 2000) & 127) << 4 | M  (7 bits for Y, 4 bits for M)
-	 * os_version = ver << 11 | lvl */
+	// Operating system version and security patch level.
+	// For version "A.B.C" and patch level "Y-M-D":
+	//   (7 bits for each of A, B, C; 7 bits for (Y-2000), 4 bits for M)
+	//   os_version = A[31:25] B[24:18] C[17:11] (Y-2000)[10:4] M[3:0]
 	uint32_t os_version;
 
-	char name[16];         /* asciiz product name */
-	char cmdline[512];
-	char id[32];           /* timestamp / checksum / sha1 / etc */
+	char name[BOOT_NAME_SIZE];  /* asciiz product name */
+	char cmdline[BOOT_ARGS_SIZE];
+	char id[BOOT_ID_SIZE];      /* timestamp / checksum / sha1 / etc */
 
-	/* Supplemental command line data; kept here to maintain
-	 * binary compatibility with older versions of mkbootimg */
-	char extra_cmdline[1024];
+	// Supplemental command line data; kept here to maintain
+	// binary compatibility with older versions of mkbootimg.
+	char extra_cmdline[BOOT_EXTRA_ARGS_SIZE];
 } __attribute__((packed));
 
 struct boot_img_hdr_v1 : public boot_img_hdr_v0 {
@@ -101,59 +131,54 @@ struct boot_img_hdr_v2 : public boot_img_hdr_v1 {
 using boot_img_hdr = boot_img_hdr_v2;
 
 // Special Samsung header
-struct boot_img_hdr_pxa : public boot_img_hdr_base {
+struct boot_img_hdr_pxa : public boot_img_hdr_common {
 	uint32_t extra_size;   /* extra blob size in bytes */
 	uint32_t unknown;
 	uint32_t tags_addr;    /* physical addr for kernel tags */
 	uint32_t page_size;    /* flash page size we assume */
 
 	char name[24];         /* asciiz product name */
-	char cmdline[512];
-	char id[32];           /* timestamp / checksum / sha1 / etc */
+	char cmdline[BOOT_ARGS_SIZE];
+	char id[BOOT_ID_SIZE]; /* timestamp / checksum / sha1 / etc */
 
-	/* Supplemental command line data; kept here to maintain
-	 * binary compatibility with older versions of mkbootimg */
-	char extra_cmdline[1024];
+	char extra_cmdline[BOOT_EXTRA_ARGS_SIZE];
 } __attribute__((packed));
 
-/*
-** +-----------------+
-** | boot header     | 1 page
-** +-----------------+
-** | kernel          | n pages
-** +-----------------+
-** | ramdisk         | m pages
-** +-----------------+
-** | second stage    | o pages
-** +-----------------+
-** | extra blob      | p pages
-** +-----------------+
-** | recovery dtbo   | q pages
-** +-----------------+
-** | dtb             | r pages
-** +-----------------+
-**
-** n = (kernel_size + page_size - 1) / page_size
-** m = (ramdisk_size + page_size - 1) / page_size
-** o = (second_size + page_size - 1) / page_size
-** p = (extra_size + page_size - 1) / page_size
-** q = (recovery_dtbo_size + page_size - 1) / page_size
-** r = (dtb_size + page_size - 1) / page_size
-**
-** 0. all entities are page_size aligned in flash
-** 1. kernel and ramdisk are required (size != 0)
-** 2. second is optional (second_size == 0 -> no second)
-** 3. load each element (kernel, ramdisk, second) at
-**    the specified physical address (kernel_addr, etc)
-** 4. prepare tags at tag_addr.  kernel_args[] is
-**    appended to the kernel commandline in the tags.
-** 5. r0 = 0, r1 = MACHINE_TYPE, r2 = tags_addr
-** 6. if second_size != 0: jump to second_addr
-**    else: jump to kernel_addr
-*/
+/* When the boot image header has a version of 3, the structure of the boot
+ * image is as follows:
+ *
+ * +---------------------+
+ * | boot header         | 4096 bytes
+ * +---------------------+
+ * | kernel              | m pages
+ * +---------------------+
+ * | ramdisk             | n pages
+ * +---------------------+
+ *
+ * m = (kernel_size + 4096 - 1) / 4096
+ * n = (ramdisk_size + 4096 - 1) / 4096
+ *
+ * Note that in version 3 of the boot image header, page size is fixed at 4096 bytes.
+ */
 
-#define drct_var(name) \
-auto &name() { return img_hdr->name; }
+struct boot_img_hdr_v3 {
+	uint8_t magic[BOOT_MAGIC_SIZE];
+
+	uint32_t kernel_size;  /* size in bytes */
+	uint32_t ramdisk_size; /* size in bytes */
+	uint32_t os_version;
+	uint32_t header_size;
+	uint32_t reserved[4];
+
+	uint32_t header_version;
+
+	char cmdline[BOOT_ARGS_SIZE + BOOT_EXTRA_ARGS_SIZE];
+} __attribute__((packed));
+
+/*******************************
+ * Polymorphic Universal Header
+ *******************************/
+
 #define decl_var(name, len) \
 virtual uint##len##_t &name() { j##len = 0; return j##len; }
 #define decl_val(name, type) \
@@ -161,12 +186,10 @@ virtual type name() { return 0; }
 
 struct dyn_img_hdr {
 
-	// Direct entries
-	drct_var(kernel_size)
-	drct_var(ramdisk_size)
-	drct_var(second_size)
-
 	// Standard entries
+	decl_var(kernel_size, 32)
+	decl_var(ramdisk_size, 32)
+	decl_var(second_size, 32)
 	decl_var(page_size, 32)
 	decl_val(header_version, uint32_t)
 	decl_var(extra_size, 32)
@@ -188,20 +211,16 @@ struct dyn_img_hdr {
 
 	virtual size_t hdr_size() = 0;
 
-	boot_img_hdr_base * const &operator* () const {
-		return img_hdr;
-	}
-
+	const void *raw_hdr() const { return raw; }
 	void print();
 	void dump_hdr_file();
 	void load_hdr_file();
 
 protected:
 	union {
-		/* Main header could be either AOSP or PXA,
-		 * but both of them are base headers. */
-		boot_img_hdr_base *img_hdr;  /* Common base header */
+		// Main header could be either AOSP or PXA
 		boot_img_hdr_v2 *v2_hdr;     /* AOSP v2 header */
+		boot_img_hdr_v3 *v3_hdr;     /* AOSP v3 header */
 		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
 		void *raw;                   /* Raw pointer */
 	};
@@ -212,7 +231,6 @@ private:
 	static uint64_t j64;
 };
 
-#undef drct_var
 #undef decl_var
 #undef decl_val
 
@@ -228,24 +246,15 @@ size_t hdr_size() override { return sizeof(hdr); }
 #define impl_cls(ver) __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
 
 #define impl_val(name) \
-decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_pxa->name; }
-
-struct dyn_img_pxa : public dyn_img_hdr {
-	impl_cls(pxa)
-
-	impl_val(extra_size)
-	impl_val(page_size)
-	impl_val(name)
-	impl_val(cmdline)
-	impl_val(id)
-	impl_val(extra_cmdline)
-};
-
-#undef impl_val
-#define impl_val(name) \
 decltype(std::declval<dyn_img_hdr>().name()) name() override { return v2_hdr->name; }
 
-struct dyn_img_v0 : public dyn_img_hdr {
+struct dyn_img_common : public dyn_img_hdr {
+	impl_val(kernel_size)
+	impl_val(ramdisk_size)
+	impl_val(second_size)
+};
+
+struct dyn_img_v0 : public dyn_img_common {
 	impl_cls(v0)
 
 	impl_val(page_size)
@@ -265,9 +274,7 @@ struct dyn_img_v1 : public dyn_img_v0 {
 	impl_val(recovery_dtbo_offset)
 	impl_val(header_size)
 
-	uint32_t &extra_size() override {
-		return dyn_img_hdr::extra_size();
-	}
+	uint32_t &extra_size() override { return dyn_img_hdr::extra_size(); }
 };
 
 struct dyn_img_v2 : public dyn_img_v1 {
@@ -276,11 +283,51 @@ struct dyn_img_v2 : public dyn_img_v1 {
 	impl_val(dtb_size)
 };
 
+#undef impl_val
+#define impl_val(name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_pxa->name; }
+
+struct dyn_img_pxa : public dyn_img_common {
+	impl_cls(pxa)
+
+	impl_val(extra_size)
+	impl_val(page_size)
+	impl_val(name)
+	impl_val(cmdline)
+	impl_val(id)
+	impl_val(extra_cmdline)
+};
+
+#undef impl_val
+#define impl_val(name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return v3_hdr->name; }
+
+struct dyn_img_v3 : public dyn_img_hdr {
+	impl_cls(v3)
+
+	impl_val(kernel_size)
+	impl_val(ramdisk_size)
+	impl_val(os_version)
+	impl_val(header_size)
+	impl_val(header_version)
+	impl_val(cmdline)
+
+	// Make API compatible
+	uint32_t &page_size() override { page_sz = 4096; return page_sz; }
+	char *extra_cmdline() override { return &v3_hdr->cmdline[BOOT_ARGS_SIZE]; }
+
+private:
+	uint32_t page_sz;
+};
+
 #undef __impl_cls
 #undef impl_cls
 #undef impl_val
 
-// Flags
+/******************
+ * Full Boot Image
+ ******************/
+
 #define MTK_KERNEL      (1 << 0)
 #define MTK_RAMDISK     (1 << 1)
 #define CHROMEOS_FLAG   (1 << 2)
@@ -304,9 +351,9 @@ struct boot_img {
 	uint16_t flags = 0;
 
 	// The format of kernel, ramdisk and extra
-	format_t k_fmt;
-	format_t r_fmt;
-	format_t e_fmt;
+	format_t k_fmt = UNKNOWN;
+	format_t r_fmt = UNKNOWN;
+	format_t e_fmt = UNKNOWN;
 
 	/***************************************************
 	 * Following pointers points within the mmap region
@@ -337,5 +384,4 @@ struct boot_img {
 	~boot_img();
 
 	void parse_image(uint8_t *addr);
-	void find_kernel_dtb();
 };

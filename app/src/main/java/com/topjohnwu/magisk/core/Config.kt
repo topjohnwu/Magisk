@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.core
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Environment
 import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
@@ -10,25 +10,31 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.magiskdb.SettingsDao
 import com.topjohnwu.magisk.core.magiskdb.StringDao
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.Utils
 import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.data.preference.PreferenceModel
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.inject
-import com.topjohnwu.magisk.model.preference.PreferenceModel
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.io.SuFileInputStream
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
 
 object Config : PreferenceModel, DBConfig {
 
     override val stringDao: StringDao by inject()
     override val settingsDao: SettingsDao by inject()
     override val context: Context by inject(Protected)
+
+    @get:SuppressLint("ApplySharedPref")
+    val prefsFile: File get() {
+        // Flush prefs to disk
+        prefs.edit().apply {
+            remove(Key.ASKED_HOME)
+        }.commit()
+        return File("${context.filesDir.parent}/shared_prefs", "${fileName}.xml")
+    }
 
     object Key {
         // db configs
@@ -51,10 +57,12 @@ object Config : PreferenceModel, DBConfig {
         const val DARK_THEME = "dark_theme_extended"
         const val REPO_ORDER = "repo_order"
         const val SHOW_SYSTEM_APP = "show_system"
-        const val DOWNLOAD_PATH = "download_path"
+        const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
+        const val ASKED_HOME = "asked_home"
+        const val DOH = "doh"
 
         // system state
         const val MAGISKHIDE = "magiskhide"
@@ -107,13 +115,18 @@ object Config : PreferenceModel, DBConfig {
         else
             Value.DEFAULT_CHANNEL
 
-    var bootId by preference(Key.BOOT_ID, "")
+    @JvmStatic var keepVerity = false
+    @JvmStatic var keepEnc = false
+    @JvmStatic var recovery = false
 
-    var downloadPath by preference(Key.DOWNLOAD_PATH, Environment.DIRECTORY_DOWNLOADS)
+    var bootId by preference(Key.BOOT_ID, "")
+    var askedHome by preference(Key.ASKED_HOME, false)
+
+    var downloadDir by preference(Key.DOWNLOAD_DIR, "")
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
-    var suAutoReponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
+    var suAutoResponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
@@ -122,6 +135,7 @@ object Config : PreferenceModel, DBConfig {
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
+    var doh by preference(Key.DOH, false)
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
@@ -141,14 +155,14 @@ object Config : PreferenceModel, DBConfig {
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
-    // Always return a path in external storage where we can write
-    val downloadDirectory get() =
-        Utils.ensureDownloadPath(downloadPath) ?: get<Context>().getExternalFilesDir(null)!!
-
     private const val SU_FINGERPRINT = "su_fingerprint"
 
-    fun initialize() {
-        prefs.edit { parsePrefs() }
+    fun load(pkg: String) {
+        try {
+            context.contentResolver.openInputStream(Provider.PREFS_URI(pkg))?.use {
+                prefs.edit { parsePrefs(it) }
+            }
+        } catch (e: IOException) {}
 
         prefs.edit {
             // Settings migration
@@ -170,10 +184,8 @@ object Config : PreferenceModel, DBConfig {
         }
     }
 
-    private fun SharedPreferences.Editor.parsePrefs() {
-        val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
-        if (config.exists()) runCatching {
-            val input = SuFileInputStream(config)
+    private fun SharedPreferences.Editor.parsePrefs(input: InputStream) {
+        runCatching {
             val parser = Xml.newPullParser()
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
             parser.setInput(input, "UTF-8")
@@ -217,19 +229,6 @@ object Config : PreferenceModel, DBConfig {
                     else -> parser.next()
                 }
             }
-            config.delete()
         }
     }
-
-    fun export() {
-        // Flush prefs to disk
-        prefs.edit().commit()
-        val context = get<Context>(Protected)
-        val xml = File(
-            "${context.filesDir.parent}/shared_prefs",
-            "${context.packageName}_preferences.xml"
-        )
-        Shell.su("cat $xml > /data/adb/${Const.MANAGER_CONFIGS}").exec()
-    }
-
 }

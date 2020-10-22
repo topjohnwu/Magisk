@@ -13,6 +13,7 @@ import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDialog
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
 import androidx.core.view.updatePadding
 import androidx.databinding.Bindable
@@ -22,9 +23,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
-import com.topjohnwu.magisk.ui.base.itemBindingOf
 import com.topjohnwu.magisk.utils.ObservableHost
 import com.topjohnwu.magisk.utils.set
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
@@ -54,10 +55,12 @@ class MagiskDialog(
             )
         }
 
+        val paddingTop = binding.root.paddingTop
+        val paddingBottom = binding.root.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             view.updatePadding(
-                top = view.paddingTop + insets.systemWindowInsetTop,
-                bottom = view.paddingBottom + insets.systemWindowInsetBottom
+                top = paddingTop + insets.systemWindowInsetTop,
+                bottom = paddingBottom + insets.systemWindowInsetBottom
             )
             insets
         }
@@ -77,12 +80,8 @@ class MagiskDialog(
         override var callbacks: PropertyChangeRegistry? = null
 
         @get:Bindable
-        var icon = 0
+        var icon: Drawable? = null
             set(value) = set(value, field, { field = it }, BR.icon)
-
-        @get:Bindable
-        var iconRaw: Drawable? = null
-            set(value) = set(value, field, { field = it }, BR.iconRaw)
 
         @get:Bindable
         var title: CharSequence = ""
@@ -185,10 +184,12 @@ class MagiskDialog(
         apply { data.message = message }
 
     fun applyIcon(@DrawableRes drawableRes: Int) =
-        apply { data.icon = drawableRes }
+        apply {
+            data.icon = AppCompatResources.getDrawable(context, drawableRes)
+        }
 
     fun applyIcon(drawable: Drawable) =
-        apply { data.iconRaw = drawable }
+        apply { data.icon = drawable }
 
     fun applyButton(buttonType: ButtonType, builder: ButtonBuilder.() -> Unit) = apply {
         val button = when (buttonType) {
@@ -227,7 +228,7 @@ class MagiskDialog(
                     dismiss()
                 }
             }
-            val items = list.mapIndexed { i, it -> DialogItem(it, i) }
+            val items = list.mapIndexed { i, cs -> DialogItem(cs, i) }
             val binding = itemBindingOf<DialogItem> { it.bindExtra(BR.listener, actualListener) }
                 .let { ItemBinding.of(it) }
 
@@ -253,6 +254,9 @@ class MagiskDialog(
         )
     }
 
+    fun onCancel(callback: OnDialogButtonClickListener) =
+        apply { setOnCancelListener(callback) }
+
     fun onDismiss(callback: OnDialogButtonClickListener) =
         apply { setOnDismissListener(callback) }
 
@@ -269,7 +273,7 @@ class MagiskDialog(
 
     fun resetTitle() = applyTitle("")
     fun resetMessage() = applyMessage("")
-    fun resetIcon() = applyIcon(0)
+    fun resetIcon() = apply { data.icon = null }
 
     fun resetButtons() = apply {
         ButtonType.values().forEach {

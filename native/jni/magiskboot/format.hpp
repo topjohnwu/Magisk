@@ -17,6 +17,7 @@ typedef enum {
 	BZIP2,
 	LZ4,
 	LZ4_LEGACY,
+	LZ4_LG,
 /* Unsupported compression */
 	LZOP,
 /* Misc */
@@ -38,6 +39,7 @@ typedef enum {
 #define LZ41_MAGIC      "\x03\x21\x4c\x18"
 #define LZ42_MAGIC      "\x04\x22\x4d\x18"
 #define MTK_MAGIC       "\x88\x16\x88\x58"
+#define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"

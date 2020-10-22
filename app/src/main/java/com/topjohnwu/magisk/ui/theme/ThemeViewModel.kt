@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.ui.theme
 
-import com.topjohnwu.magisk.model.entity.recycler.TappableHeadlineItem
-import com.topjohnwu.magisk.model.events.RecreateEvent
-import com.topjohnwu.magisk.model.events.dialog.DarkThemeDialog
-import com.topjohnwu.magisk.ui.base.BaseViewModel
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.events.RecreateEvent
+import com.topjohnwu.magisk.events.dialog.DarkThemeDialog
+import com.topjohnwu.magisk.view.TappableHeadlineItem
 
 class ThemeViewModel : BaseViewModel(), TappableHeadlineItem.Listener {
 
