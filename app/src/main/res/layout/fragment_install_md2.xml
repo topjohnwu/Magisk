@@ -69,7 +69,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/install_options_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold" />
+                                android:fontFamily="sans-serif-medium" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"
@@ -160,7 +160,7 @@
                                 android:gravity="center_vertical"
                                 android:text="@string/install_method_title"
                                 android:textAppearance="@style/AppearanceFoundation.Body"
-                                android:textStyle="bold" />
+                                android:fontFamily="sans-serif-medium" />
 
                             <Button
                                 style="@style/WidgetFoundation.Button.Text"

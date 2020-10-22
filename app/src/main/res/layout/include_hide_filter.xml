@@ -33,7 +33,7 @@
             android:textAllCaps="true"
             android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.chip.ChipGroup
@@ -99,7 +99,7 @@
             android:textAllCaps="true"
             android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_chip_group" />
 
         <com.google.android.material.card.MaterialCardView

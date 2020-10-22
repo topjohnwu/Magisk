@@ -61,7 +61,7 @@
             android:textAllCaps="true"
             android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textColor="?colorPrimary"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             app:layout_constraintBottom_toTopOf="@+id/module_filter_search" />
 
         <com.google.android.material.card.MaterialCardView

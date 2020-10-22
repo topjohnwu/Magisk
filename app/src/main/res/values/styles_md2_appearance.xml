@@ -26,7 +26,7 @@
     <!--region Title-->
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="AppearanceFoundation.Title.Variant">
@@ -40,6 +40,12 @@
     <style name="AppearanceFoundation.Title.OnPrimary.Variant">
         <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
     </style>
+
+    <style name="AppearanceFoundation.Title.Bold">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!--endregion-->
 
     <!--region Body-->
@@ -101,7 +107,7 @@
     </style>
 
     <style name="AppearanceFoundation.Tiny.Bold">
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Variant">

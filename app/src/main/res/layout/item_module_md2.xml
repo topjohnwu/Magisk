@@ -64,7 +64,7 @@
                     android:layout_marginEnd="@dimen/l_50"
                     android:text="@{item.item.name}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
-                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     app:layout_constraintEnd_toStartOf="@+id/module_indicator"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

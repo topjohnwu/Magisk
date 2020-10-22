@@ -22,7 +22,7 @@
         <item name="android:paddingStart">@dimen/l1</item>
         <item name="android:paddingEnd">@dimen/l1</item>
         <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:paddingTop">@dimen/l_50</item>
         <item name="android:paddingBottom">@dimen/l_50</item>
     </style>
@@ -59,7 +59,7 @@
 
     <style name="W.Home.ItemContent.Right">
         <item name="android:layout_marginStart">@dimen/l_50</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textAppearance">@style/AppearanceFoundation.Caption</item>
     </style>
 

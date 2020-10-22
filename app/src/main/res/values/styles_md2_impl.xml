@@ -46,7 +46,7 @@
 
 
     <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
     </style>
@@ -59,7 +59,7 @@
     </style>
 
     <style name="WidgetFoundation.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
         <item name="strokeColor">?colorPrimary</item>
@@ -81,7 +81,7 @@
     </style>
 
     <style name="WidgetFoundation.Button.Flat" parent="Widget.MaterialComponents.Button.UnelevatedButton">
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
     </style>
@@ -94,7 +94,7 @@
     </style>
 
     <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
     </style>

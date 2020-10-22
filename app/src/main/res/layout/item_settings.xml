@@ -58,7 +58,7 @@
                     android:gravity="start"
                     android:text="@{item.title}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
-                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     tools:lines="1"
                     tools:text="@tools:sample/lorem/random" />
 

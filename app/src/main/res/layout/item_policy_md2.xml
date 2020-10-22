@@ -57,7 +57,7 @@
                         android:text="@{item.item.appName}"
                         android:textAppearance="@style/AppearanceFoundation.Body"
                         android:textIsSelectable="false"
-                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
                         app:layout_constraintEnd_toStartOf="@+id/policy_indicator"
                         app:layout_constraintStart_toEndOf="@+id/policy_app_icon"
                         app:layout_constraintTop_toTopOf="@+id/policy_app_icon"

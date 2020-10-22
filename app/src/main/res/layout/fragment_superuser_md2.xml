@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading"
                 android:textAppearance="@style/AppearanceFoundation.Title"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
 
             <ProgressBar
                 style="@style/WidgetFoundation.ProgressBar.Indeterminate"
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/not_available"
                 android:textAppearance="@style/AppearanceFoundation.Title"
-                android:textStyle="bold" />
+                android:fontFamily="sans-serif-medium" />
 
         </LinearLayout>
 

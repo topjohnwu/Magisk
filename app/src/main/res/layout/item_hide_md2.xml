@@ -58,7 +58,7 @@
                     android:singleLine="true"
                     android:text="@{item.info.label}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
-                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     app:layout_constraintBottom_toTopOf="@+id/hide_package"
                     app:layout_constraintEnd_toStartOf="@+id/hide_expand_icon"
                     app:layout_constraintStart_toEndOf="@+id/hide_icon"

@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{item.item.appName}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 app:layout_constraintBottom_toTopOf="@+id/log_date"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

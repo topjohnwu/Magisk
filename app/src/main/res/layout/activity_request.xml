@@ -75,7 +75,7 @@
                         android:minWidth="200dp"
                         android:text="@{viewModel.title}"
                         android:textAppearance="@style/AppearanceFoundation.Body"
-                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
                         tools:text="Magisk" />
 
                     <TextView
@@ -112,7 +112,7 @@
                 android:text="@string/su_warning"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="?colorError"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 tools:text="@string/su_warning" />
 
             <LinearLayout

@@ -159,7 +159,7 @@
                         android:layout_marginStart="@dimen/l1"
                         android:layout_marginEnd="@dimen/l1"
                         android:text="@string/home_support_title"
-                        android:textAppearance="@style/AppearanceFoundation.Title" />
+                        android:textAppearance="@style/AppearanceFoundation.Title.Bold" />
 
                     <TextView
                         android:layout_width="match_parent"

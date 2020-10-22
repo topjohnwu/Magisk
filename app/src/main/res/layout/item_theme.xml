@@ -120,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:text="@{theme.themeName}"
                     android:textAppearance="@style/AppearanceFoundation.Title.OnPrimary"
-                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     tools:text="Default" />
 
                 <View

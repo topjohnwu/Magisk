@@ -80,7 +80,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 app:elevation="0dp"
                 app:itemHorizontalTranslationEnabled="false"
                 app:itemIconTint="@color/color_menu_tint"

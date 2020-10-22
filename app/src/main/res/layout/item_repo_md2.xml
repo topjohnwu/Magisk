@@ -43,7 +43,7 @@
                 android:layout_marginEnd="@dimen/l1"
                 android:text="@{item.item.name}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

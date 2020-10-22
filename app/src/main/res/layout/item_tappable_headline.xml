@@ -43,7 +43,7 @@
                 android:singleLine="true"
                 android:text="@{item.title}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
-                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/headline_icon_pointer"
                 app:layout_constraintStart_toEndOf="@+id/tappable_icon"
