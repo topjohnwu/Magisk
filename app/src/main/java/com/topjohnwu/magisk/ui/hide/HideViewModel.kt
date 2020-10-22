@@ -67,7 +67,8 @@ class HideViewModel : BaseViewModel(), Queryable {
                 .asSequence()
                 .filter { it.enabled && !blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm) }
-                .map { createTarget(it, hides) }
+                .map { runCatching { createTarget(it, hides) }.getOrNull() }
+                .filterNotNull()
                 .filter { it.processes.isNotEmpty() }
                 .map { HideItem(it) }
                 .toList()
