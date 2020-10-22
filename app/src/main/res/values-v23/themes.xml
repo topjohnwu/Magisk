@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.V23.Theme.Foundation.Light" parent="Base.V21.Theme.Foundation.Light">
+        <item name="android:statusBarColor">#40bdbdbd</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.Foundation.Light" parent="Base.V23.Theme.Foundation.Light" />
+
+    <style name="Base.V23.Theme.Splash.Light" parent="Base.V21.Theme.Splash.Light">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="Theme.Splash.Light" parent="Base.V23.Theme.Splash.Light" />
+
+</resources>

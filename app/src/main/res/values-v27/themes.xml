@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.V27.Theme.Foundation.Light" parent="Base.V23.Theme.Foundation.Light">
+        <item name="android:navigationBarColor">#e0fafafa</item>
+        <item name="android:navigationBarDividerColor">#1f000000</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+
+    <style name="Base.V27.Theme.Foundation" parent="Base.V21.Theme.Foundation">
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.Foundation.Light" parent="Base.V27.Theme.Foundation.Light" />
+
+    <style name="Theme.Foundation" parent="Base.V27.Theme.Foundation" />
+
+    <style name="Base.V27.Theme.Splash.Light" parent="Base.V23.Theme.Splash.Light">
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
+    <style name="Theme.Splash.Light" parent="Base.V27.Theme.Splash.Light" />
+
+</resources>
