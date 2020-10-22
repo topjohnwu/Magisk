@@ -56,6 +56,8 @@ class MagiskDialog(
 
         val inset = context.resources.getDimensionPixelSize(R.dimen.appcompat_dialog_background_inset)
         window?.setBackgroundDrawable(InsetDrawable(materialShapeDrawable, inset, inset, inset, inset))
+
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     inner class Data : ObservableHost {
