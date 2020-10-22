@@ -79,7 +79,7 @@ class SettingsViewModel(
         if (Utils.showSuperUser()) {
             list.addAll(listOf(
                 Superuser,
-                Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
+                Tapjack, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
                 AutomaticResponse, RequestTimeout, SUNotification
             ))
             if (Build.VERSION.SDK_INT < 23) {

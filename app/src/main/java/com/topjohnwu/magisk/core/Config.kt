@@ -50,6 +50,7 @@ object Config : PreferenceModel, DBConfig {
         const val SU_AUTO_RESPONSE = "su_auto_response"
         const val SU_NOTIFICATION = "su_notification"
         const val SU_REAUTH = "su_reauth"
+        const val SU_TAPJACK = "su_tapjack"
         const val CHECK_UPDATES = "check_update"
         const val UPDATE_CHANNEL = "update_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
@@ -134,6 +135,7 @@ object Config : PreferenceModel, DBConfig {
     var darkTheme by preference(Key.DARK_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
+    var suTapjack by preference(Key.SU_TAPJACK, true)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var doh by preference(Key.DOH, false)
     var magiskHide by preference(Key.MAGISKHIDE, true)
