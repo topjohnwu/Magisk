@@ -51,7 +51,7 @@ class MagiskDialog(
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT
+                WindowManager.LayoutParams.WRAP_CONTENT
             )
         }
 
