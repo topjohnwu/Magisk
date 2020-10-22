@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав суперкористувача</string>
+    <string name="touch_filtered_warning">Magisk не може перевірити вашу відповідь, тому що застосунок заступає вікно запиту прав суперкористувача</string>
     <string name="deny">Відмовити</string>
     <string name="prompt">Запитувати</string>
     <string name="grant">Надати</string>
@@ -169,6 +170,8 @@
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програ</string>
+    <string name="settings_su_tapjack_title">Увімкнути захист від Tapjack</string>
+    <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
     <string name="settings_su_biometric_title">Біометрична автентифікація</string>
     <string name="settings_su_biometric_summary">Використовувати біометричну автентифікацію, щоб підтверджувати запити суперкористувача</string>
     <string name="no_biometric">Пристрій не підтримується, або не налаштовано біометрику</string>
