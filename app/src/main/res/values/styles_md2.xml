@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
+    <style name="SplashTheme" parent="Theme.Splash.Light" />
 
-    <style name="SplashTheme" parent="SplashThemeBase" />
-
-    <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">?colorSurface</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <!--This should be overridden in v21 for transparency, etc-->
-    <style name="Foundation.Compat" />
+    <style name="Foundation" parent="Theme.Foundation.Light" />
 
     <!--region Do not remove-->
     <style name="Empty" />
@@ -28,7 +17,7 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Foundation.Default" parent="Foundation.Compat">
+    <style name="Foundation.Default">
         <item name="android:includeFontPadding">false</item>
         <item name="actionBarSize">@dimen/internal_action_bar_size</item>
         <item name="popupMenuStyle">@style/Foundation.PopupMenu</item>
