@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">超级用户请求</string>
+    <string name="touch_filtered_warning">由于某个应用遮挡了超级用户请求界面，因此 Magisk 无法验证您的回应</string>
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
     <string name="grant">允许</string>
@@ -102,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">显示系统应用</string>
+    <string name="show_os_app">显示操作系统</string>
     <string name="hide_filter_hint">按名称过滤</string>
     <string name="hide_scroll_up">返回顶部</string>
     <string name="hide_filters">过滤</string>
@@ -109,6 +111,7 @@
 
     <!--Module -->
     <string name="no_info_provided">（未提供信息）</string>
+    <string name="reboot_userspace">软重启</string>
     <string name="reboot_recovery">重启到 Recovery</string>
     <string name="reboot_bootloader">重启到 Bootloader</string>
     <string name="reboot_download">重启到 Download</string>
@@ -170,6 +173,8 @@
     <string name="superuser_notification">超级用户通知</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
+    <string name="settings_su_tapjack_title">启用点按劫持保护</string>
+    <string name="settings_su_tapjack_summary">存在屏幕叠加层时，超级用户请求弹窗不响应允许操作</string>
     <string name="settings_su_biometric_title">启用生物识别验证</string>
     <string name="settings_su_biometric_summary">使用生物识别来允许超级用户请求</string>
     <string name="no_biometric">设备不支持或未配置生物识别功能</string>
@@ -217,7 +222,8 @@
     <string name="done">完成！</string>
     <string name="failure">失败</string>
     <string name="hide_manager_title">正在隐藏 Magisk Manager</string>
-    <string name="hide_manager_fail_toast">隐藏失败</string>
+    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
+    <string name="restore_manager_fail_toast">还原 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂映像</string>
