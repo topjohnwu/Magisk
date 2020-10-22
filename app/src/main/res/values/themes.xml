@@ -4,11 +4,13 @@
     <style name="Base.V17.Theme.Foundation.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="dialogTheme">@style/ThemeOverlay.Foundation.Dialog</item>
     </style>
 
     <style name="Base.V17.Theme.Foundation" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="dialogTheme">@style/ThemeOverlay.Foundation.Dialog</item>
     </style>
 
     <style name="Theme.Foundation.Light" parent="Base.V17.Theme.Foundation.Light" />
@@ -28,5 +30,12 @@
     <style name="Theme.Splash.Light" parent="Base.V17.Theme.Splash.Light" />
 
     <style name="Theme.Splash" parent="Base.V17.Theme.Splash" />
+
+    <style name="Base.V17.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
+    </style>
+
+    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V17.ThemeOverlay.Foundation.Dialog" />
 
 </resources>

@@ -2,25 +2,24 @@ package com.topjohnwu.magisk.view
 
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.ViewCompat
-import androidx.core.view.updatePadding
 import androidx.databinding.Bindable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.itemBindingOf
@@ -47,36 +46,22 @@ class MagiskDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         super.setContentView(binding.root)
+
+        val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, javaClass.canonicalName)
+        val materialShapeDrawable = MaterialShapeDrawable(context, null, R.attr.alertDialogStyle, R.style.MaterialAlertDialog_MaterialComponents)
+        materialShapeDrawable.initializeElevationOverlay(context)
+        materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)
+        materialShapeDrawable.elevation = context.resources.getDimension(R.dimen.margin_generic)
+        materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l_50))
+
+        val inset = context.resources.getDimensionPixelSize(R.dimen.appcompat_dialog_background_inset)
         window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT
-            )
-        }
-
-        val paddingTop = binding.root.paddingTop
-        val paddingBottom = binding.root.paddingBottom
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            view.updatePadding(
-                top = paddingTop + insets.systemWindowInsetTop,
-                bottom = paddingBottom + insets.systemWindowInsetBottom
-            )
-            insets
+            setBackgroundDrawable(InsetDrawable(materialShapeDrawable, inset, inset, inset, inset))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
     }
 
-    override fun setCancelable(flag: Boolean) {
-        val listener = if (!flag) {
-            null
-        } else {
-            setCanceledOnTouchOutside(true)
-            View.OnClickListener { dismiss() }
-        }
-        binding.dialogBaseOutsideContainer.setOnClickListener(listener)
-    }
-
-    inner class Data: ObservableHost {
+    inner class Data : ObservableHost {
         override var callbacks: PropertyChangeRegistry? = null
 
         @get:Bindable
@@ -88,7 +73,7 @@ class MagiskDialog(
             set(value) = set(value, field, { field = it }, BR.title)
 
         @get:Bindable
-        var message : CharSequence = ""
+        var message: CharSequence = ""
             set(value) = set(value, field, { field = it }, BR.message)
 
         val buttonPositive = Button()
@@ -101,7 +86,7 @@ class MagiskDialog(
         POSITIVE, NEUTRAL, NEGATIVE, IDGAF
     }
 
-    inner class Button: ObservableHost {
+    inner class Button : ObservableHost {
         override var callbacks: PropertyChangeRegistry? = null
 
         @get:Bindable
