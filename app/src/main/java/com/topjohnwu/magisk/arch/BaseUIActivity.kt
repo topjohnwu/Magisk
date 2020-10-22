@@ -14,6 +14,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.ui.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
@@ -41,6 +42,8 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        layoutInflater.factory2 = LayoutInflaterFactory(delegate)
+
         setTheme(themeRes)
         super.onCreate(savedInstanceState)
 
