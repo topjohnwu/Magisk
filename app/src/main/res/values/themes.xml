@@ -31,7 +31,10 @@
 
     <style name="Theme.Splash" parent="Base.V17.Theme.Splash" />
 
-    <style name="Base.V17.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog" />
+    <style name="Base.V17.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
+    </style>
 
     <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V17.ThemeOverlay.Foundation.Dialog" />
 

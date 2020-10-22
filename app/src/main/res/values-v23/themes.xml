@@ -14,12 +14,4 @@
 
     <style name="Theme.Splash.Light" parent="Base.V23.Theme.Splash.Light" />
 
-    <style name="Base.V23.ThemeOverlay.Foundation.Dialog" parent="Base.V17.ThemeOverlay.Foundation.Dialog">
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V23.ThemeOverlay.Foundation.Dialog" />
-
 </resources>

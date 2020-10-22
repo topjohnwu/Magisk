@@ -21,10 +21,4 @@
 
     <style name="Theme.Splash.Light" parent="Base.V27.Theme.Splash.Light" />
 
-    <style name="Base.V27.ThemeOverlay.Foundation.Dialog" parent="Base.V23.ThemeOverlay.Foundation.Dialog">
-        <item name="android:windowLightNavigationBar">false</item>
-    </style>
-
-    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V27.ThemeOverlay.Foundation.Dialog" />
-
 </resources>
