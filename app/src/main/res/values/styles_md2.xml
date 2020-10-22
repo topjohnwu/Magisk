@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="SplashThemeBase" parent="android:Theme.DeviceDefault.NoActionBar">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="SplashTheme" parent="SplashThemeBase" />
+    <style name="SplashTheme" parent="Theme.Splash.Light" />
 
     <style name="Foundation" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?colorSurface</item>
