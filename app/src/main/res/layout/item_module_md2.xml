@@ -31,7 +31,6 @@
             android:alpha="@{item.enabled ? 1f : .5f}"
             android:nextFocusRight="@id/module_indicator"
             android:onClick="@{() -> viewModel.infoPressed(item)}"
-            android:clickable="@{item.repo != null}"
             tools:layout_gravity="center"
             tools:layout_margin="@dimen/l1">
 

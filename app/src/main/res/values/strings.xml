@@ -125,6 +125,7 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
+    <string name="module_no_info_provided">No readme file is provided for this module.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Theme Mode</string>

@@ -312,11 +312,15 @@ class ModuleViewModel(
 
 
     fun infoPressed(item: ModuleItem) {
-        item.repo?.also {
-            if (isConnected.get())
-                OpenReadmeEvent(it).publish()
-            else
-                SnackbarEvent(R.string.no_connection).publish()
-        } ?: return
+        item.repo.let {
+            if (it != null) {
+                if (isConnected.get())
+                    OpenReadmeEvent(it).publish()
+                else
+                    SnackbarEvent(R.string.no_connection).publish()
+            } else {
+                SnackbarEvent(R.string.module_no_info_provided).publish()
+            }
+        }
     }
 }
