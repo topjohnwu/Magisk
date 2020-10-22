@@ -16,4 +16,7 @@
     <!--l1 + fab size-->
 
     <dimen name="internal_action_bar_size">56dp</dimen>
+
+    <item type="dimen" format="float" name="ambient_shadow_alpha">0.02574</item>
+    <item type="dimen" format="float" name="spot_shadow_alpha">0.076</item>
 </resources>

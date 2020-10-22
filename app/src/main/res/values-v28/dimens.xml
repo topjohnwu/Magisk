@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="dimen" format="float" name="ambient_shadow_alpha">0.039</item>
+    <item type="dimen" format="float" name="spot_shadow_alpha">0.19</item>
+</resources>
