@@ -24,8 +24,6 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
     override val viewRoot: View get() = binding.root
     private val navigation get() = activity.navigation
 
-    override fun consumeSystemWindowInsets(insets: Insets) = insets
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startObserveEvents()
@@ -65,7 +63,6 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
                 return true
             }
         })
-        ensureInsets()
     }
 
     override fun onResume() {

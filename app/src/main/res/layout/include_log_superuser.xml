@@ -16,16 +16,15 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/log_superuser"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-            android:paddingEnd="@dimen/l1"
-            android:paddingBottom="@{viewModel.insets.bottom}"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_log_access_md2"
             tools:paddingTop="24dp" />

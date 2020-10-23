@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -32,8 +33,8 @@
                     precomputedText="@{viewModel.consoleText}"
                     android:textAppearance="@style/AppearanceFoundation.Caption"
                     android:textSize="10sp"
-                    android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-                    android:paddingBottom="@{viewModel.insets.bottom}"
+                    android:paddingTop="@dimen/internal_action_bar_size"
+                    app:layout_fitsSystemWindowsInsets="top|bottom"
                     tools:text="@tools:sample/lorem/random" />
 
             </HorizontalScrollView>

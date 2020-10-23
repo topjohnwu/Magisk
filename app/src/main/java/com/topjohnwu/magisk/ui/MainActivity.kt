@@ -39,14 +39,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     override val viewModel by viewModel<MainViewModel>()
     override val navHost: Int = R.id.main_nav_host
 
-    //This temporarily fixes unwanted feature of BottomNavigationView - where the view applies
-    //padding on itself given insets are not consumed beforehand. Unfortunately the listener
-    //implementation doesn't favor us against the design library, so on re-create it's often given
-    //upper hand.
-    private val navObserver = ViewTreeObserver.OnGlobalLayoutListener {
-        binding.mainNavigation.setPadding(0)
-    }
-
     private var isRootFragment = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,8 +92,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
 
-        binding.mainNavigation.viewTreeObserver.addOnGlobalLayoutListener(navObserver)
-
         val section = if (intent.action == ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
         else intent.getStringExtra(Const.Key.OPEN_SECTION)
         getScreen(section)?.navigate()
@@ -119,11 +109,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             findItem(R.id.superuserFragment)?.isEnabled = Info.env.isActive
             findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
-    }
-
-    override fun onDestroy() {
-        binding.mainNavigation.viewTreeObserver.removeOnGlobalLayoutListener(navObserver)
-        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

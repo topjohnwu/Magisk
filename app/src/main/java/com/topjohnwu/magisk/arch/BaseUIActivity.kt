@@ -69,8 +69,6 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
             it.setVariable(BR.viewModel, viewModel)
             it.lifecycleOwner = this
         }
-
-        ensureInsets()
     }
 
     fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
