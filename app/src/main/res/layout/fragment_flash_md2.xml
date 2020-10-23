@@ -18,7 +18,8 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
+            android:layout_marginTop="@dimen/internal_action_bar_size"
+            app:layout_fitsSystemWindowsInsets="top"
             tools:layout_marginTop="@dimen/internal_action_bar_size">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -31,9 +32,7 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:orientation="vertical"
-                android:paddingLeft="@{viewModel.insets.left}"
-                android:paddingRight="@{viewModel.insets.right}"
-                android:paddingBottom="@{viewModel.insets.bottom}"
+                app:fitsSystemWindowsInsets="start|end|bottom"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 tools:listitem="@layout/item_console_md2" />
@@ -46,12 +45,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/l1"
-            android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
+            android:layout_marginBottom="@dimen/l1"
             android:onClick="@{() -> viewModel.restartPressed()}"
             android:text="@string/reboot"
             android:textAllCaps="false"
             android:textColor="?colorOnPrimary"
             android:fontFamily="sans-serif-medium"
+            app:layout_fitsSystemWindowsInsets="bottom"
             app:backgroundTint="?colorPrimary"
             app:icon="@drawable/ic_restart"
             app:iconTint="?colorOnPrimary" />

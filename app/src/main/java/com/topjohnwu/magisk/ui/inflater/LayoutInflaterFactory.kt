@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.collection.SimpleArrayMap
+import com.topjohnwu.magisk.ui.WindowInsetsHelper
 import timber.log.Timber
 import java.lang.reflect.Constructor
 
@@ -28,6 +29,7 @@ open class LayoutInflaterFactory(private val delegate: AppCompatDelegate) : Layo
         if (view == null) return
 
         CJKLanguageFontWeightFix.onViewCreated(view, name, context, attrs)
+        WindowInsetsHelper.attach(view, attrs)
     }
 }
 

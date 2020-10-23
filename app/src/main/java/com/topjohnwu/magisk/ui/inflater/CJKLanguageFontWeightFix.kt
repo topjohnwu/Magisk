@@ -52,7 +52,7 @@ object CJKLanguageFontWeightFix {
             val lang = when (it.lang) {
                 "zh-Hans" -> LANG.ZH_HANS
                 "zh-Hant", "zh-Hant,zh-Bopo" -> LANG.ZH_HANS
-                "ja" -> LANG.ZH_HANS
+                "ja" -> LANG.JA
                 "ko" -> LANG.KO
                 else -> return@forEach
             }

@@ -25,7 +25,7 @@ interface BaseUIComponent<VM : BaseViewModel>: LifecycleOwner {
     fun onEventDispatched(event: ViewEvent) {}
 
     fun ensureInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(viewRoot) { _, insets ->
+       /* ViewCompat.setOnApplyWindowInsetsListener(viewRoot) { _, insets ->
             insets.asInsets()
                 .also { viewModel.insets = it }
                 .let { consumeSystemWindowInsets(it) }
@@ -40,7 +40,7 @@ interface BaseUIComponent<VM : BaseViewModel>: LifecycleOwner {
                     ViewCompat.requestApplyInsets(v)
                 }
             })
-        }
+        }*/
     }
 
     private fun WindowInsetsCompat.asInsets() = Insets.of(

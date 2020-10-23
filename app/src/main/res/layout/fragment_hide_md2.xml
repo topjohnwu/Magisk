@@ -17,7 +17,6 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/hide_content"
-            dividerVertical="@{@drawable/divider_l_50}"
             invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
@@ -25,10 +24,8 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            android:paddingEnd="@dimen/l1"
-            android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_hide_md2"
             tools:paddingTop="40dp" />
@@ -41,8 +38,9 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+            android:layout_marginBottom="@dimen/l1"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
+            app:layout_fitsSystemWindowsInsets="bottom"
             app:srcCompat="@drawable/ic_search_md2"
             app:tint="?colorPrimary"
             tools:layout_marginBottom="64dp" />

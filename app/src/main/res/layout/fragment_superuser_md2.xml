@@ -20,8 +20,6 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/superuser_list"
             adapter="@{viewModel.adapter}"
-            dividerHorizontal="@{@drawable/divider_l1}"
-            dividerVertical="@{@drawable/divider_l_50}"
             goneUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
@@ -29,9 +27,8 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_policy_md2" />
 

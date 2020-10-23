@@ -20,8 +20,9 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l2}"
+        android:paddingTop="@dimen/internal_action_bar_size"
+        android:paddingBottom="@dimen/l2"
+        app:fitsSystemWindowsInsets="top|bottom"
         tools:paddingTop="24dp">
 
         <FrameLayout
@@ -34,7 +35,7 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:orientation="vertical"
-                android:paddingTop="@dimen/l1">
+                android:paddingTop="@dimen/l_50">
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/WidgetFoundation.Card"

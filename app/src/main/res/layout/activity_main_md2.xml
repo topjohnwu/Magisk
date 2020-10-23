@@ -17,8 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="@{viewModel.insets.left}"
-        android:paddingRight="@{viewModel.insets.right}"
+        app:consumeSystemWindowsInsets="start|end"
+        app:edgeToEdge="true"
+        app:fitsSystemWindowsInsets="start|end"
         tools:ignore="RtlHardcoded">
 
         <androidx.fragment.app.FragmentContainerView
@@ -34,7 +35,7 @@
             style="@style/WidgetFoundation.Appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@{viewModel.insets.top}">
+            app:fitsSystemWindowsInsets="top">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/main_toolbar"
@@ -72,7 +73,9 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
+            android:layout_marginBottom="@dimen/l1"
+            android:fitsSystemWindows="false"
+            app:layout_fitsSystemWindowsInsets="bottom"
             tools:layout_marginBottom="64dp">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,6 +84,9 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:fontFamily="sans-serif-medium"
+                android:fitsSystemWindows="false"
+                android:paddingBottom="0dp"
+                app:fitsSystemWindowsInsets="start|end"
                 app:elevation="0dp"
                 app:itemHorizontalTranslationEnabled="false"
                 app:itemIconTint="@color/color_menu_tint"

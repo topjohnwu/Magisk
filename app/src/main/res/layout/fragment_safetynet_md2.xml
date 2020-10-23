@@ -22,8 +22,8 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom}"
+        android:paddingTop="@dimen/internal_action_bar_size"
+        app:fitsSystemWindowsInsets="top|bottom"
         tools:paddingBottom="48dp"
         tools:paddingTop="24dp">
 
