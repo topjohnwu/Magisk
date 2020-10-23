@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Požiadavka superužívateľa</string>
+    <string name="touch_filtered_warning">Pretože aplikácia zakrýva požiadavku superužívateľa, Magisk nemôže overiť vašu odpoveď</string>
     <string name="deny">Zamietnuť</string>
     <string name="prompt">Výzva</string>
     <string name="grant">Udeliť</string>
@@ -174,6 +175,8 @@
     <string name="superuser_notification">Upozornenia Superužívateľa</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení Superužívateľa po upgrade aplikácie</string>
+    <string name="settings_su_tapjack_title">Povoliť ochranu pred tapjackingom</string>
+    <string name="settings_su_tapjack_summary">Dialógové okno superužívateľa nebude reagovať na zadanie, ak je zakryté alebo prekryté iným oknom</string>
     <string name="settings_su_biometric_title">Povoliť biometrické overenie</string>
     <string name="settings_su_biometric_summary">Použije biometrickú autentifikáciu na povolenie žiadostí Superužívateľa</string>
     <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
