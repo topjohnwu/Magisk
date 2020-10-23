@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">超級使用者請求</string>
+    <string name="touch_filtered_warning">由於某個應用程式遮蔽了超級使用者請求的視窗，因此 Magisk 無法驗證您的回應</string>
     <string name="deny">拒絕</string>
     <string name="prompt">提示</string>
     <string name="grant">允許</string>
@@ -102,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">顯示系統應用程式</string>
+    <string name="show_os_app">顯示作業系统</string>
     <string name="hide_filter_hint">過濾名稱</string>
     <string name="hide_scroll_up">回到最上面</string>
     <string name="hide_filters">過濾器</string>
@@ -109,6 +111,7 @@
 
     <!--Module -->
     <string name="no_info_provided">（未提供資訊）</string>
+    <string name="reboot_userspace">快速重新啟動</string>
     <string name="reboot_recovery">重新啟動至 Recovery</string>
     <string name="reboot_bootloader">重新啟動至 Bootloader</string>
     <string name="reboot_download">重新啟動至 Download</string>
@@ -170,6 +173,8 @@
     <string name="superuser_notification">超級使用者通知</string>
     <string name="settings_su_reauth_title">更新後重新驗證</string>
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的請求</string>
+    <string name="settings_su_tapjack_title">啟用點選攔截保護</string>
+    <string name="settings_su_tapjack_summary">發現超級使用者視窗上有應用程式重疊在上層時，不回應允許操作</string>
     <string name="settings_su_biometric_title">啟用生物特徵驗證</string>
     <string name="settings_su_biometric_summary">使用生物特徵驗證來允許 Superuser 的請求</string>
     <string name="no_biometric">不支援的裝置或是未啟用生物特徵設定</string>
@@ -218,6 +223,7 @@
     <string name="failure">失敗</string>
     <string name="hide_manager_title">正在隱藏 Magisk Manager……</string>
     <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
+    <string name="restore_manager_fail_toast">還原 Magisk Manager 失敗</string>
     <string name="open_link_failed_toast">沒有可以開啟此連結的應用程式</string>
     <string name="complete_uninstall">完全解除安裝</string>
     <string name="restore_img">還原原始映像檔</string>
