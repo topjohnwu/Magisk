@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.inflater
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.InflateException
 import android.view.LayoutInflater
@@ -24,6 +25,10 @@ open class LayoutInflaterFactory(private val delegate: AppCompatDelegate) : Layo
 
     open fun onViewCreated(view: View?, parent: View?, name: String, context: Context, attrs: AttributeSet) {
         if (view == null) return
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            WindowInsetsHelper.attach(view, attrs)
+        }
     }
 }
 

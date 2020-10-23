@@ -21,7 +21,8 @@
         android:paddingStart="@dimen/l1"
         android:paddingTop="@dimen/l1"
         android:paddingEnd="@dimen/l1"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+        android:paddingBottom="@dimen/l1"
+        app:fitsSystemWindowsInsets="bottom"
         tools:layout_gravity="bottom"
         tools:paddingBottom="64dp">
 
