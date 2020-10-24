@@ -22,7 +22,7 @@
     <string name="status">Status</string>
     <string name="home_package">Package</string>
 
-    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions.</string>
+    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
@@ -85,11 +85,11 @@
     <string name="superuser_policy_none">No app has asked for superuser permission yet.</string>
 
     <!--Logs-->
-    <string name="log_data_none">You\'re log-free, try using your SU enabled apps more.</string>
-    <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird.</string>
+    <string name="log_data_none">You\'re log-free, try using your SU enabled apps more</string>
+    <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird</string>
     <string name="menuSaveLog">Save log</string>
     <string name="menuClearLog">Clear log now</string>
-    <string name="logs_cleared">Log successfully cleared.</string>
+    <string name="logs_cleared">Log successfully cleared</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
@@ -101,7 +101,7 @@
     <string name="safetynet_attest_loading">Just a sec…</string>
     <string name="safetynet_attest_restart">Try again</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
@@ -109,14 +109,14 @@
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(No info provided)</string>
     <string name="reboot_userspace">Soft reboot</string>
     <string name="reboot_recovery">Reboot to Recovery</string>
     <string name="reboot_bootloader">Reboot to Bootloader</string>
     <string name="reboot_download">Reboot to Download</string>
     <string name="reboot_edl">Reboot to EDL</string>
-    <string name="module_version_author">%1$s by %2$s</string>
+    <string name="module_version_author">Version: %1$s\nAuthor: %2$s</string>
     <string name="module_section_pending">Updates</string>
     <string name="module_section_pending_action">Update all</string>
     <string name="module_state_remove">Remove</string>
@@ -127,7 +127,7 @@
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
     <string name="settings_dark_mode_message">Select mode which best suits your style!</string>
     <string name="settings_dark_mode_light">Always Light</string>
@@ -220,7 +220,7 @@
     <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>
-    <string name="failure">Failed</string>
+    <string name="failure">Failed!</string>
     <string name="hide_manager_title">Hiding Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Hide Magisk Manager failed</string>
     <string name="restore_manager_fail_toast">Restore Magisk Manager failed</string>
