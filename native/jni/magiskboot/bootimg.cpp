@@ -294,7 +294,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
 
 	hdr->print();
 
-	size_t off = hdr->page_size();
+	size_t off = hdr->hdr_space();
 	hdr_addr = addr;
 	get_block(kernel);
 	get_block(ramdisk);
@@ -474,9 +474,9 @@ void repack(const char* src_img, const char* out_img, bool skip_comp) {
 		restore_buf(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
 	}
 
-	// Copy a page for header
+	// Copy header
 	off.header = lseek(fd, 0, SEEK_CUR);
-	restore_buf(fd, boot.hdr_addr, boot.hdr->page_size());
+	restore_buf(fd, boot.hdr_addr, boot.hdr->hdr_space());
 
 	// kernel
 	off.kernel = lseek(fd, 0, SEEK_CUR);

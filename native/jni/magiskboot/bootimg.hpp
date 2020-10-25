@@ -243,6 +243,7 @@ struct dyn_img_hdr {
 	}
 
 	virtual size_t hdr_size() = 0;
+	virtual size_t hdr_space() { return page_size(); }
 
 	const void *raw_hdr() const { return raw; }
 	void print();
@@ -366,6 +367,8 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr {
 	impl_val(name)
 	impl_val(header_size)
 	impl_val(dtb_size)
+
+	size_t hdr_space() override { auto sz = page_size(); return do_align(hdr_size(), sz); }
 
 	// Make API compatible
 	char *extra_cmdline() override { return &vnd->cmdline[BOOT_ARGS_SIZE]; }
