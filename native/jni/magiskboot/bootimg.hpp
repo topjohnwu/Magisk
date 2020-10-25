@@ -50,6 +50,7 @@ struct blob_hdr {
 #define BOOT_ID_SIZE 32
 #define BOOT_ARGS_SIZE 512
 #define BOOT_EXTRA_ARGS_SIZE 1024
+#define VENDOR_BOOT_ARGS_SIZE 2048
 
 /*
  * +-----------------+
@@ -159,6 +160,21 @@ struct boot_img_hdr_pxa : public boot_img_hdr_common {
  * n = (ramdisk_size + 4096 - 1) / 4096
  *
  * Note that in version 3 of the boot image header, page size is fixed at 4096 bytes.
+ *
+ * The structure of the vendor boot image (introduced with version 3 and
+ * required to be present when a v3 boot image is used) is as follows:
+ *
+ * +---------------------+
+ * | vendor boot header  | o pages
+ * +---------------------+
+ * | vendor ramdisk      | p pages
+ * +---------------------+
+ * | dtb                 | q pages
+ * +---------------------+
+ *
+ * o = (2112 + page_size - 1) / page_size
+ * p = (ramdisk_size + page_size - 1) / page_size
+ * q = (dtb_size + page_size - 1) / page_size
  */
 
 struct boot_img_hdr_v3 {
@@ -173,6 +189,23 @@ struct boot_img_hdr_v3 {
 	uint32_t header_version;
 
 	char cmdline[BOOT_ARGS_SIZE + BOOT_EXTRA_ARGS_SIZE];
+} __attribute__((packed));
+
+struct boot_img_hdr_vnd_v3 {
+	// Must be VENDOR_BOOT_MAGIC.
+	uint8_t magic[BOOT_MAGIC_SIZE];
+	// Version of the vendor boot image header.
+	uint32_t header_version;
+	uint32_t page_size;     /* flash page size we assume */
+	uint32_t kernel_addr;   /* physical load addr */
+	uint32_t ramdisk_addr;  /* physical load addr */
+	uint32_t ramdisk_size;  /* size in bytes */
+	char cmdline[VENDOR_BOOT_ARGS_SIZE];
+	uint32_t tags_addr;     /* physical addr for kernel tags (if required) */
+	char name[BOOT_NAME_SIZE]; /* asciiz product name */
+	uint32_t header_size;
+	uint32_t dtb_size;      /* size in bytes for DTB image */
+	uint64_t dtb_addr;      /* physical load address for DTB image */
 } __attribute__((packed));
 
 /*******************************
@@ -222,6 +255,7 @@ protected:
 		boot_img_hdr_v2 *v2_hdr;     /* AOSP v2 header */
 		boot_img_hdr_v3 *v3_hdr;     /* AOSP v3 header */
 		boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
+		boot_img_hdr_vnd_v3 *vnd;    /* AOSP vendor v3 header */
 		void *raw;                   /* Raw pointer */
 	};
 
@@ -243,10 +277,11 @@ name(void *ptr) { \
 } \
 size_t hdr_size() override { return sizeof(hdr); }
 
-#define impl_cls(ver) __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
+#define __impl_val(name, hdr_name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_name->name; }
 
-#define impl_val(name) \
-decltype(std::declval<dyn_img_hdr>().name()) name() override { return v2_hdr->name; }
+#define impl_cls(ver) __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
+#define impl_val(name) __impl_val(name, v2_hdr)
 
 struct dyn_img_common : public dyn_img_hdr {
 	impl_val(kernel_size)
@@ -284,8 +319,7 @@ struct dyn_img_v2 : public dyn_img_v1 {
 };
 
 #undef impl_val
-#define impl_val(name) \
-decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_pxa->name; }
+#define impl_val(name) __impl_val(name, hdr_pxa)
 
 struct dyn_img_pxa : public dyn_img_common {
 	impl_cls(pxa)
@@ -299,8 +333,7 @@ struct dyn_img_pxa : public dyn_img_common {
 };
 
 #undef impl_val
-#define impl_val(name) \
-decltype(std::declval<dyn_img_hdr>().name()) name() override { return v3_hdr->name; }
+#define impl_val(name) __impl_val(name, v3_hdr)
 
 struct dyn_img_v3 : public dyn_img_hdr {
 	impl_cls(v3)
@@ -320,7 +353,26 @@ private:
 	uint32_t page_sz;
 };
 
+#undef impl_val
+#define impl_val(name) __impl_val(name, vnd)
+
+struct dyn_img_vnd_v3 : public dyn_img_hdr {
+	impl_cls(vnd_v3)
+
+	impl_val(header_version)
+	impl_val(page_size)
+	impl_val(ramdisk_size)
+	impl_val(cmdline)
+	impl_val(name)
+	impl_val(header_size)
+	impl_val(dtb_size)
+
+	// Make API compatible
+	char *extra_cmdline() override { return &vnd->cmdline[BOOT_ARGS_SIZE]; }
+};
+
 #undef __impl_cls
+#undef __impl_val
 #undef impl_cls
 #undef impl_val
 
@@ -363,7 +415,7 @@ struct boot_img {
 	mtk_hdr *k_hdr;
 	mtk_hdr *r_hdr;
 
-	// Pointer to dtb that is appended after kernel
+	// Pointer to dtb that is embedded in kernel
 	uint8_t *kernel_dtb;
 	uint32_t kernel_dt_size = 0;
 
@@ -383,5 +435,5 @@ struct boot_img {
 	boot_img(const char *);
 	~boot_img();
 
-	void parse_image(uint8_t *addr);
+	void parse_image(uint8_t *addr, format_t type);
 };

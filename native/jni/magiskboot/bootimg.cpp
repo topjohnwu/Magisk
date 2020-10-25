@@ -162,7 +162,8 @@ boot_img::boot_img(const char *image) {
 	mmap_ro(image, map_addr, map_size);
 	fprintf(stderr, "Parsing boot image: [%s]\n", image);
 	for (uint8_t *addr = map_addr; addr < map_addr + map_size; ++addr) {
-		switch (check_fmt(addr, map_size)) {
+		format_t fmt = check_fmt(addr, map_size);
+		switch (fmt) {
 		case CHROMEOS:
 			// chromeos require external signing
 			flags |= CHROMEOS_FLAG;
@@ -179,7 +180,8 @@ boot_img::boot_img(const char *image) {
 			addr += sizeof(blob_hdr) - 1;
 			break;
 		case AOSP:
-			parse_image(addr);
+		case AOSP_VENDOR:
+			parse_image(addr, fmt);
 			return;
 		default:
 			break;
@@ -242,9 +244,12 @@ off += hdr->name##_size(); \
 off = do_align(off, hdr->page_size()); \
 }
 
-void boot_img::parse_image(uint8_t *addr) {
+void boot_img::parse_image(uint8_t *addr, format_t type) {
 	auto hp = reinterpret_cast<boot_img_hdr*>(addr);
-	if (hp->page_size >= 0x02000000) {
+	if (type == AOSP_VENDOR) {
+		fprintf(stderr, "VENDOR_BOOT_HDR\n");
+		hdr = new dyn_img_vnd_v3(addr);
+	} else if (hp->page_size >= 0x02000000) {
 		fprintf(stderr, "PXA_BOOT_HDR\n");
 		hdr = new dyn_img_pxa(addr);
 	} else {

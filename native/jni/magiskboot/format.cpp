@@ -28,6 +28,8 @@ format_t check_fmt(const void *buf, size_t len) {
 		return CHROMEOS;
 	} else if (MATCH(BOOT_MAGIC)) {
 		return AOSP;
+	} else if (MATCH(VENDOR_BOOT_MAGIC)) {
+		return AOSP_VENDOR;
 	} else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
 		return GZIP;
 	} else if (MATCH(LZOP_MAGIC)) {
@@ -58,10 +60,6 @@ format_t check_fmt(const void *buf, size_t len) {
 
 const char *Fmt2Name::operator[](format_t fmt) {
 	switch (fmt) {
-		case CHROMEOS:
-			return "chromeos";
-		case AOSP:
-			return "aosp";
 		case GZIP:
 			return "gzip";
 		case LZOP:
@@ -78,8 +76,6 @@ const char *Fmt2Name::operator[](format_t fmt) {
 			return "lz4_legacy";
 		case LZ4_LG:
 			return "lz4_lg";
-		case MTK:
-			return "mtk";
 		case DTB:
 			return "dtb";
 		default:

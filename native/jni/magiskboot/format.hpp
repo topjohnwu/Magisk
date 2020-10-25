@@ -8,6 +8,7 @@ typedef enum {
 /* Boot formats */
 	CHROMEOS,
 	AOSP,
+	AOSP_VENDOR,
 	DHTB,
 	BLOB,
 /* Compression formats */
@@ -29,6 +30,7 @@ typedef enum {
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BOOT_MAGIC      "ANDROID!"
+#define VENDOR_BOOT_MAGIC "VNDRBOOT"
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define GZIP1_MAGIC     "\x1f\x8b"
 #define GZIP2_MAGIC     "\x1f\x9e"
