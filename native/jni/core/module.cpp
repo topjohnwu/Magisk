@@ -643,7 +643,7 @@ static void prepare_modules() {
 }
 
 template<typename Func>
-static void foreach_modules(Func fn) {
+static void foreach_module(Func fn) {
 	auto dir = open_dir(MODULEROOT);
 	if (!dir)
 		return;
@@ -659,7 +659,7 @@ static void foreach_modules(Func fn) {
 }
 
 static void collect_modules() {
-	foreach_modules([](int dfd, dirent *entry, int modfd) {
+	foreach_module([](int dfd, dirent *entry, int modfd) {
 		if (faccessat(modfd, "remove", F_OK, 0) == 0) {
 			LOGI("%s: remove\n", entry->d_name);
 			auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
@@ -686,13 +686,13 @@ void handle_modules() {
 }
 
 void disable_modules() {
-	foreach_modules([](auto, auto, int modfd) {
+	foreach_module([](int, auto, int modfd) {
 		close(xopenat(modfd, "disable", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
 	});
 }
 
 void remove_modules() {
-	foreach_modules([](int dfd, dirent *entry, int modfd) {
+	foreach_module([](int, dirent *entry, int) {
 		auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
 		if (access(uninstaller.data(), F_OK) == 0)
 			exec_script(uninstaller.data());
