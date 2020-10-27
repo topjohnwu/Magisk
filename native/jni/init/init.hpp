@@ -7,6 +7,8 @@
 
 #include <utils.hpp>
 
+#include "raw_data.hpp"
+
 struct cmdline {
 	bool skip_initramfs;
 	bool force_normal_boot;
@@ -17,35 +19,6 @@ struct cmdline {
 	char hardware_plat[32];
 };
 
-struct data_holder {
-	uint8_t *buf = nullptr;
-	size_t sz = 0;
-	using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
-	int patch(str_pairs list);
-	bool contains(std::string_view pattern);
-protected:
-	void consume(data_holder &other);
-};
-
-enum data_type { HEAP, MMAP };
-template <data_type T>
-struct auto_data : public data_holder {
-	auto_data<T>() = default;
-	auto_data<T>(const auto_data&) = delete;
-	auto_data<T>(auto_data<T> &&other) { consume(other); }
-	~auto_data<T>() {}
-	auto_data<T>& operator=(auto_data<T> &&other) { consume(other); return *this; }
-};
-template <> inline auto_data<MMAP>::~auto_data<MMAP>() { if (buf) munmap(buf, sz); }
-template <> inline auto_data<HEAP>::~auto_data<HEAP>() { free(buf); }
-
-namespace raw_data {
-	auto_data<HEAP> read(const char *name);
-	auto_data<HEAP> read(int fd);
-	auto_data<MMAP> mmap_rw(const char *name);
-	auto_data<MMAP> mmap_ro(const char *name);
-}
-
 struct fstab_entry {
 	std::string dev;
 	std::string mnt_point;
@@ -55,7 +28,7 @@ struct fstab_entry {
 
 	fstab_entry() = default;
 	fstab_entry(const fstab_entry &) = delete;
-	fstab_entry(fstab_entry &&o) = default;
+	fstab_entry(fstab_entry &&) = default;
 	void to_file(FILE *fp);
 };
 
@@ -65,9 +38,7 @@ struct fstab_entry {
 void load_kernel_info(cmdline *cmd);
 bool check_two_stage();
 int dump_magisk(const char *path, mode_t mode);
-int magisk_proxy_main(int argc, char *argv[]);
 void setup_klog();
-void setup_tmp(const char *path, const data_holder &self, const data_holder &config);
 
 /***************
  * Base classes
@@ -85,31 +56,32 @@ protected:
 		exit(1);
 	}
 	virtual void cleanup();
+	void read_dt_fstab(std::vector<fstab_entry> &fstab);
 public:
 	BaseInit(char *argv[], cmdline *cmd) :
 	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
-	void read_dt_fstab(std::vector<fstab_entry> &fstab);
-	void dt_early_mount();
 };
 
 class MagiskInit : public BaseInit {
 protected:
 	auto_data<HEAP> self;
+	auto_data<HEAP> config;
 	std::string persist_dir;
 
-	virtual void early_mount() = 0;
+	void mount_with_dt();
 	bool patch_sepolicy(const char *file);
+	void setup_tmp(const char *path);
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 };
 
 class SARBase : public MagiskInit {
 protected:
-	auto_data<HEAP> config;
 	std::vector<raw_file> overlays;
 
+	virtual void early_mount() = 0;
 	void backup_files();
 	void patch_rootdir();
 	void mount_system_root();
@@ -129,28 +101,11 @@ public:
 class FirstStageInit : public BaseInit {
 private:
 	void prepare();
-
 public:
 	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
 		LOGD("%s\n", __FUNCTION__);
 	};
 	void start() override {
-		prepare();
-		exec_init();
-	}
-};
-
-class SARFirstStageInit : public SARBase {
-private:
-	void prepare();
-protected:
-	void early_mount() override;
-public:
-	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
-		LOGD("%s\n", __FUNCTION__);
-	};
-	void start() override {
-		early_mount();
 		prepare();
 		exec_init();
 	}
@@ -179,6 +134,24 @@ public:
 	};
 };
 
+// Special case for legacy SAR on Android 10+
+// Should be followed by normal 2SI SecondStageInit
+class SARFirstStageInit : public SARBase {
+private:
+	void prepare();
+protected:
+	void early_mount() override;
+public:
+	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
+		LOGD("%s\n", __FUNCTION__);
+	};
+	void start() override {
+		early_mount();
+		prepare();
+		exec_init();
+	}
+};
+
 /************
  * Initramfs
  ************/
@@ -186,8 +159,7 @@ public:
 class RootFSInit : public MagiskInit {
 private:
 	void setup_rootfs();
-protected:
-	void early_mount() override;
+	void early_mount();
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
 		LOGD("%s\n", __FUNCTION__);
@@ -198,4 +170,12 @@ public:
 		setup_rootfs();
 		exec_init();
 	}
+};
+
+class MagiskProxy : public MagiskInit {
+public:
+	explicit MagiskProxy(char *argv[]) : MagiskInit(argv, nullptr) {
+		LOGD("%s\n", __FUNCTION__);
+	}
+	void start() override;
 };

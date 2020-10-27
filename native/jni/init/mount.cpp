@@ -151,7 +151,7 @@ void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
 	}
 }
 
-void BaseInit::dt_early_mount() {
+void MagiskInit::mount_with_dt() {
 	vector<fstab_entry> fstab;
 	read_dt_fstab(fstab);
 	for (const auto &entry : fstab) {
@@ -224,7 +224,7 @@ void RootFSInit::early_mount() {
 	LOGD("Restoring /init\n");
 	rename("/.backup/init", "/init");
 
-	dt_early_mount();
+	mount_with_dt();
 
 	xmkdir("/dev/mnt", 0755);
 	mount_persist("/dev/block", "/dev/mnt");
@@ -272,7 +272,7 @@ void SARInit::early_mount() {
 	mount_system_root();
 	switch_root("/system_root");
 
-	dt_early_mount();
+	mount_with_dt();
 }
 
 void SARFirstStageInit::early_mount() {
@@ -308,7 +308,7 @@ static void patch_socket_name(const char *path) {
 	bin.patch({ make_pair(MAIN_SOCKET, rstr) });
 }
 
-void setup_tmp(const char *path, const data_holder &self, const data_holder &config) {
+void MagiskInit::setup_tmp(const char *path) {
 	LOGD("Setup Magisk tmp at %s\n", path);
 	xmount("tmpfs", path, "tmpfs", 0, "mode=755");
 

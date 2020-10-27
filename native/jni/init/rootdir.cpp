@@ -228,7 +228,7 @@ void SARBase::patch_rootdir() {
 		sepol = "/dev/.se";
 	}
 
-	setup_tmp(tmp_dir, self, config);
+	setup_tmp(tmp_dir);
 	persist_dir = MIRRDIR "/persist/magisk";
 
 	chdir(tmp_dir);
@@ -317,24 +317,20 @@ void SARBase::patch_rootdir() {
 	chdir("/");
 }
 
-int magisk_proxy_main(int argc, char *argv[]) {
-	setup_klog();
-
-	auto self = raw_data::read("/sbin/magisk");
-	auto config = raw_data::read("/.backup/.magisk");
+void MagiskProxy::start() {
+	self = raw_data::read("/sbin/magisk");
+	config = raw_data::read("/.backup/.magisk");
 
 	xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
 	unlink("/sbin/magisk");
 	rm_rf("/.backup");
 
-	setup_tmp("/sbin", self, config);
+	setup_tmp("/sbin");
 
 	// Create symlinks pointing back to /root
 	recreate_sbin("/root", false);
 
 	setenv("REMOUNT_ROOT", "1", 1);
 	execv("/sbin/magisk", argv);
-
-	return 1;
 }

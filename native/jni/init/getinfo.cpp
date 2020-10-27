@@ -11,7 +11,8 @@
 
 using namespace std;
 
-static void parse_cmdline(const std::function<void (std::string_view, const char *)> &fn) {
+template<typename Func>
+static void parse_cmdline(Func fn) {
 	char cmdline[4096];
 	int fd = xopen("/proc/cmdline", O_RDONLY | O_CLOEXEC);
 	cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
@@ -139,7 +140,7 @@ void load_kernel_info(cmdline *cmd) {
 	// Log to kernel
 	setup_klog();
 
-	parse_cmdline([&](auto key, auto value) -> void {
+	parse_cmdline([=](auto key, auto value) -> void {
 		if (key == "androidboot.slot_suffix") {
 			strcpy(cmd->slot, value);
 		} else if (key == "androidboot.slot") {
