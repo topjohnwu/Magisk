@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ktx
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -7,7 +8,6 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.content.res.Configuration
@@ -57,28 +57,30 @@ import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
 
-val PackageInfo.processes
-    get() = activities?.processNames.orEmpty() +
-            services?.processNames.orEmpty() +
-            receivers?.processNames.orEmpty() +
-            providers?.processNames.orEmpty()
-
-val Array<out ComponentInfo>.processNames get() = mapNotNull { it.processName }
-
-val ApplicationInfo.packageInfo: PackageInfo get() {
+val ApplicationInfo.processes: List<String> @SuppressLint("InlinedApi") get() {
     val pm = get<PackageManager>()
-
-    return try {
+    val appProcessName = processName ?: packageName
+    val baseFlag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES
+    val packageInfo = try {
         val request = GET_ACTIVITIES or GET_SERVICES or GET_RECEIVERS or GET_PROVIDERS
-        pm.getPackageInfo(packageName, request)
+        pm.getPackageInfo(packageName, baseFlag or request)
+    } catch (e: NameNotFoundException) { // EdXposed hooked, issue#3276
+        return listOf(appProcessName)
     } catch (e: Exception) {
         // Exceed binder data transfer limit, fetch each component type separately
-        pm.getPackageInfo(packageName, 0).apply {
+        pm.getPackageInfo(packageName, baseFlag).apply {
             runCatching { activities = pm.getPackageInfo(packageName, GET_ACTIVITIES).activities }
             runCatching { services = pm.getPackageInfo(packageName, GET_SERVICES).services }
             runCatching { receivers = pm.getPackageInfo(packageName, GET_RECEIVERS).receivers }
             runCatching { providers = pm.getPackageInfo(packageName, GET_PROVIDERS).providers }
         }
+    }
+    fun Array<out ComponentInfo>.processNames() = map { it.processName ?: appProcessName }
+    return with(packageInfo) {
+        activities?.processNames().orEmpty() +
+        services?.processNames().orEmpty() +
+        receivers?.processNames().orEmpty() +
+        providers?.processNames().orEmpty()
     }
 }
 

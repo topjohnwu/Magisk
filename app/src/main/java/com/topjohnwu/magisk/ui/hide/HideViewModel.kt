@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.hide
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.os.Process
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -12,7 +13,6 @@ import com.topjohnwu.magisk.arch.filterableListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.ktx.packageInfo
 import com.topjohnwu.magisk.ktx.packageName
 import com.topjohnwu.magisk.ktx.processes
 import com.topjohnwu.magisk.utils.Utils
@@ -67,8 +67,7 @@ class HideViewModel : BaseViewModel(), Queryable {
                 .asSequence()
                 .filter { it.enabled && !blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm) }
-                .map { runCatching { createTarget(it, hides) }.getOrNull() }
-                .filterNotNull()
+                .map { createTarget(it, hides) }
                 .filter { it.processes.isNotEmpty() }
                 .map { HideItem(it) }
                 .toList()
@@ -84,7 +83,7 @@ class HideViewModel : BaseViewModel(), Queryable {
     private fun createTarget(info: HideAppInfo, hideList: List<HideTarget>): HideAppTarget {
         val pkg = info.packageName
         val hidden = hideList.filter { it.packageName == pkg }
-        val processNames = info.packageInfo.processes.distinct()
+        val processNames = info.processes.distinct()
         val processes = processNames.map { name ->
             HideProcessInfo(name, pkg, hidden.any { name == it.process })
         }
@@ -99,7 +98,12 @@ class HideViewModel : BaseViewModel(), Queryable {
 
             fun filterSystem() = isShowSystem || it.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
 
-            fun filterOS() = (isShowSystem && isShowOS) || it.info.uid >= 10000
+            fun isApp(uid: Int) = run {
+                val appId: Int = uid % 100000
+                appId >= Process.FIRST_APPLICATION_UID && appId <= Process.LAST_APPLICATION_UID
+            }
+
+            fun filterOS() = (isShowSystem && isShowOS) || isApp(it.info.uid)
 
             fun filterQuery(): Boolean {
                 fun inName() = it.info.label.contains(query, true)
