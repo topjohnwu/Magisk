@@ -54,11 +54,10 @@ static void collect_devices() {
 				continue;
 			sprintf(path, "/sys/dev/block/%s/uevent", entry->d_name);
 			parse_device(&dev, path);
-			dev.dmname[0] = '\0';
 			sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
 			if (access(path, F_OK) == 0) {
 				auto name = rtrim(full_read(path));
-				strcpy(dev.dmname, name.c_str());
+				strcpy(dev.dmname, name.data());
 			}
 			dev_list.push_back(dev);
 		}
@@ -70,7 +69,7 @@ static struct {
 	char block_dev[64];
 } blk_info;
 
-static int64_t setup_block(bool write_block = true) {
+static int64_t setup_block(bool write_block) {
 	if (dev_list.empty())
 		collect_devices();
 	xmkdir("/dev", 0755);
@@ -78,20 +77,19 @@ static int64_t setup_block(bool write_block = true) {
 
 	for (int tries = 0; tries < 3; ++tries) {
 		for (auto &dev : dev_list) {
-			if (strcasecmp(dev.partname, blk_info.partname) == 0) {
-				if (write_block) {
-					sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
-				}
+			if (strcasecmp(dev.partname, blk_info.partname) == 0)
 				LOGD("Setup %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
-				dev_t rdev = makedev(dev.major, dev.minor);
-				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
-				return rdev;
-			} else if (strcasecmp(dev.dmname, blk_info.partname) == 0) {
+			else if (strcasecmp(dev.dmname, blk_info.partname) == 0)
 				LOGD("Setup %s: [%s] (%d, %d)\n", dev.dmname, dev.devname, dev.major, dev.minor);
-				dev_t rdev = makedev(dev.major, dev.minor);
-				mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
-				return rdev;
+			else
+				continue;
+
+			if (write_block) {
+				sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
 			}
+			dev_t rdev = makedev(dev.major, dev.minor);
+			mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
+			return rdev;
 		}
 		// Wait 10ms and try again
 		usleep(10000);
@@ -171,7 +169,7 @@ void MagiskInit::mount_with_dt() {
 			continue;
 		// Derive partname from dev
 		sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), cmd->slot);
-		setup_block();
+		setup_block(true);
 		xmkdir(entry.mnt_point.data(), 0755);
 		xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
 		mount_list.push_back(entry.mnt_point);
