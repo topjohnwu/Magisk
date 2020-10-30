@@ -239,6 +239,10 @@
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
     <string name="unsupport_magisk_msg">This version of Magisk Manager does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="unsupport_other_su_title">Other su found on this device</string>
+    <string name="unsupport_other_su_msg">The existence of other su may cause Magisk to run abnormally and MagiskHide to be invalid. Please remove other su.</string>
+    <string name="unsupport_system_app_title">Unsupported run as system app</string>
+    <string name="unsupport_system_app_msg">Magisk Manager does not support run as system app, which breaks its hidden feature. Please revert to user app.</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>

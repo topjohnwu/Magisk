@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
@@ -29,6 +30,7 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 class MainViewModel : BaseViewModel()
 
@@ -91,7 +93,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
 
-        val section = if (intent.action == ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
+        val section = if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
         else intent.getStringExtra(Const.Key.OPEN_SECTION)
         getScreen(section)?.navigate()
 
@@ -198,7 +200,25 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .applyTitle(R.string.unsupport_magisk_title)
                 .applyMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(true)
+                .reveal()
+        }
+
+        if (Info.env.isActive && System.getenv("PATH")
+                ?.split(':')
+                ?.filterNot { File("$it/magisk").exists() }
+                ?.any { File("$it/su").exists() } == true) {
+            MagiskDialog(this)
+                .applyTitle(R.string.unsupport_other_su_title)
+                .applyMessage(R.string.unsupport_other_su_msg)
+                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
+                .reveal()
+        }
+
+        if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
+            MagiskDialog(this)
+                .applyTitle(R.string.unsupport_system_app_title)
+                .applyMessage(R.string.unsupport_system_app_msg)
+                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .reveal()
         }
     }
@@ -222,11 +242,4 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .reveal()
         }
     }
-
-    companion object {
-        private val ACTION_APPLICATION_PREFERENCES get() =
-            if (Build.VERSION.SDK_INT >= 24) Intent.ACTION_APPLICATION_PREFERENCES
-            else "???"
-    }
-
 }
