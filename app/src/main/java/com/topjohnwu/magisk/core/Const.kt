@@ -48,6 +48,7 @@ object Const {
     object ID {
         const val FETCH_ZIP = 2
         const val SELECT_FILE = 3
+        const val UNINSTALL_APP = 4
         const val MAX_ACTIVITY_RESULT = 10
 
         // notifications
