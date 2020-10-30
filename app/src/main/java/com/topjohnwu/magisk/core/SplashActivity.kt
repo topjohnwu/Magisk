@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.core
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
@@ -11,8 +13,11 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
+import java.util.concurrent.CountDownLatch
 
 open class SplashActivity : Activity() {
+
+    private val latch = CountDownLatch(1)
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base.wrap())
@@ -36,7 +41,8 @@ open class SplashActivity : Activity() {
             if (Config.suManager.isNotEmpty())
                 Config.suManager = ""
             pkg ?: return
-            Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
+            val uninstall = Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
+            if (!uninstall.isSuccess) uninstallApp(pkg)
         }
     }
 
@@ -56,6 +62,21 @@ open class SplashActivity : Activity() {
 
         redirect<MainActivity>().also { startActivity(it) }
         finish()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun uninstallApp(pkg: String) {
+        val uri = Uri.Builder().scheme("package").opaquePart(pkg).build()
+        val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri)
+        intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
+        startActivityForResult(intent, Const.ID.UNINSTALL_APP)
+        latch.await()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Const.ID.UNINSTALL_APP) {
+            if (resultCode != RESULT_CANCELED) latch.countDown()
+        } else super.onActivityResult(requestCode, resultCode, data)
     }
 
     companion object {
