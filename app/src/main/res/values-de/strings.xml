@@ -20,7 +20,7 @@
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
     <string name="status">Status</string>
-    <string name="home_package">Packet</string>
+    <string name="home_package">Paket</string>
 
     <string name="home_notice_content">Benutzen Sie nur den quelloffenen Magisk Manager. Magisk von unbekannten Quellen kann zu schädlichen Aktionen führen.</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
