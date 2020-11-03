@@ -26,16 +26,19 @@ static bool safe_mode = false;
 #define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
-#define mount_mirror(part, flag) \
-else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) { \
-	SETMIR(buf1, part); \
-	SETBLK(buf2, part); \
-	unlink(buf2); \
-	mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-	xmkdir(buf1, 0755); \
-	xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
-	LOGI("mount: %s\n", buf1); \
+#define do_mount_mirror(part, flag) {\
+    SETMIR(buf1, part); \
+    SETBLK(buf2, part); \
+    unlink(buf2); \
+    mknod(buf2, S_IFBLK | 0600, st.st_dev); \
+    xmkdir(buf1, 0755); \
+    xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
+    LOGI("mount: %s\n", buf1); \
 }
+
+#define mount_mirror(part, flag) \
+else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) \
+	do_mount_mirror(part, flag)
 
 #define link_mirror(part) \
 SETMIR(buf1, part); \
@@ -119,10 +122,17 @@ static bool magisk_env() {
 		return true;
 	});
 	SETMIR(buf1, system);
-	SETMIR(buf2, system_root);
-	if (access(buf1, F_OK) != 0 && access(buf2, F_OK) == 0) {
+	if (access(buf1, F_OK) != 0) {
 		xsymlink("./system_root/system", buf1);
 		LOGI("link: %s\n", buf1);
+		parse_mnt("/proc/mounts", [&](mntent *me) {
+			struct stat st;
+			if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
+				do_mount_mirror(system_root, MS_RDONLY)
+				return false;
+			}
+			return true;
+		});
 	}
 	link_mirror(vendor)
 	link_mirror(product)

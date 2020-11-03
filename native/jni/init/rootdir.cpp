@@ -183,13 +183,12 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
-#define ROOTBLK     BLOCKDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
 #define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void SARBase::patch_rootdir() {
-	char tmp_dir[16];
+	char tmp_dir[32];
 	const char *sepol;
 
 	char *p;
@@ -208,13 +207,10 @@ void SARBase::patch_rootdir() {
 	mount_rules_dir(BLOCKDIR, MIRRDIR);
 
 	// Mount system_root mirror
-	struct stat st;
-	xstat("/", &st);
 	xmkdir(ROOTMIR, 0755);
-	mknod(ROOTBLK, S_IFBLK | 0600, st.st_dev);
-	strcpy(p, "/" ROOTBLK);
-	if (xmount(tmp_dir, ROOTMIR, "ext4", MS_RDONLY, nullptr))
-		xmount(tmp_dir, ROOTMIR, "erofs", MS_RDONLY, nullptr);
+	xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
+	strcpy(p, "/" ROOTMIR);
+	mount_list.emplace_back(tmp_dir);
 	*p = '\0';
 
 	// Recreate original sbin structure if necessary
