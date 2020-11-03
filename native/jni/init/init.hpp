@@ -68,11 +68,12 @@ class MagiskInit : public BaseInit {
 protected:
 	auto_data<HEAP> self;
 	auto_data<HEAP> config;
-	std::string persist_dir;
+	std::string custom_rules_dir;
 
 	void mount_with_dt();
 	bool patch_sepolicy(const char *file);
 	void setup_tmp(const char *path);
+	void mount_rules_dir(const char *dev_base, const char *mnt_base);
 public:
 	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 };
@@ -114,10 +115,11 @@ public:
 class SecondStageInit : public SARBase {
 protected:
 	void early_mount() override;
-	void cleanup() override { /* Do not do any cleanup */ }
 public:
 	SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
 		LOGD("%s\n", __FUNCTION__);
+		// Do not unmount /sys and /proc
+		mount_list.clear();
 	};
 };
 

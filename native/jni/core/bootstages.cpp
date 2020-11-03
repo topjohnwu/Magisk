@@ -22,14 +22,15 @@ static bool safe_mode = false;
  * Setup *
  *********/
 
-#define DIR_IS(part)      (me->mnt_dir == "/" #part ""sv)
+#define MNT_DIR_IS(dir)   (me->mnt_dir == string_view(dir))
 #define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
 #define mount_mirror(part, flag) \
-else if (DIR_IS(part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) { \
+else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) { \
 	SETMIR(buf1, part); \
 	SETBLK(buf2, part); \
+	unlink(buf2); \
 	mknod(buf2, S_IFBLK | 0600, st.st_dev); \
 	xmkdir(buf1, 0755); \
 	xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
@@ -42,6 +43,16 @@ if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
 	xsymlink("./system/" #part, buf1); \
 	LOGI("link: %s\n", buf1); \
 }
+
+#define link_orig_dir(dir, part) \
+else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv) { \
+	SETMIR(buf1, part); \
+	rmdir(buf1); \
+	xsymlink(dir, buf1); \
+	LOGI("link: %s\n", buf1); \
+}
+
+#define link_orig(part) link_orig_dir("/" #part, part)
 
 static bool magisk_env() {
 	LOGI("* Initializing Magisk environment\n");
@@ -98,7 +109,11 @@ static bool magisk_env() {
 		mount_mirror(product, MS_RDONLY)
 		mount_mirror(system_ext, MS_RDONLY)
 		mount_mirror(data, 0)
-		else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
+		link_orig(cache)
+		link_orig(metadata)
+		link_orig(persist)
+		link_orig_dir("/mnt/vendor/persist", persist)
+		else if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
 			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 		}
 		return true;
@@ -109,9 +124,9 @@ static bool magisk_env() {
 		xsymlink("./system_root/system", buf1);
 		LOGI("link: %s\n", buf1);
 	}
-	link_mirror(vendor);
-	link_mirror(product);
-	link_mirror(system_ext);
+	link_mirror(vendor)
+	link_mirror(product)
+	link_mirror(system_ext)
 
 	// Disable/remove magiskhide, resetprop
 	if (SDK_INT < 19) {

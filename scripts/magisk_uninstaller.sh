@@ -15,7 +15,6 @@ TMPDIR=/dev/tmp
 
 INSTALLER=$TMPDIR/install
 CHROMEDIR=$INSTALLER/chromeos
-PERSISTDIR=/sbin/.magisk/mirror/persist
 
 # Default permissions
 umask 022
@@ -36,7 +35,12 @@ setup_flashable
 print_title "Magisk Uninstaller"
 
 is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with Magisk Manager"
-is_mounted /cache || mount /cache 2>/dev/null
+if ! $BOOTMODE; then
+  # Mounting stuffs in recovery (best effort)
+  mount_name metadata /metadata
+  mount_name "cache cac" /cache
+  mount_name persist /persist
+fi
 mount_partitions
 
 api_level_arch_detect
@@ -141,7 +145,8 @@ ui_print "- Removing Magisk files"
 rm -rf \
 /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \
 /data/Magisk.apk /data/busybox /data/custom_ramdisk_patch.sh /data/adb/*magisk* \
-/data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* $PERSISTDIR/magisk 2>/dev/null
+/data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* \
+/data/unencrypted/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
 if [ -f /system/addon.d/99-magisk.sh ]; then
   blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
@@ -158,7 +163,7 @@ if $BOOTMODE; then
   ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
-  rm -rf /data/user*/*/*magisk* /data/app/*magisk*
+  rm -rf /data/data/*magisk* /data/user*/*/*magisk* /data/app/*magisk* /data/app/*/*magisk*
   recovery_cleanup
   ui_print "- Done"
 fi

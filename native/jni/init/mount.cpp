@@ -205,27 +205,89 @@ static void switch_root(const string &path) {
 	frm_rf(root);
 }
 
-static void mount_persist(const char *dev_base, const char *mnt_base) {
-	string mnt_point = mnt_base + "/persist"s;
-	strcpy(blk_info.partname, "persist");
+void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
+	char path[128];
 	xrealpath(dev_base, blk_info.block_dev);
-	char *s = blk_info.block_dev + strlen(blk_info.block_dev);
-	strcpy(s, "/persist");
+	xrealpath(mnt_base, path);
+	char *b = blk_info.block_dev + strlen(blk_info.block_dev);
+	char *p = path + strlen(path);
+
+	auto do_mount = [&](const char *type) -> bool {
+		xmkdir(path, 0755);
+		bool success = xmount(blk_info.block_dev, path, type, 0, nullptr) == 0;
+		if (success)
+			mount_list.emplace_back(path);
+		return success;
+	};
+
+	// First try userdata
+	strcpy(blk_info.partname, "userdata");
+	strcpy(b, "/data");
+	strcpy(p, "/data");
 	if (setup_block(false) < 0) {
-		// Fallback to cache
-		strcpy(blk_info.partname, "cache");
-		strcpy(s, "/cache");
-		if (setup_block(false) < 0) {
-			// Try NVIDIA's BS
-			strcpy(blk_info.partname, "CAC");
-			if (setup_block(false) < 0)
-				return;
-		}
-		xsymlink("./cache", mnt_point.data());
-		mnt_point = mnt_base + "/cache"s;
+		// Try NVIDIA naming scheme
+		strcpy(blk_info.partname, "UDA");
+		if (setup_block(false) < 0)
+			goto cache;
 	}
-	xmkdir(mnt_point.data(), 0755);
-	xmount(blk_info.block_dev, mnt_point.data(), "ext4", 0, nullptr);
+	// Try to mount with either ext4 or f2fs
+	// Failure means either FDE or metadata encryption
+	if (!do_mount("ext4") && !do_mount("f2fs"))
+		goto cache;
+
+	strcpy(p, "/data/unencrypted");
+	if (access(path, F_OK) == 0) {
+		// FBE, need to use an unencrypted path
+		custom_rules_dir = path + "/magisk"s;
+	} else {
+		// Skip if /data/adb does not exist
+		strcpy(p, "/data/adb");
+		if (access(path, F_OK) != 0)
+			return;
+		// Unencrypted, directly use module paths
+		custom_rules_dir = string(mnt_base) + MODULEROOT;
+	}
+	goto success;
+
+cache:
+	// Fallback to cache
+	strcpy(blk_info.partname, "cache");
+	strcpy(b, "/cache");
+	strcpy(p, "/cache");
+	if (setup_block(false) < 0) {
+		// Try NVIDIA naming scheme
+		strcpy(blk_info.partname, "CAC");
+		if (setup_block(false) < 0)
+			goto metadata;
+	}
+	if (!do_mount("ext4"))
+		goto metadata;
+	custom_rules_dir = path + "/magisk"s;
+	goto success;
+
+metadata:
+	// Fallback to metadata
+	strcpy(blk_info.partname, "metadata");
+	strcpy(b, "/metadata");
+	strcpy(p, "/metadata");
+	if (setup_block(false) < 0 || !do_mount("ext4"))
+		goto persist;
+	custom_rules_dir = path + "/magisk"s;
+	goto success;
+
+persist:
+	// Fallback to persist
+	strcpy(blk_info.partname, "persist");
+	strcpy(b, "/persist");
+	strcpy(p, "/persist");
+	if (setup_block(false) < 0 || !do_mount("ext4"))
+		return;
+	custom_rules_dir = path + "/magisk"s;
+
+success:
+	// Create symlinks so we don't need to go through this logic again
+	strcpy(p, "/sepolicy.rules");
+	xsymlink(custom_rules_dir.data(), path);
 }
 
 void RootFSInit::early_mount() {
@@ -235,11 +297,6 @@ void RootFSInit::early_mount() {
 	rename("/.backup/init", "/init");
 
 	mount_with_dt();
-
-	xmkdir("/dev/mnt", 0755);
-	mount_persist("/dev/block", "/dev/mnt");
-	mount_list.emplace_back("/dev/mnt/persist");
-	persist_dir = "/dev/mnt/persist/magisk";
 }
 
 void SARBase::backup_files() {
@@ -336,8 +393,6 @@ void MagiskInit::setup_tmp(const char *path) {
 	xmkdir(INTLROOT, 0755);
 	xmkdir(MIRRDIR, 0);
 	xmkdir(BLOCKDIR, 0);
-
-	mount_persist(BLOCKDIR, MIRRDIR);
 
 	int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
 	xwrite(fd, config.buf, config.sz);
