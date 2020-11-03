@@ -20,7 +20,7 @@ static int (*system_property_set)(const char*, const char*);
 
 [[noreturn]] static void usage(char* arg0) {
 	fprintf(stderr,
-R"EOF("resetprop - System Props Modification Tool
+R"EOF(resetprop - System Property Manipulation Tool
 
 Usage: %s [flags] [options...]
 
@@ -34,10 +34,10 @@ Options:
 
 Flags:
    -v      print verbose output to stderr
-   -n      set properties without going through init
-           affects setprop and prop file loading
-   -p      also access props directly from persist storage
-           affects getprop and delprop
+   -n      set props without going through property_service
+           (this flag only affects setprop)
+   -p      read/write props from/to persistent storage
+           (this flag only affects getprop and delprop)
 
 )EOF", arg0);
 	exit(1);
