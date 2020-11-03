@@ -13,8 +13,8 @@
 
 // Missing functions
 #define fsetxattr(...) syscall(__NR_fsetxattr, __VA_ARGS__)
-#define getline __getline
-ssize_t __getline(char **, size_t *, FILE *);
+#define getline compat_getline
+ssize_t compat_getline(char **, size_t *, FILE *);
 
 // Rename symbols
 #pragma redefine_extname __system_property_set _system_property_set2
