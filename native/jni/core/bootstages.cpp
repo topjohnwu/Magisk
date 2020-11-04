@@ -57,50 +57,9 @@ else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv) { \
 
 #define link_orig(part) link_orig_dir("/" #part, part)
 
-static bool magisk_env() {
-	LOGI("* Initializing Magisk environment\n");
-
-	string pkg;
-	check_manager(&pkg);
-
+static void mount_mirrors() {
 	char buf1[4096];
 	char buf2[4096];
-
-	sprintf(buf1, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
-
-	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf1 };
-	for (auto alt : alt_bin) {
-		struct stat st;
-		if (lstat(alt, &st) == 0) {
-			if (S_ISLNK(st.st_mode)) {
-				unlink(alt);
-				continue;
-			}
-			rm_rf(DATABIN);
-			cp_afc(alt, DATABIN);
-			rm_rf(alt);
-			break;
-		}
-	}
-
-	// Remove stuffs
-	rm_rf("/cache/data_adb");
-	rm_rf("/data/adb/modules/.core");
-	unlink("/data/adb/magisk.img");
-	unlink("/data/adb/magisk_merge.img");
-	unlink("/data/magisk.img");
-	unlink("/data/magisk_merge.img");
-	unlink("/data/magisk_debug.log");
-
-	sprintf(buf1, "%s/" MODULEMNT, MAGISKTMP.data());
-	xmkdir(buf1, 0755);
-
-	// Directories in /data/adb
-	xmkdir(DATABIN, 0755);
-	xmkdir(MODULEROOT, 0755);
-	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
-	xmkdir(SECURE_DIR "/service.d", 0755);
 
 	LOGI("* Mounting mirrors");
 
@@ -137,6 +96,48 @@ static bool magisk_env() {
 	link_mirror(vendor)
 	link_mirror(product)
 	link_mirror(system_ext)
+}
+
+static bool magisk_env() {
+	char buf[4096];
+
+	LOGI("* Initializing Magisk environment\n");
+
+	string pkg;
+	check_manager(&pkg);
+
+	sprintf(buf, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+
+	// Alternative binaries paths
+	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
+	for (auto alt : alt_bin) {
+		struct stat st;
+		if (lstat(alt, &st) == 0) {
+			if (S_ISLNK(st.st_mode)) {
+				unlink(alt);
+				continue;
+			}
+			rm_rf(DATABIN);
+			cp_afc(alt, DATABIN);
+			rm_rf(alt);
+			break;
+		}
+	}
+
+	// Remove stuffs
+	rm_rf("/cache/data_adb");
+	rm_rf("/data/adb/modules/.core");
+	unlink("/data/adb/magisk.img");
+	unlink("/data/adb/magisk_merge.img");
+	unlink("/data/magisk.img");
+	unlink("/data/magisk_merge.img");
+	unlink("/data/magisk_debug.log");
+
+	// Directories in /data/adb
+	xmkdir(DATABIN, 0755);
+	xmkdir(MODULEROOT, 0755);
+	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
+	xmkdir(SECURE_DIR "/service.d", 0755);
 
 	// Disable/remove magiskhide, resetprop
 	if (SDK_INT < 19) {
@@ -149,10 +150,10 @@ static bool magisk_env() {
 
 	// TODO: Remove. Backwards compatibility for old manager
 	LOGI("* Setting up internal busybox\n");
-	sprintf(buf1, "%s/" BBPATH "/busybox", MAGISKTMP.data());
-	mkdir(dirname(buf1), 0755);
-	cp_afc(DATABIN "/busybox", buf1);
-	exec_command_sync(buf1, "--install", "-s", dirname(buf1));
+	sprintf(buf, "%s/" BBPATH "/busybox", MAGISKTMP.data());
+	mkdir(dirname(buf), 0755);
+	cp_afc(DATABIN "/busybox", buf);
+	exec_command_sync(buf, "--install", "-s", dirname(buf));
 
 	return true;
 }
@@ -307,25 +308,25 @@ void post_fs_data(int client) {
 
 	LOGI("** post-fs-data mode running\n");
 
-	// Unlock all blocks for rw
 	unlock_blocks();
+	mount_mirrors();
 
 	if (access(SECURE_DIR, F_OK) != 0) {
 		if (SDK_INT < 24) {
 			// There is no FBE pre 7.0, we can directly create the folder without issues
 			xmkdir(SECURE_DIR, 0700);
 		} else {
-			/* If the folder is not automatically created by Android,
-			 * do NOT proceed further. Manual creation of the folder
-			 * will cause bootloops on FBE devices. */
-			LOGE(SECURE_DIR " is not present, abort...\n");
-			goto unblock_init;
+			// If the folder is not automatically created by Android,
+			// do NOT proceed further. Manual creation of the folder
+			// will cause bootloops on FBE devices.
+			LOGE(SECURE_DIR " is not present, abort\n");
+			goto early_abort;
 		}
 	}
 
 	if (!magisk_env()) {
-		LOGE("* Magisk environment setup incomplete, abort\n");
-		goto unblock_init;
+		LOGE("* Magisk environment incomplete, abort\n");
+		goto early_abort;
 	}
 
 	if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
@@ -339,9 +340,11 @@ void post_fs_data(int client) {
 		handle_modules();
 	}
 
+	pfs_done = true;
+
+early_abort:
 	// We still do magic mount because root itself might need it
 	magic_mount();
-	pfs_done = true;
 
 unblock_init:
 	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
@@ -373,8 +376,7 @@ void boot_complete(int client) {
 	if (safe_mode)
 		return;
 
-	/* It's safe to create the folder at this point if the system didn't create it
-	 * Magisk Manager should finish up the remaining environment setup */
+	// At this point it's safe to create the folder
 	if (access(SECURE_DIR, F_OK) != 0)
 		xmkdir(SECURE_DIR, 0700);
 
