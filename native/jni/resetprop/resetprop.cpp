@@ -67,25 +67,25 @@ static bool check_legal_property_name(const char *name) {
 
 	return true;
 
-	illegal:
+illegal:
 	LOGE("Illegal property name: [%s]\n", name);
 	return false;
 }
 
 static void read_prop(const prop_info *pi, void *cb) {
-	__system_property_read_callback(
-			pi, [](auto cb, auto name, auto value, auto) {
-				reinterpret_cast<prop_cb*>(cb)->exec(name, value);
-			}, cb);
+	auto callback = [](void *cb, const char *name, const char *value, uint32_t) {
+		static_cast<prop_cb*>(cb)->exec(name, value);
+	};
+	__system_property_read_callback(pi, callback, cb);
 }
 
 static void print_props(bool persist) {
-	getprops([](auto name, auto value, auto) {
+	getprops([](const char *name, const char *value, auto) {
 		printf("[%s]: [%s]\n", name, value);
 	}, nullptr, persist);
 }
 
-struct sysprop {
+struct sysprop_stub {
 	virtual int setprop(const char *name, const char *value, bool trigger) { return 1; }
 	virtual string getprop(const char *name, bool persist) { return ""; }
 	virtual void getprops(void (*callback)(const char *, const char *, void *),
@@ -93,7 +93,7 @@ struct sysprop {
 	virtual int delprop(const char *name, bool persist) { return 1; }
 };
 
-struct stock_sysprop : public sysprop {
+struct sysprop : public sysprop_stub {
 	int setprop(const char *name, const char *value, bool) override {
 		return system_property_set(name, value);
 	}
@@ -105,31 +105,30 @@ struct stock_sysprop : public sysprop {
 	}
 };
 
-struct resetprop : public sysprop {
-	int setprop(const char *name, const char *value, bool trigger) override {
+struct resetprop : public sysprop_stub {
+	int setprop(const char *name, const char *value, bool prop_svc) override {
 		if (!check_legal_property_name(name))
 			return 1;
 
+		const char *msg = prop_svc ? "property_service" : "modifying prop data structure";
 		int ret;
 		auto pi = const_cast<prop_info *>(__system_property_find(name));
 		if (pi != nullptr) {
-			if (trigger) {
+			if (prop_svc) {
 				if (strncmp(name, "ro.", 3) == 0)
 					delprop(name, false);
 				ret = system_property_set(name, value);
 			} else {
 				ret = __system_property_update(pi, value, strlen(value));
 			}
-			LOGD("resetprop: update prop [%s]: [%s] by %s\n", name, value,
-				 trigger ? "property_service" : "modifying prop data structure");
+			LOGD("resetprop: update prop [%s]: [%s] by %s\n", name, value, msg);
 		} else {
-			if (trigger) {
+			if (prop_svc) {
 				ret = system_property_set(name, value);
 			} else {
 				ret = __system_property_add(name, strlen(name), value, strlen(value));
 			}
-			LOGD("resetprop: create prop [%s]: [%s] by %s\n", name, value,
-				 trigger ? "property_service" : "modifying prop data structure");
+			LOGD("resetprop: create prop [%s]: [%s] by %s\n", name, value, msg);
 		}
 
 		if (ret)
@@ -138,24 +137,30 @@ struct resetprop : public sysprop {
 		return ret;
 	}
 
+	struct prop_to_string : prop_cb {
+		explicit prop_to_string(string &s) : val(s) {}
+		void exec(const char *name, const char *value) override {
+			val = value;
+		}
+	private:
+		string &val;
+	};
+
 	string getprop(const char *name, bool persist) override {
 		if (!check_legal_property_name(name))
 			return string();
 		auto pi = __system_property_find(name);
 		if (pi == nullptr) {
 			if (persist && strncmp(name, "persist.", 8) == 0) {
-				auto value = persist_getprop(name);
-				if (value.empty())
-					goto not_found;
-				return value;
+				if (auto value = persist_getprop(name); !value.empty())
+					return value;
 			}
-			not_found:
 			LOGD("resetprop: prop [%s] does not exist\n", name);
 			return string();
 		} else {
 			string val;
-			auto reader = make_prop_cb(val, [](auto, auto value, auto str){ str = value; });
-			read_prop(pi, &reader);
+			auto prop = prop_to_string(val);
+			read_prop(pi, &prop);
 			LOGD("resetprop: getprop [%s]: [%s]\n", name, val.data());
 			return val;
 		}
@@ -170,8 +175,6 @@ struct resetprop : public sysprop {
 			persist_getprops(&collector);
 		for (auto &[key, val] : list)
 			callback(key.data(), val.data(), cookie);
-		if (persist)
-			persist_cleanup();
 	}
 
 	int delprop(const char *name, bool persist) override {
@@ -187,8 +190,8 @@ struct resetprop : public sysprop {
 #define DLOAD(name) \
 *(void **) &name = dlsym(RTLD_DEFAULT, "__" #name)
 
-static sysprop *get_impl() {
-	static sysprop *impl = nullptr;
+static sysprop_stub *get_impl() {
+	static sysprop_stub *impl = nullptr;
 	if (impl == nullptr) {
 		use_pb = access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0;
 #ifdef APPLET_STUB_MAIN
@@ -203,7 +206,7 @@ static sysprop *get_impl() {
 		if (__system_properties_init()) {
 			LOGW("resetprop: __system_properties_init error\n");
 			DLOAD(system_property_get);
-			impl = system_property_get ? new stock_sysprop() : new sysprop();
+			impl = system_property_get ? new sysprop() : new sysprop_stub();
 		} else {
 			impl = new resetprop();
 		}
@@ -232,11 +235,11 @@ int delprop(const char *name, bool persist) {
 	return get_impl()->delprop(name, persist);
 }
 
-void load_prop_file(const char *filename, bool trigger) {
+void load_prop_file(const char *filename, bool prop_svc) {
 	auto impl = get_impl();
 	LOGD("resetprop: Parse prop file [%s]\n", filename);
 	parse_prop_file(filename, [=](auto key, auto val) -> bool {
-		impl->setprop(key.data(), val.data(), trigger);
+		impl->setprop(key.data(), val.data(), prop_svc);
 		return true;
 	});
 }
@@ -244,9 +247,9 @@ void load_prop_file(const char *filename, bool trigger) {
 int resetprop_main(int argc, char *argv[]) {
 	log_cb.d = [](auto fmt, auto ap) -> int { return verbose ? vfprintf(stderr, fmt, ap) : 0; };
 
-	bool trigger = true, persist = false;
+	bool prop_svc = true;
+	bool persist = false;
 	char *argv0 = argv[0];
-	string prop;
 
 	--argc;
 	++argv;
@@ -257,7 +260,7 @@ int resetprop_main(int argc, char *argv[]) {
 			switch (argv[0][idx]) {
 			case '-':
 				if (strcmp(argv[0], "--file") == 0 && argc == 2) {
-					load_prop_file(argv[1], trigger);
+					load_prop_file(argv[1], prop_svc);
 					return 0;
 				} else if (strcmp(argv[0], "--delete") == 0 && argc == 2) {
 					return delprop(argv[1], persist);
@@ -271,7 +274,7 @@ int resetprop_main(int argc, char *argv[]) {
 				persist = true;
 				continue;
 			case 'n':
-				trigger = false;
+				prop_svc = false;
 				continue;
 			case '\0':
 				break;
@@ -289,13 +292,15 @@ int resetprop_main(int argc, char *argv[]) {
 	case 0:
 		print_props(persist);
 		return 0;
-	case 1:
-		prop = getprop(argv[0], persist);
-		if (prop.empty()) return 1;
+	case 1: {
+		string prop = getprop(argv[0], persist);
+		if (prop.empty())
+			return 1;
 		printf("%s\n", prop.data());
 		return 0;
+	}
 	case 2:
-		return setprop(argv[0], argv[1], trigger);
+		return setprop(argv[0], argv[1], prop_svc);
 	default:
 		usage(argv0);
 	}
