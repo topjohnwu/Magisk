@@ -95,7 +95,7 @@ static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
 	prop.name.arg = &name;
 	if (!pb_decode(stream, &PersistentProperties_PersistentPropertyRecord_msg, &prop))
 		return false;
-	auto cb = reinterpret_cast<prop_cb*>(*arg);
+	auto cb = static_cast<prop_cb*>(*arg);
 	cb->exec(std::move(name), prop.value);
 	return true;
 }
@@ -186,13 +186,17 @@ string persist_getprop(const char *name) {
 	if (use_pb) {
 		auto prop = match_prop_name(name);
 		pb_getprop(&prop);
-		if (prop.value[0])
+		if (prop.value[0]) {
+			LOGD("resetprop: getprop (persist) [%s]: [%s]\n", name, prop.value);
 			return prop.value;
+		}
 	} else {
 		// Try to read from file
 		char value[PROP_VALUE_MAX];
-		if (file_getprop(name, value))
+		if (file_getprop(name, value)) {
+			LOGD("resetprop: getprop (persist) [%s]: [%s]\n", name, value);
 			return value;
+		}
 	}
 	return string();
 }

@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 
-int setprop(const char *name, const char *value, bool trigger = true);
+int setprop(const char *name, const char *value, bool prop_svc = true);
 std::string getprop(const char *name, bool persist = false);
 void getprops(void (*callback)(const char *, const char *, void *),
 		void *cookie = nullptr, bool persist = false);
