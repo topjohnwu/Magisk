@@ -57,7 +57,9 @@ sealed class IconLink : RvItem() {
 
         object App : PayPal(), AppDev
 
-        object Main : PayPal(), MainDev
+        object Main : PayPal() {
+            override val name: String get() = "magiskdonate"
+        }
     }
 
     object Patreon : IconLink() {
