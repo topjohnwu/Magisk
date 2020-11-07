@@ -148,12 +148,10 @@ static bool magisk_env() {
 	if (access(DATABIN "/busybox", X_OK) == -1)
 		return false;
 
-	// TODO: Remove. Backwards compatibility for old manager
-	LOGI("* Setting up internal busybox\n");
 	sprintf(buf, "%s/" BBPATH "/busybox", MAGISKTMP.data());
 	mkdir(dirname(buf), 0755);
 	cp_afc(DATABIN "/busybox", buf);
-	exec_command_sync(buf, "--install", "-s", dirname(buf));
+	exec_command_async(buf, "--install", "-s", dirname(buf));
 
 	return true;
 }

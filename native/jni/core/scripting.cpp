@@ -10,15 +10,25 @@
 
 using namespace std;
 
-#define BBEXEC_CMD DATABIN "/busybox", "sh"
+#define BBEXEC_CMD bbpath(), "sh"
 
-static void set_standalone() {
+static const char *bbpath() {
+	static string path;
+	if (path.empty())
+		path = MAGISKTMP + "/" BBPATH "/busybox";
+	return path.data();
+}
+
+static void set_script_env() {
 	setenv("ASH_STANDALONE", "1", 1);
+	char new_path[4096];
+	sprintf(new_path, "%s:%s", getenv("PATH"), MAGISKTMP.data());
+	setenv("PATH", new_path, 1);
 };
 
 void exec_script(const char *script) {
 	exec_t exec {
-		.pre_exec = set_standalone,
+		.pre_exec = set_script_env,
 		.fork = fork_no_zombie
 	};
 	exec_command_sync(exec, BBEXEC_CMD, script);
@@ -43,7 +53,7 @@ void exec_common_scripts(const char *stage) {
 			LOGI("%s.d: exec [%s]\n", stage, entry->d_name);
 			strcpy(name, entry->d_name);
 			exec_t exec {
-				.pre_exec = set_standalone,
+				.pre_exec = set_script_env,
 				.fork = pfs ? fork_no_zombie : fork_dont_care
 			};
 			if (pfs)
@@ -59,13 +69,13 @@ void exec_module_scripts(const char *stage, const vector<string> &module_list) {
 	char path[4096];
 	bool pfs = stage == "post-fs-data"sv;
 	for (auto &m : module_list) {
-		const char* module = m.c_str();
+		const char* module = m.data();
 		sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);
 		if (access(path, F_OK) == -1)
 			continue;
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec {
-			.pre_exec = set_standalone,
+			.pre_exec = set_script_env,
 			.fork = pfs ? fork_no_zombie : fork_dont_care
 		};
 		if (pfs)
@@ -78,30 +88,35 @@ void exec_module_scripts(const char *stage, const vector<string> &module_list) {
 constexpr char install_script[] = R"EOF(
 APK=%s
 log -t Magisk "apk_install: $APK"
-log -t Magisk "apk_install: `pm install -r $APK 2>&1`"
+log -t Magisk "apk_install: $(pm install -r $APK 2>&1)"
 rm -f $APK
 )EOF";
 
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 	exec_t exec {
-		.pre_exec = set_standalone,
 		.fork = fork_no_zombie
 	};
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
-	exec_command_sync(exec, BBEXEC_CMD, "-c", cmds);
+	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 
-[[noreturn]] static void abort(const char *msg) {
-	fprintf(stderr, "%s\n\n", msg);
+[[noreturn]] __printflike(1, 2)
+static void abort(const char *fmt, ...) {
+	va_list valist;
+	va_start(valist, fmt);
+	vfprintf(stderr, fmt, valist);
+	fprintf(stderr, "\n\n");
+	va_end(valist);
 	exit(1);
 }
 
 constexpr char install_module_script[] = R"EOF(
+exec $(magisk --path)/.magisk/busybox/busybox sh -c '
 . /data/adb/magisk/util_functions.sh
 install_module
-exit 0
+exit 0'
 )EOF";
 
 void install_module(const char *file) {
@@ -112,20 +127,18 @@ void install_module(const char *file) {
 		access(DATABIN "/util_functions.sh", F_OK))
 		abort("Incomplete Magisk install");
 	if (access(file, F_OK)) {
-		char msg[4096];
-		sprintf(msg, "'%s' does not exist", file);
-		abort(msg);
+		abort("'%s' does not exist", file);
 	}
 
-	setenv("OUTFD", "1", true);
-	setenv("ZIPFILE", file, true);
+	setenv("OUTFD", "1", 1);
+	setenv("ZIPFILE", file, 1);
 	setenv("ASH_STANDALONE", "1", 1);
 
 	int fd = xopen("/dev/null", O_RDONLY);
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
-	const char *argv[] = { BBEXEC_CMD, "-c", install_module_script };
+	const char *argv[] = { "/system/bin/sh", "-c", install_module_script };
 	execve(argv[0], (char **) argv, environ);
 	abort("Failed to execute BusyBox shell");
 }
