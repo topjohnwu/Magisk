@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запит прав суперкористувача</string>
+    <string name="touch_filtered_warning">Magisk не може перевірити вашу відповідь, тому що застосунок заступає вікно запиту прав суперкористувача</string>
     <string name="deny">Відмовити</string>
     <string name="prompt">Запитувати</string>
     <string name="grant">Надати</string>
@@ -102,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Показувати системні застосунки</string>
+    <string name="show_os_app">Показувати вбудовані застосунки</string>
     <string name="hide_filter_hint">Фільтрувати за назвою</string>
     <string name="hide_scroll_up">Прогорнути вгору</string>
     <string name="hide_filters">Фільтри</string>
@@ -109,6 +111,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(немає наданої інформації)</string>
+    <string name="reboot_userspace">Швидке перезавантаження</string>
     <string name="reboot_recovery">Перезавантажити в Recovery</string>
     <string name="reboot_bootloader">Перезавантажити в Bootloader</string>
     <string name="reboot_download">Перезавантажити в Download</string>
@@ -121,6 +124,7 @@
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="update_available">Доступне оновлення</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Онлайн</string>
     <string name="sorting_order">Порядок сортування</string>
 
     <!--Settings -->
@@ -169,10 +173,15 @@
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програ</string>
+    <string name="settings_su_tapjack_title">Увімкнути захист від Tapjack</string>
+    <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
     <string name="settings_su_biometric_title">Біометрична автентифікація</string>
     <string name="settings_su_biometric_summary">Використовувати біометричну автентифікацію, щоб підтверджувати запити суперкористувача</string>
     <string name="no_biometric">Пристрій не підтримується, або не налаштовано біометрику</string>
     <string name="settings_customization">Оформлення</string>
+    <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
+    <string name="settings_doh_title">DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Відключити DoH (при нестабільному підключенні)</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
@@ -214,6 +223,7 @@
     <string name="failure">Не вдалося</string>
     <string name="hide_manager_title">Приховування Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Не вдалося приховати Magisk Manager.</string>
+    <string name="restore_manager_fail_toast">Не вдалося відновити Magisk Manager</string>
     <string name="open_link_failed_toast">Не знайдено застосунку для відкриття посилання</string>
     <string name="complete_uninstall">Повне видалення</string>
     <string name="restore_img">Відновити розділи</string>
@@ -230,5 +240,8 @@
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
     <string name="unsupport_magisk_msg">Ця версія Magisk Manager не підтримує версію Magisk нижчу, ніж %1$s.\n\nЗастосунок буде працювати, ніби Magisk не встановлено. Будь ласка, оновіть Magisk якомога швидше.</string>
     <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
+    <string name="add_shortcut_title">Ярлик на домашньому екрані</string>
+    <string name="add_shortcut_msg">Після приховування Magisk Manager, його ім\'я та іконка може сильно відрізнятися від оригіналу, що ускладнить пошук. Хочете створити ярлик на домашньому екрані?</string>
+    <string name="app_not_found">Не знайдено застосунку, який повинен опрацювати цю дію</string>
 
 </resources>
