@@ -275,7 +275,7 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide() {
 	if (hide_enabled()) {
-		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+		pthread_kill(proc_monitor_thread, SIGALRM);
 		hide_late_sensitive_props();
 	} else if (SDK_INT >= 19) {
 		db_settings dbs;

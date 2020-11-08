@@ -107,6 +107,14 @@ void update_uid_map() {
 	}
 }
 
+static bool is_zygote_done() {
+#ifdef __LP64__
+	return zygote_map.size() >= 2;
+#else
+	return zygote_map.size() >= 1;
+#endif
+}
+
 static void check_zygote() {
 	crawl_procfs([](int pid) -> bool {
 		char buf[512];
@@ -119,6 +127,12 @@ static void check_zygote() {
 		}
 		return true;
 	});
+	if (is_zygote_done()) {
+		// Stop periodic scanning
+		timeval val { .tv_sec = 0, .tv_usec = 0 };
+		itimerval interval { .it_interval = val, .it_value = val };
+		setitimer(ITIMER_REAL, &interval, nullptr);
+	}
 }
 
 #define APP_PROC "/system/bin/app_process"
@@ -168,10 +182,6 @@ static void inotify_event(int) {
 	read(inotify_fd, buf, sizeof(buf));
 	if ((event->mask & IN_CLOSE_WRITE) && event->name == "packages.xml"sv)
 		update_uid_map();
-	check_zygote();
-}
-
-static void check_zygote(int) {
 	check_zygote();
 }
 
@@ -323,6 +333,7 @@ void proc_monitor() {
 	sigemptyset(&block_set);
 	sigaddset(&block_set, SIGTERMTHRD);
 	sigaddset(&block_set, SIGIO);
+	sigaddset(&block_set, SIGALRM);
 	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 
 	struct sigaction act{};
@@ -330,13 +341,19 @@ void proc_monitor() {
 	sigaction(SIGTERMTHRD, &act, nullptr);
 	act.sa_handler = inotify_event;
 	sigaction(SIGIO, &act, nullptr);
-	act.sa_handler = check_zygote;
-	sigaction(SIGZYGOTE, &act, nullptr);
+	act.sa_handler = [](int){ check_zygote(); };
+	sigaction(SIGALRM, &act, nullptr);
 
 	setup_inotify();
 
-	// First find existing zygotes
+	// First try find existing zygotes
 	check_zygote();
+	if (!is_zygote_done()) {
+		// Periodic scan every 250ms
+		timeval val { .tv_sec = 0, .tv_usec = 250000 };
+		itimerval interval { .it_interval = val, .it_value = val };
+		setitimer(ITIMER_REAL, &interval, nullptr);
+	}
 
 	int status;
 
@@ -344,8 +361,7 @@ void proc_monitor() {
 		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
 		if (pid < 0) {
 			if (errno == ECHILD) {
-				/* This mean we have nothing to wait, sleep
-				 * and wait till signal interruption */
+				// Nothing to wait yet, sleep and wait till signal interruption
 				LOGD("proc_monitor: nothing to monitor, wait for signal\n");
 				struct timespec ts = {
 					.tv_sec = INT_MAX,

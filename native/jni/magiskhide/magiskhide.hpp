@@ -13,7 +13,6 @@
 #include <daemon.hpp>
 
 #define SIGTERMTHRD SIGUSR1
-#define SIGZYGOTE   SIGUSR2
 
 // CLI entries
 int launch_magiskhide();
