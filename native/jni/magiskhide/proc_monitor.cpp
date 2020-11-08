@@ -35,7 +35,16 @@ static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 pthread_mutex_t monitor_lock;
 
 #define PID_MAX 32768
-static bitset<PID_MAX> attaches;  /* true if pid is monitored */
+struct pid_set {
+	bitset<PID_MAX>::const_reference operator[](size_t pos) const { return set[pos - 1]; }
+	bitset<PID_MAX>::reference operator[](size_t pos) { return set[pos - 1]; }
+	void reset() { set.reset(); }
+private:
+	bitset<PID_MAX> set;
+};
+
+// true if pid is monitored
+pid_set attaches;
 
 /********
  * Utils
