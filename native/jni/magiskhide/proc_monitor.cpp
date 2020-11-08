@@ -56,7 +56,7 @@ static int parse_ppid(int pid) {
 	if (stat == nullptr)
 		return -1;
 
-	/* PID COMM STATE PPID ..... */
+	// PID COMM STATE PPID .....
 	fscanf(stat, "%*d %*s %*c %d", &ppid);
 	fclose(stat);
 
@@ -78,15 +78,23 @@ void update_uid_map() {
 	mutex_guard lock(monitor_lock);
 	uid_proc_map.clear();
 	string data_path(APP_DATA_DIR);
-	data_path += "/0/";
 	size_t len = data_path.length();
-	struct stat st;
-	for (auto &hide : hide_set) {
-		data_path.erase(data_path.begin() + len, data_path.end());
-		data_path += hide.first;
-		if (stat(data_path.data(), &st))
-			continue;
-		uid_proc_map[st.st_uid].emplace_back(hide.second);
+	auto dir = open_dir(APP_DATA_DIR);
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
+		data_path += '/';
+		data_path += entry->d_name;
+		data_path += '/';
+		size_t user_len = data_path.length();
+		struct stat st;
+		for (auto &hide : hide_set) {
+			data_path.resize(user_len);
+			data_path += hide.first;
+			if (stat(data_path.data(), &st))
+				continue;
+			uid_proc_map[st.st_uid].emplace_back(hide.second);
+		}
+		// Reset string
+		data_path.resize(len);
 	}
 }
 
@@ -178,9 +186,9 @@ static void term_thread(int) {
  * Ptrace Madness
  ******************/
 
-/* Ptrace is super tricky, preserve all excessive logging in code
- * but disable when actually building for usage (you won't want
- * your logcat spammed with new thread events from all apps) */
+// Ptrace is super tricky, preserve all excessive logging in code
+// but disable when actually building for usage (you won't want
+// your logcat spammed with new thread events from all apps)
 
 //#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
 #define PTRACE_LOG(...)
@@ -208,9 +216,8 @@ static bool check_pid(int pid) {
 		return false;
 
 	sprintf(path, "/proc/%d/cmdline", pid);
-	if (FILE *f; (f = fopen(path, "re"))) {
-		fgets(cmdline, sizeof(cmdline), f);
-		fclose(f);
+	if (auto f = open_file(path, "re")) {
+		fgets(cmdline, sizeof(cmdline), f.get());
 	} else {
 		// Process killed unexpectedly, ignore
 		detach_pid(pid);
@@ -221,7 +228,7 @@ static bool check_pid(int pid) {
 		cmdline == "usap32"sv || cmdline == "usap64"sv)
 		return false;
 
-	int uid = st.st_uid % 100000;
+	int uid = st.st_uid;
 	auto it = uid_proc_map.find(uid);
 	if (it != uid_proc_map.end()) {
 		for (auto &s : it->second) {
@@ -240,9 +247,9 @@ static bool check_pid(int pid) {
 				if (!mnt_ns)
 					break;
 
-				/* Finally this is our target!
-				 * Detach from ptrace but should still remain stopped.
-				 * The hide daemon will resume the process. */
+				// Finally this is our target!
+				// Detach from ptrace but should still remain stopped.
+				// The hide daemon will resume the process.
 				PTRACE_LOG("target found\n");
 				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
 				detach_pid(pid, SIGSTOP);
@@ -261,7 +268,7 @@ static bool is_process(int pid) {
 	char key[32];
 	int tgid;
 	sprintf(buf, "/proc/%d/status", pid);
-	unique_ptr<FILE, decltype(&fclose)> fp(fopen(buf, "re"), &fclose);
+	auto fp = open_file(buf, "re");
 	// PID is dead
 	if (!fp)
 		return false;

@@ -24,7 +24,7 @@ void ls_list(int client);
 [[noreturn]] void test_proc_monitor();
 
 // Process monitoring
-void proc_monitor();
+[[noreturn]] void proc_monitor();
 void update_uid_map();
 
 // Utility functions
