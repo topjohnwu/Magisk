@@ -247,6 +247,10 @@ mount_partitions() {
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
   # Mount ro partitions
+  if is_mounted /system_root; then
+    umount /system 2&>/dev/null
+    umount /system_root 2&>/dev/null
+  fi
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init -o -L /system/init ]; then
     SYSTEM_ROOT=true
