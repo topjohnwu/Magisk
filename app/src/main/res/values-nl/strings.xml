@@ -33,6 +33,8 @@
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd!\nRoot wordt verwijderd!\nJe gegevens worden, als ze dat nog niet waren, mogelijk versleuteld!</string>
+    <string name="home_check_safetynet">SafetyNet controleren</string>
+
 
     <!--Install-->
     <string name="keep_force_encryption">Afgedwongen versleuteling behouden</string>
@@ -229,5 +231,8 @@
     <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
     <string name="unsupport_magisk_msg">Deze versie van Magisk Manager heeft geen ondersteuning voor Magisk-versies ouder dan %1$s.\n\nDe app werkt, maar doet alsof Magisk niet geïnstalleerd is. Update Magisk zo spoedig mogelijk.</string>
     <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
-
+    <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>
+    <string name="add_shortcut_msg">Als je Magisk Manager verbergt, herken je de naam en het pictogram mogelijk niet meer. Wil je een mooie snelkoppeling plaatsen op je startscherm?</string>
+    <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
+    
 </resources>
