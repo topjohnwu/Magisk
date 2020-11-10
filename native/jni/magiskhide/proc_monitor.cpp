@@ -90,6 +90,7 @@ void update_uid_map() {
 	size_t len = data_path.length();
 	auto dir = open_dir(APP_DATA_DIR);
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
+		data_path.resize(len);
 		data_path += '/';
 		data_path += entry->d_name;
 		data_path += '/';
@@ -102,8 +103,6 @@ void update_uid_map() {
 				continue;
 			uid_proc_map[st.st_uid].emplace_back(hide.second);
 		}
-		// Reset string
-		data_path.resize(len);
 	}
 }
 
