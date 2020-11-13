@@ -22,7 +22,7 @@
     <string name="status">Stare</string>
     <string name="home_package">Pachet</string>
 
-    <string name="home_notice_content">Asigură-te întotdeauna că folosești aplicația open-source Magisk Manager. Managerul din surse necunoscute poate efectua acțiuni rău-intenționate.</string>
+    <string name="home_notice_content">Asigură-te întotdeauna că folosești aplicația open-source Magisk Manager. Managerul din surse necunoscute poate efectua acțiuni rău-intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
     <string name="home_item_source">Sursă</string>
     <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
@@ -55,7 +55,8 @@
     <string name="flash_screen_title">Instalare</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Solicitare de superutilizator</string>
+    <string name="su_request_title">Cerere de superutilizator</string>
+    <string name="touch_filtered_warning">Deoarece o aplicație ascunde o cerere de superutilizator, Magisk nu îți poate verifica răspunsul</string>
     <string name="deny">Refuză</string>
     <string name="prompt">Solicită</string>
     <string name="grant">Acordă</string>
@@ -81,14 +82,14 @@
 
     <string name="superuser_toggle_notification">Notificări</string>
     <string name="superuser_toggle_revoke">Revocă</string>
-    <string name="superuser_policy_none">Nicio aplicație nu a solicitat încă permisiuni de superutilizator.</string>
+    <string name="superuser_policy_none">Nicio aplicație nu a cerut încă permisiuni de superutilizator.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile cu acces de superutilizator.</string>
-    <string name="log_data_magisk_none">Jurnalele Magisk sunt goale, asta-i ciudat.</string>
+    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile cu acces de superutilizator</string>
+    <string name="log_data_magisk_none">Jurnalele Magisk sunt goale, asta-i ciudat</string>
     <string name="menuSaveLog">Salvează jurnalul</string>
     <string name="menuClearLog">Golește jurnalul acum</string>
-    <string name="logs_cleared">Jurnal golit cu succes.</string>
+    <string name="logs_cleared">Jurnal golit cu succes</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID țintă: %1$d</string>
 
@@ -100,15 +101,17 @@
     <string name="safetynet_attest_loading">Așteaptă o clipă…</string>
     <string name="safetynet_attest_restart">Încearcă din nou</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Afișează aplicațiile de sistem</string>
+    <string name="show_os_app">Afișează aplicațiile SO-ului</string>
     <string name="hide_filter_hint">Filtrează după nume</string>
     <string name="hide_scroll_up">Derulează în sus</string>
     <string name="hide_filters">Filtre</string>
     <string name="hide_search">Căutare</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(Nu sunt furnizate informații)</string>
+    <string name="reboot_userspace">Repornire software</string>
     <string name="reboot_recovery">Repornește în modul recovery</string>
     <string name="reboot_bootloader">Repornește în modul bootloader</string>
     <string name="reboot_download">Repornește în modul download</string>
@@ -124,7 +127,7 @@
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Ordine de sortare</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Mod pentru temă</string>
     <string name="settings_dark_mode_message">Selectează modul care ți se pliază cel mai bine stilului!</string>
     <string name="settings_dark_mode_light">Mereu deschis</string>
@@ -133,7 +136,7 @@
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
-    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online.</string>
+    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online</string>
     <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
     <string name="settings_hide_manager_summary">Reîmpachetează Magisk Manager cu numele aleatorii pentru pachet și aplicație</string>
     <string name="settings_restore_manager_title">Restaurează Magisk Manager</string>
@@ -166,10 +169,12 @@
     <string name="settings_su_request_60">60 de secunde</string>
     <string name="superuser_access">Acces pentru superutilizator</string>
     <string name="auto_response">Răspuns automat</string>
-    <string name="request_timeout">Expirare pentru solicitare</string>
+    <string name="request_timeout">Expirare pentru cerere</string>
     <string name="superuser_notification">Notificare de superutilizator</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
     <string name="settings_su_reauth_summary">Reautentifică permisiunile pentru superutilizator după o actualizare a aplicației</string>
+    <string name="settings_su_tapjack_title">Activează protecția față de tapjacking</string>
+    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea drepturilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
     <string name="settings_su_biometric_title">Activează autentificarea biometrică</string>
     <string name="settings_su_biometric_summary">Folosește autentificarea biometrică pentru a permite cereri de superutilizator</string>
     <string name="no_biometric">Dispozitiv nesuportat sau nu sunt activate setări biometrice</string>
@@ -183,7 +188,7 @@
     <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>
     <string name="settings_user_independent">Utilizator independent</string>
     <string name="owner_only_summary">Numai proprietarul are acces la root</string>
-    <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească solicitări</string>
+    <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească cereri</string>
     <string name="user_indepenent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
 
     <string name="mount_namespace_mode">Modul spațiului de nume pentru montare</string>
@@ -215,9 +220,10 @@
     <string name="repo_cache_cleared">Cache-ul depozitelor golit</string>
     <string name="flashing">Se scrie în memoria flash…</string>
     <string name="done">Terminat!</string>
-    <string name="failure">Eșec</string>
+    <string name="failure">Eșec!</string>
     <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat.</string>
+    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat</string>
+    <string name="restore_manager_fail_toast">Restaurarea Magisk Manager a eșuat</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
     <string name="complete_uninstall">Finalizează dezinstalarea</string>
     <string name="restore_img">Restaurează imagini</string>
