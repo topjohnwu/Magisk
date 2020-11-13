@@ -100,12 +100,12 @@ Supported actions:
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
+    Supported methods: bzip2 gzip lz4 lz4_legacy lz4_lg lzma xz
 
   decompress <infile> [outfile]
     Detect method and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
+    Supported methods: bzip2 gzip lz4 lz4_legacy lz4_lg lzma xz
 ```
 
 ### magiskinit
@@ -258,10 +258,10 @@ Options:
 
 Flags:
    -v      print verbose output to stderr
-   -n      set properties without going through init
-           affects setprop and prop file loading
-   -p      also access props directly from persist storage
-           affects getprop and delprop
+   -n      set props without going through property_service
+           (this flag only affects setprop)
+   -p      read/write props from/to persistent storage
+           (this flag only affects getprop and delprop)
 ```
 
 ### magiskhide

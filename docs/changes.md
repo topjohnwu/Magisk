@@ -1,5 +1,20 @@
 # Magisk Changelog
 
+### v21.1
+
+- [MagiskBoot] Support boot header v3 (Pixel 5 and 4a 5G)
+- [MagiskBoot] Distinguish `lz4_lg` and `lz4_legacy` (Pixel 5 and 4a 5G)
+- [MagiskBoot] Support vendor boot images (for dev, not relevant for Magisk installation)
+- [MagiskInit] Support kernel cmdline `androidboot.fstab_suffix`
+- [MagiskInit] Support kernel initialized dm-verity on legacy SAR
+- [General] Significantly broaden sepolicy.rule compatibility
+- [General] Add Magisk binaries to `PATH` when executing boot scripts
+- [General] Update `--remove-modules` command implementation
+- [General] Make Magisk properly survive after factory reset on Android 11
+- [MagiskSU] Add APEX package `com.android.i18n` to `LD_LIBRARY_PATH` when linking `libsqlite.so`
+- [MagiskHide] Support hiding apps installed in secondary users (e.g. work profile)
+- [MagiskHide] Make zygote detection more robust
+
 ### v21.0
 
 - [General] Support Android 11 🎉

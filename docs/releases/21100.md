@@ -1,0 +1,5 @@
+## 2020.11.13 Magisk v21.1
+
+v21.1 is a maintenance update from v21.0, mostly addressing bugs, refining some details, and adding new boot image format support (for Pixel 5 and 4a 5G). Checkout the full [v21.0 release notes](https://topjohnwu.github.io/Magisk/releases/21000.html) if coming from older releases.
+
+### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)
