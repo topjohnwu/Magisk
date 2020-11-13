@@ -116,7 +116,7 @@
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
     <string name="reboot_edl">Перезагрузка в EDL</string>
-    <string name="module_version_author">Версия: %1$s\nАвтор: %2$s</string>
+    <string name="module_version_author">%1$s от %2$s</string>
     <string name="module_section_pending">Обновления</string>
     <string name="module_section_pending_action">Обновить всё</string>
     <string name="module_state_remove">Удалить</string>
