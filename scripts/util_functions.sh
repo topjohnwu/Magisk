@@ -566,7 +566,7 @@ run_migrations() {
 
 copy_sepolicy_rules() {
   # Remove all existing rule folders
-  rm -rf /data/unencrypted/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
+  rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
   # Find current active RULESDIR
   local RULESDIR

@@ -113,13 +113,14 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 			for (dirent *entry; (entry = xreaddir(dir.get()));) {
 				auto rule = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
 				if (access(rule.data(), R_OK) == 0) {
-					LOGD("Loading custom sepolicy patch: %s\n", rule.data());
+					LOGD("Loading custom sepolicy patch: [%s]\n", rule.data());
 					sepol->load_rule_file(rule.data());
 				}
 			}
 		}
 	}
 
+	LOGD("Dumping sepolicy to: [%s]\n", file);
 	sepol->to_file(file);
 	delete sepol;
 
