@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Demande d’accès super‑utilisateur</string>
+    <string name="touch_filtered_warning">Parce qu’une application obscurcit une demande du super-utilisateur, Magisk ne peut pas vérifier votre réponse</string>
     <string name="deny">Refuser</string>
     <string name="prompt">Demander</string>
     <string name="grant">Accorder</string>
@@ -102,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
+    <string name="show_os_app">Afficher les applis système</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_scroll_up">Faire défiler vers le haut</string>
     <string name="hide_filters">Filtres</string>
@@ -171,6 +173,8 @@
     <string name="superuser_notification">Notification super‑utilisateur</string>
     <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
+    <string name="settings_su_tapjack_title">Activer Protection Détournement de Clic</string>
+    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super-utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou un recouvrement</string>
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
