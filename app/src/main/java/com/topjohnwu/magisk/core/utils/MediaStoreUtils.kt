@@ -66,8 +66,8 @@ object MediaStoreUtils {
     }
 
     private fun queryFile(displayName: String): UriFile? {
-        if (Build.VERSION.SDK_INT < 29) {
-            // Before official general purpose MediaStore API exists, fallback to file based I/O
+        if (Build.VERSION.SDK_INT < 30) {
+            // Fallback to file based I/O pre Android 11
             val parent = File(Environment.getExternalStorageDirectory(), relativePath)
             parent.mkdirs()
             return LegacyUriFile(File(parent, displayName))

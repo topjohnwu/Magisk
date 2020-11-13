@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.base
 
-import android.Manifest
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -40,8 +40,8 @@ abstract class BaseActivity : AppCompatActivity() {
     fun withPermission(permission: String, builder: PermissionRequestBuilder.() -> Unit) {
         val request = PermissionRequestBuilder().apply(builder).build()
 
-        if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && Build.VERSION.SDK_INT >= 29) {
-            // We do not need external rw on 29+
+        if (permission == WRITE_EXTERNAL_STORAGE && Build.VERSION.SDK_INT >= 30) {
+            // We do not need external rw on 30+
             request.onSuccess()
             return
         }
@@ -64,7 +64,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun withExternalRW(builder: PermissionRequestBuilder.() -> Unit) {
-        withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, builder = builder)
+        withPermission(WRITE_EXTERNAL_STORAGE, builder = builder)
     }
 
     override fun onRequestPermissionsResult(
