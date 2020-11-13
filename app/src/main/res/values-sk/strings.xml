@@ -22,7 +22,7 @@
     <string name="status">Stav</string>
     <string name="home_package">Balíček</string>
 
-    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
+    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie!</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
@@ -85,11 +85,11 @@
     <string name="superuser_policy_none">Žiadna aplikácia zatiaľ nepožiadala o povolenie Superužívateľa.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva Superužívateľa.</string>
-    <string name="log_data_magisk_none">Záznamy Magisku sú prázdne, to je divné.</string>
+    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva Superužívateľa</string>
+    <string name="log_data_magisk_none">Záznamy Magisku sú prázdne, to je divné</string>
     <string name="menuSaveLog">Uložiť záznam</string>
     <string name="menuClearLog">Odstrániť záznam</string>
-    <string name="logs_cleared">Záznam úspešne odstránený.</string>
+    <string name="logs_cleared">Záznam úspešne odstránený</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cieľový UID: %1$d</string>
 
@@ -101,7 +101,7 @@
     <string name="safetynet_attest_loading">Momentík ...</string>
     <string name="safetynet_attest_restart">Skúste to znova</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
     <string name="show_os_app">Zobraziť aplikácie OS</string>
     <string name="hide_filter_hint">Filtrovať podľa názvu</string>
@@ -109,7 +109,7 @@
     <string name="hide_filters">Filtre</string>
     <string name="hide_search">Vyhľadávanie</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>
     <string name="reboot_userspace">Softvérový reštart</string>
     <string name="reboot_recovery">Reštartovať do Recovery</string>
@@ -129,7 +129,7 @@
 
     
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
     <string name="settings_dark_mode_message">Vyberte režim, ktorý najlepšie vyhovuje vášmu štýlu!</string>
     <string name="settings_dark_mode_light">Vždy svetlý</string>
@@ -222,7 +222,7 @@
     <string name="repo_cache_cleared">Cache repo odstránená</string>
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
-    <string name="failure">Zlyhalo</string>
+    <string name="failure">Zlyhalo!</string>
     <string name="hide_manager_title">Skrývanie Magisk Managera…</string>
     <string name="hide_manager_fail_toast">Skrytie Magisk Managera zlyhalo</string>
     <string name="restore_manager_fail_toast">Obnovenie Magisk Managera zlyhalo</string>
