@@ -17,7 +17,7 @@
     <string name="manager">Manager</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Обновить</string>
-    <string name="not_available">Н/Д</string>
+    <string name="not_available">N/A</string>
     <string name="hide">Скрыть</string>
     <string name="status">Режим</string>
     <string name="home_package">Имя пакета</string>
@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
+    <string name="touch_filtered_warning">Обнаружены наложения экрана, обработка запроса недоступна</string>
     <string name="deny">Запретить</string>
     <string name="prompt">Запросить</string>
     <string name="grant">Разрешить</string>
@@ -110,12 +111,12 @@
 
     <!--Module-->
     <string name="no_info_provided">(Нет информации)</string>
-    <string name="reboot_userspace">Перезагрузка оболочки</string>
+    <string name="reboot_userspace">Перезапуск оболочки</string>
     <string name="reboot_recovery">Перезагрузка в Recovery</string>
     <string name="reboot_bootloader">Перезагрузка в Bootloader</string>
     <string name="reboot_download">Перезагрузка в Download</string>
     <string name="reboot_edl">Перезагрузка в EDL</string>
-    <string name="module_version_author">Версия: %1$s\nАвтор: %2$s</string>
+    <string name="module_version_author">%1$s от %2$s</string>
     <string name="module_section_pending">Обновления</string>
     <string name="module_section_pending_action">Обновить всё</string>
     <string name="module_state_remove">Удалить</string>
@@ -172,6 +173,8 @@
     <string name="superuser_notification">Уведомления суперпользователя</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
+    <string name="settings_su_tapjack_title">Защита от перехвата ввода</string>
+    <string name="settings_su_tapjack_summary">Окно запроса прав суперпользователя будет неактивно пока активированы наложения экрана</string>
     <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
     <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
