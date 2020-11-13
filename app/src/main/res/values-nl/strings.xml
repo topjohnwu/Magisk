@@ -140,7 +140,6 @@
     <string name="settings_restore_manager_summary">Herstelt Magisk Manager\'s oorspronkelijke naam.</string>
     <string name="language">Taal</string>
     <string name="system_default">(systeemstandaard)</string>
-    <string name="settings_update_title">Controleren op updates</string>
     <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>
     <string name="settings_update_channel_title">Updatekanaal</string>
     <string name="settings_update_stable">Stabiel</string>
