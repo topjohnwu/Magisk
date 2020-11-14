@@ -1,0 +1,244 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Modulet </string>
+    <string name="superuser">Super përdoruesi</string>
+    <string name="logs">Regjistrat</string>
+    <string name="settings">Cilësimet</string>
+    <string name="refresh">Rifresko të Dhënat Lokale</string>
+    <string name="install">Instalo</string>
+    <string name="section_home">Shtëpia</string>
+    <string name="section_theme">Temat</string>
+    <string name="safetynet">Rrjeti i Sigurisë</string>
+
+    <!--Home-->
+    <string name="no_connection">Nuk ka lidhje të disponueshme</string>
+    <string name="app_changelog">Ndryshimi</string>
+    <string name="manager">Menaxheri</string>
+    <string name="loading">Po ngarkon…</string>
+    <string name="update">Përditëso</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">Fshih</string>
+    <string name="status">Statusi</string>
+    <string name="home_package">Paketa</string>
+
+    <string name="home_notice_content">Gjithmonë sigurohuni që jeni duke përdorur Magisk Manager me burim të hapur. Menaxheri i një burimi të panjohur mund të kryejë veprime të dëmshme!</string>
+    <string name="home_support_title">Na ndihmoni</string>
+    <string name="home_item_source">Burimi</string>
+    <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Megjithatë mund të na tregoni se ju interesoni duke dërguar një donacion të vogël.</string>
+    <string name="home_status_normal">Normale</string>
+    <string name="home_status_stub">Stub</string>
+    <string name="home_installed_version">Instaluar</string>
+    <string name="home_latest_version">Më e fundit</string>
+    <string name="invalid_update_channel">Kanal i pavlefshëm i azhurnimit</string>
+    <string name="uninstall_magisk_title">Çinstalo Magisk</string>
+    <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen! \n Rrënja do të hiqet! \n Të dhënat tuaja potencialisht të koduara nëse jo tashmë!</string>
+    <string name="home_check_safetynet">Kontrolloni Rrjetin e Sigurisë</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Ruaj kriptimin e forcës</string>
+    <string name="keep_dm_verity">Ruaj AVB 2.0 /dm-vërtetësi</string>
+    <string name="recovery_mode">Modaliteti i rikuperimit</string>
+    <string name="install_options_title">Opsionet</string>
+    <string name="install_method_title">Metoda</string>
+    <string name="install_next">Tjetra</string>
+    <string name="install_start">Le të shkojmë</string>
+    <string name="manager_download_install">Shtypni për të shkarkuar dhe instaluar</string>
+    <string name="download_zip_only">Shkarkoni vetëm Zip</string>
+    <string name="direct_install">Instalimi i drejtpërdrejtë (rekomandohet)</string>
+    <string name="install_inactive_slot">Instalo në Slot Inaktive (Pas OTA)</string>
+    <string name="install_inactive_slot_msg">Pajisja juaj do të detyrohet të nisë në vendndodhjen aktuale joaktive pas një rindezjeje! \n Të përdorni vetëm këtë mundësi pasi të keni mbaruar OTA. \n Vazhdoni? </string>
+    <string name="setup_title">Konfigurimi shtesë</string>
+    <string name="select_patch_file">Zgjidhni dhe Patch një Skedar</string>
+    <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (* .img) ose një tarifë ODIN (* .tar)</string>
+    <string name="reboot_delay_toast">Rinisni në 5 sekonda…</string>
+    <string name="flash_screen_title">Instalimi</string>
+
+    <!--Superuser-->
+    <string name="su_quest_title">Kërkesa e superpërdoruesit</string>
+    <string name="touch_filtered_warning">Meqenëse një aplikacion po errëson një kërkesë të superpërdoruesit, Magisk nuk mund të verifikojë përgjigjen tuaj</string>
+    <string name="deny">Moho</string>
+    <string name="prompt">Shpejtë</string>
+    <string name="grant">Lejo</string>
+    <string name="su_warning">Jep hyrjen e plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
+    <string name="forever">Përgjithmonë</string>
+    <string name="once">Një herë</string>
+    <string name="tenmin">10 minuta</string>
+    <string name="twentymin">20 minuta</string>
+    <string name="thirtymin">30 minuta</string>
+    <string name="sixtymin">60 minuta</string>
+    <string name="su_allow_toast">%1$s iu dha e drejta e superpërdoruesit</string>
+    <string name="su_deny_toast">%1$s iu refuzuan të drejtat e Superpërdoruesit</string>
+    <string name="su_snack_grant">Jepen të drejtat e superpërdoruesit prej %1$s</string>
+    <string name="su_snack_deny">Të drejtat e superpërdoruesit prej %1$s mohohen</string>
+    <string name="su_snack_notif_on">Njoftimet e %1$s janë aktivizuar</string>
+    <string name="su_snack_notif_off">Njoftimet e %1$s janë çaktivizuar</string>
+    <string name="su_snack_log_on"> Regjistrimi i %1$s është aktivizuar</string>
+    <string name="su_snack_log_off">Regjistrimi i %1$s është çaktivizuar</string>
+    <string name="su_revoke_title">Anulohet?</string>
+    <string name="su_revoke_msg">Konfirmo të heqësh të drejtat e %1$s?</string>
+    <string name="toast">dolli</string>
+    <string name="asnjë">Asnjë</string>
+    <string name="superuser_toggle_notification">Njoftimet</string>
+    <string name="superuser_toggle_revoke">Anulo</string>
+    <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar ende leje për superpërdoruesin.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Ju jeni pa regjistrime,  provoni të përdorni më shumë aplikacionet tuaja të aktivizuara SU</string>
+    <string name="log_data_magisk_none">Regjistrat e Magisk janë bosh, kjo është e çuditshme</string>
+    <string name="menuSaveLog">Ruaj regjistrin</string>
+    <string name="menuClearLog">Pastro regjistrin tani</string>
+    <string name="logs_cleared">Regjistri u pastrua me sukses</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid"> UID i synuar: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">Gabim API i SafetyNet</string>
+    <string name="safetynet_res_invalid"> Përgjigjja është e pavlefshme </string>
+    <string name="safetynet_attest_success">Suksese!</string>
+    <string name="safetynet_attest_failure">Vërtetimi dështoi!</string>
+    <string name="safetynet_attest_loading">Thjesht një sekondë…</string>
+    <string name="safetynet_attest_restart">Provo përsëri</string>
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Shfaq aplikacionet e sistemit</string>
+    <string name="show_os_app">Shfaq aplikacionet e sistemit operativ</string>
+    <string name="hide_filter_hint">Filtro me emër</string>
+    <string name="hide_scroll_up">Lëviz lart</string>
+    <string name="hide_filters">Filtrat</string>
+    <string name="hide_search">Kërko</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Nuk ofrohet informacion)</string>
+    <string name="reboot_userspace">Ristartimi i butë</string>
+    <string name="reboot_recovery">Ristartoni te Rikuperimi</string>
+    <string name="reboot_bootloader">Ristartoni në bootloader</string>
+    <string name="reboot_download">Ristartoni për ta shkarkuar</string>
+    <string name="reboot_edl">Ristartoni në EDL</string>
+    <string name="module_version_author">%1$s nga %2$s</string>
+    <string name="module_section_nging">Përditësimet</string>
+    <string name="module_section_nging_action">Përditëso të gjitha</string>
+    <string name="module_state_remove">Hiq</string>
+    <string name="module_state_restore">Rivendos</string>
+    <string name="module_action_install_external">Instaloni nga hapësira ruajtëse</string>
+    <string name="update_available">Përditësimi i disponueshëm</string>
+    <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Në internet</string>
+    <string name="sorting_order">Renditja e Renditjes</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Modaliteti i temës</string>
+    <string name="settings_dark_mode_message">Zgjidhni mënyrën e cila i përshtatet më mirë stilit tuaj!</string>
+    <string name="settings_dark_mode_light">Gjithmonë e lehtë</string>
+    <string name="settings_dark_mode_system">Ndiqni sistemin</string>
+    <string name="settings_dark_mode_dark">Gjithmonë e errët</string>
+    <string name="settings_download_path_title">Shtegu i shkarkimit</string>
+    <string name="settings_download_path_message">Skedarët do të ruhen në %1$s</string>
+    <string name="settings_clear_cache_title">Pastro Cache të Repos</string>
+    <string name="settings_clear_cache_summary">Pastroni informacionin e memorizuar për repot në internet. Kjo e detyron aplikacionin të rifreskohet në internet</string>
+    <string name="settings_hide_manager_title">Fshih menaxherin e Magisk</string>
+    <string name="settings_hide_manager_summary">Ripaketimi Magisk Manager me paketa të rastësishme dhe emra të aplikacioneve</string>
+    <string name="settings_restore_manager_title">Rivendos menaxherin e Magisk</string>
+    <string name="settings_restore_manager_summary">Rivendos Magisk Manager me paketën origjinale dhe emrat e aplikacioneve</string>
+    <string name="language">Gjuha</string>
+    <string name="system_default">(Parazgjedhja e Sistemit)</string>
+    <string name="settings_check_update_title">Kontrolloni azhurnimet</string>
+    <string name="settings_check_update_summary">Kontrolloni periodikisht për azhurnime në sfond</string>
+    <string name="settings_update_channel_title">Azhurnoni Kanalin</string>
+    <string name="settings_update_stable">Qëndrueshëm</string>
+    <string name="settings_update_beta">Beta</string>
+    <string name="settings_update_custom">Kanali i personalizuar</string>
+    <string name="settings_update_custom_msg">Vendos një URL të personalizuar</string>
+    <string name="settings_magiskhide_summary">Fshih Magisk nga forma të ndryshme të zbulimit</string>
+    <string name="settings_hosts_title">Pritës pa sistem</string>
+    <string name="settings_hosts_summary">Mbështetja e hostëve pa sistem për aplikacionet Adblock</string>
+    <string name="settings_hosts_toast">Moduli i pritur i sistemit pa sistem</string>
+    <string name="settings_app_name_hint">Emër i ri</string>
+    <string name="settings_app_name_helper">Aplikacioni do të ripaketohet në këtë emër</string>
+    <string name="settings_app_name_error">Formati i pavlefshëm</string>
+    <string name="settings_su_app_adb">Aplikacionet dhe ADB</string>
+    <string name="settings_su_app">Vetëm aplikacionet</string>
+    <string name="settings_su_adb">vetëm ADB</string>
+    <string name="settings_su_disable">Çaktivizuar</string>
+    <string name="settings_su_quest_10">10 sekonda</string>
+    <string name="settings_su_quest_15">15 sekonda</string>
+    <string name="settings_su_quest_20">20 sekonda</string>
+    <string name="settings_su_quest_30">30 sekonda</string>
+    <string name="settings_su_quest_45">45 sekonda</string>
+    <string name="settings_su_quest_60">60 sekonda</string>
+    <string name="superuser_access">Hyrja në superpërdorues</string>
+    <string name="auto_response">Përgjigje Automatike</string>
+    <string name="request_timeout">Koha e kërkesës</string>
+    <string name="superuser_notification">Njoftimi i superpërdoruesit</string>
+    <string name="settings_su_reauth_title">Ridentifikoni pas azhurnimit</string>
+    <string name="settings_su_reauth_summary">Ridentifikoni lejet e superpërdoruesit pas azhurnimeve të një aplikacioni</string>
+    <string name="settings_su_tapjack_title">Aktivizo Mbrojtjen nga Tapjacking</string>
+    <string name="settings_su_tapjack_summary">Dialogu i menjëhershëm i superpërdoruesit nuk do ti përgjigjet hyrjes ndërsa errësohet nga ndonjë dritare tjetër ose mbivendosja</string>
+    <string name="settings_su_biometric_title">Aktivizo vërtetimin biometrik</string>
+    <string name="settings_su_biometric_summary">Përdorni vërtetimin biometrik për të lejuar kërkesat e superpërdoruesit</string>
+    <string name="no_biometric">Pajisja e pambështetur ose nuk janë aktivizuar cilësime biometrike</string>
+    <string name="settings_customization">Përshtatje</string>
+    <string name="setting_add_shortcut_summary">"Shtoni një shkurtore të bukur në ekranin kryesor në rast se emri dhe ikona janë të vështira për t'u njohur pasi të keni fshehur aplikacionin"</string>
+    <string name="settings_doh_title">DNS mbi HTTPS</string>
+    <string name="settings_doh_description">Helmimi i paqartë nga DNS në disa kombe</string>
+    <string name="multiuser_mode">Modaliteti i shumë përdoruesit</string>
+    <string name="settings_owner_only">Vetëm zotëruesi i pajisjes</string>
+    <string name="settings_owner_manage">Pronari i Pajisjes i Menaxhuar</string>
+    <string name="settings_user_independent">Përdorues i Pavarur</string>
+    <string name="Owner_only_summary">Vetëm pronari ka qasje rrënjësore</string>
+    <string name="Owner_manage_summary">Vetëm pronari mund të menaxhojë hyrjen në rrënjë dhe të marrë kërkesat e kërkesës</string>
+    <string name="user_indepenent_summary">Çdo përdorues ka rregullat e tij / saj të veçanta rrënjësore</string>
+    <string name="mount_namespace_mode">Modaliteti i hapësirës së emrave të malit</string>
+    <string name="settings_ns_global">Hapësira Globale e Emrave</string>
+    <string name="settings_ns_requester">Trashëgoni Hapësirën e Emrave</string>
+    <string name="settings_ns_isolate">Hapësira e izoluar e emrave</string>
+    <string name="global_summary">Të gjitha sesionet rrënjësore përdorin hapësirën globale të emrave të montimit</string>
+    <string name="requester_summary">Seancat rrënjësore do të trashëgojnë hapësirën e emrave të kërkuesit të tyre</string>
+    <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
+
+    <!--Notifications-->
+    <string name="update_channel"> Përditësimet Magisk </string>
+    <string name="progress_channel"> Njoftimet e Progresit </string>
+    <string name="download_complete"> Shkarkimi përfundoi </string>
+    <string name="download_file_error"> Gabim në shkarkimin e skedarit </string>
+    <string name="download_open_parent"> Shfaq në dosjen mëmë </string>
+    <string name="download_open_ self"> Shfaq skedarin </string>
+    <string name="magisk_update_title"> Mundësohet azhurnimi i Magisk! </string>
+    <string name="manager_update_title"> Mundësohet azhurnimi i menaxherit Magisk! </string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Po</string>
+    <string name="no">Jo</string>
+    <string name="repo_install_title">Instalo %1$s</string>
+    <string name="repo_install_msg">Dëshiron të instalosh %1$s tani?</string>
+    <string name="download">Shkarkim</string>
+    <string name="reboot">Rinis</string>
+    <string name="release_notes">Lëshoni shënime</string>
+    <string name="repo_cache_cleared">Depoja e repos u pastrua</string>
+    <string name="flashing">Ndezje…</string>
+    <string name="done">U krye!</string>
+    <string name="failure">Dështoi!</string>
+    <string name="hide_manager_title">Fshehja e Menaxherit të Magisk…</string>
+    <string name="hide_manager_fail_toast">Fsheh Menaxherin e Magisk dështoi</string>
+    <string name="restore_manager_fail_toast">Rikthe menaxherin e Magisk dështoi</string>
+    <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
+    <string name="complete_uninstall">Çinstalimi i plotë</string>
+    <string name="restore_img">Rikthe Imazhet</string>
+    <string name="restore_img_msg">Rivendosja…</string>
+    <string name="restore_done">Restaurimi u krye!</string>
+    <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
+    <string name="proprietary_title">Shkarkoni Kodin e Pronarit</string>
+    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \ n \ nA do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</ string >>
+    <string name="setup_fail">Konfigurimi dështoi</string>
+    <string name="env_fix_title">Kërkon Konfigurim Shtesë</string>
+    <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet. Do të shkarkojë zip-in e konfigurimit të Magisk, doni të vazhdoni tani?</string>
+    <string name="setup_msg">Konfigurimi i mjedisit drejtues…</string>
+    <string name="authenticate">Vërteto</string>
+    <string name="unsupport_magisk_title">Versioni i pambështetur Magisk</string>
+    <string name="unsupport_magisk_msg">Ky version i Magisk Manager nuk e mbështet versionin Magisk më të ulët se %1$s. \n\n Aplikimi do të sillet sikur nuk është instaluar asnjë Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</ string >>
+    <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
+    <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
+    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t'u njohur. Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
+    <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
+
+</resources>
