@@ -225,7 +225,7 @@
     <string name="hide_manager_fail_toast">הסתרת מנהל Magisk כשלה.</string>
     <string name="restore_manager_fail_toast">שחזור מנהל Magisk נכשל</string>
     <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>			
-    <string name="complete_uninstall">הוסר בהצלחה</string>
+    <string name="complete_uninstall">הסרה מלאה</string>
     <string name="restore_img">שיחזור תמונות</string>
     <string name="restore_img_msg">משחזר…</string>
     <string name="restore_done">השיחזור בוצע!</string>
