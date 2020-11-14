@@ -102,8 +102,8 @@
     <string name="safetynet_attest_restart">Tekrar deneyiniz</string>
 
     <!--MagiskHide-->
-    <string name="show_system_app">Sistem uygulamalarını göster</string>
-    <string name="show_os_app">Sistem uygulamalarını göster</string>
+    <string name="show_system_app">Sistem uyg. göster</string>
+    <string name="show_os_app">İşletim Sistemi uyg. göster</string>
     <string name="hide_filter_hint">İsme göre filtrele</string>
     <string name="hide_scroll_up">Yukarı kaydır</string>
     <string name="hide_filters">Filtreler</string>
