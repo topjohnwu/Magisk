@@ -106,8 +106,6 @@ ensure_bb() {
     bb=$TMPDIR/busybox
   elif [ -f $MAGISKBIN/busybox.bin ]; then
     bb=$MAGISKBIN/busybox.bin
-  elif [ -f $MAGISKBIN/busybox ]; then
-    bb=$MAGISKBIN/busybox
   else
     abort "! Cannot find BusyBox"
   fi
