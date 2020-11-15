@@ -99,9 +99,11 @@ using parsed_tokens = vector<vector<const char *>>;
 static bool tokenize_string(char *stmt, parsed_tokens &arr) {
 	// cur is the pointer to where the top level is parsing
 	char *cur = stmt;
-	for (char *tok; (tok = strtok_r(nullptr, " ", &cur)) != nullptr;) {
+	for (char *tok; (tok = strtok_r(nullptr, " \r", &cur)) != nullptr;) {
 		vector<const char *> token;
-		if (tok[0] == '{') {
+		if (tok[0] == '\0') {
+			continue;
+		} else if (tok[0] == '{') {
 			// cur could point to somewhere in the braces, restore the string
 			if (cur)
 				cur[-1] = ' ';
