@@ -104,6 +104,8 @@ ensure_bb() {
   local bb
   if [ -f $TMPDIR/busybox ]; then
     bb=$TMPDIR/busybox
+  elif [ -f $MAGISKBIN/busybox.bin ]; then
+    bb=$MAGISKBIN/busybox.bin
   elif [ -f $MAGISKBIN/busybox ]; then
     bb=$MAGISKBIN/busybox
   else
