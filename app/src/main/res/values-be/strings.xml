@@ -6,8 +6,8 @@
     <string name="logs">Журналы</string>
     <string name="settings">Налады</string>
     <string name="refresh">Абнавіць даныя</string>
-    <string name="install">Усталяваць</string>
-    <string name="section_home">На хатнюю старонку</string>
+    <string name="install">Усталёўка</string>
+    <string name="section_home">Хатняя старонка</string>
     <string name="section_theme">Тэмы</string>
     <string name="safetynet">SafetyNet</string>
     <!--Home-->
@@ -16,7 +16,7 @@
     <string name="manager">Кіраўнік</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Абнавіць</string>
-    <string name="not_available">Н/Д</string>
+    <string name="not_available">Не</string>
     <string name="hide">Схаваць</string>
     <string name="status">Статус</string>
     <string name="home_package">Пакунак</string>
@@ -26,7 +26,7 @@
     <string name="home_support_content">Magisk ёсць і заўсёды будзе бясплатным праектам з адкрытым зыходным кодам. Але вы заўсёды можаце ахвяраваць нам на распрацоўку.</string>
     <string name="home_status_normal">Звычайны</string>
     <string name="home_status_stub">Хаванне</string>
-    <string name="home_installed_version">Усталяваны</string>
+    <string name="home_installed_version">Усталявана</string>
     <string name="home_latest_version">Апошні</string>
     <string name="invalid_update_channel">Хібны канал абнаўлення</string>
     <string name="uninstall_magisk_title">Выдаліць Magisk</string>
