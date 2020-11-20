@@ -126,7 +126,6 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">מקוון</string>
     <string name="sorting_order">סדר מיון</string>
-    <string name="external_rw_permission_denied">הענק הרשאה לאחסון כדי לאפשר פונקציונליות זו</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">מצב עיצוב</string>
@@ -173,7 +172,6 @@
     <string name="request_timeout">בקש פסק זמן</string>
     <string name="superuser_notification">התראות משתמש על</string>
     <string name="settings_su_reauth_title">אמת מחדש לאחר שדרוג</string>
-    <string name="settings_su_reauth_summary">אמת מחדש הרשאות משתמש על לאחר שדרוג יישום</string>
     <string name="settings_su_reauth_summary">אימות מחדש הרשאות של משתמש על לאחר שדרוג יישום</string>
     <string name="settings_su_tapjack_title">הפעלת הגנת Tapjacking</string>
     <string name="settings_su_tapjack_summary">תיבת הדו שיח של משתמש העל לא תגיב לקלט כשהיא מוסתרת על ידי חלון או כיסוי אחר</string>						  																																						       <string name="settings_su_biometric_title">אפשר אימות ביומטרי</string>
