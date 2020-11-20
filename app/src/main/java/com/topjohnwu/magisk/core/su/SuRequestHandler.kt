@@ -36,7 +36,7 @@ class SuRequestHandler(
         if (policy.packageName == BuildConfig.APPLICATION_ID)
             return false
 
-        when (Config.suAutoReponse) {
+        when (Config.suAutoResponse) {
             Config.Value.SU_AUTO_DENY -> {
                 respond(SuPolicy.DENY, 0)
                 return false

@@ -16,16 +16,16 @@
     <string name="app_changelog">Wijzigingslog</string>
     <string name="manager">Beheer</string>
     <string name="loading">Bezig met laden…</string>
-    <string name="update">Update</string>
+    <string name="update">Updaten</string>
     <string name="not_available">Niet beschikbaar</string>
     <string name="hide">Verbergen</string>
     <string name="status">Status</string>
     <string name="home_package">Pakket</string>
 
-    <string name="home_notice_content">Zorg ervoor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
+    <string name="home_notice_content">Zorg er voor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
     <string name="home_support_title">Ondersteun ons</string>
     <string name="home_item_source">Broncode</string>
-    <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt kun je een kleine donatie doen.</string>
+    <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen.</string>
     <string name="home_status_normal">Normaal</string>
     <string name="home_status_stub">Inactief</string>
     <string name="home_installed_version">Geïnstalleerd</string>
@@ -33,6 +33,8 @@
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd!\nRoot wordt verwijderd!\nJe gegevens worden, als ze dat nog niet waren, mogelijk versleuteld!</string>
+    <string name="home_check_safetynet">SafetyNet controleren</string>
+
 
     <!--Install-->
     <string name="keep_force_encryption">Afgedwongen versleuteling behouden</string>
@@ -49,7 +51,7 @@
     <string name="install_inactive_slot_msg">Je apparaat wordt GEDWONGEN opgestart in de huidige inactieve sleuf na het herstarten!\nGebruik deze optie alleen NA het installeren van een OTA-update.\nWil je doorgaan?</string>
     <string name="setup_title">Installatie afronden</string>
     <string name="select_patch_file">Kies en patch een bestand</string>
-    <string name="patch_file_msg">Kies een schijfkopie (*.img) of een ODIN-tarbestand (*.tar)</string>
+    <string name="patch_file_msg">Kies een schijfkopie (*.img) of ODIN-tarbestand (*.tar)</string>
     <string name="reboot_delay_toast">Je apparaat wordt over 5 seconden herstart…</string>
     <string name="flash_screen_title">Installatie</string>
 
@@ -60,15 +62,15 @@
     <string name="grant">Toestaan</string>
     <string name="su_warning">Verleent volledige toegang tot je apparaat.\nBij twijfel, altijd weigeren!</string>
     <string name="forever">Permanent</string>
-    <string name="once">Eénmalig</string>
+    <string name="once">Eenmalig</string>
     <string name="tenmin">10 min</string>
     <string name="twentymin">20 min</string>
     <string name="thirtymin">30 min</string>
     <string name="sixtymin">60 min</string>
     <string name="su_allow_toast">%1$s beschikt nu over superuserrechten</string>
-    <string name="su_deny_toast">Superusermachtiging van %1$s geweigerd</string>
+    <string name="su_deny_toast">Superuserrecht van %1$s geweigerd</string>
     <string name="su_snack_grant">%1$s beschikt nu over superuserrechten</string>
-    <string name="su_snack_deny">Superusermachtiging van %1$s geweigerd</string>
+    <string name="su_snack_deny">Superuserrecht van %1$s geweigerd</string>
     <string name="su_snack_notif_on">%1$s-meldingen ingeschakeld</string>
     <string name="su_snack_notif_off">%1$s-meldingen uitgeschakeld</string>
     <string name="su_snack_log_on">%1$s wordt nu gelogd</string>
@@ -102,14 +104,14 @@
     <!-- MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
-    <string name="hide_scroll_up">Omhoogscrollen</string>
+    <string name="hide_scroll_up">Omhoog scrollen</string>
     <string name="hide_filters">Filters</string>
     <string name="hide_search">Zoeken</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(geen informatie verstrekt)</string>
-    <string name="reboot_recovery">Herstelmodus starten</string>
-    <string name="reboot_bootloader">Opstartlader starten</string>
+    <string name="reboot_recovery">Recovery starten</string>
+    <string name="reboot_bootloader">Bootloader starten</string>
     <string name="reboot_download">Downloadmodus starten</string>
     <string name="reboot_edl">EDL starten</string>
     <string name="module_version_author">%1$s van %2$s</string>
@@ -138,7 +140,6 @@
     <string name="settings_restore_manager_summary">Herstelt Magisk Manager\'s oorspronkelijke naam.</string>
     <string name="language">Taal</string>
     <string name="system_default">(systeemstandaard)</string>
-    <string name="settings_check_update_title">Controleren op updates</string>
     <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>
     <string name="settings_update_channel_title">Updatekanaal</string>
     <string name="settings_update_stable">Stabiel</string>
@@ -228,6 +229,9 @@
     <string name="authenticate">Goedkeuren</string>
     <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
     <string name="unsupport_magisk_msg">Deze versie van Magisk Manager heeft geen ondersteuning voor Magisk-versies ouder dan %1$s.\n\nDe app werkt, maar doet alsof Magisk niet geïnstalleerd is. Update Magisk zo spoedig mogelijk.</string>
-    <string name="external_rw_permission_denied">Verleen de opslagmachtiging om deze functie te kunnen gebruiken</string>
-
+    <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
+    <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>
+    <string name="add_shortcut_msg">Als je Magisk Manager verbergt, herken je de naam en het pictogram mogelijk niet meer. Wil je een mooie snelkoppeling plaatsen op je startscherm?</string>
+    <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
+    
 </resources>

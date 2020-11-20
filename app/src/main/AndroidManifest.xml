@@ -4,11 +4,10 @@
     package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="29" />
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -64,6 +63,15 @@
 
         <!-- DownloadService -->
         <service android:name="a.j" />
+
+        <!-- FileProvider -->
+        <provider
+            android:name="a.p"
+            android:authorities="${applicationId}.provider"
+            android:directBootAware="true"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
 
         <!-- Hardcode GMS version -->
         <meta-data

@@ -17,6 +17,7 @@
 extern std::string  MAGISKTMP;
 #define INTLROOT    ".magisk"
 #define MIRRDIR     INTLROOT "/mirror"
+#define RULESDIR    MIRRDIR "/sepolicy.rules"
 #define BLOCKDIR    INTLROOT "/block"
 #define MODULEMNT   INTLROOT "/modules"
 #define BBPATH      INTLROOT "/busybox"

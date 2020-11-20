@@ -51,11 +51,12 @@ android {
 
     packagingOptions {
         exclude("/META-INF/**")
-        exclude("/androidsupportmultidexversion.txt")
         exclude("/org/bouncycastle/**")
         exclude("/kotlin/**")
         exclude("/kotlinx/**")
         exclude("/okhttp3/**")
+        exclude("/*.txt")
+        exclude("/*.bin")
     }
 
     kotlinOptions {
@@ -123,7 +124,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.2.5"
+    val vRoom = "2.3.0-alpha03"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
@@ -133,7 +134,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.2.0")
     implementation("androidx.preference:preference:1.1.1")

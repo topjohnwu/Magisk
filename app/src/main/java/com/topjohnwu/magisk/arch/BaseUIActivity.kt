@@ -1,5 +1,8 @@
 package com.topjohnwu.magisk.arch
 
+import android.content.res.Resources
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -14,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.ui.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
@@ -41,6 +45,8 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        layoutInflater.factory2 = LayoutInflaterFactory(delegate)
+
         setTheme(themeRes)
         super.onCreate(savedInstanceState)
 
@@ -59,6 +65,31 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
                 directionsDispatcher.value = null
             }
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window?.decorView?.let {
+                it.systemUiVisibility = (it.systemUiVisibility
+                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                window?.decorView?.post {
+                    // If navigation bar is short enough (gesture navigation enabled), make it transparent
+                    if (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0 < Resources.getSystem().displayMetrics.density * 40) {
+                        window.navigationBarColor = Color.TRANSPARENT
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            window.navigationBarDividerColor = Color.TRANSPARENT
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            window.isNavigationBarContrastEnforced = false
+                            window.isStatusBarContrastEnforced = false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun setContentView() {
@@ -66,8 +97,10 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
             it.setVariable(BR.viewModel, viewModel)
             it.lifecycleOwner = this
         }
+    }
 
-        ensureInsets()
+    fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
+        viewRoot.rootView.accessibilityDelegate = delegate
     }
 
     override fun onResume() {
@@ -79,7 +112,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
     }
 
-    override fun onEventDispatched(event: ViewEvent) = when(event) {
+    override fun onEventDispatched(event: ViewEvent) = when (event) {
         is ContextExecutor -> event(this)
         is ActivityExecutor -> event(this)
         else -> Unit

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.view.View
 import android.widget.Toast
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
@@ -12,7 +13,7 @@ import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.ActivityResultCallback
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MarkDownWindow
 import com.topjohnwu.magisk.view.Shortcuts
@@ -22,10 +23,10 @@ class ViewActionEvent(val action: BaseActivity.() -> Unit) : ViewEvent(), Activi
     override fun invoke(activity: BaseUIActivity<*, *>) = action(activity)
 }
 
-class OpenChangelogEvent(val item: Repo) : ViewEventWithScope(), ContextExecutor {
+class OpenReadmeEvent(val item: OnlineModule) : ViewEventWithScope(), ContextExecutor {
     override fun invoke(context: Context) {
         scope.launch {
-            MarkDownWindow.show(context, null, item::readme)
+            MarkDownWindow.show(context, null, item::notes)
         }
     }
 }
@@ -58,9 +59,11 @@ class DieEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class ShowUIEvent : ViewEvent(), ActivityExecutor {
+class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
+    : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: BaseUIActivity<*, *>) {
         activity.setContentView()
+        activity.setAccessibilityDelegate(delegate)
     }
 }
 

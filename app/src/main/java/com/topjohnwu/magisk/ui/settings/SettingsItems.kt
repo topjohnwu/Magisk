@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.UpdateCheckService
-import com.topjohnwu.magisk.core.tasks.PatchAPK
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.availableLocales
@@ -90,7 +90,7 @@ object Hide : BaseSettingsItem.Input() {
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     val maxLength
-        get() = PatchAPK.MAX_LABEL_LENGTH
+        get() = HideAPK.MAX_LABEL_LENGTH
 
     @get:Bindable
     val isError
@@ -99,11 +99,17 @@ object Hide : BaseSettingsItem.Input() {
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
 
+    override fun refresh() {
+        isEnabled = Info.remote.stub.versionCode > 0
+    }
 }
 
 object Restore : BaseSettingsItem.Blank() {
     override val title = R.string.settings_restore_manager_title.asTransitive()
     override val description = R.string.settings_restore_manager_summary.asTransitive()
+    override fun refresh() {
+        isEnabled = Info.remote.app.versionCode > 0
+    }
 }
 
 object AddShortcut : BaseSettingsItem.Blank() {
@@ -187,6 +193,13 @@ object DoHToggle : BaseSettingsItem.Toggle() {
 object SystemlessHosts : BaseSettingsItem.Blank() {
     override val title = R.string.settings_hosts_title.asTransitive()
     override val description = R.string.settings_hosts_summary.asTransitive()
+}
+
+object Tapjack : BaseSettingsItem.Toggle() {
+    override val title = R.string.settings_su_tapjack_title.asTransitive()
+    override var description = R.string.settings_su_tapjack_summary.asTransitive()
+    override var value = Config.suTapjack
+        set(value) = setV(value, field, { field = it }) { Config.suTapjack = it }
 }
 
 object Biometrics : BaseSettingsItem.Toggle() {
@@ -288,9 +301,9 @@ object AutomaticResponse : BaseSettingsItem.Selector() {
     override val entryRes = R.array.auto_response
     override val entryValRes = R.array.value_array
 
-    override var value = Config.suAutoReponse
+    override var value = Config.suAutoResponse
         set(value) = setV(value, field, { field = it }) {
-            Config.suAutoReponse = entryValues[it].toInt()
+            Config.suAutoResponse = entryValues[it].toInt()
         }
 }
 

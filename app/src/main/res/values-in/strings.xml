@@ -12,7 +12,7 @@
     <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
-    <string name="no_connection">Tidak ada koneksi</string>
+    <string name="no_connection">Koneksi tidak tersedia</string>
     <string name="app_changelog">Catatan perubahan</string>
     <string name="manager">Manager</string>
     <string name="loading">Memuat…</string>
@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Permintaan superuser</string>
+    <string name="touch_filtered_warning">Karena terdapat aplikasi yang menghalangi dialog permintaan superuser, Magisk tidak dapat memverifikasi respons Anda</string>
     <string name="deny">Tolak</string>
     <string name="prompt">Ajukan</string>
     <string name="grant">Izinkan</string>
@@ -102,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
+    <string name="show_os_app">Tampilkan aplikasi OS</string>
     <string name="hide_filter_hint">Filter menurut nama</string>
     <string name="hide_scroll_up">Gulir ke atas</string>
     <string name="hide_filters">Filter</string>
@@ -109,6 +111,7 @@
 
     <!--Module -->
     <string name="no_info_provided">(Info tidak tersedia)</string>
+    <string name="reboot_userspace">Nyalakan ulang secara halus</string>
     <string name="reboot_recovery">Nyalakan ke mode Recovery</string>
     <string name="reboot_bootloader">Nyalakan ke mode Bootloader</string>
     <string name="reboot_download">Nyalakan ke mode Download</string>
@@ -170,6 +173,8 @@
     <string name="superuser_notification">Notifikasi superuser</string>
     <string name="settings_su_reauth_title">Autentikasi ulang setelah upgrade</string>
     <string name="settings_su_reauth_summary">Autentikasi ulang izin akses superuser setelah aplikasi diupgrade</string>
+    <string name="settings_su_tapjack_title">Aktifkan perlindungan tapjacking</string>
+    <string name="settings_su_tapjack_summary">Dialog permintaan superuser tidak akan menanggapi masukan saat terhalangi oleh lapisan atau jendela lainnya</string>
     <string name="settings_su_biometric_title">Aktifkan autentikasi biometrik</string>
     <string name="settings_su_biometric_summary">Gunakan autentikasi biometrik untuk mengizinkan permintaan superuser</string>
     <string name="no_biometric">Perangkat tidak mendukung atau setelan biometrik tidak diaktifkan</string>
@@ -218,6 +223,7 @@
     <string name="failure">Gagal</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Gagal menyembunyikan Magisk Manager.</string>
+    <string name="restore_manager_fail_toast">Gagal memulihkan Magisk Manager</string>
     <string name="open_link_failed_toast">Tidak ditemukan aplikasi untuk membuka link ini</string>
     <string name="complete_uninstall">Uninstal penuh</string>
     <string name="restore_img">Pulihkan image</string>

@@ -18,6 +18,8 @@ import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import org.koin.core.get
+import timber.log.Timber
+import java.io.IOException
 import kotlin.math.roundToInt
 
 class InstallViewModel(
@@ -64,7 +66,11 @@ class InstallViewModel(
 
     init {
         viewModelScope.launch {
-            notes = svc.fetchString(Info.remote.magisk.note)
+            try {
+                notes = svc.fetchString(Info.remote.magisk.note)
+            } catch (e: IOException) {
+                Timber.e(e)
+            }
         }
     }
 
@@ -75,6 +81,8 @@ class InstallViewModel(
         this.progress = progress.times(100).roundToInt()
         if (this.progress >= 100) {
             state = State.LOADED
+        } else if (this.progress < -150) {
+            state = State.LOADING_FAILED
         }
     }
 

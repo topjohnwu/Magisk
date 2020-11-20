@@ -447,9 +447,9 @@ private:
 
 class LZ4_encoder : public cpr_stream {
 public:
-	explicit LZ4_encoder(stream_ptr &&base)
+	explicit LZ4_encoder(stream_ptr &&base, bool lg)
 	: cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]),
-	buf(new char[LZ4_UNCOMPRESSED]), init(false), buf_off(0), in_total(0) {}
+	buf(new char[LZ4_UNCOMPRESSED]), init(false), lg(lg), buf_off(0), in_total(0) {}
 
 	int write(const void *in, size_t size) override {
 		int ret = 0;
@@ -490,7 +490,8 @@ public:
 	~LZ4_encoder() override {
 		if (buf_off)
 			write_block();
-		bwrite(&in_total, sizeof(in_total));
+		if (lg)
+			bwrite(&in_total, sizeof(in_total));
 		delete[] outbuf;
 		delete[] buf;
 	}
@@ -499,11 +500,12 @@ private:
 	char *outbuf;
 	char *buf;
 	bool init;
+	bool lg;
 	int buf_off;
 	unsigned in_total;
 
 	int write_block() {
-		int written = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, 9);
+		int written = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
 		if (written == 0) {
 			LOGW("LZ4HC compression failure\n");
 			return -1;
@@ -525,7 +527,9 @@ stream_ptr get_encoder(format_t type, stream_ptr &&base) {
 		case LZ4:
 			return make_unique<LZ4F_encoder>(std::move(base));
 		case LZ4_LEGACY:
-			return make_unique<LZ4_encoder>(std::move(base));
+			return make_unique<LZ4_encoder>(std::move(base), false);
+		case LZ4_LG:
+			return make_unique<LZ4_encoder>(std::move(base), true);
 		case GZIP:
 		default:
 			return make_unique<gz_encoder>(std::move(base));

@@ -22,8 +22,9 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l3}"
+        android:paddingTop="@dimen/internal_action_bar_size"
+        android:paddingBottom="@dimen/l3"
+        app:fitsSystemWindowsInsets="top|bottom"
         tools:layout_marginTop="24dp">
 
         <LinearLayout

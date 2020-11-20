@@ -90,7 +90,7 @@ EOF
 }
 
 adb_pm_install() {
-  local tmp=/data/local/tmp/patched.apk
+  local tmp=/data/local/tmp/temp.apk
   cp -f "$1" $tmp
   chmod 644 $tmp
   su 2000 -c pm install $tmp || pm install $tmp

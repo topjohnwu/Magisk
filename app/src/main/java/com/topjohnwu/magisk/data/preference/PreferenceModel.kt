@@ -11,16 +11,14 @@ interface PreferenceModel {
 
     val fileName: String
         get() = "${context.packageName}_preferences"
-    val commitPrefs: Boolean
-        get() = false
+
     val prefs: SharedPreferences
         get() = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
 
     fun preferenceStrInt(
         name: String,
         default: Int,
-        writeDefault: Boolean = false,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = object: ReadWriteProperty<PreferenceModel, Int> {
         val base = StringProperty(name, default.toString(), commit)
         override fun getValue(thisRef: PreferenceModel, property: KProperty<*>): Int =
@@ -33,37 +31,37 @@ interface PreferenceModel {
     fun preference(
         name: String,
         default: Boolean,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = BooleanProperty(name, default, commit)
 
     fun preference(
         name: String,
         default: Float,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = FloatProperty(name, default, commit)
 
     fun preference(
         name: String,
         default: Int,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = IntProperty(name, default, commit)
 
     fun preference(
         name: String,
         default: Long,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = LongProperty(name, default, commit)
 
     fun preference(
         name: String,
         default: String,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = StringProperty(name, default, commit)
 
     fun preference(
         name: String,
         default: Set<String>,
-        commit: Boolean = commitPrefs
+        commit: Boolean = false
     ) = StringSetProperty(name, default, commit)
 
 }

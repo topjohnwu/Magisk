@@ -13,6 +13,9 @@ import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
+import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
+import com.topjohnwu.magisk.ktx.addVerticalPadding
+import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
@@ -62,6 +65,37 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
             }
         })
+
+        val resource = requireContext().resources
+        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
+        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
+        binding.moduleList.apply {
+            addVerticalPadding(
+                l_50,
+                l1 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
+            )
+            addSimpleItemDecoration(
+                left = l1,
+                top = l_50,
+                right = l1,
+                bottom = l_50,
+            )
+            fixEdgeEffect()
+        }
+
+        binding.moduleFilterInclude.moduleFilterList.apply {
+            addVerticalPadding(
+                l_50,
+                l1 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
+            )
+            addSimpleItemDecoration(
+                left = l1,
+                top = l_50,
+                right = l1,
+                bottom = l_50,
+            )
+            fixEdgeEffect()
+        }
     }
 
     override fun onDestroyView() {

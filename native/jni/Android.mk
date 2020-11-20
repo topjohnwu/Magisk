@@ -62,6 +62,7 @@ LOCAL_SRC_FILES := \
 	init/rootdir.cpp \
 	init/getinfo.cpp \
 	init/twostage.cpp \
+	init/raw_data.cpp \
 	core/socket.cpp \
 	magiskpolicy/sepolicy.cpp \
 	magiskpolicy/magiskpolicy.cpp \

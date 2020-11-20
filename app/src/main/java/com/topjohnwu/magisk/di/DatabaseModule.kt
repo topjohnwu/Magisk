@@ -17,8 +17,6 @@ val databaseModule = module {
     single { StringDao() }
     single { createRepoDatabase(get()) }
     single { get<RepoDatabase>().repoDao() }
-    single { get<RepoDatabase>().repoByNameDao() }
-    single { get<RepoDatabase>().repoByUpdatedDao() }
     single { createSuLogDatabase(get(Protected)).suLogDao() }
     single { RepoUpdater(get(), get()) }
 }

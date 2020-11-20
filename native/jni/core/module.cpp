@@ -75,7 +75,7 @@ protected:
 	: _name(name), _file_type(file_type), node_type(type_id<T>()) {}
 
 	template<class T>
-	node_entry(T*) : node_type(type_id<T>()) {}
+	explicit node_entry(T*) : node_type(type_id<T>()) {}
 
 	void create_and_mount(const string &src);
 
@@ -228,8 +228,8 @@ protected:
 
 class root_node : public dir_node {
 public:
-	root_node(const char *name) : dir_node(name, this), prefix("") {}
-	root_node(node_entry *node) : dir_node(node, this), prefix("/system") {}
+	explicit root_node(const char *name) : dir_node(name, this), prefix("") {}
+	explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {}
 	const char * const prefix;
 };
 
@@ -250,7 +250,7 @@ public:
 		merge_node(this, node);
 	}
 
-	module_node(inter_node *node) : module_node(node, node->module) {}
+	explicit module_node(inter_node *node) : module_node(node, node->module) {}
 
 	void mount() override;
 private:
@@ -259,7 +259,7 @@ private:
 
 class mirror_node : public node_entry {
 public:
-	mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
+	explicit mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
 	void mount() override {
 		create_and_mount(mirror_path());
 	}
@@ -267,7 +267,7 @@ public:
 
 class skel_node : public dir_node {
 public:
-	skel_node(node_entry *node);
+	explicit skel_node(node_entry *node);
 	void mount() override;
 };
 
@@ -415,7 +415,6 @@ bool dir_node::prepare() {
 		}
 next_node:
 		++it;
-		continue;
 	}
 	return !to_skel;
 }
@@ -433,8 +432,8 @@ bool dir_node::collect_files(const char *module, int dfd) {
 
 		if (entry->d_type == DT_DIR) {
 			// Need check cause emplace could fail due to previous module dir replace
-			if (auto dn = emplace_or_get<inter_node>(entry->d_name, entry->d_name, module); dn &&
-				!dn->collect_files(module, dirfd(dir.get()))) {
+			if (auto dn = emplace_or_get<inter_node>(entry->d_name, entry->d_name, module);
+				dn && !dn->collect_files(module, dirfd(dir.get()))) {
 				// Upgrade node to module due to '.replace'
 				upgrade<module_node>(dn->name(), module);
 			}
@@ -498,7 +497,7 @@ void skel_node::mount() {
 
 class magisk_node : public node_entry {
 public:
-	magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+	explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
 
 	void mount() override {
 		const string &dir_name = parent()->node_path();
@@ -637,35 +636,44 @@ static void prepare_modules() {
 	// Setup module mount (workaround nosuid selabel issue)
 	auto src = MAGISKTMP + "/" MIRRDIR MODULEROOT;
 	auto dest = MAGISKTMP + "/" MODULEMNT;
+	xmkdir(dest.data(), 0755);
 	bind_mount(src.data(), dest.data());
 
 	restorecon();
 	chmod(SECURE_DIR, 0700);
 }
 
-static void collect_modules() {
-	auto dir = xopen_dir(MODULEROOT);
+template<typename Func>
+static void foreach_module(Func fn) {
+	auto dir = open_dir(MODULEROOT);
 	if (!dir)
 		return;
+
 	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR && entry->d_name != ".core"sv) {
-			int modfd = xopenat(dfd, entry->d_name, O_RDONLY);
-			if (faccessat(modfd, "remove", F_OK, 0) == 0) {
-				LOGI("%s: remove\n", entry->d_name);
-				auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
-				if (access(uninstaller.data(), F_OK) == 0)
-					exec_script(uninstaller.data());
-				frm_rf(modfd);
-				unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
-				continue;
-			}
-			unlinkat(modfd, "update", 0);
-			if (faccessat(modfd, "disable", F_OK, 0) != 0)
-				module_list.emplace_back(entry->d_name);
+			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+			fn(dfd, entry, modfd);
 			close(modfd);
 		}
 	}
+}
+
+static void collect_modules() {
+	foreach_module([](int dfd, dirent *entry, int modfd) {
+		if (faccessat(modfd, "remove", F_OK, 0) == 0) {
+			LOGI("%s: remove\n", entry->d_name);
+			auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
+			if (access(uninstaller.data(), F_OK) == 0)
+				exec_script(uninstaller.data());
+			frm_rf(xdup(modfd));
+			unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
+			return;
+		}
+		unlinkat(modfd, "update", 0);
+		if (faccessat(modfd, "disable", F_OK, 0) != 0)
+			module_list.emplace_back(entry->d_name);
+	});
 }
 
 void handle_modules() {
@@ -678,23 +686,19 @@ void handle_modules() {
 	collect_modules();
 }
 
-void foreach_modules(const char *name) {
-	LOGI("* Add %s to all modules\n", name);
-	auto dir = open_dir(MODULEROOT);
-	if (!dir)
-		return;
+void disable_modules() {
+	foreach_module([](int, auto, int modfd) {
+		close(xopenat(modfd, "disable", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+	});
+}
 
-	int dfd = dirfd(dir.get());
-	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == ".core"sv)
-				continue;
-
-			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			close(xopenat(modfd, name, O_RDONLY | O_CREAT | O_CLOEXEC, 0));
-			close(modfd);
-		}
-	}
+void remove_modules() {
+	foreach_module([](int, dirent *entry, int) {
+		auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
+		if (access(uninstaller.data(), F_OK) == 0)
+			exec_script(uninstaller.data());
+	});
+	rm_rf(MODULEROOT);
 }
 
 void exec_module_scripts(const char *stage) {

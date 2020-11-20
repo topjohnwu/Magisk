@@ -73,10 +73,7 @@ open class DownloadService : BaseDownloader() {
     }
 
     private fun Notification.Builder.setIntent(subject: Manager)
-    = when (subject.action) {
-        APK.Upgrade -> setContentIntent(APKInstall.installIntent(context, subject.file.toFile()))
-        else -> setContentIntent(Intent())
-    }
+    = setContentIntent(APKInstall.installIntent(context, subject.file.toFile()))
 
     private fun Notification.Builder.setContentIntent(intent: Intent) =
         setContentIntent(

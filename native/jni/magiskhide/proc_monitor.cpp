@@ -35,7 +35,16 @@ static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 pthread_mutex_t monitor_lock;
 
 #define PID_MAX 32768
-static bitset<PID_MAX> attaches;  /* true if pid is monitored */
+struct pid_set {
+	bitset<PID_MAX>::const_reference operator[](size_t pos) const { return set[pos - 1]; }
+	bitset<PID_MAX>::reference operator[](size_t pos) { return set[pos - 1]; }
+	void reset() { set.reset(); }
+private:
+	bitset<PID_MAX> set;
+};
+
+// true if pid is monitored
+pid_set attaches;
 
 /********
  * Utils
@@ -56,7 +65,7 @@ static int parse_ppid(int pid) {
 	if (stat == nullptr)
 		return -1;
 
-	/* PID COMM STATE PPID ..... */
+	// PID COMM STATE PPID .....
 	fscanf(stat, "%*d %*s %*c %d", &ppid);
 	fclose(stat);
 
@@ -78,16 +87,31 @@ void update_uid_map() {
 	mutex_guard lock(monitor_lock);
 	uid_proc_map.clear();
 	string data_path(APP_DATA_DIR);
-	data_path += "/0/";
 	size_t len = data_path.length();
-	struct stat st;
-	for (auto &hide : hide_set) {
-		data_path.erase(data_path.begin() + len, data_path.end());
-		data_path += hide.first;
-		if (stat(data_path.data(), &st))
-			continue;
-		uid_proc_map[st.st_uid].emplace_back(hide.second);
+	auto dir = open_dir(APP_DATA_DIR);
+	for (dirent *entry; (entry = xreaddir(dir.get()));) {
+		data_path.resize(len);
+		data_path += '/';
+		data_path += entry->d_name;
+		data_path += '/';
+		size_t user_len = data_path.length();
+		struct stat st;
+		for (auto &hide : hide_set) {
+			data_path.resize(user_len);
+			data_path += hide.first;
+			if (stat(data_path.data(), &st))
+				continue;
+			uid_proc_map[st.st_uid].emplace_back(hide.second);
+		}
 	}
+}
+
+static bool is_zygote_done() {
+#ifdef __LP64__
+	return zygote_map.size() >= 2;
+#else
+	return zygote_map.size() >= 1;
+#endif
 }
 
 static void check_zygote() {
@@ -102,6 +126,12 @@ static void check_zygote() {
 		}
 		return true;
 	});
+	if (is_zygote_done()) {
+		// Stop periodic scanning
+		timeval val { .tv_sec = 0, .tv_usec = 0 };
+		itimerval interval { .it_interval = val, .it_value = val };
+		setitimer(ITIMER_REAL, &interval, nullptr);
+	}
 }
 
 #define APP_PROC "/system/bin/app_process"
@@ -154,10 +184,6 @@ static void inotify_event(int) {
 	check_zygote();
 }
 
-static void check_zygote(int) {
-	check_zygote();
-}
-
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
 	LOGD("proc_monitor: cleaning up\n");
@@ -178,9 +204,9 @@ static void term_thread(int) {
  * Ptrace Madness
  ******************/
 
-/* Ptrace is super tricky, preserve all excessive logging in code
- * but disable when actually building for usage (you won't want
- * your logcat spammed with new thread events from all apps) */
+// Ptrace is super tricky, preserve all excessive logging in code
+// but disable when actually building for usage (you won't want
+// your logcat spammed with new thread events from all apps)
 
 //#define PTRACE_LOG(fmt, args...) LOGD("PID=[%d] " fmt, pid, ##args)
 #define PTRACE_LOG(...)
@@ -208,9 +234,8 @@ static bool check_pid(int pid) {
 		return false;
 
 	sprintf(path, "/proc/%d/cmdline", pid);
-	if (FILE *f; (f = fopen(path, "re"))) {
-		fgets(cmdline, sizeof(cmdline), f);
-		fclose(f);
+	if (auto f = open_file(path, "re")) {
+		fgets(cmdline, sizeof(cmdline), f.get());
 	} else {
 		// Process killed unexpectedly, ignore
 		detach_pid(pid);
@@ -221,7 +246,7 @@ static bool check_pid(int pid) {
 		cmdline == "usap32"sv || cmdline == "usap64"sv)
 		return false;
 
-	int uid = st.st_uid % 100000;
+	int uid = st.st_uid;
 	auto it = uid_proc_map.find(uid);
 	if (it != uid_proc_map.end()) {
 		for (auto &s : it->second) {
@@ -240,9 +265,9 @@ static bool check_pid(int pid) {
 				if (!mnt_ns)
 					break;
 
-				/* Finally this is our target!
-				 * Detach from ptrace but should still remain stopped.
-				 * The hide daemon will resume the process. */
+				// Finally this is our target!
+				// Detach from ptrace but should still remain stopped.
+				// The hide daemon will resume the process.
 				PTRACE_LOG("target found\n");
 				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
 				detach_pid(pid, SIGSTOP);
@@ -261,7 +286,7 @@ static bool is_process(int pid) {
 	char key[32];
 	int tgid;
 	sprintf(buf, "/proc/%d/status", pid);
-	unique_ptr<FILE, decltype(&fclose)> fp(fopen(buf, "re"), &fclose);
+	auto fp = open_file(buf, "re");
 	// PID is dead
 	if (!fp)
 		return false;
@@ -307,6 +332,7 @@ void proc_monitor() {
 	sigemptyset(&block_set);
 	sigaddset(&block_set, SIGTERMTHRD);
 	sigaddset(&block_set, SIGIO);
+	sigaddset(&block_set, SIGALRM);
 	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 
 	struct sigaction act{};
@@ -314,13 +340,19 @@ void proc_monitor() {
 	sigaction(SIGTERMTHRD, &act, nullptr);
 	act.sa_handler = inotify_event;
 	sigaction(SIGIO, &act, nullptr);
-	act.sa_handler = check_zygote;
-	sigaction(SIGZYGOTE, &act, nullptr);
+	act.sa_handler = [](int){ check_zygote(); };
+	sigaction(SIGALRM, &act, nullptr);
 
 	setup_inotify();
 
-	// First find existing zygotes
+	// First try find existing zygotes
 	check_zygote();
+	if (!is_zygote_done()) {
+		// Periodic scan every 250ms
+		timeval val { .tv_sec = 0, .tv_usec = 250000 };
+		itimerval interval { .it_interval = val, .it_value = val };
+		setitimer(ITIMER_REAL, &interval, nullptr);
+	}
 
 	int status;
 
@@ -328,8 +360,7 @@ void proc_monitor() {
 		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
 		if (pid < 0) {
 			if (errno == ECHILD) {
-				/* This mean we have nothing to wait, sleep
-				 * and wait till signal interruption */
+				// Nothing to wait yet, sleep and wait till signal interruption
 				LOGD("proc_monitor: nothing to monitor, wait for signal\n");
 				struct timespec ts = {
 					.tv_sec = INT_MAX,

@@ -22,7 +22,7 @@
     <string name="status">Stav</string>
     <string name="home_package">Balíček</string>
 
-    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie.</string>
+    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie!</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Požiadavka superužívateľa</string>
+    <string name="touch_filtered_warning">Pretože aplikácia zakrýva požiadavku superužívateľa, Magisk nemôže overiť vašu odpoveď</string>
     <string name="deny">Zamietnuť</string>
     <string name="prompt">Výzva</string>
     <string name="grant">Udeliť</string>
@@ -84,11 +85,11 @@
     <string name="superuser_policy_none">Žiadna aplikácia zatiaľ nepožiadala o povolenie Superužívateľa.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva Superužívateľa.</string>
-    <string name="log_data_magisk_none">Záznamy Magisku sú prázdne, to je divné.</string>
+    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva Superužívateľa</string>
+    <string name="log_data_magisk_none">Záznamy Magisku sú prázdne, to je divné</string>
     <string name="menuSaveLog">Uložiť záznam</string>
     <string name="menuClearLog">Odstrániť záznam</string>
-    <string name="logs_cleared">Záznam úspešne odstránený.</string>
+    <string name="logs_cleared">Záznam úspešne odstránený</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cieľový UID: %1$d</string>
 
@@ -100,15 +101,17 @@
     <string name="safetynet_attest_loading">Momentík ...</string>
     <string name="safetynet_attest_restart">Skúste to znova</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
+    <string name="show_os_app">Zobraziť aplikácie OS</string>
     <string name="hide_filter_hint">Filtrovať podľa názvu</string>
     <string name="hide_scroll_up">Posunúť nahor</string>
     <string name="hide_filters">Filtre</string>
     <string name="hide_search">Vyhľadávanie</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(Nie sú k dispozícii žiadne informácie)</string>
+    <string name="reboot_userspace">Softvérový reštart</string>
     <string name="reboot_recovery">Reštartovať do Recovery</string>
     <string name="reboot_bootloader">Reštartovať do Bootloader</string>
     <string name="reboot_download">Reštartovať do Download</string>
@@ -126,7 +129,7 @@
 
     
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
     <string name="settings_dark_mode_message">Vyberte režim, ktorý najlepšie vyhovuje vášmu štýlu!</string>
     <string name="settings_dark_mode_light">Vždy svetlý</string>
@@ -172,6 +175,8 @@
     <string name="superuser_notification">Upozornenia Superužívateľa</string>
     <string name="settings_su_reauth_title">Overenie autentifikácie po upgrade</string>
     <string name="settings_su_reauth_summary">Overí autentifikáciu oprávnení Superužívateľa po upgrade aplikácie</string>
+    <string name="settings_su_tapjack_title">Povoliť ochranu pred tapjackingom</string>
+    <string name="settings_su_tapjack_summary">Dialógové okno superužívateľa nebude reagovať na zadanie, ak je zakryté alebo prekryté iným oknom</string>
     <string name="settings_su_biometric_title">Povoliť biometrické overenie</string>
     <string name="settings_su_biometric_summary">Použije biometrickú autentifikáciu na povolenie žiadostí Superužívateľa</string>
     <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
@@ -217,9 +222,10 @@
     <string name="repo_cache_cleared">Cache repo odstránená</string>
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
-    <string name="failure">Zlyhalo</string>
-    <string name="hide_manager_title">Skrytie Magisk Managera…</string>
-    <string name="hide_manager_fail_toast">Skrytie Magisk Manager zlyhalo.</string>
+    <string name="failure">Zlyhalo!</string>
+    <string name="hide_manager_title">Skrývanie Magisk Managera…</string>
+    <string name="hide_manager_fail_toast">Skrytie Magisk Managera zlyhalo</string>
+    <string name="restore_manager_fail_toast">Obnovenie Magisk Managera zlyhalo</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>

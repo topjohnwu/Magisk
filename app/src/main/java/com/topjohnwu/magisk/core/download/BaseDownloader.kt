@@ -117,7 +117,7 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
     fun Subject.notifyID() = hashCode()
 
     private fun notifyFail(subject: Subject) = lastNotify(subject.notifyID()) {
-        broadcast(-1f, subject)
+        broadcast(-2f, subject)
         it.setContentText(getString(R.string.download_file_error))
             .setSmallIcon(android.R.drawable.stat_notify_error)
             .setOngoing(false)

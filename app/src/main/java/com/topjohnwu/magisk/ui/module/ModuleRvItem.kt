@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.ui.module
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.model.module.Module
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.databinding.ObservableItem
 import com.topjohnwu.magisk.utils.set
@@ -39,7 +39,7 @@ class SectionTitle(
     override fun contentSameAs(other: SectionTitle): Boolean = this === other
 }
 
-sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
+sealed class RepoItem(val item: OnlineModule) : ObservableItem<RepoItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     @get:Bindable
@@ -51,21 +51,21 @@ sealed class RepoItem(val item: Repo) : ObservableItem<RepoItem>() {
     override fun contentSameAs(other: RepoItem): Boolean = item == other.item
     override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
 
-    class Update(item: Repo) : RepoItem(item) {
+    class Update(item: OnlineModule) : RepoItem(item) {
         override val isUpdate get() = true
     }
 
-    class Remote(item: Repo) : RepoItem(item) {
+    class Remote(item: OnlineModule) : RepoItem(item) {
         override val isUpdate get() = false
     }
 }
 
-class ModuleItem(val item: Module) : ObservableItem<ModuleItem>() {
+class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
 
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
-    var repo: Repo? = null
+    var repo: OnlineModule? = null
         set(value) = set(value, field, { field = it }, BR.repo)
 
     @get:Bindable

@@ -56,6 +56,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Demande d’accès super‑utilisateur</string>
+    <string name="touch_filtered_warning">Parce qu’une application obscurcit une demande du super-utilisateur, Magisk ne peut pas vérifier votre réponse</string>
     <string name="deny">Refuser</string>
     <string name="prompt">Demander</string>
     <string name="grant">Accorder</string>
@@ -102,13 +103,15 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
+    <string name="show_os_app">Afficher les applis système</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_scroll_up">Faire défiler vers le haut</string>
     <string name="hide_filters">Filtres</string>
     <string name="hide_search">Rechercher</string>
 
-    <!--Module Fragment-->
+    <!--Module -->
     <string name="no_info_provided">(aucune info transmise)</string>
+    <string name="reboot_userspace">Redémarrage en douceur</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
@@ -170,6 +173,8 @@
     <string name="superuser_notification">Notification super‑utilisateur</string>
     <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
+    <string name="settings_su_tapjack_title">Activer Protection Détournement de Clic</string>
+    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super-utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou un recouvrement</string>
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
@@ -219,6 +224,7 @@
     <string name="hide_manager_title">Masquage de Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Le masquage de Magisk Manager a échoué.</string>
     <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée</string>
+    <string name="restore_manager_fail_toast">Échec de la restauration de Magisk Manager</string>
     <string name="complete_uninstall">Désinstallation complète</string>
     <string name="restore_img">Restauration des images</string>
     <string name="restore_img_msg">Restauration…</string>
@@ -234,7 +240,8 @@
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
     <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
-    <string name="add_shortcut_title">Ajouter un raccourcis à l’écran d’accueil</string>
-    <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez-vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
+    <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
+    <string name="add_shortcut_msg">Après avoir caché Magisk Manager, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
+    <string name="app_not_found">Aucune application trouvée pour traiter cette action</string>
 
 </resources>

@@ -57,7 +57,8 @@ void reboot();
 // Module stuffs
 void handle_modules();
 void magic_mount();
-void foreach_modules(const char *name);
+void disable_modules();
+void remove_modules();
 void exec_module_scripts(const char *stage);
 
 // MagiskHide

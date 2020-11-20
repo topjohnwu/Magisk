@@ -18,7 +18,6 @@ object Const {
     // Misc
     const val ANDROID_MANIFEST = "AndroidManifest.xml"
     const val MAGISK_INSTALL_LOG_FILENAME = "magisk_install_log_%s.log"
-    const val MANAGER_CONFIGS = ".tmp.magisk.config"
     val USER_ID = Process.myUid() / 100000
 
     object Version {
@@ -46,7 +45,6 @@ object Const {
     }
 
     object Url {
-        const val ZIP_URL = "https://github.com/Magisk-Modules-Repo/%s/archive/master.zip"
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
@@ -54,14 +52,13 @@ object Const {
         const val GITHUB_API_URL = "https://api.github.com/"
         const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk_files/"
         const val JS_DELIVR_URL = "https://cdn.jsdelivr.net/gh/"
+        const val OFFICIAL_REPO = "https://magisk-modules-repo.github.io/submission/modules.json"
     }
 
     object Key {
-        // others
-        const val LINK_KEY = "Link"
-        const val ETAG_KEY = "ETag"
         // intents
         const val OPEN_SECTION = "section"
+        const val HIDDEN_PKG = "hidden_pkg"
     }
 
     object Value {

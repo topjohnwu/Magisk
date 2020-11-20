@@ -138,6 +138,7 @@
                 <Button
                     android:id="@+id/grant_btn"
                     style="@style/WidgetFoundation.Button.Text"
+                    onTouch="@{viewModel.grantTouchListener}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

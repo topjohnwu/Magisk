@@ -6,6 +6,15 @@
         android:title="@string/reboot" />
 
     <item
+        android:id="@+id/action_reboot_userspace"
+        android:title="@string/reboot_userspace"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/action_reboot_recovery"
+        android:title="@string/reboot_recovery" />
+
+    <item
         android:id="@+id/action_reboot_bootloader"
         android:title="@string/reboot_bootloader" />
 
@@ -16,9 +25,5 @@
     <item
         android:id="@+id/action_reboot_edl"
         android:title="@string/reboot_edl" />
-
-    <item
-        android:id="@+id/action_reboot_recovery"
-        android:title="@string/reboot_recovery" />
 
 </menu>

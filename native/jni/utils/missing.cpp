@@ -10,83 +10,53 @@
 
 #include "missing.hpp"
 
-/* Original source: https://opensource.apple.com/source/cvs/cvs-19/cvs/lib/getline.c
- * License: GPL 2 or later
- * Adjusted to match POSIX */
-#define MIN_CHUNK 64
-ssize_t __getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
-	size_t nchars_avail;
-	char *read_pos;
+/* Original source: https://github.com/freebsd/freebsd/blob/master/contrib/file/src/getline.c
+ * License: BSD, full copyright notice please check original source */
 
-	if (!lineptr || !n || !stream) {
-		errno = EINVAL;
-		return -1;
-	}
+ssize_t compat_getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp) {
+	char *ptr, *eptr;
 
-	if (!*lineptr) {
-		*n = MIN_CHUNK;
-		*lineptr = (char *) malloc(*n);
-		if (!*lineptr) {
-			errno = ENOMEM;
+	if (*buf == nullptr || *bufsiz == 0) {
+		*bufsiz = BUFSIZ;
+		if ((*buf = (char *) malloc(*bufsiz)) == nullptr)
 			return -1;
-		}
 	}
 
-	nchars_avail = *n;
-	read_pos = *lineptr;
-
-	for (;;) {
-		int save_errno;
-		int c = getc(stream);
-
-		save_errno = errno;
-
-		if (nchars_avail < 2) {
-			if (*n > MIN_CHUNK)
-				*n *= 2;
+	for (ptr = *buf, eptr = *buf + *bufsiz;;) {
+		int c = fgetc(fp);
+		if (c == -1) {
+			if (feof(fp))
+				return ptr == *buf ? -1 : ptr - *buf;
 			else
-				*n += MIN_CHUNK;
-
-			nchars_avail = *n + *lineptr - read_pos;
-			*lineptr = (char *) realloc(*lineptr, *n);
-			if (!*lineptr) {
-				errno = ENOMEM;
 				return -1;
-			}
-			read_pos = *n - nchars_avail + *lineptr;
 		}
-
-		if (ferror(stream)) {
-			errno = save_errno;
-			return -1;
+		*ptr++ = c;
+		if (c == delimiter) {
+			*ptr = '\0';
+			return ptr - *buf;
 		}
-
-		if (c == EOF) {
-			if (read_pos == *lineptr)
+		if (ptr + 2 >= eptr) {
+			char *nbuf;
+			size_t nbufsiz = *bufsiz * 2;
+			ssize_t d = ptr - *buf;
+			if ((nbuf = (char *) realloc(*buf, nbufsiz)) == nullptr)
 				return -1;
-			else
-				break;
+			*buf = nbuf;
+			*bufsiz = nbufsiz;
+			eptr = nbuf + nbufsiz;
+			ptr = nbuf + d;
 		}
-
-		*read_pos++ = c;
-		nchars_avail--;
-
-		if (c == delim)
-			break;
 	}
-
-	*read_pos = '\0';
-
-	return read_pos - *lineptr;
 }
 
-ssize_t __getline(char **lineptr, size_t *n, FILE *stream) {
-	return getdelim(lineptr, n, '\n', stream);
+ssize_t compat_getline(char **buf, size_t *bufsiz, FILE *fp) {
+	return getdelim(buf, bufsiz, '\n', fp);
 }
 
-/* mntent functions are copied from AOSP libc/bionic/mntent.cpp */
+/* Original source: https://android.googlesource.com/platform/bionic/+/master/libc/bionic/mntent.cpp
+ * License: AOSP, full copyright notice please check original source */
 
-struct mntent *__getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf_len) {
+struct mntent *compat_getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf_len) {
 	memset(e, 0, sizeof(*e));
 	while (fgets(buf, buf_len, fp) != nullptr) {
 		// Entries look like "proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0".
@@ -109,18 +79,18 @@ struct mntent *__getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf_len)
 	return nullptr;
 }
 
-FILE *__setmntent(const char* path, const char* mode) {
+FILE *compat_setmntent(const char* path, const char* mode) {
 	return fopen(path, mode);
 }
 
-int __endmntent(FILE* fp) {
+int compat_endmntent(FILE* fp) {
 	if (fp != nullptr) {
 		fclose(fp);
 	}
 	return 1;
 }
 
-char *__hasmntopt(const struct mntent* mnt, const char* opt) {
+char *compat_hasmntopt(const struct mntent* mnt, const char* opt) {
 	char* token = mnt->mnt_opts;
 	char* const end = mnt->mnt_opts + strlen(mnt->mnt_opts);
 	const size_t optLen = strlen(opt);

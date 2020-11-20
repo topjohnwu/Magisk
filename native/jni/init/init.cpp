@@ -20,63 +20,11 @@
 
 using namespace std;
 
+// Debug toggle
+#define ENABLE_TEST 0
+
 constexpr int (*init_applet_main[])(int, char *[]) =
 		{ magiskpolicy_main, magiskpolicy_main, nullptr };
-
-int data_holder::patch(str_pairs list) {
-	int count = 0;
-	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
-		for (auto [from, to] : list) {
-			if (memcmp(p, from.data(), from.length() + 1) == 0) {
-				LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
-				memset(p, 0, from.length());
-				memcpy(p, to.data(), to.length());
-				++count;
-				p += from.length();
-			}
-		}
-	}
-	return count;
-}
-
-bool data_holder::contains(string_view pattern) {
-	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
-		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0)
-			return true;
-	}
-	return false;
-}
-
-void data_holder::consume(data_holder &other) {
-	buf = other.buf;
-	sz = other.sz;
-	other.buf = nullptr;
-	other.sz = 0;
-}
-
-auto_data<HEAP> raw_data::read(int fd) {
-	auto_data<HEAP> data;
-	fd_full_read(fd, data.buf, data.sz);
-	return data;
-}
-
-auto_data<HEAP> raw_data::read(const char *name) {
-	auto_data<HEAP> data;
-	full_read(name, data.buf, data.sz);
-	return data;
-}
-
-auto_data<MMAP> raw_data::mmap_rw(const char *name) {
-	auto_data<MMAP> data;
-	::mmap_rw(name, data.buf, data.sz);
-	return data;
-}
-
-auto_data<MMAP> raw_data::mmap_ro(const char *name) {
-	auto_data<MMAP> data;
-	::mmap_ro(name, data.buf, data.sz);
-	return data;
-}
 
 static bool unxz(int fd, const uint8_t *buf, size_t size) {
 	uint8_t out[8192];
@@ -123,7 +71,7 @@ static int dump_manager(const char *path, mode_t mode) {
 
 class RecoveryInit : public BaseInit {
 public:
-	RecoveryInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+	RecoveryInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 	void start() override {
 		LOGD("Ramdisk is recovery, abort\n");
 		rename("/.backup/init", "/init");
@@ -132,6 +80,7 @@ public:
 	}
 };
 
+#if ENABLE_TEST
 class TestInit : public BaseInit {
 public:
 	TestInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
@@ -140,7 +89,7 @@ public:
 	}
 };
 
-[[maybe_unused]] static int test_main(int argc, char *argv[]) {
+static int test_main(int argc, char *argv[]) {
 	// Log to console
 	cmdline_logging();
 	log_cb.ex = nop_ex;
@@ -172,6 +121,14 @@ public:
 
 	return 1;
 }
+#endif // ENABLE_TEST
+
+static int magisk_proxy_main(int argc, char *argv[]) {
+	setup_klog();
+	auto init = make_unique<MagiskProxy>(argv);
+	init->start();
+	return 1;
+}
 
 int main(int argc, char *argv[]) {
 	umask(0);
@@ -184,7 +141,7 @@ int main(int argc, char *argv[]) {
 			return (*init_applet_main[i])(argc, argv);
 	}
 
-#if 0
+#if ENABLE_TEST
 	if (getenv("INIT_TEST") != nullptr)
 		return test_main(argc, argv);
 #endif

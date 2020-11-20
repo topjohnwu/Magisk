@@ -45,18 +45,20 @@ int mkdirs(string path, mode_t mode) {
 	return 0;
 }
 
-static void post_order_walk(int dirfd, const function<void(int, dirent *)> &&fn) {
+template <typename Func>
+static void post_order_walk(int dirfd, const Func &fn) {
 	auto dir = xopen_dir(dirfd);
 	if (!dir) return;
 
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_DIR)
-			post_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), std::move(fn));
+			post_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), fn);
 		fn(dirfd, entry);
 	}
 }
 
-static void pre_order_walk(int dirfd, const function<bool(int, dirent *)> &&fn) {
+template <typename Func>
+static void pre_order_walk(int dirfd, const Func &fn) {
 	auto dir = xopen_dir(dirfd);
 	if (!dir) return;
 
@@ -64,7 +66,7 @@ static void pre_order_walk(int dirfd, const function<bool(int, dirent *)> &&fn) 
 		if (!fn(dirfd, entry))
 			continue;
 		if (entry->d_type == DT_DIR)
-			pre_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), std::move(fn));
+			pre_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), fn);
 	}
 }
 
@@ -338,7 +340,7 @@ void file_readline(bool trim, const char *file, const function<bool(string_view)
 	while ((read = getline(&buf, &len, fp)) >= 0) {
 		start = buf;
 		if (trim) {
-			while (read && (buf[read - 1] == '\n' || buf[read - 1] == ' '))
+			while (read && "\n\r "sv.find(buf[read - 1]) != string::npos)
 				--read;
 			buf[read] = '\0';
 			while (*start == ' ')

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Xml
@@ -9,25 +10,31 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.magiskdb.SettingsDao
 import com.topjohnwu.magisk.core.magiskdb.StringDao
 import com.topjohnwu.magisk.core.utils.BiometricHelper
-import com.topjohnwu.magisk.core.utils.defaultLocale
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.data.preference.PreferenceModel
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.io.SuFileInputStream
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
+import java.io.IOException
+import java.io.InputStream
 
 object Config : PreferenceModel, DBConfig {
 
     override val stringDao: StringDao by inject()
     override val settingsDao: SettingsDao by inject()
     override val context: Context by inject(Protected)
+
+    @get:SuppressLint("ApplySharedPref")
+    val prefsFile: File get() {
+        // Flush prefs to disk
+        prefs.edit().apply {
+            remove(Key.ASKED_HOME)
+        }.commit()
+        return File("${context.filesDir.parent}/shared_prefs", "${fileName}.xml")
+    }
 
     object Key {
         // db configs
@@ -43,6 +50,7 @@ object Config : PreferenceModel, DBConfig {
         const val SU_AUTO_RESPONSE = "su_auto_response"
         const val SU_NOTIFICATION = "su_notification"
         const val SU_REAUTH = "su_reauth"
+        const val SU_TAPJACK = "su_tapjack"
         const val CHECK_UPDATES = "check_update"
         const val UPDATE_CHANNEL = "update_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
@@ -119,7 +127,7 @@ object Config : PreferenceModel, DBConfig {
     var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
 
     var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
-    var suAutoReponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
+    var suAutoResponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
     var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
 
@@ -127,8 +135,9 @@ object Config : PreferenceModel, DBConfig {
     var darkTheme by preference(Key.DARK_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
+    var suTapjack by preference(Key.SU_TAPJACK, true)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    var doh by preference(Key.DOH, defaultLocale.country == "CN")
+    var doh by preference(Key.DOH, false)
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
@@ -150,8 +159,12 @@ object Config : PreferenceModel, DBConfig {
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
-    fun initialize() {
-        prefs.edit { parsePrefs() }
+    fun load(pkg: String) {
+        try {
+            context.contentResolver.openInputStream(Provider.PREFS_URI(pkg))?.use {
+                prefs.edit { parsePrefs(it) }
+            }
+        } catch (e: IOException) {}
 
         prefs.edit {
             // Settings migration
@@ -173,10 +186,8 @@ object Config : PreferenceModel, DBConfig {
         }
     }
 
-    private fun SharedPreferences.Editor.parsePrefs() {
-        val config = SuFile.open("/data/adb", Const.MANAGER_CONFIGS)
-        if (config.exists()) runCatching {
-            val input = SuFileInputStream(config)
+    private fun SharedPreferences.Editor.parsePrefs(input: InputStream) {
+        runCatching {
             val parser = Xml.newPullParser()
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
             parser.setInput(input, "UTF-8")
@@ -220,21 +231,6 @@ object Config : PreferenceModel, DBConfig {
                     else -> parser.next()
                 }
             }
-            config.delete()
         }
     }
-
-    fun export() {
-        // Flush prefs to disk
-        prefs.edit().apply {
-            remove(Key.ASKED_HOME)
-        }.commit()
-        val context = get<Context>(Protected)
-        val xml = File(
-            "${context.filesDir.parent}/shared_prefs",
-            "${context.packageName}_preferences.xml"
-        )
-        Shell.su("cat $xml > /data/adb/${Const.MANAGER_CONFIGS}").exec()
-    }
-
 }

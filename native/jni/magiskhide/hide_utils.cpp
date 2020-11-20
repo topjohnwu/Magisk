@@ -275,7 +275,7 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide() {
 	if (hide_enabled()) {
-		pthread_kill(proc_monitor_thread, SIGZYGOTE);
+		pthread_kill(proc_monitor_thread, SIGALRM);
 		hide_late_sensitive_props();
 	} else if (SDK_INT >= 19) {
 		db_settings dbs;
@@ -289,5 +289,4 @@ void test_proc_monitor() {
 	if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
 		exit(1);
 	proc_monitor();
-	exit(0);
 }

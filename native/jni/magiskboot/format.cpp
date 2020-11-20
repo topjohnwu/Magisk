@@ -15,6 +15,7 @@ public:
 		name2fmt["bzip2"] = BZIP2;
 		name2fmt["lz4"] = LZ4;
 		name2fmt["lz4_legacy"] = LZ4_LEGACY;
+		name2fmt["lz4_lg"] = LZ4_LG;
 	}
 };
 
@@ -27,6 +28,8 @@ format_t check_fmt(const void *buf, size_t len) {
 		return CHROMEOS;
 	} else if (MATCH(BOOT_MAGIC)) {
 		return AOSP;
+	} else if (MATCH(VENDOR_BOOT_MAGIC)) {
+		return AOSP_VENDOR;
 	} else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
 		return GZIP;
 	} else if (MATCH(LZOP_MAGIC)) {
@@ -44,6 +47,8 @@ format_t check_fmt(const void *buf, size_t len) {
 		return LZ4_LEGACY;
 	} else if (MATCH(MTK_MAGIC)) {
 		return MTK;
+	} else if (MATCH(DTB_MAGIC)) {
+		return DTB;
 	} else if (MATCH(DHTB_MAGIC)) {
 		return DHTB;
 	} else if (MATCH(TEGRABLOB_MAGIC)) {
@@ -55,10 +60,6 @@ format_t check_fmt(const void *buf, size_t len) {
 
 const char *Fmt2Name::operator[](format_t fmt) {
 	switch (fmt) {
-		case CHROMEOS:
-			return "chromeos";
-		case AOSP:
-			return "aosp";
 		case GZIP:
 			return "gzip";
 		case LZOP:
@@ -73,8 +74,10 @@ const char *Fmt2Name::operator[](format_t fmt) {
 			return "lz4";
 		case LZ4_LEGACY:
 			return "lz4_legacy";
-		case MTK:
-			return "mtk";
+		case LZ4_LG:
+			return "lz4_lg";
+		case DTB:
+			return "dtb";
 		default:
 			return "raw";
 	}
@@ -94,6 +97,7 @@ const char *Fmt2Ext::operator[](format_t fmt) {
 			return ".bz2";
 		case LZ4:
 		case LZ4_LEGACY:
+		case LZ4_LG:
 			return ".lz4";
 		default:
 			return "";

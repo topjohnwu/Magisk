@@ -43,6 +43,22 @@ data class StubJson(
 ) : Parcelable
 
 @JsonClass(generateAdapter = true)
+data class ModuleJson(
+    val id: String,
+    val last_update: Long,
+    val prop_url: String,
+    val zip_url: String,
+    val notes_url: String
+)
+
+@JsonClass(generateAdapter = true)
+data class RepoJson(
+    val name: String,
+    val last_update: Long,
+    val modules: List<ModuleJson>
+)
+
+@JsonClass(generateAdapter = true)
 data class CommitInfo(
     val sha: String
 )

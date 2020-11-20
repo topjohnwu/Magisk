@@ -13,7 +13,6 @@
 #include <daemon.hpp>
 
 #define SIGTERMTHRD SIGUSR1
-#define SIGZYGOTE   SIGUSR2
 
 // CLI entries
 int launch_magiskhide();
@@ -24,7 +23,7 @@ void ls_list(int client);
 [[noreturn]] void test_proc_monitor();
 
 // Process monitoring
-void proc_monitor();
+[[noreturn]] void proc_monitor();
 void update_uid_map();
 
 // Utility functions

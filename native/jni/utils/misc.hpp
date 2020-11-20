@@ -58,12 +58,23 @@ reversed_container<T> reversed(T &base) {
 }
 
 int parse_int(const char *s);
-static inline int parse_int(std::string s) { return parse_int(s.data()); }
+static inline int parse_int(const std::string &s) { return parse_int(s.data()); }
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
 
 using thread_entry = void *(*)(void *);
 int new_daemon_thread(thread_entry entry, void *arg = nullptr, const pthread_attr_t *attr = nullptr);
 int new_daemon_thread(std::function<void()> &&entry);
+
+bool ends_with(const std::string_view &s1, const std::string_view &s2);
+int fork_dont_care();
+int fork_no_zombie();
+int strend(const char *s1, const char *s2);
+void init_argv0(int argc, char **argv);
+void set_nice_name(const char *name);
+uint32_t binary_gcd(uint32_t u, uint32_t v);
+int switch_mnt_ns(int pid);
+int gen_rand_str(char *buf, int len, bool varlen = true);
+std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 
 struct exec_t {
 	bool err = false;
@@ -92,14 +103,12 @@ int exec_command_sync(Args &&...args) {
 	exec_t exec{};
 	return exec_command_sync(exec, args...);
 }
-
-bool ends_with(const std::string_view &s1, const std::string_view &s2);
-int fork_dont_care();
-int fork_no_zombie();
-int strend(const char *s1, const char *s2);
-void init_argv0(int argc, char **argv);
-void set_nice_name(const char *name);
-uint32_t binary_gcd(uint32_t u, uint32_t v);
-int switch_mnt_ns(int pid);
-int gen_rand_str(char *buf, int len, bool varlen = true);
-std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
+template <class ...Args>
+void exec_command_async(Args &&...args) {
+	const char *argv[] = {args..., nullptr};
+	exec_t exec {
+		.argv = argv,
+		.fork = fork_dont_care
+	};
+	exec_command(exec);
+}

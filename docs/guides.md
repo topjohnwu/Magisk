@@ -46,7 +46,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   ├── service.sh          <--- This script will be executed in late_start service
 |   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
 │   ├── system.prop         <--- Properties in this file will be loaded as system properties by resetprop
-│   ├── sepolicy.rule       <--- Additional custom sepolicy rules to be patched
+│   ├── sepolicy.rule       <--- Additional custom sepolicy rules
 │   │
 │   │      *** Auto Generated, DO NOT MANUALLY CREATE OR MODIFY ***
 │   │
@@ -96,7 +96,7 @@ This file follows the same format as `build.prop`. Each line comprises of `[key]
 #### sepolicy.rule
 If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk's daemon will make sure this file is copied to somewhere `magiskinit` can read pre-init to ensure these rules are injected properly.
 
-Each line in this file will be treated as a policy statement. For more details how a policy statement is formated, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
+Each line in this file will be treated as a policy statement. For more details how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
 
 #### The `system` folder
 All files you want Magisk to replace/inject for you should be placed in this folder. Please read through the [Magic Mount](details.md#magic-mount) section to understand how Magisk mount your files.

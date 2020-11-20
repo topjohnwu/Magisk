@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.ManagerJson
 import com.topjohnwu.magisk.core.model.StubJson
-import com.topjohnwu.magisk.core.model.module.Repo
+import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
@@ -26,10 +26,10 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Module(
-        val module: Repo,
+        val module: OnlineModule,
         override val action: Action
     ) : Subject() {
-        override val url: String get() = module.zipUrl
+        override val url: String get() = module.zip_url
         override val title: String get() = module.downloadFilename
 
         @IgnoredOnParcel
@@ -40,16 +40,12 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Manager(
-        override val action: Action.APK,
         private val app: ManagerJson = Info.remote.app,
         val stub: StubJson = Info.remote.stub
     ) : Subject() {
-
-        override val title: String
-            get() = "MagiskManager-${app.version}(${app.versionCode})"
-
-        override val url: String
-            get() = app.link
+        override val action get() = Action.Download
+        override val title: String get() = "MagiskManager-${app.version}(${app.versionCode})"
+        override val url: String get() = app.link
 
         @IgnoredOnParcel
         override val file by lazy {

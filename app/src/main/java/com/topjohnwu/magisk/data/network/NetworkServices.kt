@@ -2,22 +2,17 @@ package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.BranchInfo
+import com.topjohnwu.magisk.core.model.RepoJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
-import com.topjohnwu.magisk.core.tasks.GithubRepoInfo
 import okhttp3.ResponseBody
-import retrofit2.Response
 import retrofit2.http.*
 
 private const val REVISION = "revision"
-private const val MODULE = "module"
-private const val FILE = "file"
-private const val IF_NONE_MATCH = "If-None-Match"
 private const val BRANCH = "branch"
 private const val REPO = "repo"
 
 const val MAGISK_FILES = "topjohnwu/magisk_files"
 const val MAGISK_MAIN = "topjohnwu/Magisk"
-private const val MAGISK_MODULES = "Magisk-Modules-Repo"
 
 interface GithubPageServices {
 
@@ -46,13 +41,13 @@ interface JSDelivrServices {
     suspend fun fetchInstaller(@Path(REVISION) revision: String): ResponseBody
 }
 
-interface GithubRawServices {
+interface RawServices {
 
     @GET
     suspend fun fetchCustomUpdate(@Url url: String): UpdateInfo
 
-    @GET("$MAGISK_MODULES/{$MODULE}/master/{$FILE}")
-    suspend fun fetchModuleFile(@Path(MODULE) id: String, @Path(FILE) file: String): String
+    @GET
+    suspend fun fetchRepoInfo(@Url url: String): RepoJson
 
     @GET
     @Streaming
@@ -64,15 +59,6 @@ interface GithubRawServices {
 }
 
 interface GithubApiServices {
-
-    @GET("users/$MAGISK_MODULES/repos")
-    @Headers("Accept: application/vnd.github.v3+json")
-    suspend fun fetchRepos(
-        @Query("page") page: Int,
-        @Header(IF_NONE_MATCH) etag: String,
-        @Query("sort") sort: String = "pushed",
-        @Query("per_page") count: Int = 100
-    ): Response<List<GithubRepoInfo>>
 
     @GET("repos/{$REPO}/branches/{$BRANCH}")
     @Headers("Accept: application/vnd.github.v3+json")

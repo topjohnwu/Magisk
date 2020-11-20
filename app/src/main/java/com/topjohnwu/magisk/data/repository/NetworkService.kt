@@ -9,20 +9,18 @@ import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.*
-import com.topjohnwu.magisk.core.model.module.Repo
 import com.topjohnwu.magisk.data.network.*
-import okhttp3.ResponseBody
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
 class NetworkService(
     private val pages: GithubPageServices,
-    private val raw: GithubRawServices,
+    private val raw: RawServices,
     private val jsd: JSDelivrServices,
     private val api: GithubApiServices
 ) {
-    suspend fun fetchUpdate() = try {
+    suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
             DEFAULT_CHANNEL, STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
@@ -38,19 +36,13 @@ class NetworkService(
         }
         Info.remote = info
         info
-    } catch (e: IOException) {
-        Timber.e(e)
-        null
-    } catch (e: HttpException) {
-        Timber.e(e)
-        null
     }
 
     // UpdateInfo
-    suspend fun fetchStableUpdate() = pages.fetchStableUpdate()
-    suspend fun fetchBetaUpdate() = pages.fetchBetaUpdate()
-    suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
-    suspend fun fetchCanaryUpdate(): UpdateInfo {
+    private suspend fun fetchStableUpdate() = pages.fetchStableUpdate()
+    private suspend fun fetchBetaUpdate() = pages.fetchBetaUpdate()
+    private suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
+    private suspend fun fetchCanaryUpdate(): UpdateInfo {
         val sha = fetchCanaryVersion()
         val info = jsd.fetchCanaryUpdate(sha)
 
@@ -68,22 +60,38 @@ class NetworkService(
         )
     }
 
-    // Byte streams
-    suspend fun fetchSafetynet() = jsd.fetchSafetynet()
-    suspend fun fetchBootctl() = jsd.fetchBootctl()
-    suspend fun fetchInstaller(): ResponseBody {
-        val sha = fetchMainVersion()
-        return jsd.fetchInstaller(sha)
+    private inline fun <T> safe(factory: () -> T): T? {
+        return try {
+            factory()
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
+        }
     }
-    suspend fun fetchFile(url: String) = raw.fetchFile(url)
 
-    // Strings
-    suspend fun fetchMetadata(repo: Repo) = raw.fetchModuleFile(repo.id, "module.prop")
-    suspend fun fetchReadme(repo: Repo) = raw.fetchModuleFile(repo.id, "README.md")
-    suspend fun fetchString(url: String) = raw.fetchString(url)
+    private inline fun <T> wrap(factory: () -> T): T {
+        return try {
+            factory()
+        } catch (e: HttpException) {
+            throw IOException(e)
+        }
+    }
 
-    // API calls
-    suspend fun fetchRepos(page: Int, etag: String) = api.fetchRepos(page, etag)
+    // Modules related
+    suspend fun fetchRepoInfo(url: String = Const.Url.OFFICIAL_REPO) = safe {
+        raw.fetchRepoInfo(url)
+    }
+
+    // Fetch files
+    suspend fun fetchSafetynet() = wrap { jsd.fetchSafetynet() }
+    suspend fun fetchBootctl() = wrap { jsd.fetchBootctl() }
+    suspend fun fetchInstaller() = wrap {
+        val sha = fetchMainVersion()
+        jsd.fetchInstaller(sha)
+    }
+    suspend fun fetchFile(url: String) = wrap { raw.fetchFile(url) }
+    suspend fun fetchString(url: String) = wrap { raw.fetchString(url) }
+
     private suspend fun fetchCanaryVersion() = api.fetchBranch(MAGISK_FILES, "canary").commit.sha
     private suspend fun fetchMainVersion() = api.fetchBranch(MAGISK_MAIN, "master").commit.sha
 }

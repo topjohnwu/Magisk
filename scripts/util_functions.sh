@@ -114,7 +114,7 @@ ensure_bb() {
   # Find our current arguments
   # Run in busybox environment to ensure consistent results
   # /proc/<pid>/cmdline shall be <interpreter> <script> <arguments...>
-  local cmds=$($bb sh -o standalone -c "
+  local cmds="$($bb sh -o standalone -c "
   for arg in \$(tr '\0' '\n' < /proc/$$/cmdline); do
     if [ -z \"\$cmds\" ]; then
       # Skip the first argument as we want to change the interpreter
@@ -123,7 +123,7 @@ ensure_bb() {
       cmds=\"\$cmds '\$arg'\"
     fi
   done
-  echo \$cmds")
+  echo \$cmds")"
 
   # Re-exec our script
   echo $cmds | $bb xargs $bb
@@ -152,6 +152,7 @@ recovery_cleanup() {
   fi
   umount -l /vendor
   umount -l /persist
+  umount -l /metadata
   for DIR in /apex /system /system_root; do
     if [ -L "${DIR}_link" ]; then
       rmdir $DIR
@@ -217,13 +218,13 @@ mount_name() {
   local FLAG=$3
   setup_mntpoint $POINT
   is_mounted $POINT && return
-  ui_print "- Mounting $POINT"
   # First try mounting with fstab
   mount $FLAG $POINT 2>/dev/null
   if ! is_mounted $POINT; then
-    local BLOCK=`find_block $PART`
-    mount $FLAG $BLOCK $POINT
+    local BLOCK=$(find_block $PART)
+    mount $FLAG $BLOCK $POINT || return
   fi
+  ui_print "- Mounting $POINT"
 }
 
 # mount_ro_ensure <partname(s)> <mountpoint>
@@ -266,18 +267,6 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
-
-  # Mount persist partition in recovery
-  if ! $BOOTMODE && [ ! -z $PERSISTDIR ]; then
-    # Try to mount persist
-    PERSISTDIR=/persist
-    mount_name persist /persist
-    if ! is_mounted /persist; then
-      # Fallback to cache
-      mount_name "cache cac" /cache
-      is_mounted /cache && PERSISTDIR=/cache || PERSISTDIR=
-    fi
-  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -575,6 +564,41 @@ run_migrations() {
   done
 }
 
+copy_sepolicy_rules() {
+  # Remove all existing rule folders
+  rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
+
+  # Find current active RULESDIR
+  local RULESDIR
+  local active_dir=$(magisk --path)/.magisk/mirror/sepolicy.rules
+  if [ -e $active_dir ]; then
+    RULESDIR=$(readlink -f $active_dir)
+  elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -q 'dm-'; then
+    RULESDIR=/data/unencrypted/magisk
+  elif grep -q ' /cache ' /proc/mounts; then
+    RULESDIR=/cache/magisk
+  elif grep -q ' /metadata ' /proc/mounts; then
+    RULESDIR=/metadata/magisk
+  elif grep -q ' /persist ' /proc/mounts; then
+    RULESDIR=/persist/magisk
+  elif grep -q ' /mnt/vendor/persist ' /proc/mounts; then
+    RULESDIR=/mnt/vendor/persist/magisk
+  else
+    return
+  fi
+
+  # Copy all enabled sepolicy.rule
+  for r in /data/adb/modules*/*/sepolicy.rule; do
+    [ -f "$r" ] || continue
+    local MODDIR=${r%/*}
+    [ -f $MODDIR/disable ] && continue
+    [ -f $MODDIR/remove ] && continue
+    local MODNAME=${MODDIR##*/}
+    mkdir -p $RULESDIR/$MODNAME
+    cp -f $r $RULESDIR/$MODNAME/sepolicy.rule
+  done
+}
+
 #################
 # Module Related
 #################
@@ -620,9 +644,6 @@ is_legacy_script() {
 
 # Require OUTFD, ZIPFILE to be set
 install_module() {
-  local PERSISTDIR
-  command -v magisk >/dev/null && PERSISTDIR=$(magisk --path)/mirror/persist
-
   rm -rf $TMPDIR
   mkdir -p $TMPDIR
 
@@ -646,7 +667,7 @@ install_module() {
   MODPATH=$MODULEROOT/$MODID
 
   # Create mod paths
-  rm -rf $MODPATH 2>/dev/null
+  rm -rf $MODPATH
   mkdir -p $MODPATH
 
   if is_legacy_script; then
@@ -699,19 +720,15 @@ install_module() {
   fi
 
   # Copy over custom sepolicy rules
-  if [ -f $MODPATH/sepolicy.rule -a -e "$PERSISTDIR" ]; then
-    ui_print "- Installing custom sepolicy patch"
-    # Remove old recovery logs (which may be filling partition) to make room
-    rm -f $PERSISTDIR/cache/recovery/*
-    PERSISTMOD=$PERSISTDIR/magisk/$MODID
-    mkdir -p $PERSISTMOD
-    cp -af $MODPATH/sepolicy.rule $PERSISTMOD/sepolicy.rule || abort "! Insufficient partition size"
+  if [ -f $MODPATH/sepolicy.rule ]; then
+    ui_print "- Installing custom sepolicy rules"
+    copy_sepolicy_rules
   fi
 
   # Remove stuffs that don't belong to modules
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
-  $MODPATH/README.md $MODPATH/.git* 2>/dev/null
+  $MODPATH/README.md $MODPATH/.git*
 
   cd /
   $BOOTMODE || recovery_cleanup
