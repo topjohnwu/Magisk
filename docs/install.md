@@ -13,7 +13,7 @@ Before you start:
 
 ---
 
-Download and install the latest Magisk Manager. We use the app to gather some information about your device. In the home screen, you should see this:
+[Download](https://github.com/topjohnwu/Magisk) and install the latest Magisk Manager. We use the app to gather some information about your device. In the home screen, you should see this:
 
 <p align="center"><img src="images/device_info.png" width="500"/></p>
 
