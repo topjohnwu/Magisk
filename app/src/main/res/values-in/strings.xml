@@ -22,7 +22,7 @@
     <string name="status">Status</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_notice_content">Pastikan selalu menggunakan Magisk Manager dari sumber terbuka. Manager dari sumber yang tidak dikenal dapat melakukan tindakan jahat.</string>
+    <string name="home_notice_content">Pastikan selalu menggunakan Magisk Manager dari sumber terbuka. Manager dari sumber yang tidak dikenal dapat melakukan tindakan jahat!</string>
     <string name="home_support_title">Dukung kami</string>
     <string name="home_item_source">Sumber</string>
     <string name="home_support_content">Magisk gratis dan bersumber terbuka, dan akan selalu seperti itu. Bagaimanapun juga Anda dapat menunjukan kepedulian Anda kepada kami dengan mengirimkan sedikit donasi.</string>
@@ -85,11 +85,11 @@
     <string name="superuser_policy_none">Belum ada aplikasi yang meminta izin superuser.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Log Anda masih kosong, coba gunakan lebih banyak aplikasi yang membutuhkan SU Anda.</string>
-    <string name="log_data_magisk_none">Log Magisk kosong, ini aneh.</string>
+    <string name="log_data_none">Log Anda masih kosong, coba gunakan lebih banyak aplikasi yang membutuhkan SU Anda</string>
+    <string name="log_data_magisk_none">Log Magisk kosong, ini aneh</string>
     <string name="menuSaveLog">Simpan log</string>
     <string name="menuClearLog">Hapus log sekarang</string>
-    <string name="logs_cleared">Log berhasil dihapus.</string>
+    <string name="logs_cleared">Log berhasil dihapus</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
@@ -101,7 +101,7 @@
     <string name="safetynet_attest_loading">Tunggu sebentar…</string>
     <string name="safetynet_attest_restart">Coba lagi</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
     <string name="show_os_app">Tampilkan aplikasi OS</string>
     <string name="hide_filter_hint">Filter menurut nama</string>
@@ -109,7 +109,7 @@
     <string name="hide_filters">Filter</string>
     <string name="hide_search">Telusuri</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(Info tidak tersedia)</string>
     <string name="reboot_userspace">Nyalakan ulang secara halus</string>
     <string name="reboot_recovery">Nyalakan ke mode Recovery</string>
@@ -127,7 +127,7 @@
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Urutan sortir</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Mode tema</string>
     <string name="settings_dark_mode_message">Pilih mode yang paling cocok dengan gaya Anda!</string>
     <string name="settings_dark_mode_light">Selalu terang</string>
@@ -220,7 +220,7 @@
     <string name="repo_cache_cleared">Cache repo dihapus</string>
     <string name="flashing">Memasang…</string>
     <string name="done">Selesai!</string>
-    <string name="failure">Gagal</string>
+    <string name="failure">Gagal!</string>
     <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Gagal menyembunyikan Magisk Manager.</string>
     <string name="restore_manager_fail_toast">Gagal memulihkan Magisk Manager</string>
