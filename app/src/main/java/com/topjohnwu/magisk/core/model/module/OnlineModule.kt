@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.core.model.ModuleJson
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.legalFilename
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
 import java.util.*
 

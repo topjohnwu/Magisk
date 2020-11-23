@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.core.model
 
 import android.os.Parcelable
 import com.squareup.moshi.JsonClass
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @JsonClass(generateAdapter = true)
 data class UpdateInfo(
