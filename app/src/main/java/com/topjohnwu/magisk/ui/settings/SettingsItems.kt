@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.utils.TransitiveText
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asTransitive
 import com.topjohnwu.magisk.utils.set
@@ -143,11 +144,12 @@ object UpdateChannel : BaseSettingsItem.Selector() {
         set(value) = setV(value, field, { field = it }) { Config.updateChannel = it }
 
     override val title = R.string.settings_update_channel_title.asTransitive()
-    override val entries
-        get() = resources.getStringArray(R.array.update_channel).let {
-            if (BuildConfig.DEBUG) it.toMutableList().apply { add("Canary") }.toTypedArray() else it
-        }
-    override val entryValRes = R.array.value_array
+    override val entries: Array<String> = resources.getStringArray(R.array.update_channel).let {
+        if (BuildConfig.DEBUG) it.toMutableList().apply { add("Canary") }.toTypedArray() else it
+    }
+    override val description
+        get() = entries.getOrNull(value)?.asTransitive()
+            ?: TransitiveText.String(if (value == -1) entries[0] else "Canary")
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
