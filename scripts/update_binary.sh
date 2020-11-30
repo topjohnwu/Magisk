@@ -14,7 +14,8 @@ setup_bb() {
 export BBBIN
 case "$1" in
   "extract"|"-x")
-    [ -z "$2" ] && BBBIN=./busybox || BBBIN="$2"
+    BBBIN=./busybox
+    [ -z "$2" ] || BBBIN="$2"
     extract_bb
     ;;
   "sh")
