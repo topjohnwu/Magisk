@@ -12,7 +12,11 @@
 ###################
 
 ui_print() {
-  $BOOTMODE && echo "$1" || echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+  if $BOOTMODE; then
+    echo "$1"
+  else
+    echo -e "ui_print $1\nui_print" >> /proc/self/fd/$OUTFD
+  fi
 }
 
 toupper() {
@@ -64,7 +68,8 @@ print_title() {
   local len line1len line2len pounds
   line1len=$(echo -n $1 | wc -c)
   line2len=$(echo -n $2 | wc -c)
-  [ $line1len -gt $line2len ] && len=$line1len || len=$line2len
+  len=$line2len
+  [ $line1len -gt $line2len ] && len=$line1len
   len=$((len + 2))
   pounds=$(printf "%${len}s" | tr ' ' '*')
   ui_print "$pounds"
@@ -258,8 +263,8 @@ mount_partitions() {
     fi
     mount -o bind /system_root/system /system
   else
-    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \
-    && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+    SYSTEM_ROOT=false
+    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM_ROOT=true
   fi
   # /vendor is used only on some older devices for recovery AVBv1 signing so is not critical if fails
   [ -L /system/vendor ] && mount_name vendor$SLOT /vendor '-o ro'
@@ -426,7 +431,11 @@ install_magisk() {
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi
 
-  $IS64BIT && mv -f magiskinit64 magiskinit 2>/dev/null || rm -f magiskinit64
+  if $IS64BIT; then
+    mv -f magiskinit64 magiskinit 2>/dev/null
+  else
+    rm -f magiskinit64
+  fi
 
   # Source the boot patcher
   SOURCEDMODE=true
@@ -511,7 +520,8 @@ check_data() {
     # Test if DE storage is writable
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
   fi
-  $DATA && NVBASE=/data || NVBASE=/cache/data_adb
+  NVBASE=/data
+  $DATA || NVBASE=/cache/data_adb
   $DATA_DE && NVBASE=/data/adb
   resolve_vars
 }
@@ -652,14 +662,18 @@ install_module() {
   api_level_arch_detect
 
   # Setup busybox and binaries
-  $BOOTMODE && boot_actions || recovery_actions
+  if $BOOTMODE; then
+    boot_actions
+  else
+    recovery_actions
+  fi
 
   # Extract prop file
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
   [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
 
-  local MODDIRNAME
-  $BOOTMODE && MODDIRNAME=modules_update || MODDIRNAME=modules
+  local MODDIRNAME=modules
+  $BOOTMODE && MODDIRNAME=modules_update
   local MODULEROOT=$NVBASE/$MODDIRNAME
   MODID=`grep_prop id $TMPDIR/module.prop`
   MODNAME=`grep_prop name $TMPDIR/module.prop`

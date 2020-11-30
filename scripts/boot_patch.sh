@@ -32,7 +32,14 @@
 # Pure bash dirname implementation
 getdir() {
   case "$1" in
-    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
+    */*)
+      dir=${1%/*}
+      if [ -z $dir ]; then
+        echo "/"
+      else
+        echo $dir
+      fi
+    ;;
     *) echo "." ;;
   esac
 }

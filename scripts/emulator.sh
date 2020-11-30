@@ -63,7 +63,8 @@ pgrep magiskd >/dev/null && pkill -9 magiskd
 [ -f /system/bin/magisk ] && umount -l /system/bin
 
 # SELinux stuffs
-[ -e /sys/fs/selinux ] && SELINUX=true || SELINUX=false
+SELINUX=false
+[ -e /sys/fs/selinux ] && SELINUX=true
 if $SELINUX; then
   ln -sf ./magiskinit magiskpolicy
   ./magiskpolicy --live --magisk
