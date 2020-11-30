@@ -256,22 +256,20 @@ object Superuser : BaseSettingsItem.Section() {
 object AccessMode : BaseSettingsItem.Selector() {
     override val title = R.string.superuser_access.asTransitive()
     override val entryRes = R.array.su_access
-    override val entryValRes = R.array.value_array
 
     override var value = Config.rootMode
         set(value) = setV(value, field, { field = it }) {
-            Config.rootMode = entryValues[it].toInt()
+            Config.rootMode = it
         }
 }
 
 object MultiuserMode : BaseSettingsItem.Selector() {
     override val title = R.string.multiuser_mode.asTransitive()
     override val entryRes = R.array.multiuser_mode
-    override val entryValRes = R.array.value_array
 
     override var value = Config.suMultiuserMode
         set(value) = setV(value, field, { field = it }) {
-            Config.suMultiuserMode = entryValues[it].toInt()
+            Config.suMultiuserMode = it
         }
 
     override val description
@@ -285,11 +283,10 @@ object MultiuserMode : BaseSettingsItem.Selector() {
 object MountNamespaceMode : BaseSettingsItem.Selector() {
     override val title = R.string.mount_namespace_mode.asTransitive()
     override val entryRes = R.array.namespace
-    override val entryValRes = R.array.value_array
 
     override var value = Config.suMntNamespaceMode
         set(value) = setV(value, field, { field = it }) {
-            Config.suMntNamespaceMode = entryValues[it].toInt()
+            Config.suMntNamespaceMode = it
         }
 
     override val description
@@ -299,11 +296,10 @@ object MountNamespaceMode : BaseSettingsItem.Selector() {
 object AutomaticResponse : BaseSettingsItem.Selector() {
     override val title = R.string.auto_response.asTransitive()
     override val entryRes = R.array.auto_response
-    override val entryValRes = R.array.value_array
 
     override var value = Config.suAutoResponse
         set(value) = setV(value, field, { field = it }) {
-            Config.suAutoResponse = entryValues[it].toInt()
+            Config.suAutoResponse = it
         }
 }
 
@@ -314,7 +310,7 @@ object RequestTimeout : BaseSettingsItem.Selector() {
 
     override var value = selected
         set(value) = setV(value, field, { field = it }) {
-            Config.suDefaultTimeout = entryValues[it].toInt()
+            Config.suDefaultTimeout = it
         }
 
     private val selected: Int
@@ -324,10 +320,9 @@ object RequestTimeout : BaseSettingsItem.Selector() {
 object SUNotification : BaseSettingsItem.Selector() {
     override val title = R.string.superuser_notification.asTransitive()
     override val entryRes = R.array.su_notification
-    override val entryValRes = R.array.value_array
 
     override var value = Config.suNotification
         set(value) = setV(value, field, { field = it }) {
-            Config.suNotification = entryValues[it].toInt()
+            Config.suNotification = it
         }
 }

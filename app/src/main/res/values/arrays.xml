@@ -16,14 +16,6 @@
         <item>@string/settings_su_app_adb</item>
     </string-array>
 
-    <string-array name="value_array">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
     <string-array name="request_timeout">
         <item>@string/settings_su_request_10</item>
         <item>@string/settings_su_request_15</item>

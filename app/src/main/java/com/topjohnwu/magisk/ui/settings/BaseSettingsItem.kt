@@ -158,7 +158,7 @@ sealed class BaseSettingsItem : ObservableItem<BaseSettingsItem>() {
             runCatching { getStringArray(id) }.getOrDefault(emptyArray())
 
         override fun onPressed(view: View, callback: Callback) {
-            if (entries.isEmpty() || entryValues.isEmpty()) return
+            if (entries.isEmpty()) return
             super.onPressed(view, callback)
         }
 
