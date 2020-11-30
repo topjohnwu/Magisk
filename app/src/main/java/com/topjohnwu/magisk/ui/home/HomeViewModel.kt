@@ -68,8 +68,7 @@ class HomeViewModel(
         set(value) = set(value, field, { field = it }, BR.stateManagerProgress)
 
     @get:Bindable
-    val showUninstall get() =
-        Info.env.magiskVersionCode > 0 && stateMagisk != MagiskState.LOADING && isConnected.get()
+    val showUninstall get() = Info.env.isActive && state != State.LOADING
 
     @get:Bindable
     val showSafetyNet get() = Info.hasGMS && isConnected.get()
@@ -82,8 +81,6 @@ class HomeViewModel(
 
     override fun refresh() = viewModelScope.launch {
         state = State.LOADING
-        notifyPropertyChanged(BR.showUninstall)
-        notifyPropertyChanged(BR.showSafetyNet)
         svc.fetchUpdate()?.apply {
             state = State.LOADED
             stateMagisk = when {
@@ -107,6 +104,8 @@ class HomeViewModel(
                 ensureEnv()
             }
         } ?: apply { state = State.LOADING_FAILED }
+        notifyPropertyChanged(BR.showUninstall)
+        notifyPropertyChanged(BR.showSafetyNet)
     }
 
     val showTest = false
