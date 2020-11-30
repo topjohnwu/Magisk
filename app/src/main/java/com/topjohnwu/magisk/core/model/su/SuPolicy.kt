@@ -5,11 +5,12 @@ package com.topjohnwu.magisk.core.model.su
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.INTERACTIVE
 import com.topjohnwu.magisk.ktx.getLabel
 
 data class SuPolicy(
-    var uid: Int,
+    val uid: Int,
     val packageName: String,
     val appName: String,
     val icon: Drawable,
@@ -42,8 +43,7 @@ fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
     val packageName = get("package_name").orEmpty()
     val info = pm.getApplicationInfo(packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES)
 
-    if (info.uid != uid)
-        throw PackageManager.NameNotFoundException()
+    if (info.uid != uid) throw PackageManager.NameNotFoundException()
 
     return SuPolicy(
         uid = uid,
@@ -58,15 +58,28 @@ fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
 }
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): SuPolicy {
+fun Int.toPolicy(pm: PackageManager,
+                 policy: Int = INTERACTIVE,
+                 transformUid: Boolean = false): SuPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
+    val uid = if (transformUid) this % 100000 + Const.USER_ID * 100000 else this
     val info = pm.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
     return SuPolicy(
-        uid = info.uid,
+        uid = uid,
         packageName = pkg,
         appName = info.getLabel(pm),
         icon = info.loadIcon(pm),
+        policy = policy
+    )
+}
+
+fun Int.toUidPolicy(pm: PackageManager, policy: Int): SuPolicy {
+    return SuPolicy(
+        uid = this,
+        packageName = "[UID] $this",
+        appName = "[UID] $this",
+        icon = pm.defaultActivityIcon,
         policy = policy
     )
 }
