@@ -90,7 +90,6 @@ class HomeViewModel(
             }
 
             stateManager = when {
-                !app.isUpdateChannelCorrect && isConnected.get() -> MagiskState.NOT_INSTALLED
                 app.isObsolete -> MagiskState.OBSOLETE
                 else -> MagiskState.UP_TO_DATE
             }
@@ -170,8 +169,6 @@ class HomeViewModel(
 
     private val MagiskJson.isObsolete
         get() = Info.env.isActive && Info.env.magiskVersionCode < versionCode
-    private val ManagerJson.isUpdateChannelCorrect
-        get() = versionCode > 0
     private val ManagerJson.isObsolete
         get() = BuildConfig.VERSION_CODE < versionCode
 
