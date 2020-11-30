@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.home
 
-import android.os.Build
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
@@ -152,17 +151,7 @@ class HomeViewModel(
             MagiskState.NOT_INSTALLED,
             MagiskState.LOADING
         )
-
-        // Don't bother checking env when magisk is not installed, loading or already has been shown
-        if (
-            invalidStates.any { it == stateMagisk } ||
-            shownDialog ||
-            // don't care for emulators either
-            Build.DEVICE.orEmpty().contains("generic") ||
-            Build.PRODUCT.orEmpty().contains("generic")
-        ) {
-            return
-        }
+        if (invalidStates.any { it == stateMagisk } || shownDialog) return
 
         val result = Shell.su("env_check").await()
         if (!result.isSuccess) {
