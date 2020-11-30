@@ -125,14 +125,18 @@ class HomeViewModel(
 
     fun onDeletePressed() = UninstallDialog().publish()
 
-    fun onManagerPressed() =
-        if (isConnected.get()) ManagerInstallDialog().publish()
-        else SnackbarEvent(R.string.no_connection).publish()
+    fun onManagerPressed() = when (state) {
+        State.LOADED -> ManagerInstallDialog().publish()
+        State.LOADING -> SnackbarEvent(R.string.loading).publish()
+        else -> SnackbarEvent(R.string.no_connection).publish()
+    }
 
-    fun onMagiskPressed() = if (isConnected.get()) withExternalRW {
-        HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
-    } else {
-        SnackbarEvent(R.string.no_connection).publish()
+    fun onMagiskPressed() = when (state) {
+        State.LOADED -> withExternalRW {
+            HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+        }
+        State.LOADING -> SnackbarEvent(R.string.loading).publish()
+        else -> SnackbarEvent(R.string.no_connection).publish()
     }
 
     fun onSafetyNetPressed() =
