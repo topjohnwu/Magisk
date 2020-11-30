@@ -10,7 +10,6 @@ import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
-import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavDirections
 import com.google.android.material.card.MaterialCardView
@@ -26,9 +25,9 @@ import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideableBehavior
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
-import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainViewModel : BaseViewModel()
@@ -106,7 +105,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     override fun onResume() {
         super.onResume()
         binding.mainNavigation.menu.apply {
-            findItem(R.id.superuserFragment)?.isEnabled = Info.env.isActive
+            findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
             findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
     }
