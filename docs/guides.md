@@ -10,7 +10,7 @@ For those who want to use this "Standalone Mode" feature outside of Magisk, ther
 1. Set environment variable `ASH_STANDALONE` to `1`<br>Example: `ASH_STANDALONE=1 /data/adb/magisk/busybox sh <script>`
 2. Toggle with command-line options:<br>`/data/adb/magisk/busybox sh -o standalone <script>`
 
-To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and Magisk Manager internally uses) as environment variables are inherited down to child processes.
+To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and Magisk Manager internally use) as environment variables are inherited down to child processes.
 
 
 ## Magisk Modules
@@ -29,7 +29,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   │
 │   │      *** Main Contents ***
 │   │
-│   ├── system              <--- This folder will be mounted if skip_mount does not exists
+│   ├── system              <--- This folder will be mounted if skip_mount does not exist
 │   │   ├── ...
 │   │   ├── ...
 │   │   └── ...
@@ -96,14 +96,14 @@ This file follows the same format as `build.prop`. Each line comprises of `[key]
 #### sepolicy.rule
 If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk's daemon will make sure this file is copied to somewhere `magiskinit` can read pre-init to ensure these rules are injected properly.
 
-Each line in this file will be treated as a policy statement. For more details how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
+Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
 
 #### The `system` folder
 All files you want Magisk to replace/inject for you should be placed in this folder. Please read through the [Magic Mount](details.md#magic-mount) section to understand how Magisk mount your files.
 
 ## Magisk Module Installer
 
-A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in Magisk Manager or custom recoveries such as TWRP. An installer have the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
+A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in Magisk Manager or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
@@ -156,7 +156,7 @@ ui_print <msg>
     Avoid using 'echo' as it will not display in custom recovery's console
 
 abort <msg>
-    print error message <msg> to console and terminate installation
+    print error message <msg> to console and terminate the installation
     Avoid using 'exit' as it will skip the termination cleanup steps
 
 set_perm <target> <owner> <group> <permission> [context]
@@ -214,7 +214,7 @@ Same as mentioned above, actually making the folder *disappear* is not worth the
 In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
 
 - post-fs-data mode
-    - This stage is BLOCKING. Boot process is paused before execution is done, or 10 seconds has passed.
+    - This stage is BLOCKING. The boot process is paused before execution is done, or 10 seconds have passed.
     - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
     - This stage happens before Zygote is started, which pretty much means everything in Android
     - **Run scripts in this mode only if necessary!**
@@ -247,7 +247,7 @@ Overlay files shall be placed in the `overlay.d` folder in boot image ramdisk, a
 2. Existing files can be replaced by files located at the same relative path
 3. Files that correspond to a non-existing file will be ignored
 
-In order to have additional files which you want to reference in your custom `*.rc` scripts, add them in `overlay.d/sbin`. The 3 rules above does not apply to everything in this specific folder, as they will directly be copied to Magisk's internal `tmpfs` directory (which used to always be located at `/sbin`).
+In order to have additional files that you want to reference in your custom `*.rc` scripts, add them in `overlay.d/sbin`. The 3 rules above does not apply to everything in this specific folder, as they will directly be copied to Magisk's internal `tmpfs` directory (which used to always be located at `/sbin`).
 
 Due to changes in Android 11, the `/sbin` folder is no longer guaranteed to exist. In that case, Magisk randomly generates the `tmpfs` folder. Every occurrence of the pattern `${MAGISKTMP}` in your `*.rc` scripts will be replaced with the Magisk `tmpfs` folder when `magiskinit` injects it into `init.rc`. This also works on pre Android 11 devices as `${MAGISKTMP}` will simply be replaced with `/sbin` in this case, so the best practice is to **NEVER** hardcode `/sbin` in your `*.rc` scripts when referencing additional files.
 
