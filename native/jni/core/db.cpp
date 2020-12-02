@@ -359,7 +359,7 @@ bool validate_manager(string &pkg, int userid, struct stat *st) {
 		// Check the official package name
 		sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
 		if (stat(app_path, st)) {
-			LOGE("su: cannot find manager");
+			LOGE("su: cannot find manager\n");
 			memset(st, 0, sizeof(*st));
 			pkg.clear();
 			return false;

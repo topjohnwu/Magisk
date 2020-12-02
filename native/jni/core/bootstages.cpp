@@ -61,7 +61,7 @@ static void mount_mirrors() {
 	char buf1[4096];
 	char buf2[4096];
 
-	LOGI("* Mounting mirrors");
+	LOGI("* Mounting mirrors\n");
 
 	parse_mnt("/proc/mounts", [&](mntent *me) {
 		struct stat st;

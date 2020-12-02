@@ -29,17 +29,17 @@ sFILE make_stream_fp(stream_ptr &&strm) {
 }
 
 int stream::read(void *buf, size_t len)  {
-	LOGE("This stream does not support read");
+	LOGE("This stream does not support read\n");
 	return -1;
 }
 
 int stream::write(const void *buf, size_t len) {
-	LOGE("This stream does not support write");
+	LOGE("This stream does not support write\n");
 	return -1;
 }
 
 off_t stream::seek(off_t off, int whence) {
-	LOGE("This stream does not support seek");
+	LOGE("This stream does not support seek\n");
 	return -1;
 }
 

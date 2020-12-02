@@ -82,7 +82,7 @@ int recv_fd(int sockfd) {
 		cmsg->cmsg_level != SOL_SOCKET            ||
 		cmsg->cmsg_type  != SCM_RIGHTS) {
 error:
-		LOGE("unable to read fd");
+		LOGE("unable to read fd\n");
 		exit(-1);
 	}
 

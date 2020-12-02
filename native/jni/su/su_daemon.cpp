@@ -185,7 +185,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 	// Fail fast
 	if (ctx.info->access.policy == DENY) {
-		LOGW("su: request rejected (%u)", ctx.info->uid);
+		LOGW("su: request rejected (%u)\n", ctx.info->uid);
 		ctx.info.reset();
 		write_int(client, DENY);
 		close(client);
@@ -244,7 +244,7 @@ void su_daemon_handler(int client, struct ucred *credential) {
 
 		// If caller is not root, ensure the owner of pts_slave is the caller
 		if(st.st_uid != ctx.info->uid && ctx.info->uid != 0)
-			LOGE("su: Wrong permission of pts_slave");
+			LOGE("su: Wrong permission of pts_slave\n");
 
 		// Opening the TTY has to occur after the
 		// fork() and setsid() so that it becomes
