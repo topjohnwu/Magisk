@@ -10,6 +10,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 
+fun RecyclerView.addInvalidateItemDecorationsObserver() {
+
+    adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            invalidateItemDecorations()
+        }
+
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+            invalidateItemDecorations()
+        }
+
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            invalidateItemDecorations()
+        }
+    })
+}
+
 fun RecyclerView.addVerticalPadding(paddingTop: Int = 0, paddingBottom: Int = 0) {
     addItemDecoration(VerticalPaddingDecoration(paddingTop, paddingBottom))
 }
@@ -20,11 +37,9 @@ private class VerticalPaddingDecoration(private val paddingTop: Int = 0, private
     private var allowBottom: Boolean = true
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        if (parent.adapter == null) {
-            return
-        }
+        val adapter = parent.adapter ?: return
         val position = parent.getChildAdapterPosition(view)
-        val count = parent.adapter!!.itemCount
+        val count = adapter.itemCount
         if (position == 0 && allowTop) {
             outRect.top = paddingTop
         } else if (position == count - 1 && allowBottom) {
