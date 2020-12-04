@@ -8,7 +8,7 @@
 
 // Daemon command codes
 enum {
-	DO_NOTHING = 0,
+	START_DAEMON,
 	SUPERUSER,
 	CHECK_VERSION,
 	CHECK_VERSION_CODE,
@@ -19,6 +19,7 @@ enum {
 	SQLITE_CMD,
 	REMOVE_MODULES,
 	GET_PATH,
+	DAEMON_CODE_END,
 };
 
 // Return codes for daemon

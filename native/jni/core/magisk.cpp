@@ -81,7 +81,7 @@ int magisk_main(int argc, char *argv[]) {
 		return 0;
 	} else if (argv[1] == "--daemon"sv) {
 		int fd = connect_daemon(true);
-		write_int(fd, DO_NOTHING);
+		write_int(fd, START_DAEMON);
 		return 0;
 	} else if (argv[1] == "--post-fs-data"sv) {
 		int fd = connect_daemon(true);

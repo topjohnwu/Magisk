@@ -25,7 +25,7 @@ int DAEMON_STATE = STATE_UNKNOWN;
 
 static struct stat self_st;
 
-static bool verify_client(int client, pid_t pid) {
+static bool verify_client(pid_t pid) {
 	// Verify caller is the same as server
 	char path[32];
 	sprintf(path, "/proc/%d/exe", pid);
@@ -71,11 +71,14 @@ static void handle_request(int client) {
 	// Verify client credentials
 	ucred cred;
 	get_client_cred(client, &cred);
-	if (cred.uid != 0 && !verify_client(client, cred.pid))
+	if (cred.uid != 0 && !verify_client(cred.pid))
+		goto shortcut;
+
+	req_code = read_int(client);
+	if (req_code < 0 || req_code >= DAEMON_CODE_END)
 		goto shortcut;
 
 	// Check client permissions
-	req_code = read_int(client);
 	switch (req_code) {
 	case MAGISKHIDE:
 	case POST_FS_DATA:
@@ -108,7 +111,7 @@ static void handle_request(int client) {
 		DAEMON_STATE = STATE_BOOT_COMPLETE;
 		break;
 
-	// Simple requests to query daemon info
+	// Simple requests
 	case CHECK_VERSION:
 		write_string(client, MAGISK_VERSION ":MAGISK");
 		goto shortcut;
@@ -118,7 +121,8 @@ static void handle_request(int client) {
 	case GET_PATH:
 		write_string(client, MAGISKTMP.data());
 		goto shortcut;
-	case DO_NOTHING:
+	case START_DAEMON:
+		setup_logfile(true);
 		goto shortcut;
 	}
 
