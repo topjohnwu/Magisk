@@ -23,7 +23,7 @@ static int strm_close(void *v) {
 }
 
 sFILE make_stream_fp(stream_ptr &&strm) {
-	sFILE fp(funopen(strm.release(), strm_read, strm_write, strm_seek, strm_close), fclose);
+	auto fp = make_file(funopen(strm.release(), strm_read, strm_write, strm_seek, strm_close));
 	setbuf(fp.get(), nullptr);
 	return fp;
 }

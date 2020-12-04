@@ -222,39 +222,6 @@ void unlock_blocks() {
 	}
 }
 
-static void collect_logs(bool reset) {
-	static bool running = false;
-	static pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
-	{
-		mutex_guard lock(log_lock);
-		if (running)
-			return;
-		int test = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null");
-		chmod("/dev/null", 0666);
-		if (test != 0)
-			return;
-		running = true;
-	}
-	if (reset)
-		rename(LOGFILE, LOGFILE ".bak");
-	// Start a daemon thread and wait indefinitely
-	new_daemon_thread([]{
-		int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-		exec_t exec {
-			.fd = fd,
-			.fork = fork_no_zombie
-		};
-		int pid = exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
-		close(fd);
-		if (pid < 0) {
-			mutex_guard lock(log_lock);
-			running = false;
-		} else {
-			waitpid(pid, nullptr, 0);
-		}
-	});
-}
-
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
 
 static bool check_key_combo() {
@@ -317,7 +284,7 @@ void post_fs_data(int client) {
 	if (!check_data())
 		goto unblock_init;
 
-	collect_logs(true);
+	setup_logfile(true);
 
 	LOGI("** post-fs-data mode running\n");
 
@@ -369,7 +336,7 @@ void late_start(int client) {
 	write_int(client, 0);
 	close(client);
 
-	collect_logs(false);
+	setup_logfile(false);
 
 	if (!pfs_done || safe_mode)
 		return;
@@ -384,7 +351,7 @@ void boot_complete(int client) {
 	write_int(client, 0);
 	close(client);
 
-	collect_logs(false);
+	setup_logfile(false);
 
 	if (safe_mode)
 		return;

@@ -353,7 +353,7 @@ void file_readline(bool trim, const char *file, const function<bool(string_view)
 	free(buf);
 }
 
-void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &&fn) {
+void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &fn) {
 	file_readline(true, file, [&](string_view line_view) -> bool {
 		char *line = (char *) line_view.data();
 		if (line[0] == '#')
@@ -421,4 +421,12 @@ void restore_folder(const char *dir, vector<raw_file> &files) {
 		}
 		setattr(path.data(), &file.attr);
 	}
+}
+
+sDIR make_dir(DIR *dp) {
+	return sDIR(dp, [](DIR *dp){ return dp ? closedir(dp) : 1; });
+}
+
+sFILE make_file(FILE *fp) {
+	return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
 }

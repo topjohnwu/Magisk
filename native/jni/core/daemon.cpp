@@ -14,6 +14,7 @@
 #include <db.hpp>
 #include <resetprop.hpp>
 #include <flags.hpp>
+#include <stream.hpp>
 
 using namespace std;
 
@@ -122,21 +123,77 @@ static void handle_request(int client) {
 	}
 
 	// Create new thread to handle complex requests
-	new_daemon_thread(std::bind(&request_handler, client, req_code, cred));
+	new_daemon_thread([=] { return request_handler(client, req_code, cred); });
 	return;
 
 shortcut:
 	close(client);
 }
 
-#define vlog __android_log_vprint
+static FILE *log_file;
+
+bool in_mem_log = true;
+static char *log_buf;
+static size_t log_buf_len;
+
+void setup_logfile(bool reset) {
+	if (!in_mem_log)
+		return;
+	in_mem_log = false;
+	if (reset)
+		rename(LOGFILE, LOGFILE ".bak");
+
+	int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+
+	// Dump all logs in memory (if exists)
+	if (log_buf) {
+		write(fd, log_buf, log_buf_len);
+	}
+
+	// Redirect to log file
+	log_file = fdopen(fd, "a");
+	setbuf(log_file, nullptr);
+
+	free(log_buf);
+}
+
+static int magisk_log(int prio, const char *fmt, va_list ap) {
+	// Log to logcat
+	__android_log_vprint(prio, "Magisk", fmt, ap);
+
+	char buf[4096];
+	timeval tv;
+	tm tm;
+	char type;
+	switch (prio) {
+	case ANDROID_LOG_DEBUG:
+		type = 'D';
+		break;
+	case ANDROID_LOG_INFO:
+		type = 'I';
+		break;
+	case ANDROID_LOG_WARN:
+		type = 'W';
+		break;
+	default:
+		type = 'E';
+		break;
+	}
+	gettimeofday(&tv, nullptr);
+	localtime_r(&tv.tv_sec, &tm);
+	size_t len = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
+	int ms = tv.tv_usec / 1000;
+	len += sprintf(buf + len, ".%03d %c : ", ms, type);
+	strcpy(buf + len, fmt);
+	return vfprintf(log_file, buf, ap);
+}
 
 static void android_logging() {
-	static constexpr char TAG[] = "Magisk";
-	log_cb.d = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_DEBUG, TAG, fmt, ap); };
-	log_cb.i = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_INFO, TAG, fmt, ap); };
-	log_cb.w = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_WARN, TAG, fmt, ap); };
-	log_cb.e = [](auto fmt, auto ap){ return vlog(ANDROID_LOG_ERROR, TAG, fmt, ap); };
+	log_file = make_stream_fp<byte_stream>(log_buf, log_buf_len).release();
+	log_cb.d = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_DEBUG, fmt, ap); };
+	log_cb.i = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_INFO, fmt, ap); };
+	log_cb.w = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_WARN, fmt, ap); };
+	log_cb.e = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_ERROR, fmt, ap); };
 	log_cb.ex = nop_ex;
 }
 

@@ -67,7 +67,7 @@ static inline void file_readline(const char *file,
 	file_readline(false, file, fn);
 }
 void parse_prop_file(const char *file,
-		const std::function<bool(std::string_view, std::string_view)> &&fn);
+		const std::function<bool(std::string_view, std::string_view)> &fn);
 void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
@@ -113,27 +113,29 @@ void mmap_rw(const char *filename, B &buf, L &sz) {
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
 using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;
+sDIR make_dir(DIR *dp);
+sFILE make_file(FILE *fp);
 
 static inline sDIR open_dir(const char *path) {
-	return sDIR(opendir(path), closedir);
+	return make_dir(opendir(path));
 }
 
 static inline sDIR xopen_dir(const char *path) {
-	return sDIR(xopendir(path), closedir);
+	return make_dir(xopendir(path));
 }
 
 static inline sDIR xopen_dir(int dirfd) {
-	return sDIR(xfdopendir(dirfd), closedir);
+	return make_dir(xfdopendir(dirfd));
 }
 
 static inline sFILE open_file(const char *path, const char *mode) {
-	return sFILE(fopen(path, mode), fclose);
+	return make_file(fopen(path, mode));
 }
 
 static inline sFILE xopen_file(const char *path, const char *mode) {
-	return sFILE(xfopen(path, mode), fclose);
+	return make_file(xfopen(path, mode));
 }
 
 static inline sFILE xopen_file(int fd, const char *mode) {
-	return sFILE(xfdopen(fd, mode), fclose);
+	return make_file(xfdopen(fd, mode));
 }

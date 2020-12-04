@@ -53,6 +53,7 @@ void su_daemon_handler(int client, ucred *credential);
 int connect_daemon(bool create = false);
 void unlock_blocks();
 void reboot();
+void setup_logfile(bool reset);
 
 // Module stuffs
 void handle_modules();
