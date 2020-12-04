@@ -166,18 +166,14 @@ int main(int argc, char *argv[]) {
 		// This will also mount /sys and /proc
 		load_kernel_info(&cmd);
 
-		bool two_stage = check_two_stage();
 		if (cmd.skip_initramfs) {
-			if (two_stage)
-				init = new SARFirstStageInit(argv, &cmd);
-			else
-				init = new SARInit(argv, &cmd);
+			init = new SARInit(argv, &cmd);
 		} else {
 			if (cmd.force_normal_boot)
 				init = new FirstStageInit(argv, &cmd);
 			else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)
 				init = new RecoveryInit(argv, &cmd);
-			else if (two_stage)
+			else if (check_two_stage())
 				init = new FirstStageInit(argv, &cmd);
 			else
 				init = new RootFSInit(argv, &cmd);

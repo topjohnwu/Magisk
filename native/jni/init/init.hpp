@@ -128,28 +128,21 @@ public:
  *************/
 
 class SARInit : public SARBase {
-protected:
-	void early_mount() override;
-public:
-	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
-		LOGD("%s\n", __FUNCTION__);
-	};
-};
-
-// Special case for legacy SAR on Android 10+
-// Should be followed by normal 2SI SecondStageInit
-class SARFirstStageInit : public SARBase {
 private:
-	void prepare();
+	bool is_two_stage;
+	void first_stage_prep();
 protected:
 	void early_mount() override;
 public:
-	SARFirstStageInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd) {
+	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd), is_two_stage(false) {
 		LOGD("%s\n", __FUNCTION__);
 	};
 	void start() override {
 		early_mount();
-		prepare();
+		if (is_two_stage)
+			first_stage_prep();
+		else
+			patch_rootdir();
 		exec_init();
 	}
 };

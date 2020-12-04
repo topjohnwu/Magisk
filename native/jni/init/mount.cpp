@@ -338,23 +338,22 @@ mount_root:
 }
 
 void SARInit::early_mount() {
-	// Make dev writable
-	xmkdir("/dev", 0755);
-	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-	mount_list.emplace_back("/dev");
-
-	backup_files();
-
-	mount_system_root();
-	switch_root("/system_root");
-
-	mount_with_dt();
-}
-
-void SARFirstStageInit::early_mount() {
 	backup_files();
 	mount_system_root();
 	switch_root("/system_root");
+
+	{
+		auto init = raw_data::mmap_ro("/init");
+		is_two_stage = init.contains("selinux_setup");
+	}
+
+	if (!is_two_stage) {
+		// Make dev writable
+		xmkdir("/dev", 0755);
+		xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+		mount_list.emplace_back("/dev");
+		mount_with_dt();
+	}
 }
 
 void SecondStageInit::early_mount() {

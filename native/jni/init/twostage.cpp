@@ -139,7 +139,7 @@ void FirstStageInit::prepare() {
 #define INIT_PATH  "/system/bin/init"
 #define REDIR_PATH "/system/bin/am"
 
-void SARFirstStageInit::prepare() {
+void SARInit::first_stage_prep() {
 	int pid = getpid();
 
 	xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
