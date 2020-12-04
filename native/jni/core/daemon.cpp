@@ -158,6 +158,9 @@ void setup_logfile(bool reset) {
 }
 
 static int magisk_log(int prio, const char *fmt, va_list ap) {
+	va_list args;
+	va_copy(args, ap);
+
 	// Log to logcat
 	__android_log_vprint(prio, "Magisk", fmt, ap);
 
@@ -185,7 +188,7 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
 	int ms = tv.tv_usec / 1000;
 	len += sprintf(buf + len, ".%03d %c : ", ms, type);
 	strcpy(buf + len, fmt);
-	return vfprintf(log_file, buf, ap);
+	return vfprintf(log_file, buf, args);
 }
 
 static void android_logging() {
