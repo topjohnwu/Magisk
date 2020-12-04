@@ -13,10 +13,7 @@ import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
-import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
-import com.topjohnwu.magisk.ktx.addVerticalPadding
-import com.topjohnwu.magisk.ktx.fixEdgeEffect
-import com.topjohnwu.magisk.ktx.hideKeyboard
+import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
@@ -72,7 +69,7 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         binding.moduleList.apply {
             addVerticalPadding(
                 l_50,
-                l1 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
+                l1 + l_50 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
             )
             addSimpleItemDecoration(
                 left = l1,
@@ -81,6 +78,9 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
                 bottom = l_50,
             )
             fixEdgeEffect()
+            post {
+                addInvalidateItemDecorationsObserver()
+            }
         }
 
         binding.moduleFilterInclude.moduleFilterList.apply {
