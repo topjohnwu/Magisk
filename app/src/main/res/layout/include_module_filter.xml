@@ -33,7 +33,7 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="@dimen/internal_action_bar_size"
-            app:fitsSystemWindowsInsets="top|bottom"
+            app:fitsSystemWindowsInsets="top"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@+id/module_filter_title_search"

@@ -86,7 +86,7 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         binding.moduleFilterInclude.moduleFilterList.apply {
             addVerticalPadding(
                 l_50,
-                l1 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
+                l_50
             )
             addSimpleItemDecoration(
                 left = l1,
