@@ -273,10 +273,17 @@ void fclone_attr(int src, int dest) {
 }
 
 void *__mmap(const char *filename, size_t *size, bool rw) {
+	int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
+	if (fd < 0) {
+		*size = 0;
+		return nullptr;
+	}
 	struct stat st;
 	void *buf;
-	int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
-	fstat(fd, &st);
+	if (fstat(fd, &st)) {
+		*size = 0;
+		return nullptr;
+	}
 	if (S_ISBLK(st.st_mode))
 		ioctl(fd, BLKGETSIZE64, size);
 	else

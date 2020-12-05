@@ -346,6 +346,7 @@ void SARInit::early_mount() {
 		auto init = raw_data::mmap_ro("/init");
 		is_two_stage = init.contains("selinux_setup");
 	}
+	LOGD("is_two_stage: [%d]\n", is_two_stage);
 
 	if (!is_two_stage) {
 		// Make dev writable

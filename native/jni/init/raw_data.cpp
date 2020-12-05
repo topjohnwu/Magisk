@@ -3,6 +3,8 @@
 using namespace std;
 
 int data_holder::patch(str_pairs list) {
+	if (buf == nullptr)
+		return 0;
 	int count = 0;
 	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
 		for (auto [from, to] : list) {
@@ -19,9 +21,13 @@ int data_holder::patch(str_pairs list) {
 }
 
 bool data_holder::contains(string_view pattern) {
+	if (buf == nullptr)
+		return false;
 	for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
-		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0)
+		if (memcmp(p, pattern.data(), pattern.length() + 1) == 0) {
+			LOGD("Found pattern [%s]\n", pattern.data());
 			return true;
+		}
 	}
 	return false;
 }
