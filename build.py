@@ -274,9 +274,7 @@ def dump_bin_headers():
                 binary_dump(src, out, 'magisk_xz')
     stub = op.join(config['outdir'], 'stub-release.apk')
     if not op.exists(stub):
-        stub = op.join(config['outdir'], 'stub-debug.apk')
-        if not op.exists(stub):
-            error('Build stub APK before building "magiskinit"')
+        error('Build stub APK before building "magiskinit"')
     with open(op.join('native', 'out', 'binaries.h'), 'w') as out:
         with open(stub, 'rb') as src:
             binary_dump(src, out, 'manager_xz')
@@ -334,7 +332,7 @@ def build_binary(args):
 
 
 def build_apk(args, module):
-    build_type = 'Release' if args.release else 'Debug'
+    build_type = 'Release' if args.release or module == 'stub' else 'Debug'
 
     proc = execv([gradlew, f'{module}:assemble{build_type}',
                  '-PconfigPath=' + op.abspath(args.config)])
