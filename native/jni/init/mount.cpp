@@ -1,8 +1,6 @@
+#include <sys/mount.h>
 #include <sys/sysmacros.h>
-#include <string.h>
-#include <stdio.h>
 #include <libgen.h>
-#include <vector>
 
 #include <utils.hpp>
 #include <selinux.hpp>
@@ -357,7 +355,7 @@ void SARInit::early_mount() {
 	}
 }
 
-void SecondStageInit::early_mount() {
+void SecondStageInit::prepare() {
 	backup_files();
 
 	umount2("/init", MNT_DETACH);
@@ -367,14 +365,14 @@ void SecondStageInit::early_mount() {
 		switch_root("/system_root");
 }
 
-void BaseInit::cleanup() {
+void BaseInit::exec_init() {
 	// Unmount in reverse order
 	for (auto &p : reversed(mount_list)) {
 		if (xumount(p.data()) == 0)
 			LOGD("Unmount [%s]\n", p.data());
 	}
-	mount_list.clear();
-	mount_list.shrink_to_fit();
+	execv("/init", argv);
+	exit(1);
 }
 
 static void patch_socket_name(const char *path) {

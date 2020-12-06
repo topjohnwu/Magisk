@@ -1,3 +1,5 @@
+#include <sys/mount.h>
+
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <socket.hpp>

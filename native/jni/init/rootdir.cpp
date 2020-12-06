@@ -1,7 +1,4 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <vector>
+#include <sys/mount.h>
 #include <libgen.h>
 
 #include <magisk.hpp>
@@ -293,7 +290,7 @@ void SARBase::patch_rootdir() {
 #define TMP_MNTDIR "/dev/mnt"
 #define TMP_RULESDIR "/.backup/.sepolicy.rules"
 
-void RootFSInit::setup_rootfs() {
+void RootFSInit::patch_rootfs() {
 	// Handle custom sepolicy rules
 	xmkdir(TMP_MNTDIR, 0755);
 	mount_rules_dir("/dev/block", TMP_MNTDIR);

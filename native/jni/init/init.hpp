@@ -1,10 +1,3 @@
-#include <sys/mount.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <vector>
-
 #include <utils.hpp>
 
 #include "raw_data.hpp"
@@ -50,16 +43,10 @@ protected:
 	char **argv;
 	std::vector<std::string> mount_list;
 
-	void exec_init() {
-		cleanup();
-		execv("/init", argv);
-		exit(1);
-	}
-	virtual void cleanup();
+	[[noreturn]] void exec_init();
 	void read_dt_fstab(std::vector<fstab_entry> &fstab);
 public:
-	BaseInit(char *argv[], cmdline *cmd) :
-	cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
+	BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
 	virtual ~BaseInit() = default;
 	virtual void start() = 0;
 };
@@ -82,17 +69,11 @@ class SARBase : public MagiskInit {
 protected:
 	std::vector<raw_file> overlays;
 
-	virtual void early_mount() = 0;
 	void backup_files();
 	void patch_rootdir();
 	void mount_system_root();
 public:
 	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {}
-	void start() override {
-		early_mount();
-		patch_rootdir();
-		exec_init();
-	}
 };
 
 /***************
@@ -113,14 +94,19 @@ public:
 };
 
 class SecondStageInit : public SARBase {
-protected:
-	void early_mount() override;
+private:
+	void prepare();
 public:
 	SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
 		LOGD("%s\n", __FUNCTION__);
 		// Do not unmount /sys and /proc
 		mount_list.clear();
 	};
+	void start() override {
+		prepare();
+		patch_rootdir();
+		exec_init();
+	}
 };
 
 /*************
@@ -130,9 +116,9 @@ public:
 class SARInit : public SARBase {
 private:
 	bool is_two_stage;
+
+	void early_mount();
 	void first_stage_prep();
-protected:
-	void early_mount() override;
 public:
 	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd), is_two_stage(false) {
 		LOGD("%s\n", __FUNCTION__);
@@ -153,16 +139,15 @@ public:
 
 class RootFSInit : public MagiskInit {
 private:
-	void setup_rootfs();
 	void early_mount();
+	void patch_rootfs();
 public:
 	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
 		LOGD("%s\n", __FUNCTION__);
 	}
-
 	void start() override {
 		early_mount();
-		setup_rootfs();
+		patch_rootfs();
 		exec_init();
 	}
 };
