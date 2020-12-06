@@ -189,55 +189,57 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void SARBase::patch_rootdir() {
-	char tmp_dir[32];
+	string tmp_dir;
 	const char *sepol;
 
-	char *p;
 	if (access("/sbin", F_OK) == 0) {
-		p = tmp_dir + sprintf(tmp_dir, "%s", "/sbin");
+		tmp_dir = "/sbin";
 		sepol = "/sbin/.se";
 	} else {
-		p = tmp_dir + sprintf(tmp_dir, "%s", "/dev/");
-		p += gen_rand_str(p, 8);
-		xmkdir(tmp_dir, 0);
+		char buf[8];
+		gen_rand_str(buf, sizeof(buf));
+		tmp_dir = "/dev/"s + buf;
+		xmkdir(tmp_dir.data(), 0);
 		sepol = "/dev/.se";
 	}
 
-	setup_tmp(tmp_dir);
-	chdir(tmp_dir);
+	setup_tmp(tmp_dir.data());
+	chdir(tmp_dir.data());
+
 	mount_rules_dir(BLOCKDIR, MIRRDIR);
 
 	// Mount system_root mirror
 	xmkdir(ROOTMIR, 0755);
 	xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
-	strcpy(p, "/" ROOTMIR);
-	mount_list.emplace_back(tmp_dir);
-	*p = '\0';
+	mount_list.emplace_back(tmp_dir + "/" ROOTMIR);
 
 	// Recreate original sbin structure if necessary
-	if (tmp_dir == "/sbin"sv)
+	if (tmp_dir == "/sbin")
 		recreate_sbin(ROOTMIR "/sbin", true);
 
 	// Patch init
-	int src = xopen("/init", O_RDONLY | O_CLOEXEC);
-	auto init = raw_data::read(src);
-	int patch_count = init.patch({
-		make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
-		make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
-	});
-	xmkdir(ROOTOVL, 0);
-	int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
-	xwrite(dest, init.buf, init.sz);
-	fclone_attr(src, dest);
-	close(src);
-	close(dest);
+	int patch_count;
+	{
+		int src = xopen("/init", O_RDONLY | O_CLOEXEC);
+		auto init = raw_data::read(src);
+		patch_count = init.patch({
+			make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
+			make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
+		 });
+		xmkdir(ROOTOVL, 0);
+		int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
+		xwrite(dest, init.buf, init.sz);
+		fclone_attr(src, dest);
+		close(src);
+		close(dest);
+	}
 
 	if (patch_count != 2 && access(LIBSELINUX, F_OK) == 0) {
 		// init is dynamically linked, need to patch libselinux
 		auto lib = raw_data::read(LIBSELINUX);
 		lib.patch({make_pair(MONOPOLICY, sepol)});
 		xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
-		dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
+		int dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
 		xwrite(dest, lib.buf, lib.sz);
 		close(dest);
 		clone_attr(LIBSELINUX, ROOTOVL LIBSELINUX);
@@ -252,7 +254,7 @@ void SARBase::patch_rootdir() {
 	if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
 		LOGD("ACK init daemon to write backup files\n");
 		// Let daemon know where tmp_dir is
-		write_string(sockfd, tmp_dir);
+		write_string(sockfd, tmp_dir.data());
 		// Wait for daemon to finish restoring files
 		int ack;
 		read(sockfd, &ack, sizeof(ack));
@@ -272,16 +274,16 @@ void SARBase::patch_rootdir() {
 
 	// Patch init.rc
 	if (access("/init.rc", F_OK) == 0) {
-		patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir);
+		patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
 	} else {
 		// Android 11's new init.rc
 		xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
-		patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir);
+		patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data());
 	}
 
 	// Mount rootdir
 	magic_mount(ROOTOVL);
-	dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC, 0);
+	int dest = xopen(ROOTMNT, O_WRONLY | O_CREAT | O_CLOEXEC, 0);
 	write(dest, magic_mount_list.data(), magic_mount_list.length());
 	close(dest);
 
