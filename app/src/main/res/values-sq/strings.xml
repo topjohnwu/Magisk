@@ -55,7 +55,6 @@
     <string name="flash_screen_title">Instalimi</string>
 
     <!--Superuser-->
-    <string name="su_quest_title">Kërkesa e superpërdoruesit</string>
     <string name="touch_filtered_warning">Meqenëse një aplikacion po errëson një kërkesë të superpërdoruesit, Magisk nuk mund të verifikojë përgjigjen tuaj</string>
     <string name="deny">Moho</string>
     <string name="prompt">Shpejtë</string>
@@ -78,7 +77,6 @@
     <string name="su_revoke_title">Anulohet?</string>
     <string name="su_revoke_msg">Konfirmo të heqësh të drejtat e %1$s?</string>
     <string name="toast">dolli</string>
-    <string name="asnjë">Asnjë</string>
     <string name="superuser_toggle_notification">Njoftimet</string>
     <string name="superuser_toggle_revoke">Anulo</string>
     <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar ende leje për superpërdoruesin.</string>
@@ -116,8 +114,6 @@
     <string name="reboot_download">Ristartoni për ta shkarkuar</string>
     <string name="reboot_edl">Ristartoni në EDL</string>
     <string name="module_version_author">%1$s nga %2$s</string>
-    <string name="module_section_nging">Përditësimet</string>
-    <string name="module_section_nging_action">Përditëso të gjitha</string>
     <string name="module_state_remove">Hiq</string>
     <string name="module_state_restore">Rivendos</string>
     <string name="module_action_install_external">Instaloni nga hapësira ruajtëse</string>
@@ -160,12 +156,6 @@
     <string name="settings_su_app">Vetëm aplikacionet</string>
     <string name="settings_su_adb">vetëm ADB</string>
     <string name="settings_su_disable">Çaktivizuar</string>
-    <string name="settings_su_quest_10">10 sekonda</string>
-    <string name="settings_su_quest_15">15 sekonda</string>
-    <string name="settings_su_quest_20">20 sekonda</string>
-    <string name="settings_su_quest_30">30 sekonda</string>
-    <string name="settings_su_quest_45">45 sekonda</string>
-    <string name="settings_su_quest_60">60 sekonda</string>
     <string name="superuser_access">Hyrja në superpërdorues</string>
     <string name="auto_response">Përgjigje Automatike</string>
     <string name="request_timeout">Koha e kërkesës</string>
@@ -185,8 +175,6 @@
     <string name="settings_owner_only">Vetëm zotëruesi i pajisjes</string>
     <string name="settings_owner_manage">Pronari i Pajisjes i Menaxhuar</string>
     <string name="settings_user_independent">Përdorues i Pavarur</string>
-    <string name="Owner_only_summary">Vetëm pronari ka qasje rrënjësore</string>
-    <string name="Owner_manage_summary">Vetëm pronari mund të menaxhojë hyrjen në rrënjë dhe të marrë kërkesat e kërkesës</string>
     <string name="user_indepenent_summary">Çdo përdorues ka rregullat e tij / saj të veçanta rrënjësore</string>
     <string name="mount_namespace_mode">Modaliteti i hapësirës së emrave të malit</string>
     <string name="settings_ns_global">Hapësira Globale e Emrave</string>
@@ -202,7 +190,6 @@
     <string name="download_complete"> Shkarkimi përfundoi </string>
     <string name="download_file_error"> Gabim në shkarkimin e skedarit </string>
     <string name="download_open_parent"> Shfaq në dosjen mëmë </string>
-    <string name="download_open_ self"> Shfaq skedarin </string>
     <string name="magisk_update_title"> Mundësohet azhurnimi i Magisk! </string>
     <string name="manager_update_title"> Mundësohet azhurnimi i menaxherit Magisk! </string>
 
@@ -228,17 +215,17 @@
     <string name="restore_done">Restaurimi u krye!</string>
     <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
     <string name="proprietary_title">Shkarkoni Kodin e Pronarit</string>
-    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \ n \ nA do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</ string >>
+    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \ n \ nA do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</string>
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim Shtesë</string>
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet. Do të shkarkojë zip-in e konfigurimit të Magisk, doni të vazhdoni tani?</string>
     <string name="setup_msg">Konfigurimi i mjedisit drejtues…</string>
     <string name="authenticate">Vërteto</string>
     <string name="unsupport_magisk_title">Versioni i pambështetur Magisk</string>
-    <string name="unsupport_magisk_msg">Ky version i Magisk Manager nuk e mbështet versionin Magisk më të ulët se %1$s. \n\n Aplikimi do të sillet sikur nuk është instaluar asnjë Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</ string >>
+    <string name="unsupport_magisk_msg">Ky version i Magisk Manager nuk e mbështet versionin Magisk më të ulët se %1$s. \n\n Aplikimi do të sillet sikur nuk është instaluar asnjë Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</string>
     <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
-    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t'u njohur. Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
+    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t\'u njohur. Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
 
 </resources>
