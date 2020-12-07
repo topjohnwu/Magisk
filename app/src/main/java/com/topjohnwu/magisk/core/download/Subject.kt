@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.get
-import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 private fun cachedFile(name: String) = get<Context>().cachedFile(name).apply { delete() }.toUri()
@@ -101,7 +101,6 @@ sealed class Subject : Parcelable {
                 Action.Download -> Download()
                 Action.Uninstall -> Uninstall()
                 Action.EnvFix, is Action.Flash, is Action.Patch -> Internal(config)
-                else -> throw IllegalArgumentException()
             }
         }
 
