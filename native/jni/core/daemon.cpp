@@ -134,31 +134,32 @@ shortcut:
 	close(client);
 }
 
-static FILE *log_file;
+static shared_ptr<FILE> log_file;
 
-bool in_mem_log = true;
+atomic_flag file_backed = ATOMIC_FLAG_INIT;
 static char *log_buf;
 static size_t log_buf_len;
 
 void setup_logfile(bool reset) {
-	if (!in_mem_log)
+	if (file_backed.test_and_set(memory_order_relaxed))
 		return;
-	in_mem_log = false;
 	if (reset)
 		rename(LOGFILE, LOGFILE ".bak");
 
 	int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-
-	// Dump all logs in memory (if exists)
-	if (log_buf) {
-		write(fd, log_buf, log_buf_len);
+	if (fd < 0) {
+		log_file.reset();
+		return;
 	}
 
-	// Redirect to log file
-	log_file = fdopen(fd, "a");
-	setbuf(log_file, nullptr);
+	// Dump all logs in memory (if exists)
+	if (log_buf)
+		write(fd, log_buf, log_buf_len);
 
-	free(log_buf);
+	if (FILE *fp = fdopen(fd, "a")) {
+		setbuf(fp, nullptr);
+		log_file.reset(fp, &fclose);
+	}
 }
 
 static int magisk_log(int prio, const char *fmt, va_list ap) {
@@ -167,6 +168,10 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
 
 	// Log to logcat
 	__android_log_vprint(prio, "Magisk", fmt, ap);
+
+	auto local_log_file = log_file;
+	if (!local_log_file)
+		return 0;
 
 	char buf[4096];
 	timeval tv;
@@ -192,11 +197,15 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
 	int ms = tv.tv_usec / 1000;
 	len += sprintf(buf + len, ".%03d %c : ", ms, type);
 	strcpy(buf + len, fmt);
-	return vfprintf(log_file, buf, args);
+	return vfprintf(local_log_file.get(), buf, args);
 }
 
 static void android_logging() {
-	log_file = make_stream_fp<byte_stream>(log_buf, log_buf_len).release();
+	auto in_mem_file = make_stream_fp<byte_stream>(log_buf, log_buf_len);
+	log_file.reset(in_mem_file.release(), [](FILE *) {
+		free(log_buf);
+		log_buf = nullptr;
+	});
 	log_cb.d = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_DEBUG, fmt, ap); };
 	log_cb.i = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_INFO, fmt, ap); };
 	log_cb.w = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_WARN, fmt, ap); };
