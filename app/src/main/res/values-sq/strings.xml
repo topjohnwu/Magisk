@@ -57,7 +57,7 @@
     <!--Superuser-->
     <string name="touch_filtered_warning">Meqenëse një aplikacion po errëson një kërkesë të superpërdoruesit, Magisk nuk mund të verifikojë përgjigjen tuaj</string>
     <string name="deny">Moho</string>
-    <string name="prompt">Shpejtë</string>
+    <string name="prompt">Pyet</string>
     <string name="grant">Lejo</string>
     <string name="su_warning">Jep hyrjen e plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
     <string name="forever">Përgjithmonë</string>
@@ -72,7 +72,7 @@
     <string name="su_snack_deny">Të drejtat e superpërdoruesit prej %1$s mohohen</string>
     <string name="su_snack_notif_on">Njoftimet e %1$s janë aktivizuar</string>
     <string name="su_snack_notif_off">Njoftimet e %1$s janë çaktivizuar</string>
-    <string name="su_snack_log_on"> Regjistrimi i %1$s është aktivizuar</string>
+    <string name="su_snack_log_on">Regjistrimi i %1$s është aktivizuar</string>
     <string name="su_snack_log_off">Regjistrimi i %1$s është çaktivizuar</string>
     <string name="su_revoke_title">Anulohet?</string>
     <string name="su_revoke_msg">Konfirmo të heqësh të drejtat e %1$s?</string>
@@ -88,11 +88,11 @@
     <string name="menuClearLog">Pastro regjistrin tani</string>
     <string name="logs_cleared">Regjistri u pastrua me sukses</string>
     <string name="pid">PID: %1$d</string>
-    <string name="target_uid"> UID i synuar: %1$d</string>
+    <string name="target_uid">UID i synuar: %1$d</string>
 
     <!--SafetyNet-->
     <string name="safetynet_api_error">Gabim API i SafetyNet</string>
-    <string name="safetynet_res_invalid"> Përgjigjja është e pavlefshme </string>
+    <string name="safetynet_res_invalid">Përgjigjja është e pavlefshme </string>
     <string name="safetynet_attest_success">Suksese!</string>
     <string name="safetynet_attest_failure">Vërtetimi dështoi!</string>
     <string name="safetynet_attest_loading">Thjesht një sekondë…</string>
@@ -154,7 +154,7 @@
     <string name="settings_app_name_error">Formati i pavlefshëm</string>
     <string name="settings_su_app_adb">Aplikacionet dhe ADB</string>
     <string name="settings_su_app">Vetëm aplikacionet</string>
-    <string name="settings_su_adb">vetëm ADB</string>
+    <string name="settings_su_adb">Vetëm ADB</string>
     <string name="settings_su_disable">Çaktivizuar</string>
     <string name="superuser_access">Hyrja në superpërdorues</string>
     <string name="auto_response">Përgjigje Automatike</string>
@@ -185,13 +185,13 @@
     <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
 
     <!--Notifications-->
-    <string name="update_channel"> Përditësimet Magisk </string>
-    <string name="progress_channel"> Njoftimet e Progresit </string>
-    <string name="download_complete"> Shkarkimi përfundoi </string>
-    <string name="download_file_error"> Gabim në shkarkimin e skedarit </string>
-    <string name="download_open_parent"> Shfaq në dosjen mëmë </string>
-    <string name="magisk_update_title"> Mundësohet azhurnimi i Magisk! </string>
-    <string name="manager_update_title"> Mundësohet azhurnimi i menaxherit Magisk! </string>
+    <string name="update_channel">Përditësimet Magisk </string>
+    <string name="progress_channel">Njoftimet e Progresit </string>
+    <string name="download_complete">Shkarkimi përfundoi </string>
+    <string name="download_file_error">Gabim në shkarkimin e skedarit </string>
+    <string name="download_open_parent">Shfaq në dosjen mëmë </string>
+    <string name="magisk_update_title">Mundësohet azhurnimi i Magisk! </string>
+    <string name="manager_update_title">Mundësohet azhurnimi i menaxherit Magisk! </string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
