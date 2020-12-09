@@ -519,6 +519,8 @@ check_data() {
     touch /data/.rw && rm /data/.rw && DATA=true
     # Test if DE storage is writable
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
+    # Some recovery have broken FDE implementations, which cannot access existing folders
+    $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
   fi
   NVBASE=/data
   $DATA || NVBASE=/cache/data_adb
