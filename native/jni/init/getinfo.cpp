@@ -130,6 +130,16 @@ void setup_klog() {
 	}
 }
 
+#define read_dt(name, key) \
+sprintf(file_name, "%s/" name, cmd->dt_dir); \
+if (access(file_name, R_OK) == 0){ \
+    string data = full_read(file_name); \
+    if (!data.empty()) { \
+        data.pop_back(); \
+        strcpy(cmd->key, data.data()); \
+    } \
+}
+
 void load_kernel_info(cmdline *cmd) {
 	// Get kernel data using procfs and sysfs
 	xmkdir("/proc", 0755);
@@ -161,7 +171,7 @@ void load_kernel_info(cmdline *cmd) {
 		}
 	});
 
-	LOGD("Device info:\n");
+	LOGD("Kernel cmdline info:\n");
 	LOGD("skip_initramfs=[%d]\n", cmd->skip_initramfs);
 	LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
 	LOGD("slot=[%s]\n", cmd->slot);
@@ -181,6 +191,17 @@ void load_kernel_info(cmdline *cmd) {
 
 	if (cmd->dt_dir[0] == '\0')
 		strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
+
+	char file_name[128];
+	read_dt("fstab_suffix", fstab_suffix)
+	read_dt("hardware", hardware)
+	read_dt("hardware.platform", hardware_plat)
+
+	LOGD("Device tree info:\n");
+	LOGD("dt_dir=[%s]\n", cmd->dt_dir);
+	LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
+	LOGD("hardware=[%s]\n", cmd->hardware);
+	LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
 }
 
 bool check_two_stage() {
