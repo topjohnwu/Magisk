@@ -123,6 +123,7 @@ object HideAPK {
             Config.suManager = pkg
             grantUriPermission(pkg, APK_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             grantUriPermission(pkg, PREFS_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.putExtra(Const.Key.PREV_PKG, packageName)
             startActivity(intent)
         }
 
@@ -167,7 +168,7 @@ object HideAPK {
             Config.suManager = ""
             grantUriPermission(APPLICATION_ID, APK_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             grantUriPermission(APPLICATION_ID, PREFS_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.putExtra(Const.Key.HIDDEN_PKG, packageName)
+            intent.putExtra(Const.Key.PREV_PKG, packageName)
             startActivity(intent)
         }
 

@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.ui.theme.Theme
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
-import java.io.IOException
 import java.io.InputStream
 
 object Config : PreferenceModel, DBConfig {
@@ -159,12 +158,13 @@ object Config : PreferenceModel, DBConfig {
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
-    fun load(pkg: String) {
-        try {
+    fun load(pkg: String?) {
+        // Only try to load prefs when fresh install and a previous package name is set
+        if (pkg != null && prefs.all.isEmpty()) runCatching {
             context.contentResolver.openInputStream(Provider.PREFS_URI(pkg))?.use {
                 prefs.edit { parsePrefs(it) }
             }
-        } catch (e: IOException) {}
+        }
 
         prefs.edit {
             // Settings migration

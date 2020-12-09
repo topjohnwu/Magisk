@@ -12,7 +12,7 @@
     <application
         android:icon="@drawable/ic_launcher"
         android:name="a.e"
-        android:allowBackup="true"
+        android:allowBackup="false"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Splash -->

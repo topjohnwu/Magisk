@@ -48,10 +48,10 @@ open class SplashActivity : Activity() {
         // Pre-initialize root shell
         Shell.getShell()
 
-        val hiddenPackage = intent.getStringExtra(Const.Key.HIDDEN_PKG)
+        val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)
 
-        Config.load(hiddenPackage ?: APPLICATION_ID)
-        handleRepackage(hiddenPackage)
+        Config.load(prevPkg)
+        handleRepackage(prevPkg)
         Notifications.setup(this)
         UpdateCheckService.schedule(this)
         Shortcuts.setupDynamic(this)
