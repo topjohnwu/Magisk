@@ -61,7 +61,7 @@ BINDIR=$INSTALLER/$ARCH32
 chmod -R 755 $CHROMEDIR $BINDIR
 
 # Check if system root is installed and remove
-remove_system_su
+$BOOTMODE || remove_system_su
 
 ##############
 # Environment
