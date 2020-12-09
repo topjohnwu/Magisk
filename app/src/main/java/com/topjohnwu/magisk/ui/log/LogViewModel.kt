@@ -62,7 +62,7 @@ class LogViewModel(
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
-            val logFile = MediaStoreUtils.getFile(filename)
+            val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---System Properties---\n\n")
 

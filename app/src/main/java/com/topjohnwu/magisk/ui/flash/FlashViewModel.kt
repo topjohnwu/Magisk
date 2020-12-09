@@ -107,7 +107,7 @@ class FlashViewModel(
     private fun savePressed() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "magisk_install_log_%s.log".format(now.toTime(timeFormatStandard))
-            val file = MediaStoreUtils.getFile(name)
+            val file = MediaStoreUtils.getFile(name, true)
             file.uri.outputStream().bufferedWriter().use { writer ->
                 logItems.forEach {
                     writer.write(it)
