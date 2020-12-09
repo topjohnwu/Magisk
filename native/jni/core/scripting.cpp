@@ -102,12 +102,12 @@ void install_apk(const char *apk) {
 	exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 
-[[noreturn]] __printflike(1, 2)
-static void abort(const char *fmt, ...) {
+[[noreturn]] __printflike(2, 3)
+static void abort(FILE *fp, const char *fmt, ...) {
 	va_list valist;
 	va_start(valist, fmt);
-	vfprintf(stderr, fmt, valist);
-	fprintf(stderr, "\n\n");
+	vfprintf(fp, fmt, valist);
+	fprintf(fp, "\n\n");
 	va_end(valist);
 	exit(1);
 }
@@ -121,14 +121,13 @@ exit 0'
 
 void install_module(const char *file) {
 	if (getuid() != 0)
-		abort("Run this command with root");
+		abort(stderr, "Run this command with root");
 	if (access(DATABIN, F_OK) ||
 		access(DATABIN "/busybox", X_OK) ||
 		access(DATABIN "/util_functions.sh", F_OK))
-		abort("Incomplete Magisk install");
-	if (access(file, F_OK)) {
-		abort("'%s' does not exist", file);
-	}
+		abort(stderr, "Incomplete Magisk install");
+	if (access(file, F_OK))
+		abort(stderr, "'%s' does not exist", file);
 
 	setenv("OUTFD", "1", 1);
 	setenv("ZIPFILE", file, 1);
@@ -138,7 +137,7 @@ void install_module(const char *file) {
 	xdup2(fd, STDERR_FILENO);
 	close(fd);
 
-	const char *argv[] = { "/system/bin/sh", "-c", install_module_script };
+	const char *argv[] = { "/system/bin/sh", "-c", install_module_script, nullptr };
 	execve(argv[0], (char **) argv, environ);
-	abort("Failed to execute BusyBox shell");
+	abort(stdout, "Failed to execute BusyBox shell");
 }
