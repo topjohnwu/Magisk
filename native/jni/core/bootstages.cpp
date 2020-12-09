@@ -363,17 +363,18 @@ void boot_complete(int client) {
 	if (pfs_done)
 		auto_start_magiskhide();
 
-	if (access(MANAGERAPK, F_OK) == 0) {
-		// Install Magisk Manager if exists
-		rename(MANAGERAPK, "/data/magisk.apk");
-		install_apk("/data/magisk.apk");
-	} else {
-		// Check whether we have manager installed
-		if (!check_manager()) {
+	if (!check_manager()) {
+		if (access(MANAGERAPK, F_OK) == 0) {
+			// Only try to install APK when no manager is installed
+			// Magisk Manager should be upgraded by itself, not through recovery installs
+			rename(MANAGERAPK, "/data/magisk.apk");
+			install_apk("/data/magisk.apk");
+		} else {
 			// Install stub
 			auto init = MAGISKTMP + "/magiskinit";
 			exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
 			install_apk("/data/magisk.apk");
 		}
 	}
+	unlink(MANAGERAPK);
 }
