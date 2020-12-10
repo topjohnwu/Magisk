@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">ਸੈਟਅਪ ਨੂੰ ਪੂਰਾ ਕਰਨ ਲਈ ਪੂਰੇ ਮੈਜਿਕਸ ਮੈਨੇਜਰ ਵਿਚ ਅਪਗ੍ਰੇਡ ਕਰੋ. ਡਾਉਨਲੋਡ ਅਤੇ ਇੰਸਟੌਲ ਕਰੋ?</string>
+    <string name="no_internet_msg">ਕਿਰਪਾ ਕਰਕੇ ਇੰਟਰਨੈਟ ਨਾਲ ਜੁੜੋ! ਪੂਰਾ ਮੈਜਿਕਸ ਮੈਨੇਜਰ ਅਪਗ੍ਰੇਡ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।</string>
+    <string name="dling">ਡਾਊਨਲੋਡ ਹੋ ਰਿਹਾ ਹੈ</string>
+    <string name="relaunch_app">ਕਿਰਪਾ ਕਰਕੇ ਐਪ ਨੂੰ ਮੁੜ ਚਾਲੂ ਕਰੋ</string>
+</resources>
