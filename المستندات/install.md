@@ -67,7 +67,7 @@ When Magisk is installed in your recovery, **you CANNOT use custom recoveries to
 
 Since Magisk now hijacks the recovery of the device, there is a mechanism to let you *actually* boot into recovery mode when needed: it is determined by **how long you press volume up**.
 
-Each device has its own key combo to boot into recovery, as an example for Galaxy S10 it is (Power + Bixby + Volume Up). A quick Google search should easily get you this info of your device. As soon as you press the combo and the device vibrates with a splash screen, release all buttons to boot into Magisk. If you decide to boot into actual recovery mode, continue to press volume up until you see the recovery screen.
+Each device has its own key combo to bo noot into recovery, as an example for Galaxy S10 it is (Power + Bixby + Volume Up). A quick Google search should easily get you this info of your device. As soon as you press the combo and the device vibrates with a splash screen, release all buttons to boot into Magisk. If you decide to boot into actual recovery mode, continue to press volume up until you see the recovery screen.
 
 **After installing Magisk in recovery (starting from power off):**
 
