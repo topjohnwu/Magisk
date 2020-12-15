@@ -247,7 +247,7 @@ int launch_magiskhide() {
 		return DAEMON_ERROR;
 
 	hide_sensitive_props();
-	if (DAEMON_STATE >= STATE_BOOT_COMPLETE)
+	if (DAEMON_STATE >= STATE_BOOT_COMPLETE || DAEMON_STATE == STATE_NONE)
 		hide_late_sensitive_props();
 
 	// Start monitoring

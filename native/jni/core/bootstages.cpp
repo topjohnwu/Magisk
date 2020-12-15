@@ -15,7 +15,6 @@
 
 using namespace std;
 
-static bool pfs_done = false;
 static bool safe_mode = false;
 
 /*********
@@ -269,14 +268,18 @@ static bool check_key_combo() {
 	return true;
 }
 
-/****************
- * Entry points *
- ****************/
+/***********************
+ * Boot Stage Handlers *
+ ***********************/
+
+static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void post_fs_data(int client) {
 	// ack
 	write_int(client, 0);
 	close(client);
+
+	mutex_guard lock(stage_lock);
 
 	if (getenv("REMOUNT_ROOT"))
 		xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
@@ -284,6 +287,7 @@ void post_fs_data(int client) {
 	if (!check_data())
 		goto unblock_init;
 
+	DAEMON_STATE = STATE_POST_FS_DATA;
 	setup_logfile(true);
 
 	LOGI("** post-fs-data mode running\n");
@@ -320,25 +324,27 @@ void post_fs_data(int client) {
 		handle_modules();
 	}
 
-	pfs_done = true;
-
 early_abort:
 	// We still do magic mount because root itself might need it
 	magic_mount();
+	DAEMON_STATE = STATE_POST_FS_DATA_DONE;
 
 unblock_init:
 	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
 }
 
 void late_start(int client) {
-	LOGI("** late_start service mode running\n");
 	// ack
 	write_int(client, 0);
 	close(client);
 
+	mutex_guard lock(stage_lock);
+	run_finally fin([]{ DAEMON_STATE = STATE_LATE_START_DONE; });
 	setup_logfile(false);
 
-	if (!pfs_done || safe_mode)
+	LOGI("** late_start service mode running\n");
+
+	if (DAEMON_STATE < STATE_POST_FS_DATA_DONE || safe_mode)
 		return;
 
 	exec_common_scripts("service");
@@ -346,12 +352,15 @@ void late_start(int client) {
 }
 
 void boot_complete(int client) {
-	LOGI("** boot_complete triggered\n");
 	// ack
 	write_int(client, 0);
 	close(client);
 
+	mutex_guard lock(stage_lock);
+	DAEMON_STATE = STATE_BOOT_COMPLETE;
 	setup_logfile(false);
+
+	LOGI("** boot_complete triggered\n");
 
 	if (safe_mode)
 		return;
@@ -360,8 +369,7 @@ void boot_complete(int client) {
 	if (access(SECURE_DIR, F_OK) != 0)
 		xmkdir(SECURE_DIR, 0700);
 
-	if (pfs_done)
-		auto_start_magiskhide();
+	auto_start_magiskhide();
 
 	if (!check_manager()) {
 		if (access(MANAGERAPK, F_OK) == 0) {

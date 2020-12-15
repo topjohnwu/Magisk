@@ -21,7 +21,7 @@ using namespace std;
 int SDK_INT = -1;
 bool RECOVERY_MODE = false;
 string MAGISKTMP;
-int DAEMON_STATE = STATE_UNKNOWN;
+int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
 
@@ -99,19 +99,8 @@ static void handle_request(int client) {
 		break;
 	}
 
-	switch (req_code) {
-	// In case of init trigger launches, set the corresponding states
-	case POST_FS_DATA:
-		DAEMON_STATE = STATE_POST_FS_DATA;
-		break;
-	case LATE_START:
-		DAEMON_STATE = STATE_LATE_START;
-		break;
-	case BOOT_COMPLETE:
-		DAEMON_STATE = STATE_BOOT_COMPLETE;
-		break;
-
 	// Simple requests
+	switch (req_code) {
 	case CHECK_VERSION:
 		write_string(client, MAGISK_VERSION ":MAGISK");
 		goto shortcut;
