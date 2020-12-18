@@ -297,7 +297,10 @@ def build_binary(args):
 
     header('* Building binaries: ' + ' '.join(args.target))
 
-    os.utime(op.join('native', 'jni', 'include', 'flags.hpp'))
+    config_stat = os.stat(args.config)
+    flags = op.join('native', 'jni', 'include', 'flags.hpp')
+    if config_stat.st_mtime_ns > os.stat(flags).st_mtime_ns:
+        os.utime(flags, ns=(config_stat.st_atime_ns, config_stat.st_mtime_ns))
 
     # Basic flags
     global base_flags
