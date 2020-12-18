@@ -1,6 +1,9 @@
 #include <magisk.hpp>
 #include <selinux.hpp>
 
+#define quote(s) #s
+#define str(s) quote(s)
+
 constexpr char MAGISK_RC[] =
 "\n"
 
@@ -8,7 +11,7 @@ constexpr char MAGISK_RC[] =
 "    start logd\n"
 "    rm " UNBLOCKFILE "\n"
 "    start %2$s\n"
-"    wait " UNBLOCKFILE " 40\n"
+"    wait " UNBLOCKFILE " " str(POST_FS_DATA_WAIT_TIME) "\n"
 "    rm " UNBLOCKFILE "\n"
 "\n"
 

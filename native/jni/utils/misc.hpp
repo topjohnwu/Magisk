@@ -67,7 +67,7 @@ int new_daemon_thread(std::function<void()> &&entry);
 
 bool ends_with(const std::string_view &s1, const std::string_view &s2);
 int fork_dont_care();
-int fork_no_zombie();
+int fork_no_orphan();
 int strend(const char *s1, const char *s2);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);

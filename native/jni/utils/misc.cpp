@@ -1,6 +1,3 @@
-/* misc.cpp - Store all functions that are unable to be catagorized clearly
- */
-
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/prctl.h>
@@ -20,17 +17,16 @@
 using namespace std;
 
 int fork_dont_care() {
-	int pid = xfork();
-	if (pid) {
+	if (int pid = xfork()) {
 		waitpid(pid, nullptr, 0);
 		return pid;
-	} else if ((pid = xfork())) {
+	} else if (xfork()) {
 		exit(0);
 	}
 	return 0;
 }
 
-int fork_no_zombie() {
+int fork_no_orphan() {
 	int pid = xfork();
 	if (pid)
 		return pid;

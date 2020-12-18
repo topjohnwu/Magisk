@@ -1,8 +1,6 @@
-#include <unistd.h>
-#include <cstdio>
-#include <cstdlib>
 #include <string>
 #include <vector>
+#include <sys/wait.h>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -29,9 +27,46 @@ static void set_script_env() {
 void exec_script(const char *script) {
 	exec_t exec {
 		.pre_exec = set_script_env,
-		.fork = fork_no_zombie
+		.fork = fork_no_orphan
 	};
 	exec_command_sync(exec, BBEXEC_CMD, script);
+}
+
+static timespec pfs_timeout;
+
+#define PFS_SETUP() \
+if (pfs) { \
+	if (int pid = xfork()) { \
+		if (pid < 0) \
+			return; \
+		/* In parent process, simply wait for child to finish */ \
+		waitpid(pid, nullptr, 0); \
+		return; \
+	} \
+	timer_pid = xfork(); \
+	if (timer_pid == 0) { \
+		/* In timer process, count down */ \
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &pfs_timeout, nullptr); \
+		exit(0); \
+	} \
+}
+
+#define PFS_WAIT() \
+if (pfs) { \
+	/* If we ran out of time, don't block */ \
+	if (timer_pid < 0) \
+		continue; \
+	if (int pid = waitpid(-1, nullptr, 0); pid == timer_pid) { \
+		LOGW("* post-fs-data scripts blocking phase timeout\n"); \
+		timer_pid = -1; \
+	} \
+}
+
+#define PFS_DONE() \
+if (pfs) { \
+	if (timer_pid > 0) \
+		kill(timer_pid, SIGKILL); \
+	exit(0); \
 }
 
 void exec_common_scripts(const char *stage) {
@@ -39,13 +74,19 @@ void exec_common_scripts(const char *stage) {
 	char path[4096];
 	char *name = path + sprintf(path, SECURE_DIR "/%s.d", stage);
 	auto dir = xopen_dir(path);
-	if (!dir)
-		return;
+	if (!dir) return;
 
-	int dfd = dirfd(dir.get());
 	bool pfs = stage == "post-fs-data"sv;
-	*(name++) = '/';
+	int timer_pid = -1;
+	if (pfs) {
+		// Setup timer
+		clock_gettime(CLOCK_MONOTONIC, &pfs_timeout);
+		pfs_timeout.tv_sec += POST_FS_DATA_SCRIPT_MAX_TIME;
+	}
+	PFS_SETUP()
 
+	*(name++) = '/';
+	int dfd = dirfd(dir.get());
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		if (entry->d_type == DT_REG) {
 			if (faccessat(dfd, entry->d_name, X_OK, 0) != 0)
@@ -54,20 +95,40 @@ void exec_common_scripts(const char *stage) {
 			strcpy(name, entry->d_name);
 			exec_t exec {
 				.pre_exec = set_script_env,
-				.fork = pfs ? fork_no_zombie : fork_dont_care
+				.fork = pfs ? xfork : fork_dont_care
 			};
-			if (pfs)
-				exec_command_sync(exec, BBEXEC_CMD, path);
-			else
-				exec_command(exec, BBEXEC_CMD, path);
+			exec_command(exec, BBEXEC_CMD, path);
+			PFS_WAIT()
 		}
 	}
+
+	PFS_DONE()
+}
+
+// Return if a > b
+static bool timespec_larger(timespec *a, timespec *b) {
+	if (a->tv_sec != b->tv_sec)
+		return a->tv_sec > b->tv_sec;
+	return a->tv_nsec > b->tv_nsec;
 }
 
 void exec_module_scripts(const char *stage, const vector<string> &module_list) {
 	LOGI("* Running module %s scripts\n", stage);
-	char path[4096];
+	if (module_list.empty())
+		return;
+
 	bool pfs = stage == "post-fs-data"sv;
+	if (pfs) {
+		timespec now{};
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		// If we had already timed out, treat it as service mode
+		if (timespec_larger(&now, &pfs_timeout))
+			pfs = false;
+	}
+	int timer_pid = -1;
+	PFS_SETUP()
+
+	char path[4096];
 	for (auto &m : module_list) {
 		const char* module = m.data();
 		sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);
@@ -76,13 +137,13 @@ void exec_module_scripts(const char *stage, const vector<string> &module_list) {
 		LOGI("%s: exec [%s.sh]\n", module, stage);
 		exec_t exec {
 			.pre_exec = set_script_env,
-			.fork = pfs ? fork_no_zombie : fork_dont_care
+			.fork = pfs ? xfork : fork_dont_care
 		};
-		if (pfs)
-			exec_command_sync(exec, BBEXEC_CMD, path);
-		else
-			exec_command(exec, BBEXEC_CMD, path);
+		exec_command(exec, BBEXEC_CMD, path);
+		PFS_WAIT()
 	}
+
+	PFS_DONE()
 }
 
 constexpr char install_script[] = R"EOF(
@@ -95,7 +156,7 @@ rm -f $APK
 void install_apk(const char *apk) {
 	setfilecon(apk, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 	exec_t exec {
-		.fork = fork_no_zombie
+		.fork = fork_no_orphan
 	};
 	char cmds[sizeof(install_script) + 4096];
 	sprintf(cmds, install_script, apk);
