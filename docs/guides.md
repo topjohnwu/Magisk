@@ -285,4 +285,4 @@ on early-init
 
 service myservice ${MAGISKTMP}/myscript.sh
     oneshot
-```
+```add update guides.md
