@@ -388,8 +388,6 @@ find_boot_image() {
 }
 
 flash_image() {
-  # Make sure all blocks are writable
-  $MAGISKBIN/magisk --unlock-blocks 2>/dev/null
   case "$1" in
     *.gz) CMD1="$MAGISKBIN/magiskboot decompress '$1' - 2>/dev/null";;
     *)    CMD1="cat '$1'";;
@@ -401,16 +399,19 @@ flash_image() {
     CMD2="cat -"
   fi
   if [ -b "$2" ]; then
-    local img_sz=`stat -c '%s' "$1"`
-    local blk_sz=`blockdev --getsize64 "$2"`
-    [ $img_sz -gt $blk_sz ] && return 1
-    eval $CMD1 | eval $CMD2 | cat - /dev/zero > "$2" 2>/dev/null
+    local img_sz=$(stat -c '%s' "$1")
+    local blk_sz=$(blockdev --getsize64 "$2")
+    [ "$img_sz" -gt "$blk_sz" ] && return 1
+    blockdev --setrw "$2"
+    local blk_ro=$(blockdev --getro "$2")
+    [ "$blk_ro" -eq 1 ] && return 2
+    eval "$CMD1" | eval "$CMD2" | cat - /dev/zero > "$2" 2>/dev/null
   elif [ -c "$2" ]; then
     flash_eraseall "$2" >&2
-    eval $CMD1 | eval $CMD2 | nandwrite -p "$2" - >&2
+    eval "$CMD1" | eval "$CMD2" | nandwrite -p "$2" - >&2
   else
     ui_print "- Not block or char device, storing image"
-    eval $CMD1 | eval $CMD2 > "$2" 2>/dev/null
+    eval "$CMD1" | eval "$CMD2" > "$2" 2>/dev/null
   fi
   return 0
 }
@@ -445,7 +446,15 @@ install_magisk() {
 
   # Restore the original boot partition path
   [ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
-  flash_image new-boot.img "$BOOTIMAGE" || abort "! Insufficient partition size"
+  flash_image new-boot.img "$BOOTIMAGE"
+  case $? in
+    1)
+      abort "! Insufficient partition size"
+      ;;
+    2)
+      abort "! $BOOTIMAGE is read only"
+      ;;
+  esac
 
   ./magiskboot cleanup
   rm -f new-boot.img

@@ -30,10 +30,16 @@ direct_install() {
   rm -f $MAGISKBIN/new-boot.img
   echo "- Flashing new boot image"
   flash_image $1/new-boot.img $2
-  if [ $? -ne 0 ]; then
-    echo "! Insufficient partition size"
-    return 1
-  fi
+  case $? in
+    1)
+      echo "! Insufficient partition size"
+      return 1
+      ;;
+    2)
+      echo "! $2 is read only"
+      return 2
+      ;;
+  esac
   rm -rf $1
   return 0
 }
