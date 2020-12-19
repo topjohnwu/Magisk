@@ -33,7 +33,7 @@ grep_prop() {
   shift
   local FILES=$@
   [ -z "$FILES" ] && FILES='/system/build.prop'
-  sed -n "$REGEX" $FILES 2>/dev/null | head -n 1
+  cat $FILES | dos2unix | sed -n "$REGEX" 2>/dev/null | head -n 1
 }
 
 getvar() {
