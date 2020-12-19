@@ -185,8 +185,5 @@ ui_print "- Repacking boot image"
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
 
-# Copy existing rules for migration
-$BOOTMODE && copy_sepolicy_rules
-
 # Reset any error code
 true

@@ -10,6 +10,7 @@ import androidx.core.os.postDelayed
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
@@ -339,6 +340,13 @@ abstract class MagiskInstallImpl : KoinComponent {
         return true
     }
 
+    private fun copySepolicyRules(): Boolean {
+        if (Info.remote.magisk.versionCode >= 21100) return true
+        // Copy existing rules for migration
+        "copy_sepolicy_rules".sh()
+        return true
+    }
+
     private fun flashBoot(): Boolean {
         if (!"direct_install $installDir $srcBoot".sh().isSuccess)
             return false
@@ -373,10 +381,11 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     protected fun doPatchFile(patchFile: Uri) = extractZip() && handleFile(patchFile)
 
-    protected fun direct() = findImage() && extractZip() && patchBoot() && flashBoot()
+    protected fun direct() = findImage() && extractZip() && patchBoot() &&
+        copySepolicyRules() && flashBoot()
 
-    protected suspend fun secondSlot() =
-        findSecondaryImage() && extractZip() && patchBoot() && flashBoot() && postOTA()
+    protected suspend fun secondSlot() = findSecondaryImage() && extractZip() &&
+        patchBoot() && copySepolicyRules() && flashBoot() && postOTA()
 
     protected fun fixEnv(zip: Uri): Boolean {
         installDir = SuFile("/data/adb/magisk")
