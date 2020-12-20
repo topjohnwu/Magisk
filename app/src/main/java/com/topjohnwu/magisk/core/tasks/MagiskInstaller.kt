@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
@@ -41,6 +42,8 @@ import org.koin.core.inject
 import timber.log.Timber
 import java.io.*
 import java.nio.ByteBuffer
+import java.security.SecureRandom
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -108,6 +111,8 @@ abstract class MagiskInstallImpl : KoinComponent {
         }
 
         console.add("- Device platform: " + Build.CPU_ABI)
+        console.add("- Magisk Manager: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+        console.add("- Install target: ${Info.remote.magisk.version} (${Info.remote.magisk.versionCode})")
 
         try {
             ZipInputStream(zipUri.inputStream().buffered()).use { zi ->
@@ -226,7 +231,7 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     private fun handleFile(uri: Uri): Boolean {
         val outStream: OutputStream
-        val outFile: MediaStoreUtils.UriFile
+        var outFile: MediaStoreUtils.UriFile? = null
 
         // Process input file
         try {
@@ -238,27 +243,40 @@ abstract class MagiskInstallImpl : KoinComponent {
                     return false
                 }
                 src.reset()
+
+                val alpha = "abcdefghijklmnopqrstuvwxyz"
+                val alphaNum = "$alpha${alpha.toUpperCase(Locale.ROOT)}0123456789"
+                val random = SecureRandom()
+                val suffix = StringBuilder()
+                for (i in 1..5) {
+                    suffix.append(alphaNum[random.nextInt(alphaNum.length)])
+                }
+
+                val filename = "magisk_patched_$suffix"
                 outStream = if (magic.contentEquals("ustar".toByteArray())) {
-                    outFile = MediaStoreUtils.getFile("magisk_patched.tar")
-                    handleTar(src, outFile.uri.outputStream())
+                    outFile = MediaStoreUtils.getFile("$filename.tar")
+                    handleTar(src, outFile!!.uri.outputStream())
                 } else {
                     // Raw image
                     srcBoot = File(installDir, "boot.img").path
                     console.add("- Copying image to cache")
                     FileOutputStream(srcBoot).use { src.copyTo(it) }
-                    outFile = MediaStoreUtils.getFile("magisk_patched.img")
-                    outFile.uri.outputStream()
+                    outFile = MediaStoreUtils.getFile("$filename.img")
+                    outFile!!.uri.outputStream()
                 }
             }
         } catch (e: IOException) {
             console.add("! Process error")
+            outFile?.delete()
             Timber.e(e)
             return false
         }
 
         // Patch file
-        if (!patchBoot())
+        if (!patchBoot()) {
+            outFile!!.delete()
             return false
+        }
 
         // Output file
         try {
@@ -277,6 +295,7 @@ abstract class MagiskInstallImpl : KoinComponent {
             console.add("****************************")
         } catch (e: IOException) {
             console.add("! Failed to output to $outFile")
+            outFile!!.delete()
             Timber.e(e)
             return false
         }
