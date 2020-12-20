@@ -89,7 +89,7 @@ Each device has its own key combo to boot into recovery, as an example for Galax
 Unlocking BL on modern Samsung devices have some caveats, so I figure this would be helpful.
 
 - Allow bootloader unlocking in **Developer options → OEM unlocking**
-- Reboot to download mode: reboot and press the download mode key combo for your device.
+- Reboot to download mode: power off your device and press the download mode key combo for your device (usually Power + Vol Down + Bixby).
 - Long press volume up to unlock the bootloader. **This will wipe your data and automatically reboot.**
 
 If you think the bootloader is fully unlocked, it is actually not! Samsung introduced `VaultKeeper`, meaning the bootloader will still reject any unofficial partitions before `VaultKeeper` explicitly allows it.
@@ -109,8 +109,9 @@ If you think the bootloader is fully unlocked, it is actually not! Samsung intro
 - Copy the patched tar file to your PC with ADB:<br>
 `adb pull /sdcard/Download/magisk_patched.tar`<br>
 Do **NOT** use MTP as it is reported to corrupt files.
-- Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware.
-- After Odin is done, your device should reboot. You may continue with standard initial setup.
+- Reboot to download mode. Open Odin on your PC, and flash `magisk_patched.tar` as `AP`, together with `BL`, `CP`, and `CSC` (**NOT** `HOME_CSC` because we want to **wipe data**) from the original firmware. This may take some time (>10 mins).
+- After Odin is done, your device should reboot. You may continue with standard initial setup.<br>
+If you are stuck in a bootloop, agree to do a factory reset if promted.
 - If your device does **NOT** have boot ramdisk, reboot to recovery now to boot Android with Magisk (reason stated in [Magisk in Recovery](#magisk-in-recovery)).
 - Although Magisk is installed, it still need some additional setup. Please connect to the Internet.
 - Install the latest Magisk Manager and open the app. It should show a dialog asking for additional setups. Let it do its job and the app will automatically reboot your device.
