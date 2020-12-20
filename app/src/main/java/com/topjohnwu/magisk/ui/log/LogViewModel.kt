@@ -3,20 +3,27 @@ package com.topjohnwu.magisk.ui.log
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
-import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ktx.now
+import com.topjohnwu.magisk.ktx.timeFormatStandard
+import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.TextItem
+import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.concurrent.Executor
 
 class LogViewModel(
     private val repo: LogRepository
@@ -54,14 +61,28 @@ class LogViewModel(
 
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val now = Calendar.getInstance()
-            val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
-                now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-                now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
-            )
+            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
             val logFile = MediaStoreUtils.getFile(filename)
-            logFile.uri.outputStream().writer().use { it.write(consoleText) }
+            logFile.uri.outputStream().bufferedWriter().use { file ->
+                file.write("---System Properties---\n\n")
+
+                val fileList = object : CallbackList<String>(Executor { it.run() }) {
+                    override fun onAddElement(e: String) {
+                        file.write(e)
+                        file.newLine()
+                    }
+                }
+                Shell.su("getprop").to(fileList).exec()
+
+                file.write("\n---Magisk Logs---\n")
+                file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")
+                file.write(consoleText)
+
+                file.write("\n---Manager Logs---\n")
+                file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")
+                ProcessBuilder("logcat", "-d").start()
+                    .inputStream.reader().use { it.copyTo(file) }
+            }
             SnackbarEvent(logFile.toString()).publish()
         }
     }

@@ -13,18 +13,17 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.databinding.RvBindingAdapter
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FlashViewModel(
     args: FlashFragmentArgs,
@@ -106,18 +105,16 @@ class FlashViewModel(
     }
 
     private fun savePressed() = withExternalRW {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val name = Const.MAGISK_INSTALL_LOG_FILENAME.format(now.toTime(timeFormatStandard))
-                val file = MediaStoreUtils.getFile(name)
-                file.uri.outputStream().bufferedWriter().use { writer ->
-                    logItems.forEach {
-                        writer.write(it)
-                        writer.newLine()
-                    }
+        viewModelScope.launch(Dispatchers.IO) {
+            val name = "magisk_install_log_%s.log".format(now.toTime(timeFormatStandard))
+            val file = MediaStoreUtils.getFile(name)
+            file.uri.outputStream().bufferedWriter().use { writer ->
+                logItems.forEach {
+                    writer.write(it)
+                    writer.newLine()
                 }
-                SnackbarEvent(file.toString()).publish()
             }
+            SnackbarEvent(file.toString()).publish()
         }
     }
 
