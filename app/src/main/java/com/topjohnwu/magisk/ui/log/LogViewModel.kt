@@ -18,12 +18,9 @@ import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.TextItem
-import com.topjohnwu.superuser.CallbackList
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executor
 
 class LogViewModel(
     private val repo: LogRepository
@@ -66,13 +63,8 @@ class LogViewModel(
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---System Properties---\n\n")
 
-                val fileList = object : CallbackList<String>(Executor { it.run() }) {
-                    override fun onAddElement(e: String) {
-                        file.write(e)
-                        file.newLine()
-                    }
-                }
-                Shell.su("getprop").to(fileList).exec()
+                ProcessBuilder("getprop").start()
+                    .inputStream.reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")
