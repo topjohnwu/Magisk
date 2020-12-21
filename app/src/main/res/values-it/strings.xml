@@ -55,6 +55,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Richiesta di accesso root</string>
+    <string name="touch_filtered_warning">Magisk non può verificare la tua risposta perché un\'app sta oscurando una richiesta di accesso root</string>
     <string name="deny">Nega</string>
     <string name="prompt">Chiedi</string>
     <string name="grant">Consenti</string>
@@ -101,6 +102,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra app di sistema</string>
+    <string name="show_os_app">Mostra app del sistema operativo</string>
     <string name="hide_filter_hint">Filtra per nome</string>
     <string name="hide_scroll_up">Scorri verso l\'alto</string>
     <string name="hide_filters">Filtri</string>
@@ -108,6 +110,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
+    <string name="reboot_userspace">Riavvio veloce</string>
     <string name="reboot_recovery">Riavvia in recovery</string>
     <string name="reboot_bootloader">Riavvia in bootloader</string>
     <string name="reboot_download">Riavvia in modalità download</string>
@@ -169,6 +172,8 @@
     <string name="superuser_notification">Notifica di accesso root</string>
     <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
     <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
+    <string name="settings_su_tapjack_title">Abilita protezione anti-tapjacking</string>
+    <string name="settings_su_tapjack_summary">La schermata di richiesta dei permessi di root non risponderà al tocco mentre è oscurata da altre finestre o elementi in sovraimpressione</string>
     <string name="settings_su_biometric_title">Abilita autenticazione biometrica</string>
     <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste di accesso root</string>
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
@@ -217,6 +222,7 @@
     <string name="failure">Fallito</string>
     <string name="hide_manager_title">Nascondendo Magisk Manager…</string>
     <string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager.</string>
+    <string name="restore_manager_fail_toast">Non è stato possibile ripristinare Magisk Manager.</string>
     <string name="open_link_failed_toast">Nessuna app disponibile per aprire il link</string>
     <string name="complete_uninstall">Disinstalla completamente</string>
     <string name="restore_img">Ripristina immagini</string>
