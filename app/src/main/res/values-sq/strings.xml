@@ -12,8 +12,8 @@
     <string name="safetynet">Rrjeti i Sigurisë</string>
 
     <!--Home-->
-    <string name="no_connection">Nuk ka lidhje të disponueshme</string>
-    <string name="app_changelog">Ndryshimi</string>
+    <string name="no_connection">Nuk ka lidhje interneti</string>
+    <string name="app_changelog">Ndryshimet</string>
     <string name="manager">Menaxheri</string>
     <string name="loading">Po ngarkon…</string>
     <string name="update">Përditëso</string>
@@ -22,21 +22,21 @@
     <string name="status">Statusi</string>
     <string name="home_package">Paketa</string>
 
-    <string name="home_notice_content">Gjithmonë sigurohuni që jeni duke përdorur Magisk Manager me burim të hapur. Menaxheri i një burimi të panjohur mund të kryejë veprime të dëmshme!</string>
+    <string name="home_notice_content">Gjithmonë sigurohuni që jeni duke përdorur Magisk Manager me burim të hapur. Magisk Manager i një burimi të panjohur mund të kryejë veprime të dëmshme!</string>
     <string name="home_support_title">Na ndihmoni</string>
     <string name="home_item_source">Burimi</string>
     <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Megjithatë mund të na tregoni se ju interesoni duke dërguar një donacion të vogël.</string>
     <string name="home_status_normal">Normale</string>
     <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Instaluar</string>
-    <string name="home_latest_version">Më e fundit</string>
+    <string name="home_latest_version">Më të fundit</string>
     <string name="invalid_update_channel">Kanal i pavlefshëm i azhurnimit</string>
     <string name="uninstall_magisk_title">Çinstalo Magisk</string>
     <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen! \n Rrënja do të hiqet! \n Të dhënat tuaja potencialisht të koduara nëse jo tashmë!</string>
     <string name="home_check_safetynet">Kontrolloni Rrjetin e Sigurisë</string>
 
     <!--Install-->
-    <string name="keep_force_encryption">Ruaj kriptimin e forcës</string>
+    <string name="keep_force_encryption">Ruaj kriptimin me forcë</string>
     <string name="keep_dm_verity">Ruaj AVB 2.0 /dm-vërtetësi</string>
     <string name="recovery_mode">Modaliteti i rikuperimit</string>
     <string name="install_options_title">Opsionet</string>
@@ -51,7 +51,7 @@
     <string name="setup_title">Konfigurimi shtesë</string>
     <string name="select_patch_file">Zgjidhni dhe Patch një Skedar</string>
     <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (* .img) ose një tarifë ODIN (* .tar)</string>
-    <string name="reboot_delay_toast">Rinisni në 5 sekonda…</string>
+    <string name="reboot_delay_toast">Rinisje pas 5 sekonda…</string>
     <string name="flash_screen_title">Instalimi</string>
 
     <!--Superuser-->
@@ -59,7 +59,7 @@
     <string name="deny">Moho</string>
     <string name="prompt">Pyet</string>
     <string name="grant">Lejo</string>
-    <string name="su_warning">Jep hyrjen e plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
+    <string name="su_warning">Jep akses të plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
     <string name="forever">Përgjithmonë</string>
     <string name="once">Një herë</string>
     <string name="tenmin">10 minuta</string>
@@ -108,10 +108,10 @@
 
     <!--Module-->
     <string name="no_info_provided">(Nuk ofrohet informacion)</string>
-    <string name="reboot_userspace">Ristartimi i butë</string>
-    <string name="reboot_recovery">Ristartoni te Rikuperimi</string>
+    <string name="reboot_userspace">Ristartim normal</string>
+    <string name="reboot_recovery">Ristartoni në recovery</string>
     <string name="reboot_bootloader">Ristartoni në bootloader</string>
-    <string name="reboot_download">Ristartoni për ta shkarkuar</string>
+    <string name="reboot_download">Ristartoni për në download</string>
     <string name="reboot_edl">Ristartoni në EDL</string>
     <string name="module_version_author">%1$s nga %2$s</string>
     <string name="module_state_remove">Hiq</string>
