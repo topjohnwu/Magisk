@@ -51,7 +51,7 @@
     <string name="setup_title">ਅਤਿਰਿਕਤ ਸੈਟਅਪ</string>
     <string name="select_patch_file">ਇੱਕ ਫਾਈਲ ਚੁਣੋ ਅਤੇ ਪੈਚ ਕਰੋ</string>
     <string name="patch_file_msg">ਇੱਕ ਰੋ ਛੱਞੀ ਨੂੰ (* .img) ਜਾਂ ਇੱਕ Odin tarfile (* .tar) ਦੀ ਚੋਣ ਕਰੋ</string>
-    <string name="reboot_delay_toast">5 ਸਕਿੰਟਾਂ ਵਿੱਚ ਰੀਬੂਟ ਹੋ ਰਿਹਾ ਹੈ ...</string>
+    <string name="reboot_delay_toast">5 ਸਕਿੰਟਾਂ ਵਿੱਚ ਰੀਬੂਟ ਹੋ ਰਿਹਾ ਹੈ …</string>
     <string name="flash_screen_title">ਇੰਸਟਾਲੇਸ਼ਨ</string>
 
     <!--Superuser-->
@@ -143,7 +143,7 @@
     <string name="language">ਭਾਸ਼ਾ</string>
     <string name="system_default">(ਸਿਸਟਮ ਡਿਫੌਲਟ)</string>
     <string name="settings_check_update_title">ਚੈੱਕ ਅੱਪਡੇਟ</string>
-    <string name="settings_check_update_summary">ਸਮੇਂ-ਸਮੇਂ 'ਤੇ ਪਿਛੋਕੜ ਦੇ ਅਪਡੇਟਾਂ ਦੀ ਜਾਂਚ ਕਰੋ</string>
+    <string name="settings_check_update_summary">ਸਮੇਂ-ਸਮੇਂ \'ਤੇ ਪਿਛੋਕੜ ਦੇ ਅਪਡੇਟਾਂ ਦੀ ਜਾਂਚ ਕਰੋ</string>
     <string name="settings_update_channel_title">ਅਪਡੇਟ ਚੈਨਲ</string>
     <string name="settings_update_stable">ਸਥਿਰ</string>
     <string name="settings_update_beta">ਬੀਟਾ</string>
@@ -215,16 +215,16 @@
     <string name="reboot">ਰੀਬੂਟ</string>
     <string name="release_notes">ਰੀਲਿਜ਼ ਨੋਟਿਸ</string>
     <string name="repo_cache_cleared">ਰਿਪੋ ਕੈਚੇ ਸਾਫ਼ ਕੀਤਾ</string>
-    <string name="flashing">ਫਲੈਸ਼ਿੰਗ ...</string>
+    <string name="flashing">ਫਲੈਸ਼ਿੰਗ …</string>
     <string name="done">ਸਫਲ ਹੋਇਆ!</string>
     <string name="failure">ਅਸਫਲ ਹੋਇਆ</string>
-    <string name="hide_manager_title">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਨੂੰ ਲੁਕਾਇਆ ਜਾ ਰਿਹਾ ਹੈ ...</string>
+    <string name="hide_manager_title">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਨੂੰ ਲੁਕਾਇਆ ਜਾ ਰਿਹਾ ਹੈ …</string>
     <string name="hide_manager_fail_toast">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਓਹਲੇ ਕਰਨ ਵਿੱਚ ਅਸਫਲ</string>
     <string name="restore_manager_fail_toast">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਨੂੰ ਰਿਸਟੋਰ ਕਰਨਾ ਵਿਫਲ ਹੋਇਆ</string>
     <string name="open_link_failed_toast">ਲਿੰਕ ਖੋਲ੍ਹਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
     <string name="complete_uninstall">ਪੂਰੀ ਤਰ੍ਹਾਂ ਅਣਇੰਸਟੌਲ ਕਰੋ</string>
     <string name="restore_img">ਇਮੇਜ ਰਿਸਟੋਰ ਕਰੋ</string>
-    <string name="restore_img_msg">ਰਿਸਟੋਰ ਹੋ ਰਿਹਾ ਹੈ ...</string>
+    <string name="restore_img_msg">ਰਿਸਟੋਰ ਹੋ ਰਿਹਾ ਹੈ …</string>
     <string name="restore_done">रिस्टोर ਸਫਲ ਹੋਇਆ!</string>
     <string name="restore_fail">ਸਟਾਕ ਬੈਕਅਪ ਮੌਜੂਦ ਨਹੀਂ ਹੈ!</string>
     <string name="proprietary_title">ਮਲਕੀਅਤ ਕੋਡ ਡਾਉਨਲੋਡ ਕਰੋ</string>
@@ -232,12 +232,12 @@
     <string name="setup_fail">ਸੈਟਅਪ ਅਸਫਲ ਹੋਇਆ</string>
     <string name="env_fix_title">ਵਾਧੂ ਸੈਟਅਪ ਚਾਹੀਦਾ ਹੈ</string>
     <string name="env_fix_msg">ਤੁਹਾਡੀ ਡਿਵਾਈਸ ਤੇ ਮੈਜਿਸਕ ਨੂੰ ਸਹੀ ਤਰ੍ਹਾਂ ਕੰਮ ਕਰਨ ਲਈ ਵਾਧੂ ਸੈਟਅਪ ਦੀ ਲੋੜ ਹੈ। ਇਹ ਇੱਕ ਮੈਜਿਸਕ ਸੈਟਅਪ ਜ਼ਿਪ ਡਾਉਨਲੋਡ ਕਰੇਗਾ, ਕੀ ਤੁਸੀਂ ਅੱਗੇ ਵਧਣਾ ਚਾਹੋਗੇ?</string>
-    <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ ...</string>
+    <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ …</string>
     <string name="authenticate">ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
     <string name="unsupport_magisk_title">ਗ਼ੈਰ ਮੈਜਿਸਕ ਵਰਜਨ</string>
     <string name="unsupport_magisk_msg">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਦਾ ਇਹ ਵਰਜਨ ਮੈਜਿਸਕ ਵਰਜਨ %1$s ਤੋਂ ਘੱਟ ਦਾ ਸਮਰਥਨ ਨਹੀਂ ਕਰਦਾ।\n\n ਐਪ ਇਸ ਤਰ੍ਹਾਂ ਦਾ ਵਿਵਹਾਰ ਕਰੇਗੀ ਜਿਵੇਂ ਮੈਜਿਸਕ ਇੰਸਟਾਲ ਨਹੀਂ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਜਲਦੀ ਹੀ ਮੈਜਿਸਕ ਨੂੰ ਅਪਗ੍ਰੇਡ ਕਰੋ।</string>
     <string name="external_rw_permission_denied">ਇਸ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਸਟੋਰੇਜ ਦੀ ਆਗਿਆ ਦਿਓ</string>
-    <string name="add_shortcut_title">ਹੋਮਸਕ੍ਰੀਨ 'ਤੇ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="add_shortcut_title">ਹੋਮਸਕ੍ਰੀਨ \'ਤੇ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="add_shortcut_msg">ਮੈਜਿਸਕ ਮੈਨੇਜਰ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਇਸਦੇ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਦੀ ਪਛਾਣ ਕਰਨਾ ਮੁਸ਼ਕਲ ਹੋ ਸਕਦਾ ਹੈ, ਕੀ ਤੁਸੀਂ ਹੋਮਸਕ੍ਰੀਨ ਤੇ ਇੱਕ ਵਧੀਆ ਲੁੱਕ ਸ਼ੌਰਟਕਟ ਸ਼ਾਮਲ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?</string>
     <string name="app_not_found">ਇਸ ਐਕਸ਼ਨ ਨੂੰ ਸੰਭਾਲਣ ਲਈ ਕੋਈ ਐਪਲੀਕੇਸ਼ਨ ਨਹੀਂ ਮਿਲੀ</string>
 
