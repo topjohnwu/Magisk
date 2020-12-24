@@ -1,3 +1,8 @@
+##########################################################
+# All variables in config.prop are optional
+# Removing or leaving them blank will keep default values
+##########################################################
+
 # The version name and version code of Magisk
 version=
 versionCode=
@@ -6,16 +11,28 @@ versionCode=
 appVersion=
 appVersionCode=
 
-outdir=out
+# Output path
+outdir=
 
-# Whether use pretty names for zips, e.g. Magisk-v${version}.zip, Magisk-uninstaller-${date}.zip
-# The default output names are magisk-${release/debug/uninstaller}.zip
-prettyName=false
+################################################################
+# Whether to use pretty names for zips
+# e.g. Magisk-v${version}.zip, Magisk-uninstaller-${date}.zip
+# Default names are magisk-${release/debug/uninstaller}.zip
+################################################################
 
-# Only used when building with release flag
-# These passwords are used along with keyStore to sign APKs and zips
-# keyPass is the pwd for the specified keyAlias
-keyStore=release-key.jks
+# The value is either true or false
+prettyName=
+
+#####################################################
+# Signing configs for signing zips and APKs
+# These 4 variables has to be either all set or not
+#####################################################
+
+# Path to keystore file
+keyStore=
+# Keystore password
 keyStorePass=
+# The desired key alias in the keystore
 keyAlias=
+# Password of specified key alias
 keyPass=

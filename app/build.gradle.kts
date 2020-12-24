@@ -20,12 +20,12 @@ android {
         applicationId = "com.topjohnwu.magisk"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
-        versionName = Config["appVersion"]
-        versionCode = Config["appVersionCode"]?.toInt()
-        buildConfigField("int", "LATEST_MAGISK", Config["versionCode"] ?: "Integer.MAX_VALUE")
+        versionName = Config.appVersion
+        versionCode = Config.appVersionCode
+        buildConfigField("int", "LATEST_MAGISK", Config.magiskVersionCode.toString())
 
         javaCompileOptions.annotationProcessorOptions.arguments(
-                mapOf("room.incremental" to "true")
+            mapOf("room.incremental" to "true")
         )
     }
 

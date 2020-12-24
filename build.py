@@ -116,6 +116,10 @@ def system(cmd):
     return subprocess.run(cmd, shell=True, stdout=STDOUT)
 
 
+def cmd_out(cmd):
+    return subprocess.check_output(cmd).strip().decode('utf-8')
+
+
 def xz(data):
     return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
 
@@ -129,36 +133,38 @@ def parse_props(file):
             prop = line.split('=')
             if len(prop) != 2:
                 continue
-            props[prop[0].strip(' \t\r\n')] = prop[1].strip(' \t\r\n')
+            value = prop[1].strip(' \t\r\n')
+            if len(value) == 0:
+                continue
+            props[prop[0].strip(' \t\r\n')] = value
     return props
 
 
 def load_config(args):
-    # Load prop file
-    if not op.exists(args.config):
-        error(f'Please make sure {args.config} exists')
+    commit_hash = cmd_out(['git', 'rev-parse', '--short=8', 'refs/heads/master'])
+    commit_count = cmd_out(['git', 'rev-list', '--count', 'refs/heads/master'])
 
     # Some default values
+    config['version'] = commit_hash
+    config['versionCode'] = 2147483647
+    config['appVersion'] = commit_hash
+    config['appVersionCode'] = commit_count
     config['outdir'] = 'out'
     config['prettyName'] = 'false'
     config['keyStore'] = 'release-key.jks'
 
-    config.update(parse_props(args.config))
+    # Load prop file
+    if op.exists(args.config):
+        config.update(parse_props(args.config))
 
     # Sanitize configs
 
     config['prettyName'] = config['prettyName'].lower() == 'true'
 
-    if 'version' not in config or 'versionCode' not in config:
-        error('Config error: "version" and "versionCode" is required')
-
     try:
         config['versionCode'] = int(config['versionCode'])
     except ValueError:
         error('Config error: "versionCode" is required to be an integer')
-
-    if args.release and not op.exists(config['keyStore']):
-        error(f'Config error: assign "keyStore" to a java keystore')
 
     mkdir_p(config['outdir'])
     global STDOUT
@@ -295,10 +301,15 @@ def build_binary(args):
 
     header('* Building binaries: ' + ' '.join(args.target))
 
-    config_stat = os.stat(args.config)
+    update_flags = True
     flags = op.join('native', 'jni', 'include', 'flags.hpp')
-    if config_stat.st_mtime_ns > os.stat(flags).st_mtime_ns:
-        os.utime(flags, ns=(config_stat.st_atime_ns, config_stat.st_mtime_ns))
+
+    if op.exists(args.config):
+        config_stat = os.stat(args.config)
+        update_flags = config_stat.st_mtime_ns > os.stat(flags).st_mtime_ns
+
+    if update_flags:
+        os.utime(flags)
 
     # Basic flags
     global base_flags
@@ -567,7 +578,7 @@ parser.add_argument('-r', '--release', action='store_true',
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='verbose output')
 parser.add_argument('-c', '--config', default='config.prop',
-                    help='override config file (default: config.prop)')
+                    help='set config file (default: config.prop)')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser(
