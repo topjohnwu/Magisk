@@ -171,7 +171,7 @@
     <string name="settings_su_reauth_title">Re-autenticación</string>
     <string name="settings_su_reauth_summary">Pedir permisos de superusuario nuevamente si una aplicación es actualizada o reinstalada</string>
     <string name="settings_su_tapjack_title">Habilitar Protección contra Tapjacking</string>
-    <string name="settings_su_tapjack_summary">El cuadro de diálogo de solicitud de superusuario no responderá a la entrada mientras esté oculto por cualquier otra ventana o superposición</string>
+    <string name="settings_su_tapjack_summary">El cuadro de diálogo de solicitud de superusuario no responderá mientras esté oculto por cualquier otra ventana o superposición</string>
     <string name="settings_su_biometric_title">Habilitar autenticación biométrica</string>
     <string name="settings_su_biometric_summary">Usar autenticación biométrica para permitir solicitudes de superusuario</string>
     <string name="no_biometric">Dispositivo no compatible o las configuraciones biométricas no están habilitadas</string>
