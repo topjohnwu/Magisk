@@ -22,7 +22,6 @@ android {
         multiDexEnabled = true
         versionName = Config.appVersion
         versionCode = Config.appVersionCode
-        buildConfigField("int", "LATEST_MAGISK", Config.magiskVersionCode.toString())
 
         javaCompileOptions.annotationProcessorOptions.arguments(
             mapOf("room.incremental" to "true")

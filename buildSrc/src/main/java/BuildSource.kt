@@ -19,22 +19,21 @@ object Config {
     fun contains(key: String) = get(key) != null
 
     val appVersion: String get() = get("appVersion") ?: commitHash
-    val appVersionCode: Int get() = get("appVersionCode")?.toInt() ?: commitCount
-    val magiskVersionCode: Int get() = get("versionCode")?.toInt() ?: Int.MAX_VALUE
+    val appVersionCode: Int get() = commitCount
 }
 
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val configPath: String? by project
-        val config = configPath?.let { File(it) } ?: project.file("config.prop")
-        if (config.exists())
-            config.inputStream().use { props.load(it) }
-
-        if (!Config.contains("appVersion") || !Config.contains("appVersionCode")) {
-            val repo = FileRepository(project.rootProject.file(".git"))
-            val refId = repo.refDatabase.exactRef("refs/heads/master").objectId
-            commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
-            commitCount = Git(repo).log().add(refId).call().count()
+        configPath?.let {
+            val config = File(it)
+            if (config.exists())
+                config.inputStream().use { s -> props.load(s) }
         }
+
+        val repo = FileRepository(project.rootProject.file(".git"))
+        val refId = repo.refDatabase.exactRef("HEAD").objectId
+        commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
+        commitCount = Git(repo).log().add(refId).call().count()
     }
 }

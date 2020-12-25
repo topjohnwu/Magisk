@@ -55,9 +55,6 @@ arch64 = ['arm64-v8a', 'x86_64']
 support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 
-ndk_ver = '21d'
-ndk_ver_full = '21.3.6528147'
-
 ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
@@ -141,23 +138,20 @@ def parse_props(file):
 
 
 def load_config(args):
-    commit_hash = cmd_out(['git', 'rev-parse', '--short=8', 'refs/heads/master'])
-    commit_count = cmd_out(['git', 'rev-list', '--count', 'refs/heads/master'])
+    commit_hash = cmd_out(['git', 'rev-parse', '--short=8', 'HEAD'])
 
-    # Some default values
+    # Default values
     config['version'] = commit_hash
-    config['versionCode'] = 2147483647
-    config['appVersion'] = commit_hash
-    config['appVersionCode'] = commit_count
     config['outdir'] = 'out'
     config['prettyName'] = 'false'
-    config['keyStore'] = 'release-key.jks'
 
-    # Load prop file
+    # Load prop files
     if op.exists(args.config):
         config.update(parse_props(args.config))
 
-    # Sanitize configs
+    for key, value in parse_props('gradle.properties').items():
+        if key.startswith('magisk.'):
+            config[key[7:]] = value
 
     config['prettyName'] = config['prettyName'].lower() == 'true'
 
@@ -201,7 +195,7 @@ def clean_elf():
 
 
 def sign_zip(unsigned, output, release):
-    if not release:
+    if not release or 'keyStore' not in config:
         mv(unsigned, output)
         return
 
@@ -289,7 +283,7 @@ def dump_bin_headers():
 def build_binary(args):
     # Verify NDK install
     props = parse_props(op.join(ndk_path, 'source.properties'))
-    if props['Pkg.Revision'] != ndk_ver_full:
+    if props['Pkg.Revision'] != config['fullNdkVersion']:
         error('Incorrect NDK. Please install/upgrade NDK with "build.py ndk"')
 
     if args.target:
@@ -301,12 +295,17 @@ def build_binary(args):
 
     header('* Building binaries: ' + ' '.join(args.target))
 
-    update_flags = True
+    update_flags = False
     flags = op.join('native', 'jni', 'include', 'flags.hpp')
+    flags_stat = os.stat(flags)
 
     if op.exists(args.config):
-        config_stat = os.stat(args.config)
-        update_flags = config_stat.st_mtime_ns > os.stat(flags).st_mtime_ns
+        if os.stat(args.config).st_mtime_ns > flags_stat.st_mtime_ns:
+            update_flags = True
+
+    last_commit = int(cmd_out(['git', 'log', '-1', r'--format=%at', 'HEAD']))
+    if last_commit > flags_stat.st_mtime:
+        update_flags = True
 
     if update_flags:
         os.utime(flags)
@@ -522,6 +521,7 @@ def cleanup(args):
 
 def setup_ndk(args):
     os_name = platform.system().lower()
+    ndk_ver = config['ndkVersion']
     url = f'https://dl.google.com/android/repository/android-ndk-r{ndk_ver}-{os_name}-x86_64.zip'
     ndk_zip = url.split('/')[-1]
 
@@ -578,7 +578,7 @@ parser.add_argument('-r', '--release', action='store_true',
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='verbose output')
 parser.add_argument('-c', '--config', default='config.prop',
-                    help='set config file (default: config.prop)')
+                    help='custom config file (default: config.prop)')
 subparsers = parser.add_subparsers(title='actions')
 
 all_parser = subparsers.add_parser(

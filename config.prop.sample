@@ -3,16 +3,14 @@
 # Removing or leaving them blank will keep default values
 ##########################################################
 
-# The version name and version code of Magisk
-version=
-versionCode=
+# The version name of Magisk. Default: git HEAD short SHA1
+version=string
 
-# The version name and version code of Magisk Manager
-appVersion=
-appVersionCode=
+# The version name of Magisk Manager. Default: git HEAD short SHA1
+appVersion=string
 
-# Output path
-outdir=
+# Output path. Default: out
+outdir=string
 
 ################################################################
 # Whether to use pretty names for zips
@@ -20,8 +18,8 @@ outdir=
 # Default names are magisk-${release/debug/uninstaller}.zip
 ################################################################
 
-# The value is either true or false
-prettyName=
+# Default: false
+prettyName=bool
 
 #####################################################
 # Signing configs for signing zips and APKs
@@ -29,10 +27,10 @@ prettyName=
 #####################################################
 
 # Path to keystore file
-keyStore=
+keyStore=string
 # Keystore password
-keyStorePass=
+keyStorePass=string
 # The desired key alias in the keystore
-keyAlias=
+keyAlias=string
 # Password of specified key alias
-keyPass=
+keyPass=string
