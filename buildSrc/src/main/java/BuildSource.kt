@@ -25,11 +25,9 @@ object Config {
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val configPath: String? by project
-        configPath?.let {
-            val config = File(it)
-            if (config.exists())
-                config.inputStream().use { s -> props.load(s) }
-        }
+        val config = configPath?.let { File(it) } ?: project.rootProject.file("config.prop")
+        if (config.exists())
+            config.inputStream().use { props.load(it) }
 
         val repo = FileRepository(project.rootProject.file(".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
