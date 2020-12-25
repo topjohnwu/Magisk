@@ -39,12 +39,17 @@ jobs:
           $oldAndroidPath = $env:ANDROID_SDK_ROOT
           $sdk_root = "C:\Android"
           New-Item -Path $sdk_root -ItemType SymbolicLink -Value $oldAndroidPath
+          $ndk_ver = Select-String -Path "gradle.properties" -Pattern "^magisk.fullNdkVersion=" | % { $_ -replace ".*=" }
           echo "ANDROID_SDK_ROOT=$sdk_root" >> $env:GITHUB_ENV
           echo "ANDROID_HOME=$sdk_root" >> $env:GITHUB_ENV
+          echo "MAGISK_NDK_VERSION=$ndk_ver" >> $env:GITHUB_ENV
 
       - name: Set up GitHub env (Unix)
         if: runner.os != 'Windows'
-        run: echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
+        run: |
+          ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' gradle.properties)
+          echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
+          echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
 
       - name: Cache Gradle
         uses: actions/cache@v2
@@ -60,22 +65,22 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.ANDROID_SDK_ROOT }}/ndk/magisk
-          key: ${{ runner.os }}-ndk-${{ hashFiles('gradle.properties') }}
+          key: ${{ runner.os }}-ndk-${{ env.MAGISK_NDK_VERSION }}
 
       - name: Set up NDK
         if: steps.ndk-cache.outputs.cache-hit != 'true'
-        run: python3 build.py ndk
+        run: python build.py ndk
 
       - name: Build release
-        run: python3 build.py -vr all
+        run: python build.py -vr all
 
       - name: Build debug
-        run: python3 build.py -v all
+        run: python build.py -v all
 
       # Only upload artifacts built on Linux
       - name: Upload build artifact
         if: runner.os == 'Linux' && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ github.sha }}-artifact
+          name: ${{ github.sha }}
           path: out

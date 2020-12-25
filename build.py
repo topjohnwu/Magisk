@@ -4,18 +4,26 @@ import os
 import subprocess
 
 is_windows = os.name == 'nt'
-if is_windows:
+is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
+
+if not is_ci and is_windows:
     import colorama
     colorama.init()
 
 
 def error(str):
-    print('\n' + '\033[41m' + str + '\033[0m' + '\n')
+    if is_ci:
+        print(f'\n ! {str}\n')
+    else:
+        print(f'\n\033[41m{str}\033[0m\n')
     sys.exit(1)
 
 
 def header(str):
-    print('\n' + '\033[44m' + str + '\033[0m' + '\n')
+    if is_ci:
+        print(f'\n{str}\n')
+    else:
+        print(f'\n\033[44m{str}\033[0m\n')
 
 
 def vprint(str):
