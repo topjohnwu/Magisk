@@ -2,9 +2,6 @@
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <sys/sysmacros.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <pwd.h>
 #include <unistd.h>
@@ -30,10 +27,6 @@ int fork_no_orphan() {
 	int pid = xfork();
 	if (pid)
 		return pid;
-	// Unblock all signals
-	sigset_t block_set;
-	sigfillset(&block_set);
-	pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
 	prctl(PR_SET_PDEATHSIG, SIGTERM);
 	if (getppid() == 1)
 		exit(1);
@@ -95,6 +88,11 @@ int exec_command(exec_t &exec) {
 		}
 		return pid;
 	}
+
+	// Unblock all signals
+	sigset_t set;
+	sigfillset(&set);
+	pthread_sigmask(SIG_UNBLOCK, &set, nullptr);
 
 	if (outfd >= 0) {
 		xdup2(outfd, STDOUT_FILENO);
