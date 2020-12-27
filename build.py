@@ -473,7 +473,10 @@ def zip_main(args):
 
         # chromeos
         for tool in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
-            source = op.join('tools', tool)
+            if tool == 'futility':
+                source = op.join('tools', tool)
+            else:
+                source = op.join('tools', 'keys', tool)
             target = op.join('chromeos', tool)
             zip_with_msg(zipf, source, target)
 

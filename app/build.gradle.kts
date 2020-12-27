@@ -1,3 +1,5 @@
+import java.io.PrintStream
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -63,12 +65,46 @@ android {
     }
 }
 
-val copyUtils = tasks.register("copyUtils", Copy::class) {
+tasks["preBuild"]?.dependsOn(tasks.register("copyUtils", Copy::class) {
     from(rootProject.file("scripts/util_functions.sh"))
     into("src/main/res/raw")
-}
+})
 
-tasks["preBuild"]?.dependsOn(copyUtils)
+android.applicationVariants.all {
+    val keysDir = rootProject.file("tools/keys")
+    val outSrcDir = File(buildDir, "generated/source/keydata/$name")
+    val outSrc = File(outSrcDir, "com/topjohnwu/signing/KeyData.java")
+
+    fun PrintStream.newField(name: String, file: File) {
+        println("public static byte[] $name() {")
+        print("byte[] buf = {")
+        val bytes = file.readBytes()
+        print(bytes.joinToString(",") { "(byte)(${it.toInt() and 0xff})" })
+        println("};")
+        println("return buf;")
+        println("}")
+    }
+
+    val genSrcTask = tasks.register("generate${name.capitalize()}KeyData") {
+        inputs.dir(keysDir)
+        outputs.file(outSrc)
+        doLast {
+            outSrc.parentFile.mkdirs()
+            PrintStream(outSrc).use {
+                it.println("package com.topjohnwu.signing;")
+                it.println("public final class KeyData {")
+
+                it.newField("testCert", File(keysDir, "testkey.x509.pem"))
+                it.newField("testKey", File(keysDir, "testkey.pk8"))
+                it.newField("verityCert", File(keysDir, "verity.x509.pem"))
+                it.newField("verityKey", File(keysDir, "verity.pk8"))
+
+                it.println("}")
+            }
+        }
+    }
+    registerJavaGeneratingTask(genSrcTask.get(), outSrcDir)
+}
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))

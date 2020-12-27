@@ -1,5 +1,8 @@
 package com.topjohnwu.signing;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -14,6 +17,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,8 +88,10 @@ public class SignBoot {
         }
     }
 
-    public static boolean doSignature(String target, InputStream imgIn, OutputStream imgOut,
-                                      InputStream cert, InputStream key) {
+    public static boolean doSignature(
+            @Nullable X509Certificate cert, @Nullable PrivateKey key,
+            @NonNull InputStream imgIn, @NonNull OutputStream imgOut, @NonNull String target
+    ) {
         try {
             PushBackRWStream in = new PushBackRWStream(imgIn, imgOut);
             byte[] hdr = new byte[BOOT_IMAGE_HEADER_SIZE_MAXIMUM];
@@ -96,16 +102,16 @@ public class SignBoot {
             in.unread(hdr);
             BootSignature bootsig = new BootSignature(target, signableSize);
             if (cert == null) {
-                cert = SignBoot.class.getResourceAsStream("/keys/verity.x509.pem");
+                cert = CryptoUtils.readCertificate(
+                        new ByteArrayInputStream(KeyData.verityCert()));
             }
-            X509Certificate certificate = CryptoUtils.readCertificate(cert);
-            bootsig.setCertificate(certificate);
+            bootsig.setCertificate(cert);
             if (key == null) {
-                key = SignBoot.class.getResourceAsStream("/keys/verity.pk8");
+                key = CryptoUtils.readPrivateKey(
+                        new ByteArrayInputStream(KeyData.verityKey()));
             }
-            PrivateKey privateKey = CryptoUtils.readPrivateKey(key);
-            byte[] sig = bootsig.sign(privateKey, in, signableSize);
-            bootsig.setSignature(sig, CryptoUtils.getSignatureAlgorithmIdentifier(privateKey));
+            byte[] sig = bootsig.sign(key, in, signableSize);
+            bootsig.setSignature(sig, CryptoUtils.getSignatureAlgorithmIdentifier(key));
             byte[] encoded_bootsig = bootsig.getEncoded();
             imgOut.write(encoded_bootsig);
             imgOut.flush();
@@ -116,7 +122,7 @@ public class SignBoot {
         }
     }
 
-    public static boolean verifySignature(InputStream imgIn, InputStream certIn) {
+    public static boolean verifySignature(InputStream imgIn, X509Certificate cert) {
         try {
             // Read the header for size
             byte[] hdr = new byte[BOOT_IMAGE_HEADER_SIZE_MAXIMUM];
@@ -142,8 +148,8 @@ public class SignBoot {
             }
 
             BootSignature bootsig = new BootSignature(signature);
-            if (certIn != null) {
-                bootsig.setCertificate(CryptoUtils.readCertificate(certIn));
+            if (cert != null) {
+                bootsig.setCertificate(cert);
             }
             if (bootsig.verify(rawImg, signableSize)) {
                 System.err.println("Signature is VALID");
@@ -314,4 +320,46 @@ public class SignBoot {
         }
 
     }
+
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0 && "-verify".equals(args[0])) {
+            X509Certificate cert = null;
+            if (args.length >= 2) {
+                // args[1] is the path to a public key certificate
+                cert = CryptoUtils.readCertificate(new FileInputStream(args[1]));
+            }
+            boolean signed = SignBoot.verifySignature(System.in, cert);
+            System.exit(signed ? 0 : 1);
+        } else if (args.length > 0 && "-sign".equals(args[0])) {
+            X509Certificate cert = null;
+            PrivateKey key = null;
+            String name = "/boot";
+
+            if (args.length >= 3) {
+                cert = CryptoUtils.readCertificate(new FileInputStream(args[1]));
+                key = CryptoUtils.readPrivateKey(new FileInputStream(args[2]));
+            }
+            if (args.length == 2) {
+                name = args[1];
+            } else if (args.length >= 4) {
+                name = args[3];
+            }
+
+            boolean result = SignBoot.doSignature(cert, key, System.in, System.out, name);
+            System.exit(result ? 0 : 1);
+        } else {
+            System.err.println(
+                    "BootSigner <actions> [args]\n" +
+                    "Input from stdin, output to stdout\n" +
+                    "\n" +
+                    "Actions:\n" +
+                    "   -verify [x509.pem]\n" +
+                    "      verify image. cert is optional.\n" +
+                    "   -sign [x509.pem] [pk8] [name]\n" +
+                    "      sign image. name and the cert/key pair are optional.\n" +
+                    "      name should be either /boot (default) or /recovery.\n"
+            );
+        }
+    }
+
 }

@@ -7,10 +7,12 @@ import android.util.Base64OutputStream
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.signing.CryptoUtils.readCertificate
 import com.topjohnwu.signing.CryptoUtils.readPrivateKey
+import com.topjohnwu.signing.KeyData
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.KeyPairGenerator
@@ -58,10 +60,10 @@ class Keygen(context: Context) : CertKeyProvider {
 
     class TestProvider : CertKeyProvider {
         override val cert by lazy {
-            readCertificate(javaClass.getResourceAsStream("/keys/testkey.x509.pem"))
+            readCertificate(ByteArrayInputStream(KeyData.testCert()))
         }
         override val key by lazy {
-            readPrivateKey(javaClass.getResourceAsStream("/keys/testkey.pk8"))
+            readPrivateKey(ByteArrayInputStream(KeyData.testKey()))
         }
     }
 

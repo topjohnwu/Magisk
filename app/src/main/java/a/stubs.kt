@@ -8,10 +8,10 @@ import com.topjohnwu.magisk.core.SplashActivity
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
-import com.topjohnwu.signing.BootSigner
+import com.topjohnwu.signing.SignBoot
 
 fun main(args: Array<String>) {
-    BootSigner.main(args)
+    SignBoot.main(args)
 }
 
 class b : MainActivity()

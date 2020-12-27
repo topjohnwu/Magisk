@@ -345,7 +345,7 @@ abstract class MagiskInstallImpl : KoinComponent {
             val signed = File(installDir, "signed.img")
             try {
                 withStreams(SuFileInputStream(patched), signed.outputStream().buffered()) {
-                    input, out -> SignBoot.doSignature("/boot", input, out, null, null)
+                    input, out -> SignBoot.doSignature(null, null, input, out, "/boot")
                 }
             } catch (e: IOException) {
                 console.add("! Unable to sign image")
