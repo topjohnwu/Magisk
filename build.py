@@ -2,13 +2,17 @@
 import sys
 import os
 import subprocess
-
-is_windows = os.name == 'nt'
-is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
-
-if not is_ci and is_windows:
-    import colorama
-    colorama.init()
+import argparse
+import multiprocessing
+import zipfile
+import datetime
+import errno
+import shutil
+import lzma
+import platform
+import urllib.request
+import os.path as op
+from distutils.dir_util import copy_tree
 
 
 def error(str):
@@ -31,6 +35,13 @@ def vprint(str):
         print(str)
 
 
+is_windows = os.name == 'nt'
+is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
+
+if not is_ci and is_windows:
+    import colorama
+    colorama.init()
+
 # Environment checks
 if not sys.version_info >= (3, 6):
     error('Requires Python 3.6+')
@@ -43,19 +54,6 @@ try:
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 except FileNotFoundError:
     error('Please install JDK and make sure \'javac\' is available in PATH')
-
-import argparse
-import multiprocessing
-import zipfile
-import datetime
-import errno
-import shutil
-import lzma
-import tempfile
-import platform
-import urllib.request
-import os.path as op
-from distutils.dir_util import copy_tree
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86']
@@ -71,6 +69,8 @@ gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
 # Global vars
 config = {}
 STDOUT = None
+build_tools = None
+
 
 def mv(source, target):
     try:
@@ -196,33 +196,52 @@ def clean_elf():
         elf_cleaner = op.join('native', 'out', 'elf-cleaner')
         if not op.exists(elf_cleaner):
             execv(['g++', '-std=c++11', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp',
-                  '-o', elf_cleaner])
+                   '-o', elf_cleaner])
     args = [elf_cleaner]
-    args.extend(op.join('native', 'out', arch, 'magisk') for arch in archs + arch64)
+    args.extend(op.join('native', 'out', arch, 'magisk')
+                for arch in archs + arch64)
     execv(args)
 
 
-def sign_zip(unsigned, output, release):
-    if not release or 'keyStore' not in config:
-        mv(unsigned, output)
+def find_build_tools():
+    global build_tools
+    if build_tools:
+        return build_tools
+    build_tools_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'build-tools')
+    ls = os.listdir(build_tools_root)
+    # Use the latest build tools available
+    ls.sort()
+    build_tools = op.join(build_tools_root, ls[-1])
+    return build_tools
+
+
+def sign_zip(unsigned):
+    if 'keyStore' not in config:
         return
 
-    signer_name = 'zipsigner-4.0.jar'
-    zipsigner = op.join('app', 'signing', 'build', 'libs', signer_name)
+    msg = '* Signing APK'
+    apksigner = op.join(find_build_tools(), 'apksigner')
 
-    if not op.exists(zipsigner):
-        header('* Building ' + signer_name)
-        proc = execv([gradlew, 'app:signing:shadowJar'])
-        if proc.returncode != 0:
-            error(f'Build {signer_name} failed!')
+    execArgs = [apksigner, 'sign',
+                '--ks', config['keyStore'],
+                '--ks-pass', f'pass:{config["keyStorePass"]}',
+                '--ks-key-alias', config['keyAlias'],
+                '--key-pass', f'pass:{config["keyPass"]}',
+                '--v1-signer-name', 'CERT',
+                '--v4-signing-enabled', 'false']
 
-    header('* Signing Zip')
+    if unsigned.endswith('.zip'):
+        msg = '* Signing zip'
+        execArgs.extend(['--min-sdk-version', '17',
+                         '--v2-signing-enabled', 'false',
+                         '--v3-signing-enabled', 'false'])
 
-    proc = execv(['java', '-jar', zipsigner, config['keyStore'], config['keyStorePass'],
-                  config['keyAlias'], config['keyPass'], unsigned, output])
+    execArgs.append(unsigned)
 
+    header(msg)
+    proc = execv(execArgs)
     if proc.returncode != 0:
-        error('Signing zip failed!')
+        error('Signing failed!')
 
 
 def binary_dump(src, out, var_name):
@@ -353,7 +372,7 @@ def build_apk(args, module):
     build_type = 'Release' if args.release or module == 'stub' else 'Debug'
 
     proc = execv([gradlew, f'{module}:assemble{build_type}',
-                 '-PconfigPath=' + op.abspath(args.config)])
+                  '-PconfigPath=' + op.abspath(args.config)])
     if proc.returncode != 0:
         error(f'Build {module} failed!')
 
@@ -398,10 +417,16 @@ def build_snet(args):
 def zip_main(args):
     header('* Packing Flashable Zip')
 
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        unsigned = f.name
+    if config['prettyName']:
+        name = f'Magisk-v{config["version"]}.zip'
+    elif args.release:
+        name = 'magisk-release.zip'
+    else:
+        name = 'magisk-debug.zip'
 
-    with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
+    output = op.join(config['outdir'], name)
+
+    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
         # update-binary
         target = op.join('META-INF', 'com', 'google',
                          'android', 'update-binary')
@@ -454,20 +479,18 @@ def zip_main(args):
 
         # End of zipping
 
-    output = op.join(config['outdir'], f'Magisk-v{config["version"]}.zip' if config['prettyName'] else
-                     'magisk-release.zip' if args.release else 'magisk-debug.zip')
-    sign_zip(unsigned, output, args.release)
-    rm(unsigned)
+    sign_zip(output)
     header('Output: ' + output)
 
 
 def zip_uninstaller(args):
     header('* Packing Uninstaller Zip')
 
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        unsigned = f.name
+    datestr = datetime.datetime.now().strftime("%Y%m%d")
+    name = f'Magisk-uninstaller-{datestr}.zip' if config['prettyName'] else 'magisk-uninstaller.zip'
+    output = op.join(config['outdir'], name)
 
-    with zipfile.ZipFile(unsigned, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
+    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
         # update-binary
         target = op.join('META-INF', 'com', 'google',
                          'android', 'update-binary')
@@ -500,11 +523,7 @@ def zip_uninstaller(args):
 
         # End of zipping
 
-    datestr = datetime.datetime.now().strftime("%Y%m%d")
-    output = op.join(config['outdir'], f'Magisk-uninstaller-{datestr}.zip'
-                     if config['prettyName'] else 'magisk-uninstaller.zip')
-    sign_zip(unsigned, output, args.release)
-    rm(unsigned)
+    sign_zip(output)
     header('Output: ' + output)
 
 
@@ -543,7 +562,7 @@ def setup_ndk(args):
         for info in zf.infolist():
             extracted_path = zf.extract(info, ndk_root)
             vprint(f'Extracting {info.filename}')
-            if info.create_system == 3: # ZIP_UNIX_SYSTEM = 3
+            if info.create_system == 3:  # ZIP_UNIX_SYSTEM = 3
                 unix_attributes = info.external_attr >> 16
             if unix_attributes:
                 os.chmod(extracted_path, unix_attributes)
@@ -560,15 +579,15 @@ def setup_ndk(args):
 
     header('* Replacing API-16 static libs')
     for target in ['arm-linux-androideabi', 'i686-linux-android']:
-      arch = target.split('-')[0]
-      lib_dir = op.join(
-        ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-        'sysroot', 'usr', 'lib', f'{target}', '16')
-      src_dir = op.join('tools', 'ndk-bins', arch)
-      # Remove stupid macOS crap
-      rm(op.join(src_dir, '.DS_Store'))
-      for path in copy_tree(src_dir, lib_dir):
-          vprint(f'Replaced {path}')
+        arch = target.split('-')[0]
+        lib_dir = op.join(
+            ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
+            'sysroot', 'usr', 'lib', f'{target}', '16')
+        src_dir = op.join('tools', 'ndk-bins', arch)
+        # Remove stupid macOS crap
+        rm(op.join(src_dir, '.DS_Store'))
+        for path in copy_tree(src_dir, lib_dir):
+            vprint(f'Replaced {path}')
 
 
 def build_all(args):
@@ -581,6 +600,7 @@ def build_all(args):
 
 
 parser = argparse.ArgumentParser(description='Magisk build script')
+parser.set_defaults(func=lambda x: None)
 parser.add_argument('-r', '--release', action='store_true',
                     help='compile in release mode')
 parser.add_argument('-v', '--verbose', action='store_true',
