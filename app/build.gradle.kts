@@ -74,12 +74,15 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib"))
     implementation(project(":app:shared"))
-    implementation(project(":app:signing"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
     implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
+
+    val vBC = "1.67"
+    implementation("org.bouncycastle:bcprov-jdk15on:${vBC}")
+    implementation("org.bouncycastle:bcpkix-jdk15on:${vBC}")
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"

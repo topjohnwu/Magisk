@@ -1,1 +1,1 @@
-include(":app", ":app:signing", ":app:shared", ":native", ":stub")
+include(":app", ":app:shared", ":native", ":stub")
