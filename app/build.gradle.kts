@@ -80,7 +80,7 @@ dependencies {
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    val vBC = "1.67"
+    val vBC = "1.68"
     implementation("org.bouncycastle:bcprov-jdk15on:${vBC}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${vBC}")
 
@@ -122,7 +122,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.3.0-alpha03"
+    val vRoom = "2.3.0-alpha04"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
@@ -134,7 +134,7 @@ dependencies {
     implementation("androidx.biometric:biometric:1.0.1")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.browser:browser:1.2.0")
+    implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
