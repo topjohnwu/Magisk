@@ -68,7 +68,7 @@
     <string name="sixtymin">60 minuta</string>
     <string name="su_allow_toast">%1$s iu dha e drejta e superpërdoruesit</string>
     <string name="su_deny_toast">%1$s iu refuzuan të drejtat e Superpërdoruesit</string>
-    <string name="su_snack_grant">Jepen të drejtat e superpërdoruesit prej %1$s</string>
+    <string name="su_snack_grant">Jep të drejtën e superpërdoruesit prej %1$s</string>
     <string name="su_snack_deny">Të drejtat e superpërdoruesit prej %1$s mohohen</string>
     <string name="su_snack_notif_on">Njoftimet e %1$s janë aktivizuar</string>
     <string name="su_snack_notif_off">Njoftimet e %1$s janë çaktivizuar</string>
@@ -175,7 +175,7 @@
     <string name="settings_owner_only">Vetëm zotëruesi i pajisjes</string>
     <string name="settings_owner_manage">Pronari i Pajisjes i Menaxhuar</string>
     <string name="settings_user_independent">Përdorues i Pavarur</string>
-    <string name="user_indepenent_summary">Çdo përdorues ka rregullat e tij / saj të veçanta rrënjësore</string>
+    <string name="user_indepenent_summary">Çdo përdorues ka rregullat e tij/saj të veçanta rrënjësore</string>
     <string name="mount_namespace_mode">Modaliteti i hapësirës së emrave të malit</string>
     <string name="settings_ns_global">Hapësira Globale e Emrave</string>
     <string name="settings_ns_requester">Trashëgoni Hapësirën e Emrave</string>
@@ -185,13 +185,13 @@
     <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
 
     <!--Notifications-->
-    <string name="update_channel">Përditësimet Magisk </string>
-    <string name="progress_channel">Njoftimet e Progresit </string>
-    <string name="download_complete">Shkarkimi përfundoi </string>
-    <string name="download_file_error">Gabim në shkarkimin e skedarit </string>
-    <string name="download_open_parent">Shfaq në dosjen mëmë </string>
-    <string name="magisk_update_title">Mundësohet azhurnimi i Magisk! </string>
-    <string name="manager_update_title">Mundësohet azhurnimi i menaxherit Magisk! </string>
+    <string name="update_channel">Përditësimet e Magisk</string>
+    <string name="progress_channel">Njoftimet e Progresit</string>
+    <string name="download_complete">Shkarkimi përfundoi</string>
+    <string name="download_file_error">Gabim në shkarkimin e skedarit</string>
+    <string name="download_open_parent">Shfaq në dosjen mëmë</string>
+    <string name="magisk_update_title">Mundësohet azhurnimi i Magisk!</string>
+    <string name="manager_update_title">Ka perditësime të ri të Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
@@ -205,7 +205,7 @@
     <string name="flashing">Ndezje…</string>
     <string name="done">U krye!</string>
     <string name="failure">Dështoi!</string>
-    <string name="hide_manager_title">Fshehja e Menaxherit të Magisk…</string>
+    <string name="hide_manager_title">Fshehja e Magisk manager…</string>
     <string name="hide_manager_fail_toast">Fsheh Menaxherin e Magisk dështoi</string>
     <string name="restore_manager_fail_toast">Rikthe menaxherin e Magisk dështoi</string>
     <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
@@ -215,17 +215,17 @@
     <string name="restore_done">Restaurimi u krye!</string>
     <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
     <string name="proprietary_title">Shkarkoni Kodin e Pronarit</string>
-    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \ n \ nA do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</string>
+    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \n\n A do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</string>
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim Shtesë</string>
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet. Do të shkarkojë zip-in e konfigurimit të Magisk, doni të vazhdoni tani?</string>
     <string name="setup_msg">Konfigurimi i mjedisit drejtues…</string>
     <string name="authenticate">Vërteto</string>
-    <string name="unsupport_magisk_title">Versioni i pambështetur Magisk</string>
+    <string name="unsupport_magisk_title">Versioni i pambështetur i Magisk</string>
     <string name="unsupport_magisk_msg">Ky version i Magisk Manager nuk e mbështet versionin Magisk më të ulët se %1$s. \n\n Aplikimi do të sillet sikur nuk është instaluar asnjë Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</string>
     <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
-    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t\'u njohur. Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
+    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t\'u njohur. \n\n Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
 
 </resources>
