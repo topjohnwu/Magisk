@@ -116,14 +116,23 @@ ensure_bb() {
   fi
   chmod 755 $bb
 
+  # Busybox could be a script, make sure /system/bin/sh exists
+  if [ ! -f /system/bin/sh ]; then
+    umount -l /system 2>/dev/null
+    mkdir -p /system/bin
+    ln -s $(command -v sh) /system/bin/sh
+  fi
+
+  export ASH_STANDALONE=1
+
   # Find our current arguments
   # Run in busybox environment to ensure consistent results
   # /proc/<pid>/cmdline shall be <interpreter> <script> <arguments...>
-  local cmds="$($bb sh -o standalone -c "
+  local cmds="$($bb sh -c "
   for arg in \$(tr '\0' '\n' < /proc/$$/cmdline); do
     if [ -z \"\$cmds\" ]; then
       # Skip the first argument as we want to change the interpreter
-      cmds=\"sh -o standalone\"
+      cmds=\"sh\"
     else
       cmds=\"\$cmds '\$arg'\"
     fi
