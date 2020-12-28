@@ -58,11 +58,11 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
 - Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)
 - Run `./build.py ndk` to let the script download and install NDK for you
-- Set configurations in `config.prop`. A sample `config.prop.sample` is provided.
 - To start building, run `build.py` to see your options. \
 For each action, use `-h` to access help (e.g. `./build.py all -h`)
 - To start development, open the project in Android Studio. Both app (Kotlin/Java) and native (C++/C) source code can be properly developed using the IDE, but *always* use `build.py` for building.
-- `build.py` builds in debug mode by default. If you want release builds (with `-r, --release`), you need a Java Keystore to sign APKs and zips. For more information, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
+- Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
+- To sign APKs and zips with your own private keys, set signing configs in `config.prop`. For more info, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
 
 ## Translation Contributions
 
