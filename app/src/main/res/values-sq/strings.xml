@@ -28,11 +28,11 @@
     <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Megjithatë mund të na tregoni se ju interesoni duke dërguar një donacion të vogël.</string>
     <string name="home_status_normal">Normale</string>
     <string name="home_status_stub">Stub</string>
-    <string name="home_installed_version">Instaluar</string>
-    <string name="home_latest_version">Më të fundit</string>
+    <string name="home_installed_version">E instaluar</string>
+    <string name="home_latest_version">Më e fundit</string>
     <string name="invalid_update_channel">Kanal i pavlefshëm i azhurnimit</string>
     <string name="uninstall_magisk_title">Çinstalo Magisk</string>
-    <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen! \n Rrënja do të hiqet! \n Të dhënat tuaja potencialisht të koduara nëse jo tashmë!</string>
+    <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen! \n Rrënja do të hiqet! \n\n Të dhënat tuaja potencialisht të koduara nëse jo tashmë!</string>
     <string name="home_check_safetynet">Kontrolloni Rrjetin e Sigurisë</string>
 
     <!--Install-->
