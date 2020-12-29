@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.widget.Toast;
 
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.Request;
@@ -20,11 +22,13 @@ import java.io.File;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
+import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
 import static com.topjohnwu.magisk.R.string.dling;
 import static com.topjohnwu.magisk.R.string.no_internet_msg;
+import static com.topjohnwu.magisk.R.string.relaunch_app;
 import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
-public class MainActivity extends Activity {
+public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk Manager";
     private static final String CDN_URL = "https://cdn.jsdelivr.net/gh/topjohnwu/magisk_files@%s/%s";
@@ -107,11 +111,23 @@ public class MainActivity extends Activity {
     private void dlAPK() {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
         // Download and upgrade the app
-        File apk = new File(getCacheDir(), "manager.apk");
-        request(apkLink).getAsFile(apk, file -> {
-            dialog.dismiss();
-            APKInstall.install(this, file);
-            finish();
+        File apk = dynLoad ? DynAPK.current(this) : new File(getCacheDir(), "manager.apk");
+        request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
+            if (dynLoad) {
+                InjectAPK.setup(this);
+                runOnUiThread(() -> {
+                    dialog.dismiss();
+                    Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();
+                    finish();
+                });
+            } else {
+                runOnUiThread(() -> {
+                    dialog.dismiss();
+                    APKInstall.install(this, file);
+                    finish();
+                });
+            }
         });
     }
+
 }

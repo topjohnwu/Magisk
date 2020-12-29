@@ -5,24 +5,81 @@
     package="com.topjohnwu.magisk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
 
     <application
-        android:allowBackup="true"
-        tools:ignore="AllowBackup">
+        android:appComponentFactory=".DelegateComponentFactory"
+        android:name="a.e"
+        android:allowBackup="false"
+        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
 
-        <activity android:name=".MainActivity">
+        <!-- Splash -->
+        <activity
+            android:name="a.c">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
+        <!-- Main -->
+        <activity android:name="a.b" />
+
+        <!-- Superuser -->
+        <activity
+            android:name="a.m"
+            android:directBootAware="true"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            tools:ignore="AppLinkUrlError">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <!-- Receiver -->
+        <receiver
+            android:name="a.h"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <!-- DownloadService -->
+        <service android:name="a.j" />
+
+        <!-- FileProvider -->
         <provider
-            android:name=".FileProvider"
+            android:name="a.p"
             android:authorities="${applicationId}.provider"
+            android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true">
         </provider>
+
+        <!-- Hardcode GMS version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="12451000" />
 
     </application>
 
