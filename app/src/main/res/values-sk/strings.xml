@@ -44,7 +44,7 @@
     <string name="install_next">Ďalej</string>
     <string name="install_start">Poďme na to</string>
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
-    <string name="download_zip_only">Len tiahnuť zip</string>
+    <string name="download_zip_only">Len stiahnuť zip</string>
     <string name="direct_install">Priama inštalácia (Odporúča sa)</string>
     <string name="install_inactive_slot">Inštalovať na neaktívny slot (Po OTA)</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
