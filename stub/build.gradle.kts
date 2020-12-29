@@ -17,9 +17,13 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
-            isShrinkResources = true
+            isShrinkResources = false
             proguardFiles("proguard-rules.pro")
         }
+    }
+
+    aaptOptions {
+        additionalParameters("--package-id", "0x80")
     }
 
     dependenciesInfo {
