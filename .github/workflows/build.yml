@@ -50,6 +50,7 @@ jobs:
           echo "ANDROID_SDK_ROOT=$sdk_root" >> $env:GITHUB_ENV
           echo "ANDROID_HOME=$sdk_root" >> $env:GITHUB_ENV
           echo "MAGISK_NDK_VERSION=$ndk_ver" >> $env:GITHUB_ENV
+          echo "GRADLE_OPTS=-Dorg.gradle.daemon=false" >> $env:GITHUB_ENV
 
       - name: Set up GitHub env (Unix)
         if: runner.os != 'Windows'
@@ -64,7 +65,6 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            !~/.gradle/caches/**/*.lock
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
