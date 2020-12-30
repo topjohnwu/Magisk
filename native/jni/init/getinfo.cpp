@@ -160,6 +160,8 @@ void load_kernel_info(cmdline *cmd) {
 			cmd->skip_initramfs = true;
 		} else if (key == "androidboot.force_normal_boot") {
 			cmd->force_normal_boot = value[0] == '1';
+		} else if (key == "rootwait") {
+			cmd->rootwait = true;
 		} else if (key == "androidboot.android_dt_dir") {
 			strcpy(cmd->dt_dir, value);
 		} else if (key == "androidboot.hardware") {
@@ -174,6 +176,7 @@ void load_kernel_info(cmdline *cmd) {
 	LOGD("Kernel cmdline info:\n");
 	LOGD("skip_initramfs=[%d]\n", cmd->skip_initramfs);
 	LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
+	LOGD("rootwait=[%d]\n", cmd->rootwait);
 	LOGD("slot=[%s]\n", cmd->slot);
 	LOGD("dt_dir=[%s]\n", cmd->dt_dir);
 	LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
