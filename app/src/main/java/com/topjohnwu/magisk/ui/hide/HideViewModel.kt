@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.hide
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.os.Process
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
@@ -14,7 +15,6 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.packageName
-import com.topjohnwu.magisk.ktx.processes
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
@@ -45,11 +45,11 @@ class HideViewModel : BaseViewModel(), Queryable {
             submitQuery()
         }
 
-    val items = filterableListOf<HideItem>()
-    val itemBinding = itemBindingOf<HideItem> {
+    val items = filterableListOf<HideRvItem>()
+    val itemBinding = itemBindingOf<HideRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
-    val itemInternalBinding = itemBindingOf<HideProcessItem> {
+    val itemInternalBinding = itemBindingOf<HideProcessRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
@@ -62,32 +62,19 @@ class HideViewModel : BaseViewModel(), Queryable {
         state = State.LOADING
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = get<PackageManager>()
-            val hides = Shell.su("magiskhide --ls").exec().out.map { HideTarget(it) }
-            val apps = pm.getInstalledApplications(PackageManager.MATCH_UNINSTALLED_PACKAGES)
+            val hideList = Shell.su("magiskhide --ls").exec().out.map { CmdlineHiddenItem(it) }
+            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES)
                 .asSequence()
                 .filter { it.enabled && !blacklist.contains(it.packageName) }
-                .map { HideAppInfo(it, pm) }
-                .map { createTarget(it, hides) }
+                .map { HideAppInfo(it, pm, hideList) }
                 .filter { it.processes.isNotEmpty() }
-                .map { HideItem(it) }
+                .map { HideRvItem(it) }
                 .toList()
                 .sorted()
             apps to items.calculateDiff(apps)
         }
         items.update(apps, diff)
         submitQuery()
-    }
-
-    // ---
-
-    private fun createTarget(info: HideAppInfo, hideList: List<HideTarget>): HideAppTarget {
-        val pkg = info.packageName
-        val hidden = hideList.filter { it.packageName == pkg }
-        val processNames = info.processes.distinct()
-        val processes = processNames.map { name ->
-            HideProcessInfo(name, pkg, hidden.any { name == it.process })
-        }
-        return HideAppTarget(info, processes)
     }
 
     // ---

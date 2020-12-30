@@ -58,12 +58,6 @@ int gen_rand_str(char *buf, int len, bool varlen) {
 	return len - 1;
 }
 
-int strend(const char *s1, const char *s2) {
-	size_t l1 = strlen(s1);
-	size_t l2 = strlen(s2);
-	return strcmp(s1 + l1 - l2, s2);
-}
-
 int exec_command(exec_t &exec) {
 	int pipefd[] = {-1, -1};
 	int outfd = -1;
@@ -149,12 +143,6 @@ void set_nice_name(const char *name) {
 	memset(argv0, 0, name_len);
 	strlcpy(argv0, name, name_len);
 	prctl(PR_SET_NAME, name);
-}
-
-bool ends_with(const std::string_view &s1, const std::string_view &s2) {
-	unsigned l1 = s1.length();
-	unsigned l2 = s2.length();
-	return l1 < l2 ? false : s1.compare(l1 - l2, l2, s2) == 0;
 }
 
 /*

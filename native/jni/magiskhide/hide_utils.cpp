@@ -48,23 +48,27 @@ void set_hide_state(bool state) {
 	hide_state = state;
 }
 
+template <bool str_op(string_view, string_view)>
 static bool proc_name_match(int pid, const char *name) {
 	char buf[4019];
 	sprintf(buf, "/proc/%d/cmdline", pid);
-	if (FILE *f = fopen(buf, "re")) {
-		fgets(buf, sizeof(buf), f);
-		fclose(f);
-		if (strcmp(buf, name) == 0)
+	if (auto fp = open_file(buf, "re")) {
+		fgets(buf, sizeof(buf), fp.get());
+		if (str_op(buf, name)) {
+			LOGD("hide_utils: kill PID=[%d] (%s)\n", pid, buf);
 			return true;
+		}
 	}
 	return false;
 }
 
-static void kill_process(const char *name, bool multi = false) {
+static inline bool str_eql(string_view s, string_view ss) { return s == ss; }
+
+static void kill_process(const char *name, bool multi = false,
+		bool (*filter)(int, const char *) = proc_name_match<&str_eql>) {
 	crawl_procfs([=](int pid) -> bool {
-		if (proc_name_match(pid, name)) {
-			if (kill(pid, SIGTERM) == 0)
-				LOGD("hide_utils: killed PID=[%d] (%s)\n", pid, name);
+		if (filter(pid, name)) {
+			kill(pid, SIGTERM);
 			return multi;
 		}
 		return true;
@@ -72,6 +76,8 @@ static void kill_process(const char *name, bool multi = false) {
 }
 
 static bool validate(const char *s) {
+	if (strcmp(s, ISOLATED_MAGIC) == 0)
+		return true;
 	bool dot = false;
 	for (char c; (c = *s); ++s) {
 		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
@@ -87,7 +93,18 @@ static bool validate(const char *s) {
 	return dot;
 }
 
-static int add_list(const char *pkg, const char *proc = "") {
+static void add_hide_set(const char *pkg, const char *proc) {
+	LOGI("hide_list add: [%s/%s]\n", pkg, proc);
+	hide_set.emplace(pkg, proc);
+	if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
+		// Kill all matching isolated processes
+		kill_process(proc, true, proc_name_match<&str_starts>);
+	} else {
+		kill_process(proc);
+	}
+}
+
+static int add_list(const char *pkg, const char *proc) {
 	if (proc[0] == '\0')
 		proc = pkg;
 
@@ -105,15 +122,12 @@ static int add_list(const char *pkg, const char *proc = "") {
 	char *err = db_exec(sql);
 	db_err_cmd(err, return DAEMON_ERROR);
 
-	LOGI("hide_list add: [%s/%s]\n", pkg, proc);
-
-	// Critical region
 	{
+		// Critical region
 		mutex_guard lock(monitor_lock);
-		hide_set.emplace(pkg, proc);
+		add_hide_set(pkg, proc);
 	}
 
-	kill_process(proc);
 	return DAEMON_SUCCESS;
 }
 
@@ -123,27 +137,28 @@ int add_list(int client) {
 	int ret = add_list(pkg, proc);
 	free(pkg);
 	free(proc);
-	update_uid_map();
+	if (ret == DAEMON_SUCCESS)
+		update_uid_map();
 	return ret;
 }
 
-static int rm_list(const char *pkg, const char *proc = "") {
+static int rm_list(const char *pkg, const char *proc) {
+	bool remove = false;
 	{
 		// Critical region
 		mutex_guard lock(monitor_lock);
-		bool remove = false;
 		for (auto it = hide_set.begin(); it != hide_set.end();) {
 			if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
 				remove = true;
-				LOGI("hide_list rm: [%s]\n", it->second.data());
+				LOGI("hide_list rm: [%s/%s]\n", it->first.data(), it->second.data());
 				it = hide_set.erase(it);
 			} else {
 				++it;
 			}
 		}
-		if (!remove)
-			return HIDE_ITEM_NOT_EXIST;
 	}
+	if (!remove)
+		return HIDE_ITEM_NOT_EXIST;
 
 	char sql[4096];
 	if (proc[0] == '\0')
@@ -167,10 +182,11 @@ int rm_list(int client) {
 	return ret;
 }
 
-static void init_list(const char *pkg, const char *proc) {
-	LOGI("hide_list init: [%s/%s]\n", pkg, proc);
-	hide_set.emplace(pkg, proc);
-	kill_process(proc);
+static bool str_ends_safe(string_view s, string_view ss) {
+	// Never kill webview zygote
+	if (s == "webview_zygote")
+		return false;
+	return str_ends(s, ss);
 }
 
 #define SNET_PROC    "com.google.android.gms.unstable"
@@ -181,25 +197,26 @@ static bool init_list() {
 	LOGD("hide_list: initialize\n");
 
 	char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
-		init_list(row["package_name"].data(), row["process"].data());
+		add_hide_set(row["package_name"].data(), row["process"].data());
 		return true;
 	});
 	db_err_cmd(err, return false);
 
-	// If Android Q+, also kill blastula pool
+	// If Android Q+, also kill blastula pool and all app zygotes
 	if (SDK_INT >= 29) {
 		kill_process("usap32", true);
 		kill_process("usap64", true);
+		kill_process("_zygote", true, proc_name_match<&str_ends_safe>);
 	}
 
 	// Add SafetyNet by default
-	init_list(GMS_PKG, SNET_PROC);
-	init_list(MICROG_PKG, SNET_PROC);
+	add_hide_set(GMS_PKG, SNET_PROC);
+	add_hide_set(MICROG_PKG, SNET_PROC);
 
 	// We also need to hide the default GMS process if MAGISKTMP != /sbin
 	// The snet process communicates with the main process and get additional info
 	if (MAGISKTMP != "/sbin")
-		init_list(GMS_PKG, GMS_PKG);
+		add_hide_set(GMS_PKG, GMS_PKG);
 
 	update_uid_map();
 	return true;
@@ -251,7 +268,7 @@ int launch_magiskhide() {
 		hide_late_sensitive_props();
 
 	// Start monitoring
-	void *(*start)(void*) = [](void*) -> void* { proc_monitor(); return nullptr; };
+	void *(*start)(void*) = [](void*) -> void* { proc_monitor(); };
 	if (xpthread_create(&proc_monitor_thread, nullptr, start, nullptr))
 		return DAEMON_ERROR;
 

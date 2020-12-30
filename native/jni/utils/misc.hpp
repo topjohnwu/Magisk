@@ -8,9 +8,6 @@
 #define UID_ROOT   0
 #define UID_SHELL  2000
 
-#define str_contains(s, ss) ((ss) != nullptr && (s).find(ss) != std::string::npos)
-#define str_starts(s, ss) ((ss) != nullptr && (s).compare(0, strlen(ss), ss) == 0)
-
 class mutex_guard {
 public:
 	explicit mutex_guard(pthread_mutex_t &m): mutex(&m) {
@@ -65,10 +62,18 @@ using thread_entry = void *(*)(void *);
 int new_daemon_thread(thread_entry entry, void *arg = nullptr, const pthread_attr_t *attr = nullptr);
 int new_daemon_thread(std::function<void()> &&entry);
 
-bool ends_with(const std::string_view &s1, const std::string_view &s2);
+static inline bool str_contains(std::string_view s, std::string_view ss) {
+	return s.find(ss) != std::string::npos;
+}
+static inline bool str_starts(std::string_view s, std::string_view ss) {
+	return s.rfind(ss, 0) == 0;
+}
+static inline bool str_ends(std::string_view s, std::string_view ss) {
+	return s.size() >= ss.size() && s.compare(s.size() - ss.size(), std::string::npos, ss) == 0;
+}
+
 int fork_dont_care();
 int fork_no_orphan();
-int strend(const char *s1, const char *s2);
 void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);

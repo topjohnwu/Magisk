@@ -13,6 +13,7 @@
 #include <daemon.hpp>
 
 #define SIGTERMTHRD SIGUSR1
+#define ISOLATED_MAGIC "isolated"
 
 // CLI entries
 int launch_magiskhide();

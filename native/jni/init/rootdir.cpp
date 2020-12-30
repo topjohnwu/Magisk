@@ -68,7 +68,7 @@ static void load_overlay_rc(const char *overlay) {
 	// Do not allow overwrite init.rc
 	unlinkat(dfd, "init.rc", 0);
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (strend(entry->d_name, ".rc") == 0) {
+		if (str_ends(entry->d_name, ".rc")) {
 			LOGD("Found rc script [%s]\n", entry->d_name);
 			int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
 			rc_list.push_back(fd_full_read(rc));

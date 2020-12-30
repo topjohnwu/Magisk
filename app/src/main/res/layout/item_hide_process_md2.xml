@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.hide.HideProcessItem" />
+            type="com.topjohnwu.magisk.ui.hide.HideProcessRvItem" />
 
         <variable
             name="viewModel"

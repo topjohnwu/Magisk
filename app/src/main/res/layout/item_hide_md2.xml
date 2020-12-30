@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.hide.HideItem" />
+            type="com.topjohnwu.magisk.ui.hide.HideRvItem" />
 
         <variable
             name="viewModel"

@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -61,13 +58,13 @@ static int parse_ppid(int pid) {
 	int ppid;
 
 	sprintf(path, "/proc/%d/stat", pid);
-	FILE *stat = fopen(path, "re");
-	if (stat == nullptr)
+
+	auto stat = open_file(path, "re");
+	if (!stat)
 		return -1;
 
 	// PID COMM STATE PPID .....
-	fscanf(stat, "%*d %*s %*c %d", &ppid);
-	fclose(stat);
+	fscanf(stat.get(), "%*d %*s %*c %d", &ppid);
 
 	return ppid;
 }
@@ -89,20 +86,27 @@ void update_uid_map() {
 	string data_path(APP_DATA_DIR);
 	size_t len = data_path.length();
 	auto dir = open_dir(APP_DATA_DIR);
+	bool firstIteration = true;
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		data_path.resize(len);
 		data_path += '/';
-		data_path += entry->d_name;
+		data_path += entry->d_name;  // multiuser user id
 		data_path += '/';
 		size_t user_len = data_path.length();
 		struct stat st;
 		for (auto &hide : hide_set) {
+			if (hide.first == ISOLATED_MAGIC) {
+				if (!firstIteration) continue;
+				// Setup isolated processes
+				uid_proc_map[-1].emplace_back(hide.second);
+			}
 			data_path.resize(user_len);
 			data_path += hide.first;
 			if (stat(data_path.data(), &st))
 				continue;
 			uid_proc_map[st.st_uid].emplace_back(hide.second);
 		}
+		firstIteration = false;
 	}
 }
 
@@ -224,7 +228,7 @@ static bool check_pid(int pid) {
 
 	sprintf(path, "/proc/%d", pid);
 	if (stat(path, &st)) {
-		// Process killed unexpectedly, ignore
+		// Process died unexpectedly, ignore
 		detach_pid(pid);
 		return true;
 	}
@@ -237,7 +241,7 @@ static bool check_pid(int pid) {
 	if (auto f = open_file(path, "re")) {
 		fgets(cmdline, sizeof(cmdline), f.get());
 	} else {
-		// Process killed unexpectedly, ignore
+		// Process died unexpectedly, ignore
 		detach_pid(pid);
 		return true;
 	}
@@ -247,36 +251,59 @@ static bool check_pid(int pid) {
 		return false;
 
 	int uid = st.st_uid;
-	auto it = uid_proc_map.find(uid);
-	if (it != uid_proc_map.end()) {
-		for (auto &s : it->second) {
-			if (s == cmdline) {
-				// Double check whether ns is separated
-				read_ns(pid, &st);
-				bool mnt_ns = true;
-				for (auto &zit : zygote_map) {
-					if (zit.second.st_ino == st.st_ino &&
-						zit.second.st_dev == st.st_dev) {
-						mnt_ns = false;
-						break;
-					}
-				}
-				// For some reason ns is not separated, abort
-				if (!mnt_ns)
-					break;
+	auto it = uid_proc_map.end();
 
-				// Finally this is our target!
-				// Detach from ptrace but should still remain stopped.
-				// The hide daemon will resume the process.
-				PTRACE_LOG("target found\n");
-				LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
-				detach_pid(pid, SIGSTOP);
-				hide_daemon(pid);
-				return true;
+	if (uid % 100000 > 90000) {
+		// Isolated process
+		it = uid_proc_map.find(-1);
+		if (it == uid_proc_map.end())
+			goto not_target;
+		for (auto &s : it->second) {
+			if (str_starts(cmdline, s)) {
+				LOGI("proc_monitor: (isolated) [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+				goto inject_and_hide;
 			}
 		}
 	}
-	PTRACE_LOG("[%s] not our target\n", cmdline);
+
+	it = uid_proc_map.find(uid);
+	if (it == uid_proc_map.end())
+		goto not_target;
+	for (auto &s : it->second) {
+		if (s != cmdline)
+			continue;
+
+		if (str_ends(s, "_zygote")) {
+			LOGI("proc_monitor: (app zygote) [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+			goto inject_and_hide;
+		}
+
+		// Double check whether ns is separated
+		read_ns(pid, &st);
+		for (auto &zit : zygote_map) {
+			if (zit.second.st_ino == st.st_ino &&
+				zit.second.st_dev == st.st_dev) {
+				// For some reason ns is not separated, abort
+				goto not_target;
+			}
+		}
+
+		// Finally this is our target!
+		// Detach from ptrace but should still remain stopped.
+		// The hide daemon will resume the process.
+		LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+		detach_pid(pid, SIGSTOP);
+		hide_daemon(pid);
+		return true;
+	}
+
+not_target:
+	PTRACE_LOG("[%s] is not our target\n", cmdline);
+	detach_pid(pid);
+	return true;
+
+inject_and_hide:
+	// TODO: handle isolated processes and app zygotes
 	detach_pid(pid);
 	return true;
 }
@@ -324,7 +351,7 @@ static void new_zygote(int pid) {
 }
 
 #define WEVENT(s) (((s) & 0xffff0000) >> 16)
-#define DETACH_AND_CONT { detach = true; continue; }
+#define DETACH_AND_CONT { detach_pid(pid); continue; }
 
 void proc_monitor() {
 	// Unblock some signals
@@ -354,9 +381,7 @@ void proc_monitor() {
 		setitimer(ITIMER_REAL, &interval, nullptr);
 	}
 
-	int status;
-
-	for (;;) {
+	for (int status;;) {
 		const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
 		if (pid < 0) {
 			if (errno == ECHILD) {
@@ -370,38 +395,35 @@ void proc_monitor() {
 			}
 			continue;
 		}
-		bool detach = false;
-		run_finally f([&] {
-			if (detach)
-				// Non of our business now
-				detach_pid(pid);
-		});
 
 		if (!WIFSTOPPED(status) /* Ignore if not ptrace-stop */)
 			DETACH_AND_CONT;
 
-		if (WSTOPSIG(status) == SIGTRAP && WEVENT(status)) {
+		int event = WEVENT(status);
+		int signal = WSTOPSIG(status);
+
+		if (signal == SIGTRAP && event) {
 			unsigned long msg;
 			xptrace(PTRACE_GETEVENTMSG, pid, nullptr, &msg);
 			if (zygote_map.count(pid)) {
 				// Zygote event
-				switch (WEVENT(status)) {
+				switch (event) {
 					case PTRACE_EVENT_FORK:
 					case PTRACE_EVENT_VFORK:
-						PTRACE_LOG("zygote forked: [%d]\n", msg);
+						PTRACE_LOG("zygote forked: [%lu]\n", msg);
 						attaches[msg] = true;
 						break;
 					case PTRACE_EVENT_EXIT:
-						PTRACE_LOG("zygote exited with status: [%d]\n", msg);
+						PTRACE_LOG("zygote exited with status: [%lu]\n", msg);
 						[[fallthrough]];
 					default:
 						zygote_map.erase(pid);
 						DETACH_AND_CONT;
 				}
 			} else {
-				switch (WEVENT(status)) {
+				switch (event) {
 					case PTRACE_EVENT_CLONE:
-						PTRACE_LOG("create new threads: [%d]\n", msg);
+						PTRACE_LOG("create new threads: [%lu]\n", msg);
 						if (attaches[pid] && check_pid(pid))
 							continue;
 						break;
@@ -414,7 +436,7 @@ void proc_monitor() {
 				}
 			}
 			xptrace(PTRACE_CONT, pid);
-		} else if (WSTOPSIG(status) == SIGSTOP) {
+		} else if (signal == SIGSTOP) {
 			if (!attaches[pid]) {
 				// Double check if this is actually a process
 				attaches[pid] = is_process(pid);
@@ -432,8 +454,8 @@ void proc_monitor() {
 			}
 		} else {
 			// Not caused by us, resend signal
-			xptrace(PTRACE_CONT, pid, nullptr, WSTOPSIG(status));
-			PTRACE_LOG("signal [%d]\n", WSTOPSIG(status));
+			xptrace(PTRACE_CONT, pid, nullptr, signal);
+			PTRACE_LOG("signal [%d]\n", signal);
 		}
 	}
 }

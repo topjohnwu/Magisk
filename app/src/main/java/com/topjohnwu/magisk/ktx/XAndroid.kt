@@ -7,9 +7,11 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.ComponentInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
+import android.content.pm.ServiceInfo
+import android.content.pm.ServiceInfo.FLAG_ISOLATED_PROCESS
+import android.content.pm.ServiceInfo.FLAG_USE_APP_ZYGOTE
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.database.Cursor
@@ -57,32 +59,10 @@ import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
 
-val ApplicationInfo.processes: List<String> @SuppressLint("InlinedApi") get() {
-    val pm = get<PackageManager>()
-    val appProcessName = processName ?: packageName
-    val baseFlag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES
-    val packageInfo = try {
-        val request = GET_ACTIVITIES or GET_SERVICES or GET_RECEIVERS or GET_PROVIDERS
-        pm.getPackageInfo(packageName, baseFlag or request)
-    } catch (e: NameNotFoundException) { // EdXposed hooked, issue#3276
-        return listOf(appProcessName)
-    } catch (e: Exception) {
-        // Exceed binder data transfer limit, fetch each component type separately
-        pm.getPackageInfo(packageName, baseFlag).apply {
-            runCatching { activities = pm.getPackageInfo(packageName, GET_ACTIVITIES).activities }
-            runCatching { services = pm.getPackageInfo(packageName, GET_SERVICES).services }
-            runCatching { receivers = pm.getPackageInfo(packageName, GET_RECEIVERS).receivers }
-            runCatching { providers = pm.getPackageInfo(packageName, GET_PROVIDERS).providers }
-        }
-    }
-    fun Array<out ComponentInfo>.processNames() = map { it.processName ?: appProcessName }
-    return with(packageInfo) {
-        activities?.processNames().orEmpty() +
-        services?.processNames().orEmpty() +
-        receivers?.processNames().orEmpty() +
-        providers?.processNames().orEmpty()
-    }
-}
+val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
+
+@get:SuppressLint("InlinedApi")
+val ServiceInfo.useAppZygote get() = (flags and FLAG_USE_APP_ZYGOTE) != 0
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
