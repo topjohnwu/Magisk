@@ -309,22 +309,27 @@ void SARBase::backup_files() {
 void SARBase::mount_system_root() {
 	LOGD("Early mount system_root\n");
 	strcpy(blk_info.block_dev, "/dev/root");
-	// Try legacy SAR dm-verity
-	strcpy(blk_info.partname, "vroot");
-	auto dev = setup_block(false);
-	if (dev >= 0)
-		goto mount_root;
 
-	// Try NVIDIA naming scheme
-	strcpy(blk_info.partname, "APP");
-	dev = setup_block(false);
-	if (dev >= 0)
-		goto mount_root;
+	do {
+		// Try legacy SAR dm-verity
+		strcpy(blk_info.partname, "vroot");
+		auto dev = setup_block(false);
+		if (dev >= 0)
+			goto mount_root;
 
-	sprintf(blk_info.partname, "system%s", cmd->slot);
-	dev = setup_block(false);
-	if (dev >= 0)
-		goto mount_root;
+		// Try NVIDIA naming scheme
+		strcpy(blk_info.partname, "APP");
+		dev = setup_block(false);
+		if (dev >= 0)
+			goto mount_root;
+
+		sprintf(blk_info.partname, "system%s", cmd->slot);
+		dev = setup_block(false);
+		if (dev >= 0)
+			goto mount_root;
+
+		// Poll forever if rootwait was given in cmdline
+	} while (cmd->rootwait);
 
 	// We don't really know what to do at this point...
 	LOGE("Cannot find root partition, abort\n");

@@ -5,6 +5,7 @@
 struct cmdline {
 	bool skip_initramfs;
 	bool force_normal_boot;
+	bool rootwait;
 	char slot[3];
 	char dt_dir[64];
 	char fstab_suffix[32];
