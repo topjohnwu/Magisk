@@ -200,6 +200,14 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(true)
                 .reveal()
+        } else if (!applicationInfo.sourceDir.startsWith("/data/app/")) {
+            MagiskDialog(this)
+                    .applyTitle(R.string.installed_nonstandard_location_title)
+                    .applyMessage(R.string.installed_nonstandard_location_summary)
+                    .applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                        titleRes = android.R.string.ok
+                    }.cancellable(true)
+                    .reveal()
         }
     }
 

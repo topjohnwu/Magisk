@@ -243,5 +243,7 @@
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
     <string name="app_not_found">No application found to handle this action</string>
+    <string name="installed_nonstandard_location_title">Installed to a non-standard location</string>
+    <string name="installed_nonstandard_location_summary">Magisk Manager is installed to a non-standard location. You will encounter unexpected problems such as Magisk is installed but not detected.\n\nPlease install Magisk Manager as a user app to the internal storage.</string>
 
 </resources>

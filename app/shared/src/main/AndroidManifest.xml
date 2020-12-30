@@ -1,13 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.topjohnwu.shared">
+    package="com.topjohnwu.shared"
+    android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:label="Magisk Manager"
-        android:installLocation="internalOnly"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
