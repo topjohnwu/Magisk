@@ -40,7 +40,7 @@
     <string name="recovery_mode">Recovery Modus</string>
     <string name="install_options_title">Optionen</string>
     <string name="install_method_title">Methode</string>
-    <string name="install_next">Nächste</string>
+    <string name="install_next">Nächster Schritt</string>
     <string name="install_start">Los geht\'s</string>
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="download_zip_only">Nur Zip herunterladen</string>
