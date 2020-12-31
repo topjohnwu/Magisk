@@ -353,4 +353,6 @@ LOCAL_SRC_FILES := \
     pcre/dist2/src/pcre2_xclass.c
 include $(BUILD_STATIC_LIBRARY)
 
-include $(LOCAL_PATH)/mincrypt/Android.mk
+CWD := $(LOCAL_PATH)
+include $(CWD)/systemproperties/Android.mk
+include $(CWD)/mincrypt/Android.mk
