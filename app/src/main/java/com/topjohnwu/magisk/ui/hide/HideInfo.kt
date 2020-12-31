@@ -99,4 +99,7 @@ data class HideProcessInfo(
     val name: String,
     val packageName: String,
     var isHidden: Boolean
-)
+) {
+    val isIsolated get() = name == ISOLATED_MAGIC
+    val isAppZygote get() = name.endsWith("_zygote")
+}

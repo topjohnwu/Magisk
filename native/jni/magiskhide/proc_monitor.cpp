@@ -86,7 +86,7 @@ void update_uid_map() {
 	string data_path(APP_DATA_DIR);
 	size_t len = data_path.length();
 	auto dir = open_dir(APP_DATA_DIR);
-	bool firstIteration = true;
+	bool first_iter = true;
 	for (dirent *entry; (entry = xreaddir(dir.get()));) {
 		data_path.resize(len);
 		data_path += '/';
@@ -96,7 +96,7 @@ void update_uid_map() {
 		struct stat st;
 		for (auto &hide : hide_set) {
 			if (hide.first == ISOLATED_MAGIC) {
-				if (!firstIteration) continue;
+				if (!first_iter) continue;
 				// Setup isolated processes
 				uid_proc_map[-1].emplace_back(hide.second);
 			}
@@ -106,7 +106,7 @@ void update_uid_map() {
 				continue;
 			uid_proc_map[st.st_uid].emplace_back(hide.second);
 		}
-		firstIteration = false;
+		first_iter = false;
 	}
 }
 

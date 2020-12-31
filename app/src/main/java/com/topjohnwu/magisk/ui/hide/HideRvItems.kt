@@ -40,11 +40,10 @@ class HideRvItem(
             if (value == true) {
                 processes
                     .filterNot { it.isHidden }
-                    .filter { isExpanded || it.process.name == it.process.packageName }
+                    .filter { isExpanded || it.defaultSelection }
             } else {
                 processes
                     .filter { it.isHidden }
-                    .filter { isExpanded || it.process.name == it.process.packageName }
             }.forEach { it.toggle() }
         }
 
@@ -68,7 +67,12 @@ class HideRvItem(
                 else -> null
             }
         } else {
-            processes.find { it.isHidden && it.process.name == it.process.packageName } != null
+            val defaultProcesses = processes.filter { it.defaultSelection }
+            when (defaultProcesses.count { it.isHidden }) {
+                0 -> false
+                defaultProcesses.size -> true
+                else -> null
+            }
         }
     }
 
@@ -101,6 +105,9 @@ class HideProcessRvItem(
     fun toggle() {
         isHidden = !isHidden
     }
+
+    val defaultSelection get() =
+        process.isIsolated || process.isAppZygote || process.name == process.packageName
 
     override fun contentSameAs(other: HideProcessRvItem) = process == other.process
     override fun itemSameAs(other: HideProcessRvItem) = process.name == other.process.name
