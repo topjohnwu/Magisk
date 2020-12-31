@@ -95,6 +95,7 @@ class FlashViewModel(
             success -> resources.getString(R.string.done)
             else -> resources.getString(R.string.failure)
         }
+        SnackbarEvent(behaviorText).publish()
     }
 
     fun onMenuItemClicked(item: MenuItem): Boolean {

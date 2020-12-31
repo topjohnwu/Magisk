@@ -56,29 +56,6 @@
             app:icon="@drawable/ic_restart"
             app:iconTint="?colorOnPrimary" />
 
-        <com.google.android.material.card.MaterialCardView
-            style="@style/WidgetFoundation.Card.Elevated"
-            goneUnless="@{viewModel.loading}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:contentPadding="@dimen/l1">
-
-            <TextView
-                movieBehavior="@{viewModel.loading}"
-                movieBehaviorText="@{viewModel.behaviorText}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="monospace"
-                android:gravity="center"
-                android:textAppearance="@style/AppearanceFoundation.Body"
-                android:textColor="?colorOnSurface"
-                android:textStyle="bold"
-                tools:text="Flashing..." />
-
-        </com.google.android.material.card.MaterialCardView>
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>
