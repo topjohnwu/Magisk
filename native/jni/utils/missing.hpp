@@ -31,38 +31,38 @@ int compat_endmntent(FILE* fp);
 char *compat_hasmntopt(const struct mntent* mnt, const char* opt);
 
 static inline int compat_setns(int fd, int nstype) {
-	return syscall(__NR_setns, fd, nstype);
+    return syscall(__NR_setns, fd, nstype);
 }
 
 static inline int compat_unshare(int flags) {
-	return syscall(__NR_unshare, flags);
+    return syscall(__NR_unshare, flags);
 }
 
 static inline int compat_accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
-	return syscall(__NR_accept4, sockfd, addr, addrlen, flags);
+    return syscall(__NR_accept4, sockfd, addr, addrlen, flags);
 }
 
 static inline int compat_dup3(int oldfd, int newfd, int flags) {
-	return syscall(__NR_dup3, oldfd, newfd, flags);
+    return syscall(__NR_dup3, oldfd, newfd, flags);
 }
 
 static inline ssize_t compat_readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
-	return syscall(__NR_readlinkat, dirfd, pathname, buf, bufsiz);
+    return syscall(__NR_readlinkat, dirfd, pathname, buf, bufsiz);
 }
 
 static inline int compat_symlinkat(const char *target, int newdirfd, const char *linkpath) {
-	return syscall(__NR_symlinkat, target, newdirfd, linkpath);
+    return syscall(__NR_symlinkat, target, newdirfd, linkpath);
 }
 
 static inline int compat_linkat(int olddirfd, const char *oldpath,
-		int newdirfd, const char *newpath, int flags) {
-	return syscall(__NR_linkat, olddirfd, oldpath, newdirfd, newpath, flags);
+        int newdirfd, const char *newpath, int flags) {
+    return syscall(__NR_linkat, olddirfd, oldpath, newdirfd, newpath, flags);
 }
 
 static inline int compat_inotify_init1(int flags) {
-	return syscall(__NR_inotify_init1, flags);
+    return syscall(__NR_inotify_init1, flags);
 }
 
 static inline int compat_faccessat(int dirfd, const char *pathname, int mode, int flags) {
-	return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
+    return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
 }

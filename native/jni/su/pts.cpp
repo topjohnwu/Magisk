@@ -26,16 +26,16 @@
  */
 // Ensures all the data is written out
 static int write_blocking(int fd, char *buf, ssize_t bufsz) {
-	ssize_t ret, written;
+    ssize_t ret, written;
 
-	written = 0;
-	do {
-		ret = write(fd, buf + written, bufsz - written);
-		if (ret == -1) return -1;
-		written += ret;
-	} while (written < bufsz);
+    written = 0;
+    do {
+        ret = write(fd, buf + written, bufsz - written);
+        if (ret == -1) return -1;
+        written += ret;
+    } while (written < bufsz);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -43,28 +43,28 @@ static int write_blocking(int fd, char *buf, ssize_t bufsz) {
  * true, then close the output FD when we're done.
  */
 static void pump(int input, int output, bool close_output = true) {
-	char buf[4096];
-	int len;
-	while ((len = read(input, buf, 4096)) > 0) {
-		if (write_blocking(output, buf, len) == -1) break;
-	}
-	close(input);
-	if (close_output) close(output);
+    char buf[4096];
+    int len;
+    while ((len = read(input, buf, 4096)) > 0) {
+        if (write_blocking(output, buf, len) == -1) break;
+    }
+    close(input);
+    if (close_output) close(output);
 }
 
 static void* pump_thread(void* data) {
-	int *fds = (int*) data;
-	pump(fds[0], fds[1]);
-	delete[] fds;
-	return nullptr;
+    int *fds = (int*) data;
+    pump(fds[0], fds[1]);
+    delete[] fds;
+    return nullptr;
 }
 
 static void pump_async(int input, int output) {
-	pthread_t writer;
-	int *fds = new int[2];
-	fds[0] = input;
-	fds[1] = output;
-	pthread_create(&writer, nullptr, pump_thread, fds);
+    pthread_t writer;
+    int *fds = new int[2];
+    fds[0] = input;
+    fds[1] = output;
+    pthread_create(&writer, nullptr, pump_thread, fds);
 }
 
 
@@ -82,31 +82,31 @@ static void pump_async(int input, int output) {
  * on success, the file descriptor of the master device is returned.
  */
 int pts_open(char *slave_name, size_t slave_name_size) {
-	int fdm;
+    int fdm;
 
-	// Open master ptmx device
-	fdm = open("/dev/ptmx", O_RDWR);
-	if (fdm == -1)
-		goto error;
+    // Open master ptmx device
+    fdm = open("/dev/ptmx", O_RDWR);
+    if (fdm == -1)
+        goto error;
 
-	// Get the slave name
-	if (ptsname_r(fdm, slave_name, slave_name_size-1))
-		goto error;
+    // Get the slave name
+    if (ptsname_r(fdm, slave_name, slave_name_size-1))
+        goto error;
 
-	slave_name[slave_name_size - 1] = '\0';
+    slave_name[slave_name_size - 1] = '\0';
 
-	// Grant, then unlock
-	if (grantpt(fdm) == -1)
-		goto error;
+    // Grant, then unlock
+    if (grantpt(fdm) == -1)
+        goto error;
 
-	if (unlockpt(fdm) == -1)
-		goto error;
+    if (unlockpt(fdm) == -1)
+        goto error;
 
-	return fdm;
+    return fdm;
 error:
-	close(fdm);
-	PLOGE("pts_open");
-	return -1;
+    close(fdm);
+    PLOGE("pts_open");
+    return -1;
 }
 
 // Stores the previous termios of stdin
@@ -124,31 +124,31 @@ static int stdin_is_raw = 0;
  * on success 0
  */
 int set_stdin_raw(void) {
-	struct termios new_termios;
+    struct termios new_termios;
 
-	// Save the current stdin termios
-	if (tcgetattr(STDIN_FILENO, &old_stdin) < 0) {
-		return -1;
-	}
+    // Save the current stdin termios
+    if (tcgetattr(STDIN_FILENO, &old_stdin) < 0) {
+        return -1;
+    }
 
-	// Start from the current settings
-	new_termios = old_stdin;
+    // Start from the current settings
+    new_termios = old_stdin;
 
-	// Make the terminal like an SSH or telnet client
-	new_termios.c_iflag |= IGNPAR;
-	new_termios.c_iflag &= ~(ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF);
-	new_termios.c_lflag &= ~(ISIG | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
-	new_termios.c_oflag &= ~OPOST;
-	new_termios.c_cc[VMIN] = 1;
-	new_termios.c_cc[VTIME] = 0;
+    // Make the terminal like an SSH or telnet client
+    new_termios.c_iflag |= IGNPAR;
+    new_termios.c_iflag &= ~(ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF);
+    new_termios.c_lflag &= ~(ISIG | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+    new_termios.c_oflag &= ~OPOST;
+    new_termios.c_cc[VMIN] = 1;
+    new_termios.c_cc[VTIME] = 0;
 
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_termios) < 0) {
-		return -1;
-	}
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_termios) < 0) {
+        return -1;
+    }
 
-	stdin_is_raw = 1;
+    stdin_is_raw = 1;
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -165,15 +165,15 @@ int set_stdin_raw(void) {
  * on success, 0
  */
 int restore_stdin(void) {
-	if (!stdin_is_raw) return 0;
+    if (!stdin_is_raw) return 0;
 
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_stdin) < 0) {
-		return -1;
-	}
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_stdin) < 0) {
+        return -1;
+    }
 
-	stdin_is_raw = 0;
+    stdin_is_raw = 0;
 
-	return 0;
+    return 0;
 }
 
 // Flag indicating whether the sigwinch watcher should terminate.
@@ -184,30 +184,30 @@ static volatile bool close_sigwinch_watcher = false;
  * the terminal size.
  */
 static void *watch_sigwinch(void *data) {
-	sigset_t winch;
-	int *fds = (int *)data;
-	int sig;
+    sigset_t winch;
+    int *fds = (int *)data;
+    int sig;
 
-	sigemptyset(&winch);
-	sigaddset(&winch, SIGWINCH);
-	pthread_sigmask(SIG_UNBLOCK, &winch, nullptr);
+    sigemptyset(&winch);
+    sigaddset(&winch, SIGWINCH);
+    pthread_sigmask(SIG_UNBLOCK, &winch, nullptr);
 
-	do {
-		if (close_sigwinch_watcher)
-			break;
+    do {
+        if (close_sigwinch_watcher)
+            break;
 
-		// Get the new terminal size
-		struct winsize w;
-		if (ioctl(fds[0], TIOCGWINSZ, &w) == -1)
-			continue;
+        // Get the new terminal size
+        struct winsize w;
+        if (ioctl(fds[0], TIOCGWINSZ, &w) == -1)
+            continue;
 
-		// Set the new terminal size
-		ioctl(fds[1], TIOCSWINSZ, &w);
+        // Set the new terminal size
+        ioctl(fds[1], TIOCSWINSZ, &w);
 
-	} while (sigwait(&winch, &sig) == 0);
-	delete[] fds;
+    } while (sigwait(&winch, &sig) == 0);
+    delete[] fds;
 
-	return nullptr;
+    return nullptr;
 }
 
 /**
@@ -233,30 +233,30 @@ static void *watch_sigwinch(void *data) {
  * on success, 0
  */
 int watch_sigwinch_async(int master, int slave) {
-	pthread_t watcher;
-	int *fds = new int[2];
+    pthread_t watcher;
+    int *fds = new int[2];
 
-	// Block SIGWINCH so sigwait can later receive it
-	sigset_t winch;
-	sigemptyset(&winch);
-	sigaddset(&winch, SIGWINCH);
-	if (pthread_sigmask(SIG_BLOCK, &winch, nullptr) == -1) {
-		delete[] fds;
-		return -1;
-	}
+    // Block SIGWINCH so sigwait can later receive it
+    sigset_t winch;
+    sigemptyset(&winch);
+    sigaddset(&winch, SIGWINCH);
+    if (pthread_sigmask(SIG_BLOCK, &winch, nullptr) == -1) {
+        delete[] fds;
+        return -1;
+    }
 
-	// Initialize some variables, then start the thread
-	close_sigwinch_watcher = 0;
-	fds[0] = master;
-	fds[1] = slave;
-	int ret = pthread_create(&watcher, nullptr, &watch_sigwinch, fds);
-	if (ret != 0) {
-		delete[] fds;
-		errno = ret;
-		return -1;
-	}
+    // Initialize some variables, then start the thread
+    close_sigwinch_watcher = 0;
+    fds[0] = master;
+    fds[1] = slave;
+    int ret = pthread_create(&watcher, nullptr, &watch_sigwinch, fds);
+    if (ret != 0) {
+        delete[] fds;
+        errno = ret;
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -266,11 +266,11 @@ int watch_sigwinch_async(int master, int slave) {
  * in a seperate thread
  */
 void pump_stdin_async(int outfd) {
-	// Put stdin into raw mode
-	set_stdin_raw();
+    // Put stdin into raw mode
+    set_stdin_raw();
 
-	// Pump data from stdin to the PTY
-	pump_async(STDIN_FILENO, outfd);
+    // Pump data from stdin to the PTY
+    pump_async(STDIN_FILENO, outfd);
 }
 
 /**
@@ -282,11 +282,11 @@ void pump_stdin_async(int outfd) {
  * Before returning, restores stdin settings.
  */
 void pump_stdout_blocking(int infd) {
-	// Pump data from stdout to PTY
-	pump(infd, STDOUT_FILENO, false /* Don't close output when done */);
+    // Pump data from stdout to PTY
+    pump(infd, STDOUT_FILENO, false /* Don't close output when done */);
 
-	// Cleanup
-	restore_stdin();
-	close_sigwinch_watcher = true;
-	raise(SIGWINCH);
+    // Cleanup
+    restore_stdin();
+    close_sigwinch_watcher = true;
+    raise(SIGWINCH);
 }

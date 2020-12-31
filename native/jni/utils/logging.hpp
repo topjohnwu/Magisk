@@ -5,18 +5,18 @@
 #include <cstring>
 
 enum {
-	L_DEBUG,
-	L_INFO,
-	L_WARN,
-	L_ERR
+    L_DEBUG,
+    L_INFO,
+    L_WARN,
+    L_ERR
 };
 
 struct log_callback {
-	int (*d)(const char* fmt, va_list ap);
-	int (*i)(const char* fmt, va_list ap);
-	int (*w)(const char* fmt, va_list ap);
-	int (*e)(const char* fmt, va_list ap);
-	void (*ex)(int code);
+    int (*d)(const char* fmt, va_list ap);
+    int (*i)(const char* fmt, va_list ap);
+    int (*w)(const char* fmt, va_list ap);
+    int (*e)(const char* fmt, va_list ap);
+    void (*ex)(int code);
 };
 
 extern log_callback log_cb;

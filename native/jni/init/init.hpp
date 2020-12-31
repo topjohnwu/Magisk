@@ -3,27 +3,27 @@
 #include "raw_data.hpp"
 
 struct cmdline {
-	bool skip_initramfs;
-	bool force_normal_boot;
-	bool rootwait;
-	char slot[3];
-	char dt_dir[64];
-	char fstab_suffix[32];
-	char hardware[32];
-	char hardware_plat[32];
+    bool skip_initramfs;
+    bool force_normal_boot;
+    bool rootwait;
+    char slot[3];
+    char dt_dir[64];
+    char fstab_suffix[32];
+    char hardware[32];
+    char hardware_plat[32];
 };
 
 struct fstab_entry {
-	std::string dev;
-	std::string mnt_point;
-	std::string type;
-	std::string mnt_flags;
-	std::string fsmgr_flags;
+    std::string dev;
+    std::string mnt_point;
+    std::string type;
+    std::string mnt_flags;
+    std::string fsmgr_flags;
 
-	fstab_entry() = default;
-	fstab_entry(const fstab_entry &) = delete;
-	fstab_entry(fstab_entry &&) = default;
-	void to_file(FILE *fp);
+    fstab_entry() = default;
+    fstab_entry(const fstab_entry &) = delete;
+    fstab_entry(fstab_entry &&) = default;
+    void to_file(FILE *fp);
 };
 
 #define INIT_SOCKET "MAGISKINIT"
@@ -40,41 +40,41 @@ void setup_klog();
 
 class BaseInit {
 protected:
-	cmdline *cmd;
-	char **argv;
-	std::vector<std::string> mount_list;
+    cmdline *cmd;
+    char **argv;
+    std::vector<std::string> mount_list;
 
-	[[noreturn]] void exec_init();
-	void read_dt_fstab(std::vector<fstab_entry> &fstab);
+    [[noreturn]] void exec_init();
+    void read_dt_fstab(std::vector<fstab_entry> &fstab);
 public:
-	BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
-	virtual ~BaseInit() = default;
-	virtual void start() = 0;
+    BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
+    virtual ~BaseInit() = default;
+    virtual void start() = 0;
 };
 
 class MagiskInit : public BaseInit {
 protected:
-	auto_data<HEAP> self;
-	auto_data<HEAP> config;
-	std::string custom_rules_dir;
+    auto_data<HEAP> self;
+    auto_data<HEAP> config;
+    std::string custom_rules_dir;
 
-	void mount_with_dt();
-	bool patch_sepolicy(const char *file);
-	void setup_tmp(const char *path);
-	void mount_rules_dir(const char *dev_base, const char *mnt_base);
+    void mount_with_dt();
+    bool patch_sepolicy(const char *file);
+    void setup_tmp(const char *path);
+    void mount_rules_dir(const char *dev_base, const char *mnt_base);
 public:
-	MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
+    MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 };
 
 class SARBase : public MagiskInit {
 protected:
-	std::vector<raw_file> overlays;
+    std::vector<raw_file> overlays;
 
-	void backup_files();
-	void patch_rootdir();
-	void mount_system_root();
+    void backup_files();
+    void patch_rootdir();
+    void mount_system_root();
 public:
-	SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {}
+    SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {}
 };
 
 /***************
@@ -83,31 +83,31 @@ public:
 
 class FirstStageInit : public BaseInit {
 private:
-	void prepare();
+    void prepare();
 public:
-	FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
-		LOGD("%s\n", __FUNCTION__);
-	};
-	void start() override {
-		prepare();
-		exec_init();
-	}
+    FirstStageInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {
+        LOGD("%s\n", __FUNCTION__);
+    };
+    void start() override {
+        prepare();
+        exec_init();
+    }
 };
 
 class SecondStageInit : public SARBase {
 private:
-	void prepare();
+    void prepare();
 public:
-	SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
-		LOGD("%s\n", __FUNCTION__);
-		// Do not unmount /sys and /proc
-		mount_list.clear();
-	};
-	void start() override {
-		prepare();
-		patch_rootdir();
-		exec_init();
-	}
+    SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
+        LOGD("%s\n", __FUNCTION__);
+        // Do not unmount /sys and /proc
+        mount_list.clear();
+    };
+    void start() override {
+        prepare();
+        patch_rootdir();
+        exec_init();
+    }
 };
 
 /*************
@@ -116,22 +116,22 @@ public:
 
 class SARInit : public SARBase {
 private:
-	bool is_two_stage;
+    bool is_two_stage;
 
-	void early_mount();
-	void first_stage_prep();
+    void early_mount();
+    void first_stage_prep();
 public:
-	SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd), is_two_stage(false) {
-		LOGD("%s\n", __FUNCTION__);
-	};
-	void start() override {
-		early_mount();
-		if (is_two_stage)
-			first_stage_prep();
-		else
-			patch_rootdir();
-		exec_init();
-	}
+    SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd), is_two_stage(false) {
+        LOGD("%s\n", __FUNCTION__);
+    };
+    void start() override {
+        early_mount();
+        if (is_two_stage)
+            first_stage_prep();
+        else
+            patch_rootdir();
+        exec_init();
+    }
 };
 
 /************
@@ -140,23 +140,23 @@ public:
 
 class RootFSInit : public MagiskInit {
 private:
-	void early_mount();
-	void patch_rootfs();
+    void early_mount();
+    void patch_rootfs();
 public:
-	RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
-		LOGD("%s\n", __FUNCTION__);
-	}
-	void start() override {
-		early_mount();
-		patch_rootfs();
-		exec_init();
-	}
+    RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
+        LOGD("%s\n", __FUNCTION__);
+    }
+    void start() override {
+        early_mount();
+        patch_rootfs();
+        exec_init();
+    }
 };
 
 class MagiskProxy : public MagiskInit {
 public:
-	explicit MagiskProxy(char *argv[]) : MagiskInit(argv, nullptr) {
-		LOGD("%s\n", __FUNCTION__);
-	}
-	void start() override;
+    explicit MagiskProxy(char *argv[]) : MagiskInit(argv, nullptr) {
+        LOGD("%s\n", __FUNCTION__);
+    }
+    void start() override;
 };

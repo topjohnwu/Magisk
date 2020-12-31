@@ -4,26 +4,26 @@
 #include <string_view>
 
 typedef enum {
-	UNKNOWN,
+    UNKNOWN,
 /* Boot formats */
-	CHROMEOS,
-	AOSP,
-	AOSP_VENDOR,
-	DHTB,
-	BLOB,
+    CHROMEOS,
+    AOSP,
+    AOSP_VENDOR,
+    DHTB,
+    BLOB,
 /* Compression formats */
-	GZIP,
-	XZ,
-	LZMA,
-	BZIP2,
-	LZ4,
-	LZ4_LEGACY,
-	LZ4_LG,
+    GZIP,
+    XZ,
+    LZMA,
+    BZIP2,
+    LZ4,
+    LZ4_LEGACY,
+    LZ4_LG,
 /* Unsupported compression */
-	LZOP,
+    LZOP,
 /* Misc */
-	MTK,
-	DTB,
+    MTK,
+    DTB,
 } format_t;
 
 #define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
@@ -57,12 +57,12 @@ typedef enum {
 
 class Fmt2Name {
 public:
-	const char *operator[](format_t fmt);
+    const char *operator[](format_t fmt);
 };
 
 class Fmt2Ext {
 public:
-	const char *operator[](format_t fmt);
+    const char *operator[](format_t fmt);
 };
 
 format_t check_fmt(const void *buf, size_t len);

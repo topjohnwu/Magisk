@@ -13,7 +13,7 @@
 using namespace std;
 
 static void usage(char *arg0) {
-	fprintf(stderr,
+    fprintf(stderr,
 R"EOF(MagiskBoot - Boot Image Modification Tool
 
 Usage: %s <action> [args...]
@@ -96,100 +96,100 @@ Supported actions:
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: )EOF", arg0);
 
-	for (auto &it : name2fmt)
-		fprintf(stderr, "%s ", it.first.data());
+    for (auto &it : name2fmt)
+        fprintf(stderr, "%s ", it.first.data());
 
-	fprintf(stderr, R"EOF(
+    fprintf(stderr, R"EOF(
 
   decompress <infile> [outfile]
     Detect method and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: )EOF");
 
-	for (auto &it : name2fmt)
-		fprintf(stderr, "%s ", it.first.data());
+    for (auto &it : name2fmt)
+        fprintf(stderr, "%s ", it.first.data());
 
-	fprintf(stderr, "\n\n");
-	exit(1);
+    fprintf(stderr, "\n\n");
+    exit(1);
 }
 
 int main(int argc, char *argv[]) {
-	cmdline_logging();
-	umask(0);
+    cmdline_logging();
+    umask(0);
 
-	if (argc < 2)
-		usage(argv[0]);
+    if (argc < 2)
+        usage(argv[0]);
 
-	// Skip '--' for backwards compatibility
-	string_view action(argv[1]);
-	if (str_starts(action, "--"))
-		action = argv[1] + 2;
+    // Skip '--' for backwards compatibility
+    string_view action(argv[1]);
+    if (str_starts(action, "--"))
+        action = argv[1] + 2;
 
-	if (action == "cleanup") {
-		fprintf(stderr, "Cleaning up...\n");
-		unlink(HEADER_FILE);
-		unlink(KERNEL_FILE);
-		unlink(RAMDISK_FILE);
-		unlink(SECOND_FILE);
-		unlink(KER_DTB_FILE);
-		unlink(EXTRA_FILE);
-		unlink(RECV_DTBO_FILE);
-		unlink(DTB_FILE);
-	} else if (argc > 2 && action == "sha1") {
-		uint8_t sha1[SHA_DIGEST_SIZE];
-		void *buf;
-		size_t size;
-		mmap_ro(argv[2], buf, size);
-		SHA_hash(buf, size, sha1);
-		for (uint8_t i : sha1)
-			printf("%02x", i);
-		printf("\n");
-		munmap(buf, size);
-	} else if (argc > 2 && action == "split") {
-		return split_image_dtb(argv[2]);
-	} else if (argc > 2 && action == "unpack") {
-		int idx = 2;
-		bool nodecomp = false;
-		bool hdr = false;
-		for (;;) {
-			if (idx >= argc)
-				usage(argv[0]);
-			if (argv[idx][0] != '-')
-				break;
-			for (char *flag = &argv[idx][1]; *flag; ++flag) {
-				if (*flag == 'n')
-					nodecomp = true;
-				else if (*flag == 'h')
-					hdr = true;
-				else
-					usage(argv[0]);
-			}
-			++idx;
-		}
-		return unpack(argv[idx], nodecomp, hdr);
-	} else if (argc > 2 && action == "repack") {
-		if (argv[2] == "-n"sv) {
-			if (argc == 3)
-				usage(argv[0]);
-			repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
-		} else {
-			repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
-		}
-	} else if (argc > 2 && action == "decompress") {
-		decompress(argv[2], argv[3]);
-	} else if (argc > 2 && str_starts(action, "compress")) {
-		compress(action[8] == '=' ? &action[9] : "gzip", argv[2], argv[3]);
-	} else if (argc > 4 && action == "hexpatch") {
-		return hexpatch(argv[2], argv[3], argv[4]);
-	} else if (argc > 2 && action == "cpio"sv) {
-		if (cpio_commands(argc - 2, argv + 2))
-			usage(argv[0]);
-	} else if (argc > 3 && action == "dtb") {
-		if (dtb_commands(argc - 2, argv + 2))
-			usage(argv[0]);
-	} else {
-		usage(argv[0]);
-	}
+    if (action == "cleanup") {
+        fprintf(stderr, "Cleaning up...\n");
+        unlink(HEADER_FILE);
+        unlink(KERNEL_FILE);
+        unlink(RAMDISK_FILE);
+        unlink(SECOND_FILE);
+        unlink(KER_DTB_FILE);
+        unlink(EXTRA_FILE);
+        unlink(RECV_DTBO_FILE);
+        unlink(DTB_FILE);
+    } else if (argc > 2 && action == "sha1") {
+        uint8_t sha1[SHA_DIGEST_SIZE];
+        void *buf;
+        size_t size;
+        mmap_ro(argv[2], buf, size);
+        SHA_hash(buf, size, sha1);
+        for (uint8_t i : sha1)
+            printf("%02x", i);
+        printf("\n");
+        munmap(buf, size);
+    } else if (argc > 2 && action == "split") {
+        return split_image_dtb(argv[2]);
+    } else if (argc > 2 && action == "unpack") {
+        int idx = 2;
+        bool nodecomp = false;
+        bool hdr = false;
+        for (;;) {
+            if (idx >= argc)
+                usage(argv[0]);
+            if (argv[idx][0] != '-')
+                break;
+            for (char *flag = &argv[idx][1]; *flag; ++flag) {
+                if (*flag == 'n')
+                    nodecomp = true;
+                else if (*flag == 'h')
+                    hdr = true;
+                else
+                    usage(argv[0]);
+            }
+            ++idx;
+        }
+        return unpack(argv[idx], nodecomp, hdr);
+    } else if (argc > 2 && action == "repack") {
+        if (argv[2] == "-n"sv) {
+            if (argc == 3)
+                usage(argv[0]);
+            repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
+        } else {
+            repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
+        }
+    } else if (argc > 2 && action == "decompress") {
+        decompress(argv[2], argv[3]);
+    } else if (argc > 2 && str_starts(action, "compress")) {
+        compress(action[8] == '=' ? &action[9] : "gzip", argv[2], argv[3]);
+    } else if (argc > 4 && action == "hexpatch") {
+        return hexpatch(argv[2], argv[3], argv[4]);
+    } else if (argc > 2 && action == "cpio"sv) {
+        if (cpio_commands(argc - 2, argv + 2))
+            usage(argv[0]);
+    } else if (argc > 3 && action == "dtb") {
+        if (dtb_commands(argc - 2, argv + 2))
+            usage(argv[0]);
+    } else {
+        usage(argv[0]);
+    }
 
-	return 0;
+    return 0;
 }

@@ -12,25 +12,25 @@ LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
-	core/applets.cpp \
-	core/magisk.cpp \
-	core/daemon.cpp \
-	core/bootstages.cpp \
-	core/socket.cpp \
-	core/db.cpp \
-	core/scripting.cpp \
-	core/restorecon.cpp \
-	core/module.cpp \
-	magiskhide/magiskhide.cpp \
-	magiskhide/proc_monitor.cpp \
-	magiskhide/hide_utils.cpp \
-	magiskhide/hide_policy.cpp \
-	resetprop/persist_properties.cpp \
-	resetprop/resetprop.cpp \
-	su/su.cpp \
-	su/connect.cpp \
-	su/pts.cpp \
-	su/su_daemon.cpp
+    core/applets.cpp \
+    core/magisk.cpp \
+    core/daemon.cpp \
+    core/bootstages.cpp \
+    core/socket.cpp \
+    core/db.cpp \
+    core/scripting.cpp \
+    core/restorecon.cpp \
+    core/module.cpp \
+    magiskhide/magiskhide.cpp \
+    magiskhide/proc_monitor.cpp \
+    magiskhide/hide_utils.cpp \
+    magiskhide/hide_policy.cpp \
+    resetprop/persist_properties.cpp \
+    resetprop/resetprop.cpp \
+    su/su.cpp \
+    su/connect.cpp \
+    su/pts.cpp \
+    su/su_daemon.cpp
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)
@@ -52,24 +52,24 @@ ifdef BB_INIT
 
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 LOCAL_C_INCLUDES := \
-	jni/include \
-	out \
-	out/$(TARGET_ARCH_ABI)
+    jni/include \
+    out \
+    out/$(TARGET_ARCH_ABI)
 
 LOCAL_SRC_FILES := \
-	init/init.cpp \
-	init/mount.cpp \
-	init/rootdir.cpp \
-	init/getinfo.cpp \
-	init/twostage.cpp \
-	init/raw_data.cpp \
-	core/socket.cpp \
-	magiskpolicy/sepolicy.cpp \
-	magiskpolicy/magiskpolicy.cpp \
-	magiskpolicy/rules.cpp \
-	magiskpolicy/policydb.cpp \
-	magiskpolicy/statement.cpp \
-	magiskboot/pattern.cpp
+    init/init.cpp \
+    init/mount.cpp \
+    init/rootdir.cpp \
+    init/getinfo.cpp \
+    init/twostage.cpp \
+    init/raw_data.cpp \
+    core/socket.cpp \
+    magiskpolicy/sepolicy.cpp \
+    magiskpolicy/magiskpolicy.cpp \
+    magiskpolicy/rules.cpp \
+    magiskpolicy/policydb.cpp \
+    magiskpolicy/statement.cpp \
+    magiskboot/pattern.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
@@ -84,15 +84,15 @@ LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
-	magiskboot/main.cpp \
-	magiskboot/bootimg.cpp \
-	magiskboot/hexpatch.cpp \
-	magiskboot/compress.cpp \
-	magiskboot/format.cpp \
-	magiskboot/dtb.cpp \
-	magiskboot/ramdisk.cpp \
-	magiskboot/pattern.cpp \
-	utils/cpio.cpp
+    magiskboot/main.cpp \
+    magiskboot/bootimg.cpp \
+    magiskboot/hexpatch.cpp \
+    magiskboot/compress.cpp \
+    magiskboot/format.cpp \
+    magiskboot/dtb.cpp \
+    magiskboot/ramdisk.cpp \
+    magiskboot/pattern.cpp \
+    utils/cpio.cpp
 
 LOCAL_LDLIBS := -lz
 LOCAL_LDFLAGS := -static
@@ -108,12 +108,12 @@ LOCAL_STATIC_LIBRARIES := libsepol libutils
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
-	core/applet_stub.cpp \
-	magiskpolicy/sepolicy.cpp \
-	magiskpolicy/magiskpolicy.cpp \
-	magiskpolicy/rules.cpp \
-	magiskpolicy/policydb.cpp \
-	magiskpolicy/statement.cpp
+    core/applet_stub.cpp \
+    magiskpolicy/sepolicy.cpp \
+    magiskpolicy/magiskpolicy.cpp \
+    magiskpolicy/rules.cpp \
+    magiskpolicy/policydb.cpp \
+    magiskpolicy/statement.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
 LOCAL_LDFLAGS := -static
@@ -129,9 +129,9 @@ LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
-	core/applet_stub.cpp \
-	resetprop/persist_properties.cpp \
-	resetprop/resetprop.cpp \
+    core/applet_stub.cpp \
+    resetprop/persist_properties.cpp \
+    resetprop/resetprop.cpp \
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 LOCAL_LDFLAGS := -static

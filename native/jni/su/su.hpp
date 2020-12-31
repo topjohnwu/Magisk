@@ -16,54 +16,54 @@
 
 class su_info {
 public:
-	/* Unique key */
-	const int uid;
+    /* Unique key */
+    const int uid;
 
-	/* These should be guarded with internal lock */
-	db_settings cfg;
-	db_strings str;
-	su_access access;
-	struct stat mgr_st;
+    /* These should be guarded with internal lock */
+    db_settings cfg;
+    db_strings str;
+    su_access access;
+    struct stat mgr_st;
 
-	/* This should be guarded with global cache lock */
-	long timestamp;
+    /* This should be guarded with global cache lock */
+    long timestamp;
 
-	su_info(unsigned uid = 0);
-	~su_info();
-	mutex_guard lock();
-	bool is_fresh();
-	void refresh();
+    su_info(unsigned uid = 0);
+    ~su_info();
+    mutex_guard lock();
+    bool is_fresh();
+    void refresh();
 
 private:
-	pthread_mutex_t _lock;  /* Internal lock */
+    pthread_mutex_t _lock;  /* Internal lock */
 };
 
 struct su_req_base {
-	int uid = UID_ROOT;
-	bool login = false;
-	bool keepenv = false;
-	bool mount_master = false;
+    int uid = UID_ROOT;
+    bool login = false;
+    bool keepenv = false;
+    bool mount_master = false;
 } __attribute__((packed));
 
 struct su_request : public su_req_base {
-	const char *shell = DEFAULT_SHELL;
-	const char *command = "";
-	su_request(bool dyn = false) : dyn(dyn) {}
-	~su_request() {
-		if (dyn) {
-			free(const_cast<char*>(shell));
-			free(const_cast<char*>(command));
-		}
-	}
+    const char *shell = DEFAULT_SHELL;
+    const char *command = "";
+    su_request(bool dyn = false) : dyn(dyn) {}
+    ~su_request() {
+        if (dyn) {
+            free(const_cast<char*>(shell));
+            free(const_cast<char*>(command));
+        }
+    }
 
 private:
-	bool dyn;
+    bool dyn;
 } __attribute__((packed));
 
 struct su_context {
-	std::shared_ptr<su_info> info;
-	su_request req;
-	int pid;
+    std::shared_ptr<su_info> info;
+    su_request req;
+    int pid;
 };
 
 void app_log(const su_context &ctx);
