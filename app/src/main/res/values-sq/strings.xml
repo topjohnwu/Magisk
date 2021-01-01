@@ -95,7 +95,7 @@
     <string name="safetynet_res_invalid">Përgjigjja është e pavlefshme </string>
     <string name="safetynet_attest_success">Suksese!</string>
     <string name="safetynet_attest_failure">Vërtetimi dështoi!</string>
-    <string name="safetynet_attest_loading">Thjesht një sekondë…</string>
+    <string name="safetynet_attest_loading">Prit një sekondë…</string>
     <string name="safetynet_attest_restart">Provo përsëri</string>
 
     <!--MagiskHide-->
@@ -111,7 +111,7 @@
     <string name="reboot_userspace">Ristartim normal</string>
     <string name="reboot_recovery">Ristartoni në recovery</string>
     <string name="reboot_bootloader">Ristartoni në bootloader</string>
-    <string name="reboot_download">Ristartoni për në download</string>
+    <string name="reboot_download">Ristartoni në download</string>
     <string name="reboot_edl">Ristartoni në EDL</string>
     <string name="module_version_author">%1$s nga %2$s</string>
     <string name="module_state_remove">Hiq</string>
