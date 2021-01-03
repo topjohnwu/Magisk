@@ -60,4 +60,4 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 int xinotify_init1(int flags);
 char *xrealpath(const char *path, char *resolved_path);
 int xmknod(const char *pathname, mode_t mode, dev_t dev);
-
+long xptrace(int request, pid_t pid, void *addr = nullptr, void *data = nullptr);

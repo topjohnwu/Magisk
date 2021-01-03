@@ -47,6 +47,10 @@ pid_set attaches;
  * Utils
  ********/
 
+static inline long xptrace(int request, pid_t pid, void *addr, uintptr_t data) {
+    return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
+}
+
 static inline int read_ns(const int pid, struct stat *st) {
     char path[32];
     sprintf(path, "/proc/%d/ns/mnt", pid);
@@ -67,17 +71,6 @@ static int parse_ppid(int pid) {
     fscanf(stat.get(), "%*d %*s %*c %d", &ppid);
 
     return ppid;
-}
-
-static inline long xptrace(int request, pid_t pid, void *addr, void *data) {
-    long ret = ptrace(request, pid, addr, data);
-    if (ret < 0)
-        PLOGE("ptrace %d", pid);
-    return ret;
-}
-
-static inline long xptrace(int request, pid_t pid, void *addr = nullptr, intptr_t data = 0) {
-    return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
 }
 
 void update_uid_map() {

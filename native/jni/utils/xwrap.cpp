@@ -9,6 +9,7 @@
 #include <sys/mount.h>
 #include <sys/mman.h>
 #include <sys/sendfile.h>
+#include <sys/ptrace.h>
 
 #include <utils.hpp>
 
@@ -468,5 +469,12 @@ int xmknod(const char *pathname, mode_t mode, dev_t dev) {
     if (ret < 0) {
         PLOGE("mknod");
     }
+    return ret;
+}
+
+long xptrace(int request, pid_t pid, void *addr, void *data) {
+    long ret = ptrace(request, pid, addr, data);
+    if (ret < 0)
+        PLOGE("ptrace %d", pid);
     return ret;
 }
