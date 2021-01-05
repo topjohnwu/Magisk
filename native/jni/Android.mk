@@ -140,15 +140,16 @@ include $(BUILD_EXECUTABLE)
 endif
 
 ifdef B_TEST
+ifneq (,$(wildcard jni/test.cpp))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
 LOCAL_STATIC_LIBRARIES := libutils
 LOCAL_C_INCLUDES := jni/include
 LOCAL_SRC_FILES := test.cpp
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
+endif
 endif
 
 ifdef B_BB
