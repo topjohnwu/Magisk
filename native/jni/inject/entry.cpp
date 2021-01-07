@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <sys/mount.h>
 #include <sys/sendfile.h>
+#include <sys/prctl.h>
 #include <android/log.h>
 #include <atomic>
 
@@ -60,6 +61,25 @@ static void *unload_first_stage(void *) {
     return nullptr;
 }
 
+// Make sure /proc/self/environ does not reveal our secrets
+// Copy all env to a contiguous memory and set the memory region as MM_ENV
+static void sanitize_environ() {
+    static string env;
+
+    for (int i = 0; environ[i]; ++i) {
+        env += environ[i];
+        env += '\0';
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        bool success = true;
+        success &= (0 <= prctl(PR_SET_MM, PR_SET_MM_ENV_START, env.data(), 0, 0));
+        success &= (0 <= prctl(PR_SET_MM, PR_SET_MM_ENV_END, env.data() + env.size(), 0, 0));
+        if (success)
+            break;
+    }
+}
+
 __attribute__((constructor))
 static void inject_init() {
     inject_logging();
@@ -89,6 +109,8 @@ static void inject_init() {
         active_threads++;
         new_daemon_thread(&unload_first_stage);
         unsetenv(INJECT_ENV_2);
+
+        sanitize_environ();
 
         // TODO: actually inject stuffs, for now we demonstrate clean self unloading
         self_unload();
@@ -120,5 +142,5 @@ int app_process_main(int argc, char *argv[]) {
     // Execute real app_process
     xumount2(buf, MNT_DETACH);
     execve(buf, argv, environ);
-    exit(1);
+    return 1;
 }
