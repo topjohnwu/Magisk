@@ -131,7 +131,7 @@ bool _remote_write(int pid, uintptr_t addr, const void *buf, size_t len) {
     for (size_t i = 0; i < len; i += sizeof(long)) {
         long data = 0;
         memcpy(&data, static_cast<const uint8_t *>(buf) + i, std::min(len - i, sizeof(data)));
-        if (xptrace(PTRACE_POKETEXT, pid, reinterpret_cast<void*>(addr + i), &data) < 0)
+        if (xptrace(PTRACE_POKETEXT, pid, reinterpret_cast<void*>(addr + i), data) < 0)
             return false;
     }
     return true;

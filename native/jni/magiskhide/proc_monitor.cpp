@@ -47,10 +47,6 @@ pid_set attaches;
  * Utils
  ********/
 
-static inline long xptrace(int request, pid_t pid, void *addr, uintptr_t data) {
-    return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
-}
-
 static inline int read_ns(const int pid, struct stat *st) {
     char path[32];
     sprintf(path, "/proc/%d/ns/mnt", pid);
