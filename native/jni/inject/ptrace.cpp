@@ -24,6 +24,7 @@
 
 #include <utils.hpp>
 
+#include "inject.hpp"
 #include "ptrace.hpp"
 
 using namespace std;
@@ -42,80 +43,6 @@ using namespace std;
 #define ARM_lr regs[30]
 #define ARM_r0 regs[0]
 #endif
-
-struct map_info {
-    uintptr_t start;
-    uintptr_t end;
-    int perms;
-    char *path;
-
-    map_info() : start(0), end(0), perms(0), path(nullptr) {}
-
-    enum {
-        EXEC = (1 << 0),
-        WRITE = (1 << 1),
-        READ = (1 << 2),
-    };
-};
-
-// Func signature: bool(map_info&)
-template <typename Func>
-static void parse_maps(int pid, Func fn) {
-    char file[32];
-
-    // format: start-end perms offset dev inode path
-    sprintf(file, "/proc/%d/maps", pid);
-    file_readline(true, file, [=](string_view l) -> bool {
-        char *pos = (char *) l.data();
-        map_info info;
-
-        // Parse address hex strings
-        info.start = strtoul(pos, &pos, 16);
-        info.end = strtoul(++pos, &pos, 16);
-
-        // Parse permissions
-        if (*(++pos) != '-')
-            info.perms |= map_info::READ;
-        if (*(++pos) != '-')
-            info.perms |= map_info::WRITE;
-        if (*(++pos) != '-')
-            info.perms |= map_info::EXEC;
-        pos += 3;
-
-        // Skip everything except path
-        int path_off;
-        sscanf(pos, "%*s %*s %*s %n%*s", &path_off);
-        pos += path_off;
-        info.path = pos;
-
-        return fn(info);
-    });
-}
-
-uintptr_t get_function_lib(uintptr_t addr, char *lib) {
-    uintptr_t base = 0;
-    parse_maps(getpid(), [=, &base](map_info &info) -> bool {
-        if (addr >= info.start && addr < info.end) {
-            strcpy(lib, info.path);
-            base = info.start;
-            return false;
-        }
-        return true;
-    });
-    return base;
-}
-
-uintptr_t get_remote_lib(int pid, const char *lib) {
-    uintptr_t base = 0;
-    parse_maps(pid, [=, &base](map_info &info) -> bool {
-        if (strcmp(info.path, lib) == 0 && (info.perms & map_info::EXEC)) {
-            base = info.start;
-            return false;
-        }
-        return true;
-    });
-    return base;
-}
 
 bool _remote_read(int pid, uintptr_t addr, void *buf, size_t len) {
     for (size_t i = 0; i < len; i += sizeof(long)) {
@@ -165,7 +92,7 @@ static void _remote_setregs(int pid, pt_regs *regs) {
 #endif
 }
 
-static uintptr_t remote_call_abi(int pid, uintptr_t func_addr, int nargs, va_list va) {
+uintptr_t remote_call_abi(int pid, uintptr_t func_addr, int nargs, va_list va) {
     pt_regs regs, regs_bak;
 
     // Get registers and save a backup
@@ -300,7 +227,11 @@ static uintptr_t remote_call_abi(int pid, uintptr_t func_addr, int nargs, va_lis
 uintptr_t remote_call_vararg(int pid, uintptr_t addr, int nargs, ...) {
     char lib_name[4096];
     auto local = get_function_lib(addr, lib_name);
+    if (local == 0)
+        return 0;
     auto remote = get_remote_lib(pid, lib_name);
+    if (remote == 0)
+        return 0;
     addr = addr - local + remote;
     va_list va;
     va_start(va, nargs);

@@ -113,12 +113,12 @@ int exec_command_sync(exec_t &exec) {
     return WEXITSTATUS(status);
 }
 
-int new_daemon_thread(thread_entry entry, void *arg, const pthread_attr_t *attr) {
+int new_daemon_thread(thread_entry entry, void *arg) {
     pthread_t thread;
-    int ret = xpthread_create(&thread, attr, entry, arg);
-    if (ret == 0)
-        pthread_detach(thread);
-    return ret;
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    return xpthread_create(&thread, &attr, entry, arg);
 }
 
 static void *proxy_routine(void *fp) {

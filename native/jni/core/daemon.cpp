@@ -189,21 +189,22 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
     return vfprintf(local_log_file.get(), buf, args);
 }
 
-static void android_logging() {
+#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
+static void magisk_logging() {
     auto in_mem_file = make_stream_fp<byte_stream>(log_buf, log_buf_len);
     log_file.reset(in_mem_file.release(), [](FILE *) {
         free(log_buf);
         log_buf = nullptr;
     });
-    log_cb.d = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_DEBUG, fmt, ap); };
-    log_cb.i = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_INFO, fmt, ap); };
-    log_cb.w = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_WARN, fmt, ap); };
-    log_cb.e = [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_ERROR, fmt, ap); };
+    log_cb.d = mlog(DEBUG);
+    log_cb.i = mlog(INFO);
+    log_cb.w = mlog(WARN);
+    log_cb.e = mlog(ERROR);
     log_cb.ex = nop_ex;
 }
 
 static void daemon_entry(int ppid) {
-    android_logging();
+    magisk_logging();
 
     int fd = xopen("/dev/null", O_WRONLY);
     xdup2(fd, STDOUT_FILENO);

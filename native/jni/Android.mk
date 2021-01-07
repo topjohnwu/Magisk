@@ -30,7 +30,9 @@ LOCAL_SRC_FILES := \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
-    su/su_daemon.cpp
+    su/su_daemon.cpp \
+    inject/entry.cpp \
+    inject/utils.cpp
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)

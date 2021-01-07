@@ -339,7 +339,6 @@ static void new_zygote(int pid) {
     xptrace(PTRACE_CONT, pid);
 }
 
-#define WEVENT(s) (((s) & 0xffff0000) >> 16)
 #define DETACH_AND_CONT { detach_pid(pid); continue; }
 
 void proc_monitor() {

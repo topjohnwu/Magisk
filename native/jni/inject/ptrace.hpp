@@ -2,12 +2,6 @@
 
 #include <stdint.h>
 
-// Get library name and base address that contains the function
-uintptr_t get_function_lib(uintptr_t addr, char *lib);
-
-// Get library base address with name
-uintptr_t get_remote_lib(int pid, const char *lib);
-
 // Write bytes to the remote process at addr
 bool _remote_write(int pid, uintptr_t addr, const void *buf, size_t len);
 #define remote_write(...) _remote_write(pid, __VA_ARGS__)
@@ -19,6 +13,9 @@ bool _remote_read(int pid, uintptr_t addr, void *buf, size_t len);
 // Call a remote function
 // Arguments are expected to be only integer-like or pointer types
 // as other more complex C ABIs are not implemented.
+uintptr_t remote_call_abi(int pid, uintptr_t func_addr, int nargs, va_list va);
+
+// Find remote offset and invoke function
 uintptr_t remote_call_vararg(int pid, uintptr_t addr, int nargs, ...);
 
 // C++ wrapper for auto argument counting and casting function pointers
