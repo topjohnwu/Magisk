@@ -50,7 +50,7 @@ static void *unload_first_stage(void *) {
     // Setup 1ms
     timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
 
-    while (getenv(INJECT_ENV_2))
+    while (getenv(INJECT_ENV_1))
         nanosleep(&ts, nullptr);
 
     // Wait another 1ms to make sure all threads left our code
@@ -67,6 +67,8 @@ static void sanitize_environ() {
     static string env;
 
     for (int i = 0; environ[i]; ++i) {
+        if (str_starts(environ[i], INJECT_ENV_1 "="))
+            continue;
         env += environ[i];
         env += '\0';
     }
@@ -83,37 +85,39 @@ static void sanitize_environ() {
 __attribute__((constructor))
 static void inject_init() {
     inject_logging();
-    if (char *env = getenv(INJECT_ENV_1)) {
+
+    if (getenv(INJECT_ENV_2)) {
+        LOGD("zygote: inject 2nd stage\n");
+        active_threads = 1;
+        unsetenv(INJECT_ENV_2);
+
+        // Get our own handle
+        self_handle = dlopen(INJECT_LIB_2, RTLD_LAZY);
+        dlclose(self_handle);
+
+        // TODO: actually inject stuffs here
+
+        // Some cleanup
+        sanitize_environ();
+        active_threads++;
+        new_daemon_thread(&unload_first_stage);
+
+        // Demonstrate self unloading 2nd stage
+        self_unload();
+    } else if (char *env = getenv(INJECT_ENV_1)) {
         LOGD("zygote: inject 1st stage\n");
 
         if (env[0] == '1')
             unsetenv("LD_PRELOAD");
         else
             setenv("LD_PRELOAD", env, 1);  // Restore original LD_PRELOAD
-        unsetenv(INJECT_ENV_1);
 
         // Setup second stage
         setenv(INJECT_ENV_2, "1", 1);
         cp_afc(INJECT_LIB_1, INJECT_LIB_2);
         dlopen(INJECT_LIB_2, RTLD_LAZY);
-    } else if (getenv(INJECT_ENV_2)) {
-        LOGD("zygote: inject 2nd stage\n");
 
-        active_threads = 1;
-
-        // Get our own handle
-        self_handle = dlopen(INJECT_LIB_2, RTLD_LAZY);
-        dlclose(self_handle);
-
-        // Cleanup 1st stage maps
-        active_threads++;
-        new_daemon_thread(&unload_first_stage);
-        unsetenv(INJECT_ENV_2);
-
-        sanitize_environ();
-
-        // TODO: actually inject stuffs, for now we demonstrate clean self unloading
-        self_unload();
+        unsetenv(INJECT_ENV_1);
     }
 }
 
