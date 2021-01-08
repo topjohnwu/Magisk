@@ -8,7 +8,7 @@ ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libxhook
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
@@ -32,7 +32,8 @@ LOCAL_SRC_FILES := \
     su/pts.cpp \
     su/su_daemon.cpp \
     inject/entry.cpp \
-    inject/utils.cpp
+    inject/utils.cpp \
+    inject/hook.cpp
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)

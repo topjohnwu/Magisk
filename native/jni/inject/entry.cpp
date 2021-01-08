@@ -41,7 +41,10 @@ static void inject_cleanup() {
     nanosleep(&ts, nullptr);
 }
 
-static inline void self_unload() {
+void self_unload() {
+    // If unhook failed, do not unload or else it will cause SIGSEGV
+    if (!unhook_functions())
+        return;
     new_daemon_thread(reinterpret_cast<void *(*)(void *)>(&dlclose), self_handle);
     active_threads--;
 }
@@ -95,15 +98,12 @@ static void inject_init() {
         self_handle = dlopen(INJECT_LIB_2, RTLD_LAZY);
         dlclose(self_handle);
 
-        // TODO: actually inject stuffs here
+        hook_functions();
 
         // Some cleanup
         sanitize_environ();
         active_threads++;
         new_daemon_thread(&unload_first_stage);
-
-        // Demonstrate self unloading 2nd stage
-        self_unload();
     } else if (char *env = getenv(INJECT_ENV_1)) {
         LOGD("zygote: inject 1st stage\n");
 

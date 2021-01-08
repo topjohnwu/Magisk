@@ -15,3 +15,7 @@ uintptr_t get_function_lib(uintptr_t addr, char *lib);
 
 // Get library base address with name
 uintptr_t get_remote_lib(int pid, const char *lib);
+
+void self_unload();
+void hook_functions();
+bool unhook_functions();
