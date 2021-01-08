@@ -33,7 +33,8 @@ LOCAL_SRC_FILES := \
     su/su_daemon.cpp \
     inject/entry.cpp \
     inject/utils.cpp \
-    inject/hook.cpp
+    inject/hook.cpp \
+    inject/jni_hooks.cpp
 
 LOCAL_LDLIBS := -llog
 include $(BUILD_EXECUTABLE)

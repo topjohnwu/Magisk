@@ -42,6 +42,7 @@ static void inject_cleanup() {
 }
 
 void self_unload() {
+    LOGD("hook: Request to self unload\n");
     // If unhook failed, do not unload or else it will cause SIGSEGV
     if (!unhook_functions())
         return;
