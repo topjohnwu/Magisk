@@ -15,7 +15,7 @@
     <string name="no_connection">Keine Verbindung verfügbar</string>
     <string name="app_changelog">Änderungen</string>
     <string name="manager">Manager</string>
-    <string name="loading">Lädt…</string>
+    <string name="loading">Laden…</string>
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
