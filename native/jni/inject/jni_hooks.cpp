@@ -59,273 +59,179 @@ static void nativeForkSystemServer_post(JNIEnv *env, jclass clazz, jint res) {
 
 // -----------------------------------------------------------------
 
-#define pre_fork() nativeForkAndSpecialize_pre( \
-    env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, \
-    se_info, se_name, fdsToClose, fdsToIgnore, is_child_zygote, \
+// All possible missing arguments
+static union {
+    struct {
+        jintArray fdsToIgnore;
+        jboolean is_child_zygote;
+        jboolean isTopApp;
+        jobjectArray pkgDataInfoList;
+        jobjectArray whitelistedDataInfoList;
+        jboolean bindMountAppDataDirs;
+        jboolean bindMountAppStorageDirs;
+    };
+    size_t missing_arg_buf[8];  // Easy access to wipe all variables at once
+};
+
+#define DCL_JNI(ret, name, sig, ...) \
+const static char name##_sig[] = sig; \
+static ret name(__VA_ARGS__)
+
+// -----------------------------------------------------------------
+
+#define pre_fork() \
+    memset(missing_arg_buf, 0, sizeof(missing_arg_buf)); \
+    nativeForkAndSpecialize_pre( env, clazz, uid, gid, gids, runtime_flags, \
+    rlimits, mount_external, se_info, se_name, fdsToClose, fdsToIgnore, is_child_zygote, \
     instructionSet, appDataDir, isTopApp, pkgDataInfoList, whitelistedDataInfoList, \
     bindMountAppDataDirs, bindMountAppStorageDirs) \
 
-template<typename T, typename ...Args>
-static jint orig_fork(Args && ...args) {
-    return reinterpret_cast<T>(JNI::Zygote::nativeForkAndSpecialize_orig->fnPtr)(std::forward<Args>(args)...);
-}
+#define orig_fork(ver, ...) \
+    jint pid = reinterpret_cast<decltype(&nativeForkAndSpecialize_##ver)> \
+    (JNI::Zygote::nativeForkAndSpecialize_orig->fnPtr)(__VA_ARGS__)
 
-#define post_fork() nativeForkAndSpecialize_post(env, clazz, uid, pid)
+#define post_fork() \
+    nativeForkAndSpecialize_post(env, clazz, uid, pid); \
+    return pid
 
-const static char nativeForkAndSpecialize_m_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I";
+#define DCL_FORK_AND_SPECIALIZE(ver, sig, ...) \
+DCL_JNI(jint, nativeForkAndSpecialize_##ver, sig, __VA_ARGS__)
 
-static jint nativeForkAndSpecialize_m(
+DCL_FORK_AND_SPECIALIZE(m,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jstring instructionSet, jstring appDataDir) {
-
-    jintArray fdsToIgnore = nullptr;
-    jboolean is_child_zygote = JNI_FALSE;
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_m)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, instructionSet, appDataDir);
+    orig_fork(m, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, se_name, fdsToClose, instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_o_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I";
-
-static jint nativeForkAndSpecialize_o(
+DCL_FORK_AND_SPECIALIZE(o,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jstring instructionSet, jstring appDataDir) {
-
-    jboolean is_child_zygote = JNI_FALSE;
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_o)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, instructionSet, appDataDir);
+    orig_fork(o, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, se_name, fdsToClose, fdsToIgnore, instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_p_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I";
-
-static jint nativeForkAndSpecialize_p(
+DCL_FORK_AND_SPECIALIZE(p,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir) {
-
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_p)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir);
+    orig_fork(p, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+            se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_q_alt_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z)I";
-
-static jint nativeForkAndSpecialize_q_alt(
+DCL_FORK_AND_SPECIALIZE(q_alt,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir, jboolean isTopApp) {
-
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_q_alt)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp);
+    orig_fork(q_alt, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+            se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp);
     post_fork();
-    return pid;
 }
 
 #if ENABLE_LEGACY_DP
-const static char nativeForkAndSpecialize_r_dp2_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;)I";
-
-static jint nativeForkAndSpecialize_r_dp2(
+DCL_FORK_AND_SPECIALIZE(r_dp2,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir, jboolean isTopApp, jobjectArray pkgDataInfoList) {
-
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_r_dp2)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp,
-            pkgDataInfoList);
+    orig_fork(r_dp2, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+            se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir,
+            isTopApp, pkgDataInfoList);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_r_dp3_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;Z)I";
-
-static jint nativeForkAndSpecialize_r_dp3(
+DCL_FORK_AND_SPECIALIZE(r_dp3,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;Z)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir, jboolean isTopApp, jobjectArray pkgDataInfoList,
         jboolean bindMountAppStorageDirs) {
-
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_r_dp3)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp,
-            pkgDataInfoList,
-            bindMountAppStorageDirs);
+    orig_fork(r_dp3, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet,
+            appDataDir, isTopApp, pkgDataInfoList, bindMountAppStorageDirs);
     post_fork();
-    return pid;
 }
 #endif // ENABLE_LEGACY_DP
 
-const static char *nativeForkAndSpecialize_r_sig =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)I";
-
-static jint nativeForkAndSpecialize_r(
+DCL_FORK_AND_SPECIALIZE(r,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jstring se_name,
         jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir, jboolean isTopApp, jobjectArray pkgDataInfoList,
         jobjectArray whitelistedDataInfoList, jboolean bindMountAppDataDirs, jboolean bindMountAppStorageDirs) {
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_r)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, se_name,
-            fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp,
-            pkgDataInfoList,
-            whitelistedDataInfoList, bindMountAppDataDirs, bindMountAppStorageDirs);
+    orig_fork(r, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+            se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet, appDataDir, isTopApp,
+            pkgDataInfoList, whitelistedDataInfoList, bindMountAppDataDirs, bindMountAppStorageDirs);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_samsung_m_sig[] =
-        "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I";
-
-jint nativeForkAndSpecialize_samsung_m(
+DCL_FORK_AND_SPECIALIZE(samsung_m,
+        "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jint category, jint accessInfo,
         jstring se_name, jintArray fdsToClose, jstring instructionSet, jstring appDataDir) {
-
-    jintArray fdsToIgnore = nullptr;
-    jboolean is_child_zygote = JNI_FALSE;
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_samsung_m)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, category,
-            accessInfo, se_name, fdsToClose, instructionSet, appDataDir);
+    orig_fork(samsung_m, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, category, accessInfo, se_name, fdsToClose, instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_samsung_n_sig[] =
-        "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;I)I";
-
-static jint nativeForkAndSpecialize_samsung_n(
+DCL_FORK_AND_SPECIALIZE(samsung_n,
+        "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;I)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jint category, jint accessInfo,
-        jstring se_name, jintArray fdsToClose, jstring instructionSet, jstring appDataDir,
-        jint a1) {
-
-    jintArray fdsToIgnore = nullptr;
-    jboolean is_child_zygote = JNI_FALSE;
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
+        jstring se_name, jintArray fdsToClose, jstring instructionSet, jstring appDataDir, jint a1) {
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_samsung_n)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, category,
-            accessInfo, se_name, fdsToClose, instructionSet, appDataDir, a1);
+    orig_fork(samsung_n, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, category, accessInfo, se_name, fdsToClose, instructionSet, appDataDir, a1);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_samsung_o_sig[] =
-        "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I";
-
-static jint nativeForkAndSpecialize_samsung_o(
+DCL_FORK_AND_SPECIALIZE(samsung_o,
+        "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jint category, jint accessInfo,
         jstring se_name, jintArray fdsToClose, jintArray fdsToIgnore, jstring instructionSet,
         jstring appDataDir) {
-
-    jboolean is_child_zygote = JNI_FALSE;
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_samsung_o)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, category,
-            accessInfo, se_name, fdsToClose, fdsToIgnore, instructionSet, appDataDir);
+    orig_fork(samsung_o, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, category, accessInfo, se_name, fdsToClose, fdsToIgnore,
+            instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
-const static char nativeForkAndSpecialize_samsung_p_sig[] =
-        "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I";
-
-static jint nativeForkAndSpecialize_samsung_p(
+DCL_FORK_AND_SPECIALIZE(samsung_p,
+        "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
         jobjectArray rlimits, jint mount_external, jstring se_info, jint category, jint accessInfo,
         jstring se_name, jintArray fdsToClose, jintArray fdsToIgnore, jboolean is_child_zygote,
         jstring instructionSet, jstring appDataDir) {
-
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_fork();
-    jint pid = orig_fork<decltype(&nativeForkAndSpecialize_samsung_p)>(
-            env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, category,
-            accessInfo, se_name, fdsToClose, fdsToIgnore, is_child_zygote, instructionSet,
-            appDataDir);
+    orig_fork(samsung_p, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external,
+            se_info, category, accessInfo, se_name, fdsToClose, fdsToIgnore, is_child_zygote,
+            instructionSet, appDataDir);
     post_fork();
-    return pid;
 }
 
 #define DCL_FORK(ver) { \
@@ -336,138 +242,94 @@ static jint nativeForkAndSpecialize_samsung_p(
 
 // -----------------------------------------------------------------
 
-#define pre_spec() nativeSpecializeAppProcess_pre( \
+#define pre_spec() \
+    memset(missing_arg_buf, 0, sizeof(missing_arg_buf)); \
+    nativeSpecializeAppProcess_pre( \
     env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName, \
     startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList, \
     whitelistedDataInfoList, bindMountAppDataDirs, bindMountAppStorageDirs)
 
-template<typename T, typename ...Args>
-static void orig_spec(Args && ...args) {
-    reinterpret_cast<T>(JNI::Zygote::nativeSpecializeAppProcess_orig->fnPtr)(std::forward<Args>(args)...);
-}
+#define orig_spec(ver, ...) \
+    reinterpret_cast<decltype(&nativeSpecializeAppProcess_##ver)> \
+    (JNI::Zygote::nativeSpecializeAppProcess_orig->fnPtr)(__VA_ARGS__)
 
 #define post_spec() nativeSpecializeAppProcess_post(env, clazz)
 
-const static char nativeSpecializeAppProcess_q_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V";
+#define DCL_SPECIALIZE_APP(ver, sig, ...) \
+DCL_JNI(void, nativeSpecializeAppProcess_##ver, sig, __VA_ARGS__)
 
-static void nativeSpecializeAppProcess_q(
+DCL_SPECIALIZE_APP(q,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jstring niceName,
         jboolean startChildZygote, jstring instructionSet, jstring appDataDir) {
-
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_q)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
-            startChildZygote, instructionSet, appDataDir);
+    orig_spec(q, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo,
+            niceName, startChildZygote, instructionSet, appDataDir);
     post_spec();
 }
 
-const static char nativeSpecializeAppProcess_q_alt_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z)V";
-
-static void nativeSpecializeAppProcess_q_alt(
+DCL_SPECIALIZE_APP(q_alt,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jstring niceName,
         jboolean startChildZygote, jstring instructionSet, jstring appDataDir,
         jboolean isTopApp) {
-
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_q_alt)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
-            startChildZygote, instructionSet, appDataDir, isTopApp);
+    orig_spec(q_alt, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo,
+            niceName, startChildZygote, instructionSet, appDataDir, isTopApp);
     post_spec();
 }
 
 #if ENABLE_LEGACY_DP
-const static char nativeSpecializeAppProcess_r_dp2_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;)V";
-
-static void nativeSpecializeAppProcess_r_dp2(
+DCL_SPECIALIZE_APP(r_dp2,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jstring niceName,
         jboolean startChildZygote, jstring instructionSet, jstring appDataDir,
         jboolean isTopApp, jobjectArray pkgDataInfoList) {
-
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_r_dp2)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
-            startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList);
+    orig_spec(r_dp2, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo,
+            niceName, startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList);
     post_spec();
 }
 
-const static char nativeSpecializeAppProcess_r_dp3_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;Z)V";
-
-static void nativeSpecializeAppProcess_r_dp3(
+DCL_SPECIALIZE_APP(r_dp3,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;Z)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jstring niceName,
         jboolean startChildZygote, jstring instructionSet, jstring appDataDir,
         jboolean isTopApp, jobjectArray pkgDataInfoList, jboolean bindMountAppStorageDirs) {
-
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_r_dp3)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
-            startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList,
+    orig_spec(r_dp3, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo,
+            niceName, startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList,
             bindMountAppStorageDirs);
     post_spec();
 }
 #endif // ENABLE_LEGACY_DP
 
-const static char nativeSpecializeAppProcess_r_sig[] =
-        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)V";
-
-static void nativeSpecializeAppProcess_r(
+DCL_SPECIALIZE_APP(r,
+        "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jstring niceName,
         jboolean startChildZygote, jstring instructionSet, jstring appDataDir,
         jboolean isTopApp, jobjectArray pkgDataInfoList, jobjectArray whitelistedDataInfoList,
         jboolean bindMountAppDataDirs, jboolean bindMountAppStorageDirs) {
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_r)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
+    orig_spec(r, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, niceName,
             startChildZygote, instructionSet, appDataDir, isTopApp, pkgDataInfoList,
             whitelistedDataInfoList, bindMountAppDataDirs, bindMountAppStorageDirs);
     post_spec();
 }
 
-const static char nativeSpecializeAppProcess_samsung_q_sig[] =
-        "(II[II[[IILjava/lang/String;IILjava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V";
-
-static void nativeSpecializeAppProcess_samsung_q(
+DCL_SPECIALIZE_APP(samsung_q,
+        "(II[II[[IILjava/lang/String;IILjava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",
         JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jint mountExternal, jstring seInfo, jint space, jint accessInfo,
         jstring niceName, jboolean startChildZygote, jstring instructionSet, jstring appDataDir) {
-
-    jboolean isTopApp = JNI_FALSE;
-    jobjectArray pkgDataInfoList = nullptr;
-    jobjectArray whitelistedDataInfoList = nullptr;
-    jboolean bindMountAppDataDirs = JNI_FALSE;
-    jboolean bindMountAppStorageDirs = JNI_FALSE;
-
     pre_spec();
-    orig_spec<decltype(&nativeSpecializeAppProcess_samsung_q)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal, seInfo, space,
-            accessInfo, niceName, startChildZygote, instructionSet, appDataDir);
+    orig_spec(samsung_q, env, clazz, uid, gid, gids, runtimeFlags, rlimits, mountExternal,
+            seInfo, space, accessInfo, niceName, startChildZygote, instructionSet, appDataDir);
     post_spec();
 }
 
@@ -479,45 +341,39 @@ static void nativeSpecializeAppProcess_samsung_q(
 
 // -----------------------------------------------------------------
 
-#define pre_server() nativeForkSystemServer_pre( \
-    env, clazz, uid, gid, gids, runtimeFlags, rlimits, permittedCapabilities, \
-    effectiveCapabilities)
+#define pre_server() \
+    memset(missing_arg_buf, 0, sizeof(missing_arg_buf)); \
+    nativeForkSystemServer_pre(env, clazz, uid, gid, gids, runtimeFlags, \
+    rlimits, permittedCapabilities, effectiveCapabilities)
 
-template<typename T, typename ...Args>
-static jint orig_server(Args && ...args) {
-    return reinterpret_cast<T>(JNI::Zygote::nativeForkSystemServer_orig->fnPtr)(std::forward<Args>(args)...);
-}
+#define orig_server(ver, ...) \
+    jint pid = reinterpret_cast<decltype(&nativeForkSystemServer_##ver)> \
+    (JNI::Zygote::nativeForkSystemServer_orig->fnPtr)(__VA_ARGS__)
 
-#define post_server() nativeForkSystemServer_post(env, clazz, pid)
+#define post_server() \
+    nativeForkSystemServer_post(env, clazz, pid); \
+    return pid
 
-const static char nativeForkSystemServer_m_sig[] = "(II[II[[IJJ)I";
+#define DCL_FORK_SERVER(ver, sig, ...) \
+DCL_JNI(jint, nativeForkSystemServer_##ver, sig, __VA_ARGS__)
 
-static jint nativeForkSystemServer_m(
+DCL_FORK_SERVER(m, "(II[II[[IJJ)I",
         JNIEnv *env, jclass clazz, uid_t uid, gid_t gid, jintArray gids, jint runtimeFlags,
         jobjectArray rlimits, jlong permittedCapabilities, jlong effectiveCapabilities) {
-
     pre_server();
-    jint pid = orig_server<decltype(&nativeForkSystemServer_m)>(
-            env, clazz, uid, gid, gids, runtimeFlags, rlimits, permittedCapabilities,
+    orig_server(m, env, clazz, uid, gid, gids, runtimeFlags, rlimits, permittedCapabilities,
             effectiveCapabilities);
     post_server();
-    return pid;
 }
 
-const static char nativeForkSystemServer_samsung_q_sig[] = "(II[IIII[[IJJ)I";
-
-static jint nativeForkSystemServer_samsung_q(
+DCL_FORK_SERVER(samsung_q, "(II[IIII[[IJJ)I",
         JNIEnv *env, jclass clazz, uid_t uid, gid_t gid, jintArray gids, jint runtimeFlags,
         jint space, jint accessInfo, jobjectArray rlimits, jlong permittedCapabilities,
         jlong effectiveCapabilities) {
-
     pre_server();
-    jint pid = orig_server<decltype(&nativeForkSystemServer_samsung_q)>(
-            env, clazz, uid, gid, gids, runtimeFlags, space, accessInfo, rlimits,
-            permittedCapabilities,
-            effectiveCapabilities);
+    orig_server(samsung_q, env, clazz, uid, gid, gids, runtimeFlags, space, accessInfo, rlimits,
+            permittedCapabilities, effectiveCapabilities);
     post_server();
-    return pid;
 }
 
 #define DCL_SERVER(ver) { \
