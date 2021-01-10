@@ -20,28 +20,3 @@ uintptr_t get_remote_lib(int pid, const char *lib);
 void self_unload();
 void hook_functions();
 bool unhook_functions();
-
-// JNI method declarations
-
-namespace JNI {
-    namespace Zygote {
-        extern JNINativeMethod *nativeForkAndSpecialize_orig;
-        extern JNINativeMethod *nativeSpecializeAppProcess_orig;
-        extern JNINativeMethod *nativeForkSystemServer_orig;
-
-        extern const JNINativeMethod nativeForkAndSpecialize_methods[];
-        extern const int nativeForkAndSpecialize_methods_num;
-
-        extern const JNINativeMethod nativeSpecializeAppProcess_methods[];
-        extern const int nativeSpecializeAppProcess_methods_num;
-
-        extern const JNINativeMethod nativeForkSystemServer_methods[];
-        extern const int nativeForkSystemServer_methods_num;
-    }
-    namespace SystemProperties {
-        extern JNINativeMethod *native_set_orig;
-
-        extern const JNINativeMethod native_set_methods[];
-        constexpr int native_set_methods_num = 1;
-    }
-}
