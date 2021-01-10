@@ -8,10 +8,19 @@
 
 using namespace std;
 
-static JavaVM *g_jvm;
+#define DCL_HOOK_FUNC(ret, func, ...) \
+    static ret (*old_##func)(__VA_ARGS__); \
+    static ret new_##func(__VA_ARGS__)
+
+#define DCL_JNI_FUNC(name) \
+    static const JNINativeMethod *name##_orig = nullptr; \
+    extern const JNINativeMethod name##_methods[]; \
+    extern const int name##_methods_num;
 
 // For some reason static vector won't work, use a pointer instead
 static vector<tuple<const char *, const char *, void **>> *hook_list;
+
+static JavaVM *g_jvm;
 
 namespace {
 
@@ -19,46 +28,22 @@ struct HookContext {
     int pid;
 };
 
-}
-
 // JNI method declarations
+DCL_JNI_FUNC(nativeForkAndSpecialize)
+DCL_JNI_FUNC(nativeSpecializeAppProcess)
+DCL_JNI_FUNC(nativeForkSystemServer)
 
-namespace JNI {
-    namespace Zygote {
-        const JNINativeMethod *nativeForkAndSpecialize_orig = nullptr;
-        const JNINativeMethod *nativeSpecializeAppProcess_orig = nullptr;
-        const JNINativeMethod *nativeForkSystemServer_orig = nullptr;
-
-        extern const JNINativeMethod nativeForkAndSpecialize_methods[];
-        extern const int nativeForkAndSpecialize_methods_num;
-
-        extern const JNINativeMethod nativeSpecializeAppProcess_methods[];
-        extern const int nativeSpecializeAppProcess_methods_num;
-
-        extern const JNINativeMethod nativeForkSystemServer_methods[];
-        extern const int nativeForkSystemServer_methods_num;
-    }
-    namespace SystemProperties {
-        const JNINativeMethod *native_set_orig = nullptr;
-
-        extern const JNINativeMethod native_set_methods[];
-        constexpr int native_set_methods_num = 1;
-    }
 }
 
-#define DEF_HOOK_FUNC(ret, func, ...) \
-    static ret (*old_##func)(__VA_ARGS__); \
-    static ret new_##func(__VA_ARGS__)
-
-#define HOOK_JNI(clazz, method) \
+#define HOOK_JNI(method) \
 if (newMethods[i].name == #method##sv) { \
     auto orig = new JNINativeMethod(); \
     memcpy(orig, &newMethods[i], sizeof(JNINativeMethod)); \
-    JNI::clazz::method##_orig = orig; \
-    for (int j = 0; j < JNI::clazz::method##_methods_num; ++j) { \
-        if (strcmp(newMethods[i].signature, JNI::clazz::method##_methods[j].signature) == 0) { \
-            newMethods[i] = JNI::clazz::method##_methods[j]; \
-            LOGI("hook: replaced " #clazz "#" #method "\n"); \
+    method##_orig = orig; \
+    for (int j = 0; j < method##_methods_num; ++j) { \
+        if (strcmp(newMethods[i].signature, method##_methods[j].signature) == 0) { \
+            newMethods[i] = method##_methods[j]; \
+            LOGI("hook: replaced #" #method "\n"); \
             ++hooked; \
             break; \
         } \
@@ -66,11 +51,7 @@ if (newMethods[i].name == #method##sv) { \
     continue; \
 }
 
-#define clone_methods() \
-    newMethods = make_unique<JNINativeMethod[]>(numMethods); \
-    memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods)
-
-DEF_HOOK_FUNC(int, jniRegisterNativeMethods,
+DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
     LOGD("hook: jniRegisterNativeMethods %s", className);
 
@@ -83,16 +64,12 @@ DEF_HOOK_FUNC(int, jniRegisterNativeMethods,
     }
 
     if (className == "com/android/internal/os/Zygote"sv) {
-        clone_methods();
+        newMethods = make_unique<JNINativeMethod[]>(numMethods);
+        memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods);
         for (int i = 0; i < numMethods && hooked < 3; ++i) {
-            HOOK_JNI(Zygote, nativeForkAndSpecialize);
-            HOOK_JNI(Zygote, nativeSpecializeAppProcess);
-            HOOK_JNI(Zygote, nativeForkSystemServer);
-        }
-    } else if (className == "android/os/SystemProperties"sv) {
-        clone_methods();
-        for (int i = 0; i < numMethods && hooked < 1; ++i) {
-            HOOK_JNI(SystemProperties, native_set);
+            HOOK_JNI(nativeForkAndSpecialize);
+            HOOK_JNI(nativeSpecializeAppProcess);
+            HOOK_JNI(nativeForkSystemServer);
         }
     }
 
@@ -102,9 +79,11 @@ DEF_HOOK_FUNC(int, jniRegisterNativeMethods,
 static void nativeForkAndSpecialize_pre(HookContext *ctx,
         JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
         jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
-        jintArray &fds_to_close, jintArray &fds_to_ignore, jboolean &is_child_zygote,
-        jstring &instruction_set, jstring &app_data_dir, jboolean &is_top_app, jobjectArray &pkg_data_info_list,
-        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs, jboolean &mount_storage_dirs) {
+        jintArray &fds_to_close, jintArray &fds_to_ignore,  /* These 2 arguments are unique to fork */
+        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
+        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
+        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
+        jboolean &mount_storage_dirs) {
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
@@ -118,11 +97,12 @@ static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass c
 // -----------------------------------------------------------------
 
 static void nativeSpecializeAppProcess_pre(HookContext *ctx,
-        JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags,
-        jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name,
-        jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir,
-        jboolean &is_top_app, jobjectArray &pkg_data_info_list, jobjectArray &whitelisted_data_info_list,
-        jboolean &mount_data_dirs, jboolean &mount_storage_dirs) {
+        JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
+        jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
+        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
+        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
+        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
+        jboolean &mount_storage_dirs) {
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
@@ -141,6 +121,8 @@ static void nativeForkSystemServer_pre(HookContext *ctx,
 static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
     LOGD("hook: %s\n", __FUNCTION__);
 }
+
+// -----------------------------------------------------------------
 
 static bool hook_refresh() {
     if (xhook_refresh(0) == 0) {
@@ -176,8 +158,8 @@ void hook_functions() {
     hook_refresh();
 }
 
-#define push_method(clazz, method) \
-if (JNI::clazz::method##_orig) methods.emplace_back(*JNI::clazz::method##_orig)
+#define push_method(method) \
+if (method##_orig) methods.emplace_back(*method##_orig)
 
 bool unhook_functions() {
     JNIEnv* env;
@@ -186,25 +168,14 @@ bool unhook_functions() {
 
     // Unhook JNI methods
     vector<JNINativeMethod> methods;
-
-    push_method(Zygote, nativeForkAndSpecialize);
-    push_method(Zygote, nativeSpecializeAppProcess);
-    push_method(Zygote, nativeForkSystemServer);
+    push_method(nativeForkAndSpecialize);
+    push_method(nativeSpecializeAppProcess);
+    push_method(nativeForkSystemServer);
 
     if (!methods.empty() && old_jniRegisterNativeMethods(env,
             "com/android/internal/os/Zygote",
             methods.data(), methods.size()) != 0) {
         LOGE("hook: Failed to register JNI hook for Zygote\n");
-        return false;
-    }
-
-    methods.clear();
-    push_method(SystemProperties, native_set);
-
-    if (!methods.empty() && old_jniRegisterNativeMethods(env,
-            "android/os/SystemProperties",
-            methods.data(), methods.size()) != 0) {
-        LOGE("hook: Failed to register JNI hook for SystemProperties\n");
         return false;
     }
 

@@ -6,7 +6,7 @@
  * Copyright (c) 2021, John 'topjohnwu' Wu
  */
 
-#define ENABLE_LEGACY_DP 1  // Nobody should use outdated developer preview...
+#define ENABLE_LEGACY_DP 0  // Nobody should use outdated developer preview...
 
 // All possible missing arguments
 static union {
@@ -38,7 +38,7 @@ static ret name(__VA_ARGS__)
 
 #define orig_fork(ver, ...) \
     ctx.pid = reinterpret_cast<decltype(&nativeForkAndSpecialize_##ver)> \
-    (JNI::Zygote::nativeForkAndSpecialize_orig->fnPtr)(__VA_ARGS__)
+    (nativeForkAndSpecialize_orig->fnPtr)(__VA_ARGS__)
 
 #define post_fork() \
     nativeForkAndSpecialize_post(&ctx, env, clazz); \
@@ -184,7 +184,7 @@ DCL_FORK_AND_SPECIALIZE(samsung_p,
     post_fork();
 }
 
-#define DCL_FORK(ver) { \
+#define DEF_FORK(ver) { \
     "nativeForkAndSpecialize", \
     nativeForkAndSpecialize_##ver##_sig, \
     (void *) &nativeForkAndSpecialize_##ver \
@@ -202,7 +202,7 @@ DCL_FORK_AND_SPECIALIZE(samsung_p,
 
 #define orig_spec(ver, ...) \
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_##ver)> \
-    (JNI::Zygote::nativeSpecializeAppProcess_orig->fnPtr)(__VA_ARGS__)
+    (nativeSpecializeAppProcess_orig->fnPtr)(__VA_ARGS__)
 
 #define post_spec() \
     nativeSpecializeAppProcess_post(&ctx, env, clazz)
@@ -285,7 +285,7 @@ DCL_SPECIALIZE_APP(samsung_q,
     post_spec();
 }
 
-#define DCL_SPEC(ver) { \
+#define DEF_SPEC(ver) { \
     "nativeSpecializeAppProcess", \
     nativeSpecializeAppProcess_##ver##_sig, \
     (void *) &nativeSpecializeAppProcess_##ver \
@@ -301,7 +301,7 @@ DCL_SPECIALIZE_APP(samsung_q,
 
 #define orig_server(ver, ...) \
     ctx.pid = reinterpret_cast<decltype(&nativeForkSystemServer_##ver)> \
-    (JNI::Zygote::nativeForkSystemServer_orig->fnPtr)(__VA_ARGS__)
+    (nativeForkSystemServer_orig->fnPtr)(__VA_ARGS__)
 
 #define post_server() \
     nativeForkSystemServer_post(&ctx, env, clazz); \
@@ -329,71 +329,38 @@ DCL_FORK_SERVER(samsung_q, "(II[IIII[[IJJ)I",
     post_server();
 }
 
-#define DCL_SERVER(ver) { \
+#define DEF_SERVER(ver) { \
     "nativeForkSystemServer", \
     nativeForkSystemServer_##ver##_sig, \
     (void *) &nativeForkSystemServer_##ver \
 }
 
-/*
- * On Android 9+, in very rare cases, SystemProperties.set("sys.user." + userId + ".ce_available", "true")
- * will throw an exception (no idea if this is caused by hooking) and user data will be wiped.
- * Hook it and clear the exception to prevent this problem from happening.
- *
- * https://cs.android.com/android/platform/superproject/+/android-9.0.0_r34:frameworks/base/services/core/java/com/android/server/pm/UserDataPreparer.java;l=107;bpv=0;bpt=0
- */
-static void SystemProperties_set(JNIEnv *env, jobject clazz, jstring keyJ, jstring valJ) {
-    const char *key = env->GetStringUTFChars(keyJ, JNI_FALSE);
-    char user[16];
-    bool no_throw = sscanf(key, "sys.user.%[^.].ce_available", user) == 1;
-    env->ReleaseStringUTFChars(keyJ, key);
+namespace {
 
-    reinterpret_cast<decltype(&SystemProperties_set)>
-    (JNI::SystemProperties::native_set_orig->fnPtr)(env, clazz, keyJ, valJ);
-
-    jthrowable exception = env->ExceptionOccurred();
-    if (exception && no_throw) {
-        LOGW("prevented data destroy");
-
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-    }
-}
-
-namespace JNI {
-
-    namespace Zygote {
-        const JNINativeMethod nativeForkAndSpecialize_methods[] = {
-            DCL_FORK(m), DCL_FORK(o), DCL_FORK(p),
-            DCL_FORK(q_alt), DCL_FORK(r),
-            DCL_FORK(samsung_m), DCL_FORK(samsung_n),
-            DCL_FORK(samsung_o), DCL_FORK(samsung_p),
+const JNINativeMethod nativeForkAndSpecialize_methods[] = {
+    DEF_FORK(m), DEF_FORK(o), DEF_FORK(p),
+    DEF_FORK(q_alt), DEF_FORK(r),
+    DEF_FORK(samsung_m), DEF_FORK(samsung_n),
+    DEF_FORK(samsung_o), DEF_FORK(samsung_p),
 #if ENABLE_LEGACY_DP
-            DCL_FORK(r_dp2), DCL_FORK(r_dp3)
+    DEF_FORK(r_dp2), DEF_FORK(r_dp3)
 #endif
-        };
-        const int nativeForkAndSpecialize_methods_num = std::size(nativeForkAndSpecialize_methods);
+};
+const int nativeForkAndSpecialize_methods_num = std::size(nativeForkAndSpecialize_methods);
 
-        const JNINativeMethod nativeSpecializeAppProcess_methods[] = {
-            DCL_SPEC(q), DCL_SPEC(q_alt),
-            DCL_SPEC(r), DCL_SPEC(samsung_q),
+const JNINativeMethod nativeSpecializeAppProcess_methods[] = {
+    DEF_SPEC(q), DEF_SPEC(q_alt),
+    DEF_SPEC(r), DEF_SPEC(samsung_q),
 #if ENABLE_LEGACY_DP
-            DCL_SPEC(r_dp2), DCL_SPEC(r_dp3)
+    DEF_SPEC(r_dp2), DEF_SPEC(r_dp3)
 #endif
-        };
-        const int nativeSpecializeAppProcess_methods_num = std::size(nativeSpecializeAppProcess_methods);
+};
+const int nativeSpecializeAppProcess_methods_num = std::size(
+    nativeSpecializeAppProcess_methods);
 
-        const JNINativeMethod nativeForkSystemServer_methods[] = {
-            DCL_SERVER(m), DCL_SERVER(samsung_q)
-        };
-        const int nativeForkSystemServer_methods_num = std::size(nativeForkSystemServer_methods);
-    }
+const JNINativeMethod nativeForkSystemServer_methods[] = {
+    DEF_SERVER(m), DEF_SERVER(samsung_q)
+};
+const int nativeForkSystemServer_methods_num = std::size(nativeForkSystemServer_methods);
 
-    namespace SystemProperties {
-        const JNINativeMethod native_set_methods[] = {{
-            "native_set",
-            "(Ljava/lang/String;Ljava/lang/String;)V",
-            (void *) &SystemProperties_set
-        }};
-    }
 }
