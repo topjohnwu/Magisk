@@ -17,8 +17,10 @@ using namespace std;
     extern const JNINativeMethod name##_methods[]; \
     extern const int name##_methods_num;
 
-// For some reason static vector won't work, use a pointer instead
-static vector<tuple<const char *, const char *, void **>> *hook_list;
+// For some reason static vectors won't work, use pointers instead
+static vector<tuple<const char *, const char *, void **>> *xhook_list;
+static vector<JNINativeMethod> *jni_list;
+
 static JavaVM *g_jvm;
 static int prev_fork_pid = -1;
 
@@ -41,6 +43,7 @@ if (newMethods[i].name == #method##sv) { \
     auto orig = new JNINativeMethod(); \
     memcpy(orig, &newMethods[i], sizeof(JNINativeMethod)); \
     method##_orig = orig; \
+    jni_list->push_back(newMethods[i]); \
     for (int j = 0; j < method##_methods_num; ++j) { \
         if (strcmp(newMethods[i].signature, method##_methods[j].signature) == 0) { \
             newMethods[i] = method##_methods[j]; \
@@ -196,7 +199,7 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
         LOGE("hook: Failed to register hook \"%s\"\n", symbol);
         return ret;
     }
-    hook_list->emplace_back(path, symbol, old_func);
+    xhook_list->emplace_back(path, symbol, old_func);
     return 0;
 }
 
@@ -208,14 +211,13 @@ void hook_functions() {
     xhook_enable_debug(1);
     xhook_enable_sigsegv_protection(0);
 #endif
-    hook_list = new remove_pointer_t<decltype(hook_list)>();
+    xhook_list = new remove_pointer_t<decltype(xhook_list)>();
+    jni_list = new remove_pointer_t<decltype(jni_list)>();
+
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", jniRegisterNativeMethods);
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", fork);
     hook_refresh();
 }
-
-#define push_method(method) \
-if (method##_orig) methods.emplace_back(*method##_orig)
 
 bool unhook_functions() {
     JNIEnv* env;
@@ -223,26 +225,22 @@ bool unhook_functions() {
         return false;
 
     // Unhook JNI methods
-    vector<JNINativeMethod> methods;
-    push_method(nativeForkAndSpecialize);
-    push_method(nativeSpecializeAppProcess);
-    push_method(nativeForkSystemServer);
-
-    if (!methods.empty() && old_jniRegisterNativeMethods(env,
+    if (!jni_list->empty() && old_jniRegisterNativeMethods(env,
             "com/android/internal/os/Zygote",
-            methods.data(), methods.size()) != 0) {
-        LOGE("hook: Failed to register JNI hook for Zygote\n");
+            jni_list->data(), jni_list->size()) != 0) {
+        LOGE("hook: Failed to register JNI hook\n");
         return false;
     }
+    delete jni_list;
 
     // Unhook xhook
-    for (auto &[path, sym, old_func] : *hook_list) {
+    for (auto &[path, sym, old_func] : *xhook_list) {
         if (xhook_register(path, sym, *old_func, nullptr) != 0) {
             LOGE("hook: Failed to register hook \"%s\"\n", sym);
             return false;
         }
     }
-    delete hook_list;
+    delete xhook_list;
     return hook_refresh();
 }
 
