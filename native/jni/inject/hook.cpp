@@ -19,13 +19,14 @@ using namespace std;
 
 // For some reason static vector won't work, use a pointer instead
 static vector<tuple<const char *, const char *, void **>> *hook_list;
-
 static JavaVM *g_jvm;
+static int prev_fork_pid = -1;
 
 namespace {
 
 struct HookContext {
     int pid;
+    bool unload;
 };
 
 // JNI method declarations
@@ -76,6 +77,32 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
 
+DCL_HOOK_FUNC(int, fork) {
+    if (prev_fork_pid < 0)
+        return old_fork();
+
+    // Skip an actual fork and return the previous fork result
+    int pid = prev_fork_pid;
+    prev_fork_pid = -1;
+    return pid;
+}
+
+static int sigmask(int how, int signum) {
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, signum);
+    return sigprocmask(how, &set, nullptr);
+}
+
+static int pre_specialize_fork() {
+    // First block SIGCHLD, unblock after original fork is done
+    sigmask(SIG_BLOCK, SIGCHLD);
+    prev_fork_pid = old_fork();
+    return prev_fork_pid;
+}
+
+// -----------------------------------------------------------------
+
 static void nativeForkAndSpecialize_pre(HookContext *ctx,
         JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
         jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
@@ -84,13 +111,29 @@ static void nativeForkAndSpecialize_pre(HookContext *ctx,
         jboolean &is_top_app, jobjectArray &pkg_data_info_list,
         jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
         jboolean &mount_storage_dirs) {
+
+    // Do our own fork before loading any 3rd party code
+    ctx->pid = pre_specialize_fork();
+    if (ctx->pid != 0)
+        return;
+
+    // TODO: check if we need to do hiding
+    // Demonstrate self unload in child process
+    ctx->unload = true;
+
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
 static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    // Unblock SIGCHLD in case the original method didn't
+    sigmask(SIG_UNBLOCK, SIGCHLD);
+
+    if (ctx->pid != 0)
+        return;
+
     LOGD("hook: %s\n", __FUNCTION__);
-    // Demonstrate self unload in child process
-    if (ctx->pid == 0)
+
+    if (ctx->unload)
         self_unload();
 }
 
@@ -115,10 +158,22 @@ static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclas
 static void nativeForkSystemServer_pre(HookContext *ctx,
         JNIEnv *env, jclass clazz, uid_t &uid, gid_t &gid, jintArray &gids, jint &runtime_flags,
         jobjectArray &rlimits, jlong &permitted_capabilities, jlong &effective_capabilities) {
+
+    // Do our own fork before loading any 3rd party code
+    ctx->pid = pre_specialize_fork();
+    if (ctx->pid != 0)
+        return;
+
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
 static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    // Unblock SIGCHLD in case the original method didn't
+    sigmask(SIG_UNBLOCK, SIGCHLD);
+
+    if (ctx->pid != 0)
+        return;
+
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
@@ -155,6 +210,7 @@ void hook_functions() {
 #endif
     hook_list = new remove_pointer_t<decltype(hook_list)>();
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", jniRegisterNativeMethods);
+    XHOOK_REGISTER(".*\\libandroid_runtime.so$", fork);
     hook_refresh();
 }
 

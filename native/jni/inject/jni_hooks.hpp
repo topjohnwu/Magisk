@@ -37,7 +37,7 @@ static ret name(__VA_ARGS__)
     mount_data_dirs, mount_storage_dirs)
 
 #define orig_fork(ver, ...) \
-    ctx.pid = reinterpret_cast<decltype(&nativeForkAndSpecialize_##ver)> \
+    reinterpret_cast<decltype(&nativeForkAndSpecialize_##ver)> \
     (nativeForkAndSpecialize_orig->fnPtr)(__VA_ARGS__)
 
 #define post_fork() \
@@ -300,7 +300,7 @@ DCL_SPECIALIZE_APP(samsung_q,
     rlimits, permitted_capabilities, effective_capabilities)
 
 #define orig_server(ver, ...) \
-    ctx.pid = reinterpret_cast<decltype(&nativeForkSystemServer_##ver)> \
+    reinterpret_cast<decltype(&nativeForkSystemServer_##ver)> \
     (nativeForkSystemServer_orig->fnPtr)(__VA_ARGS__)
 
 #define post_server() \
