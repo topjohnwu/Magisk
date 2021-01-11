@@ -60,7 +60,7 @@
     <string name="prompt">Pyet</string>
     <string name="grant">Lejo</string>
     <string name="su_warning">Jep akses të plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
-    <string name="forever">Përgjithmonë</string>
+    <string name="forever">Gjithmonë</string>
     <string name="once">Një herë</string>
     <string name="tenmin">10 minuta</string>
     <string name="twentymin">20 minuta</string>
