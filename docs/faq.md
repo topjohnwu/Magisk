@@ -1,5 +1,7 @@
 # Frequently Asked Questions
 
+#add update faq.md
+
 ### Q: Why is X app detecting root?
 
 Manually enable MagiskHide in settings (MagiskHide is no longer enabled by default). Also, there are known methods to detect Magisk, so your mileage may vary.
