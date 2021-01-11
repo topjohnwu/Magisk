@@ -207,7 +207,7 @@
     <string name="failure">Dështoi!</string>
     <string name="hide_manager_title">Fshehja e Magisk manager…</string>
     <string name="hide_manager_fail_toast">Fsheh Menaxherin e Magisk dështoi</string>
-    <string name="restore_manager_fail_toast">Rikthe menaxherin e Magisk dështoi</string>
+    <string name="restore_manager_fail_toast">Rikthimi i menaxherin e Magisk dështoi</string>
     <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
     <string name="complete_uninstall">Çinstalimi i plotë</string>
     <string name="restore_img">Rikthe Imazhet</string>
