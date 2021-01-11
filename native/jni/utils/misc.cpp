@@ -121,15 +121,22 @@ int new_daemon_thread(thread_entry entry, void *arg) {
     return xpthread_create(&thread, &attr, entry, arg);
 }
 
-static void *proxy_routine(void *fp) {
-    auto fn = reinterpret_cast<std::function<void()>*>(fp);
-    (*fn)();
-    delete fn;
-    return nullptr;
+int new_daemon_thread(void(*entry)()) {
+    thread_entry proxy = [](void *entry) -> void * {
+        reinterpret_cast<void(*)()>(entry)();
+        return nullptr;
+    };
+    return new_daemon_thread(proxy, (void *) entry);
 }
 
 int new_daemon_thread(std::function<void()> &&entry) {
-    return new_daemon_thread(proxy_routine, new std::function<void()>(std::move(entry)));
+    thread_entry proxy = [](void *fp) -> void * {
+        auto fn = reinterpret_cast<std::function<void()>*>(fp);
+        (*fn)();
+        delete fn;
+        return nullptr;
+    };
+    return new_daemon_thread(proxy, new std::function<void()>(std::move(entry)));
 }
 
 static char *argv0;

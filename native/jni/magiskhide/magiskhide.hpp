@@ -25,13 +25,12 @@ void ls_list(int client);
 
 // Process monitoring
 [[noreturn]] void proc_monitor();
-void update_uid_map();
 
 // Utility functions
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 bool hide_enabled();
-void set_hide_state(bool state);
+void update_uid_map();
 
 // Hide policies
 void hide_daemon(int pid);
@@ -39,8 +38,8 @@ void hide_unmount(int pid = getpid());
 void hide_sensitive_props();
 void hide_late_sensitive_props();
 
-extern pthread_mutex_t monitor_lock;
-extern std::set<std::pair<std::string, std::string>> hide_set;
+extern pthread_mutex_t hide_state_lock;
+extern std::map<int, std::vector<std::string_view>> uid_proc_map;
 
 enum {
     LAUNCH_MAGISKHIDE,

@@ -18,18 +18,11 @@ using namespace std;
 
 static int inotify_fd = -1;
 
-static void term_thread(int sig = SIGTERMTHRD);
 static void new_zygote(int pid);
 
-/**********************
- * All data structures
- **********************/
-
-set<pair<string, string>> hide_set;                 /* set of <pkg, process> pair */
-static map<int, struct stat> zygote_map;            /* zygote pid -> mnt ns */
-static map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
-
-pthread_mutex_t monitor_lock;
+/******************
+ * Data structures
+ ******************/
 
 #define PID_MAX 32768
 struct pid_set {
@@ -41,7 +34,10 @@ private:
 };
 
 // true if pid is monitored
-pid_set attaches;
+static pid_set attaches;
+
+// zygote pid -> mnt ns
+static map<int, struct stat> zygote_map;
 
 /********
  * Utils
@@ -67,36 +63,6 @@ static int parse_ppid(int pid) {
     fscanf(stat.get(), "%*d %*s %*c %d", &ppid);
 
     return ppid;
-}
-
-void update_uid_map() {
-    mutex_guard lock(monitor_lock);
-    uid_proc_map.clear();
-    string data_path(APP_DATA_DIR);
-    size_t len = data_path.length();
-    auto dir = open_dir(APP_DATA_DIR);
-    bool first_iter = true;
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        data_path.resize(len);
-        data_path += '/';
-        data_path += entry->d_name;  // multiuser user id
-        data_path += '/';
-        size_t user_len = data_path.length();
-        struct stat st;
-        for (auto &hide : hide_set) {
-            if (hide.first == ISOLATED_MAGIC) {
-                if (!first_iter) continue;
-                // Setup isolated processes
-                uid_proc_map[-1].emplace_back(hide.second);
-            }
-            data_path.resize(user_len);
-            data_path += hide.first;
-            if (stat(data_path.data(), &st))
-                continue;
-            uid_proc_map[st.st_uid].emplace_back(hide.second);
-        }
-        first_iter = false;
-    }
 }
 
 static bool is_zygote_done() {
@@ -132,7 +98,7 @@ static void check_zygote() {
 static void setup_inotify() {
     inotify_fd = xinotify_init1(IN_CLOEXEC);
     if (inotify_fd < 0)
-        term_thread();
+        return;
 
     // Setup inotify asynchronous I/O
     fcntl(inotify_fd, F_SETFL, O_ASYNC);
@@ -160,8 +126,8 @@ static void setup_inotify() {
  ************************/
 
 static void inotify_event(int) {
-    /* Make sure we can actually read stuffs
-     * or else the whole thread will be blocked.*/
+    // Make sure we can actually read stuffs
+    // or else the whole thread will be blocked.
     struct pollfd pfd = {
         .fd = inotify_fd,
         .events = POLLIN,
@@ -180,13 +146,8 @@ static void inotify_event(int) {
 // Workaround for the lack of pthread_cancel
 static void term_thread(int) {
     LOGD("proc_monitor: cleaning up\n");
-    uid_proc_map.clear();
     zygote_map.clear();
-    hide_set.clear();
     attaches.reset();
-    // Misc
-    set_hide_state(false);
-    pthread_mutex_destroy(&monitor_lock);
     close(inotify_fd);
     inotify_fd = -1;
     LOGD("proc_monitor: terminate\n");
@@ -240,6 +201,9 @@ static bool check_pid(int pid) {
         return false;
 
     int uid = st.st_uid;
+
+    // Start accessing uid_proc_map
+    mutex_guard lock(hide_state_lock);
     auto it = uid_proc_map.end();
 
     if (uid % 100000 > 90000) {

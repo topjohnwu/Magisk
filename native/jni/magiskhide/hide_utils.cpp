@@ -15,11 +15,43 @@
 
 using namespace std;
 
-static pthread_t proc_monitor_thread;
+static pthread_t monitor_thread;
 static bool hide_state = false;
+static set<pair<string, string>> hide_set;   /* set of <pkg, process> pair */
+map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 
-// This locks the 2 variables above
-static pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
+// Locks the variables above
+pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
+
+void update_uid_map() {
+    mutex_guard lock(hide_state_lock);
+    uid_proc_map.clear();
+    string data_path(APP_DATA_DIR);
+    size_t len = data_path.length();
+    auto dir = open_dir(APP_DATA_DIR);
+    bool first_iter = true;
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        data_path.resize(len);
+        data_path += '/';
+        data_path += entry->d_name;  // multiuser user id
+        data_path += '/';
+        size_t user_len = data_path.length();
+        struct stat st;
+        for (auto &hide : hide_set) {
+            if (hide.first == ISOLATED_MAGIC) {
+                if (!first_iter) continue;
+                // Setup isolated processes
+                uid_proc_map[-1].emplace_back(hide.second);
+            }
+            data_path.resize(user_len);
+            data_path += hide.first;
+            if (stat(data_path.data(), &st))
+                continue;
+            uid_proc_map[st.st_uid].emplace_back(hide.second);
+        }
+        first_iter = false;
+    }
+}
 
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
@@ -41,11 +73,6 @@ void crawl_procfs(DIR *dir, const function<bool(int)> &fn) {
 bool hide_enabled() {
     mutex_guard g(hide_state_lock);
     return hide_state;
-}
-
-void set_hide_state(bool state) {
-    mutex_guard g(hide_state_lock);
-    hide_state = state;
 }
 
 template <bool str_op(string_view, string_view)>
@@ -124,7 +151,7 @@ static int add_list(const char *pkg, const char *proc) {
 
     {
         // Critical region
-        mutex_guard lock(monitor_lock);
+        mutex_guard lock(hide_state_lock);
         add_hide_set(pkg, proc);
     }
 
@@ -146,7 +173,7 @@ static int rm_list(const char *pkg, const char *proc) {
     bool remove = false;
     {
         // Critical region
-        mutex_guard lock(monitor_lock);
+        mutex_guard lock(hide_state_lock);
         for (auto it = hide_set.begin(); it != hide_set.end();) {
             if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
                 remove = true;
@@ -256,9 +283,6 @@ int launch_magiskhide() {
 
     LOGI("* Starting MagiskHide\n");
 
-    // Initialize the mutex lock
-    pthread_mutex_init(&monitor_lock, nullptr);
-
     // Initialize the hide list
     if (!init_list())
         return DAEMON_ERROR;
@@ -268,8 +292,7 @@ int launch_magiskhide() {
         hide_late_sensitive_props();
 
     // Start monitoring
-    void *(*start)(void*) = [](void*) -> void* { proc_monitor(); };
-    if (xpthread_create(&proc_monitor_thread, nullptr, start, nullptr))
+    if (new_daemon_thread(&proc_monitor))
         return DAEMON_ERROR;
 
     hide_state = true;
@@ -282,7 +305,9 @@ int stop_magiskhide() {
 
     if (hide_state) {
         LOGI("* Stopping MagiskHide\n");
-        pthread_kill(proc_monitor_thread, SIGTERMTHRD);
+        uid_proc_map.clear();
+        hide_set.clear();
+        pthread_kill(monitor_thread, SIGTERMTHRD);
     }
 
     hide_state = false;
@@ -292,7 +317,7 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide() {
     if (hide_enabled()) {
-        pthread_kill(proc_monitor_thread, SIGALRM);
+        pthread_kill(monitor_thread, SIGALRM);
         hide_late_sensitive_props();
     } else if (SDK_INT >= 19) {
         db_settings dbs;
