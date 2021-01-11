@@ -5,15 +5,17 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <dirent.h>
-#include <string>
+#include <string_view>
 #include <functional>
 #include <map>
-#include <set>
 
 #include <daemon.hpp>
 
 #define SIGTERMTHRD SIGUSR1
 #define ISOLATED_MAGIC "isolated"
+
+// Global toggle for ptrace monitor
+#define ENABLE_PTRACE_MONITOR 1
 
 // CLI entries
 int launch_magiskhide();
@@ -21,10 +23,12 @@ int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
-[[noreturn]] void test_proc_monitor();
 
+#if ENABLE_PTRACE_MONITOR
 // Process monitoring
 [[noreturn]] void proc_monitor();
+[[noreturn]] void test_proc_monitor();
+#endif
 
 // Utility functions
 void crawl_procfs(const std::function<bool (int)> &fn);
@@ -34,7 +38,7 @@ void update_uid_map();
 
 // Hide policies
 void hide_daemon(int pid);
-void hide_unmount(int pid = getpid());
+void hide_unmount(int pid = -1);
 void hide_sensitive_props();
 void hide_late_sensitive_props();
 

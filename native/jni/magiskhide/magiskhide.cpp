@@ -105,7 +105,7 @@ int magiskhide_main(int argc, char *argv[]) {
         execvp(argv[2], argv + 2);
         exit(1);
     }
-#if 0
+#if 0 && ENABLE_PTRACE_MONITOR
     else if (opt == "test"sv)
         test_proc_monitor();
 #endif

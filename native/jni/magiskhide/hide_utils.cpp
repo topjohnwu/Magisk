@@ -1,11 +1,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <string.h>
+#include <set>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -15,13 +13,16 @@
 
 using namespace std;
 
-static pthread_t monitor_thread;
 static bool hide_state = false;
 static set<pair<string, string>> hide_set;   /* set of <pkg, process> pair */
 map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 
 // Locks the variables above
 pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
+
+#if ENABLE_PTRACE_MONITOR
+static pthread_t monitor_thread;
+#endif
 
 void update_uid_map() {
     mutex_guard lock(hide_state_lock);
@@ -82,7 +83,7 @@ static bool proc_name_match(int pid, const char *name) {
     if (auto fp = open_file(buf, "re")) {
         fgets(buf, sizeof(buf), fp.get());
         if (str_op(buf, name)) {
-            LOGD("hide_utils: kill PID=[%d] (%s)\n", pid, buf);
+            LOGD("hide: kill PID=[%d] (%s)\n", pid, buf);
             return true;
         }
     }
@@ -221,7 +222,7 @@ static bool str_ends_safe(string_view s, string_view ss) {
 #define MICROG_PKG   "org.microg.gms.droidguard"
 
 static bool init_list() {
-    LOGD("hide_list: initialize\n");
+    LOGD("hide: initialize\n");
 
     char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
         add_hide_set(row["package_name"].data(), row["process"].data());
@@ -281,7 +282,7 @@ int launch_magiskhide() {
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
         return DAEMON_ERROR;
 
-    LOGI("* Starting MagiskHide\n");
+    LOGI("* Enable MagiskHide\n");
 
     // Initialize the hide list
     if (!init_list())
@@ -291,9 +292,11 @@ int launch_magiskhide() {
     if (DAEMON_STATE >= STATE_BOOT_COMPLETE || DAEMON_STATE == STATE_NONE)
         hide_late_sensitive_props();
 
+#if ENABLE_PTRACE_MONITOR
     // Start monitoring
     if (new_daemon_thread(&proc_monitor))
         return DAEMON_ERROR;
+#endif
 
     hide_state = true;
     update_hide_config();
@@ -304,10 +307,12 @@ int stop_magiskhide() {
     mutex_guard g(hide_state_lock);
 
     if (hide_state) {
-        LOGI("* Stopping MagiskHide\n");
+        LOGI("* Disable MagiskHide\n");
         uid_proc_map.clear();
         hide_set.clear();
+#if ENABLE_PTRACE_MONITOR
         pthread_kill(monitor_thread, SIGTERMTHRD);
+#endif
     }
 
     hide_state = false;
@@ -317,7 +322,9 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide() {
     if (hide_enabled()) {
+#if ENABLE_PTRACE_MONITOR
         pthread_kill(monitor_thread, SIGALRM);
+#endif
         hide_late_sensitive_props();
     } else if (SDK_INT >= 19) {
         db_settings dbs;
@@ -327,8 +334,10 @@ void auto_start_magiskhide() {
     }
 }
 
+#if ENABLE_PTRACE_MONITOR
 void test_proc_monitor() {
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
         exit(1);
     proc_monitor();
 }
+#endif

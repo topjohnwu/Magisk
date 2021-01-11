@@ -30,7 +30,7 @@ static const char *late_prop_val[] =
         { "green", nullptr };
 
 void hide_sensitive_props() {
-    LOGI("hide_policy: Hiding sensitive props\n");
+    LOGI("hide: Hiding sensitive props\n");
 
     for (int i = 0; prop_key[i]; ++i) {
         auto value = getprop(prop_key[i]);
@@ -63,7 +63,7 @@ void hide_sensitive_props() {
 }
 
 void hide_late_sensitive_props() {
-    LOGI("hide_policy: Hiding sensitive props (late)\n");
+    LOGI("hide: Hiding sensitive props (late)\n");
 
     for (int i = 0; late_prop_key[i]; ++i) {
         auto value = getprop(late_prop_key[i]);
@@ -74,9 +74,10 @@ void hide_late_sensitive_props() {
 
 static void lazy_unmount(const char* mountpoint) {
     if (umount2(mountpoint, MNT_DETACH) != -1)
-        LOGD("hide_policy: Unmounted (%s)\n", mountpoint);
+        LOGD("hide: Unmounted (%s)\n", mountpoint);
 }
 
+#if ENABLE_PTRACE_MONITOR
 void hide_daemon(int pid) {
     if (fork_dont_care() == 0) {
         hide_unmount(pid);
@@ -85,15 +86,16 @@ void hide_daemon(int pid) {
         _exit(0);
     }
 }
+#endif
 
 #define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && \
 strncmp(mentry->mnt_dir, "/" #dir, sizeof("/" #dir) - 1) == 0)
 
 void hide_unmount(int pid) {
-    if (switch_mnt_ns(pid))
+    if (pid > 0 && switch_mnt_ns(pid))
         return;
 
-    LOGD("hide_policy: handling PID=[%d]\n", pid);
+    LOGD("hide: handling PID=[%d]\n", pid);
 
     char val;
     int fd = xopen(SELINUX_ENFORCE, O_RDONLY);
