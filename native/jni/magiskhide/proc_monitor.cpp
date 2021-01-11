@@ -207,16 +207,8 @@ static bool check_pid(int pid) {
     auto it = uid_proc_map.end();
 
     if (uid % 100000 > 90000) {
-        // Isolated process
-        it = uid_proc_map.find(-1);
-        if (it == uid_proc_map.end())
-            goto not_target;
-        for (auto &s : it->second) {
-            if (str_starts(cmdline, s)) {
-                LOGI("proc_monitor: (isolated) [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
-                goto inject_and_hide;
-            }
-        }
+        // No way to handle isolated process
+        goto not_target;
     }
 
     it = uid_proc_map.find(uid);
@@ -226,17 +218,12 @@ static bool check_pid(int pid) {
         if (s != cmdline)
             continue;
 
-        if (str_ends(s, "_zygote")) {
-            LOGI("proc_monitor: (app zygote) [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
-            goto inject_and_hide;
-        }
-
-        // Double check whether ns is separated
+        // Check if ns is separated (could be app zygote)
         read_ns(pid, &st);
         for (auto &zit : zygote_map) {
             if (zit.second.st_ino == st.st_ino &&
                 zit.second.st_dev == st.st_dev) {
-                // For some reason ns is not separated, abort
+                // ns not separated, abort
                 goto not_target;
             }
         }
@@ -252,11 +239,6 @@ static bool check_pid(int pid) {
 
 not_target:
     PTRACE_LOG("[%s] is not our target\n", cmdline);
-    detach_pid(pid);
-    return true;
-
-inject_and_hide:
-    // TODO: handle isolated processes and app zygotes
     detach_pid(pid);
     return true;
 }
