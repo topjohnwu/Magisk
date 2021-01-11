@@ -25,6 +25,7 @@ object Const {
         fun atLeast_20_2() = Info.env.magiskVersionCode >= 20200 || isCanary()
         fun atLeast_20_4() = Info.env.magiskVersionCode >= 20400 || isCanary()
         fun atLeast_21_0() = Info.env.magiskVersionCode >= 21000 || isCanary()
+        fun atLeast_21_2() = Info.env.magiskVersionCode >= 21200 || isCanary()
         fun isCanary() = Info.env.magiskVersionCode % 100 != 0
     }
 
@@ -36,7 +37,6 @@ object Const {
         // notifications
         const val MAGISK_UPDATE_NOTIFICATION_ID = 4
         const val APK_UPDATE_NOTIFICATION_ID = 5
-        const val HIDE_MANAGER_NOTIFICATION_ID = 8
         const val UPDATE_NOTIFICATION_CHANNEL = "update"
         const val PROGRESS_NOTIFICATION_CHANNEL = "progress"
         const val CHECK_MAGISK_UPDATE_WORKER_ID = "magisk_update"

@@ -1,3 +1,7 @@
+## v8.0.5
+
+- Fix sepolicy rule copying
+
 ## v8.0.4
 
 - A lot of stability changes and minor bug fixes

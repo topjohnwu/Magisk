@@ -27,13 +27,13 @@ class LocalModule(path: String) : Module() {
             val dir = "$PERSIST/$id"
             if (enable) {
                 disableFile.delete()
-                if (Const.Version.isCanary())
+                if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
                     Shell.su("mkdir -p $dir", "cp -af $ruleFile $dir").submit()
             } else {
                 !disableFile.createNewFile()
-                if (Const.Version.isCanary())
+                if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
                     Shell.su("rm -rf $dir").submit()
@@ -45,13 +45,13 @@ class LocalModule(path: String) : Module() {
         set(remove) {
             if (remove) {
                 removeFile.createNewFile()
-                if (Const.Version.isCanary())
+                if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
                     Shell.su("rm -rf $PERSIST/$id").submit()
             } else {
                 !removeFile.delete()
-                if (Const.Version.isCanary())
+                if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
                     Shell.su("cp -af $ruleFile $PERSIST/$id").submit()
