@@ -77,6 +77,7 @@
     <string name="su_revoke_title">Anulohet?</string>
     <string name="su_revoke_msg">Konfirmo të heqësh të drejtat e %1$s?</string>
     <string name="toast">dolli</string>
+    <string name="none">Asnjë</string>
     <string name="superuser_toggle_notification">Njoftimet</string>
     <string name="superuser_toggle_revoke">Anulo</string>
     <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar ende leje për superpërdoruesin.</string>
