@@ -1,26 +1,19 @@
 /*
- * Copyright 2017, John Wu (@topjohnwu)
+ * Copyright 2017 - 2021, John Wu (@topjohnwu)
  * Copyright 2015, Pierre-Hugues Husson <phh@phh.me>
  * Copyright 2010, Adam Shanks (@ChainsDD)
  * Copyright 2008, Zinx Verituse (@zinxv)
  */
 
-/* su.c - The main function running in the daemon
- */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <getopt.h>
 #include <fcntl.h>
 #include <pwd.h>
-#include <errno.h>
-#include <signal.h>
 #include <sched.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <magisk.hpp>
 #include <daemon.hpp>
 #include <utils.hpp>
 #include <flags.hpp>

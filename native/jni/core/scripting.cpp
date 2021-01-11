@@ -6,6 +6,8 @@
 #include <utils.hpp>
 #include <selinux.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
 #define BBEXEC_CMD bbpath(), "sh"

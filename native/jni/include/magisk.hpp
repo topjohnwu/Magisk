@@ -30,6 +30,9 @@ constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 #define POST_FS_DATA_WAIT_TIME       40
 #define POST_FS_DATA_SCRIPT_MAX_TIME 35
 
+extern int SDK_INT;
+#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
+
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
 int magiskhide_main(int argc, char *argv[]);

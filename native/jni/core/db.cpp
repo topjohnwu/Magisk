@@ -1,14 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
 #include <unistd.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
 
 #include <magisk.hpp>
 #include <db.hpp>
-#include <daemon.hpp>
+#include <socket.hpp>
 #include <utils.hpp>
 
 #define DB_VERSION 10

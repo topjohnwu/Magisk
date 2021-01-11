@@ -18,7 +18,7 @@
 #define ENABLE_PTRACE_MONITOR 1
 
 // CLI entries
-int launch_magiskhide();
+int launch_magiskhide(bool late_props);
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);

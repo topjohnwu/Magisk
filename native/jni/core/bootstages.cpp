@@ -13,6 +13,8 @@
 #include <resetprop.hpp>
 #include <selinux.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
 static bool safe_mode = false;
@@ -320,7 +322,7 @@ void post_fs_data(int client) {
         stop_magiskhide();
     } else {
         exec_common_scripts("post-fs-data");
-        auto_start_magiskhide();
+        auto_start_magiskhide(false);
         handle_modules();
     }
 
@@ -369,7 +371,7 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    auto_start_magiskhide();
+    auto_start_magiskhide(true);
 
     if (!check_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {

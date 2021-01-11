@@ -1,7 +1,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <daemon.hpp>
 #include <utils.hpp>
 #include <selinux.hpp>
 

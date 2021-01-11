@@ -1,6 +1,6 @@
 #include <fcntl.h>
 #include <pthread.h>
-#include <signal.h>
+#include <csignal>
 #include <libgen.h>
 #include <sys/un.h>
 #include <sys/types.h>
@@ -16,11 +16,14 @@
 #include <flags.hpp>
 #include <stream.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
 int SDK_INT = -1;
-bool RECOVERY_MODE = false;
 string MAGISKTMP;
+
+bool RECOVERY_MODE = false;
 int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;

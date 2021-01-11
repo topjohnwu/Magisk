@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <signal.h>
-#include <string.h>
 #include <sys/wait.h>
-#include <sys/types.h>
 #include <sys/mount.h>
 
-#include <daemon.hpp>
 #include <utils.hpp>
 
 #include "magiskhide.hpp"
@@ -53,7 +45,7 @@ void magiskhide_handler(int client) {
 
     switch (req) {
     case LAUNCH_MAGISKHIDE:
-        res = launch_magiskhide();
+        res = launch_magiskhide(true);
         break;
     case STOP_MAGISKHIDE:
         res = stop_magiskhide();

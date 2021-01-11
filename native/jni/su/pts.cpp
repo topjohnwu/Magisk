@@ -9,13 +9,9 @@
  * helper functions to handle raw input mode and terminal window resizing
  */
 
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <termios.h>
-#include <errno.h>
-#include <pthread.h>
 
 #include <utils.hpp>
 
@@ -116,7 +112,7 @@ static int stdin_is_raw = 0;
 /**
  * set_stdin_raw
  *
- * Changes stdin to raw unbuffered mode, disables echo, 
+ * Changes stdin to raw unbuffered mode, disables echo,
  * auto carriage return, etc.
  *
  * Return Value
@@ -180,7 +176,7 @@ int restore_stdin(void) {
 static volatile bool close_sigwinch_watcher = false;
 
 /**
- * Thread process. Wait for a SIGWINCH to be received, then update 
+ * Thread process. Wait for a SIGWINCH to be received, then update
  * the terminal size.
  */
 static void *watch_sigwinch(void *data) {
@@ -214,7 +210,7 @@ static void *watch_sigwinch(void *data) {
  * watch_sigwinch_async
  *
  * After calling this function, if the application receives
- * SIGWINCH, the terminal window size will be read from 
+ * SIGWINCH, the terminal window size will be read from
  * "input" and set on "output".
  *
  * NOTE: This function blocks SIGWINCH and spawns a thread.
@@ -228,7 +224,7 @@ static void *watch_sigwinch(void *data) {
  *
  * Return Value
  * on failure, -1 and errno will be set. In this case, no
- *      thread has been spawned and SIGWINCH will not be 
+ *      thread has been spawned and SIGWINCH will not be
  *      blocked.
  * on success, 0
  */

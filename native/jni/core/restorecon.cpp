@@ -1,7 +1,6 @@
 #include <string_view>
 
 #include <magisk.hpp>
-#include <daemon.hpp>
 #include <selinux.hpp>
 #include <utils.hpp>
 

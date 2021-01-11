@@ -5,8 +5,9 @@
 #include <utils.hpp>
 #include <magisk.hpp>
 #include <selinux.hpp>
-#include <daemon.hpp>
 #include <resetprop.hpp>
+
+#include "core.hpp"
 
 using namespace std;
 

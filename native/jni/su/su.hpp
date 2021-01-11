@@ -5,7 +5,6 @@
 #include <memory>
 
 #include <db.hpp>
-#include <utils.hpp>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 

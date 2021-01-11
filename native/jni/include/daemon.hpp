@@ -2,7 +2,6 @@
 
 #include <pthread.h>
 #include <string>
-#include <vector>
 
 #include <socket.hpp>
 
@@ -39,10 +38,7 @@ enum {
     STATE_BOOT_COMPLETE
 };
 
-extern int SDK_INT;
-extern bool RECOVERY_MODE;
-extern int DAEMON_STATE;
-#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
+int connect_daemon(bool create = false);
 
 // Daemon handlers
 void post_fs_data(int client);
@@ -51,26 +47,6 @@ void boot_complete(int client);
 void magiskhide_handler(int client);
 void su_daemon_handler(int client, ucred *credential);
 
-// Misc
-int connect_daemon(bool create = false);
-void unlock_blocks();
-void reboot();
-void setup_logfile(bool reset);
-
-// Module stuffs
-void handle_modules();
-void magic_mount();
-void disable_modules();
-void remove_modules();
-void exec_module_scripts(const char *stage);
-
 // MagiskHide
-void auto_start_magiskhide();
+void auto_start_magiskhide(bool late_props);
 int stop_magiskhide();
-
-// Scripting
-void exec_script(const char *script);
-void exec_common_scripts(const char *stage);
-void exec_module_scripts(const char *stage, const std::vector<std::string> &module_list);
-void install_apk(const char *apk);
-[[noreturn]] void install_module(const char *file);

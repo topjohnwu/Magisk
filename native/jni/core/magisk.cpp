@@ -7,6 +7,8 @@
 #include <selinux.hpp>
 #include <flags.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
 [[noreturn]] static void usage() {

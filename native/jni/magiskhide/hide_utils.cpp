@@ -267,7 +267,7 @@ static void update_hide_config() {
     db_err(err);
 }
 
-int launch_magiskhide() {
+int launch_magiskhide(bool late_props) {
     mutex_guard g(hide_state_lock);
 
     if (SDK_INT < 19)
@@ -289,7 +289,7 @@ int launch_magiskhide() {
         return DAEMON_ERROR;
 
     hide_sensitive_props();
-    if (DAEMON_STATE >= STATE_BOOT_COMPLETE || DAEMON_STATE == STATE_NONE)
+    if (late_props)
         hide_late_sensitive_props();
 
 #if ENABLE_PTRACE_MONITOR
@@ -320,7 +320,7 @@ int stop_magiskhide() {
     return DAEMON_SUCCESS;
 }
 
-void auto_start_magiskhide() {
+void auto_start_magiskhide(bool late_props) {
     if (hide_enabled()) {
 #if ENABLE_PTRACE_MONITOR
         pthread_kill(monitor_thread, SIGALRM);
@@ -330,7 +330,7 @@ void auto_start_magiskhide() {
         db_settings dbs;
         get_db_settings(dbs, HIDE_CONFIG);
         if (dbs[HIDE_CONFIG])
-            launch_magiskhide();
+            launch_magiskhide(late_props);
     }
 }
 
