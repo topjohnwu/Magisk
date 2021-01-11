@@ -157,6 +157,12 @@
     <string name="settings_su_app">Vetëm aplikacionet</string>
     <string name="settings_su_adb">Vetëm ADB</string>
     <string name="settings_su_disable">Çaktivizuar</string>
+    <string name="settings_su_request_10">10 Sekonda</string>
+    <string name="settings_su_request_15">15 Sekonda</string>
+    <string name="settings_su_request_20">20 Sekonda</string>
+    <string name="settings_su_request_30">30 Sekonda</string>
+    <string name="settings_su_request_45">45 Sekonda</string>
+    <string name="settings_su_request_60">60 Sekonda</string>
     <string name="superuser_access">Hyrja në superpërdorues</string>
     <string name="auto_response">Përgjigje Automatike</string>
     <string name="request_timeout">Koha e kërkesës</string>
