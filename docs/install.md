@@ -17,7 +17,7 @@ Download and install the latest Magisk Manager. We use the app to gather some in
 
 <p align="center"><img src="images/device_info.png" width="500"/></p>
 
-Pay special attention to the **Ramdisk** info. If the result is **Yes**, congratulations, your device is perfect for installing Magisk! However, if the result is **No**, this means your device's boot partition does **NOT** include ramdisk, and unfortunately you would have to go through some hoops to make Magisk work properly.
+Pay special attention to the **Ramdisk** info. If the result is **Yes**, congratulations, your device is perfect for installing Magisk! However, if the result is **No** this means your device's boot partition does **NOT** include ramdisk. This means you will have to go through some extra steps to make Magisk work properly.
 
 > **If your device does not have boot ramdisk, read the [Magisk in Recovery](#magisk-in-recovery) section after installing. The information in that section is VERY important!**
 
@@ -27,15 +27,15 @@ If you are using a Huawei device and the **SAR** result is **Yes**, please check
 
 Otherwise, continue to [Patching Images](#patching-images).
 
-(P.S.1 If your device have boot ramdisk, you can also install with [Custom Recovery](#custom-recovery))<br>
+(P.S.1 If your device has boot ramdisk, you can also install with [Custom Recovery](#custom-recovery))<br>
 (P.S.2 If you are interested in how Android boots and how it affects Magisk, check out [this document](boot.md))
 
 ## Patching Images
 
-If your device have boot ramdisk, you need a copy of the `boot.img`<br>
+If your device has boot ramdisk, you need a copy of the `boot.img`<br>
 If your device does **NOT** have boot ramdisk, you need a copy of the `recovery.img`
 
-You should be able to extract either of them from official firmware packages, your custom ROM zip (if using one), or go to [XDA-Developers](https://forum.xda-developers.com/) and seek for resources, guides, discussions, or ask for help in your device's forum.
+You should be able to extract the file you need from official firmware packages or your custom ROM zip (if using one). If you are still having trouble, go to [XDA-Developers](https://forum.xda-developers.com/) and look for resources, guides, discussions, or ask for help in your device's forum.
 
 - Copy the boot/recovery image to your device
 - Press the **Install** button in the Magisk card
@@ -52,7 +52,7 @@ For most devices, reboot into fastboot mode and flash with command:<br>
 
 ## Custom Recovery
 
-In some custom recoveries of modern devices, the installer scripts either cannot properly detect the correct device info, or the recovery environment does not meet its expectation, causing the installation to fail (or looks like success but actually bootloops). If you face any issues, use the [Patch Image](#patching-images) method as it is guaranteed to work 100% of the time. Due to this reason, we no longer recommend installing Magisk through custom recoveries on modern devices. The custom recovery installation method exists mostly for legacy support.
+In some custom recoveries the installation may fail (this may look like success but actually bootloops). This is because the installer scripts cannot properly detect the correct device info or the recovery environment does not meet its expectation. If you face any issues, use the [Patch Image](#patching-images) method as it is guaranteed to work 100% of the time. Due to this reason, we no longer recommend installing Magisk through custom recoveries on modern devices. The custom recovery installation method exists mostly for legacy support.
 
 - Download the Magisk installer zip
 - Reboot to custom recovery
@@ -65,7 +65,7 @@ If your device does not have ramdisk in boot images, Magisk has no choice but to
 
 When Magisk is installed in your recovery, **you CANNOT use custom recoveries to install/upgrade Magisk!** The only way to install/upgrade Magisk is through Magisk Manager. The app will be aware of your device state and install to the correct partition and reboot into the correct mode.
 
-Since Magisk now hijacks the recovery of the device, there is a mechanism to let you *actually* boot into recovery mode when needed: it is determined by **how long you press volume up**.
+Since Magisk now hijacks the recovery of the device, there is a mechanism to let you *actually* boot into recovery mode when needed: it is determined by **how long you press the recovery key combo**.
 
 Each device has its own key combo to boot into recovery, as an example for Galaxy S10 it is (Power + Bixby + Volume Up). A quick Google search should easily get you this info of your device. As soon as you press the combo and the device vibrates with a splash screen, release all buttons to boot into Magisk. If you decide to boot into actual recovery mode, continue to press volume up until you see the recovery screen.
 
