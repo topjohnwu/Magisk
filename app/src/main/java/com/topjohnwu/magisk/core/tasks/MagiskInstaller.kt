@@ -191,9 +191,10 @@ abstract class MagiskInstallImpl : KoinComponent {
                     if (rawData.size < 256)
                         continue
 
-                    // Patch flags to AVB_VBMETA_IMAGE_FLAGS_VERIFICATION_DISABLED
+                    // Patch flags to AVB_VBMETA_IMAGE_FLAGS_HASHTREE_DISABLED |
+                    // AVB_VBMETA_IMAGE_FLAGS_VERIFICATION_DISABLED
                     console.add("-- Patching: vbmeta.img")
-                    ByteBuffer.wrap(rawData).putInt(120, 2)
+                    ByteBuffer.wrap(rawData).putInt(120, 3)
                     tarOut.putNextEntry(newEntry("vbmeta.img", rawData.size.toLong()))
                     tarOut.write(rawData)
                 } else {
@@ -204,7 +205,7 @@ abstract class MagiskInstallImpl : KoinComponent {
             }
             val boot = SuFile.open(installDir, "boot.img")
             val recovery = SuFile.open(installDir, "recovery.img")
-            if (recovery.exists() && boot.exists()) {
+            if (Config.recovery && recovery.exists() && boot.exists()) {
                 // Install Magisk to recovery
                 srcBoot = recovery.path
                 // Repack boot image to prevent restore
