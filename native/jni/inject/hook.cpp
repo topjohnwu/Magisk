@@ -3,6 +3,7 @@
 #include <xhook.h>
 #include <utils.hpp>
 #include <flags.hpp>
+#include <daemon.hpp>
 
 #include "inject.hpp"
 
@@ -17,18 +18,11 @@ using namespace std;
     extern const JNINativeMethod name##_methods[]; \
     extern const int name##_methods_num;
 
-// For some reason static vectors won't work, use pointers instead
-static vector<tuple<const char *, const char *, void **>> *xhook_list;
-static vector<JNINativeMethod> *jni_list;
-
-static JavaVM *g_jvm;
-static int prev_fork_pid = -1;
-
 namespace {
 
 struct HookContext {
     int pid;
-    bool unload;
+    bool do_hide;
 };
 
 // JNI method declarations
@@ -37,6 +31,14 @@ DCL_JNI_FUNC(nativeSpecializeAppProcess)
 DCL_JNI_FUNC(nativeForkSystemServer)
 
 }
+
+// For some reason static vectors won't work, use pointers instead
+static vector<tuple<const char *, const char *, void **>> *xhook_list;
+static vector<JNINativeMethod> *jni_list;
+
+static JavaVM *g_jvm;
+static int prev_fork_pid = -1;
+static HookContext *current_ctx;
 
 #define HOOK_JNI(method) \
 if (newMethods[i].name == #method##sv) { \
@@ -90,6 +92,17 @@ DCL_HOOK_FUNC(int, fork) {
     return pid;
 }
 
+DCL_HOOK_FUNC(int, selinux_android_setcontext,
+        uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
+    if (current_ctx && current_ctx->do_hide) {
+        // Ask magiskd to hide ourselves before switching context
+        // because magiskd socket is not accessible on Android 8.0+
+        remote_request_hide();
+        LOGD("hook: process successfully hidden\n");
+    }
+    return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
+}
+
 static int sigmask(int how, int signum) {
     sigset_t set;
     sigemptyset(&set);
@@ -106,10 +119,43 @@ static int pre_specialize_fork() {
 
 // -----------------------------------------------------------------
 
+static void nativeSpecializeAppProcess_pre(HookContext *ctx,
+        JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
+        jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
+        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
+        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
+        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
+        jboolean &mount_storage_dirs) {
+
+    current_ctx = ctx;
+
+    const char *process = env->GetStringUTFChars(nice_name, nullptr);
+    LOGD("hook: %s %s\n", __FUNCTION__, process);
+
+    if (mount_external != 0  /* TODO: Handle MOUNT_EXTERNAL_NONE cases */
+        && remote_check_hide(uid, process)) {
+        ctx->do_hide = true;
+        LOGI("hook: [%s] should be hidden\n", process);
+    }
+
+    env->ReleaseStringUTFChars(nice_name, process);
+}
+
+static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    LOGD("hook: %s\n", __FUNCTION__);
+
+    if (ctx->do_hide)
+        self_unload();
+
+    current_ctx = nullptr;
+}
+
+// -----------------------------------------------------------------
+
 static void nativeForkAndSpecialize_pre(HookContext *ctx,
         JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
         jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
-        jintArray &fds_to_close, jintArray &fds_to_ignore,  /* These 2 arguments are unique to fork */
+        jintArray fds_to_close, jintArray fds_to_ignore,  /* These 2 arguments are unique to fork */
         jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
         jboolean &is_top_app, jobjectArray &pkg_data_info_list,
         jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
@@ -120,40 +166,19 @@ static void nativeForkAndSpecialize_pre(HookContext *ctx,
     if (ctx->pid != 0)
         return;
 
-    // TODO: check if we need to do hiding
-    // Demonstrate self unload in child process
-    ctx->unload = true;
-
-    LOGD("hook: %s\n", __FUNCTION__);
+    nativeSpecializeAppProcess_pre(
+            ctx, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+            nice_name, is_child_zygote, instruction_set, app_data_dir, is_top_app,
+            pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs);
 }
 
 static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
     // Unblock SIGCHLD in case the original method didn't
     sigmask(SIG_UNBLOCK, SIGCHLD);
-
     if (ctx->pid != 0)
         return;
 
-    LOGD("hook: %s\n", __FUNCTION__);
-
-    if (ctx->unload)
-        self_unload();
-}
-
-// -----------------------------------------------------------------
-
-static void nativeSpecializeAppProcess_pre(HookContext *ctx,
-        JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-        jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
-        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
-        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
-        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
-        jboolean &mount_storage_dirs) {
-    LOGD("hook: %s\n", __FUNCTION__);
-}
-
-static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
-    LOGD("hook: %s\n", __FUNCTION__);
+    nativeSpecializeAppProcess_post(ctx, env, clazz);
 }
 
 // -----------------------------------------------------------------
@@ -167,6 +192,7 @@ static void nativeForkSystemServer_pre(HookContext *ctx,
     if (ctx->pid != 0)
         return;
 
+    current_ctx = ctx;
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
@@ -178,6 +204,7 @@ static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass cl
         return;
 
     LOGD("hook: %s\n", __FUNCTION__);
+    current_ctx = nullptr;
 }
 
 // -----------------------------------------------------------------
@@ -216,6 +243,7 @@ void hook_functions() {
 
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", jniRegisterNativeMethods);
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", fork);
+    XHOOK_REGISTER(".*\\libandroid_runtime.so$", selinux_android_setcontext);
     hook_refresh();
 }
 

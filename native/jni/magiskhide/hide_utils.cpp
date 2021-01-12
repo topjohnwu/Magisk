@@ -274,7 +274,7 @@ int launch_magiskhide(bool late_props) {
     if (hide_state)
         return HIDE_IS_ENABLED;
 
-    if (access("/proc/1/ns/mnt", F_OK) != 0)
+    if (access("/proc/self/ns/mnt", F_OK) != 0)
         return HIDE_NO_NS;
 
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
@@ -344,3 +344,36 @@ void test_proc_monitor() {
     proc_monitor();
 }
 #endif
+
+int check_uid_map(int client) {
+    mutex_guard lock(hide_state_lock);
+
+    if (!hide_state)
+        return 0;
+
+    int uid = read_int(client);
+    string process = read_string(client);
+
+    if (uid % 100000 > 90000) {
+        // Isolated process
+        auto it = uid_proc_map.find(-1);
+        if (it == uid_proc_map.end())
+            return 0;
+
+        for (auto &s : it->second) {
+            if (str_starts(process, s))
+                return 1;
+        }
+    } else {
+        auto it = uid_proc_map.find(uid);
+        if (it == uid_proc_map.end())
+            return 0;
+
+        for (auto &s : it->second) {
+            if (process == s)
+                return 1;
+        }
+    }
+
+    return 0;
+}

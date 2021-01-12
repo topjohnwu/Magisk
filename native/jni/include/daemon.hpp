@@ -44,9 +44,13 @@ int connect_daemon(bool create = false);
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
-void magiskhide_handler(int client);
+void magiskhide_handler(int client, ucred *cred);
 void su_daemon_handler(int client, ucred *credential);
 
 // MagiskHide
 void auto_start_magiskhide(bool late_props);
 int stop_magiskhide();
+
+// For injected process to access daemon
+int remote_check_hide(int uid, const char *process);
+void remote_request_hide();

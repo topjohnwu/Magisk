@@ -36,10 +36,20 @@ static bool verify_client(pid_t pid) {
     return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
 }
 
+static bool check_zygote(pid_t pid) {
+    char buf[32];
+    sprintf(buf, "/proc/%d/attr/current", pid);
+    auto fp = open_file(buf, "r");
+    if (!fp)
+        return false;
+    fscanf(fp.get(), "%s", buf);
+    return buf == "u:r:zygote:s0"sv;
+}
+
 static void request_handler(int client, int req_code, ucred cred) {
     switch (req_code) {
     case MAGISKHIDE:
-        magiskhide_handler(client);
+        magiskhide_handler(client, &cred);
         break;
     case SUPERUSER:
         su_daemon_handler(client, &cred);
@@ -74,7 +84,12 @@ static void handle_request(int client) {
     // Verify client credentials
     ucred cred;
     get_client_cred(client, &cred);
-    if (cred.uid != 0 && !verify_client(cred.pid))
+
+    bool is_root = cred.uid == 0;
+    bool is_zygote = check_zygote(cred.pid);
+    bool is_client = verify_client(cred.pid);
+
+    if (!is_root && !is_zygote && !is_client)
         goto shortcut;
 
     req_code = read_int(client);
@@ -83,13 +98,12 @@ static void handle_request(int client) {
 
     // Check client permissions
     switch (req_code) {
-    case MAGISKHIDE:
     case POST_FS_DATA:
     case LATE_START:
     case BOOT_COMPLETE:
     case SQLITE_CMD:
     case GET_PATH:
-        if (cred.uid != 0) {
+        if (!is_root) {
             write_int(client, ROOT_REQUIRED);
             goto shortcut;
         }
@@ -97,6 +111,12 @@ static void handle_request(int client) {
     case REMOVE_MODULES:
         if (cred.uid != UID_SHELL && cred.uid != UID_ROOT) {
             write_int(client, 1);
+            goto shortcut;
+        }
+        break;
+    case MAGISKHIDE:  // accept hide request from zygote
+        if (!is_root && !is_zygote) {
+            write_int(client, ROOT_REQUIRED);
             goto shortcut;
         }
         break;

@@ -15,7 +15,7 @@
 #define ISOLATED_MAGIC "isolated"
 
 // Global toggle for ptrace monitor
-#define ENABLE_PTRACE_MONITOR 1
+#define ENABLE_PTRACE_MONITOR 0
 
 // CLI entries
 int launch_magiskhide(bool late_props);
@@ -23,6 +23,7 @@ int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
+int check_uid_map(int client);
 
 #if ENABLE_PTRACE_MONITOR
 // Process monitoring
@@ -52,6 +53,8 @@ enum {
     RM_HIDELIST,
     LS_HIDELIST,
     HIDE_STATUS,
+    REMOTE_CHECK_HIDE,
+    REMOTE_DO_HIDE
 };
 
 enum {

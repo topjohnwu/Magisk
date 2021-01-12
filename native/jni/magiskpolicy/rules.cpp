@@ -106,13 +106,14 @@ void sepolicy::magisk_rules() {
         // Don't allow pesky processes to monitor audit deny logs when poking magisk daemon socket
         dontaudit(ALL, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
 
-        // Only allow client processes to connect to magisk daemon socket
+        // Only allow client processes and zygote to connect to magisk daemon socket
         allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
+        allow("zygote", SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
     } else {
         // Fallback to poking holes in sandbox as Android 4.3 to 7.1 set PR_SET_NO_NEW_PRIVS
 
         // Allow these processes to access MagiskSU
-        const char *clients[] { "init", "shell", "appdomain" };
+        const char *clients[] { "init", "shell", "appdomain", "zygote" };
         for (auto type : clients) {
             if (!exists(type))
                 continue;

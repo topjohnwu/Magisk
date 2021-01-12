@@ -77,7 +77,6 @@ static void lazy_unmount(const char* mountpoint) {
         LOGD("hide: Unmounted (%s)\n", mountpoint);
 }
 
-#if ENABLE_PTRACE_MONITOR
 void hide_daemon(int pid) {
     if (fork_dont_care() == 0) {
         hide_unmount(pid);
@@ -86,7 +85,6 @@ void hide_daemon(int pid) {
         _exit(0);
     }
 }
-#endif
 
 #define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && \
 strncmp(mentry->mnt_dir, "/" #dir, sizeof("/" #dir) - 1) == 0)
