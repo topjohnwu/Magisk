@@ -139,7 +139,7 @@
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
     <string name="settings_clear_cache_title">Smazat mezipaměť</string>
     <string name="settings_clear_cache_summary">Smažete online informace o použití z mezipaměti, a tím vynutíte na aplikaci obnovení online informací.</string>
-    <string name="settings_hide_manager_title">Skrýt Magisk Manager/string>
+    <string name="settings_hide_manager_title">Skrýt Magisk Manager</string>
     <string name="settings_hide_manager_summary">Nahradíte Magisk Manager náhodným názvem balíčku.</string>
     <string name="settings_restore_manager_title">Obnovit Magisk Manager</string>
     <string name="settings_restore_manager_summary">Obnovíte Magisk Manager na původní název balíčku.</string>
