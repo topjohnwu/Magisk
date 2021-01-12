@@ -369,8 +369,8 @@ bool validate_manager(string &pkg, int userid, struct stat *st) {
 
 void exec_sql(int client) {
     run_finally f([=]{ close(client); });
-    char *sql = read_string(client);
-    char *err = db_exec(sql, [&](db_row &row) -> bool {
+    string sql = read_string(client);
+    char *err = db_exec(sql.data(), [client](db_row &row) -> bool {
         string out;
         bool first = true;
         for (auto it : row) {
@@ -380,11 +380,9 @@ void exec_sql(int client) {
             out += '=';
             out += it.second;
         }
-        write_int(client, out.length());
-        xwrite(client, out.data(), out.length());
+        write_string(client, out);
         return true;
     });
-    free(sql);
     write_int(client, 0);
     db_err_cmd(err, return; );
 }

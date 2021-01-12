@@ -160,11 +160,9 @@ static int add_list(const char *pkg, const char *proc) {
 }
 
 int add_list(int client) {
-    char *pkg = read_string(client);
-    char *proc = read_string(client);
-    int ret = add_list(pkg, proc);
-    free(pkg);
-    free(proc);
+    string pkg = read_string(client);
+    string proc = read_string(client);
+    int ret = add_list(pkg.data(), proc.data());
     if (ret == DAEMON_SUCCESS)
         update_uid_map();
     return ret;
@@ -200,11 +198,9 @@ static int rm_list(const char *pkg, const char *proc) {
 }
 
 int rm_list(int client) {
-    char *pkg = read_string(client);
-    char *proc = read_string(client);
-    int ret = rm_list(pkg, proc);
-    free(pkg);
-    free(proc);
+    string pkg = read_string(client);
+    string proc = read_string(client);
+    int ret = rm_list(pkg.data(), proc.data());
     if (ret == DAEMON_SUCCESS)
         update_uid_map();
     return ret;
@@ -246,16 +242,18 @@ static bool init_list() {
     if (MAGISKTMP != "/sbin")
         add_hide_set(GMS_PKG, GMS_PKG);
 
-    update_uid_map();
     return true;
 }
 
 void ls_list(int client) {
-    FILE *out = fdopen(recv_fd(client), "a");
-    for (auto &hide : hide_set)
-        fprintf(out, "%s|%s\n", hide.first.data(), hide.second.data());
-    fclose(out);
     write_int(client, DAEMON_SUCCESS);
+    for (auto &hide : hide_set) {
+        write_int(client, hide.first.size() + hide.second.size() + 1);
+        xwrite(client, hide.first.data(), hide.first.size());
+        xwrite(client, "|", 1);
+        xwrite(client, hide.second.data(), hide.second.size());
+    }
+    write_int(client, 0);
     close(client);
 }
 
@@ -268,7 +266,7 @@ static void update_hide_config() {
 }
 
 int launch_magiskhide(bool late_props) {
-    mutex_guard g(hide_state_lock);
+    mutex_guard lock(hide_state_lock);
 
     if (SDK_INT < 19)
         return DAEMON_ERROR;
@@ -300,6 +298,11 @@ int launch_magiskhide(bool late_props) {
 
     hide_state = true;
     update_hide_config();
+
+    // Unlock here or else we'll be stuck in deadlock
+    lock.unlock();
+
+    update_uid_map();
     return DAEMON_SUCCESS;
 }
 

@@ -56,9 +56,8 @@ int magisk_main(int argc, char *argv[]) {
     } else if (argv[1] == "-v"sv) {
         int fd = connect_daemon();
         write_int(fd, CHECK_VERSION);
-        char *v = read_string(fd);
-        printf("%s\n", v);
-        free(v);
+        string v = read_string(fd);
+        printf("%s\n", v.data());
         return 0;
     } else if (argv[1] == "-V"sv) {
         int fd = connect_daemon();
@@ -101,13 +100,12 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon();
         write_int(fd, SQLITE_CMD);
         write_string(fd, argv[2]);
+        string res;
         for (;;) {
-            char *res = read_string(fd);
-            if (res[0] == '\0') {
+            read_string(fd, res);
+            if (res.empty())
                 return 0;
-            }
-            printf("%s\n", res);
-            free(res);
+            printf("%s\n", res.data());
         }
     } else if (argv[1] == "--remove-modules"sv) {
         int fd = connect_daemon();
@@ -116,8 +114,8 @@ int magisk_main(int argc, char *argv[]) {
     } else if (argv[1] == "--path"sv) {
         int fd = connect_daemon();
         write_int(fd, GET_PATH);
-        char *path = read_string(fd);
-        printf("%s\n", path);
+        string path = read_string(fd);
+        printf("%s\n", path.data());
         return 0;
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);

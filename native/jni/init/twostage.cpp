@@ -196,9 +196,8 @@ void SARInit::first_stage_prep() {
         int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
 
         // Write backup files
-        char *tmp_dir = read_string(client);
-        chdir(tmp_dir);
-        free(tmp_dir);
+        string tmp_dir = read_string(client);
+        chdir(tmp_dir.data());
         int cfg = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
         xwrite(cfg, config.buf, config.sz);
         close(cfg);

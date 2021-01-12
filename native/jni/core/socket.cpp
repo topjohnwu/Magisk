@@ -4,6 +4,8 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
+using namespace std;
+
 static size_t socket_len(sockaddr_un *sun) {
     if (sun->sun_path[0])
         return sizeof(sa_family_t) + strlen(sun->sun_path) + 1;
@@ -160,43 +162,21 @@ void write_int_be(int fd, int val) {
     xwrite(fd, &nl, sizeof(nl));
 }
 
-static char *rd_str(int fd, int len) {
-    char *val = (char *) xmalloc(sizeof(char) * (len + 1));
-    xxread(fd, val, len);
-    val[len] = '\0';
-    return val;
-}
-
-char* read_string(int fd) {
+void read_string(int fd, std::string &str) {
     int len = read_int(fd);
-    return rd_str(fd, len);
+    str.clear();
+    str.resize(len);
+    xxread(fd, str.data(), len);
 }
 
-char* read_string_be(int fd) {
-    int len = read_int_be(fd);
-    return rd_str(fd, len);
+string read_string(int fd) {
+    string str;
+    read_string(fd, str);
+    return str;
 }
 
-void write_string(int fd, const char *val) {
+void write_string(int fd, string_view str) {
     if (fd < 0) return;
-    int len = strlen(val);
-    write_int(fd, len);
-    xwrite(fd, val, len);
-}
-
-void write_string_be(int fd, const char *val) {
-    int len = strlen(val);
-    write_int_be(fd, len);
-    xwrite(fd, val, len);
-}
-
-void write_key_value(int fd, const char *key, const char *val) {
-    write_string_be(fd, key);
-    write_string_be(fd, val);
-}
-
-void write_key_token(int fd, const char *key, int tok) {
-    char val[16];
-    sprintf(val, "%d", tok);
-    write_key_value(fd, key, val);
+    write_int(fd, str.size());
+    xwrite(fd, str.data(), str.size());
 }

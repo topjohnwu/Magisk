@@ -45,19 +45,9 @@ struct su_req_base {
 } __attribute__((packed));
 
 struct su_request : public su_req_base {
-    const char *shell = DEFAULT_SHELL;
-    const char *command = "";
-    su_request(bool dyn = false) : dyn(dyn) {}
-    ~su_request() {
-        if (dyn) {
-            free(const_cast<char*>(shell));
-            free(const_cast<char*>(command));
-        }
-    }
-
-private:
-    bool dyn;
-} __attribute__((packed));
+    std::string shell = DEFAULT_SHELL;
+    std::string command;
+};
 
 struct su_context {
     std::shared_ptr<su_info> info;

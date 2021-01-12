@@ -5,7 +5,7 @@
 
 #include "magiskhide.hpp"
 
-using namespace std::literals;
+using namespace std;
 
 [[noreturn]] static void usage(char *arg0) {
     fprintf(stderr,
@@ -112,8 +112,6 @@ int magiskhide_main(int argc, char *argv[]) {
         write_string(fd, argv[2]);
         write_string(fd, argv[3] ? argv[3] : "");
     }
-    if (req == LS_HIDELIST)
-        send_fd(fd, STDOUT_FILENO);
 
     // Get response
     int code = read_int(fd);
@@ -122,30 +120,41 @@ int magiskhide_main(int argc, char *argv[]) {
         break;
     case HIDE_NOT_ENABLED:
         fprintf(stderr, "MagiskHide is not enabled\n");
-        break;
+        goto return_code;
     case HIDE_IS_ENABLED:
         fprintf(stderr, "MagiskHide is enabled\n");
-        break;
+        goto return_code;
     case HIDE_ITEM_EXIST:
         fprintf(stderr, "Target already exists in hide list\n");
-        break;
+        goto return_code;
     case HIDE_ITEM_NOT_EXIST:
         fprintf(stderr, "Target does not exist in hide list\n");
-        break;
+        goto return_code;
     case HIDE_NO_NS:
         fprintf(stderr, "Your kernel doesn't support mount namespace\n");
-        break;
+        goto return_code;
     case HIDE_INVALID_PKG:
         fprintf(stderr, "Invalid package / process name\n");
-        break;
+        goto return_code;
     case ROOT_REQUIRED:
         fprintf(stderr, "Root is required for this operation\n");
-        break;
+        goto return_code;
     case DAEMON_ERROR:
     default:
         fprintf(stderr, "Daemon error\n");
         return DAEMON_ERROR;
     }
 
+    if (req == LS_HIDELIST) {
+        string res;
+        for (;;) {
+            read_string(fd, res);
+            if (res.empty())
+                break;
+            printf("%s\n", res.data());
+        }
+    }
+
+return_code:
     return req == HIDE_STATUS ? (code == HIDE_IS_ENABLED ? 0 : 1) : code != DAEMON_SUCCESS;
 }

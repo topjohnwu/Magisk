@@ -30,7 +30,7 @@ enum {
 ? info->uid / 100000 : 0)
 
 #define get_cmd(to) \
-(to.command[0] ? to.command : to.shell[0] ? to.shell : DEFAULT_SHELL)
+(to.command.empty() ? (to.shell.empty() ? DEFAULT_SHELL : to.shell.data()) : to.command.data())
 
 class Extra {
     const char *key;
@@ -42,7 +42,7 @@ class Extra {
     union {
         int int_val;
         bool bool_val;
-        const char * str_val;
+        const char *str_val;
     };
     char buf[32];
 public:

@@ -13,15 +13,13 @@ public:
     explicit mutex_guard(pthread_mutex_t &m): mutex(&m) {
         pthread_mutex_lock(mutex);
     }
-
-    explicit mutex_guard(pthread_mutex_t *m): mutex(m) {
-        pthread_mutex_lock(mutex);
-    }
-
-    ~mutex_guard() {
+    void unlock() {
         pthread_mutex_unlock(mutex);
+        mutex = nullptr;
     }
-
+    ~mutex_guard() {
+        if (mutex) pthread_mutex_unlock(mutex);
+    }
 private:
     pthread_mutex_t *mutex;
 };

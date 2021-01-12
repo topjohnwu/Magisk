@@ -43,18 +43,6 @@ static void usage(int status) {
     exit(status);
 }
 
-static char *concat_commands(int argc, char *argv[]) {
-    char command[ARG_MAX];
-    command[0] = '\0';
-    for (int i = optind - 1; i < argc; ++i) {
-        if (command[0])
-            sprintf(command, "%s %s", command, argv[i]);
-        else
-            strcpy(command, argv[i]);
-    }
-    return strdup(command);
-}
-
 static void sighandler(int sig) {
     restore_stdin();
 
@@ -114,7 +102,13 @@ int su_client_main(int argc, char *argv[]) {
     while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:M", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c':
-                su_req.command = concat_commands(argc, argv);
+                for (int i = optind - 1; i < argc; ++i) {
+                    if (!su_req.command.empty())
+                        su_req.command += ' ';
+                    su_req.command += '\'';
+                    su_req.command += argv[i];
+                    su_req.command += '\'';
+                }
                 optind = argc;
                 break;
             case 'h':

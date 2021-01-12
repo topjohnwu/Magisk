@@ -2,6 +2,7 @@
 
 #include <sys/un.h>
 #include <sys/socket.h>
+#include <string_view>
 
 socklen_t setup_sockaddr(sockaddr_un *sun, const char *name);
 int socket_accept(int sockfd, int timeout);
@@ -12,9 +13,6 @@ int read_int(int fd);
 int read_int_be(int fd);
 void write_int(int fd, int val);
 void write_int_be(int fd, int val);
-char *read_string(int fd);
-char *read_string_be(int fd);
-void write_string(int fd, const char *val);
-void write_string_be(int fd, const char *val);
-void write_key_value(int fd, const char *key, const char *val);
-void write_key_token(int fd, const char *key, int tok);
+std::string read_string(int fd);
+void read_string(int fd, std::string &str);
+void write_string(int fd, std::string_view str);
