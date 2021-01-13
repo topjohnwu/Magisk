@@ -21,22 +21,13 @@ struct file_attr {
 struct raw_file {
     std::string path;
     file_attr attr;
-    uint8_t *buf = nullptr;
-    size_t sz = 0;
+    uint8_t *buf;
+    size_t sz;
 
-    raw_file() = default;
+    raw_file() : attr({}), buf(nullptr), sz(0) {}
     raw_file(const raw_file&) = delete;
-    raw_file(raw_file &&d) {
-        path = std::move(d.path);
-        attr = d.attr;
-        buf = d.buf;
-        sz = d.sz;
-        d.buf = nullptr;
-        d.sz = 0;
-    }
-    ~raw_file() {
-        free(buf);
-    }
+    raw_file(raw_file &&o);
+    ~raw_file();
 };
 
 ssize_t fd_path(int fd, char *path, size_t size);

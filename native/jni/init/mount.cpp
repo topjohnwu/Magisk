@@ -289,7 +289,7 @@ success:
 }
 
 void RootFSInit::early_mount() {
-    self = raw_data::read("/init");
+    self = mmap_data::ro("/init");
 
     LOGD("Restoring /init\n");
     rename("/.backup/init", "/init");
@@ -301,9 +301,9 @@ void SARBase::backup_files() {
     if (access("/overlay.d", F_OK) == 0)
         backup_folder("/overlay.d", overlays);
 
-    self = raw_data::read("/proc/self/exe");
+    self = mmap_data::ro("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
-        config = raw_data::read("/.backup/.magisk");
+        config = mmap_data::ro("/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
@@ -346,7 +346,7 @@ void SARInit::early_mount() {
     switch_root("/system_root");
 
     {
-        auto init = raw_data::mmap_ro("/init");
+        auto init = mmap_data::ro("/init");
         is_two_stage = init.contains("selinux_setup");
     }
     LOGD("is_two_stage: [%d]\n", is_two_stage);
@@ -383,7 +383,7 @@ void BaseInit::exec_init() {
 static void patch_socket_name(const char *path) {
     char rstr[16];
     gen_rand_str(rstr, sizeof(rstr));
-    auto bin = raw_data::mmap_rw(path);
+    auto bin = mmap_data::rw(path);
     bin.patch({ make_pair(MAIN_SOCKET, rstr) });
 }
 

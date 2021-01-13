@@ -279,7 +279,6 @@ void *__mmap(const char *filename, size_t *size, bool rw) {
         return nullptr;
     }
     struct stat st;
-    void *buf;
     if (fstat(fd, &st)) {
         *size = 0;
         return nullptr;
@@ -288,7 +287,9 @@ void *__mmap(const char *filename, size_t *size, bool rw) {
         ioctl(fd, BLKGETSIZE64, size);
     else
         *size = st.st_size;
-    buf = *size > 0 ? xmmap(nullptr, *size, PROT_READ | (rw ? PROT_WRITE : 0), MAP_SHARED, fd, 0) : nullptr;
+    void *buf = *size > 0 ?
+            xmmap(nullptr, *size, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0) :
+            nullptr;
     close(fd);
     return buf;
 }
@@ -436,4 +437,17 @@ sDIR make_dir(DIR *dp) {
 
 sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
+}
+
+raw_file::raw_file(raw_file &&o) {
+    path.swap(o.path);
+    attr = o.attr;
+    buf = o.buf;
+    sz = o.sz;
+    o.buf = nullptr;
+    o.sz = 0;
+}
+
+raw_file::~raw_file() {
+    free(buf);
 }

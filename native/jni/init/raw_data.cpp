@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int data_holder::patch(str_pairs list) {
+int mmap_data::patch(str_pairs list) {
     if (buf == nullptr)
         return 0;
     int count = 0;
@@ -20,7 +20,7 @@ int data_holder::patch(str_pairs list) {
     return count;
 }
 
-bool data_holder::contains(string_view pattern) {
+bool mmap_data::contains(string_view pattern) {
     if (buf == nullptr)
         return false;
     for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
@@ -32,33 +32,21 @@ bool data_holder::contains(string_view pattern) {
     return false;
 }
 
-void data_holder::consume(data_holder &other) {
+void mmap_data::consume(mmap_data &other) {
     buf = other.buf;
     sz = other.sz;
     other.buf = nullptr;
     other.sz = 0;
 }
 
-auto_data<HEAP> raw_data::read(int fd) {
-    auto_data<HEAP> data;
-    fd_full_read(fd, data.buf, data.sz);
+mmap_data mmap_data::rw(const char *name) {
+    mmap_data data;
+    mmap_rw(name, data.buf, data.sz);
     return data;
 }
 
-auto_data<HEAP> raw_data::read(const char *name) {
-    auto_data<HEAP> data;
-    full_read(name, data.buf, data.sz);
-    return data;
-}
-
-auto_data<MMAP> raw_data::mmap_rw(const char *name) {
-    auto_data<MMAP> data;
-    ::mmap_rw(name, data.buf, data.sz);
-    return data;
-}
-
-auto_data<MMAP> raw_data::mmap_ro(const char *name) {
-    auto_data<MMAP> data;
-    ::mmap_ro(name, data.buf, data.sz);
+mmap_data mmap_data::ro(const char *name) {
+    mmap_data data;
+    mmap_ro(name, data.buf, data.sz);
     return data;
 }

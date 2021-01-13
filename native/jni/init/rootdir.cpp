@@ -218,7 +218,7 @@ void SARBase::patch_rootdir() {
     int patch_count;
     {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
-        auto init = raw_data::read(src);
+        auto init = mmap_data::ro("/init");
         patch_count = init.patch({
             make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
             make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
@@ -233,7 +233,7 @@ void SARBase::patch_rootdir() {
 
     if (patch_count != 2 && access(LIBSELINUX, F_OK) == 0) {
         // init is dynamically linked, need to patch libselinux
-        auto lib = raw_data::read(LIBSELINUX);
+        auto lib = mmap_data::ro(LIBSELINUX);
         lib.patch({make_pair(MONOPOLICY, sepol)});
         xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
         int dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
@@ -301,7 +301,7 @@ void RootFSInit::patch_rootfs() {
     }
 
     if (patch_sepolicy("/sepolicy")) {
-        auto init = raw_data::mmap_rw("/init");
+        auto init = mmap_data::rw("/init");
         init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
     }
 
@@ -331,8 +331,8 @@ void MagiskProxy::start() {
     xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
     // Backup stuffs before removing them
-    self = raw_data::read("/sbin/magisk");
-    config = raw_data::read("/.backup/.magisk");
+    self = mmap_data::ro("/sbin/magisk");
+    config = mmap_data::ro("/.backup/.magisk");
     char custom_rules_dir[64];
     custom_rules_dir[0] = '\0';
     xreadlink(TMP_RULESDIR, custom_rules_dir, sizeof(custom_rules_dir));

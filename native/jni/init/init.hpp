@@ -54,8 +54,8 @@ public:
 
 class MagiskInit : public BaseInit {
 protected:
-    auto_data<HEAP> self;
-    auto_data<HEAP> config;
+    mmap_data self;
+    mmap_data config;
     std::string custom_rules_dir;
 
     void mount_with_dt();
