@@ -312,7 +312,7 @@ object RequestTimeout : BaseSettingsItem.Selector() {
 
     override var value = selected
         set(value) = setV(value, field, { field = it }) {
-            Config.suDefaultTimeout = it
+            Config.suDefaultTimeout = entryValues[it].toInt()
         }
 
     private val selected: Int
