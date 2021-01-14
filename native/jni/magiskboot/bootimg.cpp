@@ -443,6 +443,7 @@ void repack(const char* src_img, const char* out_img, bool skip_comp) {
         uint32_t second;
         uint32_t extra;
         uint32_t dtb;
+        uint32_t total;
     } off;
 
     fprintf(stderr, "Repack to boot image: [%s]\n", out_img);
@@ -565,11 +566,12 @@ void repack(const char* src_img, const char* out_img, bool skip_comp) {
         restore_buf(fd, LG_BUMP_MAGIC, 16);
     }
 
+    off.total = lseek(fd, 0, SEEK_CUR);
+
     // Pad image to at least original size if not chromeos (as it requires post processing)
     if (!is_flag(CHROMEOS_FLAG)) {
-        auto current_sz = lseek(fd, 0, SEEK_CUR);
-        if (current_sz < boot.map_size) {
-            int padding = boot.map_size - current_sz;
+        if (off.total < boot.map_size) {
+            int padding = boot.map_size - off.total;
             write_zero(fd, padding);
         }
     }
@@ -642,11 +644,11 @@ void repack(const char* src_img, const char* out_img, bool skip_comp) {
         // DHTB header
         auto hdr = reinterpret_cast<dhtb_hdr *>(boot.map_addr);
         memcpy(hdr, DHTB_MAGIC, 8);
-        hdr->size = boot.map_size - sizeof(dhtb_hdr);
+        hdr->size = off.total - sizeof(dhtb_hdr);
         SHA256_hash(boot.map_addr + sizeof(dhtb_hdr), hdr->size, hdr->checksum);
     } else if (is_flag(BLOB_FLAG)) {
         // Blob header
         auto hdr = reinterpret_cast<blob_hdr *>(boot.map_addr);
-        hdr->size = boot.map_size - sizeof(blob_hdr);
+        hdr->size = off.total - sizeof(blob_hdr);
     }
 }
