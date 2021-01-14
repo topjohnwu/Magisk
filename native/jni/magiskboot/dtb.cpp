@@ -207,7 +207,7 @@ static bool fdt_patch(void *fdt) {
     int node;
     fdt_for_each_subnode(node, fdt, fstab) {
         const char *name = fdt_get_name(fdt, node, nullptr);
-        // Always patch verity if 2SI
+        // Force remove AVB for 2SI since it may bootloop some devices
         int len;
         auto value = (const char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
         string copy(value, len);
