@@ -9,12 +9,6 @@
 #include "init.hpp"
 #include "magiskrc.inc"
 
-#ifdef USE_64BIT
-#define LIBNAME "lib64"
-#else
-#define LIBNAME "lib"
-#endif
-
 using namespace std;
 
 static vector<string> rc_list;
@@ -182,7 +176,6 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 
 #define ROOTMIR     MIRRDIR "/system_root"
 #define MONOPOLICY  "/sepolicy"
-#define LIBSELINUX  "/system/" LIBNAME "/libselinux.so"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void SARBase::patch_rootdir() {
@@ -231,15 +224,25 @@ void SARBase::patch_rootdir() {
         close(dest);
     }
 
-    if (patch_count != 2 && access(LIBSELINUX, F_OK) == 0) {
+    if (patch_count != 2) {
         // init is dynamically linked, need to patch libselinux
-        auto lib = mmap_data::ro(LIBSELINUX);
-        lib.patch({make_pair(MONOPOLICY, sepol)});
-        xmkdirs(dirname(ROOTOVL LIBSELINUX), 0755);
-        int dest = xopen(ROOTOVL LIBSELINUX, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
-        xwrite(dest, lib.buf, lib.sz);
-        close(dest);
-        clone_attr(LIBSELINUX, ROOTOVL LIBSELINUX);
+        const char *path = "/system/lib64/libselinux.so";
+        if (access(path, F_OK) != 0) {
+            path = "/system/lib/libselinux.so";
+            if (access(path, F_OK) != 0)
+                path = nullptr;
+        }
+        if (path) {
+            char ovl[128];
+            sprintf(ovl, ROOTOVL "%s", path);
+            auto lib = mmap_data::ro(path);
+            lib.patch({make_pair(MONOPOLICY, sepol)});
+            xmkdirs(dirname(ovl), 0755);
+            int dest = xopen(ovl, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
+            xwrite(dest, lib.buf, lib.sz);
+            close(dest);
+            clone_attr(path, ovl);
+        }
     }
 
     // sepolicy
@@ -251,10 +254,9 @@ void SARBase::patch_rootdir() {
     if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
         LOGD("ACK init daemon to write backup files\n");
         // Let daemon know where tmp_dir is
-        write_string(sockfd, tmp_dir.data());
+        write_string(sockfd, tmp_dir);
         // Wait for daemon to finish restoring files
-        int ack;
-        read(sockfd, &ack, sizeof(ack));
+        read_int(sockfd);
     } else {
         LOGD("Restore backup files locally\n");
         restore_folder(ROOTOVL, overlays);

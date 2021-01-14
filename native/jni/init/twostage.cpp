@@ -142,8 +142,6 @@ void FirstStageInit::prepare() {
 #define REDIR_PATH "/system/bin/am"
 
 void SARInit::first_stage_prep() {
-    int pid = getpid();
-
     xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
 
     // Patch init binary
@@ -174,7 +172,7 @@ void SARInit::first_stage_prep() {
     sigaddset(&block, SIGUSR1);
     sigprocmask(SIG_BLOCK, &block, &old);
 
-    if (int child = xfork(); child) {
+    if (int child = xfork()) {
         LOGD("init daemon [%d]\n", child);
         // Wait for children signal
         int sig;
@@ -190,7 +188,7 @@ void SARInit::first_stage_prep() {
         xlisten(sockfd, 1);
 
         // Resume parent
-        kill(pid, SIGUSR1);
+        kill(getppid(), SIGUSR1);
 
         // Wait for second stage ack
         int client = xaccept4(sockfd, nullptr, nullptr, SOCK_CLOEXEC);
@@ -204,7 +202,7 @@ void SARInit::first_stage_prep() {
         restore_folder(ROOTOVL, overlays);
 
         // Ack and bail out!
-        write(sockfd, &sockfd, sizeof(sockfd));
+        write_int(sockfd, 0);
         close(client);
         close(sockfd);
 
