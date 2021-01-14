@@ -48,8 +48,8 @@ void magisk_cpio::patch() {
         auto cur = it++;
         bool fstab = (!keepverity || !keepforceencrypt) &&
                      S_ISREG(cur->second->mode) &&
-                     !str_starts(cur->first, ".backup") && 
-                     !str_contains(cur->first, "twrp") && 
+                     !str_starts(cur->first, ".backup") &&
+                     !str_contains(cur->first, "twrp") &&
                      !str_contains(cur->first, "recovery") &&
                      str_contains(cur->first, "fstab");
         if (!keepverity) {
@@ -73,7 +73,6 @@ void magisk_cpio::patch() {
 #define MAGISK_PATCHED    (1 << 0)
 #define UNSUPPORTED_CPIO  (1 << 1)
 #define COMPRESSED_CPIO   (1 << 2)
-#define TWO_STAGE_INIT    (1 << 3)
 
 int magisk_cpio::test() {
     for (auto file : UNSUPPORT_LIST)
@@ -86,9 +85,6 @@ int magisk_cpio::test() {
         flags |= COMPRESSED_CPIO | MAGISK_PATCHED;
         decompress();
     }
-
-    if (exists("apex") || exists("first_stage_ramdisk"))
-        flags |= TWO_STAGE_INIT;
 
     for (auto file : MAGISK_LIST) {
         if (exists(file)) {

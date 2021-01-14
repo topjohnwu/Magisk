@@ -142,18 +142,13 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-if [ $((STATUS & 4)) -ne 0 ]; then
-  ui_print "- Compressing ramdisk"
-  ./magiskboot cpio ramdisk.cpio compress
-fi
-
 rm -f ramdisk.cpio.orig config
 
 #################
 # Binary Patches
 #################
 
-for dt in dtb kernel_dtb extra recovery_dtbo; do
+for dt in dtb kernel_dtb extra; do
   [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patch fstab in $dt"
 done
 
