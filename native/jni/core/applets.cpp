@@ -20,10 +20,11 @@ static int call_applet(int argc, char *argv[]) {
             return (*applet_main[i])(argc, argv);
         }
     }
+#if ENABLE_INJECT
     if (str_starts(base, "app_process")) {
         return app_process_main(argc, argv);
     }
-
+#endif
     fprintf(stderr, "%s: applet not found\n", base.data());
     return 1;
 }

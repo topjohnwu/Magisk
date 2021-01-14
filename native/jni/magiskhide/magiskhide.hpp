@@ -14,21 +14,20 @@
 #define SIGTERMTHRD SIGUSR1
 #define ISOLATED_MAGIC "isolated"
 
-// Global toggle for ptrace monitor
-#define ENABLE_PTRACE_MONITOR 0
-
 // CLI entries
 int launch_magiskhide(bool late_props);
 int stop_magiskhide();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
-int check_uid_map(int client);
 
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
 // Process monitoring
 [[noreturn]] void proc_monitor();
 [[noreturn]] void test_proc_monitor();
+#else
+// Response whether target process should be hidden
+int check_uid_map(int client);
 #endif
 
 // Utility functions

@@ -20,7 +20,7 @@ map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 // Locks the variables above
 pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
 
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
 static pthread_t monitor_thread;
 #endif
 
@@ -290,7 +290,7 @@ int launch_magiskhide(bool late_props) {
     if (late_props)
         hide_late_sensitive_props();
 
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
     // Start monitoring
     if (new_daemon_thread(&proc_monitor))
         return DAEMON_ERROR;
@@ -313,7 +313,7 @@ int stop_magiskhide() {
         LOGI("* Disable MagiskHide\n");
         uid_proc_map.clear();
         hide_set.clear();
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
         pthread_kill(monitor_thread, SIGTERMTHRD);
 #endif
     }
@@ -325,7 +325,7 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide(bool late_props) {
     if (hide_enabled()) {
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
         pthread_kill(monitor_thread, SIGALRM);
 #endif
         hide_late_sensitive_props();
@@ -337,7 +337,7 @@ void auto_start_magiskhide(bool late_props) {
     }
 }
 
-#if ENABLE_PTRACE_MONITOR
+#if !ENABLE_INJECT
 void test_proc_monitor() {
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
         exit(1);
@@ -345,6 +345,7 @@ void test_proc_monitor() {
 }
 #endif
 
+#if ENABLE_INJECT
 int check_uid_map(int client) {
     mutex_guard lock(hide_state_lock);
 
@@ -377,3 +378,4 @@ int check_uid_map(int client) {
 
     return 0;
 }
+#endif

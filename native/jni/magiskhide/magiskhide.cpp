@@ -62,6 +62,7 @@ void magiskhide_handler(int client, ucred *cred) {
     case HIDE_STATUS:
         res = hide_enabled() ? HIDE_IS_ENABLED : HIDE_NOT_ENABLED;
         break;
+#if ENABLE_INJECT
     case REMOTE_CHECK_HIDE:
         res = check_uid_map(client);
         break;
@@ -71,6 +72,7 @@ void magiskhide_handler(int client, ucred *cred) {
         hide_daemon(cred->pid);
         close(client);
         return;
+#endif
     }
 
     write_int(client, res);
@@ -106,7 +108,7 @@ int magiskhide_main(int argc, char *argv[]) {
         execvp(argv[2], argv + 2);
         exit(1);
     }
-#if 0 && ENABLE_PTRACE_MONITOR
+#if 0 && !ENABLE_INJECT
     else if (opt == "test"sv)
         test_proc_monitor();
 #endif
@@ -168,6 +170,7 @@ return_code:
     return req == HIDE_STATUS ? (code == HIDE_IS_ENABLED ? 0 : 1) : code != DAEMON_SUCCESS;
 }
 
+#if ENABLE_INJECT
 int remote_check_hide(int uid, const char *process) {
     int fd = connect_daemon();
     write_int(fd, MAGISKHIDE);
@@ -190,3 +193,4 @@ void remote_request_hide() {
 
     close(fd);
 }
+#endif
