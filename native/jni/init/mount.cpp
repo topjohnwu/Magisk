@@ -228,9 +228,9 @@ void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
         if (setup_block(false) < 0)
             goto cache;
     }
-    // Try to mount with either ext4 or f2fs
-    // Failure means either FDE or metadata encryption
-    if (!do_mount("ext4") && !do_mount("f2fs"))
+    // WARNING: DO NOT ATTEMPT TO MOUNT F2FS AS IT MAY CRASH THE KERNEL
+    // Failure means either f2fs, FDE, or metadata encryption
+    if (!do_mount("ext4"))
         goto cache;
 
     strcpy(p, "/data/unencrypted");
