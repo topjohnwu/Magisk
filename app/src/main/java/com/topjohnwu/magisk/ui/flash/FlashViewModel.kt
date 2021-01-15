@@ -4,6 +4,8 @@ import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.Bindable
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -37,6 +39,9 @@ class FlashViewModel(
     @get:Bindable
     var behaviorText = resources.getString(R.string.flashing)
         set(value) = set(value, field, { field = it }, BR.behaviorText)
+
+    private val _subtitle = MutableLiveData<CharSequence>(behaviorText)
+    val subtitle = _subtitle as LiveData<CharSequence>
 
     val adapter = RvBindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
@@ -95,7 +100,7 @@ class FlashViewModel(
             success -> resources.getString(R.string.done)
             else -> resources.getString(R.string.failure)
         }
-        SnackbarEvent(behaviorText).publish()
+        _subtitle.postValue(behaviorText)
     }
 
     fun onMenuItemClicked(item: MenuItem): Boolean {

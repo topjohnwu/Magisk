@@ -32,6 +32,10 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
         super.onStart()
         setHasOptionsMenu(true)
         activity.setTitle(R.string.flash_screen_title)
+
+        viewModel.subtitle.observe(this) {
+            activity.supportActionBar?.subtitle = it
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
