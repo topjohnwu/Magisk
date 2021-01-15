@@ -124,52 +124,37 @@ static void dtb_print(const char *file, bool fstab) {
     munmap(dtb, size);
 }
 
+[[maybe_unused]]
 static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file);
 
 static bool dtb_patch(const char *file) {
     bool keep_verity = check_env("KEEPVERITY");
-    bool have_system = false;
-    vector<pair<char *, int>> flags_list;
 
     size_t size;
     uint8_t *dtb;
     fprintf(stderr, "Loading dtbs from [%s]\n", file);
     mmap_rw(file, dtb, size);
-    run_finally f([=]{ munmap(dtb, size); });
 
-    // First traverse through DTB to determine whether we need a rebuild
-    int dtb_num = 0;
+    bool patched = false;
     for (int i = 0; i < size; ++i) {
         if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
             auto fdt = dtb + i;
             if (int fstab = find_fstab(fdt); fstab >= 0) {
                 int node;
                 fdt_for_each_subnode(node, fdt, fstab) {
-                    const char *name = fdt_get_name(fdt, node, nullptr);
                     if (!keep_verity) {
                         int len;
                         char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
-                        flags_list.emplace_back(value, len);
+                        patched |= patch_verity(value, len) != len;
                     }
-                    if (name == "system"sv)
-                        have_system = true;
                 }
             }
             i += fdt_totalsize(fdt) - 1;
-            ++dtb_num;
         }
     }
 
-    if (!have_system) {
-        // Patch in place with rw mmap
-        bool patched = false;
-        for (auto &[value, len] : flags_list)
-            patched |= patch_verity(value, len) != len;
-        return patched;
-    } else {
-        // Need to rebuild dtb due to additional props
-        return dtb_patch_rebuild(dtb, size, file);
-    }
+    munmap(dtb, size);
+    return patched;
 }
 
 int dtb_commands(int argc, char *argv[]) {

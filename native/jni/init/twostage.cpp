@@ -57,36 +57,63 @@ void FirstStageInit::prepare() {
     }
 exit_loop:
 
-    if (fstab_file[0] == '\0') {
-        LOGI("Cannot find fstab file in ramdisk!\n");
-        return;
-    }
-
-    // Parse and load fstab file
+    // Try to load dt fstab
     vector<fstab_entry> fstab;
-    file_readline(fstab_file, [&](string_view l) -> bool {
-        if (l[0] == '#' || l.length() == 1)
+    read_dt_fstab(fstab);
+
+    if (!fstab.empty()) {
+        // Dump dt fstab to fstab file in rootfs and force init to use it instead
+
+        // All dt fstab entries should be first_stage_mount
+        for (auto &entry : fstab) {
+            if (!str_contains(entry.fsmgr_flags, "first_stage_mount")) {
+                if (!entry.fsmgr_flags.empty())
+                    entry.fsmgr_flags += ',';
+                entry.fsmgr_flags += "first_stage_mount";
+            }
+        }
+
+        if (fstab_file[0] == '\0') {
+            const char *suffix =
+                    cmd->fstab_suffix[0] ? cmd->fstab_suffix :
+                    (cmd->hardware[0] ? cmd->hardware :
+                    (cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr));
+            if (suffix == nullptr) {
+                LOGE("Cannot determine fstab suffix!\n");
+                return;
+            }
+            sprintf(fstab_file, "fstab.%s", suffix);
+        }
+
+        // Patch init to force IsDtFstabCompatible() return false
+        auto init = mmap_data::rw("/init");
+        init.patch({ make_pair("android,fstab", "xxx") });
+    } else {
+        // Parse and load the fstab file
+        file_readline(fstab_file, [&](string_view l) -> bool {
+            if (l[0] == '#' || l.length() == 1)
+                return true;
+            char *line = (char *) l.data();
+
+            int dev0, dev1, mnt_point0, mnt_point1, type0, type1,
+                    mnt_flags0, mnt_flags1, fsmgr_flags0, fsmgr_flags1;
+
+            sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
+                   &dev0, &dev1, &mnt_point0, &mnt_point1, &type0, &type1,
+                   &mnt_flags0, &mnt_flags1, &fsmgr_flags0, &fsmgr_flags1);
+
+            fstab_entry entry;
+
+            set_info(dev);
+            set_info(mnt_point);
+            set_info(type);
+            set_info(mnt_flags);
+            set_info(fsmgr_flags);
+
+            fstab.emplace_back(std::move(entry));
             return true;
-        char *line = (char *) l.data();
-
-        int dev0, dev1, mnt_point0, mnt_point1, type0, type1,
-                mnt_flags0, mnt_flags1, fsmgr_flags0, fsmgr_flags1;
-
-        sscanf(line, "%n%*s%n %n%*s%n %n%*s%n %n%*s%n %n%*s%n",
-               &dev0, &dev1, &mnt_point0, &mnt_point1, &type0, &type1,
-               &mnt_flags0, &mnt_flags1, &fsmgr_flags0, &fsmgr_flags1);
-
-        fstab_entry entry;
-
-        set_info(dev);
-        set_info(mnt_point);
-        set_info(type);
-        set_info(mnt_flags);
-        set_info(fsmgr_flags);
-
-        fstab.emplace_back(std::move(entry));
-        return true;
-    });
+        });
+    }
 
     {
         LOGD("Write fstab file: %s\n", fstab_file);
