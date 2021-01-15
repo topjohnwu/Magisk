@@ -345,10 +345,8 @@ void SARInit::early_mount() {
     mount_system_root();
     switch_root("/system_root");
 
-    {
-        auto init = mmap_data::ro("/init");
-        is_two_stage = init.contains("selinux_setup");
-    }
+    // Use the apex folder to determine whether 2SI (Android 10+)
+    is_two_stage = access("/apex", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
     if (!is_two_stage) {
