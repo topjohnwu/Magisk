@@ -29,6 +29,8 @@ struct fstab_entry {
 #define INIT_SOCKET "MAGISKINIT"
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 
+extern std::vector<std::string> mount_list;
+
 void load_kernel_info(cmdline *cmd);
 bool check_two_stage();
 int dump_magisk(const char *path, mode_t mode);
@@ -42,12 +44,11 @@ class BaseInit {
 protected:
     cmdline *cmd;
     char **argv;
-    std::vector<std::string> mount_list;
 
     [[noreturn]] void exec_init();
     void read_dt_fstab(std::vector<fstab_entry> &fstab);
 public:
-    BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv), mount_list{"/sys", "/proc"} {}
+    BaseInit(char *argv[], cmdline *cmd) : cmd(cmd), argv(argv) {}
     virtual ~BaseInit() = default;
     virtual void start() = 0;
 };
@@ -100,8 +101,6 @@ private:
 public:
     SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
         LOGD("%s\n", __FUNCTION__);
-        // Do not unmount /sys and /proc
-        mount_list.clear();
     };
     void start() override {
         prepare();

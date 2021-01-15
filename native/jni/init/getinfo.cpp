@@ -11,6 +11,8 @@
 
 using namespace std;
 
+vector<string> mount_list;
+
 template<typename Func>
 static void parse_cmdline(const Func &fn) {
     char cmdline[4096];
@@ -147,10 +149,13 @@ void load_kernel_info(cmdline *cmd) {
     xmkdir("/sys", 0755);
     xmount("sysfs", "/sys", "sysfs", 0, nullptr);
 
+    mount_list.emplace_back("/proc");
+    mount_list.emplace_back("/sys");
+
     // Log to kernel
     setup_klog();
 
-    parse_cmdline([=](string_view key, const char *value) -> void {
+    parse_cmdline([=](string_view key, const char *value) {
         if (key == "androidboot.slot_suffix") {
             strcpy(cmd->slot, value);
         } else if (key == "androidboot.slot") {
