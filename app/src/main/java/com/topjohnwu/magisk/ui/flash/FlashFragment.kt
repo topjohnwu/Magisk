@@ -34,7 +34,7 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
         activity.setTitle(R.string.flash_screen_title)
 
         viewModel.subtitle.observe(this) {
-            activity.supportActionBar?.subtitle = it
+            activity.supportActionBar?.setSubtitle(it)
         }
     }
 
