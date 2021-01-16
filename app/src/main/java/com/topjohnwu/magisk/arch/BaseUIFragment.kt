@@ -41,6 +41,11 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        activity.supportActionBar?.subtitle = null
+    }
+
     override fun onEventDispatched(event: ViewEvent) = when(event) {
         is ContextExecutor -> event(requireContext())
         is ActivityExecutor -> event(activity)

@@ -29,6 +29,6 @@ val viewModelModules = module {
     viewModel { MainViewModel() }
 
     // Legacy
-    viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args, get()) }
+    viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args) }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }

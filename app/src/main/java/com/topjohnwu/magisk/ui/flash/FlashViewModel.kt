@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.ui.flash
 
-import android.content.res.Resources
 import android.net.Uri
 import android.view.MenuItem
 import androidx.databinding.Bindable
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -26,17 +27,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FlashViewModel(
-    args: FlashFragmentArgs,
-    private val resources: Resources
+    args: FlashFragmentArgs
 ) : BaseViewModel() {
 
     @get:Bindable
     var showReboot = Shell.rootAccess()
         set(value) = set(value, field, { field = it }, BR.showReboot)
 
-    @get:Bindable
-    var behaviorText = resources.getString(R.string.flashing)
-        set(value) = set(value, field, { field = it }, BR.behaviorText)
+    private val _subtitle = MutableLiveData(R.string.flashing)
+    val subtitle get() = _subtitle as LiveData<Int>
 
     val adapter = RvBindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
@@ -91,9 +90,9 @@ class FlashViewModel(
 
     private fun onResult(success: Boolean) {
         state = if (success) State.LOADED else State.LOADING_FAILED
-        behaviorText = when {
-            success -> resources.getString(R.string.done)
-            else -> resources.getString(R.string.failure)
+        when {
+            success -> _subtitle.postValue(R.string.done)
+            else -> _subtitle.postValue(R.string.failure)
         }
     }
 
