@@ -211,6 +211,7 @@ static bool check_pid(int pid) {
         if (zit.second.st_ino == st.st_ino &&
             zit.second.st_dev == st.st_dev) {
             // ns not separated, abort
+            LOGW("proc_monitor: skip [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
             goto not_target;
         }
     }
