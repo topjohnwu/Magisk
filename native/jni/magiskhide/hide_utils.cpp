@@ -337,6 +337,32 @@ void auto_start_magiskhide(bool late_props) {
     }
 }
 
+bool is_hide_target(int uid, string_view process) {
+    mutex_guard lock(hide_state_lock);
+
+    if (uid % 100000 >= 90000) {
+        // Isolated processes
+        auto it = uid_proc_map.find(-1);
+        if (it == uid_proc_map.end())
+            return false;
+
+        for (auto &s : it->second) {
+            if (str_starts(process, s))
+                return true;
+        }
+    } else {
+        auto it = uid_proc_map.find(uid);
+        if (it == uid_proc_map.end())
+            return false;
+
+        for (auto &s : it->second) {
+            if (s == process)
+                return true;
+        }
+    }
+    return false;
+}
+
 #if !ENABLE_INJECT
 void test_proc_monitor() {
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
@@ -347,35 +373,11 @@ void test_proc_monitor() {
 
 #if ENABLE_INJECT
 int check_uid_map(int client) {
-    mutex_guard lock(hide_state_lock);
-
-    if (!hide_state)
+    if (!hide_enabled())
         return 0;
 
     int uid = read_int(client);
     string process = read_string(client);
-
-    if (uid % 100000 > 90000) {
-        // Isolated process
-        auto it = uid_proc_map.find(-1);
-        if (it == uid_proc_map.end())
-            return 0;
-
-        for (auto &s : it->second) {
-            if (str_starts(process, s))
-                return 1;
-        }
-    } else {
-        auto it = uid_proc_map.find(uid);
-        if (it == uid_proc_map.end())
-            return 0;
-
-        for (auto &s : it->second) {
-            if (process == s)
-                return 1;
-        }
-    }
-
-    return 0;
+    return is_hide_target(uid, process) ? 1 : 0;
 }
 #endif

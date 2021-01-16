@@ -183,8 +183,10 @@ static bool check_pid(int pid) {
         return true;
     }
 
+    int uid = st.st_uid;
+
     // UID hasn't changed
-    if (st.st_uid == 0)
+    if (uid == 0)
         return false;
 
     sprintf(path, "/proc/%d/cmdline", pid);
@@ -200,42 +202,25 @@ static bool check_pid(int pid) {
         cmdline == "usap32"sv || cmdline == "usap64"sv)
         return false;
 
-    int uid = st.st_uid;
-
-    // Start accessing uid_proc_map
-    mutex_guard lock(hide_state_lock);
-    auto it = uid_proc_map.end();
-
-    if (uid % 100000 > 90000) {
-        // No way to handle isolated process
+    if (!is_hide_target(uid, cmdline))
         goto not_target;
-    }
 
-    it = uid_proc_map.find(uid);
-    if (it == uid_proc_map.end())
-        goto not_target;
-    for (auto &s : it->second) {
-        if (s != cmdline)
-            continue;
-
-        // Check if ns is separated (could be app zygote)
-        read_ns(pid, &st);
-        for (auto &zit : zygote_map) {
-            if (zit.second.st_ino == st.st_ino &&
-                zit.second.st_dev == st.st_dev) {
-                // ns not separated, abort
-                goto not_target;
-            }
+    // Ensure ns is separated
+    read_ns(pid, &st);
+    for (auto &zit : zygote_map) {
+        if (zit.second.st_ino == st.st_ino &&
+            zit.second.st_dev == st.st_dev) {
+            // ns not separated, abort
+            goto not_target;
         }
-
-        // Finally this is our target!
-        // Detach from ptrace but should still remain stopped.
-        // The hide daemon will resume the process.
-        LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
-        detach_pid(pid, SIGSTOP);
-        hide_daemon(pid);
-        return true;
     }
+
+    // Detach but the process should still remain stopped
+    // The hide daemon will resume the process after hiding it
+    LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
+    detach_pid(pid, SIGSTOP);
+    hide_daemon(pid);
+    return true;
 
 not_target:
     PTRACE_LOG("[%s] is not our target\n", cmdline);
