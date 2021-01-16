@@ -1,5 +1,10 @@
 # Magisk Manager Changelog
 
+### v8.0.5
+
+- Minor UI changes
+- Update internal scripts
+
 ### v8.0.4
 
 - A lot of stability changes and minor bug fixes

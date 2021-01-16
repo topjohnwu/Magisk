@@ -1,5 +1,11 @@
 # Magisk Changelog
 
+### v21.3
+
+- [MagiskInit] Avoid mounting `f2fs` userdata as it may result in kernel crashes. This shall fix a lot of bootloops
+- [MagiskBoot] Fix a minor header checksum bug for `DHTB` header and ASUS `blob` image formats
+- [MagiskHide] Allowing hiding isolated processes if the mount namespace is separated
+
 ### v21.2
 
 - [MagiskInit] Detect 2SI after mounting `system_root` on legacy SAR devices
