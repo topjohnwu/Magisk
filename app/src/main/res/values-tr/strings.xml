@@ -132,7 +132,7 @@
     <string name="settings_dark_mode_message">Stilinize en iyi uyan modu seçin!</string>
     <string name="settings_dark_mode_light">Her Zaman Aydınlık</string>
     <string name="settings_dark_mode_system">Sistemi Takip Et</string>
-    <string name="settings_dark_mode_dark">Her Zmana Karanlık</string>
+    <string name="settings_dark_mode_dark">Her Zaman Karanlık</string>
     <string name="settings_download_path_title">İndirme dizini</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Depo Önbelleğini Temizle</string>
