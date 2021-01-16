@@ -60,7 +60,7 @@
     <string name="prompt">Pyet</string>
     <string name="grant">Lejo</string>
     <string name="su_warning">Jep akses të plotë në pajisjen tuaj. \n Moho nëse nuk je i sigurt!</string>
-    <string name="forever">Përgjithmonë</string>
+    <string name="forever">Gjithmonë</string>
     <string name="once">Një herë</string>
     <string name="tenmin">10 minuta</string>
     <string name="twentymin">20 minuta</string>
@@ -77,6 +77,7 @@
     <string name="su_revoke_title">Anulohet?</string>
     <string name="su_revoke_msg">Konfirmo të heqësh të drejtat e %1$s?</string>
     <string name="toast">dolli</string>
+    <string name="none">Asnjë</string>
     <string name="superuser_toggle_notification">Njoftimet</string>
     <string name="superuser_toggle_revoke">Anulo</string>
     <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar ende leje për superpërdoruesin.</string>
@@ -156,6 +157,12 @@
     <string name="settings_su_app">Vetëm aplikacionet</string>
     <string name="settings_su_adb">Vetëm ADB</string>
     <string name="settings_su_disable">Çaktivizuar</string>
+    <string name="settings_su_request_10">10 Sekonda</string>
+    <string name="settings_su_request_15">15 Sekonda</string>
+    <string name="settings_su_request_20">20 Sekonda</string>
+    <string name="settings_su_request_30">30 Sekonda</string>
+    <string name="settings_su_request_45">45 Sekonda</string>
+    <string name="settings_su_request_60">60 Sekonda</string>
     <string name="superuser_access">Hyrja në superpërdorues</string>
     <string name="auto_response">Përgjigje Automatike</string>
     <string name="request_timeout">Koha e kërkesës</string>
@@ -207,7 +214,7 @@
     <string name="failure">Dështoi!</string>
     <string name="hide_manager_title">Fshehja e Magisk manager…</string>
     <string name="hide_manager_fail_toast">Fsheh Menaxherin e Magisk dështoi</string>
-    <string name="restore_manager_fail_toast">Rikthe menaxherin e Magisk dështoi</string>
+    <string name="restore_manager_fail_toast">Rikthimi i menaxherin e Magisk dështoi</string>
     <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
     <string name="complete_uninstall">Çinstalimi i plotë</string>
     <string name="restore_img">Rikthe Imazhet</string>
