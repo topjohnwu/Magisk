@@ -1,7 +1,5 @@
 #include <sched.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -82,11 +80,20 @@ ssize_t xread(int fd, void *buf, size_t count) {
 
 // Read exact same size as count
 ssize_t xxread(int fd, void *buf, size_t count) {
-    int ret = read(fd, buf, count);
-    if (count != ret) {
-        PLOGE("read (%zu != %d)", count, ret);
+    size_t read_sz = 0;
+    int ret = -1;
+    while (read_sz != count && ret != 0) {
+        ret = read(fd, buf, count);
+        if (ret < 0) {
+            PLOGE("read");
+            return ret;
+        }
+        read_sz += ret;
     }
-    return ret;
+    if (read_sz != count) {
+        PLOGE("read (%zu != %zu)", count, read_sz);
+    }
+    return read_sz;
 }
 
 int xpipe2(int pipefd[2], int flags) {
@@ -242,7 +249,7 @@ ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags) {
     return rec;
 }
 
-int xpthread_create(pthread_t *thread, const pthread_attr_t *attr, 
+int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
                     void *(*start_routine) (void *), void *arg) {
     errno = pthread_create(thread, attr, start_routine, arg);
     if (errno) {
