@@ -15,11 +15,11 @@ Here are some feature highlights:
 
 ## Downloads
 
-[![](https://img.shields.io/badge/Magisk%20Manager-v8.0.6-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v8.0.6/MagiskManager-v8.0.6.apk)
+[![](https://img.shields.io/badge/Magisk%20Manager-v8.0.7-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v8.0.7/MagiskManager-v8.0.7.apk)
 [![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
 <br>
-[![](https://img.shields.io/badge/Magisk-v21.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.3)
-[![](https://img.shields.io/badge/Magisk%20Beta-v21.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.3)
+[![](https://img.shields.io/badge/Magisk-v21.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.4)
+[![](https://img.shields.io/badge/Magisk%20Beta-v21.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.4)
 
 ## Useful Links
 
