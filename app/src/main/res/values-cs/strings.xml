@@ -1,7 +1,7 @@
 <resources>
 
     <!--Sections-->
-    <string name="modules">Správce modulů</string>
+    <string name="modules">Moduly</string>
     <string name="superuser">SuperUser</string>
     <string name="logs">Protokol</string>
     <string name="settings">Nastavení</string>
@@ -14,7 +14,7 @@
     <!--Home-->
     <string name="no_connection">Žádné připojení</string>
     <string name="app_changelog">Seznam změn</string>
-    <string name="manager">Správce</string>
+    <string name="manager">Manager</string>
     <string name="loading">Načítání…</string>
     <string name="update">Aktualizovat</string>
     <string name="not_available">N/A</string>
@@ -22,13 +22,13 @@
     <string name="status">Stav</string>
     <string name="home_package">Balíček</string>
 
-    <string name="home_notice_content">Zkontrolujte, zda používáte Magisk Manager s otevřeným kódem. Správce z neznámého zdroje může provádět nebezpečné akce!</string>
+    <string name="home_notice_content">Zkontrolujte, zda používáte Magisk Manager s otevřeným kódem. Magisk Manager z neznámého zdroje může provádět nebezpečné akce!</string>
     <string name="home_support_title">Podpořte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude svobodný s otevřeným kódem. Můžete nám však zaslat malý dar jako poděkování.</string>
     <string name="home_status_normal">Normální</string>
     <string name="home_status_stub">Testovací</string>
-    <string name="home_installed_version">Nainstalovaná</string>
+    <string name="home_installed_version">Nainstalovano</string>
     <string name="home_latest_version">Poslední</string>
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
@@ -143,7 +143,7 @@
     <string name="settings_restore_manager_summary">Obnovíte Magisk Manager na původní název balíčku.</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(výchozí podle systému)</string>
-    <string name="settings_check_update_title">Automatické aktualizace</string>
+    <string name="settings_check_update_title">Zkontrolovat aktualizace</string>
     <string name="settings_check_update_summary">Povolíte pravidelnou kontrolu aktualizace na pozadí.</string>
     <string name="settings_update_channel_title">Kanál aktualizace</string>
     <string name="settings_update_stable">Stabilní</string>
