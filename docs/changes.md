@@ -1,5 +1,10 @@
 # Magisk Changelog
 
+### v21.4
+
+- [MagiskSU] Fix `su -c` behavior that broke many root apps
+- [General] Properly handle read/write over sockets (the `broken pipe` issue)
+
 ### v21.3
 
 - [MagiskInit] Avoid mounting `f2fs` userdata as it may result in kernel crashes. This shall fix a lot of bootloops
