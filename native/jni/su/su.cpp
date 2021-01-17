@@ -105,9 +105,7 @@ int su_client_main(int argc, char *argv[]) {
                 for (int i = optind - 1; i < argc; ++i) {
                     if (!su_req.command.empty())
                         su_req.command += ' ';
-                    su_req.command += '\'';
                     su_req.command += argv[i];
-                    su_req.command += '\'';
                 }
                 optind = argc;
                 break;
