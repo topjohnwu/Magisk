@@ -361,9 +361,10 @@ abstract class MagiskInstallImpl : KoinComponent {
     }
 
     private fun copySepolicyRules(): Boolean {
-        if (Info.remote.magisk.versionCode >= 21100) return true
-        // Copy existing rules for migration
-        "copy_sepolicy_rules".sh()
+        if (Info.remote.magisk.versionCode >= 21100) {
+            // Copy existing rules for migration
+            "copy_sepolicy_rules".sh()
+        }
         return true
     }
 
