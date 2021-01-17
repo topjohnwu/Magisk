@@ -61,12 +61,24 @@ int xopenat(int dirfd, const char *pathname, int flags, mode_t mode) {
     return fd;
 }
 
+// Write exact same size as count
 ssize_t xwrite(int fd, const void *buf, size_t count) {
-    int ret = write(fd, buf, count);
-    if (count != ret) {
-        PLOGE("write");
+    size_t write_sz = 0;
+    ssize_t ret;
+    do {
+        ret = write(fd, (byte *) buf + write_sz, count - write_sz);
+        if (ret < 0) {
+            if (errno == EINTR)
+                continue;
+            PLOGE("write");
+            return ret;
+        }
+        write_sz += ret;
+    } while (write_sz != count && ret != 0);
+    if (write_sz != count) {
+        PLOGE("write (%zu != %zu)", count, write_sz);
     }
-    return ret;
+    return write_sz;
 }
 
 // Read error other than EOF
@@ -81,15 +93,17 @@ ssize_t xread(int fd, void *buf, size_t count) {
 // Read exact same size as count
 ssize_t xxread(int fd, void *buf, size_t count) {
     size_t read_sz = 0;
-    int ret = -1;
-    while (read_sz != count && ret != 0) {
-        ret = read(fd, buf, count);
+    ssize_t ret;
+    do {
+        ret = read(fd, (byte *) buf + read_sz, count - read_sz);
         if (ret < 0) {
+            if (errno == EINTR)
+                continue;
             PLOGE("read");
             return ret;
         }
         read_sz += ret;
-    }
+    } while (read_sz != count && ret != 0);
     if (read_sz != count) {
         PLOGE("read (%zu != %zu)", count, read_sz);
     }
