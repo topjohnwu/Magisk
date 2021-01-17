@@ -207,7 +207,7 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
     localtime_r(&tv.tv_sec, &tm);
     size_t len = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
     int ms = tv.tv_usec / 1000;
-    len += sprintf(buf + len, ".%03d %c : ", ms, type);
+    len += sprintf(buf + len, ".%03d %*d %*d %c : ", ms, 5, getpid(), 5, gettid(), type);
     strcpy(buf + len, fmt);
     return vfprintf(local_log_file.get(), buf, args);
 }
