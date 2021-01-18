@@ -53,8 +53,8 @@ if [ -z $SOURCEDMODE ]; then
   cd "`getdir "${BASH_SOURCE:-$0}"`"
   # Load utility functions
   . ./util_functions.sh
-  # Detect version and architecture
-  api_level_arch_detect
+  # Check if 64-bit
+  [ -d /system/lib64 ] && IS64BIT=true || IS64BIT=false
 fi
 
 BOOTIMAGE="$1"
@@ -135,23 +135,22 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
 # Compress to save precious ramdisk space
-if $IS64BIT; then
-  ./magiskboot compress=xz magisk64 magisk.xz
-else
-  ./magiskboot compress=xz magisk32 magisk.xz
-fi
+./magiskboot compress=xz magisk32 magisk32.xz
+./magiskboot compress=xz magisk64 magisk64.xz
+$IS64BIT && SKIP64="" || SKIP64="#"
 
 ./magiskboot cpio ramdisk.cpio \
-"add 750 init magiskinit" \
+"add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
-"add 750 overlay.d/sbin/magisk.xz magisk.xz" \
+"add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
+"$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk.xz
+rm -f ramdisk.cpio.orig config magisk*.xz
 
 #################
 # Binary Patches

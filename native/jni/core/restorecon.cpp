@@ -93,10 +93,9 @@ void restore_tmpcon() {
     auto dir = xopen_dir(MAGISKTMP.data());
     int dfd = dirfd(dir.get());
 
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (SDK_INT >= 26 && entry->d_name == "magisk"sv)
-            setfilecon_at(dfd, entry->d_name, EXEC_CON);
-        else
-            setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
-    }
+    for (dirent *entry; (entry = xreaddir(dir.get()));)
+        setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
+
+    string magisk = MAGISKTMP + "/magisk";
+    setfilecon(magisk.data(), EXEC_CON);
 }

@@ -1,7 +1,3 @@
-#include <string.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-
 #include <utils.hpp>
 #include <cpio.hpp>
 
@@ -35,7 +31,7 @@ public:
 
 bool check_env(const char *name) {
     const char *val = getenv(name);
-    return val ? strcmp(val, "true") == 0 : false;
+    return val ? val == "true"sv : false;
 }
 
 void magisk_cpio::patch() {
@@ -284,60 +280,62 @@ int cpio_commands(int argc, char *argv[]) {
     int cmdc;
     char *cmdv[6];
 
-    while (argc) {
-        // Clean up
+    for (int i = 0; i < argc; ++i) {
+        // Reset
         cmdc = 0;
-        memset(cmdv, NULL, sizeof(cmdv));
+        memset(cmdv, 0, sizeof(cmdv));
 
         // Split the commands
-        for (char *tok = strtok(argv[0], " "); tok; tok = strtok(nullptr, " "))
+        char *tok = strtok(argv[i], " ");
+        while (tok && cmdc < std::size(cmdv)) {
+            if (cmdc == 0 && tok[0] == '#')
+                break;
             cmdv[cmdc++] = tok;
+            tok = strtok(nullptr, " ");
+        }
 
         if (cmdc == 0)
             continue;
 
-        if (strcmp(cmdv[0], "test") == 0) {
+        if (cmdv[0] == "test"sv) {
             exit(cpio.test());
-        } else if (strcmp(cmdv[0], "restore") == 0) {
+        } else if (cmdv[0] == "restore"sv) {
             cpio.restore();
-        } else if (strcmp(cmdv[0], "sha1") == 0) {
+        } else if (cmdv[0] == "sha1"sv) {
             char *sha1 = cpio.sha1();
             if (sha1) printf("%s\n", sha1);
             return 0;
-        } else if (strcmp(cmdv[0], "compress") == 0){
+        } else if (cmdv[0] == "compress"sv){
             cpio.compress();
-        } else if (strcmp(cmdv[0], "decompress") == 0){
+        } else if (cmdv[0] == "decompress"sv){
             cpio.decompress();
-        } else if (strcmp(cmdv[0], "patch") == 0) {
+        } else if (cmdv[0] == "patch"sv) {
             cpio.patch();
-        } else if (cmdc == 2 && strcmp(cmdv[0], "exists") == 0) {
+        } else if (cmdc == 2 && cmdv[0] == "exists"sv) {
             exit(!cpio.exists(cmdv[1]));
-        } else if (cmdc == 2 && strcmp(cmdv[0], "backup") == 0) {
+        } else if (cmdc == 2 && cmdv[0] == "backup"sv) {
             cpio.backup(cmdv[1]);
-        } else if (cmdc >= 2 && strcmp(cmdv[0], "rm") == 0) {
-            bool r = cmdc > 2 && strcmp(cmdv[1], "-r") == 0;
+        } else if (cmdc >= 2 && cmdv[0] == "rm"sv) {
+            bool r = cmdc > 2 && cmdv[1] == "-r"sv;
             cpio.rm(cmdv[1 + r], r);
-        } else if (cmdc == 3 && strcmp(cmdv[0], "mv") == 0) {
+        } else if (cmdc == 3 && cmdv[0] == "mv"sv) {
             cpio.mv(cmdv[1], cmdv[2]);
-        } else if (strcmp(cmdv[0], "extract") == 0) {
+        } else if (cmdv[0] == "extract"sv) {
             if (cmdc == 3) {
                 return !cpio.extract(cmdv[1], cmdv[2]);
             } else {
                 cpio.extract();
                 return 0;
             }
-        } else if (cmdc == 3 && strcmp(cmdv[0], "mkdir") == 0) {
+        } else if (cmdc == 3 && cmdv[0] == "mkdir"sv) {
             cpio.mkdir(strtoul(cmdv[1], nullptr, 8), cmdv[2]);
-        } else if (cmdc == 3 && strcmp(cmdv[0], "ln") == 0) {
+        } else if (cmdc == 3 && cmdv[0] == "ln"sv) {
             cpio.ln(cmdv[1], cmdv[2]);
-        } else if (cmdc == 4 && strcmp(cmdv[0], "add") == 0) {
+        } else if (cmdc == 4 && cmdv[0] == "add"sv) {
             cpio.add(strtoul(cmdv[1], nullptr, 8), cmdv[2], cmdv[3]);
         } else {
             return 1;
         }
-
-        --argc;
-        ++argv;
     }
 
     cpio.dump(incpio);

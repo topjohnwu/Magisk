@@ -35,7 +35,8 @@ int main(int argc, char *argv[]) {
     cmdline_logging();
     init_argv0(argc, argv);
 
-    if (basename(argv[0]) == "magisk"sv) {
+    string_view base = basename(argv[0]);
+    if (base == "magisk" || base == "magisk32" || base == "magisk64") {
         if (argc > 1 && argv[1][0] != '-') {
             // Calling applet via magisk [applet] args
             --argc;

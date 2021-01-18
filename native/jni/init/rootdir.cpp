@@ -175,8 +175,9 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 }
 
 static void patch_socket_name(const char *path) {
-    char rstr[16];
-    gen_rand_str(rstr, sizeof(rstr));
+    static char rstr[16] = { 0 };
+    if (rstr[0] == '\0')
+        gen_rand_str(rstr, sizeof(rstr));
     auto bin = mmap_data::rw(path);
     bin.patch({ make_pair(MAIN_SOCKET, rstr) });
 }
@@ -289,12 +290,23 @@ void SARBase::patch_rootdir() {
 
     // Extract magisk
     {
-        auto magisk = mmap_data::ro("magisk.xz");
-        unlink("magisk.xz");
-        int fd = xopen("magisk", O_WRONLY | O_CREAT, 0755);
+        auto magisk = mmap_data::ro("magisk32.xz");
+        unlink("magisk32.xz");
+        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
-        patch_socket_name("magisk");
+        patch_socket_name("magisk32");
+        if (access("magisk64.xz", F_OK) == 0) {
+            magisk = mmap_data::ro("magisk64.xz");
+            unlink("magisk64.xz");
+            fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
+            unxz(fd, magisk.buf, magisk.sz);
+            close(fd);
+            patch_socket_name("magisk64");
+            xsymlink("./magisk64", "magisk");
+        } else {
+            xsymlink("./magisk32", "magisk");
+        }
     }
 
     // Mount rootdir
@@ -352,22 +364,33 @@ void MagiskProxy::start() {
     // Backup stuffs before removing them
     self = mmap_data::ro("/sbin/magisk");
     config = mmap_data::ro("/.backup/.magisk");
-    auto magisk = mmap_data::ro("/sbin/magisk.xz");
+    auto magisk = mmap_data::ro("/sbin/magisk32.xz");
+    auto magisk64 = mmap_data::ro("/sbin/magisk64.xz");
     char custom_rules_dir[64];
     custom_rules_dir[0] = '\0';
     xreadlink(TMP_RULESDIR, custom_rules_dir, sizeof(custom_rules_dir));
 
     unlink("/sbin/magisk");
-    unlink("/sbin/magisk.xz");
+    unlink("/sbin/magisk32.xz");
+    unlink("/sbin/magisk64.xz");
     rm_rf("/.backup");
 
     setup_tmp("/sbin");
 
     // Extract magisk
-    int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
+    int fd = xopen("/sbin/magisk32", O_WRONLY | O_CREAT, 0755);
     unxz(fd, magisk.buf, magisk.sz);
     close(fd);
-    patch_socket_name("/sbin/magisk");
+    patch_socket_name("/sbin/magisk32");
+    if (magisk64.sz) {
+        fd = xopen("/sbin/magisk64", O_WRONLY | O_CREAT, 0755);
+        unxz(fd, magisk64.buf, magisk64.sz);
+        close(fd);
+        patch_socket_name("/sbin/magisk64");
+        xsymlink("./magisk64", "/sbin/magisk");
+    } else {
+        xsymlink("./magisk32", "/sbin/magisk");
+    }
 
     // Create symlinks pointing back to /root
     recreate_sbin("/root", false);
