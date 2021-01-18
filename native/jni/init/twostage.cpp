@@ -199,7 +199,7 @@ void SARInit::first_stage_prep() {
         restore_folder(ROOTOVL, overlays);
 
         // Ack and bail out!
-        write_int(sockfd, 0);
+        write_int(client, 0);
         close(client);
         close(sockfd);
 
