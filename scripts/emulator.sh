@@ -28,14 +28,8 @@ mount_sbin() {
 
 if [ ! -f /system/build.prop ]; then
   # Running on PC
-  cd "`dirname "$0"`/.."
-  adb push native/out/x86/busybox scripts/emulator.sh /data/local/tmp
-  emu_arch=`adb shell uname -m`
-  if [ "$emu_arch" = "x86_64" ]; then
-    adb push native/out/x86/magiskinit64 /data/local/tmp/magiskinit
-  else
-    adb push native/out/x86/magiskinit /data/local/tmp
-  fi
+  cd "$(dirname "$0")/.."
+  adb push native/out/x86/busybox scripts/emulator.sh native/out/x86/magiskinit native/out/x86_64/magisk /data/local/tmp
   adb shell sh /data/local/tmp/emulator.sh
   exit 0
 fi
@@ -43,7 +37,7 @@ fi
 cd /data/local/tmp
 chmod 777 busybox
 chmod 777 magiskinit
-./magiskinit -x magisk magisk
+chmod 777 magisk
 
 if [ -z "$FIRST_STAGE" ]; then
   export FIRST_STAGE=1
@@ -113,7 +107,7 @@ else
 fi
 
 # Magisk stuffs
-./magiskinit -x magisk $BINDIR/magisk
+cp -af ./magisk $BINDIR/magisk
 chmod 755 $BINDIR/magisk
 ln -s ./magisk $BINDIR/su
 ln -s ./magisk $BINDIR/resetprop

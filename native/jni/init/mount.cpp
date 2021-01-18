@@ -378,13 +378,6 @@ void BaseInit::exec_init() {
     exit(1);
 }
 
-static void patch_socket_name(const char *path) {
-    char rstr[16];
-    gen_rand_str(rstr, sizeof(rstr));
-    auto bin = mmap_data::rw(path);
-    bin.patch({ make_pair(MAIN_SOCKET, rstr) });
-}
-
 void MagiskInit::setup_tmp(const char *path) {
     LOGD("Setup Magisk tmp at %s\n", path);
     xmount("tmpfs", path, "tmpfs", 0, "mode=755");
@@ -401,8 +394,8 @@ void MagiskInit::setup_tmp(const char *path) {
     fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
     xwrite(fd, self.buf, self.sz);
     close(fd);
-    dump_magisk("magisk", 0755);
-    patch_socket_name("magisk");
+
+    // The magisk binary will be handled later
 
     // Create applet symlinks
     for (int i = 0; applet_names[i]; ++i)

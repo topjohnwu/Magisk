@@ -65,6 +65,16 @@ abstract class MagiskInstallImpl : KoinComponent {
         logs = NOPList.getInstance()
     }
 
+    companion object {
+        private val ABI_MAP = TreeMap<String, String>()
+        init {
+            ABI_MAP["armeabi-v7a"] = "arm"
+            ABI_MAP["arm64-v8a"] = "arm64"
+            ABI_MAP["x86"] = "x86"
+            ABI_MAP["x86_64"] = "x64"
+        }
+    }
+
     protected constructor(zip: Uri, out: MutableList<String>, err: MutableList<String>) {
         console = out
         logs = err
@@ -103,16 +113,26 @@ abstract class MagiskInstallImpl : KoinComponent {
 
     @Suppress("DEPRECATION")
     private fun extractZip(): Boolean {
-        val arch = if (Build.VERSION.SDK_INT >= 21) {
-            val abis = listOf(*Build.SUPPORTED_ABIS)
-            if (abis.contains("x86")) "x86" else "arm"
+        val arch: String
+        val arch32: String
+        if (Build.VERSION.SDK_INT >= 21) {
+            arch = ABI_MAP[Build.SUPPORTED_ABIS[0]]!!
+            arch32 = ABI_MAP[Build.SUPPORTED_32_BIT_ABIS[0]]!!
         } else {
-            if (Build.CPU_ABI == "x86") "x86" else "arm"
+            arch = ABI_MAP[Build.CPU_ABI]!!
+            arch32 = arch
         }
 
-        console.add("- Device platform: " + Build.CPU_ABI)
+        console.add("- Device platform: $arch")
         console.add("- Magisk Manager: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
         console.add("- Install target: ${Info.remote.magisk.version} (${Info.remote.magisk.versionCode})")
+
+        fun newFile(name: String): File {
+            return if (installDir is SuFile)
+                SuFile(installDir, name)
+            else
+                File(installDir, name)
+        }
 
         try {
             ZipInputStream(zipUri.inputStream().buffered()).use { zi ->
@@ -120,27 +140,25 @@ abstract class MagiskInstallImpl : KoinComponent {
                 while (zi.nextEntry?.let { ze = it } != null) {
                     if (ze.isDirectory)
                         continue
+
                     var name: String? = null
-                    val names = arrayOf("$arch/", "common/", "META-INF/com/google/android/update-binary")
-                    for (n in names) {
-                        ze.name.run {
-                            if (startsWith(n)) {
-                                name = substring(lastIndexOf('/') + 1)
+
+                    if (ze.name.startsWith("chromeos/")) {
+                        name = ze.name
+                    } else {
+                        for (n in listOf("$arch32/", "common/", "META-INF/com/google/android/update-binary")) {
+                            if (ze.name.startsWith(n)) {
+                                name = ze.name.substring(ze.name.lastIndexOf('/') + 1)
+                                break
                             }
                         }
-                        name ?: continue
-                        break
                     }
-                    if (name == null && ze.name.startsWith("chromeos/"))
-                        name = ze.name
-                    name?.also {
-                        val dest = if (installDir is SuFile)
-                            SuFile(installDir, it)
-                        else
-                            File(installDir, it)
-                        dest.parentFile!!.mkdirs()
-                        SuFileOutputStream(dest).use { s -> zi.copyTo(s) }
-                    } ?: continue
+
+                    name ?: continue
+
+                    val dest = newFile(name)
+                    dest.parentFile!!.mkdirs()
+                    SuFileOutputStream(dest).use { s -> zi.copyTo(s) }
                 }
             }
         } catch (e: IOException) {
@@ -149,9 +167,9 @@ abstract class MagiskInstallImpl : KoinComponent {
             return false
         }
 
-        val init64 = SuFile.open(installDir, "magiskinit64")
-        if (Build.VERSION.SDK_INT >= 21 && Build.SUPPORTED_64_BIT_ABIS.isNotEmpty()) {
-            init64.renameTo(SuFile.open(installDir, "magiskinit"))
+        val init64 = newFile("magiskinit64")
+        if (init64.exists() && arch != arch32) {
+            init64.renameTo(newFile("magiskinit"))
         } else {
             init64.delete()
         }
@@ -324,9 +342,12 @@ abstract class MagiskInstallImpl : KoinComponent {
             return false
         }
 
-        if (!("KEEPFORCEENCRYPT=${Config.keepEnc} KEEPVERITY=${Config.keepVerity} " +
-                "RECOVERYMODE=${Config.recovery} sh update-binary " +
-                "sh boot_patch.sh $srcBoot").sh().isSuccess) {
+        val FLAGS =
+            "KEEPFORCEENCRYPT=${Config.keepEnc} " +
+            "KEEPVERITY=${Config.keepVerity} " +
+            "RECOVERYMODE=${Config.recovery}"
+
+        if (!("$FLAGS sh update-binary sh boot_patch.sh $srcBoot").sh().isSuccess) {
             return false
         }
 

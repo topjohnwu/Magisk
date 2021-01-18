@@ -54,21 +54,10 @@ endif
 include $(CLEAR_VARS)
 
 ifdef B_INIT
+
 LOCAL_MODULE := magiskinit
-BB_INIT := 1
-else ifdef B_INIT64
-LOCAL_MODULE := magiskinit64
-LOCAL_CPPFLAGS += -DUSE_64BIT
-BB_INIT := 1
-endif
-
-ifdef BB_INIT
-
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
-LOCAL_C_INCLUDES := \
-    jni/include \
-    out \
-    out/$(TARGET_ARCH_ABI)
+LOCAL_C_INCLUDES := jni/include out
 
 LOCAL_SRC_FILES := \
     init/init.cpp \

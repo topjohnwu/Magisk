@@ -287,18 +287,6 @@ def run_ndk_build(flags):
 
 
 def dump_bin_headers():
-    for arch in archs:
-        bin_file = op.join('native', 'out', arch, 'magisk')
-        if not op.exists(bin_file):
-            error('Build "magisk" before building "magiskinit"')
-        with open(op.join('native', 'out', arch, 'binaries_arch.h'), 'w') as out:
-            with open(bin_file, 'rb') as src:
-                binary_dump(src, out, 'magisk_xz')
-    for arch, arch32 in list(zip(arch64, archs)):
-        bin_file = op.join('native', 'out', arch, 'magisk')
-        with open(op.join('native', 'out', arch32, 'binaries_arch64.h'), 'w') as out:
-            with open(bin_file, 'rb') as src:
-                binary_dump(src, out, 'magisk_xz')
     stub = op.join(config['outdir'], 'stub-release.apk')
     if not op.exists(stub):
         error('Build stub APK before building "magiskinit"')
@@ -347,25 +335,30 @@ def build_binary(args):
         run_ndk_build('B_MAGISK=1 B_64BIT=1')
         clean_elf()
 
-    if 'magiskinit' in args.target:
-        dump_bin_headers()
-        run_ndk_build('B_INIT=1')
-        run_ndk_build('B_INIT64=1')
-
-    if 'magiskpolicy' in args.target:
-        run_ndk_build('B_POLICY=1')
-
-    if 'resetprop' in args.target:
-        run_ndk_build('B_PROP=1')
-
-    if 'magiskboot' in args.target:
-        run_ndk_build('B_BOOT=1')
-
-    if 'busybox' in args.target:
-        run_ndk_build('B_BB=1')
-
     if 'test' in args.target:
         run_ndk_build('B_TEST=1 B_64BIT=1')
+
+    # 32-bit only targets can be built in one command
+    flag = ''
+
+    if 'magiskinit' in args.target:
+        dump_bin_headers()
+        flag += ' B_INIT=1'
+
+    if 'magiskpolicy' in args.target:
+        flag += ' B_POLICY=1'
+
+    if 'resetprop' in args.target:
+        flag += ' B_PROP=1'
+
+    if 'magiskboot' in args.target:
+        flag += ' B_BOOT=1'
+
+    if 'busybox' in args.target:
+        flag += ' B_BB=1'
+
+    if flag:
+        run_ndk_build(flag)
 
 
 def build_apk(args, module):
@@ -440,11 +433,16 @@ def zip_main(args):
         zip_with_msg(zipf, source, target)
 
         # Binaries
-        for lib_dir, zip_dir in [('armeabi-v7a', 'arm'), ('x86', 'x86')]:
-            for binary in ['magiskinit', 'magiskinit64', 'magiskboot']:
+        for lib_dir, zip_dir in zip(archs, ('arm', 'x86')):
+            for binary in ['magiskinit', 'magiskboot', 'magisk']:
                 source = op.join('native', 'out', lib_dir, binary)
-                target = op.join(zip_dir, binary)
+                target = op.join(zip_dir, 'magisk32' if binary == 'magisk' else binary)
                 zip_with_msg(zipf, source, target)
+
+        for lib_dir, zip_dir in zip(arch64, ('arm', 'x86')):
+            source = op.join('native', 'out', lib_dir, 'magisk')
+            target = op.join(zip_dir, 'magisk64')
+            zip_with_msg(zipf, source, target)
 
         # APK
         source = op.join(

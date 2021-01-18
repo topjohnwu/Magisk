@@ -53,6 +53,8 @@ if [ -z $SOURCEDMODE ]; then
   cd "`getdir "${BASH_SOURCE:-$0}"`"
   # Load utility functions
   . ./util_functions.sh
+  # Detect version and architecture
+  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"
@@ -66,9 +68,6 @@ export KEEPVERITY
 export KEEPFORCEENCRYPT
 
 chmod -R 755 .
-
-# Extract magisk if doesn't exist
-[ -e magisk ] || ./magiskinit -x magisk magisk
 
 #########
 # Unpack
@@ -135,14 +134,24 @@ echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
+# Compress to save precious ramdisk space
+if $IS64BIT; then
+  ./magiskboot compress=xz magisk64 magisk.xz
+else
+  ./magiskboot compress=xz magisk32 magisk.xz
+fi
+
 ./magiskboot cpio ramdisk.cpio \
 "add 750 init magiskinit" \
+"mkdir 0750 overlay.d" \
+"mkdir 0750 overlay.d/sbin" \
+"add 750 overlay.d/sbin/magisk.xz magisk.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config
+rm -f ramdisk.cpio.orig config magisk.xz
 
 #################
 # Binary Patches

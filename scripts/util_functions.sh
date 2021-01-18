@@ -445,12 +445,6 @@ install_magisk() {
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi
 
-  if $IS64BIT; then
-    mv -f magiskinit64 magiskinit 2>/dev/null
-  else
-    rm -f magiskinit64
-  fi
-
   # Source the boot patcher
   SOURCEDMODE=true
   . ./boot_patch.sh "$BOOTIMAGE"

@@ -31,9 +31,9 @@ struct fstab_entry {
 
 extern std::vector<std::string> mount_list;
 
+bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(cmdline *cmd);
 bool check_two_stage();
-int dump_magisk(const char *path, mode_t mode);
 void setup_klog();
 
 /***************

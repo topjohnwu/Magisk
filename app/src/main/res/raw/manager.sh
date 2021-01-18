@@ -7,7 +7,7 @@ run_delay() {
 }
 
 env_check() {
-  for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
+  for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
   done
   return 0
