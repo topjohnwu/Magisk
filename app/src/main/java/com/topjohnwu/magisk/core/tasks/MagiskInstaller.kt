@@ -46,24 +46,20 @@ import java.security.SecureRandom
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import kotlin.collections.set
 
-abstract class MagiskInstallImpl : KoinComponent {
+abstract class MagiskInstallImpl protected constructor(
+    private var zipUri: Uri,
+    protected val console: MutableList<String> = NOPList.getInstance(),
+    private val logs: MutableList<String> = NOPList.getInstance()
+) : KoinComponent {
 
     protected lateinit var installDir: File
     private lateinit var srcBoot: String
-    private lateinit var zipUri: Uri
 
-    protected val console: MutableList<String>
-    private val logs: MutableList<String>
     private var tarOut: TarOutputStream? = null
-
     private val service: NetworkService by inject()
     protected val context: Context by inject()
-
-    protected constructor() {
-        console = NOPList.getInstance()
-        logs = NOPList.getInstance()
-    }
 
     companion object {
         private val ABI_MAP = TreeMap<String, String>()
@@ -73,15 +69,6 @@ abstract class MagiskInstallImpl : KoinComponent {
             ABI_MAP["x86"] = "x86"
             ABI_MAP["x86_64"] = "x64"
         }
-    }
-
-    protected constructor(zip: Uri, out: MutableList<String>, err: MutableList<String>) {
-        console = out
-        logs = err
-        zipUri = zip
-        installDir = File(get<Context>(Protected).filesDir.parent, "install")
-        "rm -rf $installDir".sh()
-        installDir.mkdirs()
     }
 
     private fun findImage(): Boolean {
@@ -416,7 +403,7 @@ abstract class MagiskInstallImpl : KoinComponent {
         return true
     }
 
-    private fun String.sh() = Shell.sh(this).to(console, logs).exec()
+    protected fun String.sh() = Shell.sh(this).to(console, logs).exec()
     private fun Array<String>.sh() = Shell.sh(*this).to(console, logs).exec()
     private fun String.fsh() = ShellUtils.fastCmd(this)
     private fun Array<String>.fsh() = ShellUtils.fastCmd(*this)
@@ -429,10 +416,9 @@ abstract class MagiskInstallImpl : KoinComponent {
     protected suspend fun secondSlot() = findSecondaryImage() && extractZip() &&
         patchBoot() && copySepolicyRules() && flashBoot() && postOTA()
 
-    protected fun fixEnv(zip: Uri): Boolean {
+    protected fun fixEnv(): Boolean {
         installDir = SuFile("/data/adb/magisk")
         Shell.su("rm -rf /data/adb/magisk/*").exec()
-        zipUri = zip
         return extractZip() && Shell.su("fix_env").exec().isSuccess
     }
 
@@ -442,11 +428,17 @@ abstract class MagiskInstallImpl : KoinComponent {
     open suspend fun exec() = withContext(Dispatchers.IO) { operations() }
 }
 
-sealed class MagiskInstaller(
-    file: Uri,
+abstract class MagiskInstaller(
+    zip: Uri,
     console: MutableList<String>,
     logs: MutableList<String>
-) : MagiskInstallImpl(file, console, logs) {
+) : MagiskInstallImpl(zip, console, logs) {
+
+    init {
+        installDir = File(get<Context>(Protected).filesDir.parent, "install")
+        "rm -rf $installDir".sh()
+        installDir.mkdirs()
+    }
 
     override suspend fun exec(): Boolean {
         val success = super.exec()
@@ -460,36 +452,52 @@ sealed class MagiskInstaller(
     }
 
     class Patch(
-        file: Uri,
+        zip: Uri,
         private val uri: Uri,
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(file, console, logs) {
+    ) : MagiskInstaller(zip, console, logs) {
         override suspend fun operations() = doPatchFile(uri)
     }
 
     class SecondSlot(
-        file: Uri,
+        zip: Uri,
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(file, console, logs) {
+    ) : MagiskInstaller(zip, console, logs) {
         override suspend fun operations() = secondSlot()
     }
 
     class Direct(
-        file: Uri,
+        zip: Uri,
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(file, console, logs) {
+    ) : MagiskInstaller(zip, console, logs) {
         override suspend fun operations() = direct()
     }
 
+    class Emulator(
+        zip: Uri,
+        console: MutableList<String>,
+        logs: MutableList<String>
+    ) : MagiskInstallImpl(zip, console, logs) {
+        override suspend fun operations() = fixEnv()
+
+        override suspend fun exec(): Boolean {
+            val success = super.exec()
+            if (success) {
+                console.add("- All done!")
+            } else {
+                console.add("! Installation failed")
+            }
+            return success
+        }
+    }
 }
 
-class EnvFixTask(
-    private val zip: Uri
-) : MagiskInstallImpl() {
-    override suspend fun operations() = fixEnv(zip)
+class EnvFixTask(zip: Uri) : MagiskInstallImpl(zip) {
+
+    override suspend fun operations() = fixEnv()
 
     override suspend fun exec(): Boolean {
         val success = super.exec()

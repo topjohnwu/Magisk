@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -69,7 +70,10 @@ class FlashViewModel(
                     FlashZip.Uninstall(installer, outItems, logItems).exec()
                 }
                 Const.Value.FLASH_MAGISK -> {
-                    MagiskInstaller.Direct(installer, outItems, logItems).exec()
+                    if (Info.isEmulator)
+                        MagiskInstaller.Emulator(installer, outItems, logItems).exec()
+                    else
+                        MagiskInstaller.Direct(installer, outItems, logItems).exec()
                 }
                 Const.Value.FLASH_INACTIVE_SLOT -> {
                     MagiskInstaller.SecondSlot(installer, outItems, logItems).exec()
