@@ -189,7 +189,7 @@ abstract class MagiskInstallImpl protected constructor(
                     console.add("-- Extracting: $name")
 
                     val extract = File(installDir, name)
-                    decompressedStream().writeTo(extract)
+                    extract.outputStream().use { decompressedStream().copyTo(it) }
                 } else if (entry.name.contains("vbmeta.img")) {
                     val rawData = decompressedStream().readBytes()
                     // Valid vbmeta.img should be at least 256 bytes
