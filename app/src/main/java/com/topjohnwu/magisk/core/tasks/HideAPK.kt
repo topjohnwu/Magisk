@@ -49,7 +49,7 @@ object HideAPK {
         var next: Char
         var prev = 0.toChar()
         for (i in 0 until len) {
-            next = if (prev == '.' || prev == 0.toChar() || i == len - 1) {
+            next = if (prev == '.' || i == 0 || i == len - 1) {
                 ALPHA[random.nextInt(ALPHA.length)]
             } else {
                 ALPHADOTS[random.nextInt(ALPHADOTS.length)]
