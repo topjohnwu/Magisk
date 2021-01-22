@@ -1,72 +1,75 @@
 #MAGISK
 ############################################
-#
-# Magisk Uninstaller
-# by topjohnwu
-#
+# Magisk Uninstaller (updater-script)
 ############################################
 
 ##############
 # Preparation
 ##############
 
-# This path should work in any cases
-TMPDIR=/dev/tmp
-
-INSTALLER=$TMPDIR/install
-CHROMEDIR=$INSTALLER/chromeos
-
 # Default permissions
 umask 022
 
 OUTFD=$2
-ZIP=$3
+APK="$3"
+COMMONDIR=$INSTALLER/assets
+CHROMEDIR=$INSTALLER/assets/chromeos
 
-if [ ! -f $INSTALLER/util_functions.sh ]; then
+if [ ! -f $COMMONDIR/util_functions.sh ]; then
   echo "! Unable to extract zip file!"
   exit 1
 fi
 
 # Load utility functions
-. $INSTALLER/util_functions.sh
+. $COMMONDIR/util_functions.sh
 
 setup_flashable
 
-print_title "Magisk Uninstaller"
+############
+# Detection
+############
+
+if echo $MAGISK_VER | grep -q '\.'; then
+  PRETTY_VER=$MAGISK_VER
+else
+  PRETTY_VER="$MAGISK_VER($MAGISK_VER_CODE)"
+fi
+print_title "Magisk $PRETTY_VER Uninstaller"
 
 is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with Magisk Manager"
+mount_partitions
+check_data
+$DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
 if ! $BOOTMODE; then
   # Mounting stuffs in recovery (best effort)
   mount_name metadata /metadata
   mount_name "cache cac" /cache
   mount_name persist /persist
 fi
-mount_partitions
+get_flags
+find_boot_image
 
+[ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
+ui_print "- Target image: $BOOTIMAGE"
+
+# Detect version and architecture
 api_level_arch_detect
 
 ui_print "- Device platform: $ARCH"
-MAGISKBIN=$INSTALLER/$ARCH32
-mv $CHROMEDIR $MAGISKBIN
-chmod -R 755 $MAGISKBIN
 
-check_data
-$DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
-$BOOTMODE || recovery_actions
-run_migrations
+BINDIR=$INSTALLER/lib/$ARCH32
+[ ! -d "$BINDIR" ] && BINDIR=$INSTALLER/lib/armeabi-v7a
+cd $BINDIR
+for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
+cd /
+chmod -R 755 $CHROMEDIR $BINDIR
+cp -af $CHROMEDIR/. $BINDIR/chromeos
 
 ############
 # Uninstall
 ############
 
-get_flags
-find_boot_image
-
-[ -e $BOOTIMAGE ] || abort "! Unable to detect boot image"
-ui_print "- Found target image: $BOOTIMAGE"
-[ -z $DTBOIMAGE ] || ui_print "- Found dtbo image: $DTBOIMAGE"
-
-cd $MAGISKBIN
+cd $BINDIR
 
 CHROMEOS=false
 
@@ -108,14 +111,14 @@ case $((STATUS & 3)) in
   1 )  # Magisk patched
     ui_print "- Magisk patched image detected"
     # Find SHA1 of stock boot image
-    SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
+    SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
     BACKUPDIR=/data/magisk_backup_$SHA1
     if [ -d $BACKUPDIR ]; then
       ui_print "- Restoring stock boot image"
       flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
       for name in dtb dtbo dtbs; do
         [ -f $BACKUPDIR/${name}.img.gz ] || continue
-        IMAGE=`find_block $name$SLOT`
+        IMAGE=$(find_block $name$SLOT)
         [ -z $IMAGE ] && continue
         ui_print "- Restoring stock $name image"
         flash_image $BACKUPDIR/${name}.img.gz $IMAGE
@@ -124,7 +127,7 @@ case $((STATUS & 3)) in
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
       ./magiskboot cpio ramdisk.cpio restore
-      if ! ./magiskboot cpio ramdisk.cpio "exists init.rc"; then
+      if ! ./magiskboot cpio ramdisk.cpio "exists init"; then
         # A only system-as-root
         rm -f ramdisk.cpio
       fi
@@ -148,10 +151,11 @@ rm -rf \
 /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* \
 /data/unencrypted/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
-if [ -f /system/addon.d/99-magisk.sh ]; then
+ADDOND=/system/addon.d/99-magisk.sh
+if [ -f $ADDOND ]; then
   blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
   mount -o rw,remount /system || mount -o rw,remount /
-  rm -f /system/addon.d/99-magisk.sh
+  rm -f $ADDOND
 fi
 
 cd /
@@ -163,7 +167,10 @@ if $BOOTMODE; then
   ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
-  rm -rf /data/data/*magisk* /data/user*/*/*magisk* /data/app/*magisk* /data/app/*/*magisk*
+  ui_print "********************************************"
+  ui_print " Magisk Manager will not be uninstalled"
+  ui_print " Please uninstall it manually after reboot"
+  ui_print "********************************************"
   recovery_cleanup
   ui_print "- Done"
 fi

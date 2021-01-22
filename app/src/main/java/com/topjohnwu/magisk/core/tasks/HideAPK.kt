@@ -91,8 +91,7 @@ object HideAPK {
     }
 
     private suspend fun patchAndHide(context: Context, label: String): Boolean {
-        val dlStub = !isRunningAsStub && SDK_INT >= 28 && Const.Version.atLeast_20_2()
-        val src = if (dlStub) {
+        val src = if (!isRunningAsStub && SDK_INT >= 28) {
             val stub = File(context.cacheDir, "stub.apk")
             try {
                 svc.fetchFile(Info.remote.stub.link).byteStream().use {

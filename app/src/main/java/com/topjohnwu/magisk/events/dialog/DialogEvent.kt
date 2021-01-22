@@ -10,7 +10,9 @@ abstract class DialogEvent : ViewEvent(), ActivityExecutor {
     protected lateinit var dialog: MagiskDialog
 
     override fun invoke(activity: BaseUIActivity<*, *>) {
-        dialog = MagiskDialog(activity).apply(this::build).reveal()
+        dialog = MagiskDialog(activity)
+            .apply { setOwnerActivity(activity) }
+            .apply(this::build).reveal()
     }
 
     abstract fun build(dialog: MagiskDialog)

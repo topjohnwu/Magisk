@@ -1,13 +1,30 @@
 package com.topjohnwu.magisk.core
 
+import android.os.Build
 import android.os.Process
+import java.io.File
 
+@Suppress("DEPRECATION")
 object Const {
+
+    val CPU_ABI: String
+    val CPU_ABI_32: String
+
+    init {
+        if (Build.VERSION.SDK_INT >= 21) {
+            CPU_ABI = Build.SUPPORTED_ABIS[0]
+            CPU_ABI_32 = Build.SUPPORTED_32_BIT_ABIS[0]
+        } else {
+            CPU_ABI = Build.CPU_ABI
+            CPU_ABI_32 = CPU_ABI
+        }
+    }
 
     // Paths
     lateinit var MAGISKTMP: String
+    lateinit var NATIVE_LIB_DIR: File
     val MAGISK_PATH get() = "$MAGISKTMP/modules"
-    const val TMP_FOLDER_PATH = "/dev/tmp"
+    const val TMPDIR = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
 
     // Versions
@@ -19,11 +36,9 @@ object Const {
     val USER_ID = Process.myUid() / 100000
 
     object Version {
-        const val MIN_VERSION = "v19.0"
-        const val MIN_VERCODE = 19000
+        const val MIN_VERSION = "v20.4"
+        const val MIN_VERCODE = 20400
 
-        fun atLeast_20_2() = Info.env.magiskVersionCode >= 20200 || isCanary()
-        fun atLeast_20_4() = Info.env.magiskVersionCode >= 20400 || isCanary()
         fun atLeast_21_0() = Info.env.magiskVersionCode >= 21000 || isCanary()
         fun atLeast_21_2() = Info.env.magiskVersionCode >= 21200 || isCanary()
         fun isCanary() = Info.env.magiskVersionCode % 100 != 0

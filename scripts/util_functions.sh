@@ -1,8 +1,5 @@
 ############################################
-#
 # Magisk General Utility Functions
-# by topjohnwu
-#
 ############################################
 
 #MAGISK_VERSION_STUB
@@ -33,7 +30,7 @@ grep_prop() {
   shift
   local FILES=$@
   [ -z "$FILES" ] && FILES='/system/build.prop'
-  cat $FILES | dos2unix | sed -n "$REGEX" 2>/dev/null | head -n 1
+  cat $FILES 2>/dev/null | dos2unix | sed -n "$REGEX" | head -n 1
 }
 
 getvar() {
@@ -42,11 +39,11 @@ getvar() {
   local PROPPATH='/data/.magisk /cache/.magisk'
   [ -n $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
-  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
+  [ -n $VALUE ] && eval $VARNAME=\$VALUE
 }
 
 is_mounted() {
-  grep -q " `readlink -f $1` " /proc/mounts 2>/dev/null
+  grep -q " $(readlink -f $1) " /proc/mounts 2>/dev/null
   return $?
 }
 
@@ -96,6 +93,7 @@ setup_flashable() {
       fi
     done
   fi
+  recovery_actions
 }
 
 ensure_bb() {
@@ -309,51 +307,57 @@ mount_apex() {
   $BOOTMODE || [ ! -d /system/apex ] && return
   local APEX DEST
   setup_mntpoint /apex
+  mount -t tmpfs tmpfs /apex -o mode=755
+  local PATTERN='s/.*"name":[^"]*"\([^"]*\).*/\1/p'
   for APEX in /system/apex/*; do
-    DEST=/apex/$(basename $APEX .apex)
-    [ "$DEST" == /apex/com.android.runtime.release ] && DEST=/apex/com.android.runtime
-    mkdir -p $DEST 2>/dev/null
     if [ -f $APEX ]; then
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      loop_setup apex_payload.img
+      DEST=/apex/$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
+      [ -z $DEST ] && DEST=/apex/$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
+      [ -z $DEST ] && continue
+      mkdir -p $DEST
+      loop_setup /apex/apex_payload.img
       if [ ! -z $LOOPDEV ]; then
         ui_print "- Mounting $DEST"
         mount -t ext4 -o ro,noatime $LOOPDEV $DEST
       fi
-      rm -f apex_payload.img
+      rm -f /apex/apex_payload.img
     elif [ -d $APEX ]; then
       # APEX folders, bind mount directory
+      if [ -f $APEX/apex_manifest.json ]; then
+        DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
+      elif [ -f $APEX/apex_manifest.pb ]; then
+        DEST=/apex/$(strings apex_manifest.pb | head -n 1)
+      else
+        continue
+      fi
+      mkdir -p $DEST
       ui_print "- Mounting $DEST"
       mount -o bind $APEX $DEST
     fi
   done
   export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
   export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
-  local APEXRJPATH=/apex/com.android.runtime/javalib
-  local SYSFRAME=/system/framework
-  export BOOTCLASSPATH=\
-$APEXRJPATH/core-oj.jar:$APEXRJPATH/core-libart.jar:$APEXRJPATH/okhttp.jar:\
-$APEXRJPATH/bouncycastle.jar:$APEXRJPATH/apache-xml.jar:$SYSFRAME/framework.jar:\
-$SYSFRAME/ext.jar:$SYSFRAME/telephony-common.jar:$SYSFRAME/voip-common.jar:\
-$SYSFRAME/ims-common.jar:$SYSFRAME/android.test.base.jar:$SYSFRAME/telephony-ext.jar:\
-/apex/com.android.conscrypt/javalib/conscrypt.jar:\
-/apex/com.android.media/javalib/updatable-media.jar
+  export ANDROID_ART_ROOT=/apex/com.android.art
+  export ANDROID_I18N_ROOT=/apex/com.android.i18n
+  local APEXJARS=$(find /apex -name '*.jar' | sort | tr '\n' ':')
+  local FWK=/system/framework
+  export BOOTCLASSPATH=${APEXJARS}\
+$FWK/framework.jar:$FWK/ext.jar:$FWK/telephony-common.jar:\
+$FWK/voip-common.jar:$FWK/ims-common.jar:$FWK/telephony-ext.jar
 }
 
 umount_apex() {
   [ -d /apex ] || return
-  local DEST SRC
-  for DEST in /apex/*; do
-    [ "$DEST" = '/apex/*' ] && break
-    SRC=$(grep $DEST /proc/mounts | awk '{ print $1 }')
-    umount -l $DEST
-    # Detach loop device just in case
-    losetup -d $SRC 2>/dev/null
+  umount -l /apex
+  for loop in /dev/block/loop*; do
+    losetup -d $loop 2>/dev/null
   done
-  rm -rf /apex
   unset ANDROID_RUNTIME_ROOT
   unset ANDROID_TZDATA_ROOT
+  unset ANDROID_ART_ROOT
+  unset ANDROID_I18N_ROOT
   unset BOOTCLASSPATH
 }
 
@@ -389,7 +393,7 @@ find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
     BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery$SLOT sos`
-  elif [ ! -z $SLOT ]; then
+  elif [ -n $SLOT ]; then
     BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
     BOOTIMAGE=`find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg boot lnx boot_a`
@@ -402,7 +406,7 @@ find_boot_image() {
 
 flash_image() {
   case "$1" in
-    *.gz) CMD1="$MAGISKBIN/magiskboot decompress '$1' - 2>/dev/null";;
+    *.gz) CMD1="gzip -d < '$1' 2>/dev/null";;
     *)    CMD1="cat '$1'";;
   esac
   if $BOOTSIGNED; then

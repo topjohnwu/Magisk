@@ -17,13 +17,12 @@ import com.topjohnwu.magisk.ui.MainActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import com.topjohnwu.magisk.MainDirections.Companion.actionFlashFragment as toFlash
-import com.topjohnwu.magisk.ui.flash.FlashFragmentArgs as args
 
 class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_flash_md2
     override val viewModel by viewModel<FlashViewModel> {
-        parametersOf(args.fromBundle(requireArguments()))
+        parametersOf(FlashFragmentArgs.fromBundle(requireArguments()))
     }
 
     private var defaultOrientation = -1
@@ -78,7 +77,7 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
     companion object {
 
-        private fun createIntent(context: Context, args: args) =
+        private fun createIntent(context: Context, args: FlashFragmentArgs) =
             NavDeepLinkBuilder(context)
                 .setGraph(R.navigation.main)
                 .setComponentName(MainActivity::class.java.cmp(context.packageName))
@@ -91,59 +90,34 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flashIntent(context: Context, file: Uri, isSecondSlot: Boolean, id: Int = -1) = args(
-            installer = file,
-            action = flashType(isSecondSlot),
-            dismissId = id
-        ).let { createIntent(context, it) }
-
-        fun flash(file: Uri, isSecondSlot: Boolean, id: Int) = toFlash(
-            installer = file,
-            action = flashType(isSecondSlot),
-            dismissId = id
+        fun flash(isSecondSlot: Boolean) = toFlash(
+            action = flashType(isSecondSlot)
         ).let { BaseUIActivity.postDirections(it) }
 
         /* Patching is understood as injecting img files with magisk */
 
-        fun patchIntent(context: Context, file: Uri, uri: Uri, id: Int = -1) = args(
-            installer = file,
+        fun patch(uri: Uri) = toFlash(
             action = Const.Value.PATCH_FILE,
-            additionalData = uri,
-            dismissId = id
-        ).let { createIntent(context, it) }
-
-        fun patch(file: Uri, uri: Uri, id: Int) = toFlash(
-            installer = file,
-            action = Const.Value.PATCH_FILE,
-            additionalData = uri,
-            dismissId = id
+            additionalData = uri
         ).let { BaseUIActivity.postDirections(it) }
 
         /* Uninstalling is understood as removing magisk entirely */
 
-        fun uninstallIntent(context: Context, file: Uri, id: Int = -1) = args(
-            installer = file,
-            action = Const.Value.UNINSTALL,
-            dismissId = id
-        ).let { createIntent(context, it) }
-
-        fun uninstall(file: Uri, id: Int) = toFlash(
-            installer = file,
-            action = Const.Value.UNINSTALL,
-            dismissId = id
+        fun uninstall() = toFlash(
+            action = Const.Value.UNINSTALL
         ).let { BaseUIActivity.postDirections(it) }
 
         /* Installing is understood as flashing modules / zips */
 
-        fun installIntent(context: Context, file: Uri, id: Int = -1) = args(
-            installer = file,
+        fun installIntent(context: Context, file: Uri, id: Int = -1) = FlashFragmentArgs(
             action = Const.Value.FLASH_ZIP,
+            additionalData = file,
             dismissId = id
         ).let { createIntent(context, it) }
 
         fun install(file: Uri, id: Int) = toFlash(
-            installer = file,
             action = Const.Value.FLASH_ZIP,
+            additionalData = file,
             dismissId = id
         ).let { BaseUIActivity.postDirections(it) }
     }

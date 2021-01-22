@@ -23,6 +23,7 @@ import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import android.system.Os
 import android.text.PrecomputedText
 import android.view.View
 import android.view.ViewGroup
@@ -59,6 +60,20 @@ import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
 
+fun symlink(oldPath: String, newPath: String) {
+    if (SDK_INT >= 21) {
+        Os.symlink(oldPath, newPath)
+    } else {
+        // Just copy the files pre 5.0
+        val old = File(oldPath)
+        val newFile = File(newPath)
+        old.copyTo(newFile)
+        if (old.canExecute())
+            newFile.setExecutable(true)
+    }
+
+}
+
 val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
 
 @get:SuppressLint("InlinedApi")
@@ -82,6 +97,11 @@ fun Context.getBitmap(id: Int): Bitmap {
     drawable.draw(canvas)
     return bitmap
 }
+
+val Context.deviceProtectedContext: Context get() =
+    if (SDK_INT >= 24) {
+        createDeviceProtectedStorageContext()
+    } else { this }
 
 fun Intent.startActivity(context: Context) = context.startActivity(this)
 

@@ -13,6 +13,8 @@
         android:icon="@drawable/ic_launcher"
         android:name="a.e"
         android:allowBackup="false"
+        android:multiArch="true"
+        android:extractNativeLibs="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Splash -->

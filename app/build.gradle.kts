@@ -1,3 +1,4 @@
+import org.apache.tools.ant.filters.FixCrLfFilter
 import java.io.PrintStream
 
 plugins {
@@ -22,8 +23,8 @@ android {
         applicationId = "com.topjohnwu.magisk"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled = true
-        versionName = Config.appVersion
-        versionCode = Config.appVersionCode
+        versionName = Config.version
+        versionCode = Config.versionCode
 
         javaCompileOptions.annotationProcessorOptions.arguments(
             mapOf("room.incremental" to "true")
@@ -51,13 +52,14 @@ android {
     }
 
     packagingOptions {
-        exclude("/META-INF/**")
+        exclude("/META-INF/*")
         exclude("/org/bouncycastle/**")
         exclude("/kotlin/**")
         exclude("/kotlinx/**")
         exclude("/okhttp3/**")
         exclude("/*.txt")
         exclude("/*.bin")
+        doNotStrip("**/*.so")
     }
 
     kotlinOptions {
@@ -65,10 +67,82 @@ android {
     }
 }
 
-tasks["preBuild"]?.dependsOn(tasks.register("copyUtils", Copy::class) {
-    from(rootProject.file("scripts/util_functions.sh"))
-    into("src/main/res/raw")
-})
+val syncLibs by tasks.registering(Sync::class) {
+    into("src/main/jniLibs")
+    into("armeabi-v7a") {
+        from(rootProject.file("native/out/armeabi-v7a")) {
+            include("busybox", "magiskboot", "magiskinit", "magisk")
+            rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+        }
+        from(rootProject.file("native/out/arm64-v8a")) {
+            include("magisk")
+            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+        }
+    }
+    into("x86") {
+        from(rootProject.file("native/out/x86")) {
+            include("busybox", "magiskboot", "magiskinit", "magisk")
+            rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+        }
+        from(rootProject.file("native/out/x86_64")) {
+            include("magisk")
+            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+        }
+    }
+    doFirst {
+        if (inputs.sourceFiles.files.size != 10)
+            throw StopExecutionException("Build binary files first")
+    }
+}
+
+val createStubLibs by tasks.registering {
+    dependsOn(syncLibs)
+    doLast {
+        val arm64 = project.file("src/main/jniLibs/arm64-v8a/libstub.so")
+        arm64.parentFile.mkdirs()
+        arm64.createNewFile()
+        val x64 = project.file("src/main/jniLibs/x86_64/libstub.so")
+        x64.parentFile.mkdirs()
+        x64.createNewFile()
+    }
+}
+
+val syncAssets by tasks.registering(Sync::class) {
+    dependsOn(createStubLibs)
+    inputs.property("version", Config.version)
+    inputs.property("versionCode", Config.versionCode)
+    into("src/main/assets")
+    from(rootProject.file("scripts")) {
+        include("util_functions.sh", "boot_patch.sh", "magisk_uninstaller.sh", "addon.d.sh")
+    }
+    into("chromeos") {
+        from(rootProject.file("tools/futility"))
+        from(rootProject.file("tools/keys")) {
+            include("kernel_data_key.vbprivk", "kernel.keyblock")
+        }
+    }
+    filesMatching("**/util_functions.sh") {
+        filter {
+            it.replace("#MAGISK_VERSION_STUB",
+                "MAGISK_VER='${Config.version}'\n" +
+                "MAGISK_VER_CODE=${Config.versionCode}")
+        }
+        filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+    }
+}
+
+val syncResources by tasks.registering(Sync::class) {
+    dependsOn(syncAssets)
+    into("src/main/resources/META-INF/com/google/android")
+    from(rootProject.file("scripts/update_binary.sh")) {
+        rename { "update-binary" }
+    }
+    from(rootProject.file("scripts/flash_script.sh")) {
+        rename { "updater-script" }
+    }
+}
+
+tasks["preBuild"]?.dependsOn(syncResources)
 
 android.applicationVariants.all {
     val keysDir = rootProject.file("tools/keys")
@@ -178,6 +252,5 @@ dependencies {
     implementation("androidx.transition:transition:1.3.1")
     implementation("androidx.multidex:multidex:2.0.1")
     implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
     implementation("com.google.android.material:material:1.2.1")
 }

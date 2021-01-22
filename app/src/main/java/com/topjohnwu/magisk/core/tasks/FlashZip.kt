@@ -2,14 +2,13 @@ package com.topjohnwu.magisk.core.tasks
 
 import android.content.Context
 import android.net.Uri
-import androidx.core.os.postDelayed
+import androidx.core.net.toFile
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
-import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
+import com.topjohnwu.magisk.core.utils.unzip
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.KoinComponent
@@ -25,61 +24,50 @@ open class FlashZip(
     private val logs: MutableList<String>
 ): KoinComponent {
 
-    val context: Context by inject()
-    private val installFolder = File(context.cacheDir, "flash").apply {
-        if (!exists()) mkdirs()
-    }
-    private val tmpFile: File = File(installFolder, "install.zip")
-
-    @Throws(IOException::class)
-    private fun unzipAndCheck(): Boolean {
-        val parentFile = tmpFile.parentFile ?: return false
-        tmpFile.unzip(parentFile, "META-INF/com/google/android", true)
-
-        val updaterScript = File(parentFile, "updater-script")
-        return Shell
-            .su("grep -q '#MAGISK' $updaterScript")
-            .exec()
-            .isSuccess
-    }
+    private val context: Context by inject()
+    private val installDir = File(context.cacheDir, "flash")
+    private lateinit var zipFile: File
 
     @Throws(IOException::class)
     private fun flash(): Boolean {
-        console.add("- Copying zip to temp directory")
+        installDir.deleteRecursively()
+        installDir.mkdirs()
 
-        runCatching {
-            mUri.inputStream().writeTo(tmpFile)
-        }.getOrElse {
-            when (it) {
-                is FileNotFoundException -> console.add("! Invalid Uri")
-                is IOException -> console.add("! Cannot copy to cache")
+        zipFile = if (mUri.scheme == "file") {
+            mUri.toFile()
+        } else {
+            File(installDir, "install.zip").also {
+                console.add("- Copying zip to temp directory")
+                try {
+                    mUri.inputStream().writeTo(it)
+                } catch (e: IOException) {
+                    when (e) {
+                        is FileNotFoundException -> console.add("! Invalid Uri")
+                        else -> console.add("! Cannot copy to cache")
+                    }
+                    throw e
+                }
             }
-            throw it
         }
 
-        val isMagiskModule = runCatching {
-            unzipAndCheck()
+        val isValid = runCatching {
+            zipFile.unzip(installDir, "META-INF/com/google/android", true)
+            val script = File(installDir, "updater-script")
+            script.readText().contains("#MAGISK")
         }.getOrElse {
             console.add("! Unzip error")
             throw it
         }
 
-        if (!isMagiskModule) {
-            console.add("! This zip is not a Magisk Module!")
+        if (!isValid) {
+            console.add("! This zip is not a Magisk module!")
             return false
         }
 
         console.add("- Installing ${mUri.displayName}")
 
-        val parentFile = tmpFile.parent ?: return false
-
-        return Shell
-            .su(
-                "cd $parentFile",
-                "BOOTMODE=true sh update-binary dummy 1 $tmpFile"
-            )
-            .to(console, logs)
-            .exec().isSuccess
+        return Shell.su("sh $installDir/update-binary dummy 1 $zipFile")
+            .to(console, logs).exec().isSuccess
     }
 
     open suspend fun exec() = withContext(Dispatchers.IO) {
@@ -94,25 +82,7 @@ open class FlashZip(
             Timber.e(e)
             false
         } finally {
-            Shell.su("cd /", "rm -rf ${tmpFile.parent} ${Const.TMP_FOLDER_PATH}").submit()
+            Shell.su("cd /", "rm -rf $installDir ${Const.TMPDIR}").submit()
         }
     }
-
-    class Uninstall(
-        uri: Uri,
-        console: MutableList<String>,
-        log: MutableList<String>
-    ) : FlashZip(uri, console, log) {
-
-        override suspend fun exec(): Boolean {
-            val success = super.exec()
-            if (success) {
-                UiThreadHandler.handler.postDelayed(3000) {
-                    Shell.su("pm uninstall " + context.packageName).exec()
-                }
-            }
-            return success
-        }
-    }
-
 }

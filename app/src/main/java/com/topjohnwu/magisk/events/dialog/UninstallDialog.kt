@@ -4,9 +4,7 @@ import android.app.ProgressDialog
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.Action
-import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.Subject
+import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
@@ -46,7 +44,7 @@ class UninstallDialog : DialogEvent() {
     }
 
     private fun completeUninstall() {
-        DownloadService.start(dialog.context, Subject.Magisk(Action.Uninstall))
+        FlashFragment.uninstall()
     }
 
 }

@@ -6,9 +6,6 @@
 # The version name of Magisk. Default: git HEAD short SHA1
 version=string
 
-# The version name of Magisk Manager. Default: git HEAD short SHA1
-appVersion=string
-
 # Output path. Default: out
 outdir=string
 

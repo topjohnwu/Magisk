@@ -110,7 +110,7 @@ class SelectModuleEvent : ViewEvent(), FragmentExecutor {
                 activity.startActivityForResult(intent, Const.ID.FETCH_ZIP) { code, intent ->
                     if (code == Activity.RESULT_OK && intent != null) {
                         intent.data?.also {
-                            MainDirections.actionFlashFragment(it, Const.Value.FLASH_ZIP).navigate()
+                            MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, it).navigate()
                         }
                     }
                 }

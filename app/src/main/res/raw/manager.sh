@@ -13,21 +13,35 @@ env_check() {
   return 0
 }
 
-fix_env() {
-  cd $MAGISKBIN
-  PATH=/system/bin /system/bin/sh update-binary -x
-  ./busybox rm -f update-binary magisk.apk
-  ./busybox chmod -R 755 .
-  ./magiskinit -x magisk magisk
+cp_readlink() {
+  if [ -z $2 ]; then
+    cd $1
+  else
+    cp -af $1/. $2
+    cd $2
+  fi
+  for file in *; do
+    if [ -L $file ]; then
+      local full=$(readlink -f $file)
+      rm $file
+      cp -af $full $file
+    fi
+  done
+  chmod -R 755 .
   cd /
 }
 
-direct_install() {
-  rm -rf $MAGISKBIN/* 2>/dev/null
+fix_env() {
+  # Cleanup and make dirs
+  rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
   cp -af $1/. $MAGISKBIN
-  rm -f $MAGISKBIN/new-boot.img
+  rm -rf $1
+  chown -R 0:0 $MAGISKBIN
+}
+
+direct_install() {
   echo "- Flashing new boot image"
   flash_image $1/new-boot.img $2
   case $? in
@@ -40,8 +54,18 @@ direct_install() {
       return 2
       ;;
   esac
-  rm -rf $1
+
+  rm -f $1/new-boot.img
+  fix_env $1
+
   return 0
+}
+
+run_uninstaller() {
+  rm -rf /dev/tmp
+  mkdir -p /dev/tmp/install
+  unzip -o "$1" "assets/*" "lib/*" -d /dev/tmp/install
+  INSTALLER=/dev/tmp/install sh /dev/tmp/install/assets/magisk_uninstaller.sh dummy 1 "$1"
 }
 
 restore_imgs() {

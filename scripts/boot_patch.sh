@@ -1,8 +1,7 @@
 #!/system/bin/sh
-###########################################################################################
-#
+#######################################################################################
 # Magisk Boot Image Patcher
-# by topjohnwu
+#######################################################################################
 #
 # Usage: boot_patch.sh <bootimage>
 #
@@ -14,16 +13,17 @@
 # File name          Type      Description
 #
 # boot_patch.sh      script    A script to patch boot image for Magisk.
-#                  (this file) The script will use binaries and files in its same directory
-#                              to complete the patching process
-# util_functions.sh  script    A script which hosts all functions required for this script
-#                              to work properly
-# magiskinit         binary    The binary to replace /init; magisk binary embedded
+#                  (this file) The script will use files in its same
+#                              directory to complete the patching process
+# util_functions.sh  script    A script which hosts all functions required
+#                              for this script to work properly
+# magiskinit         binary    The binary to replace /init
+# magisk(32/64)      binary    The magisk binaries
 # magiskboot         binary    A tool to manipulate boot images
-# chromeos           folder    This folder includes all the utilities and keys to sign
-#                  (optional)  chromeos boot images. Currently only used for Pixel C
+# chromeos           folder    This folder includes the utility and keys to sign
+#                  (optional)  chromeos boot images. Only used for Pixel C.
 #
-###########################################################################################
+#######################################################################################
 
 ############
 # Functions
@@ -50,7 +50,7 @@ getdir() {
 
 if [ -z $SOURCEDMODE ]; then
   # Switch to the location of the script file
-  cd "`getdir "${BASH_SOURCE:-$0}"`"
+  cd "$(getdir "${BASH_SOURCE:-$0}")"
   # Load utility functions
   . ./util_functions.sh
   # Check if 64-bit
@@ -106,14 +106,14 @@ fi
 case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
-    SHA1=`./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null`
+    SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
     cat $BOOTIMAGE > stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
     ./magiskboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     ;;

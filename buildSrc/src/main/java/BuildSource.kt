@@ -18,12 +18,13 @@ object Config {
     }
     fun contains(key: String) = get(key) != null
 
-    val appVersion: String get() = get("appVersion") ?: commitHash
-    val appVersionCode: Int get() = commitCount
+    val version: String = get("version") ?: commitHash
+    val versionCode: Int get() = get("magisk.versionCode")!!.toInt()
 }
 
 class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        project.rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by project
         val config = configPath?.let { File(it) } ?: project.rootProject.file("config.prop")
         if (config.exists())

@@ -8,7 +8,6 @@ import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.checkSum
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.repository.NetworkService
@@ -69,17 +68,14 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
     // -- Download logic
 
     private suspend fun Subject.startDownload() {
-        val skip = this is Subject.Magisk && file.checkSum("MD5", magisk.md5)
-        if (!skip) {
-            val stream = service.fetchFile(url).toProgressStream(this)
-            when (this) {
-                is Subject.Module ->  // Download and process on-the-fly
-                    stream.toModule(file, service.fetchInstaller().byteStream())
-                else -> {
-                    withStreams(stream, file.outputStream()) { it, out -> it.copyTo(out) }
-                    if (this is Subject.Manager)
-                        handleAPK(this)
-                }
+        val stream = service.fetchFile(url).toProgressStream(this)
+        when (this) {
+            is Subject.Module ->  // Download and process on-the-fly
+                stream.toModule(file, service.fetchInstaller().byteStream())
+            else -> {
+                withStreams(stream, file.outputStream()) { it, out -> it.copyTo(out) }
+                if (this is Subject.Manager)
+                    handleAPK(this)
             }
         }
         val newId = notifyFinish(this)
