@@ -4,24 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
 
     <application
-        android:appComponentFactory=".DelegateComponentFactory"
         android:name="a.e"
-        android:allowBackup="false"
-        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning" >
+        android:appComponentFactory=".DelegateComponentFactory"
+        tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon,UnusedAttribute">
 
         <!-- Splash -->
-        <activity
-            android:name="a.c">
+        <activity android:name="a.c">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -43,15 +35,16 @@
             android:exported="false"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <!-- Receiver -->
         <receiver
             android:name="a.h"
-            android:directBootAware="true">
+            android:directBootAware="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -73,8 +66,7 @@
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
-            android:grantUriPermissions="true">
-        </provider>
+            android:grantUriPermissions="true" />
 
         <!-- Hardcode GMS version -->
         <meta-data

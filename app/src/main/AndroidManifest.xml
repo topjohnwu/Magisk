@@ -3,18 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
-
     <application
-        android:icon="@drawable/ic_launcher"
         android:name="a.e"
-        android:allowBackup="false"
-        android:multiArch="true"
         android:extractNativeLibs="true"
+        android:icon="@drawable/ic_launcher"
+        android:multiArch="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Splash -->
@@ -42,15 +35,16 @@
             android:exported="false"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <!-- Receiver -->
         <receiver
             android:name="a.h"
-            android:directBootAware="true">
+            android:directBootAware="true"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -72,8 +66,7 @@
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
-            android:grantUriPermissions="true">
-        </provider>
+            android:grantUriPermissions="true" />
 
         <!-- Hardcode GMS version -->
         <meta-data
@@ -84,12 +77,13 @@
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove" />
+            tools:node="remove"
+            tools:ignore="ExportedContentProvider" />
 
         <!-- We don't invalidate Room -->
         <service
             android:name="androidx.room.MultiInstanceInvalidationService"
-            tools:node="remove"/>
+            tools:node="remove" />
 
         <!-- We don't use Device Credentials -->
         <activity
