@@ -369,3 +369,13 @@ fun Int.dpInPx(): Int {
     val scale = AssetHack.resource.displayMetrics.density
     return (this * scale + 0.5).toInt()
 }
+
+@SuppressLint("PrivateApi")
+fun getProperty(key: String, def: String): String {
+    runCatching {
+        val clazz = Class.forName("android.os.SystemProperties")
+        val get = clazz.getMethod("get", String::class.java, String::class.java)
+        return get.invoke(clazz, key, def) as String
+    }
+    return def
+}

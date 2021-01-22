@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.core
 
-import android.os.Build
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
@@ -30,33 +30,14 @@ object Info {
 
     // Device state
     var crypto = ""
-    @JvmStatic var isSAR = false
-    @JvmStatic var isAB = false
+    @JvmField var isSAR = false
+    @JvmField var isAB = false
     @JvmStatic val isFDE get() = crypto == "block"
-    @JvmStatic var ramdisk = false
-    @JvmStatic var hasGMS = true
-    @JvmStatic var isPixel = false
-    @JvmStatic val cryptoText get() = crypto.capitalize(Locale.US)
-
-    @JvmStatic
-    val isEmulator: Boolean get() {
-        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
-            || Build.FINGERPRINT.startsWith("generic")
-            || Build.FINGERPRINT.startsWith("unknown")
-            || Build.HARDWARE.contains("goldfish")
-            || Build.HARDWARE.contains("ranchu")
-            || Build.MODEL.contains("google_sdk")
-            || Build.MODEL.contains("Emulator")
-            || Build.MODEL.contains("Android SDK built for x86")
-            || Build.MANUFACTURER.contains("Genymotion")
-            || Build.PRODUCT.contains("sdk_google")
-            || Build.PRODUCT.contains("google_sdk")
-            || Build.PRODUCT.contains("sdk")
-            || Build.PRODUCT.contains("sdk_x86")
-            || Build.PRODUCT.contains("vbox86p")
-            || Build.PRODUCT.contains("emulator")
-            || Build.PRODUCT.contains("simulator"))
-    }
+    @JvmField var ramdisk = false
+    @JvmField var hasGMS = true
+    @JvmField var isPixel = false
+    @JvmStatic val cryptoText get()= crypto.capitalize(Locale.US)
+    @JvmField val isEmulator = getProperty("ro.kernel.qemu", "0") == "1"
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->
