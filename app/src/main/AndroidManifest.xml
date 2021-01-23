@@ -46,7 +46,6 @@
             android:directBootAware="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
             <intent-filter>
