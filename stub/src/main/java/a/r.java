@@ -2,5 +2,4 @@ package a;
 
 import com.topjohnwu.magisk.dummy.DummyReceiver;
 
-public class h extends DummyReceiver {
-}
+public class r extends DummyReceiver {}

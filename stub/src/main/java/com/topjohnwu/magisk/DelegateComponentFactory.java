@@ -37,7 +37,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Activity instantiateActivity(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateActivity(loader, className, intent);
+            return delegate.instantiateActivity(loader, Mapping.get(className), intent);
         return create(className, DownloadActivity::new);
     }
 
@@ -45,7 +45,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public BroadcastReceiver instantiateReceiver(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateReceiver(loader, className, intent);
+            return delegate.instantiateReceiver(loader, Mapping.get(className), intent);
         return create(className, DummyReceiver::new);
     }
 
@@ -53,7 +53,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Service instantiateService(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (delegate != null)
-            return delegate.instantiateService(loader, className, intent);
+            return delegate.instantiateService(loader, Mapping.get(className), intent);
         return create(className, DummyService::new);
     }
 
@@ -62,7 +62,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (loader == null) loader = cl;
         if (delegate != null)
-            return delegate.instantiateProvider(loader, className);
+            return delegate.instantiateProvider(loader, Mapping.get(className));
         return create(className, DummyProvider::new);
     }
 
@@ -76,4 +76,5 @@ public class DelegateComponentFactory extends AppComponentFactory {
             return factory.create();
         }
     }
+
 }

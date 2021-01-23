@@ -11,10 +11,8 @@ import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 public class InjectAPK {
 
@@ -70,8 +68,7 @@ public class InjectAPK {
     private static DynAPK.Data dynData() {
         DynAPK.Data data = new DynAPK.Data();
         data.version = BuildConfig.STUB_VERSION;
-        // Public source code does not do component name obfuscation
-        data.classToComponent = new HashMap<>();
+        data.classToComponent = Mapping.inverseMap;
         return data;
     }
 

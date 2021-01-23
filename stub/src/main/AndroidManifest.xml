@@ -8,12 +8,12 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
     <application
-        android:name="a.e"
-        android:appComponentFactory=".DelegateComponentFactory"
+        android:name="a.Q"
+        android:appComponentFactory="a.z"
         tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon,UnusedAttribute">
 
         <!-- Splash -->
-        <activity android:name="a.c">
+        <activity android:name="a.u7">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -25,11 +25,11 @@
         </activity>
 
         <!-- Main -->
-        <activity android:name="a.b" />
+        <activity android:name="xt.R" />
 
         <!-- Superuser -->
         <activity
-            android:name="a.m"
+            android:name="lt5.a"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
@@ -42,7 +42,7 @@
 
         <!-- Receiver -->
         <receiver
-            android:name="a.h"
+            android:name="a.r"
             android:directBootAware="true"
             android:exported="false">
             <intent-filter>
@@ -58,15 +58,23 @@
         </receiver>
 
         <!-- DownloadService -->
-        <service android:name="a.j" />
+        <service android:name="d.s" />
 
         <!-- FileProvider -->
         <provider
-            android:name="a.p"
+            android:name="a.ii"
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true" />
+
+        <!-- WorkManager -->
+        <service
+            android:name="w.d"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <!-- Hardcode GMS version -->
         <meta-data

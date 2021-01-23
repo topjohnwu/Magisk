@@ -9,7 +9,7 @@ android {
         applicationId = "com.topjohnwu.magisk"
         versionCode = 1
         versionName = Config.version
-        buildConfigField("int", "STUB_VERSION", "16")
+        buildConfigField("int", "STUB_VERSION", Config.stubVersion)
         buildConfigField("String", "DEV_CHANNEL", Config["DEV_CHANNEL"] ?: "null")
         buildConfigField("boolean", "CANARY", if (canary) "true" else "false")
     }
