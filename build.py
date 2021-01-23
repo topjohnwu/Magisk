@@ -220,7 +220,7 @@ def sign_zip(unsigned):
         return
 
     msg = '* Signing APK'
-    apksigner = op.join(find_build_tools(), 'apksigner')
+    apksigner = op.join(find_build_tools(), 'apksigner' + ('.bat' if is_windows else ''))
 
     exec_args = [apksigner, 'sign',
                 '--ks', config['keyStore'],
