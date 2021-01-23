@@ -34,7 +34,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base.wrap(false))
+        super.attachBaseContext(base.wrap(true))
     }
 
     fun withPermission(permission: String, builder: PermissionRequestBuilder.() -> Unit) {

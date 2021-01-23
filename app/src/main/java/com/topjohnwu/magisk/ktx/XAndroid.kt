@@ -46,7 +46,7 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.ResMgr
+import com.topjohnwu.magisk.core.AssetHack
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils
@@ -366,6 +366,6 @@ var TextView.precomputedText: CharSequence
     }
 
 fun Int.dpInPx(): Int {
-    val scale = ResMgr.resource.displayMetrics.density
+    val scale = AssetHack.resource.displayMetrics.density
     return (this * scale + 0.5).toInt()
 }

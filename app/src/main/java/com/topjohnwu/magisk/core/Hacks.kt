@@ -14,6 +14,7 @@ import android.content.Intent
 import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
@@ -27,23 +28,22 @@ fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)
 }
 
-fun Context.wrap(global: Boolean = true): Context =
-    if (global) GlobalResContext(this) else ResContext(this)
+fun Context.wrap(inject: Boolean = false): Context =
+    if (inject) ReInjectedContext(this) else InjectedContext(this)
 
-fun Context.wrapJob(): Context = object : GlobalResContext(this) {
+fun Context.wrapJob(): Context = object : InjectedContext(this) {
 
-    override fun getApplicationContext(): Context {
-        return this
-    }
+    override fun getApplicationContext() = this
 
     @SuppressLint("NewApi")
     override fun getSystemService(name: String): Any? {
-        return if (!isRunningAsStub) super.getSystemService(name) else
-            when (name) {
-                Context.JOB_SCHEDULER_SERVICE ->
-                    JobSchedulerWrapper(super.getSystemService(name) as JobScheduler)
-                else -> super.getSystemService(name)
+        return super.getSystemService(name).let {
+            when {
+                !isRunningAsStub -> it
+                name == JOB_SCHEDULER_SERVICE -> JobSchedulerWrapper(it as JobScheduler)
+                else -> it
             }
+        }
     }
 }
 
@@ -58,34 +58,27 @@ inline fun <reified T> Activity.redirect() = Intent(intent)
 
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 
-private open class GlobalResContext(base: Context) : ContextWrapper(base) {
-    open val mRes: Resources get() = ResMgr.resource
-
-    override fun getResources(): Resources {
-        return mRes
-    }
-
-    override fun getClassLoader(): ClassLoader {
-        return javaClass.classLoader!!
-    }
-
+private open class InjectedContext(base: Context) : ContextWrapper(base) {
+    open val res: Resources get() = AssetHack.resource
+    override fun getAssets(): AssetManager = res.assets
+    override fun getResources() = res
+    override fun getClassLoader() = javaClass.classLoader!!
     override fun createConfigurationContext(config: Configuration): Context {
-        return ResContext(super.createConfigurationContext(config))
+        return super.createConfigurationContext(config).wrap(true)
     }
 }
 
-private class ResContext(base: Context) : GlobalResContext(base) {
-    override val mRes by lazy { base.resources.patch() }
-
+private class ReInjectedContext(base: Context) : InjectedContext(base) {
+    override val res by lazy { base.resources.patch() }
     private fun Resources.patch(): Resources {
         updateConfig()
         if (isRunningAsStub)
-            assets.addAssetPath(ResMgr.apk)
+            assets.addAssetPath(AssetHack.apk)
         return this
     }
 }
 
-object ResMgr {
+object AssetHack {
 
     lateinit var resource: Resources
     lateinit var apk: String
@@ -100,37 +93,27 @@ object ResMgr {
             apk = context.packageResourcePath
         }
     }
+
+    fun newResource(): Resources {
+        val asset = AssetManager::class.java.newInstance()
+        asset.addAssetPath(apk)
+        val config = Configuration(resource.configuration)
+        val metrics = DisplayMetrics()
+        metrics.setTo(resource.displayMetrics)
+        return Resources(asset, metrics, config)
+    }
 }
 
 @RequiresApi(28)
 private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler() {
-
-    override fun schedule(job: JobInfo): Int {
-        return base.schedule(job.patch())
-    }
-
-    override fun enqueue(job: JobInfo, work: JobWorkItem): Int {
-        return base.enqueue(job.patch(), work)
-    }
-
-    override fun cancel(jobId: Int) {
-        base.cancel(jobId)
-    }
-
-    override fun cancelAll() {
-        base.cancelAll()
-    }
-
-    override fun getAllPendingJobs(): List<JobInfo> {
-        return base.allPendingJobs
-    }
-
-    override fun getPendingJob(jobId: Int): JobInfo? {
-        return base.getPendingJob(jobId)
-    }
-
+    override fun schedule(job: JobInfo) = base.schedule(job.patch())
+    override fun enqueue(job: JobInfo, work: JobWorkItem) = base.enqueue(job.patch(), work)
+    override fun cancel(jobId: Int) = base.cancel(jobId)
+    override fun cancelAll() = base.cancelAll()
+    override fun getAllPendingJobs(): List<JobInfo> = base.allPendingJobs
+    override fun getPendingJob(jobId: Int) = base.getPendingJob(jobId)
     private fun JobInfo.patch(): JobInfo {
-        // We need to swap out the service of JobInfo
+        // Swap out the service of JobInfo
         val name = service.className
         val component = ComponentName(
             service.packageName,

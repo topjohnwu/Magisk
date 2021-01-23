@@ -73,7 +73,7 @@ open class App() : Application() {
             androidContext(wrapped)
             modules(koinModules)
         }
-        ResMgr.init(impl)
+        AssetHack.init(impl)
         app.registerActivityLifecycleCallbacks(ForegroundTracker)
         WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
