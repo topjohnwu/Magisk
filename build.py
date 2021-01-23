@@ -506,7 +506,6 @@ def build_all(args):
     build_stub(args)
     build_binary(args)
     build_app(args)
-    zip_uninstaller(args)
 
 
 parser = argparse.ArgumentParser(description='Magisk build script')
