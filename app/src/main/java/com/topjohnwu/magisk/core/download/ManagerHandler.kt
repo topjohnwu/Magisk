@@ -37,7 +37,7 @@ suspend fun BaseDownloader.handleAPK(subject: Subject.Manager) {
         if (Info.stubChk.version < subject.stub.versionCode) {
             notifyHide(id)
             // Also upgrade stub
-            service.fetchFile(subject.stub.link).byteStream().use { it.writeTo(apk) }
+            service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
             patch(apk)
         } else {
             // Simply relaunch the app

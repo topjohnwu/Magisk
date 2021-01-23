@@ -94,9 +94,7 @@ object HideAPK {
         val src = if (!isRunningAsStub && SDK_INT >= 28) {
             val stub = File(context.cacheDir, "stub.apk")
             try {
-                svc.fetchFile(Info.remote.stub.link).byteStream().use {
-                    it.writeTo(stub)
-                }
+                svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
             } catch (e: IOException) {
                 Timber.e(e)
                 return false
@@ -150,9 +148,7 @@ object HideAPK {
         } else {
             File(context.cacheDir, "manager.apk").also { apk ->
                 try {
-                    svc.fetchFile(Info.remote.app.link).byteStream().use {
-                        it.writeTo(apk)
-                    }
+                    svc.fetchFile(Info.remote.app.link).byteStream().writeTo(apk)
                 } catch (e: IOException) {
                     Timber.e(e)
                     return false

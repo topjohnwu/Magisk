@@ -140,14 +140,14 @@ abstract class MagiskInstallImpl protected constructor(
             // Extract scripts
             for (script in listOf("util_functions.sh", "boot_patch.sh", "addon.d.sh")) {
                 val dest = File(binDir, script)
-                context.assets.open(script).use { it.writeTo(dest) }
+                context.assets.open(script).writeTo(dest)
             }
             // Extract chromeos tools
             File(binDir, "chromeos").mkdir()
             for (file in listOf("futility", "kernel_data_key.vbprivk", "kernel.keyblock")) {
                 val name = "chromeos/$file"
                 val dest = File(binDir, name)
-                context.assets.open(name).use { it.writeTo(dest) }
+                context.assets.open(name).writeTo(dest)
             }
         } catch (e: Exception) {
             console.add("! Unable to extract files")
