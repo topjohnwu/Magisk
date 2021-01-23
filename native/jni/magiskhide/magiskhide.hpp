@@ -23,6 +23,7 @@ void ls_list(int client);
 
 #if !ENABLE_INJECT
 // Process monitoring
+extern pthread_t monitor_thread;
 [[noreturn]] void proc_monitor();
 [[noreturn]] void test_proc_monitor();
 #else

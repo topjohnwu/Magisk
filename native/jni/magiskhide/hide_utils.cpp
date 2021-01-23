@@ -20,10 +20,6 @@ map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
 // Locks the variables above
 pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
 
-#if !ENABLE_INJECT
-static pthread_t monitor_thread;
-#endif
-
 void update_uid_map() {
     mutex_guard lock(hide_state_lock);
     uid_proc_map.clear();
