@@ -109,7 +109,7 @@ object Restore : BaseSettingsItem.Blank() {
     override val title = R.string.settings_restore_manager_title.asTransitive()
     override val description = R.string.settings_restore_manager_summary.asTransitive()
     override fun refresh() {
-        isEnabled = Info.remote.app.versionCode > 0
+        isEnabled = Info.remote.magisk.versionCode > 0
     }
 }
 

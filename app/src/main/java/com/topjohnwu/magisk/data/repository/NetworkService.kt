@@ -8,7 +8,9 @@ import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.model.*
+import com.topjohnwu.magisk.core.model.MagiskJson
+import com.topjohnwu.magisk.core.model.StubJson
+import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.data.network.*
 import retrofit2.HttpException
 import timber.log.Timber
@@ -47,14 +49,12 @@ class NetworkService(
         val info = jsd.fetchCanaryUpdate(sha)
 
         fun genCDNUrl(name: String) = "${Const.Url.JS_DELIVR_URL}${MAGISK_FILES}@${sha}/${name}"
-        fun ManagerJson.updateCopy() = copy(link = genCDNUrl(link), note = genCDNUrl(note))
         fun MagiskJson.updateCopy() = copy(link = genCDNUrl(link), note = genCDNUrl(note))
         fun StubJson.updateCopy() = copy(link = genCDNUrl(link))
 
         return info.copy(
-            app = info.app.updateCopy(),
             magisk = info.magisk.updateCopy(),
-            stub = info.stub.updateCopy(),
+            stub = info.stub.updateCopy()
         )
     }
 

@@ -148,7 +148,7 @@ object HideAPK {
         } else {
             File(context.cacheDir, "manager.apk").also { apk ->
                 try {
-                    svc.fetchFile(Info.remote.app.link).byteStream().writeTo(apk)
+                    svc.fetchFile(Info.remote.magisk.link).byteStream().writeTo(apk)
                 } catch (e: IOException) {
                     Timber.e(e)
                     return false

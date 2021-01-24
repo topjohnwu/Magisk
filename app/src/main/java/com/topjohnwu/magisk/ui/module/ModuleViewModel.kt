@@ -313,10 +313,8 @@ class ModuleViewModel(
 
     fun infoPressed(item: ModuleItem) {
         item.repo?.also {
-            if (isConnected.get())
-                OpenReadmeEvent(it).publish()
-            else
-                SnackbarEvent(R.string.no_connection).publish()
+            if (isConnected.get()) OpenReadmeEvent(it).publish()
+            else SnackbarEvent(R.string.no_connection).publish()
         } ?: return
     }
 }

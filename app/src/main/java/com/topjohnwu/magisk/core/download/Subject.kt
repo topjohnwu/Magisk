@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Parcelable
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.model.ManagerJson
+import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.StubJson
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -39,12 +39,12 @@ sealed class Subject : Parcelable {
 
     @Parcelize
     class Manager(
-        private val app: ManagerJson = Info.remote.app,
+        private val json: MagiskJson = Info.remote.magisk,
         val stub: StubJson = Info.remote.stub
     ) : Subject() {
         override val action get() = Action.Download
-        override val title: String get() = "MagiskManager-${app.version}(${app.versionCode})"
-        override val url: String get() = app.link
+        override val title: String get() = "Magisk-${json.version}(${json.versionCode})"
+        override val url: String get() = json.link
 
         @IgnoredOnParcel
         override val file by lazy {
