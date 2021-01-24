@@ -67,12 +67,14 @@ class InstallViewModel(
             try {
                 val context = get<Context>()
                 File(context.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
-                    notes = if (exists())
-                        readText()
-                    else {
-                        val text = svc.fetchString(Const.Url.CHANGELOG_URL)
-                        writeText(text)
-                        text
+                    notes = when {
+                        exists() -> readText()
+                        Const.Url.CHANGELOG_URL.isEmpty() -> ""
+                        else -> {
+                            val text = svc.fetchString(Const.Url.CHANGELOG_URL)
+                            writeText(text)
+                            text
+                        }
                     }
                 }
             } catch (e: IOException) {
