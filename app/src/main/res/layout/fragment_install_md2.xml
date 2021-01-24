@@ -214,6 +214,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"
+                gone="@{viewModel.notes.empty}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/l1"

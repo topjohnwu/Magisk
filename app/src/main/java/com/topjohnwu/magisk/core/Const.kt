@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core
 
 import android.os.Build
 import android.os.Process
+import com.topjohnwu.magisk.BuildConfig
 import java.io.File
 
 @Suppress("DEPRECATION")
@@ -60,6 +61,9 @@ object Const {
     object Url {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
+
+        val CHANGELOG_URL = if (Version.isCanary()) Info.remote.magisk.note
+        else "https://topjohnwu.github.io/Magisk/releases/${BuildConfig.VERSION_CODE}.md"
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
         const val GITHUB_API_URL = "https://api.github.com/"

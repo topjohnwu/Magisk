@@ -1,12 +1,15 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.app.Activity
+import android.content.Context
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
@@ -15,7 +18,9 @@ import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
+import org.koin.core.get
 import timber.log.Timber
+import java.io.File
 import java.io.IOException
 
 class InstallViewModel(
@@ -60,7 +65,16 @@ class InstallViewModel(
     init {
         viewModelScope.launch {
             try {
-                notes = svc.fetchString(Info.remote.magisk.note)
+                val context = get<Context>()
+                File(context.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
+                    notes = if (exists())
+                        readText()
+                    else {
+                        val text = svc.fetchString(Const.Url.CHANGELOG_URL)
+                        writeText(text)
+                        text
+                    }
+                }
             } catch (e: IOException) {
                 Timber.e(e)
             }
