@@ -62,7 +62,7 @@ object Const {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
-        val CHANGELOG_URL = if (Version.isCanary()) Info.remote.magisk.note
+        val CHANGELOG_URL = if (BuildConfig.VERSION_CODE % 100 != 0) Info.remote.magisk.note
         else "https://topjohnwu.github.io/Magisk/releases/${BuildConfig.VERSION_CODE}.md"
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
