@@ -206,7 +206,7 @@
     <string name="repo_install_title">Instalo %1$s</string>
     <string name="repo_install_msg">Dëshiron të instalosh %1$s tani?</string>
     <string name="download">Shkarkim</string>
-    <string name="reboot">Rinis</string>
+    <string name="reboot">Ristartoni</string>
     <string name="release_notes">Lëshoni shënime</string>
     <string name="repo_cache_cleared">Depoja e repos u pastrua</string>
     <string name="flashing">Ndezje…</string>
