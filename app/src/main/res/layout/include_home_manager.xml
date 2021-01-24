@@ -115,8 +115,8 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.loadFailed ? @string/not_available : viewModel.managerRemoteVersion}"
-                                tools:text="8.0.0 (123) (10)" />
+                                android:text="@{viewModel.managerRemoteVersion}"
+                                tools:text="22.0 (22000) (16)" />
 
                         </LinearLayout>
 
@@ -133,7 +133,7 @@
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{viewModel.managerInstalledVersion}"
-                                tools:text="8.0.0 (123) (10)" />
+                                tools:text="22.0 (22000) (16)" />
 
                         </LinearLayout>
 
@@ -150,7 +150,7 @@
                             <TextView
                                 android:id="@+id/home_manager_extra_connection_value"
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.statePackageName}"
+                                android:text="@{context.packageName}"
                                 tools:text="com.topjohnwu.magisk" />
 
                         </LinearLayout>

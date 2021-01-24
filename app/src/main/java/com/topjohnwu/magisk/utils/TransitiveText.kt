@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
-import com.topjohnwu.magisk.ktx.get
 
 sealed class TransitiveText {
 
@@ -42,13 +41,13 @@ sealed class TransitiveText {
 }
 
 
-fun Int.asTransitive(vararg params: Any) = TransitiveText.Res(this, *params)
-fun CharSequence.asTransitive() = TransitiveText.String(this)
+fun Int.asTransitive(vararg params: Any): TransitiveText = TransitiveText.Res(this, *params)
+fun CharSequence.asTransitive(): TransitiveText = TransitiveText.String(this)
 
 
 @BindingAdapter("android:text")
 fun TextView.setText(text: TransitiveText) {
-    this.text = text.getText(get())
+    this.text = text.getText(context.resources)
 }
 
 @InverseBindingAdapter(attribute = "android:text", event = "android:textAttrChanged")

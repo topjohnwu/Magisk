@@ -55,7 +55,6 @@
                 android:id="@+id/home_magisk_button"
                 style="@style/WidgetFoundation.Button"
                 invisible="@{viewModel.stateMagisk != MagiskState.OBSOLETE}"
-                android:enabled="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.onMagiskPressed()}"
@@ -69,7 +68,6 @@
             <Button
                 style="@style/WidgetFoundation.Button.Text"
                 invisible="@{viewModel.stateMagisk == MagiskState.OBSOLETE}"
-                android:enabled="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="@{() -> viewModel.onMagiskPressed()}"
@@ -105,27 +103,10 @@
                         android:layout_height="wrap_content">
 
                         <LinearLayout
-                            android:id="@+id/home_magisk_latest_version"
+                            android:id="@+id/home_magisk_installed_version"
                             style="@style/W.Home.Item.Top"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="@string/home_latest_version" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{viewModel.loadFailed ? @string/not_available : viewModel.magiskRemoteVersion }"
-                                tools:text="20.1 (12345)" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_magisk_installed_version"
-                            style="@style/W.Home.Item"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_latest_version">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
@@ -133,13 +114,13 @@
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.env.isActive ? viewModel.magiskInstalledVersion : @string/not_available}"
-                                tools:text="20.1 (12345)" />
+                                android:text="@{viewModel.magiskInstalledVersion}"
+                                tools:text="22.0 (22000)" />
 
                         </LinearLayout>
 
                         <LinearLayout
-                            android:id="@+id/home_device_details_recovery"
+                            android:id="@+id/home_device_details_ramdisk"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
@@ -160,7 +141,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:barrierDirection="end"
-                            tools:constraint_referenced_ids="home_magisk_latest_version,home_magisk_installed_version"/>
+                            tools:constraint_referenced_ids="home_magisk_installed_version,home_device_details_ramdisk"/>
 
                         <LinearLayout
                             android:id="@+id/home_device_details_ab"
@@ -181,7 +162,7 @@
 
                         <LinearLayout
                             android:id="@+id/home_device_details_sar"
-                            style="@style/W.Home.Item"
+                            style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
                             app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
 
@@ -193,23 +174,6 @@
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{Info.isSAR ? @string/yes : @string/no}"
                                 tools:text="Yes" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_device_details_crypto"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_details_sar"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_sar">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="Crypto" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.cryptoText}"
-                                tools:text="N/A" />
 
                         </LinearLayout>
 

@@ -6,7 +6,6 @@ import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.getProperty
-import com.topjohnwu.magisk.utils.CachedValue
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -18,10 +17,6 @@ val isRunningAsStub get() = Info.stub != null
 
 object Info {
 
-    val envRef = CachedValue { loadState() }
-
-    @JvmStatic val env by envRef
-
     var stub: DynAPK.Data? = null
     val stubChk: DynAPK.Data
         get() = stub as DynAPK.Data
@@ -29,15 +24,16 @@ object Info {
     var remote = UpdateInfo()
 
     // Device state
-    var crypto = ""
+    @JvmStatic val env by lazy { loadState() }
     @JvmField var isSAR = false
     @JvmField var isAB = false
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
     @JvmField var isPixel = false
-    @JvmStatic val cryptoText get()= crypto.capitalize(Locale.US)
+    @JvmStatic val cryptoText get() = crypto.capitalize(Locale.US)
     @JvmField val isEmulator = getProperty("ro.kernel.qemu", "0") == "1"
+    var crypto = ""
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->

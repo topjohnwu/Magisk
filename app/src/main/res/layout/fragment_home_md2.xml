@@ -108,7 +108,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
             <Space
-                gone="@{!viewModel.showSafetyNet &amp;&amp; !viewModel.showUninstall}"
+                gone="@{!viewModel.showSafetyNet &amp;&amp; !Info.env.isActive}"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/l1" />
 
@@ -128,7 +128,7 @@
 
             <Button
                 style="@style/WidgetFoundation.Button.Outlined.Error"
-                gone="@{!viewModel.showUninstall}"
+                goneUnless="@{Info.env.isActive}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"

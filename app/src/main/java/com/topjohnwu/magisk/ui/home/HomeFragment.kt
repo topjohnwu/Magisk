@@ -26,14 +26,14 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         // Set barrier reference IDs in code, since resource IDs will be stripped in release mode
         binding.homeMagiskWrapper.homeMagiskTitleBarrier.referencedIds =
             intArrayOf(R.id.home_magisk_button, R.id.home_magisk_title, R.id.home_magisk_icon)
         binding.homeMagiskWrapper.homeMagiskBarrier.referencedIds =
-            intArrayOf(R.id.home_magisk_latest_version, R.id.home_magisk_installed_version)
+            intArrayOf(R.id.home_magisk_installed_version, R.id.home_device_details_ramdisk)
         binding.homeManagerWrapper.homeManagerTitleBarrier.referencedIds =
             intArrayOf(R.id.home_manager_button, R.id.home_manager_title, R.id.home_manager_icon)
 
@@ -46,11 +46,14 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
             menu.removeItem(R.id.action_reboot)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_settings -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
-            .navigate()
-        R.id.action_reboot -> RebootEvent.inflateMenu(activity).show()
-        else -> null
-    }?.let { true } ?: super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_settings ->
+                HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
+            R.id.action_reboot -> RebootEvent.inflateMenu(activity).show()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
+    }
 
 }
