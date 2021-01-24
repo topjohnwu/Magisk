@@ -132,7 +132,7 @@
     ]]>
     <string name="settings_download_path_title">Caminho de Download</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
-    <string name="settings_clear_cache_title">Limpar cache de repositório</string>
+    <string name="settings_clear_cache_title">Limpar cache do repositório</string>
     <string name="settings_clear_cache_summary">Limpe as informações em cache para repositórios online. Isso força o aplicativo a atualizar on-line</string>
     <string name="settings_hide_manager_title">Ocultar o Magisk Manager</string>
     <string name="settings_hide_manager_summary">Reinstalar o Magisk Manager com nomes aleatórios de pacotes e aplicativos</string>
@@ -170,6 +170,8 @@
     <string name="superuser_notification">Notificação de superusuário</string>
     <string name="settings_su_reauth_title">Autenticar novamente após a atualização</string>
     <string name="settings_su_reauth_summary">Reautenticar permissões de superusuário após a atualização de um aplicativo</string>
+    <string name="settings_su_tapjack_title">Ativar proteção contra Tapjacking</string>
+    <string name="settings_su_tapjack_summary">A caixa de diálogo do superusuário não responderá à entrada enquanto estiver obscurecida por qualquer outra janela ou sobreposição</string>
     <string name="settings_su_biometric_title">Ativar autenticação biométrica</string>
     <string name="settings_su_biometric_summary">Use a autenticação biométrica para permitir solicitações de superusuário</string>
     <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
