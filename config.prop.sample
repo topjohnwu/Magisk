@@ -9,15 +9,6 @@ version=string
 # Output path. Default: out
 outdir=string
 
-################################################################
-# Whether to use pretty names for zips
-# e.g. Magisk-v${version}.zip, Magisk-uninstaller-${date}.zip
-# Default names are magisk-${release/debug/uninstaller}.zip
-################################################################
-
-# Default: false
-prettyName=bool
-
 #####################################################
 # Signing configs for signing zips and APKs
 # These 4 variables has to be either all set or not

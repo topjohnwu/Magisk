@@ -5,7 +5,6 @@ import subprocess
 import argparse
 import multiprocessing
 import zipfile
-import datetime
 import errno
 import shutil
 import lzma
@@ -151,7 +150,6 @@ def load_config(args):
     # Default values
     config['version'] = commit_hash
     config['outdir'] = 'out'
-    config['prettyName'] = 'false'
 
     # Load prop files
     if op.exists(args.config):
@@ -160,8 +158,6 @@ def load_config(args):
     for key, value in parse_props('gradle.properties').items():
         if key.startswith('magisk.'):
             config[key[7:]] = value
-
-    config['prettyName'] = config['prettyName'].lower() == 'true'
 
     try:
         config['versionCode'] = int(config['versionCode'])
@@ -173,17 +169,10 @@ def load_config(args):
     STDOUT = None if args.verbose else subprocess.DEVNULL
 
 
-def zip_with_msg(zip_file, source, target):
-    if not op.exists(source):
-        error(f'{source} does not exist! Try build \'binary\' and \'apk\' before zipping!')
-    zip_file.write(source, target)
-    vprint(f'zip: {source} -> {target}')
-
-
 def collect_binary():
     for arch in archs + arch64:
         mkdir_p(op.join('native', 'out', arch))
-        for bin in support_targets + ['magiskinit64']:
+        for bin in support_targets:
             source = op.join('native', 'libs', arch, bin)
             target = op.join('native', 'out', arch, bin)
             mv(source, target)
@@ -214,7 +203,7 @@ def find_build_tools():
     build_tools = op.join(build_tools_root, ls[-1])
     return build_tools
 
-
+# Unused but keep this code
 def sign_zip(unsigned):
     if 'keyStore' not in config:
         return
@@ -384,60 +373,6 @@ def build_snet(args):
     header('Output: ' + target)
 
 
-def zip_uninstaller(args):
-    header('* Packing Uninstaller Zip')
-
-    datestr = f'{datetime.datetime.now():%Y%m%d}'
-    name = f'Magisk-uninstaller-{datestr}.zip' if config['prettyName'] else 'magisk-uninstaller.zip'
-    output = op.join(config['outdir'], name)
-
-    with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as zipf:
-        # update-binary
-        source = op.join('scripts', 'update_binary.sh')
-        target = op.join('META-INF', 'com', 'google',
-                         'android', 'update-binary')
-        zip_with_msg(zipf, source, target)
-
-        # updater-script
-        source = op.join('scripts', 'uninstaller.sh')
-        target = op.join('META-INF', 'com', 'google',
-                         'android', 'updater-script')
-        zip_with_msg(zipf, source, target)
-
-        # Binaries
-        for exe in ('busybox', 'magiskboot'):
-            for arch in archs:
-                source = op.join('native', 'out', arch, exe)
-                target = op.join('lib', arch, f'lib{exe}.so')
-                zip_with_msg(zipf, source, target)
-
-        # util_functions.sh
-        source = op.join('scripts', 'util_functions.sh')
-        with open(source, 'r') as script:
-            # Add version info util_functions.sh
-            util_func = script.read().replace(
-                '#MAGISK_VERSION_STUB',
-                f'MAGISK_VER="{config["version"]}"\n'
-                f'MAGISK_VER_CODE={config["versionCode"]}')
-            target = op.join('assets', 'util_functions.sh')
-            vprint(f'zip: {source} -> {target}')
-            zipf.writestr(target, util_func)
-
-        # chromeos
-        for tool in ['futility', 'kernel_data_key.vbprivk', 'kernel.keyblock']:
-            if tool == 'futility':
-                source = op.join('tools', tool)
-            else:
-                source = op.join('tools', 'keys', tool)
-            target = op.join('assets', 'chromeos', tool)
-            zip_with_msg(zipf, source, target)
-
-        # End of zipping
-
-    sign_zip(output)
-    header('Output: ' + output)
-
-
 def cleanup(args):
     support_targets = {'native', 'java'}
     if args.target:
@@ -540,10 +475,6 @@ stub_parser.set_defaults(func=build_stub)
 snet_parser = subparsers.add_parser(
     'snet', help='build snet extension')
 snet_parser.set_defaults(func=build_snet)
-
-un_parser = subparsers.add_parser(
-    'uninstaller', help='create flashable uninstaller')
-un_parser.set_defaults(func=zip_uninstaller)
 
 clean_parser = subparsers.add_parser('clean', help='cleanup')
 clean_parser.add_argument(
