@@ -50,13 +50,11 @@ class NetworkService(
         fun ManagerJson.updateCopy() = copy(link = genCDNUrl(link), note = genCDNUrl(note))
         fun MagiskJson.updateCopy() = copy(link = genCDNUrl(link), note = genCDNUrl(note))
         fun StubJson.updateCopy() = copy(link = genCDNUrl(link))
-        fun UninstallerJson.updateCopy() = copy(link = genCDNUrl(link))
 
         return info.copy(
             app = info.app.updateCopy(),
             magisk = info.magisk.updateCopy(),
             stub = info.stub.updateCopy(),
-            uninstaller = info.uninstaller.updateCopy()
         )
     }
 

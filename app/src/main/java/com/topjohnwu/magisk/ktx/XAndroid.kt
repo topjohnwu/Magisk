@@ -45,8 +45,8 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.AssetHack
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils

@@ -7,14 +7,8 @@ import kotlinx.parcelize.Parcelize
 @JsonClass(generateAdapter = true)
 data class UpdateInfo(
     val app: ManagerJson = ManagerJson(),
-    val uninstaller: UninstallerJson = UninstallerJson(),
     val magisk: MagiskJson = MagiskJson(),
     val stub: StubJson = StubJson()
-)
-
-@JsonClass(generateAdapter = true)
-data class UninstallerJson(
-    val link: String = ""
 )
 
 @JsonClass(generateAdapter = true)
