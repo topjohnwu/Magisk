@@ -7,6 +7,7 @@
     <option name="ARTIFACT_NAME" value="" />
     <option name="PM_INSTALL_OPTIONS" value="" />
     <option name="ALL_USERS" value="false" />
+    <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
     <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
     <option name="ACTIVITY_EXTRA_FLAGS" value="" />
     <option name="MODE" value="default_activity" />
@@ -15,9 +16,7 @@
     <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
     <option name="FORCE_STOP_RUNNING_APP" value="true" />
     <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
-    <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
-    <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
-    <option name="DEBUGGER_TYPE" value="Auto" />
+    <option name="DEBUGGER_TYPE" value="Java" />
     <Auto>
       <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
       <option name="SHOW_STATIC_VARS" value="true" />
