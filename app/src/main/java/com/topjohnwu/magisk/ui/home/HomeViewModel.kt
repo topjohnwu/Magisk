@@ -119,8 +119,9 @@ class HomeViewModel(
         else -> SnackbarEvent(R.string.no_connection).publish()
     }
 
-    fun onMagiskPressed() =
+    fun onMagiskPressed() = withExternalRW {
         HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+    }
 
     fun onSafetyNetPressed() =
         HomeFragmentDirections.actionHomeFragmentToSafetynetFragment().publish()
