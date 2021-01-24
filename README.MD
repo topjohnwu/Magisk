@@ -60,7 +60,8 @@ For Magisk Manager crashes, record and upload the logcat when the crash occurs.
 - Run `./build.py ndk` to let the script download and install NDK for you
 - To start building, run `build.py` to see your options. \
 For each action, use `-h` to access help (e.g. `./build.py all -h`)
-- To start development, open the project in Android Studio. Both app (Kotlin/Java) and native (C++/C) source code can be properly developed using the IDE, but *always* use `build.py` for building.
+- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native (C++/C) sources.
+- Select the "appFull" run/debug configuration to run Magisk Manager via Android Studio. The default "app" config will not work.
 - Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
 - To sign APKs and zips with your own private keys, set signing configs in `config.prop`. For more info, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
 

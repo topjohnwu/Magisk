@@ -89,9 +89,10 @@ val syncLibs by tasks.registering(Sync::class) {
             rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
         }
     }
-    doFirst {
+    onlyIf {
         if (inputs.sourceFiles.files.size != 10)
-            throw StopExecutionException("Build binary files first")
+            throw StopExecutionException("Please build binaries first! (./build.py binary)")
+        true
     }
 }
 
