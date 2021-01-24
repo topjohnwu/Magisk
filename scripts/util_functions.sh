@@ -313,9 +313,10 @@ mount_apex() {
     if [ -f $APEX ]; then
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      DEST=/apex/$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
-      [ -z $DEST ] && DEST=/apex/$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
+      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
+      [ -z $DEST ] && DEST=$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
       [ -z $DEST ] && continue
+      DEST=/apex/$DEST
       mkdir -p $DEST
       loop_setup /apex/apex_payload.img
       if [ ! -z $LOOPDEV ]; then
