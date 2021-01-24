@@ -399,7 +399,7 @@ def zip_uninstaller(args):
         zip_with_msg(zipf, source, target)
 
         # updater-script
-        source = op.join('scripts', 'magisk_uninstaller.sh')
+        source = op.join('scripts', 'uninstaller.sh')
         target = op.join('META-INF', 'com', 'google',
                          'android', 'updater-script')
         zip_with_msg(zipf, source, target)

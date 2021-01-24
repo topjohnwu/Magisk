@@ -65,7 +65,7 @@ run_uninstaller() {
   rm -rf /dev/tmp
   mkdir -p /dev/tmp/install
   unzip -o "$1" "assets/*" "lib/*" -d /dev/tmp/install
-  INSTALLER=/dev/tmp/install sh /dev/tmp/install/assets/magisk_uninstaller.sh dummy 1 "$1"
+  INSTALLER=/dev/tmp/install sh /dev/tmp/install/assets/uninstaller.sh dummy 1 "$1"
 }
 
 restore_imgs() {

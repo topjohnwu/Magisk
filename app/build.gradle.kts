@@ -114,7 +114,7 @@ val syncAssets by tasks.registering(Sync::class) {
     inputs.property("versionCode", Config.versionCode)
     into("src/main/assets")
     from(rootProject.file("scripts")) {
-        include("util_functions.sh", "boot_patch.sh", "magisk_uninstaller.sh", "addon.d.sh")
+        include("util_functions.sh", "boot_patch.sh", "uninstaller.sh", "addon.d.sh")
     }
     into("chromeos") {
         from(rootProject.file("tools/futility"))
