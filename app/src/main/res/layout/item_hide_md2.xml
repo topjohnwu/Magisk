@@ -64,7 +64,7 @@
                     app:layout_constraintStart_toEndOf="@+id/hide_icon"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_chainStyle="packed"
-                    tools:text="@string/app_name" />
+                    tools:text="@string/magisk" />
 
                 <TextView
                     android:id="@+id/hide_package"

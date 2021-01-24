@@ -29,7 +29,7 @@ object Shortcuts {
         val manager = context.getSystemService<ShortcutManager>() ?: return
         val intent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return
         val info = ShortcutInfo.Builder(context, Const.Nav.HOME)
-            .setShortLabel(context.getString(R.string.app_name))
+            .setShortLabel(context.getString(R.string.magisk))
             .setIntent(intent)
             .setIcon(context.getIcon(R.drawable.ic_launcher))
             .build()

@@ -58,7 +58,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@string/app_name" />
+                tools:text="@string/magisk" />
 
             <TextView
                 android:id="@+id/log_date"

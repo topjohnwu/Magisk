@@ -2,7 +2,6 @@
 <resources>
 
     <!-- Static strings -->
-    <string name="app_name" translatable="false">Magisk Manager</string>
     <string name="magisk" translatable="false">Magisk</string>
     <string name="magiskhide" translatable="false">MagiskHide</string>
     <string name="empty" translatable="false"/>

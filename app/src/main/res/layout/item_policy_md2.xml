@@ -61,7 +61,7 @@
                         app:layout_constraintEnd_toStartOf="@+id/policy_indicator"
                         app:layout_constraintStart_toEndOf="@+id/policy_app_icon"
                         app:layout_constraintTop_toTopOf="@+id/policy_app_icon"
-                        tools:text="@string/app_name" />
+                        tools:text="@string/magisk" />
 
                     <TextView
                         android:id="@+id/policy_package_name"
