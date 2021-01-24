@@ -32,7 +32,7 @@ object HideAPK {
 
     private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
     private const val ALPHADOTS = "$ALPHA....."
-    private const val APP_NAME = "Magisk Manager"
+    private const val APP_NAME = "Magisk"
     private const val ANDROID_MANIFEST = "AndroidManifest.xml"
 
     // Some arbitrary limit

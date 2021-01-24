@@ -17,7 +17,7 @@
     <application
         android:allowBackup="false"
         android:installLocation="internalOnly"
-        android:label="Magisk Manager"
+        android:label="Magisk"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
