@@ -438,14 +438,7 @@ flash_image() {
 install_magisk() {
   cd $MAGISKBIN
 
-  # Dump image for MTD/NAND character device boot partitions
-  if [ -c $BOOTIMAGE ]; then
-    nanddump -f boot.img $BOOTIMAGE
-    local BOOTNAND=$BOOTIMAGE
-    BOOTIMAGE=boot.img
-  fi
-
-  if [ $API -ge 21 ]; then
+  if [ $API -ge 21 -a ! -c $BOOTIMAGE ]; then
     eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi
@@ -455,9 +448,6 @@ install_magisk() {
   . ./boot_patch.sh "$BOOTIMAGE"
 
   ui_print "- Flashing new boot image"
-
-  # Restore the original boot partition path
-  [ "$BOOTNAND" ] && BOOTIMAGE=$BOOTNAND
   flash_image new-boot.img "$BOOTIMAGE"
   case $? in
     1)

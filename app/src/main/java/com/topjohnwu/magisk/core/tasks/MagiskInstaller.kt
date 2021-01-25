@@ -327,23 +327,19 @@ abstract class MagiskInstallImpl protected constructor(
     private fun patchBoot(): Boolean {
         "cd $installDir".sh()
 
-        var srcNand: File? = null
-        if ("[ -c $srcBoot ] && nanddump -f boot.img $srcBoot".sh().isSuccess) {
-            srcNand = srcBoot
-            srcBoot = installDirFile("boot.img")
-        }
-
-        var isSigned: Boolean
-        try {
-            SuFileInputStream(srcBoot).use {
-                isSigned = SignBoot.verifySignature(it, null)
-                if (isSigned) {
-                    console.add("- Boot image is signed with AVB 1.0")
+        var isSigned = false
+        if (srcBoot.let { it !is SuFile || !it.isCharacter }) {
+            try {
+                SuFileInputStream(srcBoot).use {
+                    if (SignBoot.verifySignature(it, null)) {
+                        isSigned = true
+                        console.add("- Boot image is signed with AVB 1.0")
+                    }
                 }
+            } catch (e: IOException) {
+                console.add("! Unable to check signature")
+                return false
             }
-        } catch (e: IOException) {
-            console.add("! Unable to check signature")
-            return false
         }
 
         val FLAGS =
@@ -353,9 +349,6 @@ abstract class MagiskInstallImpl protected constructor(
 
         if (!"$FLAGS sh boot_patch.sh $srcBoot".sh().isSuccess)
             return false
-
-        if (srcNand != null)
-            srcBoot = srcNand
 
         val job = Shell.sh("./magiskboot cleanup", "cd /")
 

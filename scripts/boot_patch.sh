@@ -60,6 +60,13 @@ fi
 BOOTIMAGE="$1"
 [ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
 
+# Dump image for MTD/NAND character device boot partitions
+if [ -c "$BOOTIMAGE" ]; then
+  nanddump -f boot.img "$BOOTIMAGE"
+  BOOTNAND="$BOOTIMAGE"
+  BOOTIMAGE=boot.img
+fi
+
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
@@ -187,6 +194,9 @@ ui_print "- Repacking boot image"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
+
+# Restore the original boot partition path
+[ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"
 
 # Reset any error code
 true
