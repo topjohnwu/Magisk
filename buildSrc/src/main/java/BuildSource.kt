@@ -1,4 +1,3 @@
-
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.gradle.api.Plugin
@@ -12,13 +11,14 @@ private lateinit var commitHash: String
 private var commitCount = 0
 
 object Config {
-    operator fun get(key: String) : String? {
+    operator fun get(key: String): String? {
         val v = props[key] as? String ?: return null
         return if (v.isBlank()) null else v
     }
+
     fun contains(key: String) = get(key) != null
 
-    val version: String = get("version") ?: commitHash
+    val version: String get() = get("version") ?: commitHash
     val versionCode: Int get() = get("magisk.versionCode")!!.toInt()
     val stubVersion: String get() = get("magisk.stubVersion")!!
 }
