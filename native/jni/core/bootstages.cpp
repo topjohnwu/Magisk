@@ -99,13 +99,6 @@ static void mount_mirrors() {
     link_mirror(system_ext)
 }
 
-constexpr char bb_script[] = R"EOF(
-#!/system/bin/sh
-BB=%s
-[ -x $BB ] && exec $BB "$@"
-exec /data/adb/magisk/busybox.bin "$@"
-)EOF";
-
 static bool magisk_env() {
     char buf[4096];
 
@@ -153,20 +146,12 @@ static bool magisk_env() {
         unlink("/sbin/magiskhide");
     }
 
-    if (access(DATABIN "/busybox.bin", X_OK)) {
-        if (access(DATABIN "/busybox", X_OK))
-            return false;
-        rename(DATABIN "/busybox", DATABIN "/busybox.bin");
-    }
+    if (access(DATABIN "/busybox", X_OK))
+        return false;
 
     sprintf(buf, "%s/" BBPATH "/busybox", MAGISKTMP.data());
-    {
-        auto fp = open_file(DATABIN "/busybox", "we");
-        fprintf(fp.get(), bb_script, buf);
-    }
-    chmod(DATABIN "/busybox", 0755);
     mkdir(dirname(buf), 0755);
-    cp_afc(DATABIN "/busybox.bin", buf);
+    cp_afc(DATABIN "/busybox", buf);
     exec_command_async(buf, "--install", "-s", dirname(buf));
 
     return true;
