@@ -52,19 +52,20 @@ abstract class MagiskInstallImpl protected constructor(
 ) : KoinComponent {
 
     protected lateinit var installDir: File
-    private lateinit var srcBoot: String
+    private lateinit var srcBoot: File
 
     private var tarOut: TarOutputStream? = null
     private val service: NetworkService by inject()
     protected val context: Context by inject(Protected)
 
     private fun findImage(): Boolean {
-        srcBoot = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
-        if (srcBoot.isEmpty()) {
+        val bootPath = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
+        if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
         }
-        console.add("- Target image: $srcBoot")
+        srcBoot = SuFile(bootPath)
+        console.add("- Target image: $bootPath")
         return true
     }
 
@@ -72,16 +73,17 @@ abstract class MagiskInstallImpl protected constructor(
         val slot = "echo \$SLOT".fsh()
         val target = if (slot == "_a") "_b" else "_a"
         console.add("- Target slot: $target")
-        srcBoot = arrayOf(
+        val bootPath = arrayOf(
             "SLOT=$target",
             "find_boot_image",
             "SLOT=$slot",
             "echo \"\$BOOTIMAGE\"").fsh()
-        if (srcBoot.isEmpty()) {
+        if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
         }
-        console.add("- Target image: $srcBoot")
+        srcBoot = SuFile(bootPath)
+        console.add("- Target image: $bootPath")
         return true
     }
 
@@ -213,29 +215,29 @@ abstract class MagiskInstallImpl protected constructor(
                     tarIn.copyTo(tarOut, bufferSize = 1024 * 1024)
                 }
             }
-            val boot = installDirFile("boot.img")
-            val recovery = installDirFile("recovery.img")
-            if (Config.recovery && recovery.exists() && boot.exists()) {
-                // Install Magisk to recovery
-                srcBoot = recovery.path
-                // Repack boot image to prevent restore
-                arrayOf(
-                    "./magiskboot unpack boot.img",
-                    "./magiskboot repack boot.img",
-                    "./magiskboot cleanup",
-                    "mv new-boot.img boot.img").sh()
-                SuFileInputStream(boot).use {
-                    tarOut.putNextEntry(newEntry("boot.img", boot.length()))
-                    it.copyTo(tarOut)
-                }
-                boot.delete()
-            } else {
-                if (!boot.exists()) {
-                    console.add("! No boot image found")
-                    throw IOException()
-                }
-                srcBoot = boot.path
+        }
+        val boot = installDirFile("boot.img")
+        val recovery = installDirFile("recovery.img")
+        if (Config.recovery && recovery.exists() && boot.exists()) {
+            // Install Magisk to recovery
+            srcBoot = recovery
+            // Repack boot image to prevent restore
+            arrayOf(
+                "./magiskboot unpack boot.img",
+                "./magiskboot repack boot.img",
+                "./magiskboot cleanup",
+                "mv new-boot.img boot.img").sh()
+            SuFileInputStream(boot).use {
+                tarOut.putNextEntry(newEntry("boot.img", boot.length()))
+                it.copyTo(tarOut)
             }
+            boot.delete()
+        } else {
+            if (!boot.exists()) {
+                console.add("! No boot image found")
+                throw IOException()
+            }
+            srcBoot = boot
         }
         return tarOut
     }
@@ -258,21 +260,21 @@ abstract class MagiskInstallImpl protected constructor(
                 val alpha = "abcdefghijklmnopqrstuvwxyz"
                 val alphaNum = "$alpha${alpha.toUpperCase(Locale.ROOT)}0123456789"
                 val random = SecureRandom()
-                val suffix = StringBuilder()
-                for (i in 1..5) {
-                    suffix.append(alphaNum[random.nextInt(alphaNum.length)])
+                val filename = StringBuilder("magisk_patched_").run {
+                    for (i in 1..5) {
+                        append(alphaNum[random.nextInt(alphaNum.length)])
+                    }
+                    toString()
                 }
 
-                val filename = "magisk_patched_$suffix"
                 outStream = if (magic.contentEquals("ustar".toByteArray())) {
                     outFile = MediaStoreUtils.getFile("$filename.tar", true)
                     handleTar(src, outFile!!.uri.outputStream())
                 } else {
                     // Raw image
-                    val image = installDirFile("boot.img")
-                    srcBoot = image.path
+                    srcBoot = installDirFile("boot.img")
                     console.add("- Copying image to cache")
-                    SuFileOutputStream(image).use { src.copyTo(it) }
+                    SuFileOutputStream(srcBoot).use { src.copyTo(it) }
                     outFile = MediaStoreUtils.getFile("$filename.img", true)
                     outFile!!.uri.outputStream()
                 }
@@ -292,9 +294,9 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Output file
         try {
-            val patched = SuFile.open(installDir, "new-boot.img")
+            val patched = installDirFile("new-boot.img")
             if (outStream is TarOutputStream) {
-                val name = if (srcBoot.contains("recovery")) "recovery.img" else "boot.img"
+                val name = if (srcBoot.path.contains("recovery")) "recovery.img" else "boot.img"
                 outStream.putNextEntry(newEntry(name, patched.length()))
             }
             withStreams(SuFileInputStream(patched), outStream) { src, out -> src.copyTo(out) }
@@ -325,10 +327,10 @@ abstract class MagiskInstallImpl protected constructor(
     private fun patchBoot(): Boolean {
         "cd $installDir".sh()
 
-        var srcNand = ""
+        var srcNand: File? = null
         if ("[ -c $srcBoot ] && nanddump -f boot.img $srcBoot".sh().isSuccess) {
             srcNand = srcBoot
-            srcBoot = File(installDir, "boot.img").path
+            srcBoot = installDirFile("boot.img")
         }
 
         var isSigned: Boolean
@@ -352,7 +354,7 @@ abstract class MagiskInstallImpl protected constructor(
         if (!"$FLAGS sh boot_patch.sh $srcBoot".sh().isSuccess)
             return false
 
-        if (srcNand.isNotEmpty())
+        if (srcNand != null)
             srcBoot = srcNand
 
         val job = Shell.sh("./magiskboot cleanup", "cd /")
