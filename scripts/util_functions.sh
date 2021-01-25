@@ -680,6 +680,7 @@ is_legacy_script() {
 install_module() {
   rm -rf $TMPDIR
   mkdir -p $TMPDIR
+  cd $TMPDIR
 
   setup_flashable
   mount_partitions
