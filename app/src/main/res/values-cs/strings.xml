@@ -116,7 +116,7 @@
     <string name="reboot_bootloader">Restartovat do Bootloader</string>
     <string name="reboot_download">Restartovat do Download</string>
     <string name="reboot_edl">Restartovat do EDL</string>
-    <string name="module_version_author">%1$s z %2$s</string>
+    <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_section_pending">Aktualizace</string>
     <string name="module_section_pending_action">Aktualizovat vše</string>
     <string name="module_state_remove">Odstranit</string>
