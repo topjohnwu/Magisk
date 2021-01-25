@@ -76,7 +76,7 @@ class HomeViewModel(
     override fun refresh() = viewModelScope.launch {
         state = State.LOADING
         notifyPropertyChanged(BR.showSafetyNet)
-        svc.fetchUpdate()?.apply {
+        Info.getRemote(svc)?.apply {
             state = State.LOADED
 
             stateManager = when {

@@ -36,7 +36,6 @@ class NetworkService(
             Config.updateChannel = BETA_CHANNEL
             info = fetchBetaUpdate()
         }
-        Info.remote = info
         info
     }
 

@@ -4,6 +4,7 @@ import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
+import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.Shell
@@ -18,7 +19,13 @@ object Info {
 
     var stub: DynAPK.Data? = null
 
-    var remote = UpdateInfo()
+    val EMPTY_REMOTE = UpdateInfo()
+    var remote = EMPTY_REMOTE
+    suspend fun getRemote(svc: NetworkService): UpdateInfo? {
+        return if (remote === EMPTY_REMOTE) {
+            svc.fetchUpdate()?.apply { remote = this }
+        } else remote
+    }
 
     // Device state
     @JvmStatic val env by lazy { loadState() }

@@ -141,7 +141,10 @@ object DownloadPath : BaseSettingsItem.Input() {
 
 object UpdateChannel : BaseSettingsItem.Selector() {
     override var value = Config.updateChannel
-        set(value) = setV(value, field, { field = it }) { Config.updateChannel = it }
+        set(value) = setV(value, field, { field = it }) {
+            Config.updateChannel = it
+            Info.remote = Info.EMPTY_REMOTE
+        }
 
     override val title = R.string.settings_update_channel_title.asTransitive()
     override val entries: Array<String> = resources.getStringArray(R.array.update_channel).let {
@@ -155,7 +158,10 @@ object UpdateChannel : BaseSettingsItem.Selector() {
 object UpdateChannelUrl : BaseSettingsItem.Input() {
     override val title = R.string.settings_update_custom.asTransitive()
     override var value = Config.customChannelUrl
-        set(value) = setV(value, field, { field = it }) { Config.customChannelUrl = it }
+        set(value) = setV(value, field, { field = it }) {
+            Config.customChannelUrl = it
+            Info.remote = Info.EMPTY_REMOTE
+        }
     override val description get() = value.asTransitive()
 
     override val inputResult get() = result
