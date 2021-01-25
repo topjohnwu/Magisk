@@ -9,17 +9,14 @@ import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import java.io.FileInputStream
+import java.io.File
 import java.io.IOException
-import java.util.*
 
 val isRunningAsStub get() = Info.stub != null
 
 object Info {
 
     var stub: DynAPK.Data? = null
-    val stubChk: DynAPK.Data
-        get() = stub as DynAPK.Data
 
     var remote = UpdateInfo()
 
@@ -31,7 +28,6 @@ object Info {
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
     @JvmField var isPixel = false
-    @JvmStatic val cryptoText get() = crypto.capitalize(Locale.US)
     @JvmField val isEmulator = getProperty("ro.kernel.qemu", "0") == "1"
     var crypto = ""
 
@@ -45,14 +41,12 @@ object Info {
 
     val isNewReboot by lazy {
         try {
-            FileInputStream("/proc/sys/kernel/random/boot_id").bufferedReader().use {
-                val id = it.readLine()
-                if (id != Config.bootId) {
-                    Config.bootId = id
-                    true
-                } else {
-                    false
-                }
+            val id = File("/proc/sys/kernel/random/boot_id").readText()
+            if (id != Config.bootId) {
+                Config.bootId = id
+                true
+            } else {
+                false
             }
         } catch (e: IOException) {
             false
@@ -71,8 +65,8 @@ object Info {
         hide: Boolean = false
     ) {
         val magiskHide get() = Config.magiskHide
-        val magiskVersionCode = when (code) {
-            in Int.MIN_VALUE..Const.Version.MIN_VERCODE -> -1
+        val magiskVersionCode = when {
+            code < Const.Version.MIN_VERCODE -> -1
             else -> if (Shell.rootAccess()) code else -1
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE

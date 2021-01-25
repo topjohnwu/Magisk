@@ -117,7 +117,7 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
         val name = service.className
         val component = ComponentName(
             service.packageName,
-            Info.stubChk.classToComponent[name] ?: name
+            Info.stub!!.classToComponent[name] ?: name
         )
         javaClass.getDeclaredField("service").apply {
             isAccessible = true

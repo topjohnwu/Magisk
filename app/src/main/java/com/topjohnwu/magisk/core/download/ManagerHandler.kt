@@ -34,7 +34,7 @@ suspend fun BaseDownloader.handleAPK(subject: Subject.Manager) {
         // Move to upgrade location
         apk.copyTo(DynAPK.update(this), overwrite = true)
         apk.delete()
-        if (Info.stubChk.version < subject.stub.versionCode) {
+        if (Info.stub!!.version < subject.stub.versionCode) {
             notifyHide(id)
             // Also upgrade stub
             service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
