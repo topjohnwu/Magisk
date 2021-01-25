@@ -86,7 +86,7 @@ static int64_t setup_block(bool write_block) {
                 sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
             }
             dev_t rdev = makedev(dev.major, dev.minor);
-            mknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
+            xmknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
             return rdev;
         }
         // Wait 10ms and try again

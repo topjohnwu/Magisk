@@ -322,8 +322,14 @@ void SARBase::patch_rootdir() {
 #define TMP_RULESDIR "/.backup/.sepolicy.rules"
 
 void RootFSInit::patch_rootfs() {
+    // Create hardlink mirror of /sbin to /root
+    mkdir("/root", 0777);
+    clone_attr("/sbin", "/root");
+    link_path("/sbin", "/root");
+
     // Handle custom sepolicy rules
     xmkdir(TMP_MNTDIR, 0755);
+    xmkdir("/dev/block", 0755);
     mount_rules_dir("/dev/block", TMP_MNTDIR);
     // Preserve custom rule path
     if (!custom_rules_dir.empty()) {
@@ -345,11 +351,6 @@ void RootFSInit::patch_rootfs() {
 
     patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
     rename("/init.p.rc", "/init.rc");
-
-    // Create hardlink mirror of /sbin to /root
-    mkdir("/root", 0750);
-    clone_attr("/sbin", "/root");
-    link_path("/sbin", "/root");
 
     // Dump magiskinit as magisk
     int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
