@@ -188,10 +188,15 @@ abstract class MagiskInstallImpl protected constructor(
                     val name = entry.name.replace(".lz4", "")
                     console.add("-- Extracting: $name")
 
-                    val extract = File(installDir, name)
-                    extract.outputStream().use { decompressedStream().copyTo(it) }
+                    val extract = installDirFile(name)
+                    SuFileOutputStream(extract).use { decompressedStream().copyTo(it) }
                 } else if (entry.name.contains("vbmeta.img")) {
-                    val rawData = decompressedStream().readBytes()
+                    // DO NOT USE readBytes() DUE TO BUG IN LZ4FrameInputStream
+                    val rawData = decompressedStream().run {
+                        val buffer = ByteArrayOutputStream()
+                        copyTo(buffer)
+                        buffer.toByteArray()
+                    }
                     // Valid vbmeta.img should be at least 256 bytes
                     if (rawData.size < 256)
                         continue
@@ -264,9 +269,10 @@ abstract class MagiskInstallImpl protected constructor(
                     handleTar(src, outFile!!.uri.outputStream())
                 } else {
                     // Raw image
-                    srcBoot = File(installDir, "boot.img").path
+                    val image = installDirFile("boot.img")
+                    srcBoot = image.path
                     console.add("- Copying image to cache")
-                    FileOutputStream(srcBoot).use { src.copyTo(it) }
+                    SuFileOutputStream(image).use { src.copyTo(it) }
                     outFile = MediaStoreUtils.getFile("$filename.img", true)
                     outFile!!.uri.outputStream()
                 }
