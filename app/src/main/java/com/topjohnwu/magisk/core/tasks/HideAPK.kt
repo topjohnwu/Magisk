@@ -3,12 +3,14 @@ package com.topjohnwu.magisk.core.tasks
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION.SDK_INT
 import android.widget.Toast
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.Provider
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
 import com.topjohnwu.magisk.data.repository.NetworkService
@@ -67,11 +69,11 @@ object HideAPK {
 
     fun patch(
         context: Context,
-        apk: String, out: String,
+        apk: File, out: File,
         pkg: String, label: CharSequence
     ): Boolean {
         try {
-            val jar = JarMap.open(apk)
+            val jar = JarMap.open(apk, true)
             val je = jar.getJarEntry(ANDROID_MANIFEST)
             val xml = AXML(jar.getRawData(je))
 
@@ -91,17 +93,12 @@ object HideAPK {
     }
 
     private suspend fun patchAndHide(context: Context, label: String): Boolean {
-        val src = if (!isRunningAsStub && SDK_INT >= 28) {
-            val stub = File(context.cacheDir, "stub.apk")
-            try {
-                svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
-            } catch (e: IOException) {
-                Timber.e(e)
-                return false
-            }
-            stub.path
-        } else {
-            context.packageCodePath
+        val stub = File(context.cacheDir, "stub.apk")
+        try {
+            svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
+        } catch (e: IOException) {
+            Timber.e(e)
+            return false
         }
 
         // Generate a new random package name and signature
@@ -109,7 +106,7 @@ object HideAPK {
         val pkg = genPackageName()
         Config.keyStoreRaw = ""
 
-        if (!patch(context, src, repack.path, pkg, label))
+        if (!patch(context, stub, repack, pkg, label))
             return false
 
         // Install the application
@@ -142,20 +139,8 @@ object HideAPK {
         }
     }
 
-    private suspend fun downloadAndRestore(context: Context): Boolean {
-        val apk = if (isRunningAsStub) {
-            DynAPK.current(context)
-        } else {
-            File(context.cacheDir, "manager.apk").also { apk ->
-                try {
-                    svc.fetchFile(Info.remote.magisk.link).byteStream().writeTo(apk)
-                } catch (e: IOException) {
-                    Timber.e(e)
-                    return false
-                }
-            }
-        }
-
+    private fun restoreImpl(context: Context): Boolean {
+        val apk = DynAPK.current(context)
         if (!Shell.su("adb_pm_install $apk").exec().isSuccess)
             return false
 
@@ -176,7 +161,7 @@ object HideAPK {
         val dialog = ProgressDialog.show(context, context.getString(R.string.restore_img_msg), "", true)
         GlobalScope.launch {
             val result = withContext(Dispatchers.IO) {
-                downloadAndRestore(context)
+                restoreImpl(context)
             }
             if (!result) {
                 Utils.toast(R.string.restore_manager_fail_toast, Toast.LENGTH_LONG)

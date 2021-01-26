@@ -59,8 +59,12 @@ class SettingsViewModel(
         ))
         if (Info.env.isActive) {
             list.add(ClearRepoCache)
-            if (Const.USER_ID == 0 && Info.isConnected.get())
-                list.add(if (hidden) Restore else Hide)
+            if (Build.VERSION.SDK_INT >= 21 && Const.USER_ID == 0) {
+                if (hidden)
+                    list.add(Restore)
+                else if (Info.isConnected.get())
+                    list.add(Hide)
+            }
         }
 
         // Magisk

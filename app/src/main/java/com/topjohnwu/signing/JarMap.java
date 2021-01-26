@@ -19,16 +19,8 @@ public abstract class JarMap implements Closeable {
 
     LinkedHashMap<String, JarEntry> entryMap;
 
-    public static JarMap open(String file) throws IOException {
-        return new FileMap(new File(file), true, ZipFile.OPEN_READ);
-    }
-
     public static JarMap open(File file, boolean verify) throws IOException {
         return new FileMap(file, verify, ZipFile.OPEN_READ);
-    }
-
-    public static JarMap open(String file, boolean verify) throws IOException {
-        return new FileMap(new File(file), verify, ZipFile.OPEN_READ);
     }
 
     public static JarMap open(InputStream is, boolean verify) throws IOException {
