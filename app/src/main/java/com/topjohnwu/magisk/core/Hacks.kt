@@ -18,11 +18,8 @@ import android.util.DisplayMetrics
 import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.updateConfig
-import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 
 fun AssetManager.addAssetPath(path: String) {
     DynAPK.addAssetPath(this, path)
@@ -47,10 +44,8 @@ fun Context.wrapJob(): Context = object : InjectedContext(this) {
     }
 }
 
-fun Class<*>.cmp(pkg: String): ComponentName {
-    val name = ClassMap[this].name
-    return ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
-}
+fun Class<*>.cmp(pkg: String) =
+    ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
 
 inline fun <reified T> Activity.redirect() = Intent(intent)
     .setComponent(T::class.java.cmp(packageName))
@@ -114,31 +109,16 @@ private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler
     override fun getPendingJob(jobId: Int) = base.getPendingJob(jobId)
     private fun JobInfo.patch(): JobInfo {
         // Swap out the service of JobInfo
-        val name = service.className
-        val component = ComponentName(
-            service.packageName,
-            Info.stub!!.classToComponent[name] ?: name
-        )
+        val component = service.run {
+            ComponentName(packageName,
+                Info.stub?.classToComponent?.get(className) ?: className)
+        }
         javaClass.getDeclaredField("service").apply {
             isAccessible = true
         }.set(this, component)
 
         return this
     }
-}
-
-private object ClassMap {
-
-    private val map = mapOf(
-        App::class.java to a.e::class.java,
-        MainActivity::class.java to a.b::class.java,
-        SplashActivity::class.java to a.c::class.java,
-        Receiver::class.java to a.h::class.java,
-        DownloadService::class.java to a.j::class.java,
-        SuRequestActivity::class.java to a.m::class.java
-    )
-
-    operator fun get(c: Class<*>) = map.getOrElse(c) { c }
 }
 
 // Keep a reference to these resources to prevent it from

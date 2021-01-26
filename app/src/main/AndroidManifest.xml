@@ -4,7 +4,7 @@
     package="com.topjohnwu.magisk">
 
     <application
-        android:name="a.e"
+        android:name=".core.App"
         android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:multiArch="true"
@@ -12,7 +12,7 @@
 
         <!-- Splash -->
         <activity
-            android:name="a.c"
+            android:name=".core.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +25,11 @@
         </activity>
 
         <!-- Main -->
-        <activity android:name="a.b" />
+        <activity android:name=".ui.MainActivity" />
 
         <!-- Superuser -->
         <activity
-            android:name="a.m"
+            android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
@@ -42,7 +42,7 @@
 
         <!-- Receiver -->
         <receiver
-            android:name="a.h"
+            android:name=".core.Receiver"
             android:directBootAware="true"
             android:exported="false">
             <intent-filter>
@@ -57,11 +57,11 @@
         </receiver>
 
         <!-- DownloadService -->
-        <service android:name="a.j" />
+        <service android:name=".core.download.DownloadService" />
 
         <!-- FileProvider -->
         <provider
-            android:name="a.p"
+            android:name=".core.Provider"
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
