@@ -9,22 +9,15 @@ import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
 import android.content.Intent;
 
-import com.topjohnwu.magisk.dummy.DummyProvider;
-import com.topjohnwu.magisk.dummy.DummyReceiver;
-import com.topjohnwu.magisk.dummy.DummyService;
-
 @SuppressLint("NewApi")
 public class DelegateComponentFactory extends AppComponentFactory {
 
+    static DelegateComponentFactory INSTANCE;
     ClassLoader loader;
-    AppComponentFactory delegate;
-
-    interface DummyFactory<T> {
-        T create();
-    }
+    AppComponentFactory receiver;
 
     public DelegateComponentFactory() {
-        InjectAPK.factory = this;
+        INSTANCE = this;
     }
 
     @Override
@@ -36,45 +29,39 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public Activity instantiateActivity(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (delegate != null)
-            return delegate.instantiateActivity(loader, Mapping.get(className), intent);
-        return create(className, DownloadActivity::new);
+        if (receiver != null)
+            return receiver.instantiateActivity(loader, className, intent);
+        return create(className);
     }
 
     @Override
     public BroadcastReceiver instantiateReceiver(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (delegate != null)
-            return delegate.instantiateReceiver(loader, Mapping.get(className), intent);
-        return create(className, DummyReceiver::new);
+        if (receiver != null)
+            return receiver.instantiateReceiver(loader, className, intent);
+        return create(className);
     }
 
     @Override
     public Service instantiateService(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (delegate != null)
-            return delegate.instantiateService(loader, Mapping.get(className), intent);
-        return create(className, DummyService::new);
+        if (receiver != null)
+            return receiver.instantiateService(loader, className, intent);
+        return create(className);
     }
 
     @Override
     public ContentProvider instantiateProvider(ClassLoader cl, String className)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (loader == null) loader = cl;
-        if (delegate != null)
-            return delegate.instantiateProvider(loader, Mapping.get(className));
-        return create(className, DummyProvider::new);
+        if (receiver != null)
+            return receiver.instantiateProvider(loader, className);
+        return create(className);
     }
 
-    /**
-     * Create the class or dummy implementation if creation failed
-     */
-    private <T> T create(String name, DummyFactory<T> factory) {
-        try {
-            return (T) loader.loadClass(name).newInstance();
-        } catch (Exception ignored) {
-            return factory.create();
-        }
+    private <T> T create(String name)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException{
+        return (T) loader.loadClass(name).newInstance();
     }
 
 }

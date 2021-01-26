@@ -13,7 +13,7 @@
         tools:ignore="GoogleAppIndexingWarning,MissingApplicationIcon,UnusedAttribute">
 
         <!-- Splash -->
-        <activity android:name="a.u7">
+        <activity android:name="f.u7">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -42,7 +42,7 @@
 
         <!-- Receiver -->
         <receiver
-            android:name="a.r"
+            android:name="yy.E"
             android:directBootAware="true"
             android:exported="false">
             <intent-filter>
@@ -61,7 +61,7 @@
 
         <!-- FileProvider -->
         <provider
-            android:name="a.ii"
+            android:name="fxQ.lk"
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"

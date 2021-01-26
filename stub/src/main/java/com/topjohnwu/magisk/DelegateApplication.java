@@ -10,32 +10,31 @@ import java.lang.reflect.Method;
 
 public class DelegateApplication extends Application {
 
-    private Application delegate;
     static boolean dynLoad = false;
+
+    private Application receiver;
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        // Only dynamic load full APK if hidden and possible
-        dynLoad = Build.VERSION.SDK_INT >= 28 &&
+        // Only dynamic load full APK if hidden and supported
+        dynLoad = Build.VERSION.SDK_INT >= 21 &&
                 !base.getPackageName().equals(BuildConfig.APPLICATION_ID);
-        if (!dynLoad)
-            return;
 
-        delegate = InjectAPK.setup(this);
-        if (delegate != null) try {
+        receiver = InjectAPK.setup(this);
+        if (receiver != null) try {
             // Call attachBaseContext without ContextImpl to show it is being wrapped
             Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
             m.setAccessible(true);
-            m.invoke(delegate, this);
+            m.invoke(receiver, this);
         } catch (Exception ignored) { /* Impossible */ }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (delegate != null)
-            delegate.onConfigurationChanged(newConfig);
+        if (receiver != null)
+            receiver.onConfigurationChanged(newConfig);
     }
 }
