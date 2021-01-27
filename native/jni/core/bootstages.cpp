@@ -315,7 +315,7 @@ void post_fs_data(int client) {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
+    if (getprop("persist.sys.safemode", true) == "1") {
         safe_mode = true;
         // Disable all modules and magiskhide so next boot will be clean
         disable_modules();
