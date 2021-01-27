@@ -100,10 +100,6 @@ object Hide : BaseSettingsItem.Input() {
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
-
-    override fun refresh() {
-        isEnabled = Info.remote.stub.versionCode > 0
-    }
 }
 
 object Restore : BaseSettingsItem.Blank() {

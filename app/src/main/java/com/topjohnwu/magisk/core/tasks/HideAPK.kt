@@ -106,7 +106,9 @@ object HideAPK {
             svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
         } catch (e: IOException) {
             Timber.e(e)
-            return false
+            stub.createNewFile()
+            val cmd = "\$MAGISKBIN/magiskinit -x manager ${stub.path}"
+            if (!Shell.su(cmd).exec().isSuccess) return false
         }
 
         // Generate a new random package name and signature
