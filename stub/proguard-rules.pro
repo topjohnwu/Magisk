@@ -21,5 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 # Excessive obfuscation
--repackageclasses 'a'
+-repackageclasses
 -allowaccessmodification
+-keepclassmembers class com.topjohnwu.magisk.dummy.* { <init>(); }
+-keepclassmembers class com.topjohnwu.magisk.DownloadActivity { <init>(); }
