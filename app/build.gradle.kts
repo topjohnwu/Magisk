@@ -25,6 +25,7 @@ android {
         multiDexEnabled = true
         versionName = Config.version
         versionCode = Config.versionCode
+        ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
         javaCompileOptions.annotationProcessorOptions.arguments(
             mapOf("room.incremental" to "true")

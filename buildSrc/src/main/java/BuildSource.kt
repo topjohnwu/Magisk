@@ -1,4 +1,4 @@
-import org.eclipse.jgit.api.Git
+
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -7,8 +7,7 @@ import java.io.File
 import java.util.*
 
 private val props = Properties()
-private lateinit var commitHash: String
-private var commitCount = 0
+private var commitHash = ""
 
 object Config {
     operator fun get(key: String): String? {
@@ -24,16 +23,18 @@ object Config {
 }
 
 class MagiskPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        project.rootProject.file("gradle.properties").inputStream().use { props.load(it) }
-        val configPath: String? by project
-        val config = configPath?.let { File(it) } ?: project.rootProject.file("config.prop")
+    override fun apply(project: Project) = project.applyPlugin()
+
+    private fun Project.applyPlugin() {
+        props.clear()
+        rootProject.file("gradle.properties").inputStream().use { props.load(it) }
+        val configPath: String? by this
+        val config = configPath?.let { File(it) } ?: rootProject.file("config.prop")
         if (config.exists())
             config.inputStream().use { props.load(it) }
 
-        val repo = FileRepository(project.rootProject.file(".git"))
+        val repo = FileRepository(rootProject.file(".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
         commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
-        commitCount = Git(repo).log().add(refId).call().count()
     }
 }
