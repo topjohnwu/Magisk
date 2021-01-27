@@ -284,8 +284,7 @@ def build_binary(args):
         if os.stat(args.config).st_mtime_ns > flags_stat.st_mtime_ns:
             update_flags = True
 
-    last_commit = int(cmd_out(['git', 'log', '-1', r'--format=%at', 'HEAD']))
-    if last_commit > flags_stat.st_mtime:
+    if os.stat('gradle.properties').st_mtime_ns > flags_stat.st_mtime_ns:
         update_flags = True
 
     if update_flags:
