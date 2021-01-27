@@ -56,10 +56,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
         ))
         if (Info.env.isActive) {
             if (Const.USER_ID == 0) {
-                if (hidden)
-                    list.add(Restore)
-                else if (Info.isConnected.get())
-                    list.add(Hide)
+                if (hidden) list.add(Restore) else list.add(Hide)
             }
         }
 
