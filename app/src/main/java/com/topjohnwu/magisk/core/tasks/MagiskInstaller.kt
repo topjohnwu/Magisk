@@ -43,8 +43,7 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
+import java.util.zip.ZipFile
 
 abstract class MagiskInstallImpl protected constructor(
     protected val console: MutableList<String> = NOPList.getInstance(),
@@ -111,22 +110,14 @@ abstract class MagiskInstallImpl protected constructor(
         try {
             // Extract binaries
             if (isRunningAsStub) {
-                ZipInputStream(DynAPK.current(context).inputStream().buffered()).use { zi ->
-                    lateinit var ze: ZipEntry
-                    while (zi.nextEntry?.let { ze = it } != null) {
-                        if (ze.isDirectory)
-                            continue
-
-                        val name = if (ze.name.startsWith("lib/${Const.CPU_ABI_32}/")) {
-                            val n = ze.name.substring(ze.name.lastIndexOf('/') + 1)
-                            n.substring(3, n.length - 3)
-                        } else {
-                            continue
-                        }
-
-                        val dest = File(binDir, name)
-                        dest.outputStream().use { zi.copyTo(it) }
-                    }
+                val zf = ZipFile(DynAPK.current(context))
+                zf.entries().asSequence().filter {
+                    !it.isDirectory && it.name.startsWith("lib/${Const.CPU_ABI_32}/")
+                }.forEach {
+                    val n = it.name.substring(it.name.lastIndexOf('/') + 1)
+                    val name = n.substring(3, n.length - 3)
+                    val dest = File(binDir, name)
+                    zf.getInputStream(it).writeTo(dest)
                 }
             } else {
                 val libs = Const.NATIVE_LIB_DIR.listFiles { _, name ->
