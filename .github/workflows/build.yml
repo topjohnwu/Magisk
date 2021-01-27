@@ -2,7 +2,7 @@ name: Magisk Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ v21.4-safeboot-bypass-disabled ]
     paths:
       - 'app/**'
       - 'native/**'
@@ -11,7 +11,7 @@ on:
       - 'build.py'
       - 'gradle.properties'
   pull_request:
-    branches: [ master ]
+    branches: [ v21.4-safeboot-bypass-disabled ]
   workflow_dispatch:
 
 jobs:
