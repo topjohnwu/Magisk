@@ -11,7 +11,7 @@ import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
+inline fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     var entry: ZipEntry? = nextEntry
     while (entry != null) {
         callback(entry)

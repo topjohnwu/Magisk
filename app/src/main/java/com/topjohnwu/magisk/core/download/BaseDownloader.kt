@@ -8,10 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,11 +70,7 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
         when (this) {
             is Subject.Module ->  // Download and process on-the-fly
                 stream.toModule(file, service.fetchInstaller().byteStream())
-            else -> {
-                withStreams(stream, file.outputStream()) { it, out -> it.copyTo(out) }
-                if (this is Subject.Manager)
-                    handleAPK(this)
-            }
+            is Subject.Manager -> handleAPK(this, stream)
         }
         val newId = notifyFinish(this)
         if (ForegroundTracker.hasForeground)

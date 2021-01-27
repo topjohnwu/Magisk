@@ -51,6 +51,7 @@ sealed class Subject : Parcelable {
             cachedFile("manager.apk")
         }
 
+        val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
     }
 }
 
