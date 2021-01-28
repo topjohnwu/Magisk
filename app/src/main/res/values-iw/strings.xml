@@ -49,14 +49,14 @@
     <string name="install_inactive_slot">התקן לחריץ לא פעיל (לאחר OTA)</string>
     <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לחריץ הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
     <string name="setup_title">התקנה נוספת</string>
-    <string name="select_patch_file">בחר ותקן קובץ</string>
+    <string name="select_patch_file">בחר והתקן קובץ</string>
     <string name="patch_file_msg">בחר תמונה גולמית (*.img) או ODIN קובץ tar (*.tar)</string>
     <string name="reboot_delay_toast">מאתחל בעוד 5 שניות…</string>
     <string name="flash_screen_title">התקנה</string>
 
     <!--Superuser-->
     <string name="su_request_title">בקשות משתמש על</string>
-    <string name="touch_filtered_warning">מכיוון שאפליקציה מסתירה בקשה של משתמש על, Magisk לא יכולה לאמת את תגובתך</string>
+    <string name="touch_filtered_warning">מכיוון שיישום מסתיר בקשה של משתמש על, Magisk לא יכולה לאמת את תגובתך</string>
     <string name="deny">דחה</string>		 
     <string name="prompt">מיידי</string>
     <string name="grant">הענק</string>
