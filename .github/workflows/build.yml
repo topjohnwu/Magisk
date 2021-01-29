@@ -43,12 +43,8 @@ jobs:
       - name: Set up GitHub env (Windows)
         if: runner.os == 'Windows'
         run: |
-          $oldAndroidPath = $env:ANDROID_SDK_ROOT
-          $sdk_root = "C:\Android"
-          New-Item -Path $sdk_root -ItemType SymbolicLink -Value $oldAndroidPath
           $ndk_ver = Select-String -Path "gradle.properties" -Pattern "^magisk.fullNdkVersion=" | % { $_ -replace ".*=" }
-          echo "ANDROID_SDK_ROOT=$sdk_root" >> $env:GITHUB_ENV
-          echo "ANDROID_HOME=$sdk_root" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$env:ANDROID_SDK_ROOT" >> $env:GITHUB_ENV
           echo "MAGISK_NDK_VERSION=$ndk_ver" >> $env:GITHUB_ENV
           echo "GRADLE_OPTS=-Dorg.gradle.daemon=false" >> $env:GITHUB_ENV
 
