@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core
 
+import android.os.Build
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
@@ -34,9 +35,10 @@ object Info {
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
-    @JvmField var isPixel = false
+    @JvmField val isPixel = Build.BRAND == "google"
     @JvmField val isEmulator = getProperty("ro.kernel.qemu", "0") == "1"
     var crypto = ""
+    var noDataExec = false
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->

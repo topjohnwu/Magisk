@@ -10,8 +10,9 @@ import androidx.multidex.MultiDex
 import androidx.work.WorkManager
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
+import com.topjohnwu.magisk.core.utils.AppShellInit
+import com.topjohnwu.magisk.core.utils.BusyBoxInit
 import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
-import com.topjohnwu.magisk.core.utils.RootInit
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.di.koinModules
 import com.topjohnwu.magisk.ktx.unwrap
@@ -32,7 +33,7 @@ open class App() : Application() {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         Shell.setDefaultBuilder(Shell.Builder.create()
             .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(RootInit::class.java)
+            .setInitializers(BusyBoxInit::class.java, AppShellInit::class.java)
             .setTimeout(2))
         Shell.EXECUTOR = IODispatcherExecutor()
 

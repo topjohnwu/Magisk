@@ -36,7 +36,7 @@ fix_env() {
   rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
-  cp -af $1/. $MAGISKBIN
+  cp_readlink $1 $MAGISKBIN
   rm -rf $1
   chown -R 0:0 $MAGISKBIN
 }
@@ -57,6 +57,8 @@ direct_install() {
 
   rm -f $1/new-boot.img
   fix_env $1
+  run_migrations
+  copy_sepolicy_rules
 
   return 0
 }
@@ -87,15 +89,17 @@ restore_imgs() {
 }
 
 post_ota() {
-  cd $1
+  cd /data/adb
+  cp -f $1 bootctl
+  rm -f $1
   chmod 755 bootctl
   ./bootctl hal-info || return
   [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
   ./bootctl set-active-boot-slot $SLOT_NUM
   cat << EOF > post-fs-data.d/post_ota.sh
-${1}/bootctl mark-boot-successful
-rm -f ${1}/bootctl
-rm -f ${1}/post-fs-data.d/post_ota.sh
+/data/adb/bootctl mark-boot-successful
+rm -f /data/adb/bootctl
+rm -f /data/adb/post-fs-data.d/post_ota.sh
 EOF
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
@@ -196,8 +200,7 @@ grep_prop() { return; }
 # Initialize
 #############
 
-mm_init() {
-  export BOOTMODE=true
+app_init() {
   mount_partitions
   get_flags
   run_migrations
@@ -207,3 +210,5 @@ mm_init() {
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
+
+export BOOTMODE=true
