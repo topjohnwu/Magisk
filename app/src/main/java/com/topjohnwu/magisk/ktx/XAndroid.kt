@@ -56,22 +56,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.lang.reflect.Method
 import java.lang.reflect.Array as JArray
 
 val packageName: String get() = get<Context>().packageName
+
+private lateinit var osSymlink: Method
+private lateinit var os: Any
 
 fun symlink(oldPath: String, newPath: String) {
     if (SDK_INT >= 21) {
         Os.symlink(oldPath, newPath)
     } else {
-        // Just copy the files pre 5.0
-        val old = File(oldPath)
-        val newFile = File(newPath)
-        old.copyTo(newFile)
-        if (old.canExecute())
-            newFile.setExecutable(true)
+        if (!::osSymlink.isInitialized) {
+            os = Class.forName("libcore.io.Libcore").getField("os").get(null)!!
+            osSymlink = os.javaClass.getMethod("symlink", String::class.java, String::class.java)
+        }
+        osSymlink.invoke(os, oldPath, newPath)
     }
-
 }
 
 val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
