@@ -48,7 +48,7 @@ abstract class MagiskInstallImpl protected constructor(
     private val logs: MutableList<String> = NOPList.getInstance()
 ) : KoinComponent {
 
-    protected lateinit var installDir: File
+    protected var installDir = File("xxx")
     private lateinit var srcBoot: File
 
     private lateinit var shell: Shell
