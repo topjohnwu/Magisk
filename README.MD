@@ -15,6 +15,8 @@ Here are some feature highlights:
 
 ## Downloads
 
+Please note that the only source of official Magisk information and downloads is [Github](https://github.com/topjohnwu/Magisk/). Beware of any other websites.
+
 [![](https://img.shields.io/badge/Magisk%20Manager-v8.0.7-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v8.0.7/MagiskManager-v8.0.7.apk)
 [![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
 <br>
