@@ -29,7 +29,14 @@ mount_sbin() {
 if [ ! -f /system/build.prop ]; then
   # Running on PC
   cd "$(dirname "$0")/.."
-  adb push native/out/x86/busybox scripts/emulator.sh native/out/x86/magiskinit native/out/x86_64/magisk /data/local/tmp
+  tmp="/data/local/tmp"
+  adb push native/out/x86/busybox native/out/x86/magiskinit scripts/emulator.sh $tmp
+  emu_arch=$(adb shell "chmod 777 $tmp/busybox; $tmp/busybox uname -m")
+  if [ "$emu_arch" = "x86_64" ]; then
+    adb push native/out/x86_64/magisk /data/local/tmp
+  else
+    adb push native/out/x86/magisk /data/local/tmp
+  fi
   adb shell sh /data/local/tmp/emulator.sh
   exit 0
 fi
