@@ -16,7 +16,7 @@
     <string name="app_changelog">Änderungen</string>
     <string name="manager">Manager</string>
     <string name="loading">Laden…</string>
-    <string name="update">Update</string>
+    <string name="update">Aktualisieren</string>
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
     <string name="status">Status</string>
@@ -71,10 +71,10 @@
     <string name="su_deny_toast">%1$s wurden Superuser-Rechte verweigert</string>
     <string name="su_snack_grant">Superuser-Rechte für %1$s gewährt</string>
     <string name="su_snack_deny">Superuser-Rechte für %1$s verweigert</string>
-    <string name="su_snack_notif_on">Benachrichtigungen von %1$s sind aktiviert</string>
-    <string name="su_snack_notif_off">Benachrichtigungen von %1$s sind deaktiviert</string>
-    <string name="su_snack_log_on">Protokollierung von %1$s ist aktiviert</string>
-    <string name="su_snack_log_off">Protokollierung von %1$s ist deaktiviert</string>
+    <string name="su_snack_notif_on">Benachrichtigungen für %1$s sind an</string>
+    <string name="su_snack_notif_off">Benachrichtigungen für %1$s sind aus</string>
+    <string name="su_snack_log_on">Protokollierung für %1$s aktiviert</string>
+    <string name="su_snack_log_off">Protokollierung für %1$s deaktiviert</string>
     <string name="su_revoke_title">Widerrufen?</string>
     <string name="su_revoke_msg">Bestätigen, dass %1$s-Rechte widerufen werden?</string>
     <string name="toast">Toast</string>
@@ -124,8 +124,8 @@
     <string name="module_action_install_external">Aus dem Speicher installieren</string>
     <string name="update_available">Update verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sortierreihenfolge</string>
-    <string name="external_rw_permission_denied">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Themen-Modus</string>
@@ -142,7 +142,7 @@
     <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
     <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wiederherstellen</string>
     <string name="language">Sprache</string>
-    <string name="system_default">(Systemstandard)</string>
+    <string name="system_default">Systemstandard</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
     <string name="settings_check_update_summary">Regelmäßig im Hintergrund auf Aktualisierungen prüfen</string>
     <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
@@ -171,13 +171,13 @@
     <string name="auto_response">Automatisch beantworten</string>
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
-    <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
-    <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
+    <string name="settings_su_reauth_title">Nach Aktualisierung erneut zertifizieren</string>
+    <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_tapjack_title">Tapjacking-Schutz aktivieren</string>
     <string name="settings_su_tapjack_summary">Das Dialogfeld der Superuser-Eingabeaufforderung reagiert nicht auf Eingaben, wenn es durch ein anderes Fenster oder Überlagerung verdeckt wird</string>
     <string name="settings_su_biometric_title">Biometrische Authentifizierung aktivieren</string>
-    <string name="settings_su_biometric_summary">Biometrische Authentifizierung verwenden, um Superuser-Anfragen zu ermöglichen</string>
-    <string name="no_biometric">Nicht unterstütztes Gerät oder keine biometrischen Einstellungen aktiviert</string>
+    <string name="settings_su_biometric_summary">Biometrie verwenden, um Superuser-Anfragen zuzulassen</string>
+    <string name="no_biometric">Gerät unterstützt keine biometrischen Daten oder ist nicht mit diesen konfiguriert</string>
     <string name="settings_customization">Personalisierung</string>
     <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
     <string name="settings_doh_title">DNS über HTTPS</string>
