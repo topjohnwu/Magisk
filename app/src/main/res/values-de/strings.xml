@@ -120,7 +120,7 @@
     <string name="update_available">Update verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="sorting_order">Sortierreihenfolge</string>
-    <string name="external_rw_permission_denied">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
+    <string name="external_rw_permission_denied">Gewähre den Speicher-Zugriff, um diese Funktion zu aktivieren.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Themen-Modus</string>
@@ -193,7 +193,7 @@
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Fortschrittsmitteilungen</string>
     <string name="download_complete">Download abgeschlossen</string>
-    <string name="download_file_error">Fehler beim herunterladen der Datei</string>
+    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="download_open_parent">Im übergeordneten Ordner anzeigen</string>
     <string name="download_open_self">Datei anzeigen</string>
     <string name="magisk_update_title">Magisk Update verfügbar!</string>
