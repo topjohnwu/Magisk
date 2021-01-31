@@ -73,8 +73,8 @@
     <string name="su_snack_deny">Superuser-Rechte für %1$s verweigert</string>
     <string name="su_snack_notif_on">Benachrichtigungen für %1$s sind an</string>
     <string name="su_snack_notif_off">Benachrichtigungen für %1$s sind aus</string>
-    <string name="su_snack_log_on">Protokollierung für %1$s aktiviert</string>
-    <string name="su_snack_log_off">Protokollierung für %1$s deaktiviert</string>
+    <string name="su_snack_log_on">Protokollierung für %1$s ist an</string>
+    <string name="su_snack_log_off">Protokollierung für %1$s ist aus</string>
     <string name="su_revoke_title">Widerrufen?</string>
     <string name="su_revoke_msg">Bestätigen, dass %1$s-Rechte widerufen werden?</string>
     <string name="toast">Toast</string>
