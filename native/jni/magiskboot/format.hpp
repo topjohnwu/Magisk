@@ -26,7 +26,7 @@ typedef enum {
     DTB,
 } format_t;
 
-#define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
+#define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) <= LZ4_LEGACY)
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BOOT_MAGIC      "ANDROID!"
