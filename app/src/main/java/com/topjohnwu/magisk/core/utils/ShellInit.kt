@@ -34,7 +34,7 @@ class BusyBoxInit : BaseShellInit() {
                 val jar = JarFile(DynAPK.current(context))
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI_32}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
-                jar.getInputStream(bb).writeTo(localBB)
+                kotlin.runCatching { jar.getInputStream(bb).writeTo(localBB) }
                 localBB.setExecutable(true)
             } else {
                 localBB = File(Const.NATIVE_LIB_DIR, "libbusybox.so")
