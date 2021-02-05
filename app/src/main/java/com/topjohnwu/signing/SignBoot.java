@@ -90,6 +90,21 @@ public class SignBoot {
         }
     }
 
+    private static int fullRead(InputStream in, byte[] b) throws IOException {
+        return fullRead(in, b, 0, b.length);
+    }
+
+    private static int fullRead(InputStream in, byte[] b, int off, int len) throws IOException {
+        int n = 0;
+        while (n < len) {
+            int count = in.read(b, off + n, len - n);
+            if (count <= 0)
+                break;
+            n += count;
+        }
+        return n;
+    }
+
     public static boolean doSignature(
             @Nullable X509Certificate cert, @Nullable PrivateKey key,
             @NonNull InputStream imgIn, @NonNull OutputStream imgOut, @NonNull String target
@@ -98,7 +113,7 @@ public class SignBoot {
             PushBackRWStream in = new PushBackRWStream(imgIn, imgOut);
             byte[] hdr = new byte[BOOT_IMAGE_HEADER_SIZE_MAXIMUM];
             // First read the header
-            in.read(hdr);
+            fullRead(in, hdr);
             int signableSize = getSignableImageSize(hdr);
             // Unread header
             in.unread(hdr);
@@ -128,7 +143,7 @@ public class SignBoot {
         try {
             // Read the header for size
             byte[] hdr = new byte[BOOT_IMAGE_HEADER_SIZE_MAXIMUM];
-            if (imgIn.read(hdr) != hdr.length) {
+            if (fullRead(imgIn, hdr) != hdr.length) {
                 System.err.println("Unable to read image header");
                 return false;
             }
@@ -137,7 +152,7 @@ public class SignBoot {
             // Read the rest of the image
             byte[] rawImg = Arrays.copyOf(hdr, signableSize);
             int remain = signableSize - hdr.length;
-            if (imgIn.read(rawImg, hdr.length, remain) != remain) {
+            if (fullRead(imgIn, rawImg, hdr.length, remain) != remain) {
                 System.err.println("Unable to read image");
                 return false;
             }

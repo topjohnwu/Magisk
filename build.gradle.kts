@@ -14,12 +14,12 @@ buildscript {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     }
 
-    val vNav = "2.3.2"
+    val vNav = "2.3.3"
     extra["vNav"] = vNav
 
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${vNav}")
 
         // NOTE: Do not place your application dependencies here; they belong

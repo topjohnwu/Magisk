@@ -11,9 +11,6 @@ import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 open class SplashActivity : Activity() {
 
@@ -24,9 +21,8 @@ open class SplashActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.SplashTheme)
         super.onCreate(savedInstanceState)
-        GlobalScope.launch(Dispatchers.IO) {
-            initAndStart()
-        }
+        // Pre-initialize root shell
+        Shell.getShell(null) { initAndStart() }
     }
 
     private fun handleRepackage(pkg: String?) {
@@ -45,9 +41,6 @@ open class SplashActivity : Activity() {
     }
 
     private fun initAndStart() {
-        // Pre-initialize root shell
-        Shell.getShell()
-
         val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)
 
         Config.load(prevPkg)

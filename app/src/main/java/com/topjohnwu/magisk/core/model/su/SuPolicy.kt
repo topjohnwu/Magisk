@@ -1,10 +1,12 @@
+@file:SuppressLint("InlinedApi")
+
 package com.topjohnwu.magisk.core.model.su
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.INTERACTIVE
 import com.topjohnwu.magisk.ktx.getLabel
-
 
 data class SuPolicy(
     var uid: Int,
@@ -38,7 +40,7 @@ fun SuPolicy.toMap() = mapOf(
 fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
     val uid = get("uid")?.toIntOrNull() ?: -1
     val packageName = get("package_name").orEmpty()
-    val info = pm.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES)
+    val info = pm.getApplicationInfo(packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES)
 
     if (info.uid != uid)
         throw PackageManager.NameNotFoundException()
@@ -59,7 +61,7 @@ fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
 fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): SuPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
-    val info = pm.getApplicationInfo(pkg, PackageManager.GET_UNINSTALLED_PACKAGES)
+    val info = pm.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
     return SuPolicy(
         uid = info.uid,
         packageName = pkg,

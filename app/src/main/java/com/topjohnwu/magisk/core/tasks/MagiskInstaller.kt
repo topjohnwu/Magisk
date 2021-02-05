@@ -27,6 +27,7 @@ import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.NOPList
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.io.SuFile
+import com.topjohnwu.superuser.io.SuFileInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.jpountz.lz4.LZ4FrameInputStream
@@ -292,24 +293,6 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun rootInputStream(file: File): InputStream {
-        return if (file is SuFile)
-            object : BufferedInputStream(null) {
-                private val tmp =
-                    File.createTempFile(file.name, null, context.cacheDir).also {
-                        // Copy to tmp file and read from there
-                        "cat $file > $it".sh()
-                        `in` = it.inputStream()
-                    }
-                override fun close() {
-                    super.close()
-                    tmp.delete()
-                }
-            }
-        else
-            file.inputStream().buffered()
-    }
-
     private fun patchBoot(): Boolean {
         val inRootDir = shell.isRoot && Info.noDataExec
 
@@ -335,7 +318,7 @@ abstract class MagiskInstallImpl protected constructor(
         var isSigned = false
         if (srcBoot.let { it !is SuFile || !it.isCharacter }) {
             try {
-                rootInputStream(srcBoot).use {
+                SuFileInputStream.open(srcBoot).use {
                     if (SignBoot.verifySignature(it, null)) {
                         isSigned = true
                         console.add("- Boot image is signed with AVB 1.0")
@@ -361,8 +344,9 @@ abstract class MagiskInstallImpl protected constructor(
             console.add("- Signing boot image with verity keys")
             val signed = File.createTempFile("signed", ".img", context.cacheDir)
             try {
-                withStreams(rootInputStream(newBootImg), signed.outputStream().buffered()) {
-                    src, out -> SignBoot.doSignature(null, null, src, out, "/boot")
+                withStreams(SuFileInputStream.open(newBootImg).buffered(),
+                    signed.outputStream().buffered()) { src, out ->
+                    SignBoot.doSignature(null, null, src, out, "/boot")
                 }
             } catch (e: IOException) {
                 console.add("! Unable to sign image")
