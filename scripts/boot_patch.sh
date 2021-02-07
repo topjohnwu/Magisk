@@ -123,6 +123,7 @@ case $((STATUS & 3)) in
     [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
     ./magiskboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
+    rm -f stock_boot.img
     ;;
   2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"

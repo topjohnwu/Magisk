@@ -9,8 +9,6 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.*
-import com.topjohnwu.magisk.core.utils.BusyBoxInit
-import com.topjohnwu.magisk.core.utils.LightShellInit
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
@@ -52,9 +50,7 @@ abstract class MagiskInstallImpl protected constructor(
     protected var installDir = File("xxx")
     private lateinit var srcBoot: File
 
-    private lateinit var shell: Shell
-    private var closeShell = false
-
+    private val shell = Shell.getShell()
     private val service: NetworkService by inject()
     protected val context: Context by inject(Protected)
 
@@ -298,7 +294,7 @@ abstract class MagiskInstallImpl protected constructor(
 
         val newBootImg: File
         if (inRootDir) {
-            // Migrate everything to tmpfs to workaround Samsung bullshit
+            // Move everything to tmpfs to workaround Samsung bullshit
             SuFile("${Const.TMPDIR}/install").also {
                 arrayOf(
                     "rm -rf $it",
@@ -311,8 +307,9 @@ abstract class MagiskInstallImpl protected constructor(
             newBootImg = SuFile(installDir, "new-boot.img")
         } else {
             newBootImg = File(installDir, "new-boot.img")
-            // Create the output file before hand
+            // Create output files before hand
             newBootImg.createNewFile()
+            File(installDir, "stock_boot.img").createNewFile()
         }
 
         var isSigned = false
@@ -330,12 +327,14 @@ abstract class MagiskInstallImpl protected constructor(
             }
         }
 
-        val flags =
+        val cmds = arrayOf(
+            "cd $installDir",
             "KEEPFORCEENCRYPT=${Config.keepEnc} " +
             "KEEPVERITY=${Config.keepVerity} " +
-            "RECOVERYMODE=${Config.recovery}"
+            "RECOVERYMODE=${Config.recovery} " +
+            "sh boot_patch.sh $srcBoot")
 
-        if (!"cd $installDir; $flags sh boot_patch.sh $srcBoot".sh().isSuccess)
+        if (!cmds.sh().isSuccess)
             return false
 
         val job = shell.newJob().add("./magiskboot cleanup", "cd /")
@@ -383,47 +382,26 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun setupShell(forceNonRoot: Boolean = false): Boolean {
-        shell = Shell.getShell()
-        if (forceNonRoot && shell.isRoot) {
-            shell = Shell.Builder.create()
-                .setFlags(Shell.FLAG_NON_ROOT_SHELL)
-                .setInitializers(BusyBoxInit::class.java, LightShellInit::class.java)
-                .build()
-            closeShell = true
-        }
-        return true
-    }
-
     private fun String.sh() = shell.newJob().add(this).to(console, logs).exec()
     private fun Array<String>.sh() = shell.newJob().add(*this).to(console, logs).exec()
     private fun String.fsh() = ShellUtils.fastCmd(shell, this)
     private fun Array<String>.fsh() = ShellUtils.fastCmd(shell, *this)
 
-    protected fun doPatchFile(patchFile: Uri) =
-        setupShell(true) && extractFiles() && handleFile(patchFile)
+    protected fun doPatchFile(patchFile: Uri) = extractFiles() && handleFile(patchFile)
 
-    protected fun direct() =
-        setupShell() && findImage() && extractFiles() && patchBoot() && flashBoot()
+    protected fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
 
     protected suspend fun secondSlot() =
-        setupShell() && findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
+        findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
 
-    protected fun fixEnv() =
-        setupShell() && extractFiles() && "fix_env $installDir".sh().isSuccess
+    protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
-    protected fun uninstall() =
-        setupShell() && "run_uninstaller ${AssetHack.apk}".sh().isSuccess
+    protected fun uninstall() = "run_uninstaller ${AssetHack.apk}".sh().isSuccess
 
     @WorkerThread
     protected abstract suspend fun operations(): Boolean
 
-    open suspend fun exec() = withContext(Dispatchers.IO) {
-        val result = operations()
-        if (closeShell)
-            shell.close()
-        result
-    }
+    open suspend fun exec() = withContext(Dispatchers.IO) { operations() }
 }
 
 abstract class MagiskInstaller(

@@ -34,6 +34,7 @@ class BusyBoxInit : BaseShellInit() {
                 val jar = JarFile(DynAPK.current(context))
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI_32}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
+                localBB.delete()
                 jar.getInputStream(bb).writeTo(localBB)
                 localBB.setExecutable(true)
             } else {
@@ -61,17 +62,6 @@ class BusyBoxInit : BaseShellInit() {
                 // Directly execute the file
                 add("exec $localBB sh")
             }
-        }.exec()
-        return true
-    }
-}
-
-class LightShellInit : BaseShellInit() {
-
-    override fun init(context: Context, shell: Shell): Boolean {
-        shell.newJob().apply {
-            add("export SDK_INT=${Build.VERSION.SDK_INT}")
-            add(context.rawResource(R.raw.manager))
         }.exec()
         return true
     }
