@@ -31,7 +31,7 @@
     <string name="home_installed_version">Installiert</string>
     <string name="home_latest_version">Neueste</string>
     <string name="invalid_update_channel">Ungültiger Update-Kanal</string>
-    <string name="uninstall_magisk_title">Deinstalliere Magisk</string>
+    <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nIhre Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>
     <string name="home_check_safetynet">SafetyNet überprüfen</string>
 
@@ -231,14 +231,14 @@
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="proprietary_title">Proprietären Code herunterladen</string>
-    <string name="proprietary_notice">Magisk Manager ist FOSS und enthält nicht den proprietären SafetyNet-API-Code von Google.\n\nWollen Sie Magisk Manager erlauben, eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Prüfungen herunterzuladen?</string>
+    <string name="proprietary_notice">Magisk Manager ist FOSS (Freie und quelloffene Software) und enthält nicht den \'im Eigentum befindlichen\' SafetyNet-API-Code von Google.\n\nWollen Sie Magisk Manager erlauben, eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Prüfungen herunterzuladen?</string>
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Ihr Gerät muss zusätzlich eingerichtet werden, damit Magisk ordnungsgemäß funktioniert. Es wird das Magisk Setup-Zip herunterladen, möchten Sie jetzt fortfahren?</string>
     <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
-    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
+    <string name="unsupport_magisk_msg">Diese Magisk Manager-Version unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
     <string name="add_shortcut_msg">Nachdem der Magisk Manager ausgeblendet wurde, sind sein Name und sein Symbol möglicherweise nicht mehr zu erkennen. Möchten Sie eine hübsche Verknüpfung auf dem Startbildschirm hinzufügen?</string>
