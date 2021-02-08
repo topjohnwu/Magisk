@@ -16,7 +16,7 @@
     <string name="app_changelog">Änderungen</string>
     <string name="manager">Manager</string>
     <string name="loading">Laden…</string>
-    <string name="update">Update</string>
+    <string name="update">Aktualisieren</string>
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
     <string name="status">Status</string>
@@ -33,6 +33,7 @@
     <string name="invalid_update_channel">Ungültiger Update-Kanal</string>
     <string name="uninstall_magisk_title">Deinstalliere Magisk</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nIhre Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>
+    <string name="home_check_safetynet">SafetyNet überprüfen</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Erzwungene Verschlüsselung beibehalten</string>
@@ -51,9 +52,11 @@
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image (*.img) oder ein ODIN tarfile (*.tar) auswählen</string>
     <string name="reboot_delay_toast">Neustart in 5 Sekunden…</string>
+    <string name="flash_screen_title">Installieren</string>
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
+    <string name="touch_filtered_warning">Weil eine App eine Superuser-Anfrage verdeckt, kann Magisk Ihre Antwort nicht verifizieren</string>
     <string name="deny">Verweigern</string>
     <string name="prompt">Fragen</string>
     <string name="grant">Gewähren</string>
@@ -68,10 +71,10 @@
     <string name="su_deny_toast">%1$s wurden Superuser-Rechte verweigert</string>
     <string name="su_snack_grant">Superuser-Rechte für %1$s gewährt</string>
     <string name="su_snack_deny">Superuser-Rechte für %1$s verweigert</string>
-    <string name="su_snack_notif_on">Benachrichtigungen von %1$s sind aktiviert</string>
-    <string name="su_snack_notif_off">Benachrichtigungen von %1$s sind deaktiviert</string>
-    <string name="su_snack_log_on">Protokollierung von %1$s ist aktiviert</string>
-    <string name="su_snack_log_off">Protokollierung von %1$s ist deaktiviert</string>
+    <string name="su_snack_notif_on">Benachrichtigungen für %1$s sind an</string>
+    <string name="su_snack_notif_off">Benachrichtigungen für %1$s sind aus</string>
+    <string name="su_snack_log_on">Protokollierung für %1$s ist an</string>
+    <string name="su_snack_log_off">Protokollierung für %1$s ist aus</string>
     <string name="su_revoke_title">Widerrufen?</string>
     <string name="su_revoke_msg">Bestätigen, dass %1$s-Rechte widerufen werden?</string>
     <string name="toast">Toast</string>
@@ -100,6 +103,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">System-Apps anzeigen</string>
+    <string name="show_os_app">OS-Apps anzeigen</string>
     <string name="hide_filter_hint">Nach Namen filtern</string>
     <string name="hide_scroll_up">Nach oben scrollen</string>
     <string name="hide_filters">Filter</string>
@@ -107,6 +111,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Keine Informationen verfügbar)</string>
+    <string name="reboot_userspace">Sanfter Neustart</string>
     <string name="reboot_recovery">Neustart zum Recovery</string>
     <string name="reboot_bootloader">Neustart zum Bootloader</string>
     <string name="reboot_download">Neustart zum Download</string>
@@ -119,8 +124,8 @@
     <string name="module_action_install_external">Aus dem Speicher installieren</string>
     <string name="update_available">Update verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sortierreihenfolge</string>
-    <string name="external_rw_permission_denied">Gewähre den Speicher-Zugriff, um diese Funtion zu aktivieren.</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Themen-Modus</string>
@@ -137,7 +142,7 @@
     <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
     <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wiederherstellen</string>
     <string name="language">Sprache</string>
-    <string name="system_default">(Systemstandard)</string>
+    <string name="system_default">Systemstandard</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
     <string name="settings_check_update_summary">Regelmäßig im Hintergrund auf Aktualisierungen prüfen</string>
     <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
@@ -166,12 +171,17 @@
     <string name="auto_response">Automatisch beantworten</string>
     <string name="request_timeout">Zeitlimit für Anfrage</string>
     <string name="superuser_notification">Superuser-Benachrichtigung</string>
-    <string name="settings_su_reauth_title">Nach Aktualisierung erneut authentifizieren</string>
-    <string name="settings_su_reauth_summary">Superuser-Zugriff nach App-Aktualisierung erneut abfragen</string>
+    <string name="settings_su_reauth_title">Nach Aktualisierung erneut zertifizieren</string>
+    <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
+    <string name="settings_su_tapjack_title">Tapjacking-Schutz aktivieren</string>
+    <string name="settings_su_tapjack_summary">Das Dialogfeld der Superuser-Eingabeaufforderung reagiert nicht auf Eingaben, wenn es durch ein anderes Fenster oder Überlagerung verdeckt wird</string>
     <string name="settings_su_biometric_title">Biometrische Authentifizierung aktivieren</string>
-    <string name="settings_su_biometric_summary">Biometrische Authentifizierung verwenden, um Superuser-Anfragen zu ermöglichen</string>
-    <string name="no_biometric">Nicht unterstütztes Gerät oder keine biometrischen Einstellungen aktiviert</string>
+    <string name="settings_su_biometric_summary">Biometrie verwenden, um Superuser-Anfragen zuzulassen</string>
+    <string name="no_biometric">Gerät unterstützt keine biometrischen Daten oder ist nicht mit diesen konfiguriert</string>
     <string name="settings_customization">Personalisierung</string>
+    <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
+    <string name="settings_doh_title">DNS über HTTPS</string>
+    <string name="settings_doh_description">Umgehung des DNS-Poisoning in einigen Ländern</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
@@ -213,6 +223,7 @@
     <string name="failure">Fehlgeschlagen</string>
     <string name="hide_manager_title">Magisk Manager ausblenden…</string>
     <string name="hide_manager_fail_toast">Magisk Manager ausblenden fehlgeschlagen.</string>
+    <string name="restore_manager_fail_toast">Magisk Manager wiederherstellen fehlgeschlagen</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
@@ -228,5 +239,9 @@
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
     <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
+    <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
+    <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
+    <string name="add_shortcut_msg">Nachdem der Magisk Manager ausgeblendet wurde, sind sein Name und sein Symbol möglicherweise nicht mehr zu erkennen. Möchten Sie eine hübsche Verknüpfung auf dem Startbildschirm hinzufügen?</string>
+    <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
 
 </resources>
