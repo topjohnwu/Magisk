@@ -96,7 +96,7 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">SafetyNet API Fehler</string>
     <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
-    <string name="safetynet_attest_success">Erfolg!</string>
+    <string name="safetynet_attest_success">Erfolgreich!</string>
     <string name="safetynet_attest_failure">Bestätigung fehlgeschlagen!</string>
     <string name="safetynet_attest_loading">Einen Moment…</string>
     <string name="safetynet_attest_restart">Erneut versuchen</string>
