@@ -3,7 +3,7 @@
     <!--Sections-->
     <string name="modules">Module</string>
     <string name="superuser">Superuser</string>
-    <string name="logs">Logs</string>
+    <string name="logs">Protokolle</string>
     <string name="settings">Einstellungen</string>
     <string name="refresh">Lokale Dateien aktualisieren</string>
     <string name="install">Installieren</string>
@@ -46,7 +46,7 @@
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot">In inaktiven Slot installieren (Nach OTA)</string>
     <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
@@ -76,17 +76,17 @@
     <string name="su_snack_log_on">Protokollierung für %1$s ist an</string>
     <string name="su_snack_log_off">Protokollierung für %1$s ist aus</string>
     <string name="su_revoke_title">Widerrufen?</string>
-    <string name="su_revoke_msg">Bestätigen, dass %1$s-Rechte widerufen werden?</string>
+    <string name="su_revoke_msg">Das %1$s-Rechte widerufen werden bestätigen?</string>
     <string name="toast">Toast</string>
     <string name="none">Keine</string>
 
     <string name="superuser_toggle_notification">Benachrichtigungen</string>
     <string name="superuser_toggle_revoke">Widerruf</string>
-    <string name="superuser_policy_none">Bisher hat noch keine App um die Erlaubnis des Superusers gebeten.</string>
+    <string name="superuser_policy_none">Bisher hat noch keine App nach der Superuser-Berechtigung gefragt.</string>
 
     <!--Logs-->
     <string name="log_data_none">Sie sind protokollfrei, versuchen Sie, Ihre SU-fähigen Apps mehr zu nutzen.</string>
-    <string name="log_data_magisk_none">Die Magisk-Protokolle sind leer, das ist seltsam.</string>
+    <string name="log_data_magisk_none">Keine Magisk-Protokolle vorhanden, das ist seltsam.</string>
     <string name="menuSaveLog">Protokoll speichern</string>
     <string name="menuClearLog">Protokoll jetzt löschen</string>
     <string name="logs_cleared">Protokoll erfolgreich gelöscht.</string>
@@ -94,7 +94,7 @@
     <string name="target_uid">Ziel-UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API Fehler</string>
+    <string name="safetynet_api_error">SafetyNet API-Fehler</string>
     <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
     <string name="safetynet_attest_success">Erfolgreich installiert!</string>
     <string name="safetynet_attest_failure">Bestätigung fehlgeschlagen!</string>
@@ -122,7 +122,7 @@
     <string name="module_state_remove">Entfernen</string>
     <string name="module_state_restore">Wiederherstellen</string>
     <string name="module_action_install_external">Aus dem Speicher installieren</string>
-    <string name="update_available">Update verfügbar</string>
+    <string name="update_available">Aktualisierung verfügbar</string>
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Sortierreihenfolge</string>
@@ -136,7 +136,7 @@
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_clear_cache_title">Repo-Cache leeren</string>
-    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen des Online-Repos. Erzwingt eine Aktualisierung</string>
+    <string name="settings_clear_cache_summary">Zwischengespeicherte Informationen für Online-Repos werden gelöscht. Erzwingt eine Aktualisierung</string>
     <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
     <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
     <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
@@ -145,7 +145,7 @@
     <string name="system_default">Systemstandard</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
     <string name="settings_check_update_summary">Regelmäßig im Hintergrund auf Aktualisierungen prüfen</string>
-    <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
+    <string name="settings_update_channel_title">Aktualisierungskanal</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
@@ -231,7 +231,7 @@
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="proprietary_title">Proprietären Code herunterladen</string>
-    <string name="proprietary_notice">Magisk Manager ist FOSS (Freie und quelloffene Software) und enthält nicht den \'im Eigentum befindlichen\' SafetyNet-API-Code von Google.\n\nWollen Sie Magisk Manager erlauben, eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Prüfungen herunterzuladen?</string>
+    <string name="proprietary_notice">Magisk Manager ist FOSS (Freie und quelloffene Software) und enthält nicht den \"Im Eigentum befindlichen\" SafetyNet-API-Code von Google.\n\nWollen Sie Magisk Manager erlauben, eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Prüfungen herunterzuladen?</string>
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Ihr Gerät muss zusätzlich eingerichtet werden, damit Magisk ordnungsgemäß funktioniert. Es wird das Magisk Setup-Zip herunterladen, möchten Sie jetzt fortfahren?</string>
