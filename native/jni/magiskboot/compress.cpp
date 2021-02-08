@@ -546,6 +546,7 @@ stream_ptr get_decoder(format_t type, stream_ptr &&base) {
         case LZ4:
             return make_unique<LZ4F_decoder>(std::move(base));
         case LZ4_LEGACY:
+        case LZ4_LG:
             return make_unique<LZ4_decoder>(std::move(base));
         case GZIP:
         default:
