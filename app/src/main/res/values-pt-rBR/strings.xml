@@ -17,9 +17,11 @@
     <string name="app_changelog">Registro de alterações</string>
 
     <string name="home_support_title">Contribua com o Projeto</string>
+    <string name="home_notice_content">Baixe o Magisk SOMENTE pela pagina oficial do Github. Arquivos de fontes desconhecida podem ser maliciosos.</string>
     <string name="home_item_source">Origem</string>
     <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
     <string name="home_package">Pacote</string>
+    <string name="home_app_title">App</string>
     <string name="invalid_update_channel">Canal de atualização inválido</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">Todos os módulos serão desativados/removidos!\nA raiz será removida!\nSeus dados potencialmente criptografados, se ainda não estiverem!</string>
@@ -130,6 +132,10 @@
     <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
     <string name="settings_clear_cache_title">Limpar cache do repositório</string>
     <string name="settings_clear_cache_summary">Limpe as informações em cache para repositórios online. Isso força o aplicativo a atualizar on-line</string>
+    <string name="settings_hide_app_title">Esconder o app do Magisk</string>
+    <string name="settings_hide_app_summary">Instala um app proxy com ID de pacote aleatorio e nome de app personalizado</string>
+    <string name="settings_restore_app_title">Restaura o app do Magisk</string>
+    <string name="settings_restore_app_summary">Desesconder o app e restaura-lo ao seu APK original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Padrão do sistema)</string>
     <string name="settings_check_update_title">Verificar atualizações</string>
@@ -207,6 +213,7 @@
     <string name="flashing">Flechando…</string>
     <string name="done">Concluído!</string>
     <string name="failure">Falha</string>
+    <string name="hide_app_title">Escondendo o app do Magisk…</string>
     <string name="open_link_failed_toast">Nenhum aplicativo encontrado para abrir o link</string>
     <string name="complete_uninstall">Desinstalação completa</string>
     <string name="restore_img">Restaurar imagens</string>
@@ -215,12 +222,16 @@
     <string name="restore_done">Restauração concluída!</string>
     <string name="restore_fail">O backup de estoque não existe!</string>
     <string name="proprietary_title">Faça o download do código proprietário</string>
+    <string name="proprietary_notice">Magisk é FOSS e não inclui codigo pra API proprietaria do SafetyNet da Google.\n\nVoce quer baixar a extensão proprietaria pra checagem do SafetyNet?</string>
     <string name="setup_fail">Falha na instalação</string>
     <string name="env_fix_title">Requer configuração adicional</string>
+    <string name="env_fix_msg">Seu dispositivo requer configuração adicional pro Magisk funcionar corretamente. Voce quer continuar e reiniciar?</string>
     <string name="setup_msg">Executando a configuração do ambiente…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versão Magisk não suportada</string>
+    <string name="unsupport_magisk_msg">Essa versão do app não suporta versão do Magisk inferior a %1$s.\n\nO App ira se comportar como se nenhum Magisk estivesse instalado, por favor atualize o Magisk assim que possivel.</string>
     <string name="add_shortcut_title">Adicionar atalho à tela inicial</string>
+    <string name="add_shortcut_msg">Depois de esconder o app o seu nome e icone ficarão dificeis de reconhecer. Voce quer adicionar um atalho bonitinho na tela inicial?</string>
     <string name="app_not_found">Nenhum aplicativo encontrado para realizar esta ação</string>
 
 </resources>
