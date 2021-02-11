@@ -19,7 +19,9 @@
     <string name="not_available">N/A</string>
     <string name="hide">Skryť</string>
     <string name="home_package">Balíček</string>
+    <string name="home_app_title">App</string>
 
+    <string name="home_notice_content">Magisk sťahujte IBA z oficiálnej stránky na GitHubé. Súbory z neznámych zdrojov môžu byť škodlivé!</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
@@ -121,8 +123,6 @@
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Zoradenie</string>
 
-
-
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
     <string name="settings_dark_mode_message">Vyberte režim, ktorý najlepšie vyhovuje vášmu štýlu!</string>
@@ -133,6 +133,10 @@
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>
     <string name="settings_clear_cache_summary">Vyčistí uložené informácie pre online repos. Vynúti appku obnoviť online</string>
+    <string name="settings_hide_app_title">Skryť aplikáciu Magisk</string>
+    <string name="settings_hide_app_summary">Inštalovať proxy aplikáciu s náhodným ID balíčka a vlastným názvom aplikácie</string>
+    <string name="settings_restore_app_title">Obnoviť aplikáciu Magisk</string>
+    <string name="settings_restore_app_summary">Odkryť aplikáciu a obnoviť povodné APK</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(Predvolený systémom)</string>
     <string name="settings_check_update_title">Kontrolovať aktualizácie</string>
@@ -210,6 +214,7 @@
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Zlyhalo!</string>
+    <string name="hide_app_title">Skrýva sa aplikácia Magisk…</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
@@ -217,13 +222,17 @@
     <string name="restore_done">Obnovovanie ukončené!</string>
     <string name="restore_fail">Stock záloha neexistuje!</string>
     <string name="proprietary_title">Stiahnutie proprietárneho kódu</string>
+    <string name="proprietary_notice">Magisk je FOSS a neobsahuje proprietárny kód od Googlu SafetyNet API.\n\nChcete stiahnuť proprietárne rozšírenie pre kontrolu SafetyNet?</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
+    <string name="env_fix_msg">Aby Magisk fungoval správne, vaše zariadenie potrebuje ďalšie nastavenie. Chcete pokračovať a reštartovať?</string>
     <string name="setup_msg">Nastavenie je spustené…</string>
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
+    <string name="unsupport_magisk_msg">Táto verzia aplikácie nepodporuje Magisk s verziou nižšou ako %1$s.\n\nAplikácia sa bude správať, akoby Magisk nebol nainštalový, aktualizujte Magisk čo najskôr.</string>
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
+    <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznantelnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
 
 </resources>
