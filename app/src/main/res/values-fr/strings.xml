@@ -221,7 +221,7 @@
     <string name="restore_done">Restauration effectuée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">L'application Magisk est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google. Souhaitez-vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
+    <string name="proprietary_notice">L'application Magisk est un logiciel libre et ne contient pas de code propriétaire de l’API SafetyNet de Google. Souhaitez-vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation supplémentaire requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez-vous effectuer cette installation maintenant et redémarrer ?</string>
@@ -232,10 +232,6 @@
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
-    <string name="app_not_found">Aucune application trouvée pour traiter cette action</string>
-
-</resources>
-
     <string name="app_not_found">Aucune application trouvée pour traiter cette action</string>
 
 </resources>
