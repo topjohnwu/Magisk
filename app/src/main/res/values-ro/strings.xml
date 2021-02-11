@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Nu există conexiune disponibilă</string>
     <string name="app_changelog">Jurnalul schimbărilor</string>
-    <string name="manager">Manager</string>
     <string name="loading">Se încarcă…</string>
     <string name="update">Actualizează</string>
     <string name="not_available">N/A</string>
     <string name="hide">Ascunde</string>
-    <string name="status">Stare</string>
     <string name="home_package">Pachet</string>
 
-    <string name="home_notice_content">Asigură-te întotdeauna că folosești aplicația open-source Magisk Manager. Managerul din surse necunoscute poate efectua acțiuni rău-intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
     <string name="home_item_source">Sursă</string>
     <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
-    <string name="home_status_normal">Normală</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Versiune instalată</string>
     <string name="home_latest_version">Ultima versiune</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Înainte</string>
     <string name="install_start">Să-i dăm drumul</string>
     <string name="manager_download_install">Apasă pentru a descărca și a instala</string>
-    <string name="download_zip_only">Descarcă doar fișierul zip</string>
     <string name="direct_install">Instalează direct (Recomandat)</string>
     <string name="install_inactive_slot">Instalează în slotul inactiv (După OTA)</string>
     <string name="install_inactive_slot_msg">Dispozitivul va fi FORȚAT să booteze în slotul actual inactiv după repornire!\nFolosește această opțiune numai după terminarea OTA.\nContinui?</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online</string>
-    <string name="settings_hide_manager_title">Ascunde Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Reîmpachetează Magisk Manager cu numele aleatorii pentru pachet și aplicație</string>
-    <string name="settings_restore_manager_title">Restaurează Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Restaurează Magisk Manager cu numele originale pentru pachet și aplicație</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">Notificări de progres</string>
     <string name="download_complete">Descărcare finalizată</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
-    <string name="download_open_parent">Afișează în dosarul părinte</string>
-    <string name="download_open_self">Afișează fișierul</string>
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
-    <string name="manager_update_title">Actualizare Magisk Manager disponibilă!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Da</string>
@@ -221,9 +208,6 @@
     <string name="flashing">Se scrie în memoria flash…</string>
     <string name="done">Terminat!</string>
     <string name="failure">Eșec!</string>
-    <string name="hide_manager_title">Se ascunde Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ascunderea Magisk Manager a eșuat</string>
-    <string name="restore_manager_fail_toast">Restaurarea Magisk Manager a eșuat</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
     <string name="complete_uninstall">Finalizează dezinstalarea</string>
     <string name="restore_img">Restaurează imagini</string>
@@ -231,17 +215,13 @@
     <string name="restore_done">Restaurare terminată!</string>
     <string name="restore_fail">Nu există backup stock!</string>
     <string name="proprietary_title">Descarcă cod proprietar</string>
-    <string name="proprietary_notice">Magisk Manager este FOSS și nu conține codul proprietar al Google pentru API-ul SafetyNet.\n\nPermiți ca Magisk Manager să descarce o extensie (care conține GoogleApiClient) pentru verificările SafetyNet?</string>
     <string name="setup_fail">Configurare eșuată</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
-    <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Se va descărca fișierul zip de configurare Magisk, vrei să continui acum?</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
-    <string name="unsupport_magisk_msg">Această versiune de Magisk Manager nu suportă versiunea Magisk mai mică de %1$s.\n\nAplicația se va comporta ca și cum nu este instalat Magisk, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
     <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
-    <string name="add_shortcut_msg">După ascunderea Magisk Manager, numele și pictograma acestuia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
 
 </resources>

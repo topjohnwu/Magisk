@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">사용 가능한 연결 없음</string>
     <string name="app_changelog">앱 변경 사항</string>
-    <string name="manager">Manager</string>
     <string name="loading">로딩중…</string>
     <string name="update">업데이트</string>
     <string name="not_available">N/A</string>
     <string name="hide">숨기기</string>
-    <string name="status">상태</string>
     <string name="home_package">패키지</string>
 
-    <string name="home_notice_content">항상 오픈 소스 Magisk Manager를 사용하고 있는지 확인하십시오. 출처를 알 수 없는 Manager는 악의적인 작업을 수행 할 수 있습니다.</string>
     <string name="home_support_title">후원하기</string>
     <string name="home_item_source">소스</string>
     <string name="home_support_content">Magisk는 항상 무료일 것이며, 오픈소스일 것입니다. 그러나 소액의 후원을 통해 관심을 표할 수 있습니다.</string>
-    <string name="home_status_normal">정상</string>
-    <string name="home_status_stub">스텁</string>
     <string name="home_installed_version">설치됨</string>
     <string name="home_latest_version">최신</string>
     <string name="invalid_update_channel">올바르지 않은 업데이트 채널</string>
@@ -44,7 +39,6 @@
     <string name="install_next">다음</string>
     <string name="install_start">설치</string>
     <string name="manager_download_install">눌러서 다운로드하고 설치</string>
-    <string name="download_zip_only">Zip만 다운로드</string>
     <string name="direct_install">바로 설치 (권장됨)</string>
     <string name="install_inactive_slot">비활성 슬롯에 설치 (OTA 이후)</string>
     <string name="install_inactive_slot_msg">기기를 다시 시작한 후에는 현재 비활성 상태인 슬롯으로 강제로 부팅됩니다!\nOTA 업데이트 후에만 이 옵션을 사용하십시오.\n계속하시겠습니까?</string>
@@ -134,10 +128,6 @@
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다</string>
     <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
     <string name="settings_clear_cache_summary">온라인 저장소에 대해 캐시된 정보를 지우고, 온라인에서 정보를 강제로 새로 고칩니다.</string>
-    <string name="settings_hide_manager_title">Magisk Manager 숨기기</string>
-    <string name="settings_hide_manager_summary">무작위 패키지 이름으로 Magisk Manager를 다시 패키징합니다.</string>
-    <string name="settings_restore_manager_title">Magisk Manager 복구</string>
-    <string name="settings_restore_manager_summary">기존 패키지 이름으로 Magisk Manager를 복원합니다.</string>
     <string name="language">언어</string>
     <string name="system_default">(시스템 기본값)</string>
     <string name="settings_check_update_title">업데이트 확인</string>
@@ -200,10 +190,7 @@
     <string name="progress_channel">진행 상황</string>
     <string name="download_complete">다운로드 완료</string>
     <string name="download_file_error">파일 다운로드 오류</string>
-    <string name="download_open_parent">상위 폴더에서 보기</string>
-    <string name="download_open_self">파일 보기</string>
     <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
-    <string name="manager_update_title">새 버전의 Magisk Manager를 사용할 수 있습니다!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">예</string>
@@ -217,8 +204,6 @@
     <string name="flashing">플래싱 중…</string>
     <string name="done">완료!</string>
     <string name="failure">실패</string>
-    <string name="hide_manager_title">Magisk Manager를 숨기는 중…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager를 숨기는 데 실패하였습니다.</string>
     <string name="open_link_failed_toast">링크를 열 수 있는 앱이 없습니다.</string>
     <string name="complete_uninstall">완전히 제거</string>
     <string name="restore_img">이미지 복구</string>
@@ -226,17 +211,13 @@
     <string name="restore_done">복구 완료!</string>
     <string name="restore_fail">순정 백업이 존재하지 않습니다!</string>
     <string name="proprietary_title">사유 코드 다운로드</string>
-    <string name="proprietary_notice">Magisk Manager는 자유 오픈 소스 소프트웨어이며, 구글의 사유 SafetyNet API 코드를 포함하지 않습니다.\n\nMagisk Manager가 SafetyNet 상태 확인을 위해 (GoogleApiClient를 포함하는) 확장 기능을 다운로드하도록 허가하시겠습니까?</string>
     <string name="setup_fail">설치 실패</string>
     <string name="env_fix_title">추가 설정 필요</string>
-    <string name="env_fix_msg">이 기기에서 Magisk가 제대로 작동하기 위해선 추가 설정이 필요합니다. Magisk 설치 zip이 다운로드 될 것인데, 계속 진행하시겠습니까?</string>
     <string name="setup_msg">환경 설정 진행 중…</string>
     <string name="authenticate">인증</string>
     <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
-    <string name="unsupport_magisk_msg">이 버전의 Magisk Manager는 %1$s 미만 버전의 Magisk를 지원하지 않습니다.\n\n이 앱은 Magisk가 설치되지 않은 것처럼 동작하게 되니, Magisk를 가능한 빨리 업데이트하십시오.</string>
     <string name="external_rw_permission_denied">해당 기능을 사용하려면 저장소 권한을 허용해 주십시오.</string>
     <string name="add_shortcut_title">홈 화면에 바로가기 추가</string>
-    <string name="add_shortcut_msg">Magisk Manager를 숨긴 후, 아이콘과 이름을 알아보기 힘들 수도 있습니다. 홈 화면에 알아보기 쉬운 바로가기를 추가하시겠습니까?</string>
     <string name="app_not_found">해당 작업을 처리할 어플리케이션이 없습니다.</string>
 
 </resources>

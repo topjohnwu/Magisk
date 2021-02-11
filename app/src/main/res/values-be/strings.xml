@@ -13,19 +13,14 @@
     <!--Home-->
     <string name="no_connection">Злучэнне адсутнічае</string>
     <string name="app_changelog">Спіс змен</string>
-    <string name="manager">Кіраўнік</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Абнавіць</string>
     <string name="not_available">Не</string>
     <string name="hide">Схаваць</string>
-    <string name="status">Статус</string>
     <string name="home_package">Пакунак</string>
-    <string name="home_notice_content">Заўсёды правярайце адкуль вы спампоўваеце Magisk Manager. Пакункі, спампаваныя з невядомых крыніц, могуць змяшчаць шкоднасны код.</string>
     <string name="home_support_title">Падтрымайце нас</string>
     <string name="home_item_source">Зыходны код</string>
     <string name="home_support_content">Magisk ёсць і заўсёды будзе бясплатным праектам з адкрытым зыходным кодам. Але вы заўсёды можаце ахвяраваць нам на распрацоўку.</string>
-    <string name="home_status_normal">Звычайны</string>
-    <string name="home_status_stub">Хаванне</string>
     <string name="home_installed_version">Усталявана</string>
     <string name="home_latest_version">Апошні</string>
     <string name="invalid_update_channel">Хібны канал абнаўлення</string>
@@ -41,7 +36,6 @@
     <string name="install_next">Далей</string>
     <string name="install_start">Усталяваць</string>
     <string name="manager_download_install">Націсніце, каб спампаваць і ўсталяваць</string>
-    <string name="download_zip_only">Толькі спампаваць Zip з праграмай</string>
     <string name="direct_install">Непасрэдная ўсталёўка (рэкамендуецца)</string>
     <string name="install_inactive_slot">Усталяваць у неактыўны слот (пасля OTA)</string>
     <string name="install_inactive_slot_msg">Ваша прылада ПРЫМУСОВА перазапусціцца ў неактыўны слот!\nВыкарыстоўвайце гэты параметр толькі пасля завяршэння OTA.\nПрацягнуць?</string>
@@ -124,10 +118,6 @@
     <string name="settings_download_path_message">Файлы будуць спампоўвацца ў %1$s</string>
     <string name="settings_clear_cache_title">Ачыстка кэшу рэпазіторыя</string>
     <string name="settings_clear_cache_summary">Ачысціць кэш сеціўных рэпазіторыяў. Гэта прымусіць абнавіць кэш</string>
-    <string name="settings_hide_manager_title">Схаваць Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Перапакваць Magisk Manager з выпадковай назвай і назвай пакунка</string>
-    <string name="settings_restore_manager_title">Аднавіць Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Аднавіць Magisk Manager з арыгінальнай назвай і назвай пакунка</string>
     <string name="language">Мова</string>
     <string name="system_default">(Сістэмная)</string>
     <string name="settings_check_update_title">Правяраць на абнаўленні</string>
@@ -186,10 +176,7 @@
     <string name="progress_channel">Апавяшчэнні пра ход выканання</string>
     <string name="download_complete">Спампоўка завершаная</string>
     <string name="download_file_error">Не атрымалася спампаваць файл</string>
-    <string name="download_open_parent">Паказаць у каталозе</string>
-    <string name="download_open_self">Паказаць файл</string>
     <string name="magisk_update_title">Даступна абнаўленне Magisk!</string>
-    <string name="manager_update_title">Даступна абнаўленне Magisk Manager!</string>
     <!--Toasts, Dialogs-->
     <string name="yes">Так</string>
     <string name="no">Не</string>
@@ -202,8 +189,6 @@
     <string name="flashing">Усталёўка…</string>
     <string name="done">Завершана!</string>
     <string name="failure">Не атрымалася</string>
-    <string name="hide_manager_title">Хаванне Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Не атрымалася схаваць Magisk Manager.</string>
     <string name="open_link_failed_toast">Праграмы для адкрыцця спасылкі не знойдзена</string>
     <string name="complete_uninstall">Поўнае выдаленне</string>
     <string name="restore_img">Аднавіць раздзелы</string>
@@ -211,16 +196,12 @@
     <string name="restore_done">Аднаўленне завершана!</string>
     <string name="restore_fail">Рэзервовая копія адсутнічае!</string>
     <string name="proprietary_title">Спампаваць прапрыетарны код</string>
-    <string name="proprietary_notice">Magisk Manager - праект з адкрытым зыходным кодам, які не змяшчае прапрыетарны код SafetyNet API.\n\nДазволіць Magisk Manager спампаваць пашырэнне SafetyNet(змяшчае GoogleApiClient)?</string>
     <string name="setup_fail">Усталяваць не атрымалася</string>
     <string name="env_fix_title">Патрабуецца дадатковая ўсталёўка</string>
-    <string name="env_fix_msg">Вашай прыладзе для карэктнай працы патрабуецца дадатковая ўсталёўка Magisk. Будзе спампаваны Zip Magisk. Працягнуць?</string>
     <string name="setup_msg">Наладка асяроддзя…</string>
     <string name="authenticate">Аўтэнтыфікацыя</string>
     <string name="unsupport_magisk_title">Непадтрымліваемая версія Magisk</string>
-    <string name="unsupport_magisk_msg">Гэтая версія Magisk Manager не падтрымлівае Magisk версіі ніжэй за %1$s.\n\nПраграма будзе працаваць так, як быццам Magisk не ўсталяваны. Як мага хутчэй абнавіце Magisk.</string>
     <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
     <string name="add_shortcut_title">Дадаць цэтлік на хатні экран</string>
-    <string name="add_shortcut_msg">Пасля хавання Magisk Manager яго значок і назву можа быць цяжка разглядзець. Хочаце дадаць цэтлік на хатні экран?</string>
     <string name="app_not_found">Не знойдзена праграм для апрацоўкі гэтага дзеяння</string>
 </resources>

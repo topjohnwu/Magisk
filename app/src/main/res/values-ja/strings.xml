@@ -43,7 +43,6 @@
     <string name="download_complete">ダウンロード完了</string>
     <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
     <string name="magisk_update_title">新しい Magisk の更新が利用可能です！</string>
-    <string name="manager_update_title">Magisk Manager の更新があります！</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">%1$s をインストール</string>
@@ -54,10 +53,7 @@
     <string name="repo_cache_cleared">リポジトリのキャッシュを消去しました</string>
     <string name="manager_download_install">タップでダウンロードしてインストールします</string>
     <string name="flashing">書き込み中</string>
-    <string name="hide_manager_title">Magisk Manager を隠しています…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager を隠せませんでした…</string>
     <string name="open_link_failed_toast">このリンクを開けるアプリがありません</string>
-    <string name="download_zip_only">ZIP のみダウンロード</string>
     <string name="direct_install">直接インストール (推奨)</string>
     <string name="install_inactive_slot">Inactive Slot にインストール (OTA 後)</string>
     <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在の Inactive Slot で強制的に起動されます！\nこのオプションは OTA の完了後にのみ使用してください。\n続行しますか？</string>
@@ -67,10 +63,8 @@
     <string name="restore_done">リストア完了！</string>
     <string name="restore_fail">Stock のバックアップがありません！</string>
     <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
-    <string name="proprietary_notice">Magisk Manager は FOSS であるため、Google のプロプライエタリな SafetyNet API コードを含んでいません。\n\nMagisk Manager が SafetyNet チェックのための拡張機能 (GoogleApiClient を含む) をダウンロードすることを許可しますか?</string>
     <string name="setup_fail">セットアップに失敗しました。</string>
     <string name="env_fix_title">追加のセットアップが必要</string>
-    <string name="env_fix_msg">Magisk を正常に機能させるには、お使いのデバイスに追加のセットアップが必要です。Magisk のセットアップ用zipをダウンロードすることになりますが、今すぐ続行しますか？</string>
     <string name="setup_title">追加セットアップ</string>
     <string name="setup_msg">環境セットアップを実行中…</string>
 
@@ -79,10 +73,6 @@
     <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
     <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報を消去し、アプリをオンラインで更新します</string>
-    <string name="settings_hide_manager_title">Magisk Manager を隠す</string>
-    <string name="settings_hide_manager_summary">Magisk Manager をランダムなパッケージ名で再パックします</string>
-    <string name="settings_restore_manager_title">Magisk Manager を復元</string>
-    <string name="settings_restore_manager_summary">元のパッケージで Magisk Manager を復元します</string>
     <string name="language">言語</string>
     <string name="system_default">(システム標準)</string>
     <string name="settings_check_update_title">更新をチェック</string>
@@ -174,7 +164,6 @@
     <string name="settings_app_name_error">不正なフォーマット</string>
     <string name="no_biometric">サポートされていないデバイスまたは生体認証が有効化されていません</string>
     <string name="hide">隠す</string>
-    <string name="status">状態</string>
     <string name="home_package">パッケージ</string>
     <string name="home_latest_version">最新版</string>
     <string name="home_support_title">支援する</string>
@@ -187,7 +176,6 @@
     <string name="settings_dark_mode_title">テーマモード</string>
     <string name="section_home">ホーム</string>
     <string name="no_connection">接続がありません</string>
-    <string name="manager">Manager</string>
     <string name="safetynet">SafetyNet</string>
     <string name="loading">読み込み中…</string>
     <string name="install_options_title">オプション</string>
@@ -196,9 +184,7 @@
     <string name="install_start">Let\'s go</string>
     <string name="safetynet_attest_loading">しばらくお待ちください…</string>
     <string name="safetynet_attest_restart">やり直す</string>
-    <string name="home_status_stub">スタブ</string>
     <string name="recovery_mode">リカバリーモード</string>
-    <string name="home_notice_content">必ずオープンソースの Magisk Manager を使用していることを確認してください。ソース不明の Manager は悪意のある動作を行う可能性があります。</string>
     <string name="hide_scroll_up">上へ</string>
     <string name="hide_filters">フィルタ</string>
     <string name="hide_search">検索</string>
@@ -226,14 +212,9 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="settings_dark_mode_message">自分のスタイルに合ったモードを選択！</string>
     <string name="external_rw_permission_denied">この機能を有効にするためにストレージの許可を付与</string>
-    <string name="download_open_parent">"親フォルダに表示 "</string>
-    <string name="download_open_self">ファイルを表示</string>
-    <string name="unsupport_magisk_msg">このバージョンの Magisk Manager は、%1$s 以下の Magisk バージョンには対応していません。 アプリは Magisk がインストールされていないかのように動作しますので、できるだけ早く Magisk をアップグレードしてください。</string>
     <string name="home_check_safetynet">SafetyNet のチェック</string>
-    <string name="home_status_normal">ノーマル</string>
     <string name="module_section_online">オンライン</string>
     <string name="setting_add_shortcut_summary">アプリを隠した後に名前やアイコンが分かりづらい場合ホーム画面にショートカットを追加する</string>
     <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
-    <string name="add_shortcut_msg">Magisk Manager を隠した後、名前やアイコンは分かりづらくなります。ホーム画面にショートカットを追加しますか？</string>
 
 </resources>

@@ -14,20 +14,17 @@
     <!--Home-->
     <string name="no_connection">No connection available</string>
     <string name="app_changelog">Changelog</string>
-    <string name="manager">Manager</string>
     <string name="loading">Loading…</string>
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Hide</string>
-    <string name="status">Status</string>
     <string name="home_package">Package</string>
+    <string name="home_app_title">App</string>
 
-    <string name="home_notice_content">Always make sure you\'re using open-source Magisk Manager. Manager of unknown source can perform malicious actions!</string>
+    <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
-    <string name="home_status_normal">Normal</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
@@ -44,7 +41,6 @@
     <string name="install_next">Next</string>
     <string name="install_start">Let\'s go</string>
     <string name="manager_download_install">Press to download and install</string>
-    <string name="download_zip_only">Download Zip Only</string>
     <string name="direct_install">Direct Install (Recommended)</string>
     <string name="install_inactive_slot">Install to Inactive Slot (After OTA)</string>
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
@@ -137,10 +133,10 @@
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_clear_cache_title">Clear Repo Cache</string>
     <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online</string>
-    <string name="settings_hide_manager_title">Hide Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Repackage Magisk Manager with random package and app names</string>
-    <string name="settings_restore_manager_title">Restore Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Restore Magisk Manager with original package and app names</string>
+    <string name="settings_hide_app_title">Hide the Magisk app</string>
+    <string name="settings_hide_app_summary">Install a proxy app with random package ID and custom app label</string>
+    <string name="settings_restore_app_title">Restore the Magisk app</string>
+    <string name="settings_restore_app_summary">Un-hide the app and restore it back to the original APK</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_check_update_title">Check Updates</string>
@@ -204,10 +200,7 @@
     <string name="progress_channel">Progress Notifications</string>
     <string name="download_complete">Download complete</string>
     <string name="download_file_error">Error downloading file</string>
-    <string name="download_open_parent">Show in parent folder</string>
-    <string name="download_open_self">Show file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
-    <string name="manager_update_title">Magisk Manager Update Available!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Yes</string>
@@ -221,9 +214,7 @@
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>
     <string name="failure">Failed!</string>
-    <string name="hide_manager_title">Hiding Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Hide Magisk Manager failed</string>
-    <string name="restore_manager_fail_toast">Restore Magisk Manager failed</string>
+    <string name="hide_app_title">Hiding the Magisk app…</string>
     <string name="open_link_failed_toast">No application found to open the link</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
@@ -231,17 +222,17 @@
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
     <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
+    <string name="proprietary_notice">Magisk is FOSS and doesn\'t include code for Google\'s proprietary SafetyNet API.\n\nDo you want to download a proprietary extension for SafetyNet checks?</string>
     <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
-    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. It will download the Magisk setup zip, do you want to proceed now?</string>
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. Do you want to proceed and reboot?</string>
     <string name="setup_msg">Running environment setup…</string>
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
-    <string name="unsupport_magisk_msg">This version of Magisk Manager does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
-    <string name="add_shortcut_msg">After hiding Magisk Manager, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
+    <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
     <string name="app_not_found">No application found to handle this action</string>
 
 </resources>

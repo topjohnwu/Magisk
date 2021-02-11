@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
     <string name="app_changelog">Änderungen</string>
-    <string name="manager">Manager</string>
     <string name="loading">Laden…</string>
     <string name="update">Aktualisieren</string>
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
-    <string name="status">Status</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_notice_content">Benutzen Sie nur den quelloffenen Magisk Manager. Magisk von unbekannten Quellen kann zu schädlichen Aktionen führen.</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
-    <string name="home_status_normal">Normal</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Installiert</string>
     <string name="home_latest_version">Neueste</string>
     <string name="invalid_update_channel">Ungültiger Update-Kanal</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Nächster Schritt</string>
     <string name="install_start">Los geht\'s</string>
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
-    <string name="download_zip_only">Nur Zip herunterladen</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
     <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
     <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_clear_cache_title">Repo-Cache leeren</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen des Online-Repos. Erzwingt eine Aktualisierung</string>
-    <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
-    <string name="settings_hide_manager_summary">Magisk Manager mit zufälligem Paketnamen neu packen</string>
-    <string name="settings_restore_manager_title">Magisk Manager wiederherstellen</string>
-    <string name="settings_restore_manager_summary">Magisk Manager mit ursprünglichem Paketnamen wiederherstellen</string>
     <string name="language">Sprache</string>
     <string name="system_default">Systemstandard</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">Fortschrittsmitteilungen</string>
     <string name="download_complete">Download abgeschlossen</string>
     <string name="download_file_error">Fehler beim herunterladen der Datei</string>
-    <string name="download_open_parent">Im übergeordneten Ordner anzeigen</string>
-    <string name="download_open_self">Datei anzeigen</string>
     <string name="magisk_update_title">Magisk Update verfügbar!</string>
-    <string name="manager_update_title">Magisk Manager Update verfügbar!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
@@ -221,9 +208,6 @@
     <string name="flashing">Flashen…</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-    <string name="hide_manager_title">Magisk Manager ausblenden…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager ausblenden fehlgeschlagen.</string>
-    <string name="restore_manager_fail_toast">Magisk Manager wiederherstellen fehlgeschlagen</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
@@ -231,17 +215,13 @@
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="proprietary_title">Proprietären Code herunterladen</string>
-    <string name="proprietary_notice">Magisk Manager ist FOSS und enthält nicht den proprietären SafetyNet-API-Code von Google.\n\nWollen Sie Magisk Manager erlauben, eine Erweiterung (enthält GoogleApiClient) für SafetyNet-Prüfungen herunterzuladen?</string>
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
-    <string name="env_fix_msg">Ihr Gerät muss zusätzlich eingerichtet werden, damit Magisk ordnungsgemäß funktioniert. Es wird das Magisk Setup-Zip herunterladen, möchten Sie jetzt fortfahren?</string>
     <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
-    <string name="unsupport_magisk_msg">Diese Version von Magisk Manager unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich, als ob kein Magisk installiert wäre. Bitte Magisk so schnell wie möglich aktualisieren.</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
-    <string name="add_shortcut_msg">Nachdem der Magisk Manager ausgeblendet wurde, sind sein Name und sein Symbol möglicherweise nicht mehr zu erkennen. Möchten Sie eine hübsche Verknüpfung auf dem Startbildschirm hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
 
 </resources>

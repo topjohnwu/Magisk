@@ -46,14 +46,10 @@
     <string name="magisk_update_title">Налице е нова версия на Magisk.</string>
     <string name="release_notes">Бележки</string>
     <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
-    <string name="manager_update_title">Налице е нова версия на Magisk Manager.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
-    <string name="hide_manager_title">Скриване на Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Скриването на Magisk Manager бе неуспешно.</string>
     <string name="open_link_failed_toast">Не бе намерено приложение за отваряне на линка.</string>
-    <string name="download_zip_only">Изтегляне само на архив</string>
     <string name="direct_install">Директно инсталиране (Препоръчва се.)</string>
     <string name="install_inactive_slot">Инсталиране на неактивен слот (След OTA)</string>
     <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране.\nИзползвайте тази опция само след като приключи инсталирането на OTA.\nПродължаване?</string>
@@ -64,10 +60,8 @@
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
     <string name="proprietary_title">Изтегляне на патентования код</string>
-    <string name="proprietary_notice">Magisk Manager е FOSS и затова не включва патентования код за SafetyNet ППИ на Google.\n\nПозволявате ли на Magisk Manager да изтегли добавката (включва GoogleApiClient) за SafetyNet проверки?</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна.</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
-    <string name="env_fix_msg">Вашето устройство се нуждае от допълнително надстройване на Magisk, за да работи нормално. Ще бъде изтеглен архивът за надстройка на Magisk. Желаете ли да продължите?</string>
     <string name="setup_title">Допълнително надстройване</string>
     <string name="setup_msg">Надстройването на средата е в ход…</string>
     <string name="download_file_error">Грешка при изтеглянето на файла.</string>
@@ -75,10 +69,6 @@
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Изчистване кеша на хранилището</string>
     <string name="settings_clear_cache_summary">Изчистване на кешираната информация на онлайн хранилището за принудителното му обновяване.</string>
-    <string name="settings_hide_manager_title">Скриване на Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Смяна пакетното наименование на Magisk Manager със случайно наименование.</string>
-    <string name="settings_restore_manager_title">Възстановяване на Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Възстановяване на оригиналното пакетно наименование на Magisk Manager.</string>
     <string name="language">Език</string>
     <string name="system_default">(Системен)</string>
     <string name="settings_check_update_title">Проверка за актуализации</string>

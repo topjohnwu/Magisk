@@ -41,13 +41,9 @@
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>
     <string name="release_notes">Notas da atualização</string>
     <string name="repo_cache_cleared">Cache do repositório apagado</string>
-    <string name="manager_update_title">Nova atualização do Magisk Manager disponível!</string>
     <string name="manager_download_install">Pressione para transferir e instalar</string>
     <string name="update_channel">Atualizações do Magisk</string>
     <string name="flashing">A instalar</string>
-    <string name="hide_manager_title">A esconder Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Falha ao esconder Magisk Manager…</string>
-    <string name="download_zip_only">Transferir Apenas Ficheiro Zip</string>
     <string name="direct_install">Instalar Diretamente (Recomendado)</string>
     <string name="complete_uninstall">Desinstalação Completa</string>
     <string name="restore_done">Restauração feita!</string>
@@ -56,7 +52,6 @@
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Apagar Cache de Repositório</string>
     <string name="settings_clear_cache_summary">Apaga a informação cache de repositórios online. online, forçando a aplicação a atualizar online</string>
-    <string name="settings_hide_manager_title">Esconder Magisk Manager</string>
     <string name="language">Língua</string>
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update_stable">Estável</string>

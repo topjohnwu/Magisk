@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Bağlantı yok</string>
     <string name="app_changelog">Değişiklikler</string>
-    <string name="manager">Manager</string>
     <string name="loading">Yükleniyor…</string>
     <string name="update">Güncelle</string>
     <string name="not_available">N/A</string>
     <string name="hide">Gizle</string>
-    <string name="status">Durum</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_notice_content">Her zaman açık kaynaklı Magisk Manager kullandığınızdan emin olun. Kaynağı bilinmeyen Manager(yönetici) uygulamaları kötü amaçlı eylemler gerçekleştirebilirler!</string>
     <string name="home_support_title">Bizi Destekleyin</string>
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk özgür ve açık kaynaklıdır ve her zaman da öyle kalacaktır. Ancak küçük bir bağış göndererek bize önem verdiğinizi gösterebilirsiniz.</string>
-    <string name="home_status_normal">Normal</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Yüklü</string>
     <string name="home_latest_version">Güncel</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
@@ -44,7 +39,6 @@
     <string name="install_next">İleri</string>
     <string name="install_start">Devam et</string>
     <string name="manager_download_install">İndirmek ve yüklemek için tıklayın.</string>
-    <string name="download_zip_only">Sadece Zip\'i indir</string>
     <string name="direct_install">Doğrudan kurulum (Önerilen)</string>
     <string name="install_inactive_slot">Aktif olmayan yuvaya yükle (OTA\'dan sonra)</string>
     <string name="install_inactive_slot_msg">Cihazınız, yeniden başlatmanın ardından geçerli etkin olmayan yuvaya ön yüklemeye ZORLANACAK!\nBu seçeneği yalnızca OTA bittikten sonra kullanın.\nDevam edilsin mi?</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_clear_cache_title">Depo Önbelleğini Temizle</string>
     <string name="settings_clear_cache_summary">Çevrim içi depolar için önbellek bilgilerini temizle, uygulamayı çevrim içi yenilemeye zorla</string>
-    <string name="settings_hide_manager_title">Magisk Manager\'ı Gizle</string>
-    <string name="settings_hide_manager_summary">Rastgele paket adı ile Magisk Manager\'ı yeniden paketle</string>
-    <string name="settings_restore_manager_title">Magisk Manager\'ı Geri Yükle</string>
-    <string name="settings_restore_manager_summary">Orijinal paket adı ile Magisk Manager\'ı geri yükle</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_check_update_title">Güncellemeleri Denetle</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">İlerleme Bildirimleri</string>
     <string name="download_complete">İndirme tamamlandı</string>
     <string name="download_file_error">Dosya indirme hatası</string>
-    <string name="download_open_parent">Üst klasörde göster</string>
-    <string name="download_open_self">Dosyayı göster</string>
     <string name="magisk_update_title">Magisk Güncellemesi Mevcut!</string>
-    <string name="manager_update_title">Magisk Manager Güncellemesi Mevcut!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Evet</string>
@@ -221,9 +208,6 @@
     <string name="flashing">Yükleniyor…</string>
     <string name="done">Tamamlandı!</string>
     <string name="failure">Başarısız</string>
-    <string name="hide_manager_title">Magisk Manager Gizleniyor…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager\'ı gizleme başarısız</string>
-    <string name="restore_manager_fail_toast">Magisk Manager\'ı geri yükleme başarısız</string>
     <string name="open_link_failed_toast">Bağlantıyı açabilecek bir uygulama bulunamadı</string>
     <string name="complete_uninstall">Tamamen Kaldır</string>
     <string name="restore_img">İmajları Geri Yükle</string>
@@ -231,17 +215,13 @@
     <string name="restore_done">Geri yükleme tamamlandı!</string>
     <string name="restore_fail">Stock ön yükleme yedeği yok!</string>
     <string name="proprietary_title">Sahipli Kodu İndirin</string>
-    <string name="proprietary_notice">Magisk Manager, FOSS(açık kaynaklı) olduğundan gerekli olan Google\'ın sahipli(kapalı kaynaklı) SafetyNet API kodunu içermez.\n\nMagisk Manager\'ın SafetyNet kontrolü için (GoogleApiClient içeren) bir uzantıyı indirmesine izin veriyor musunuz?</string>
     <string name="setup_fail">Kurulum başarısız</string>
     <string name="env_fix_title">Ek Kurulum Gerekli</string>
-    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün çalışması için ek kuruluma ihtiyacı var. Bu Magisk kurulum zip dosyasını indirecektir, şimdi devam etmek istiyor musunuz?</string>
     <string name="setup_msg">Ortam kurulumu çalıştırılıyor…</string>
     <string name="authenticate">Kimlik Doğrulaması</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
-    <string name="unsupport_magisk_msg">Magisk Manager\'ın bu sürümü, %1$s daha düşük Magisk versiyonlarını desteklememektedir.\n\nUygulama hiçbir Magisk kurulu değil gibi davranacak, lütfen en kısa zamanda Magisk\'i yükseltin.</string>
     <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
     <string name="add_shortcut_title">Ana ekrana kısayol ekle</string>
-    <string name="add_shortcut_msg">Magisk Manager\'ı gizledikten sonra, ismini ve simgesini tanıması zor olabilir. Ana ekrana güzel bir kısayol eklemek ister misin?</string>
     <string name="app_not_found">Bu işlemi yapabilecek bir uygulama bulunamadı</string>
 
 </resources>

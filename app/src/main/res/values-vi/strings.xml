@@ -46,14 +46,10 @@
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
     <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
-    <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="flashing">Đang flash</string>
-    <string name="hide_manager_title">Ẩn Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ẩn Magisk Manager thất bại.</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết.</string>
-    <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>
     <string name="direct_install">Cài đặt trực tiếp (Được đề xuất)</string>
     <string name="install_inactive_slot">Cài đặt vào vùng không hoạt động (Sau khi OTA)</string>
     <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
@@ -63,10 +59,8 @@
     <string name="restore_done">Đã hoàn tất khôi phục!</string>
     <string name="restore_fail">Sao lưu gốc không tồn tại!</string>
     <string name="proprietary_title">Tải xuống mã độc quyền</string>
-    <string name="proprietary_notice">Magisk Manager là FOSS và không chứa mã SafetyNet API độc quyền của Google.\n\nBạn có cho phép Magisk Manager tải xuống tiện ích (có chứa GoogleApiClient) để kiểm tra SafetyNet không?</string>
     <string name="setup_fail">Thiết lập thất bại.</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
-    <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Nó sẽ tải xuống tập tin zip để thiết lập Magisk, bạn có muốn tiếp tục không?</string>
     <string name="setup_title">Thiết lập bổ sung</string>
     <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
     <string name="download_file_error">Lỗi tải tập tin</string>
@@ -74,10 +68,6 @@
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
     <string name="settings_clear_cache_summary">Xoá thông tin được lưu trong bộ nhớ cache của các bản thử nghiệm trực tuyến. Điều này buộc ứng dụng phải làm mới trực tuyến.</string>
-    <string name="settings_hide_manager_title">Ẩn Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Đóng gói lại Magisk Manager với tên gói ngẫu nhiên.</string>
-    <string name="settings_restore_manager_title">Khôi phục Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Khôi phục Magisk Manager với gói ban đầu</string>
     <string name="language">Ngôn ngữ</string>
     <string name="system_default">(Mặc định hệ thống)</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>

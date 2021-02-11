@@ -41,7 +41,6 @@
     <string name="magisk_update_title">En uppdatering av Magisk finns tillgänglig!</string>
     <string name="release_notes">Release notes</string>
     <string name="repo_cache_cleared">Repo-cache rensad</string>
-    <string name="manager_update_title">En uppdatering av Magisk Manager finns tillgänglig!</string>
     <string name="manager_download_install">Tryck för att ladda ner och installera</string>
     <string name="update_channel">Magiska uppdateringar</string>
     <string name="download_file_error">Fel vid nerladdning av fil</string>

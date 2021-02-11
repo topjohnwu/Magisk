@@ -61,10 +61,10 @@ object Theme : BaseSettingsItem.Blank() {
     override val title = R.string.section_theme.asTransitive()
 }
 
-// --- Manager
+// --- App
 
-object Manager : BaseSettingsItem.Section() {
-    override val title = R.string.manager.asTransitive()
+object AppSettings : BaseSettingsItem.Section() {
+    override val title = R.string.home_app_title.asTransitive()
 }
 
 object ClearRepoCache : BaseSettingsItem.Blank() {
@@ -77,8 +77,8 @@ object ClearRepoCache : BaseSettingsItem.Blank() {
 }
 
 object Hide : BaseSettingsItem.Input() {
-    override val title = R.string.settings_hide_manager_title.asTransitive()
-    override val description = R.string.settings_hide_manager_summary.asTransitive()
+    override val title = R.string.settings_hide_app_title.asTransitive()
+    override val description = R.string.settings_hide_app_summary.asTransitive()
 
     override var value = ""
         set(value) = setV(value, field, { field = it })
@@ -106,8 +106,8 @@ object Hide : BaseSettingsItem.Input() {
 }
 
 object Restore : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_restore_manager_title.asTransitive()
-    override val description = R.string.settings_restore_manager_summary.asTransitive()
+    override val title = R.string.settings_restore_app_title.asTransitive()
+    override val description = R.string.settings_restore_app_summary.asTransitive()
     override fun refresh() {
         isEnabled = Info.remote.magisk.versionCode > 0
     }

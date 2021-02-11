@@ -54,7 +54,7 @@ class SettingsViewModel(
 
         // Manager
         list.addAll(listOf(
-            Manager,
+            AppSettings,
             UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {

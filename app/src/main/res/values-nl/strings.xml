@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Geen internetverbinding</string>
     <string name="app_changelog">Wijzigingslog</string>
-    <string name="manager">Beheer</string>
     <string name="loading">Bezig met laden…</string>
     <string name="update">Updaten</string>
     <string name="not_available">Niet beschikbaar</string>
     <string name="hide">Verbergen</string>
-    <string name="status">Status</string>
     <string name="home_package">Pakket</string>
 
-    <string name="home_notice_content">Zorg er voor dat je altijd de opensourceversie van Magisk Manager gebruikt. Magisk Manager van een onbekende bron kan schade veroorzaken.</string>
     <string name="home_support_title">Ondersteun ons</string>
     <string name="home_item_source">Broncode</string>
     <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen.</string>
-    <string name="home_status_normal">Normaal</string>
-    <string name="home_status_stub">Inactief</string>
     <string name="home_installed_version">Geïnstalleerd</string>
     <string name="home_latest_version">Actueel</string>
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
@@ -45,7 +40,6 @@
     <string name="install_next">Volgende</string>
     <string name="install_start">Aan de slag</string>
     <string name="manager_download_install">Druk om te downloaden en installeren</string>
-    <string name="download_zip_only">Alleen zip-bestand downloaden</string>
     <string name="direct_install">Direct installeren (aanbevolen)</string>
     <string name="install_inactive_slot">Installeren in inactieve sleuf (na OTA)</string>
     <string name="install_inactive_slot_msg">Je apparaat wordt GEDWONGEN opgestart in de huidige inactieve sleuf na het herstarten!\nGebruik deze optie alleen NA het installeren van een OTA-update.\nWil je doorgaan?</string>
@@ -134,10 +128,6 @@
     <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
     <string name="settings_clear_cache_title">Pakketbroncache wissen</string>
     <string name="settings_clear_cache_summary">Wis de opgeslagen informatie van de online-pakketbronnen. Hierdoor wordt de app online ververst.</string>
-    <string name="settings_hide_manager_title">Magisk Manager verbergen</string>
-    <string name="settings_hide_manager_summary">Pak Magisk Manager in onder een andere naam.</string>
-    <string name="settings_restore_manager_title">Magisk Manager herstellen</string>
-    <string name="settings_restore_manager_summary">Herstelt Magisk Manager\'s oorspronkelijke naam.</string>
     <string name="language">Taal</string>
     <string name="system_default">(systeemstandaard)</string>
     <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>
@@ -195,10 +185,7 @@
     <string name="progress_channel">Voortgangsmeldingen</string>
     <string name="download_complete">Downloaden voltooid</string>
     <string name="download_file_error">Het bestand kan niet worden gedownload</string>
-    <string name="download_open_parent">Tonen in bovenliggende map</string>
-    <string name="download_open_self">Bestand tonen</string>
     <string name="magisk_update_title">Er is een Magisk-update beschikbaar!</string>
-    <string name="manager_update_title">Er is een Magisk Manager-update beschikbaar!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
@@ -212,8 +199,6 @@
     <string name="flashing">Bezig met flashen…</string>
     <string name="done">Voltooid!</string>
     <string name="failure">Mislukt</string>
-    <string name="hide_manager_title">Bezig met verbergen van Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager kan niet worden verborgen.</string>
     <string name="open_link_failed_toast">Er is geen app op je apparaat die deze link kan openen</string>
     <string name="complete_uninstall">Volledig deïnstalleren</string>
     <string name="restore_img">Schijfkopieën herstellen</string>
@@ -221,17 +206,13 @@
     <string name="restore_done">Herstellen voltooid!</string>
     <string name="restore_fail">Er is geen back-up beschikbaar.</string>
     <string name="proprietary_title">SafetyNet-code downloaden</string>
-    <string name="proprietary_notice">Magisk Manager is FOSS en bevat daarom geen Google SafetyNet API-code.\n\nWil je dat Magisk Manager een uitbreiding downloadt (deze bevat GoogleApiClient) voor SafetyNet-controles?</string>
     <string name="setup_fail">Installatie mislukt</string>
     <string name="env_fix_title">Installatie nog niet afgerond</string>
-    <string name="env_fix_msg">De Magisk-installatie is nog niet afgerond. De Magisk-installatiezip wordt gedownload. Wil je doorgaan?</string>
     <string name="setup_msg">Bezig met toepassen van omgevingsinstellingen…</string>
     <string name="authenticate">Goedkeuren</string>
     <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
-    <string name="unsupport_magisk_msg">Deze versie van Magisk Manager heeft geen ondersteuning voor Magisk-versies ouder dan %1$s.\n\nDe app werkt, maar doet alsof Magisk niet geïnstalleerd is. Update Magisk zo spoedig mogelijk.</string>
     <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
     <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>
-    <string name="add_shortcut_msg">Als je Magisk Manager verbergt, herken je de naam en het pictogram mogelijk niet meer. Wil je een mooie snelkoppeling plaatsen op je startscherm?</string>
     <string name="app_not_found">Er is geen app op je apparaat die deze handeling kan uitvoeren</string>
-    
+
 </resources>

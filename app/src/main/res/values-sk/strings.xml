@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Žiadne pripojenie</string>
     <string name="app_changelog">Zoznam zmien</string>
-    <string name="manager">Správca</string>
     <string name="loading">Načítava sa…</string>
     <string name="update">Aktualizovať</string>
     <string name="not_available">N/A</string>
     <string name="hide">Skryť</string>
-    <string name="status">Stav</string>
     <string name="home_package">Balíček</string>
 
-    <string name="home_notice_content">Vždy sa uistite, že používate Magisk Manager s otvoreným kódom. Správca z neznámeho zdroja môže vykonávať škodlivé akcie!</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však ukázať, že vám na tom záleží zaslaním malého daru.</string>
-    <string name="home_status_normal">Normálny</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Nainštalované</string>
     <string name="home_latest_version">Posledná</string>
     <string name="invalid_update_channel">Neplatný aktualizačný kanál</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Ďalej</string>
     <string name="install_start">Poďme na to</string>
     <string name="manager_download_install">Stlačte pre stiahnutie a inštaláciu</string>
-    <string name="download_zip_only">Len stiahnuť zip</string>
     <string name="direct_install">Priama inštalácia (Odporúča sa)</string>
     <string name="install_inactive_slot">Inštalovať na neaktívny slot (Po OTA)</string>
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
@@ -127,7 +121,7 @@
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Zoradenie</string>
 
-    
+
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -139,10 +133,6 @@
     <string name="settings_download_path_message">Súbory budú uložené do %1$s</string>
     <string name="settings_clear_cache_title">Vyčistiť cache repo</string>
     <string name="settings_clear_cache_summary">Vyčistí uložené informácie pre online repos. Vynúti appku obnoviť online</string>
-    <string name="settings_hide_manager_title">Skryť Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Prebalí Magisk Manager s náhodným názvom balíčka a aplikácie</string>
-    <string name="settings_restore_manager_title">Obnoviť Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Obnoví Magisk Manager s pôvodným názvom balíčka a appky</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(Predvolený systémom)</string>
     <string name="settings_check_update_title">Kontrolovať aktualizácie</string>
@@ -206,10 +196,7 @@
     <string name="progress_channel">Upozornenia o priebehu</string>
     <string name="download_complete">Sťahovanie ukončené</string>
     <string name="download_file_error">Chyba sťahovania súboru</string>
-    <string name="download_open_parent">Zobraziť v nadradenom priečinku</string>
-    <string name="download_open_self">Zobraziť súbor</string>
     <string name="magisk_update_title">Je dostupná aktualizácia Magisku!</string>
-    <string name="manager_update_title">Je dostupná aktualizácia Magisk Managera!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Áno</string>
@@ -223,9 +210,6 @@
     <string name="flashing">Flashovanie...</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Zlyhalo!</string>
-    <string name="hide_manager_title">Skrývanie Magisk Managera…</string>
-    <string name="hide_manager_fail_toast">Skrytie Magisk Managera zlyhalo</string>
-    <string name="restore_manager_fail_toast">Obnovenie Magisk Managera zlyhalo</string>
     <string name="open_link_failed_toast">Nepodarilo sa nájsť vhodnú aplikáciu na otvorenie odkazu</string>
     <string name="complete_uninstall">Úplne odinštalovať</string>
     <string name="restore_img">Obnoviť obrazy</string>
@@ -233,17 +217,13 @@
     <string name="restore_done">Obnovovanie ukončené!</string>
     <string name="restore_fail">Stock záloha neexistuje!</string>
     <string name="proprietary_title">Stiahnutie proprietárneho kódu</string>
-    <string name="proprietary_notice">Magisk Manager je FOSS, ktorý neobsahuje proprietárny kód SafetyNet API od Googlu.\n\nChcete povoliť appke Magisk Manager stiahnuť rozšírenie (obsahujúce GoogleApiClient) pre kontrolu SafetyNet?</string>
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
-    <string name="env_fix_msg">Vaše zariadenie si vyžaduje ďalšie nastavenie pre správne fungovanie Magisku. Stiahne sa inštalačný zip súbor Magisku, chcete pokračovať teraz?</string>
     <string name="setup_msg">Nastavenie je spustené…</string>
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
-    <string name="unsupport_magisk_msg">Táto verzia aplikácie Magisk Managera nepodporuje verziu Magisku nižšiu ako %1$s.\n\nAplikácia sa bude správať, ako keby Magisk nebol nainštalovaný, upgradnite Magisk čo najskôr.</string>
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí Magisk Managera sa môžu jeho názov a ikona ťažko rozpoznať. Chcete pridať odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
 
 </resources>

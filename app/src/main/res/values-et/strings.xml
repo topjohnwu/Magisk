@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Ühendus puudub</string>
     <string name="app_changelog">Muudatuste logi</string>
-    <string name="manager">Manager</string>
     <string name="loading">Laadimine…</string>
     <string name="update">Uuenda</string>
     <string name="not_available">puudub</string>
     <string name="hide">Peida</string>
-    <string name="status">Olek</string>
     <string name="home_package">Pakett</string>
 
-    <string name="home_notice_content">Veendu alati, et kasutad avatud lähtekoodiga Magisk Manageri. Tundmatust allikast pärinev Manager võib teha pahatahtlikke toiminguid.</string>
     <string name="home_support_title">Toeta meid</string>
     <string name="home_item_source">Lähtekood</string>
     <string name="home_support_content">Magisk on ja jääb alati tasuta ning avatud lähtekoodiga kättesaadavaks. Siiski, sa võid meile väikese annetuse näol toetust üles näidata.</string>
-    <string name="home_status_normal">Tavaline</string>
-    <string name="home_status_stub">Makett</string>
     <string name="home_installed_version">Installitud</string>
     <string name="home_latest_version">Viimatine</string>
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Edasi</string>
     <string name="install_start">Läksime</string>
     <string name="manager_download_install">Vajuta allalaadimiseks ja installimiseks.</string>
-    <string name="download_zip_only">Laadi ainult ZIP alla</string>
     <string name="direct_install">Otsene install (soovitatud)</string>
     <string name="install_inactive_slot">Installi ebaaktiivsesse lahtrisse (pärast üle-õhu uuendust)</string>
     <string name="install_inactive_slot_msg">Sinu seade SUNNITAKSE peale taaskäivitust käivituma praegusesse ebaaktiivsesse lahtrisse!\nKasuta seda valikut vaid peale üle-õhu uuenduse teostamist.\nJätkad?</string>
@@ -134,10 +128,6 @@
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
     <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
     <string name="settings_clear_cache_summary">Tühjenda vahemälus olev teave võrgus olevate hoidlate kohta. See sunnib rakendust võrgust värskendama</string>
-    <string name="settings_hide_manager_title">Peida Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Paki Magisk Manager juhusliku paketi- ja rakenduse nimega ümber</string>
-    <string name="settings_restore_manager_title">Taasta Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Taasta Magisk Manageri originaalpakett</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_check_update_title">Kontrolli uuendusi</string>
@@ -199,10 +189,7 @@
     <string name="progress_channel">Edenemise teated</string>
     <string name="download_complete">Allalaadimine valmis</string>
     <string name="download_file_error">Faili allalaadimisel esines viga</string>
-    <string name="download_open_parent">Kuva ülemkaustas</string>
-    <string name="download_open_self">Kuva fail</string>
     <string name="magisk_update_title">Magiski uuendus on saadaval!</string>
-    <string name="manager_update_title">Magisk Manageri uuendus on saadaval!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Jah</string>
@@ -216,8 +203,6 @@
     <string name="flashing">Välgutamine…</string>
     <string name="done">Valmis!</string>
     <string name="failure">Ebaõnnestus</string>
-    <string name="hide_manager_title">Magisk Manageri peitmine…</string>
-    <string name="hide_manager_fail_toast">Magisk Manageri peitmine ebaõnnestus.</string>
     <string name="open_link_failed_toast">Lingi avamiseks sobivat rakendust ei leitud.</string>
     <string name="complete_uninstall">Täielik eemaldus</string>
     <string name="restore_img">Taasta tõmmised</string>
@@ -225,17 +210,13 @@
     <string name="restore_done">Taastamine valmis!</string>
     <string name="restore_fail">Originaalne varundus puudub!</string>
     <string name="proprietary_title">Laadi alla suletud koodi</string>
-    <string name="proprietary_notice">Magisk Manager on vaba ja avatud lähtekoodiga ning ei sisalda Google\'i suletud SafetyNeti API koodi.\n\nKas lubad Magisk Manageril SafetyNeti kontrollide jaoks laadida alla laiendus (sisaldab GoogleApiClienti)?</string>
     <string name="setup_fail">Seadistus ebaõnnnestus</string>
     <string name="env_fix_title">Vajab lisaseadistust</string>
-    <string name="env_fix_msg">Sinu seade vajab Magiski korralikuks toimimiseks lisaseadistust. Laadime alla Magiski seadistus-ZIPi, kas soovid kohe jätkata?</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
     <string name="authenticate">Autendi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magiski versioon</string>
-    <string name="unsupport_magisk_msg">See Magisk Manageri versioon ei toeta Magiski versiooni, mis on vanem kui %1$s.\n\nRakendus käitub nii, nagu Magisk ei oleks paigaldatud, palun uuenda Magisk nii ruttu kui võimalik.</string>
     <string name="external_rw_permission_denied">Selle funktsionaalsuse lubamiseks anna mäluruumi haldamise luba</string>
     <string name="add_shortcut_title">Lisa avakuvale otsetee</string>
-    <string name="add_shortcut_msg">Pärast Magisk Manageri peitmist võib selle nimi ja ikoon muutuda raskelt tuvastatavaks. Kas soovid avakuvale ilusa otsetee lisada?</string>
     <string name="app_not_found">Selle tegevuse teostamiseks ei leitud ühtegi rakendust</string>
 
 </resources>

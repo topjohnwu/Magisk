@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Koneksi tidak tersedia</string>
     <string name="app_changelog">Catatan perubahan</string>
-    <string name="manager">Manager</string>
     <string name="loading">Memuat…</string>
     <string name="update">Update</string>
     <string name="not_available">N/A</string>
     <string name="hide">Tutup</string>
-    <string name="status">Status</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_notice_content">Pastikan selalu menggunakan Magisk Manager dari sumber terbuka. Manager dari sumber yang tidak dikenal dapat melakukan tindakan jahat!</string>
     <string name="home_support_title">Dukung kami</string>
     <string name="home_item_source">Sumber</string>
     <string name="home_support_content">Magisk gratis dan bersumber terbuka, dan akan selalu seperti itu. Bagaimanapun juga Anda dapat menunjukan kepedulian Anda kepada kami dengan mengirimkan sedikit donasi.</string>
-    <string name="home_status_normal">Normal</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Terinstal</string>
     <string name="home_latest_version">Terbaru</string>
     <string name="invalid_update_channel">Kanal update tidak valid</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Berikutnya</string>
     <string name="install_start">Mulai</string>
     <string name="manager_download_install">Sentuh untuk download dan instal</string>
-    <string name="download_zip_only">Download zip saja</string>
     <string name="direct_install">Langsung instal (Disarankan)</string>
     <string name="install_inactive_slot">Instal pada slot nonaktif (Setelah OTA)</string>
     <string name="install_inactive_slot_msg">Perangkat Anda akan DIPAKSA boot ke slot yang saat ini tidak aktif setelah perangkat dinyalakan ulang!\nGunakan opsi ini hanya setelah proses OTA selesai.\nLanjutkan?</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
     <string name="settings_clear_cache_title">Hapus cache repo</string>
     <string name="settings_clear_cache_summary">Hapus cache informasi repo online. Tindakan ini memaksa aplikasi untuk memperbarui repo online</string>
-    <string name="settings_hide_manager_title">Sembunyikan Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Kemas ulang Magisk Manager dengan nama paket dan nama aplikasi secara acak</string>
-    <string name="settings_restore_manager_title">Pulihkan Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Pulihkan Magisk Manager dengan nama paket dan nama aplikasi aslinya</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default sistem)</string>
     <string name="settings_check_update_title">Periksa update</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">Notifikasi Kemajuan</string>
     <string name="download_complete">Download selesai</string>
     <string name="download_file_error">Kesalahan saat mendownload file</string>
-    <string name="download_open_parent">Tampilkan dalam folder</string>
-    <string name="download_open_self">Tampilkan file</string>
     <string name="magisk_update_title">Update Magisk tersedia!</string>
-    <string name="manager_update_title">Update Magisk Manager tersedia!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ya</string>
@@ -221,9 +208,6 @@
     <string name="flashing">Memasang…</string>
     <string name="done">Selesai!</string>
     <string name="failure">Gagal!</string>
-    <string name="hide_manager_title">Menyembunyikan Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Gagal menyembunyikan Magisk Manager.</string>
-    <string name="restore_manager_fail_toast">Gagal memulihkan Magisk Manager</string>
     <string name="open_link_failed_toast">Tidak ditemukan aplikasi untuk membuka link ini</string>
     <string name="complete_uninstall">Uninstal penuh</string>
     <string name="restore_img">Pulihkan image</string>
@@ -231,17 +215,13 @@
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
     <string name="proprietary_title">Download kode proprieter</string>
-    <string name="proprietary_notice">Magisk Manager adalah aplikasi FOSS dan tidak memiliki kode proprieter API SafetyNet Google.\n\nMaukah mengizinkan Magisk Manager untuk mendownload ekstensi (berisi GoogleApiClient) untuk memeriksa SafetyNet?</string>
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Perlu penyiapan tambahan</string>
-    <string name="env_fix_msg">Perangkat Anda memerlukan penyiapan tambahan agar Magisk bekerja dengan baik. Perangkat akan mendownload zip untuk penyiapan Magisk, apakah Anda ingin melanjutkan sekarang?</string>
     <string name="setup_msg">Memproses penyiapan lingkungan…</string>
     <string name="authenticate">Autentikasi</string>
     <string name="unsupport_magisk_title">Versi Magisk tidak didukung</string>
-    <string name="unsupport_magisk_msg">Versi Magisk Manager ini tidak mendukung Magisk di bawah versi %1$s.\n\nAplikasi akan berperilaku seolah-olah Magisk tidak terinstal, harap meningkatkan Magisk sesegera mungkin.</string>
     <string name="external_rw_permission_denied">Berikan izin akses ke penyimpanan untuk mengaktifkan fungsi ini</string>
     <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
-    <string name="add_shortcut_msg">Setelah menyembunyikan Magisk Manager, nama dan ikonnya mungkin menjadi sulit untuk dikenali. Apakah Anda ingin menambahkan pintasan yang menarik pada layar utama?</string>
     <string name="app_not_found">Tidak ditemukan aplikasi untuk menangani tindakan ini</string>
 
 </resources>

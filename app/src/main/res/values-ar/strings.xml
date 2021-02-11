@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">لا يوجد إتصال</string>
     <string name="app_changelog">تفاصيل التحديث</string>
-    <string name="manager">المدير</string>
     <string name="loading">جارٍ التحميل...</string>
     <string name="update">تحديث</string>
     <string name="not_available">غير/متوفر</string>
     <string name="hide">إخفاء</string>
-    <string name="status">الحالة</string>
     <string name="home_package">الحزمة</string>
 
-    <string name="home_notice_content">تأكد دوما أنك تستعمل إصدار ماجسيك رسمي، التطبيقات المثبتة من الجهات الخارجية ستسبب لك أضراراً</string>
     <string name="home_support_title">تبرع لنا</string>
     <string name="home_item_source">الكود المصدري للتطبيق</string>
     <string name="home_support_content">مـاجـيسك هي، وستظل دوماً، مجانيةً و مفتوحة المصدر، اظهر اهتمامك لنا لكي نبقيها هكذا بدعم مالي صغير</string>
-    <string name="home_status_normal"> الوضـع الطبيعي</string>
-    <string name="home_status_stub"> وضـع STUB</string>
     <string name="home_installed_version">تم التثبيت</string>
     <string name="home_latest_version">آخر إصدار</string>
     <string name="invalid_update_channel">مصدر التحديث غير صالح</string>
@@ -43,7 +38,6 @@
     <string name="install_next">التالي</string>
     <string name="install_start">هيا، بنا</string>
     <string name="manager_download_install">اضغط للتنزيل و التثبيت</string>
-    <string name="download_zip_only">تحميل Zip فقط</string>
     <string name="direct_install">تثبيت مباشر (موصى بها)</string>
     <string name="install_inactive_slot">التثبيت على المنطقة الغير نشطة (بعد OTA)</string>
     <string name="install_inactive_slot_msg">سيُجبر جهازك للاقلاع على المنطقة الغير النشطة بعد إعادة التشغيل!\n استخدم هذا الخيار فقط بعد الانتهاء من OTA. استمرار؟</string>
@@ -133,10 +127,6 @@
     <string name="settings_download_path_message">ستحمل الملفات إلى %1$s</string>
     <string name="settings_clear_cache_title">حذف الذاكرة المؤقتة للإضافات</string>
     <string name="settings_clear_cache_summary">حذف المعلومات المخزنة محليا، هذا سيجبر التطبيق على التحديث الإضافات عبر الانترنت</string>
-    <string name="settings_hide_manager_title">إخفاء مـاجـيسك Manager</string>
-    <string name="settings_hide_manager_summary">تغيير اسم حزمة التطبيق لتجنب الكشف</string>
-    <string name="settings_restore_manager_title">استعادة مـاجـيسك Manager</string>
-    <string name="settings_restore_manager_summary">استعادة مـاجـيسك Manager مع اسم الحزمة الأصلي</string>
     <string name="language">اللغة</string>
     <string name="system_default">(الأفتراضي)</string>
     <string name="settings_check_update_title">تحقق من التحديثات</string>
@@ -195,10 +185,7 @@
     <string name="progress_channel">إشعارات التقدم</string>
     <string name="download_complete">اكتمل التنزيل</string>
     <string name="download_file_error">فشل تنزيل الملف</string>
-    <string name="download_open_parent">أظهر المجلد الرئيسي</string>
-    <string name="download_open_self">أظهر الملف</string>
     <string name="magisk_update_title">تحديث مـاجـيسك متوفر!</string>
-    <string name="manager_update_title">تحديث مـاجـيسك Manager متوفر!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">نعم</string>
@@ -212,8 +199,6 @@
     <string name="flashing">يتم الحرق...</string>
     <string name="done">تم!</string>
     <string name="failure">فشل!</string>
-    <string name="hide_manager_title">جار إخفاء مـاجـيسك Manager…</string>
-    <string name="hide_manager_fail_toast">فشل إخفاء مـاجـيسك Manager…</string>
     <string name="open_link_failed_toast">لم يُعثر على تطبيق لفتح الرابط …</string>
     <string name="complete_uninstall">إلغاء التثبيت بالكامل</string>
     <string name="restore_img">استعادة الصور</string>
@@ -221,13 +206,10 @@
     <string name="restore_done">تم الأستعادة</string>
     <string name="restore_fail">النسخة الاحتياطية الأصلية غير موجودة!</string>
     <string name="proprietary_title">تنزيل شفرة الملكية</string>
-    <string name="proprietary_notice">مـاجـيسك برنامج FOSS(السرعة والأمان)،ولا يحتوي على شفرة SafetyNet الخاصة بكوكل.\n\nهل تسمح لـمـاجـيسك بتحميل ملحق GoogleApiClient لفحص SafetyNet?</string>
     <string name="setup_fail">فشل التضبيط</string>
     <string name="env_fix_title"> الإعداد الأضافي مطلوب</string>
-    <string name="env_fix_msg">يحتاج جهازك إلى إعداد إضافي ليتسنى لـمـاجـيسك العمل بشكل صحيح. سيتم تنزيل ملف مضغوط لتثبيت مـاجـيسك هل تريد المتابعة؟</string>
     <string name="setup_msg">جار تضبيت البيئة</string>
     <string name="authenticate">تصديق</string>
     <string name="unsupport_magisk_title">إصدار مـاجـيسك غير مدعوم</string>
-    <string name="unsupport_magisk_msg">إصدار الملف أصغر من %1$s.مـاجـيسك لا يدعمها..\n\nسيتصرف التطبيق كأنك لا تملك روت بجهازك.فضلاًً حدث المعجبين باسرع وقت.</string>
 
 </resources>

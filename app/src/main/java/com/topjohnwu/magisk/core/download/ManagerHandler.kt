@@ -25,7 +25,7 @@ private fun Context.patch(apk: File) {
 private fun BaseDownloader.notifyHide(id: Int) {
     update(id) {
         it.setProgress(0, 0, true)
-            .setContentTitle(getString(R.string.hide_manager_title))
+            .setContentTitle(getString(R.string.hide_app_title))
             .setContentText("")
     }
 }

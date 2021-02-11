@@ -14,26 +14,21 @@
     <!--Home-->
     <string name="no_connection">אין חיבור זמין</string>
     <string name="app_changelog">רשימת שינויים</string>
-    <string name="manager">מנהל</string>
     <string name="loading">טוען…</string>
     <string name="update">עדכון</string>
     <string name="not_available">ל/ז</string>
     <string name="hide">הסתרה</string>
-    <string name="status">סטטוס</string>
     <string name="home_package">חבילה</string>
 
-    <string name="home_notice_content">ודא שאתה משתמש במנהל Magisk המשתמש בקוד פתוח. מנהל ממקור לא ידוע יכול לבצע פעולות זדוניות.</string>
     <string name="home_support_title">תמיכה בנו</string>
     <string name="home_item_source">מקור</string>
     <string name="home_support_content">Magisk היה ותמיד יהיה בעל קוד מקור פתוח. עם זאת אתה יכול להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
-    <string name="home_status_normal">רגיל</string>
-    <string name="home_status_stub">חלקי</string>
     <string name="home_installed_version">מותקנת</string>
     <string name="home_latest_version">אחרונה</string>
     <string name="invalid_update_channel">ערוץ עדכון לא חוקי</string>
     <string name="uninstall_magisk_title">הסרת Magisk</string>
     <string name="uninstall_magisk_msg">כל המודולים יושבתו/יוסרו!\nגישת שורש תושבת!\nהנתונים שלך עשויים להיות מוצפנים אם לא הוצפנו כבר!</string>
-    <string name="home_check_safetynet">בדיקת SafetyNet</string>																
+    <string name="home_check_safetynet">בדיקת SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">שמירה על הצפנה בכח</string>
@@ -44,7 +39,6 @@
     <string name="install_next">הבא</string>
     <string name="install_start">צא לדרך</string>
     <string name="manager_download_install">לחץ להורדה והתקנה</string>
-    <string name="download_zip_only">הורד ZIP בלבד</string>
     <string name="direct_install">התקנה ישירה (מומלץ)</string>
     <string name="install_inactive_slot">התקן לחריץ לא פעיל (לאחר OTA)</string>
     <string name="install_inactive_slot_msg">ההתקן שלך ייאלץ אתחול לחריץ הלא פעיל הנוכחי שלך לאחר הפעלה מחדש!\nיש להשתמש באפשרות זו רק לאחר ביצוע OTA בלבד.\nלהמשיך?</string>
@@ -57,7 +51,7 @@
     <!--Superuser-->
     <string name="su_request_title">בקשות משתמש על</string>
     <string name="touch_filtered_warning">מכיוון שיישום מסתיר בקשה של משתמש על, Magisk לא יכול לאמת את תגובתך</string>
-    <string name="deny">דחה</string>		 
+    <string name="deny">דחה</string>
     <string name="prompt">מיידי</string>
     <string name="grant">הענק</string>
     <string name="su_warning">מעניק גישה מלאה להתקן שלך.\nדחה באם אינך בטוח!</string>
@@ -103,7 +97,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">הצגת יישומי מערכת</string>
-    <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>													
+    <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>
     <string name="hide_filter_hint">סינון לפי שם</string>
     <string name="hide_scroll_up">גלול למעלה</string>
     <string name="hide_filters">מסננים</string>
@@ -111,7 +105,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(לא סופק מידע)</string>
-    <string name="reboot_userspace">אתחול מהיר</string>														
+    <string name="reboot_userspace">אתחול מהיר</string>
     <string name="reboot_recovery">אתחול למצב שחזור</string>
     <string name="reboot_bootloader">אתחול מצב מנהל האתחול</string>
     <string name="reboot_download">אתחול מצב הורדה</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
     <string name="settings_clear_cache_title">נקה מטמון ריפו</string>
     <string name="settings_clear_cache_summary">נקה מידע זיכרון מטמון עבור ריפו מקוונים, זה יכריח את היישום לרענן באופן מקוון</string>
-    <string name="settings_hide_manager_title">הסתר את מנהל  Magisk</string>
-    <string name="settings_hide_manager_summary">ארוז מחדש את מנהל Magisk עם חבילה ושם אקראיים</string>
-    <string name="settings_restore_manager_title">שחזר את מנהל Magisk</string>
-    <string name="settings_restore_manager_summary">שחזר את מנהל Magisk עם חבילה ושם מקוריים</string>
     <string name="language">שפה</string>
     <string name="system_default">(ברירת מחדל מערכת)</string>
     <string name="settings_check_update_title">בדוק עדכונים</string>
@@ -180,7 +170,7 @@
     <string name="settings_customization">התאמה אישית</string>
     <string name="setting_add_shortcut_summary">הוסף קיצור דרך יפה במסך הבית למקרה שקשה לזהות את השם ואת הסמל לאחר הסתרת היישום</string>
     <string name="settings_doh_title">DNS על HTTPS</string>
-    <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>																																										   
+    <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>
     <string name="multiuser_mode">מצב מרובה משתמשים</string>
     <string name="settings_owner_only">בעל ההתקן בלבד</string>
     <string name="settings_owner_manage">אחראי ניהול ההתקן</string>
@@ -202,10 +192,7 @@
     <string name="progress_channel">התראות התקדמות</string>
     <string name="download_complete">ההורדה הושלמה</string>
     <string name="download_file_error">שגיאה בהורדת קובץ</string>
-    <string name="download_open_parent">הצג בתיקיית אב</string>
-    <string name="download_open_self">הצג קובץ</string>
     <string name="magisk_update_title">עדכון Magisk זמין!</string>
-    <string name="manager_update_title">עדכון מנהל Magisk זמין!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">כן</string>
@@ -219,26 +206,19 @@
     <string name="flashing">צורב…</string>
     <string name="done">בוצע!</string>
     <string name="failure">נכשל</string>
-    <string name="hide_manager_title">מסתיר את מנהל Magisk…</string>
-    <string name="hide_manager_fail_toast">הסתרת מנהל Magisk כשלה.</string>
-    <string name="restore_manager_fail_toast">שחזור מנהל Magisk נכשל</string>
-    <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>			
+    <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>
     <string name="complete_uninstall">הסרה מלאה</string>
     <string name="restore_img">שיחזור תמונות</string>
     <string name="restore_img_msg">משחזר…</string>
     <string name="restore_done">השיחזור בוצע!</string>
     <string name="restore_fail">גיבוי מקורי אינו קיים!</string>
     <string name="proprietary_title">הורד קוד קנייני</string>
-    <string name="proprietary_notice">מנהל Magisk הוא חינמי ובעל קוד מקור פתוח ואינו מכיל את קוד ה-API של SafetyNet הקנייני של גוגל.\n\nהאם תרשה למנהל Magisk להוריד את הסיומת (מכיל את GoogleApiClient) לבדיקות SafetyNet?</string>
     <string name="setup_fail">ההתקנה כשלה</string>
     <string name="env_fix_title">דורש התקנה נוספת</string>
-    <string name="env_fix_msg">ההתקן שלך זקוק להתקנה נוספת בכדי ש-Magisk יעבוד כראוי. זה יוריד קובץ התקנה zip של Magisk, האם ברצונך להמשיך?</string>
     <string name="setup_msg">הגדרת סביבת ריצה…</string>
     <string name="authenticate">אימות</string>
     <string name="unsupport_magisk_title">גרסת Magisk אינה נתמכת</string>
-    <string name="unsupport_magisk_msg">גרסה זו של מנהל Magisk אינה תומכת בגרסת Magisk הנמוכה מ-%1$s.\n\nהיישום יתנהג כאילו לא הותקן Magisk, אנא שדרג את Magisk בהקדם האפשרי.</string>
     <string name="external_rw_permission_denied">הענק הרשאת אחסון להפעלת פונקציונליות זו</string>
     <string name="add_shortcut_title">הוסף קיצור דרך למסך הבית</string>
-    <string name="add_shortcut_msg">לאחר שהסתיר את Magisk Manager, השם והסמל שלו עשויים להיות קשים לזיהוי. האם אתה רוצה להוסיף קיצור דרך יפה למסך הבית?</string>
-    <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>																					   
+    <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
 </resources>

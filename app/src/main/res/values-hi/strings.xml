@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">कोई कनेक्शन उपलब्ध नहीं है</string>
     <string name="app_changelog">बदलाव</string>
-    <string name="manager">मैनेजर</string>
     <string name="loading">लोड हो रहा है…</string>
     <string name="update">अपडेट करें</string>
     <string name="not_available">N/A</string>
     <string name="hide">छिपाएँ</string>
-    <string name="status">स्थिति</string>
     <string name="home_package">पैकेज</string>
 
-    <string name="home_notice_content">हमेशा सुनिश्चित करें कि आप ओपन-सोर्स मैजिक मैनेजर का उपयोग कर रहे हैं। अज्ञात स्रोत के प्रबंधक दुर्भावनापूर्ण कार्य कर सकते हैं।</string>
     <string name="home_support_title">हमें सहयोग दीजिये</string>
     <string name="home_item_source">स्रोत</string>
     <string name="home_support_content">मैजिस्क है, और हमेशा मुफ्त और ओपन-सोर्स रहेगा। हालाँकि आप एक छोटा सा दान भेजकर यह दिखा सकते हैं कि आप देख-भाल करते हैं।</string>
-    <string name="home_status_normal">साधारण</string>
-    <string name="home_status_stub">स्टब</string>
     <string name="home_installed_version">इंस्टॉल्ड</string>
     <string name="home_latest_version">नवीनतम</string>
     <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
@@ -44,7 +39,6 @@
     <string name="install_next">आगे</string>
     <string name="install_start">तो चलिए शुरू करते हैं!</string>
     <string name="manager_download_install">डाउनलोड और इंस्टॉल करने के लिए दबाएं</string>
-    <string name="download_zip_only">केवल ज़िप डाउनलोड करें</string>
     <string name="direct_install">प्रत्यक्ष इंस्टॉल (अनुशंसित)</string>
     <string name="install_inactive_slot">निष्क्रिय स्लॉट में इंस्टॉल करें (OTA के बाद)</string>
     <string name="install_inactive_slot_msg">आपका डिवाइस रीबूट होने के बाद वर्तमान निष्क्रिय स्लॉट में बूट करने के लिए मजबूर किया जाएगा!\n इस विकल्प का उपयोग सिर्फ OTA हो जाने के बाद करें।\n जारी रखें?</string>
@@ -136,10 +130,6 @@
     <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
     <string name="settings_clear_cache_title">रेपो कैश साफ़ करें</string>
     <string name="settings_clear_cache_summary">ऑनलाइन रेपो के लिए कैश्ड जानकारी साफ़ करें। यह एप्लिकेशन को ऑनलाइन रिफ्रेश करने के लिए मजबूर करता है</string>
-    <string name="settings_hide_manager_title">मैजिस्क मैनेजर छिपाएं</string>
-    <string name="settings_hide_manager_summary">बेतरतीब पैकेज और ऐप नामों के साथ मैगिस्क मैनेजर को रिपैकेज करें</string>
-    <string name="settings_restore_manager_title">मैजिस्क मैनेजर को रिस्टोर करें</string>
-    <string name="settings_restore_manager_summary">मूल पैकेज और ऐप नाम के साथ मैजिस्क मैनेजर को रिस्टोर करें</string>
     <string name="language">भाषा</string>
     <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
     <string name="settings_check_update_title">अपडेट जांचें</string>
@@ -201,10 +191,7 @@
     <string name="progress_channel">प्रगति सूचनाएँ</string>
     <string name="download_complete">डाउनलोड सम्पन्न हुआ</string>
     <string name="download_file_error">फ़ाइल डाउनलोड करने में त्रुटि</string>
-    <string name="download_open_parent">मूल फ़ोल्डर में दिखाएं</string>
-    <string name="download_open_self">फ़ाइल दिखाएँ</string>
     <string name="magisk_update_title">मैजिस्क अपडेट उपलब्ध!</string>
-    <string name="manager_update_title">मैजिस्क मैनेजर के लिए अपडेट उपलब्ध है!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">हाँ</string>
@@ -218,9 +205,6 @@
     <string name="flashing">फ़्लैश हो रहा है...</string>
     <string name="done">सफल हुआ!</string>
     <string name="failure">असफल हुआ</string>
-    <string name="hide_manager_title">मैजिस्क मैनेजर को छिपा रहे हैं...</string>
-    <string name="hide_manager_fail_toast">मैजिस्क मैनेजर छिपाना विफल हुआ</string>
-    <string name="restore_manager_fail_toast">मैजिस्क मैनेजर को रिस्टोर करना विफल हुआ</string>
     <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला</string>
     <string name="complete_uninstall">पूर्ण रूप से अनइंस्टॉल करें</string>
     <string name="restore_img">इमेज रिस्टोर करें</string>
@@ -228,17 +212,13 @@
     <string name="restore_done">रिस्टोर सफल हुआ!</string>
     <string name="restore_fail">स्टॉक बैकअप मौजूद नहीं है!</string>
     <string name="proprietary_title">मालिकाना कोड डाउनलोड करें</string>
-    <string name="proprietary_notice">मैजिस्क मैनेजर एक मुफ्त और ओपन-सोर्स ऐप है जो गूगल के मालिकाना सेफ्टीनेट कोड का इस्तेमाल नहीं करता। क्या आप मैजिस्क मैनेजर को सेफ्टीनेट की जांच के लिए एक एक्सटेंशन डाऊनलोड करने की अनुमति प्रदान करना चाहेंगे?</string>
     <string name="setup_fail">सेटअप असफल हुआ</string>
     <string name="env_fix_title">अतिरिक्त सेटअप की ज़रूरत है</string>
-    <string name="env_fix_msg">आपके डिवाइस पर मैजिस्क को सही से काम करने के लिए अतिरिक्त सेटअप की ज़रूरत है। यह एक मैजिस्क सेटअप ज़िप डाउनलोड करेगा, क्या आप आगे बढ़ना चाहेंगे?</string>
     <string name="setup_msg">वातावरण सेटअप चल रहा है...</string>
     <string name="authenticate">प्रमाणित करें</string>
     <string name="unsupport_magisk_title">असमर्थित मैजिस्क संस्करण</string>
-    <string name="unsupport_magisk_msg">मैजिस्क मैनेजर का यह संस्करण मैजिस्क संस्करण %1$s से कम का समर्थन नहीं करता। \n\nऐप इस तरह व्यवहार करेगा जैसे मैजिस्क इंस्टॉल नहीं है, कृपया मैजिस्क को जल्द अपग्रेड करें।</string>
     <string name="external_rw_permission_denied">इसका उपयोग करने के लिए स्टोरेज अनुमति प्रदान करें</string>
     <string name="add_shortcut_title">होम स्क्रीन पर शॉर्टकट जोड़ें</string>
-    <string name="add_shortcut_msg">मैजिस्क मैनेजर को छिपाने के बाद इसका नाम और आइकॉन पहचानना मुश्किल हो सकता है, क्या आप एक अच्छा दिखने वाला शॉर्टकट होम स्क्रीन पर जोड़ना चाहेंगे?</string>
     <string name="app_not_found">इस एक्शन को संभालने के लिए कोई एप्लिकेशन नहीं मिली</string>
 
 </resources>

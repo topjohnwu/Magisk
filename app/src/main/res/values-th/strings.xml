@@ -42,7 +42,6 @@
     <string name="download_complete">ดาวน์โหลดสำเร็จ</string>
     <string name="download_file_error">เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์</string>
     <string name="magisk_update_title">มีการอัพเดต Magisk!</string>
-    <string name="manager_update_title">มีการอัพเดต Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">ติดตั้ง %1$s</string>
@@ -53,10 +52,7 @@
     <string name="repo_cache_cleared">แคช Repo ถูกล้างแล้ว</string>
     <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
     <string name="flashing">กำลังแฟลช</string>
-    <string name="hide_manager_title">กำลังซ่อน Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">การซ่อน Magisk Manager ล้มเหลว</string>
     <string name="open_link_failed_toast">ไม่พบแอปพลิเคชันสำหรับเปิดลิ้งค์</string>
-    <string name="download_zip_only">ดาวน์โหลด Zip เท่านั้น</string>
     <string name="direct_install">การติดตั้งโดยตรง (แนะนำ)</string>
     <string name="install_inactive_slot">ติดตั้งไปยัง Slot ที่ไม่ใช้งาน (หลังจาก OTA)</string>
     <string name="install_inactive_slot_msg">อุปกรณ์ของคุณจะถูกบังคับให้บู๊ตไป Slot ที่ไม่ใช่งานหลังจากรีบูต!\nใช้ตัวเลือกนี้หลังจาก OTA เสร็จเท่านั้น\nดำเนินการต่อ?</string>
@@ -66,20 +62,14 @@
     <string name="restore_done">การกู้คืนสำเร็จ!</string>
     <string name="restore_fail">ไม่มีไฟล์แบ็คอัพ!</string>
     <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk Manager is FOSS and doesn\'t contain Google\'s proprietary SafetyNet API code.\n\nWill you allow Magisk Manager to download an extension (contains GoogleApiClient) for SafetyNet checks?</string>
     <string name="setup_fail">การตั้งค่าล้มเหลว</string>
     <string name="env_fix_title">ต้องมีการตั้งค่าเพิ่มเติม</string>
-    <string name="env_fix_msg">อุปกรณ์ของคุณต้องมีการตั้งค่าเพิ่มเติมเพื่อให้ Magisk สามารถทำงานได้ จะมีการดาวน์โหลดไฟล์ติดตั้ง Magisk ต้องการทำเลยหรือไม่?</string>
     <string name="setup_title">การตั้งค่าเพิ่มเติม</string>
     <string name="setup_msg">กำลังรันการตั้งค่า…</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">ล้างแคช Repo</string>
     <string name="settings_clear_cache_summary">ล้างข้อมูล repo ออนไลน์ที่ถูกแคชไว้</string>
-    <string name="settings_hide_manager_title">ซ่อน Magisk Manager</string>
-    <string name="settings_hide_manager_summary">แพ็คเกจ Magisk Manager ด้วยชื่อที่ถูกสุ่ม</string>
-    <string name="settings_restore_manager_title">กู้คืน Magisk Manager</string>
-    <string name="settings_restore_manager_summary">กู้คืนชื่อเดิมของ Magisk Manager</string>
     <string name="language">ภาษา</string>
     <string name="system_default">(มาตรฐานระบบ)</string>
     <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>

@@ -46,13 +46,9 @@
     <string name="magisk_update_title">Atsirado nauja Magisk versija!</string>
     <string name="release_notes">Pakeitimai</string>
     <string name="repo_cache_cleared">Repo failai išvalyti</string>
-    <string name="manager_update_title">Atsirado naujas Magisk Manager atnaujinimas!</string>
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
-    <string name="hide_manager_title">Magisk Manager paslėpiamas…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager paslėpimas žlugo…</string>
-    <string name="download_zip_only">Atsisiųsti zip failą</string>
     <string name="direct_install">Tiesioginis instaliavimas (Rekomenduojamas)</string>
     <string name="complete_uninstall">Pilnas pašalinimas</string>
     <string name="restore_img">Atstatyti boot failą</string>
@@ -60,10 +56,8 @@
     <string name="restore_done">Atstatymas įvykdytas!</string>
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
     <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
-    <string name="proprietary_notice">Magisk Manager yra FOSS todėl neturi Google patentuoto SafetyNet API kodo.\n\nAr jūs leidžiate Magisk Manager atsisiųsti papildinį (turintį GoogleApiClient) SafetyNet paieškai?</string>
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
-    <string name="env_fix_msg">Kad Magisk veiktų tinkamai, jūsų įrenginiui reikia papildomo paruošimo. Tai atsisiųs papildomą Magisk zip failą, ar norite tęsti?</string>
     <string name="setup_title">Papildomas pasiruošimas</string>
     <string name="setup_msg">Paruošiama aplinka…</string>
     <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
@@ -71,10 +65,6 @@
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Išvalyti nereikalingus saugyklos failus</string>
     <string name="settings_clear_cache_summary">Išvalyti patalpintą informaciją talpykloms internete, priverčia perkrauti interneto jungtį</string>
-    <string name="settings_hide_manager_title">Paslėpti Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Perpakuoti Magisk Manager su atsitiktiniu pakuotės pavadinimu</string>
-    <string name="settings_restore_manager_title">Grąžinti Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Grąžinti Magisk Manager su orginalia pakuote</string>
     <string name="language">Kalba</string>
     <string name="system_default">(Sistemos)</string>
     <string name="settings_check_update_title">Automatiškas atnaujinimų ieškojimas</string>

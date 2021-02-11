@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">Nuk ka lidhje interneti</string>
     <string name="app_changelog">Ndryshimet</string>
-    <string name="manager">Menaxheri</string>
     <string name="loading">Po shkarkon…</string>
     <string name="update">Përditëso</string>
     <string name="not_available">N/A</string>
     <string name="hide">Fshih</string>
-    <string name="status">Statusi</string>
     <string name="home_package">Paketa</string>
 
-    <string name="home_notice_content">Gjithmonë sigurohuni që jeni duke përdorur Magisk Manager me burim të hapur. Magisk Manager i një burimi të panjohur mund të kryejë veprime të dëmshme!</string>
     <string name="home_support_title">Na ndihmoni</string>
     <string name="home_item_source">Burimi</string>
     <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Megjithatë mund të na tregoni se ju interesoni duke dërguar një donacion të vogël.</string>
-    <string name="home_status_normal">Normale</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">E instaluar</string>
     <string name="home_latest_version">Më e fundit</string>
     <string name="invalid_update_channel">Kanal i pavlefshëm i azhurnimit</string>
@@ -44,7 +39,6 @@
     <string name="install_next">Tjetra</string>
     <string name="install_start">Le të shkojmë</string>
     <string name="manager_download_install">Shtypni për të shkarkuar dhe instaluar</string>
-    <string name="download_zip_only">Shkarkoni vetëm Zip</string>
     <string name="direct_install">Instalimi i drejtpërdrejtë (rekomandohet)</string>
     <string name="install_inactive_slot">Instalo në Slot Inaktive (Pas OTA)</string>
     <string name="install_inactive_slot_msg">Pajisja juaj do të detyrohet të nisë në vendndodhjen aktuale joaktive pas një rindezjeje! \n Të përdorni vetëm këtë mundësi pasi të keni mbaruar OTA. \n Vazhdoni? </string>
@@ -133,10 +127,6 @@
     <string name="settings_download_path_message">Skedarët do të ruhen në %1$s</string>
     <string name="settings_clear_cache_title">Pastro Cache të Repos</string>
     <string name="settings_clear_cache_summary">Pastroni informacionin e memorizuar për repot në internet. Kjo e detyron aplikacionin të rifreskohet në internet</string>
-    <string name="settings_hide_manager_title">Fshih menaxherin e Magisk</string>
-    <string name="settings_hide_manager_summary">Ripaketimi Magisk Manager me paketa të rastësishme dhe emra të aplikacioneve</string>
-    <string name="settings_restore_manager_title">Rivendos menaxherin e Magisk</string>
-    <string name="settings_restore_manager_summary">Rivendos Magisk Manager me paketën origjinale dhe emrat e aplikacioneve</string>
     <string name="language">Gjuha</string>
     <string name="system_default">(Parazgjedhja e Sistemit)</string>
     <string name="settings_check_update_title">Kontrolloni azhurnimet</string>
@@ -196,9 +186,7 @@
     <string name="progress_channel">Njoftimet e Progresit</string>
     <string name="download_complete">Shkarkimi përfundoi</string>
     <string name="download_file_error">Gabim në shkarkimin e skedarit</string>
-    <string name="download_open_parent">Shfaq në dosjen mëmë</string>
     <string name="magisk_update_title">Mundësohet azhurnimi i Magisk!</string>
-    <string name="manager_update_title">Ka perditësime të ri të Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
@@ -212,9 +200,6 @@
     <string name="flashing">Ndezje…</string>
     <string name="done">U krye!</string>
     <string name="failure">Dështoi!</string>
-    <string name="hide_manager_title">Fshehja e Magisk manager…</string>
-    <string name="hide_manager_fail_toast">Fsheh Menaxherin e Magisk dështoi</string>
-    <string name="restore_manager_fail_toast">Rikthimi i menaxherin e Magisk dështoi</string>
     <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
     <string name="complete_uninstall">Çinstalimi i plotë</string>
     <string name="restore_img">Rikthe Imazhet</string>
@@ -222,17 +207,13 @@
     <string name="restore_done">Restaurimi u krye!</string>
     <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
     <string name="proprietary_title">Shkarkoni Kodin e Pronarit</string>
-    <string name="proprietary_notice">Magisk Manager është FOSS dhe nuk përmban kodin e pronarit të Google SecurityNet API. \n\n A do të lejoni që Magisk Manager të shkarkojë një shtesë (përmban GoogleApiClient) për kontrollet e SafetyNet?</string>
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim Shtesë</string>
-    <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet. Do të shkarkojë zip-in e konfigurimit të Magisk, doni të vazhdoni tani?</string>
     <string name="setup_msg">Konfigurimi i mjedisit drejtues…</string>
     <string name="authenticate">Vërteto</string>
     <string name="unsupport_magisk_title">Versioni i pambështetur i Magisk</string>
-    <string name="unsupport_magisk_msg">Ky version i Magisk Manager nuk e mbështet versionin Magisk më të ulët se %1$s. \n\n Aplikimi do të sillet sikur nuk është instaluar asnjë Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</string>
     <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
-    <string name="add_shortcut_msg">Pasi të keni fshehur Magisk Manager, emri dhe ikona e tij mund të bëhen të vështira për t\'u njohur. \n\n Dëshironi të shtoni një shkurtore të bukur në ekranin kryesor?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
 
 </resources>

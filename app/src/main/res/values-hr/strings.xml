@@ -15,20 +15,15 @@
     <!--Home-->
     <string name="no_connection">Nema dostupne veze</string>
     <string name="app_changelog">Popis izmjena</string>
-    <string name="manager">Manager</string>
     <string name="loading">Učitavanje…</string>
     <string name="update">Ažuriraj</string>
     <string name="not_available">N/A</string>
     <string name="hide">Sakrij</string>
-    <string name="status">Status</string>
     <string name="home_package">Paket</string>
 
-    <string name="home_notice_content">Uvijek provjerite koristite li Magisk Manager s otvorenim kodom. Manager nepoznatog izvora može izvoditi zlonamjerne radnje.</string>
     <string name="home_support_title">Podržite nas</string>
     <string name="home_item_source">Izvor</string>
     <string name="home_support_content">Magisk je i uvijek će biti besplatan i otvoren. Međutim, možete nam pokazati da vam je stalo slanjem male donacije.</string>
-    <string name="home_status_normal">Normalno</string>
-    <string name="home_status_stub">Stub</string>
     <string name="home_installed_version">Instalirana</string>
     <string name="home_latest_version">Najnovija</string>
     <string name="invalid_update_channel">Nevažeći kanal ažuriranja</string>
@@ -45,7 +40,6 @@
     <string name="install_next">Dalje</string>
     <string name="install_start">Krenimo</string>
     <string name="manager_download_install">Dodirnite za preuzimanje i instalaciju</string>
-    <string name="download_zip_only">Preuzmi samo zip</string>
     <string name="direct_install">Izravna instalacija (preporučeno)</string>
     <string name="install_inactive_slot">Instaliraj u neaktivni utor (Nakon OTA)</string>
     <string name="install_inactive_slot_msg">Vaš će se uređaj prisiliti pokrenuti s trenutnog neaktivnog mjesta nakon ponovnog pokretanja!\nKoristite tu opciju samo nakon što je OTA dovršena.\nContinue?</string>
@@ -134,10 +128,6 @@
     <string name="settings_download_path_message">Datoteke će biti spremljene u %1$s</string>
     <string name="settings_clear_cache_title">Obriši predmemoriju repozitorija</string>
     <string name="settings_clear_cache_summary">Obrišite predmemorirane podatke za mrežne repozitorije. To prisiljava aplikaciju da se osvježi na mreži</string>
-    <string name="settings_hide_manager_title">Sakrij Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Prepakiraj Magisk Manager s nasumičnim nazivima paketa i aplikacija</string>
-    <string name="settings_restore_manager_title">Vrati Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Vrati Magisk Manager s izvornim nazivima paketa i aplikacija</string>
     <string name="language">Jezik</string>
     <string name="system_default">(Zadano sustavom)</string>
     <string name="settings_check_update_title">Provjeri za ažuriranja</string>
@@ -199,10 +189,7 @@
     <string name="progress_channel">Obavijesti o napretku</string>
     <string name="download_complete">Preuzimanje završeno</string>
     <string name="download_file_error">Pogreška pri preuzimanju datoteke</string>
-    <string name="download_open_parent">Prikaži u nadređenoj mapi</string>
-    <string name="download_open_self">Prikaži datoteku</string>
     <string name="magisk_update_title">Dostupno je Magisk ažuriranje!</string>
-    <string name="manager_update_title">Dostupno je Magisk Manager ažuriranje! </string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Da</string>
@@ -216,8 +203,6 @@
     <string name="flashing">Apliciranje…</string>
     <string name="done">Dovršeno!</string>
     <string name="failure">Nije uspjelo</string>
-    <string name="hide_manager_title">Skrivanje Magisk Manager-a…</string>
-    <string name="hide_manager_fail_toast">Skrivanje Magisk Manager-a nije uspjelo.</string>
     <string name="open_link_failed_toast">Nije pronađena aplikacija za otvaranje veze</string>
     <string name="complete_uninstall">Dovršite deinstalaciju</string>
     <string name="restore_img">Vrati Images</string>
@@ -225,16 +210,12 @@
     <string name="restore_done">Vraćanje je dovršeno!</string>
     <string name="restore_fail">Izvorna Sig. kopija ne postoji!</string>
     <string name="proprietary_title">Preuzmite vlasnički kod</string>
-    <string name="proprietary_notice">Magisk Manager je FOSS i ne sadrži Googleov zaštićeni API sigurnosni kod.\n\nHoćete li dopustiti Magisk Manageru da preuzme proširenje (sadrži GoogleApiClient) za SafetyNet provjeru?</string>
     <string name="setup_fail">Postavljanje nije uspjelo</string>
     <string name="env_fix_title">Zahtijeva dodatno postavljanje</string>
-    <string name="env_fix_msg">Vašem je uređaju potrebno dodatno postavljanje kako bi Magisk ispravno radio. Preuzet će se zip za postavljanje Magiska, želite li nastaviti sada?</string>
     <string name="setup_msg">Postavljanje okruženja za pokretanje…</string>
     <string name="authenticate">Potvrdi</string>
     <string name="unsupport_magisk_title">Nepodržana Magisk verzija</string>
-    <string name="unsupport_magisk_msg">Ova verzija Magisk Manager-a ne podržava Magisk verziju nižu od %1$s.\n\nAplikacija će se ponašati kao da nije instaliran Magisk, ažurirajte Magisk što je prije moguće.</string>
     <string name="external_rw_permission_denied">Odobrite dopuštenje za pohranu da biste omogućili ovu funkciju</string>
     <string name="add_shortcut_title">Dodaj prečac na početni zaslon</string>
-    <string name="add_shortcut_msg">Nakon skrivanja Magisk Manager-a, njegov naziv i ikonu moglo bi postati teško prepoznati. Želite li dodati lijepi prečac na početni zaslon?</string>
     <string name="app_not_found">Nije pronađena nijedna aplikacijaza obradu ove radnju</string>
 </resources>

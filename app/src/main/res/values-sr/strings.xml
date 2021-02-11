@@ -43,26 +43,19 @@
     <string name="magisk_update_title">Нови Адбејт Магиска Доступан!</string>
     <string name="release_notes">Белешке обљављивања</string>
     <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
-    <string name="manager_update_title">Ново Ажурирање Магиск Менаџера Доступно!</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
-    <string name="hide_manager_title">Сакривам Магиск Менаџер…</string>
-    <string name="hide_manager_fail_toast">Скривање Магиск Менаџера неуспешно…</string>
-    <string name="download_zip_only">Преузми само Зип</string>
     <string name="direct_install">Директна Инсталација (Препоручено)</string>
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
     <string name="proprietary_title">Преузми Власнички Код</string>
-    <string name="proprietary_notice">Магиск Менаџер је \'FOSS\' што значи да не садржи Гуглов власнички код од СигурнаМрежа АПИ.\n\nДа ли дозвољавате да Магиск Менаџер преузме додатак (садржи GoogleApiClient) за СигурнаМрежа провере?</string>
     <string name="download_file_error">Грешка при преузимању фајла</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Обриши кеш спремишта</string>
     <string name="settings_clear_cache_summary">Очисти кеширану имформацију за онлајн спремишта, форсира апликацију да освежи онлајн</string>
-    <string name="settings_hide_manager_title">Сакриј Магиск Менаџер</string>
-    <string name="settings_hide_manager_summary">Препакуј Магиск Менаџер са насумичним именом пакета</string>
     <string name="language">Језик</string>
     <string name="system_default">(Фабрички Система)</string>
     <string name="settings_update_channel_title">Канал Ажурирања</string>

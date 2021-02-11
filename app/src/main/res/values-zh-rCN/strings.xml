@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">无法连接</string>
     <string name="app_changelog">更新日志</string>
-    <string name="manager">Manager</string>
     <string name="loading">正在加载</string>
     <string name="update">更新</string>
     <string name="not_available">无法获取</string>
     <string name="hide">不再显示</string>
-    <string name="status">状态</string>
     <string name="home_package">包名</string>
 
-    <string name="home_notice_content">请确认正在使用开源的 Magisk Manager。未知来源的 Manager 可能具有恶意行为。</string>
     <string name="home_support_title">支持开发</string>
     <string name="home_item_source">源代码</string>
     <string name="home_support_content">Magisk 将一直保持免费且开源，向开发者捐赠以表示支持。</string>
-    <string name="home_status_normal">正常</string>
-    <string name="home_status_stub">动态加载(反检测)</string>
     <string name="home_installed_version">当前</string>
     <string name="home_latest_version">最新</string>
     <string name="invalid_update_channel">无效的更新通道</string>
@@ -44,7 +39,6 @@
     <string name="install_next">下一步</string>
     <string name="install_start">开始</string>
     <string name="manager_download_install">立即安装</string>
-    <string name="download_zip_only">仅下载安装包</string>
     <string name="direct_install">直接安装（推荐）</string>
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
     <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！只能在 OTA 更新完成后使用。\n是否继续？</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新数据</string>
-    <string name="settings_hide_manager_title">隐藏 Magisk Manager</string>
-    <string name="settings_hide_manager_summary">安装随机包名的 Magisk Manager</string>
-    <string name="settings_restore_manager_title">还原 Magisk Manager</string>
-    <string name="settings_restore_manager_summary">安装原始包名的 Magisk Manager</string>
     <string name="language">语言</string>
     <string name="system_default">系统默认</string>
     <string name="settings_check_update_title">检查更新</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">下载进度</string>
     <string name="download_complete">下载完成</string>
     <string name="download_file_error">下载失败</string>
-    <string name="download_open_parent">在文件夹中显示</string>
-    <string name="download_open_self">打开文件</string>
     <string name="magisk_update_title">Magisk 已发布新版本！</string>
-    <string name="manager_update_title">Magisk Manager 已发布新版本！</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">是</string>
@@ -221,9 +208,6 @@
     <string name="flashing">正在刷入</string>
     <string name="done">完成！</string>
     <string name="failure">失败</string>
-    <string name="hide_manager_title">正在隐藏 Magisk Manager</string>
-    <string name="hide_manager_fail_toast">隐藏 Magisk Manager 失败</string>
-    <string name="restore_manager_fail_toast">还原 Magisk Manager 失败</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂映像</string>
@@ -231,17 +215,13 @@
     <string name="restore_done">已还原</string>
     <string name="restore_fail">原厂 Boot 映像的备份不存在</string>
     <string name="proprietary_title">下载专有代码</string>
-    <string name="proprietary_notice">Magisk Manager 是自由软件，因此不会包含 Google 专有的 SafetyNet API 代码。\n\n是否允许 Magisk Manager 下载一个扩展（包含 GoogleApiClient）用于 SafetyNet 检查？</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要修复运行环境</string>
-    <string name="env_fix_msg">缺失 Magisk 正常工作所需的文件。 将下载 Magisk 安装包进行修复安装，完成后自动重启，是否继续？</string>
     <string name="setup_msg">正在修复运行环境</string>
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
-    <string name="unsupport_magisk_msg">此版本的 Magisk Manager 不支持低于 %1$s 版本的 Magisk。\n\n应用表现为未安装状态，但升级功能可用，请尽快升级 Magisk。</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
-    <string name="add_shortcut_msg">隐藏 Magisk Manager 后，其名称和图标会变得难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
 
 </resources>

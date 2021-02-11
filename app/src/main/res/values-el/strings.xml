@@ -47,26 +47,19 @@
     <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
     <string name="repo_cache_cleared">Η Repo cache καθαρίστηκε</string>
-    <string name="manager_update_title">Νέα Ενημέρωση Magisk Manager Διαθέσιμη!</string>
     <string name="manager_download_install">Πιέστε για λήψη και εγκατάσταση</string>
     <string name="update_channel">Ενημερώσεις Magisk</string>
     <string name="flashing">Γίνεται flash</string>
-    <string name="hide_manager_title">Κρύβοντας το Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Η απόκρυψη του Magisk Manager απέτυχε…</string>
-    <string name="download_zip_only">Λήψη Zip Μόνο</string>
     <string name="direct_install">Απευθείας Εγκατάσταση (Προτείνεται)</string>
     <string name="complete_uninstall">Πλήρης απεγκατάσταση</string>
     <string name="restore_done">Η ανάκτηση έγινε!</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
     <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
-    <string name="proprietary_notice">Το Magisk Manager είναι FOSS οπότε δεν περιέχει της Google τον ιδιόκτητο κώδικα του SafetyNet API.\n\nΕπιτρέπετε στο Magisk Manager να κατεβάσει μια επέκταση (περιέχει το GoogleApiClient) για ελέγχους του SafetyNet?</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
     <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
-    <string name="settings_hide_manager_title">Απόκρυψη του Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Ανασυγκρότηση του Magisk Manager με τυχαίο όνομα πακέτου</string>
     <string name="language">Γλώσσα</string>
     <string name="system_default">(Προεπιλογή Συστήματος)</string>
     <string name="settings_update_channel_title">Κανάλι Ενημερώσεων</string>

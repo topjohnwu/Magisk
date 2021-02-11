@@ -127,13 +127,13 @@ object HideAPK {
 
     @Suppress("DEPRECATION")
     fun hide(context: Context, label: String) {
-        val dialog = ProgressDialog.show(context, context.getString(R.string.hide_manager_title), "", true)
+        val dialog = ProgressDialog.show(context, context.getString(R.string.hide_app_title), "", true)
         GlobalScope.launch {
             val result = withContext(Dispatchers.IO) {
                 patchAndHide(context, label)
             }
             if (!result) {
-                Utils.toast(R.string.hide_manager_fail_toast, Toast.LENGTH_LONG)
+                Utils.toast(R.string.failure, Toast.LENGTH_LONG)
                 dialog.dismiss()
             }
         }
@@ -164,7 +164,7 @@ object HideAPK {
                 restoreImpl(context)
             }
             if (!result) {
-                Utils.toast(R.string.restore_manager_fail_toast, Toast.LENGTH_LONG)
+                Utils.toast(R.string.failure, Toast.LENGTH_LONG)
                 dialog.dismiss()
             }
         }

@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">კავშირი არ არის</string>
     <string name="app_changelog">ცვლილებები</string>
-    <string name="manager">მენეჯერი</string>
     <string name="loading">იტვირთება…</string>
     <string name="update">განახლება</string>
     <string name="not_available">ხელმიუწვდომელია</string>
     <string name="hide">დამალვა</string>
-    <string name="status">სტატუსი</string>
     <string name="home_package">პაკეტი</string>
 
-    <string name="home_notice_content">დარწმუნებული იყავით რომ Magisk მენეჯერის წყარო-გახსნილ ვერსიას ხმარობთ. დახურული წყაროს მქონე მენეჯემა შეიძლება მოწყობილობა დააზიანოს.</string>
     <string name="home_support_title">მხარდაჭერა</string>
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
-    <string name="home_status_normal">ნორმალური</string>
-    <string name="home_status_stub">დინამიური</string>
     <string name="home_installed_version">დაინსტალირებული</string>
     <string name="home_latest_version">უახლესი</string>
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
@@ -43,7 +38,6 @@
     <string name="install_next">შემდეგი</string>
     <string name="install_start">დაწყება</string>
     <string name="manager_download_install">დააჭირეთ გადმოსაწერად და შემდგომ დასაყენებლად</string>
-    <string name="download_zip_only">მხოლოდ Zip-ის გადმოწერა</string>
     <string name="direct_install">აქვე დაინსტალირება (რეკომენდირებულია)</string>
     <string name="install_inactive_slot">არააქტიურ სლოტში დაყენება (სისტემის განახლების შემდეგ)</string>
     <string name="install_inactive_slot_msg">თქვენი მოწყობილობა გადაიტვირთება არააქატიურ სლოტში!\nგამოიყენეთ ეს ოფცია მხოლოდ სისტემის განახლების დროს.\nგავაგრძელოთ?</string>
@@ -133,10 +127,6 @@
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
     <string name="settings_clear_cache_summary">რეპოზიტორიებისთვის ქეშის წაშლა. ეს დაარეფრეშებს პროგრამას</string>
-    <string name="settings_hide_manager_title">Magisk მენეჯერის დამალვა</string>
-    <string name="settings_hide_manager_summary">Magisk მენეჯერის რეპაკეტირება რანდომ პაკეტის სახელებით</string>
-    <string name="settings_restore_manager_title">Magisk მენეჯერის პაკეტის სახელის აღდგენა</string>
-    <string name="settings_restore_manager_summary">Magisk მენეჯერის აღდგენა ორიგინალი პაკეტის სახელით</string>
     <string name="language">ენა</string>
     <string name="system_default">(სისტემის რჩეული)</string>
     <string name="settings_check_update_title">განახლებების შემოწმება</string>
@@ -195,10 +185,7 @@
     <string name="progress_channel">პროგრესის შეტყობინებები</string>
     <string name="download_complete">გადმოწერა დასრულებულია</string>
     <string name="download_file_error">შეცდომა გადმოწერის დროს</string>
-    <string name="download_open_parent">მშობელ საქაღდეში ნახვა</string>
-    <string name="download_open_self">ფაილის ჩვენება</string>
     <string name="magisk_update_title">ხელმისაწვდომია Magisk-ის განახლება!</string>
-    <string name="manager_update_title">ხელმისაწვდომია Magisk მენეჯერის განახლება!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">დიახ</string>
@@ -212,8 +199,6 @@
     <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
-    <string name="hide_manager_title">ვმალავთ Magisk მენეჯერს…</string>
-    <string name="hide_manager_fail_toast">Magisk მენეჯრის დამალვა ჩაიშალა.</string>
     <string name="open_link_failed_toast">ლინკის გამხსნელი აპლიკაცია ვერ მოიძებნა</string>
     <string name="complete_uninstall">დეინსტალაციის დასრულება</string>
     <string name="restore_img">სურათის აღდგენა</string>
@@ -221,13 +206,10 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk მენეჯერი არის უფასო და კოდ-გახსნილი, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nდართავთ Magisk მენეჯერს ამ გაფართოების გადმოწერას (ასევე შეიცავს GoogleApiClient-ს) SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი გამართვა</string>
-    <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი გამართვა იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
     <string name="setup_msg">მიმდინარეობს ინტერფეისის ინსტალაცია…</string>
     <string name="authenticate">აუტენთიფიკაცია</string>
     <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>
-    <string name="unsupport_magisk_msg">ამ ვერსიის Magisk მენეჯერთან არ არის მხარდაჭერილი %1$s-ზე დაბალი Magisk-ის ვერსია.\n\nპროგრამა ისე ირეაგირებს, თითქოს Magisk-ი არ არის დაყენებული, გთხოვთ განაახლოთ Magisk-ი რაც შეიძლება მალე.</string>
 
 </resources>

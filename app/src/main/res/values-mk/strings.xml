@@ -43,11 +43,9 @@
     <string name="download_complete">Преземањето е завршено</string>
     <string name="download_file_error">Грешка при преземање на фајлот</string>
     <string name="magisk_update_title">Достапно е ажурирање на Magisk!</string>
-    <string name="manager_update_title">Достапно е ажурирање на Magisk Manager!</string>
 
     <!-- Installation -->
     <string name="manager_download_install">Притисни за преземање и инсталирање.</string>
-    <string name="download_zip_only">Преземи само Zip датотека</string>
     <string name="direct_install">Директна инсталација (Препорачано)</string>
     <string name="install_inactive_slot">Инсталирај во неактивен слот (по ОТА)</string>
     <string name="install_inactive_slot_msg">Вашиот уред ќе биде ПРИНУДЕН да се подигне на тековниот неактивен слот по рестартирањето!\nОваа опција користете ја само откако OTA ажурирање е направено.\nПродолжи?</string>
@@ -65,8 +63,6 @@
     <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
 
     <string name="flashing">Применувам</string>
-    <string name="hide_manager_title">Сокриј го Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Сокривањето на Magisk Manager е неуспешно.</string>
     <string name="open_link_failed_toast">Не е пронајдена апликација за отворање на врската.</string>
     <string name="complete_uninstall">Целосно деинсталирање</string>
     <string name="restore_img">Врати image датотеки</string>
@@ -74,19 +70,13 @@
     <string name="restore_done">Враќањето заврши!</string>
     <string name="restore_fail">Не постои оригинална резервна копија!</string>
     <string name="proprietary_title">Превземи патентиран код</string>
-    <string name="proprietary_notice">Magisk Manager е FOSS апликација и затоа не содржи код од SafetyNet API кој е во сопственост на Google.\n\nДали ќе дозволите Magisk Manager да преземе проширување (содржи GoogleApiClient) за SafetyNet проверка?</string>
     <string name="setup_fail">Поставувањето е неуспешно.</string>
     <string name="env_fix_title">Потребни е дополнително поставување</string>
-    <string name="env_fix_msg">На Вашиот уред му е потребно дополнително поставување за Magisk да работи нормално. Ќе се преземе ZIP фајлот за поставување на Magisk, дали сакате да продолжите?</string>
     <string name="setup_msg">Надградба на работната околина…</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Исчисти го кешот од репозиториумот</string>
     <string name="settings_clear_cache_summary">Исчисти ги кешираните информации за онлајн репозиториумот. Ова ја принудува апликацијата да се освежи онлајн.</string>
-    <string name="settings_hide_manager_title">Сокриј го Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Препакувај го Magisk Manager со случајно име на пакет.</string>
-    <string name="settings_restore_manager_title">Врати го Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Врати го Magisk Manager со оригиналното име на пакет</string>
     <string name="language">Јазик</string>
     <string name="system_default">(Стандарден системски)</string>
     <string name="settings_check_update_title">Провери за ажурирања</string>

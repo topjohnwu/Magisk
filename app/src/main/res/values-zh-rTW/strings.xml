@@ -14,20 +14,15 @@
     <!--Home-->
     <string name="no_connection">無法連線</string>
     <string name="app_changelog">更新日誌</string>
-    <string name="manager">Manager</string>
     <string name="loading">讀取中……</string>
     <string name="update">更新</string>
     <string name="not_available">無</string>
     <string name="hide">隱藏</string>
-    <string name="status">狀態</string>
     <string name="home_package">包裝名稱</string>
 
-    <string name="home_notice_content">請總是確認您正在使用開源的 Magisk Manager。未知來源的 Manager 可能藏有惡意的操作。</string>
     <string name="home_support_title">支援我們</string>
     <string name="home_item_source">原始碼</string>
     <string name="home_support_content">Magisk 現在是，未來也永遠是免費且開源。但您可以透過發送小額的抖內來彰顯對我們的支持。</string>
-    <string name="home_status_normal">正常</string>
-    <string name="home_status_stub">殘存模式</string>
     <string name="home_installed_version">已安裝</string>
     <string name="home_latest_version">最新</string>
     <string name="invalid_update_channel">無效的更新頻道</string>
@@ -44,7 +39,6 @@
     <string name="install_next">下一步</string>
     <string name="install_start">開始執行</string>
     <string name="manager_download_install">點選以下載並安裝</string>
-    <string name="download_zip_only">僅下載 ZIP 安裝包</string>
     <string name="direct_install">直接安裝（建議）</string>
     <string name="install_inactive_slot">安裝到非使用中的槽位（在 OTA 更新後）</string>
     <string name="install_inactive_slot_msg">您的裝置將在下次重新啟動後強制切換到非使用中的槽位！\n這個選項僅在 OTA 更新完畢後使用。\n是否繼續？</string>
@@ -137,10 +131,6 @@
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
     <string name="settings_clear_cache_title">清除線上模組庫快取</string>
     <string name="settings_clear_cache_summary">將強制重新載入線上模組庫</string>
-    <string name="settings_hide_manager_title">隱藏 Magisk Manager</string>
-    <string name="settings_hide_manager_summary">以隨機的包裝名稱重新安裝 Magisk Manager</string>
-    <string name="settings_restore_manager_title">還原 Magisk Manager</string>
-    <string name="settings_restore_manager_summary">以原始包裝名稱重新安裝 Magisk Manager</string>
     <string name="language">語言</string>
     <string name="system_default">（系統預設值) </string>
     <string name="settings_check_update_title">檢查更新</string>
@@ -204,10 +194,7 @@
     <string name="progress_channel">進度通知</string>
     <string name="download_complete">下載完成</string>
     <string name="download_file_error">下載錯誤</string>
-    <string name="download_open_parent">在資料夾內顯示</string>
-    <string name="download_open_self">顯示檔案</string>
     <string name="magisk_update_title">Magisk 已發布新版本！</string>
-    <string name="manager_update_title">Magisk Manager 已發布新版本！</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">是</string>
@@ -221,9 +208,6 @@
     <string name="flashing">正在刷入……</string>
     <string name="done">完成！</string>
     <string name="failure">失敗</string>
-    <string name="hide_manager_title">正在隱藏 Magisk Manager……</string>
-    <string name="hide_manager_fail_toast">隱藏 Magisk Manager 失敗</string>
-    <string name="restore_manager_fail_toast">還原 Magisk Manager 失敗</string>
     <string name="open_link_failed_toast">沒有可以開啟此連結的應用程式</string>
     <string name="complete_uninstall">完全解除安裝</string>
     <string name="restore_img">還原原始映像檔</string>
@@ -231,16 +215,12 @@
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">不存在原始備份的映像檔！</string>
     <string name="proprietary_title">下載專有程式碼</string>
-    <string name="proprietary_notice">Magisk Manager 是完全免費且開源的軟體，因此不包含 Google 專有的 SafetyNet API 程式碼。\n\n您同意讓 Magisk Manager 額外的下載一個元件（包含 GoogleApiClient）以進行 SafetyNet 的檢查嗎？</string>
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">運作環境需被修復</string>
-    <string name="env_fix_msg">缺少讓 Magisk 正常運作所需的檔案。您同意讓 Magisk Manager 額外下載安裝包進行修復安裝，修復完成後自動重新啟動。是否繼續？</string>
     <string name="setup_msg">正在修復運作環境……</string>
     <string name="authenticate">認證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
-    <string name="unsupport_magisk_msg">此 Magisk Manager 的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
     <string name="external_rw_permission_denied">授予儲存權限以啟用此功能</string>
     <string name="add_shortcut_title">新增捷徑到首頁</string>
-    <string name="add_shortcut_msg">在隱藏 Magisk Manager 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
 
 </resources>
