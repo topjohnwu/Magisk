@@ -3,9 +3,9 @@
     <!--Sections-->
     <string name="modules">Модули</string>
     <string name="superuser">Суперпользователь</string>
-    <string name="logs">Логи</string>
+    <string name="logs">Лог</string>
     <string name="settings">Настройки</string>
-    <string name="refresh">Обновить список</string>
+    <string name="refresh">Обновить данные</string>
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
@@ -19,7 +19,9 @@
     <string name="not_available">N/A</string>
     <string name="hide">Скрыть</string>
     <string name="home_package">Имя пакета</string>
+    <string name="home_app_title">Приложение</string>
 
+    <string name="home_notice_content">Загружайте Magisk только из официального репозитория GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
@@ -27,7 +29,7 @@
     <string name="home_latest_version">Доступен</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
-    <string name="uninstall_magisk_msg">Все модули будут отключены/удалены!\nRoot-права будут удалены!\nШифрование будет активировано!</string>
+    <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будут убран!\nШифрование будет активировано!</string>
     <string name="home_check_safetynet">Проверка SafetyNet</string>
 
     <!--Install-->
@@ -129,8 +131,12 @@
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
-    <string name="settings_clear_cache_title">Очистка кэша репозитория</string>
-    <string name="settings_clear_cache_summary">Стереть кэш репозитория модулей. Кэш будет загружен заново</string>
+    <string name="settings_clear_cache_title">Очистить кэш репозитория</string>
+    <string name="settings_clear_cache_summary">Стереть кэш репозитория модулей (будет создан заново)</string>
+    <string name="settings_hide_app_title">Скрытие приложения Magisk</string>
+    <string name="settings_hide_app_summary">Пересобрать приложение Magisk со случайным названием и именем пакета</string>
+    <string name="settings_restore_app_title">Восстановление приложения Magisk</string>
+    <string name="settings_restore_app_summary">Восстановить приложение Magisk к исходному состоянию</string>
     <string name="language">Язык</string>
     <string name="system_default">По умолчанию</string>
     <string name="settings_check_update_title">Проверка обновлений</string>
@@ -170,8 +176,8 @@
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
-    <string name="settings_doh_title">DNS поверх HTTPS</string>
-    <string name="settings_doh_description">Отключить DoH (при проблемах с подключением)</string>
+    <string name="settings_doh_title">Отключение DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Отключает DoH (используйте при проблемах с подключением к сети)</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только администратор</string>
@@ -208,6 +214,7 @@
     <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка!</string>
+    <string name="hide_app_title">Скрытие приложения Magisk…</string>
     <string name="open_link_failed_toast">Приложения для открытия ссылки не найдены</string>
     <string name="complete_uninstall">Полное удаление</string>
     <string name="restore_img">Восстановить разделы</string>
@@ -215,13 +222,17 @@
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
     <string name="proprietary_title">Загрузка расширения SafetyNet</string>
+    <string name="proprietary_notice">Magisk — проект с открытым исходным кодом и не содержит проприетарный код SafetyNet API от Google.\n\nХотите загрузить проприетарное расширение для проверки статуса SafetyNet?</string>
     <string name="setup_fail">Ошибка установки</string>
     <string name="env_fix_title">Требуется расширенная установка</string>
+    <string name="env_fix_msg">Требуется расширенная установка Magisk для корректной работы. Продолжить и выполнить перезагрузку?</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
+    <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее!</string>
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
     <string name="add_shortcut_title">Создание ярлыка</string>
+    <string name="add_shortcut_msg">После скрытия приложения Magisk его имя и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
 
 </resources>
