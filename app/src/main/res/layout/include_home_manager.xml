@@ -52,39 +52,45 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/home_app_title" />
 
-            <Button
+            <FrameLayout
                 android:id="@+id/home_manager_button"
-                style="@style/WidgetFoundation.Button"
-                invisible="@{viewModel.stateManager != MagiskState.OBSOLETE}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.onManagerPressed()}"
-                android:text="@string/update"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_update_md2"
-                app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/home_manager_title"/>
+                app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
+                app:layout_constraintTop_toTopOf="@+id/home_manager_title">
 
-            <Button
-                style="@style/WidgetFoundation.Button.Text"
-                invisible="@{viewModel.stateManager == MagiskState.OBSOLETE}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="@{() -> viewModel.onManagerPressed()}"
-                android:text="@string/install"
-                android:textAllCaps="false"
-                app:icon="@drawable/ic_install"
-                app:layout_constraintBottom_toBottomOf="@+id/home_manager_title"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/home_manager_title"/>
+                <Button
+                    style="@style/WidgetFoundation.Button"
+                    gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.onManagerPressed()}"
+                    android:text="@string/update"
+                    android:textAllCaps="false"
+                    android:layout_gravity="end"
+                    app:icon="@drawable/ic_update_md2" />
+
+                <Button
+                    style="@style/WidgetFoundation.Button.Text"
+                    gone="@{viewModel.stateManager != MagiskState.UP_TO_DATE}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:onClick="@{() -> viewModel.onManagerPressed()}"
+                    android:text="@string/install"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_install"/>
+
+            </FrameLayout>
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/home_manager_title_barrier"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
-                tools:constraint_referenced_ids="home_manager_button,home_manager_title,home_manager_icon" />
+                app:referencedIds="@{viewModel.appTitleBarrierIds}"
+                tools:constraint_referenced_ids="home_manager_icon,home_manager_title,home_manager_button" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"

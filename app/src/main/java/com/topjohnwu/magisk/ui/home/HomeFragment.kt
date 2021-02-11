@@ -29,13 +29,35 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        // Set barrier reference IDs in code, since resource IDs will be stripped in release mode
-        binding.homeMagiskWrapper.homeMagiskTitleBarrier.referencedIds =
-            intArrayOf(R.id.home_magisk_button, R.id.home_magisk_title, R.id.home_magisk_icon)
-        binding.homeMagiskWrapper.homeMagiskBarrier.referencedIds =
-            intArrayOf(R.id.home_magisk_installed_version, R.id.home_device_details_ramdisk)
-        binding.homeManagerWrapper.homeManagerTitleBarrier.referencedIds =
-            intArrayOf(R.id.home_manager_button, R.id.home_manager_title, R.id.home_manager_icon)
+        // If titles are squished, hide icons
+
+        with(binding.homeMagiskWrapper) {
+            with(homeMagiskTitle) {
+                post {
+                    if (lineCount != 1) {
+                        with(homeMagiskIcon) {
+                            layoutParams.width = 0
+                            layoutParams.height = 0
+                            requestLayout()
+                        }
+                    }
+                }
+            }
+        }
+
+        with(binding.homeManagerWrapper) {
+            with(homeManagerTitle) {
+                post {
+                    if (lineCount != 1) {
+                        with(homeManagerIcon) {
+                            layoutParams.width = 0
+                            layoutParams.height = 0
+                            requestLayout()
+                        }
+                    }
+                }
+            }
+        }
 
         return binding.root
     }
