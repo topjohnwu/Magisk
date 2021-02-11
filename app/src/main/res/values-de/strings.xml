@@ -19,7 +19,9 @@
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
     <string name="home_package">Paket</string>
+    <string name="home_app_title">App</string>
 
+    <string name="home_notice_content">Laden sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
@@ -131,6 +133,10 @@
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_clear_cache_title">Repo-Cache leeren</string>
     <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen des Online-Repos. Erzwingt eine Aktualisierung</string>
+    <string name="settings_hide_app_title">Verstecke die Magisk App</string>
+    <string name="settings_hide_app_summary">Installiere eine Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label</string>
+    <string name="settings_restore_app_title">Stelle die Magisk App wiederher</string>
+    <string name="settings_restore_app_summary">Blende die App wieder ein und stelle die original APK wieder her</string>
     <string name="language">Sprache</string>
     <string name="system_default">Systemstandard</string>
     <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
@@ -208,6 +214,7 @@
     <string name="flashing">Flashen…</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
+    <string name="hide_app_title">Verstecke die Magisk App…</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
@@ -215,13 +222,17 @@
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="proprietary_title">Proprietären Code herunterladen</string>
+    <string name="proprietary_notice">Magisk ist FOSS und enthält keinen Code für Google\'s proprietäre SafetyNet API.\n\nWillst du eine proprietäre Erweiterung für Safetynet Überprüfungen herunterladen?</string>
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
+    <string name="env_fix_msg">Magisk braucht ein zusätzliches Setup, um auf deinem Gerät zu funktionieren. Willst du fortfahren und dein Gerät neustarten?</string>
     <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
+    <string name="unsupport_magisk_msg">Diese Version der App unterstütz keine Magisk version niedriger, als %1$s.\n\nDie App wird sich verhalten, als wäre Magisk nicht installiert, bitte aktualisiere Magisk so schnell, wie möglich.</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
+    <string name="add_shortcut_msg">Nachdem du diese App versteckst, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
 
 </resources>
