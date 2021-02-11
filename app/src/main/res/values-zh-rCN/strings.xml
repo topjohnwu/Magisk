@@ -19,7 +19,9 @@
     <string name="not_available">无法获取</string>
     <string name="hide">不再显示</string>
     <string name="home_package">包名</string>
+    <string name="home_app_title">App</string>
 
+    <string name="home_notice_content">仅从官方 GitHub 页面下载 Magisk。未知来源的文件可能具有恶意行为！</string>
     <string name="home_support_title">支持开发</string>
     <string name="home_item_source">源代码</string>
     <string name="home_support_content">Magisk 将一直保持免费且开源，向开发者捐赠以表示支持。</string>
@@ -41,7 +43,7 @@
     <string name="manager_download_install">立即安装</string>
     <string name="direct_install">直接安装（推荐）</string>
     <string name="install_inactive_slot">安装到未使用的槽位（OTA 后）</string>
-    <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！只能在 OTA 更新完成后使用。\n是否继续？</string>
+    <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！注意只能在 OTA 更新完成后的重启之前使用。</string>
     <string name="setup_title">修复安装</string>
     <string name="select_patch_file">选择并修补一个文件</string>
     <string name="patch_file_msg">选择一个原始映像文件（*.img）或一个 Odin 包（*.tar）</string>
@@ -95,7 +97,7 @@
     <string name="safetynet_attest_loading">稍候片刻</string>
     <string name="safetynet_attest_restart">重试</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">显示系统应用</string>
     <string name="show_os_app">显示操作系统</string>
     <string name="hide_filter_hint">按名称过滤</string>
@@ -103,7 +105,7 @@
     <string name="hide_filters">过滤</string>
     <string name="hide_search">搜索</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">（未提供信息）</string>
     <string name="reboot_userspace">软重启</string>
     <string name="reboot_recovery">重启到 Recovery</string>
@@ -121,7 +123,7 @@
     <string name="module_section_online">在线</string>
     <string name="sorting_order">排序方式</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">主题模式</string>
     <string name="settings_dark_mode_message">选择一个模式</string>
     <string name="settings_dark_mode_light">明亮模式</string>
@@ -131,6 +133,10 @@
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
     <string name="settings_clear_cache_title">清除仓库缓存</string>
     <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新数据</string>
+    <string name="settings_hide_app_title">隐藏 Magisk 应用</string>
+    <string name="settings_hide_app_summary">安装具有随机包名和自定义应用名称的代理应用</string>
+    <string name="settings_restore_app_title">还原 Magisk 应用</string>
+    <string name="settings_restore_app_summary">取消隐藏，恢复到原始应用</string>
     <string name="language">语言</string>
     <string name="system_default">系统默认</string>
     <string name="settings_check_update_title">检查更新</string>
@@ -163,9 +169,9 @@
     <string name="superuser_notification">超级用户通知</string>
     <string name="settings_su_reauth_title">更新后重新认证</string>
     <string name="settings_su_reauth_summary">应用更新后重新认证超级用户权限</string>
-    <string name="settings_su_tapjack_title">启用点按劫持保护</string>
+    <string name="settings_su_tapjack_title">点按劫持保护</string>
     <string name="settings_su_tapjack_summary">存在屏幕叠加层时，超级用户请求弹窗不响应允许操作</string>
-    <string name="settings_su_biometric_title">启用生物识别验证</string>
+    <string name="settings_su_biometric_title">生物识别验证</string>
     <string name="settings_su_biometric_summary">使用生物识别来允许超级用户请求</string>
     <string name="no_biometric">设备不支持或未配置生物识别功能</string>
     <string name="settings_customization">个性化</string>
@@ -208,6 +214,7 @@
     <string name="flashing">正在刷入</string>
     <string name="done">完成！</string>
     <string name="failure">失败</string>
+    <string name="hide_app_title">正在隐藏 Magisk 应用</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
     <string name="complete_uninstall">完全卸载</string>
     <string name="restore_img">还原原厂映像</string>
@@ -215,13 +222,17 @@
     <string name="restore_done">已还原</string>
     <string name="restore_fail">原厂 Boot 映像的备份不存在</string>
     <string name="proprietary_title">下载专有代码</string>
+    <string name="proprietary_notice">Magisk 是自由软件，不包含 Google 专有的 SafetyNet API 代码。是否允许下载一个专有扩展用于 SafetyNet 检查？</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要修复运行环境</string>
+    <string name="env_fix_msg">需要一些额外的安装才能使 Magisk 正常工作。完成后自动重启，是否继续？</string>
     <string name="setup_msg">正在修复运行环境</string>
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
+    <string name="unsupport_magisk_msg">应用不支持低于 %1$s 版本的 Magisk，表现为未安装状态。仅升级功能可用，请尽快升级 Magisk。</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
+    <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
 
 </resources>
