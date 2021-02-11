@@ -19,7 +19,9 @@
     <string name="not_available">No disponible</string>
     <string name="hide">Ocultar</string>
     <string name="home_package">Paquete</string>
+    <string name="home_app_title">App</string>
 
+    <string name="home_notice_content">Descarga Magisk SÓLO de la página de GitHub oficial. Archivos de fuentes desconocidas pueden resultar maliciosos!</string>
     <string name="home_support_title">Apóyenos</string>
     <string name="home_item_source">Código fuente</string>
     <string name="home_support_content">Magisk es, y siempre será gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
@@ -50,6 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Petición de superusuario</string>
+    <string name="touch_filtered_warning">Como otra app está escondiendo la solicitud de superusuario, Magisk no puede verificar tu respuesta</string>
     <string name="deny">Denegar</string>
     <string name="prompt">Preguntar</string>
     <string name="grant">Permitir</string>
@@ -95,7 +98,8 @@
     <string name="safetynet_attest_restart">Inténtelo de nuevo</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">Mostrar sistema</string>
+    <string name="show_system_app">Mostrar apps del sistema</string>
+    <string name="show_os_app">Mostrar apps del OS</string>
     <string name="hide_filter_hint">Filtrar por nombre</string>
     <string name="hide_scroll_up">Subir</string>
     <string name="hide_filters">Filtros</string>
@@ -103,6 +107,7 @@
 
     <!--Module -->
     <string name="no_info_provided">(No hay información)</string>
+    <string name="reboot_userspace">Reinicio suave</string>
     <string name="reboot_recovery">Reiniciar en modo recovery</string>
     <string name="reboot_bootloader">Reiniciar en modo bootloader</string>
     <string name="reboot_download">Reiniciar en modo download</string>
@@ -128,6 +133,10 @@
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
     <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
     <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
+    <string name="settings_hide_app_title">Esconder la app de Magisk</string>
+    <string name="settings_hide_app_summary">Instalar una nueva app proxy con una ID de paquete aleatoria y una etiqueta personalizada</string>
+    <string name="settings_restore_app_title">Restaurar la app de Magisk</string>
+    <string name="settings_restore_app_summary">Descubrir la app y restaurarla al APK original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Idioma del sistema)</string>
     <string name="settings_check_update_title">Comprobar Actualizaciones</string>
@@ -205,6 +214,7 @@
     <string name="flashing">Flasheando…</string>
     <string name="done">¡Hecho!</string>
     <string name="failure">Ha fallado</string>
+    <string name="hide_app_title">Escondiendo la app de Magisk…</string>
     <string name="open_link_failed_toast">No se encontró ninguna aplicación para abrir el enlace…</string>
     <string name="complete_uninstall">Desinstalación completa</string>
     <string name="restore_img">Restaurar imágenes</string>
@@ -212,13 +222,17 @@
     <string name="restore_done">¡Restauración Terminada!</string>
     <string name="restore_fail">¡El respaldo de la imagen boot Stock no existe!</string>
     <string name="proprietary_title">Descargar código propietario</string>
+    <string name="proprietary_notice">Magisk es FOSS y no incluye código de la API de SafetyNet, propiedad de Google.\n\n¿Quieres descargar una extensión propietaria para las comprobaciones de SafetyNet?</string>
     <string name="setup_fail">Instalación fallida</string>
     <string name="env_fix_title">Se requiere una instalación adicional</string>
+    <string name="env_fix_msg">Tu dispositivo necesita configuración adicional para el correcto funcionamiento de Magisk. ¿Quieres proceder y reiniciar?</string>
     <string name="setup_msg">Ejecutando configuración de entorno…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
+    <string name="unsupport_magisk_msg">Esta versión de la app no soporta versiones de Magisk inferiores a la %1$s.\n\nLa aplicación se comportará como si no tuvieses Magisk instalado, por favor actualiza Magisk tan pronto como sea posible.</string>
     <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
     <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
+    <string name="add_shortcut_msg">Tras esconder la app, su nombre e icono pueden resultar difíciles de reconocer. ¿Quieres añadir un acceso directo más bonito a la pantalla principal?</string>
     <string name="app_not_found">No se ha encontrado ninguna app para manejar esta acción</string>
 
 </resources>
