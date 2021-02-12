@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.ui.home
 
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.download.BaseDownloader
@@ -22,6 +24,18 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
     }
 
+    private fun checkTitle(text: TextView, icon: ImageView) {
+        text.post {
+            if (text.layout.getEllipsisCount(0) != 0) {
+                with (icon) {
+                    layoutParams.width = 0
+                    layoutParams.height = 0
+                    requestLayout()
+                }
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,33 +44,11 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         // If titles are squished, hide icons
-
         with(binding.homeMagiskWrapper) {
-            with(homeMagiskTitle) {
-                post {
-                    if (lineCount != 1) {
-                        with(homeMagiskIcon) {
-                            layoutParams.width = 0
-                            layoutParams.height = 0
-                            requestLayout()
-                        }
-                    }
-                }
-            }
+            checkTitle(homeMagiskTitle, homeMagiskIcon)
         }
-
         with(binding.homeManagerWrapper) {
-            with(homeManagerTitle) {
-                post {
-                    if (lineCount != 1) {
-                        with(homeManagerIcon) {
-                            layoutParams.width = 0
-                            layoutParams.height = 0
-                            requestLayout()
-                        }
-                    }
-                }
-            }
+            checkTitle(homeManagerTitle, homeManagerIcon)
         }
 
         return binding.root

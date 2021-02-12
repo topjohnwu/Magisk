@@ -46,6 +46,8 @@
                 android:text="@string/magisk"
                 android:textAppearance="@style/AppearanceFoundation.Title"
                 android:textColor="?colorPrimary"
+                android:maxLines="1"
+                android:ellipsize="end"
                 app:layout_constraintBottom_toBottomOf="@+id/home_magisk_icon"
                 app:layout_constraintEnd_toStartOf="@+id/home_magisk_button"
                 app:layout_constraintStart_toEndOf="@+id/home_magisk_icon"
