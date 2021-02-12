@@ -19,7 +19,9 @@
     <string name="not_available">ხელმიუწვდომელია</string>
     <string name="hide">დამალვა</string>
     <string name="home_package">პაკეტი</string>
+    <string name="home_app_title">აპი</string>
 
+    <string name="home_notice_content">გადმოიწერეთ Magisk მხოლოდ ოფიციალური GitHub-ის გვერდიდან. სხვა წყაროებიდან გადმოწერილი ფაილები შესაძლოა სახიფათო იყოს!</string>
     <string name="home_support_title">მხარდაჭერა</string>
     <string name="home_item_source">წყარო</string>
     <string name="home_support_content">Magisk-ი არის და ყოველთვის იქნება უფასო და წყარო-გახსნილი. მაგრამ თქვენ შეგიძლიათ დახმარება გაგვიწიოთ პატარა დონაციით.</string>
@@ -28,6 +30,7 @@
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
     <string name="uninstall_magisk_msg">ყველა მოდული იქნება წაშლილი/გამორთული!\nRoot-ი წაიშლება!\nთქვენი მონაცემები დაიშიფრება!</string>
+    <string name="home_check_safetynet">SafetyNet-ის შემოწმება</string>
 
     <!--Install-->
     <string name="keep_force_encryption">შიფრირება ყოველთვის იყოს ჩართული</string>
@@ -49,6 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">სუპერმომხმარებლის ნებართვის მოთხოვნა</string>
+    <string name="touch_filtered_warning">სხვა აპი ხელს უშლის Magisk-ს თქვენი პასუხის დადასტურებაში</string>
     <string name="deny">აკრძალვა</string>
     <string name="prompt">კითხვა</string>
     <string name="grant">დართვა</string>
@@ -95,6 +99,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
+    <string name="show_os_app">ოპერაციული სისტემის აპების ჩვენება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
     <string name="hide_scroll_up">მაღლა ასქროლვა</string>
     <string name="hide_filters">ფილტრები</string>
@@ -102,6 +107,7 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(ინფორმაცია არ არის მითითებული)</string>
+    <string name="reboot_userspace">სისტემის გადატვირთვა</string>
     <string name="reboot_recovery">Recovery-ში გადატვირთვა</string>
     <string name="reboot_bootloader">Bootloader-ში გადატვირთვა</string>
     <string name="reboot_download">Download-ში გადატვირთვა</string>
@@ -114,8 +120,8 @@
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
     <string name="module_installed">@string/home_installed_version</string>
+    <string name="module_section_online">ონლაინი</string>
     <string name="sorting_order">სორტირება</string>
-    <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
@@ -127,6 +133,10 @@
     <string name="settings_download_path_message">ფაილები შეინახება %1$s-ში</string>
     <string name="settings_clear_cache_title">რეპოზიტორიების ქეშის წაშლა</string>
     <string name="settings_clear_cache_summary">რეპოზიტორიებისთვის ქეშის წაშლა. ეს დაარეფრეშებს პროგრამას</string>
+    <string name="settings_hide_app_title">Magisk-ის აპის დამალვა</string>
+    <string name="settings_hide_app_summary">დაყენდეს ამოუცნობელი აპი შემთხვევითი პაკეტის ID-ით და განსხვავებული სახელით</string>
+    <string name="settings_restore_app_title">Magisk-ის აპის დაბრუნება</string>
+    <string name="settings_restore_app_summary">აპის თავდაპირველ მდგომარეობაზე დაბრუნება</string>
     <string name="language">ენა</string>
     <string name="system_default">(სისტემის რჩეული)</string>
     <string name="settings_check_update_title">განახლებების შემოწმება</string>
@@ -159,10 +169,15 @@
     <string name="superuser_notification">სუპერმომხმარებლის შეტყობინება</string>
     <string name="settings_su_reauth_title">რეაუტენთიფიკაცია განახლების შემდეგ</string>
     <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
+    <string name="settings_su_tapjack_title">Tapjacking-სგან თავის დაცვა</string> <!-- TODO: tapjacking has no direct translation; must make something up later -->
+    <string name="settings_su_tapjack_summary">superuser-ის დიალოგის ღილაკებზე დაჭერა არ იქნება შესაძლებელი თუ სხვა აპი არის მასზე გადახურული</string>
     <string name="settings_su_biometric_title">ბიომეტრიკული აუტენთიფიკაციის ჩართვა</string>
     <string name="settings_su_biometric_summary">ბიომეტრიკული აუტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
     <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
     <string name="settings_customization">პერსონალიზაცია</string>
+    <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
+    <string name="settings_doh_title">DNS HTTPS-ზე</string>
+    <string name="settings_doh_description">DNS-ის ლიმიტების მოხსნა კონკრეტულ სახელმწიფოებში</string>
 
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
@@ -199,6 +214,7 @@
     <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
+    <string name="hide_app_title">ვმალავთ Magisk-ის აპს…</string>
     <string name="open_link_failed_toast">ლინკის გამხსნელი აპლიკაცია ვერ მოიძებნა</string>
     <string name="complete_uninstall">დეინსტალაციის დასრულება</string>
     <string name="restore_img">სურათის აღდგენა</string>
@@ -206,11 +222,17 @@
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
     <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
+    <string name="proprietary_notice">Magisk-ი არის უფასო და გახსნილი წყაროს მქონე პროგრამა, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nგსურთ კუთვნილი დამატების გადმოწერა SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი გამართვა</string>
-    <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი გამართვა იმისთვის რომ Magisk-მა იმუშავოს. გადმოწერილი იქნება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
+    <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი გამართვა იმისთვის რომ Magisk-მა იმუშავოს. გადმოიწერება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>
     <string name="setup_msg">მიმდინარეობს ინტერფეისის ინსტალაცია…</string>
     <string name="authenticate">აუტენთიფიკაცია</string>
     <string name="unsupport_magisk_title">შეუთავსებელი Magisk-ის ვერსია</string>
+    <string name="unsupport_magisk_msg">ეს აპის ვერსია შეუთავსებსლია Magisk-ის %1$s-ზე ნაკლებ ვერსიებთან.\n\nაპს ეგონება, რომ Magisk-ი არაა დაყენებული, გთხოვთ გაანხალოთ Magisk-ი დროულად.</string>
+    <string name="external_rw_permission_denied">დართეთ მეხსიერებასთან წვდომის ნებართვა ამ ფუნქციის გამოსაყნებლად</string>
+    <string name="add_shortcut_title">ხატულის დამატება საწყისს ეკრანზე</string>
+    <string name="add_shortcut_msg">აპის დამალვის შემდეგ, მისი ნახატი და სახელი შეიძლება ამოუცნობი გახდეს. გნებავთ ხატულის დამატება ასწყისს ეკრანზე?</string>
+    <string name="app_not_found">ამ ფუნქციის შესასრულებლად აპი ვერ მოიძებნა</string>
 
 </resources>
