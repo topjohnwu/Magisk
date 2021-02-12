@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">அமைப்பை முடிக்க முழு மேகிஸ்க்கு மேம்படுத்தவும். பதிவிறக்கி நிறுவவா?</string>
+    <string name="no_internet_msg">இணையத்துடன் இணைக்கவும்! முழு மேகிஸ்க்கு மேம்படுத்தல் தேவை.</string>
+    <string name="dling">பதிவிறக்குகிறது</string>
+    <string name="relaunch_app">பயன்பாட்டை கைமுறையாக மீண்டும் தொடங்கவும்</string>
+</resources>
