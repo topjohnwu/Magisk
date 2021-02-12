@@ -1,206 +1,226 @@
-#include <logging.hpp>
-#include <flags.h>
+#include <utils.hpp>
 #include <magiskpolicy.hpp>
 
-#include "sepolicy.h"
+#include "sepolicy.hpp"
 
-static void allowSuClient(const char *target) {
-	if (!sepol_exists(target))
-		return;
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-	sepol_allow(SEPOL_PROC_DOMAIN, target, "fd", "use");
-	sepol_allow(SEPOL_PROC_DOMAIN, target, "fifo_file", ALL);
+using namespace std;
 
-	// Allow binder service
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow(target, SEPOL_PROC_DOMAIN, "binder", "transfer");
+void sepolicy::magisk_rules() {
+    // Temp suppress warnings
+    auto bak = log_cb.w;
+    log_cb.w = nop_log;
 
-	// Allow termios ioctl
-	sepol_allow(target, "devpts", "chr_file", "ioctl");
-	sepol_allow(target, "untrusted_app_devpts", "chr_file", "ioctl");
-	sepol_allow(target, "untrusted_app_25_devpts", "chr_file", "ioctl");
-	sepol_allow(target, "untrusted_app_all_devpts", "chr_file", "ioctl");
-	if (magisk_policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
-		sepol_allowxperm(target, "devpts", "chr_file", "0x5400-0x54FF");
-		sepol_allowxperm(target, "untrusted_app_devpts", "chr_file", "0x5400-0x54FF");
-		sepol_allowxperm(target, "untrusted_app_25_devpts", "chr_file", "0x5400-0x54FF");
-		sepol_allowxperm(target, "untrusted_app_all_devpts", "chr_file", "0x5400-0x54FF");
-	}
-}
+    // This indicates API 26+
+    bool new_rules = exists("untrusted_app_25");
 
-void sepol_magisk_rules() {
-	// Temp suppress warnings
-	auto bak = log_cb.w;
-	log_cb.w = nop_log;
+    // Prevent anything to change sepolicy except ourselves
+    deny(ALL, "kernel", "security", "load_policy");
 
-	// First prevent anything to change sepolicy except ourselves
-	sepol_deny(ALL, "kernel", "security", "load_policy");
+    type(SEPOL_PROC_DOMAIN, "domain");
+    permissive(SEPOL_PROC_DOMAIN);  /* Just in case something is missing */
+    typeattribute(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
+    typeattribute(SEPOL_PROC_DOMAIN, "netdomain");
+    typeattribute(SEPOL_PROC_DOMAIN, "bluetoothdomain");
+    type(SEPOL_FILE_TYPE, "file_type");
+    typeattribute(SEPOL_FILE_TYPE, "mlstrustedobject");
 
-	if (!sepol_exists(SEPOL_PROC_DOMAIN))
-		sepol_create(SEPOL_PROC_DOMAIN);
-	if (!sepol_exists(SEPOL_FILE_DOMAIN))
-		sepol_create(SEPOL_FILE_DOMAIN);
-	sepol_permissive(SEPOL_PROC_DOMAIN);
+    // Make our root domain unconstrained
+    allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
+    // Allow us to do any ioctl
+    if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
+    }
 
-	sepol_attradd(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
-	sepol_attradd(SEPOL_PROC_DOMAIN, "netdomain");
-	sepol_attradd(SEPOL_PROC_DOMAIN, "bluetoothdomain");
-	sepol_attradd(SEPOL_FILE_DOMAIN, "mlstrustedobject");
+    // Create unconstrained file type
+    allow(ALL, SEPOL_FILE_TYPE, "file", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "dir", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
 
-	// Let everyone access tmpfs files (for SAR sbin overlay)
-	sepol_allow(ALL, "tmpfs", "file", ALL);
+    if (new_rules) {
+        // Make client type literally untrusted_app
+        type(SEPOL_CLIENT_DOMAIN, "domain");
+        typeattribute(SEPOL_CLIENT_DOMAIN, "coredomain");
+        typeattribute(SEPOL_CLIENT_DOMAIN, "appdomain");
+        typeattribute(SEPOL_CLIENT_DOMAIN, "untrusted_app_all");
+        typeattribute(SEPOL_CLIENT_DOMAIN, "netdomain");
+        typeattribute(SEPOL_CLIENT_DOMAIN, "bluetoothdomain");
 
-	// For normal rootfs file/directory operations when rw (for SAR / overlay)
-	sepol_allow("rootfs", "labeledfs", "filesystem", "associate");
+        type(SEPOL_EXEC_TYPE, "file_type");
+        typeattribute(SEPOL_EXEC_TYPE, "exec_type");
 
-	// Let init transit to SEPOL_PROC_DOMAIN
-	sepol_allow("kernel", "kernel", "process", "setcurrent");
-	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
+        // Basic su client needs
+        allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
+        allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
 
-	// Let init run stuffs
-	sepol_allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
-	sepol_allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-	sepol_allow("init", "tmpfs", "file", "getattr");
-	sepol_allow("init", "tmpfs", "file", "execute");
+        const char *pts[] {
+            "devpts", "untrusted_app_devpts",
+            "untrusted_app_25_devpts", "untrusted_app_all_devpts" };
+        for (auto type : pts) {
+            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "open");
+            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
+            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
+            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
+            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
+            allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5400-0x54FF");
+        }
 
-	// Shell, properties, logs
-	if (sepol_exists("default_prop"))
-		sepol_allow(SEPOL_PROC_DOMAIN, "default_prop", "property_service", "set");
-	sepol_allow(SEPOL_PROC_DOMAIN, "init", "unix_stream_socket", "connectto");
-	sepol_allow(SEPOL_PROC_DOMAIN, "rootfs", "filesystem", "remount");
-	if (sepol_exists("logd"))
-		sepol_allow(SEPOL_PROC_DOMAIN, "logd", "unix_stream_socket", "connectto");
-	sepol_allow(SEPOL_PROC_DOMAIN, SEPOL_PROC_DOMAIN, ALL, ALL);
+        // Allow these processes to access MagiskSU
+        vector<const char *> clients{ "init", "shell", "update_engine", "appdomain" };
+        for (auto type : clients) {
+            if (!exists(type))
+                continue;
+            // exec magisk
+            allow(type, SEPOL_EXEC_TYPE, "file", "read");
+            allow(type, SEPOL_EXEC_TYPE, "file", "open");
+            allow(type, SEPOL_EXEC_TYPE, "file", "getattr");
+            allow(type, SEPOL_EXEC_TYPE, "file", "execute");
+            allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
 
-	// For sepolicy live patching
-	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "security", "read_policy");
-	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "security", "load_policy");
+            // Auto transit to client domain
+            allow(type, SEPOL_CLIENT_DOMAIN, "process", "transition");
+            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "siginh");
+            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "rlimitinh");
+            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "noatsecure");
 
-	// Allow these processes to access MagiskSU
-	allowSuClient("init");
-	allowSuClient("shell");
-	allowSuClient("system_app");
-	allowSuClient("priv_app");
-	allowSuClient("platform_app");
-	allowSuClient("untrusted_app");
-	allowSuClient("untrusted_app_25");
-	allowSuClient("untrusted_app_27");
-	allowSuClient("untrusted_app_29");
-	allowSuClient("update_engine");
+            // Kill client process
+            allow(type, SEPOL_CLIENT_DOMAIN, "process", "signal");
+        }
 
-	// suRights
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-	sepol_allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "search");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "dir", "read");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "open");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "file", "read");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "process", "getattr");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "transfer");
-	sepol_allow(SEPOL_PROC_DOMAIN, "servicemanager", "binder", "call");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
+        // type transition require actual types, not attributes
+        const char *app_types[] {
+            "system_app", "priv_app", "platform_app", "untrusted_app",
+            "untrusted_app_25", "untrusted_app_27", "untrusted_app_29" };
+        clients.pop_back();
+        clients.insert(clients.end(), app_types, app_types + std::size(app_types));
+        for (auto type : clients) {
+            // Auto transit to client domain
+            type_transition(type, SEPOL_EXEC_TYPE, "process", SEPOL_CLIENT_DOMAIN);
+        }
 
-	// allowLog
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
+        // Allow system_server to manage magisk_client
+        allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "getpgid");
+        allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "sigkill");
 
-	// suBackL0
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow("system_server", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "call");
-	sepol_allow(SEPOL_PROC_DOMAIN, "system_server", "binder", "transfer");
+        // Don't allow pesky processes to monitor audit deny logs when poking magisk daemon socket
+        dontaudit(ALL, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
 
-	// suBackL6
-	sepol_allow("surfaceflinger", "app_data_file", "dir", ALL);
-	sepol_allow("surfaceflinger", "app_data_file", "file", ALL);
-	sepol_allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
-	sepol_attradd("surfaceflinger", "mlstrustedsubject");
+        // Only allow client processes and zygote to connect to magisk daemon socket
+        allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
+        allow("zygote", SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
+    } else {
+        // Fallback to poking holes in sandbox as Android 4.3 to 7.1 set PR_SET_NO_NEW_PRIVS
 
-	// suMiscL6
-	if (sepol_exists("audioserver"))
-		sepol_allow("audioserver", "audioserver", "process", "execmem");
+        // Allow these processes to access MagiskSU
+        const char *clients[] { "init", "shell", "appdomain", "zygote" };
+        for (auto type : clients) {
+            if (!exists(type))
+                continue;
+            allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
+            allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
 
-	// Liveboot
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "transfer");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "call");
-	sepol_allow("surfaceflinger", SEPOL_PROC_DOMAIN, "fd", "use");
-	sepol_allow("debuggerd", SEPOL_PROC_DOMAIN, "process", "ptrace");
+            // Allow termios ioctl
+            const char *pts[] { "devpts", "untrusted_app_devpts" };
+            for (auto pts_type : pts) {
+                allow(type, pts_type, "chr_file", "ioctl");
+                if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
+                    allowxperm(type, pts_type, "chr_file", "0x5400-0x54FF");
+            }
+        }
+    }
 
-	// dumpsys
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "write");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
+    // Let everyone access tmpfs files (for SAR sbin overlay)
+    allow(ALL, "tmpfs", "file", ALL);
 
-	// bootctl
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-	sepol_allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
+    // For relabelling files
+    allow("rootfs", "labeledfs", "filesystem", "associate");
+    allow(SEPOL_FILE_TYPE, "pipefs", "filesystem", "associate");
+    allow(SEPOL_FILE_TYPE, "devpts", "filesystem", "associate");
 
-	// For mounting loop devices, mirrors, tmpfs
-	sepol_allow(SEPOL_PROC_DOMAIN, "kernel", "process", "setsched");
-	sepol_allow(SEPOL_PROC_DOMAIN, "labeledfs", "filesystem", "mount");
-	sepol_allow(SEPOL_PROC_DOMAIN, "labeledfs", "filesystem", "unmount");
-	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "mount");
-	sepol_allow(SEPOL_PROC_DOMAIN, "tmpfs", "filesystem", "unmount");
-	sepol_allow("kernel", ALL, "file", "read");
-	sepol_allow("kernel", ALL, "file", "write");
+    // Let init transit to SEPOL_PROC_DOMAIN
+    allow("kernel", "kernel", "process", "setcurrent");
+    allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
 
-	// Allow us to do anything to any files/dir/links
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "file", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "dir", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "lnk_file", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "sock_file", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
-	sepol_allow(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
+    // Let init run stuffs
+    allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
+    allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
+    allow("init", "tmpfs", "file", "getattr");
+    allow("init", "tmpfs", "file", "execute");
 
-	// Allow us to do any ioctl on all block devices
-	if (magisk_policydb->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
-		sepol_allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", "0x0000-0xFFFF");
+    // suRights
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
+    allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
+    allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
-	// Allow all binder transactions
-	sepol_allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
+    // allowLog
+    allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
+    allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
+    allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
+    allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
 
-	// Super files
-	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "file", ALL);
-	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "dir", ALL);
-	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "fifo_file", ALL);
-	sepol_allow(ALL, SEPOL_FILE_DOMAIN, "chr_file", ALL);
-	sepol_allow(SEPOL_FILE_DOMAIN, ALL, "filesystem", "associate");
+    // suBackL6
+    allow("surfaceflinger", "app_data_file", "dir", ALL);
+    allow("surfaceflinger", "app_data_file", "file", ALL);
+    allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
+    typeattribute("surfaceflinger", "mlstrustedsubject");
 
-	// For changing attributes
-	sepol_allow("rootfs", "tmpfs", "filesystem", "associate");
+    // suMiscL6
+    allow("audioserver", "audioserver", "process", "execmem");
 
-	// Xposed
-	sepol_allow("untrusted_app", "untrusted_app", "capability", "setgid");
-	sepol_allow("system_server", "dex2oat_exec", "file", ALL);
+    // Liveboot
+    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
+    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "transfer");
+    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "call");
+    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "fd", "use");
+    allow("debuggerd", SEPOL_PROC_DOMAIN, "process", "ptrace");
 
-	// Support deodexed ROM on Oreo
-	sepol_allow("zygote", "dalvikcache_data_file", "file", "execute");
+    // dumpsys
+    allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
+    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "write");
+    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
+    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
+    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
 
-	// Support deodexed ROM on Pie (Samsung)
-	sepol_allow("system_server", "dalvikcache_data_file", "file", "write");
-	sepol_allow("system_server", "dalvikcache_data_file", "file", "execute");
+    // bootctl
+    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
+    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
+    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
+    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
+    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 
-	// Allow update_engine/addon.d-v2 to run permissive on all ROMs
-	sepol_permissive("update_engine");
+    // For mounting loop devices, mirrors, tmpfs
+    allow("kernel", ALL, "file", "read");
+    allow("kernel", ALL, "file", "write");
+
+    // Allow all binder transactions
+    allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
+
+    // For changing file context
+    allow("rootfs", "tmpfs", "filesystem", "associate");
+
+    // Xposed
+    allow("untrusted_app", "untrusted_app", "capability", "setgid");
+    allow("system_server", "dex2oat_exec", "file", ALL);
+
+    // Support deodexed ROM on Oreo
+    allow("zygote", "dalvikcache_data_file", "file", "execute");
+
+    // Support deodexed ROM on Pie (Samsung)
+    allow("system_server", "dalvikcache_data_file", "file", "write");
+    allow("system_server", "dalvikcache_data_file", "file", "execute");
+
+    // Allow update_engine/addon.d-v2 to run permissive on all ROMs
+    permissive("update_engine");
 
 #if 0
-	// Remove all dontaudit in debug mode
-	strip_dontaudit();
+    // Remove all dontaudit in debug mode
+    impl->strip_dontaudit();
 #endif
 
-	log_cb.w = bak;
+    log_cb.w = bak;
 }

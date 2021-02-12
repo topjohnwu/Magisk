@@ -32,7 +32,7 @@ extern "C" void *xrealloc(void *ptr, size_t size);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-					void *(*start_routine) (void *), void *arg);
+                    void *(*start_routine) (void *), void *arg);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
@@ -45,8 +45,8 @@ int xsymlink(const char *target, const char *linkpath);
 int xsymlinkat(const char *target, int newdirfd, const char *linkpath);
 int xlinkat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath, int flags);
 int xmount(const char *source, const char *target,
-		   const char *filesystemtype, unsigned long mountflags,
-		   const void *data);
+           const char *filesystemtype, unsigned long mountflags,
+           const void *data);
 int xumount(const char *target);
 int xumount2(const char *target, int flags);
 int xrename(const char *oldpath, const char *newpath);
@@ -59,4 +59,9 @@ pid_t xfork();
 int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 int xinotify_init1(int flags);
 char *xrealpath(const char *path, char *resolved_path);
-
+int xmknod(const char *pathname, mode_t mode, dev_t dev);
+long xptrace(int request, pid_t pid, void *addr = nullptr, void *data = nullptr);
+static inline long xptrace(int request, pid_t pid, void *addr, uintptr_t data) {
+    return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
+}
+#define WEVENT(s) (((s) & 0xffff0000) >> 16)

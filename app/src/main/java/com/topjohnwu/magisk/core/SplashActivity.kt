@@ -3,15 +3,13 @@ package com.topjohnwu.magisk.core
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.tasks.patchDTB
-import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.core.view.Notifications
-import com.topjohnwu.magisk.core.view.Shortcuts
-import com.topjohnwu.magisk.data.network.GithubRawServices
-import com.topjohnwu.magisk.extensions.get
-import com.topjohnwu.magisk.model.navigation.Navigation
+import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.view.Notifications
+import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 
 open class SplashActivity : Activity() {
@@ -23,44 +21,44 @@ open class SplashActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.SplashTheme)
         super.onCreate(savedInstanceState)
-        Shell.getShell { Shell.EXECUTOR.execute(this::initAndStart) }
+        // Pre-initialize root shell
+        Shell.getShell(null) { initAndStart() }
     }
 
-    private fun handleRepackage() {
-        val pkg = Config.suManager
-        if (Config.suManager.isNotEmpty() && packageName == BuildConfig.APPLICATION_ID) {
-            Config.suManager = ""
-            Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
-        }
-        if (pkg == packageName) {
+    private fun handleRepackage(pkg: String?) {
+        if (packageName != APPLICATION_ID) {
             runCatching {
-                // We are the manager, remove com.topjohnwu.magisk as it could be malware
-                packageManager.getApplicationInfo(BuildConfig.APPLICATION_ID, 0)
-                Shell.su("(pm uninstall ${BuildConfig.APPLICATION_ID})& >/dev/null 2>&1").exec()
+                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
+                packageManager.getApplicationInfo(APPLICATION_ID, 0)
+                Shell.su("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
             }
+        } else {
+            if (Config.suManager.isNotEmpty())
+                Config.suManager = ""
+            pkg ?: return
+            Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
         }
     }
 
     private fun initAndStart() {
-        Config.initialize()
-        handleRepackage()
+        val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)
+
+        Config.load(prevPkg)
+        handleRepackage(prevPkg)
         Notifications.setup(this)
-        Utils.scheduleUpdateCheck(this)
-        Shortcuts.setup(this)
+        UpdateCheckService.schedule(this)
+        Shortcuts.setupDynamic(this)
 
-        // Patch DTB partitions if needed
-        patchDTB(this)
-
-        // Pre-fetch network stuffs
-        get<GithubRawServices>()
+        // Pre-fetch network services
+        get<NetworkService>()
 
         DONE = true
-        Navigation.start(intent, this)
+
+        redirect<MainActivity>().also { startActivity(it) }
         finish()
     }
 
     companion object {
-
         var DONE = false
     }
 }

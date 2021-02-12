@@ -1,3 +1,8 @@
-# v7.5.1
-- Fix toggling app components in MagiskHide screen
-- Update translations
+## v8.0.7
+
+- Fix sepolicy rule migration when upgrading
+
+## v8.0.6
+
+- Minor UI changes
+- Update internal scripts

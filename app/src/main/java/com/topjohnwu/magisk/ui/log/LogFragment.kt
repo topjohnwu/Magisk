@@ -7,9 +7,12 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
+import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
+import com.topjohnwu.magisk.ktx.addVerticalPadding
+import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -42,6 +45,21 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
         binding.logFilterToggle.setOnClickListener {
             isMagiskLogVisible = true
         }
+
+        val resource = requireContext().resources
+        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
+        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
+        binding.logFilterSuperuser.logSuperuser.addVerticalPadding(
+            0,
+            l1
+        )
+        binding.logFilterSuperuser.logSuperuser.addSimpleItemDecoration(
+            left = l1,
+            top = l_50,
+            right = l1,
+            bottom = l_50,
+        )
+        binding.logFilterSuperuser.logSuperuser.fixEdgeEffect()
     }
 
 

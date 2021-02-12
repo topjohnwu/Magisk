@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="upgrade_msg">需要升级到完整的 Magisk Manager 来完成安装。 现在下载？</string>
-    <string name="no_internet_msg">请连接到互联网！ 这是升级到完整 Magisk Manager 所必需的。</string>
+    <string name="upgrade_msg">需要下载完整版 Magisk 才能正常运行。开始下载？</string>
+    <string name="no_internet_msg">下载需要网络，请检查网络连接。</string>
     <string name="dling">正在下载</string>
+    <string name="relaunch_app">请重新打开本应用</string>
 </resources>

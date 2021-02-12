@@ -2,59 +2,72 @@
 # Magisk Manager internal scripts
 ##################################
 
+run_delay() {
+  (sleep $1; $2)&
+}
+
 env_check() {
-  for file in busybox magisk magiskboot magiskinit util_functions.sh boot_patch.sh; do
+  for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
   done
   return 0
 }
 
-fix_env() {
-  cd $MAGISKBIN
-  PATH=/system/bin /system/bin/sh update-binary -x
-  ./busybox rm -f update-binary magisk.apk
-  ./busybox chmod -R 755 .
-  ./magiskinit -x magisk magisk
+cp_readlink() {
+  if [ -z $2 ]; then
+    cd $1
+  else
+    cp -af $1/. $2
+    cd $2
+  fi
+  for file in *; do
+    if [ -L $file ]; then
+      local full=$(readlink -f $file)
+      rm $file
+      cp -af $full $file
+    fi
+  done
+  chmod -R 755 .
   cd /
 }
 
-direct_install() {
-  rm -rf $MAGISKBIN/* 2>/dev/null
+fix_env() {
+  # Cleanup and make dirs
+  rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
-  cp -af $1/. $MAGISKBIN
-  rm -f $MAGISKBIN/new-boot.img
+  cp_readlink $1 $MAGISKBIN
+  rm -rf $1
+  chown -R 0:0 $MAGISKBIN
+}
+
+direct_install() {
   echo "- Flashing new boot image"
   flash_image $1/new-boot.img $2
-  if [ $? -ne 0 ]; then
-    echo "! Insufficient partition size"
-    return 1
-  fi
-  rm -rf $1
+  case $? in
+    1)
+      echo "! Insufficient partition size"
+      return 1
+      ;;
+    2)
+      echo "! $2 is read only"
+      return 2
+      ;;
+  esac
+
+  rm -f $1/new-boot.img
+  fix_env $1
+  run_migrations
+  copy_sepolicy_rules
+
   return 0
 }
 
-mm_patch_dtb() {
-  (local result=1
-  local PATCHED=$TMPDIR/dt.patched
-  for name in dtb dtbo; do
-    local IMAGE=`find_block $name$SLOT`
-    if [ ! -z $IMAGE ]; then
-      if $MAGISKBIN/magiskboot dtb $IMAGE patch $PATCHED; then
-        result=0
-        if [ ! -z $SHA1 ]; then
-          # Backup stuffs
-          mkdir /data/magisk_backup_${SHA1} 2>/dev/null
-          cat $IMAGE | gzip -9 > /data/magisk_backup_${SHA1}/${name}.img.gz
-        fi
-        cat $PATCHED /dev/zero > $IMAGE
-        rm -f $PATCHED
-      fi
-    fi
-  done
-  # Run broadcast command passed from app
-  eval $1
-  )& >/dev/null 2>&1
+run_uninstaller() {
+  rm -rf /dev/tmp
+  mkdir -p /dev/tmp/install
+  unzip -o "$1" "assets/*" "lib/*" -d /dev/tmp/install
+  INSTALLER=/dev/tmp/install sh /dev/tmp/install/assets/uninstaller.sh dummy 1 "$1"
 }
 
 restore_imgs() {
@@ -67,7 +80,7 @@ restore_imgs() {
 
   for name in dtb dtbo; do
     [ -f $BACKUPDIR/${name}.img.gz ] || continue
-    local IMAGE=`find_block $name$SLOT`
+    local IMAGE=$(find_block $name$SLOT)
     [ -z $IMAGE ] && continue
     flash_image $BACKUPDIR/${name}.img.gz $IMAGE
   done
@@ -76,15 +89,17 @@ restore_imgs() {
 }
 
 post_ota() {
-  cd $1
+  cd /data/adb
+  cp -f $1 bootctl
+  rm -f $1
   chmod 755 bootctl
   ./bootctl hal-info || return
-  [ `./bootctl get-current-slot` -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
+  [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
   ./bootctl set-active-boot-slot $SLOT_NUM
   cat << EOF > post-fs-data.d/post_ota.sh
-${1}/bootctl mark-boot-successful
-rm -f ${1}/bootctl
-rm -f ${1}/post-fs-data.d/post_ota.sh
+/data/adb/bootctl mark-boot-successful
+rm -f /data/adb/bootctl
+rm -f /data/adb/post-fs-data.d/post_ota.sh
 EOF
   chmod 755 post-fs-data.d/post_ota.sh
   cd /
@@ -108,13 +123,13 @@ EOF
   cd /
 }
 
-force_pm_install() {
-  local APK=$1
-  local VERIFY=`settings get global package_verifier_enable`
-  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 0
-  pm install -r $APK
+adb_pm_install() {
+  local tmp=/data/local/tmp/temp.apk
+  cp -f "$1" $tmp
+  chmod 644 $tmp
+  su 2000 -c pm install $tmp || pm install $tmp
   local res=$?
-  [ "$VERIFY" -eq 1 ] && settings put global package_verifier_enable 1
+  rm -f $tmp
   return $res
 }
 
@@ -122,20 +137,42 @@ check_boot_ramdisk() {
   # Create boolean ISAB
   [ -z $SLOT ] && ISAB=false || ISAB=true
 
-  # If we are running as recovery mode, then we do not have ramdisk in boot
-  $RECOVERYMODE && return 1
+  # If we are running as recovery mode, then we do not have ramdisk
+  [ "$RECOVERYMODE" = "true" ] && return 1
 
   # If we are A/B, then we must have ramdisk
   $ISAB && return 0
 
-  # If we are using legacy SAR, but not AB, we do not have ramdisk in boot
+  # If we are using legacy SAR, but not A/B, assume we do not have ramdisk
   if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
-    # Override recovery mode to true
-    RECOVERYMODE=true
+    # Override recovery mode to true if not set
+    [ -z $RECOVERYMODE ] && RECOVERYMODE=true
     return 1
   fi
 
   return 0
+}
+
+check_encryption() {
+  if $ISENCRYPTED; then
+    if [ $SDK_INT -lt 24 ]; then
+      CRYPTOTYPE="block"
+    else
+      # First see what the system tells us
+      CRYPTOTYPE=$(getprop ro.crypto.type)
+      if [ -z $CRYPTOTYPE ]; then
+        # If not mounting through device mapper, we are FBE
+        if grep ' /data ' /proc/mounts | grep -qv 'dm-'; then
+          CRYPTOTYPE="file"
+        else
+          # We are either FDE or metadata encryption (which is also FBE)
+          grep -q ' /metadata ' /proc/mounts && CRYPTOTYPE="file" || CRYPTOTYPE="block"
+        fi
+      fi
+    fi
+  else
+    CRYPTOTYPE="N/A"
+  fi
 }
 
 ##########################
@@ -143,15 +180,16 @@ check_boot_ramdisk() {
 ##########################
 
 mount_partitions() {
-  [ "`getprop ro.build.ab_update`" = "true" ] && SLOT=`getprop ro.boot.slot_suffix`
+  [ "$(getprop ro.build.ab_update)" = "true" ] && SLOT=$(getprop ro.boot.slot_suffix)
   # Check whether non rootfs root dir exists
   grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_ROOT=true || SYSTEM_ROOT=false
 }
 
 get_flags() {
-  $SYSTEM_ROOT && KEEPVERITY=true || KEEPVERITY=false
-  [ "`getprop ro.crypto.state`" = "encrypted" ] && KEEPFORCEENCRYPT=true || KEEPFORCEENCRYPT=false
-  RECOVERYMODE=false
+  KEEPVERITY=$SYSTEM_ROOT
+  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true || ISENCRYPTED=false
+  KEEPFORCEENCRYPT=$ISENCRYPTED
+  # Do NOT preset RECOVERYMODE here
 }
 
 run_migrations() { return; }
@@ -162,10 +200,15 @@ grep_prop() { return; }
 # Initialize
 #############
 
-mm_init() {
-  export BOOTMODE=true
+app_init() {
   mount_partitions
   get_flags
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+  check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
+  check_encryption
+  # Make sure RECOVERYMODE has value
+  [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
+
+export BOOTMODE=true

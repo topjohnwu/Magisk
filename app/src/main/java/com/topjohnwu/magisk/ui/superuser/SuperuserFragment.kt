@@ -1,8 +1,13 @@
 package com.topjohnwu.magisk.ui.superuser
 
+import android.os.Bundle
+import android.view.View
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
+import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
+import com.topjohnwu.magisk.ktx.addVerticalPadding
+import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SuperuserFragment : BaseUIFragment<SuperuserViewModel, FragmentSuperuserMd2Binding>() {
@@ -13,6 +18,25 @@ class SuperuserFragment : BaseUIFragment<SuperuserViewModel, FragmentSuperuserMd
     override fun onStart() {
         super.onStart()
         activity.title = resources.getString(R.string.superuser)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val resource = requireContext().resources
+        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
+        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
+        binding.superuserList.addVerticalPadding(
+            l_50,
+            l1
+        )
+        binding.superuserList.addSimpleItemDecoration(
+            left = l1,
+            top = l_50,
+            right = l1,
+            bottom = l_50,
+        )
+        binding.superuserList.fixEdgeEffect()
     }
 
     override fun onPreBind(binding: FragmentSuperuserMd2Binding) {}

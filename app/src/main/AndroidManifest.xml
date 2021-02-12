@@ -3,18 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.topjohnwu.magisk">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
     <application
-        android:name="a.e"
-        android:allowBackup="true"
+        android:name=".core.App"
+        android:extractNativeLibs="true"
+        android:icon="@drawable/ic_launcher"
+        android:multiArch="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <!-- Splash -->
         <activity
-            android:name="a.c"
+            android:name=".core.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,32 +25,27 @@
         </activity>
 
         <!-- Main -->
-        <activity android:name="a.b" />
+        <activity android:name=".ui.MainActivity" />
 
         <!-- Superuser -->
         <activity
-            android:name="a.m"
+            android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
             android:excludeFromRecents="true"
             android:exported="false"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
-        <!-- ProcessPhoenix -->
-        <activity
-            android:name="a.r"
-            android:process=":remote" />
-
         <!-- Receiver -->
         <receiver
-            android:name="a.h"
-            android:directBootAware="true">
+            android:name=".core.Receiver"
+            android:directBootAware="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.REBOOT" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
             <intent-filter>
@@ -64,7 +57,15 @@
         </receiver>
 
         <!-- DownloadService -->
-        <service android:name="a.j" />
+        <service android:name=".core.download.DownloadService" />
+
+        <!-- FileProvider -->
+        <provider
+            android:name=".core.Provider"
+            android:authorities="${applicationId}.provider"
+            android:directBootAware="true"
+            android:exported="false"
+            android:grantUriPermissions="true" />
 
         <!-- Hardcode GMS version -->
         <meta-data
@@ -75,12 +76,13 @@
         <provider
             android:name="androidx.work.impl.WorkManagerInitializer"
             android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove" />
+            tools:node="remove"
+            tools:ignore="ExportedContentProvider" />
 
         <!-- We don't invalidate Room -->
         <service
             android:name="androidx.room.MultiInstanceInvalidationService"
-            tools:node="remove"/>
+            tools:node="remove" />
 
         <!-- We don't use Device Credentials -->
         <activity

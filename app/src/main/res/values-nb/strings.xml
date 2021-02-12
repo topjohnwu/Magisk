@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Preserver tvunget kryptering</string>
     <string name="keep_dm_verity">Preserver AVB 2.0/dm-verity</string>
-    <string name="uninstall">Avinstaller</string>
     <string name="uninstall_magisk_title">Avinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet. Root vil bli fjernet, og dataene dine blir kanskje kryptert dersom de ikke allerede er det.</string>
     <string name="update">Oppdater</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Ingen info er oppgitt)</string>
-    <string name="no_modules_found">Ingen moduler ble funnet</string>
     <string name="reboot_recovery">Omstart til gjenoppretting</string>
     <string name="reboot_bootloader">Omstart til oppstartslaster</string>
     <string name="reboot_download">Omstart til nedlasting</string>
@@ -46,24 +44,17 @@
     <string name="download_complete">Nedlastingen er fullført</string>
     <string name="download_file_error">Feil under nedlasting av fil</string>
     <string name="magisk_update_title">En Magisk-oppdatering er tilgjengelig!</string>
-    <string name="manager_update_title">En Magisk Manager-oppdatering er tilgjengelig!</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">Installer %1$s</string>
     <string name="repo_install_msg">Vil du installere %1$s nå?</string>
     <string name="download">Last ned</string>
     <string name="reboot">Omstart</string>
-    <string name="settings_reboot_toast">Start på nytt for å benytte innstillingene.</string>
     <string name="release_notes">Lanseringsnyheter</string>
     <string name="repo_cache_cleared">Repomellomlageret ble tømt</string>
     <string name="manager_download_install">Trykk for å laste ned og installere.</string>
-    <string name="dtbo_patched_title">DTBO ble patchet!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager har patchet dtbo.img. Vennligst start på nytt.</string>
     <string name="flashing">Flashing</string>
-    <string name="hide_manager_title">Skjuler Magisk Manager …</string>
-    <string name="hide_manager_fail_toast">Skjulingen av Magisk Manager mislyktes.</string>
     <string name="open_link_failed_toast">Ingen apper som kunne åpne denne lenken ble funnet.</string>
-    <string name="download_zip_only">Bare last ned ZIPen</string>
     <string name="direct_install">Direkteinstallasjon (Anbefalt)</string>
     <string name="install_inactive_slot">Installer til et inaktivt felt (Etter OTA)</string>
     <string name="install_inactive_slot_msg">Enheten din vil bli TVUNGET til å starte opp på det som for øyeblikket er et inaktivt felt, etter en omstart!\nBare bruk dette alternativet etter at OTA-oppdateringen er ferdig.\nVil du fortsette?</string>
@@ -73,20 +64,14 @@
     <string name="restore_done">Gjenopprettingen er fullført!</string>
     <string name="restore_fail">Sikkerhetskopien av mobilens eget oppstartsbilde!</string>
     <string name="proprietary_title">Last ned proprietær kode</string>
-    <string name="proprietary_notice">Magisk Manager bruker FOSSS, og kommer ikke med Googles proprietære SafetyNet-API-kode.\n\nVil du tillate Magisk Manager å laste ned utvidelse (som inneholder GoogleApiClient) for å kjøre SafetyNet-sjekker?</string>
     <string name="setup_fail">Oppsettet mislyktes.</string>
     <string name="env_fix_title">Krever ekstra oppsett</string>
-    <string name="env_fix_msg">Enheten din krever ekstra oppsett for at Magisk skal kunne fungere ordentlig. Den vil laste ned Magisk-oppsetts-ZIP-filen, vil du fortsette med det nå?</string>
     <string name="setup_title">Ekstra oppsett</string>
     <string name="setup_msg">Kjører appmiljøoppsettet …</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Tøm repomellomlageret</string>
     <string name="settings_clear_cache_summary">Tøm den mellomlagrede informasjonen til nettrepoer. Dette tvinger appen til å oppfriskes på nett.</string>
-    <string name="settings_hide_manager_title">Skjul Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Pakk inn Magisk Manager på nytt med et tilfeldig pakkenavn.</string>
-    <string name="settings_restore_manager_title">Gjenopprett Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Gjenopprett Magisk Manager med den opprinnelige pakken</string>
     <string name="language">Språk</string>
     <string name="system_default">(Systemets standard)</string>
     <string name="settings_check_update_title">Let etter oppdateringer</string>
@@ -96,7 +81,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Tilpasset</string>
     <string name="settings_update_custom_msg">Skriv inn en egendefinert URL</string>
-    <string name="settings_core_only_summary">Bare aktiver kjernefunksjonene. MagiskSU og MagiskHide vil fortsatt være skrudd på, men ingen moduler vil bli lastet inn</string>
     <string name="settings_magiskhide_summary">Skjul Magisk fra diverse måter å bli oppdaget på.</string>
     <string name="settings_hosts_title">Systemløs «hosts»-fil</string>
     <string name="settings_hosts_summary">Systemløs «hosts»-filstøtte for reklameblokkeringsapper.</string>
@@ -149,7 +133,6 @@
     <string name="sixtymin">60min</string>
     <string name="su_allow_toast">%1$s ble tildelt superbruker-rettigheter</string>
     <string name="su_deny_toast">%1$s ble nektet superbruker-rettigheter</string>
-    <string name="no_apps_found">Ingen apper ble funnet</string>
     <string name="su_snack_grant">Superbruker-rettigheter for %1$s har blitt tildelt</string>
     <string name="su_snack_deny">Superbruker-rettigheter for %1$s har blitt avslått</string>
     <string name="su_snack_notif_on">Notifikasjoner for %1$s har blitt skrudd på</string>

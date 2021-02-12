@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SettingsItem" />
+            type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem" />
 
     </data>
 
@@ -17,16 +17,16 @@
         android:paddingTop="@dimen/l1"
         android:paddingBottom="@dimen/l_50">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             gone="@{item.title.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{item.title}"
-            android:textAppearance="@style/AppearanceFoundation.Display.Secondary"
+            android:textAppearance="@style/AppearanceFoundation.Large.Secondary"
             android:textStyle="bold"
             tools:text="@tools:sample/lorem" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             gone="@{item.description.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

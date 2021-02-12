@@ -14,14 +14,12 @@
     <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
-    <string name="uninstall">Sil</string>
     <string name="uninstall_magisk_title">Magisk\'i Sil</string>
     <string name="uninstall_magisk_msg">Bütün əlavələr ləğv olunacaq/silinəcək. Root silinəcək, və əgər hal-hazırda deyilsə, bütün məlumatlarınız potensiyal olaraq şifrələnəcək.</string>
     <string name="update">Yenilə</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Məlumat təmin edilməyib)</string>
-    <string name="no_modules_found">Əlavələr yoxdur.</string>
     <string name="reboot_recovery">Bərpa rejimində yenidən başlat</string>
     <string name="reboot_bootloader">Bootloader\'ə yenidən başlat</string>
     <string name="reboot_download">Yükləmə rejimində yenidən başlat</string>
@@ -45,27 +43,18 @@
     <string name="progress_channel">Nəticə Bildirişləri</string>
     <string name="download_complete">Yükləmə bitdi</string>
     <string name="download_file_error">Faylı yükləmək alınmadı</string>
-    <string name="download_open_parent">Valideyn qovluğunda göstər</string>
-    <string name="download_open_self">Faylı göstər</string>
     <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
-    <string name="manager_update_title">Magisk Manager Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">%1$s faylını yüklə</string>
     <string name="repo_install_msg">%1$s faylını indi yükləmək istəyirsiniz?</string>
     <string name="download">Yüklə</string>
     <string name="reboot">Yenidən Başlat</string>
-    <string name="settings_reboot_toast">Tənzimləmələri saxlamaq üçün yenidən başladın.</string>
     <string name="release_notes">Yeniliklər</string>
     <string name="repo_cache_cleared">Repo keşi silindi</string>
     <string name="manager_download_install">Yükləyib quraşdırmaq üçün toxun.</string>
-    <string name="dtbo_patched_title">DTBO yamaqlanıb!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager dtbo.img\'ni yamaqladı. Xahiş olunur yenidən başladın.</string>
     <string name="flashing">Qurulur</string>
-    <string name="hide_manager_title">Magisk Manager gizlədilir…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager\'i gizlətmək alınmadı.</string>
     <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
-    <string name="download_zip_only">Yalnız Zip yüklə</string>
     <string name="direct_install">Birdəfəlik Yüklə (Tövsiyə olunur)</string>
     <string name="select_patch_file">Fayl Seç və Yamaqla</string>
     <string name="install_inactive_slot">Fəal olmayan slota quraşdır (OTA\'dan sonra)</string>
@@ -76,20 +65,14 @@
     <string name="restore_done">Geri qaytarma bitdi!</string>
     <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
     <string name="proprietary_title">Özəl kodu yükləyin</string>
-    <string name="proprietary_notice">Magisk Manager açıq lisenziyalıdır və Google\'ın özəl SafetyNet API kodunu ehtiva etmir.\n\Magisk Managerə SafetyNet yoxlamaları üçün tərkibində GoogleApiClient olan əlavəni yükləməyə icazə verirsiniz?</string>
     <string name="setup_fail">Quraşdırma alınmadı.</string>
     <string name="env_fix_title">Əlavə Quraşdırma Lazımdır</string>
-    <string name="env_fix_msg">Cihazınızın Magisk\'in düzgün işləməsi üçün əlavə quraşdırmaya ehtiyacı var . Bu Magisk zip faylını endirəcək, davam etmək istəyirsiniz?</string>
     <string name="setup_title">Əlavə quraşdırma</string>
     <string name="setup_msg">Quraşdırma yerinə yetirilir…</string>
 
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Repo Keşini Təmizlə</string>
     <string name="settings_clear_cache_summary">Onlayn repolar üçün keşlənmiş məlumatı silin. Bu tətbiqi onlayn şəkildə yenilənməyə məcbur edir.</string>
-    <string name="settings_hide_manager_title">Magisk Manager\'i Gizlə</string>
-    <string name="settings_hide_manager_summary">Magisk Manager\'i təsadüfi adla yenidən sıxışdır.</string>
-    <string name="settings_restore_manager_title">Magisk Manager\'i Geri Qaytar</string>
-    <string name="settings_restore_manager_summary">Magisk Manager\'i orjinal sıxışdırma ilə geri qaytar</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Dili)</string>
     <string name="settings_check_update_title">Yeniləmələri Yoxla</string>
@@ -99,7 +82,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özəl</string>
     <string name="settings_update_custom_msg">Özəl URL daxil edin</string>
-    <string name="settings_core_only_summary">Yalnız nüvə xüsusiyyətlərini aç. MagiskSU və MagiskHide hələ də açıq qalacaq, amma əlavələr yüklənməyəcək.</string>
     <string name="settings_magiskhide_summary">Magisk\'i fərqli növdə aşkarlamalardan gizləyin.</string>
     <string name="settings_hosts_title">Sistemsiz host\'lar</string>
     <string name="settings_hosts_summary">Adblock tətbiqləri üçün Sistemsiz host dəstəyi.</string>
@@ -149,7 +131,6 @@
     <string name="sixtymin">60 dəq</string>
     <string name="su_allow_toast">%1$s SuperUser icazəsi ilə təmin edildi</string>
     <string name="su_deny_toast">%1$s SuperUser icazəsi ilə təmin edilmədi</string>
-    <string name="no_apps_found">Tətbiq yoxdur</string>
     <string name="su_snack_grant">%1$s üçün Superuser icazəsi verilib</string>
     <string name="su_snack_deny">%1$s üçün Superuser icazəsi verilməyib</string>
     <string name="su_snack_notif_on">%1$s üçün bildirişlər açıqdır</string>

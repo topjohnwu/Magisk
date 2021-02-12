@@ -29,7 +29,8 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+            android:layout_marginBottom="@dimen/l1"
+            app:layout_fitsSystemWindowsInsets="bottom"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:srcCompat="@drawable/ic_folder_list"
             app:tint="?colorPrimary"
@@ -37,7 +38,8 @@
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
             android:id="@+id/log_filter"
-            style="@style/WidgetFoundation.Card.Variant"
+            style="@style/WidgetFoundation.Card"
+            app:cardBackgroundColor="?colorSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"

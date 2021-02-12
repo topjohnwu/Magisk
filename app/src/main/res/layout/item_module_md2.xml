@@ -11,7 +11,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.ModuleItem" />
+            type="com.topjohnwu.magisk.ui.module.ModuleItem" />
 
         <variable
             name="viewModel"
@@ -19,132 +19,140 @@
 
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card.Variant"
-        isEnabled="@{!Config.coreOnly &amp;&amp; !item.removed}"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:alpha="@{item.enabled &amp;&amp; !Config.coreOnly ? 1f : .5f}"
-        android:onClick="@{() -> item.toggle()}"
-        tools:layout_gravity="center"
-        tools:layout_marginBottom="@dimen/l1"
-        tools:layout_marginEnd="@dimen/l1">
+        android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/module_state_icon"
-            gone="@{!item.removed &amp;&amp; !item.updated}"
-            srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:alpha=".05"
-            android:background="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?colorOnSurface"
-            tools:srcCompat="@drawable/ic_update_md2" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.card.MaterialCardView
+            style="@style/WidgetFoundation.Card"
+            isEnabled="@{!item.removed}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true">
+            android:alpha="@{item.enabled ? 1f : .5f}"
+            android:nextFocusRight="@id/module_indicator"
+            tools:layout_gravity="center"
+            tools:layout_margin="@dimen/l1">
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/module_title"
-                strikeThrough="@{item.removed}"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l_50"
-                android:text="@{item.item.name}"
-                android:textAppearance="@style/AppearanceFoundation.Body"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/module_indicator"
-                app:layout_constraintStart_toStartOf="parent"
+            <ImageView
+                android:id="@+id/module_state_icon"
+                gone="@{!item.removed &amp;&amp; !item.updated}"
+                srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:alpha=".05"
+                android:background="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="@tools:sample/lorem" />
+                app:tint="?colorOnSurface"
+                tools:srcCompat="@drawable/ic_update_md2" />
 
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/module_version_author"
-                strikeThrough="@{item.removed}"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
-                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintEnd_toEndOf="@+id/module_title"
-                app:layout_constraintStart_toStartOf="@+id/module_title"
-                app:layout_constraintTop_toBottomOf="@+id/module_title"
-                tools:text="v1 by topjohnwu" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/module_indicator"
-                style="@style/WidgetFoundation.Switch"
-                isSelected="@{item.enabled &amp;&amp; !Config.coreOnly}"
-                android:layout_marginEnd="@dimen/l_50"
-                app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1"
-                app:layout_constraintStart_toEndOf="@+id/module_info"
-                app:layout_constraintTop_toTopOf="@+id/module_title" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/module_description"
-                gone="@{item.item.description.empty}"
-                strikeThrough="@{item.removed}"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:text="@{item.item.description}"
-                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintTop_toBottomOf="@+id/module_version_author"
-                tools:lines="4"
-                tools:text="@tools:sample/lorem/random" />
+                android:animateLayoutChanges="true">
 
-            <View
-                android:id="@+id/module_divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginRight="6dp"
-                android:background="?colorSurfaceVariant"
-                app:layout_constraintTop_toBottomOf="@+id/module_description" />
+                <TextView
+                    android:id="@+id/module_title"
+                    strikeThrough="@{item.removed}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l_50"
+                    android:text="@{item.item.name}"
+                    android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/module_indicator"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@tools:sample/lorem" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/module_info"
-                style="@style/WidgetFoundation.Icon"
-                gone="@{item.repo == null}"
-                android:layout_width="wrap_content"
-                android:alpha=".5"
-                android:onClick="@{() -> viewModel.infoPressed(item)}"
-                android:paddingEnd="@dimen/l_50"
-                app:layout_constraintBottom_toBottomOf="@+id/module_remove"
-                app:layout_constraintEnd_toStartOf="@+id/module_remove"
-                app:layout_constraintTop_toTopOf="@+id/module_remove"
-                app:srcCompat="@drawable/ic_info" />
+                <TextView
+                    android:id="@+id/module_version_author"
+                    strikeThrough="@{item.removed}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintEnd_toEndOf="@+id/module_title"
+                    app:layout_constraintStart_toStartOf="@+id/module_title"
+                    app:layout_constraintTop_toBottomOf="@+id/module_title"
+                    tools:text="v1 by topjohnwu" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/module_remove"
-                style="@style/WidgetFoundation.Button.Text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="@{(v) -> item.delete(viewModel)}"
-                android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
-                android:textAllCaps="false"
-                app:icon="@{item.removed ? R.drawable.ic_restart : R.drawable.ic_delete_md2}"
-                app:iconGravity="textEnd"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/module_divider"
-                tools:icon="@drawable/ic_delete_md2"
-                tools:text="Remove" />
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/module_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/l_50"
+                    android:checked="@={item.enabled}"
+                    app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toEndOf="@+id/module_info"
+                    app:layout_constraintTop_toTopOf="@+id/module_title" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/module_description"
+                    gone="@{item.item.description.empty}"
+                    strikeThrough="@{item.removed}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:text="@{item.item.description}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                    tools:lines="4"
+                    tools:text="@tools:sample/lorem/random" />
 
-    </com.google.android.material.card.MaterialCardView>
+                <View
+                    android:id="@+id/module_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="@dimen/l1"
+                    android:background="?colorSurfaceSurfaceVariant"
+                    app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
+                <ImageView
+                    android:id="@+id/module_info"
+                    style="@style/WidgetFoundation.Icon"
+                    gone="@{item.repo == null}"
+                    android:layout_width="wrap_content"
+                    android:alpha=".5"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="@{() -> viewModel.infoPressed(item)}"
+                    android:paddingEnd="@dimen/l_50"
+                    app:layout_constraintBottom_toBottomOf="@+id/module_remove"
+                    app:layout_constraintEnd_toStartOf="@+id/module_remove"
+                    app:layout_constraintTop_toTopOf="@+id/module_remove"
+                    app:srcCompat="@drawable/ic_info" />
+
+                <Button
+                    android:id="@+id/module_remove"
+                    style="@style/WidgetFoundation.Button.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="@{() -> item.delete(viewModel)}"
+                    android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
+                    android:textAllCaps="false"
+                    app:icon="@{item.removed ? @drawable/ic_restart : @drawable/ic_delete_md2}"
+                    app:iconGravity="textEnd"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                    tools:icon="@drawable/ic_delete_md2"
+                    tools:text="Remove" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
 
 </layout>

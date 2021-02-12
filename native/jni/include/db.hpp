@@ -9,25 +9,25 @@
 template <class T, size_t num>
 class db_data_base {
 public:
-	T& operator [](std::string_view key) {
-		return data[getKeyIdx(key)];
-	}
+    T& operator [](std::string_view key) {
+        return data[getKeyIdx(key)];
+    }
 
-	const T& operator [](std::string_view key) const {
-		return data[getKeyIdx(key)];
-	}
+    const T& operator [](std::string_view key) const {
+        return data[getKeyIdx(key)];
+    }
 
-	T& operator [](int key) {
-		return data[key];
-	}
+    T& operator [](int key) {
+        return data[key];
+    }
 
-	const T& operator [](int key) const {
-		return data[key];
-	}
+    const T& operator [](int key) const {
+        return data[key];
+    }
 
 protected:
-	T data[num + 1];
-	virtual int getKeyIdx(std::string_view key) const = 0;
+    T data[num + 1];
+    virtual int getKeyIdx(std::string_view key) const = 0;
 };
 
 /***************
@@ -46,40 +46,40 @@ protected:
 
 // Settings keys
 enum {
-	ROOT_ACCESS = 0,
-	SU_MULTIUSER_MODE,
-	SU_MNT_NS,
-	HIDE_CONFIG
+    ROOT_ACCESS = 0,
+    SU_MULTIUSER_MODE,
+    SU_MNT_NS,
+    HIDE_CONFIG
 };
 
 // Values for root_access
 enum {
-	ROOT_ACCESS_DISABLED = 0,
-	ROOT_ACCESS_APPS_ONLY,
-	ROOT_ACCESS_ADB_ONLY,
-	ROOT_ACCESS_APPS_AND_ADB
+    ROOT_ACCESS_DISABLED = 0,
+    ROOT_ACCESS_APPS_ONLY,
+    ROOT_ACCESS_ADB_ONLY,
+    ROOT_ACCESS_APPS_AND_ADB
 };
 
 // Values for multiuser_mode
 enum {
-	MULTIUSER_MODE_OWNER_ONLY = 0,
-	MULTIUSER_MODE_OWNER_MANAGED,
-	MULTIUSER_MODE_USER
+    MULTIUSER_MODE_OWNER_ONLY = 0,
+    MULTIUSER_MODE_OWNER_MANAGED,
+    MULTIUSER_MODE_USER
 };
 
 // Values for mnt_ns
 enum {
-	NAMESPACE_MODE_GLOBAL = 0,
-	NAMESPACE_MODE_REQUESTER,
-	NAMESPACE_MODE_ISOLATE
+    NAMESPACE_MODE_GLOBAL = 0,
+    NAMESPACE_MODE_REQUESTER,
+    NAMESPACE_MODE_ISOLATE
 };
 
 class db_settings : public db_data_base<int, DB_SETTINGS_NUM> {
 public:
-	db_settings();
+    db_settings();
 
 protected:
-	int getKeyIdx(std::string_view key) const override;
+    int getKeyIdx(std::string_view key) const override;
 };
 
 /**************
@@ -95,12 +95,12 @@ protected:
 
 // Strings keys
 enum {
-	SU_MANAGER = 0
+    SU_MANAGER = 0
 };
 
 class db_strings : public db_data_base<std::string, DB_STRING_NUM> {
 protected:
-	int getKeyIdx(std::string_view key) const override;
+    int getKeyIdx(std::string_view key) const override;
 };
 
 /*************
@@ -108,15 +108,15 @@ protected:
  *************/
 
 typedef enum {
-	QUERY = 0,
-	DENY = 1,
-	ALLOW = 2,
+    QUERY = 0,
+    DENY = 1,
+    ALLOW = 2,
 } policy_t;
 
 struct su_access {
-	policy_t policy;
-	int log;
-	int notify;
+    policy_t policy;
+    int log;
+    int notify;
 };
 
 #define DEFAULT_SU_ACCESS (su_access) { \

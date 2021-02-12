@@ -16,14 +16,6 @@
         <item>@string/settings_su_app_adb</item>
     </string-array>
 
-    <string-array name="value_array">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
     <string-array name="request_timeout">
         <item>@string/settings_su_request_10</item>
         <item>@string/settings_su_request_15</item>
@@ -81,14 +73,6 @@
         <item>@string/settings_update_stable</item>
         <item>@string/settings_update_beta</item>
         <item>@string/settings_update_custom</item>
-        <!-- Debug only, don't care to translate -->
-        <item>Canary</item>
-        <item>Canary (Debug)</item>
-    </string-array>
-
-    <string-array name="span_count">
-        <item>@string/settings_grid_column_count_1</item>
-        <item>@string/settings_grid_column_count_2</item>
     </string-array>
 
 </resources>

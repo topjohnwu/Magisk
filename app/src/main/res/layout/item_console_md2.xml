@@ -6,7 +6,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.ConsoleItem" />
+            type="com.topjohnwu.magisk.ui.flash.ConsoleItem" />
 
     </data>
 

@@ -1,185 +1,224 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">मॉड्यूल</string>
-    <string name="superuser">उत्तम उपयोगकर्ता</string>
-    <string name="logs">अभिलेख</string>
+    <string name="superuser">सुपर यूज़र</string>
+    <string name="logs">लॉग्स</string>
     <string name="settings">सेटिंग्स</string>
-    <string name="install">स्थापित करें</string>
-    <string name="unsupport_magisk_title">असमर्थित Magisk संस्करण</string>
+    <string name="refresh">स्थानीय डेटा रिफ्रेश करें</string>
+    <string name="install">इंस्टॉल</string>
+    <string name="section_home">घर</string>
+    <string name="section_theme">थीम</string>
+    <string name="safetynet">सेफ्टीनेट</string>
 
-    <!--Status Fragment-->
-    <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
-    <string name="safetynet_api_error">SafetyNet API त्रुटि</string>
-    <string name="safetynet_res_invalid">अनुक्रिया अमान्य है.</string>
-    <string name="keep_force_encryption">बल एन्क्रिप्शन को बनाये रखें</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity को बनाये रखें</string>
-    <string name="recovery_mode">रिकवरी मोड</string>
-    <string name="uninstall">स्थापना रद्द करें</string>
-    <string name="uninstall_magisk_title">Magisk की स्थापना रद्द करें</string>
-    <string name="uninstall_magisk_msg">सभी मॉड्यूल अक्षम/हटा दिए जाएंगे. रुट और आपका संभावित रूप से एन्क्रिप्ट डाटा हटा दिया जाएगा.</string>
+    <!--Home-->
+    <string name="no_connection">कोई कनेक्शन उपलब्ध नहीं है</string>
+    <string name="app_changelog">बदलाव</string>
+    <string name="loading">लोड हो रहा है…</string>
     <string name="update">अपडेट करें</string>
+    <string name="not_available">N/A</string>
+    <string name="hide">छिपाएँ</string>
+    <string name="home_package">पैकेज</string>
 
-    <!--Module Fragment-->
-    <string name="no_info_provided">(कोई जानकारी प्रदान नहीं की गई)</string>
-    <string name="no_modules_found">कोई मॉड्यूल नहीं मिला</string>
-    <string name="reboot_recovery">रिकवरी मोड में रिबूट करें</string>
-    <string name="reboot_bootloader">बूटलोडर में रिबूट करें</string>
-    <string name="reboot_download">डाउनलोड में रिबूट करें</string>
-    <string name="reboot_edl">EDL मोड में रिबूट करें</string>
+    <string name="home_support_title">हमें सहयोग दीजिये</string>
+    <string name="home_item_source">स्रोत</string>
+    <string name="home_support_content">मैजिस्क है, और हमेशा मुफ्त और ओपन-सोर्स रहेगा। हालाँकि आप एक छोटा सा दान भेजकर यह दिखा सकते हैं कि आप देख-भाल करते हैं।</string>
+    <string name="home_installed_version">इंस्टॉल्ड</string>
+    <string name="home_latest_version">नवीनतम</string>
+    <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
+    <string name="uninstall_magisk_title">मैजिस्क को अनइंस्टॉल करें</string>
+    <string name="uninstall_magisk_msg">सभी मॉड्यूल्स को निष्क्रिय/हटा दिया जाएगा!\n रूट को हटा दिया जाएगा!\n आपका डेटा संभावित रूप से एन्क्रिप्ट किया गया है यदि पहले से नहीं है!</string>
+    <string name="home_check_safetynet">सेफ्टीनेट की जाँच करें</string>
 
-    <!--Repo Fragment-->
-    <string name="update_available">अपडेट उपलब्ध है</string>
-    <string name="home_installed_version">स्थापित</string>
-    <string name="sorting_order">छँटाई क्रम </string>
-
-    <!--Log Fragment-->
-    <string name="menuSaveLog">अभिलेख सेव करें</string>
-    <string name="menuClearLog">अभिलेख साफ़ करें</string>
-    <string name="logs_cleared">अभिलेख सफलतापूर्वक साफ़ हो गया.</string>
-
-    <!--About Activity-->
-    <string name="app_changelog">परिवर्तन अभिलेख</string>
-
-    <!-- System Components, Notifications -->
-    <string name="update_channel">Magisk की अपडेट</string>
-    <string name="progress_channel">प्रगति सूचनाएँ</string>
-    <string name="download_complete">डाउनलोड सम्पन्न हुआ</string>
-    <string name="download_file_error">फ़ाइल डाउनलोड करने में त्रुटि</string>
-    <string name="download_open_parent">मूल फ़ोल्डर में दिखाएँ</string>
-    <string name="download_open_self">फाइल दिखाएँ</string>
-    <string name="magisk_update_title">Magisk की अपडेट उपलब्ध है!</string>
-    <string name="manager_update_title">Magisk Manager की अपडेट उपलब्ध है!</string>
-
-    <!-- Installation -->
-    <string name="manager_download_install">डाउनलोड और स्थापित करने के लिए दबाएँ.</string>
-    <string name="download_zip_only">खाली Zip डाउनलोड करें</string>
-    <string name="direct_install">सीधा स्थापित करें (अनुशंसित)</string>
-    <string name="install_inactive_slot">निष्क्रिय स्लॉट में स्थापित करें (OTA के बाद)</string>
-    <string name="install_inactive_slot_msg">आपके डिवाइस को रीबूट के बाद वर्तमान निष्क्रिय स्लॉट में बूट करने के लिए मजबूर किया जाएगा!\nOTA होने के बाद ही इस विकल्प का उपयोग करें.\nजारी रखें?</string>
+    <!--Install-->
+    <string name="keep_force_encryption">फ़ोर्स एन्क्रिप्शन को संरक्षित रखें</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity को संरक्षित रखें</string>
+    <string name="recovery_mode">रिकवरी मोड</string>
+    <string name="install_options_title">विकल्प</string>
+    <string name="install_method_title">तरीका</string>
+    <string name="install_next">आगे</string>
+    <string name="install_start">तो चलिए शुरू करते हैं!</string>
+    <string name="manager_download_install">डाउनलोड और इंस्टॉल करने के लिए दबाएं</string>
+    <string name="direct_install">प्रत्यक्ष इंस्टॉल (अनुशंसित)</string>
+    <string name="install_inactive_slot">निष्क्रिय स्लॉट में इंस्टॉल करें (OTA के बाद)</string>
+    <string name="install_inactive_slot_msg">आपका डिवाइस रीबूट होने के बाद वर्तमान निष्क्रिय स्लॉट में बूट करने के लिए मजबूर किया जाएगा!\n इस विकल्प का उपयोग सिर्फ OTA हो जाने के बाद करें।\n जारी रखें?</string>
     <string name="setup_title">अतिरिक्त सेटअप</string>
     <string name="select_patch_file">एक फ़ाइल का चयन और पैच करें</string>
-    <string name="patch_file_msg">एक कच्ची इमेज चुनें (*.img) या एक ODIN tarfile (*.tar)</string>
-    <string name="reboot_delay_toast">5 सेकंड में रिबूट हो रहा है …</string>
-
-    <!--Toasts, Dialogs-->
-    <string name="repo_install_title">%1$s को स्थापित करें</string>
-    <string name="repo_install_msg">क्या आप %1$s को स्थापित करना चाहते हैं ?</string>
-    <string name="download">डाउनलोड</string>
-    <string name="reboot">रिबूट</string>
-    <string name="settings_reboot_toast">सेटिंग्स लागू करने के लिए रिबूट करें.</string>
-    <string name="release_notes">रिलीज नोट्स</string>
-    <string name="repo_cache_cleared">Repo cache साफ़ हो गया</string>
-
-    <string name="dtbo_patched_title">DTBO पैच कर दिया गया!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ने dtbo.img को पैच कर दिया. कृपया रिबूट करें.</string>
-    <string name="flashing">फ़्लैश हो रहा है…</string>
-    <string name="done">हो गया!</string>
-    <string name="failure">विफल हुआ</string>
-    <string name="hide_manager_title">Magisk Manager छुप रहा है…</string>
-    <string name="hide_manager_fail_toast">Magisk Manager छुपने में असफल रहा.</string>
-    <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला.</string>
-    <string name="complete_uninstall">पूरी तरह से स्थापना रद्द करें</string>
-    <string name="restore_img">इमेजेज को पुनर्स्थापित करें</string>
-    <string name="restore_img_msg">वापस लाया जा रहा…</string>
-    <string name="restore_done">वापस ले आया गया!</string>
-    <string name="restore_fail">स्टॉक बैकअप मौजूद नहीं है!</string>
-    <string name="proprietary_title">मालिकाना कोड डाउनलोड करें</string>
-    <string name="proprietary_notice">Magisk Manager FOSS है और उस्में Google का मालिकाना SafetyNet API कोड शामिल नहीं है.\n\nक्या आप Magisk Manager को SafetyNet चेक के लिए एक्सटेंशन (GoogleApiClient शामिल) डाउनलोड करने की अनुमति देंगे ?</string>
-    <string name="setup_fail">सेटअप असफल हुआ.</string>
-    <string name="env_fix_title">अतिरिक्त सेटअप की आवश्यकता है</string>
-    <string name="env_fix_msg">ठीक से काम करने के लिए आपके डिवाइस को Magisk के लिए अतिरिक्त सेटअप की आवश्यकता है. यह Magisk सेटअप zip डाउनलोड करेगा, क्या आप आगे बढ़ना चाहते हैं?</string>
-    <string name="setup_msg">पर्यावरण सेटअप चल रहा है…</string>
-
-    <!--Settings Activity -->
-    <string name="settings_download_path_title">डाउनलोड करने की जगह</string>
-    <string name="settings_download_path_message">%1$s में फाइल्स रखी जाएँगी</string>
-    <string name="settings_clear_cache_title">Repo Cache साफ़ करें</string>
-    <string name="settings_clear_cache_summary">ऑनलाइन Repo के लिए Cached जानकारी साफ़ करें. यह एप्लिकेशन को ऑनलाइन रिफ्रेश होने के लिए मजबूर करता है.</string>
-    <string name="settings_hide_manager_title">Magisk Manager को छुपाएं</string>
-    <string name="settings_hide_manager_summary">Magisk Manager को क्रमरहित नाम से फिर से पैकेज करें.</string>
-    <string name="settings_restore_manager_title">Magisk Manager को पुनर्स्थापित करें</string>
-    <string name="settings_restore_manager_summary">Magisk Manager को अपने मूल पैकेज नाम से पुनर्स्थापित करें</string>
-    <string name="language">भाषा</string>
-    <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
-    <string name="settings_check_update_title">अपडेट के लिए जाँच करें</string>
-    <string name="settings_check_update_summary">समय-समय पर बैकग्राउंड में अपडेट की जांच करते रहें.</string>
-    <string name="settings_update_channel_title">अपडेट का चैनल</string>
-    <string name="settings_update_stable">स्थिर</string>
-    <string name="settings_update_beta">बीटा</string>
-    <string name="settings_update_custom">कस्टम</string>
-    <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
-    <string name="settings_core_only_summary">केवल मुख्य विशेषताएं सक्षम करें. MagiskSU और MagiskHide अभी भी सक्षम रहेंगे, लेकिन कोई मॉड्यूल लोड नहीं किया जाएगा.</string>
-    <string name="settings_magiskhide_summary">पता लगाने के विभिन्न रूपों से Magisk को छुपाएं.</string>
-    <string name="settings_hosts_title">सिस्टमलेस होस्ट्स</string>
-    <string name="settings_hosts_summary">एडब्लॉक ऍप्लिकेशन्स के लिए सिस्टमलेस होस्ट्स का समर्थन</string>
-    <string name="settings_hosts_toast">सिस्टमलेस होस्ट्स का मॉड्यूल जोड़ दिया गया</string>
-
-    <string name="settings_su_app_adb">ऍप्लिकेशन्स और ADB</string>
-    <string name="settings_su_app">केवल ऍप्लिकेशन्स</string>
-    <string name="settings_su_adb">केवल ADB</string>
-    <string name="settings_su_disable">निर्योग्य</string>
-    <string name="settings_su_request_10">10 सेकंड्‌स</string>
-    <string name="settings_su_request_15">15 सेकंड्‌स</string>
-    <string name="settings_su_request_20">20 सेकंड्‌स</string>
-    <string name="settings_su_request_30">30 सेकंड्‌स</string>
-    <string name="settings_su_request_45">45 सेकंड्‌स</string>
-    <string name="settings_su_request_60">60 सेकंड्‌स</string>
-    <string name="superuser_access">उत्तम उपयोगकर्ता की पहुँच</string>
-    <string name="auto_response">स्वचालित प्रतिक्रिया</string>
-    <string name="request_timeout">निवेदन का समय समाप्त</string>
-    <string name="superuser_notification">उत्तम उपयोगकर्ता सूचना</string>
-    <string name="settings_su_reauth_title">अपग्रेड के बाद फिर से प्रमाणित करें</string>
-    <string name="settings_su_reauth_summary">एप्लीकेशन अपग्रेड होने के बाद उत्तम उपयोगकर्ता की अनुमतियों को फिर से प्रमाणित करें</string>
-
-    <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
-    <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
-    <string name="settings_owner_manage">केवल डिवाइस के मालिक द्वौरा प्रभंदित</string>
-    <string name="settings_user_independent">उपयोगकर्ता स्वतंत्र</string>
-    <string name="owner_only_summary">केवल मालिक के पास ही रूट की पहुँच है.</string>
-    <string name="owner_manage_summary">केवल मालिक ही रूट की पहुँच का प्रबंधन कर सकता है और अनुरोध संकेत प्राप्त कर सकता है.</string>
-    <string name="user_indepenent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है.</string>
-
-    <string name="mount_namespace_mode">माउंट नेमस्पेस मोड</string>
-    <string name="settings_ns_global">वैश्विक नेमस्पेस</string>
-    <string name="settings_ns_requester">नेमस्पेस को इन्हेरिट करें</string>
-    <string name="settings_ns_isolate">संगरोध नेमस्पेस</string>
-    <string name="global_summary">सभी रूट सत्र वैश्विक माउंट नेमस्पेस का उपयोग करते हैं.</string>
-    <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे.</string>
-    <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग नेमस्पेस होगा.</string>
-    <string name="settings_download_path_error">फोल्डर बनाने में त्रुटि. यह स्टोरेज रूट डायरेक्टरी से एक्सेस होना चाहिए और फाइल नहीं होना चाहिए.</string>
+    <string name="patch_file_msg">एक रॉ छवि (* .img) या एक ODIN tarfile (* .tar) का चयन करें</string>
+    <string name="reboot_delay_toast">5 सेकंड में रिबूट हो रहा है...</string>
+    <string name="flash_screen_title">इंस्टॉलेशन</string>
 
     <!--Superuser-->
-    <string name="su_request_title">उत्तम उपयोगकर्ता का अनुरोध</string>
+    <string name="su_request_title">सुपरयूज़र अनुरोध</string>
     <string name="deny">इंकार करें</string>
-    <string name="prompt">आदेश</string>
+    <string name="prompt">संकेत दिखाएँ</string>
     <string name="grant">अनुमति दें</string>
-    <string name="su_warning">यह आपके डिवाइस की पूरी पहुँच की अनुमति देगा. यदि आप सुनिश्चित नहीं हैं तो इंकार करें!</string>
+    <string name="su_warning">यह आपके डिवाइस की पूरी पहुँच की अनुमति देगा,\n यदि आप सुनिश्चित नहीं हैं तो इंकार करें!</string>
     <string name="forever">सदैव</string>
     <string name="once">एक बार</string>
-    <string name="tenmin">10 मिनट</string>
+    <string name="tenmin">10 मिनिट</string>
     <string name="twentymin">20 मिनट</string>
     <string name="thirtymin">30 मिनट</string>
     <string name="sixtymin">60 मिनट</string>
-    <string name="su_allow_toast">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति दी गई</string>
-    <string name="su_deny_toast">%1$s को उत्तम उपयोगकर्ता के अधिकार से इनकार किया गया</string>
-    <string name="no_apps_found">कोई एप्लीकेशन नहीं मिला</string>
-    <string name="su_snack_grant">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति है</string>
-    <string name="su_snack_deny">%1$s को उत्तम उपयोगकर्ता के अधिकार की अनुमति नहीं है</string>
-    <string name="su_snack_notif_on">%1$s की सूचनाएं सक्षम हैं</string>
-    <string name="su_snack_notif_off">%1$s की सूचनाएं अक्षम हैं</string>
-    <string name="su_snack_log_on">%1$s के लिए अभिलेख सक्षम है</string>
-    <string name="su_snack_log_off">%1$s के लिए अभिलेख अक्षम है</string>
-    <string name="su_revoke_title">वापस लें?</string>
-    <string name="su_revoke_msg">%1$s के अधिकारों को वापस लेने की पुष्टि करें?</string>
-    <string name="toast">पॉप-अप नोट</string>
+    <string name="su_allow_toast"> %1$s को सुपरयूज़र अधिकार प्रदान किया गया</string>
+    <string name="su_deny_toast"> %1$s को सुपरयूज़र अधिकार से इंकार किया गया</string>
+    <string name="su_snack_grant"> %1$s को सुपरयूज़र अधिकार प्रदान किए गए </string>
+    <string name="su_snack_deny"> %1$s के सुपरयूज़र अधिकारों को अस्वीकार कर दिया गया है</string>
+    <string name="su_snack_notif_on"> %1$s की सूचनाएं सक्षम हैं</string>
+    <string name="su_snack_notif_off"> %1$s की सूचनाएं अक्षम हैं</string>
+    <string name="su_snack_log_on"> %1$s की लॉगिंग सक्षम है</string>
+    <string name="su_snack_log_off"> %1$s की लॉगिंग अक्षम है</string>
+    <string name="su_revoke_title">अधिकार वापस लें?</string>
+    <string name="su_revoke_msg"> %1$s के अधिकारों को रद्द करने की पुष्टि करें?</string>
+    <string name="toast">पॉप-अप सूचना</string>
     <string name="none">कोई नहीं</string>
 
-    <!--Superuser logs-->
+    <string name="superuser_toggle_notification">सूचनाएं</string>
+    <string name="superuser_toggle_revoke">अधिकार वापस लें</string>
+    <string name="superuser_policy_none">किसी भी ऐप ने अभी तक सुपरयूज़र की अनुमति नहीं मांगी है।</string>
+
+    <!--Logs-->
+    <string name="log_data_none">कोई लॉग नहीं, अपने सुपरयूज़र सक्षम एप्लिकेशन का अधिक उपयोग करने का प्रयास करें।</string>
+    <string name="log_data_magisk_none">मैजिस्क लॉग खाली हैं, यह अजीब है।</string>
+    <string name="menuSaveLog">लॉग सहेजे</string>
+    <string name="menuClearLog">लॉग साफ़ करें</string>
+    <string name="logs_cleared">लॉग सफलतापूर्वक साफ़ किया गया।</string>
     <string name="pid">PID: %1$d</string>
-    <string name="target_uid">लक्ष्य UID: %1$d</string>
+    <string name="target_uid">लक्षित UID: %1$d</string>
+
+    <!--SafetyNet-->
+    <string name="safetynet_api_error">सेफ्टीनेट एपीआई त्रुटि</string>
+    <string name="safetynet_res_invalid">प्रतिक्रिया अमान्य है</string>
+    <string name="safetynet_attest_success">सफलता!</string>
+    <string name="safetynet_attest_failure">सत्यापन विफल!</string>
+    <string name="safetynet_attest_loading">सिर्फ एक सेकंड…</string>
+    <string name="safetynet_attest_restart">पुनः प्रयास करें</string>
 
     <!-- MagiskHide -->
-    <string name="show_system_app">सिस्टम ऍप्लिकेशन्स दिखाएं</string>
+    <string name="show_system_app">सिस्टम ऐप्स दिखाएं</string>
+    <string name="show_os_app">OS एप्लिकेशन दिखाएं</string>
+    <string name="hide_filter_hint">नाम से फ़िल्टर करें</string>
+    <string name="hide_scroll_up">ऊपर स्क्रॉल करें</string>
+    <string name="hide_filters">फिल्टर</string>
+    <string name="hide_search">खोजें</string>
+
+    <!--Module -->
+    <string name="no_info_provided">(कोई जानकारी नहीं दी गई)</string>
+    <string name="reboot_userspace">सॉफ्ट रिबूट</string>
+    <string name="reboot_recovery">रिकवरी रिबूट</string>
+    <string name="reboot_bootloader">बूटलोडर रिबूट</string>
+    <string name="reboot_download">डाउनलोड मोड रिबूट</string>
+    <string name="reboot_edl">EDL रिबूट</string>
+    <string name="module_version_author"> %2$s के द्वारा %1$s</string>
+    <string name="module_section_pending">अपडेट्स</string>
+    <string name="module_section_pending_action">सभी अपडेट करें</string>
+    <string name="module_state_remove">हटाएँ</string>
+    <string name="module_state_restore">रिस्टोर करें</string>
+    <string name="module_action_install_external">स्टोरेज से इनस्टॉल करें</string>
+    <string name="update_available">अपडेट उपलब्ध</string>
+    <string name="module_installed">इंस्टॉल्ड</string>
+    <string name="module_section_online">ऑनलाइन</string>
+    <string name="sorting_order">क्रमबद्ध तरीका</string>
+
+    <!--Settings -->
+    <string name="settings_dark_mode_title">थीम मोड</string>
+    <string name="settings_dark_mode_message">ऐसी थीम का चयन करें जो आपकी शैली के अनुकूल हो!</string>
+    <string name="settings_dark_mode_light">हमेशा सफेद रंग वाली</string>
+    <string name="settings_dark_mode_system">सिस्टम के अनुसार</string>
+    <string name="settings_dark_mode_dark">हमेशा गहरे रंग वाली</string>
+    <string name="settings_download_path_title">डाउनलोड पथ</string>
+    <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
+    <string name="settings_clear_cache_title">रेपो कैश साफ़ करें</string>
+    <string name="settings_clear_cache_summary">ऑनलाइन रेपो के लिए कैश्ड जानकारी साफ़ करें। यह एप्लिकेशन को ऑनलाइन रिफ्रेश करने के लिए मजबूर करता है</string>
+    <string name="language">भाषा</string>
+    <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
+    <string name="settings_check_update_title">अपडेट जांचें</string>
+    <string name="settings_check_update_summary">समय-समय पर बैकग्राउंड में अपडेट की जांच करते रहें</string>
+    <string name="settings_update_channel_title">अपडेट चैनल</string>
+    <string name="settings_update_stable">स्टेबल</string>
+    <string name="settings_update_beta">बीटा</string>
+    <string name="settings_update_custom">कस्टम चैनल</string>
+    <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
+    <string name="settings_magiskhide_summary">विभिन्न रूप की खोजों से बचने के लिए मैजिस्क को छिपाएं</string>
+    <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
+    <string name="settings_hosts_summary">Adblock ऐप्स के लिए सिस्टमलेस होस्ट सपोर्ट</string>
+    <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>
+    <string name="settings_app_name_hint">नया नाम</string>
+    <string name="settings_app_name_helper">इस नाम से ऐप को फिर से इंस्टॉल किया जाएगा</string>
+    <string name="settings_app_name_error">अवैध प्रारूप</string>
+    <string name="settings_su_app_adb">ऐप्स और एडीबी</string>
+    <string name="settings_su_app">केवल ऐप्स</string>
+    <string name="settings_su_adb">केवल एडीबी</string>
+    <string name="settings_su_disable">बंद है</string>
+    <string name="settings_su_request_10">10 सेकंड</string>
+    <string name="settings_su_request_15">15 सेकंड</string>
+    <string name="settings_su_request_20">20 सेकंड</string>
+    <string name="settings_su_request_30">30 सेकंड</string>
+    <string name="settings_su_request_45">45 सेकंड</string>
+    <string name="settings_su_request_60">60 सेकंड</string>
+    <string name="superuser_access">सुपरयूज़र एक्सेस</string>
+    <string name="auto_response">स्वचालित प्रतिक्रिया</string>
+    <string name="request_timeout">अनुरोध की समय समाप्ति सीमा</string>
+    <string name="superuser_notification">सुपरयूज़र सूचना</string>
+    <string name="settings_su_reauth_title">अपग्रेड के बाद प्रमाणीकरण</string>
+    <string name="settings_su_reauth_summary">एक ऐप अपडेट होने के बाद सुपरयूज़र अनुमति प्रमाणित करें</string>
+    <string name="settings_su_biometric_title">बायोमेट्रिक प्रमाणीकरण सक्षम करें</string>
+    <string name="settings_su_biometric_summary">सुपरयूज़र अनुरोधों की अनुमति देने के लिए बायोमेट्रिक प्रमाणीकरण का उपयोग करें</string>
+    <string name="no_biometric">असमर्थित डिवाइस या कोई बायोमेट्रिक सेटिंग सक्षम नहीं हैं</string>
+    <string name="settings_customization">कस्टमाईजेशन</string>
+    <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
+    <string name="settings_doh_title">DNS पर HTTPS</string>
+    <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
+
+    <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
+    <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
+    <string name="settings_owner_manage">डिवाइस मालिक द्वारा प्रबंधित</string>
+    <string name="settings_user_independent"> स्वत्रंत उपयोगकर्ता</string>
+    <string name="owner_only_summary">केवल मालिक के पास ही रूट की पहुँच है</string>
+    <string name="owner_manage_summary">केवल मालिक रूट एक्सेस का प्रबंधन कर सकते हैं और अनुरोध संकेत प्राप्त कर सकते हैं</string>
+    <string name="user_indepenent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है</string>
+
+    <string name="mount_namespace_mode">माउंट नेमस्पेस मोड</string>
+    <string name="settings_ns_global">ग्लोबल नेमस्पेस</string>
+    <string name="settings_ns_requester">इनहेरिट नेमस्पेस</string>
+    <string name="settings_ns_isolate">आइसोलेटेड नेमस्पेस</string>
+    <string name="global_summary">सभी रूट सत्र ग्लोबल नेमस्पेस का उपयोग करते हैं</string>
+    <string name="requester_summary">रूट सत्रों को उनके अनुरोधकर्ताओं के नेमस्पेस विरासत में मिलेंगे</string>
+    <string name="isolate_summary">प्रत्येक रूट सत्र का अपना अलग आइसोलेटेड नेमस्पेस होगा</string>
+
+    <!--Notifications-->
+    <string name="update_channel">मैजिस्क अपडेट</string>
+    <string name="progress_channel">प्रगति सूचनाएँ</string>
+    <string name="download_complete">डाउनलोड सम्पन्न हुआ</string>
+    <string name="download_file_error">फ़ाइल डाउनलोड करने में त्रुटि</string>
+    <string name="magisk_update_title">मैजिस्क अपडेट उपलब्ध!</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
+    <string name="repo_install_title">इंस्टॉल %1$s</string>
+    <string name="repo_install_msg">क्या आप अभी %1$s इंस्टॉल करना चाहते हैं?</string>
+    <string name="download">डाउनलोड</string>
+    <string name="reboot">रीबूट</string>
+    <string name="release_notes">रिलीज नोट्स</string>
+    <string name="repo_cache_cleared">रेपो कैश साफ़ किया</string>
+    <string name="flashing">फ़्लैश हो रहा है...</string>
+    <string name="done">सफल हुआ!</string>
+    <string name="failure">असफल हुआ</string>
+    <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला</string>
+    <string name="complete_uninstall">पूर्ण रूप से अनइंस्टॉल करें</string>
+    <string name="restore_img">इमेज रिस्टोर करें</string>
+    <string name="restore_img_msg">रिस्टोर हो रहा है...</string>
+    <string name="restore_done">रिस्टोर सफल हुआ!</string>
+    <string name="restore_fail">स्टॉक बैकअप मौजूद नहीं है!</string>
+    <string name="proprietary_title">मालिकाना कोड डाउनलोड करें</string>
+    <string name="setup_fail">सेटअप असफल हुआ</string>
+    <string name="env_fix_title">अतिरिक्त सेटअप की ज़रूरत है</string>
+    <string name="setup_msg">वातावरण सेटअप चल रहा है...</string>
+    <string name="authenticate">प्रमाणित करें</string>
+    <string name="unsupport_magisk_title">असमर्थित मैजिस्क संस्करण</string>
+    <string name="external_rw_permission_denied">इसका उपयोग करने के लिए स्टोरेज अनुमति प्रदान करें</string>
+    <string name="add_shortcut_title">होम स्क्रीन पर शॉर्टकट जोड़ें</string>
+    <string name="app_not_found">इस एक्शन को संभालने के लिए कोई एप्लिकेशन नहीं मिली</string>
 
 </resources>

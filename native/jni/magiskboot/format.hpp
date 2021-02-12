@@ -4,30 +4,33 @@
 #include <string_view>
 
 typedef enum {
-	UNKNOWN,
+    UNKNOWN,
 /* Boot formats */
-	CHROMEOS,
-	AOSP,
-	DHTB,
-	BLOB,
+    CHROMEOS,
+    AOSP,
+    AOSP_VENDOR,
+    DHTB,
+    BLOB,
 /* Compression formats */
-	GZIP,
-	XZ,
-	LZMA,
-	BZIP2,
-	LZ4,
-	LZ4_LEGACY,
+    GZIP,
+    XZ,
+    LZMA,
+    BZIP2,
+    LZ4,
+    LZ4_LEGACY,
+    LZ4_LG,
 /* Unsupported compression */
-	LZOP,
+    LZOP,
 /* Misc */
-	MTK,
-	DTB,
+    MTK,
+    DTB,
 } format_t;
 
-#define COMPRESSED(fmt)  ((fmt) >= GZIP && (fmt) <= LZ4_LEGACY)
+#define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BOOT_MAGIC      "ANDROID!"
+#define VENDOR_BOOT_MAGIC "VNDRBOOT"
 #define CHROMEOS_MAGIC  "CHROMEOS"
 #define GZIP1_MAGIC     "\x1f\x8b"
 #define GZIP2_MAGIC     "\x1f\x9e"
@@ -38,6 +41,7 @@ typedef enum {
 #define LZ41_MAGIC      "\x03\x21\x4c\x18"
 #define LZ42_MAGIC      "\x04\x22\x4d\x18"
 #define MTK_MAGIC       "\x88\x16\x88\x58"
+#define DTB_MAGIC       "\xd0\x0d\xfe\xed"
 #define LG_BUMP_MAGIC   "\x41\xa9\xe4\x67\x74\x4d\x1d\x1b\xa4\x29\xf2\xec\xea\x65\x52\x79"
 #define DHTB_MAGIC      "\x44\x48\x54\x42\x01\x00\x00\x00"
 #define SEANDROID_MAGIC "SEANDROIDENFORCE"
@@ -53,12 +57,12 @@ typedef enum {
 
 class Fmt2Name {
 public:
-	const char *operator[](format_t fmt);
+    const char *operator[](format_t fmt);
 };
 
 class Fmt2Ext {
 public:
-	const char *operator[](format_t fmt);
+    const char *operator[](format_t fmt);
 };
 
 format_t check_fmt(const void *buf, size_t len);

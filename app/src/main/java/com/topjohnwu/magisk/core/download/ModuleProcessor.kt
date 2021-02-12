@@ -1,13 +1,15 @@
 package com.topjohnwu.magisk.core.download
 
-import com.topjohnwu.magisk.extensions.withStreams
-import java.io.File
+import android.net.Uri
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.ktx.forEach
+import com.topjohnwu.magisk.ktx.withStreams
 import java.io.InputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-fun InputStream.toModule(file: File, installer: InputStream) {
+fun InputStream.toModule(file: Uri, installer: InputStream) {
 
     val input = ZipInputStream(buffered())
     val output = ZipOutputStream(file.outputStream().buffered())
@@ -24,8 +26,7 @@ fun InputStream.toModule(file: File, installer: InputStream) {
         zout.write("#MAGISK\n".toByteArray(charset("UTF-8")))
 
         var off = -1
-        var entry: ZipEntry? = zin.nextEntry
-        while (entry != null) {
+        zin.forEach { entry ->
             if (off < 0) {
                 off = entry.name.indexOf('/') + 1
             }
@@ -37,8 +38,6 @@ fun InputStream.toModule(file: File, installer: InputStream) {
                     zin.copyTo(zout)
                 }
             }
-
-            entry = zin.nextEntry
         }
     }
 }

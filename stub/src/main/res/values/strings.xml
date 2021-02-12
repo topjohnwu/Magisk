@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="upgrade_msg">Upgrade to full Magisk Manager to finish the setup. Download and install?</string>
-    <string name="no_internet_msg">Please connect to the Internet! Upgrading to full Magisk Manager is required.</string>
+    <string name="upgrade_msg">Upgrade to full Magisk to finish the setup. Download and install?</string>
+    <string name="no_internet_msg">Please connect to the Internet! Upgrading to full Magisk is required.</string>
     <string name="dling">Downloading</string>
+    <string name="relaunch_app">Please manually re-launch the app</string>
 </resources>

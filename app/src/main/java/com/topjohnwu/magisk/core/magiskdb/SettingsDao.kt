@@ -4,17 +4,19 @@ class SettingsDao : BaseDao() {
 
     override val table = Table.SETTINGS
 
-    fun delete(key: String) = query<Delete> {
+    suspend fun delete(key: String) = buildQuery<Delete> {
         condition { equals("key", key) }
-    }.ignoreElement()
+    }.commit()
 
-    fun put(key: String, value: Int) = query<Replace> {
+    suspend fun put(key: String, value: Int) = buildQuery<Replace> {
         values("key" to key, "value" to value)
-    }.ignoreElement()
+    }.commit()
 
-    fun fetch(key: String, default: Int = -1) = query<Select> {
+    suspend fun fetch(key: String, default: Int = -1) = buildQuery<Select> {
         fields("value")
         condition { equals("key", key) }
-    }.map { it.firstOrNull()?.values?.firstOrNull()?.toIntOrNull() ?: default }
+    }.query {
+        it["value"]?.toIntOrNull()
+    }.firstOrNull() ?: default
 
 }

@@ -46,7 +46,7 @@ Supported actions:
     Search <hexpattern1> in <file>, and replace with <hexpattern2>
 
   cpio <incpio> [commands...]
-    Do cpio commands to <incpio> (modifications are done directly)
+    Do cpio commands to <incpio> (modifications are done in-place)
     Each command is a single argument, add quotes for each command
     Supported commands:
       exists ENTRY
@@ -68,8 +68,8 @@ Supported actions:
         Return values:
         0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
       patch
-        Apply ramdisk patches. Configure settings with env variables:
-        KEEPVERITY KEEPFORCEENCRYPT
+        Apply ramdisk patches
+        Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
       backup ORIG
         Create ramdisk backups from ORIG
       restore
@@ -83,10 +83,10 @@ Supported actions:
       print [-f]
         Print all contents of dtb for debugging
         Specify [-f] to only print fstab nodes
-      patch [OUT]
+      patch
         Search for fstab and remove verity/avb
-        If [OUT] is not specified, it will directly output to <input>
-        Configure with env variables: KEEPVERITY TWOSTAGEINIT
+        Modifications are done directly to the file in-place
+        Configure with env variables: KEEPVERITY
 
   split <input>
     Split image.*-dtb into kernel + kernel_dtb
@@ -100,12 +100,12 @@ Supported actions:
   compress[=method] <infile> [outfile]
     Compress <infile> with [method] (default: gzip), optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
+    Supported methods: bzip2 gzip lz4 lz4_legacy lz4_lg lzma xz
 
   decompress <infile> [outfile]
     Detect method and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: bzip2 gzip lz4 lz4_legacy lzma xz
+    Supported methods: bzip2 gzip lz4 lz4_legacy lz4_lg lzma xz
 ```
 
 ### magiskinit
@@ -138,57 +138,60 @@ If neither --load or --compile-split is specified, it will load
 from current live policies (/sys/fs/selinux/policy)
 
 One policy statement should be treated as one parameter;
-this means a full policy statement should be enclosed in quotes.
+this means each policy statement should be enclosed in quotes.
 Multiple policy statements can be provided in a single command.
 
-The statements has a format of "<rule_name> [args...]"
-Multiple types and permissions can be grouped into collections
-wrapped in curly brackets.
-'*' represents a collection containing all valid matches.
+Statements has a format of "<rule_name> [args...]".
+Arguments labeled with (^) can accept one or more entries. Multiple
+entries consist of a space separated list enclosed in braces ({}).
+Arguments labeled with (*) are the same as (^), but additionally
+support the match-all operator (*).
+
+Example: "allow { s1 s2 } { t1 t2 } class *"
+Will be expanded to:
+
+allow s1 t1 class { all-permissions-of-class }
+allow s1 t2 class { all-permissions-of-class }
+allow s2 t1 class { all-permissions-of-class }
+allow s2 t2 class { all-permissions-of-class }
 
 Supported policy statements:
 
-Type 1:
-"<rule_name> source_type target_type class perm_set"
-Rules: allow, deny, auditallow, dontaudit
+"allow *source_type *target_type *class *perm_set"
+"deny *source_type *target_type *class *perm_set"
+"auditallow *source_type *target_type *class *perm_set"
+"dontaudit *source_type *target_type *class *perm_set"
 
-Type 2:
-"<rule_name> source_type target_type class operation xperm_set"
-Rules: allowxperm, auditallowxperm, dontauditxperm
-* The only supported operation is ioctl
-* The only supported xperm_set format is range ([low-high])
+"allowxperm *source_type *target_type *class operation xperm_set"
+"auditallowxperm *source_type *target_type *class operation xperm_set"
+"dontauditxperm *source_type *target_type *class operation xperm_set"
+- The only supported operation is 'ioctl'
+- xperm_set format is either 'low-high', 'value', or '*'.
+  '*' will be treated as '0x0000-0xFFFF'.
+  All values should be written in hexadecimal.
 
-Type 3:
-"<rule_name> class"
-Rules: create, permissive, enforcing
+"permissive ^type"
+"enforce ^type"
 
-Type 4:
-"attradd class attribute"
+"typeattribute ^type ^attribute"
 
-Type 5:
-"<rule_name> source_type target_type class default_type"
-Rules: type_transition, type_change, type_member
+"type type_name ^(attribute)"
+- Argument 'attribute' is optional, default to 'domain'
 
-Type 6:
-"name_transition source_type target_type class default_type object_name"
+"attribute attribute_name"
 
-Notes:
-* Type 4 - 6 does not support collections
-* Object classes cannot be collections
-* source_type and target_type can also be attributes
+"type_transition source_type target_type class default_type (object_name)"
+- Argument 'object_name' is optional
 
-Example: allow { s1 s2 } { t1 t2 } class *
-Will be expanded to:
+"type_change source_type target_type class default_type"
+"type_member source_type target_type class default_type"
 
-allow s1 t1 class { all-permissions }
-allow s1 t2 class { all-permissions }
-allow s2 t1 class { all-permissions }
-allow s2 t2 class { all-permissions }
+"genfscon fs_name partial_path fs_context"
 ```
 
 
 ### magisk
-When the magisk binary is called with the name `magisk`, it works as an utility tool with many helper functions and the entry points for several Magisk services.
+When the magisk binary is called with the name `magisk`, it works as a utility tool with many helper functions and the entry points for several Magisk services.
 
 ```
 Usage: magisk [applet [arguments]...]
@@ -199,21 +202,22 @@ Options:
    -v                        print running daemon version
    -V                        print running daemon version code
    --list                    list all available applets
-   --daemon                  manually start magisk daemon
    --remove-modules          remove all modules and reboot
-   --[init trigger]          start service for init trigger
+   --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
+   --daemon                  manually start magisk daemon
+   --[init trigger]          start service for init trigger
+                             Supported init triggers:
+                             post-fs-data, service, boot-complete
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
    --restorecon              restore selinux context on Magisk files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
+   --path                    print Magisk tmpfs mount path
 
-Supported init triggers:
-   post-fs-data, service, boot-complete
-
-Supported applets:
+Available applets:
     su, resetprop, magiskhide
 ```
 
@@ -254,10 +258,10 @@ Options:
 
 Flags:
    -v      print verbose output to stderr
-   -n      set properties without init triggers
-           only affects setprop
-   -p      access actual persist storage
-           only affects getprop and deleteprop
+   -n      set props without going through property_service
+           (this flag only affects setprop)
+   -p      read/write props from/to persistent storage
+           (this flag only affects getprop and delprop)
 ```
 
 ### magiskhide

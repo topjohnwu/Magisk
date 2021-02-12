@@ -1,31 +1,26 @@
 #MAGISK
 ############################################
-#
 # Magisk Flash Script (updater-script)
-# by topjohnwu
-#
 ############################################
 
 ##############
 # Preparation
 ##############
 
-COMMONDIR=$INSTALLER/common
-APK=$COMMONDIR/magisk.apk
-CHROMEDIR=$INSTALLER/chromeos
-
 # Default permissions
 umask 022
 
 OUTFD=$2
-ZIP=$3
+APK="$3"
+COMMONDIR=$INSTALLER/assets
+CHROMEDIR=$INSTALLER/assets/chromeos
 
 if [ ! -f $COMMONDIR/util_functions.sh ]; then
   echo "! Unable to extract zip file!"
   exit 1
 fi
 
-# Load utility fuctions
+# Load utility functions
 . $COMMONDIR/util_functions.sh
 
 setup_flashable
@@ -57,11 +52,15 @@ api_level_arch_detect
 
 ui_print "- Device platform: $ARCH"
 
-BINDIR=$INSTALLER/$ARCH32
+BINDIR=$INSTALLER/lib/$ARCH32
+[ ! -d "$BINDIR" ] && BINDIR=$INSTALLER/lib/armeabi-v7a
+cd $BINDIR
+for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
+cd /
 chmod -R 755 $CHROMEDIR $BINDIR
 
 # Check if system root is installed and remove
-remove_system_su
+$BOOTMODE || remove_system_su
 
 ##############
 # Environment
@@ -72,23 +71,22 @@ ui_print "- Constructing environment"
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
-cp -af $BINDIR/. $COMMONDIR/. $CHROMEDIR $BBBIN $MAGISKBIN
+cp -af $BINDIR/. $COMMONDIR/. $BBBIN $MAGISKBIN
 chmod -R 755 $MAGISKBIN
 
 # addon.d
 if [ -d /system/addon.d ]; then
   ui_print "- Adding addon.d survival script"
-  mount -o rw,remount /system
+  blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
+  mount -o rw,remount /system || mount -o rw,remount /
   ADDOND=/system/addon.d/99-magisk.sh
   cp -af $COMMONDIR/addon.d.sh $ADDOND
   chmod 755 $ADDOND
 fi
 
-$BOOTMODE || recovery_actions
-
-#####################
-# Boot/DTBO Patching
-#####################
+##################
+# Image Patching
+##################
 
 install_magisk
 

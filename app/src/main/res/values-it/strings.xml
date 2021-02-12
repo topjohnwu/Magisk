@@ -2,7 +2,7 @@
 
     <!--Welcome Activity-->
     <string name="modules">Moduli</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Accesso root</string>
     <string name="logs">Registro eventi</string>
     <string name="settings">Impostazioni</string>
     <string name="refresh">Aggiorna dati locali</string>
@@ -13,26 +13,18 @@
 
     <!--Home-->
     <string name="no_connection">Connessione non disponibile</string>
-    <string name="home_notice_content">Assicurarsi di utilizzare la versione open source di Magisk Manager. Se proveniente da fonti sconosciute, potrebbe eseguire azioni dannose.</string>
     <string name="hide">Hide</string>
     <string name="app_changelog">Changelog</string>
-    <string name="manager">Manager</string>
-
+    <string name="home_latest_version">Ultima</string>
+    <string name="home_installed_version">Installata</string>
     <string name="home_support_title">Supportaci</string>
-    <string name="home_links_project">Link del progetto</string>
     <string name="home_item_source">Codice sorgente</string>
     <string name="home_support_content">Magisk è e sempre sarà gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento inviando una piccola donazione.</string>
-
-    <string name="home_device_system">Sistema</string>
-
     <string name="home_package">Pacchetto</string>
-
-    <string name="home_status_normal">Normale</string>
-
+    <string name="home_check_safetynet">Controlla SafetyNet</string>
+    <string name="loading">Caricamento…</string>
+    <string name="not_available">N/D</string>
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
-    <string name="safetynet_api_error">Errore API SafetyNet</string>
-    <string name="safetynet_res_invalid">La risposta non è valida</string>
-    <string name="uninstall">Disinstalla</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
     <string name="update">Aggiorna</string>
@@ -40,26 +32,27 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">Recovery Mode</string>
+    <string name="recovery_mode">Modalità recovery</string>
     <string name="install_options_title">Opzioni</string>
     <string name="install_method_title">Metodo</string>
     <string name="install_next">Avanti</string>
     <string name="install_start">Andiamo!</string>
     <string name="manager_download_install">Apri questa notifica per scaricare e installare</string>
-    <string name="download_zip_only">Scarica solo il file zip</string>
     <string name="direct_install">Installazione diretta (raccomandata)</string>
-    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un OTA)</string>
-    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un OTA è stato installato.\nVuoi continuare?</string>
+    <string name="install_inactive_slot">Installa nello slot inattivo (dopo un aggiornamento OTA)</string>
+    <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
     <string name="select_patch_file">Seleziona e aggiorna un file</string>
     <string name="patch_file_msg">Seleziona un\'immagine in formato .img o un file ODIN .tar</string>
     <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
+    <string name="flash_screen_title">Installazione</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Richiesta Superuser</string>
+    <string name="su_request_title">Richiesta di accesso root</string>
+    <string name="touch_filtered_warning">Magisk non può verificare la tua risposta perché un\'app sta oscurando una richiesta di accesso root</string>
     <string name="deny">Nega</string>
     <string name="prompt">Chiedi</string>
-    <string name="grant">Accetta</string>
+    <string name="grant">Consenti</string>
     <string name="su_warning">Concede il pieno accesso al dispositivo.\nNega se non sei sicuro!</string>
     <string name="forever">Sempre</string>
     <string name="once">Una volta</string>
@@ -67,23 +60,22 @@
     <string name="twentymin">20 minuti</string>
     <string name="thirtymin">30 minuti</string>
     <string name="sixtymin">60 minuti</string>
-    <string name="su_allow_toast">%1$s ha ottenuto i permessi Superuser</string>
-    <string name="su_deny_toast">%1$s non ha ottenuto i permessi Superuser</string>
-    <string name="no_apps_found">Nessuna app trovata</string>
-    <string name="su_snack_grant"> %1$s ha ottenuto i permessi Superuser</string>
-    <string name="su_snack_deny"> %1$s non ha ottenuto i permessi Superuser</string>
+    <string name="su_allow_toast">%1$s ha ottenuto i permessi di root</string>
+    <string name="su_deny_toast">%1$s non ha ottenuto i permessi di root</string>
+    <string name="su_snack_grant">%1$s potrà ottenere i permessi di root</string>
+    <string name="su_snack_deny">%1$s non potrà più ottenere i permessi di root</string>
     <string name="su_snack_notif_on">Notifiche per %1$s abilitate</string>
     <string name="su_snack_notif_off">Notifiche per %1$s disabilitate</string>
-    <string name="su_snack_log_on">Registro eventi abilitato per %1$s</string>
-    <string name="su_snack_log_off">Registro eventi non abilitato per %1$s</string>
+    <string name="su_snack_log_on">Registrazione eventi abilitata per %1$s</string>
+    <string name="su_snack_log_off">Registrazione eventi disabilitata per %1$s</string>
     <string name="su_revoke_title">Conferma revoca</string>
-    <string name="su_revoke_msg">Confermi la revoca dei diritti a %1$s?</string>
+    <string name="su_revoke_msg">Confermi la revoca dei permessi a %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nessuno</string>
 
     <string name="superuser_toggle_notification">Notifiche</string>
     <string name="superuser_toggle_revoke">Revoca</string>
-    <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di superuser.</string>
+    <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di root.</string>
 
     <!--Logs-->
     <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i diritti di root.</string>
@@ -95,14 +87,16 @@
     <string name="target_uid">Target UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_attest_success">Successo!</string>
+    <string name="safetynet_api_error">Errore nelle API SafetyNet</string>
+    <string name="safetynet_res_invalid">La risposta non è valida</string>
+    <string name="safetynet_attest_success">Attestazione riuscita!</string>
     <string name="safetynet_attest_failure">Attestazione fallita!</string>
     <string name="safetynet_attest_loading">Solo un secondo…</string>
     <string name="safetynet_attest_restart">Prova di nuovo</string>
-    <string name="safetynet_system">Sistema</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra app di sistema</string>
+    <string name="show_os_app">Mostra app del sistema operativo</string>
     <string name="hide_filter_hint">Filtra per nome</string>
     <string name="hide_scroll_up">Scorri verso l\'alto</string>
     <string name="hide_filters">Filtri</string>
@@ -110,22 +104,20 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nessuna informazione)</string>
-    <string name="no_modules_found">Nessun modulo trovato</string>
-    <string name="reboot_recovery">Riavvia in Recovery</string>
-    <string name="reboot_bootloader">Riavvia in Bootloader</string>
-    <string name="reboot_download">Riavvia in Download Mode</string>
-    <string name="reboot_edl">Riavvia in EDL</string>
-    <string name="module_safe_mode_message">È stata attivata la modalità sicura. I moduli dell\'utente non funzioneranno.\nQuesto messaggio scomprarirà quando la modalità verrà disabilitata.</string>
+    <string name="reboot_userspace">Riavvio veloce</string>
+    <string name="reboot_recovery">Riavvia in recovery</string>
+    <string name="reboot_bootloader">Riavvia in bootloader</string>
+    <string name="reboot_download">Riavvia in modalità download</string>
+    <string name="reboot_edl">Riavvia in modalità EDL</string>
     <string name="module_version_author">%1$s di %2$s</string>
     <string name="module_section_pending">Aggiornamenti</string>
     <string name="module_section_pending_action">Aggiorna tutto</string>
-    <string name="module_section_remote">Remoto</string>
     <string name="module_state_remove">Rimuovi</string>
     <string name="module_state_restore">Ripristina</string>
-    <string name="module_action_install_external">Installa dalla memoria</string>
-    <string name="module_update_none">I tuoi moduli sono aggiornati!</string>
+    <string name="module_action_install_external">Installa dal dispositivo</string>
+    <string name="module_installed">Installato</string>
+    <string name="module_section_online">Online</string>
     <string name="update_available">Aggiornamento disponibile</string>
-    <string name="home_installed_version">Installato</string>
     <string name="sorting_order">Ordina per</string>
 
     <!--Settings -->
@@ -134,16 +126,10 @@
     <string name="settings_dark_mode_light">Chiaro</string>
     <string name="settings_dark_mode_system">Adatta al sistema</string>
     <string name="settings_dark_mode_dark">Scuro</string>
-    <string name="settings_safe_mode_title">Modalità sicura</string>
-    <string name="settings_core_only_summary" deprecated="true">Abilita solo le funzioni principali. Nessun modulo verrà caricato. MagiskSU e MagiskHide rimarranno abilitati</string>
     <string name="settings_download_path_title">Percorso di download</string>
     <string name="settings_download_path_message">I file verranno salvati in %1$s</string>
     <string name="settings_clear_cache_title">Svuota cache repository</string>
-    <string name="settings_clear_cache_summary">Svuota la cache delle repository. Questa opzione forza l\'aggiornamento online dell\'app</string>
-    <string name="settings_hide_manager_title">Nascondi Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Reinstalla Magisk Manager con un nome pacchetto e app casuali</string>
-    <string name="settings_restore_manager_title">Ripristina Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Ripristina Magisk Manager con il nome pacchetto e app originali</string>
+    <string name="settings_clear_cache_summary">Svuota la cache dei repository. In questo modo l\'app sarà costretta a recuperare le informazioni online</string>
     <string name="language">Lingua</string>
     <string name="system_default">(Sistema)</string>
     <string name="settings_check_update_title">Controlla aggiornamenti</string>
@@ -151,12 +137,12 @@
     <string name="settings_update_channel_title">Canale di aggiornamento</string>
     <string name="settings_update_stable">Stabile</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Personalizzato</string>
+    <string name="settings_update_custom">Canale personalizzato</string>
     <string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
-    <string name="settings_magiskhide_summary">Nasconde Magisk da numerose rilevazioni</string>
-    <string name="settings_hosts_title">Host systemless</string>
-    <string name="settings_hosts_summary">Supporto a host systemless per le app che bloccano le pubblicità</string>
-    <string name="settings_hosts_toast">Aggiunto modulo per host systemless</string>
+    <string name="settings_magiskhide_summary">Nasconde Magisk da numerosi sistemi di rilevazione</string>
+    <string name="settings_hosts_title">File hosts systemless</string>
+    <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
+    <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>
     <string name="settings_app_name_hint">Nuovo nome</string>
     <string name="settings_app_name_helper">L\'app sarà ricreata con questo nome</string>
     <string name="settings_app_name_error">Formato non valido</string>
@@ -170,24 +156,29 @@
     <string name="settings_su_request_30">30 secondi</string>
     <string name="settings_su_request_45">45 secondi</string>
     <string name="settings_su_request_60">60 secondi</string>
-    <string name="superuser_access">Accesso Superuser</string>
-    <string name="auto_response">Accesso predefinito</string>
+    <string name="superuser_access">Accesso root</string>
+    <string name="auto_response">Azione predefinita</string>
     <string name="request_timeout">Timeout richiesta</string>
-    <string name="superuser_notification">Notifica Superuser</string>
+    <string name="superuser_notification">Notifica di accesso root</string>
     <string name="settings_su_reauth_title">Riautentica dopo aggiornamento</string>
-    <string name="settings_su_reauth_summary">Riautentica i permessi Superuser dopo un aggiornamento dell\'app</string>
+    <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
+    <string name="settings_su_tapjack_title">Abilita protezione anti-tapjacking</string>
+    <string name="settings_su_tapjack_summary">La schermata di richiesta dei permessi di root non risponderà al tocco mentre è oscurata da altre finestre o elementi in sovraimpressione</string>
     <string name="settings_su_biometric_title">Abilita autenticazione biometrica</string>
-    <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste superuser</string>
+    <string name="settings_su_biometric_summary">Utilizza l\'autenticazione biometrica per accettare le richieste di accesso root</string>
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
     <string name="settings_customization">Personalizzazione</string>
+    <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Soluzione alternativa al DNS poisoning in alcune nazioni</string>
 
     <string name="multiuser_mode">Modalità multiutente</string>
-    <string name="settings_owner_only">Solo proprietario del dispositivo</string>
-    <string name="settings_owner_manage">Gestito dal proprietario utente</string>
-    <string name="settings_user_independent">Idipendente dall\'utente</string>
-    <string name="owner_only_summary">Solo il proprietario ha i permessi di root</string>
-    <string name="owner_manage_summary">Solo il proprietario può gestire accesso root e ricevere richieste</string>
-    <string name="user_indepenent_summary">Ogni utente ha le proprie regole di root indpendenti</string>
+    <string name="settings_owner_only">Solo per il proprietario del dispositivo</string>
+    <string name="settings_owner_manage">Gestito dal proprietario del dispositivo</string>
+    <string name="settings_user_independent">Indipendente dall\'utente</string>
+    <string name="owner_only_summary">Solo il proprietario possiede i permessi di root</string>
+    <string name="owner_manage_summary">Solo il proprietario può gestire l\'accesso root e ricevere le richieste dalle app</string>
+    <string name="user_indepenent_summary">Ogni utente ha le proprie regole di root indipendenti</string>
 
     <string name="mount_namespace_mode">Modalità mount namespace</string>
     <string name="settings_ns_global">Namespace globale</string>
@@ -196,17 +187,13 @@
     <string name="global_summary">Tutte le sessioni di root erediteranno il namespace globale</string>
     <string name="requester_summary">Le sessioni di root erediteranno il namespace del loro richiedente</string>
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
-    <string name="settings_download_path_error">Errore durante la creazione della cartella. Deve essere accessibile dalla radice della memoria di archiviazione e non essere un file.</string>
 
     <!--Notifications-->
     <string name="update_channel">Aggiornamenti Magisk</string>
     <string name="progress_channel">Notifiche di avanzamento</string>
     <string name="download_complete">Download completato</string>
     <string name="download_file_error">Errore durante il download del file</string>
-    <string name="download_open_parent">Mostra nella cartella padre</string>
-    <string name="download_open_self">Mostra file</string>
     <string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
-    <string name="manager_update_title">È disponibile un aggiornamento di Magisk Manager!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Sì</string>
@@ -215,31 +202,25 @@
     <string name="repo_install_msg">Vuoi installare %1$s?</string>
     <string name="download">Download</string>
     <string name="reboot">Riavvia</string>
-    <string name="settings_reboot_toast">Riavvia per applicare i cambiamenti</string>
     <string name="release_notes">Note di rilascio</string>
-    <string name="repo_cache_cleared">La cache delle repository è stata svuotata</string>
-    <string name="dtbo_patched_title">DTBO è stato aggiornato!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager ha aggiornato dtbo.img. Riavvia per completare.</string>
+    <string name="repo_cache_cleared">La cache dei repository è stata svuotata</string>
     <string name="flashing">Flash in corso…</string>
     <string name="done">Completato!</string>
     <string name="failure">Fallito</string>
-    <string name="hide_manager_title">Nascondendo Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Non è stato possibile nascondere Magisk Manager.</string>
     <string name="open_link_failed_toast">Nessuna app disponibile per aprire il link</string>
-    <string name="complete_uninstall">Disinstallazione completa</string>
-    <string name="restore_img">Ripristina Immagini</string>
+    <string name="complete_uninstall">Disinstalla completamente</string>
+    <string name="restore_img">Ripristina immagini</string>
     <string name="restore_img_msg">Ripristino…</string>
     <string name="restore_done">Ripristino completato!</string>
-    <string name="restore_fail">Non esiste un\'immagine originale di boot!</string>
+    <string name="restore_fail">Non esiste un backup dell\'immagine di boot originale!</string>
     <string name="proprietary_title">Scarica codice proprietario</string>
-    <string name="proprietary_notice">Magisk Manager è FOSS e non contiene codice proprietario delle API Google SafetyNet.\n\nVuoi scaricare un\'estensione (contenente GoogleApiClient) per controllare lo stato di SafetyNet?</string>
     <string name="setup_fail">Configurazione fallita</string>
     <string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
-    <string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Verrà scaricato il file zip di Magisk, vuoi procedere ora?</string>
     <string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
     <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
-    <string name="unsupport_magisk_msg">Questa versione di Magisk Manager non supporta versioni di Magisk inferiori a %1$s.\n\nQuesta app si comporterà come se non fosse installato Magisk, che deve essere aggiornato per procedere all\'utilizzo.</string>
-
+    <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
+    <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
+    <string name="app_not_found">Nessuna app disponibile per gestire quest\'azione</string>
 
 </resources>

@@ -24,7 +24,7 @@
             android:minWidth="350dp"
             android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/request_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp">
 
-                <androidx.appcompat.widget.AppCompatImageView
+                <ImageView
                     android:id="@+id/app_icon"
                     style="@style/WidgetFoundation.Icon"
                     android:layout_gravity="center_vertical"
@@ -65,7 +65,7 @@
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:id="@+id/app_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                         android:textStyle="bold"
                         tools:text="Magisk" />
 
-                    <androidx.appcompat.widget.AppCompatTextView
+                    <TextView
                         android:id="@+id/package_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -92,23 +92,24 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatSpinner
+            <Spinner
                 android:id="@+id/timeout"
                 onTouch="@{() -> viewModel.spinnerTouched()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:enabled="@{viewModel.grantEnabled}"
                 android:adapter="@{viewModel.adapter}"
                 android:selection="@={viewModel.selectedItemPosition}" />
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <TextView
                 android:id="@+id/warning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="@dimen/l1"
                 android:gravity="center"
-                android:text="@{viewModel.warningText}"
+                android:text="@string/su_warning"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="?colorError"
                 android:textStyle="bold"
@@ -123,7 +124,7 @@
                 android:paddingStart="@dimen/l2"
                 android:paddingEnd="@dimen/l2">
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/deny_btn"
                     style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="0dp"
@@ -134,9 +135,10 @@
                     android:textColor="?colorOnSurfaceVariant"
                     tools:text="@string/deny" />
 
-                <com.google.android.material.button.MaterialButton
+                <Button
                     android:id="@+id/grant_btn"
                     style="@style/WidgetFoundation.Button.Text"
+                    onTouch="@{viewModel.grantTouchListener}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

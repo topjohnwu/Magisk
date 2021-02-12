@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.HideProcessItem" />
+            type="com.topjohnwu.magisk.ui.hide.HideProcessRvItem" />
 
         <variable
             name="viewModel"
@@ -19,11 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:alpha="@{item.isHidden() ? 1f : .7f}"
-        android:background="?selectableItemBackground"
-        android:onClick="@{() -> item.toggle(viewModel)}">
+        android:alpha="@{item.hidden ? 1f : .7f}">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/l1"
@@ -31,7 +29,8 @@
             android:layout_marginEnd="@dimen/l1"
             android:layout_marginBottom="@dimen/l_75"
             android:singleLine="true"
-            android:text="@{item.item.name}"
+            android:ellipsize="middle"
+            android:text="@{item.process.name}"
             android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/hide_process_checkbox"
@@ -39,18 +38,15 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="com.topjohnwu.magisk" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/hide_process_checkbox"
-            style="@style/WidgetFoundation.Image.Small"
-            isSelected="@{item.isHidden}"
+            android:checked="@={item.hidden}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l_50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@drawable/bg_checkbox"
-            app:srcCompat="@drawable/ic_checkbox" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

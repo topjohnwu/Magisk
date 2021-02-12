@@ -9,7 +9,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import com.topjohnwu.magisk.extensions.drawableCompat
+import com.topjohnwu.magisk.ktx.drawableCompat
 import kotlin.math.roundToInt
 
 class KItemDecoration(

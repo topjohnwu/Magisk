@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.core.Info" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.MainViewModel" />
@@ -15,11 +17,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="@{viewModel.insets.left}"
-        android:paddingRight="@{viewModel.insets.right}"
+        app:consumeSystemWindowsInsets="start|end"
+        app:edgeToEdge="true"
+        app:fitsSystemWindowsInsets="start|end"
         tools:ignore="RtlHardcoded">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/main_nav_host"
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
@@ -32,7 +35,7 @@
             style="@style/WidgetFoundation.Appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="@{viewModel.insets.top}">
+            app:fitsSystemWindowsInsets="top">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/main_toolbar"
@@ -42,6 +45,12 @@
                 app:layout_scrollFlags="noScroll"
                 tools:layout_marginTop="24dp"
                 tools:title="Home" />
+
+            <View
+                gone="@{android.os.Build.VERSION.SDK_INT >= 21}"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?colorSurfaceVariant"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -64,44 +73,29 @@
             android:layout_gravity="bottom|center_horizontal"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@{(int) @dimen/l1 + viewModel.insets.bottom}"
+            android:layout_marginBottom="@dimen/l1"
+            android:fitsSystemWindows="false"
+            app:layout_fitsSystemWindowsInsets="bottom"
             tools:layout_marginBottom="64dp">
 
-            <LinearLayout
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/main_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
-
-                <com.google.android.material.bottomnavigation.BottomNavigationView
-                    android:id="@+id/main_navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:textStyle="bold"
-                    app:elevation="0dp"
-                    app:itemHorizontalTranslationEnabled="false"
-                    app:itemIconTint="@color/color_menu_tint"
-                    app:itemRippleColor="?colorPrimary"
-                    app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
-                    app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
-                    app:itemTextColor="@color/color_menu_tint"
-                    app:labelVisibilityMode="unlabeled"
-                    app:menu="@menu/menu_bottom_nav" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    gone="@{viewModel.isConnected}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingBottom="@dimen/l_50"
-                    android:text="@string/no_connection"
-                    android:textAppearance="@style/AppearanceFoundation.Caption"
-                    android:textColor="?colorError"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
-            </LinearLayout>
+                android:background="@android:color/transparent"
+                android:textStyle="bold"
+                android:fitsSystemWindows="false"
+                android:paddingBottom="0dp"
+                app:fitsSystemWindowsInsets="start|end"
+                app:elevation="0dp"
+                app:itemHorizontalTranslationEnabled="false"
+                app:itemIconTint="@color/color_menu_tint"
+                app:itemRippleColor="?colorPrimary"
+                app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+                app:itemTextColor="@color/color_menu_tint"
+                app:labelVisibilityMode="unlabeled"
+                app:menu="@menu/menu_bottom_nav" />
 
         </com.google.android.material.card.MaterialCardView>
 

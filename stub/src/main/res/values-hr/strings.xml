@@ -1,1 +1,7 @@
-<resources></resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Nadogradite na full Magisk Manager da biste dovršili postavljanje. Preuzeti i instalirati?</string>
+    <string name="no_internet_msg">Povežite se na Internet! Potrebna je nadogradnja na full Magisk Manager.</string>
+    <string name="dling">Preuzimanje</string>
+    <string name="relaunch_app">Ručno ponovno pokrenite aplikaciju</string>
+</resources>

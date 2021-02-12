@@ -1,11 +1,7 @@
 #include <sys/mount.h>
 #include <sys/wait.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-#include <dirent.h>
+#include <sys/sysmacros.h>
+#include <linux/input.h>
 #include <libgen.h>
 #include <vector>
 #include <string>
@@ -17,339 +13,363 @@
 #include <resetprop.hpp>
 #include <selinux.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
-extern vector<string> module_list;
-static bool no_secure_dir = false;
-static bool pfs_done = false;
-
-extern void auto_start_magiskhide();
+static bool safe_mode = false;
 
 /*********
  * Setup *
  *********/
 
-#define DIR_IS(part)      (me->mnt_dir == "/" #part ""sv)
+#define MNT_DIR_IS(dir)   (me->mnt_dir == string_view(dir))
 #define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
-#define mount_mirror(part, flag) \
-else if (DIR_IS(part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) { \
-	SETMIR(buf1, part); \
-	SETBLK(buf2, part); \
-	mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-	xmkdir(buf1, 0755); \
-	xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
-	LOGI("mount: %s\n", buf1); \
+#define do_mount_mirror(part, flag) {\
+    SETMIR(buf1, part); \
+    SETBLK(buf2, part); \
+    unlink(buf2); \
+    mknod(buf2, S_IFBLK | 0600, st.st_dev); \
+    xmkdir(buf1, 0755); \
+    xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
+    LOGI("mount: %s\n", buf1); \
 }
+
+#define mount_mirror(part, flag) \
+else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) \
+    do_mount_mirror(part, flag)
 
 #define link_mirror(part) \
 SETMIR(buf1, part); \
 if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
-	xsymlink("./system/" #part, buf1); \
-	LOGI("link: %s\n", buf1); \
+    xsymlink("./system/" #part, buf1); \
+    LOGI("link: %s\n", buf1); \
+}
+
+#define link_orig_dir(dir, part) \
+else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv) { \
+    SETMIR(buf1, part); \
+    rmdir(buf1); \
+    xsymlink(dir, buf1); \
+    LOGI("link: %s\n", buf1); \
+}
+
+#define link_orig(part) link_orig_dir("/" #part, part)
+
+static void mount_mirrors() {
+    char buf1[4096];
+    char buf2[4096];
+
+    LOGI("* Mounting mirrors\n");
+
+    parse_mnt("/proc/mounts", [&](mntent *me) {
+        struct stat st;
+        if (0) {}
+        mount_mirror(system, MS_RDONLY)
+        mount_mirror(vendor, MS_RDONLY)
+        mount_mirror(product, MS_RDONLY)
+        mount_mirror(system_ext, MS_RDONLY)
+        mount_mirror(data, 0)
+        link_orig(cache)
+        link_orig(metadata)
+        link_orig(persist)
+        link_orig_dir("/mnt/vendor/persist", persist)
+        else if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
+            xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
+        }
+        return true;
+    });
+    SETMIR(buf1, system);
+    if (access(buf1, F_OK) != 0) {
+        xsymlink("./system_root/system", buf1);
+        LOGI("link: %s\n", buf1);
+        parse_mnt("/proc/mounts", [&](mntent *me) {
+            struct stat st;
+            if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
+                do_mount_mirror(system_root, MS_RDONLY)
+                return false;
+            }
+            return true;
+        });
+    }
+    link_mirror(vendor)
+    link_mirror(product)
+    link_mirror(system_ext)
 }
 
 static bool magisk_env() {
-	LOGI("* Initializing Magisk environment\n");
+    char buf[4096];
 
-	string pkg;
-	check_manager(&pkg);
+    LOGI("* Initializing Magisk environment\n");
 
-	char buf1[4096];
-	char buf2[4096];
+    string pkg;
+    check_manager(&pkg);
 
-	sprintf(buf1, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
 
-	// Alternative binaries paths
-	const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf1 };
-	for (auto alt : alt_bin) {
-		struct stat st;
-		if (lstat(alt, &st) == 0) {
-			if (S_ISLNK(st.st_mode)) {
-				unlink(alt);
-				continue;
-			}
-			rm_rf(DATABIN);
-			cp_afc(alt, DATABIN);
-			rm_rf(alt);
-			break;
-		}
-	}
+    // Alternative binaries paths
+    const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
+    for (auto alt : alt_bin) {
+        struct stat st;
+        if (lstat(alt, &st) == 0) {
+            if (S_ISLNK(st.st_mode)) {
+                unlink(alt);
+                continue;
+            }
+            rm_rf(DATABIN);
+            cp_afc(alt, DATABIN);
+            rm_rf(alt);
+            break;
+        }
+    }
 
-	// Remove stuffs
-	rm_rf("/cache/data_adb");
-	rm_rf("/data/adb/modules/.core");
-	unlink("/data/adb/magisk.img");
-	unlink("/data/adb/magisk_merge.img");
-	unlink("/data/magisk.img");
-	unlink("/data/magisk_merge.img");
-	unlink("/data/magisk_debug.log");
+    // Remove stuffs
+    rm_rf("/cache/data_adb");
+    rm_rf("/data/adb/modules/.core");
+    unlink("/data/adb/magisk.img");
+    unlink("/data/adb/magisk_merge.img");
+    unlink("/data/magisk.img");
+    unlink("/data/magisk_merge.img");
+    unlink("/data/magisk_debug.log");
 
-	sprintf(buf1, "%s/" MODULEMNT, MAGISKTMP.data());
-	xmkdir(buf1, 0755);
+    // Directories in /data/adb
+    xmkdir(DATABIN, 0755);
+    xmkdir(MODULEROOT, 0755);
+    xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
+    xmkdir(SECURE_DIR "/service.d", 0755);
 
-	// Directories in /data/adb
-	xmkdir(DATABIN, 0755);
-	xmkdir(MODULEROOT, 0755);
-	xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
-	xmkdir(SECURE_DIR "/service.d", 0755);
+    // Disable/remove magiskhide, resetprop
+    if (SDK_INT < 19) {
+        unlink("/sbin/resetprop");
+        unlink("/sbin/magiskhide");
+    }
 
-	LOGI("* Mounting mirrors");
+    if (access(DATABIN "/busybox", X_OK))
+        return false;
 
-	parse_mnt("/proc/mounts", [&](mntent *me) {
-		struct stat st;
-		if (0) {}
-		mount_mirror(system, MS_RDONLY)
-		mount_mirror(vendor, MS_RDONLY)
-		mount_mirror(product, MS_RDONLY)
-		mount_mirror(system_ext, MS_RDONLY)
-		mount_mirror(data, 0)
-		else if (SDK_INT >= 24 && DIR_IS(proc) && !strstr(me->mnt_opts, "hidepid=2")) {
-			xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-		}
-		return true;
-	});
-	SETMIR(buf1, system);
-	SETMIR(buf2, system_root);
-	if (access(buf1, F_OK) != 0 && access(buf2, F_OK) == 0) {
-		xsymlink("./system_root/system", buf1);
-		LOGI("link: %s\n", buf1);
-	}
-	link_mirror(vendor);
-	link_mirror(product);
-	link_mirror(system_ext);
+    sprintf(buf, "%s/" BBPATH "/busybox", MAGISKTMP.data());
+    mkdir(dirname(buf), 0755);
+    cp_afc(DATABIN "/busybox", buf);
+    exec_command_async(buf, "--install", "-s", dirname(buf));
 
-	// Disable/remove magiskhide, resetprop
-	if (SDK_INT < 19) {
-		unlink("/sbin/resetprop");
-		unlink("/sbin/magiskhide");
-	}
-
-	if (access(DATABIN "/busybox", X_OK) == -1)
-		return false;
-
-	// TODO: Remove. Backwards compatibility for old manager
-	LOGI("* Setting up internal busybox\n");
-	sprintf(buf1, "%s/" BBPATH "/busybox", MAGISKTMP.data());
-	mkdir(dirname(buf1), 0755);
-	cp_afc(DATABIN "/busybox", buf1);
-	exec_command_sync(buf1, "--install", "-s", dirname(buf1));
-
-	return true;
+    return true;
 }
 
-static void reboot() {
-	if (RECOVERY_MODE)
-		exec_command_sync("/system/bin/reboot", "recovery");
-	else
-		exec_command_sync("/system/bin/reboot");
-}
-
-void remove_modules() {
-	LOGI("* Remove all modules and reboot");
-	auto dir = xopen_dir(MODULEROOT);
-	int dfd = dirfd(dir.get());
-	for (dirent *entry; (entry = xreaddir(dir.get()));) {
-		if (entry->d_type == DT_DIR) {
-			if (entry->d_name == ".core"sv)
-				continue;
-
-			int modfd = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-			close(xopenat(modfd, "remove", O_RDONLY | O_CREAT | O_CLOEXEC));
-			close(modfd);
-		}
-	}
-	reboot();
+void reboot() {
+    if (RECOVERY_MODE)
+        exec_command_sync("/system/bin/reboot", "recovery");
+    else
+        exec_command_sync("/system/bin/reboot");
 }
 
 static bool check_data() {
-	bool mnt = false;
-	bool data = false;
-	file_readline("/proc/mounts", [&](string_view s) -> bool {
-		if (str_contains(s, " /data ") && !str_contains(s, "tmpfs"))
-			mnt = true;
-		return true;
-	});
-	if (mnt) {
-		auto crypto = getprop("ro.crypto.state");
-		if (!crypto.empty()) {
-			if (crypto == "unencrypted") {
-				// Unencrypted, we can directly access data
-				data = true;
-			} else {
-				// Encrypted, check whether vold is started
-				data = !getprop("init.svc.vold").empty();
-			}
-		} else {
-			// ro.crypto.state is not set, assume it's unencrypted
-			data = true;
-		}
-	}
-	return data;
+    bool mnt = false;
+    file_readline("/proc/mounts", [&](string_view s) {
+        if (str_contains(s, " /data ") && !str_contains(s, "tmpfs")) {
+            mnt = true;
+            return false;
+        }
+        return true;
+    });
+    if (!mnt)
+        return false;
+    auto crypto = getprop("ro.crypto.state");
+    if (!crypto.empty()) {
+        if (crypto == "unencrypted") {
+            // Unencrypted, we can directly access data
+            return true;
+        } else {
+            // Encrypted, check whether vold is started
+            return !getprop("init.svc.vold").empty();
+        }
+    }
+    // ro.crypto.state is not set, assume it's unencrypted
+    return true;
 }
 
 void unlock_blocks() {
-	int fd, dev, OFF = 0;
+    int fd, dev, OFF = 0;
 
-	auto dir = xopen_dir("/dev/block");
-	if (!dir)
-		return;
-	dev = dirfd(dir.get());
+    auto dir = xopen_dir("/dev/block");
+    if (!dir)
+        return;
+    dev = dirfd(dir.get());
 
-	for (dirent *entry; (entry = readdir(dir.get()));) {
-		if (entry->d_type == DT_BLK) {
-			if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
-				continue;
-			if (ioctl(fd, BLKROSET, &OFF) < 0)
-				PLOGE("unlock %s", entry->d_name);
-			close(fd);
-		}
-	}
+    for (dirent *entry; (entry = readdir(dir.get()));) {
+        if (entry->d_type == DT_BLK) {
+            if ((fd = openat(dev, entry->d_name, O_RDONLY | O_CLOEXEC)) < 0)
+                continue;
+            if (ioctl(fd, BLKROSET, &OFF) < 0)
+                PLOGE("unlock %s", entry->d_name);
+            close(fd);
+        }
+    }
 }
 
-static bool log_dump = false;
-static void dump_logs() {
-	if (log_dump)
-		return;
-	int test = exec_command_sync("/system/bin/logcat", "-d", "-f", "/dev/null");
-	chmod("/dev/null", 0666);
-	if (test != 0)
-		return;
-	rename(LOGFILE, LOGFILE ".bak");
-	log_dump = true;
-	// Start a daemon thread and wait indefinitely
-	new_daemon_thread([]() -> void {
-		int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-		exec_t exec {
-			.fd = fd,
-			.fork = fork_no_zombie
-		};
-		int pid = exec_command(exec, "/system/bin/logcat", "-s", "Magisk");
-		close(fd);
-		if (pid < 0) {
-			log_dump = false;
-		} else {
-			waitpid(pid, nullptr, 0);
-		}
-	});
+#define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
+
+static bool check_key_combo() {
+    uint8_t bitmask[(KEY_MAX + 1) / 8];
+    vector<int> events;
+    constexpr char name[] = "/dev/.ev";
+
+    // First collect candidate events that accepts volume down
+    for (int minor = 64; minor < 96; ++minor) {
+        if (xmknod(name, S_IFCHR | 0444, makedev(13, minor)))
+            continue;
+        int fd = open(name, O_RDONLY | O_CLOEXEC);
+        unlink(name);
+        if (fd < 0)
+            continue;
+        memset(bitmask, 0, sizeof(bitmask));
+        ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(bitmask)), bitmask);
+        if (test_bit(KEY_VOLUMEDOWN, bitmask))
+            events.push_back(fd);
+        else
+            close(fd);
+    }
+    if (events.empty())
+        return false;
+
+    run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
+
+    // Check if volume down key is held continuously for more than 3 seconds
+    for (int i = 0; i < 300; ++i) {
+        bool pressed = false;
+        for (const int &fd : events) {
+            memset(bitmask, 0, sizeof(bitmask));
+            ioctl(fd, EVIOCGKEY(sizeof(bitmask)), bitmask);
+            if (test_bit(KEY_VOLUMEDOWN, bitmask)) {
+                pressed = true;
+                break;
+            }
+        }
+        if (!pressed)
+            return false;
+        // Check every 10ms
+        usleep(10000);
+    }
+    LOGD("KEY_VOLUMEDOWN detected: enter safe mode\n");
+    return true;
 }
 
-/****************
- * Entry points *
- ****************/
+/***********************
+ * Boot Stage Handlers *
+ ***********************/
 
-[[noreturn]] static void unblock_boot_process() {
-	close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
-	pthread_exit(nullptr);
-}
-
-[[noreturn]] static void core_only() {
-	pfs_done = true;
-	auto_start_magiskhide();
-	unblock_boot_process();
-}
+static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void post_fs_data(int client) {
-	// ack
-	write_int(client, 0);
-	close(client);
+    // ack
+    write_int(client, 0);
+    close(client);
 
-	if (getenv("REMOUNT_ROOT"))
-		xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+    mutex_guard lock(stage_lock);
 
-	if (!check_data())
-		unblock_boot_process();
+    if (getenv("REMOUNT_ROOT"))
+        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
-	dump_logs();
+    if (!check_data())
+        goto unblock_init;
 
-	LOGI("** post-fs-data mode running\n");
+    DAEMON_STATE = STATE_POST_FS_DATA;
+    setup_logfile(true);
 
-	// Unlock all blocks for rw
-	unlock_blocks();
+    LOGI("** post-fs-data mode running\n");
 
-	if (access(SECURE_DIR, F_OK) != 0) {
-		/* If the folder is not automatically created by the system,
-		 * do NOT proceed further. Manual creation of the folder
-		 * will cause bootloops on FBE devices. */
-		LOGE(SECURE_DIR " is not present, abort...");
-		no_secure_dir = true;
-		unblock_boot_process();
-	}
+    unlock_blocks();
+    mount_mirrors();
 
-	if (!magisk_env()) {
-		LOGE("* Magisk environment setup incomplete, abort\n");
-		unblock_boot_process();
-	}
+    if (access(SECURE_DIR, F_OK) != 0) {
+        if (SDK_INT < 24) {
+            // There is no FBE pre 7.0, we can directly create the folder without issues
+            xmkdir(SECURE_DIR, 0700);
+        } else {
+            // If the folder is not automatically created by Android,
+            // do NOT proceed further. Manual creation of the folder
+            // will cause bootloops on FBE devices.
+            LOGE(SECURE_DIR " is not present, abort\n");
+            goto early_abort;
+        }
+    }
 
-	LOGI("* Running post-fs-data.d scripts\n");
-	exec_common_script("post-fs-data");
+    if (!magisk_env()) {
+        LOGE("* Magisk environment incomplete, abort\n");
+        goto early_abort;
+    }
 
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) == 0)
-		core_only();
+    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
+        safe_mode = true;
+        // Disable all modules and magiskhide so next boot will be clean
+        disable_modules();
+        stop_magiskhide();
+    } else {
+        exec_common_scripts("post-fs-data");
+        auto_start_magiskhide(false);
+        handle_modules();
+    }
 
-	handle_modules();
+early_abort:
+    // We still do magic mount because root itself might need it
+    magic_mount();
+    DAEMON_STATE = STATE_POST_FS_DATA_DONE;
 
-	core_only();
+unblock_init:
+    close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
 }
 
 void late_start(int client) {
-	LOGI("** late_start service mode running\n");
-	// ack
-	write_int(client, 0);
-	close(client);
+    // ack
+    write_int(client, 0);
+    close(client);
 
-	dump_logs();
+    mutex_guard lock(stage_lock);
+    run_finally fin([]{ DAEMON_STATE = STATE_LATE_START_DONE; });
+    setup_logfile(false);
 
-	if (no_secure_dir) {
-		// It's safe to create the folder at this point if the system didn't create it
-		if (access(SECURE_DIR, F_OK) != 0)
-			xmkdir(SECURE_DIR, 0700);
-		// And reboot to make proper setup possible
-		reboot();
-	}
+    LOGI("** late_start service mode running\n");
 
-	if (!pfs_done)
-		return;
+    if (DAEMON_STATE < STATE_POST_FS_DATA_DONE || safe_mode)
+        return;
 
-	auto_start_magiskhide();
-
-	LOGI("* Running service.d scripts\n");
-	exec_common_script("service");
-
-	// Core only mode
-	if (access(DISABLEFILE, F_OK) != 0) {
-		LOGI("* Running module service scripts\n");
-		exec_module_script("service", module_list);
-	}
-
-	// All boot stage done, cleanup
-	module_list.clear();
-	module_list.shrink_to_fit();
+    exec_common_scripts("service");
+    exec_module_scripts("service");
 }
 
 void boot_complete(int client) {
-	LOGI("** boot_complete triggered\n");
-	// ack
-	write_int(client, 0);
-	close(client);
+    // ack
+    write_int(client, 0);
+    close(client);
 
-	if (!pfs_done)
-		return;
+    mutex_guard lock(stage_lock);
+    DAEMON_STATE = STATE_BOOT_COMPLETE;
+    setup_logfile(false);
 
-	auto_start_magiskhide();
+    LOGI("** boot_complete triggered\n");
 
-	if (access(MANAGERAPK, F_OK) == 0) {
-		// Install Magisk Manager if exists
-		rename(MANAGERAPK, "/data/magisk.apk");
-		install_apk("/data/magisk.apk");
-	} else {
-		// Check whether we have manager installed
-		if (!check_manager()) {
-			// Install stub
-			exec_command_sync("/sbin/magiskinit", "-x", "manager", "/data/magisk.apk");
-			install_apk("/data/magisk.apk");
-		}
-	}
+    if (safe_mode)
+        return;
+
+    // At this point it's safe to create the folder
+    if (access(SECURE_DIR, F_OK) != 0)
+        xmkdir(SECURE_DIR, 0700);
+
+    auto_start_magiskhide(true);
+
+    if (!check_manager()) {
+        if (access(MANAGERAPK, F_OK) == 0) {
+            // Only try to install APK when no manager is installed
+            // Magisk Manager should be upgraded by itself, not through recovery installs
+            rename(MANAGERAPK, "/data/magisk.apk");
+            install_apk("/data/magisk.apk");
+        } else {
+            // Install stub
+            auto init = MAGISKTMP + "/magiskinit";
+            exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
+            install_apk("/data/magisk.apk");
+        }
+    }
+    unlink(MANAGERAPK);
 }

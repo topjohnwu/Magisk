@@ -15,25 +15,19 @@
 
     <androidx.recyclerview.widget.RecyclerView
         adapter="@{viewModel.adapter}"
-        dividerHorizontal="@{@drawable/divider_l_50}"
-        dividerVertical="@{@drawable/divider_l_50}"
         itemBinding="@{viewModel.itemBinding}"
         items="@{viewModel.items}"
-        spanCount="@{Config.listSpanCount}"
         android:id="@+id/settings_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusableInTouchMode="false"
         android:clipToPadding="false"
         android:orientation="vertical"
-        android:paddingStart="@dimen/l1"
-        android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size}"
-        android:paddingEnd="@dimen/l_50"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
-        app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-        app:spanCount="1"
+        android:paddingTop="@dimen/internal_action_bar_size"
+        app:fitsSystemWindowsInsets="top|bottom"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:layout_marginTop="24dp"
-        tools:listitem="@layout/item_settings_toggle"
+        tools:listitem="@layout/item_settings"
         tools:paddingTop="@dimen/l1" />
 
 </layout>

@@ -33,6 +33,14 @@
             app:popEnterAnim="@anim/fragment_enter_pop"
             app:popExitAnim="@anim/fragment_exit_pop" />
 
+        <action
+            android:id="@+id/action_homeFragment_to_safetynetFragment"
+            app:destination="@id/safetynetFragment"
+            app:enterAnim="@anim/fragment_enter"
+            app:exitAnim="@anim/fragment_exit"
+            app:popEnterAnim="@anim/fragment_enter_pop"
+            app:popExitAnim="@anim/fragment_exit_pop" />
+
     </fragment>
 
     <fragment
@@ -40,10 +48,6 @@
         android:name="com.topjohnwu.magisk.ui.flash.FlashFragment"
         android:label="FlashFragment"
         tools:layout="@layout/fragment_flash_md2">
-
-        <argument
-            android:name="installer"
-            app:argType="android.net.Uri" />
 
         <argument
             android:name="action"
@@ -107,14 +111,6 @@
         android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
         android:label="SuperuserFragment"
         tools:layout="@layout/fragment_superuser_md2">
-
-        <action
-            android:id="@+id/action_superuserFragment_to_safetynetFragment"
-            app:destination="@id/safetynetFragment"
-            app:enterAnim="@anim/fragment_enter"
-            app:exitAnim="@anim/fragment_exit"
-            app:popEnterAnim="@anim/fragment_enter_pop"
-            app:popExitAnim="@anim/fragment_exit_pop" />
 
         <action
             android:id="@+id/action_superuserFragment_to_hideFragment"

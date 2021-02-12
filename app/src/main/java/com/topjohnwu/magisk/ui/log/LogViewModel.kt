@@ -1,27 +1,26 @@
 package com.topjohnwu.magisk.ui.log
 
+import androidx.databinding.Bindable
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.diffListOf
+import com.topjohnwu.magisk.arch.itemBindingOf
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.extensions.subscribeK
-import com.topjohnwu.magisk.model.binding.BindingAdapter
-import com.topjohnwu.magisk.model.entity.recycler.ConsoleItem
-import com.topjohnwu.magisk.model.entity.recycler.LogItem
-import com.topjohnwu.magisk.model.entity.recycler.TextItem
-import com.topjohnwu.magisk.model.events.SnackbarEvent
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.ui.base.diffListOf
-import com.topjohnwu.magisk.ui.base.itemBindingOf
-import com.topjohnwu.superuser.Shell
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import java.io.File
-import java.util.*
+import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.ktx.now
+import com.topjohnwu.magisk.ktx.timeFormatStandard
+import com.topjohnwu.magisk.ktx.toTime
+import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.view.TextItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LogViewModel(
     private val repo: LogRepository
@@ -32,81 +31,62 @@ class LogViewModel(
     val itemEmpty = TextItem(R.string.log_data_none)
     val itemMagiskEmpty = TextItem(R.string.log_data_magisk_none)
 
-    // --- main view
+    // --- su log
 
-    val items = diffListOf<LogItem>()
-    val itemBinding = itemBindingOf<LogItem> {
+    val items = diffListOf<LogRvItem>()
+    val itemBinding = itemBindingOf<LogRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
-    // --- console
+    // --- magisk log
+    @get:Bindable
+    var consoleText = " "
+        set(value) = set(value, field, { field = it }, BR.consoleText)
 
-    val consoleAdapter = BindingAdapter<ConsoleItem>()
-    val itemsConsole = diffListOf<ConsoleItem>()
-    val itemConsoleBinding = itemBindingOf<ConsoleItem>()
+    override fun refresh() = viewModelScope.launch {
+        consoleText = repo.fetchMagiskLogs()
+        val (suLogs, diff) = withContext(Dispatchers.Default) {
+            val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
+            suLogs to items.calculateDiff(suLogs)
+        }
+        items.firstOrNull()?.isTop = false
+        items.lastOrNull()?.isBottom = false
+        items.update(suLogs, diff)
+        items.firstOrNull()?.isTop = true
+        items.lastOrNull()?.isBottom = true
+    }
 
-    override fun refresh(): Disposable {
-        val logs = repo.fetchLogs()
-            .map { it.map { LogItem(it) } }
-            .observeOn(Schedulers.computation())
-            .map { it to items.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess {
-                items.firstOrNull()?.isTop = false
-                items.lastOrNull()?.isBottom = false
+    fun saveMagiskLog() = withExternalRW {
+        viewModelScope.launch(Dispatchers.IO) {
+            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
+            val logFile = MediaStoreUtils.getFile(filename, true)
+            logFile.uri.outputStream().bufferedWriter().use { file ->
+                file.write("---System Properties---\n\n")
 
-                items.update(it.first, it.second)
+                ProcessBuilder("getprop").start()
+                    .inputStream.reader().use { it.copyTo(file) }
 
-                items.firstOrNull()?.isTop = true
-                items.lastOrNull()?.isBottom = true
+                file.write("\n---Magisk Logs---\n")
+                file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")
+                file.write(consoleText)
+
+                file.write("\n---Manager Logs---\n")
+                file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")
+                ProcessBuilder("logcat", "-d").start()
+                    .inputStream.reader().use { it.copyTo(file) }
             }
-            .ignoreElement()
-
-        val console = repo.fetchMagiskLogs()
-            .map { ConsoleItem(it) }
-            .toList()
-            .observeOn(Schedulers.computation())
-            .map { it to itemsConsole.calculateDiff(it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { itemsConsole.update(it.first, it.second) }
-            .ignoreElement()
-
-        return Completable.merge(listOf(logs, console)).subscribeK()
-    }
-
-    fun saveMagiskLog() {
-        val now = Calendar.getInstance()
-        val filename = "magisk_log_%04d%02d%02d_%02d%02d%02d.log".format(
-            now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1,
-            now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY),
-            now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
-        )
-
-        val logFile = File(Config.downloadDirectory, filename)
-        runCatching {
-            logFile.createNewFile()
-        }.onFailure {
-            Timber.e(it)
-            return
-        }
-
-        Shell.su("cat ${Const.MAGISK_LOG} > $logFile").submit {
-            SnackbarEvent(logFile.path).publish()
+            SnackbarEvent(logFile.toString()).publish()
         }
     }
 
-    fun clearMagiskLog() = repo.clearMagiskLogs()
-        .subscribeK {
-            SnackbarEvent(R.string.logs_cleared).publish()
-            requestRefresh()
-        }
-        .add()
+    fun clearMagiskLog() = repo.clearMagiskLogs {
+        SnackbarEvent(R.string.logs_cleared).publish()
+        requestRefresh()
+    }
 
-    fun clearLog() = repo.clearLogs()
-        .subscribeK {
-            SnackbarEvent(R.string.logs_cleared).publish()
-            requestRefresh()
-        }
-        .add()
-
+    fun clearLog() = viewModelScope.launch {
+        repo.clearLogs()
+        SnackbarEvent(R.string.logs_cleared).publish()
+        requestRefresh()
+    }
 }

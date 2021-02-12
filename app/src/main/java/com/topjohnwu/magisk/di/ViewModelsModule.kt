@@ -17,18 +17,18 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModules = module {
-    viewModel { HideViewModel(get()) }
+    viewModel { HideViewModel() }
     viewModel { HomeViewModel(get()) }
     viewModel { LogViewModel(get()) }
-    viewModel { ModuleViewModel(get(), get(), get()) }
-    viewModel { SafetynetViewModel(get()) }
+    viewModel { ModuleViewModel(get(), get()) }
+    viewModel { SafetynetViewModel() }
     viewModel { SettingsViewModel(get()) }
-    viewModel { SuperuserViewModel(get(), get(), get()) }
+    viewModel { SuperuserViewModel(get(), get()) }
     viewModel { ThemeViewModel() }
-    viewModel { InstallViewModel() }
+    viewModel { InstallViewModel(get()) }
     viewModel { MainViewModel() }
 
     // Legacy
-    viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args, get()) }
+    viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args) }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }

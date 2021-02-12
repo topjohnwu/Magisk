@@ -1,8 +1,7 @@
 #!/system/bin/sh
-###########################################################################################
-#
+#######################################################################################
 # Magisk Boot Image Patcher
-# by topjohnwu
+#######################################################################################
 #
 # Usage: boot_patch.sh <bootimage>
 #
@@ -14,16 +13,17 @@
 # File name          Type      Description
 #
 # boot_patch.sh      script    A script to patch boot image for Magisk.
-#                  (this file) The script will use binaries and files in its same directory
-#                              to complete the patching process
-# util_functions.sh  script    A script which hosts all functions required for this script
-#                              to work properly
-# magiskinit         binary    The binary to replace /init; magisk binary embedded
+#                  (this file) The script will use files in its same
+#                              directory to complete the patching process
+# util_functions.sh  script    A script which hosts all functions required
+#                              for this script to work properly
+# magiskinit         binary    The binary to replace /init
+# magisk(32/64)      binary    The magisk binaries
 # magiskboot         binary    A tool to manipulate boot images
-# chromeos           folder    This folder includes all the utilities and keys to sign
-#                  (optional)  chromeos boot images. Currently only used for Pixel C
+# chromeos           folder    This folder includes the utility and keys to sign
+#                  (optional)  chromeos boot images. Only used for Pixel C.
 #
-###########################################################################################
+#######################################################################################
 
 ############
 # Functions
@@ -32,7 +32,14 @@
 # Pure bash dirname implementation
 getdir() {
   case "$1" in
-    */*) dir=${1%/*}; [ -z $dir ] && echo "/" || echo $dir ;;
+    */*)
+      dir=${1%/*}
+      if [ -z $dir ]; then
+        echo "/"
+      else
+        echo $dir
+      fi
+    ;;
     *) echo "." ;;
   esac
 }
@@ -43,13 +50,22 @@ getdir() {
 
 if [ -z $SOURCEDMODE ]; then
   # Switch to the location of the script file
-  cd "`getdir "${BASH_SOURCE:-$0}"`"
+  cd "$(getdir "${BASH_SOURCE:-$0}")"
   # Load utility functions
   . ./util_functions.sh
+  # Check if 64-bit
+  [ -d /system/lib64 ] && IS64BIT=true || IS64BIT=false
 fi
 
 BOOTIMAGE="$1"
 [ -e "$BOOTIMAGE" ] || abort "$BOOTIMAGE does not exist!"
+
+# Dump image for MTD/NAND character device boot partitions
+if [ -c "$BOOTIMAGE" ]; then
+  nanddump -f boot.img "$BOOTIMAGE"
+  BOOTNAND="$BOOTIMAGE"
+  BOOTIMAGE=boot.img
+fi
 
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
@@ -59,9 +75,6 @@ export KEEPVERITY
 export KEEPFORCEENCRYPT
 
 chmod -R 755 .
-
-# Extract magisk if doesn't exist
-[ -e magisk ] || ./magiskinit -x magisk magisk
 
 #########
 # Unpack
@@ -100,27 +113,23 @@ fi
 case $((STATUS & 3)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
-    SHA1=`./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null`
+    SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
     cat $BOOTIMAGE > stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=`./magiskboot cpio ramdisk.cpio sha1 2>/dev/null`
+    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
     ./magiskboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
+    rm -f stock_boot.img
     ;;
   2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore back to stock boot image"
     ;;
 esac
-
-if [ $((STATUS & 8)) -ne 0 ]; then
-  # Possibly using 2SI, export env var
-  export TWOSTAGEINIT=true
-fi
 
 ##################
 # Ramdisk Patches
@@ -133,25 +142,29 @@ echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
+# Compress to save precious ramdisk space
+./magiskboot compress=xz magisk32 magisk32.xz
+./magiskboot compress=xz magisk64 magisk64.xz
+$IS64BIT && SKIP64="" || SKIP64="#"
+
 ./magiskboot cpio ramdisk.cpio \
-"add 750 init magiskinit" \
+"add 0750 init magiskinit" \
+"mkdir 0750 overlay.d" \
+"mkdir 0750 overlay.d/sbin" \
+"add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
+"$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-if [ $((STATUS & 4)) -ne 0 ]; then
-  ui_print "- Compressing ramdisk"
-  ./magiskboot cpio ramdisk.cpio compress
-fi
-
-rm -f ramdisk.cpio.orig config
+rm -f ramdisk.cpio.orig config magisk*.xz
 
 #################
 # Binary Patches
 #################
 
-for dt in dtb kernel_dtb extra recovery_dtbo; do
+for dt in dtb kernel_dtb extra; do
   [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patch fstab in $dt"
 done
 
@@ -182,6 +195,9 @@ ui_print "- Repacking boot image"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
+
+# Restore the original boot partition path
+[ -e "$BOOTNAND" ] && BOOTIMAGE="$BOOTNAND"
 
 # Reset any error code
 true

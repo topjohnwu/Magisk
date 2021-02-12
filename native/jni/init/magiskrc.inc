@@ -1,14 +1,17 @@
 #include <magisk.hpp>
 #include <selinux.hpp>
 
-constexpr char magiskrc[] =
+#define quote(s) #s
+#define str(s) quote(s)
+
+constexpr char MAGISK_RC[] =
 "\n"
 
 "on post-fs-data\n"
 "    start logd\n"
 "    rm " UNBLOCKFILE "\n"
 "    start %2$s\n"
-"    wait " UNBLOCKFILE " 10\n"
+"    wait " UNBLOCKFILE " " str(POST_FS_DATA_WAIT_TIME) "\n"
 "    rm " UNBLOCKFILE "\n"
 "\n"
 

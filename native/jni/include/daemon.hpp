@@ -2,73 +2,57 @@
 
 #include <pthread.h>
 #include <string>
-#include <vector>
 
 #include <socket.hpp>
 
-// Commands require connecting to daemon
+// Daemon command codes
 enum {
-	DO_NOTHING = 0,
-	SUPERUSER,
-	CHECK_VERSION,
-	CHECK_VERSION_CODE,
-	POST_FS_DATA,
-	LATE_START,
-	BOOT_COMPLETE,
-	MAGISKHIDE,
-	SQLITE_CMD,
-	REMOVE_MODULES,
-	GET_PATH,
+    START_DAEMON,
+    SUPERUSER,
+    CHECK_VERSION,
+    CHECK_VERSION_CODE,
+    POST_FS_DATA,
+    LATE_START,
+    BOOT_COMPLETE,
+    MAGISKHIDE,
+    SQLITE_CMD,
+    REMOVE_MODULES,
+    GET_PATH,
+    DAEMON_CODE_END,
 };
 
 // Return codes for daemon
 enum {
-	DAEMON_ERROR = -1,
-	DAEMON_SUCCESS = 0,
-	ROOT_REQUIRED,
-	DAEMON_LAST
+    DAEMON_ERROR = -1,
+    DAEMON_SUCCESS = 0,
+    ROOT_REQUIRED,
+    DAEMON_LAST
 };
 
-// daemon.cpp
+// Daemon state
+enum {
+    STATE_NONE,
+    STATE_POST_FS_DATA,
+    STATE_POST_FS_DATA_DONE,
+    STATE_LATE_START_DONE,
+    STATE_BOOT_COMPLETE
+};
 
 int connect_daemon(bool create = false);
 
-/***************
- * Boot Stages *
- ***************/
-
-void unlock_blocks();
+// Daemon handlers
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
-void handle_modules();
-void remove_modules();
+void magiskhide_handler(int client, ucred *cred);
+void su_daemon_handler(int client, ucred *credential);
 
-/*************
- * Scripting *
- *************/
+// MagiskHide
+void auto_start_magiskhide(bool late_props);
+int stop_magiskhide();
 
-void exec_script(const char *script);
-void exec_common_script(const char *stage);
-void exec_module_script(const char *stage, const std::vector<std::string> &module_list);
-void install_apk(const char *apk);
-
-/**************
- * MagiskHide *
- **************/
-
-void magiskhide_handler(int client);
-
-/*************
- * Superuser *
- *************/
-
-void su_daemon_handler(int client, struct ucred *credential);
-
-/*********************
- * Daemon Global Vars
- *********************/
-
-extern int SDK_INT;
-extern bool RECOVERY_MODE;
-#define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
+#if ENABLE_INJECT
+// For injected process to access daemon
+int remote_check_hide(int uid, const char *process);
+void remote_request_hide();
+#endif

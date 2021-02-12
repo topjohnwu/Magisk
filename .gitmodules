@@ -25,6 +25,9 @@
 [submodule "pcre"]
 	path = native/jni/external/pcre
 	url = https://android.googlesource.com/platform/external/pcre
+[submodule "xhook"]
+	path = native/jni/external/xhook
+	url = https://github.com/iqiyi/xHook.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

@@ -18,30 +18,23 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:orientation="vertical"
-        android:paddingBottom="@{viewModel.insets.bottom + (int) @dimen/l1}"
+        android:paddingBottom="@dimen/l1"
+        app:fitsSystemWindowsInsets="bottom"
         tools:layout_gravity="bottom"
         tools:paddingBottom="64dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_filter_list"
-            dividerHorizontal="@{@drawable/divider_l1}"
-            dividerVertical="@{@drawable/divider_l1}"
             itemBinding="@{viewModel.itemSearchBinding}"
             items="@{viewModel.itemsSearch}"
-            spanCount="@{Config.listSpanCount}"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="@dimen/l1"
             android:clipToPadding="false"
             android:orientation="vertical"
-            android:paddingStart="@dimen/l1"
-            android:paddingTop="@{viewModel.insets.top + (int) @dimen/internal_action_bar_size + (int) @dimen/l1}"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollHorizontalTrackDrawable="@drawable/fast_scroll_track"
-            app:fastScrollVerticalThumbDrawable="@drawable/fast_scroll_thumb"
-            app:fastScrollVerticalTrackDrawable="@drawable/fast_scroll_track"
-            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toTopOf="@+id/module_filter_title_search"
             app:layout_constraintTop_toTopOf="parent"
@@ -49,13 +42,14 @@
             app:spanCount="2"
             tools:listitem="@layout/item_repo_md2" />
 
-        <View
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="@dimen/l_50"
-            android:background="@drawable/bg_shadow"
+            app:srcCompat="@drawable/bg_shadow"
+            app:tint="?colorSurfaceVariant"
             app:layout_constraintBottom_toBottomOf="@+id/module_filter_list" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <TextView
             android:id="@+id/module_filter_title_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,7 +76,7 @@
             app:layout_constraintEnd_toStartOf="@+id/module_filter_done"
             app:layout_constraintStart_toStartOf="parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <ImageView
                 style="@style/WidgetFoundation.Icon"
                 android:layout_width="48dp"
                 android:layout_height="36dp"
@@ -91,7 +85,8 @@
                 app:srcCompat="@drawable/ic_search_md2"
                 app:tint="?colorDisabled" />
 
-            <androidx.appcompat.widget.AppCompatEditText
+            <EditText
+                android:id="@+id/module_filter_search_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="48dp"
@@ -99,6 +94,7 @@
                 android:hint="@string/hide_filter_hint"
                 android:inputType="textUri"
                 android:minHeight="36dp"
+                android:nextFocusRight="@id/module_filter_done"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
@@ -114,6 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l1"
+            android:nextFocusLeft="@id/module_filter_search_field"
             app:backgroundTint="?colorPrimary"
             app:elevation="0dp"
             app:fabSize="mini"

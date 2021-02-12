@@ -15,14 +15,12 @@
     <!--Install Fragment-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hoá</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-    <string name="uninstall">Gỡ bỏ</string>
     <string name="uninstall_magisk_title">Gỡ bỏ Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả mô-đun sẽ bị vô hiệu/loại bỏ. Root sẽ bị loại bỏ và dữ liệu của bạn có thể bị mã hoá.</string>
     <string name="update">Cập nhật</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Không có thông tin được cung cấp)</string>
-    <string name="no_modules_found">Không tìm thấy mô-đun</string>
     <string name="reboot_recovery">Khởi động vào Recovery</string>
     <string name="reboot_bootloader">Khởi động vào Bootloader</string>
     <string name="reboot_download">Khởi động vào Download</string>
@@ -46,19 +44,12 @@
     <string name="download">Tải xuống</string>
     <string name="reboot">Khởi động lại</string>
     <string name="magisk_update_title">Có cập nhật Magisk mới!</string>
-    <string name="settings_reboot_toast">Khởi động lại để áp dụng thiết lập</string>
     <string name="release_notes">Thay đổi</string>
     <string name="repo_cache_cleared">Đã xoá bộ đệm kho</string>
-    <string name="manager_update_title">Đã có bản cập nhật Magisk Manager mới!</string>
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt.</string>
-    <string name="dtbo_patched_title">DTBO đã được vá!</string>
-    <string name="dtbo_patched_reboot">Magisk Manager đã vá dtbo.img. Hãy khởi động lại.</string>
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="flashing">Đang flash</string>
-    <string name="hide_manager_title">Ẩn Magisk Manager…</string>
-    <string name="hide_manager_fail_toast">Ẩn Magisk Manager thất bại.</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết.</string>
-    <string name="download_zip_only">Chỉ tải xuống tập tin zip</string>
     <string name="direct_install">Cài đặt trực tiếp (Được đề xuất)</string>
     <string name="install_inactive_slot">Cài đặt vào vùng không hoạt động (Sau khi OTA)</string>
     <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bắt buộc phải khởi động tới vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tuỳ chọn này sau khi cập nhật OTA hoàn tất.\nMuốn tiếp tục?</string>
@@ -68,10 +59,8 @@
     <string name="restore_done">Đã hoàn tất khôi phục!</string>
     <string name="restore_fail">Sao lưu gốc không tồn tại!</string>
     <string name="proprietary_title">Tải xuống mã độc quyền</string>
-    <string name="proprietary_notice">Magisk Manager là FOSS và không chứa mã SafetyNet API độc quyền của Google.\n\nBạn có cho phép Magisk Manager tải xuống tiện ích (có chứa GoogleApiClient) để kiểm tra SafetyNet không?</string>
     <string name="setup_fail">Thiết lập thất bại.</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
-    <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Nó sẽ tải xuống tập tin zip để thiết lập Magisk, bạn có muốn tiếp tục không?</string>
     <string name="setup_title">Thiết lập bổ sung</string>
     <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
     <string name="download_file_error">Lỗi tải tập tin</string>
@@ -79,10 +68,6 @@
     <!--Settings Activity -->
     <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
     <string name="settings_clear_cache_summary">Xoá thông tin được lưu trong bộ nhớ cache của các bản thử nghiệm trực tuyến. Điều này buộc ứng dụng phải làm mới trực tuyến.</string>
-    <string name="settings_hide_manager_title">Ẩn Magisk Manager</string>
-    <string name="settings_hide_manager_summary">Đóng gói lại Magisk Manager với tên gói ngẫu nhiên.</string>
-    <string name="settings_restore_manager_title">Khôi phục Magisk Manager</string>
-    <string name="settings_restore_manager_summary">Khôi phục Magisk Manager với gói ban đầu</string>
     <string name="language">Ngôn ngữ</string>
     <string name="system_default">(Mặc định hệ thống)</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>
@@ -92,7 +77,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_core_only_summary">Chỉ bật các tính năng chính. MagiskSU và MagiskHide sẽ vẫn được kích hoạt, nhưng sẽ không có mô-đun nào được tải.</string>
     <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
@@ -142,7 +126,6 @@
     <string name="sixtymin">60 phút</string>
     <string name="su_allow_toast">%1$s đã được cấp quyền Superuser</string>
     <string name="su_deny_toast">Đã từ chối cấp quyền Superuser cho %1$s</string>
-    <string name="no_apps_found">Không tìm thấy ứng dụng</string>
     <string name="su_snack_grant">Quyền Superuser của %1$s đã được cấp</string>
     <string name="su_snack_deny">Quyền Superuser của %1$s đã bị từ chối</string>
     <string name="su_snack_notif_on">Thông báo của %1$s đã được kích hoạt</string>

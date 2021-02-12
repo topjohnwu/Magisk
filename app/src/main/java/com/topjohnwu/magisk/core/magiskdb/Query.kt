@@ -1,6 +1,12 @@
 package com.topjohnwu.magisk.core.magiskdb
 
 import androidx.annotation.StringDef
+import com.topjohnwu.magisk.ktx.await
+import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 
 class Query(private val _query: String) {
     val query get() = "magisk --sqlite '$_query'"
@@ -9,6 +15,24 @@ class Query(private val _query: String) {
         val requestType: String
         var table: String
     }
+
+    suspend inline fun <R : Any> query(crossinline mapper: (Map<String, String>) -> R?): List<R> =
+        withContext(Dispatchers.Default) {
+            Shell.su(query).await().out.map { line ->
+                async {
+                    line.split("\\|".toRegex())
+                        .map { it.split("=", limit = 2) }
+                        .filter { it.size == 2 }
+                        .map { it[0] to it[1] }
+                        .toMap()
+                        .let(mapper)
+                }
+            }.awaitAll().filterNotNull()
+        }
+
+    suspend inline fun query() = query { it }
+
+    suspend inline fun commit() = Shell.su(query).to(null).await()
 }
 
 class Delete : Query.Builder {

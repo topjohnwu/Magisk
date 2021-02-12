@@ -10,9 +10,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
-import com.topjohnwu.magisk.extensions.hideKeyboard
-import com.topjohnwu.magisk.ui.base.BaseUIFragment
+import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
+import com.topjohnwu.magisk.ktx.addVerticalPadding
+import com.topjohnwu.magisk.ktx.fixEdgeEffect
+import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -48,6 +51,21 @@ class HideFragment : BaseUIFragment<HideViewModel, FragmentHideMd2Binding>() {
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
             }
         })
+
+        val resource = requireContext().resources
+        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
+        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
+        binding.hideContent.addVerticalPadding(
+            l_50,
+            l1 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
+        )
+        binding.hideContent.addSimpleItemDecoration(
+            left = l1,
+            top = l_50,
+            right = l1,
+            bottom = l_50,
+        )
+        binding.hideContent.fixEdgeEffect()
 
         val lama = binding.hideContent.layoutManager ?: return
         lama.isAutoMeasureEnabled = false

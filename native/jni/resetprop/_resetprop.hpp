@@ -1,57 +1,37 @@
 #pragma once
 
 #include <string>
-#include <logging.hpp>
+#include <map>
 
 #include <system_properties.h>
 
-struct prop_t {
-	char *name;
-	char value[PROP_VALUE_MAX];
-	prop_t() : name(nullptr) {}
-	explicit prop_t(const char *name) {
-		this->name = strdup(name);
-		value[0] = '\0';
-	}
-	prop_t(const char *name, const char *value) {
-		this->name = strdup(name);
-		strcpy(this->value, value);
-	}
-	prop_t(prop_t &&prop): name(nullptr) {
-		operator=(std::move(prop));
-	}
-	bool operator<(const prop_t &prop) const {
-		return strcmp(name, prop.name) < 0;
-	}
-	prop_t& operator=(prop_t &&prop) {
-		if (this != &prop) {
-			free(name);
-			name = prop.name;
-			strcpy(value, prop.value);
-			prop.name = nullptr;
-		}
-		return *this;
-	};
-	~prop_t() {
-		free(name);
-	}
-};
-
-struct read_cb_t {
-	void (*cb)(const char *, const char *, void *);
-	void *arg;
-	explicit read_cb_t(void (*cb)(const char *, const char *, void *) = nullptr, void *arg = nullptr)
-			: cb(cb), arg(arg) {}
-	void exec(const char *name, const char *value) {
-		cb(name, value, arg);
-	}
-};
-
 #define PERSISTENT_PROPERTY_DIR  "/data/property"
+
+struct prop_cb {
+    virtual void exec(const char *name, const char *value) {
+        exec(std::string(name), value);
+    }
+    virtual void exec(std::string &&name, const char *value) {
+        exec(name.data(), value);
+    }
+};
 
 extern bool use_pb;
 
+using prop_list = std::map<std::string, std::string>;
+
+struct prop_collector : prop_cb {
+    explicit prop_collector(prop_list &list) : list(list) {}
+    void exec(const char *name, const char *value) override {
+        list.insert_or_assign(name, value);
+    }
+    void exec(std::string &&name, const char *value) override {
+        list.insert_or_assign(std::move(name), value);
+    }
+private:
+    prop_list &list;
+};
+
 std::string persist_getprop(const char *name);
-void persist_getprop(read_cb_t *read_cb);
+void persist_getprops(prop_cb *prop_cb);
 bool persist_deleteprop(const char *name);
-void collect_props(const char *name, const char *value, void *v_plist);

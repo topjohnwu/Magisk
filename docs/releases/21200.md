@@ -1,0 +1,14 @@
+## 2020.12.28 Magisk v21.2
+
+v21.2 is a maintenance update, mostly addressing bugs, and expanding device compatibility. Checkout the full [v21.0 release notes](https://topjohnwu.github.io/Magisk/releases/21000.html) if coming from older releases.
+
+### v21.2
+
+- [MagiskInit] Detect 2SI after mounting `system_root` on legacy SAR devices
+- [General] Make sure `post-fs-data` scripts cannot block more than 35 seconds
+- [General] Fix the `magisk --install-module` command
+- [General] Trim Windows newline when reading files
+- [General] Directly log to file to prevent `logcat` weirdness
+- [MagiskBoot] Fix header dump/load for header v3 images
+
+### Full Changelog: [here](https://topjohnwu.github.io/Magisk/changes.html)

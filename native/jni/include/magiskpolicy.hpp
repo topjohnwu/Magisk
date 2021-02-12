@@ -3,38 +3,58 @@
 #include <stdlib.h>
 #include <selinux.hpp>
 
-#define ALL NULL
+#define ALL nullptr
 
-// policydb functions
-int load_policydb(const char *file);
-int load_split_cil();
-int compile_split_cil();
-int dump_policydb(const char *file);
-void destroy_policydb();
+struct policydb;
 
-// Handy functions
-int sepol_allow(const char *s, const char *t, const char *c, const char *p);
-int sepol_deny(const char *s, const char *t, const char *c, const char *p);
-int sepol_auditallow(const char *s, const char *t, const char *c, const char *p);
-int sepol_dontaudit(const char *s, const char *t, const char *c, const char *p);
-int sepol_typetrans(const char *s, const char *t, const char *c, const char *d);
-int sepol_typechange(const char *s, const char *t, const char *c, const char *d);
-int sepol_typemember(const char *s, const char *t, const char *c, const char *d);
-int sepol_nametrans(const char *s, const char *t, const char *c, const char *d, const char *o);
-int sepol_allowxperm(const char *s, const char *t, const char *c, const char *range);
-int sepol_auditallowxperm(const char *s, const char *t, const char *c, const char *range);
-int sepol_dontauditxperm(const char *s, const char *t, const char *c, const char *range);
-int sepol_create(const char *s);
-int sepol_permissive(const char *s);
-int sepol_enforce(const char *s);
-int sepol_attradd(const char *s, const char *a);
-int sepol_genfscon(const char *name, const char *path, const char *context);
-int sepol_exists(const char *source);
+class sepolicy {
+public:
+    typedef const char * c_str;
+    ~sepolicy();
 
-// Built in rules
-void sepol_magisk_rules();
+    // Public static factory functions
+    static sepolicy *from_file(c_str file);
+    static sepolicy *from_split();
+    static sepolicy *compile_split();
 
-// Statement parsing
-void parse_statement(const char *statement);
-void load_rule_file(const char *file);
-void statement_help();
+    // External APIs
+    bool to_file(c_str file);
+    void parse_statement(c_str stmt);
+    void load_rule_file(c_str file);
+
+    // Operation on types
+    bool type(c_str name, c_str attr);
+    bool attribute(c_str name);
+    bool permissive(c_str type);
+    bool enforce(c_str type);
+    bool typeattribute(c_str type, c_str attr);
+    bool exists(c_str type);
+
+    // Access vector rules
+    bool allow(c_str src, c_str tgt, c_str cls, c_str perm);
+    bool deny(c_str src, c_str tgt, c_str cls, c_str perm);
+    bool auditallow(c_str src, c_str tgt, c_str cls, c_str perm);
+    bool dontaudit(c_str src, c_str tgt, c_str cls, c_str perm);
+
+    // Extended permissions access vector rules
+    bool allowxperm(c_str src, c_str tgt, c_str cls, c_str range);
+    bool auditallowxperm(c_str src, c_str tgt, c_str cls, c_str range);
+    bool dontauditxperm(c_str src, c_str tgt, c_str cls, c_str range);
+
+    // Type rules
+    bool type_transition(c_str src, c_str tgt, c_str cls, c_str def, c_str obj = nullptr);
+    bool type_change(c_str src, c_str tgt, c_str cls, c_str def);
+    bool type_member(c_str src, c_str tgt, c_str cls, c_str def);
+
+    // File system labeling
+    bool genfscon(c_str fs_name, c_str path, c_str ctx);
+
+    // Magisk
+    void magisk_rules();
+
+    // Deprecate
+    bool create(c_str name) { return type(name, "domain"); }
+
+protected:
+    policydb *db;
+};

@@ -6,17 +6,17 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.model.entity.recycler.SpinnerRvItem" />
+            type="com.topjohnwu.magisk.ui.superuser.SpinnerRvItem" />
 
     </data>
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <TextView
         android:id="@android:id/text1"
         style="?android:attr/spinnerItemStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="marquee"
-        android:background="?colorSurfaceVariant"
+        android:background="?colorSurfaceSurfaceVariant"
         android:textAppearance="@style/AppearanceFoundation.Caption"
         android:gravity="center_vertical"
         android:minHeight="?attr/listPreferredItemHeightSmall"

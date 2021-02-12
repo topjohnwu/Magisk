@@ -1,75 +1,99 @@
 package com.topjohnwu.magisk.ui.install
 
+import android.app.Activity
+import android.content.Context
 import android.net.Uri
-import android.widget.Toast
+import androidx.databinding.Bindable
+import androidx.lifecycle.viewModelScope
+import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.DownloadService
-import com.topjohnwu.magisk.core.download.RemoteFileService
-import com.topjohnwu.magisk.core.utils.Utils
-import com.topjohnwu.magisk.extensions.addOnPropertyChangedCallback
-import com.topjohnwu.magisk.model.entity.internal.Configuration
-import com.topjohnwu.magisk.model.entity.internal.DownloadSubject
-import com.topjohnwu.magisk.model.events.RequestFileEvent
-import com.topjohnwu.magisk.model.events.dialog.SecondSlotWarningDialog
-import com.topjohnwu.magisk.ui.base.BaseViewModel
-import com.topjohnwu.magisk.utils.KObservableField
+import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.events.MagiskInstallFileEvent
+import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
+import com.topjohnwu.magisk.ui.flash.FlashFragment
+import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.launch
 import org.koin.core.get
-import kotlin.math.roundToInt
+import timber.log.Timber
+import java.io.File
+import java.io.IOException
 
-class InstallViewModel : BaseViewModel(State.LOADED) {
+class InstallViewModel(
+    svc: NetworkService
+) : BaseViewModel() {
 
-    val isRooted get() = Shell.rootAccess()
-    val isAB get() = Info.isAB
+    val isRooted = Shell.rootAccess()
+    val skipOptions = Info.isEmulator || (Info.ramdisk && !Info.isFDE && Info.isSAR)
+    val noSecondSlot = !isRooted || Info.isPixel || Info.isVirtualAB || !Info.isAB || Info.isEmulator
 
-    val step = KObservableField(0)
-    val method = KObservableField(-1)
+    @get:Bindable
+    var step = if (skipOptions) 1 else 0
+        set(value) = set(value, field, { field = it }, BR.step)
 
-    val progress = KObservableField(0)
+    var _method = -1
 
-    var data = KObservableField<Uri?>(null)
-
-    init {
-        RemoteFileService.reset()
-        RemoteFileService.progressBroadcast.observeForever {
-            val (progress, subject) = it ?: return@observeForever
-            if (subject !is DownloadSubject.Magisk) {
-                return@observeForever
-            }
-            this.progress.value = progress.times(100).roundToInt()
-            if (this.progress.value >= 100) {
-                state = State.LOADED
-            }
-        }
-        method.addOnPropertyChangedCallback {
-            when (method.value) {
+    @get:Bindable
+    var method
+        get() = _method
+        set(value) = set(value, _method, { _method = it }, BR.method) {
+            when (it) {
                 R.id.method_patch -> {
-                    Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
-                    RequestFileEvent().publish()
+                    MagiskInstallFileEvent { code, intent ->
+                        if (code == Activity.RESULT_OK)
+                            data = intent?.data
+                    }.publish()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().publish()
                 }
             }
         }
+
+    @get:Bindable
+    var data: Uri? = null
+        set(value) = set(value, field, { field = it }, BR.data)
+
+    @get:Bindable
+    var notes = ""
+        set(value) = set(value, field, { field = it }, BR.notes)
+
+    init {
+        viewModelScope.launch {
+            try {
+                val context = get<Context>()
+                File(context.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
+                    notes = when {
+                        exists() -> readText()
+                        Const.Url.CHANGELOG_URL.isEmpty() -> ""
+                        else -> {
+                            val text = svc.fetchString(Const.Url.CHANGELOG_URL)
+                            writeText(text)
+                            text
+                        }
+                    }
+                }
+            } catch (e: IOException) {
+                Timber.e(e)
+            }
+        }
     }
 
     fun step(nextStep: Int) {
-        step.value = nextStep
+        step = nextStep
     }
 
-    fun install() = DownloadService(get()) {
-        subject = DownloadSubject.Magisk(resolveConfiguration())
-    }.also { state = State.LOADING }
-
-    // ---
-
-    private fun resolveConfiguration() = when (method.value) {
-        R.id.method_download -> Configuration.Download
-        R.id.method_patch -> Configuration.Patch(data.value!!)
-        R.id.method_direct -> Configuration.Flash.Primary
-        R.id.method_inactive_slot -> Configuration.Flash.Secondary
-        else -> throw IllegalArgumentException("Unknown value")
+    fun install() {
+        when (method) {
+            R.id.method_patch -> FlashFragment.patch(data!!)
+            R.id.method_direct -> FlashFragment.flash(false)
+            R.id.method_inactive_slot -> FlashFragment.flash(true)
+            else -> error("Unknown value")
+        }
+        state = State.LOADING
     }
 }
