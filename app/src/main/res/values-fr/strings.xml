@@ -132,10 +132,10 @@
     <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
     <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
     <string name="settings_clear_cache_summary">Effacer les informations en cache concerant les dépôts en ligne. Ceci force l’application à télécharger des informations à jour.</string>
-    <string name="settings_hide_app_title">Masquer l'application Magisk</string>
+    <string name="settings_hide_app_title">Masquer l’application Magisk</string>
     <string name="settings_hide_app_summary">Installer une application intermédiaire avec un ID de package aléatoire et un nom personnalisé</string>
-    <string name="settings_restore_app_title">Restorer l'application Magisk</string>
-    <string name="settings_restore_app_summary">Démasquer l'application et la restaurer à son APK d'origine</string>
+    <string name="settings_restore_app_title">Restorer l’application Magisk</string>
+    <string name="settings_restore_app_summary">Démasquer l’application et la restaurer à son APK d’origine</string>
     <string name="language">Langue</string>
     <string name="system_default">(langue par défaut du système)</string>
     <string name="settings_check_update_title">Vérifier les mises à jour</string>
@@ -213,7 +213,7 @@
     <string name="flashing">Écriture dans la mémoire Flash…</string>
     <string name="done">Terminé !</string>
     <string name="failure">Erreur</string>
-    <string name="hide_app_title">Masquage de l'application Magisk…</string>
+    <string name="hide_app_title">Masquage de l’application Magisk…</string>
     <string name="open_link_failed_toast">Aucune application permettant d’ouvrir le lien n’a été trouvée</string>
     <string name="complete_uninstall">Désinstallation complète</string>
     <string name="restore_img">Restauration des images</string>
@@ -221,7 +221,7 @@
     <string name="restore_done">Restauration effectuée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">L'application Magisk est un logiciel libre et ne contient pas de code propriétaire de l’API SafetyNet de Google. Souhaitez-vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
+    <string name="proprietary_notice">L’application Magisk est un logiciel libre et ne contient pas de code propriétaire de l’API SafetyNet de Google. Souhaitez-vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation supplémentaire requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez-vous effectuer cette installation maintenant et redémarrer ?</string>
