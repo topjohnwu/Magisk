@@ -32,7 +32,7 @@ object Info {
     @JvmStatic val env by lazy { loadState() }
     @JvmField var isSAR = false
     @JvmField var isAB = false
-    @JvmField var isVirtualAB = getProperty("ro.virtual_ab.enabled", "false") == "true"
+    @JvmField val isVirtualAB = getProperty("ro.virtual_ab.enabled", "false") == "true"
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
