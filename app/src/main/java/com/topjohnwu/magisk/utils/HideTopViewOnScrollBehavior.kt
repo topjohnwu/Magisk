@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.utils
 
 import android.animation.TimeInterpolator
+import android.content.Context
+import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
@@ -8,9 +10,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import com.google.android.material.animation.AnimationUtils
 
-class HideTopViewOnScrollBehavior<V : View> :
-    CoordinatorLayout.Behavior<V>(),
-    HideableBehavior<V> {
+class HideTopViewOnScrollBehavior<V : View>(context: Context, attrs: AttributeSet) :
+    CoordinatorLayout.Behavior<V>(), HideableBehavior<V> {
 
     companion object {
         private const val STATE_SCROLLED_DOWN = 1

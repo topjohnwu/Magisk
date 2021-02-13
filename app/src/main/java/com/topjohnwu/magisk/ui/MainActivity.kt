@@ -10,9 +10,7 @@ import android.view.WindowManager
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
-import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavDirections
-import com.google.android.material.card.MaterialCardView
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIActivity
@@ -22,8 +20,6 @@ import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
-import com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior
-import com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior
 import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -77,12 +73,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         setSupportActionBar(binding.mainToolbar)
 
-        binding.mainToolbarWrapper.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            behavior = HideTopViewOnScrollBehavior<MaterialCardView>()
-        }
-        binding.mainBottomBar.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            behavior = HideBottomViewOnScrollBehavior<MaterialCardView>()
-        }
         binding.mainNavigation.setOnNavigationItemSelectedListener {
             getScreen(it.itemId)?.navigate()
             true

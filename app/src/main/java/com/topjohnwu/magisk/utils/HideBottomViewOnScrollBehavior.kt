@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.utils
 
+import android.content.Context
+import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -13,8 +15,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import kotlin.math.roundToInt
 
-class HideBottomViewOnScrollBehavior<V : View> : HideBottomViewOnScrollBehavior<V>(),
-    HideableBehavior<V> {
+class HideBottomViewOnScrollBehavior<V : View>(context: Context, attrs: AttributeSet) :
+    HideBottomViewOnScrollBehavior<V>(), HideableBehavior<V> {
 
     private var lockState: Boolean = false
     private var isLaidOut = false
