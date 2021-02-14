@@ -26,9 +26,10 @@ void FirstStageInit::prepare() {
         xmkdirs(FSR "/system/bin", 0755);
         rename("/init" /* magiskinit */, FSR "/system/bin/init");
         symlink("/system/bin/init", FSR "/init");
+        rename("/.backup/init", "/init");
+
         rename("/.backup", FSR "/.backup");
         rename("/overlay.d", FSR "/overlay.d");
-        xsymlink("/system/bin/init", "/init");
 
         chdir(FSR);
     } else {
