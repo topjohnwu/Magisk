@@ -182,7 +182,7 @@ abstract class MagiskInstallImpl protected constructor(
             }
 
             while (tarIn.nextEntry?.let { entry = it } != null) {
-                if (entry.name.contains("boot.img") ||
+                if (entry.name.startsWith("boot.img") ||
                     (Config.recovery && entry.name.contains("recovery.img"))) {
                     val name = entry.name.replace(".lz4", "")
                     console.add("-- Extracting: $name")
