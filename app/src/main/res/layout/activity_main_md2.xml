@@ -35,7 +35,7 @@
             style="@style/WidgetFoundation.Appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior=".utils.HideTopViewOnScrollBehavior"
+            app:layout_behavior="com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior"
             app:fitsSystemWindowsInsets="top">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -77,7 +77,7 @@
             android:layout_marginBottom="@dimen/l1"
             android:fitsSystemWindows="false"
             app:layout_fitsSystemWindowsInsets="bottom"
-            app:layout_behavior=".utils.HideBottomViewOnScrollBehavior"
+            app:layout_behavior="com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior"
             tools:layout_marginBottom="64dp">
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
