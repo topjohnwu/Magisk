@@ -5,7 +5,7 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
-    <string name="refresh">Odśwież lokalne dane</string>
+    <string name="refresh">Odśwież dane lokalne</string>
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
@@ -19,7 +19,9 @@
     <string name="not_available">N/D</string>
     <string name="hide">Ukryj</string>
     <string name="home_package">Pakiet</string>
+    <string name="home_app_title">Aplikacja</string>
 
+    <string name="home_notice_content">Pobieraj Magisk tylko z oficjalnej strony GitHub. Pliki z nieznanych źródeł mogą być szkodliwe!</string>
     <string name="home_support_title">Wesprzyj nas</string>
     <string name="home_item_source">Źródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Niemniej możesz nam pokazać, że Ci zależy, wysyłając drobną darowiznę.</string>
@@ -41,7 +43,7 @@
     <string name="manager_download_install">Naciśnij, aby pobrać i zainstalować</string>
     <string name="direct_install">Bezpośrednia instalacja (zalecana)</string>
     <string name="install_inactive_slot">Zainstaluj w nieaktywnym gnieździe (po OTA)</string>
-    <string name="install_inactive_slot_msg">Po restarcie twoje urządzenie zostanie ZMUSZONE do uruchomienia z aktualnie nieaktywnego gniazda!\nUżyj tej opcji wyłącznie po ukończeniu aktualizacji OTA.\nKontynuować?</string>
+    <string name="install_inactive_slot_msg">Po restarcie twoje urządzenie zostanie ZMUSZONE do rozruchu z aktualnie nieaktywnego gniazda!\nUżyj tej opcji wyłącznie po ukończeniu aktualizacji OTA.\nKontynuować?</string>
     <string name="setup_title">Dodatkowa konfiguracja</string>
     <string name="select_patch_file">Wybierz i załataj plik</string>
     <string name="patch_file_msg">Wybierz obraz raw (*.img) lub plik tar ODIN (*.tar)</string>
@@ -50,9 +52,10 @@
 
     <!--Superuser-->
     <string name="su_request_title">Żądanie dostępu do Superusera</string>
+    <string name="touch_filtered_warning">Ponieważ zapytanie o Superuser aplikacji jest przysłonięte, Magisk nie może zweryfikować twojej odpowiedzi.</string>
     <string name="deny">Odmów</string>
     <string name="prompt">Zapytaj</string>
-    <string name="grant">Przyznaj</string>
+    <string name="grant">Zezwól</string>
     <string name="su_warning">Udziela pełnego dostępu do urządzenia.\nOdmów jeśli nie jesteś pewien!</string>
     <string name="forever">Zawsze</string>
     <string name="once">Raz</string>
@@ -109,7 +112,7 @@
     <string name="reboot_bootloader">Reboot do trybu Bootloader</string>
     <string name="reboot_download">Reboot do trybu Download</string>
     <string name="reboot_edl">Reboot do trybu EDL</string>
-    <string name="module_version_author">%1$s by %2$s</string>
+    <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_section_pending">Aktualizacje</string>
     <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
     <string name="module_state_remove">Usuń</string>
@@ -117,7 +120,7 @@
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="update_available">Dostępna aktualizacja</string>
     <string name="module_installed">Zainstalowane</string>
-    <string name="module_section_online">Online</string>
+    <string name="module_section_online">Aktywne</string>
     <string name="sorting_order">Kolejność sortowania</string>
 
     <!--Settings -->
@@ -130,6 +133,10 @@
     <string name="settings_download_path_message">Pliki zostaną zapisane do %1$s</string>
     <string name="settings_clear_cache_title">Wyczyść pamięć podr. repozytoriów</string>
     <string name="settings_clear_cache_summary">Wyczyść informacje z pamięci podr. dotyczące repozytoriów. Zmusza to aplikację do odświeżenia informacji online</string>
+    <string name="settings_hide_app_title">Ukryj aplikację Magisk</string>
+    <string name="settings_hide_app_summary">Zainstaluj aplikację z losowym ID pakietu i własną etykietą.</string>
+    <string name="settings_restore_app_title">Przywróć aplikację Magisk</string>
+    <string name="settings_restore_app_summary">Przestań ukrywać aplikację i przywróć oryginalny plik APK</string>
     <string name="language">Język</string>
     <string name="system_default">(Domyślny systemowy)</string>
     <string name="settings_check_update_title">Sprawdzanie aktualizacji</string>
@@ -162,6 +169,8 @@
     <string name="superuser_notification">Powiadomienia Superusera</string>
     <string name="settings_su_reauth_title">Ponowienie uwierzytelniania po aktualizacji</string>
     <string name="settings_su_reauth_summary">Ponowienie dostępu do uprawnień Superusera po uaktualnieniu aplikacji</string>
+    <string name="settings_su_tapjack_title">Włącz ochronę przed Tapjacking (niezamierzone kliknięcie)</string>
+    <string name="settings_su_tapjack_summary">Pytanie o Superuser nie będzie reagować na odpowiedź jeżeli będzie zasłonięte lub przyćmione.</string>
     <string name="settings_su_biometric_title">Uwierzytelnianie biometryczne</string>
     <string name="settings_su_biometric_summary">Używaj uwierzytelniania biometrycznego (np. odcisku palca) aby przyznać uprawnienia Superusera</string>
     <string name="no_biometric">Urządzenie jest nieobsługiwane lub ustawienia biometryczne nie są włączone</string>
@@ -205,6 +214,7 @@
     <string name="flashing">Flashowanie…</string>
     <string name="done">Gotowe!</string>
     <string name="failure">Błąd</string>
+    <string name="hide_app_title">Ukrywam aplikację Magisk…</string>
     <string name="open_link_failed_toast">Nie znaleziono aplikacji do otwarcia linku</string>
     <string name="complete_uninstall">Odinstaluj całkowicie</string>
     <string name="restore_img">Przywróć obrazy</string>
@@ -212,13 +222,17 @@
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Kopia zapasowa nie istnieje!</string>
     <string name="proprietary_title">Pobierz kod własnościowy</string>
+    <string name="proprietary_notice">Magisk jest programem FOSS i nie zawiera kodu własnościowego Google SafetyNet API.\n\nCzy chcesz pobrać własnościowe rozszerzenie dla sprawdzenia SafetyNet?</string>
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga dodatkowej konfiguracji</string>
+    <string name="env_fix_msg">Twoje urządzenie wymaga dodatkowej konfiguracji aby Magisk działał właściwie. Czy chcesz kontynuować i uruchomić ponownie?</string>
     <string name="setup_msg">Uruchamianie środowiska konfiguracji…</string>
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magisk</string>
+    <string name="unsupport_magisk_msg">Ta wersja aplikacji nie obsługuje Magisk w wersji niższej niż %1$s.\n\nAplikacja będzie zachowywać się tak jakby Magisk nie był zainstalowany, proszę uaktualnij Magisk.</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcję.</string>
     <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
+    <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
 
 </resources>
