@@ -329,7 +329,7 @@ mount_apex() {
       if [ -f $APEX/apex_manifest.json ]; then
         DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
       elif [ -f $APEX/apex_manifest.pb ]; then
-        DEST=/apex/$(strings apex_manifest.pb | head -n 1)
+        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1)
       else
         continue
       fi
