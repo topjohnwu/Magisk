@@ -22,6 +22,8 @@
     <string name="home_support_content">Magisk è e sempre sarà gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento inviando una piccola donazione.</string>
     <string name="home_package">Pacchetto</string>
     <string name="home_check_safetynet">Controlla SafetyNet</string>
+    <string name="home_app_title">App</string>
+    <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
     <string name="loading">Caricamento…</string>
     <string name="not_available">N/D</string>
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
@@ -78,7 +80,7 @@
     <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di root.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i diritti di root.</string>
+    <string name="log_data_none">Non ci sono eventi, prova ad utilizzare un\'app che richiede i permessi di root.</string>
     <string name="log_data_magisk_none">Il registro eventi di Magisk è vuoto, questo è davvero strano.</string>
     <string name="menuSaveLog">Salva registro eventi</string>
     <string name="menuClearLog">Svuota il registro eventi</string>
@@ -171,6 +173,10 @@
     <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Soluzione alternativa al DNS poisoning in alcune nazioni</string>
+    <string name="settings_hide_app_title">Nascondi l\'app di Magisk</string>
+    <string name="settings_hide_app_summary">Installa un\'app \"proxy\" con un ID pacchetto casuale e un nome personalizzato</string>
+    <string name="settings_restore_app_title">Ripristina l\'app di Magisk</string>
+    <string name="settings_restore_app_summary">Rendi l\'app nuovamente rilevabile e ripristina l\'APK originale</string>
 
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo per il proprietario del dispositivo</string>
@@ -216,11 +222,16 @@
     <string name="proprietary_title">Scarica codice proprietario</string>
     <string name="setup_fail">Configurazione fallita</string>
     <string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
+    <string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Vuoi procedere e riavviare il dispositivo?</string>
     <string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
     <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
+    <string name="unsupport_magisk_msg">Questa versione dell\'app non supporta versioni di Magisk inferiori a %1$s.\n\nL\'app si comporterà come se Magisk non fosse installato: aggiornalo il prima possibile.</string>
     <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
     <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
+    <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
     <string name="app_not_found">Nessuna app disponibile per gestire quest\'azione</string>
+    <string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string>
+    <string name="proprietary_notice">Magisk è un software libero e open source e non contiene codice proprietario per utilizzare le API SafetyNet di Google.\n\nVuoi scaricare un\'estensione proprietaria per controllare lo stato di SafetyNet?</string>
 
 </resources>
