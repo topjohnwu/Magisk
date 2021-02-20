@@ -110,7 +110,7 @@ void selinux_builtin_impl() {
 }
 
 void dload_selinux() {
-    if (access("/system/lib/libselinux.so", F_OK))
+    if (access("/system/lib/libselinux.so", F_OK) && access("/system/lib64/libselinux.so", F_OK))
         return;
     /* We only check whether libselinux.so exists but don't dlopen.
      * For some reason calling symbols returned from dlsym
