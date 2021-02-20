@@ -145,7 +145,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    sprintf(target, "%s/a.m", info->str[SU_MANAGER].data());
+    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->str[SU_MANAGER].data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);

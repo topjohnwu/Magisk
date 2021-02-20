@@ -51,7 +51,7 @@ fun String.langTagToLocale(): Locale {
     if (Build.VERSION.SDK_INT >= 21) {
         return Locale.forLanguageTag(this)
     } else {
-        val tok = split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        val tok = split("[-_]".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (tok.isEmpty()) {
             return Locale("")
         }

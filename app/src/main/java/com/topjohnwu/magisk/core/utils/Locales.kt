@@ -38,7 +38,7 @@ withContext(Dispatchers.Default) {
         add("pt-BR")
 
         // Then add all supported locales
-        addAll(res.assets.locales)
+        addAll(Resources.getSystem().assets.locales)
     }.map {
         it.langTagToLocale()
     }.distinctBy {

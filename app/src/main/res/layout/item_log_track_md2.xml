@@ -29,14 +29,15 @@
         tools:layout_gravity="center"
         tools:minHeight="?listPreferredItemHeightSmall">
 
-        <View
+        <ImageView
             android:id="@+id/track_top"
             invisible="@{isTop}"
             android:layout_width="2dp"
             android:layout_height="0dp"
             android:layout_marginBottom="2dp"
             android:alpha=".3"
-            android:background="@drawable/bg_line_bottom_rounded"
+            app:tint="?colorSecondary"
+            app:srcCompat="@drawable/bg_line_bottom_rounded"
             app:layout_constraintBottom_toTopOf="@+id/track_bullet"
             app:layout_constraintEnd_toEndOf="@+id/track_bullet"
             app:layout_constraintStart_toStartOf="@+id/track_bullet"
@@ -54,14 +55,15 @@
             app:tint="@color/color_primary_error_transient"
             tools:srcCompat="@drawable/ic_check_md2" />
 
-        <View
+        <ImageView
             android:id="@+id/track_bottom"
             invisible="@{isBottom}"
             android:layout_width="2dp"
             android:layout_height="0dp"
             android:layout_marginTop="2dp"
             android:alpha=".3"
-            android:background="@drawable/bg_line_top_rounded"
+            app:tint="?colorSecondary"
+            app:srcCompat="@drawable/bg_line_top_rounded"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/track_bullet"
             app:layout_constraintStart_toStartOf="@+id/track_bullet"
