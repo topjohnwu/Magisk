@@ -21,6 +21,7 @@ public class APKInstall {
         if (Build.VERSION.SDK_INT >= 24) {
             intent.setData(FileProvider.getUriForFile(c, c.getPackageName() + ".provider", apk));
         } else {
+            //noinspection ResultOfMethodCallIgnored SetWorldReadable
             apk.setReadable(true, false);
             intent.setData(Uri.fromFile(apk));
         }
@@ -31,15 +32,17 @@ public class APKInstall {
         c.startActivity(installIntent(c, apk));
     }
 
-    public static void installAndWait(Activity c, File apk, BroadcastReceiver r) {
+    public static void registerInstallReceiver(Context c, BroadcastReceiver r) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addDataScheme("package");
         c.getApplicationContext().registerReceiver(r, filter);
+    }
 
+    public static void installHideResult(Activity c, File apk) {
         Intent intent = installIntent(c, apk);
         intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
-        c.startActivityForResult(intent, 0);
+        c.startActivityForResult(intent, 0); // Ignore result, use install receiver
     }
 }
