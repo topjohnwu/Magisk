@@ -84,11 +84,6 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             tools:node="remove" />
 
-        <!-- We don't use Device Credentials -->
-        <activity
-            android:name="androidx.biometric.DeviceCredentialHandlerActivity"
-            tools:node="remove" />
-
     </application>
 
 </manifest>

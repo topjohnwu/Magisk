@@ -21,7 +21,6 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.system.Os
 import android.text.PrecomputedText
@@ -42,11 +41,13 @@ import androidx.core.widget.TextViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.AssetHack
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils
@@ -249,15 +250,13 @@ fun Context.colorStateListCompat(@ColorRes id: Int) = try {
     null
 }
 
-fun Context.drawableCompat(@DrawableRes id: Int) = ContextCompat.getDrawable(this, id)
+fun Context.drawableCompat(@DrawableRes id: Int) = AppCompatResources.getDrawable(this, id)
 /**
  * Pass [start] and [end] dimensions, function will return left and right
  * with respect to RTL layout direction
  */
 fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
-    if (SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 &&
-        resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-    ) {
+    if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
         return end to start
     }
     return start to end
@@ -317,8 +316,21 @@ fun ViewGroup.startAnimations() {
     )
 }
 
+val View.activity: Activity get() {
+    var context = context
+    while(true) {
+        if (context !is ContextWrapper)
+            error("View is not attached to activity")
+        if (context is Activity)
+            return context
+        context = context.baseContext
+    }
+}
+
 var View.coroutineScope: CoroutineScope
-    get() = getTag(R.id.coroutineScope) as? CoroutineScope ?: GlobalScope
+    get() = getTag(R.id.coroutineScope) as? CoroutineScope
+        ?: (activity as? BaseActivity)?.lifecycleScope
+        ?: GlobalScope
     set(value) = setTag(R.id.coroutineScope, value)
 
 @set:BindingAdapter("precomputedText")

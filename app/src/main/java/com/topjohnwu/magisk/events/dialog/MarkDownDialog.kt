@@ -6,10 +6,8 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ktx.coroutineScope
 import com.topjohnwu.magisk.view.MagiskDialog
 import io.noties.markwon.Markwon
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +29,6 @@ abstract class MarkDownDialog : DialogEvent(), KoinComponent {
             applyView(view)
             (ownerActivity as BaseActivity).lifecycleScope.launch {
                 val tv = view.findViewById<TextView>(R.id.md_txt)
-                tv.coroutineScope = CoroutineScope(coroutineContext)
                 withContext(Dispatchers.IO) {
                     try {
                         markwon.setMarkdown(tv, getMarkdownText())
