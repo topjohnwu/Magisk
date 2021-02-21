@@ -62,8 +62,8 @@ object HideAPK {
         }
         if (!builder.contains('.')) {
             // Pick a random index and set it as dot
-            val idx = random.nextInt(len - 1)
-            builder[idx] = '.'
+            val idx = random.nextInt(len - 2)
+            builder[idx + 1] = '.'
         }
         return builder.toString()
     }
