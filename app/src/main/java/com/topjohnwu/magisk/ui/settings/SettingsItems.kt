@@ -108,9 +108,6 @@ object Hide : BaseSettingsItem.Input() {
 object Restore : BaseSettingsItem.Blank() {
     override val title = R.string.settings_restore_app_title.asTransitive()
     override val description = R.string.settings_restore_app_summary.asTransitive()
-    override fun refresh() {
-        isEnabled = Info.remote.magisk.versionCode > 0
-    }
 }
 
 object AddShortcut : BaseSettingsItem.Blank() {
