@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.JarMap
 import com.topjohnwu.signing.SignApk
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -141,7 +142,9 @@ object HideAPK {
             return false
 
         // Install and auto launch app
-        APKInstall.installAndWait(activity, repack, WaitPackageReceiver(pkg, activity))
+        APKInstall.registerInstallReceiver(activity, WaitPackageReceiver(pkg, activity))
+        if (!Shell.su("adb_pm_install $repack").exec().isSuccess)
+            APKInstall.installHideResult(activity, repack)
         return true
     }
 
@@ -156,6 +159,8 @@ object HideAPK {
 
     fun restore(activity: Activity) {
         val apk = DynAPK.current(activity)
-        APKInstall.installAndWait(activity, apk, WaitPackageReceiver(APPLICATION_ID, activity))
+        APKInstall.registerInstallReceiver(activity, WaitPackageReceiver(APPLICATION_ID, activity))
+        if (!Shell.su("adb_pm_install $apk").exec().isSuccess)
+            APKInstall.installHideResult(activity, apk)
     }
 }
