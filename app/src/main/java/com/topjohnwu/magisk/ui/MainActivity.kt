@@ -223,7 +223,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .cancellable(false)
                 .reveal()
         }
-    }g
+    }
 
     private fun askForHomeShortcut() {
         if (isRunningAsStub && !Config.askedHome &&
