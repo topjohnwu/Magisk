@@ -17,12 +17,12 @@
 
     <style name="Theme.Foundation" parent="Base.V17.Theme.Foundation" />
 
-    <style name="Base.V17.Theme.Splash.Light" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+    <style name="Base.V17.Theme.Splash.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="Base.V17.Theme.Splash" parent="android:Theme.DeviceDefault.NoActionBar">
+    <style name="Base.V17.Theme.Splash" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>

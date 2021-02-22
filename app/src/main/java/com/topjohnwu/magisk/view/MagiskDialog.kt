@@ -47,7 +47,8 @@ class MagiskDialog(
         super.onCreate(savedInstanceState)
         super.setContentView(binding.root)
 
-        val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, javaClass.canonicalName)
+        val default = MaterialColors.getColor(context, R.attr.colorSurface, javaClass.canonicalName)
+        val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, default)
         val materialShapeDrawable = MaterialShapeDrawable(context, null, R.attr.alertDialogStyle, R.style.MaterialAlertDialog_MaterialComponents)
         materialShapeDrawable.initializeElevationOverlay(context)
         materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)

@@ -14,7 +14,6 @@ import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.set
@@ -26,6 +25,13 @@ typealias ActivityResultCallback = BaseActivity.(Int, Intent?) -> Unit
 abstract class BaseActivity : AppCompatActivity() {
 
     private val resultCallbacks by lazy { SparseArrayCompat<ActivityResultCallback>() }
+    private val newRequestCode: Int get() {
+        var requestCode: Int
+        do {
+            requestCode = Random.nextInt(0, 1 shl 15)
+        } while (resultCallbacks.containsKey(requestCode))
+        return requestCode
+    }
 
     override fun applyOverrideConfiguration(config: Configuration?) {
         // Force applying our preferred local
@@ -49,10 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             request.onSuccess()
         } else {
-            var requestCode: Int
-            do {
-                requestCode = Random.nextInt(Const.ID.MAX_ACTIVITY_RESULT + 1, 1 shl 15)
-            } while (resultCallbacks.containsKey(requestCode))
+            val requestCode = newRequestCode
             resultCallbacks[requestCode] = { result, _ ->
                 if (result > 0)
                     request.onSuccess()
@@ -92,7 +95,8 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun startActivityForResult(intent: Intent, requestCode: Int, callback: ActivityResultCallback) {
+    fun startActivityForResult(intent: Intent, callback: ActivityResultCallback) {
+        val requestCode = newRequestCode
         resultCallbacks[requestCode] = callback
         try {
             startActivityForResult(intent, requestCode)

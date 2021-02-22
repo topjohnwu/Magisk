@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.*
-import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
@@ -26,7 +25,6 @@ import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
-import com.topjohnwu.superuser.Shell
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
@@ -196,12 +194,12 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .reveal()
         }
 
-        if (Info.env.isActive && System.getenv("PATH")
+        if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
                 ?.filterNot { File("$it/magisk").exists() }
                 ?.any { File("$it/su").exists() } == true) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_other_su_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_other_su_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)
@@ -210,7 +208,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_system_app_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_system_app_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)
@@ -219,25 +217,13 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_external_storage_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_external_storage_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)
                 .reveal()
         }
-
-        if (isRunningAsStub && !Shell.rootAccess()) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_nonroot_stub_title)
-                .applyMessage(R.string.unsupport_nonroot_stub_msg)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = R.string.install
-                    onClick { HideAPK.restore(this@MainActivity) }
-                }
-                .cancellable(false)
-                .reveal()
-        }
-    }
+    }g
 
     private fun askForHomeShortcut() {
         if (isRunningAsStub && !Config.askedHome &&
