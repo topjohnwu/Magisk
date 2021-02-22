@@ -31,6 +31,8 @@ class BusyBoxInit : BaseShellInit() {
 
             val localBB: File
             if (isRunningAsStub) {
+                if (!shell.isRoot)
+                    return true
                 val jar = JarFile(DynAPK.current(context))
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI_32}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")

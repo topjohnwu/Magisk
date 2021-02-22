@@ -196,12 +196,12 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 .reveal()
         }
 
-        if (Info.env.isActive && System.getenv("PATH")
+        if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
                 ?.filterNot { File("$it/magisk").exists() }
                 ?.any { File("$it/su").exists() } == true) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_other_su_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_other_su_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)
@@ -210,7 +210,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_system_app_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_system_app_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)
@@ -219,7 +219,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
             MagiskDialog(this)
-                .applyTitle(R.string.unsupport_external_storage_title)
+                .applyTitle(R.string.unsupport_general_title)
                 .applyMessage(R.string.unsupport_external_storage_msg)
                 .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
                 .cancellable(false)

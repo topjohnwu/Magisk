@@ -1,21 +1,23 @@
 package com.topjohnwu.magisk.core
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import java.util.concurrent.CountDownLatch
 
-open class SplashActivity : Activity() {
+open class SplashActivity : BaseActivity() {
 
     private val latch = CountDownLatch(1)
 
@@ -41,12 +43,27 @@ open class SplashActivity : Activity() {
             if (Config.suManager.isNotEmpty())
                 Config.suManager = ""
             pkg ?: return
-            val uninstall = Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
-            if (!uninstall.isSuccess) uninstallApp(pkg)
+            if (!Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess)
+                uninstallApp(pkg)
         }
     }
 
     private fun initAndStart() {
+        if (isRunningAsStub && !Shell.rootAccess()) {
+            runOnUiThread {
+                MagiskDialog(this)
+                    .applyTitle(R.string.unsupport_nonroot_stub_title)
+                    .applyMessage(R.string.unsupport_nonroot_stub_msg)
+                    .applyButton(MagiskDialog.ButtonType.POSITIVE) {
+                        titleRes = R.string.install
+                        onClick { HideAPK.restore(this@SplashActivity) }
+                    }
+                    .cancellable(false)
+                    .reveal()
+            }
+            return
+        }
+
         val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)
 
         Config.load(prevPkg)
@@ -59,8 +76,7 @@ open class SplashActivity : Activity() {
         get<NetworkService>()
 
         DONE = true
-
-        redirect<MainActivity>().also { startActivity(it) }
+        startActivity(redirect<MainActivity>())
         finish()
     }
 
@@ -69,14 +85,10 @@ open class SplashActivity : Activity() {
         val uri = Uri.Builder().scheme("package").opaquePart(pkg).build()
         val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri)
         intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
-        startActivityForResult(intent, Const.ID.UNINSTALL_APP)
+        startActivityForResult(intent) { _, _ ->
+            latch.countDown()
+        }
         latch.await()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == Const.ID.UNINSTALL_APP) {
-            if (resultCode != RESULT_CANCELED) latch.countDown()
-        } else super.onActivityResult(requestCode, resultCode, data)
     }
 
     companion object {
