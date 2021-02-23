@@ -144,9 +144,10 @@ object UpdateChannel : BaseSettingsItem.Selector() {
         }
 
     override val title = R.string.settings_update_channel_title.asTransitive()
-    override val entries: Array<String> = resources.getStringArray(R.array.update_channel).apply {
+    override val entries: Array<String> = resources.getStringArray(R.array.update_channel).let {
         if (BuildConfig.VERSION_CODE % 100 == 0)
-            toMutableList().apply { removeAt(Config.Value.CANARY_CHANNEL) }.toTypedArray()
+            it.toMutableList().apply { removeAt(Config.Value.CANARY_CHANNEL) }.toTypedArray()
+        else it
     }
     override val description
         get() = entries.getOrNull(value)?.asTransitive() ?: TransitiveText.String(entries[0])
