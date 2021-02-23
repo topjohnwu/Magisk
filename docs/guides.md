@@ -52,6 +52,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   │
 │   ├── vendor              <--- A symlink to $MODID/system/vendor
 │   ├── product             <--- A symlink to $MODID/system/product
+│   ├── system_ext          <--- A symlink to $MODID/system/system_ext
 │   │
 │   │      *** Any additional files / folders are allowed ***
 │   │
