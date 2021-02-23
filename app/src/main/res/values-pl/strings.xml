@@ -230,6 +230,12 @@
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magisk</string>
     <string name="unsupport_magisk_msg">Ta wersja aplikacji nie obsługuje Magisk w wersji niższej niż %1$s.\n\nAplikacja będzie zachowywać się tak jakby Magisk nie był zainstalowany, proszę uaktualnij Magisk.</string>
+    <string name="unsupport_general_title">Nieprawidłowy stan</string>
+    <string name="unsupport_system_app_msg">Uruchomienie tej aplikacji jako systemowa nie jest obsługiwane. Proszę przemienić ją na aplikację użytkownika.</string>
+    <string name="unsupport_other_su_msg">Wykryto komendę \"su\" nie należącą do Magisk. Proszę usunąć tę drugą aplikację \"su\".</string>
+    <string name="unsupport_external_storage_msg">Zainstalowano Magisk na pamięci zewnętrznej. Proszę przenieść ją na pamięć wewnętrzną.</string>
+    <string name="unsupport_nonroot_stub_msg">Ta aplikacja nie może dłużej działać w trybie ukrycia jako że root został utracony. Proszę przywrócić ją do oryginalnego stanu.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcję.</string>
     <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
     <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
