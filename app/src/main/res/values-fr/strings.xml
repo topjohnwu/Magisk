@@ -233,8 +233,8 @@
     <string name="unsupport_general_title">État anormal</string>
     <string name="unsupport_system_app_msg">Faire fonctionner cette application en tant qu’application système n’est pas supporté. Merci de restaurer l’application en tant qu’application utilisateur.</string>
     <string name="unsupport_other_su_msg">Une commande \"su\" qui n’appartient pas à Magisk est détecté. Merci de supprimer l’autre su qui n’est pas supporté.</string>
-    <string name="unsupport_external_storage_msg">Magisk est installé sur le stockage externe. Merci de déplacer l'application sur le stockage interne.</string>
-    <string name="unsupport_nonroot_stub_msg">Cette application ne peut pas continuer à fonctionne dans un état masqué étant donné que l’accès racine est perdue. Merci de restaurer l’APK originel.</string>
+    <string name="unsupport_external_storage_msg">Magisk est installé sur le stockage externe. Merci de déplacer l’application sur le stockage interne.</string>
+    <string name="unsupport_nonroot_stub_msg">Cette application ne peut pas continuer à fonctionner dans un état masqué étant donné que l’accès racine est perdue. Merci de restaurer l’APK originel.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
