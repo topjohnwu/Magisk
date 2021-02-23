@@ -30,7 +30,7 @@ import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
 public class DownloadActivity extends Activity {
 
-    private static final String APP_NAME = "Magisk Manager";
+    private static final String APP_NAME = "Magisk";
     private static final String CDN_URL = "https://cdn.jsdelivr.net/gh/topjohnwu/magisk_files@%s/%s";
 
     private String apkLink;
