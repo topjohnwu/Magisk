@@ -17,11 +17,9 @@ Here are some feature highlights:
 
 Please note that the only source of official Magisk information and downloads is [Github](https://github.com/topjohnwu/Magisk/). Beware of any other websites.
 
-[![](https://img.shields.io/badge/Magisk%20Manager-v8.0.7-green)](https://github.com/topjohnwu/Magisk/releases/download/manager-v8.0.7/MagiskManager-v8.0.7.apk)
-[![](https://img.shields.io/badge/Magisk%20Manager-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
-<br>
-[![](https://img.shields.io/badge/Magisk-v21.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.4)
-[![](https://img.shields.io/badge/Magisk%20Beta-v21.4-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v21.4)
+[![](https://img.shields.io/badge/Magisk-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
+[![](https://img.shields.io/badge/Magisk%20Beta-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -36,17 +34,14 @@ Please note that the only source of official Magisk information and downloads is
 - Android 4.4+: All core features available
 - Android 6.0+: Guaranteed MagiskHide support
 - Android 7.0+: Full MagiskHide protection
-- Android 9.0+: Magisk Manager stealth mode
 
 ## Bug Reports
-
-Canary Channels are cutting edge builds for those adventurous. To access canary builds, install the Canary Magisk Manager, switch to the Canary Channel in settings and upgrade.
 
 **Only bug reports from Canary builds will be accepted.**
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
-For Magisk Manager crashes, record and upload the logcat when the crash occurs.
+For Magisk app crashes, record and upload the logcat when the crash occurs.
 
 ## Building and Development
 
@@ -68,7 +63,7 @@ For each action, use `-h` to access help (e.g. `./build.py all -h`)
 
 ## Translation Contributions
 
-Default string resources for Magisk Manager and its stub APK are located here:
+Default string resources for the Magisk app and its stub APK are located here:
 
 - `app/src/main/res/values/strings.xml`
 - `stub/src/main/res/values/strings.xml`
