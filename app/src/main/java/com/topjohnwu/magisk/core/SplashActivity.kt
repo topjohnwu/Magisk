@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -20,10 +19,6 @@ import java.util.concurrent.CountDownLatch
 open class SplashActivity : BaseActivity() {
 
     private val latch = CountDownLatch(1)
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base.wrap())
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.SplashTheme)
