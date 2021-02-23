@@ -160,7 +160,9 @@ object HideAPK {
     fun restore(activity: Activity) {
         val apk = DynAPK.current(activity)
         APKInstall.registerInstallReceiver(activity, WaitPackageReceiver(APPLICATION_ID, activity))
-        if (!Shell.su("adb_pm_install $apk").exec().isSuccess)
-            APKInstall.installHideResult(activity, apk)
+        Shell.su("adb_pm_install $apk").submit {
+            if (!it.isSuccess)
+                APKInstall.installHideResult(activity, apk)
+        }
     }
 }
