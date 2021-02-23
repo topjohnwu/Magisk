@@ -230,6 +230,12 @@
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
     <string name="unsupport_magisk_msg">应用不支持低于 %1$s 版本的 Magisk，表现为未安装状态。仅升级功能可用，请尽快升级 Magisk。</string>
+    <string name="unsupport_general_title">异常状态</string>
+    <string name="unsupport_system_app_msg">Magisk 不支持安装为系统应用，请还原为用户应用。</string>
+    <string name="unsupport_other_su_msg">检测到不属于 Magisk 的 su 文件，请删除其他超级用户程序。</string>
+    <string name="unsupport_external_storage_msg">不支持将 Magisk 安装到外置存储卡，请将应用移动回内部存储空间。</string>
+    <string name="unsupport_nonroot_stub_msg">超级用户权限丢失，应用无法在隐藏状态下继续工作，请恢复到原始 Magisk 应用。</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
     <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
