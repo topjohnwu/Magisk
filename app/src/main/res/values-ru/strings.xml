@@ -230,6 +230,12 @@
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
     <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее!</string>
+    <string name="unsupport_general_title">Аномальное состояние</string>
+    <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
+    <string name="unsupport_other_su_msg">Обнаружена неподдерживаемая \"su\" команда. Пожалуйста, удалите сторонние Root-права.</string>
+    <string name="unsupport_external_storage_msg">Приложение установлено на внешнем хранилище. Пожалуйста, переместите его во внутреннее хранилище.</string>
+    <string name="unsupport_nonroot_stub_msg">Приложение не может продолжить работу в скрытом режиме, так как Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
     <string name="add_shortcut_title">Создание ярлыка</string>
     <string name="add_shortcut_msg">После скрытия приложения Magisk его имя и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
