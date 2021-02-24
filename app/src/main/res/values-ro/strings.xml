@@ -19,7 +19,9 @@
     <string name="not_available">N/A</string>
     <string name="hide">Ascunde</string>
     <string name="home_package">Pachet</string>
+    <string name="home_app_title">Aplicație</string>
 
+    <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
     <string name="home_item_source">Sursă</string>
     <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
@@ -130,6 +132,10 @@
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
     <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
+    <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
+    <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
+    <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
+    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaureaz-o înapoi în APK-ul original</string>
     <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
@@ -208,6 +214,7 @@
     <string name="flashing">Se scrie în memoria flash…</string>
     <string name="done">Terminat!</string>
     <string name="failure">Eșec!</string>
+    <string name="hide_app_title">Se ascunde aplicația Magisk…</string>
     <string name="open_link_failed_toast">Nu a fost găsită nicio aplicație pentru a deschide linkul</string>
     <string name="complete_uninstall">Finalizează dezinstalarea</string>
     <string name="restore_img">Restaurează imagini</string>
@@ -215,13 +222,23 @@
     <string name="restore_done">Restaurare terminată!</string>
     <string name="restore_fail">Nu există backup stock!</string>
     <string name="proprietary_title">Descarcă cod proprietar</string>
+    <string name="proprietary_notice">Magisk este FOSS și nu include cod pentru API-ul SafetyNet proprietar al Google.\n\nVrei să descarci o extensie proprietară pentru verificările SafetyNet?</string>
     <string name="setup_fail">Configurare eșuată</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
+    <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Vrei să continui și să repornești?</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
+    <string name="unsupport_magisk_msg">Această versiune a aplicației nu suportă versiunea Magisk mai mică de %1$s.\n\nAplicația se va comporta ca și cum Magisk nu este instalat, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
+    <string name="unsupport_general_title">Stare anormală</string>
+    <string name="unsupport_system_app_msg">Rularea acestei aplicații ca aplicație de sistem nu este suportată. Te rugăm să readuci aplicația într-o aplicație de utilizator.</string>
+    <string name="unsupport_other_su_msg">Este detectată o comandă „su” care nu aparține Magisk. Te rugăm să elimini cealaltă aplicație su nesuportată.</string>
+    <string name="unsupport_external_storage_msg">Magisk este instalat în spațiul de stocare extern. Te rugăm să muți aplicația în spațiul de stocare intern.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplicația nu poate continua să funcționeze în starea ascunsă, deoarece rootul a fost pierdut. Te rugăm să o restaurezi înapoi în APK-ul original.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
+    <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
 
 </resources>
