@@ -50,6 +50,7 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         defaultOrientation = activity.requestedOrientation
         activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+        viewModel.startFlashing()
     }
 
     @SuppressLint("WrongConstant")

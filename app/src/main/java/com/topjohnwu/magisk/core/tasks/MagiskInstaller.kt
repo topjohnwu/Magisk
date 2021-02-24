@@ -43,6 +43,8 @@ import java.security.SecureRandom
 import java.util.*
 import java.util.zip.ZipFile
 
+private var haveActiveSession: Boolean = false
+
 abstract class MagiskInstallImpl protected constructor(
     protected val console: MutableList<String> = NOPList.getInstance(),
     private val logs: MutableList<String> = NOPList.getInstance()
@@ -415,7 +417,18 @@ abstract class MagiskInstallImpl protected constructor(
     @WorkerThread
     protected abstract suspend fun operations(): Boolean
 
-    open suspend fun exec() = withContext(Dispatchers.IO) { operations() }
+    open suspend fun exec(): Boolean {
+        synchronized(haveActiveSession) {
+            if (haveActiveSession)
+                return false
+            haveActiveSession = true
+        }
+        val result = withContext(Dispatchers.IO) { operations() }
+        synchronized(haveActiveSession) {
+            haveActiveSession = false
+        }
+        return result
+    }
 }
 
 abstract class MagiskInstaller(
