@@ -246,7 +246,7 @@ object MagiskHide : BaseSettingsItem.Toggle() {
     override var value = Config.magiskHide
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
-            Shell.su("magiskhide --$cmd").submit { cb ->
+            Shell.su("magiskhide $cmd").submit { cb ->
                 if (cb.isSuccess) Config.magiskHide = it
                 else field = !it
             }

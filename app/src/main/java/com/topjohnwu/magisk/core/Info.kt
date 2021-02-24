@@ -66,7 +66,7 @@ object Info {
     private fun loadState() = Env(
         fastCmd("magisk -v").split(":".toRegex())[0],
         runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1),
-        Shell.su("magiskhide --status").exec().isSuccess
+        Shell.su("magiskhide status").exec().isSuccess
     )
 
     class Env(

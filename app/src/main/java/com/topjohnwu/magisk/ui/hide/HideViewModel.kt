@@ -62,12 +62,13 @@ class HideViewModel : BaseViewModel(), Queryable {
         state = State.LOADING
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = get<PackageManager>()
-            val hideList = Shell.su("magiskhide --ls").exec().out.map { CmdlineHiddenItem(it) }
+            val hideList = Shell.su("magiskhide ls").exec().out.map { CmdlineHiddenItem(it) }
             val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES)
                 .asSequence()
-                .filter { it.enabled && !blacklist.contains(it.packageName) }
+                .filterNot { blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm, hideList) }
                 .filter { it.processes.isNotEmpty() }
+                .filter { info -> info.enabled || info.processes.any { it.isHidden } }
                 .map { HideRvItem(it) }
                 .toList()
                 .sorted()
