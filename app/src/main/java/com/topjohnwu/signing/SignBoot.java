@@ -196,6 +196,9 @@ public class SignBoot {
         int secondSize = image.getInt();
         image.getLong(); // second_addr + tags_addr
         int pageSize = image.getInt();
+        if (pageSize >= 0x02000000) {
+            throw new IllegalArgumentException("Invalid image header: PXA header detected");
+        }
         int length = pageSize // include the page aligned image header
                 + ((kernelSize + pageSize - 1) / pageSize) * pageSize
                 + ((ramdskSize + pageSize - 1) / pageSize) * pageSize
@@ -214,8 +217,7 @@ public class SignBoot {
                 image.getLong(); // dtb address
             }
             if (image.position() != headerSize) {
-                throw new IllegalArgumentException(
-                        "Invalid image header: invalid header length");
+                throw new IllegalArgumentException("Invalid image header: invalid header length");
             }
         } else {
             // headerVersion is 0 or actually dt/extra size in this case
