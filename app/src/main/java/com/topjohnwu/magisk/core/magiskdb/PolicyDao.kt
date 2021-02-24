@@ -31,12 +31,6 @@ class PolicyDao(
         }
     }.commit()
 
-    suspend fun delete(packageName: String) = buildQuery<Delete> {
-        condition {
-            equals("package_name", packageName)
-        }
-    }.commit()
-
     suspend fun delete(uid: Int) = buildQuery<Delete> {
         condition {
             equals("uid", uid)
