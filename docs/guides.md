@@ -10,7 +10,7 @@ For those who want to use this "Standalone Mode" feature outside of Magisk, ther
 1. Set environment variable `ASH_STANDALONE` to `1`<br>Example: `ASH_STANDALONE=1 /data/adb/magisk/busybox sh <script>`
 2. Toggle with command-line options:<br>`/data/adb/magisk/busybox sh -o standalone <script>`
 
-To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and Magisk Manager internally use) as environment variables are inherited down to child processes.
+To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and the Magisk app internally use) as environment variables are inherited down to child processes.
 
 
 ## Magisk Modules
@@ -104,7 +104,7 @@ All files you want Magisk to replace/inject for you should be placed in this fol
 
 ## Magisk Module Installer
 
-A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in Magisk Manager or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
+A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
@@ -141,7 +141,7 @@ This script will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enab
 ##### Variables
 - `MAGISK_VER` (string): the version string of current installed Magisk (e.g. `v20.0`)
 - `MAGISK_VER_CODE` (int): the version code of current installed Magisk (e.g. `20000`)
-- `BOOTMODE` (bool): `true` if the module is being installed in Magisk Manager
+- `BOOTMODE` (bool): `true` if the module is being installed in the Magisk app
 - `MODPATH` (path): the path where your module files should be installed
 - `TMPDIR` (path): a place where you can temporarily store files
 - `ZIPFILE` (path): your module's installation zip
@@ -188,13 +188,13 @@ The list above will result in the following files being created: `$MODPATH/syste
 
 #### Notes
 
-- When your module is downloaded with Magisk Manager, `update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to ensure all installer uses up-to-date scripts. **DO NOT** try to add any custom logic in `update-binary` as it is pointless.
+- When your module is downloaded with the Magisk app, `update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to ensure all installer uses up-to-date scripts. **DO NOT** try to add any custom logic in `update-binary` as it is pointless.
 - Due to historical reasons, **DO NOT** add a file named `install.sh` in your module installer. That specific file was previously used and will be treated differently.
 - **DO NOT** call `exit` at the end of `customize.sh`. The module installer would want to do finalizations.
 
 ## Submit Modules
 
-You can submit a module to **Magisk-Module-Repo** so users can download your module directly in Magisk Manager.
+You can submit a module to **Magisk-Module-Repo** so users can download your module directly in the Magisk app.
 
 - Follow the instructions in the previous section to create a valid installer for your module.
 - Create `README.md` (filename should be exactly the same) containing all info for your module. If you are not familiar with the Markdown syntax, the [Markdown Cheat Sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) will be handy.

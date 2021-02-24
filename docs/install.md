@@ -68,7 +68,7 @@ If you insist on using custom recoveries, rename the Magisk APK to `uninstall.zi
 
 If your device does not have ramdisk in boot images, Magisk has no choice but to be installed in the recovery partition. For these devices, you will have to **reboot to recovery** every time you want Magisk.
 
-When Magisk is installed in your recovery, **you CANNOT use custom recoveries to install/upgrade Magisk!** The only way to install/upgrade Magisk is through Magisk Manager. The app will be aware of your device state and install to the correct partition and reboot into the correct mode.
+When Magisk is installed in your recovery, **you CANNOT use custom recoveries to install/upgrade Magisk!** The only way to install/upgrade Magisk is through the Magisk app. It will be aware of your device state and install to the correct partition and reboot into the correct mode.
 
 Since Magisk now hijacks the recovery of the device, there is a mechanism to let you *actually* boot into recovery mode when needed: it is determined by **how long you press the recovery key combo**.
 
@@ -110,7 +110,7 @@ If you think the bootloader is fully unlocked, it is actually not! Samsung intro
 - Press the **Install** button in the Magisk card
 - If your device does **NOT** have boot ramdisk, make sure **"Recovery Mode"** is checked in options.<br>In most cases it should already be automatically checked.
 - Choose **"Select and Patch a File"** in method, and select the `AP` tar file
-- Magisk Manager will patch the whole firmware file to `[Internal Storage]/Download/magisk_patched_[random_strings].tar`
+- The Magisk app will patch the whole firmware file to `[Internal Storage]/Download/magisk_patched_[random_strings].tar`
 - Copy the patched tar file to your PC with ADB:<br>
 `adb pull /sdcard/Download/magisk_patched_[random_strings].tar`<br>
 **DO NOT USE MTP** as it is known to corrupt large files.
@@ -125,7 +125,7 @@ If you are stuck in a bootloop, agree to do a factory reset if promted.
 ### Additional Notes
 
 - **Never, ever** try to restore either `boot` or `recovery` partitions back to stock! You can easily brick your device by doing so, and the only way out is to do a full Odin restore with data wipe.
-- To upgrade your device with a new firmware, **NEVER** directly use the stock `AP` tar file with reasons mentioned above. **Always** pre-patch `AP` in Magisk Manager before flashing in Odin.
+- To upgrade your device with a new firmware, **NEVER** directly use the stock `AP` tar file with reasons mentioned above. **Always** pre-patch `AP` in the Magisk app before flashing in Odin.
 - Use `HOME_CSC` to preserve your data when doing a firmware upgrade in the future. Using `CSC` is only necessary for the initial Magisk installation.
 - Never just flash only `AP`, or else Odin can shrink your `/data` filesystem. Flash full `AP` + `BL` + `CP` + `HOME_CSC` when upgrading.
 

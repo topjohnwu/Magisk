@@ -345,12 +345,12 @@ def build_apk(args, module):
 
 
 def build_app(args):
-    header('* Building Magisk Manager')
+    header('* Building the Magisk app')
     build_apk(args, 'app')
 
 
 def build_stub(args):
-    header('* Building Magisk Manager stub')
+    header('* Building stub APK')
     build_apk(args, 'stub')
 
 
@@ -462,11 +462,11 @@ binary_parser.add_argument(
     or empty for defaults ({', '.join(default_targets)})")
 binary_parser.set_defaults(func=build_binary)
 
-app_parser = subparsers.add_parser('app', help='build Magisk Manager')
+app_parser = subparsers.add_parser('app', help='build the Magisk app')
 app_parser.set_defaults(func=build_app)
 
 stub_parser = subparsers.add_parser(
-    'stub', help='build stub Magisk Manager')
+    'stub', help='build stub APK')
 stub_parser.set_defaults(func=build_stub)
 
 # Need to bind mount snet sources on top of stub folder

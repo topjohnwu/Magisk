@@ -70,7 +70,7 @@ $SECURE_DIR/modules
 
 # Magisk modules that are pending for upgrade
 # Module files are not safe to be modified when mounted
-# Modules installed in Magisk Manager will be stored here
+# Modules installed through the Magisk app will be stored here
 # and will be merged into $SECURE_DIR/modules in the next reboot
 $SECURE_DIR/modules_update
 
@@ -79,7 +79,7 @@ MAGISKDB=$SECURE_DIR/magisk.db
 
 # All magisk related binaries, including busybox,
 # scripts, and magisk binaries. Used in supporting
-# module installation, addon.d, Magisk Manager etc.
+# module installation, addon.d, the Magisk app etc.
 DATABIN=$SECURE_DIR/magisk
 
 ```
