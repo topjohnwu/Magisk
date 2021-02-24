@@ -55,6 +55,7 @@ class SuperuserViewModel(
         }
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.Default) {
+            db.deleteOutdated()
             val policies = db.fetchAll {
                 PolicyRvItem(it, it.icon, this@SuperuserViewModel)
             }.sortedWith(compareBy(
