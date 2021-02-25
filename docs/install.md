@@ -2,7 +2,7 @@
 
 If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
 
-## Getting Started
+-Getting Started
 
 Before you start:
 
@@ -28,7 +28,7 @@ If you are using a Huawei device and the **SAR** result is **Yes**, please check
 Otherwise, continue to [Patching Images](#patching-images).
 
 (P.S.1 If your device has boot ramdisk, you can also install with [Custom Recovery](#custom-recovery))<br>
-(P.S.2 If you are interested in how Android boots and how it affects Magisk, check out [this document](boot.md))
+(P.S.2 If you are interested in how Android boots and how it affects Magisk, check out (this document)(boot.mdg))
 
 ## Patching Images
 
