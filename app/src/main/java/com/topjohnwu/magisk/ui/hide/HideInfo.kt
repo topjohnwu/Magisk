@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
+import android.os.Build.VERSION.SDK_INT
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.ktx.isIsolated
@@ -71,7 +72,8 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
                     // Using app zygote, don't need to track the process
                     null
                 } else {
-                    createProcess("${it.processName}:${it.name}", ISOLATED_MAGIC)
+                    val proc = if (SDK_INT >= 29) "${it.processName}:${it.name}" else it.processName
+                    createProcess(proc, ISOLATED_MAGIC)
                 }
             } else {
                 createProcess(it.processName)
