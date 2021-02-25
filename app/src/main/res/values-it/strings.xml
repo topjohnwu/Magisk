@@ -233,5 +233,11 @@
     <string name="app_not_found">Nessuna app disponibile per gestire quest\'azione</string>
     <string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string>
     <string name="proprietary_notice">Magisk è un software libero e open source e non contiene codice proprietario per utilizzare le API SafetyNet di Google.\n\nVuoi scaricare un\'estensione proprietaria per controllare lo stato di SafetyNet?</string>
+    <string name="unsupport_general_title">Stato anomalo rilevato</string>
+    <string name="unsupport_other_su_msg">È stato rilevato un comando \"su\" che non appartiene a Magisk. Rimuovilo per evitare malfunzionamenti.</string>
+    <string name="unsupport_nonroot_stub_msg">Dal momento che i permessi di root sono stati persi, l\'app non può più funzionare rimanendo nascosta. Ripristina l\'APK originale.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="unsupport_external_storage_msg">Magisk è installato nella memoria esterna. Sposta l\'app nella memoria interna.</string>
+    <string name="unsupport_system_app_msg">L\'esecuzione di quest\'app come app di sistema non è supportata. Reinstallala come applicazione utente.</string>
 
 </resources>
