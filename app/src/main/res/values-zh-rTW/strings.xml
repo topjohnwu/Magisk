@@ -19,10 +19,12 @@
     <string name="not_available">無</string>
     <string name="hide">隱藏</string>
     <string name="home_package">包裝名稱</string>
+    <string name="home_app_title">應用程式</string>
 
+    <string name="home_notice_content">請只從官方的 Github 網頁下載 Magisk。檔案從未知的來源下載可能懷有惡意！</string>
     <string name="home_support_title">支援我們</string>
     <string name="home_item_source">原始碼</string>
-    <string name="home_support_content">Magisk 現在是，未來也永遠是免費且開源。但您可以透過發送小額的抖內來彰顯對我們的支持。</string>
+    <string name="home_support_content">Magisk 無論現在和未來永遠是免費且開源。但您可以透過發送小額的抖內來彰顯您對我們的支持。</string>
     <string name="home_installed_version">已安裝</string>
     <string name="home_latest_version">最新</string>
     <string name="invalid_update_channel">無效的更新頻道</string>
@@ -35,7 +37,7 @@
     <string name="keep_dm_verity">保持 AVB 2.0/dm-verity</string>
     <string name="recovery_mode">安裝至 Recovery</string>
     <string name="install_options_title">選項</string>
-    <string name="install_method_title">方法</string>
+    <string name="install_method_title">安裝方式</string>
     <string name="install_next">下一步</string>
     <string name="install_start">開始執行</string>
     <string name="manager_download_install">點選以下載並安裝</string>
@@ -69,17 +71,17 @@
     <string name="su_snack_notif_off">已拒絕 %1$s 發送通知</string>
     <string name="su_snack_log_on">已啟用 %1$s 寫入記錄</string>
     <string name="su_snack_log_off">已停用 %1$s 寫入記錄</string>
-    <string name="su_revoke_title">撤銷？</string>
+    <string name="su_revoke_title">撤銷權限？</string>
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
     <string name="toast">快顯通知</string>
     <string name="none">無</string>
 
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤銷</string>
-    <string name="superuser_policy_none">目前沒有任何應用程式請求 Superuser 的權限。</string>
+    <string name="superuser_policy_none">目前沒有任何應用程式請求超級使用者的權限。</string>
 
     <!--Logs-->
-    <string name="log_data_none">您的日誌是空的，請嘗試使用您的 SU 啟用更多應用程式。</string>
+    <string name="log_data_none">您的日誌是空的，請嘗試使用具備需要超級使用者權限的應用程式。</string>
     <string name="log_data_magisk_none">Magisk 日誌是空的，很奇怪……。</string>
     <string name="menuSaveLog">儲存記錄</string>
     <string name="menuClearLog">清除記錄</string>
@@ -132,6 +134,10 @@
     <string name="settings_clear_cache_title">清除線上模組庫快取</string>
     <string name="settings_clear_cache_summary">將強制重新載入線上模組庫</string>
     <string name="language">語言</string>
+    <string name="settings_hide_app_title">隱藏 Magisk</string>
+    <string name="settings_hide_app_summary">安裝一個隨機包裝和可客製化應用程式名稱的代理應用程式</string>
+    <string name="settings_restore_app_title">還原 Magisk</string>
+    <string name="settings_restore_app_summary">取消隱藏並還原到原本的包裝名稱</string>
     <string name="system_default">（系統預設值) </string>
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">定期於背景檢查更新</string>
@@ -146,7 +152,7 @@
     <string name="settings_hosts_toast">已安裝主機模組</string>
     <string name="settings_app_name_hint">新的名稱</string>
     <string name="settings_app_name_helper">隨機包裝的應用程式將會使用這個新的名稱</string>
-    <string name="settings_app_name_error">無效的輸入</string>
+    <string name="settings_app_name_error">無效的格式</string>
     <string name="settings_su_app_adb">應用程式及 ADB</string>
     <string name="settings_su_app">僅限應用程式</string>
     <string name="settings_su_adb">僅限 ADB</string>
@@ -207,7 +213,8 @@
     <string name="repo_cache_cleared">已清除線上模組庫的快取</string>
     <string name="flashing">正在刷入……</string>
     <string name="done">完成！</string>
-    <string name="failure">失敗</string>
+    <string name="failure">失敗！</string>
+    <string name="hide_app_title">正在隱藏 Magisk……</string>
     <string name="open_link_failed_toast">沒有可以開啟此連結的應用程式</string>
     <string name="complete_uninstall">完全解除安裝</string>
     <string name="restore_img">還原原始映像檔</string>
@@ -215,12 +222,23 @@
     <string name="restore_done">還原完成！</string>
     <string name="restore_fail">不存在原始備份的映像檔！</string>
     <string name="proprietary_title">下載專有程式碼</string>
+    <string name="proprietary_notice">Magisk 是完全免費且開源的軟體，因此不包含 Google 專有的 SafetyNet API 程式碼。\n\n您同意讓 Magisk 額外的下載一個元件（包含 GoogleApiClient）以進行 SafetyNet 的檢查嗎？</string>
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">運作環境需被修復</string>
+    <string name="env_fix_msg">缺少讓 Magisk 正常運作所需的檔案。您同意讓 Magisk 額外下載安裝包進行修復安裝，修復完成後將自動重新啟動。是否繼續？</string>
     <string name="setup_msg">正在修復運作環境……</string>
     <string name="authenticate">認證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
+    <string name="unsupport_magisk_msg">此 Magisk 的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
+    <string name="unsupport_general_title">異常狀態</string>
+    <string name="unsupport_system_app_msg">不支援讓本應用程式以系統應用程式的方式運作。請恢復成使用者應用程式。</string>
+    <string name="unsupport_other_su_msg">偵測到有一個 \"su\" 的指令不屬於 Magisk 的。請移除其他不支援的應用程式。</string>
+    <string name="unsupport_external_storage_msg">Magisk 已被安裝到外部儲存空間。請移動應用程式回到內部儲存空間。</string>
+    <string name="unsupport_nonroot_stub_msg">應用程式無法在 Root 權限遺失的情況下以隱藏模式運作。請還原到原本的包裝名稱。</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">授予儲存權限以啟用此功能</string>
     <string name="add_shortcut_title">新增捷徑到首頁</string>
+    <string name="add_shortcut_msg">在隱藏 Magisk 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
+    <string name="app_not_found">沒有可以處理這個操作的應用程式</string>
 
 </resources>
