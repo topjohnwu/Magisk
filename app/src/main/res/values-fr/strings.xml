@@ -135,7 +135,7 @@
     <string name="settings_clear_cache_summary">Effacer les informations en cache concerant les dépôts en ligne. Ceci force l’application à télécharger des informations à jour.</string>
     <string name="settings_hide_app_title">Masquer l’application Magisk</string>
     <string name="settings_hide_app_summary">Installer une application intermédiaire avec un ID de package aléatoire et un nom personnalisé</string>
-    <string name="settings_restore_app_title">Restorer l’application Magisk</string>
+    <string name="settings_restore_app_title">Restaurer l’application Magisk</string>
     <string name="settings_restore_app_summary">Démasquer l’application et la restaurer à son APK d’origine</string>
     <string name="language">Langue</string>
     <string name="system_default">(langue par défaut du système)</string>
