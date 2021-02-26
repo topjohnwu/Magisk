@@ -247,8 +247,15 @@ static void daemon_entry(int ppid) {
     // Make sure ppid is not in acct
     char src[64], dest[64];
     sprintf(src, "/acct/uid_0/pid_%d", ppid);
-    sprintf(dest, "/acct/uid_0/pid_%d", getpid());
-    rename(src, dest);
+    if (access(src, F_OK) == 0) {
+        sprintf(dest, "/acct/uid_0/pid_%d", getpid());
+        rename(src, dest);
+    }
+    sprintf(src, "/sys/fs/cgroup/uid_0/pid_%d", ppid);
+    if (access(src, F_OK) == 0) {
+        sprintf(dest, "/sys/fs/cgroup/uid_0/pid_%d", getpid());
+        rename(src, dest);
+    }
 
     // Get self stat
     xreadlink("/proc/self/exe", src, sizeof(src));
