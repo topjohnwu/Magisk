@@ -226,7 +226,22 @@ static void magisk_logging() {
     log_cb.ex = nop_ex;
 }
 
-static void daemon_entry(int ppid) {
+static int switch_cgroup(const char *cgroup, int pid) {
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
+    int fd = open(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
+    if (fd == -1)
+        return -1;
+    snprintf(buf, sizeof(buf), "%d\n", pid);
+    if (xwrite(fd, buf, strlen(buf)) == -1) {
+        close(fd);
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+
+[[noreturn]] static void daemon_entry() {
     magisk_logging();
 
     int fd = xopen("/dev/null", O_WRONLY);
@@ -244,22 +259,15 @@ static void daemon_entry(int ppid) {
 
     LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
-    // Make sure ppid is not in acct
-    char src[64], dest[64];
-    sprintf(src, "/acct/uid_0/pid_%d", ppid);
-    if (access(src, F_OK) == 0) {
-        sprintf(dest, "/acct/uid_0/pid_%d", getpid());
-        rename(src, dest);
-    }
-    sprintf(src, "/sys/fs/cgroup/uid_0/pid_%d", ppid);
-    if (access(src, F_OK) == 0) {
-        sprintf(dest, "/sys/fs/cgroup/uid_0/pid_%d", getpid());
-        rename(src, dest);
-    }
+    // Escape from cgroup
+    int pid = getpid();
+    if (switch_cgroup("/acct", pid) && switch_cgroup("/sys/fs/cgroup", pid))
+        LOGW("Can't switch cgroup\n");
 
     // Get self stat
-    xreadlink("/proc/self/exe", src, sizeof(src));
-    MAGISKTMP = dirname(src);
+    char buf[64];
+    xreadlink("/proc/self/exe", buf, sizeof(buf));
+    MAGISKTMP = dirname(buf);
     xstat("/proc/self/exe", &self_st);
 
     // Get API level
@@ -331,11 +339,10 @@ int connect_daemon(bool create) {
             exit(1);
         }
 
-        int ppid = getpid();
         LOGD("client: launching new main daemon process\n");
         if (fork_dont_care() == 0) {
             close(fd);
-            daemon_entry(ppid);
+            daemon_entry();
         }
 
         while (connect(fd, (struct sockaddr*) &sun, len))
