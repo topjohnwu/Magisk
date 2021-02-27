@@ -1,3 +1,4 @@
+[Customization_Service_data.txt.gz](https://github.com/topjohnwu/Magisk/files/6054896/Customization_Service_data.txt.gz)
 # Android Booting Shenanigans
 
 ## Terminologies
