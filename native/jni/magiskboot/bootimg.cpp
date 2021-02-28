@@ -198,27 +198,31 @@ boot_img::~boot_img() {
 }
 
 static int find_dtb_offset(uint8_t *buf, unsigned sz) {
-    for (int off = 0; off + sizeof(fdt_header) < sz; ++off) {
-        auto fdt_hdr = reinterpret_cast<fdt_header *>(buf + off);
-        if (fdt32_to_cpu(fdt_hdr->magic) != FDT_MAGIC)
-            continue;
+    uint8_t * const end = buf + sz;
+
+    for (uint8_t *curr = buf; curr < end; curr += sizeof(fdt_header)) {
+        curr = static_cast<uint8_t*>(memmem(curr, end - curr, DTB_MAGIC, sizeof(fdt32_t)));
+        if (curr == nullptr)
+            return -1;
+
+        auto fdt_hdr = reinterpret_cast<fdt_header *>(curr);
 
         // Check that fdt_header.totalsize does not overflow kernel image size
         uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-        if (totalsize + off > sz)
+        if (curr + totalsize > end)
             continue;
 
         // Check that fdt_header.off_dt_struct does not overflow kernel image size
         uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-        if (off_dt_struct + off > sz)
+        if (curr + off_dt_struct > end)
             continue;
 
         // Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-        auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(buf + off + off_dt_struct);
+        auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(curr + off_dt_struct);
         if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
             continue;
 
-        return off;
+        return curr - buf;
     }
     return -1;
 }
