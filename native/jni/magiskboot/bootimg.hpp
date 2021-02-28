@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <utility>
+#include <bitset>
 #include "format.hpp"
 
 /******************
@@ -231,6 +232,7 @@ struct dyn_img_hdr {
     decl_val(cmdline, char *)
     decl_val(id, char *)
     decl_val(extra_cmdline, char *)
+    uint32_t kernel_dt_size = 0;
 
     // v1/v2 specific
     decl_var(recovery_dtbo_size, 32)
@@ -244,6 +246,7 @@ struct dyn_img_hdr {
 
     virtual size_t hdr_size() = 0;
     virtual size_t hdr_space() { return page_size(); }
+    virtual dyn_img_hdr *clone() = 0;
 
     const void *raw_hdr() const { return raw; }
     void print();
@@ -276,7 +279,12 @@ name(void *ptr) { \
     raw = xmalloc(sizeof(hdr)); \
     memcpy(raw, ptr, sizeof(hdr)); \
 } \
-size_t hdr_size() override { return sizeof(hdr); }
+size_t hdr_size() override { return sizeof(hdr); } \
+dyn_img_hdr *clone() override { \
+    auto p = new name(this->raw); \
+    p->kernel_dt_size = kernel_dt_size; \
+    return p; \
+};
 
 #define __impl_val(name, hdr_name) \
 decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_name->name; }
@@ -351,7 +359,7 @@ struct dyn_img_v3 : public dyn_img_hdr {
     char *extra_cmdline() override { return &v3_hdr->cmdline[BOOT_ARGS_SIZE]; }
 
 private:
-    uint32_t page_sz;
+    uint32_t page_sz = 4096;
 };
 
 #undef impl_val
@@ -383,16 +391,19 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr {
  * Full Boot Image
  ******************/
 
-#define MTK_KERNEL      (1 << 0)
-#define MTK_RAMDISK     (1 << 1)
-#define CHROMEOS_FLAG   (1 << 2)
-#define DHTB_FLAG       (1 << 3)
-#define SEANDROID_FLAG  (1 << 4)
-#define LG_BUMP_FLAG    (1 << 5)
-#define SHA256_FLAG     (1 << 6)
-#define BLOB_FLAG       (1 << 7)
-#define NOOKHD_FLAG     (1 << 8)
-#define ACCLAIM_FLAG    (1 << 9)
+enum {
+    MTK_KERNEL,
+    MTK_RAMDISK,
+    CHROMEOS_FLAG,
+    DHTB_FLAG,
+    SEANDROID_FLAG,
+    LG_BUMP_FLAG,
+    SHA256_FLAG,
+    BLOB_FLAG,
+    NOOKHD_FLAG,
+    ACCLAIM_FLAG,
+    BOOT_FLAGS_MAX
+};
 
 struct boot_img {
     // Memory map of the whole image
@@ -403,7 +414,7 @@ struct boot_img {
     dyn_img_hdr *hdr;
 
     // Flags to indicate the state of current boot image
-    uint16_t flags = 0;
+    std::bitset<BOOT_FLAGS_MAX> flags;
 
     // The format of kernel, ramdisk and extra
     format_t k_fmt = UNKNOWN;
@@ -420,7 +431,6 @@ struct boot_img {
 
     // Pointer to dtb that is embedded in kernel
     uint8_t *kernel_dtb;
-    uint32_t kernel_dt_size = 0;
 
     // Pointer to end of image
     uint8_t *tail;
