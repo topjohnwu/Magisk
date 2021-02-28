@@ -1,0 +1,1 @@
+Magisk is a suite of open source tools for customizing Android.
