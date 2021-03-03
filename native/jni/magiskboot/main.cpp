@@ -12,6 +12,12 @@
 
 using namespace std;
 
+static void print_methods() {
+    for (int fmt = GZIP; fmt < LZOP; ++fmt) {
+        fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
+    }
+}
+
 static void usage(char *arg0) {
     fprintf(stderr,
 R"EOF(MagiskBoot - Boot Image Modification Tool
@@ -96,8 +102,7 @@ Supported actions:
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: )EOF", arg0);
 
-    for (auto &it : name2fmt)
-        fprintf(stderr, "%s ", it.first.data());
+    print_methods();
 
     fprintf(stderr, R"EOF(
 
@@ -106,8 +111,7 @@ Supported actions:
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
     Supported methods: )EOF");
 
-    for (auto &it : name2fmt)
-        fprintf(stderr, "%s ", it.first.data());
+    print_methods();
 
     fprintf(stderr, "\n\n");
     exit(1);

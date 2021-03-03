@@ -1,25 +1,8 @@
-#include <string.h>
-
 #include "format.hpp"
 
-std::map<std::string_view, format_t> name2fmt;
+Name2Fmt name2fmt;
 Fmt2Name fmt2name;
 Fmt2Ext fmt2ext;
-
-class FormatInit {
-public:
-    FormatInit() {
-        name2fmt["gzip"] = GZIP;
-        name2fmt["xz"] = XZ;
-        name2fmt["lzma"] = LZMA;
-        name2fmt["bzip2"] = BZIP2;
-        name2fmt["lz4"] = LZ4;
-        name2fmt["lz4_legacy"] = LZ4_LEGACY;
-        name2fmt["lz4_lg"] = LZ4_LG;
-    }
-};
-
-static FormatInit init;
 
 #define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
 
@@ -102,4 +85,18 @@ const char *Fmt2Ext::operator[](format_t fmt) {
         default:
             return "";
     }
+}
+
+#define CHECK(s, f) else if (name == s) return f;
+
+format_t Name2Fmt::operator[](std::string_view name) {
+    if (0) {}
+    CHECK("gzip", GZIP)
+    CHECK("xz", XZ)
+    CHECK("lzma", LZMA)
+    CHECK("bzip2", BZIP2)
+    CHECK("lz4", LZ4)
+    CHECK("lz4_legacy", LZ4_LEGACY)
+    CHECK("lz4_lg", LZ4_LG)
+    else return UNKNOWN;
 }

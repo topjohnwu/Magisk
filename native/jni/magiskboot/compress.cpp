@@ -607,8 +607,8 @@ void decompress(char *infile, const char *outfile) {
 }
 
 void compress(const char *method, const char *infile, const char *outfile) {
-    auto it = name2fmt.find(method);
-    if (it == name2fmt.end())
+    format_t fmt = name2fmt[method];
+    if (fmt == UNKNOWN)
         LOGE("Unknown compression method: [%s]\n", method);
 
     bool in_std = infile == "-"sv;
@@ -624,7 +624,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
             /* If user does not provide outfile and infile is not
              * STDIN, output to <infile>.[ext] */
             string tmp(infile);
-            tmp += fmt2ext[it->second];
+            tmp += fmt2ext[fmt];
             out_fp = xfopen(tmp.data(), "we");
             fprintf(stderr, "Compressing to [%s]\n", tmp.data());
             rm_in = true;
@@ -633,7 +633,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
         out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
     }
 
-    auto strm = get_encoder(it->second, make_unique<fp_stream>(out_fp));
+    auto strm = get_encoder(fmt, make_unique<fp_stream>(out_fp));
 
     char buf[4096];
     size_t len;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <string_view>
 
 typedef enum {
@@ -69,8 +68,13 @@ public:
     const char *operator[](format_t fmt);
 };
 
+class Name2Fmt {
+public:
+    format_t operator[](std::string_view name);
+};
+
 format_t check_fmt(const void *buf, size_t len);
 
-extern std::map<std::string_view, format_t> name2fmt;
+extern Name2Fmt name2fmt;
 extern Fmt2Name fmt2name;
 extern Fmt2Ext fmt2ext;
