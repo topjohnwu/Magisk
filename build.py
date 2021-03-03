@@ -405,34 +405,33 @@ def setup_ndk(args):
     rm_rf(ndk_path)
     with zipfile.ZipFile(ndk_zip, 'r') as zf:
         for info in zf.infolist():
+            print(f'Extracting {info.filename}')
+            if info.external_attr == 2716663808:  # symlink
+                src = zf.read(info).decode("utf-8")
+                dest = op.join(ndk_root, info.filename)
+                os.symlink(src, dest)
+                continue
             extracted_path = zf.extract(info, ndk_root)
-            vprint(f'Extracting {info.filename}')
             if info.create_system == 3:  # ZIP_UNIX_SYSTEM = 3
                 unix_attributes = info.external_attr >> 16
             if unix_attributes:
                 os.chmod(extracted_path, unix_attributes)
     mv(op.join(ndk_root, f'android-ndk-r{ndk_ver}'), ndk_path)
 
-    header('* Removing unnecessary files')
-    for dirname, subdirs, _ in os.walk(op.join(ndk_path, 'platforms')):
-        for plats in subdirs:
-            pp = op.join(dirname, plats)
-            rm_rf(pp)
-            mkdir(pp)
-        subdirs.clear()
-    rm_rf(op.join(ndk_path, 'sysroot'))
-
-    header('* Replacing API-16 static libs')
-    for target in ['arm-linux-androideabi', 'i686-linux-android']:
-        arch = target.split('-')[0]
-        lib_dir = op.join(
-            ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-            'sysroot', 'usr', 'lib', f'{target}', '16')
-        src_dir = op.join('tools', 'ndk-bins', arch)
-        # Remove stupid macOS crap
-        rm(op.join(src_dir, '.DS_Store'))
-        for path in copy_tree(src_dir, lib_dir):
-            vprint(f'Replaced {path}')
+    header('* Patching static libs')
+    for api in ['16', '21']:
+        for target in ['aarch64-linux-android', 'arm-linux-androideabi',
+                       'i686-linux-android', 'x86_64-linux-android']:
+            arch = target.split('-')[0]
+            lib_dir = op.join(
+                ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
+                'sysroot', 'usr', 'lib', f'{target}', api)
+            if not op.exists(lib_dir):
+                continue
+            src_dir = op.join('tools', 'ndk-bins', api, arch)
+            rm(op.join(src_dir, '.DS_Store'))
+            for path in copy_tree(src_dir, lib_dir):
+                vprint(f'Replaced {path}')
 
 
 def build_all(args):

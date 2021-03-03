@@ -253,9 +253,10 @@ LOCAL_EXPORT_C_INCLUDES := $(LIBSELINUX)
 LOCAL_STATIC_LIBRARIES := libpcre2
 LOCAL_CFLAGS := \
     -Wno-implicit-function-declaration -Wno-int-conversion -Wno-unused-function \
-    -D_GNU_SOURCE -DUSE_PCRE2 \
+    -Wno-macro-redefined -D_GNU_SOURCE -DUSE_PCRE2 \
     -DNO_PERSISTENTLY_STORED_PATTERNS -DDISABLE_SETRANS -DDISABLE_BOOL \
-    -DNO_MEDIA_BACKEND -DNO_X_BACKEND -DNO_DB_BACKEND -DNO_ANDROID_BACKEND
+    -DNO_MEDIA_BACKEND -DNO_X_BACKEND -DNO_DB_BACKEND -DNO_ANDROID_BACKEND \
+    -Dfgets_unlocked=fgets -D'__fsetlocking(...)='
 LOCAL_SRC_FILES := \
     selinux/libselinux/src/avc.c \
     selinux/libselinux/src/avc_internal.c \
