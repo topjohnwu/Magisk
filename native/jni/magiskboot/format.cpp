@@ -21,37 +21,37 @@ public:
 
 static FormatInit init;
 
-#define MATCH(s) (len >= (sizeof(s) - 1) && memcmp(buf, s, sizeof(s) - 1) == 0)
+#define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
 
 format_t check_fmt(const void *buf, size_t len) {
-    if (MATCH(CHROMEOS_MAGIC)) {
+    if (CHECKED_MATCH(CHROMEOS_MAGIC)) {
         return CHROMEOS;
-    } else if (MATCH(BOOT_MAGIC)) {
+    } else if (CHECKED_MATCH(BOOT_MAGIC)) {
         return AOSP;
-    } else if (MATCH(VENDOR_BOOT_MAGIC)) {
+    } else if (CHECKED_MATCH(VENDOR_BOOT_MAGIC)) {
         return AOSP_VENDOR;
-    } else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
+    } else if (CHECKED_MATCH(GZIP1_MAGIC) || CHECKED_MATCH(GZIP2_MAGIC)) {
         return GZIP;
-    } else if (MATCH(LZOP_MAGIC)) {
+    } else if (CHECKED_MATCH(LZOP_MAGIC)) {
         return LZOP;
-    } else if (MATCH(XZ_MAGIC)) {
+    } else if (CHECKED_MATCH(XZ_MAGIC)) {
         return XZ;
     } else if (len >= 13 && memcmp(buf, "\x5d\x00\x00", 3) == 0
             && (((char *)buf)[12] == '\xff' || ((char *)buf)[12] == '\x00')) {
         return LZMA;
-    } else if (MATCH(BZIP_MAGIC)) {
+    } else if (CHECKED_MATCH(BZIP_MAGIC)) {
         return BZIP2;
-    } else if (MATCH(LZ41_MAGIC) || MATCH(LZ42_MAGIC)) {
+    } else if (CHECKED_MATCH(LZ41_MAGIC) || CHECKED_MATCH(LZ42_MAGIC)) {
         return LZ4;
-    } else if (MATCH(LZ4_LEG_MAGIC)) {
+    } else if (CHECKED_MATCH(LZ4_LEG_MAGIC)) {
         return LZ4_LEGACY;
-    } else if (MATCH(MTK_MAGIC)) {
+    } else if (CHECKED_MATCH(MTK_MAGIC)) {
         return MTK;
-    } else if (MATCH(DTB_MAGIC)) {
+    } else if (CHECKED_MATCH(DTB_MAGIC)) {
         return DTB;
-    } else if (MATCH(DHTB_MAGIC)) {
+    } else if (CHECKED_MATCH(DHTB_MAGIC)) {
         return DHTB;
-    } else if (MATCH(TEGRABLOB_MAGIC)) {
+    } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
         return BLOB;
     } else {
         return UNKNOWN;

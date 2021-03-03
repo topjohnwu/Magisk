@@ -5,18 +5,18 @@
 
 #include "magiskboot.hpp"
 
-#define MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
+#define CHECKED_MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
 
 static int check_verity_pattern(const char *s) {
     int skip = s[0] == ',';
 
     if (0) {}
-    MATCH("verifyatboot");
-    MATCH("verify");
-    MATCH("avb_keys");
-    MATCH("avb");
-    MATCH("support_scfs");
-    MATCH("fsverity");
+    CHECKED_MATCH("verifyatboot");
+    CHECKED_MATCH("verify");
+    CHECKED_MATCH("avb_keys");
+    CHECKED_MATCH("avb");
+    CHECKED_MATCH("support_scfs");
+    CHECKED_MATCH("fsverity");
     else return -1;
 
     if (s[skip] == '=') {
@@ -26,14 +26,14 @@ static int check_verity_pattern(const char *s) {
     return skip;
 }
 
-#undef MATCH
-#define MATCH(p) else if (strncmp(s, p, sizeof(p) - 1) == 0) return (sizeof(p) - 1)
+#undef CHECKED_MATCH
+#define CHECKED_MATCH(p) else if (strncmp(s, p, sizeof(p) - 1) == 0) return (sizeof(p) - 1)
 
 static int check_encryption_pattern(const char *s) {
     if (0) {}
-    MATCH("forceencrypt");
-    MATCH("forcefdeorfbe");
-    MATCH("fileencryption");
+    CHECKED_MATCH("forceencrypt");
+    CHECKED_MATCH("forcefdeorfbe");
+    CHECKED_MATCH("fileencryption");
     else return -1;
 }
 

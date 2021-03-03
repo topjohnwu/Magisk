@@ -54,10 +54,6 @@ static size_t restore(int fd, const char *filename) {
     return size;
 }
 
-static void restore_buf(int fd, const void *buf, size_t size) {
-    xwrite(fd, buf, size);
-}
-
 void dyn_img_hdr::print() {
     uint32_t ver = header_version();
     fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);
@@ -250,6 +246,8 @@ off += hdr->name##_size(); \
 off = do_align(off, hdr->page_size()); \
 }
 
+#define CMD_MATCH(s) BUFFER_MATCH(hp->cmdline, s)
+
 void boot_img::parse_image(uint8_t *addr, format_t type) {
     auto hp = reinterpret_cast<boot_img_hdr*>(addr);
     if (type == AOSP_VENDOR) {
@@ -259,11 +257,11 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         fprintf(stderr, "PXA_BOOT_HDR\n");
         hdr = new dyn_img_pxa(addr);
     } else {
-        if (memcmp(hp->cmdline, NOOKHD_RL_MAGIC, 10) == 0 ||
-            memcmp(hp->cmdline, NOOKHD_GL_MAGIC, 12) == 0 ||
-            memcmp(hp->cmdline, NOOKHD_GR_MAGIC, 14) == 0 ||
-            memcmp(hp->cmdline, NOOKHD_EB_MAGIC, 26) == 0 ||
-            memcmp(hp->cmdline, NOOKHD_ER_MAGIC, 30) == 0) {
+        if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
+            CMD_MATCH(NOOKHD_GL_MAGIC) ||
+            CMD_MATCH(NOOKHD_GR_MAGIC) ||
+            CMD_MATCH(NOOKHD_EB_MAGIC) ||
+            CMD_MATCH(NOOKHD_ER_MAGIC)) {
             flags[NOOKHD_FLAG] = true;
             fprintf(stderr, "NOOKHD_LOADER\n");
             addr += NOOKHD_PRE_HEADER_SZ;
@@ -309,18 +307,6 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     get_block(recovery_dtbo);
     get_block(dtb);
 
-    if (addr + off < map_addr + map_size) {
-        tail = addr + off;
-        tail_size = map_size - (tail - map_addr);
-    }
-
-    // Check tail info
-    if (tail_size >= 16 && memcmp(tail, SEANDROID_MAGIC, 16) == 0) {
-        flags[SEANDROID_FLAG] = true;
-    } else if (tail_size >= 16 && memcmp(tail, LG_BUMP_MAGIC, 16) == 0) {
-        flags[LG_BUMP_FLAG] = true;
-    }
-
     if (int dtb_off = find_dtb_offset(kernel, hdr->kernel_size()); dtb_off > 0) {
         kernel_dtb = kernel + dtb_off;
         hdr->kernel_dt_size = hdr->kernel_size() - dtb_off;
@@ -334,7 +320,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             fprintf(stderr, "MTK_KERNEL_HDR\n");
             flags[MTK_KERNEL] = true;
             k_hdr = reinterpret_cast<mtk_hdr *>(kernel);
-            fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL", k_hdr->size);
+            fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", k_hdr->size);
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", k_hdr->name);
             kernel += sizeof(mtk_hdr);
             hdr->kernel_size() -= sizeof(mtk_hdr);
@@ -348,7 +334,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             fprintf(stderr, "MTK_RAMDISK_HDR\n");
             flags[MTK_RAMDISK] = true;
             r_hdr = reinterpret_cast<mtk_hdr *>(ramdisk);
-            fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK", r_hdr->size);
+            fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", r_hdr->size);
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
             ramdisk += sizeof(mtk_hdr);
             hdr->ramdisk_size() -= sizeof(mtk_hdr);
@@ -359,6 +345,33 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     if (auto size = hdr->extra_size()) {
         e_fmt = check_fmt_lg(extra, size);
         fprintf(stderr, "%-*s [%s]\n", PADDING, "EXTRA_FMT", fmt2name[e_fmt]);
+    }
+
+    if (addr + off < map_addr + map_size) {
+        tail = addr + off;
+        tail_size = map_addr + map_size - tail;
+
+        // Check special flags
+        if (tail_size >= 16 && BUFFER_MATCH(tail, SEANDROID_MAGIC)) {
+            fprintf(stderr, "SAMSUNG_SEANDROID\n");
+            flags[SEANDROID_FLAG] = true;
+        } else if (tail_size >= 16 && BUFFER_MATCH(tail, LG_BUMP_MAGIC)) {
+            fprintf(stderr, "LG_BUMP_IMAGE\n");
+            flags[LG_BUMP_FLAG] = true;
+        }
+
+        // Find AVB structures
+        void *meta = memmem(tail, tail_size, AVB_MAGIC, AVB_MAGIC_LEN);
+        if (meta) {
+            // Double check if footer exists
+            void *footer = tail + tail_size - sizeof(AvbFooter);
+            if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
+                fprintf(stderr, "VBMETA\n");
+                flags[AVB_FLAG] = true;
+                avb_meta = reinterpret_cast<AvbVBMetaImageHeader*>(meta);
+                avb_footer = reinterpret_cast<AvbFooter*>(footer);
+            }
+        }
     }
 }
 
@@ -448,6 +461,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         uint32_t extra;
         uint32_t dtb;
         uint32_t total;
+        uint32_t vbmeta;
     } off{};
 
     // Create a new boot header and reset sizes
@@ -472,22 +486,22 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Skip DHTB header
         write_zero(fd, sizeof(dhtb_hdr));
     } else if (boot.flags[BLOB_FLAG]) {
-        restore_buf(fd, boot.map_addr, sizeof(blob_hdr));
+        xwrite(fd, boot.map_addr, sizeof(blob_hdr));
     } else if (boot.flags[NOOKHD_FLAG]) {
-        restore_buf(fd, boot.map_addr, NOOKHD_PRE_HEADER_SZ);
+        xwrite(fd, boot.map_addr, NOOKHD_PRE_HEADER_SZ);
     } else if (boot.flags[ACCLAIM_FLAG]) {
-        restore_buf(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
+        xwrite(fd, boot.map_addr, ACCLAIM_PRE_HEADER_SZ);
     }
 
     // Copy raw header
     off.header = lseek(fd, 0, SEEK_CUR);
-    restore_buf(fd, boot.hdr_addr, hdr->hdr_space());
+    xwrite(fd, boot.hdr_addr, hdr->hdr_space());
 
     // kernel
     off.kernel = lseek(fd, 0, SEEK_CUR);
     if (boot.flags[MTK_KERNEL]) {
         // Copy MTK headers
-        restore_buf(fd, boot.k_hdr, sizeof(mtk_hdr));
+        xwrite(fd, boot.k_hdr, sizeof(mtk_hdr));
     }
     if (access(KERNEL_FILE, R_OK) == 0) {
         size_t raw_size;
@@ -510,7 +524,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     off.ramdisk = lseek(fd, 0, SEEK_CUR);
     if (boot.flags[MTK_RAMDISK]) {
         // Copy MTK headers
-        restore_buf(fd, boot.r_hdr, sizeof(mtk_hdr));
+        xwrite(fd, boot.r_hdr, sizeof(mtk_hdr));
     }
     if (access(RAMDISK_FILE, R_OK) == 0) {
         size_t raw_size;
@@ -561,21 +575,31 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         file_align();
     }
 
-    // Append tail info
+    // Proprietary stuffs
     if (boot.flags[SEANDROID_FLAG]) {
-        restore_buf(fd, SEANDROID_MAGIC "\xFF\xFF\xFF\xFF", 20);
-    }
-    if (boot.flags[LG_BUMP_FLAG]) {
-        restore_buf(fd, LG_BUMP_MAGIC, 16);
+        xwrite(fd, SEANDROID_MAGIC, 16);
+        if (boot.flags[DHTB_FLAG]) {
+            xwrite(fd, "\xFF\xFF\xFF\xFF", 4);
+        }
+    } else if (boot.flags[LG_BUMP_FLAG]) {
+        xwrite(fd, LG_BUMP_MAGIC, 16);
     }
 
     off.total = lseek(fd, 0, SEEK_CUR);
+    file_align();
 
-    // Pad image to at least original size if not chromeos (as it requires post processing)
+    // vbmeta
+    off.vbmeta = lseek(fd, 0, SEEK_CUR);
+    if (boot.flags[AVB_FLAG]) {
+        uint64_t vbmeta_size = __builtin_bswap64(boot.avb_footer->vbmeta_size);
+        xwrite(fd, boot.avb_meta, vbmeta_size);
+    }
+
+    // Pad image to original size if not chromeos (as it requires post processing)
     if (!boot.flags[CHROMEOS_FLAG]) {
-        if (off.total < boot.map_size) {
-            int padding = boot.map_size - off.total;
-            write_zero(fd, padding);
+        off_t current = lseek(fd, 0, SEEK_CUR);
+        if (current < boot.map_size) {
+            write_zero(fd, boot.map_size - current);
         }
     }
 
@@ -643,6 +667,16 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
     // Copy main header
     memcpy(new_addr + off.header, hdr->raw_hdr(), hdr->hdr_size());
+
+    if (boot.flags[AVB_FLAG]) {
+        // Copy and patch AVB structures
+        auto footer = reinterpret_cast<AvbFooter*>(new_addr + new_size - sizeof(AvbFooter));
+        auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(new_addr + off.vbmeta);
+        memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
+        footer->original_image_size = __builtin_bswap64(off.total);
+        footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
+        vbmeta->flags = __builtin_bswap32(3);
+    }
 
     if (boot.flags[DHTB_FLAG]) {
         // DHTB header

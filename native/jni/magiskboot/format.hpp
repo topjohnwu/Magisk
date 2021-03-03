@@ -29,6 +29,8 @@ typedef enum {
 #define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
+#define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
+
 #define BOOT_MAGIC      "ANDROID!"
 #define VENDOR_BOOT_MAGIC "VNDRBOOT"
 #define CHROMEOS_MAGIC  "CHROMEOS"
@@ -54,6 +56,8 @@ typedef enum {
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
+#define AVB_FOOTER_MAGIC "AVBf"
+#define AVB_MAGIC "AVB0"
 
 class Fmt2Name {
 public:

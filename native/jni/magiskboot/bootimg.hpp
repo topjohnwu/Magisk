@@ -41,6 +41,49 @@ struct blob_hdr {
     uint32_t version;       /* 0x00000001 */
 } __attribute__((packed));
 
+/**************
+ * AVB Headers
+ **************/
+
+#define AVB_FOOTER_MAGIC_LEN 4
+#define AVB_MAGIC_LEN 4
+#define AVB_RELEASE_STRING_SIZE 48
+
+// https://android.googlesource.com/platform/external/avb/+/refs/heads/android11-release/libavb/avb_footer.h
+struct AvbFooter {
+    uint8_t magic[AVB_FOOTER_MAGIC_LEN];
+    uint32_t version_major;
+    uint32_t version_minor;
+    uint64_t original_image_size;
+    uint64_t vbmeta_offset;
+    uint64_t vbmeta_size;
+    uint8_t reserved[28];
+} __attribute__((packed));
+
+// https://android.googlesource.com/platform/external/avb/+/refs/heads/android11-release/libavb/avb_vbmeta_image.h
+struct AvbVBMetaImageHeader {
+    uint8_t magic[AVB_MAGIC_LEN];
+    uint32_t required_libavb_version_major;
+    uint32_t required_libavb_version_minor;
+    uint64_t authentication_data_block_size;
+    uint64_t auxiliary_data_block_size;
+    uint32_t algorithm_type;
+    uint64_t hash_offset;
+    uint64_t hash_size;
+    uint64_t signature_offset;
+    uint64_t signature_size;
+    uint64_t public_key_offset;
+    uint64_t public_key_size;
+    uint64_t public_key_metadata_offset;
+    uint64_t public_key_metadata_size;
+    uint64_t descriptors_offset;
+    uint64_t descriptors_size;
+    uint64_t rollback_index;
+    uint32_t flags;
+    uint32_t rollback_index_location;
+    uint8_t release_string[AVB_RELEASE_STRING_SIZE];
+    uint8_t reserved[80];
+} __attribute__((packed));
 
 /*********************
  * Boot Image Headers
@@ -402,6 +445,7 @@ enum {
     BLOB_FLAG,
     NOOKHD_FLAG,
     ACCLAIM_FLAG,
+    AVB_FLAG,
     BOOT_FLAGS_MAX
 };
 
@@ -435,6 +479,10 @@ struct boot_img {
     // Pointer to end of image
     uint8_t *tail;
     size_t tail_size = 0;
+
+    // AVB structs
+    AvbFooter *avb_footer;
+    AvbVBMetaImageHeader *avb_meta;
 
     // Pointers to blocks defined in header
     uint8_t *hdr_addr;
