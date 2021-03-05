@@ -30,8 +30,8 @@ object Const {
 
     // Versions
     const val SNET_EXT_VER = 15
-    const val SNET_REVISION = "18ab78817087c337ae0edd1ecac38aec49217880"
-    const val BOOTCTL_REVISION = "18ab78817087c337ae0edd1ecac38aec49217880"
+    const val SNET_REVISION = "22.0"
+    const val BOOTCTL_REVISION = "22.0"
 
     // Misc
     val USER_ID = Process.myUid() / 100000
@@ -62,7 +62,7 @@ object Const {
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
         const val GITHUB_API_URL = "https://api.github.com/"
-        const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk_files/"
+        const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk-files/"
         const val JS_DELIVR_URL = "https://cdn.jsdelivr.net/gh/"
         const val OFFICIAL_REPO = "https://magisk-modules-repo.github.io/submission/modules.json"
     }

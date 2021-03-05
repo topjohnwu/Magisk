@@ -10,17 +10,15 @@ import retrofit2.http.*
 private const val REVISION = "revision"
 private const val BRANCH = "branch"
 private const val REPO = "repo"
+private const val FILE = "file"
 
-const val MAGISK_FILES = "topjohnwu/magisk_files"
+const val MAGISK_FILES = "topjohnwu/magisk-files"
 const val MAGISK_MAIN = "topjohnwu/Magisk"
 
 interface GithubPageServices {
 
-    @GET("stable.json")
-    suspend fun fetchStableUpdate(): UpdateInfo
-
-    @GET("beta.json")
-    suspend fun fetchBetaUpdate(): UpdateInfo
+    @GET("{$FILE}")
+    suspend fun fetchUpdateJSON(@Path(FILE) file: String): UpdateInfo
 }
 
 interface JSDelivrServices {
@@ -32,9 +30,6 @@ interface JSDelivrServices {
     @GET("$MAGISK_FILES@{$REVISION}/bootctl")
     @Streaming
     suspend fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): ResponseBody
-
-    @GET("$MAGISK_FILES@{$REVISION}/canary.json")
-    suspend fun fetchCanaryUpdate(@Path(REVISION) revision: String): UpdateInfo
 
     @GET("$MAGISK_MAIN@{$REVISION}/scripts/module_installer.sh")
     @Streaming

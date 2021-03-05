@@ -8,9 +8,6 @@ import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.model.MagiskJson
-import com.topjohnwu.magisk.core.model.StubJson
-import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.data.network.*
 import retrofit2.HttpException
 import timber.log.Timber
@@ -40,22 +37,10 @@ class NetworkService(
     }
 
     // UpdateInfo
-    private suspend fun fetchStableUpdate() = pages.fetchStableUpdate()
-    private suspend fun fetchBetaUpdate() = pages.fetchBetaUpdate()
+    private suspend fun fetchStableUpdate() = pages.fetchUpdateJSON("stable.json")
+    private suspend fun fetchBetaUpdate() = pages.fetchUpdateJSON("beta.json")
+    private suspend fun fetchCanaryUpdate() = pages.fetchUpdateJSON("canary.json")
     private suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
-    private suspend fun fetchCanaryUpdate(): UpdateInfo {
-        val sha = fetchCanaryVersion()
-        val info = jsd.fetchCanaryUpdate(sha)
-
-        fun genCDNUrl(name: String) = "${Const.Url.JS_DELIVR_URL}${MAGISK_FILES}@${sha}/${name}"
-        fun MagiskJson.updateCopy() = copy(link = genCDNUrl(link), note = genCDNUrl(note))
-        fun StubJson.updateCopy() = copy(link = genCDNUrl(link))
-
-        return info.copy(
-            magisk = info.magisk.updateCopy(),
-            stub = info.stub.updateCopy()
-        )
-    }
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
@@ -89,6 +74,5 @@ class NetworkService(
     suspend fun fetchFile(url: String) = wrap { raw.fetchFile(url) }
     suspend fun fetchString(url: String) = wrap { raw.fetchString(url) }
 
-    private suspend fun fetchCanaryVersion() = api.fetchBranch(MAGISK_FILES, "canary").commit.sha
     private suspend fun fetchMainVersion() = api.fetchBranch(MAGISK_MAIN, "master").commit.sha
 }
