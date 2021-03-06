@@ -19,6 +19,7 @@
     <string name="not_available">N/A</string>
     <string name="hide">Skrýt</string>
     <string name="home_package">Balíček</string>
+    <string name="home_app_title">Aplikace</string>
 
     <string name="home_support_title">Podpořte nás</string>
     <string name="home_item_source">Zdroj</string>
@@ -131,6 +132,10 @@
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
     <string name="settings_clear_cache_title">Smazat mezipaměť</string>
     <string name="settings_clear_cache_summary">Smažete online informace o použití z mezipaměti, a tím na aplikaci vynutíte obnovení online informací.</string>
+    <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
+    <string name="settings_hide_app_summary">Skryjete aplikaci náhodným ID balíčku a vlastním názvem aplikace.</string>
+    <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
+    <string name="settings_restore_app_summary">Obnovíte aplikaci zpět do původního APK.</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(výchozí podle systému)</string>
     <string name="settings_check_update_title">Zkontrolovat aktualizace</string>
