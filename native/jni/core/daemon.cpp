@@ -146,85 +146,7 @@ shortcut:
     close(client);
 }
 
-static shared_ptr<FILE> log_file;
-
-atomic_flag file_backed = ATOMIC_FLAG_INIT;
-static char *log_buf;
-static size_t log_buf_len;
-
-void setup_logfile(bool reset) {
-    if (file_backed.test_and_set(memory_order_relaxed))
-        return;
-    if (reset)
-        rename(LOGFILE, LOGFILE ".bak");
-
-    int fd = xopen(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-    if (fd < 0) {
-        log_file.reset();
-        return;
-    }
-
-    // Dump all logs in memory (if exists)
-    if (log_buf)
-        write(fd, log_buf, log_buf_len);
-
-    if (FILE *fp = fdopen(fd, "a")) {
-        setbuf(fp, nullptr);
-        log_file.reset(fp, &fclose);
-    }
-}
-
-static int magisk_log(int prio, const char *fmt, va_list ap) {
-    va_list args;
-    va_copy(args, ap);
-
-    // Log to logcat
-    __android_log_vprint(prio, "Magisk", fmt, ap);
-
-    auto local_log_file = log_file;
-    if (!local_log_file)
-        return 0;
-
-    char buf[4096];
-    timeval tv;
-    tm tm;
-    char type;
-    switch (prio) {
-    case ANDROID_LOG_DEBUG:
-        type = 'D';
-        break;
-    case ANDROID_LOG_INFO:
-        type = 'I';
-        break;
-    case ANDROID_LOG_WARN:
-        type = 'W';
-        break;
-    default:
-        type = 'E';
-        break;
-    }
-    gettimeofday(&tv, nullptr);
-    localtime_r(&tv.tv_sec, &tm);
-    size_t len = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
-    int ms = tv.tv_usec / 1000;
-    len += sprintf(buf + len, ".%03d %*d %*d %c : ", ms, 5, getpid(), 5, gettid(), type);
-    strcpy(buf + len, fmt);
-    return vfprintf(local_log_file.get(), buf, args);
-}
-
-#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
-static void magisk_logging() {
-    auto in_mem_file = make_stream_fp<byte_stream>(log_buf, log_buf_len);
-    log_file.reset(in_mem_file.release(), [](FILE *) {
-        free(log_buf);
-        log_buf = nullptr;
-    });
-    log_cb.d = mlog(DEBUG);
-    log_cb.i = mlog(INFO);
-    log_cb.w = mlog(WARN);
-    log_cb.e = mlog(ERROR);
-    log_cb.ex = nop_ex;
-}
+static void magisk_logging();
 
 static void daemon_entry(int ppid) {
     magisk_logging();
@@ -322,7 +244,7 @@ static void daemon_entry(int ppid) {
 }
 
 int connect_daemon(bool create) {
-    struct sockaddr_un sun;
+    sockaddr_un sun;
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (connect(fd, (struct sockaddr*) &sun, len)) {
@@ -342,4 +264,103 @@ int connect_daemon(bool create) {
             usleep(10000);
     }
     return fd;
+}
+
+#define TMP_LOGFILE "/dev/.magisk.log"
+
+namespace {
+class fd_holder {
+public:
+    explicit fd_holder(int fd) : fd(fd) {}
+    ~fd_holder() { close(fd); }
+    FILE *get_fp() { auto fp = fdopen(fd, "a"); setbuf(fp, nullptr); return fp; }
+private:
+    int fd;
+};
+}
+
+static shared_ptr<fd_holder> g_log_file;
+
+void setup_logfile(bool reset) {
+    static atomic_flag has_setup = ATOMIC_FLAG_INIT;
+    if (has_setup.test_and_set(memory_order_relaxed))
+        return;
+
+    if (reset)
+        rename(LOGFILE, LOGFILE ".bak");
+
+    g_log_file.reset();
+
+    int fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+    if (fd < 0)
+        return;
+
+    if (int old = open(TMP_LOGFILE, O_RDONLY | O_CLOEXEC); old >= 0) {
+        char buf[4096];
+        int sz;
+        while ((sz = xread(old, buf, sizeof(buf))) > 0) {
+            xwrite(fd, buf, sz);
+        }
+        close(old);
+    }
+    unlink(TMP_LOGFILE);
+    g_log_file = make_shared<fd_holder>(fd);
+}
+
+static int magisk_log(int prio, const char *fmt, va_list ap) {
+    // Block all signals temporarily
+    sigset_t block_set, old_set;
+    sigfillset(&block_set);
+    pthread_sigmask(SIG_SETMASK, &block_set, &old_set);
+    run_finally fin([set = &old_set] { pthread_sigmask(SIG_SETMASK, set, nullptr); });
+
+    va_list args;
+    va_copy(args, ap);
+
+    // Log to logcat
+    __android_log_vprint(prio, "Magisk", fmt, ap);
+
+    // Create local copy to prevent race condition
+    auto log_file = g_log_file;
+    if (!log_file)
+        return 0;
+
+    char buf[4096];
+    char type;
+    switch (prio) {
+        case ANDROID_LOG_DEBUG:
+            type = 'D';
+            break;
+        case ANDROID_LOG_INFO:
+            type = 'I';
+            break;
+        case ANDROID_LOG_WARN:
+            type = 'W';
+            break;
+        default:
+            type = 'E';
+            break;
+    }
+    timeval tv;
+    tm tm;
+    gettimeofday(&tv, nullptr);
+    localtime_r(&tv.tv_sec, &tm);
+    size_t len = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
+    int ms = tv.tv_usec / 1000;
+    len += sprintf(buf + len, ".%03d %*d %*d %c : ", ms, 5, getpid(), 5, gettid(), type);
+    strcpy(buf + len, fmt);
+    return vfprintf(log_file->get_fp(), buf, args);
+}
+
+#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
+static void magisk_logging() {
+    if (int fd = open(TMP_LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644); fd >= 0) {
+        g_log_file = make_shared<fd_holder>(fd);
+    }
+
+    log_cb.d = mlog(DEBUG);
+    log_cb.i = mlog(INFO);
+    log_cb.w = mlog(WARN);
+    log_cb.e = mlog(ERROR);
+    log_cb.ex = nop_ex;
 }
