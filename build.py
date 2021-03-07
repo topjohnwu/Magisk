@@ -303,6 +303,9 @@ def build_binary(args):
     if 'test' in args.target:
         run_ndk_build('B_TEST=1 B_64BIT=1')
 
+    if 'busybox' in args.target:
+        run_ndk_build('B_BB=1')
+
     # 32-bit only targets can be built in one command
     flag = ''
 
@@ -318,9 +321,6 @@ def build_binary(args):
 
     if 'magiskboot' in args.target:
         flag += ' B_BOOT=1'
-
-    if 'busybox' in args.target:
-        flag += ' B_BB=1'
 
     if flag:
         run_ndk_build(flag)
