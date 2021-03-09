@@ -36,10 +36,10 @@ else
 fi
 print_title "Magisk $PRETTY_VER Uninstaller"
 
-is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with Magisk Manager"
+is_mounted /data || mount /data || abort "! Unable to mount /data, please uninstall with the Magisk app"
 mount_partitions
 check_data
-$DATA_DE || abort "! Cannot access /data, please uninstall with Magisk Manager"
+$DATA_DE || abort "! Cannot access /data, please uninstall with the Magisk app"
 if ! $BOOTMODE; then
   # Mounting stuffs in recovery (best effort)
   mount_name metadata /metadata
@@ -162,13 +162,13 @@ cd /
 
 if $BOOTMODE; then
   ui_print "********************************************"
-  ui_print " Magisk Manager will uninstall itself, and"
+  ui_print " The Magisk app will uninstall itself, and"
   ui_print " the device will reboot after a few seconds"
   ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
   ui_print "********************************************"
-  ui_print " Magisk Manager will not be uninstalled"
+  ui_print " The Magisk app will not be uninstalled"
   ui_print " Please uninstall it manually after reboot"
   ui_print "********************************************"
   recovery_cleanup
