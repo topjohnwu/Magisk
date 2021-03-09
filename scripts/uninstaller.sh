@@ -162,13 +162,13 @@ cd /
 
 if $BOOTMODE; then
   ui_print "********************************************"
-  ui_print " Magisk app will uninstall itself, and"
+  ui_print " The Magisk app will uninstall itself, and"
   ui_print " the device will reboot after a few seconds"
   ui_print "********************************************"
   (sleep 8; /system/bin/reboot)&
 else
   ui_print "********************************************"
-  ui_print " Magisk app will not be uninstalled"
+  ui_print " The Magisk app will not be uninstalled"
   ui_print " Please uninstall it manually after reboot"
   ui_print "********************************************"
   recovery_cleanup
