@@ -172,8 +172,6 @@ static int switch_cgroup(const char *cgroup, int pid) {
     // Change process name
     set_nice_name("magiskd");
 
-    magisk_logging();
-
     int fd = xopen("/dev/null", O_WRONLY);
     xdup2(fd, STDOUT_FILENO);
     xdup2(fd, STDERR_FILENO);
@@ -183,6 +181,8 @@ static int switch_cgroup(const char *cgroup, int pid) {
     xdup2(fd, STDIN_FILENO);
     if (fd > STDERR_FILENO)
         close(fd);
+
+    magisk_logging();
 
     setsid();
     setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
