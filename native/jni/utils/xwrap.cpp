@@ -272,6 +272,14 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
     return errno;
 }
 
+int xaccess(const char *path, int mode) {
+    int ret = access(path, mode);
+    if (ret < 0) {
+        PLOGE("access %s", path);
+    }
+    return ret;
+}
+
 int xstat(const char *pathname, struct stat *buf) {
     int ret = stat(pathname, buf);
     if (ret < 0) {

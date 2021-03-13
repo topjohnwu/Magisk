@@ -100,10 +100,10 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
     // Custom rules
     if (!custom_rules_dir.empty()) {
-        if (auto dir = open_dir(custom_rules_dir.data())) {
+        if (auto dir = xopen_dir(custom_rules_dir.data())) {
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
                 auto rule = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
-                if (access(rule.data(), R_OK) == 0) {
+                if (xaccess(rule.data(), R_OK) == 0) {
                     LOGD("Loading custom sepolicy patch: [%s]\n", rule.data());
                     sepol->load_rule_file(rule.data());
                 }
