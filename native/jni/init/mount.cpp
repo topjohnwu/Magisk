@@ -234,16 +234,20 @@ void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
         goto cache;
 
     strcpy(p, "/data/unencrypted");
-    if (access(path, F_OK) == 0) {
+    if (xaccess(path, F_OK) == 0) {
         // FBE, need to use an unencrypted path
         custom_rules_dir = path + "/magisk"s;
     } else {
         // Skip if /data/adb does not exist
-        strcpy(p, "/data/adb");
-        if (access(path, F_OK) != 0)
+        strcpy(p, SECURE_DIR);
+        if (xaccess(path, F_OK) != 0)
             return;
+        strcpy(p, MODULEROOT);
+        if (xaccess(path, F_OK) != 0) {
+            goto cache;
+        }
         // Unencrypted, directly use module paths
-        custom_rules_dir = string(mnt_base) + MODULEROOT;
+        custom_rules_dir = string(path);
     }
     goto success;
 

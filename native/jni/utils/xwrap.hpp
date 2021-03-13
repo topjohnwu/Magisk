@@ -33,6 +33,7 @@ ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
                     void *(*start_routine) (void *), void *arg);
+int xaccess(const char *path, int mode);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);
