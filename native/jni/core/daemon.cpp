@@ -146,8 +146,6 @@ shortcut:
     close(client);
 }
 
-static void magisk_logging();
-
 static int switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
     snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
@@ -163,7 +161,12 @@ static int switch_cgroup(const char *cgroup, int pid) {
     return 0;
 }
 
+static void magisk_logging();
+static void start_log_daemon();
+
 [[noreturn]] static void daemon_entry() {
+    magisk_logging();
+
     // Block all signals
     sigset_t block_set;
     sigfillset(&block_set);
@@ -182,10 +185,10 @@ static int switch_cgroup(const char *cgroup, int pid) {
     if (fd > STDERR_FILENO)
         close(fd);
 
-    magisk_logging();
-
     setsid();
     setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+
+    start_log_daemon();
 
     LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 
@@ -261,7 +264,6 @@ int connect_daemon(bool create) {
             exit(1);
         }
 
-        LOGD("client: launching new main daemon process\n");
         if (fork_dont_care() == 0) {
             close(fd);
             daemon_entry();
@@ -415,14 +417,16 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
     return len - 1;
 }
 
-#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
-static void magisk_logging() {
+static void start_log_daemon() {
     int fds[2];
     if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds) == 0) {
         log_sockfd = fds[0];
         new_daemon_thread([=] { logfile_writer(fds[1]); });
     }
+}
 
+#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
+static void magisk_logging() {
     log_cb.d = mlog(DEBUG);
     log_cb.i = mlog(INFO);
     log_cb.w = mlog(WARN);
