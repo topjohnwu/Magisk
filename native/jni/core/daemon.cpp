@@ -310,7 +310,7 @@ static void logfile_writer(int sockfd) {
 
     char *log_buf;
     size_t buf_len;
-    sFILE log_fp = make_stream_fp<byte_stream>(log_buf, buf_len);
+    stream *log_strm = new byte_stream(log_buf, buf_len);
 
     msghdr msg{};
     iovec iov{};
@@ -342,12 +342,9 @@ static void logfile_writer(int sockfd) {
                 return;
             if (log_buf)
                 write(fd, log_buf, buf_len);
-            if (FILE *fp = fdopen(fd, "a")) {
-                setbuf(fp, nullptr);
-                log_fp = make_file(fp);
-            } else {
-                return;
-            }
+
+            delete log_strm;
+            log_strm = new fd_stream(fd);
             continue;
         }
 
@@ -382,12 +379,12 @@ static void logfile_writer(int sockfd) {
         iov.iov_len = meta.len;
         if (recvmsg(sockfd, &msg, 0) <= 0)
             return;
-        fwrite(buf, off + meta.len, 1, log_fp.get());
+        log_strm->write(buf, off + meta.len);
     }
 }
 
 static int magisk_log(int prio, const char *fmt, va_list ap) {
-    char buf[4096];
+    char buf[4000];
     int len = vsnprintf(buf, sizeof(buf), fmt, ap) + 1;
 
     if (log_sockfd >= 0) {
