@@ -96,11 +96,13 @@ def rm(file):
         if e.errno != errno.ENOENT:
             raise
 
+
 def rm_on_error(func, path, _):
     # Remove a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
     # Clear the "read-only" and retry
     os.chmod(path, stat.S_IWRITE)
     os.unlink(path)
+
 
 def rm_rf(path):
     vprint(f'rm -rf {path}')
