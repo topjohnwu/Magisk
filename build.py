@@ -11,6 +11,7 @@ import lzma
 import platform
 import urllib.request
 import os.path as op
+import stat
 from distutils.dir_util import copy_tree
 
 
@@ -96,9 +97,16 @@ def rm(file):
             raise
 
 
+def rm_on_error(func, path, _):
+    # Remove a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
+    # Clear the "read-only" and retry
+    os.chmod(path, stat.S_IWRITE)
+    os.unlink(path)
+
+
 def rm_rf(path):
     vprint(f'rm -rf {path}')
-    shutil.rmtree(path, ignore_errors=True)
+    shutil.rmtree(path, ignore_errors=True, onerror=rm_on_error)
 
 
 def mkdir(path, mode=0o755):
