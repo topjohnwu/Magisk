@@ -177,7 +177,7 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
     companion object : KoinComponent {
         const val ACTION_KEY = "download_action"
 
-        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>>()
+        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>?>()
 
         fun observeProgress(owner: LifecycleOwner, callback: (Float, Subject) -> Unit) {
             progressBroadcast.value = null
