@@ -34,7 +34,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
-    override val navHost: Int = R.id.main_nav_host
+    override val navHostId: Int = R.id.main_nav_host
 
     private var isRootFragment = true
 
@@ -166,9 +166,9 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     private fun getScreen(name: String?): NavDirections? {
         return when (name) {
-            Const.Nav.SUPERUSER -> HomeFragmentDirections.actionSuperuserFragment()
-            Const.Nav.HIDE -> HomeFragmentDirections.actionHideFragment()
-            Const.Nav.MODULES -> HomeFragmentDirections.actionModuleFragment()
+            Const.Nav.SUPERUSER -> MainDirections.actionSuperuserFragment()
+            Const.Nav.HIDE -> MainDirections.actionHideFragment()
+            Const.Nav.MODULES -> MainDirections.actionModuleFragment()
             Const.Nav.SETTINGS -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
             else -> null
         }

@@ -103,7 +103,7 @@ class SettingsViewModel(
     override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) = when (item) {
         is DownloadPath -> withExternalRW(callback)
         is Biometrics -> authenticate(callback)
-        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
+        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
         is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
         is Restore -> HideAPK.restore(view.activity)

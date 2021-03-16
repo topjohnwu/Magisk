@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment
@@ -28,7 +27,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     protected open val themeRes: Int = Theme.selected.themeRes
 
     private val navHostFragment by lazy {
-        supportFragmentManager.findFragmentById(navHost) as? NavHostFragment
+        supportFragmentManager.findFragmentById(navHostId) as? NavHostFragment
     }
     private val topFragment get() = navHostFragment?.childFragmentManager?.fragments?.getOrNull(0)
     protected val currentFragment get() = topFragment as? BaseUIFragment<*, *>
@@ -36,7 +35,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     override val viewRoot: View get() = binding.root
     open val navigation: NavController? get() = navHostFragment?.navController
 
-    open val navHost: Int = 0
+    open val navHostId: Int = 0
     open val snackbarView get() = binding.root
 
     init {
@@ -57,14 +56,6 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         obtainStyledAttributes(intArrayOf(android.R.attr.windowBackground))
             .use { it.getDrawable(0) }
             .also { window.setBackgroundDrawable(it) }
-
-        directionsDispatcher.observe(this) {
-            it?.navigate()
-            // we don't want the directions to be re-dispatched, so we preemptively set them to null
-            if (it != null) {
-                directionsDispatcher.value = null
-            }
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window?.decorView?.let {
@@ -127,14 +118,4 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     fun NavDirections.navigate() {
         navigation?.navigate(this)
     }
-
-    companion object {
-
-        private val directionsDispatcher = MutableLiveData<NavDirections?>()
-
-        fun postDirections(navDirections: NavDirections) =
-            directionsDispatcher.postValue(navDirections)
-
-    }
-
 }

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.arch
 
 import android.Manifest
-import android.os.Build
 import androidx.annotation.CallSuper
 import androidx.core.graphics.Insets
 import androidx.databinding.Bindable
@@ -107,7 +106,7 @@ abstract class BaseViewModel(
         _viewEvents.postValue(this)
     }
 
-    fun NavDirections.publish() {
+    fun NavDirections.navigate() {
         _viewEvents.postValue(NavigationEvent(this))
     }
 

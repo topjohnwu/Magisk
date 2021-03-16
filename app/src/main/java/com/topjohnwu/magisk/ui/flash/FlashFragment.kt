@@ -7,8 +7,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import androidx.navigation.NavDeepLinkBuilder
+import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import com.topjohnwu.magisk.MainDirections.Companion.actionFlashFragment as toFlash
 
 class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() {
 
@@ -91,22 +90,22 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flash(isSecondSlot: Boolean) = toFlash(
+        fun flash(isSecondSlot: Boolean) = MainDirections.actionFlashFragment(
             action = flashType(isSecondSlot)
-        ).let { BaseUIActivity.postDirections(it) }
+        )
 
         /* Patching is understood as injecting img files with magisk */
 
-        fun patch(uri: Uri) = toFlash(
+        fun patch(uri: Uri) = MainDirections.actionFlashFragment(
             action = Const.Value.PATCH_FILE,
             additionalData = uri
-        ).let { BaseUIActivity.postDirections(it) }
+        )
 
         /* Uninstalling is understood as removing magisk entirely */
 
-        fun uninstall() = toFlash(
+        fun uninstall() = MainDirections.actionFlashFragment(
             action = Const.Value.UNINSTALL
-        ).let { BaseUIActivity.postDirections(it) }
+        )
 
         /* Installing is understood as flashing modules / zips */
 
@@ -116,11 +115,11 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
             dismissId = id
         ).let { createIntent(context, it) }
 
-        fun install(file: Uri, id: Int) = toFlash(
+        fun install(file: Uri, id: Int) = MainDirections.actionFlashFragment(
             action = Const.Value.FLASH_ZIP,
             additionalData = file,
             dismissId = id
-        ).let { BaseUIActivity.postDirections(it) }
+        )
     }
 
 }

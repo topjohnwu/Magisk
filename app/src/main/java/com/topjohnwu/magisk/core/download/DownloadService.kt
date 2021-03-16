@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.net.toFile
+import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.download.Action.Flash
 import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.core.download.Subject.Module
@@ -26,7 +28,11 @@ open class DownloadService : BaseDownloader() {
     }
 
     private fun Module.onFinish(id: Int) = when (action) {
-        Flash -> FlashFragment.install(file, id)
+        Flash -> {
+            (ForegroundTracker.foreground as? BaseUIActivity<*, *>)
+                ?.navigation?.navigate(FlashFragment.install(file, id))
+            Unit
+        }
         else -> Unit
     }
 

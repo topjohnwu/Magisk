@@ -127,11 +127,11 @@ class HomeViewModel(
     }
 
     fun onMagiskPressed() = withExternalRW {
-        HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+        HomeFragmentDirections.actionHomeFragmentToInstallFragment().navigate()
     }
 
     fun onSafetyNetPressed() =
-        HomeFragmentDirections.actionHomeFragmentToSafetynetFragment().publish()
+        HomeFragmentDirections.actionHomeFragmentToSafetynetFragment().navigate()
 
     fun hideNotice() {
         Config.safetyNotice = false

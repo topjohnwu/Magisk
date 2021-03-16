@@ -80,7 +80,7 @@ class SuperuserViewModel(
     }
 
     private fun hidePressed() =
-        SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().publish()
+        SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().navigate()
 
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {

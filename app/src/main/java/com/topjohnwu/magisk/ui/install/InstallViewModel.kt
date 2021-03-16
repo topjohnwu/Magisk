@@ -89,9 +89,9 @@ class InstallViewModel(
 
     fun install() {
         when (method) {
-            R.id.method_patch -> FlashFragment.patch(data!!)
-            R.id.method_direct -> FlashFragment.flash(false)
-            R.id.method_inactive_slot -> FlashFragment.flash(true)
+            R.id.method_patch -> FlashFragment.patch(data!!).navigate()
+            R.id.method_direct -> FlashFragment.flash(false).navigate()
+            R.id.method_inactive_slot -> FlashFragment.flash(true).navigate()
             else -> error("Unknown value")
         }
         state = State.LOADING
