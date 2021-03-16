@@ -201,7 +201,7 @@ dependencies {
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vMarkwon = "4.6.1"
+    val vMarkwon = "4.6.2"
     implementation("io.noties.markwon:core:${vMarkwon}")
     implementation("io.noties.markwon:html:${vMarkwon}")
     implementation("io.noties.markwon:image:${vMarkwon}")
@@ -234,7 +234,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.3.0-beta01"
+    val vRoom = "2.3.0-beta03"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
@@ -249,7 +249,7 @@ dependencies {
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.fragment:fragment-ktx:1.3.1")
     implementation("androidx.work:work-runtime-ktx:2.5.0")
     implementation("androidx.transition:transition:1.4.0")
     implementation("androidx.multidex:multidex:2.0.1")
