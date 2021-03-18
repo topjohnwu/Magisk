@@ -60,7 +60,7 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
 
         val hidden = hideList.filter { it.packageName == packageName || it.packageName == ISOLATED_MAGIC }
         fun createProcess(name: String, pkg: String = packageName): HideProcessInfo {
-            return HideProcessInfo(name, pkg, hidden.any { it.process == name })
+            return HideProcessInfo(name, pkg, hidden.any { it.process == name && it.packageName == pkg })
         }
 
         var haveAppZygote = false
@@ -86,7 +86,7 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
             receivers?.processes().orEmpty() +
             providers?.processes().orEmpty() +
             listOf(if (haveAppZygote) createProcess("${processName}_zygote") else null)
-        }.filterNotNull().distinctBy { it.name }.sortedBy { it.name }
+        }.filterNotNull().distinct().sortedBy { it.name }
     }
 
     companion object {
@@ -102,6 +102,6 @@ data class HideProcessInfo(
     val packageName: String,
     var isHidden: Boolean
 ) {
-    val isIsolated get() = name == ISOLATED_MAGIC
+    val isIsolated get() = packageName == ISOLATED_MAGIC
     val isAppZygote get() = name.endsWith("_zygote")
 }
