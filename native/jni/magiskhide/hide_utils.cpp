@@ -108,6 +108,8 @@ static bool validate(const char *s) {
             (c >= '0' && c <= '9') || c == '_' || c == ':') {
             continue;
         }
+        if (SDK_INT >= 29 && c == '$')
+            continue;
         if (c == '.') {
             dot = true;
             continue;
@@ -333,7 +335,7 @@ void auto_start_magiskhide(bool late_props) {
     }
 }
 
-bool is_hide_target(int uid, string_view process) {
+bool is_hide_target(int uid, string_view process, int max_len) {
     mutex_guard lock(hide_state_lock);
 
     if (uid % 100000 >= 90000) {
@@ -343,6 +345,8 @@ bool is_hide_target(int uid, string_view process) {
             return false;
 
         for (auto &s : it->second) {
+            if (s.length() > max_len && process.length() > max_len && str_starts(s, process))
+                return true;
             if (str_starts(process, s))
                 return true;
         }
@@ -352,6 +356,8 @@ bool is_hide_target(int uid, string_view process) {
             return false;
 
         for (auto &s : it->second) {
+            if (s.length() > max_len && process.length() > max_len && str_starts(s, process))
+                return true;
             if (s == process)
                 return true;
         }

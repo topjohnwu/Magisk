@@ -212,7 +212,7 @@ static bool check_pid(int pid) {
         cmdline == "usap32"sv || cmdline == "usap64"sv)
         return false;
 
-    if (!is_hide_target(uid, cmdline))
+    if (!is_hide_target(uid, cmdline, 95))
         goto not_target;
 
     // Ensure ns is separated

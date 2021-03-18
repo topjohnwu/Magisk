@@ -36,7 +36,7 @@ void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
 bool hide_enabled();
 void update_uid_map();
-bool is_hide_target(int uid, std::string_view process);
+bool is_hide_target(int uid, std::string_view process, int max_len = 1024);
 
 // Hide policies
 void hide_daemon(int pid);

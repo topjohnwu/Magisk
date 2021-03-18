@@ -71,7 +71,7 @@ static inline bool str_contains(std::string_view s, std::string_view ss) {
     return s.find(ss) != std::string::npos;
 }
 static inline bool str_starts(std::string_view s, std::string_view ss) {
-    return s.rfind(ss, 0) == 0;
+    return s.size() >= ss.size() && s.compare(0, ss.size(), ss) == 0;
 }
 static inline bool str_ends(std::string_view s, std::string_view ss) {
     return s.size() >= ss.size() && s.compare(s.size() - ss.size(), std::string::npos, ss) == 0;
