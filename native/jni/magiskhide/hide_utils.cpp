@@ -213,7 +213,6 @@ static bool str_ends_safe(string_view s, string_view ss) {
 
 #define SNET_PROC    "com.google.android.gms.unstable"
 #define GMS_PKG      "com.google.android.gms"
-#define MICROG_PKG   "org.microg.gms.droidguard"
 
 static bool init_list() {
     LOGD("hide: initialize\n");
@@ -233,7 +232,6 @@ static bool init_list() {
 
     // Add SafetyNet by default
     add_hide_set(GMS_PKG, SNET_PROC);
-    add_hide_set(MICROG_PKG, SNET_PROC);
 
     // We also need to hide the default GMS process if MAGISKTMP != /sbin
     // The snet process communicates with the main process and get additional info
