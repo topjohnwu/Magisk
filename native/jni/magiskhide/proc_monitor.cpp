@@ -145,13 +145,21 @@ static void inotify_event(int) {
     check_zygote();
 }
 
-// Workaround for the lack of pthread_cancel
 static void term_thread(int) {
     LOGD("proc_monitor: cleaning up\n");
     zygote_map.clear();
     attaches.reset();
     close(inotify_fd);
     inotify_fd = -1;
+    // Restore all signal handlers that was set
+    sigset_t set;
+    sigfillset(&set);
+    pthread_sigmask(SIG_BLOCK, &set, nullptr);
+    struct sigaction act{};
+    act.sa_handler = SIG_DFL;
+    sigaction(SIGTERMTHRD, &act, nullptr);
+    sigaction(SIGIO, &act, nullptr);
+    sigaction(SIGALRM, &act, nullptr);
     LOGD("proc_monitor: terminate\n");
     pthread_exit(nullptr);
 }
@@ -276,16 +284,29 @@ static void new_zygote(int pid) {
 #define DETACH_AND_CONT { detach_pid(pid); continue; }
 
 void proc_monitor() {
-    // Unblock some signals
-    sigset_t block_set;
-    sigemptyset(&block_set);
-    sigaddset(&block_set, SIGTERMTHRD);
-    sigaddset(&block_set, SIGIO);
-    sigaddset(&block_set, SIGALRM);
-    pthread_sigmask(SIG_UNBLOCK, &block_set, nullptr);
     monitor_thread = pthread_self();
 
+    // Backup original mask
+    sigset_t orig_mask;
+    pthread_sigmask(SIG_SETMASK, nullptr, &orig_mask);
+
+    sigset_t unblock_set;
+    sigemptyset(&unblock_set);
+    sigaddset(&unblock_set, SIGTERMTHRD);
+    sigaddset(&unblock_set, SIGIO);
+    sigaddset(&unblock_set, SIGALRM);
+
     struct sigaction act{};
+    sigfillset(&act.sa_mask);
+    act.sa_handler = SIG_IGN;
+    sigaction(SIGTERMTHRD, &act, nullptr);
+    sigaction(SIGIO, &act, nullptr);
+    sigaction(SIGALRM, &act, nullptr);
+
+    // Temporary unblock to clear pending signals
+    pthread_sigmask(SIG_UNBLOCK, &unblock_set, nullptr);
+    pthread_sigmask(SIG_SETMASK, &orig_mask, nullptr);
+
     act.sa_handler = term_thread;
     sigaction(SIGTERMTHRD, &act, nullptr);
     act.sa_handler = inotify_event;
@@ -305,6 +326,8 @@ void proc_monitor() {
     }
 
     for (int status;;) {
+        pthread_sigmask(SIG_UNBLOCK, &unblock_set, nullptr);
+
         const int pid = waitpid(-1, &status, __WALL | __WNOTHREAD);
         if (pid < 0) {
             if (errno == ECHILD) {
@@ -318,6 +341,8 @@ void proc_monitor() {
             }
             continue;
         }
+
+        pthread_sigmask(SIG_SETMASK, &orig_mask, nullptr);
 
         if (!WIFSTOPPED(status) /* Ignore if not ptrace-stop */)
             DETACH_AND_CONT;
