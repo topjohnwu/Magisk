@@ -110,6 +110,7 @@ main() {
 
   remove_system_su
   find_manager_apk
+  api_level_arch_detect
   install_magisk
 
   # Cleanups
