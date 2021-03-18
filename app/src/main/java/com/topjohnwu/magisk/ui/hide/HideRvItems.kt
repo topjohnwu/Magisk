@@ -99,7 +99,7 @@ class HideProcessRvItem(
         set(value) = set(value, process.isHidden, { process.isHidden = it }, BR.hidden) {
             val arg = if (it) "add" else "rm"
             val (name, pkg) = process
-            Shell.su("magiskhide $arg $pkg $name").submit()
+            Shell.su("magiskhide $arg $pkg \'$name\'").submit()
         }
 
     fun toggle() {
