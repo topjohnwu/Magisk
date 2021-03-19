@@ -84,6 +84,8 @@ Each device has its own key combo to boot into recovery, as an example for Galax
 
 **If your device is NOT launched with Android 9.0 or higher, you are reading the wrong section.**
 
+**This is for installing Magisk on the official firmware. If you have already installed a third-party firmware like LineageOS, you can copy the boot partition and let the Magisk app patch it, then flash the patched boot partition. In this case the recovery partition is untouched.**
+
 ### Before Installing Magisk
 
 - Installing Magisk **WILL** trip KNOX
