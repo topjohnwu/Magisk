@@ -109,7 +109,7 @@ main() {
   ui_print "- Target image: $BOOTIMAGE"
 
   remove_system_su
-  find_manager_apk
+  find_magisk_apk
   install_magisk
 
   # Cleanups
