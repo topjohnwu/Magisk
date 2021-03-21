@@ -54,7 +54,7 @@ if [ -z $SOURCEDMODE ]; then
   # Load utility functions
   . ./util_functions.sh
   # Check if 64-bit
-  [ -d /system/lib64 ] && IS64BIT=true || IS64BIT=false
+  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"
