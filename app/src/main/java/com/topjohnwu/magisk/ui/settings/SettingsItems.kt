@@ -87,7 +87,7 @@ object Hide : BaseSettingsItem.Input() {
         get() = if (isError) null else result
 
     @get:Bindable
-    var result = "Manager"
+    var result = "Settings"
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     val maxLength

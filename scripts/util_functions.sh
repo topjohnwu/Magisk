@@ -538,7 +538,7 @@ check_data() {
   resolve_vars
 }
 
-find_manager_apk() {
+find_magisk_apk() {
   local DBAPK
   [ -z $APK ] && APK=/data/adb/magisk.apk
   [ -f $APK ] || APK=/data/magisk/magisk.apk
@@ -549,7 +549,7 @@ find_manager_apk() {
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
   fi
-  [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
+  [ -f $APK ] || ui_print "! Unable to detect Magisk app APK for BootSigner"
 }
 
 run_migrations() {
@@ -742,7 +742,7 @@ install_module() {
   done
 
   if $BOOTMODE; then
-    # Update info for Magisk Manager
+    # Update info for Magisk app
     mktouch $NVBASE/modules/$MODID/update
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
