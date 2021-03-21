@@ -37,9 +37,9 @@ getvar() {
   local VARNAME=$1
   local VALUE
   local PROPPATH='/data/.magisk /cache/.magisk'
-  [ -n $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
-  [ -n $VALUE ] && eval $VARNAME=\$VALUE
+  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
 is_mounted() {
@@ -50,7 +50,7 @@ is_mounted() {
 abort() {
   ui_print "$1"
   $BOOTMODE || recovery_cleanup
-  [ -n $MODPATH ] && rm -rf $MODPATH
+  [ ! -z $MODPATH ] && rm -rf $MODPATH
   rm -rf $TMPDIR
   exit 1
 }
@@ -394,7 +394,7 @@ find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
     BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery$SLOT sos`
-  elif [ -n $SLOT ]; then
+  elif [ ! -z $SLOT ]; then
     BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
     BOOTIMAGE=`find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg boot lnx boot_a`
