@@ -753,10 +753,11 @@ install_module() {
     copy_sepolicy_rules
   fi
 
-  # Remove stuffs that don't belong to modules
+  # Remove stuff that doesn't belong to modules and clean up any empty directories
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
   $MODPATH/README.md $MODPATH/.git*
+  rmdir -p $MODPATH
 
   cd /
   $BOOTMODE || recovery_cleanup
