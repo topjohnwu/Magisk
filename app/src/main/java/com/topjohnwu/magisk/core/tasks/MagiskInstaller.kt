@@ -255,7 +255,7 @@ abstract class MagiskInstallImpl protected constructor(
                 val alpha = "abcdefghijklmnopqrstuvwxyz"
                 val alphaNum = "$alpha${alpha.toUpperCase(Locale.ROOT)}0123456789"
                 val random = SecureRandom()
-                val filename = StringBuilder("magisk_patched_").run {
+                val filename = StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
                     for (i in 1..5) {
                         append(alphaNum[random.nextInt(alphaNum.length)])
                     }
