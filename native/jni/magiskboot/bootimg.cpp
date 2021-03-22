@@ -201,17 +201,16 @@ static int find_dtb_offset(uint8_t *buf, unsigned sz) {
         if (curr == nullptr)
             return -1;
 
-        int off = curr - buf;        
         auto fdt_hdr = reinterpret_cast<fdt_header *>(curr);
 
         // Check that fdt_header.totalsize does not overflow kernel image size
         uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-        if (totalsize > sz - off)
+        if (totalsize > end - curr)
             continue;
 
         // Check that fdt_header.off_dt_struct does not overflow kernel image size
         uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-        if (off_dt_struct > sz - off)
+        if (off_dt_struct > end - curr)
             continue;
 
         // Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
@@ -219,7 +218,7 @@ static int find_dtb_offset(uint8_t *buf, unsigned sz) {
         if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
             continue;
 
-        return off;
+        return curr - buf;
     }
     return -1;
 }
