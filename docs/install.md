@@ -17,9 +17,9 @@ Download and install the latest Magisk app. We use the app to gather some inform
 
 <p align="center"><img src="images/device_info.png" width="500"/></p>
 
-Pay special attention to the **Ramdisk** info. If the result is **Yes**, congratulations, your device is perfect for installing Magisk! However, if the result is **No** this means your device's boot partition does **NOT** include ramdisk. This means you will have to go through some extra steps to make Magisk work properly.
+Pay special attention to the **Ramdisk** info. If the result is **Yes**, congratulations, your device is perfect for installing Magisk! You can install with [Custom Recovery](#custom-recovery)
 
-> **If your device does not have boot ramdisk, read the [Magisk in Recovery](#magisk-in-recovery) section after installing. The information in that section is VERY important!**
+However, if the result is **No** this means your device's boot partition does **NOT** include ramdisk. This means you will have to go through some extra steps to make Magisk work properly.
 
 If you are using a Samsung device and the **SAR** result is **Yes**, please check [its own section](#samsung-system-as-root).
 
@@ -27,8 +27,9 @@ If you are using a Huawei device and the **SAR** result is **Yes**, please check
 
 Otherwise, continue to [Patching Images](#patching-images).
 
-(P.S.1 If your device has boot ramdisk, you can also install with [Custom Recovery](#custom-recovery))<br>
-(P.S.2 If you are interested in how Android boots and how it affects Magisk, check out [this document](boot.md))
+> **If your device does not have boot ramdisk, read the [Magisk in Recovery](#magisk-in-recovery) section after installing. The information in that section is VERY important!**
+
+(P.S.1 If you are interested in how Android boots and how it affects Magisk, check out [this document](boot.md))
 
 ## Patching Images
 
