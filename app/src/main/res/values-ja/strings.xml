@@ -18,13 +18,13 @@
     <string name="update">更新</string>
     <string name="not_available">なし</string>
     <string name="hide">隠す</string>
-    <string name="home_package">パッケージ</string>
+    <string name="home_package">パッケージ ID </string>
     <string name="home_app_title">アプリ</string>
 
     <string name="home_notice_content">Magisk は必ず公式 GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
     <string name="home_support_title">サポートする</string>
     <string name="home_item_source">ソース</string>
-    <string name="home_support_content">Magisk はフリーでオープンソースです。少額の寄付を送ることで、あなたが Magisk を大切にしていることを示せます。</string>
+    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ることで、 Magisk の開発を支援できます。</string>
     <string name="home_installed_version">インストール済</string>
     <string name="home_latest_version">最新版</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
@@ -33,7 +33,7 @@
     <string name="home_check_safetynet">SafetyNet のチェック</string>
 
     <!--Install-->
-    <string name="keep_force_encryption">強制的な暗号化を維持する</string>
+    <string name="keep_force_encryption">暗号化を維持する</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity を維持する</string>
     <string name="recovery_mode">リカバリーモード</string>
     <string name="install_options_title">オプション</string>
@@ -78,11 +78,11 @@
 
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">取り消し</string>
-    <string name="superuser_policy_none">スーパーユーザー権限の許可を求めたアプリはまだありません。</string>
+    <string name="superuser_policy_none">スーパーユーザー権限の許可を求めたアプリはまだありません</string>
 
     <!--Logs-->
-    <string name="log_data_none">ログはありません。スーパーユーザを使用するアプリをもっと使ってみてください。</string>
-    <string name="log_data_magisk_none">おかしなことに Magisk のログは空です。</string>
+    <string name="log_data_none">ログはありません。スーパーユーザを使用するアプリをもっと使ってみてください</string>
+    <string name="log_data_magisk_none">おかしなことに Magisk のログは空です</string>
     <string name="menuSaveLog">ログの保存</string>
     <string name="menuClearLog">ログの消去</string>
     <string name="logs_cleared">ログを消去しました</string>
@@ -120,21 +120,21 @@
     <string name="module_action_install_external">ストレージからインストール</string>
     <string name="update_available">更新あり</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">オンライン</string>
+    <string name="module_section_online">未インストール</string>
     <string name="sorting_order">並び順</string>
 
     <!--Settings-->
-    <string name="settings_dark_mode_title">テーマモード</string>
+    <string name="settings_dark_mode_title">テーマ</string>
     <string name="settings_dark_mode_message">あなたの好きなスタイルを選びましょう！</string>
-    <string name="settings_dark_mode_light">常にライト</string>
+    <string name="settings_dark_mode_light">ライトモード</string>
     <string name="settings_dark_mode_system">システムに合わせる</string>
-    <string name="settings_dark_mode_dark">常にダーク</string>
-    <string name="settings_download_path_title">ダウンロードパス</string>
+    <string name="settings_dark_mode_dark">ダークモード</string>
+    <string name="settings_download_path_title">ファイルの保存場所</string>
     <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
     <string name="settings_clear_cache_title">キャッシュを消去</string>
-    <string name="settings_clear_cache_summary">オンラインリポジトリのキャッシュされた情報を消去し、アプリをオンラインで更新します</string>
+    <string name="settings_clear_cache_summary">モジュールリポジトリのキャッシュを消去します</string>
     <string name="settings_hide_app_title">Magisk アプリを隠す</string>
-    <string name="settings_hide_app_summary">ランダムなパッケージ ID とカスタムアプリラベルのプロキシアプリをインストールします</string>
+    <string name="settings_hide_app_summary">ランダムなパッケージ ID と任意のアプリ名のプロキシアプリをインストールします</string>
     <string name="settings_restore_app_title">Magisk アプリを復元する</string>
     <string name="settings_restore_app_summary">隠すのを止めて、元の APK をインストールします</string>
     <string name="language">言語 (Language)</string>
@@ -146,12 +146,12 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタム URL を入力</string>
-    <string name="settings_magiskhide_summary">さまざまな検出から Magisk を隠します</string>
+    <string name="settings_magiskhide_summary">さまざまな検出方法から Magisk を隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
-    <string name="settings_app_name_hint">新しい名前</string>
-    <string name="settings_app_name_helper">アプリはこの名前で再パッケージされます</string>
+    <string name="settings_app_name_hint">アプリ名</string>
+    <string name="settings_app_name_helper">プロキシアプリはこのアプリ名でインストールされます</string>
     <string name="settings_app_name_error">不正な形式</string>
     <string name="settings_su_app_adb">アプリと ADB</string>
     <string name="settings_su_app">アプリのみ</string>
@@ -163,7 +163,7 @@
     <string name="settings_su_request_30">30 秒</string>
     <string name="settings_su_request_45">45 秒</string>
     <string name="settings_su_request_60">60 秒</string>
-    <string name="superuser_access">スーパーユーザー権限</string>
+    <string name="superuser_access">スーパーユーザー権限を使用できるプログラム</string>
     <string name="auto_response">自動応答</string>
     <string name="request_timeout">要求のタイムアウト</string>
     <string name="superuser_notification">スーパーユーザー通知</string>
@@ -177,9 +177,9 @@
     <string name="settings_customization">カスタマイズ</string>
     <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
-    <string name="settings_doh_description">一部の国での DNS ポイズニングを回避します</string>
+    <string name="settings_doh_description">一部の国で DNS キャッシュポイズニングから守ります</string>
 
-    <string name="multiuser_mode">マルチユーザーモード</string>
+    <string name="multiuser_mode">複数ユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>
     <string name="settings_owner_manage">端末の管理者が管理</string>
     <string name="settings_user_independent">ユーザー毎</string>
@@ -203,8 +203,8 @@
     <string name="magisk_update_title">Magisk の更新があります！</string>
 
     <!--Toasts, Dialogs-->
-    <string name="yes">はい</string>
-    <string name="no">いいえ</string>
+    <string name="yes">対応</string>
+    <string name="no">非対応</string>
     <string name="repo_install_title">%1$s をインストール</string>
     <string name="repo_install_msg">%1$s をインストールしますか？</string>
     <string name="download">ダウンロード</string>
