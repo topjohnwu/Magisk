@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core.download
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -15,9 +14,9 @@ import com.topjohnwu.magisk.core.download.Subject.Module
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.APKInstall
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlin.random.Random.Default.nextInt
 
-@SuppressLint("Registered")
 open class DownloadService : BaseDownloader() {
 
     private val context get() = this
@@ -29,9 +28,10 @@ open class DownloadService : BaseDownloader() {
 
     private fun Module.onFinish(id: Int) = when (action) {
         Flash -> {
-            (ForegroundTracker.foreground as? BaseUIActivity<*, *>)
-                ?.navigation?.navigate(FlashFragment.install(file, id))
-            Unit
+            UiThreadHandler.run {
+                (ForegroundTracker.foreground as? BaseUIActivity<*, *>)
+                    ?.navigation?.navigate(FlashFragment.install(file, id))
+            }
         }
         else -> Unit
     }
