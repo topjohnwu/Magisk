@@ -54,7 +54,7 @@ if [ -z $SOURCEDMODE ]; then
   # Load utility functions
   . ./util_functions.sh
   # Check if 64-bit
-  [ -d /system/lib64 ] && IS64BIT=true || IS64BIT=false
+  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"
@@ -86,12 +86,16 @@ ui_print "- Unpacking boot image"
 ./magiskboot unpack "$BOOTIMAGE"
 
 case $? in
+  0 ) ;;
   1 )
     abort "! Unsupported/Unknown image format"
     ;;
   2 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
+    ;;
+  * )
+    abort "! Unable to unpack boot image"
     ;;
 esac
 
@@ -191,7 +195,7 @@ fi
 #################
 
 ui_print "- Repacking boot image"
-./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
+./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos

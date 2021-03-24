@@ -205,12 +205,12 @@ static int find_dtb_offset(uint8_t *buf, unsigned sz) {
 
         // Check that fdt_header.totalsize does not overflow kernel image size
         uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
-        if (curr + totalsize > end)
+        if (totalsize > end - curr)
             continue;
 
         // Check that fdt_header.off_dt_struct does not overflow kernel image size
         uint32_t off_dt_struct = fdt32_to_cpu(fdt_hdr->off_dt_struct);
-        if (curr + off_dt_struct > end)
+        if (off_dt_struct > end - curr)
             continue;
 
         // Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE

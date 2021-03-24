@@ -4,10 +4,10 @@
 #####################################################################
 #
 # This script will setup an environment with minimal Magisk that
-# Magisk Manager will be happy to run properly within the official
+# the Magisk app will be happy to run properly within the official
 # emulator bundled with Android Studio (AVD).
 #
-# ONLY use this script for developing Magisk Manager or root apps
+# ONLY use this script for developing the Magisk app or root apps
 # in the emulator. The constructed Magisk environment is not a
 # fully functional one as if it is running on an actual device.
 #

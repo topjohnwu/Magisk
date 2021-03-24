@@ -37,9 +37,9 @@ getvar() {
   local VARNAME=$1
   local VALUE
   local PROPPATH='/data/.magisk /cache/.magisk'
-  [ -n $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
-  [ -n $VALUE ] && eval $VARNAME=\$VALUE
+  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
 is_mounted() {
@@ -50,7 +50,7 @@ is_mounted() {
 abort() {
   ui_print "$1"
   $BOOTMODE || recovery_cleanup
-  [ -n $MODPATH ] && rm -rf $MODPATH
+  [ ! -z $MODPATH ] && rm -rf $MODPATH
   rm -rf $TMPDIR
   exit 1
 }
@@ -394,7 +394,7 @@ find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
     BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery$SLOT sos`
-  elif [ -n $SLOT ]; then
+  elif [ ! -z $SLOT ]; then
     BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
     BOOTIMAGE=`find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg boot lnx boot_a`
@@ -538,7 +538,7 @@ check_data() {
   resolve_vars
 }
 
-find_manager_apk() {
+find_magisk_apk() {
   local DBAPK
   [ -z $APK ] && APK=/data/adb/magisk.apk
   [ -f $APK ] || APK=/data/magisk/magisk.apk
@@ -549,7 +549,7 @@ find_manager_apk() {
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
   fi
-  [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
+  [ -f $APK ] || ui_print "! Unable to detect Magisk app APK for BootSigner"
 }
 
 run_migrations() {
@@ -742,7 +742,7 @@ install_module() {
   done
 
   if $BOOTMODE; then
-    # Update info for Magisk Manager
+    # Update info for Magisk app
     mktouch $NVBASE/modules/$MODID/update
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
@@ -753,10 +753,11 @@ install_module() {
     copy_sepolicy_rules
   fi
 
-  # Remove stuffs that don't belong to modules
+  # Remove stuff that doesn't belong to modules and clean up any empty directories
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
   $MODPATH/README.md $MODPATH/.git*
+  rmdir -p $MODPATH
 
   cd /
   $BOOTMODE || recovery_cleanup

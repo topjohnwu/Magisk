@@ -1,5 +1,5 @@
 ##################################
-# Magisk Manager internal scripts
+# Magisk app internal scripts
 ##################################
 
 run_delay() {
@@ -115,8 +115,8 @@ id=hosts
 name=Systemless Hosts
 version=1.0
 versionCode=1
-author=Magisk Manager
-description=Magisk Manager built-in systemless hosts module
+author=Magisk
+description=Magisk app built-in systemless hosts module
 EOF
   magisk --clone /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update
