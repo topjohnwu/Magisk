@@ -92,7 +92,7 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
     <string name="safetynet_res_invalid">La réponse est incorrecte</string>
-    <string name="safetynet_attest_success">Attestion accordée !</string>
+    <string name="safetynet_attest_success">Attestation accordée !</string>
     <string name="safetynet_attest_failure">Attestation refusée !</string>
     <string name="safetynet_attest_loading">Une petite seconde…</string>
     <string name="safetynet_attest_restart">Essayer à nouveau</string>
