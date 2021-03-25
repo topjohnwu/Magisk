@@ -374,4 +374,3 @@ include $(BUILD_STATIC_LIBRARY)
 CWD := $(LOCAL_PATH)
 include $(CWD)/systemproperties/Android.mk
 include $(CWD)/mincrypt/Android.mk
-include $(CWD)/libcxx/Android.mk
