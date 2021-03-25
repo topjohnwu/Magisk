@@ -28,6 +28,9 @@
 [submodule "xhook"]
 	path = native/jni/external/xhook
 	url = https://github.com/iqiyi/xHook.git
+[submodule "libcxx"]
+	path = native/jni/external/libcxx
+	url = https://github.com/topjohnwu/libcxx.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git
