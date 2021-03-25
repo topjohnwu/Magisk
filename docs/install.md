@@ -142,4 +142,4 @@ Generally, follow [Patching Images](#patching-images) with some differences from
   - If your device does **NOT** have boot ramdisk, patch `RECOVERY_RAMDIS.img` (this is not a typo) instead of `recovery.img`
 - When flashing the image back with `fastboot`
   - If you patched `RAMDISK.img`, flash with command `fastboot flash ramdisk magisk_patched.img`
-  - If you patched `RECOVERY_RAMDIS.img`, flash with command `fastboot flash recovery_ramdisk magisk_patched.img`
+  - If you patched `RECOVERY_RAMDISK.img`, flash with command `fastboot flash recovery_ramdisk magisk_patched.img`
