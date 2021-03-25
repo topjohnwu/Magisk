@@ -116,7 +116,7 @@
     <string name="module_section_pending">Mises à jour</string>
     <string name="module_section_pending_action">Tout mettre à jour</string>
     <string name="module_state_remove">Supprimer</string>
-    <string name="module_state_restore">Restorer</string>
+    <string name="module_state_restore">Restaurer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="update_available">Mise à jour disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
