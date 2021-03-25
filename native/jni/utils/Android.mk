@@ -4,6 +4,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libutils
 LOCAL_C_INCLUDES := jni/include $(LOCAL_PATH)/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_EXPORT_STATIC_LIBRARIES := libcxx
+LOCAL_STATIC_LIBRARIES := libcxx
 LOCAL_SRC_FILES := \
     missing.cpp \
     new.cpp \
