@@ -595,7 +595,7 @@ copy_sepolicy_rules() {
   local RULESDIR
   local active_dir=$(magisk --path)/.magisk/mirror/sepolicy.rules
   if [ -L $active_dir ]; then
-    RULESDIR=$(readlink -f $active_dir)
+    RULESDIR=$(ls -l $active_dir | awk -F'->' '{print $2}' | tr -d ' ')
   elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
     RULESDIR=/data/unencrypted/magisk
   elif grep -q ' /cache ' /proc/mounts; then
