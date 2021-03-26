@@ -277,6 +277,7 @@ void load_prop_file(const char *filename, bool prop_svc) {
     auto impl = get_impl();
     LOGD("resetprop: Parse prop file [%s]\n", filename);
     parse_prop_file(filename, [=](auto key, auto val) -> bool {
+        impl->delprop(key.data(), false);
         impl->setprop(key.data(), val.data(), prop_svc);
         return true;
     });
