@@ -2,7 +2,7 @@
 (Note: This is not a user tutorial for installing Magisk, this is an explanation of how Magisk can be installed, and a guide for developers to properly deploy Magisk in various different situations)
 
 ## Systemless
-When a user flashes a Magisk zip in custom recoveries or have boot images patched in Magisk Manager, Magisk is installed in the systemless fashion. This is the only officially supported method to install Magisk on a device. The systemless method installs Magisk into a boot image's ramdisk CPIO, sometimes require additional patches to the kernel.
+When a user flashes a Magisk zip in custom recoveries or have boot images patched in the Magisk app, Magisk is installed in the systemless fashion. This is the only officially supported method to install Magisk on a device. The systemless method installs Magisk into a boot image's ramdisk CPIO, sometimes require additional patches to the kernel.
 
 Here are the bare minimum commands to install Magisk into a stock boot/recovery image. Be aware that the actual Magisk installation is a little more complicated, the following commands will work but should be treat as proof-of-concepts.
 
