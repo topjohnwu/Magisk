@@ -311,7 +311,7 @@ int SystemProperties::Delete(const char *name) {
     return -1;
   }
 
-  bool ret = pa->del(name);
+  bool ret = pa->rm(name);
   if (!ret) {
     return -1;
   }

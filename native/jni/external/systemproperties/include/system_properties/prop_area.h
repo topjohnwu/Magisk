@@ -110,8 +110,7 @@ class prop_area {
 
   const prop_info* find(const char* name);
   bool add(const char* name, unsigned int namelen, const char* value, unsigned int valuelen);
-  /* resetprop */
-  bool del(const char *name);
+  bool rm(const char *name);
 
   bool foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
 
@@ -126,7 +125,7 @@ class prop_area {
   }
 
  private:
-  static prop_area* map_fd_rw(const int fd);
+  static prop_area* map_fd_ro(const int fd);
 
   void* allocate_obj(const size_t size, uint_least32_t* const off);
   prop_bt* new_prop_bt(const char* name, uint32_t namelen, uint_least32_t* const off);
@@ -138,7 +137,7 @@ class prop_area {
 
   prop_bt* root_node();
 
-  /* resetprop: Traverse through the trie and find the node */
+  /* resetprop new: traverse through the trie and find the node */
   prop_bt *find_prop_bt(prop_bt *const bt, const char* name, bool alloc_if_needed);
 
   prop_bt* find_prop_bt(prop_bt* const bt, const char* name, uint32_t namelen, bool alloc_if_needed);

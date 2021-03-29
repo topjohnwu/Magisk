@@ -12,7 +12,6 @@
 #endif
 
 // Missing functions
-#define fsetxattr(...) syscall(__NR_fsetxattr, __VA_ARGS__)
 #define getline compat_getline
 ssize_t compat_getline(char **, size_t *, FILE *);
 

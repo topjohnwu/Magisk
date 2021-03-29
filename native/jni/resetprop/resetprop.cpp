@@ -21,6 +21,9 @@ static bool verbose = false;
 #define system_property_read_callback __system_property_read_callback
 #define system_property_foreach       __system_property_foreach
 #define system_property_read(...)
+extern "C" int fsetxattr(int fd, const char* name, const void* value, size_t size, int flags) {
+    return syscall(__NR_fsetxattr, fd, name, value, size, flags);
+}
 #else
 static int (*system_property_set)(const char*, const char*);
 static int (*system_property_read)(const prop_info*, char*, char*);
