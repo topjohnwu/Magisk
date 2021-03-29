@@ -1,4 +1,10 @@
-# Android Booting Shenanigans
+```javascript
+function fancyAlert(arg) {
+  if(arg) {
+    $.facebox({div:'#foo'})
+  }
+}
+```# Android Booting Shenanigans
 
 ## Terminologies
 
