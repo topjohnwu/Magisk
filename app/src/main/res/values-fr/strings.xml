@@ -92,7 +92,7 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
     <string name="safetynet_res_invalid">La réponse est incorrecte</string>
-    <string name="safetynet_attest_success">Attestion accordée !</string>
+    <string name="safetynet_attest_success">Attestation accordée !</string>
     <string name="safetynet_attest_failure">Attestation refusée !</string>
     <string name="safetynet_attest_loading">Une petite seconde…</string>
     <string name="safetynet_attest_restart">Essayer à nouveau</string>
@@ -116,7 +116,7 @@
     <string name="module_section_pending">Mises à jour</string>
     <string name="module_section_pending_action">Tout mettre à jour</string>
     <string name="module_state_remove">Supprimer</string>
-    <string name="module_state_restore">Restorer</string>
+    <string name="module_state_restore">Restaurer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="update_available">Mise à jour disponible</string>
     <string name="module_installed">@string/home_installed_version</string>
