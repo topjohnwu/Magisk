@@ -80,13 +80,13 @@ static void handle_request_async(int client, int code, ucred cred) {
 static void handle_request_sync(int client, int code) {
     switch (code) {
     case CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
+        write_string(client, std::string(MAGISK_VERSION) + ":MAGISK");
         break;
     case CHECK_VERSION_CODE:
         write_int(client, MAGISK_VER_CODE);
         break;
     case GET_PATH:
-        write_string(client, MAGISKTMP.data());
+        write_string(client, MAGISKTMP);
         break;
     case START_DAEMON:
         setup_logfile(true);
@@ -199,7 +199,7 @@ static int switch_cgroup(const char *cgroup, int pid) {
 
     start_log_daemon();
 
-    LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
+    LOGI("Magisk %s daemon started\n", MAGISK_FULL_VER);
 
     // Escape from cgroup
     int pid = getpid();

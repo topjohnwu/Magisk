@@ -10,6 +10,7 @@ on:
       - 'buildSrc/**'
       - 'build.py'
       - 'gradle.properties'
+      - '.github/workflows/build.yml'
   pull_request:
     branches: [ master ]
   workflow_dispatch:
@@ -22,6 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
+    env:
+      NDK_CCACHE: ${{ github.workspace }}/ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
 
     steps:
       - name: Check out
@@ -47,14 +51,23 @@ jobs:
           echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
         shell: bash
 
-      - name: Cache Gradle
+      - name: Cache Gradle Dependencies
         uses: actions/cache@v2
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: ${{ runner.os }}-gradle-
+            !~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-gradle-deps-${{ hashFiles('**/build.gradle.kts') }}
+          restore-keys: gradle-deps
+
+      - name: Cache Gradle Builds
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-gradle-build-${{ hashFiles('**/build.gradle.kts') }}
+          restore-keys: gradle-build
 
       - name: Cache NDK
         id: ndk-cache
@@ -63,19 +76,48 @@ jobs:
           path: ${{ env.ANDROID_SDK_ROOT }}/ndk/magisk
           key: ${{ runner.os }}-ndk-${{ env.MAGISK_NDK_VERSION }}
 
+      - name: Ccache
+        id: ccache-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-ccache-
+
+      - name: Download ccache
+        id: ccache
+        shell: cmake -P {0}
+        env:
+            CCACHE_VERSION: 4.2.1
+        run: |
+          set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
+          file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+
       - name: Set up NDK
         if: steps.ndk-cache.outputs.cache-hit != 'true'
         run: python build.py ndk
 
+      - name: Enable gradle cache
+        run: |
+          echo 'org.gradle.caching=true' >> gradle.properties
+          echo 'org.gradle.parallel=true' >> gradle.properties
+          echo 'org.gradle.vfs.watch=true' >> gradle.properties
+          echo 'org.gradle.jvmargs=-Xmx2048m' >> gradle.properties
+
       - name: Build release
-        run: python build.py -vr all
+        run: |
+          ./ccache -zp
+          python build.py -vr all
 
       - name: Refresh flag
         run: touch gradle.properties
         shell: bash
 
       - name: Build debug
-        run: python build.py -v all
+        run: |
+          python build.py -v all
+          ./ccache -s
 
       - name: Stop gradle daemon
         run: ./gradlew --stop

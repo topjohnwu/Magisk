@@ -14,6 +14,14 @@ LOCAL_SRC_FILES := \
     selinux.cpp \
     logging.cpp \
     xwrap.cpp \
-    stream.cpp
+    stream.cpp \
+    version.cpp
 
+$(LOCAL_PATH)/version.cpp : FORCE
+	$(file > $@,#include <limits.h>)
+	$(file >> $@,const char* MAGISK_VERSION="${MAGISK_VERSION}";)
+	$(file >> $@,int MAGISK_VER_CODE=${MAGISK_VER_CODE};)
+	$(file >> $@,const char* MAGISK_FULL_VER="${MAGISK_VERSION}(${MAGISK_VER_CODE})";)
+
+FORCE: ;
 include $(BUILD_STATIC_LIBRARY)

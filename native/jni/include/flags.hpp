@@ -9,11 +9,9 @@
 #define quote(s) #s
 #define str(s) quote(s)
 
-#define MAGISK_VERSION  str(__MVSTR)
-#define MAGISK_VER_CODE __MCODE
-#define MAGISK_FULL_VER MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
-
-#define NAME_WITH_VER(name) str(name) " " MAGISK_FULL_VER
+extern const char *MAGISK_VERSION;
+extern const int MAGISK_VER_CODE;
+extern const char *MAGISK_FULL_VER;
 
 #ifdef __MDBG
 #define MAGISK_DEBUG

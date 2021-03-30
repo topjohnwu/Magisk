@@ -126,7 +126,7 @@ int su_client_main(int argc, char *argv[]) {
                 printf("%d\n", MAGISK_VER_CODE);
                 exit(EXIT_SUCCESS);
             case 'v':
-                printf("%s\n", MAGISK_VERSION ":MAGISKSU");
+                printf("%s:MAGISKSU\n", MAGISK_VERSION);
                 exit(EXIT_SUCCESS);
             case 'z':
                 // Do nothing, placed here for legacy support :)
