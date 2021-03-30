@@ -19,7 +19,9 @@ Download and install the latest Magisk app. We use the app to gather some inform
 
 Pay special attention to the **Ramdisk** info. If the result is **Yes**, congratulations, your device is perfect for installing Magisk! However, if the result is **No** this means your device's boot partition does **NOT** include ramdisk. This means you will have to go through some extra steps to make Magisk work properly.
 
-> **If your device does not have boot ramdisk, read the [Magisk in Recovery](#magisk-in-recovery) section after installing. The information in that section is VERY important!**
+Unfortunately there are exceptions to this, where you will have to follow the instructions as if your device's boot partition does include ramdisk even if it doesn't. The only way to know for sure is to try, so if you cannot seem to get Magisk to install by patching the recovery image when the **Ramdisk** info reports **No**, try patching the boot image instead. Some Xiaomi devices are known to have this setup.
+
+> **If your device does not have boot ramdisk and has to be installed to recovery, read the [Magisk in Recovery](#magisk-in-recovery) section after installing. The information in that section is VERY important!**
 
 If you are using a Samsung device and the **SAR** result is **Yes**, please check [its own section](#samsung-system-as-root).
 
@@ -66,7 +68,7 @@ If you insist on using custom recoveries, rename the Magisk APK to `uninstall.zi
 
 ## Magisk in Recovery
 
-If your device does not have ramdisk in boot images, Magisk has no choice but to be installed in the recovery partition. For these devices, you will have to **reboot to recovery** every time you want Magisk.
+If your device does not have ramdisk in boot images, it is very likely that Magisk has no choice but to be installed in the recovery partition. For these devices, you will have to **reboot to recovery** every time you want Magisk.
 
 When Magisk is installed in your recovery, **you CANNOT use custom recoveries to install/upgrade Magisk!** The only way to install/upgrade Magisk is through the Magisk app. It will be aware of your device state and install to the correct partition and reboot into the correct mode.
 
