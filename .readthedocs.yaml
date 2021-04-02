@@ -21,4 +21,4 @@ python:
    - method: pip
       extra_requirements:
          - sphinx
-         - myst-parser
+         - "myst-parser"
