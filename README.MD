@@ -22,9 +22,9 @@ Please note that the only source of official Magisk information and downloads is
 
 ## Useful Links
 
-- [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
-- [Frequently Asked Questions](https://topjohnwu.github.io/Magisk/faq.html)
-- [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
+- [Installation Instruction](https://magisk.readthedocs.io/en/latest/all_users/installation.html)
+- [Frequently Asked Questions](https://magisk.readthedocs.io/en/latest/all_users/FAQ.html)
+- [Magisk Documentation](https://magisk.readthedocs.io/en/latest/)
 - [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
 
 ## Android Version Support
