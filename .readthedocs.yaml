@@ -7,7 +7,6 @@ version: 2
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-   builder: html
    configuration: docs/conf.py
 
 # Optionally build your docs in additional formats such as PDF
@@ -18,7 +17,4 @@ formats:
 python:
    version: 3.7
    install:
-   - method: pip
-      extra_requirements:
-         - sphinx
-         - "myst-parser"
+   - requirements: docs/requirements.txt
