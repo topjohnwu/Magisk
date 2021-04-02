@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2019.3.28 Magisk v19.0 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2019.3.28 Magisk v19.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/19000.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v19-0">
+<h1>2019.3.28 Magisk v19.0<a class="headerlink" href="#magisk-v19-0" title="Permalink to this headline">¶</a></h1>
+<p>I would say this is one of my most ambitious release of all time! Due to the extremely massive changes, this release will be a public beta. Calling it v18.2 doesn’t do it justice, so v19.0 we go.</p>
+<div class="section" id="magisk-module-installer">
+<h2>Magisk Module installer<a class="headerlink" href="#magisk-module-installer" title="Permalink to this headline">¶</a></h2>
+<p><strong>Magisk module developers: pay extra attention!</strong> A completely new <a class="reference external" href="https://github.com/topjohnwu/magisk-module-installer">Magisk Module Installer</a> replaces the old Magisk module template. This new format decouples <strong>ALL</strong> installation logic from modules, and encourages developers to use the provided API for installation. This new format is <strong>ENFORCED</strong>, meaning all existing modules should upgrade ASAP, and new modules are <strong>REQUIRED</strong> to follow the rules.</p>
+<p>Carefully read through the <a class="reference external" href="https://topjohnwu.github.io/Magisk/guides.html">updated docs</a>!</p>
+<p><strong>Warning: All existing modules that does not use the new module format will be automatically removed on May 1st, 2019. Module devs: upgrade your existing modules ASAP!</strong></p>
+</div>
+<div class="section" id="imageless-magisk">
+<h2>Imageless Magisk<a class="headerlink" href="#imageless-magisk" title="Permalink to this headline">¶</a></h2>
+<p>Since the existence of Magisk, all modules are stored within an EXT4 image which will be loop mounted at boot. This approach has a few problems: resizing the image is a huge headache (no live resizing, <code class="docutils literal notranslate"><span class="pre">resize2fs</span></code> on some devices refuse to work properly), and also MANY devices using F2FS ships a broken driver with the kernel, causing EXT4 loop devices unable to be mounted at all. All these problems come to an end now: modules are now directly stored in <code class="docutils literal notranslate"><span class="pre">/data</span></code>! Backwards compatibility is provided, for modules that uses the official module template, installation should work just fine.</p>
+<p><strong>Warning: Although module migration was tested, there are still chances that your modules will get lost in the process. Be prepared to reinstall your existing modules in that case.</strong></p>
+</div>
+<div class="section" id="native-64-bit-is-back">
+<h2>Native 64 Bit is Back<a class="headerlink" href="#native-64-bit-is-back" title="Permalink to this headline">¶</a></h2>
+<p>At one point in history, Magisk uses native 64 binaries. However due to binary size considerations, all binaries was switched to 32 bit. Starting from v19, all static binaries are still 32 bit only, but the most important part: the main <code class="docutils literal notranslate"><span class="pre">magisk</span></code> binary now runs in native 64 bit on supported devices.</p>
+</div>
+<div class="section" id="zygote-ptrace-based-magiskhide">
+<h2>Zygote Ptrace Based MagiskHide<a class="headerlink" href="#zygote-ptrace-based-magiskhide" title="Permalink to this headline">¶</a></h2>
+<p>MagiskHide used to use <code class="docutils literal notranslate"><span class="pre">logcat</span></code> to monitor activity manager events for new process creation. That method is extremely unreliable: even with constant improvements since introduction, it is still not working 100% of the time. Here comes a fundamentally new approach: ptrace the zygote process and step through all fork events. In layman’s term, this new method is able to target a process before it even starts to run! The code for it is extremely tricky, but it was tested for quite a while in the canary channel, so I’m confident enough to release this to the public :)</p>
+</div>
+<div class="section" id="android-q">
+<h2>Android Q<a class="headerlink" href="#android-q" title="Permalink to this headline">¶</a></h2>
+<p>Full support for Android Q Beta 1 is also introduced in this release. However, you cannot use it on the Pixel 3 (XL) due to the fact that Google decided to use logical partitions on the 3rd gen Pixels starting with Q. A solution is still WIP, please stay tuned!</p>
+</div>
+<div class="section" id="final-words">
+<h2>Final Words<a class="headerlink" href="#final-words" title="Permalink to this headline">¶</a></h2>
+<p>What you can expect in upcoming releases: Samsung S10 support, and full logical partition support. Also, I <em>AM</em> aware of Google Pay issues, but these are not my main focus now since there are still tons of other issues for me to focus on. Several discussion threads on XDA provide seemingly working solutions, please do some research on your own.</p>
+<div class="section" id="full-changelog-here">
+<h3>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

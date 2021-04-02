@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2020.10.3 Magisk v21.0 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2020.10.3 Magisk v21.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/21000.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v21-0">
+<h1>2020.10.3 Magisk v21.0<a class="headerlink" href="#magisk-v21-0" title="Permalink to this headline">¶</a></h1>
+<p>Long time no see! v21.0 is the largest release in Magisk’s history. It comes with full Android 11 support (tons of stuff had to be rewritten from scratch!), and a completely redesigned Magisk Manager. These are the reasons why this particular public release took me over half a year to wrap up.</p>
+<p>To the end user, not much has changed other than the fact that Magisk Manager has completely changed its appearance. However developers should pay attention to some changes due to adjustments for Android 11. Full changelogs are too massive to fit, so here I’ll point out the main changes and links to updated documentations.</p>
+<div class="section" id="highlights">
+<h2>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Android 11 support 🎉</p></li>
+<li><p>Completely redesigned Magisk Manager</p></li>
+<li><p>Safe Mode detection: if you installed a module that bootloops your device, reboot into Safe Mode and all modules will be disabled. More instructions on how to deal with broken modules is linked <a class="reference external" href="https://topjohnwu.github.io/Magisk/faq.html">here</a>.</p></li>
+</ul>
+<p>The following are for advanced users/developer:</p>
+<ul class="simple">
+<li><p>On Android 8.0+, Magisk now uses a new SELinux setup that keeps Android sandbox less compromised. This provides better security to rooted users, and also separates Magisk rules from original rules. Details <a class="reference external" href="https://topjohnwu.github.io/Magisk/details.html#selinux-policies">here</a>.</p></li>
+<li><p>On Android 11, <code class="docutils literal notranslate"><span class="pre">/sbin</span></code> may no longer exist. For developers, this means the Magisk’s internal <code class="docutils literal notranslate"><span class="pre">tmpfs</span></code> directory is no longer always <code class="docutils literal notranslate"><span class="pre">/sbin</span></code>, and instead randomly created every boot. To get the <code class="docutils literal notranslate"><span class="pre">tmpfs</span></code> path, use the command <code class="docutils literal notranslate"><span class="pre">magisk</span> <span class="pre">--path</span></code> (more details <a class="reference external" href="https://topjohnwu.github.io/Magisk/details.html">here</a>). For custom kernel developers that uses <code class="docutils literal notranslate"><span class="pre">overlay.d</span></code>, updated docs are <a class="reference external" href="https://topjohnwu.github.io/Magisk/guides.html#root-directory-overlay-system">here</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">magiskpolicy</span></code> gained more features and some minor syntax changes, details <a class="reference external" href="https://topjohnwu.github.io/Magisk/tools.html#magiskpolicy">here</a>.</p></li>
+</ul>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,221 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2019.11.2 Magisk v20.1 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2019.11.2 Magisk v20.1</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/20100.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v20-1">
+<h1>2019.11.2 Magisk v20.1<a class="headerlink" href="#magisk-v20-1" title="Permalink to this headline">¶</a></h1>
+<p>Lots of bug fixes from v20.0, and some cool new features!</p>
+<div class="section" id="updated-magisk-manager-hiding">
+<h2>Updated Magisk Manager Hiding<a class="headerlink" href="#updated-magisk-manager-hiding" title="Permalink to this headline">¶</a></h2>
+<p>Starting with Magisk v20.1 paired with Magisk Manager v7.4.0, a new hiding mode is introduced for Android 9.0+. On supported devices, Magisk Manager will download and customize a heavily obfuscated stub APK and use it as a replacement. The stub app will then download the full app into its private internal data, then dynamically load and run the actual full Magisk Manager.</p>
+<p>Note, not all Android 9.0+ devices will be able to use this feature. To use an obfuscated stub as Magisk Manager, the Magisk daemon will have to rely on a special way to communicate with the app, and some OEMs (most likely Chinese manufacturers) block certain broadcasts, breaking the communication channel.</p>
+<p>Magisk Manager will verify compatibility before it uses stubs to hide itself on Android 9.0+. <strong>The verification relies on Magisk v20.1+, which means you have to fully upgrade and reboot in order to opt in this feature.</strong> If you are already running a hidden Magisk Manager, <strong>restore and upgrade Magisk Manager, upgrade Magisk and reboot, then re-hide the app</strong>.</p>
+<p>For those incompatible with the hiding-with-stub feature, there are also a few updates that everyone, regardless whether using stubs or not, can enjoy:</p>
+<ul class="simple">
+<li><p>You can now customize the app name of the repackaged Magisk Manager</p></li>
+<li><p>Magisk Manager will generate new keys to sign the repackaged APK to prevent signature detection</p></li>
+</ul>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

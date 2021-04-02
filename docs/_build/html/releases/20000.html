@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2019.10.11 Magisk v20.0 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2019.10.11 Magisk v20.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/20000.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v20-0">
+<h1>2019.10.11 Magisk v20.0<a class="headerlink" href="#magisk-v20-0" title="Permalink to this headline">¶</a></h1>
+<p>The following release notes are mostly the same as v19.4. Compared to v19.4 beta, the most notable change is adding tons of support for more devices on Android 10, along with several bug fixes.</p>
+<div class="section" id="new-system-as-root-implementation">
+<h2>New System-as-root Implementation<a class="headerlink" href="#new-system-as-root-implementation" title="Permalink to this headline">¶</a></h2>
+<p>Magisk has supported system-as-root devices for a long time since the first Pixel came out. The goal is always to revert things back to the good old initramfs based root dir. However, this not only creates tons of issues on many devices, not easily hide-able with MagiskHide, but most importantly not even possible on Android 10. Magisk will now start to follow how Google has designed system-as-root: mounting system actually to <code class="docutils literal notranslate"><span class="pre">/</span></code> (root).</p>
+<p>This implies several <strong>MASSIVE</strong> consequences for system-as-root devices:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/system</span></code> is no longer a valid mount point. For existing root apps that remounts <code class="docutils literal notranslate"><span class="pre">/system</span></code> to <code class="docutils literal notranslate"><span class="pre">rw</span></code>, you will have to remount <code class="docutils literal notranslate"><span class="pre">/</span></code> instead of <code class="docutils literal notranslate"><span class="pre">/system</span></code></p></li>
+<li><p>The root directory (<code class="docutils literal notranslate"><span class="pre">/</span></code>) is no longer <code class="docutils literal notranslate"><span class="pre">rootfs</span></code>, but actually system. Remounting <code class="docutils literal notranslate"><span class="pre">/</span></code> to <code class="docutils literal notranslate"><span class="pre">rw</span></code> and modify files means you are writing to the actual system partition, NOT volatile storage as it used to be in <code class="docutils literal notranslate"><span class="pre">rootfs</span></code>. This is not recommended as user is not necessary aware that you are tampering an actual partition, sometimes dangerous if dm-verity/AVB-verity is enforced, or sometimes outright impossible since many devices now ship with read-only system partitions (e.g. EROFS, EXT4 dedup)</p></li>
+<li><p>Several custom kernel rely on Magisk’s root directory overlay system (<code class="docutils literal notranslate"><span class="pre">overlay</span></code>) for modifying <code class="docutils literal notranslate"><span class="pre">/</span></code>. This is no longer compatible with the new implementation. A new overlay system (<code class="docutils literal notranslate"><span class="pre">overlay.d</span></code>) will replace the existing one as an alternative (details in <a class="reference external" href="https://topjohnwu.github.io/Magisk/guides.html#root-directory-overlay-system">documentations</a>). To provide backwards compatibility, Magisk will switch to “Compat Mode” when <code class="docutils literal notranslate"><span class="pre">/overlay</span></code> is detected, which simply reverts to the old system-as-root setup. <strong>Compat Mode will not work on Android 10 and will cause bootloop</strong>. Although things will still work as it used to, <strong>please upgrade to <code class="docutils literal notranslate"><span class="pre">overlay.d</span></code> ASAP</strong>.</p></li>
+</ul>
+</div>
+<div class="section" id="android-10-support">
+<h2>Android 10 Support<a class="headerlink" href="#android-10-support" title="Permalink to this headline">¶</a></h2>
+<p>Android 10 is now fully supported with MagiskHide working as expected. Android 10’s biggest challenge is the new “2-Stage-Init” system-as-root implementation, which requires modding early mount fstab in a specific way, and in many devices’ cases involves patching DTBs in the boot image.</p>
+<p>(For those interested in “2-Stage-Init” and other details of system-as-root, check <a class="reference external" href="https://twitter.com/topjohnwu/status/1174392824625676288">this Twitter thread I tweeted</a>)</p>
+</div>
+<div class="section" id="product-partition-support">
+<h2>Product Partition Support<a class="headerlink" href="#product-partition-support" title="Permalink to this headline">¶</a></h2>
+<p>Magisk Module developers can now finally properly modify files in <code class="docutils literal notranslate"><span class="pre">/product</span></code>! This partition is now an essential part in Android 10, and many files are moved from system to product. Please check <a class="reference external" href="https://topjohnwu.github.io/Magisk/details.html#magic-mount">documentations</a> for more details.</p>
+</div>
+<div class="section" id="a-only-system-as-root">
+<h2>A-Only System-as-root<a class="headerlink" href="#a-only-system-as-root" title="Permalink to this headline">¶</a></h2>
+<p>A huge number of new devices have A-only system-as-root setups (Android 9.0). These unfortunate devices will have to install Magisk into the recovery partition. Please check the fully updated <a class="reference external" href="https://topjohnwu.github.io/Magisk/install.html">Installation Guide</a> for more details.</p>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

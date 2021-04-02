@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2021.1.17 Magisk v21.4 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2021.1.17 Magisk v21.4</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/21400.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v21-4">
+<h1>2021.1.17 Magisk v21.4<a class="headerlink" href="#magisk-v21-4" title="Permalink to this headline">¶</a></h1>
+<p><strong>Update</strong>: v21.4 adds more regression hot fixes.</p>
+<p>Happy 2021! v21.3 adds a workaround for devices with buggy F2FS Linux kernel drivers. This F2FS bug may cause bootloops on many devices. Checkout the full <a class="reference external" href="https://topjohnwu.github.io/Magisk/releases/21000.html">v21.0 release notes</a> if coming from older releases.</p>
+<div class="section" id="v21-4">
+<h2>v21.4<a class="headerlink" href="#v21-4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>[MagiskSU] Fix <code class="docutils literal notranslate"><span class="pre">su</span> <span class="pre">-c</span></code> behavior that broke many root apps</p></li>
+<li><p>[General] Properly handle read/write over sockets (the <code class="docutils literal notranslate"><span class="pre">broken</span> <span class="pre">pipe</span></code> issue)</p></li>
+</ul>
+</div>
+<div class="section" id="v21-3">
+<h2>v21.3<a class="headerlink" href="#v21-3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>[MagiskInit] Avoid mounting <code class="docutils literal notranslate"><span class="pre">f2fs</span></code> userdata as it may result in kernel crashes. This shall fix a lot of bootloops</p></li>
+<li><p>[MagiskBoot] Fix a minor header checksum bug for <code class="docutils literal notranslate"><span class="pre">DHTB</span></code> header and ASUS <code class="docutils literal notranslate"><span class="pre">blob</span></code> image formats</p></li>
+<li><p>[MagiskHide] Allowing hiding isolated processes if the mount namespace is separated</p></li>
+</ul>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

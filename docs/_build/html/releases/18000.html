@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2018.12.7 Magisk v18.0 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2018.12.7 Magisk v18.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/18000.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v18-0">
+<h1>2018.12.7 Magisk v18.0<a class="headerlink" href="#magisk-v18-0" title="Permalink to this headline">¶</a></h1>
+<p>Here comes a stable release, this time with quite a few major updates!</p>
+<div class="section" id="magiskhide-improvements">
+<h2>MagiskHide Improvements<a class="headerlink" href="#magiskhide-improvements" title="Permalink to this headline">¶</a></h2>
+<p>Starting from v18, the process monitor matches component names instead of process names. Android allow app services to name their process arbitrarily, and many apps starting to use dedicated services to detect root; it used to require adding all of these service process names to the list to hide Magisk effectively. Component names have the format: <code class="docutils literal notranslate"><span class="pre">&lt;package</span> <span class="pre">name&gt;/&lt;java</span> <span class="pre">class</span> <span class="pre">name&gt;</span></code>, which means we can always know which application spawned a given process.</p>
+<p><strong>TL;DR, ALL processes spawned from the applications on the hide list will be targeted.</strong></p>
+<p>Recently I discovered a <em>very widespread Linux kernel bug</em> affecting tons of Android devices (full write-up: <a class="reference external" href="https://medium.com/&#64;topjohnwu/from-anime-game-to-android-system-security-vulnerability-9b955a182f20">Medium Article</a>). This bug exposes the supposedly protected <code class="docutils literal notranslate"><span class="pre">procfs</span></code>, which is abused in some apps to detect Magisk with information leaked from other processes. Magisk will patch this bug on all Android 7.0+ devices. Yes, a fully effective MagiskHide requires the enhanced Android Sandbox in modern Android versions.</p>
+</div>
+<div class="section" id="path-changes">
+<h2>Path Changes<a class="headerlink" href="#path-changes" title="Permalink to this headline">¶</a></h2>
+<p>The name of the folder <code class="docutils literal notranslate"><span class="pre">/sbin/.core</span></code> is confusing and will no longer be used; it is replaced with <code class="docutils literal notranslate"><span class="pre">/sbin/.magisk</span></code>. Another major change is the location to store general boot scripts. As these boot scripts should still run even if <code class="docutils literal notranslate"><span class="pre">magisk.img</span></code> is not mounted, they are moved out of <code class="docutils literal notranslate"><span class="pre">magisk.img</span></code>, from <code class="docutils literal notranslate"><span class="pre">&lt;img&gt;/.core/&lt;stage&gt;.d</span></code> to <code class="docutils literal notranslate"><span class="pre">/data/adb/&lt;stage&gt;.d</span></code> (stage is either <code class="docutils literal notranslate"><span class="pre">post-fs-data</span></code> or <code class="docutils literal notranslate"><span class="pre">service</span></code>). Say goodbye to stupid paths like <code class="docutils literal notranslate"><span class="pre">/sbin/.core/img/.core/post-fs-data.d</span></code>!</p>
+<p>Quick recap:</p>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">magisk.img</span></code> mountpoint: <code class="docutils literal notranslate"><span class="pre">/sbin/.magisk/img</span></code></p></li>
+<li><p>New internal busybox PATH: <code class="docutils literal notranslate"><span class="pre">/sbin/.magisk/busybox</span></code></p></li>
+<li><p>The folder <code class="docutils literal notranslate"><span class="pre">&lt;img&gt;/.core</span></code> is no longer used in any places. <code class="docutils literal notranslate"><span class="pre">magisk.img</span></code> is solely used for storing modules, no other functionality depends on it.</p></li>
+<li><p><strong>Symlinks are created so all old paths will still work. None of the existing apps/scripts depending on these internal paths should break, but please migrate to the new paths ASAP.</strong></p></li>
+</ul>
+</div>
+<div class="section" id="dropping-legacy-support">
+<h2>Dropping Legacy Support<a class="headerlink" href="#dropping-legacy-support" title="Permalink to this headline">¶</a></h2>
+<p><strong>The NEXT Magisk Manager upgrade (not this one) will only support v18+, please upgrade ASAP.</strong> Magisk Manager is always designed to be fully functional across a wide range of Magisk versions. However, to enforce full obfuscation, I will have to drop legacy support eventually.</p>
+<p>This is also a good opportunity to push the whole community forward, all module developers should forget about backward compatibility (e.g. stop supporting the old Magisk paths, please don’t torture yourself…). I expect very few structural changes in the near future, so again, please upgrade ASAP :)</p>
+</div>
+<div class="section" id="modern-c-code-base">
+<h2>Modern C++ Code Base<a class="headerlink" href="#modern-c-code-base" title="Permalink to this headline">¶</a></h2>
+<p>Although this has nothing to do with the end user, tons of effort was done to migrate Magisk to a more modern C++ code base instead of the previous good plain old C. This makes the code easier to maintain and allows me to utilized many C++ language features.</p>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

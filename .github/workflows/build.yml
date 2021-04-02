@@ -88,3 +88,7 @@ jobs:
         with:
           name: ${{ github.sha }}
           path: out
+
+      - name: build docs
+        path: /docs/
+        run: make html

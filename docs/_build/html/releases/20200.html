@@ -1,0 +1,220 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2020.1.2 Magisk v20.2 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2020.1.2 Magisk v20.2</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/20200.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v20-2">
+<h1>2020.1.2 Magisk v20.2<a class="headerlink" href="#magisk-v20-2" title="Permalink to this headline">¶</a></h1>
+<p>Happy New Year! Let’s start 2020 with a new Magisk release :)</p>
+<div class="section" id="pre-init-sepolicy-patches-for-modules">
+<h2>Pre-Init sepolicy Patches for Modules<a class="headerlink" href="#pre-init-sepolicy-patches-for-modules" title="Permalink to this headline">¶</a></h2>
+<p>Magisk v20.2 add support for modules to include its own custom sepolicy patches. Developers used to use boot scripts along with the <code class="docutils literal notranslate"><span class="pre">magiskpolicy</span></code> tool to do live sepolicy patches; however, this method leads to numerous issues as Android is no longer designed to allow live sepolicy patches, and on some devices (e.g. Huawei) this method is outright inapplicable.</p>
+<p>To address this issue, Magisk allow module devs to create a new file called <code class="docutils literal notranslate"><span class="pre">sepolicy.rule</span></code> in their modules. The module installer script and Magisk daemon will make sure this file is stored in somewhere accessible pre-init to allow <code class="docutils literal notranslate"><span class="pre">magiskinit</span></code> to do its job every time your device boots up.</p>
+</div>
+<div class="section" id="new-module-installer-format">
+<h2>New Module Installer Format<a class="headerlink" href="#new-module-installer-format" title="Permalink to this headline">¶</a></h2>
+<p>The old template is actually pretty convoluted: developers are expected to implement specific callback functions in their <code class="docutils literal notranslate"><span class="pre">install.sh</span></code>, and the zip file structure does not directly represent how modules are actually stored on your device. The new module installer format makes creating new modules very easy, but still give experienced developers tons of freedom to do anything they want in the installation process.</p>
+<p>For details regarding <code class="docutils literal notranslate"><span class="pre">sepolicy.rule</span></code> and the new module installer format, please read the updated <a class="reference external" href="https://topjohnwu.github.io/Magisk/guides.html">Developer Guides</a>. Note that the old “Module Installer Template” is obsolete; creating a Magisk module no longer requires a “template” as it is now a straightforward process.</p>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

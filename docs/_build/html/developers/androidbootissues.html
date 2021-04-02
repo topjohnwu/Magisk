@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Android Booting Shenanigans &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Deployment" href="deployment.html" />
+    <link rel="prev" title="Internal Details" href="internaldetails.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="guides.html">Developer guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Magisk Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internaldetails.html">Internal Details</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Android Booting Shenanigans</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#terminologies">Terminologies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boot-methods">Boot Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#some-history">Some History</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#piecing-things-together">Piecing Things Together</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Developers</a> &raquo;</li>
+        
+      <li>Android Booting Shenanigans</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/developers/androidbootissues.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="android-booting-shenanigans">
+<h1>Android Booting Shenanigans<a class="headerlink" href="#android-booting-shenanigans" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="terminologies">
+<h2>Terminologies<a class="headerlink" href="#terminologies" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><strong>rootdir</strong>: the root directory (/). All files/folders/filesystems are stored in or mounted under rootdir. On Android, the filesystem may be either rootfs or the system partition.</p></li>
+<li><p><strong>initramfs</strong>: a section in Android’s boot image that the Linux kernel will use as rootfs. People also use the term ramdisk interchangeably</p></li>
+<li><p><strong>recovery and boot partition</strong>: these 2 are actually very similar: both are Android boot images containing ramdisk and Linux kernel (plus some other stuff). The only difference is that booting boot partition will bring us to Android, while recovery has a minimalist self contained Linux environment for repairing and upgrading the device.</p></li>
+<li><p><strong>SAR</strong>: System-as-root. That is, the device uses system as rootdir instead of rootfs</p></li>
+<li><p><strong>A/B, A-only</strong>: For devices supporting Seamless System Updates, it will have 2 slots of all read-only partitions; we call these A/B devices. To differentiate, non A/B devices will be called A-only</p></li>
+<li><p><strong>2SI</strong>: Two Stage Init. The way Android 10+ boots. More info later.</p></li>
+</ul>
+<p>Here are a few parameters to more precisely define a device’s Android version:</p>
+<ul class="simple">
+<li><p><strong>LV</strong>: Launch Version. The Android version the device is launched with. That is, the Android version pre-installed when the device first hit the market.</p></li>
+<li><p><strong>RV</strong>: Running Version. The Android version the device is currently running on.</p></li>
+</ul>
+<p>We will use <strong>Android API level</strong> to represent LV and RV. The mapping between API level and Android versions can be seen in this table. For example: Pixel XL is released with Android 7.1, and is running Android 10, these parameters will be (LV = 25, RV = 29)</p>
+</div>
+<div class="section" id="boot-methods">
+<h2>Boot Methods<a class="headerlink" href="#boot-methods" title="Permalink to this headline">¶</a></h2>
+<p>Android booting can be roughly categorized into 3 major different methods. We provide a general rule of thumb to determine which method your device is most likely using, with exceptions listed separately.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 45%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Initial rootdir</p></th>
+<th class="head"><p>Final rootdir</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>A</p></td>
+<td><p>rootfs</p></td>
+<td><p>rootfs</p></td>
+</tr>
+<tr class="row-odd"><td><p>B</p></td>
+<td><p>system</p></td>
+<td><p>system</p></td>
+</tr>
+<tr class="row-even"><td><p>C</p></td>
+<td><p>rootfs</p></td>
+<td><p>system</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Method A - Legacy ramdisk</strong>: This is how all Android devices used to boot (good old days). The kernel uses initramfs as rootdir, and exec /init to boot.</dt><dd><ul>
+<li><p>Devices that does not fall in any of Method B and C’s criteria</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Method B - Legacy SAR</strong>: This method was first seen on Pixel 1. The kernel directly mounts the system partition as rootdir and exec /init to boot.</dt><dd><ul>
+<li><p>Devices with (LV = 28)</p></li>
+<li><p>Google: Pixel 1 and 2. Pixel 3 and 3a when (RV = 28).</p></li>
+<li><p>OnePlus: 6 - 7</p></li>
+<li><p>Maybe some (LV &lt; 29) Android Go devices?</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>Method C - 2SI ramdisk SAR</strong>: This method was first seen on Pixel 3 Android 10 developer preview. The kernel uses initramfs as rootdir and exec /init in rootfs. This init is responsible to mount the system partition and use it as the new rootdir, then finally exec /system/bin/init to boot.</dt><dd><ul>
+<li><p>Devices with (LV &gt;= 29)</p></li>
+<li><p>Devices with (LV &lt; 28, RV &gt;= 29), excluding those that were already using Method B</p></li>
+<li><p>Google: Pixel 3 and 3a with (RV &gt;= 29)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Discussion</strong></p>
+<p>From documents online, Google’s definition of SAR only considers how the kernel boots the device (<strong>Initial rootdir</strong> in the table above), meaning that only devices using <strong>Method B</strong> is officially considered an SAR device from Google’s standpoint.</p>
+<p>However for Magisk, the real difference lies in what the device ends up using when fully booted (<strong>Final rootdir</strong> in the table above), meaning that <strong>as far as Magisk’s concern, both Method B and C is a form of SAR</strong>, but just implemented differently. Every instance of SAR later mentioned in this document will refer to <strong>Magisk’s definition</strong> unless specifically says otherwise.</p>
+<p>The criteria for Method C is a little complicated, in layman’s words: either your device is modern enough to launch with Android 10+, or you are running an Android 10+ custom ROM on a device that was using Method A.</p>
+<ul class="simple">
+<li><p>Any Method A device running Android 10+ will automatically be using Method C</p></li>
+<li><p><strong>Method B devices are stuck with Method B</strong>, with the only exception being Pixel 3 and 3a, which Google retrofitted the device to adapt the new method.</p></li>
+</ul>
+<p>SAR is a very important part of Project Treble as rootdir should be tied to the platform. This is also the reason why Method B and C comes with (LV &gt;= ver) criterion as Google has enforced all OEMs to comply with updated requirements every year.</p>
+</div>
+<div class="section" id="some-history">
+<h2>Some History<a class="headerlink" href="#some-history" title="Permalink to this headline">¶</a></h2>
+<p>When Google released the first generation Pixel, it also introduced A/B (Seamless) System Updates. Due to storage size concerns, there are several differences compared to A-only, the most relevant one being the removal of recovery partition and the recovery ramdisk being merged into boot.</p>
+<p>Let’s go back in time when Google is first designing A/B. If using SAR (only Boot Method B exists at that time), the kernel doesn’t need initramfs to boot Android (because rootdir is in system). This mean we can be smart and just stuff the recovery ramdisk (containing the minimalist Linux environment) into boot, remove recovery, and let the kernel pick whichever rootdir to use (ramdisk or system) based on information from the bootloader.</p>
+<p>As time passed from Android 7.1 to Android 10, Google introduced Dynamic Partitions. This is bad news for SAR, because the Linux kernel cannot directly understand this new partition format, thus unable to directly mount system as rootdir. This is when they came up with Boot Method C: always boot into initramfs, and let userspace handle the rest of booting. This includes deciding whether to boot into Android or recovery, or as they officially call: USES_RECOVERY_AS_BOOT.</p>
+<p>Some modern devices using A/B with 2SI also comes with recovery_a/_b partitions. This is officially supported with Google’s standard. These devices will then only use the boot ramdisk to boot into Android as recovery is stored on a separate partition.</p>
+</div>
+<div class="section" id="piecing-things-together">
+<h2>Piecing Things Together<a class="headerlink" href="#piecing-things-together" title="Permalink to this headline">¶</a></h2>
+<p>With all the knowledge above, now we can categorize all Android devices into these different types:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 20%" />
+<col style="width: 17%" />
+<col style="width: 7%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Boot Method</p></th>
+<th class="head"><p>Partition</p></th>
+<th class="head"><p>2SI</p></th>
+<th class="head"><p>Ramdisk in boot</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>I</p></td>
+<td><p>A</p></td>
+<td><p>A-only</p></td>
+<td></td>
+<td><p>No  boot ramdisk</p></td>
+</tr>
+<tr class="row-odd"><td><p>II</p></td>
+<td><p>B</p></td>
+<td><p>A/B</p></td>
+<td></td>
+<td><p>Any     recovery ramdisk</p></td>
+</tr>
+<tr class="row-even"><td><p>III</p></td>
+<td><p>B</p></td>
+<td><p>A-only</p></td>
+<td></td>
+<td><p>Any N/A</p></td>
+</tr>
+<tr class="row-odd"><td><p>IV</p></td>
+<td><p>C</p></td>
+<td><p>Any</p></td>
+<td></td>
+<td><p>Yes     Hybrid ramdisk</p></td>
+</tr>
+</tbody>
+</table>
+<p>These types are ordered chronologically by the time they were first available.</p>
+<ul class="simple">
+<li><p><strong>Type I</strong>: Good old legacy ramdisk boot</p></li>
+<li><p><strong>Type II</strong>: Legacy A/B devices. Pixel 1 is the first device of this type, being both the first A/B and SAR device</p></li>
+<li><p><strong>Type III</strong>: Late 2018 - 2019 devices that are A-only. <strong>The worst type of device to ever exist as far as Magisk is concerned.</strong></p></li>
+<li><p><strong>Type IV</strong>: All devices using Boot Method C are Type IV. A/B Type IV ramdisk can boot into either Android or recovery based on info from bootloader; A-only Type IV ramdisk can only boot into Android.</p></li>
+</ul>
+<p>Further details on Type III devices: Magisk is always installed in the ramdisk of a boot image. For all other device types, because their boot partition have ramdisk included, Magisk can be easily installed by patching boot image through the Magisk app or flash zip in custom recovery. However for Type III devices, they are <strong>limited to install Magisk into the recovery partition</strong>. Magisk will not function when booted normally; instead Type III device owners have to always reboot to recovery to maintain Magisk access.</p>
+<p>Some Type III devices’ bootloader will still accept and provide initramfs that was manually added to the boot image to the kernel (e.g. some Xiaomi phones), but many device don’t (e.g. Samsung S10, Note 10). It solely depends on how the OEM implements its bootloader.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="deployment.html" class="btn btn-neutral float-right" title="Deployment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="internaldetails.html" class="btn btn-neutral float-left" title="Internal Details" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

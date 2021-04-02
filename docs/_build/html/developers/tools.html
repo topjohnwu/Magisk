@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Magisk Tools &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Internal Details" href="internaldetails.html" />
+    <link rel="prev" title="Developer guides" href="guides.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="guides.html">Developer guides</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Magisk Tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#magiskboot">magiskboot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magiskinit">magiskinit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magiskpolicy">magiskpolicy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magisk">magisk</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#su">su</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resetprop">resetprop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magiskhide">magiskhide</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="internaldetails.html">Internal Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="androidbootissues.html">Android Booting Shenanigans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Developers</a> &raquo;</li>
+        
+      <li>Magisk Tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/developers/tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-tools">
+<h1>Magisk Tools<a class="headerlink" href="#magisk-tools" title="Permalink to this headline">¶</a></h1>
+<p>Magisk comes with a huge collections of tools for installation, daemons, and utilities for developers. This documentation covers the 3 binaries and all included applets. The binaries and applets are shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">magiskboot</span>                 <span class="o">/*</span> <span class="n">binary</span> <span class="o">*/</span>
+<span class="n">magiskinit</span>                 <span class="o">/*</span> <span class="n">binary</span> <span class="o">*/</span>
+<span class="n">magiskpolicy</span> <span class="o">-&gt;</span> <span class="n">magiskinit</span>
+<span class="n">supolicy</span> <span class="o">-&gt;</span> <span class="n">magiskinit</span>
+<span class="n">magisk</span>                     <span class="o">/*</span> <span class="n">binary</span> <span class="o">*/</span>
+<span class="n">magiskhide</span> <span class="o">-&gt;</span> <span class="n">magisk</span>
+<span class="n">resetprop</span> <span class="o">-&gt;</span> <span class="n">magisk</span>
+<span class="n">su</span> <span class="o">-&gt;</span> <span class="n">magisk</span>
+</pre></div>
+</div>
+<p>Note: The Magisk zip you download only contains magiskboot, magiskinit, and magiskinit64. The binary magisk is compressed and embedded into magiskinit(64). Push magiskinit(64) to your device and run ./magiskinit(64) -x magisk &lt;path&gt; to extract magisk out of the binary.</p>
+<div class="section" id="magiskboot">
+<h2>magiskboot<a class="headerlink" href="#magiskboot" title="Permalink to this headline">¶</a></h2>
+<p>A tool to unpack / repack boot images, parse / patch / extract cpio, patch dtb, hex patch binaries, and compress / decompress files with multiple algorithms.</p>
+<p>magiskboot natively supports (which means it does not rely on external tools) common compression formats including gzip, lz4, lz4_legacy (only used on LG), lzma, xz, and bzip2.</p>
+<p>The concept of magiskboot is to make boot image modification simpler. For unpacking, it parses the header and extracts all sections in the image, decompressing on-the-fly if compression is detected in any sections. For repacking, the original boot image is required so the original headers can be used, changing only the necessary entries such as section sizes and checksum. All sections will be compressed back to the original format if required. The tool also supports many CPIO and DTB operations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">magiskboot</span> <span class="o">&lt;</span><span class="n">action</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">args</span><span class="o">...</span><span class="p">]</span>
+
+<span class="n">Supported</span> <span class="n">actions</span><span class="p">:</span>
+<span class="n">unpack</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">bootimg</span><span class="o">&gt;</span>
+    <span class="n">Unpack</span> <span class="o">&lt;</span><span class="n">bootimg</span><span class="o">&gt;</span> <span class="n">to</span><span class="p">,</span> <span class="k">if</span> <span class="n">available</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">kernel_dtb</span><span class="p">,</span> <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span><span class="p">,</span>
+    <span class="n">second</span><span class="p">,</span> <span class="n">dtb</span><span class="p">,</span> <span class="n">extra</span><span class="p">,</span> <span class="ow">and</span> <span class="n">recovery_dtbo</span> <span class="n">into</span> <span class="n">current</span> <span class="n">directory</span><span class="o">.</span>
+    <span class="n">If</span> <span class="s1">&#39;-n&#39;</span> <span class="ow">is</span> <span class="n">provided</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">attempt</span> <span class="n">to</span> <span class="n">decompress</span> <span class="n">kernel</span> <span class="ow">or</span>
+    <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span> <span class="kn">from</span> <span class="nn">their</span> <span class="n">original</span> <span class="n">formats</span><span class="o">.</span>
+    <span class="n">If</span> <span class="s1">&#39;-h&#39;</span> <span class="ow">is</span> <span class="n">provided</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span> <span class="n">dump</span> <span class="n">header</span> <span class="n">info</span> <span class="n">to</span> <span class="s1">&#39;header&#39;</span><span class="p">,</span>
+    <span class="n">which</span> <span class="n">will</span> <span class="n">be</span> <span class="n">parsed</span> <span class="n">when</span> <span class="n">repacking</span><span class="o">.</span>
+    <span class="n">Return</span> <span class="n">values</span><span class="p">:</span>
+    <span class="mi">0</span><span class="p">:</span><span class="n">valid</span>    <span class="mi">1</span><span class="p">:</span><span class="n">error</span>    <span class="mi">2</span><span class="p">:</span><span class="n">chromeos</span>
+
+<span class="n">repack</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">origbootimg</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">outbootimg</span><span class="p">]</span>
+    <span class="n">Repack</span> <span class="n">boot</span> <span class="n">image</span> <span class="n">components</span> <span class="kn">from</span> <span class="nn">current</span> <span class="n">directory</span>
+    <span class="n">to</span> <span class="p">[</span><span class="n">outbootimg</span><span class="p">],</span> <span class="ow">or</span> <span class="n">new</span><span class="o">-</span><span class="n">boot</span><span class="o">.</span><span class="n">img</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">specified</span><span class="o">.</span>
+    <span class="n">If</span> <span class="s1">&#39;-n&#39;</span> <span class="ow">is</span> <span class="n">provided</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">attempt</span> <span class="n">to</span> <span class="n">recompress</span> <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span><span class="p">,</span>
+    <span class="n">otherwise</span> <span class="n">it</span> <span class="n">will</span> <span class="n">compress</span> <span class="n">ramdisk</span><span class="o">.</span><span class="n">cpio</span> <span class="ow">and</span> <span class="n">kernel</span> <span class="k">with</span> <span class="n">the</span> <span class="n">same</span> <span class="n">method</span>
+    <span class="ow">in</span> <span class="o">&lt;</span><span class="n">origbootimg</span><span class="o">&gt;</span> <span class="k">if</span> <span class="n">the</span> <span class="n">file</span> <span class="n">provided</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">already</span> <span class="n">compressed</span><span class="o">.</span>
+
+<span class="n">hexpatch</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">hexpattern1</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">hexpattern2</span><span class="o">&gt;</span>
+    <span class="n">Search</span> <span class="o">&lt;</span><span class="n">hexpattern1</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span><span class="p">,</span> <span class="ow">and</span> <span class="n">replace</span> <span class="k">with</span> <span class="o">&lt;</span><span class="n">hexpattern2</span><span class="o">&gt;</span>
+
+<span class="n">cpio</span> <span class="o">&lt;</span><span class="n">incpio</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">commands</span><span class="o">...</span><span class="p">]</span>
+    <span class="n">Do</span> <span class="n">cpio</span> <span class="n">commands</span> <span class="n">to</span> <span class="o">&lt;</span><span class="n">incpio</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">modifications</span> <span class="n">are</span> <span class="n">done</span> <span class="ow">in</span><span class="o">-</span><span class="n">place</span><span class="p">)</span>
+    <span class="n">Each</span> <span class="n">command</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">single</span> <span class="n">argument</span><span class="p">,</span> <span class="n">add</span> <span class="n">quotes</span> <span class="k">for</span> <span class="n">each</span> <span class="n">command</span>
+    <span class="n">Supported</span> <span class="n">commands</span><span class="p">:</span>
+    <span class="n">exists</span> <span class="n">ENTRY</span>
+        <span class="n">Return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">ENTRY</span> <span class="n">exists</span><span class="p">,</span> <span class="k">else</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">rm</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="n">ENTRY</span>
+        <span class="n">Remove</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="n">specify</span> <span class="p">[</span><span class="o">-</span><span class="n">r</span><span class="p">]</span> <span class="n">to</span> <span class="n">remove</span> <span class="n">recursively</span>
+    <span class="n">mkdir</span> <span class="n">MODE</span> <span class="n">ENTRY</span>
+        <span class="n">Create</span> <span class="n">directory</span> <span class="n">ENTRY</span> <span class="ow">in</span> <span class="n">permissions</span> <span class="n">MODE</span>
+    <span class="n">ln</span> <span class="n">TARGET</span> <span class="n">ENTRY</span>
+        <span class="n">Create</span> <span class="n">a</span> <span class="n">symlink</span> <span class="n">to</span> <span class="n">TARGET</span> <span class="k">with</span> <span class="n">the</span> <span class="n">name</span> <span class="n">ENTRY</span>
+    <span class="n">mv</span> <span class="n">SOURCE</span> <span class="n">DEST</span>
+        <span class="n">Move</span> <span class="n">SOURCE</span> <span class="n">to</span> <span class="n">DEST</span>
+    <span class="n">add</span> <span class="n">MODE</span> <span class="n">ENTRY</span> <span class="n">INFILE</span>
+        <span class="n">Add</span> <span class="n">INFILE</span> <span class="k">as</span> <span class="n">ENTRY</span> <span class="ow">in</span> <span class="n">permissions</span> <span class="n">MODE</span><span class="p">;</span> <span class="n">replaces</span> <span class="n">ENTRY</span> <span class="k">if</span> <span class="n">exists</span>
+    <span class="n">extract</span> <span class="p">[</span><span class="n">ENTRY</span> <span class="n">OUT</span><span class="p">]</span>
+        <span class="n">Extract</span> <span class="n">ENTRY</span> <span class="n">to</span> <span class="n">OUT</span><span class="p">,</span> <span class="ow">or</span> <span class="n">extract</span> <span class="nb">all</span> <span class="n">entries</span> <span class="n">to</span> <span class="n">current</span> <span class="n">directory</span>
+    <span class="n">test</span>
+        <span class="n">Test</span> <span class="n">the</span> <span class="n">current</span> <span class="n">cpio</span><span class="s1">&#39;s patch status</span>
+        <span class="n">Return</span> <span class="n">values</span><span class="p">:</span>
+        <span class="mi">0</span><span class="p">:</span><span class="n">stock</span>    <span class="mi">1</span><span class="p">:</span><span class="n">Magisk</span>    <span class="mi">2</span><span class="p">:</span><span class="n">unsupported</span> <span class="p">(</span><span class="n">phh</span><span class="p">,</span> <span class="n">SuperSU</span><span class="p">,</span> <span class="n">Xposed</span><span class="p">)</span>
+    <span class="n">patch</span>
+        <span class="n">Apply</span> <span class="n">ramdisk</span> <span class="n">patches</span>
+        <span class="n">Configure</span> <span class="k">with</span> <span class="n">env</span> <span class="n">variables</span><span class="p">:</span> <span class="n">KEEPVERITY</span> <span class="n">KEEPFORCEENCRYPT</span>
+    <span class="n">backup</span> <span class="n">ORIG</span>
+        <span class="n">Create</span> <span class="n">ramdisk</span> <span class="n">backups</span> <span class="kn">from</span> <span class="nn">ORIG</span>
+    <span class="n">restore</span>
+        <span class="n">Restore</span> <span class="n">ramdisk</span> <span class="kn">from</span> <span class="nn">ramdisk</span> <span class="n">backup</span> <span class="n">stored</span> <span class="n">within</span> <span class="n">incpio</span>
+    <span class="n">sha1</span>
+        <span class="n">Print</span> <span class="n">stock</span> <span class="n">boot</span> <span class="n">SHA1</span> <span class="k">if</span> <span class="n">previously</span> <span class="n">backed</span> <span class="n">up</span> <span class="ow">in</span> <span class="n">ramdisk</span>
+
+<span class="n">dtb</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">action</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">args</span><span class="o">...</span><span class="p">]</span>
+    <span class="n">Do</span> <span class="n">dtb</span> <span class="n">related</span> <span class="n">actions</span> <span class="n">to</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+    <span class="n">Supported</span> <span class="n">actions</span><span class="p">:</span>
+    <span class="nb">print</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span>
+        <span class="n">Print</span> <span class="nb">all</span> <span class="n">contents</span> <span class="n">of</span> <span class="n">dtb</span> <span class="k">for</span> <span class="n">debugging</span>
+        <span class="n">Specify</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="n">to</span> <span class="n">only</span> <span class="nb">print</span> <span class="n">fstab</span> <span class="n">nodes</span>
+    <span class="n">patch</span>
+        <span class="n">Search</span> <span class="k">for</span> <span class="n">fstab</span> <span class="ow">and</span> <span class="n">remove</span> <span class="n">verity</span><span class="o">/</span><span class="n">avb</span>
+        <span class="n">Modifications</span> <span class="n">are</span> <span class="n">done</span> <span class="n">directly</span> <span class="n">to</span> <span class="n">the</span> <span class="n">file</span> <span class="ow">in</span><span class="o">-</span><span class="n">place</span>
+        <span class="n">Configure</span> <span class="k">with</span> <span class="n">env</span> <span class="n">variables</span><span class="p">:</span> <span class="n">KEEPVERITY</span>
+
+<span class="n">split</span> <span class="o">&lt;</span><span class="nb">input</span><span class="o">&gt;</span>
+    <span class="n">Split</span> <span class="n">image</span><span class="o">.*-</span><span class="n">dtb</span> <span class="n">into</span> <span class="n">kernel</span> <span class="o">+</span> <span class="n">kernel_dtb</span>
+
+<span class="n">sha1</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span>
+    <span class="n">Print</span> <span class="n">the</span> <span class="n">SHA1</span> <span class="n">checksum</span> <span class="k">for</span> <span class="o">&lt;</span><span class="n">file</span><span class="o">&gt;</span>
+
+<span class="n">cleanup</span>
+    <span class="n">Cleanup</span> <span class="n">the</span> <span class="n">current</span> <span class="n">working</span> <span class="n">directory</span>
+
+<span class="n">compress</span><span class="p">[</span><span class="o">=</span><span class="n">method</span><span class="p">]</span> <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">outfile</span><span class="p">]</span>
+    <span class="n">Compress</span> <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;</span> <span class="k">with</span> <span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">gzip</span><span class="p">),</span> <span class="n">optionally</span> <span class="n">to</span> <span class="p">[</span><span class="n">outfile</span><span class="p">]</span>
+    <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;/</span><span class="p">[</span><span class="n">outfile</span><span class="p">]</span> <span class="n">can</span> <span class="n">be</span> <span class="s1">&#39;-&#39;</span> <span class="n">to</span> <span class="n">be</span> <span class="n">STDIN</span><span class="o">/</span><span class="n">STDOUT</span>
+    <span class="n">Supported</span> <span class="n">methods</span><span class="p">:</span> <span class="n">bzip2</span> <span class="n">gzip</span> <span class="n">lz4</span> <span class="n">lz4_legacy</span> <span class="n">lz4_lg</span> <span class="n">lzma</span> <span class="n">xz</span>
+
+<span class="n">decompress</span> <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">outfile</span><span class="p">]</span>
+    <span class="n">Detect</span> <span class="n">method</span> <span class="ow">and</span> <span class="n">decompress</span> <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">optionally</span> <span class="n">to</span> <span class="p">[</span><span class="n">outfile</span><span class="p">]</span>
+    <span class="o">&lt;</span><span class="n">infile</span><span class="o">&gt;/</span><span class="p">[</span><span class="n">outfile</span><span class="p">]</span> <span class="n">can</span> <span class="n">be</span> <span class="s1">&#39;-&#39;</span> <span class="n">to</span> <span class="n">be</span> <span class="n">STDIN</span><span class="o">/</span><span class="n">STDOUT</span>
+    <span class="n">Supported</span> <span class="n">methods</span><span class="p">:</span> <span class="n">bzip2</span> <span class="n">gzip</span> <span class="n">lz4</span> <span class="n">lz4_legacy</span> <span class="n">lz4_lg</span> <span class="n">lzma</span> <span class="n">xz</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="magiskinit">
+<h2>magiskinit<a class="headerlink" href="#magiskinit" title="Permalink to this headline">¶</a></h2>
+<p>This binary will replace init in the ramdisk of a Magisk patched boot image. It is originally created for supporting devices using system-as-root, but the tool is extended to support all devices and became a crucial part of Magisk. More details can be found in the Pre-Init section in Magisk Booting Process.</p>
+</div>
+<div class="section" id="magiskpolicy">
+<h2>magiskpolicy<a class="headerlink" href="#magiskpolicy" title="Permalink to this headline">¶</a></h2>
+<p>(This tool is aliased to supolicy for compatibility with SuperSU’s sepolicy tool)</p>
+<p>An applet of magiskinit. This tool could be used for advanced developers to modify SELinux policies. In common scenarios like Linux server admins, they would directly modify the SELinux policy sources (<a href="#id1"><span class="problematic" id="id2">*</span></a>.te) and recompile the sepolicy binary, but here on Android we directly patch the binary file (or runtime policies).</p>
+<p>All processes spawned from the Magisk daemon, including root shells and all its forks, are running in the context u:r:magisk:s0. The rule used on all Magisk installed systems can be viewed as stock sepolicy with these patches: magiskpolicy –magisk ‘allow magisk * * <a href="#id3"><span class="problematic" id="id4">*</span></a>’.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Usage: magiskpolicy [--options...] [policy statements...]
+
+Options:
+--help            show help message for policy statements
+--load FILE       load policies from FILE
+--load-split      load from precompiled sepolicy or compile
+                    split policies
+--compile-split   compile split cil policies
+--save FILE       save policies to FILE
+--live            directly apply sepolicy live
+--magisk          inject built-in rules for a minimal
+                    Magisk selinux environment
+--apply FILE      apply rules from FILE, read and parsed
+                    line by line as policy statements
+
+If neither --load or --compile-split is specified, it will load
+from current live policies (/sys/fs/selinux/policy)
+
+One policy statement should be treated as one parameter;
+this means each policy statement should be enclosed in quotes.
+Multiple policy statements can be provided in a single command.
+
+Statements has a format of &quot;&lt;rule_name&gt; [args...]&quot;.
+Arguments labeled with (^) can accept one or more entries. Multiple
+entries consist of a space separated list enclosed in braces ({}).
+Arguments labeled with (*) are the same as (^), but additionally
+support the match-all operator (*).
+
+Example: &quot;allow { s1 s2 } { t1 t2 } class *&quot;
+Will be expanded to:
+
+allow s1 t1 class { all-permissions-of-class }
+allow s1 t2 class { all-permissions-of-class }
+allow s2 t1 class { all-permissions-of-class }
+allow s2 t2 class { all-permissions-of-class }
+
+Supported policy statements:
+
+&quot;allow *source_type *target_type *class *perm_set&quot;
+&quot;deny *source_type *target_type *class *perm_set&quot;
+&quot;auditallow *source_type *target_type *class *perm_set&quot;
+&quot;dontaudit *source_type *target_type *class *perm_set&quot;
+
+&quot;allowxperm *source_type *target_type *class operation xperm_set&quot;
+&quot;auditallowxperm *source_type *target_type *class operation xperm_set&quot;
+&quot;dontauditxperm *source_type *target_type *class operation xperm_set&quot;
+- The only supported operation is &#39;ioctl&#39;
+- xperm_set format is either &#39;low-high&#39;, &#39;value&#39;, or &#39;*&#39;.
+&#39;*&#39; will be treated as &#39;0x0000-0xFFFF&#39;.
+All values should be written in hexadecimal.
+
+&quot;permissive ^type&quot;
+&quot;enforce ^type&quot;
+
+&quot;typeattribute ^type ^attribute&quot;
+
+&quot;type type_name ^(attribute)&quot;
+- Argument &#39;attribute&#39; is optional, default to &#39;domain&#39;
+
+&quot;attribute attribute_name&quot;
+
+&quot;type_transition source_type target_type class default_type (object_name)&quot;
+- Argument &#39;object_name&#39; is optional
+
+&quot;type_change source_type target_type class default_type&quot;
+&quot;type_member source_type target_type class default_type&quot;
+
+&quot;genfscon fs_name partial_path fs_context&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="magisk">
+<h2>magisk<a class="headerlink" href="#magisk" title="Permalink to this headline">¶</a></h2>
+<p>When the magisk binary is called with the name magisk, it works as a utility tool with many helper functions and the entry points for several Magisk services.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">magisk</span> <span class="p">[</span><span class="n">applet</span> <span class="p">[</span><span class="n">arguments</span><span class="p">]</span><span class="o">...</span><span class="p">]</span>
+<span class="ow">or</span><span class="p">:</span> <span class="n">magisk</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span><span class="o">...</span>
+
+<span class="n">Options</span><span class="p">:</span>
+<span class="o">-</span><span class="n">c</span>                        <span class="nb">print</span> <span class="n">current</span> <span class="n">binary</span> <span class="n">version</span>
+<span class="o">-</span><span class="n">v</span>                        <span class="nb">print</span> <span class="n">running</span> <span class="n">daemon</span> <span class="n">version</span>
+<span class="o">-</span><span class="n">V</span>                        <span class="nb">print</span> <span class="n">running</span> <span class="n">daemon</span> <span class="n">version</span> <span class="n">code</span>
+<span class="o">--</span><span class="nb">list</span>                    <span class="nb">list</span> <span class="nb">all</span> <span class="n">available</span> <span class="n">applets</span>
+<span class="o">--</span><span class="n">remove</span><span class="o">-</span><span class="n">modules</span>          <span class="n">remove</span> <span class="nb">all</span> <span class="n">modules</span> <span class="ow">and</span> <span class="n">reboot</span>
+<span class="o">--</span><span class="n">install</span><span class="o">-</span><span class="n">module</span> <span class="n">ZIP</span>      <span class="n">install</span> <span class="n">a</span> <span class="n">module</span> <span class="nb">zip</span> <span class="n">file</span>
+
+<span class="n">Advanced</span> <span class="n">Options</span> <span class="p">(</span><span class="n">Internal</span> <span class="n">APIs</span><span class="p">):</span>
+<span class="o">--</span><span class="n">daemon</span>                  <span class="n">manually</span> <span class="n">start</span> <span class="n">magisk</span> <span class="n">daemon</span>
+<span class="o">--</span><span class="p">[</span><span class="n">init</span> <span class="n">trigger</span><span class="p">]</span>          <span class="n">start</span> <span class="n">service</span> <span class="k">for</span> <span class="n">init</span> <span class="n">trigger</span>
+                            <span class="n">Supported</span> <span class="n">init</span> <span class="n">triggers</span><span class="p">:</span>
+                            <span class="n">post</span><span class="o">-</span><span class="n">fs</span><span class="o">-</span><span class="n">data</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">boot</span><span class="o">-</span><span class="n">complete</span>
+<span class="o">--</span><span class="n">unlock</span><span class="o">-</span><span class="n">blocks</span>           <span class="nb">set</span> <span class="n">BLKROSET</span> <span class="n">flag</span> <span class="n">to</span> <span class="n">OFF</span> <span class="k">for</span> <span class="nb">all</span> <span class="n">block</span> <span class="n">devices</span>
+<span class="o">--</span><span class="n">restorecon</span>              <span class="n">restore</span> <span class="n">selinux</span> <span class="n">context</span> <span class="n">on</span> <span class="n">Magisk</span> <span class="n">files</span>
+<span class="o">--</span><span class="n">clone</span><span class="o">-</span><span class="n">attr</span> <span class="n">SRC</span> <span class="n">DEST</span>     <span class="n">clone</span> <span class="n">permission</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="ow">and</span> <span class="n">selinux</span> <span class="n">context</span>
+<span class="o">--</span><span class="n">clone</span> <span class="n">SRC</span> <span class="n">DEST</span>          <span class="n">clone</span> <span class="n">SRC</span> <span class="n">to</span> <span class="n">DEST</span>
+<span class="o">--</span><span class="n">sqlite</span> <span class="n">SQL</span>              <span class="n">exec</span> <span class="n">SQL</span> <span class="n">commands</span> <span class="n">to</span> <span class="n">Magisk</span> <span class="n">database</span>
+<span class="o">--</span><span class="n">path</span>                    <span class="nb">print</span> <span class="n">Magisk</span> <span class="n">tmpfs</span> <span class="n">mount</span> <span class="n">path</span>
+
+<span class="n">Available</span> <span class="n">applets</span><span class="p">:</span>
+    <span class="n">su</span><span class="p">,</span> <span class="n">resetprop</span><span class="p">,</span> <span class="n">magiskhide</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="su">
+<h2>su<a class="headerlink" href="#su" title="Permalink to this headline">¶</a></h2>
+<p>An applet of magisk, the MagiskSU entry point. Good old su command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">su</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="p">]</span> <span class="p">[</span><span class="n">user</span> <span class="p">[</span><span class="n">argument</span><span class="o">...</span><span class="p">]]</span>
+
+<span class="n">Options</span><span class="p">:</span>
+<span class="o">-</span><span class="n">c</span><span class="p">,</span> <span class="o">--</span><span class="n">command</span> <span class="n">COMMAND</span>         <span class="k">pass</span> <span class="n">COMMAND</span> <span class="n">to</span> <span class="n">the</span> <span class="n">invoked</span> <span class="n">shell</span>
+<span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                    <span class="n">display</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+<span class="o">-</span><span class="p">,</span> <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">login</span>                <span class="n">pretend</span> <span class="n">the</span> <span class="n">shell</span> <span class="n">to</span> <span class="n">be</span> <span class="n">a</span> <span class="n">login</span> <span class="n">shell</span>
+<span class="o">-</span><span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="n">p</span><span class="p">,</span>
+<span class="o">--</span><span class="n">preserve</span><span class="o">-</span><span class="n">environment</span>        <span class="n">preserve</span> <span class="n">the</span> <span class="n">entire</span> <span class="n">environment</span>
+<span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="o">--</span><span class="n">shell</span> <span class="n">SHELL</span>             <span class="n">use</span> <span class="n">SHELL</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">the</span> <span class="n">default</span> <span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sh</span>
+<span class="o">-</span><span class="n">v</span><span class="p">,</span> <span class="o">--</span><span class="n">version</span>                 <span class="n">display</span> <span class="n">version</span> <span class="n">number</span> <span class="ow">and</span> <span class="n">exit</span>
+<span class="o">-</span><span class="n">V</span>                            <span class="n">display</span> <span class="n">version</span> <span class="n">code</span> <span class="ow">and</span> <span class="n">exit</span>
+<span class="o">-</span><span class="n">mm</span><span class="p">,</span> <span class="o">-</span><span class="n">M</span><span class="p">,</span>
+<span class="o">--</span><span class="n">mount</span><span class="o">-</span><span class="n">master</span>                <span class="n">force</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">the</span> <span class="k">global</span> <span class="n">mount</span> <span class="n">namespace</span>
+</pre></div>
+</div>
+<p>Note: even though the -Z, –context option is not listed above, the option still exists for CLI compatibility with apps designed for SuperSU. However the option is silently ignored since it’s no longer relevant.</p>
+</div>
+<div class="section" id="resetprop">
+<h2>resetprop<a class="headerlink" href="#resetprop" title="Permalink to this headline">¶</a></h2>
+<p>An applet of magisk. An advanced system property manipulation utility. Check the Resetprop Details for more background information.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">resetprop</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span> <span class="p">[</span><span class="n">options</span><span class="o">...</span><span class="p">]</span>
+
+<span class="n">Options</span><span class="p">:</span>
+<span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>        <span class="n">show</span> <span class="n">this</span> <span class="n">message</span>
+<span class="p">(</span><span class="n">no</span> <span class="n">arguments</span><span class="p">)</span>    <span class="nb">print</span> <span class="nb">all</span> <span class="n">properties</span>
+<span class="n">NAME</span>              <span class="n">get</span> <span class="nb">property</span>
+<span class="n">NAME</span> <span class="n">VALUE</span>        <span class="nb">set</span> <span class="nb">property</span> <span class="n">entry</span> <span class="n">NAME</span> <span class="k">with</span> <span class="n">VALUE</span>
+<span class="o">--</span><span class="n">file</span> <span class="n">FILE</span>       <span class="n">load</span> <span class="n">props</span> <span class="kn">from</span> <span class="nn">FILE</span>
+<span class="o">--</span><span class="n">delete</span> <span class="n">NAME</span>     <span class="n">delete</span> <span class="nb">property</span>
+
+<span class="n">Flags</span><span class="p">:</span>
+<span class="o">-</span><span class="n">v</span>      <span class="nb">print</span> <span class="n">verbose</span> <span class="n">output</span> <span class="n">to</span> <span class="n">stderr</span>
+<span class="o">-</span><span class="n">n</span>      <span class="nb">set</span> <span class="n">props</span> <span class="n">without</span> <span class="n">going</span> <span class="n">through</span> <span class="n">property_service</span>
+        <span class="p">(</span><span class="n">this</span> <span class="n">flag</span> <span class="n">only</span> <span class="n">affects</span> <span class="n">setprop</span><span class="p">)</span>
+<span class="o">-</span><span class="n">p</span>      <span class="n">read</span><span class="o">/</span><span class="n">write</span> <span class="n">props</span> <span class="n">from</span><span class="o">/</span><span class="n">to</span> <span class="n">persistent</span> <span class="n">storage</span>
+        <span class="p">(</span><span class="n">this</span> <span class="n">flag</span> <span class="n">only</span> <span class="n">affects</span> <span class="n">getprop</span> <span class="ow">and</span> <span class="n">delprop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="magiskhide">
+<h2>magiskhide<a class="headerlink" href="#magiskhide" title="Permalink to this headline">¶</a></h2>
+<p>An applet of magisk, the CLI to control MagiskHide. Use this tool to communicate with the daemon to change MagiskHide settings.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Usage</span><span class="p">:</span> <span class="n">magiskhide</span> <span class="p">[</span><span class="n">action</span> <span class="p">[</span><span class="n">arguments</span><span class="o">...</span><span class="p">]</span> <span class="p">]</span>
+
+<span class="n">Actions</span><span class="p">:</span>
+<span class="n">status</span>          <span class="n">Return</span> <span class="n">the</span> <span class="n">status</span> <span class="n">of</span> <span class="n">magiskhide</span>
+<span class="n">enable</span>          <span class="n">Start</span> <span class="n">magiskhide</span>
+<span class="n">disable</span>         <span class="n">Stop</span> <span class="n">magiskhide</span>
+<span class="n">add</span> <span class="n">PKG</span> <span class="p">[</span><span class="n">PROC</span><span class="p">]</span>  <span class="n">Add</span> <span class="n">a</span> <span class="n">new</span> <span class="n">target</span> <span class="n">to</span> <span class="n">the</span> <span class="n">hide</span> <span class="nb">list</span>
+<span class="n">rm</span> <span class="n">PKG</span> <span class="p">[</span><span class="n">PROC</span><span class="p">]</span>   <span class="n">Remove</span> <span class="n">target</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">the</span> <span class="n">hide</span> <span class="nb">list</span>
+<span class="n">ls</span>              <span class="n">Print</span> <span class="n">the</span> <span class="n">current</span> <span class="n">hide</span> <span class="nb">list</span>
+<span class="n">exec</span> <span class="n">CMDs</span><span class="o">...</span>    <span class="n">Execute</span> <span class="n">commands</span> <span class="ow">in</span> <span class="n">isolated</span> <span class="n">mount</span>
+                <span class="n">namespace</span> <span class="ow">and</span> <span class="n">do</span> <span class="nb">all</span> <span class="n">hide</span> <span class="n">unmounts</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="internaldetails.html" class="btn btn-neutral float-right" title="Internal Details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="guides.html" class="btn btn-neutral float-left" title="Developer guides" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

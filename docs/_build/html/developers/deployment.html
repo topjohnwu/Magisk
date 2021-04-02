@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Deployment &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Android Booting Shenanigans" href="androidbootissues.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="guides.html">Developer guides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Magisk Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internaldetails.html">Internal Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="androidbootissues.html">Android Booting Shenanigans</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Deployment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#systemless">Systemless</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#system-only">System Only</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#emulators-official-avb-only">Emulators (Official AVB Only)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exploits">Exploits</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Developers</a> &raquo;</li>
+        
+      <li>Deployment</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/developers/deployment.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="deployment">
+<h1>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h1>
+<p>(Note: This is not a user tutorial for installing Magisk, this is an explanation of how Magisk can be installed, and a guide for developers to properly deploy Magisk in various different situations)</p>
+<div class="section" id="systemless">
+<h2>Systemless<a class="headerlink" href="#systemless" title="Permalink to this headline">¶</a></h2>
+<p>When a user flashes a Magisk zip in custom recoveries or have boot images patched in the Magisk app, Magisk is installed in the systemless fashion. This is the only officially supported method to install Magisk on a device. The systemless method installs Magisk into a boot image’s ramdisk CPIO, sometimes require additional patches to the kernel.</p>
+<p>Here are the bare minimum commands to install Magisk into a stock boot/recovery image. Be aware that the actual Magisk installation is a little more complicated, the following commands will work but should be treat as proof-of-concepts.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Push 2 binaries, magiskboot and magiskinit to the device
+
+# Assume the 2 binaries are in the current directory and
+# both have executing permissions.
+
+# The path to stock boot image, can be a file or an on-device block
+BOOTIMAGE=&lt;path to boot&gt;
+
+# First unpack the image
+./magiskboot unpack $BOOTIMAGE
+
+# In normal cases, after unpacking you should get at least kernel and ramdisk.cpio
+
+# Patch ramdisk
+./magiskboot cpio ramdisk.cpio \
+&quot;mkdir 000 .backup&quot; \          # create a folder to store our init backup
+&quot;mv init .backup/init&quot; \       # backup the original init
+&quot;add 750 init magiskinit&quot;      # replace init with magiskinit
+
+# Patch kernel to always use ramdisk as rootfs
+# You only need to do this on system-as-root devices
+./magiskboot hexpatch kernel \
+736B69705F696E697472616D6673 \
+77616E745F696E697472616D6673
+
+# Repack the boot image
+./magiskboot repack $BOOTIMAGE
+
+# The patched image should be located in new-boot.img
+</pre></div>
+</div>
+</div>
+<div class="section" id="system-only">
+<h2>System Only<a class="headerlink" href="#system-only" title="Permalink to this headline">¶</a></h2>
+<p>WIP</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Currently not available</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="emulators-official-avb-only">
+<h2>Emulators (Official AVB Only)<a class="headerlink" href="#emulators-official-avb-only" title="Permalink to this headline">¶</a></h2>
+<p>The script scripts/emulator.sh allows you to establish a minimal Magisk environment within the official Android Virtual Device included along with Android Studio / SDK. Please check the comments in the script for further information.</p>
+</div>
+<div class="section" id="exploits">
+<h2>Exploits<a class="headerlink" href="#exploits" title="Permalink to this headline">¶</a></h2>
+<p><strong>(Note: Magisk could only be used as root)</strong></p>
+<p>Occasionally, there would be exploits in certain devices that could lead to full fledged root. On modern Android, it is possible to use MagiskSU if you can gain a shell with the following conditions:</p>
+<p>Effective UID should be privileged (root, or euid=0)
+Have the ability to reload sepolicy (which 99.9% of the time means SELinux permissive)
+You can check out scripts/emulator.sh as a reference for bringing up Magisk with a root shell. Note that these changes are not persistent, and you will need to find ways to rerun the whole process every boot.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="androidbootissues.html" class="btn btn-neutral float-left" title="Android Booting Shenanigans" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

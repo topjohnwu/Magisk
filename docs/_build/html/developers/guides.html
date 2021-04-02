@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Developer guides &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Magisk Tools" href="tools.html" />
+    <link rel="prev" title="Developers" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Developer guides</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#busybox">BusyBox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magisk-modules">Magisk Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magisk-module-installer">Magisk Module Installer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submit-modules">Submit Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-tricks">Module Tricks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boot-scripts">Boot Scripts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#root-directory-overlay-system">Root Directory Overlay System</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Magisk Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internaldetails.html">Internal Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="androidbootissues.html">Android Booting Shenanigans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Developers</a> &raquo;</li>
+        
+      <li>Developer guides</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/developers/guides.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="developer-guides">
+<h1>Developer guides<a class="headerlink" href="#developer-guides" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="busybox">
+<h2>BusyBox<a class="headerlink" href="#busybox" title="Permalink to this headline">¶</a></h2>
+<p>Magisk ships with a feature complete BusyBox binary (including full SELinux support). The executable is located at /data/adb/magisk/busybox. Magisk’s BusyBox supports runtime toggle-able “ASH Standalone Shell Mode”. What this standalone mode means is that when running in the ash shell of BusyBox, every single command will directly use the applet within BusyBox, regardless of what is set as PATH. For example, commands like ls, rm, chmod will NOT use what is in PATH (in the case of Android by default it will be /system/bin/ls, /system/bin/rm, and /system/bin/chmod respectively), but will instead directly call internal BusyBox applets. This makes sure that scripts always run in a predictable environment and always have the full suite of commands no matter which Android version it is running on. To force a command not to use BusyBox, you have to call the executable with full paths.</p>
+<p>Every single shell script running in the context of Magisk will be executed in BusyBox’s ash shell with standalone mode enabled. For what is relevant to 3rd party developers, this includes all boot scripts and module installation scripts.</p>
+<p>For those who want to use this “Standalone Mode” feature outside of Magisk, there are 2 ways to enable it:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Set</span> <span class="n">environment</span> <span class="n">variable</span> <span class="n">ASH_STANDALONE</span> <span class="n">to</span> <span class="mi">1</span>
+<span class="o">*</span> <span class="n">Example</span><span class="p">:</span> <span class="n">ASH_STANDALONE</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">adb</span><span class="o">/</span><span class="n">magisk</span><span class="o">/</span><span class="n">busybox</span> <span class="n">sh</span> <span class="o">&lt;</span><span class="n">script</span><span class="o">&gt;</span>
+<span class="o">*</span> <span class="n">Toggle</span> <span class="k">with</span> <span class="n">command</span><span class="o">-</span><span class="n">line</span> <span class="n">options</span><span class="p">:</span>
+<span class="o">*</span> <span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">adb</span><span class="o">/</span><span class="n">magisk</span><span class="o">/</span><span class="n">busybox</span> <span class="n">sh</span> <span class="o">-</span><span class="n">o</span> <span class="n">standalone</span> <span class="o">&lt;</span><span class="n">script</span><span class="o">&gt;</span>
+<span class="o">*</span> <span class="n">To</span> <span class="n">make</span> <span class="n">sure</span> <span class="nb">all</span> <span class="n">subsequent</span> <span class="n">sh</span> <span class="n">shell</span> <span class="n">executed</span> <span class="n">also</span> <span class="n">runs</span> <span class="ow">in</span> <span class="n">standalone</span> <span class="n">mode</span><span class="p">,</span> <span class="n">option</span> <span class="mi">1</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">preferred</span> <span class="n">method</span> <span class="p">(</span><span class="ow">and</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">what</span> <span class="n">Magisk</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">Magisk</span> <span class="n">app</span> <span class="n">internally</span> <span class="n">use</span><span class="p">)</span> <span class="k">as</span> <span class="n">environment</span> <span class="n">variables</span> <span class="n">are</span> <span class="n">inherited</span> <span class="n">down</span> <span class="n">to</span> <span class="n">child</span> <span class="n">processes</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="magisk-modules">
+<h2>Magisk Modules<a class="headerlink" href="#magisk-modules" title="Permalink to this headline">¶</a></h2>
+<p>A Magisk module is a folder placed in /data/adb/modules with the structure below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/data/adb/modules
+├── .
+├── .
+|
+├── $MODID                  &lt;--- The folder is named with the ID of the module
+│   │
+│   │      *** Module Identity ***
+│   │
+│   ├── module.prop         &lt;--- This file stores the metadata of the module
+│   │
+│   │      *** Main Contents ***
+│   │
+│   ├── system              &lt;--- This folder will be mounted if skip_mount does not exist
+│   │   ├── ...
+│   │   ├── ...
+│   │   └── ...
+│   │
+│   │      *** Status Flags ***
+│   │
+│   ├── skip_mount          &lt;--- If exists, Magisk will NOT mount your system folder
+│   ├── disable             &lt;--- If exists, the module will be disabled
+│   ├── remove              &lt;--- If exists, the module will be removed next reboot
+│   │
+│   │      *** Optional Files ***
+│   │
+│   ├── post-fs-data.sh     &lt;--- This script will be executed in post-fs-data
+│   ├── service.sh          &lt;--- This script will be executed in late_start service
+|   ├── uninstall.sh        &lt;--- This script will be executed when Magisk removes your module
+│   ├── system.prop         &lt;--- Properties in this file will be loaded as system properties by resetprop
+│   ├── sepolicy.rule       &lt;--- Additional custom sepolicy rules
+│   │
+│   │      *** Auto Generated, DO NOT MANUALLY CREATE OR MODIFY ***
+│   │
+│   ├── vendor              &lt;--- A symlink to $MODID/system/vendor
+│   ├── product             &lt;--- A symlink to $MODID/system/product
+│   ├── system_ext          &lt;--- A symlink to $MODID/system/system_ext
+│   │
+│   │      *** Any additional files / folders are allowed ***
+│   │
+│   ├── ...
+│   └── ...
+|
+├── another_module
+│   ├── .
+│   └── .
+├── .
+├── .
+</pre></div>
+</div>
+<p><strong>module.prop</strong></p>
+<p>This is the strict format of module.prop</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">id</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="n">name</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="n">version</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="n">versionCode</span><span class="o">=&lt;</span><span class="nb">int</span><span class="o">&gt;</span>
+<span class="n">author</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+<span class="n">description</span><span class="o">=&lt;</span><span class="n">string</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><dl class="simple">
+<dt>id has to match this regular expression: ^[a-zA-Z][a-zA-Z0-9._-]+$</dt><dd><p>ex: ✓ a_module, ✓ a.module, ✓ module-101, ✗ a module, ✗ 1_module, ✗ -a-module
+This is the unique identifier of your module. You should not change it once published.</p>
+</dd>
+</dl>
+</li>
+<li><p>versionCode has to be an integer. This is used to compare versions</p></li>
+<li><p>Others that weren’t mentioned above can be any single line string.</p></li>
+<li><p>Make sure to use the UNIX (LF) line break type and not the Windows (CR+LF) or Macintosh (CR) one.</p></li>
+</ul>
+<p><strong>Shell scripts (.sh)</strong></p>
+<p>Please read the Boot Scripts section to understand the difference between post-fs-data.sh and service.sh. For most module developers, service.sh should be good enough if you just need to run a boot script.</p>
+<p>In all scripts of your module, please use MODDIR=${0%/<a href="#id1"><span class="problematic" id="id2">*</span></a>} to get your module’s base directory path; do NOT hardcode your module path in scripts.</p>
+<p><strong>system.prop</strong></p>
+<p>This file follows the same format as build.prop. Each line comprises of [key]=[value].</p>
+<p><strong>sepolicy.rule</strong></p>
+<p>If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk’s daemon will make sure this file is copied to somewhere magiskinit can read pre-init to ensure these rules are injected properly.</p>
+<p>Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check magiskpolicy’s documentation.</p>
+<p><strong>The system folder</strong></p>
+<p>All files you want Magisk to replace/inject for you should be placed in this folder. Please read through the Magic Mount section to understand how Magisk mount your files.</p>
+</div>
+<div class="section" id="magisk-module-installer">
+<h2>Magisk Module Installer<a class="headerlink" href="#magisk-module-installer" title="Permalink to this headline">¶</a></h2>
+<p>A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:</p>
+<ul class="simple">
+<li><p>update-binary: Download the latest module_installer.sh and rename/copy that script as update-binary</p></li>
+<li><p>updater-script: This file should only contain the string #MAGISK</p></li>
+</ul>
+<p>By default, update-binary will check/setup the environment, load utility functions, extract the module installer zip to where your module will be installed, and finally do some trivial tasks and cleanups, which should cover most simple modules’ needs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>module.zip
+│
+├── META-INF
+│   └── com
+│       └── google
+│           └── android
+│               ├── update-binary      &lt;--- The module_installer.sh you downloaded
+│               └── updater-script     &lt;--- Should only contain the string &quot;#MAGISK&quot;
+│
+├── customize.sh                       &lt;--- (Optional, more details later)
+│                                           This script will be sourced by update-binary
+├── ...
+├── ...  /* The rest of module&#39;s files */
+│
+</pre></div>
+</div>
+<p><strong>Customization</strong></p>
+<p>If you need to customize the module installation process, optionally you can create a new script in the installer called customize.sh. This script will be sourced (not executed!) by update-binary after all files are extracted and default permissions and secontext are applied. This is very useful if your module includes different files based on ABI, or you need to set special permissions/secontext for some of your files (e.g. files in /system/bin).</p>
+<p>If you need even more customization and prefer to do everything on your own, declare SKIPUNZIP=1 in customize.sh to skip the extraction and applying default permissions/secontext steps. Be aware that by doing so, your customize.sh will then be responsible to install everything by itself.</p>
+<p><strong>customize.sh Environment</strong></p>
+<p>This script will run in Magisk’s BusyBox ash shell with “Standalone Mode” enabled. The following variables and shell functions are available for convenience:</p>
+<p><em>Variables</em></p>
+<ul class="simple">
+<li><p>MAGISK_VER (string): the version string of current installed Magisk (e.g. v20.0)</p></li>
+<li><p>MAGISK_VER_CODE (int): the version code of current installed Magisk (e.g. 20000)</p></li>
+<li><p>BOOTMODE (bool): true if the module is being installed in the Magisk app</p></li>
+<li><p>MODPATH (path): the path where your module files should be installed</p></li>
+<li><p>TMPDIR (path): a place where you can temporarily store files</p></li>
+<li><p>ZIPFILE (path): your module’s installation zip</p></li>
+<li><p>ARCH (string): the CPU architecture of the device. Value is either arm, arm64, x86, or x64</p></li>
+<li><p>IS64BIT (bool): true if $ARCH is either arm64 or x64</p></li>
+<li><p>API (int): the API level (Android version) of the device (e.g. 21 for Android 5.0)</p></li>
+</ul>
+<p><em>Functions</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ui_print</span> <span class="o">&lt;</span><span class="n">msg</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="o">&lt;</span><span class="n">msg</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">console</span>
+    <span class="n">Avoid</span> <span class="n">using</span> <span class="s1">&#39;echo&#39;</span> <span class="k">as</span> <span class="n">it</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">display</span> <span class="ow">in</span> <span class="n">custom</span> <span class="n">recovery</span><span class="s1">&#39;s console</span>
+
+<span class="n">abort</span> <span class="o">&lt;</span><span class="n">msg</span><span class="o">&gt;</span>
+    <span class="nb">print</span> <span class="n">error</span> <span class="n">message</span> <span class="o">&lt;</span><span class="n">msg</span><span class="o">&gt;</span> <span class="n">to</span> <span class="n">console</span> <span class="ow">and</span> <span class="n">terminate</span> <span class="n">the</span> <span class="n">installation</span>
+    <span class="n">Avoid</span> <span class="n">using</span> <span class="s1">&#39;exit&#39;</span> <span class="k">as</span> <span class="n">it</span> <span class="n">will</span> <span class="n">skip</span> <span class="n">the</span> <span class="n">termination</span> <span class="n">cleanup</span> <span class="n">steps</span>
+
+<span class="n">set_perm</span> <span class="o">&lt;</span><span class="n">target</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">owner</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">group</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">permission</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">context</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="ow">is</span> <span class="s2">&quot;u:object_r:system_file:s0&quot;</span>
+    <span class="n">this</span> <span class="n">function</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">shorthand</span> <span class="k">for</span> <span class="n">the</span> <span class="n">following</span> <span class="n">commands</span><span class="p">:</span>
+    <span class="n">chown</span> <span class="n">owner</span><span class="o">.</span><span class="n">group</span> <span class="n">target</span>
+    <span class="n">chmod</span> <span class="n">permission</span> <span class="n">target</span>
+    <span class="n">chcon</span> <span class="n">context</span> <span class="n">target</span>
+
+<span class="n">set_perm_recursive</span> <span class="o">&lt;</span><span class="n">directory</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">owner</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">group</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">dirpermission</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">filepermission</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">context</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">[</span><span class="n">context</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">,</span> <span class="n">the</span> <span class="n">default</span> <span class="ow">is</span> <span class="s2">&quot;u:object_r:system_file:s0&quot;</span>
+    <span class="k">for</span> <span class="nb">all</span> <span class="n">files</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">directory</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span> <span class="n">call</span><span class="p">:</span>
+    <span class="n">set_perm</span> <span class="n">file</span> <span class="n">owner</span> <span class="n">group</span> <span class="n">filepermission</span> <span class="n">context</span>
+    <span class="k">for</span> <span class="nb">all</span> <span class="n">directories</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">directory</span><span class="o">&gt;</span> <span class="p">(</span><span class="n">including</span> <span class="n">itself</span><span class="p">),</span> <span class="n">it</span> <span class="n">will</span> <span class="n">call</span><span class="p">:</span>
+    <span class="n">set_perm</span> <span class="nb">dir</span> <span class="n">owner</span> <span class="n">group</span> <span class="n">dirpermission</span> <span class="n">context</span>
+</pre></div>
+</div>
+<p><em>Easy Replace</em></p>
+<p>You can declare a list of folders you want to directly replace in the variable name REPLACE. The module installer script will pickup this variable and create .replace files for you. An example declaration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">REPLACE</span><span class="o">=</span><span class="s2">&quot;</span>
+<span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">YouTube</span>
+<span class="o">/</span><span class="n">system</span><span class="o">/</span><span class="n">app</span><span class="o">/</span><span class="n">Bloatware</span>
+<span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>The list above will result in the following files being created: $MODPATH/system/app/YouTube/.replace and $MODPATH/system/app/Bloatware/.replace</p>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>When your module is downloaded with the Magisk app, update-binary will be forcefully replaced with the latest module_installer.sh to ensure all installer uses up-to-date scripts. DO NOT try to add any custom logic in update-binary as it is pointless.</p></li>
+<li><p>Due to historical reasons, DO NOT add a file named install.sh in your module installer. That specific file was previously used and will be treated differently.</p></li>
+<li><p>DO NOT call exit at the end of customize.sh. The module installer would want to do finalizations.</p></li>
+</ul>
+</div>
+<div class="section" id="submit-modules">
+<h2>Submit Modules<a class="headerlink" href="#submit-modules" title="Permalink to this headline">¶</a></h2>
+<p>You can submit a module to <strong>Magisk-Module-Repo</strong> so users can download your module directly in the Magisk app.</p>
+<ul class="simple">
+<li><p>Follow the instructions in the previous section to create a valid installer for your module.</p></li>
+<li><p>Create README.md (filename should be exactly the same) containing all info for your module. If you are not familiar with the Markdown syntax, the Markdown Cheat Sheet will be handy.</p></li>
+<li><p>Create a repository with your personal GitHub account, and upload your module installer to the repo</p></li>
+<li><p>Create a request for submission via this link: submission</p></li>
+</ul>
+</div>
+<div class="section" id="module-tricks">
+<h2>Module Tricks<a class="headerlink" href="#module-tricks" title="Permalink to this headline">¶</a></h2>
+<p><strong>Remove Files</strong></p>
+<p>How to remove a file systemless-ly? To actually make the file disappear is complicated (possible, not worth the effort). Replacing it with a dummy file should be good enough! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.</p>
+<p><strong>Remove Folders</strong></p>
+<p>Same as mentioned above, actually making the folder disappear is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers is to add the folder you want to remove into the REPLACE list within customize.sh. If your module doesn’t provide a corresponding folder, it will create an empty folder, and automatically add .replace into the empty folder so the dummy folder will properly replace the one in /system.</p>
+</div>
+<div class="section" id="boot-scripts">
+<h2>Boot Scripts<a class="headerlink" href="#boot-scripts" title="Permalink to this headline">¶</a></h2>
+<p>In Magisk, you can run boot scripts in 2 different modes: <strong>post-fs-data</strong> and <strong>late_start service</strong> mode.</p>
+<ul>
+<li><p>post-fs-data mode</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This stage is BLOCKING. The boot process is paused before execution is done, or 10 seconds have passed.</p></li>
+<li><p>Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.</p></li>
+<li><p>This stage happens before Zygote is started, which pretty much means everything in Android</p></li>
+<li><p><strong>Run scripts in this mode only if necessary!</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>late_start service mode</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.</p></li>
+<li><p><strong>This is the recommended stage to run most scripts!</strong></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>In Magisk, there are also 2 kinds of scripts: <strong>general scripts</strong> and <strong>module scripts</strong>.</p>
+<ul>
+<li><p>General Scripts</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Placed in /data/adb/post-fs-data.d or /data/adb/service.d</p></li>
+<li><p>Only executed if the script is executable (execution permissions, chmod +x script.sh)</p></li>
+<li><p>Scripts in post-fs-data.d runs in post-fs-data mode, and scripts in service.d runs in late_start service mode.</p></li>
+<li><p>Modules should <strong>NOT</strong> add general scripts since it violates encapsulation</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Module Scripts</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Placed in the folder of the module</p></li>
+<li><p>Only executed if the module is enabled</p></li>
+<li><p>post-fs-data.sh runs in post-fs-data mode, and service.sh runs in late_start service mode.</p></li>
+<li><p>Modules require boot scripts should <strong>ONLY</strong> use module scripts instead of general scripts</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>These scripts will run in Magisk’s BusyBox ash shell with “Standalone Mode” enabled.</p>
+</div>
+<div class="section" id="root-directory-overlay-system">
+<h2>Root Directory Overlay System<a class="headerlink" href="#root-directory-overlay-system" title="Permalink to this headline">¶</a></h2>
+<p>Since / is read-only on system-as-root devices, Magisk provides an overlay system to enable developers to replace files in rootdir or add new <a href="#id3"><span class="problematic" id="id4">*</span></a>.rc scripts. This feature is designed mostly for custom kernel developers.</p>
+<p>Overlay files shall be placed in the overlay.d folder in boot image ramdisk, and they follow these rules:</p>
+<ol class="arabic simple">
+<li><p>All <em>.rc files in overlay.d will be read and concatenated **AFTER*</em> init.rc</p></li>
+<li><p>Existing files can be replaced by files located at the same relative path</p></li>
+<li><p>Files that correspond to a non-existing file will be ignored</p></li>
+</ol>
+<p>In order to have additional files that you want to reference in your custom <a href="#id5"><span class="problematic" id="id6">*</span></a>.rc scripts, add them in overlay.d/sbin. The 3 rules above does not apply to everything in this specific folder, as they will directly be copied to Magisk’s internal tmpfs directory (which used to always be located at /sbin).</p>
+<p>Due to changes in Android 11, the /sbin folder is no longer guaranteed to exist. In that case, Magisk randomly generates the tmpfs folder. Every occurrence of the pattern ${MAGISKTMP} in your <em>.rc scripts will be replaced with the Magisk tmpfs folder when magiskinit injects it into init.rc. This also works on pre Android 11 devices as ${MAGISKTMP} will simply be replaced with /sbin in this case, so the best practice is to **NEVER*</em> hardcode /sbin in your <a href="#id7"><span class="problematic" id="id8">*</span></a>.rc scripts when referencing additional files.</p>
+<p>Here is an example of how to setup overlay.d with custom <a href="#id9"><span class="problematic" id="id10">*</span></a>.rc script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ramdisk
+│
+├── overlay.d
+│   ├── sbin
+│   │   ├── libfoo.ko      &lt;--- These 2 files will be copied
+│   │   └── myscript.sh    &lt;--- to Magisk&#39;s tmpfs directory
+│   ├── custom.rc          &lt;--- This file will be injected into init.rc
+│   ├── res
+│   │   └── random.png     &lt;--- This file will replace /res/random.png
+│   └── new_file           &lt;--- This file will be ignored because
+│                               /new_file does not exist
+├── res
+│   └── random.png         &lt;--- This file will be replaced by
+│                               /overlay.d/res/random.png
+├── ...
+├── ...  /* The rest of initramfs files */
+│
+</pre></div>
+</div>
+<p>Here is an example of the custom.rc:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Use ${MAGISKTMP} to refer to Magisk&#39;s tmpfs directory
+
+on early-init
+    setprop sys.example.foo bar
+    insmod ${MAGISKTMP}/libfoo.ko
+    start myservice
+
+service myservice ${MAGISKTMP}/myscript.sh
+    oneshot
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="tools.html" class="btn btn-neutral float-right" title="Magisk Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Developers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

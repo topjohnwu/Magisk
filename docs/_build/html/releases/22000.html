@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2020.2.23 Magisk v22.0 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2020.2.23 Magisk v22.0</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/22000.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v22-0">
+<h1>2020.2.23 Magisk v22.0<a class="headerlink" href="#magisk-v22-0" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="restore-the-existing-magisk-manager-back-to-normal-before-upgrading-if-hidden">
+<h2>RESTORE THE EXISTING MAGISK MANAGER BACK TO NORMAL BEFORE UPGRADING IF HIDDEN!<a class="headerlink" href="#restore-the-existing-magisk-manager-back-to-normal-before-upgrading-if-hidden" title="Permalink to this headline">¶</a></h2>
+<p>Another major Magisk release! This time our focus is not the core Magisk implementation, but rather on improving the whole Magisk user experience.</p>
+</div>
+<div class="section" id="magisk-manager-is-dead-br-long-live-the-magisk-app">
+<h2>Magisk Manager is dead.<br>Long live the Magisk app!<a class="headerlink" href="#magisk-manager-is-dead-br-long-live-the-magisk-app" title="Permalink to this headline">¶</a></h2>
+<p>Ever since the first Magisk release, Magisk (the core components) and Magisk Manager (the companion app) are released separately and isn’t necessarily always in sync. This leads to some confusion and a lot of complexity when downloading/installing Magisk through the app. Starting from v22.0, the Magisk app (renamed from Magisk Manager) includes everything it needs within the APK itself, making installation a 100% offline process.</p>
+<p>Custom recovery lovers, no worries! The Magisk app APK <em>itself</em> is a custom recovery flashable zip, just like MAGIC™🌈. Check out the updated <a class="reference external" href="https://topjohnwu.github.io/Magisk/install.html">installation guide</a> for more info.</p>
+</div>
+<div class="section" id="app-hiding">
+<h2>App Hiding<a class="headerlink" href="#app-hiding" title="Permalink to this headline">¶</a></h2>
+<p>Another major breakthrough in this release is that devices lower than Android 9.0 can now also use the advanced app hiding technique to hide the Magisk app. Due to this incompatible change, <strong>RESTORE THE EXISTING MAGISK MANAGER BACK TO NORMAL BEFORE UPGRADING IF HIDDEN!</strong></p>
+</div>
+<div class="section" id="bug-fixes">
+<h2>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>[MagiskHide] Fix a bug when stopping MagiskHide does not take effect</p></li>
+<li><p>[MagiskBoot] Fix bug when unpacking <code class="docutils literal notranslate"><span class="pre">lz4_lg</span></code> compressed boot images</p></li>
+<li><p>[MagiskInit] Support Galaxy S21 series</p></li>
+<li><p>[MagiskSU] Fix incorrect APEX paths that caused <code class="docutils literal notranslate"><span class="pre">libsqlite.so</span></code> fail to load</p></li>
+</ul>
+</div>
+<div class="section" id="full-changelog-here">
+<h2>Full Changelog: <a class="reference external" href="https://topjohnwu.github.io/Magisk/changes.html">here</a><a class="headerlink" href="#full-changelog-here" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

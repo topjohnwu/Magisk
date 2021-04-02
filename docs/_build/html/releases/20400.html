@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>2020.3.23 Magisk v20.4 &mdash; Magisk  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Magisk
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../all_users/index.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Release Notes</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developers/index.html">Developers</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Magisk</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>2020.3.23 Magisk v20.4</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/releases/20400.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="magisk-v20-4">
+<h1>2020.3.23 Magisk v20.4<a class="headerlink" href="#magisk-v20-4" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h2>
+<p>This release is mainly focused on stability and bug squashing. Please be aware that MagiskHide is no longer enabled by default. Since Google has enabled <a class="reference external" href="https://twitter.com/topjohnwu/status/1237656703929180160?s=20">hardware-based key attestation</a> in SafetyNet (<a class="reference external" href="https://twitter.com/topjohnwu/status/1237830555523149824?s=20">FAQ</a>), there is no effective way to pass full CTS SafetyNet anymore (although Google seems to have temporarily <a class="reference external" href="https://twitter.com/topjohnwu/status/1238514375150850048?s=20">reverted the change</a>).</p>
+<p>I decided that the fully redesigned Magisk Manager isn’t fully ready for prime time yet, so this time around no Magisk Manager update is released. The WIP manager will continue to be improved and is available for testing on the canary channel.</p>
+</div>
+<div class="section" id="busybox-standalone-mode">
+<h2>BusyBox Standalone Mode<a class="headerlink" href="#busybox-standalone-mode" title="Permalink to this headline">¶</a></h2>
+<p>Starting with Magisk v20.4, all Magisk related scripts, including boot scripts and module installation scripts, will run on BusyBox’s shell (ash) in <strong>standalone mode</strong>. In BusyBox ash standalone mode, <strong>every single command</strong> will be <strong>forced</strong> to use the one that is in Magisk’s BusyBox (if available). For instance, no matter how you change the environment variable <code class="docutils literal notranslate"><span class="pre">PATH</span></code>, the <code class="docutils literal notranslate"><span class="pre">rm</span></code> command will always use the one in BusyBox, not the one in system, external BusyBox, vendor, or included in custom recovery.</p>
+<p>The reason behind this change is that all scripts will be guaranteed to have 100% consistent results no matter how the environment is setup. The internal BusyBox is significantly beefed up with patches from &#64;osm0sis, and also with SELinux features enabled. It shall offer a very complete, reliable, and consistent scripting environment. If in any case you <strong>require</strong> to use a command outside of BusyBox, please call it with the full path (e.g. <code class="docutils literal notranslate"><span class="pre">/system/bin/nslookup</span></code>)</p>
+</div>
+<div class="section" id="magisk-changelog">
+<h2>Magisk Changelog<a class="headerlink" href="#magisk-changelog" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>[MagiskInit] Fix potential bootloop in A-only 2SI devices</p></li>
+<li><p>[MagiskInit] Properly support Tegra partition naming</p></li>
+<li><p>[General] Load libsqlite.so dynamically, which removes the need to use wrapper scripts on Android 10+</p></li>
+<li><p>[General] Detect API level with a fallback method on some devices</p></li>
+<li><p>[General] Workaround possible bug in x86 kernel readlinkat system call</p></li>
+<li><p>[BusyBox] Enable SELinux features. Add chcon/runcon etc., and ‘-Z’ option to many applets</p></li>
+<li><p>[BusyBox] Introduce standalone mode. More details in release notes</p></li>
+<li><p>[MagiskHide] Disable MagiskHide by default</p></li>
+<li><p>[MagiskHide] Add more potential detectable system properties</p></li>
+<li><p>[MagiskHide] Add workaround for Xiaomi devices bootloop when MagiskHide is enabled on cross region ROMs</p></li>
+<li><p>[MagiskBoot] Support patching special Motorolla DTB format</p></li>
+<li><p>[MagiskPolicy] Support ‘genfscon’ sepolicy rules</p></li>
+<li><p>[Scripts] Support NAND based boot images (character nodes in /dev/block)</p></li>
+<li><p>[Scripts] Better addon.d (both v1 and v2) support</p></li>
+<li><p>[Scripts] Support Lineage Recovery for Android 10+</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright .
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
