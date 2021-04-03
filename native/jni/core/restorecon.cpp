@@ -18,10 +18,11 @@ static void restore_syscon(int dirfd) {
     DIR *dir;
     char *con;
 
-    fgetfilecon(dirfd, &con);
-    if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
-        fsetfilecon(dirfd, SYSTEM_CON);
-    freecon(con);
+    if (fgetfilecon(dirfd, &con) >= 0) {
+        if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+            fsetfilecon(dirfd, SYSTEM_CON);
+        freecon(con);
+    }
 
     dir = xfdopendir(dirfd);
     while ((entry = xreaddir(dir))) {
@@ -29,10 +30,11 @@ static void restore_syscon(int dirfd) {
         if (entry->d_type == DT_DIR) {
             restore_syscon(fd);
         } else if (entry->d_type == DT_REG) {
-            fgetfilecon(fd, &con);
-            if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
-                fsetfilecon(fd, SYSTEM_CON);
-            freecon(con);
+            if (fgetfilecon(fd, &con) >= 0) {
+                if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
+                    fsetfilecon(fd, SYSTEM_CON);
+                freecon(con);
+            }
         } else if (entry->d_type == DT_LNK) {
             getfilecon_at(dirfd, entry->d_name, &con);
             if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
