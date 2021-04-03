@@ -108,7 +108,7 @@ void mv_dir(int src, int dest) {
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         switch (entry->d_type) {
         case DT_DIR:
-            if (faccessat(dest, entry->d_name, F_OK, 0) == 0) {
+            if (xfaccessat(dest, entry->d_name) == 0) {
                 // Destination folder exists, needs recursive move
                 int newsrc = xopenat(src, entry->d_name, O_RDONLY | O_CLOEXEC);
                 int newdest = xopenat(dest, entry->d_name, O_RDONLY | O_CLOEXEC);
