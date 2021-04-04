@@ -366,7 +366,7 @@ int xfaccessat(int dirfd, const char *pathname) {
     }
 #if defined(__i386__) || defined(__x86_64__)
     if (ret > 0 && errno == 0) {
-        PLOGE("faccessat success but ret is %d", ret);
+        LOGD("faccessat success but ret is %d\n", ret);
         ret = 0;
     }
 #endif
