@@ -16,6 +16,9 @@ kapt {
     javacOptions {
         option("-Xmaxerrs", 1000)
     }
+    arguments {
+        arg("room.incremental", "true")
+    }
 }
 
 android {
@@ -26,10 +29,6 @@ android {
         versionName = Config.version
         versionCode = Config.versionCode
         ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-
-        javaCompileOptions.annotationProcessorOptions.arguments(
-            mapOf("room.incremental" to "true")
-        )
     }
 
     buildTypes {
@@ -64,7 +63,8 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        useIR = true
     }
 }
 
