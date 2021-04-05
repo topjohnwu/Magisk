@@ -508,7 +508,7 @@ remove_system_su() {
 }
 
 api_level_arch_detect() {
-  API=`grep_prop ro.build.version.sdk`
+  [ -z $API ] && API=`grep_prop ro.build.version.sdk`
   ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
   ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
   ABILONG=`grep_prop ro.product.cpu.abi`
