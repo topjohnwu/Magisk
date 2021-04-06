@@ -78,7 +78,6 @@ class AppShellInit : BaseShellInit() {
         fun getBool(name: String) = getVar(name).toBoolean()
 
         shell.newJob().apply {
-            add("export API=${Build.VERSION.SDK_INT}")
             add(context.rawResource(R.raw.manager))
             if (shell.isRoot) {
                 add(context.assets.open("util_functions.sh"))
