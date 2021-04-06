@@ -78,6 +78,10 @@ jobs:
       - name: Build release
         run: python build.py -vr all
 
+      - name: Refresh flag
+        run: touch gradle.properties
+        shell: bash
+
       - name: Build debug
         run: python build.py -v all
 
