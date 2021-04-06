@@ -49,14 +49,16 @@ fun Task.applyOptimize() = doLast {
     }
 }
 
-subprojects {
+allprojects {
     repositories {
         google()
         jcenter()
         maven { url = uri("https://jitpack.io") }
         maven { url = uri("http://oss.sonatype.org/content/repositories/snapshots") }
     }
+}
 
+subprojects {
     afterEvaluate {
         if (plugins.hasPlugin("com.android.library") ||
             plugins.hasPlugin("com.android.application")) {
