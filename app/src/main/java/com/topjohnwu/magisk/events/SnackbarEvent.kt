@@ -6,11 +6,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.utils.TransitiveText
-import com.topjohnwu.magisk.utils.asTransitive
+import com.topjohnwu.magisk.utils.TextHolder
+import com.topjohnwu.magisk.utils.asText
 
 class SnackbarEvent constructor(
-    private val msg: TransitiveText,
+    private val msg: TextHolder,
     private val length: Int = Snackbar.LENGTH_SHORT,
     private val builder: Snackbar.() -> Unit = {}
 ) : ViewEvent(), ActivityExecutor {
@@ -19,13 +19,13 @@ class SnackbarEvent constructor(
         @StringRes res: Int,
         length: Int = Snackbar.LENGTH_SHORT,
         builder: Snackbar.() -> Unit = {}
-    ) : this(res.asTransitive(), length, builder)
+    ) : this(res.asText(), length, builder)
 
     constructor(
         msg: String,
         length: Int = Snackbar.LENGTH_SHORT,
         builder: Snackbar.() -> Unit = {}
-    ) : this(msg.asTransitive(), length, builder)
+    ) : this(msg.asText(), length, builder)
 
 
     private fun snackbar(

@@ -16,7 +16,7 @@ import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
-import com.topjohnwu.magisk.utils.asTransitive
+import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -54,13 +54,13 @@ class HomeViewModel(
 
     val magiskInstalledVersion get() = Info.env.run {
         if (isActive)
-            "$magiskVersionString ($magiskVersionCode)".asTransitive()
+            "$magiskVersionString ($magiskVersionCode)".asText()
         else
-            R.string.not_available.asTransitive()
+            R.string.not_available.asText()
     }
 
     @get:Bindable
-    var managerRemoteVersion = R.string.loading.asTransitive()
+    var managerRemoteVersion = R.string.loading.asText()
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
     val managerInstalledVersion = Info.stub?.let {
@@ -92,14 +92,14 @@ class HomeViewModel(
             }
 
             managerRemoteVersion =
-                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asTransitive()
+                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asText()
 
             launch {
                 ensureEnv()
             }
         } ?: {
             state = State.LOADING_FAILED
-            managerRemoteVersion = R.string.not_available.asTransitive()
+            managerRemoteVersion = R.string.not_available.asText()
         }()
     }
 

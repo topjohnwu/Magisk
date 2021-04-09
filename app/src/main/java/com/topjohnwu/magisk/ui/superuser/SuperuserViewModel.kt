@@ -18,7 +18,7 @@ import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.asTransitive
+import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.TappableHeadlineItem
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
@@ -116,7 +116,7 @@ class SuperuserViewModel(
                 else -> R.string.su_snack_notif_off
             }
         }
-        SnackbarEvent(res.asTransitive(policy.appName)).publish()
+        SnackbarEvent(res.asText(policy.appName)).publish()
     }
 
     fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
@@ -130,7 +130,7 @@ class SuperuserViewModel(
                 db.update(app)
                 val res = if (app.policy == SuPolicy.ALLOW) R.string.su_snack_grant
                 else R.string.su_snack_deny
-                SnackbarEvent(res.asTransitive(item.item.appName)).publish()
+                SnackbarEvent(res.asText(item.item.appName)).publish()
             }
         }
 
