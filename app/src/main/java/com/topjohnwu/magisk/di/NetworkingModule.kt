@@ -34,7 +34,10 @@ val networkingModule = module {
     single { createRetrofit(get()) }
     single { createApiService<RawServices>(get(), Const.Url.GITHUB_RAW_URL) }
     single { createApiService<GithubApiServices>(get(), Const.Url.GITHUB_API_URL) }
-    single { createApiService<GithubPageServices>(get(), Const.Url.GITHUB_PAGE_URL) }
+    single { createApiService<GithubPageServices>(get(),
+        if (Build.VERSION.SDK_INT < 21) Const.Url.GITHUB_OLD_PAGE_URL
+        else Const.Url.GITHUB_PAGE_URL
+    ) }
     single { createApiService<JSDelivrServices>(get(), Const.Url.JS_DELIVR_URL) }
     single { createMarkwon(get(), get()) }
 }

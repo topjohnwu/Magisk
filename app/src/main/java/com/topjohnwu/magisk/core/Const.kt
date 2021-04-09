@@ -63,6 +63,7 @@ object Const {
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
         const val GITHUB_API_URL = "https://api.github.com/"
         const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk-files/"
+        const val GITHUB_OLD_PAGE_URL = "https://topjohnwu.github.io/magisk_files/"
         const val JS_DELIVR_URL = "https://cdn.jsdelivr.net/gh/"
         const val OFFICIAL_REPO = "https://magisk-modules-repo.github.io/submission/modules.json"
     }

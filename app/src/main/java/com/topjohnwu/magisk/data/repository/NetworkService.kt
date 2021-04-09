@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.data.repository
 
+import android.os.Build
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Config.Value.BETA_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
@@ -20,6 +21,10 @@ class NetworkService(
     private val api: GithubApiServices
 ) {
     suspend fun fetchUpdate() = safe {
+        // Pre SDK 21 no longer receives any major updates
+        if (Build.VERSION.SDK_INT < 21)
+            return fetchStableUpdate()
+
         var info = when (Config.updateChannel) {
             DEFAULT_CHANNEL, STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
