@@ -37,7 +37,6 @@ sealed class TransitiveText {
     companion object {
         val EMPTY = String("")
     }
-
 }
 
 

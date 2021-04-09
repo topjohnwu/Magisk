@@ -23,12 +23,10 @@ val viewModelModules = module {
     viewModel { ModuleViewModel(get(), get()) }
     viewModel { SafetynetViewModel() }
     viewModel { SettingsViewModel(get()) }
-    viewModel { SuperuserViewModel(get(), get()) }
+    viewModel { SuperuserViewModel(get()) }
     viewModel { ThemeViewModel() }
     viewModel { InstallViewModel(get()) }
     viewModel { MainViewModel() }
-
-    // Legacy
     viewModel { (args: FlashFragmentArgs) -> FlashViewModel(args) }
     viewModel { SuRequestViewModel(get(), get(), get(SUTimeout), get()) }
 }
