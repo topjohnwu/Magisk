@@ -248,7 +248,7 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.0")
     implementation("androidx.fragment:fragment-ktx:1.3.2")
     implementation("androidx.work:work-runtime-ktx:2.5.0")
     implementation("androidx.transition:transition:1.4.0")
