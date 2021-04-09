@@ -16,8 +16,8 @@ Here are some feature highlights:
 
 Please note that the only source of official Magisk information and downloads is [Github](https://github.com/topjohnwu/Magisk/). Beware of any other websites.
 
-[![](https://img.shields.io/badge/Magisk-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
-[![](https://img.shields.io/badge/Magisk%20Beta-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
+[![](https://img.shields.io/badge/Magisk-v22.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.1)
+[![](https://img.shields.io/badge/Magisk%20Beta-v22.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.1)
 [![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
