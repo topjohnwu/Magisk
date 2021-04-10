@@ -14,7 +14,7 @@ buildscript {
         maven { url = uri("https://kotlin.bintray.com/kotlinx") }
     }
 
-    val vNav = "2.3.4"
+    val vNav = "2.3.5"
     extra["vNav"] = vNav
 
     dependencies {
@@ -68,7 +68,7 @@ subprojects {
 
                 defaultConfig {
                     if (minSdkVersion == null)
-                        minSdkVersion(17)
+                        minSdkVersion(21)
                     targetSdkVersion(30)
                 }
 

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ktx
 
 import android.content.res.Resources
-import android.os.Build
 
 val specialChars = arrayOf('!', '@', '#', '$', '%', '&', '?')
 val fullSpecialChars = arrayOf('！', '＠', '＃', '＄', '％', '＆', '？')
@@ -13,10 +12,7 @@ fun String.isCJK(): Boolean {
     return false
 }
 
-fun isCJK(codepoint: Int): Boolean {
-    return if (Build.VERSION.SDK_INT < 19) false /* Pre 5.0 don't need to be pretty.. */
-    else Character.isIdeographic(codepoint)
-}
+fun isCJK(codepoint: Int) = Character.isIdeographic(codepoint)
 
 fun String.replaceRandomWithSpecial(passes: Int): String {
     var string = this

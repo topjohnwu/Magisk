@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
-import android.os.Build
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
@@ -13,12 +12,11 @@ import com.topjohnwu.magisk.data.network.JSDelivrServices
 import com.topjohnwu.magisk.data.network.RawServices
 import com.topjohnwu.magisk.ktx.precomputedText
 import com.topjohnwu.magisk.net.Networking
-import com.topjohnwu.magisk.net.NoSSLv3SocketFactory
 import com.topjohnwu.magisk.utils.MarkwonImagePlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
 import okhttp3.Dns
-import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,10 +32,7 @@ val networkingModule = module {
     single { createRetrofit(get()) }
     single { createApiService<RawServices>(get(), Const.Url.GITHUB_RAW_URL) }
     single { createApiService<GithubApiServices>(get(), Const.Url.GITHUB_API_URL) }
-    single { createApiService<GithubPageServices>(get(),
-        if (Build.VERSION.SDK_INT < 21) Const.Url.GITHUB_OLD_PAGE_URL
-        else Const.Url.GITHUB_PAGE_URL
-    ) }
+    single { createApiService<GithubPageServices>(get(), Const.Url.GITHUB_PAGE_URL) }
     single { createApiService<JSDelivrServices>(get(), Const.Url.JS_DELIVR_URL) }
     single { createMarkwon(get(), get()) }
 }
@@ -46,7 +41,7 @@ private class DnsResolver(client: OkHttpClient) : Dns {
 
     private val doh by lazy {
         DnsOverHttps.Builder().client(client)
-            .url(HttpUrl.get("https://cloudflare-dns.com/dns-query"))
+            .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
             .bootstrapDnsHosts(listOf(
                 InetAddress.getByName("162.159.36.1"),
                 InetAddress.getByName("162.159.46.1"),
@@ -84,8 +79,6 @@ fun createOkHttpClient(context: Context): OkHttpClient {
 
     if (!Networking.init(context)) {
         Info.hasGMS = false
-        if (Build.VERSION.SDK_INT < 21)
-            builder.sslSocketFactory(NoSSLv3SocketFactory())
     }
     builder.dns(DnsResolver(builder.build()))
 

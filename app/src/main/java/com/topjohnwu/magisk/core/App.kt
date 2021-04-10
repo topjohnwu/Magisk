@@ -1,14 +1,13 @@
 package com.topjohnwu.magisk.core
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.multidex.MultiDex
 import androidx.work.WorkManager
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.utils.AppShellInit
 import com.topjohnwu.magisk.core.utils.BusyBoxInit
@@ -46,10 +45,6 @@ open class App() : Application() {
     }
 
     override fun attachBaseContext(base: Context) {
-        // Basic setup
-        if (BuildConfig.DEBUG)
-            MultiDex.install(base)
-
         // Some context magic
         val app: Application
         val impl: Context
@@ -91,6 +86,7 @@ open class App() : Application() {
     }
 }
 
+@SuppressLint("StaticFieldLeak")
 object ForegroundTracker : Application.ActivityLifecycleCallbacks {
 
     @Volatile

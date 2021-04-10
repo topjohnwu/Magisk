@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.ui
 
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -123,10 +122,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         val topView = binding.mainToolbarWrapper
         val bottomView = binding.mainBottomBar
 
-        if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
-            !binding.mainBottomBar.isAttachedToWindow
-        ) {
+        if (!binding.mainBottomBar.isAttachedToWindow) {
             binding.mainBottomBar.viewTreeObserver.addOnWindowAttachListener(object :
                 ViewTreeObserver.OnWindowAttachListener {
 
