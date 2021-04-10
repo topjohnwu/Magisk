@@ -448,7 +448,7 @@ flash_image() {
 install_magisk() {
   cd $MAGISKBIN
 
-  if [ $API -ge 21 -a ! -c $BOOTIMAGE ]; then
+  if [ ! -c $BOOTIMAGE ]; then
     eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi

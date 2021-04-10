@@ -31,7 +31,7 @@ static int call_applet(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
     umask(0);
-    dload_selinux();
+    enable_selinux();
     cmdline_logging();
     init_argv0(argc, argv);
 

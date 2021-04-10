@@ -140,12 +140,6 @@ static bool magisk_env() {
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
 
-    // Disable/remove magiskhide, resetprop
-    if (SDK_INT < 19) {
-        unlink("/sbin/resetprop");
-        unlink("/sbin/magiskhide");
-    }
-
     if (access(DATABIN "/busybox", X_OK))
         return false;
 
