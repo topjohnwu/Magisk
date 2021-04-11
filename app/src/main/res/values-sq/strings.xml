@@ -118,6 +118,10 @@
     <string name="sorting_order">Renditja e Renditjes</string>
 
     <!--Settings-->
+    <string name="settings_hide_app_title">Fshih aplikacionin Magisk</string>
+    <string name="settings_hide_app_summary">Instaloni një aplikacion proxy me ID të paketës së rastësishme dhe etiketë të personalizuar të aplikacionit</string>
+    <string name="settings_restore_app_title">Rivendosni aplikacionin Magisk</string>
+    <string name="settings_restore_app_summary">Zh-fshehni aplikacionin dhe rikthejeni atë përsëri në APK-në origjinale</string>
     <string name="settings_dark_mode_title">Modaliteti i temës</string>
     <string name="settings_dark_mode_message">Zgjidhni mënyrën e cila i përshtatet më mirë stilit tuaj!</string>
     <string name="settings_dark_mode_light">Gjithmonë e lehtë</string>
