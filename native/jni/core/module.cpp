@@ -156,14 +156,14 @@ public:
 
     // Return inserted node or null if rejected
     template<class T, class ...Args>
-    T *emplace(string_view name, Args &...args) {
+    T *emplace(string_view name, Args &&...args) {
         return iter_to_node<T>(insert(children.find(name), type_id<T>(),
                 [&](auto _) { return new T(std::forward<Args>(args)...); }));
     }
 
     // Return inserted node, existing node with same rank, or null
     template<class T, class ...Args>
-    T *emplace_or_get(string_view name, Args &...args) {
+    T *emplace_or_get(string_view name, Args &&...args) {
         return iter_to_node<T>(insert(children.find(name), type_id<T>(),
                 [&](auto _) { return new T(std::forward<Args>(args)...); }, true));
     }
@@ -205,7 +205,7 @@ protected:
     map_iter insert(map_iter it, uint8_t type, Func fn, bool allow_same = false);
 
     template<class To, class From = node_entry, class ...Args>
-    map_iter upgrade(map_iter it, Args &...args) {
+    map_iter upgrade(map_iter it, Args &&...args) {
         return insert(it, type_id<To>(), [&](node_entry *&ex) -> node_entry * {
             if (!ex)
                 return nullptr;
