@@ -224,7 +224,7 @@ protected:
     map_type children;
 
     // Root node lookup cache
-    root_node *_root;
+    root_node *_root = nullptr;
 };
 
 class root_node : public dir_node {
