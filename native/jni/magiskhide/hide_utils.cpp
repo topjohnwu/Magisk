@@ -99,24 +99,50 @@ static void kill_process(const char *name, bool multi = false,
     });
 }
 
-static bool validate(const char *s) {
-    if (strcmp(s, ISOLATED_MAGIC) == 0)
-        return true;
-    bool dot = false;
-    for (char c; (c = *s); ++s) {
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-            (c >= '0' && c <= '9') || c == '_' || c == ':') {
-            continue;
+static bool validate(const char *pkg, const char *proc) {
+    bool pkg_verified = false;
+    bool proc_verified = false;
+
+    if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
+        pkg_verified = true;
+        bool bad = false;
+        for (char c; (c = *proc); ++proc) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+                (c >= '0' && c <= '9') || c == '_' || c == '.')
+                continue;
+            if (c == ':')
+                break;
+            bad = true;
+            break;
         }
-        if (SDK_INT >= 29 && c == '$')
-            continue;
-        if (c == '.') {
-            dot = true;
-            continue;
+        proc_verified = !bad;
+    } else {
+        bool dot = false;
+        bool bad = false;
+        for (char c; (c = *pkg); ++pkg) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+                (c >= '0' && c <= '9') || c == '_')
+                continue;
+            if (c == '.') {
+                dot = true;
+                continue;
+            }
+            bad = true;
+            break;
         }
-        return false;
+        pkg_verified = !bad && dot;
+
+        bad = false;
+        for (char c; (c = *proc); ++proc) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+                (c >= '0' && c <= '9') || c == '_' || c == ':' || c == '.')
+                continue;
+            bad = true;
+            break;
+        }
+        proc_verified = !bad;
     }
-    return dot;
+    return pkg_verified && proc_verified;
 }
 
 static void add_hide_set(const char *pkg, const char *proc) {
@@ -134,7 +160,7 @@ static int add_list(const char *pkg, const char *proc) {
     if (proc[0] == '\0')
         proc = pkg;
 
-    if (!validate(pkg) || !validate(proc))
+    if (!validate(pkg, proc))
         return HIDE_INVALID_PKG;
 
     for (auto &hide : hide_set)
