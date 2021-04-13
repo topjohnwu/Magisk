@@ -545,43 +545,32 @@ void magic_mount() {
     auto system = new root_node("system");
     root->insert(system);
 
-    char buf1[4096];
-    char buf2[4096];
+    char buf[4096];
     LOGI("* Loading modules\n");
     for (const auto &m : module_list) {
         auto module = m.data();
-        char *b1 = buf1 + sprintf(buf1, MODULEROOT "/%s/", module);
+        char *b = buf + sprintf(buf, MODULEROOT "/%s/", module);
 
         // Read props
-        strcpy(b1, "system.prop");
-        if (access(buf1, F_OK) == 0) {
+        strcpy(b, "system.prop");
+        if (access(buf, F_OK) == 0) {
             LOGI("%s: loading [system.prop]\n", module);
-            load_prop_file(buf1, false);
-        }
-
-        // Copy sepolicy rules
-        strcpy(b1, "sepolicy.rule");
-        char *b2 = buf2 + sprintf(buf2, "%s/" MIRRDIR "/persist", MAGISKTMP.data());
-        if (access(buf1, F_OK) == 0 && access(buf2, F_OK) == 0) {
-            b2 += sprintf(b2, "/magisk/%s", module);
-            xmkdirs(buf2, 0755);
-            strcpy(b2, "/sepolicy.rule");
-            cp_afc(buf1, buf2);
+            load_prop_file(buf, false);
         }
 
         // Check whether skip mounting
-        strcpy(b1, "skip_mount");
-        if (access(buf1, F_OK) == 0)
+        strcpy(b, "skip_mount");
+        if (access(buf, F_OK) == 0)
             continue;
 
         // Double check whether the system folder exists
-        strcpy(b1, "system");
-        if (access(buf1, F_OK) != 0)
+        strcpy(b, "system");
+        if (access(buf, F_OK) != 0)
             continue;
 
         LOGI("%s: loading mount files\n", module);
-        b1[-1] = '\0';
-        int fd = xopen(buf1, O_RDONLY | O_CLOEXEC);
+        b[-1] = '\0';
+        int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
         system->collect_files(module, fd);
         close(fd);
     }
