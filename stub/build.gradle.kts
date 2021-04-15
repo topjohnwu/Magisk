@@ -10,7 +10,6 @@ android {
 
     defaultConfig {
         applicationId = "com.topjohnwu.magisk"
-        minSdkVersion(21)
         versionCode = 1
         versionName = Config.version
         buildConfigField("int", "STUB_VERSION", Config.stubVersion)

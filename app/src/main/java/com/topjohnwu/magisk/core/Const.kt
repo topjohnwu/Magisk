@@ -29,7 +29,7 @@ object Const {
     const val MAGISK_LOG = "/cache/magisk.log"
 
     // Versions
-    const val SNET_EXT_VER = 15
+    const val SNET_EXT_VER = 16
     const val SNET_REVISION = "22.0"
     const val BOOTCTL_REVISION = "22.0"
 

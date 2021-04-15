@@ -4,20 +4,20 @@
 
 ## Introduction
 
-Magisk is a suite of open source tools for customizing Android, supporting devices higher than Android 4.2. It covers fundamental parts of Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
-
+Magisk is a suite of open source software for customizing Android, supporting devices higher than Android 5.0.<br>
 Here are some feature highlights:
 
-- **MagiskSU**: Provide root access to your device
+- **MagiskSU**: Provide root access for applications
 - **Magisk Modules**: Modify read-only partitions by installing modules
 - **MagiskHide**: Hide Magisk from root detections / system integrity checks
+- **MagiskBoot**: The most complete tool for unpacking and repacking Android boot images
 
 ## Downloads
 
-Please note that the only source of official Magisk information and downloads is [Github](https://github.com/topjohnwu/Magisk/). Beware of any other websites.
+[Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
 
-[![](https://img.shields.io/badge/Magisk-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
-[![](https://img.shields.io/badge/Magisk%20Beta-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
+[![](https://img.shields.io/badge/Magisk-v22.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.1)
+[![](https://img.shields.io/badge/Magisk%20Beta-v22.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.1)
 [![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
@@ -26,13 +26,6 @@ Please note that the only source of official Magisk information and downloads is
 - [Frequently Asked Questions](https://topjohnwu.github.io/Magisk/faq.html)
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 - [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
-
-## Android Version Support
-
-- Android 4.2+: MagiskSU and Magisk Modules Only
-- Android 4.4+: All core features available
-- Android 6.0+: Guaranteed MagiskHide support
-- Android 7.0+: Full MagiskHide protection
 
 ## Bug Reports
 

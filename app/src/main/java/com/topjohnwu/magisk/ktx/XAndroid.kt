@@ -339,16 +339,6 @@ var TextView.precomputedText: CharSequence
     set(value) {
         val callback = tag as? Runnable
 
-        // Don't even bother pre 21
-        if (SDK_INT < 21) {
-            post {
-                text = value
-                isGone = false
-                callback?.run()
-            }
-            return
-        }
-
         coroutineScope.launch(Dispatchers.IO) {
             if (SDK_INT >= 29) {
                 // Internally PrecomputedTextCompat will use platform API on API 29+

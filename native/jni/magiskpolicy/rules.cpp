@@ -154,7 +154,6 @@ void sepolicy::magisk_rules() {
     allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
     allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
     allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
     allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
 
     // allowLog
@@ -162,22 +161,6 @@ void sepolicy::magisk_rules() {
     allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
     allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
     allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
-
-    // suBackL6
-    allow("surfaceflinger", "app_data_file", "dir", ALL);
-    allow("surfaceflinger", "app_data_file", "file", ALL);
-    allow("surfaceflinger", "app_data_file", "lnk_file", ALL);
-    typeattribute("surfaceflinger", "mlstrustedsubject");
-
-    // suMiscL6
-    allow("audioserver", "audioserver", "process", "execmem");
-
-    // Liveboot
-    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "process", "ptrace");
-    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "transfer");
-    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "binder", "call");
-    allow("surfaceflinger", SEPOL_PROC_DOMAIN, "fd", "use");
-    allow("debuggerd", SEPOL_PROC_DOMAIN, "process", "ptrace");
 
     // dumpsys
     allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
@@ -191,7 +174,6 @@ void sepolicy::magisk_rules() {
     allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
     allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
     allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "binder", "transfer");
 
     // For mounting loop devices, mirrors, tmpfs
     allow("kernel", ALL, "file", "read");
@@ -202,17 +184,6 @@ void sepolicy::magisk_rules() {
 
     // For changing file context
     allow("rootfs", "tmpfs", "filesystem", "associate");
-
-    // Xposed
-    allow("untrusted_app", "untrusted_app", "capability", "setgid");
-    allow("system_server", "dex2oat_exec", "file", ALL);
-
-    // Support deodexed ROM on Oreo
-    allow("zygote", "dalvikcache_data_file", "file", "execute");
-
-    // Support deodexed ROM on Pie (Samsung)
-    allow("system_server", "dalvikcache_data_file", "file", "write");
-    allow("system_server", "dalvikcache_data_file", "file", "execute");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");

@@ -36,7 +36,6 @@ extern int (*fsetfilecon)(int fd, const char *con);
 void getfilecon_at(int dirfd, const char *name, char **con);
 void setfilecon_at(int dirfd, const char *name, const char *con);
 
-void selinux_builtin_impl();
-void dload_selinux();
+void enable_selinux();
 void restorecon();
 void restore_tmpcon();

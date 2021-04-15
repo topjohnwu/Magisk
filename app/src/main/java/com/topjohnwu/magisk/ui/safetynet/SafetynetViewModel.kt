@@ -5,10 +5,9 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.utils.set
-import org.json.JSONObject
 
 data class SafetyNetResult(
-    val response: JSONObject? = null,
+    val response: SafetyNetResponse? = null,
     val dismiss: Boolean = false
 )
 
@@ -43,20 +42,20 @@ class SafetynetViewModel : BaseViewModel() {
 
     init {
         cachedResult?.also {
-            resolveResponse(SafetyNetResult(it))
+            handleResponse(SafetyNetResult(it))
         } ?: attest()
     }
 
     private fun attest() {
         isChecking = true
         CheckSafetyNetEvent {
-            resolveResponse(it)
+            handleResponse(it)
         }.publish()
     }
 
     fun reset() = attest()
 
-    private fun resolveResponse(response: SafetyNetResult) {
+    private fun handleResponse(response: SafetyNetResult) {
         isChecking = false
 
         if (response.dismiss) {
@@ -65,26 +64,15 @@ class SafetynetViewModel : BaseViewModel() {
         }
 
         response.response?.apply {
-            runCatching {
-                val cts = getBoolean("ctsProfileMatch")
-                val basic = getBoolean("basicIntegrity")
-                val eval = optString("evaluationType")
-                val result = cts && basic
-                cachedResult = this
-                ctsState = cts
-                basicIntegrityState = basic
-                evalType = if (eval.contains("HARDWARE")) "HARDWARE" else "BASIC"
-                isSuccess = result
-                safetyNetTitle =
-                    if (result) R.string.safetynet_attest_success
-                    else R.string.safetynet_attest_failure
-            }.onFailure {
-                isSuccess = false
-                ctsState = false
-                basicIntegrityState = false
-                evalType = "N/A"
-                safetyNetTitle = R.string.safetynet_res_invalid
-            }
+            val result = ctsProfileMatch && basicIntegrity
+            cachedResult = this
+            ctsState = ctsProfileMatch
+            basicIntegrityState = basicIntegrity
+            evalType = if (evaluationType.contains("HARDWARE")) "HARDWARE" else "BASIC"
+            isSuccess = result
+            safetyNetTitle =
+                if (result) R.string.safetynet_attest_success
+                else R.string.safetynet_attest_failure
         } ?: {
             isSuccess = false
             ctsState = false
@@ -95,7 +83,7 @@ class SafetynetViewModel : BaseViewModel() {
     }
 
     companion object {
-        private var cachedResult: JSONObject? = null
+        private var cachedResult: SafetyNetResponse? = null
     }
 
 }

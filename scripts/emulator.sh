@@ -11,7 +11,7 @@
 # in the emulator. The constructed Magisk environment is not a
 # fully functional one as if it is running on an actual device.
 #
-# The script assumes you are using x86/x64 emulator images.
+# The script assumes you are using x64 emulator images.
 # Build binaries with `./build.py binary` before running this script.
 #
 #####################################################################
@@ -29,14 +29,8 @@ mount_sbin() {
 if [ ! -f /system/build.prop ]; then
   # Running on PC
   cd "$(dirname "$0")/.."
-  tmp="/data/local/tmp"
-  adb push native/out/x86/busybox native/out/x86/magiskinit scripts/emulator.sh $tmp
-  emu_arch=$(adb shell "chmod 777 $tmp/busybox; $tmp/busybox uname -m")
-  if [ "$emu_arch" = "x86_64" ]; then
-    adb push native/out/x86_64/magisk /data/local/tmp
-  else
-    adb push native/out/x86/magisk /data/local/tmp
-  fi
+  adb push native/out/x86/busybox native/out/x86/magiskinit \
+  native/out/x86_64/magisk scripts/emulator.sh /data/local/tmp
   adb shell sh /data/local/tmp/emulator.sh
   exit 0
 fi
@@ -89,7 +83,7 @@ elif [ -e /sbin ]; then
   mount_sbin
   if ! grep -q '/sbin/.magisk/mirror/system_root' /proc/mounts; then
     mkdir -p /sbin/.magisk/mirror/system_root
-    block=`mount | grep ' / ' | awk '{ print $1 }'`
+    block=$(mount | grep ' / ' | awk '{ print $1 }')
     [ $block = "/dev/root" ] && block=/dev/block/dm-0
     mount -o ro $block /sbin/.magisk/mirror/system_root
   fi
@@ -98,7 +92,7 @@ elif [ -e /sbin ]; then
     if [ -L $file ]; then
       cp -af $file /sbin
     else
-      sfile=/sbin/`basename $file`
+      sfile=/sbin/$(basename $file)
       touch $sfile
       mount -o bind $file $sfile
     fi

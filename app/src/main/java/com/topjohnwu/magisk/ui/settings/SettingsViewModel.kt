@@ -74,10 +74,6 @@ class SettingsViewModel(
                 Magisk,
                 MagiskHide, SystemlessHosts
             ))
-            if (Build.VERSION.SDK_INT < 19) {
-                // MagiskHide is only available on 4.4+
-                list.remove(MagiskHide)
-            }
         }
 
         // Superuser

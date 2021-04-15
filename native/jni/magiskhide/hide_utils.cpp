@@ -264,9 +264,6 @@ static void update_hide_config() {
 int launch_magiskhide(bool late_props) {
     mutex_guard lock(hide_state_lock);
 
-    if (SDK_INT < 19)
-        return DAEMON_ERROR;
-
     if (hide_state)
         return HIDE_IS_ENABLED;
 
@@ -325,7 +322,7 @@ void auto_start_magiskhide(bool late_props) {
         pthread_kill(monitor_thread, SIGALRM);
 #endif
         hide_late_sensitive_props();
-    } else if (SDK_INT >= 19) {
+    } else {
         db_settings dbs;
         get_db_settings(dbs, HIDE_CONFIG);
         if (dbs[HIDE_CONFIG])

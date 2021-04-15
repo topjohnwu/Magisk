@@ -359,6 +359,20 @@ ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
 #endif
 }
 
+int xfaccessat(int dirfd, const char *pathname) {
+    int ret = faccessat(dirfd, pathname, F_OK, 0);
+    if (ret < 0) {
+        PLOGE("faccessat %s", pathname);
+    }
+#if defined(__i386__) || defined(__x86_64__)
+    if (ret > 0 && errno == 0) {
+        LOGD("faccessat success but ret is %d\n", ret);
+        ret = 0;
+    }
+#endif
+    return ret;
+}
+
 int xsymlink(const char *target, const char *linkpath) {
     int ret = symlink(target, linkpath);
     if (ret < 0) {

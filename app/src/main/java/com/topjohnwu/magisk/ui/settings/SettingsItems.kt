@@ -20,9 +20,9 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.utils.TransitiveText
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.asTransitive
+import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 // --- Customization
 
 object Customization : BaseSettingsItem.Section() {
-    override val title = R.string.settings_customization.asTransitive()
+    override val title = R.string.settings_customization.asText()
 }
 
 object Language : BaseSettingsItem.Selector() {
@@ -40,7 +40,7 @@ object Language : BaseSettingsItem.Selector() {
             Config.locale = entryValues[it]
         }
 
-    override val title = R.string.language.asTransitive()
+    override val title = R.string.language.asText()
     override var entries = emptyArray<String>()
     override var entryValues = emptyArray<String>()
 
@@ -58,18 +58,18 @@ object Language : BaseSettingsItem.Selector() {
 
 object Theme : BaseSettingsItem.Blank() {
     override val icon = R.drawable.ic_paint
-    override val title = R.string.section_theme.asTransitive()
+    override val title = R.string.section_theme.asText()
 }
 
 // --- App
 
 object AppSettings : BaseSettingsItem.Section() {
-    override val title = R.string.home_app_title.asTransitive()
+    override val title = R.string.home_app_title.asText()
 }
 
 object ClearRepoCache : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_clear_cache_title.asTransitive()
-    override val description = R.string.settings_clear_cache_summary.asTransitive()
+    override val title = R.string.settings_clear_cache_title.asText()
+    override val description = R.string.settings_clear_cache_summary.asText()
 
     override fun refresh() {
         isEnabled = Info.env.isActive
@@ -77,8 +77,8 @@ object ClearRepoCache : BaseSettingsItem.Blank() {
 }
 
 object Hide : BaseSettingsItem.Input() {
-    override val title = R.string.settings_hide_app_title.asTransitive()
-    override val description = R.string.settings_hide_app_summary.asTransitive()
+    override val title = R.string.settings_hide_app_title.asText()
+    override val description = R.string.settings_hide_app_summary.asText()
 
     override var value = ""
         set(value) = setV(value, field, { field = it })
@@ -106,21 +106,21 @@ object Hide : BaseSettingsItem.Input() {
 }
 
 object Restore : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_restore_app_title.asTransitive()
-    override val description = R.string.settings_restore_app_summary.asTransitive()
+    override val title = R.string.settings_restore_app_title.asText()
+    override val description = R.string.settings_restore_app_summary.asText()
 }
 
 object AddShortcut : BaseSettingsItem.Blank() {
-    override val title = R.string.add_shortcut_title.asTransitive()
-    override val description = R.string.setting_add_shortcut_summary.asTransitive()
+    override val title = R.string.add_shortcut_title.asText()
+    override val description = R.string.setting_add_shortcut_summary.asText()
 }
 
 object DownloadPath : BaseSettingsItem.Input() {
     override var value = Config.downloadDir
         set(value) = setV(value, field, { field = it }) { Config.downloadDir = it }
 
-    override val title = R.string.settings_download_path_title.asTransitive()
-    override val description get() = path.asTransitive()
+    override val title = R.string.settings_download_path_title.asText()
+    override val description get() = path.asText()
 
     override val inputResult: String get() = result
 
@@ -143,24 +143,24 @@ object UpdateChannel : BaseSettingsItem.Selector() {
             Info.remote = Info.EMPTY_REMOTE
         }
 
-    override val title = R.string.settings_update_channel_title.asTransitive()
+    override val title = R.string.settings_update_channel_title.asText()
     override val entries: Array<String> = resources.getStringArray(R.array.update_channel).let {
         if (BuildConfig.VERSION_CODE % 100 == 0)
             it.toMutableList().apply { removeAt(Config.Value.CANARY_CHANNEL) }.toTypedArray()
         else it
     }
     override val description
-        get() = entries.getOrNull(value)?.asTransitive() ?: TransitiveText.String(entries[0])
+        get() = entries.getOrNull(value)?.asText() ?: TextHolder.String(entries[0])
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
-    override val title = R.string.settings_update_custom.asTransitive()
+    override val title = R.string.settings_update_custom.asText()
     override var value = Config.customChannelUrl
         set(value) = setV(value, field, { field = it }) {
             Config.customChannelUrl = it
             Info.remote = Info.EMPTY_REMOTE
         }
-    override val description get() = value.asTransitive()
+    override val description get() = value.asText()
 
     override val inputResult get() = result
 
@@ -177,8 +177,8 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
 }
 
 object UpdateChecker : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_check_update_title.asTransitive()
-    override val description = R.string.settings_check_update_summary.asTransitive()
+    override val title = R.string.settings_check_update_title.asText()
+    override val description = R.string.settings_check_update_summary.asText()
     override var value = Config.checkUpdate
         set(value) = setV(value, field, { field = it }) {
             Config.checkUpdate = it
@@ -187,8 +187,8 @@ object UpdateChecker : BaseSettingsItem.Toggle() {
 }
 
 object DoHToggle : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_doh_title.asTransitive()
-    override val description = R.string.settings_doh_description.asTransitive()
+    override val title = R.string.settings_doh_title.asText()
+    override val description = R.string.settings_doh_description.asText()
     override var value = Config.doh
         set(value) = setV(value, field, { field = it }) {
             Config.doh = it
@@ -197,35 +197,35 @@ object DoHToggle : BaseSettingsItem.Toggle() {
 
 // check whether is module already installed beforehand?
 object SystemlessHosts : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_hosts_title.asTransitive()
-    override val description = R.string.settings_hosts_summary.asTransitive()
+    override val title = R.string.settings_hosts_title.asText()
+    override val description = R.string.settings_hosts_summary.asText()
 }
 
 object Tapjack : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_tapjack_title.asTransitive()
-    override var description = R.string.settings_su_tapjack_summary.asTransitive()
+    override val title = R.string.settings_su_tapjack_title.asText()
+    override var description = R.string.settings_su_tapjack_summary.asText()
     override var value = Config.suTapjack
         set(value) = setV(value, field, { field = it }) { Config.suTapjack = it }
 }
 
 object Biometrics : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_biometric_title.asTransitive()
+    override val title = R.string.settings_su_biometric_title.asText()
     override var value = Config.suBiometric
         set(value) = setV(value, field, { field = it }) { Config.suBiometric = it }
-    override var description = R.string.settings_su_biometric_summary.asTransitive()
+    override var description = R.string.settings_su_biometric_summary.asText()
 
     override fun refresh() {
         isEnabled = BiometricHelper.isSupported
         if (!isEnabled) {
             value = false
-            description = R.string.no_biometric.asTransitive()
+            description = R.string.no_biometric.asText()
         }
     }
 }
 
 object Reauthenticate : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_reauth_title.asTransitive()
-    override val description = R.string.settings_su_reauth_summary.asTransitive()
+    override val title = R.string.settings_su_reauth_title.asText()
+    override val description = R.string.settings_su_reauth_summary.asText()
     override var value = Config.suReAuth
         set(value) = setV(value, field, { field = it }) { Config.suReAuth = it }
 
@@ -237,12 +237,12 @@ object Reauthenticate : BaseSettingsItem.Toggle() {
 // --- Magisk
 
 object Magisk : BaseSettingsItem.Section() {
-    override val title = R.string.magisk.asTransitive()
+    override val title = R.string.magisk.asText()
 }
 
 object MagiskHide : BaseSettingsItem.Toggle() {
-    override val title = R.string.magiskhide.asTransitive()
-    override val description = R.string.settings_magiskhide_summary.asTransitive()
+    override val title = R.string.magiskhide.asText()
+    override val description = R.string.settings_magiskhide_summary.asText()
     override var value = Config.magiskHide
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
@@ -256,11 +256,11 @@ object MagiskHide : BaseSettingsItem.Toggle() {
 // --- Superuser
 
 object Superuser : BaseSettingsItem.Section() {
-    override val title = R.string.superuser.asTransitive()
+    override val title = R.string.superuser.asText()
 }
 
 object AccessMode : BaseSettingsItem.Selector() {
-    override val title = R.string.superuser_access.asTransitive()
+    override val title = R.string.superuser_access.asText()
     override val entryRes = R.array.su_access
 
     override var value = Config.rootMode
@@ -270,7 +270,7 @@ object AccessMode : BaseSettingsItem.Selector() {
 }
 
 object MultiuserMode : BaseSettingsItem.Selector() {
-    override val title = R.string.multiuser_mode.asTransitive()
+    override val title = R.string.multiuser_mode.asText()
     override val entryRes = R.array.multiuser_mode
 
     override var value = Config.suMultiuserMode
@@ -279,7 +279,7 @@ object MultiuserMode : BaseSettingsItem.Selector() {
         }
 
     override val description
-        get() = resources.getStringArray(R.array.multiuser_summary)[value].asTransitive()
+        get() = resources.getStringArray(R.array.multiuser_summary)[value].asText()
 
     override fun refresh() {
         isEnabled = Const.USER_ID == 0
@@ -287,7 +287,7 @@ object MultiuserMode : BaseSettingsItem.Selector() {
 }
 
 object MountNamespaceMode : BaseSettingsItem.Selector() {
-    override val title = R.string.mount_namespace_mode.asTransitive()
+    override val title = R.string.mount_namespace_mode.asText()
     override val entryRes = R.array.namespace
 
     override var value = Config.suMntNamespaceMode
@@ -296,11 +296,11 @@ object MountNamespaceMode : BaseSettingsItem.Selector() {
         }
 
     override val description
-        get() = resources.getStringArray(R.array.namespace_summary)[value].asTransitive()
+        get() = resources.getStringArray(R.array.namespace_summary)[value].asText()
 }
 
 object AutomaticResponse : BaseSettingsItem.Selector() {
-    override val title = R.string.auto_response.asTransitive()
+    override val title = R.string.auto_response.asText()
     override val entryRes = R.array.auto_response
 
     override var value = Config.suAutoResponse
@@ -310,7 +310,7 @@ object AutomaticResponse : BaseSettingsItem.Selector() {
 }
 
 object RequestTimeout : BaseSettingsItem.Selector() {
-    override val title = R.string.request_timeout.asTransitive()
+    override val title = R.string.request_timeout.asText()
     override val entryRes = R.array.request_timeout
     override val entryValRes = R.array.request_timeout_value
 
@@ -324,7 +324,7 @@ object RequestTimeout : BaseSettingsItem.Selector() {
 }
 
 object SUNotification : BaseSettingsItem.Selector() {
-    override val title = R.string.superuser_notification.asTransitive()
+    override val title = R.string.superuser_notification.asText()
     override val entryRes = R.array.su_notification
 
     override var value = Config.suNotification

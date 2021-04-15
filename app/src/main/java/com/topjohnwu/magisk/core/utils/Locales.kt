@@ -8,8 +8,6 @@ import android.content.res.Resources
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.AssetHack
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.ktx.langTagToLocale
-import com.topjohnwu.magisk.ktx.toLangTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -40,7 +38,7 @@ withContext(Dispatchers.Default) {
         // Then add all supported locales
         addAll(Resources.getSystem().assets.locales)
     }.map {
-        it.langTagToLocale()
+        Locale.forLanguageTag(it)
     }.distinctBy {
         res.updateLocale(it)
         res.getString(compareId)
@@ -59,7 +57,7 @@ withContext(Dispatchers.Default) {
 
     locales.forEach { locale ->
         names.add(locale.getDisplayName(locale))
-        values.add(locale.toLangTag())
+        values.add(locale.toLanguageTag())
     }
 
     (names.toTypedArray() to values.toTypedArray()).also { cachedLocales = it }
@@ -79,7 +77,7 @@ fun refreshLocale() {
     val localeConfig = Config.locale
     currentLocale = when {
         localeConfig.isEmpty() -> defaultLocale
-        else -> localeConfig.langTagToLocale()
+        else -> Locale.forLanguageTag(localeConfig)
     }
     Locale.setDefault(currentLocale)
     AssetHack.resource.updateConfig()
