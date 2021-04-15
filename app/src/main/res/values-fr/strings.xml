@@ -148,7 +148,7 @@
     <string name="settings_update_custom_msg">Saisissez une URL personnalisée</string>
     <string name="settings_magiskhide_summary">Rendre Magisk invisible face à diverses formes de détection.</string>
     <string name="settings_hosts_title">Fichier hôtes hors partition système</string>
-    <string name="settings_hosts_summary">Utilisation d\’un fichier hôtes hors de la partition système pour les applications de blocage de publicité.</string>
+    <string name="settings_hosts_summary">Utilisation d’un fichier hôtes hors de la partition système pour les applications de blocage de publicité.</string>
     <string name="settings_hosts_toast">Ajout d’un module pour fichier hosts hors système</string>
     <string name="settings_app_name_hint">Nouveau nom</string>
     <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
