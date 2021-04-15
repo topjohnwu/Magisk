@@ -13,7 +13,7 @@ buildscript {
         gradlePluginPortal()
     }
 
-    val vNav = "2.3.4"
+    val vNav = "2.3.5"
     extra["vNav"] = vNav
 
     dependencies {
