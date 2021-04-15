@@ -19,8 +19,9 @@
     <string name="not_available">ל/ז</string>
     <string name="hide">הסתרה</string>
     <string name="home_package">חבילה</string>
-
-    <string name="home_support_title">תמיכה בנו</string>
+    <string name="home_app_title">יישום</string>
+	<string name="home_notice_content">הורד את Magisk רק מהדף הרשמי של GitHub. קבצים ממקורות לא ידועים יכולים להיות זדוניים!</string>
+	<string name="home_support_title">תמיכה בנו</string>
     <string name="home_item_source">מקור</string>
     <string name="home_support_content">Magisk היה ותמיד יהיה בעל קוד מקור פתוח. עם זאת אתה יכול להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
     <string name="home_installed_version">מותקנת</string>
@@ -73,17 +74,16 @@
     <string name="su_revoke_msg">נא לאשר שלילת הרשאות עבור %1$s?</string>
     <string name="toast">הרמת כוסית</string>
     <string name="none">ללא</string>
-
     <string name="superuser_toggle_notification">התראות</string>
     <string name="superuser_toggle_revoke">הסרה</string>
     <string name="superuser_policy_none">לא נתבקשו הרשאות משתמש על על ידי שום יישום</string>
 
     <!--Logs-->
     <string name="log_data_none">הינך ללא יומן רישום, נסה להשתמש ביישומים מותאמים יותר למשתמש העל שלך</string>
-    <string name="log_data_magisk_none">יומני רישום Magisk ריקים, זה מוזר.</string>
+    <string name="log_data_magisk_none">יומני רישום Magisk ריקים, זה מוזר</string>
     <string name="menuSaveLog">שמור יומן רישום</string>
     <string name="menuClearLog">נקה יומן רישום כעת</string>
-    <string name="logs_cleared">יומני רישום נוקו בהצלחה.</string>
+    <string name="logs_cleared">יומני רישום נוקו בהצלחה</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">יעד UID: %1$d</string>
 
@@ -103,7 +103,7 @@
     <string name="hide_filters">מסננים</string>
     <string name="hide_search">חיפוש</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(לא סופק מידע)</string>
     <string name="reboot_userspace">אתחול מהיר</string>
     <string name="reboot_recovery">אתחול למצב שחזור</string>
@@ -131,7 +131,11 @@
     <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
     <string name="settings_clear_cache_title">נקה מטמון ריפו</string>
     <string name="settings_clear_cache_summary">נקה מידע זיכרון מטמון עבור ריפו מקוונים, זה יכריח את היישום לרענן באופן מקוון</string>
-    <string name="language">שפה</string>
+    <string name="settings_hide_app_title">הסתר את היישום Magisk</string>
+    <string name="settings_hide_app_summary">התקן יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
+    <string name="settings_restore_app_title">שחזר את יישום Magisk</string>
+    <string name="settings_restore_app_summary">בטל את הסתרת היישום ושחזר אותה ל-APK המקורי</string>
+	<string name="language">שפה</string>
     <string name="system_default">(ברירת מחדל מערכת)</string>
     <string name="settings_check_update_title">בדוק עדכונים</string>
     <string name="settings_check_update_summary">בדוק מעת לעת ברקע אם יש עדכונים</string>
@@ -164,8 +168,9 @@
     <string name="settings_su_reauth_title">אמת מחדש לאחר שדרוג</string>
     <string name="settings_su_reauth_summary">אימות מחדש הרשאות של משתמש על לאחר שדרוג יישום</string>
     <string name="settings_su_tapjack_title">הפעלת הגנת Tapjacking</string>
-    <string name="settings_su_tapjack_summary">תיבת הדו שיח של משתמש העל לא תגיב לקלט כשהיא מוסתרת על ידי חלון או כיסוי אחר</string>						  																																						       <string name="settings_su_biometric_title">אפשר אימות ביומטרי</string>
-    <string name="settings_su_biometric_summary">השתמש באימות ביומטרי כדי לאפשר בקשות לשימוש במשתמש על</string>
+    <string name="settings_su_tapjack_summary">תיבת הדו שיח של משתמש העל לא תגיב לקלט כשהיא מוסתרת על ידי חלון או כיסוי אחר</string>
+	<string name="settings_su_biometric_title">אפשר אימות ביומטרי</string>
+	<string name="settings_su_biometric_summary">השתמש באימות ביומטרי כדי לאפשר בקשות לשימוש במשתמש על</string>
     <string name="no_biometric">התקן לא נתמך או הגדרות ביומטריות אינן מאופשרות</string>
     <string name="settings_customization">התאמה אישית</string>
     <string name="setting_add_shortcut_summary">הוסף קיצור דרך יפה במסך הבית למקרה שקשה לזהות את השם ואת הסמל לאחר הסתרת היישום</string>
@@ -178,7 +183,6 @@
     <string name="owner_only_summary">לבעלים בלבד ישנה גישת שורש</string>
     <string name="owner_manage_summary">הבעלים בלבד יכול לנהל גישת שורש ולקבל הנחיות לבקשה</string>
     <string name="user_indepenent_summary">לכל משתמש יש כללי שורש נפרדים משלו</string>
-
     <string name="mount_namespace_mode">מצב הצבת מרחב שם</string>
     <string name="settings_ns_global">מרחב שם גלובלי</string>
     <string name="settings_ns_requester">מרחב שם מורש</string>
@@ -186,7 +190,7 @@
     <string name="global_summary">כלל חיבורי השורש משתמשים במרחב שם הגלובלי</string>
     <string name="requester_summary">חיבורי השורש יירשו את מרחב השם של המבקש</string>
     <string name="isolate_summary">לכל חיבור שורש יהיה מרחב שם מבודד</string>
-
+	
     <!--Notifications-->
     <string name="update_channel">עדכוני Magisk</string>
     <string name="progress_channel">התראות התקדמות</string>
@@ -206,19 +210,30 @@
     <string name="flashing">צורב…</string>
     <string name="done">בוצע!</string>
     <string name="failure">נכשל</string>
-    <string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>
+    <string name="hide_app_title">מסתיר את יישום Magisk…</string>
+	<string name="open_link_failed_toast">לא נמצאו יישומים לפתיחת קישור זה</string>
     <string name="complete_uninstall">הסרה מלאה</string>
     <string name="restore_img">שיחזור תמונות</string>
     <string name="restore_img_msg">משחזר…</string>
     <string name="restore_done">השיחזור בוצע!</string>
     <string name="restore_fail">גיבוי מקורי אינו קיים!</string>
     <string name="proprietary_title">הורד קוד קנייני</string>
-    <string name="setup_fail">ההתקנה כשלה</string>
+    <string name="proprietary_notice">Magisk היא תוכנה חינמית בעל קוד מקוד פתוח ומשום כך היא אינה כוללם את ה-API של SafetyNet הקניינית של גוגל.\n\nהאם ברצונך להוריד את הקוד הקנייני של SafetyNet בכדי לבדוק?</string>
+	<string name="setup_fail">ההתקנה כשלה</string>
     <string name="env_fix_title">דורש התקנה נוספת</string>
-    <string name="setup_msg">הגדרת סביבת ריצה…</string>
+    <string name="env_fix_msg">המכשיר שלך זקוק להתקנה נוספת כדי ש-Magisk יפעל כראוי. האם ברצונך להמשיך ולהפעיל מחדש?</string>
+	<string name="setup_msg">הגדרת סביבת ריצה…</string>
     <string name="authenticate">אימות</string>
     <string name="unsupport_magisk_title">גרסת Magisk אינה נתמכת</string>
-    <string name="external_rw_permission_denied">הענק הרשאת אחסון להפעלת פונקציונליות זו</string>
+    <string name="unsupport_magisk_msg">גרסה זו של היישום אינה תומכת ביישום  Magisk הנמוך מ- %1$s.\n\nהיישום יתנהג כאילו Magisk אינו מותקן,יש לשדרג את Magisk במהירות האפשריות.</string>
+    <string name="unsupport_general_title">מצב לא תקין</string>
+    <string name="unsupport_system_app_msg">הפעלת יישום זה כיישום מערכת אינה נתמך. נא להשיב את היישום כיישום משתמש.</string>
+    <string name="unsupport_other_su_msg">התגלתה פקודת \"su\" שאינה שייכת ליישום Magisk נא להסיר את הפקודה שאינה נתמכת.</string>
+    <string name="unsupport_external_storage_msg">Magisk מותקן באחסון החיצוני. נא להעביר את היישום לאחסון הפנימי.</string>
+    <string name="unsupport_nonroot_stub_msg">היישום אינו יכול להמשיך לעבוד במצב הנסתר מכיוון שגישת השורש אבדה. נא לשחזר אותו חזרה ל-APK המקורי.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+	<string name="external_rw_permission_denied">הענק הרשאת אחסון להפעלת פונקציונליות זו</string>
     <string name="add_shortcut_title">הוסף קיצור דרך למסך הבית</string>
-    <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
+    <string name="add_shortcut_msg">לאחר הסתרת היישום הזה, השם והסמליל שלה עשויים להיות קשים לזיהוי. האם ברצונך להוסיף קיצור דרך יפה למסך הבית?</string>
+	<string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
 </resources>
