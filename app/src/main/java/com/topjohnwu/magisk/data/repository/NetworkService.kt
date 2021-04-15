@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.data.repository
 
-import android.os.Build
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Config.Value.BETA_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
@@ -66,7 +65,7 @@ class NetworkService(
     }
 
     // Fetch files
-    suspend fun fetchSafetynet() = wrap { jsd.fetchSafetynet() }
+    // suspend fun fetchSafetynet() = wrap { jsd.fetchSafetynet() }
     suspend fun fetchBootctl() = wrap { jsd.fetchBootctl() }
     suspend fun fetchInstaller() = wrap {
         val sha = fetchMainVersion()
@@ -76,4 +75,7 @@ class NetworkService(
     suspend fun fetchString(url: String) = wrap { raw.fetchString(url) }
 
     private suspend fun fetchMainVersion() = api.fetchBranch(MAGISK_MAIN, "master").commit.sha
+
+    // Temporary for canary builds, switch to release link at next public release
+    suspend fun fetchSafetynet() = fetchFile("https://github.com/topjohnwu/Magisk/releases/download/v22.1/snet.jar")
 }

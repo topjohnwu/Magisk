@@ -363,7 +363,7 @@ def build_stub(args):
 
 
 def build_snet(args):
-    if not op.exists(op.join('snet', 'src', 'main', 'java', 'com', 'topjohnwu', 'snet')):
+    if not op.exists(op.join('stub', 'src', 'main', 'java', 'com', 'topjohnwu', 'snet')):
         error('snet sources have to be bind mounted on top of the stub folder')
     header('* Building snet extension')
     proc = execv([gradlew, 'stub:assembleRelease'])

@@ -1,14 +1,12 @@
 package com.topjohnwu.magisk.ui.safetynet
 
-import org.json.JSONObject
-
 interface SafetyNetHelper {
 
     val version: Int
 
-    fun attest()
+    fun attest(nonce: ByteArray)
 
     interface Callback {
-        fun onResponse(response: JSONObject?)
+        fun onResponse(response: String?)
     }
 }
