@@ -99,7 +99,7 @@
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
-    <string name="show_os_app">Afficher les applis système</string>
+    <string name="show_os_app">Afficher les applis de base</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_scroll_up">Faire défiler vers le haut</string>
     <string name="hide_filters">Filtres</string>
@@ -146,9 +146,9 @@
     <string name="settings_update_beta">Bêta</string>
     <string name="settings_update_custom">Canal personnalisé</string>
     <string name="settings_update_custom_msg">Saisissez une URL personnalisée</string>
-    <string name="settings_magiskhide_summary">Rendre Magisk invisible à diverses formes de détection.</string>
-    <string name="settings_hosts_title">Fichier hosts hors partition système</string>
-    <string name="settings_hosts_summary">Utilisation d’un fichier hosts hors de la partition système pour les applications de blocage de publicité.</string>
+    <string name="settings_magiskhide_summary">Rendre Magisk invisible face à diverses formes de détection.</string>
+    <string name="settings_hosts_title">Fichier hôtes hors partition système</string>
+    <string name="settings_hosts_summary">Utilisation d’un fichier hôtes hors de la partition système pour les applications de blocage de publicité.</string>
     <string name="settings_hosts_toast">Ajout d’un module pour fichier hosts hors système</string>
     <string name="settings_app_name_hint">Nouveau nom</string>
     <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
@@ -169,7 +169,7 @@
     <string name="superuser_notification">Notification super‑utilisateur</string>
     <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
-    <string name="settings_su_tapjack_title">Activer Protection Détournement de Clic</string>
+    <string name="settings_su_tapjack_title">Activer la protection contre le détournement de clic</string>
     <string name="settings_su_tapjack_summary">Le dialogue d’invite du super-utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou un recouvrement</string>
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
@@ -211,7 +211,7 @@
     <string name="reboot">Redémarrer</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache de dépôt effacé</string>
-    <string name="flashing">Écriture dans la mémoire Flash…</string>
+    <string name="flashing">Flashage en cours...</string>
     <string name="done">Terminé !</string>
     <string name="failure">Erreur</string>
     <string name="hide_app_title">Masquage de l’application Magisk…</string>
@@ -239,6 +239,6 @@
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
-    <string name="app_not_found">Aucune application trouvée pour traiter cette action</string>
+    <string name="app_not_found">Aucune application n\'a été trouvée pour gérer cette action</string>
 
 </resources>
