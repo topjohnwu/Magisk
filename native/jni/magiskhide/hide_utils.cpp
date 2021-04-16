@@ -100,49 +100,39 @@ static void kill_process(const char *name, bool multi = false,
 }
 
 static bool validate(const char *pkg, const char *proc) {
-    bool pkg_verified = false;
-    bool proc_verified = false;
+    bool pkg_valid = false;
+    bool proc_valid = true;
 
-    if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
-        pkg_verified = true;
-        bool bad = false;
+    if (str_eql(pkg, ISOLATED_MAGIC)) {
+        pkg_valid = true;
         for (char c; (c = *proc); ++proc) {
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-                (c >= '0' && c <= '9') || c == '_' || c == '.')
+            if (isalnum(c) || c == '_' || c == '.')
                 continue;
             if (c == ':')
                 break;
-            bad = true;
+            proc_valid = false;
             break;
         }
-        proc_verified = !bad;
     } else {
-        bool dot = false;
-        bool bad = false;
         for (char c; (c = *pkg); ++pkg) {
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-                (c >= '0' && c <= '9') || c == '_')
+            if (isalnum(c) || c == '_')
                 continue;
             if (c == '.') {
-                dot = true;
+                pkg_valid = true;
                 continue;
             }
-            bad = true;
+            pkg_valid = false;
             break;
         }
-        pkg_verified = !bad && dot;
 
-        bad = false;
         for (char c; (c = *proc); ++proc) {
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-                (c >= '0' && c <= '9') || c == '_' || c == ':' || c == '.')
+            if (isalnum(c) || c == '_' || c == ':' || c == '.')
                 continue;
-            bad = true;
+            proc_valid = false;
             break;
         }
-        proc_verified = !bad;
     }
-    return pkg_verified && proc_verified;
+    return pkg_valid && proc_valid;
 }
 
 static void add_hide_set(const char *pkg, const char *proc) {
