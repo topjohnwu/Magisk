@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.createClassLoader
 import com.topjohnwu.magisk.ktx.reflectField
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.signing.CryptoUtils
@@ -26,8 +27,7 @@ import kotlinx.coroutines.withContext
 import org.bouncycastle.asn1.ASN1Encoding
 import org.bouncycastle.asn1.ASN1Primitive
 import org.bouncycastle.est.jcajce.JsseDefaultHostnameAuthorizer
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.File

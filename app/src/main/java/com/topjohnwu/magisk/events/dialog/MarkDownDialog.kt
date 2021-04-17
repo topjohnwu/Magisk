@@ -6,13 +6,13 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.view.MagiskDialog
 import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 

@@ -6,8 +6,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
-import org.koin.core.KoinComponent
-import org.koin.core.get
+import com.topjohnwu.magisk.ktx.get
+import org.koin.core.component.KoinComponent
 
 object BiometricHelper: KoinComponent {
 

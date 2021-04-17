@@ -7,12 +7,13 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.unzip
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException

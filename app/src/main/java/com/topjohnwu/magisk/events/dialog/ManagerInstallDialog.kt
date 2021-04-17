@@ -6,9 +6,9 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.view.MagiskDialog
-import org.koin.core.get
-import org.koin.core.inject
 import java.io.File
 
 class ManagerInstallDialog : MarkDownDialog() {

@@ -5,9 +5,9 @@ import android.content.Context
 import androidx.work.*
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.ktx.inject
 import com.topjohnwu.magisk.view.Notifications
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 
 class UpdateCheckService(context: Context, workerParams: WorkerParameters)
