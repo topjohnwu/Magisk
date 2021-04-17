@@ -10,8 +10,7 @@ plugins {
 buildscript {
     repositories {
         google()
-        jcenter()
-        maven { url = uri("https://kotlin.bintray.com/kotlinx") }
+        mavenCentral()
     }
 
     val vNav = "2.3.5"
@@ -19,7 +18,7 @@ buildscript {
 
     dependencies {
         classpath("com.android.tools.build:gradle:4.1.3")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31")
+        classpath(kotlin("gradle-plugin", version = "1.4.32"))
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${vNav}")
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -53,9 +52,8 @@ fun Task.applyOptimize() = doLast {
 subprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url = uri("https://jitpack.io") }
-        maven { url = uri("http://oss.sonatype.org/content/repositories/snapshots") }
     }
 
     afterEvaluate {

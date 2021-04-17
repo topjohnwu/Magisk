@@ -22,10 +22,10 @@ import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.ktx.activity
+import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import org.koin.core.get
 
 class SettingsViewModel(
     private val repositoryDao: RepoDao

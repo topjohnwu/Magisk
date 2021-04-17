@@ -14,10 +14,7 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.ktx.symlink
-import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
@@ -34,8 +31,7 @@ import org.kamranzafar.jtar.TarEntry
 import org.kamranzafar.jtar.TarHeader
 import org.kamranzafar.jtar.TarInputStream
 import org.kamranzafar.jtar.TarOutputStream
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.io.*
 import java.nio.ByteBuffer

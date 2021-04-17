@@ -83,6 +83,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         var success = true
         for (res in grantResults) {
             if (res != PackageManager.PERMISSION_GRANTED) {

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.wrap
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 
 abstract class BaseReceiver : BroadcastReceiver(), KoinComponent {
 
