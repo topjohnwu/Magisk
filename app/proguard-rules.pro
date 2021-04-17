@@ -26,7 +26,7 @@
 -keepclassmembers class com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper { *; }
 -keep,allowobfuscation interface com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback
 -keepclassmembers class * implements com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback {
-  void onResponse(org.json.JSONObject);
+  void onResponse(java.lang.String);
 }
 
 # Stub
@@ -46,7 +46,12 @@
 -repackageclasses 'a'
 -allowaccessmodification
 
-# QOL
--dontnote **
--dontwarn com.caverock.androidsvg.**
--dontwarn ru.noties.markwon.**
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+-dontwarn org.commonmark.ext.gfm.strikethrough.Strikethrough
+-dontwarn org.conscrypt.Conscrypt*
+-dontwarn org.conscrypt.ConscryptHostnameVerifier
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE
