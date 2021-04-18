@@ -9,7 +9,11 @@ import dalvik.system.DexClassLoader;
 
 public class DynamicClassLoader extends DexClassLoader {
 
-    private ClassLoader base = Object.class.getClassLoader();
+    private static final ClassLoader base = Object.class.getClassLoader();
+
+    public DynamicClassLoader(File apk) {
+        super(apk.getPath(), apk.getParent(), null, base);
+    }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {
         super(apk.getPath(), apk.getParent(), null, parent);
@@ -18,7 +22,7 @@ public class DynamicClassLoader extends DexClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         // First check if already loaded
-        Class cls = findLoadedClass(name);
+        Class<?> cls = findLoadedClass(name);
         if (cls != null)
             return cls;
 

@@ -7,10 +7,7 @@ import java.io.File;
 class InjectedClassLoader extends DynamicClassLoader {
 
     InjectedClassLoader(File apk) {
-        super(apk,
-                /* Use the base classloader as we do not want stub
-                 * APK classes accessible from the main app */
-                Object.class.getClassLoader());
+        super(apk);
     }
 
     @Override

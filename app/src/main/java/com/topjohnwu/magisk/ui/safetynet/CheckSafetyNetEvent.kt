@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.arch.ContextExecutor
 import com.topjohnwu.magisk.arch.ViewEventWithScope
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.ktx.DynamicClassLoader
+import com.topjohnwu.magisk.ktx.createClassLoader
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.signing.CryptoUtils
@@ -67,7 +67,7 @@ class CheckSafetyNetEvent(
     private suspend fun attest(context: Context, onError: suspend (Exception) -> Unit) {
         val helper: SafetyNetHelper
         try {
-            val loader = DynamicClassLoader(apk)
+            val loader = createClassLoader(apk)
 
             // Scan through the dex and find our helper class
             var clazz: Class<*>? = null

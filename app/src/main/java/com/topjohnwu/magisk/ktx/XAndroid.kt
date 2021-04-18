@@ -264,8 +264,7 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
 
 fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
 
-@Suppress("FunctionName")
-inline fun <reified T> T.DynamicClassLoader(apk: File) =
+inline fun <reified T> T.createClassLoader(apk: File) =
     DynamicClassLoader(apk, T::class.java.classLoader)
 
 fun Context.unwrap(): Context {
