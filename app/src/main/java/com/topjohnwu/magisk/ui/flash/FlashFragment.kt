@@ -13,18 +13,20 @@ import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.MainActivity
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_flash_md2
-    override val viewModel by viewModel<FlashViewModel> {
-        parametersOf(FlashFragmentArgs.fromBundle(requireArguments()))
-    }
+    override val viewModel by viewModel<FlashViewModel>()
 
     private var defaultOrientation = -1
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.args = FlashFragmentArgs.fromBundle(requireArguments())
+    }
 
     override fun onStart() {
         super.onStart()

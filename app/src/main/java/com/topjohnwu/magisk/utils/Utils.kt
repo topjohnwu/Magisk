@@ -8,17 +8,17 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.superuser.internal.UiThreadHandler
 
 object Utils {
 
     fun toast(msg: CharSequence, duration: Int) {
-        UiThreadHandler.run { Toast.makeText(get(), msg, duration).show() }
+        UiThreadHandler.run { Toast.makeText(AppContext, msg, duration).show() }
     }
 
     fun toast(resId: Int, duration: Int) {
-        UiThreadHandler.run { Toast.makeText(get(), resId, duration).show() }
+        UiThreadHandler.run { Toast.makeText(AppContext, resId, duration).show() }
     }
 
     fun showSuperUser(): Boolean {

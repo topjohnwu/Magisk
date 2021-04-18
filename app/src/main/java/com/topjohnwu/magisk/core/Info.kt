@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
@@ -43,7 +43,7 @@ object Info {
 
     val isConnected by lazy {
         ObservableBoolean(false).also { field ->
-            NetworkObserver.observe(get()) {
+            NetworkObserver.observe(AppContext) {
                 UiThreadHandler.run { field.set(it) }
             }
         }

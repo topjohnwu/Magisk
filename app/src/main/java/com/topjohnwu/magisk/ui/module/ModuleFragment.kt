@@ -13,11 +13,11 @@ import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
     ReselectionTarget {

@@ -9,8 +9,8 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 interface DBConfig {
-    val settingsDao: SettingsDao
-    val stringDao: StringDao
+    val settingsDB: SettingsDao
+    val stringDB: StringDao
 
     fun dbSettings(
         name: String,
@@ -41,7 +41,7 @@ class DBSettingsValue(
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): Int {
         if (value == null)
             value = runBlocking {
-                thisRef.settingsDao.fetch(name, default)
+                thisRef.settingsDB.fetch(name, default)
             }
         return value as Int
     }
@@ -51,7 +51,7 @@ class DBSettingsValue(
             this.value = value
         }
         GlobalScope.launch {
-            thisRef.settingsDao.put(name, value)
+            thisRef.settingsDB.put(name, value)
         }
     }
 }
@@ -82,7 +82,7 @@ class DBStringsValue(
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): String {
         if (value == null)
             value = runBlocking {
-                thisRef.stringDao.fetch(name, default)
+                thisRef.stringDB.fetch(name, default)
             }
         return value!!
     }
@@ -94,21 +94,21 @@ class DBStringsValue(
         if (value.isEmpty()) {
             if (sync) {
                 runBlocking {
-                    thisRef.stringDao.delete(name)
+                    thisRef.stringDB.delete(name)
                 }
             } else {
                 GlobalScope.launch {
-                    thisRef.stringDao.delete(name)
+                    thisRef.stringDB.delete(name)
                 }
             }
         } else {
             if (sync) {
                 runBlocking {
-                    thisRef.stringDao.put(name, value)
+                    thisRef.stringDB.put(name, value)
                 }
             } else {
                 GlobalScope.launch {
-                    thisRef.stringDao.put(name, value)
+                    thisRef.stringDB.put(name, value)
                 }
             }
         }

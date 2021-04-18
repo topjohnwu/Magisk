@@ -8,9 +8,9 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.events.RebootEvent
 import com.topjohnwu.superuser.Shell
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 

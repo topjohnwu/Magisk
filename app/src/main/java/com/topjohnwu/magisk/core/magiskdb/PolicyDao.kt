@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.core.magiskdb
 
-import android.content.Context
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toMap
 import com.topjohnwu.magisk.core.model.su.toPolicy
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.now
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -13,9 +13,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
-class PolicyDao(
-    private val context: Context
-) : BaseDao() {
+class PolicyDao : BaseDao() {
 
     override val table: String = Table.POLICY
 
@@ -56,7 +54,7 @@ class PolicyDao(
     }
 
     private fun Map<String, String>.toPolicyOrNull(): SuPolicy? {
-        return runCatching { toPolicy(context.packageManager) }.getOrElse {
+        return runCatching { toPolicy(AppContext.packageManager) }.getOrElse {
             Timber.e(it)
             if (it is PackageManager.NameNotFoundException) {
                 val uid = getOrElse("uid") { null } ?: return null

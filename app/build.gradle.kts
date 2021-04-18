@@ -209,10 +209,6 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
 
-    val vKoin = "2.2.2"
-    implementation("io.insert-koin:koin-android:${vKoin}")
-    implementation("io.insert-koin:koin-androidx-viewmodel:${vKoin}")
-
     val vRetrofit = "2.9.0"
     implementation("com.squareup.retrofit2:retrofit:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-moshi:${vRetrofit}")

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
@@ -12,9 +11,9 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
-import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
@@ -65,8 +64,7 @@ class InstallViewModel(
     init {
         viewModelScope.launch {
             try {
-                val context = get<Context>()
-                File(context.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
+                File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
                     notes = when {
                         exists() -> readText()
                         Const.Url.CHANGELOG_URL.isEmpty() -> ""

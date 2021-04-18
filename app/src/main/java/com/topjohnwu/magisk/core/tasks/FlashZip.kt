@@ -1,19 +1,16 @@
 package com.topjohnwu.magisk.core.tasks
 
-import android.content.Context
 import android.net.Uri
 import androidx.core.net.toFile
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.unzip
-import com.topjohnwu.magisk.ktx.inject
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -23,10 +20,9 @@ open class FlashZip(
     private val mUri: Uri,
     private val console: MutableList<String>,
     private val logs: MutableList<String>
-): KoinComponent {
+) {
 
-    private val context: Context by inject()
-    private val installDir = File(context.cacheDir, "flash")
+    private val installDir = File(AppContext.cacheDir, "flash")
     private lateinit var zipFile: File
 
     @Throws(IOException::class)

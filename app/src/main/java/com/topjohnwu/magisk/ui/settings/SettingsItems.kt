@@ -21,7 +21,7 @@ import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.utils.set
@@ -194,7 +194,7 @@ object UpdateChecker : BaseSettingsItem.Toggle() {
     override var value = Config.checkUpdate
         set(value) = setV(value, field, { field = it }) {
             Config.checkUpdate = it
-            UpdateCheckService.schedule(get())
+            UpdateCheckService.schedule(AppContext)
         }
 }
 

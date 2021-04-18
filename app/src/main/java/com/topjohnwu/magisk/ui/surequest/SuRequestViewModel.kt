@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.surequest
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Resources
@@ -27,10 +26,10 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
-import com.topjohnwu.magisk.ktx.get
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
@@ -73,7 +72,7 @@ class SuRequestViewModel(
 
     val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
-    private val handler = SuRequestHandler(get<Context>().packageManager, policyDB)
+    private val handler = SuRequestHandler(AppContext.packageManager, policyDB)
     private lateinit var timer: CountDownTimer
 
     fun grantPressed() {
@@ -159,8 +158,6 @@ class SuRequestViewModel(
     inner class DenyText : TextHolder() {
         var seconds = 0
             set(value) = set(value, field, { field = it }, BR.denyText)
-
-        override val isEmpty get() = false
 
         override fun getText(resources: Resources): CharSequence {
             return if (seconds != 0)

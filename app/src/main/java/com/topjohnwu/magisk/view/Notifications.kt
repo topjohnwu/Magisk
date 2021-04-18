@@ -13,13 +13,13 @@ import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getBitmap
 
 @Suppress("DEPRECATION")
 object Notifications {
 
-    val mgr by lazy { get<Context>().getSystemService<NotificationManager>()!! }
+    val mgr by lazy { AppContext.getSystemService<NotificationManager>()!! }
 
     fun setup(context: Context) {
         if (SDK_INT >= 26) {

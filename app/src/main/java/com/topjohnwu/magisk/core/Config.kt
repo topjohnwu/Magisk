@@ -1,20 +1,16 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.magiskdb.SettingsDao
-import com.topjohnwu.magisk.core.magiskdb.StringDao
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.data.preference.PreferenceModel
 import com.topjohnwu.magisk.data.repository.DBConfig
-import com.topjohnwu.magisk.di.Protected
-import com.topjohnwu.magisk.ktx.inject
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
@@ -22,9 +18,9 @@ import java.io.InputStream
 
 object Config : PreferenceModel, DBConfig {
 
-    override val stringDao: StringDao by inject()
-    override val settingsDao: SettingsDao by inject()
-    override val context: Context by inject(Protected)
+    override val stringDB get() = ServiceLocator.stringDB
+    override val settingsDB get() = ServiceLocator.settingsDB
+    override val context get() = ServiceLocator.deContext
 
     @get:SuppressLint("ApplySharedPref")
     val prefsFile: File get() {

@@ -1,7 +1,5 @@
 package com.topjohnwu.magisk.ktx
 
-import android.content.res.Resources
-
 val specialChars = arrayOf('!', '@', '#', '$', '%', '&', '?')
 val fullSpecialChars = arrayOf('！', '＠', '＃', '＄', '％', '＆', '？')
 
@@ -33,11 +31,6 @@ fun String.replaceRandomWithSpecial(): String {
 
 fun StringBuilder.appendIf(condition: Boolean, builder: StringBuilder.() -> Unit) =
     if (condition) apply(builder) else this
-
-fun Int.res(vararg args: Any): String {
-    val resources: Resources by inject()
-    return resources.getString(this, *args)
-}
 
 fun String.trimEmptyToNull(): String? = if (isBlank()) null else this
 

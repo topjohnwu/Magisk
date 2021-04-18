@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentHideMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
 import com.topjohnwu.magisk.ktx.addVerticalPadding
 import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HideFragment : BaseUIFragment<HideViewModel, FragmentHideMd2Binding>() {
 

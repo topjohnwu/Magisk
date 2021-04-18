@@ -14,8 +14,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Provider
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.ktx.inject
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
@@ -41,7 +40,7 @@ object HideAPK {
     // Some arbitrary limit
     const val MAX_LABEL_LENGTH = 32
 
-    private val svc: NetworkService by inject()
+    private val svc get() = ServiceLocator.networkService
     private val Context.APK_URI get() = Provider.APK_URI(packageName)
     private val Context.PREFS_URI get() = Provider.PREFS_URI(packageName)
 

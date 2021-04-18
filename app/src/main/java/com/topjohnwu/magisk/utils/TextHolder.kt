@@ -6,7 +6,7 @@ import androidx.databinding.BindingAdapter
 
 abstract class TextHolder {
 
-    abstract val isEmpty: Boolean
+    open val isEmpty: Boolean get() = false
     abstract fun getText(resources: Resources): CharSequence
 
     // ---

@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.topjohnwu.magisk.di.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
