@@ -26,7 +26,7 @@ import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class FlashViewModel(private val args: FlashFragmentArgs) : BaseViewModel() {
+class FlashViewModel(var args: FlashFragmentArgs) : BaseViewModel() {
 
     @get:Bindable
     var showReboot = Shell.rootAccess()

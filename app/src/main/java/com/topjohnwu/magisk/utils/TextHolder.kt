@@ -4,7 +4,7 @@ import android.content.res.Resources
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 
-sealed class TextHolder {
+abstract class TextHolder {
 
     abstract val isEmpty: Boolean
     abstract fun getText(resources: Resources): CharSequence

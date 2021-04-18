@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.ui.surequest
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -30,19 +30,17 @@ import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
-import com.topjohnwu.magisk.ui.superuser.SpinnerRvItem
+import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.launch
-import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
-    pm: PackageManager,
     policyDB: PolicyDao,
-    private val timeoutPrefs: SharedPreferences,
-    private val res: Resources
+    private val timeoutPrefs: SharedPreferences
 ) : BaseViewModel() {
 
     lateinit var icon: Drawable
@@ -50,8 +48,7 @@ class SuRequestViewModel(
     lateinit var packageName: String
 
     @get:Bindable
-    var denyText = res.getString(R.string.deny)
-        set(value) = set(value, field, { field = it }, BR.denyText)
+    val denyText = DenyText()
 
     @get:Bindable
     var selectedItemPosition = 0
@@ -74,15 +71,9 @@ class SuRequestViewModel(
         false
     }
 
-    private val items = res.getStringArray(R.array.allow_timeout).map { SpinnerRvItem(it) }
-    val adapter = BindingListViewAdapter<SpinnerRvItem>(1).apply {
-        itemBinding = ItemBinding.of { binding, _, item ->
-            item.bind(binding)
-        }
-        setItems(items)
-    }
+    val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
-    private val handler = SuRequestHandler(pm, policyDB)
+    private val handler = SuRequestHandler(get<Context>().packageManager, policyDB)
     private lateinit var timer: CountDownTimer
 
     fun grantPressed() {
@@ -143,7 +134,7 @@ class SuRequestViewModel(
 
     private fun cancelTimer() {
         timer.cancel()
-        denyText = res.getString(R.string.deny)
+        denyText.seconds = 0
     }
 
     private inner class SuTimer(
@@ -155,14 +146,28 @@ class SuRequestViewModel(
             if (!grantEnabled && remains <= millis - 1000) {
                 grantEnabled = true
             }
-            denyText = "${res.getString(R.string.deny)} (${(remains / 1000) + 1})"
+            denyText.seconds = (remains / 1000).toInt() + 1
         }
 
         override fun onFinish() {
-            denyText = res.getString(R.string.deny)
+            denyText.seconds = 0
             respond(DENY)
         }
 
+    }
+
+    inner class DenyText : TextHolder() {
+        var seconds = 0
+            set(value) = set(value, field, { field = it }, BR.denyText)
+
+        override val isEmpty get() = false
+
+        override fun getText(resources: Resources): CharSequence {
+            return if (seconds != 0)
+                "${resources.getString(R.string.deny)} ($seconds)"
+            else
+                resources.getString(R.string.deny)
+        }
     }
 
     // Invisible for accessibility services
