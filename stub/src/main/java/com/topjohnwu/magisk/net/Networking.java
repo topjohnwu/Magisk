@@ -3,15 +3,12 @@ package com.topjohnwu.magisk.net;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public class Networking {
 
@@ -33,25 +30,6 @@ public class Networking {
 
     public static Request get(String url) {
         return request(url, "GET");
-    }
-
-    public static boolean init(Context context) {
-        try {
-            // Try installing new SSL provider from Google Play Service
-            Context gms = context.createPackageContext("com.google.android.gms",
-                    Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
-            gms.getClassLoader()
-                    .loadClass("com.google.android.gms.common.security.ProviderInstallerImpl")
-                    .getMethod("insertProvider", Context.class)
-                    .invoke(null, gms);
-        } catch (Exception e) {
-            if (Build.VERSION.SDK_INT < 21) {
-                // Failed to update SSL provider, use NoSSLv3SocketFactory on SDK < 21
-                HttpsURLConnection.setDefaultSSLSocketFactory(new NoSSLv3SocketFactory());
-            }
-            return false;
-        }
-        return true;
     }
 
     public static boolean checkNetworkStatus(Context context) {

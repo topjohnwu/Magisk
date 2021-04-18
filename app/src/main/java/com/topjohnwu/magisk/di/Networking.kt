@@ -3,10 +3,10 @@ package com.topjohnwu.magisk.di
 import android.content.Context
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.ProviderInstaller
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.ktx.precomputedText
-import com.topjohnwu.magisk.net.Networking
 import com.topjohnwu.magisk.utils.MarkwonImagePlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
@@ -61,7 +61,7 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         })
     }
 
-    if (!Networking.init(context)) {
+    if (!ProviderInstaller.install(context)) {
         Info.hasGMS = false
     }
     builder.dns(DnsResolver(builder.build()))
