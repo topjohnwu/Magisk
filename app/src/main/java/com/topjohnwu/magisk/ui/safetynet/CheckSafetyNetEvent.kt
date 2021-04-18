@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.arch.ViewEventWithScope
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.ktx.createClassLoader
+import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.signing.CryptoUtils
@@ -31,7 +32,6 @@ import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
-import java.lang.reflect.Field
 import java.lang.reflect.InvocationHandler
 import java.security.GeneralSecurityException
 import java.security.SecureRandom
@@ -100,14 +100,11 @@ class CheckSafetyNetEvent(
         helper.attest(nonce)
     }
 
-    private fun Class<*>.field(name: String): Field =
-        getDeclaredField(name).apply { isAccessible = true }
-
     // All of these fields are whitelisted
     private fun BaseDexClassLoader.getDexFiles(): List<DexFile> {
-        val pathList = BaseDexClassLoader::class.java.field("pathList").get(this)
-        val dexElements = pathList.javaClass.field("dexElements").get(pathList) as Array<*>
-        val fileField = dexElements.javaClass.componentType.field("dexFile")
+        val pathList = BaseDexClassLoader::class.java.reflectField("pathList").get(this)
+        val dexElements = pathList.javaClass.reflectField("dexElements").get(pathList) as Array<*>
+        val fileField = dexElements.javaClass.componentType.reflectField("dexFile")
         return dexElements.map { fileField.get(it) as DexFile }
     }
 

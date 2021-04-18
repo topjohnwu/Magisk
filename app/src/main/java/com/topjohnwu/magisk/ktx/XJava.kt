@@ -5,6 +5,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
@@ -48,3 +49,6 @@ fun <K, V> MutableMap<K, V>.synchronized() = Collections.synchronizedMap(this)
 
 fun SimpleDateFormat.parseOrNull(date: String) =
     runCatching { parse(date) }.onFailure { Timber.e(it) }.getOrNull()
+
+fun Class<*>.reflectField(name: String): Field =
+    getDeclaredField(name).apply { isAccessible = true }

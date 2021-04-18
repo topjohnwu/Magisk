@@ -31,6 +31,10 @@
 
 # Stub
 -keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }
+-keepclassmembers class androidx.appcompat.app.AppCompatDelegateImpl {
+  boolean mActivityHandlesUiModeChecked;
+  boolean mActivityHandlesUiMode;
+}
 
 # Strip Timber verbose and debug logging
 -assumenosideeffects class timber.log.Timber$Tree {
