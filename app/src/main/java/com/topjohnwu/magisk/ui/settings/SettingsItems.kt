@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk.ui.settings
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
@@ -20,7 +22,6 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.ktx.get
-import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.utils.set
@@ -41,8 +42,17 @@ object Language : BaseSettingsItem.Selector() {
         }
 
     override val title = R.string.language.asText()
-    override var entries = emptyArray<String>()
-    override var entryValues = emptyArray<String>()
+
+    private var entries = emptyArray<String>()
+    private var entryValues = emptyArray<String>()
+
+    override fun entries(res: Resources) = entries
+    override fun descriptions(res: Resources) = entries
+
+    override fun onPressed(view: View, callback: Callback) {
+        if (entries.isEmpty()) return
+        super.onPressed(view, callback)
+    }
 
     suspend fun loadLanguages(scope: CoroutineScope) {
         scope.launch {
@@ -137,20 +147,22 @@ object DownloadPath : BaseSettingsItem.Input() {
 }
 
 object UpdateChannel : BaseSettingsItem.Selector() {
-    override var value = Config.updateChannel
+    override var value = Config.updateChannel.let { if (it < 0) 0 else it }
         set(value) = setV(value, field, { field = it }) {
             Config.updateChannel = it
             Info.remote = Info.EMPTY_REMOTE
         }
 
     override val title = R.string.settings_update_channel_title.asText()
-    override val entries: Array<String> = resources.getStringArray(R.array.update_channel).let {
-        if (BuildConfig.VERSION_CODE % 100 == 0)
-            it.toMutableList().apply { removeAt(Config.Value.CANARY_CHANNEL) }.toTypedArray()
-        else it
+
+    override val entryRes = R.array.update_channel
+    override fun entries(res: Resources): Array<String> {
+        return super.entries(res).let {
+            if (!BuildConfig.DEBUG)
+                it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
+            else it
+        }
     }
-    override val description
-        get() = entries.getOrNull(value)?.asText() ?: TextHolder.String(entries[0])
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
@@ -272,14 +284,12 @@ object AccessMode : BaseSettingsItem.Selector() {
 object MultiuserMode : BaseSettingsItem.Selector() {
     override val title = R.string.multiuser_mode.asText()
     override val entryRes = R.array.multiuser_mode
+    override val descriptionRes = R.array.multiuser_summary
 
     override var value = Config.suMultiuserMode
         set(value) = setV(value, field, { field = it }) {
             Config.suMultiuserMode = it
         }
-
-    override val description
-        get() = resources.getStringArray(R.array.multiuser_summary)[value].asText()
 
     override fun refresh() {
         isEnabled = Const.USER_ID == 0
@@ -289,14 +299,12 @@ object MultiuserMode : BaseSettingsItem.Selector() {
 object MountNamespaceMode : BaseSettingsItem.Selector() {
     override val title = R.string.mount_namespace_mode.asText()
     override val entryRes = R.array.namespace
+    override val descriptionRes = R.array.namespace_summary
 
     override var value = Config.suMntNamespaceMode
         set(value) = setV(value, field, { field = it }) {
             Config.suMntNamespaceMode = it
         }
-
-    override val description
-        get() = resources.getStringArray(R.array.namespace_summary)[value].asText()
 }
 
 object AutomaticResponse : BaseSettingsItem.Selector() {
@@ -312,15 +320,15 @@ object AutomaticResponse : BaseSettingsItem.Selector() {
 object RequestTimeout : BaseSettingsItem.Selector() {
     override val title = R.string.request_timeout.asText()
     override val entryRes = R.array.request_timeout
-    override val entryValRes = R.array.request_timeout_value
 
+    private val entryValues = listOf(10, 15, 20, 30, 45, 60)
     override var value = selected
         set(value) = setV(value, field, { field = it }) {
-            Config.suDefaultTimeout = entryValues[it].toInt()
+            Config.suDefaultTimeout = entryValues[it]
         }
 
     private val selected: Int
-        get() = entryValues.indexOfFirst { it.toInt() == Config.suDefaultTimeout }
+        get() = entryValues.indexOfFirst { it == Config.suDefaultTimeout }
 }
 
 object SUNotification : BaseSettingsItem.Selector() {

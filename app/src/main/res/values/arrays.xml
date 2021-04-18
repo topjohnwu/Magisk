@@ -25,15 +25,6 @@
         <item>@string/settings_su_request_60</item>
     </string-array>
 
-    <string-array name="request_timeout_value">
-        <item>10</item>
-        <item>15</item>
-        <item>20</item>
-        <item>30</item>
-        <item>45</item>
-        <item>60</item>
-    </string-array>
-
     <string-array name="auto_response">
         <item>@string/prompt</item>
         <item>@string/deny</item>
