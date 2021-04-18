@@ -12,12 +12,11 @@ import android.content.Intent;
 @SuppressLint("NewApi")
 public class DelegateComponentFactory extends AppComponentFactory {
 
-    static DelegateComponentFactory INSTANCE;
     ClassLoader loader;
     AppComponentFactory receiver;
 
     public DelegateComponentFactory() {
-        INSTANCE = this;
+        InjectAPK.componentFactory = this;
     }
 
     @Override
@@ -53,7 +52,6 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public ContentProvider instantiateProvider(ClassLoader cl, String className)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (loader == null) loader = cl;
         if (receiver != null)
             return receiver.instantiateProvider(loader, className);
         return create(className);

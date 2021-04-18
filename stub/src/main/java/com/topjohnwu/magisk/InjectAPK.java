@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -17,6 +19,12 @@ import java.lang.reflect.Field;
 
 public class InjectAPK {
 
+    static Object componentFactory;
+
+    private static DelegateComponentFactory getComponentFactory() {
+        return (DelegateComponentFactory) componentFactory;
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     static Application setup(Context context) {
         // Get ContextImpl
@@ -28,7 +36,6 @@ public class InjectAPK {
         File update = DynAPK.update(context);
         if (update.exists())
             update.renameTo(apk);
-        Application result = null;
         if (!apk.exists()) {
             // Try copying APK
             Uri uri = new Uri.Builder().scheme("content")
@@ -48,42 +55,47 @@ public class InjectAPK {
         }
         if (apk.exists()) {
             ClassLoader cl = new InjectedClassLoader(apk);
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo info = pm.getPackageArchiveInfo(apk.getPath(), 0).applicationInfo;
             try {
                 // Create the receiver Application
-                Object app = cl.loadClass(Mapping.get("APP")).getConstructor(Object.class)
+                Object app = cl.loadClass(info.className)
+                        .getConstructor(Object.class)
                         .newInstance(DynAPK.pack(dynData()));
 
                 // Create the receiver component factory
                 Object factory = null;
                 if (Build.VERSION.SDK_INT >= 28) {
-                    factory = cl.loadClass(Mapping.get("ACF")).newInstance();
+                    factory = cl.loadClass(info.appComponentFactory).newInstance();
                 }
 
                 setClassLoader(context, cl);
 
                 // Finally, set variables
-                result = (Application) app;
                 if (Build.VERSION.SDK_INT >= 28) {
-                    DelegateComponentFactory.INSTANCE.loader = cl;
-                    DelegateComponentFactory.INSTANCE.receiver = (AppComponentFactory) factory;
+                    getComponentFactory().loader = cl;
+                    getComponentFactory().receiver = (AppComponentFactory) factory;
                 }
+
+                return (Application) app;
             } catch (Exception e) {
                 Log.e(InjectAPK.class.getSimpleName(), "", e);
                 apk.delete();
             }
-        } else {
-            ClassLoader cl = new RedirectClassLoader();
-            try {
-                setClassLoader(context, cl);
-                if (Build.VERSION.SDK_INT >= 28) {
-                    DelegateComponentFactory.INSTANCE.loader = cl;
-                }
-            } catch (Exception e) {
-                // Should never happen
-                Log.e(InjectAPK.class.getSimpleName(), "", e);
-            }
+            // fallthrough
         }
-        return result;
+
+        ClassLoader cl = new RedirectClassLoader();
+        try {
+            setClassLoader(context, cl);
+            if (Build.VERSION.SDK_INT >= 28) {
+                getComponentFactory().loader = cl;
+            }
+        } catch (Exception e) {
+            Log.e(InjectAPK.class.getSimpleName(), "", e);
+        }
+
+        return null;
     }
 
     // Replace LoadedApk mClassLoader

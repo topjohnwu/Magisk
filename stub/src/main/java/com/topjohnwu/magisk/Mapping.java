@@ -34,9 +34,6 @@ public class Mapping {
         for (Map.Entry<String, String> e : map.entrySet()) {
             inverseMap.put(e.getValue(), e.getKey());
         }
-
-        map.put("APP", "com.topjohnwu.magisk.core.App");
-        map.put("ACF", "androidx.core.app.CoreComponentFactory");
     }
 
     public static String get(String name) {
