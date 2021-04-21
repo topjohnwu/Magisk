@@ -57,6 +57,7 @@ In some custom recoveries, the installation may fail silently (it might look lik
 - Download the Magisk APK
 - Rename the `.apk` file extension to `.zip`, for example: `Magisk-v22.0.apk` → `Magisk-v22.0.zip`. If you have trouble renaming the file extension (like on Windows), use a file manager on Android or the one included in TWRP to rename the file.
 - Flash the zip just like any other ordinary flashable zip.
+- Warning: `sepolicy.rule` file of modules may be stored in `cache` partition, do not clear it.
 - Check whether the Magisk app is installed. If it isn't installed automatically, manually install the APK.
 
 ## Uninstallation
