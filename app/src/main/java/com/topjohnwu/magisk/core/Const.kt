@@ -8,18 +8,8 @@ import java.io.File
 @Suppress("DEPRECATION")
 object Const {
 
-    val CPU_ABI: String
-    val CPU_ABI_32: String
-
-    init {
-        if (Build.VERSION.SDK_INT >= 21) {
-            CPU_ABI = Build.SUPPORTED_ABIS[0]
-            CPU_ABI_32 = Build.SUPPORTED_32_BIT_ABIS.firstOrNull() ?: CPU_ABI
-        } else {
-            CPU_ABI = Build.CPU_ABI
-            CPU_ABI_32 = CPU_ABI
-        }
-    }
+    val CPU_ABI: String = Build.SUPPORTED_ABIS[0]
+    val CPU_ABI_32: String = Build.SUPPORTED_32_BIT_ABIS.firstOrNull() ?: CPU_ABI
 
     // Paths
     lateinit var MAGISKTMP: String
