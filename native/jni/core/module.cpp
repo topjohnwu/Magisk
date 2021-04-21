@@ -549,7 +549,7 @@ void magic_mount() {
     LOGI("* Loading modules\n");
     for (const auto &m : module_list) {
         auto module = m.data();
-        char *b = buf + sprintf(buf, MODULEROOT "/%s/", module);
+        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
 
         // Read props
         strcpy(b, "system.prop");
