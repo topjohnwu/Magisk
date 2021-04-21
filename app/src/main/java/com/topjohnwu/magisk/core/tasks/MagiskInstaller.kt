@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.core.tasks
 
 import android.net.Uri
+import android.system.Os
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
@@ -13,7 +14,6 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.ktx.symlink
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.utils.Utils
@@ -107,7 +107,7 @@ abstract class MagiskInstallImpl protected constructor(
                 } ?: emptyArray()
                 for (lib in libs) {
                     val name = lib.name.substring(3, lib.name.length - 3)
-                    symlink(lib.path, "$installDir/$name")
+                    Os.symlink(lib.path, "$installDir/$name")
                 }
             }
 

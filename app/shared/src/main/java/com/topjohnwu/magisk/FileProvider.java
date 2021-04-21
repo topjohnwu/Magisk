@@ -7,7 +7,6 @@ import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
@@ -24,12 +23,11 @@ import java.util.Map;
  * Modified from androidx.core.content.FileProvider
  */
 public class FileProvider extends ContentProvider {
-    private static final String[] COLUMNS = {
-            OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE };
+    private static final String[] COLUMNS = {OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE};
 
     private static final File DEVICE_ROOT = new File("/");
 
-    private static HashMap<String, PathStrategy> sCache = new HashMap<>();
+    private static final HashMap<String, PathStrategy> sCache = new HashMap<>();
 
     private PathStrategy mStrategy;
 
@@ -42,7 +40,6 @@ public class FileProvider extends ContentProvider {
     public void attachInfo(Context context, ProviderInfo info) {
         super.attachInfo(context, info);
 
-        
         if (info.exported) {
             throw new SecurityException("Provider must not be exported");
         }
@@ -50,21 +47,16 @@ public class FileProvider extends ContentProvider {
             throw new SecurityException("Provider must grant uri permissions");
         }
 
-        mStrategy = getPathStrategy(context, info.authority);
+        mStrategy = getPathStrategy(context, info.authority.split(";")[0]);
     }
 
-    
-    public static Uri getUriForFile(Context context, String authority,
-                                    File file) {
+    public static Uri getUriForFile(Context context, String authority, File file) {
         final PathStrategy strategy = getPathStrategy(context, authority);
         return strategy.getUriForFile(file);
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
-                        String[] selectionArgs,
-                        String sortOrder) {
-        
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         final File file = mStrategy.getFileForUri(uri);
 
         if (projection == null) {
@@ -94,7 +86,6 @@ public class FileProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        
         final File file = mStrategy.getFileForUri(uri);
 
         final int lastDot = file.getName().lastIndexOf('.');
@@ -115,23 +106,18 @@ public class FileProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection,
-                      String[] selectionArgs) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         throw new UnsupportedOperationException("No external updates");
     }
 
     @Override
-    public int delete(Uri uri, String selection,
-                      String[] selectionArgs) {
-        
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         final File file = mStrategy.getFileForUri(uri);
         return file.delete() ? 1 : 0;
     }
 
     @Override
-    public ParcelFileDescriptor openFile(Uri uri, String mode)
-            throws FileNotFoundException {
-        
+    public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
         final File file = mStrategy.getFileForUri(uri);
         final int fileMode = modeToMode(mode);
         return ParcelFileDescriptor.open(file, fileMode);
@@ -156,30 +142,24 @@ public class FileProvider extends ContentProvider {
         strat.addRoot("internal_files", buildPath(context.getFilesDir(), "."));
         strat.addRoot("cache_files", buildPath(context.getCacheDir(), "."));
         strat.addRoot("external_files", buildPath(Environment.getExternalStorageDirectory(), "."));
-        {
-            File[] externalFilesDirs = getExternalFilesDirs(context, null);
-            if (externalFilesDirs.length > 0) {
-                strat.addRoot("external_file_files", buildPath(externalFilesDirs[0], "."));
-            }
+
+        File[] externalFilesDirs = context.getExternalFilesDirs(null);
+        if (externalFilesDirs.length > 0) {
+            strat.addRoot("external_file_files", buildPath(externalFilesDirs[0], "."));
         }
-        {
-            File[] externalCacheDirs = getExternalCacheDirs(context);
-            if (externalCacheDirs.length > 0) {
-                strat.addRoot("external_cache_files", buildPath(externalCacheDirs[0], "."));
-            }
+        File[] externalCacheDirs = context.getExternalCacheDirs();
+        if (externalCacheDirs.length > 0) {
+            strat.addRoot("external_cache_files", buildPath(externalCacheDirs[0], "."));
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            File[] externalMediaDirs = context.getExternalMediaDirs();
-            if (externalMediaDirs.length > 0) {
-                strat.addRoot("external_media_files", buildPath(externalMediaDirs[0], "."));
-            }
+        File[] externalMediaDirs = context.getExternalMediaDirs();
+        if (externalMediaDirs.length > 0) {
+            strat.addRoot("external_media_files", buildPath(externalMediaDirs[0], "."));
         }
 
         return strat;
     }
 
     interface PathStrategy {
-        
         Uri getUriForFile(File file);
 
         File getFileForUri(Uri uri);
@@ -199,7 +179,6 @@ public class FileProvider extends ContentProvider {
             }
 
             try {
-                
                 root = root.getCanonicalFile();
             } catch (IOException e) {
                 throw new IllegalArgumentException(
@@ -218,7 +197,6 @@ public class FileProvider extends ContentProvider {
                 throw new IllegalArgumentException("Failed to resolve canonical path for " + file);
             }
 
-            
             Map.Entry<String, File> mostSpecific = null;
             for (Map.Entry<String, File> root : mRoots.entrySet()) {
                 final String rootPath = root.getValue().getPath();
@@ -233,7 +211,6 @@ public class FileProvider extends ContentProvider {
                         "Failed to find configured root that contains " + path);
             }
 
-            
             final String rootPath = mostSpecific.getValue().getPath();
             if (rootPath.endsWith("/")) {
                 path = path.substring(rootPath.length());
@@ -241,7 +218,6 @@ public class FileProvider extends ContentProvider {
                 path = path.substring(rootPath.length() + 1);
             }
 
-            
             path = Uri.encode(mostSpecific.getKey()) + '/' + Uri.encode(path, "/");
             return new Uri.Builder().scheme("content")
                     .authority(mAuthority).encodedPath(path).build();
@@ -275,7 +251,6 @@ public class FileProvider extends ContentProvider {
         }
     }
 
-    
     private static int modeToMode(String mode) {
         int modeBits;
         if ("r".equals(mode)) {
@@ -321,21 +296,5 @@ public class FileProvider extends ContentProvider {
         final Object[] result = new Object[newLength];
         System.arraycopy(original, 0, result, 0, newLength);
         return result;
-    }
-
-    private static File[] getExternalFilesDirs(Context context, String type) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            return context.getExternalFilesDirs(type);
-        } else {
-            return new File[] { context.getExternalFilesDir(type) };
-        }
-    }
-
-    private static File[] getExternalCacheDirs(Context context) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            return context.getExternalCacheDirs();
-        } else {
-            return new File[] { context.getExternalCacheDir() };
-        }
     }
 }

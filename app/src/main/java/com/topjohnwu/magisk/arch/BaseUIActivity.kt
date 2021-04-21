@@ -57,26 +57,24 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
             .use { it.getDrawable(0) }
             .also { window.setBackgroundDrawable(it) }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window?.decorView?.let {
-                it.systemUiVisibility = (it.systemUiVisibility
-                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
-            }
+        window?.decorView?.let {
+            it.systemUiVisibility = (it.systemUiVisibility
+                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+        }
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                window?.decorView?.post {
-                    // If navigation bar is short enough (gesture navigation enabled), make it transparent
-                    if (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0 < Resources.getSystem().displayMetrics.density * 40) {
-                        window.navigationBarColor = Color.TRANSPARENT
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            window.navigationBarDividerColor = Color.TRANSPARENT
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            window.isNavigationBarContrastEnforced = false
-                            window.isStatusBarContrastEnforced = false
-                        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            window?.decorView?.post {
+                // If navigation bar is short enough (gesture navigation enabled), make it transparent
+                if (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0 < Resources.getSystem().displayMetrics.density * 40) {
+                    window.navigationBarColor = Color.TRANSPARENT
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        window.navigationBarDividerColor = Color.TRANSPARENT
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.isNavigationBarContrastEnforced = false
+                        window.isStatusBarContrastEnforced = false
                     }
                 }
             }
