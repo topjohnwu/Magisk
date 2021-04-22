@@ -556,7 +556,7 @@ find_magisk_apk() {
   [ -f $APK ] || APK=/data/app/*/com.topjohnwu.magisk*/*.apk
   if [ ! -f $APK ]; then
     DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
-    [ -z $DBAPK ] && DBAPK=$(strings /data/adb/magisk.db | grep -E '^.requester.' | cut -c11-)
+    [ -z $DBAPK ] && DBAPK=$(strings /data/adb/magisk.db | grep -oE 'requester..*' | cut -c10-)
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/*/$DBAPK*/*.apk
