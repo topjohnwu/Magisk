@@ -92,7 +92,7 @@ static void kill_process(const char *name, bool multi = false,
         bool (*filter)(int, const char *) = proc_name_match<&str_eql>) {
     crawl_procfs([=](int pid) -> bool {
         if (filter(pid, name)) {
-            kill(pid, SIGTERM);
+            kill(pid, SIGKILL);
             return multi;
         }
         return true;
