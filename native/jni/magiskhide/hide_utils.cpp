@@ -241,8 +241,6 @@ static bool init_list() {
 
     // If Android Q+, also kill blastula pool and all app zygotes
     if (SDK_INT >= 29) {
-        kill_process("usap32", true);
-        kill_process("usap64", true);
         kill_process("_zygote", true, proc_name_match<&str_ends_safe>);
     }
 
