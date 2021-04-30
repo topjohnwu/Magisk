@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.events.dialog
 import android.app.ProgressDialog
 import android.widget.Toast
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -41,7 +42,8 @@ class UninstallDialog : DialogEvent() {
     }
 
     private fun completeUninstall() {
-        FlashFragment.uninstall()
+        (dialog.ownerActivity as? BaseUIActivity<*, *>)
+                ?.navigation?.navigate(FlashFragment.uninstall())
     }
 
 }
