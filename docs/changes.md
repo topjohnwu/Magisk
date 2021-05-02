@@ -1,5 +1,4 @@
 # Magisk Changelog
-
 ### v22.1
 
 - [App] Prevent multiple installation sessions running in parallel
