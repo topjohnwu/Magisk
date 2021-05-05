@@ -40,20 +40,12 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up GitHub env (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $ndk_ver = Select-String -Path "gradle.properties" -Pattern "^magisk.fullNdkVersion=" | % { $_ -replace ".*=" }
-          echo "ANDROID_SDK_ROOT=$env:ANDROID_SDK_ROOT" >> $env:GITHUB_ENV
-          echo "MAGISK_NDK_VERSION=$ndk_ver" >> $env:GITHUB_ENV
-          echo "GRADLE_OPTS=-Dorg.gradle.daemon=false" >> $env:GITHUB_ENV
-
-      - name: Set up GitHub env (Unix)
-        if: runner.os != 'Windows'
+      - name: Set up GitHub env
         run: |
           ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' gradle.properties)
           echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
           echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
+        shell: bash
 
       - name: Cache Gradle
         uses: actions/cache@v2
@@ -84,6 +76,9 @@ jobs:
 
       - name: Build debug
         run: python build.py -v all
+
+      - name: Stop gradle daemon
+        run: ./gradlew --stop
 
       # Only upload artifacts built on Linux
       - name: Upload build artifact
