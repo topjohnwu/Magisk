@@ -19,9 +19,9 @@
     <string name="not_available">non disponible</string>
     <string name="hide">Masquer</string>
     <string name="home_package">Paquet</string>
-    <string name="home_app_title">Appli</string>
+    <string name="home_app_title">Application</string>
 
-    <string name="home_notice_content">Téléchargez Magisk SEULEMENT depuis la page Github officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
+    <string name="home_notice_content">Ne téléchargez Magisk qu’uniquement depuis la page GitHub officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
     <string name="home_support_title">Soutenez‑nous</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
@@ -34,7 +34,7 @@
 
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
-    <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
+    <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Mode récupération</string>
     <string name="install_options_title">Options</string>
     <string name="install_method_title">Méthode</string>
@@ -52,7 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Demande d’accès super‑utilisateur</string>
-    <string name="touch_filtered_warning">Parce qu’une application obscurcit une demande du super-utilisateur, Magisk ne peut pas vérifier votre réponse</string>
+    <string name="touch_filtered_warning">Magisk ne peut vérifier votre réponse parce qu’une application masque une requête de super‑utilisateur</string>
     <string name="deny">Refuser</string>
     <string name="prompt">Demander</string>
     <string name="grant">Accorder</string>
@@ -95,11 +95,11 @@
     <string name="safetynet_attest_success">Attestation accordée !</string>
     <string name="safetynet_attest_failure">Attestation refusée !</string>
     <string name="safetynet_attest_loading">Une petite seconde…</string>
-    <string name="safetynet_attest_restart">Essayer à nouveau</string>
+    <string name="safetynet_attest_restart">Réessayer</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
-    <string name="show_os_app">Afficher les applis de base</string>
+    <string name="show_os_app">Afficher les applications intégrées au système</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_scroll_up">Faire défiler vers le haut</string>
     <string name="hide_filters">Filtres</string>
@@ -107,7 +107,7 @@
 
     <!--Module -->
     <string name="no_info_provided">(aucune info transmise)</string>
-    <string name="reboot_userspace">Redémarrage en douceur</string>
+    <string name="reboot_userspace">Redémarrage à chaud</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
@@ -134,9 +134,9 @@
     <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
     <string name="settings_clear_cache_summary">Effacer les informations en cache concerant les dépôts en ligne. Ceci force l’application à télécharger des informations à jour.</string>
     <string name="settings_hide_app_title">Masquer l’application Magisk</string>
-    <string name="settings_hide_app_summary">Installer une application intermédiaire avec un ID de package aléatoire et un nom personnalisé</string>
+    <string name="settings_hide_app_summary">Installer une application intermédiaire avec un identifiant de paquet aléatoire et un nom personnalisé</string>
     <string name="settings_restore_app_title">Restaurer l’application Magisk</string>
-    <string name="settings_restore_app_summary">Démasquer l’application et la restaurer à son APK d’origine</string>
+    <string name="settings_restore_app_summary">Démasquer l’application et la restaurer comme son APK d’origine.</string>
     <string name="language">Langue</string>
     <string name="system_default">(langue par défaut du système)</string>
     <string name="settings_check_update_title">Vérifier les mises à jour</string>
@@ -147,8 +147,8 @@
     <string name="settings_update_custom">Canal personnalisé</string>
     <string name="settings_update_custom_msg">Saisissez une URL personnalisée</string>
     <string name="settings_magiskhide_summary">Rendre Magisk invisible face à diverses formes de détection.</string>
-    <string name="settings_hosts_title">Fichier hôtes hors partition système</string>
-    <string name="settings_hosts_summary">Utilisation d’un fichier hôtes hors de la partition système pour les applications de blocage de publicité.</string>
+    <string name="settings_hosts_title">Fichier d’hôtes hors partition système</string>
+    <string name="settings_hosts_summary">Utilisation d’un fichier d’hôtes hors de la partition système pour les applications de blocage de publicité.</string>
     <string name="settings_hosts_toast">Ajout d’un module pour fichier hosts hors système</string>
     <string name="settings_app_name_hint">Nouveau nom</string>
     <string name="settings_app_name_helper">L’application sera réempaquetée sous ce nom</string>
@@ -169,8 +169,8 @@
     <string name="superuser_notification">Notification super‑utilisateur</string>
     <string name="settings_su_reauth_title">S’authentifier à nouveau après la mise à niveau</string>
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
-    <string name="settings_su_tapjack_title">Activer la protection contre le détournement de clic</string>
-    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super-utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou un recouvrement</string>
+    <string name="settings_su_tapjack_title">Activer la protection contre le détournement du tapotement</string>
+    <string name="settings_su_tapjack_summary">Le dialogue d’invite du super‑utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou une surcouche</string>
     <string name="settings_su_biometric_title">Activer l’authentification biométrique</string>
     <string name="settings_su_biometric_summary">Utiliser l’authentification biométrique pour autoriser les accès en super‑utilisateur</string>
     <string name="no_biometric">L’appareil n’est pas pris en charge ou alors aucun paramètre biométrique n’est activé</string>
@@ -211,7 +211,7 @@
     <string name="reboot">Redémarrer</string>
     <string name="release_notes">Notes de version</string>
     <string name="repo_cache_cleared">Cache de dépôt effacé</string>
-    <string name="flashing">Flashage en cours...</string>
+    <string name="flashing">Écriture en mémoire Flash…</string>
     <string name="done">Terminé !</string>
     <string name="failure">Erreur</string>
     <string name="hide_app_title">Masquage de l’application Magisk…</string>
@@ -222,23 +222,23 @@
     <string name="restore_done">Restauration effectuée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">L’application Magisk est un logiciel libre et ne contient pas de code propriétaire de l’API SafetyNet de Google. Souhaitez-vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
+    <string name="proprietary_notice">L’application Magisk est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google. Souhaitez‑vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation supplémentaire requise</string>
-    <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez-vous effectuer cette installation maintenant et redémarrer ?</string>
+    <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez‑vous effectuer cette installation maintenant puis redémarrer ?</string>
     <string name="setup_msg">Configuration de l’environnement en cours…</string>
     <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
-    <string name="unsupport_magisk_msg">Cette version de Magisk ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
+    <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
     <string name="unsupport_general_title">État anormal</string>
-    <string name="unsupport_system_app_msg">Faire fonctionner cette application en tant qu’application système n’est pas supporté. Merci de restaurer l’application en tant qu’application utilisateur.</string>
-    <string name="unsupport_other_su_msg">Une commande \"su\" qui n’appartient pas à Magisk est détecté. Merci de supprimer l’autre su qui n’est pas supporté.</string>
-    <string name="unsupport_external_storage_msg">Magisk est installé sur le stockage externe. Merci de déplacer l’application sur le stockage interne.</string>
-    <string name="unsupport_nonroot_stub_msg">Cette application ne peut pas continuer à fonctionner dans un état masqué étant donné que l’accès racine est perdue. Merci de restaurer l’APK originel.</string>
+    <string name="unsupport_system_app_msg">Cette application ne peut être installée en tant qu’application système. Veuillez la restaurer en tant qu’application utilisateur.</string>
+    <string name="unsupport_other_su_msg">Une commande « su » n’appartenant pas à Magisk a été détectée. Merci de supprimer cet autre « su » qui n’est pas pris en charge.</string>
+    <string name="unsupport_external_storage_msg">Magisk Manager est installé sur le stockage externe. Veuillez déplacer l’application sur le stockage interne.</string>
+    <string name="unsupport_nonroot_stub_msg">Cette application ne peut continuer à fonctionner en étant masquée car l’accès en tant que super‑utilisateur a été perdu. Merci de restaurer l’APK originel.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
-    <string name="app_not_found">Aucune application n\'a été trouvée pour gérer cette action</string>
+    <string name="app_not_found">Aucune application n’a été trouvée pour gérer cette action</string>
 
 </resources>
