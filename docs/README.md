@@ -12,3 +12,6 @@ The following sections are for developers
 - [Internal Details](details.md)
 - [Android Booting Shenanigans](boot.md)
 - [Deployment](deploy.md)
+[Magic Mount] Remove apps/priv-app from whitelist, should fix all crashes
+[phh] Fix binary out-of-date issue
+[scripts] Fix root disappear issue when upgrading within Magisk Manager
