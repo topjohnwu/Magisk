@@ -15,10 +15,7 @@ ifdef B_64BIT
 APP_ABI += arm64-v8a x86_64
 endif
 
-# Busybox require some additional settings
+# Busybox should use stock libc.a
 ifdef B_BB
-ifeq ($(OS),Windows_NT)
-APP_SHORT_COMMANDS := true
-endif
-APP_PLATFORM := android-21
+APP_PLATFORM := android-22
 endif
