@@ -212,6 +212,7 @@ abstract class MagiskInstallImpl protected constructor(
             // Repack boot image to prevent auto restore
             arrayOf(
                 "cd $installDir",
+                "chmod -R 755 .",
                 "./magiskboot unpack boot.img",
                 "./magiskboot repack boot.img",
                 "cat new-boot.img > boot.img",
