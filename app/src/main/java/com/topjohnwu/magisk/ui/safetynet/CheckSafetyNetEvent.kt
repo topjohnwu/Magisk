@@ -137,7 +137,7 @@ class CheckSafetyNetEvent(
     }
 
     private fun String.decode(): ByteArray {
-        return if (contains("\\+|/".toRegex()))
+        return if (contains("[+/]".toRegex()))
             Base64.decode(this, Base64.DEFAULT)
         else
             Base64.decode(this, Base64.URL_SAFE)

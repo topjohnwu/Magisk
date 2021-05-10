@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.di
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 
 val AppContext: Context inline get() = ServiceLocator.context
 
+@SuppressLint("StaticFieldLeak")
 object ServiceLocator {
 
     lateinit var context: Context

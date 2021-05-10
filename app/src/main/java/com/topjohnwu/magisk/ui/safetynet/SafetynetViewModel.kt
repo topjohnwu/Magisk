@@ -79,13 +79,13 @@ class SafetynetViewModel : BaseViewModel() {
                     if (success) R.string.safetynet_attest_success
                     else R.string.safetynet_attest_failure
             }
-        } ?: {
+        } ?: run {
             isSuccess = false
             ctsState = false
             basicIntegrityState = false
             evalType = "N/A"
             safetyNetTitle = R.string.safetynet_api_error
-        }()
+        }
     }
 
     companion object {
