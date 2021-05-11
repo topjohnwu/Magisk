@@ -83,7 +83,7 @@ ifdef B_BOOT
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
-LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
+LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils libz
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
@@ -97,7 +97,6 @@ LOCAL_SRC_FILES := \
     magiskboot/pattern.cpp \
     utils/cpio.cpp
 
-LOCAL_LDLIBS := -lz
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
