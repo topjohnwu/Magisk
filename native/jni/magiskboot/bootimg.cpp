@@ -1,12 +1,7 @@
-#include <sys/mman.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <libfdt.h>
 #include <functional>
 #include <memory>
 
+#include <libfdt.h>
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
 #include <utils.hpp>

@@ -1,5 +1,3 @@
-#include <malloc.h>
-
 #include <utils.hpp>
 
 #include "magiskboot.hpp"

@@ -31,7 +31,7 @@ public:
 
 bool check_env(const char *name) {
     const char *val = getenv(name);
-    return val ? val == "true"sv : false;
+    return val != nullptr && val == "true"sv;
 }
 
 void magisk_cpio::patch() {

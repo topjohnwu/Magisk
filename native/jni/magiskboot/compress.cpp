@@ -1,8 +1,3 @@
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
 #include <memory>
 #include <functional>
 
@@ -56,7 +51,8 @@ protected:
         ENCODE
     } mode;
 
-    gz_strm(mode_t mode, stream_ptr &&base) : cpr_stream(std::move(base)), mode(mode) {
+    gz_strm(mode_t mode, stream_ptr &&base) :
+        cpr_stream(std::move(base)), mode(mode), strm{}, outbuf{0} {
         switch(mode) {
             case DECODE:
                 inflateInit2(&strm, 15 | 16);
@@ -131,7 +127,8 @@ protected:
         ENCODE
     } mode;
 
-    bz_strm(mode_t mode, stream_ptr &&base) : cpr_stream(std::move(base)), mode(mode) {
+    bz_strm(mode_t mode, stream_ptr &&base) :
+        cpr_stream(std::move(base)), mode(mode), strm{}, outbuf{0} {
         switch(mode) {
             case DECODE:
                 BZ2_bzDecompressInit(&strm, 0, 0);
@@ -200,8 +197,8 @@ protected:
         ENCODE_LZMA
     } mode;
 
-    lzma_strm(mode_t mode, stream_ptr &&base)
-    : cpr_stream(std::move(base)), mode(mode), strm(LZMA_STREAM_INIT) {
+    lzma_strm(mode_t mode, stream_ptr &&base) :
+        cpr_stream(std::move(base)), mode(mode), strm(LZMA_STREAM_INIT), outbuf{0} {
         lzma_options_lzma opt;
 
         // Initialize preset
@@ -211,17 +208,20 @@ protected:
             { .id = LZMA_VLI_UNKNOWN, .options = nullptr },
         };
 
-        lzma_ret ret;
+        lzma_ret code;
         switch(mode) {
             case DECODE:
-                ret = lzma_auto_decoder(&strm, UINT64_MAX, 0);
+                code = lzma_auto_decoder(&strm, UINT64_MAX, 0);
                 break;
             case ENCODE_XZ:
-                ret = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC32);
+                code = lzma_stream_encoder(&strm, filters, LZMA_CHECK_CRC32);
                 break;
             case ENCODE_LZMA:
-                ret = lzma_alone_encoder(&strm, &opt);
+                code = lzma_alone_encoder(&strm, &opt);
                 break;
+        }
+        if (code != LZMA_OK) {
+            LOGE("LZMA initialization failed (%d)\n", code);
         }
     }
 
@@ -264,7 +264,8 @@ public:
 
 class LZ4F_decoder : public cpr_stream {
 public:
-    explicit LZ4F_decoder(stream_ptr &&base) : cpr_stream(std::move(base)), outbuf(nullptr) {
+    explicit LZ4F_decoder(stream_ptr &&base) :
+        cpr_stream(std::move(base)), ctx(nullptr), outbuf(nullptr), outCapacity(0) {
         LZ4F_createDecompressionContext(&ctx, LZ4F_VERSION);
     }
 
@@ -319,8 +320,8 @@ private:
 
 class LZ4F_encoder : public cpr_stream {
 public:
-    explicit LZ4F_encoder(stream_ptr &&base)
-    : cpr_stream(std::move(base)), outbuf(nullptr), outCapacity(0) {
+    explicit LZ4F_encoder(stream_ptr &&base) :
+        cpr_stream(std::move(base)), ctx(nullptr), outbuf(nullptr), outCapacity(0) {
         LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
     }
 
@@ -362,14 +363,14 @@ private:
 
     int write_header() {
         LZ4F_preferences_t prefs {
-            .autoFlush = 1,
-            .compressionLevel = 9,
             .frameInfo = {
-                .blockMode = LZ4F_blockIndependent,
                 .blockSizeID = LZ4F_max4MB,
+                .blockMode = LZ4F_blockIndependent,
+                .contentChecksumFlag = LZ4F_contentChecksumEnabled,
                 .blockChecksumFlag = LZ4F_noBlockChecksum,
-                .contentChecksumFlag = LZ4F_contentChecksumEnabled
-            }
+            },
+            .compressionLevel = 9,
+            .autoFlush = 1,
         };
         outCapacity = LZ4F_compressBound(BLOCK_SZ, &prefs);
         outbuf = new uint8_t[outCapacity];
@@ -380,9 +381,9 @@ private:
 
 class LZ4_decoder : public cpr_stream {
 public:
-    explicit LZ4_decoder(stream_ptr &&base)
-    : cpr_stream(std::move(base)), out_buf(new char[LZ4_UNCOMPRESSED]),
-    buf(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
+    explicit LZ4_decoder(stream_ptr &&base) :
+        cpr_stream(std::move(base)), out_buf(new char[LZ4_UNCOMPRESSED]),
+        buf(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
 
     ~LZ4_decoder() override {
         delete[] out_buf;
@@ -447,9 +448,9 @@ private:
 
 class LZ4_encoder : public cpr_stream {
 public:
-    explicit LZ4_encoder(stream_ptr &&base, bool lg)
-    : cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]),
-    buf(new char[LZ4_UNCOMPRESSED]), init(false), lg(lg), buf_off(0), in_total(0) {}
+    explicit LZ4_encoder(stream_ptr &&base, bool lg) :
+        cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]),
+        buf(new char[LZ4_UNCOMPRESSED]), init(false), lg(lg), buf_off(0), in_total(0) {}
 
     int write(const void *in, size_t size) override {
         int ret = 0;

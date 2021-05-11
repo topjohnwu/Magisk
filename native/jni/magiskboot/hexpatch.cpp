@@ -34,7 +34,7 @@ int hexpatch(const char *image, const char *from, const char *to) {
         curr = static_cast<uint8_t*>(memmem(curr, end - curr, pattern.data(), pattern.size()));
         if (curr == nullptr)
             return patched;
-        fprintf(stderr, "Patch @ %08X [%s] -> [%s]\n", curr - buf, from, to);
+        fprintf(stderr, "Patch @ %08X [%s] -> [%s]\n", (unsigned)(curr - buf), from, to);
         memset(curr, 0, pattern.size());
         memcpy(curr, patch.data(), patch.size());
         patched = 0;
