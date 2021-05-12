@@ -129,7 +129,6 @@ val shouldKeepResources = listOf(
     R.string.invalid_update_channel,
     R.string.update_available,
     R.string.safetynet_api_error,
-    R.raw.changelog,
     R.drawable.ic_device,
     R.drawable.ic_hide_select_md2,
     R.drawable.ic_more,
