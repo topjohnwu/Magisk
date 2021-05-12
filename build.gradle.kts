@@ -1,5 +1,4 @@
 import com.android.build.gradle.BaseExtension
-import java.nio.file.Paths
 
 plugins {
     id("MagiskPlugin")
@@ -30,24 +29,8 @@ tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
 }
 
-val Project.android get() = extensions.getByName<BaseExtension>("android")
-
-fun Task.applyOptimize() = doLast {
-    val aapt2 = Paths.get(project.android.sdkDirectory.path,
-        "build-tools", project.android.buildToolsVersion, "aapt2")
-    val zip = Paths.get(project.buildDir.path, "intermediates",
-        "shrunk_processed_res", "release", "resources-release-stripped.ap_")
-    val optimized = File("${zip}.opt")
-    val cmd = exec {
-        commandLine(aapt2, "optimize", "--collapse-resource-names",
-            "--shorten-resource-paths", "-o", optimized, zip)
-        isIgnoreExitValue = true
-    }
-    if (cmd.exitValue == 0) {
-        zip.toFile().delete()
-        optimized.renameTo(zip.toFile())
-    }
-}
+fun Project.android(configuration: BaseExtension.() -> Unit) =
+    extensions.getByName<BaseExtension>("android").configuration()
 
 subprojects {
     repositories {
@@ -59,7 +42,7 @@ subprojects {
     afterEvaluate {
         if (plugins.hasPlugin("com.android.library") ||
             plugins.hasPlugin("com.android.application")) {
-            android.apply {
+            android {
                 compileSdkVersion(30)
                 buildToolsVersion = "30.0.3"
                 ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
@@ -86,14 +69,8 @@ subprojects {
             }
         }
 
-        tasks.whenTaskAdded {
-            if (name == "shrinkReleaseRes") {
-                finalizedBy(tasks.create("optimizeReleaseRes").applyOptimize())
-            }
-        }
-
         if (name == "app" || name == "stub") {
-            android.apply {
+            android {
                 signingConfigs {
                     create("config") {
                         Config["keyStore"]?.also {

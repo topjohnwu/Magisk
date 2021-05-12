@@ -183,6 +183,8 @@ android.applicationVariants.all {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib"))
+    // Some dependencies request JDK 8 stdlib, specify manually here to prevent version mismatch
+    implementation(kotlin("stdlib-jdk8"))
     implementation(project(":app:shared"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
