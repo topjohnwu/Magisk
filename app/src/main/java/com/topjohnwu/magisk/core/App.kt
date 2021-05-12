@@ -17,7 +17,6 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.unwrap
 import com.topjohnwu.superuser.Shell
 import timber.log.Timber
-import java.io.File
 import kotlin.system.exitProcess
 
 open class App() : Application() {
@@ -55,12 +54,6 @@ open class App() : Application() {
         }
         val wrapped = impl.wrap()
         super.attachBaseContext(wrapped)
-
-        val info = base.applicationInfo
-        val libDir = runCatching {
-            info.javaClass.getDeclaredField("secondaryNativeLibraryDir").get(info) as String?
-        }.getOrNull() ?: info.nativeLibraryDir
-        Const.NATIVE_LIB_DIR = File(libDir)
 
         ServiceLocator.context = wrapped
         AssetHack.init(impl)

@@ -5,10 +5,15 @@ rm -rf $TMPDIR
 mkdir -p $TMPDIR 2>/dev/null
 
 export BBBIN=$TMPDIR/busybox
-unzip -o "$3" lib/x86/libbusybox.so lib/armeabi-v7a/libbusybox.so -d $TMPDIR >&2
+unzip -o "$3" "lib/*/libbusybox.so" -d $TMPDIR >&2
 chmod -R 755 $TMPDIR/lib
-mv -f $TMPDIR/lib/x86/libbusybox.so $BBBIN
-$BBBIN >/dev/null 2>&1 || mv -f $TMPDIR/lib/armeabi-v7a/libbusybox.so $BBBIN
+for arch in "x86_64" "x86" "arm64-v8a" "armeabi-v7a"; do
+  libpath="$TMPDIR/lib/$arch/libbusybox.so"
+  if [ -x $libpath ] && $libpath >/dev/null 2>&1; then
+    mv -f $libpath $BBBIN
+    break
+  fi
+done
 $BBBIN rm -rf $TMPDIR/lib
 
 export INSTALLER=$TMPDIR/install
