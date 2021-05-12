@@ -48,9 +48,9 @@ subprojects {
                 ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
 
                 defaultConfig {
-                    if (minSdkVersion == null)
-                        minSdkVersion(21)
-                    targetSdkVersion(30)
+                    if (minSdk == null)
+                        minSdk = 21
+                    targetSdk = 30
                 }
 
                 compileOptions {

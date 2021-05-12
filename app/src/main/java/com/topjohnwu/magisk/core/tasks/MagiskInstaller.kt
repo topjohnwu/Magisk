@@ -94,7 +94,7 @@ abstract class MagiskInstallImpl protected constructor(
             if (isRunningAsStub) {
                 val zf = ZipFile(DynAPK.current(context))
                 zf.entries().asSequence().filter {
-                    !it.isDirectory && it.name.startsWith("lib/${Const.CPU_ABI_32}/")
+                    !it.isDirectory && it.name.startsWith(Info.stubArch)
                 }.forEach {
                     val n = it.name.substring(it.name.lastIndexOf('/') + 1)
                     val name = n.substring(3, n.length - 3)
@@ -102,7 +102,7 @@ abstract class MagiskInstallImpl protected constructor(
                     zf.getInputStream(it).writeTo(dest)
                 }
             } else {
-                val libs = Const.NATIVE_LIB_DIR.listFiles { _, name ->
+                val libs = File(context.applicationInfo.nativeLibraryDir).listFiles { _, name ->
                     name.startsWith("lib") && name.endsWith(".so")
                 } ?: emptyArray()
                 for (lib in libs) {
@@ -250,7 +250,7 @@ abstract class MagiskInstallImpl protected constructor(
                 src.reset()
 
                 val alpha = "abcdefghijklmnopqrstuvwxyz"
-                val alphaNum = "$alpha${alpha.toUpperCase(Locale.ROOT)}0123456789"
+                val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
                 val random = SecureRandom()
                 val filename = StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
                     for (i in 1..5) {

@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core
 import android.os.Build
 import android.os.Process
 import com.topjohnwu.magisk.BuildConfig
-import java.io.File
 
 @Suppress("DEPRECATION")
 object Const {
@@ -13,7 +12,6 @@ object Const {
 
     // Paths
     lateinit var MAGISKTMP: String
-    lateinit var NATIVE_LIB_DIR: File
     val MAGISK_PATH get() = "$MAGISKTMP/modules"
     const val TMPDIR = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"

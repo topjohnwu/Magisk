@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import org.apache.tools.ant.filters.FixCrLfFilter
 import java.io.PrintStream
 
@@ -38,6 +39,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            isUniversalApk = true
         }
     }
 
@@ -88,27 +96,35 @@ val syncLibs by tasks.registering(Sync::class) {
             rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
         }
     }
+    into("arm64-v8a") {
+        from(rootProject.file("native/out/arm64-v8a")) {
+            include("busybox", "magiskboot", "magiskinit", "magisk")
+            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+        }
+        from(rootProject.file("native/out/armeabi-v7a")) {
+            include("magisk")
+            rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+        }
+    }
+    into("x86_64") {
+        from(rootProject.file("native/out/x86_64")) {
+            include("busybox", "magiskboot", "magiskinit", "magisk")
+            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+        }
+        from(rootProject.file("native/out/x86")) {
+            include("magisk")
+            rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
+        }
+    }
     onlyIf {
-        if (inputs.sourceFiles.files.size != 10)
+        if (inputs.sourceFiles.files.size != 16)
             throw StopExecutionException("Please build binaries first! (./build.py binary)")
         true
     }
 }
 
-val createStubLibs by tasks.registering {
-    dependsOn(syncLibs)
-    doLast {
-        val arm64 = project.file("src/main/jniLibs/arm64-v8a/libstub.so")
-        arm64.parentFile.mkdirs()
-        arm64.createNewFile()
-        val x64 = project.file("src/main/jniLibs/x86_64/libstub.so")
-        x64.parentFile.mkdirs()
-        x64.createNewFile()
-    }
-}
-
 val syncAssets by tasks.registering(Sync::class) {
-    dependsOn(createStubLibs)
+    dependsOn(syncLibs)
     inputs.property("version", Config.version)
     inputs.property("versionCode", Config.versionCode)
     into("src/main/assets")
@@ -123,9 +139,11 @@ val syncAssets by tasks.registering(Sync::class) {
     }
     filesMatching("**/util_functions.sh") {
         filter {
-            it.replace("#MAGISK_VERSION_STUB",
+            it.replace(
+                "#MAGISK_VERSION_STUB",
                 "MAGISK_VER='${Config.version}'\n" +
-                "MAGISK_VER_CODE=${Config.versionCode}")
+                        "MAGISK_VER_CODE=${Config.versionCode}"
+            )
         }
         filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
     }
@@ -178,6 +196,13 @@ android.applicationVariants.all {
         }
     }
     registerJavaGeneratingTask(genSrcTask.get(), outSrcDir)
+
+    outputs.all {
+        val output = this as ApkVariantOutputImpl
+        output.filters.forEach {
+            output.versionNameOverride += "-${it.identifier}"
+        }
+    }
 }
 
 dependencies {

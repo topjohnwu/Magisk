@@ -11,14 +11,13 @@ import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import java.io.File
-import java.io.IOException
 
 val isRunningAsStub get() = Info.stub != null
 
 object Info {
 
     var stub: DynAPK.Data? = null
+    var stubArch = "lib/${Const.CPU_ABI}"
 
     val EMPTY_REMOTE = UpdateInfo()
     var remote = EMPTY_REMOTE
@@ -46,20 +45,6 @@ object Info {
             NetworkObserver.observe(AppContext) {
                 UiThreadHandler.run { field.set(it) }
             }
-        }
-    }
-
-    val isNewReboot by lazy {
-        try {
-            val id = File("/proc/sys/kernel/random/boot_id").readText()
-            if (id != Config.bootId) {
-                Config.bootId = id
-                true
-            } else {
-                false
-            }
-        } catch (e: IOException) {
-            false
         }
     }
 
