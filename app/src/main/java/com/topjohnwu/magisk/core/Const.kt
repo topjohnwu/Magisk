@@ -20,7 +20,7 @@ object Const {
 
     // Versions
     const val SNET_EXT_VER = 17
-    const val SNET_REVISION = "22.0"
+    const val SNET_REVISION = "23.0"
     const val BOOTCTL_REVISION = "22.0"
 
     // Misc
