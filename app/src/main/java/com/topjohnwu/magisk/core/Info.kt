@@ -35,7 +35,9 @@ object Info {
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
     @JvmField val isPixel = Build.BRAND == "google"
-    @JvmField val isEmulator = getProperty("ro.kernel.qemu", "0") == "1"
+    @JvmField val isEmulator =
+        getProperty("ro.kernel.qemu", "0") == "1" ||
+        getProperty("ro.boot.qemu", "0") == "1"
     var crypto = ""
     var noDataExec = false
 
