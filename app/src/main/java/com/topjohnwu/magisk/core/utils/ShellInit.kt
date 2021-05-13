@@ -33,11 +33,7 @@ class BusyBoxInit : BaseShellInit() {
                 if (!shell.isRoot)
                     return true
                 val jar = JarFile(DynAPK.current(context))
-                var bb = jar.getJarEntry("${Info.stubArch}/libbusybox.so")
-                if (bb == null) {
-                    Info.stubArch = "lib/${Const.CPU_ABI_32}"
-                    bb = jar.getJarEntry("${Info.stubArch}/libbusybox.so")
-                }
+                val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
                 localBB.delete()
                 jar.getInputStream(bb).writeTo(localBB)

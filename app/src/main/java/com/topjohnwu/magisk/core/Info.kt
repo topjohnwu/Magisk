@@ -17,7 +17,6 @@ val isRunningAsStub get() = Info.stub != null
 object Info {
 
     var stub: DynAPK.Data? = null
-    var stubArch = "lib/${Const.CPU_ABI}"
 
     val EMPTY_REMOTE = UpdateInfo()
     var remote = EMPTY_REMOTE

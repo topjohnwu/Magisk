@@ -37,6 +37,7 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.*
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 abstract class MagiskInstallImpl protected constructor(
@@ -93,8 +94,14 @@ abstract class MagiskInstallImpl protected constructor(
             // Extract binaries
             if (isRunningAsStub) {
                 val zf = ZipFile(DynAPK.current(context))
+
+                // Also extract magisk32 on non 64-bit only 64-bit devices
+                val is32lib = Const.CPU_ABI_32?.let {
+                    { entry: ZipEntry -> entry.name == "lib/$it/libmagisk32.so" }
+                } ?: { false }
+
                 zf.entries().asSequence().filter {
-                    !it.isDirectory && it.name.startsWith(Info.stubArch)
+                    !it.isDirectory && (it.name.startsWith("lib/${Const.CPU_ABI}/") || is32lib(it))
                 }.forEach {
                     val n = it.name.substring(it.name.lastIndexOf('/') + 1)
                     val name = n.substring(3, n.length - 3)
@@ -102,9 +109,17 @@ abstract class MagiskInstallImpl protected constructor(
                     zf.getInputStream(it).writeTo(dest)
                 }
             } else {
-                val libs = File(context.applicationInfo.nativeLibraryDir).listFiles { _, name ->
+                val info = context.applicationInfo
+                var libs = File(info.nativeLibraryDir).listFiles { _, name ->
                     name.startsWith("lib") && name.endsWith(".so")
                 } ?: emptyArray()
+
+                // Also symlink magisk32 on non 64-bit only 64-bit devices
+                val lib32 = info.javaClass.getDeclaredField("secondaryNativeLibraryDir").get(info) as String?
+                if (lib32 != null) {
+                    libs += File(lib32, "libmagisk32.so")
+                }
+
                 for (lib in libs) {
                     val name = lib.name.substring(3, lib.name.length - 3)
                     Os.symlink(lib.path, "$installDir/$name")

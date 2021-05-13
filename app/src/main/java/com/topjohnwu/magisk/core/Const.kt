@@ -7,8 +7,12 @@ import com.topjohnwu.magisk.BuildConfig
 @Suppress("DEPRECATION")
 object Const {
 
-    val CPU_ABI: String = Build.SUPPORTED_ABIS[0]
-    val CPU_ABI_32: String = Build.SUPPORTED_32_BIT_ABIS.firstOrNull() ?: CPU_ABI
+    val CPU_ABI: String get() = Build.SUPPORTED_ABIS[0]
+
+    // Null if 32-bit only or 64-bit only
+    val CPU_ABI_32 =
+        if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) null
+        else Build.SUPPORTED_32_BIT_ABIS.firstOrNull()
 
     // Paths
     lateinit var MAGISKTMP: String

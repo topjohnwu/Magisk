@@ -347,19 +347,11 @@ def build_apk(args, module):
 
     build_type = build_type.lower()
 
-    if module == 'app':
-        for arch in archs + ['universal']:
-            apk = f'{module}-{arch}-{build_type}.apk'
-            source = op.join(module, 'build', 'outputs', 'apk', build_type, apk)
-            target = op.join(config['outdir'], apk)
-            mv(source, target)
-            header('Output: ' + target)
-    else:
-        apk = f'{module}-{build_type}.apk'
-        source = op.join(module, 'build', 'outputs', 'apk', build_type, apk)
-        target = op.join(config['outdir'], apk)
-        mv(source, target)
-        header('Output: ' + target)
+    apk = f'{module}-{build_type}.apk'
+    source = op.join(module, 'build', 'outputs', 'apk', build_type, apk)
+    target = op.join(config['outdir'], apk)
+    mv(source, target)
+    header('Output: ' + target)
 
 
 def build_app(args):
