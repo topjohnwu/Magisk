@@ -5,7 +5,7 @@ If you already have Magisk installed, it is **strongly recommended** to upgrade 
 ## Getting Started
 
 Before you start:
-
+Magisk-v22.0.apk → Magisk-v22.0.zip
 - This tutorial assumes you understand how to use `adb` and `fastboot`
 - Your device's bootloader has to be unlocked
 - If you plan to also install custom kernels, install it after Magisk
