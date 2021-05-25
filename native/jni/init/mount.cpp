@@ -10,13 +10,6 @@
 
 using namespace std;
 
-static string rtrim(string &&str) {
-    // Trim space, newline, and null byte from end of string
-    while (memchr(" \n\r", str[str.length() - 1], 4))
-        str.pop_back();
-    return std::move(str);
-}
-
 struct devinfo {
     int major;
     int minor;
