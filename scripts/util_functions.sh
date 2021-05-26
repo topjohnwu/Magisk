@@ -765,6 +765,8 @@ install_module() {
   if $BOOTMODE; then
     # Update info for Magisk app
     mktouch $NVBASE/modules/$MODID/update
+    rm -rf $NVBASE/modules/$MODID/remove 2>/dev/null
+    rm -rf $NVBASE/modules/$MODID/disable 2>/dev/null
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
 
