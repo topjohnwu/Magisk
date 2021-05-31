@@ -13,48 +13,59 @@ using namespace std;
 
 vector<string> mount_list;
 
-static vector<pair<string, string>> parse_cmdline(const string &cmdline) {
-    vector<pair<string, string>> result;
-    size_t base = 0;
-    while (true) {
-        auto found = base;
-        while (((found = cmdline.find_first_of(" \"", found)) != string::npos) &&
-               (cmdline[found] == '"')) {
-            if ((found = cmdline.find('"', found + 1)) == string::npos)
-                break;
-            found++;
+template<char... cs> using chars = integer_sequence<char, cs...>;
+
+template<char... escapes, char... breaks>
+static string extract_qutoed_str_until(chars<escapes...>, chars<breaks...>,
+                                       string_view sv, size_t &begin, bool &quoted) {
+    string result;
+    char match_array[] = {escapes..., breaks..., '"'};
+    string_view match(match_array, sizeof(match_array));
+    for (auto end = begin;; ++end) {
+        end = sv.find_first_of(match, end);
+        if (end == string_view::npos || ((sv[end] == breaks) || ...) ||
+            (!quoted && ((sv[end] == escapes) || ...))) {
+            result.append(sv.substr(begin, end - begin));
+            begin = end;
+            return result;
         }
-        string piece;
-        auto source = cmdline.substr(base, found - base);
-        remove_copy(source.begin(), source.end(), back_insert_iterator<string>(piece), '"');
-        auto equal_sign = piece.find('=');
-        if (equal_sign == string::npos) {
-            if (!piece.empty())
-                result.emplace_back(std::move(piece), "");
-        } else {
-            result.emplace_back(piece.substr(0, equal_sign), piece.substr(equal_sign + 1));
+        if (sv[end] == '"') {
+            quoted = !quoted;
+            result.append(sv.substr(begin, end - begin));
+            begin = end + 1;
         }
-        if (found == string::npos)
-            break;
-        base = found + 1;
     }
-    return result;
 }
 
-static vector<pair<string, string>> parse_bootconfig(const string &bootconfig) {
-    vector<pair<string, string>> result;
-    for (auto &line : split(bootconfig, "\n")) {
-        line.erase(remove(line.begin(), line.end(), '"'), line.end());
-        auto equal_sign = line.find('=');
-        if (equal_sign == string::npos) {
-            if (!line.empty())
-                result.emplace_back(move(line), "");
-        } else {
-            result.emplace_back(rtrim(line.substr(0, equal_sign)),
-                                ltrim(line.substr(equal_sign + 1)));
+//[pair_split][key][assign_split][assign][assign_split][value][pair_split]
+template<char... pair_spilt, char... assign, char... assign_split>
+static auto parse(chars<pair_spilt...>, chars<assign...>, chars<assign_split...>, string_view sv) {
+    vector<pair<string, string>> kv;
+    char next_array[] = {pair_spilt...};
+    string_view next(next_array, sizeof(next_array));
+    char skip_array[] = {assign..., assign_split...};
+    string_view skip(skip_array, sizeof(skip_array));
+    bool quoted = false;
+    for (size_t cur = 0u; cur < sv.size();
+         cur = sv.find_first_not_of(next, cur)) {
+        auto key = extract_qutoed_str_until(chars<assign_split..., pair_spilt...>{},
+                                            chars<assign...>{}, sv, cur, quoted);
+        cur = sv.find_first_not_of(skip, cur);
+        if (((cur == string_view::npos) || ... || (sv[cur] == pair_spilt))) {
+            kv.emplace_back(key, "");
+            continue;
         }
+        auto value = extract_qutoed_str_until(chars<pair_spilt...>{}, chars<>{}, sv, cur, quoted);
+        kv.emplace_back(key, value);
     }
-    return result;
+    return kv;
+}
+
+static auto parse_cmdline(string_view sv) {
+    return parse(chars<' '>{}, chars<'='>{}, chars<>{}, sv);
+}
+static auto parse_bootconfig(string_view sv) {
+    return parse(chars<'\n'>{}, chars<'='>{}, chars<' '>{}, sv);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
@@ -81,7 +92,7 @@ static bool check_key_combo() {
     if (events.empty())
         return false;
 
-    run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
+    run_finally fin([&] { for_each(events.begin(), events.end(), close); });
 
     // Return true if volume up key is held for more than 3 seconds
     int count = 0;
