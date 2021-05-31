@@ -55,5 +55,7 @@ Occasionally, there would be exploits in certain devices that could lead to full
 
 - Effective UID should be privileged (root, or `euid=0`)
 - Have the ability to reload `sepolicy` (which 99.9% of the time means SELinux permissive)
+- Full Linux capabilities
+- No extra seccomp
 
 You can check out `scripts/emulator.sh` as a reference for bringing up Magisk with a root shell. Note that these changes are not persistent, and you will need to find ways to rerun the whole process every boot.
