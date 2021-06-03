@@ -1,0 +1,4 @@
+files:
+  - source: /*/src/main/res/values/strings.xml
+    translation: /*/src/main/res/values-%two_letters_code%/strings.xml
+    translate_content: 0
