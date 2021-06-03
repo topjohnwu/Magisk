@@ -2,7 +2,7 @@
 <resources>
     <!--Sections-->
     <string name="modules">Модулі</string>
-    <string name="superuser">Суперкарыстальнік</string>
+    <string name="superuser">Правы суперкарыстальніка</string>
     <string name="logs">Журналы</string>
     <string name="settings">Налады</string>
     <string name="refresh">Абнавіць даныя</string>
@@ -18,6 +18,8 @@
     <string name="not_available">Не</string>
     <string name="hide">Схаваць</string>
     <string name="home_package">Пакунак</string>
+    <string name="home_app_title">App</string>
+    <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Падтрымайце нас</string>
     <string name="home_item_source">Зыходны код</string>
     <string name="home_support_content">Magisk ёсць і заўсёды будзе бясплатным праектам з адкрытым зыходным кодам. Але вы заўсёды можаце ахвяраваць нам на распрацоўку.</string>
@@ -46,6 +48,7 @@
     <string name="flash_screen_title">Усталёўка</string>
     <!--Superuser-->
     <string name="su_request_title">Запыт правоў суперкарыстальніка</string>
+    <string name="touch_filtered_warning">Because an app is obscuring a superuser request, Magisk can’t verify your response</string>
     <string name="deny">Адмовіць</string>
     <string name="prompt">Запытаць</string>
     <string name="grant">Даць</string>
@@ -86,14 +89,16 @@
     <string name="safetynet_attest_failure">Не атрымалася!</string>
     <string name="safetynet_attest_loading">Хвілінку…</string>
     <string name="safetynet_attest_restart">Паспрабаваць зноў</string>
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Паказваць сістэмныя праграмы</string>
+    <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Фільтраваць па назве</string>
     <string name="hide_scroll_up">Уверх</string>
     <string name="hide_filters">Фільтры</string>
     <string name="hide_search">Пошук</string>
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(Няма інфармацыі)</string>
+    <string name="reboot_userspace">Soft reboot</string>
     <string name="reboot_recovery">Перазапуск у Recovery</string>
     <string name="reboot_bootloader">Перазапуск у Bootloader</string>
     <string name="reboot_download">Перазапуск у Download</string>
@@ -108,7 +113,7 @@
     <string name="module_installed">Усталяваныя</string>
     <string name="module_section_online">Анлайн</string>
     <string name="sorting_order">Парадак сартавання</string>
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Рэжым афармлення</string>
     <string name="settings_dark_mode_message">Абярыце рэжым, які вам больш даспадобы!</string>
     <string name="settings_dark_mode_light">Заўсёды светлы</string>
@@ -118,6 +123,10 @@
     <string name="settings_download_path_message">Файлы будуць спампоўвацца ў %1$s</string>
     <string name="settings_clear_cache_title">Ачыстка кэшу рэпазіторыя</string>
     <string name="settings_clear_cache_summary">Ачысціць кэш сеціўных рэпазіторыяў. Гэта прымусіць абнавіць кэш</string>
+    <string name="settings_hide_app_title">Hide the Magisk app</string>
+    <string name="settings_hide_app_summary">Install a proxy app with random package ID and custom app label</string>
+    <string name="settings_restore_app_title">Restore the Magisk app</string>
+    <string name="settings_restore_app_summary">Un-hide the app and restore it back to the original APK</string>
     <string name="language">Мова</string>
     <string name="system_default">(Сістэмная)</string>
     <string name="settings_check_update_title">Правяраць на абнаўленні</string>
@@ -150,6 +159,8 @@
     <string name="superuser_notification">Апавяшчэнне суперкарыстальніка</string>
     <string name="settings_su_reauth_title">Паўторная аўтэнтыфікацыя пасля абнаўлення</string>
     <string name="settings_su_reauth_summary">Паўторна запытваць правы суперкарыстальніка пасля абнаўлення праграмы</string>
+    <string name="settings_su_tapjack_title">Enable Tapjacking Protection</string>
+    <string name="settings_su_tapjack_summary">The superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
     <string name="settings_su_biometric_title">Уключыць біяметрычную аўтэнтыфікацыю</string>
     <string name="settings_su_biometric_summary">Выкарыстанне біяметрычнай аўтэнтыфікацыі для запытаў правоў суперкарыстальніка</string>
     <string name="no_biometric">Не падтрымліваецца прыладай альбо не ўключана ў наладах</string>
@@ -189,6 +200,7 @@
     <string name="flashing">Усталёўка…</string>
     <string name="done">Завершана!</string>
     <string name="failure">Не атрымалася</string>
+    <string name="hide_app_title">Hiding the Magisk app…</string>
     <string name="open_link_failed_toast">Праграмы для адкрыцця спасылкі не знойдзена</string>
     <string name="complete_uninstall">Поўнае выдаленне</string>
     <string name="restore_img">Аднавіць раздзелы</string>
@@ -196,12 +208,22 @@
     <string name="restore_done">Аднаўленне завершана!</string>
     <string name="restore_fail">Рэзервовая копія адсутнічае!</string>
     <string name="proprietary_title">Спампаваць прапрыетарны код</string>
+    <string name="proprietary_notice">Magisk is FOSS and doesn\'t include code for Google\'s proprietary SafetyNet API.\n\nDo you want to download a proprietary extension for SafetyNet checks?</string>
     <string name="setup_fail">Усталяваць не атрымалася</string>
     <string name="env_fix_title">Патрабуецца дадатковая ўсталёўка</string>
+    <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. Do you want to proceed and reboot?</string>
     <string name="setup_msg">Наладка асяроддзя…</string>
     <string name="authenticate">Аўтэнтыфікацыя</string>
     <string name="unsupport_magisk_title">Непадтрымліваемая версія Magisk</string>
+    <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="unsupport_general_title">Abnormal State</string>
+    <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
+    <string name="unsupport_other_su_msg">An \"su\" command that does not belong to Magisk is detected. Please remove the other unsupported su.</string>
+    <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
+    <string name="unsupport_nonroot_stub_msg">The app cannot continue to work in the hidden state as root was lost. Please restore it back to the original APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Дайце доступ да сховішча, каб уключыць гэтую функцыю</string>
     <string name="add_shortcut_title">Дадаць цэтлік на хатні экран</string>
+    <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
     <string name="app_not_found">Не знойдзена праграм для апрацоўкі гэтага дзеяння</string>
 </resources>
