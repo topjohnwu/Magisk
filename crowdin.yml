@@ -1,0 +1,6 @@
+files:
+  - source: /*/src/main/res/values/strings.xml
+    ignore:
+      - /src/
+    translation: /%original_path%-%two_letters_code%/%original_file_name%
+    translate_content: 0
