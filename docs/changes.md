@@ -1,4 +1,4 @@
-# Magisk Changelog
+# Magisk https://github.com/topjohnwu/Magisk/tree/topjohnwu:master
 
 ### v23.0
 
