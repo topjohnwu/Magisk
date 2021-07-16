@@ -1,4 +1,5 @@
-# Magisk Changelog
+Adanange
+ # Magisk Changelog
 
 ### v23.0
 
