@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.surequest
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Resources
+import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
@@ -29,6 +30,9 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         lockOrientation()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.addFlags(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.setHideOverlayWindows(true)
+        }
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
