@@ -27,17 +27,14 @@ android {
         vectorDrawables.useSupportLibrary = true
         versionName = Config.version
         versionCode = Config.versionCode
-        ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        ndk.abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
     }
 
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles("proguard-rules.pro")
         }
     }
 
@@ -51,14 +48,18 @@ android {
     }
 
     packagingOptions {
-        exclude("/META-INF/*")
-        exclude("/org/bouncycastle/**")
-        exclude("/kotlin/**")
-        exclude("/kotlinx/**")
-        exclude("/okhttp3/**")
-        exclude("/*.txt")
-        exclude("/*.bin")
-        doNotStrip("**/*.so")
+        resources {
+            excludes += "/META-INF/*"
+            excludes += "/org/bouncycastle/**"
+            excludes += "/kotlin/**"
+            excludes += "/kotlinx/**"
+            excludes += "/okhttp3/**"
+            excludes += "/*.txt"
+            excludes += "/*.bin"
+        }
+        jniLibs {
+            keepDebugSymbols += "**/*.so"
+        }
     }
 
     kotlinOptions {
@@ -115,9 +116,9 @@ val syncAssets by tasks.registering(Sync::class) {
     }
     filesMatching("**/util_functions.sh") {
         filter {
-            it.replace("#MAGISK_VERSION_STUB",
-                "MAGISK_VER='${Config.version}'\n" +
-                "MAGISK_VER_CODE=${Config.versionCode}"
+            it.replace(
+                "#MAGISK_VERSION_STUB",
+                "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
             )
         }
         filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
@@ -170,14 +171,15 @@ android.applicationVariants.all {
             }
         }
     }
-    registerJavaGeneratingTask(genSrcTask.get(), outSrcDir)
+    registerJavaGeneratingTask(genSrcTask, outSrcDir)
+}
+
+configurations.all {
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib"))
-    // Some dependencies request JDK 8 stdlib, specify manually here to prevent version mismatch
-    implementation(kotlin("stdlib-jdk8"))
     implementation(project(":app:shared"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
@@ -185,7 +187,7 @@ dependencies {
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    val vBC = "1.68"
+    val vBC = "1.69"
     implementation("org.bouncycastle:bcprov-jdk15on:${vBC}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${vBC}")
 
@@ -232,10 +234,10 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.3")
-    implementation("androidx.work:work-runtime-ktx:2.5.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.fragment:fragment-ktx:1.3.5")
+    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha05")
     implementation("androidx.transition:transition:1.4.1")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("com.google.android.material:material:1.4.0")
 }

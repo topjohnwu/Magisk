@@ -12,12 +12,12 @@ buildscript {
         mavenCentral()
     }
 
-    val vNav = "2.3.5"
+    val vNav = "2.4.0-alpha06"
     extra["vNav"] = vNav
 
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.1")
-        classpath(kotlin("gradle-plugin", version = "1.5.0"))
+        classpath("com.android.tools.build:gradle:7.0.0")
+        classpath(kotlin("gradle-plugin", version = "1.5.21"))
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${vNav}")
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -43,14 +43,14 @@ subprojects {
         if (plugins.hasPlugin("com.android.library") ||
             plugins.hasPlugin("com.android.application")) {
             android {
-                compileSdkVersion(30)
-                buildToolsVersion = "30.0.3"
+                compileSdkVersion(31)
+                buildToolsVersion = "31.0.0"
                 ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
 
                 defaultConfig {
                     if (minSdk == null)
                         minSdk = 21
-                    targetSdk = 30
+                    targetSdk = 31
                 }
 
                 compileOptions {
