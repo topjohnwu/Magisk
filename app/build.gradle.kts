@@ -27,17 +27,14 @@ android {
         vectorDrawables.useSupportLibrary = true
         versionName = Config.version
         versionCode = Config.versionCode
-        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
+        ndk.abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
     }
 
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles("proguard-rules.pro")
         }
     }
 
@@ -52,16 +49,16 @@ android {
 
     packagingOptions {
         resources {
-            excludes.add("/META-INF/*")
-            excludes.add("/org/bouncycastle/**")
-            excludes.add("/kotlin/**")
-            excludes.add("/kotlinx/**")
-            excludes.add("/okhttp3/**")
-            excludes.add("/*.txt")
-            excludes.add("/*.bin")
+            excludes += "/META-INF/*"
+            excludes += "/org/bouncycastle/**"
+            excludes += "/kotlin/**"
+            excludes += "/kotlinx/**"
+            excludes += "/okhttp3/**"
+            excludes += "/*.txt"
+            excludes += "/*.bin"
         }
         jniLibs {
-            keepDebugSymbols.add("**/*.so")
+            keepDebugSymbols += "**/*.so"
         }
     }
 
@@ -119,9 +116,9 @@ val syncAssets by tasks.registering(Sync::class) {
     }
     filesMatching("**/util_functions.sh") {
         filter {
-            it.replace("#MAGISK_VERSION_STUB",
-                "MAGISK_VER='${Config.version}'\n" +
-                "MAGISK_VER_CODE=${Config.versionCode}"
+            it.replace(
+                "#MAGISK_VERSION_STUB",
+                "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
             )
         }
         filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
@@ -177,11 +174,12 @@ android.applicationVariants.all {
     registerJavaGeneratingTask(genSrcTask, outSrcDir)
 }
 
+configurations.all {
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+}
+
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(kotlin("stdlib"))
-    // Some dependencies request JDK 8 stdlib, specify manually here to prevent version mismatch
-    implementation(kotlin("stdlib-jdk8"))
     implementation(project(":app:shared"))
 
     implementation("com.github.topjohnwu:jtar:1.0.0")
@@ -238,7 +236,7 @@ dependencies {
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.fragment:fragment-ktx:1.3.6")
-    implementation("androidx.work:work-runtime-ktx:2.5.0")
+    implementation("androidx.work:work-runtime-ktx:2.7.0-alpha05")
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("com.google.android.material:material:1.4.0")
