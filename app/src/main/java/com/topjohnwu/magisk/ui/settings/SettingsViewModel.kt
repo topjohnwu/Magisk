@@ -90,6 +90,10 @@ class SettingsViewModel(
                 // Re-authenticate is not feasible on 8.0+
                 list.add(Reauthenticate)
             }
+            if (Build.VERSION.SDK_INT >= 31) {
+                // Can hide overlay windows on 12.0+
+                list.remove(Tapjack)
+            }
         }
 
         return list

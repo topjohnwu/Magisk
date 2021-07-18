@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"
@@ -22,6 +23,13 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
         android:usesCleartextTraffic="true"
-        tools:ignore="UnusedAttribute" />
+        tools:ignore="UnusedAttribute">
+
+        <!-- Hardcode GMS version -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="12451000" />
+
+    </application>
 
 </manifest>
