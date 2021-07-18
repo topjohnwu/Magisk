@@ -77,10 +77,10 @@
 
         <!-- Initialize WorkManager on-demand -->
         <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove"
-            tools:ignore="ExportedContentProvider" />
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
 
         <!-- We don't invalidate Room -->
         <service
