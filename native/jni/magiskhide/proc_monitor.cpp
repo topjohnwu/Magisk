@@ -228,8 +228,11 @@ static bool check_pid(int pid) {
 
     // Detach but the process should still remain stopped
     // The hide daemon will resume the process after hiding it
+    // Note that we are now in "PTRACE_EVENT stop", not "signal-delivery-stop",
+    // signal injection (PTRACE_restart with signal) may simply be ignored, so use kill() instead
     LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
-    detach_pid(pid, SIGSTOP);
+    kill(pid, SIGSTOP);
+    detach_pid(pid);
     hide_daemon(pid);
     return true;
 
