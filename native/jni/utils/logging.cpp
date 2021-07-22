@@ -50,7 +50,7 @@ void log_handler(const char *fmt, ...) {
         log_cb.w(fmt, argv);
     } else if constexpr (type == L_ERR) {
         log_cb.e(fmt, argv);
-        log_cb.ex(1);
+        log_cb.ex(EXIT_FAILURE);
     }
     va_end(argv);
 }

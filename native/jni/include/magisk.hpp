@@ -22,6 +22,7 @@ extern std::string  MAGISKTMP;
 #define MODULEMNT   INTLROOT "/modules"
 #define BBPATH      INTLROOT "/busybox"
 #define ROOTOVL     INTLROOT "/rootdir"
+#define SHELLPTS    INTLROOT "/pts"
 #define ROOTMNT     ROOTOVL "/.mount_list"
 
 constexpr const char *applet_names[] = { "su", "resetprop", "magiskhide", nullptr };

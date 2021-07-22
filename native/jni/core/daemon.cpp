@@ -240,6 +240,19 @@ static void start_log_daemon();
         return true;
     });
 
+    // Use isolated devpts if kernel support
+    if (access("/dev/pts/ptmx", F_OK) == 0) {
+        auto pts = MAGISKTMP + "/" SHELLPTS;
+        xmkdirs(pts.data(), 0755);
+        xmount("devpts", pts.data(), "devpts",
+               MS_NOSUID | MS_NOEXEC, "newinstance");
+        auto ptmx = pts + "/ptmx";
+        if (access(ptmx.data(), F_OK)) {
+            xumount(pts.data());
+            rmdir(pts.data());
+        }
+    }
+
     struct sockaddr_un sun;
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);

@@ -29,10 +29,13 @@
  */
 int pts_open(char *slave_name, size_t slave_name_size);
 
+
+int get_pty_num(int fd);
+
 /**
  * set_stdin_raw
  *
- * Changes stdin to raw unbuffered mode, disables echo, 
+ * Changes stdin to raw unbuffered mode, disables echo,
  * auto carriage return, etc.
  *
  * Return Value
@@ -60,7 +63,7 @@ int restore_stdin(void);
  * watch_sigwinch_async
  *
  * After calling this function, if the application receives
- * SIGWINCH, the terminal window size will be read from 
+ * SIGWINCH, the terminal window size will be read from
  * "input" and set on "output".
  *
  * NOTE: This function blocks SIGWINCH and spawns a thread.
@@ -72,7 +75,7 @@ int restore_stdin(void);
  *
  * Return Value
  * on failure, -1 and errno will be set. In this case, no
- *      thread has been spawned and SIGWINCH will not be 
+ *      thread has been spawned and SIGWINCH will not be
  *      blocked.
  * on success, 0
  */

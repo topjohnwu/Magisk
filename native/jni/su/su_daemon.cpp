@@ -6,6 +6,7 @@
 #include <sys/mount.h>
 
 #include <daemon.hpp>
+#include <magisk.hpp>
 #include <utils.hpp>
 #include <selinux.hpp>
 #include <db.hpp>
@@ -222,23 +223,32 @@ void su_daemon_handler(int client, struct ucred *credential) {
     // Become session leader
     xsetsid();
 
-    // Get pts_slave
-    string pts_slave = read_string(client);
-
     // The FDs for each of the streams
-    int infd  = recv_fd(client);
+    int infd = recv_fd(client);
     int outfd = recv_fd(client);
     int errfd = recv_fd(client);
 
-    if (!pts_slave.empty()) {
-        LOGD("su: pts_slave=[%s]\n", pts_slave.data());
-        // Check pts_slave file is owned by daemon_from_uid
-        struct stat st;
-        xstat(pts_slave.data(), &st);
+    // App need a PTY
+    if (read_int(client)) {
+        string pts;
+        string ptmx;
+        auto magiskpts = MAGISKTMP + "/" SHELLPTS;
+        if (access(magiskpts.data(), F_OK)) {
+            pts = "/dev/pts";
+            ptmx = "/dev/ptmx";
+        } else {
+            pts = magiskpts;
+            ptmx = magiskpts + "/ptmx";
+        }
+        int ptmx_fd = xopen(ptmx.data(), O_RDWR);
+        int unlock = 0;
+        ioctl(ptmx_fd, TIOCSPTLCK, &unlock);
+        send_fd(client, ptmx_fd);
+        int pty_num = get_pty_num(ptmx_fd);
+        close(ptmx_fd);
 
-        // If caller is not root, ensure the owner of pts_slave is the caller
-        if(st.st_uid != ctx.info->uid && ctx.info->uid != 0)
-            LOGE("su: Wrong permission of pts_slave\n");
+        string pts_slave = pts + "/" + to_string(pty_num);
+        LOGD("su: pts_slave=[%s]\n", pts_slave.data());
 
         // Opening the TTY has to occur after the
         // fork() and setsid() so that it becomes
@@ -257,11 +267,6 @@ void su_daemon_handler(int client, struct ucred *credential) {
     xdup2(infd, STDIN_FILENO);
     xdup2(outfd, STDOUT_FILENO);
     xdup2(errfd, STDERR_FILENO);
-
-    // Unleash all streams from SELinux hell
-    setfilecon("/proc/self/fd/0", "u:object_r:" SEPOL_FILE_TYPE ":s0");
-    setfilecon("/proc/self/fd/1", "u:object_r:" SEPOL_FILE_TYPE ":s0");
-    setfilecon("/proc/self/fd/2", "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
     close(infd);
     close(outfd);
@@ -331,5 +336,4 @@ void su_daemon_handler(int client, struct ucred *credential) {
     execvp(ctx.req.shell.data(), (char **) argv);
     fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell.data(), strerror(errno));
     PLOGE("exec");
-    exit(EXIT_FAILURE);
 }
