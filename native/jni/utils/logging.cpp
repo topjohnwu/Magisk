@@ -54,4 +54,4 @@ void LOGD(const char *fmt, ...) {}
 #endif
 void LOGI(const char *fmt, ...) { LOG_BODY(i) }
 void LOGW(const char *fmt, ...) { LOG_BODY(w) }
-void LOGE(const char *fmt, ...) { LOG_BODY(e); log_cb.ex(1); }
+void LOGE(const char *fmt, ...) { LOG_BODY(e); log_cb.ex(EXIT_FAILURE); }

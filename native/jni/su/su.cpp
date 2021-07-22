@@ -156,7 +156,6 @@ int su_client_main(int argc, char *argv[]) {
         optind++;
     }
 
-    char pts_slave[PATH_MAX];
     int ptmx, fd;
 
     // Connect to client
@@ -183,22 +182,20 @@ int su_client_main(int argc, char *argv[]) {
     if (isatty(STDOUT_FILENO)) atty |= ATTY_OUT;
     if (isatty(STDERR_FILENO)) atty |= ATTY_ERR;
 
-    if (atty) {
-        // We need a PTY. Get one.
-        ptmx = pts_open(pts_slave, sizeof(pts_slave));
-    } else {
-        pts_slave[0] = '\0';
-    }
-
-    // Send pts_slave
-    write_string(fd, pts_slave);
-
     // Send stdin
     send_fd(fd, (atty & ATTY_IN) ? -1 : STDIN_FILENO);
     // Send stdout
     send_fd(fd, (atty & ATTY_OUT) ? -1 : STDOUT_FILENO);
     // Send stderr
     send_fd(fd, (atty & ATTY_ERR) ? -1 : STDERR_FILENO);
+
+    if (atty) {
+        // We need a PTY. Get one.
+        write_int(fd, 1);
+        ptmx = recv_fd(fd);
+    } else {
+        write_int(fd, 0);
+    }
 
     if (atty) {
         setup_sighandlers(sighandler);
