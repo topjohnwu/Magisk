@@ -105,6 +105,14 @@ error:
     return -1;
 }
 
+int get_pty_num(int fd) {
+    int pty_num = -1;
+    if (ioctl(fd, TIOCGPTN, &pty_num) != 0) {
+        return -1;
+    }
+    return pty_num;
+}
+
 // Stores the previous termios of stdin
 static struct termios old_stdin;
 static int stdin_is_raw = 0;
