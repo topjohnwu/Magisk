@@ -77,9 +77,9 @@ void sepolicy::magisk_rules() {
         }
 
         // type transition require actual types, not attributes
-        const char *app_types[] {
-            "system_app", "priv_app", "platform_app", "untrusted_app",
-            "untrusted_app_25", "untrusted_app_27", "untrusted_app_29" };
+        const char *app_types[]{
+            "system_app", "priv_app", "platform_app", "untrusted_app", "untrusted_app_25",
+            "untrusted_app_27", "untrusted_app_29", "untrusted_app_30"};
         clients.pop_back();
         clients.insert(clients.end(), app_types, app_types + std::size(app_types));
         for (auto type : clients) {
