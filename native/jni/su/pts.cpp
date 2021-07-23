@@ -127,27 +127,22 @@ static int stdin_is_raw = 0;
  * on failure -1, and errno is set
  * on success 0
  */
-int set_stdin_raw(void) {
-    struct termios new_termios;
+int set_stdin_raw() {
+    struct termios termios{};
 
-    // Save the current stdin termios
-    if (tcgetattr(STDIN_FILENO, &old_stdin) < 0) {
+    if (tcgetattr(STDIN_FILENO, &termios) < 0) {
         return -1;
     }
 
-    // Start from the current settings
-    new_termios = old_stdin;
+    old_stdin = termios;
 
-    // Make the terminal like an SSH or telnet client
-    new_termios.c_iflag |= IGNPAR;
-    new_termios.c_iflag &= ~(ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXANY | IXOFF);
-    new_termios.c_lflag &= ~(ISIG | ICANON | ECHO | ECHOE | ECHOK | ECHONL);
-    new_termios.c_oflag &= ~OPOST;
-    new_termios.c_cc[VMIN] = 1;
-    new_termios.c_cc[VTIME] = 0;
+    cfmakeraw(&termios);
 
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_termios) < 0) {
-        return -1;
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &termios) < 0) {
+        // https://blog.zhanghai.me/fixing-line-editing-on-android-8-0/
+        if (tcsetattr(STDIN_FILENO, TCSADRAIN, &termios) < 0) {
+            return -1;
+        }
     }
 
     stdin_is_raw = 1;
@@ -168,11 +163,13 @@ int set_stdin_raw(void) {
  * on failure, -1 and errno is set
  * on success, 0
  */
-int restore_stdin(void) {
+int restore_stdin() {
     if (!stdin_is_raw) return 0;
 
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_stdin) < 0) {
-        return -1;
+        if (tcsetattr(STDIN_FILENO, TCSADRAIN, &old_stdin) < 0) {
+            return -1;
+        }
     }
 
     stdin_is_raw = 0;
