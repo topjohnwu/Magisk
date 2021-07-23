@@ -2,7 +2,9 @@
 
 #include <string>
 
-#define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591"
+// magiskinit will hex patch this constant,
+// appending \0 to prevent the compiler from reusing the string for "1"
+#define MAIN_SOCKET  "d30138f2310a9fb9c54a3e0c21f58591\0"
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk_unblock"
