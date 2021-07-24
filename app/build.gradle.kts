@@ -27,7 +27,7 @@ android {
         vectorDrawables.useSupportLibrary = true
         versionName = Config.version
         versionCode = Config.versionCode
-        ndk.abiFilters("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
     }
 
     buildTypes {
@@ -51,18 +51,22 @@ android {
     }
 
     packagingOptions {
-        exclude("/META-INF/*")
-        exclude("/org/bouncycastle/**")
-        exclude("/kotlin/**")
-        exclude("/kotlinx/**")
-        exclude("/okhttp3/**")
-        exclude("/*.txt")
-        exclude("/*.bin")
-        doNotStrip("**/*.so")
+        resources {
+            excludes.add("/META-INF/*")
+            excludes.add("/org/bouncycastle/**")
+            excludes.add("/kotlin/**")
+            excludes.add("/kotlinx/**")
+            excludes.add("/okhttp3/**")
+            excludes.add("/*.txt")
+            excludes.add("/*.bin")
+        }
+        jniLibs {
+            keepDebugSymbols.add("**/*.so")
+        }
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
 }
 
@@ -170,7 +174,7 @@ android.applicationVariants.all {
             }
         }
     }
-    registerJavaGeneratingTask(genSrcTask.get(), outSrcDir)
+    registerJavaGeneratingTask(genSrcTask, outSrcDir)
 }
 
 dependencies {
@@ -185,7 +189,7 @@ dependencies {
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    val vBC = "1.68"
+    val vBC = "1.69"
     implementation("org.bouncycastle:bcprov-jdk15on:${vBC}")
     implementation("org.bouncycastle:bcpkix-jdk15on:${vBC}")
 
@@ -232,10 +236,10 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.3")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
     implementation("androidx.work:work-runtime-ktx:2.5.0")
     implementation("androidx.transition:transition:1.4.1")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("androidx.core:core-ktx:1.6.0")
+    implementation("com.google.android.material:material:1.4.0")
 }

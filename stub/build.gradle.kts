@@ -24,7 +24,7 @@ android {
         }
     }
 
-    aaptOptions {
+    androidResources {
         additionalParameters("--package-id", "0x80")
     }
 
