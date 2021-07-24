@@ -23,6 +23,7 @@ typedef enum {
 /* Misc */
     MTK,
     DTB,
+    ZIMAGE,
 } format_t;
 
 #define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
@@ -57,6 +58,7 @@ typedef enum {
 #define ACCLAIM_PRE_HEADER_SZ 262144
 #define AVB_FOOTER_MAGIC "AVBf"
 #define AVB_MAGIC "AVB0"
+#define ZIMAGE_MAGIC "\x18\x28\x6f\x01"
 
 class Fmt2Name {
 public:

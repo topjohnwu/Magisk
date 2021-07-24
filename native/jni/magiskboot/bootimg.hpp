@@ -41,6 +41,20 @@ struct blob_hdr {
     uint32_t version;       /* 0x00000001 */
 } __attribute__((packed));
 
+struct zimage_hdr {
+    uint8_t head[36];
+    uint32_t magic;         /* zImage magic */
+    uint32_t load_addr;     /* absolute load/run zImage address */
+    uint32_t end_addr;      /* zImage end address */
+    uint32_t endianess;     /* endianess flag */
+    uint8_t code[];
+} __attribute__((packed));
+
+struct zimage_tail {
+    uint8_t *data;
+    uint32_t size;
+} __attribute__((packed));
+
 /**************
  * AVB Headers
  **************/
@@ -446,6 +460,7 @@ enum {
     NOOKHD_FLAG,
     ACCLAIM_FLAG,
     AVB_FLAG,
+    ZIMAGE_KERNEL,
     BOOT_FLAGS_MAX
 };
 
@@ -472,6 +487,10 @@ struct boot_img {
     // MTK headers
     mtk_hdr *k_hdr;
     mtk_hdr *r_hdr;
+
+    // ZIMAGE data
+    zimage_hdr *z_hdr;
+    zimage_tail z_tail;
 
     // Pointer to dtb that is embedded in kernel
     uint8_t *kernel_dtb;

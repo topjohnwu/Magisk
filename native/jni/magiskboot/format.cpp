@@ -36,6 +36,8 @@ format_t check_fmt(const void *buf, size_t len) {
         return DHTB;
     } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
         return BLOB;
+    } else if (len >= 0x28 && memcmp(&((char *)buf)[0x24], ZIMAGE_MAGIC, 4) == 0) {
+        return ZIMAGE;
     } else {
         return UNKNOWN;
     }
@@ -61,6 +63,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
             return "lz4_lg";
         case DTB:
             return "dtb";
+        case ZIMAGE:
+            return "zimage";
         default:
             return "raw";
     }

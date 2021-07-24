@@ -321,6 +321,44 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             hdr->kernel_size() -= sizeof(mtk_hdr);
             k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
         }
+        if (k_fmt == ZIMAGE) {
+            z_hdr = reinterpret_cast<zimage_hdr *>(kernel);
+            uint32_t zimage_hdr_size = 0;
+            uint32_t end = z_hdr->end_addr;
+            if (z_hdr->endianess == 0x01020304) {
+                // Not supported
+                fprintf(stderr, "%-*s [%s]\n", PADDING, "ZIMAGE_HDR", "big-endian");
+            }
+            else if (z_hdr->endianess == 0x04030201) {
+                fprintf(stderr, "%-*s [%s]\n", PADDING, "ZIMAGE_HDR", "little-endian");
+                uint8_t *gzip_offset = 0;
+                if ((gzip_offset = (uint8_t *)memmem(kernel, hdr->kernel_size(), GZIP1_MAGIC, 2))) {
+                    zimage_hdr_size = gzip_offset - kernel;
+                    fprintf(stderr, "%-*s [%u]\n", PADDING, "ZIMAGE_HDR_SZ", zimage_hdr_size);
+                    for (uint8_t * end_ptr = kernel + z_hdr->end_addr - 4; end_ptr >= kernel + z_hdr->end_addr - 64; end_ptr -= 4) {
+                        uint32_t tmp_end = *(uint32_t*)end_ptr;
+                        if (z_hdr->end_addr - tmp_end < 0xFF && tmp_end < end) {
+                            end = tmp_end;
+                        }
+                    }
+                    if (end == z_hdr->end_addr) {
+                       LOGW("Could not find end of zImage gzip data\n");
+                    }
+                    else {
+                        flags[ZIMAGE_KERNEL] = true;
+                        uint32_t gzip_size = end - zimage_hdr_size;
+                        fprintf(stderr, "%-*s [%u]\n", PADDING, "ZIMAGE_GZIP_SZ", gzip_size);
+                        hdr->kernel_size() -= zimage_hdr_size;
+                        z_tail.size = hdr->kernel_size() - gzip_size;
+                        hdr->kernel_size() -= z_tail.size;
+                        kernel += zimage_hdr_size;
+                        z_tail.data = kernel + hdr->kernel_size();
+                        fprintf(stderr, "%-*s [%u]\n", PADDING, "ZIMAGE_TAIL_SZ", z_tail.size);
+                        k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
+                    }
+                }
+            }
+        }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
@@ -498,8 +536,12 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Copy MTK headers
         xwrite(fd, boot.k_hdr, sizeof(mtk_hdr));
     }
+    if (boot.flags[ZIMAGE_KERNEL]) {
+        // Copy ZIMAGE headers
+        xwrite(fd, boot.z_hdr, (uint32_t)((uintptr_t)boot.kernel - (uintptr_t)boot.z_hdr));
+    }
+    size_t raw_size;
     if (access(KERNEL_FILE, R_OK) == 0) {
-        size_t raw_size;
         void *raw_buf;
         mmap_ro(KERNEL_FILE, raw_buf, raw_size);
         if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
@@ -508,6 +550,20 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
             hdr->kernel_size() = xwrite(fd, raw_buf, raw_size);
         }
         munmap(raw_buf, raw_size);
+    }
+    if (boot.flags[ZIMAGE_KERNEL]) {
+        if (hdr->kernel_size() > boot.hdr->kernel_size()) {
+            LOGW("Recompressed kernel is %d bytes too large, using original kernel\n", hdr->kernel_size() - boot.hdr->kernel_size());
+            lseek(fd, -hdr->kernel_size(), SEEK_CUR);
+            hdr->kernel_size() = xwrite(fd, boot.z_tail.data - boot.hdr->kernel_size(), boot.hdr->kernel_size());
+        }
+        else {
+            write_zero(fd, boot.hdr->kernel_size() - hdr->kernel_size() - 4);
+            xwrite(fd, &raw_size, 4);
+            hdr->kernel_size() += boot.hdr->kernel_size() - hdr->kernel_size();
+        }
+        hdr->kernel_size() += (uint32_t)((uintptr_t)boot.kernel - (uintptr_t)boot.z_hdr);
+        hdr->kernel_size() += xwrite(fd, boot.z_tail.data, boot.z_tail.size);
     }
 
     // kernel dtb
