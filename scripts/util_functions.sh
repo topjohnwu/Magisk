@@ -628,7 +628,15 @@ copy_sepolicy_rules() {
   elif grep -q ' /mnt/vendor/persist ' /proc/mounts; then
     RULESDIR=/mnt/vendor/persist/magisk
   else
-    return
+    ui_print "- Unable to find sepolicy rules dir"
+    return 1
+  fi
+
+  if [ -d ${RULESDIR%/magisk} ]; then
+    ui_print "- Sepolicy rules dir is ${RULESDIR%/magisk}"
+  else
+    ui_print "- Sepolicy rules dir ${RULESDIR%/magisk} not found"
+    return 1
   fi
 
   # Copy all enabled sepolicy.rule
