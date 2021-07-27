@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileInputStream
 
 class LogViewModel(
     private val repo: LogRepository
@@ -62,9 +63,11 @@ class LogViewModel(
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---System Properties---\n\n")
-
                 ProcessBuilder("getprop").start()
                     .inputStream.reader().use { it.copyTo(file) }
+
+                file.write("---System MountInfo---\n\n")
+                FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")
