@@ -83,7 +83,7 @@ ifdef B_BOOT
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
-LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils libz
+LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils libz libzopfli
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
