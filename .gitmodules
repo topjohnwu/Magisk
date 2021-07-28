@@ -40,3 +40,6 @@
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git
+[submodule "zopfli"]
+	path = native/jni/external/zopfli
+	url = https://android.googlesource.com/platform/external/zopfli

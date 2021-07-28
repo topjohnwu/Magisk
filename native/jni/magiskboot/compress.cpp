@@ -7,6 +7,8 @@
 #include <lz4.h>
 #include <lz4frame.h>
 #include <lz4hc.h>
+#include <zopfli/util.h>
+#include <zopfli/deflate.h>
 
 #include <utils.hpp>
 
@@ -20,6 +22,12 @@ using namespace std;
 constexpr size_t CHUNK = 0x40000;
 constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
 constexpr size_t LZ4_COMPRESSED = LZ4_COMPRESSBOUND(LZ4_UNCOMPRESSED);
+
+#if defined(ZOPFLI_MASTER_BLOCK_SIZE) && ZOPFLI_MASTER_BLOCK_SIZE > 0
+constexpr size_t ZOPFLI_CHUNK = ZOPFLI_MASTER_BLOCK_SIZE;
+#else
+constexpr size_t ZOPFLI_CHUNK = CHUNK;
+#endif
 
 class cpr_stream : public filter_stream {
 public:
@@ -104,6 +112,129 @@ public:
 class gz_encoder : public gz_strm {
 public:
     explicit gz_encoder(stream_ptr &&base) : gz_strm(ENCODE, std::move(base)) {};
+};
+
+class zopfli_gz_strm : public cpr_stream {
+public:
+    int write(const void *buf, size_t len) override {
+        return len ? write(buf, len, 0) : 0;
+    }
+
+    ~zopfli_gz_strm() override {
+        switch(mode) {
+            case ENCODE:
+                write(nullptr, 0, 1);
+                break;
+        }
+    }
+
+protected:
+    enum mode_t {
+        ENCODE
+    } mode;
+
+    ZopfliOptions zo;
+
+    zopfli_gz_strm(mode_t mode, stream_ptr &&base) :
+        cpr_stream(std::move(base)), mode(mode), out(nullptr), outsize(0), bp(0), crcvalue(0xffffffffu), in_read(0) {
+        switch(mode) {
+            case ENCODE:
+                out = 0;
+                outsize = 0;
+                bp = 0;
+                crcvalue = crc32_z(0L, Z_NULL, 0);
+
+                ZopfliInitOptions(&zo);
+
+                // Speed things up a bit, this still leads to better compression than zlib
+                zo.numiterations = 1;
+                zo.blocksplitting = 0;
+
+                ZOPFLI_APPEND_DATA(31, &out, &outsize);  /* ID1 */
+                ZOPFLI_APPEND_DATA(139, &out, &outsize);  /* ID2 */
+                ZOPFLI_APPEND_DATA(8, &out, &outsize);  /* CM */
+                ZOPFLI_APPEND_DATA(0, &out, &outsize);  /* FLG */
+                /* MTIME */
+                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+
+                ZOPFLI_APPEND_DATA(2, &out, &outsize);  /* XFL, 2 indicates best compression. */
+                ZOPFLI_APPEND_DATA(3, &out, &outsize);  /* OS follows Unix conventions. */
+                break;
+        }
+    }
+
+private:
+    unsigned char* out = nullptr;
+    size_t outsize = 0;
+    unsigned char bp = 0;
+    unsigned long crcvalue = 0xffffffffu;
+    uint32_t in_read = 0;
+
+    int write(const void *buf, size_t len, int flush) {
+        int ret = 0;
+        switch(mode) {
+            case ENCODE:
+                in_read += len;
+                if (len)
+                    crcvalue = crc32_z(crcvalue, (Bytef *)buf, len);
+                if (flush) {
+                    ZopfliDeflate(&zo, 2, 1, (const unsigned char *)buf, len, &bp, &out, &outsize);
+
+                    /* CRC */
+                    ZOPFLI_APPEND_DATA(crcvalue % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((crcvalue >> 8) % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((crcvalue >> 16) % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((crcvalue >> 24) % 256, &out, &outsize);
+
+                    /* ISIZE */
+                    ZOPFLI_APPEND_DATA(in_read % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((in_read >> 8) % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((in_read >> 16) % 256, &out, &outsize);
+                    ZOPFLI_APPEND_DATA((in_read >> 24) % 256, &out, &outsize);
+                    ret += bwrite(out, outsize);
+                    free(out);
+                    out = nullptr;
+                    bp = 0;
+                    outsize = 0;
+                }
+                else {
+                    for(size_t offset = 0; offset < len; offset += ZOPFLI_CHUNK) {
+                        ZopfliDeflatePart(&zo, 2, 0, (const unsigned char *)buf, offset, offset + ((len - offset) < ZOPFLI_CHUNK ? len - offset : ZOPFLI_CHUNK), &bp, &out, &outsize);
+                        bp &= 7;
+                        if (bp & 1) {
+                            if (bp == 7)
+                                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                            ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                            ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                            ZOPFLI_APPEND_DATA(0xff, &out, &outsize);
+                            ZOPFLI_APPEND_DATA(0xff, &out, &outsize);
+                        }
+                        else if (bp) {
+                            do {
+                                out[outsize - 1] += 2 << bp;
+                                ZOPFLI_APPEND_DATA(0, &out, &outsize);
+                                bp += 2;
+                            } while (bp < 8);
+                        }
+
+                        ret += bwrite(out, outsize);
+                        free(out);
+                        out = nullptr;
+                        bp = 0;
+                        outsize = 0;
+                    }
+                }
+                return ret;
+        }
+    }
+};
+
+class zopfli_gz_encoder : public zopfli_gz_strm {
+public:
+    explicit zopfli_gz_encoder(stream_ptr &&base) : zopfli_gz_strm(ENCODE, std::move(base)) {};
 };
 
 class bz_strm : public cpr_stream {
@@ -535,6 +666,7 @@ stream_ptr get_encoder(format_t type, stream_ptr &&base) {
         case LZ4_LG:
             return make_unique<LZ4_encoder>(std::move(base), true);
         case GZIP:
+            return make_unique<zopfli_gz_encoder>(std::move(base));
         default:
             return make_unique<gz_encoder>(std::move(base));
     }
