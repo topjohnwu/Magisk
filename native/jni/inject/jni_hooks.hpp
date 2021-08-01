@@ -1,5 +1,5 @@
 /*
- * Original code: https://github.com/RikkaApps/Riru/blob/master/riru/src/main/cpp/jni_native_method.cpp
+ * Original code from: https://github.com/RikkaApps/Riru
  * The code is modified and sublicensed to GPLv3 for incorporating into Magisk.
  *
  * Copyright (c) 2018-2021, RikkaW
@@ -38,7 +38,7 @@ static ret name(__VA_ARGS__)
 
 #define orig_fork(ver, ...) \
     reinterpret_cast<decltype(&nativeForkAndSpecialize_##ver)> \
-    (nativeForkAndSpecialize_orig->fnPtr)(__VA_ARGS__)
+    (nativeForkAndSpecialize_orig().fnPtr)(__VA_ARGS__)
 
 #define post_fork() \
     nativeForkAndSpecialize_post(&ctx, env, clazz); \
@@ -202,7 +202,7 @@ DCL_FORK_AND_SPECIALIZE(samsung_p,
 
 #define orig_spec(ver, ...) \
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_##ver)> \
-    (nativeSpecializeAppProcess_orig->fnPtr)(__VA_ARGS__)
+    (nativeSpecializeAppProcess_orig().fnPtr)(__VA_ARGS__)
 
 #define post_spec() \
     nativeSpecializeAppProcess_post(&ctx, env, clazz)
@@ -301,7 +301,7 @@ DCL_SPECIALIZE_APP(samsung_q,
 
 #define orig_server(ver, ...) \
     reinterpret_cast<decltype(&nativeForkSystemServer_##ver)> \
-    (nativeForkSystemServer_orig->fnPtr)(__VA_ARGS__)
+    (nativeForkSystemServer_orig().fnPtr)(__VA_ARGS__)
 
 #define post_server() \
     nativeForkSystemServer_post(&ctx, env, clazz); \
@@ -355,8 +355,7 @@ const JNINativeMethod nativeSpecializeAppProcess_methods[] = {
     DEF_SPEC(r_dp2), DEF_SPEC(r_dp3)
 #endif
 };
-const int nativeSpecializeAppProcess_methods_num = std::size(
-    nativeSpecializeAppProcess_methods);
+const int nativeSpecializeAppProcess_methods_num = std::size(nativeSpecializeAppProcess_methods);
 
 const JNINativeMethod nativeForkSystemServer_methods[] = {
     DEF_SERVER(m), DEF_SERVER(samsung_q)

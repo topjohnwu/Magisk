@@ -5,13 +5,13 @@ LOCAL_PATH := $(call my-dir)
 ########################
 
 # Global toggle for the WIP zygote injection features
-ENABLE_INJECT := 0
+ENABLE_INJECT := 1
 
 ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libphmap
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
@@ -42,7 +42,8 @@ LOCAL_STATIC_LIBRARIES += libxhook
 LOCAL_SRC_FILES += \
     inject/entry.cpp \
     inject/utils.cpp \
-    inject/hook.cpp
+    inject/hook.cpp \
+    inject/memory.cpp
 else
 LOCAL_SRC_FILES += magiskhide/proc_monitor.cpp
 endif
@@ -146,7 +147,7 @@ ifneq (,$(wildcard jni/test.cpp))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
-LOCAL_STATIC_LIBRARIES := libutils
+LOCAL_STATIC_LIBRARIES := libutils libphmap
 LOCAL_C_INCLUDES := jni/include
 LOCAL_SRC_FILES := test.cpp
 include $(BUILD_EXECUTABLE)

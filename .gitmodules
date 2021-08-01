@@ -34,6 +34,9 @@
 [submodule "zlib"]
 	path = native/jni/external/zlib
 	url = https://android.googlesource.com/platform/external/zlib
+[submodule "parallel-hashmap"]
+	path = native/jni/external/parallel-hashmap
+	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

@@ -4,7 +4,6 @@
 #include <sys/sendfile.h>
 #include <sys/prctl.h>
 #include <android/log.h>
-#include <atomic>
 
 #include <utils.hpp>
 
@@ -25,28 +24,12 @@ static void inject_logging() {
     log_cb.ex = nop_ex;
 }
 
-__attribute__((destructor))
-static void inject_cleanup() {
-    if (active_threads < 0)
-        return;
-
-    // Setup 1ms
-    timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
-
-    // Check flag in busy loop
-    while (active_threads)
-        nanosleep(&ts, nullptr);
-
-    // Wait another 1ms to make sure all threads left our code
-    nanosleep(&ts, nullptr);
-}
-
 void self_unload() {
     LOGD("hook: Request to self unload\n");
     // If unhook failed, do not unload or else it will cause SIGSEGV
     if (!unhook_functions())
         return;
-    new_daemon_thread(reinterpret_cast<void *(*)(void *)>(&dlclose), self_handle);
+    new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
     active_threads--;
 }
 
@@ -84,6 +67,22 @@ static void sanitize_environ() {
         if (success)
             break;
     }
+}
+
+__attribute__((destructor))
+static void inject_cleanup_wait() {
+    if (active_threads < 0)
+        return;
+
+    // Setup 1ms
+    timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
+
+    // Check flag in busy loop
+    while (active_threads)
+        nanosleep(&ts, nullptr);
+
+    // Wait another 1ms to make sure all threads left our code
+    nanosleep(&ts, nullptr);
 }
 
 __attribute__((constructor))

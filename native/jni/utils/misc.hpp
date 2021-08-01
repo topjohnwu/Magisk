@@ -58,6 +58,21 @@ reversed_container<T> reversed(T &base) {
     return reversed_container<T>(base);
 }
 
+template<typename T, typename Impl>
+class stateless_allocator {
+public:
+    using value_type = T;
+    T *allocate(size_t num) { return static_cast<T*>(Impl::allocate(sizeof(T) * num)); }
+    void deallocate(T *ptr, size_t num) { Impl::deallocate(ptr, sizeof(T) * num); }
+    stateless_allocator()                           = default;
+    stateless_allocator(const stateless_allocator&) = default;
+    stateless_allocator(stateless_allocator&&)      = default;
+    template <typename U>
+    stateless_allocator(const stateless_allocator<U, Impl>&) {}
+    bool operator==(const stateless_allocator&) { return true; }
+    bool operator!=(const stateless_allocator&) { return false; }
+};
+
 int parse_int(const char *s);
 static inline int parse_int(const std::string &s) { return parse_int(s.data()); }
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }

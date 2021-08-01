@@ -1,82 +1,86 @@
-#include <jni.h>
-
 #include <xhook.h>
 #include <utils.hpp>
 #include <flags.hpp>
 #include <daemon.hpp>
 
 #include "inject.hpp"
+#include "memory.hpp"
 
 using namespace std;
-
-#define DCL_HOOK_FUNC(ret, func, ...) \
-    static ret (*old_##func)(__VA_ARGS__); \
-    static ret new_##func(__VA_ARGS__)
-
-#define DCL_JNI_FUNC(name) \
-    static const JNINativeMethod *name##_orig = nullptr; \
-    extern const JNINativeMethod name##_methods[]; \
-    extern const int name##_methods_num;
-
-namespace {
+using jni_hook::hash_map;
+using jni_hook::tree_map;
+using xstring = jni_hook::string;
 
 struct HookContext {
     int pid;
     bool do_hide;
 };
 
-// JNI method declarations
-DCL_JNI_FUNC(nativeForkAndSpecialize)
-DCL_JNI_FUNC(nativeSpecializeAppProcess)
-DCL_JNI_FUNC(nativeForkSystemServer)
-
-}
-
-// For some reason static vectors won't work, use pointers instead
 static vector<tuple<const char *, const char *, void **>> *xhook_list;
-static vector<JNINativeMethod> *jni_list;
+static vector<JNINativeMethod> *jni_hook_list;
+static hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
 static JavaVM *g_jvm;
 static int prev_fork_pid = -1;
 static HookContext *current_ctx;
 
+#define DCL_HOOK_FUNC(ret, func, ...) \
+    static ret (*old_##func)(__VA_ARGS__); \
+    static ret new_##func(__VA_ARGS__)
+
+#define DCL_JNI_FUNC(name) \
+    static int name##_orig_idx; \
+    static inline JNINativeMethod &name##_orig() {       \
+        return (*jni_hook_list)[name##_orig_idx];        \
+    }                      \
+    extern const JNINativeMethod name##_methods[];       \
+    extern const int name##_methods_num;
+
+namespace {
+// JNI method declarations
+DCL_JNI_FUNC(nativeForkAndSpecialize)
+DCL_JNI_FUNC(nativeSpecializeAppProcess)
+DCL_JNI_FUNC(nativeForkSystemServer)
+}
+
 #define HOOK_JNI(method) \
-if (newMethods[i].name == #method##sv) { \
-    auto orig = new JNINativeMethod(); \
-    memcpy(orig, &newMethods[i], sizeof(JNINativeMethod)); \
-    method##_orig = orig; \
-    jni_list->push_back(newMethods[i]); \
-    for (int j = 0; j < method##_methods_num; ++j) { \
-        if (strcmp(newMethods[i].signature, method##_methods[j].signature) == 0) { \
-            newMethods[i] = method##_methods[j]; \
-            LOGI("hook: replaced #" #method "\n"); \
-            ++hooked; \
-            break; \
-        } \
-    } \
-    continue; \
+if (hooked < 3 && methods[i].name == #method##sv) { \
+    jni_hook_list->push_back(methods[i]);              \
+    method##_orig_idx = jni_hook_list->size() - 1;     \
+    for (int j = 0; j < method##_methods_num; ++j) {   \
+        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) { \
+            newMethods[i] = method##_methods[j];       \
+            LOGI("hook: replaced #" #method "\n");     \
+            ++hooked;    \
+            break;       \
+        }                \
+    }                    \
+    continue;            \
 }
 
 DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
     LOGD("hook: jniRegisterNativeMethods %s", className);
 
-    unique_ptr<JNINativeMethod[]> newMethods;
-    int hooked = 0;
-
     if (g_jvm == nullptr) {
         // Save for later unhooking
         env->GetJavaVM(&g_jvm);
     }
 
+    unique_ptr<JNINativeMethod[]> newMethods;
+    int hooked = numeric_limits<int>::max();
     if (className == "com/android/internal/os/Zygote"sv) {
+        hooked = 0;
         newMethods = make_unique<JNINativeMethod[]>(numMethods);
         memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods);
-        for (int i = 0; i < numMethods && hooked < 3; ++i) {
-            HOOK_JNI(nativeForkAndSpecialize);
-            HOOK_JNI(nativeSpecializeAppProcess);
-            HOOK_JNI(nativeForkSystemServer);
-        }
+    }
+
+    auto &class_map = (*jni_method_map)[className];
+    for (int i = 0; i < numMethods; ++i) {
+        class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
+        HOOK_JNI(nativeForkAndSpecialize);
+        HOOK_JNI(nativeSpecializeAppProcess);
+        HOOK_JNI(nativeForkSystemServer);
     }
 
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
@@ -239,7 +243,8 @@ void hook_functions() {
     xhook_enable_sigsegv_protection(0);
 #endif
     xhook_list = new remove_pointer_t<decltype(xhook_list)>();
-    jni_list = new remove_pointer_t<decltype(jni_list)>();
+    jni_hook_list = new remove_pointer_t<decltype(jni_hook_list)>();
+    jni_method_map = new remove_pointer_t<decltype(jni_method_map)>();
 
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", jniRegisterNativeMethods);
     XHOOK_REGISTER(".*\\libandroid_runtime.so$", fork);
@@ -252,14 +257,19 @@ bool unhook_functions() {
     if (g_jvm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
         return false;
 
+    // Do NOT call any destructors
+    operator delete(jni_method_map);
+    // Directly unmap the whole memory block
+    jni_hook::memory_block::release();
+
     // Unhook JNI methods
-    if (!jni_list->empty() && old_jniRegisterNativeMethods(env,
+    if (!jni_hook_list->empty() && old_jniRegisterNativeMethods(env,
             "com/android/internal/os/Zygote",
-            jni_list->data(), jni_list->size()) != 0) {
+            jni_hook_list->data(), jni_hook_list->size()) != 0) {
         LOGE("hook: Failed to register JNI hook\n");
         return false;
     }
-    delete jni_list;
+    delete jni_hook_list;
 
     // Unhook xhook
     for (auto &[path, sym, old_func] : *xhook_list) {
