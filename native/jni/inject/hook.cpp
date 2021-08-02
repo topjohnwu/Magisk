@@ -11,9 +11,58 @@ using jni_hook::hash_map;
 using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
+struct SpecializeAppProcessArgs {
+    jint &uid;
+    jint &gid;
+    jintArray &gids;
+    jint &runtime_flags;
+    jint &mount_external;
+    jstring &se_info;
+    jstring &nice_name;
+    jstring &instruction_set;
+    jstring &app_data_dir;
+
+    /* Optional */
+    jboolean *is_child_zygote = nullptr;
+    jboolean *is_top_app = nullptr;
+    jobjectArray *pkg_data_info_list = nullptr;
+    jobjectArray *whitelisted_data_info_list = nullptr;
+    jboolean *mount_data_dirs = nullptr;
+    jboolean *mount_storage_dirs = nullptr;
+
+    SpecializeAppProcessArgs(
+            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
+            jint &mount_external, jstring &se_info, jstring &nice_name,
+            jstring &instruction_set, jstring &app_data_dir) :
+            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
+            mount_external(mount_external), se_info(se_info), nice_name(nice_name),
+            instruction_set(instruction_set), app_data_dir(app_data_dir) {}
+};
+
+struct ForkSystemServerArgs {
+    jint &uid;
+    jint &gid;
+    jintArray &gids;
+    jint &runtime_flags;
+    jlong &permitted_capabilities;
+    jlong &effective_capabilities;
+
+    ForkSystemServerArgs(
+            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
+            jlong &permitted_capabilities, jlong &effective_capabilities) :
+            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
+            permitted_capabilities(permitted_capabilities),
+            effective_capabilities(effective_capabilities) {}
+};
+
 struct HookContext {
     int pid;
     bool do_hide;
+    union {
+        SpecializeAppProcessArgs *args;
+        ForkSystemServerArgs *server_args;
+        void *raw_args;
+    };
 };
 
 static vector<tuple<const char *, const char *, void **>> *xhook_list;
@@ -21,7 +70,6 @@ static vector<JNINativeMethod> *jni_hook_list;
 static hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
 static JavaVM *g_jvm;
-static int prev_fork_pid = -1;
 static HookContext *current_ctx;
 
 #define DCL_HOOK_FUNC(ret, func, ...) \
@@ -29,10 +77,7 @@ static HookContext *current_ctx;
     static ret new_##func(__VA_ARGS__)
 
 #define DCL_JNI_FUNC(name) \
-    static int name##_orig_idx; \
-    static inline JNINativeMethod &name##_orig() {       \
-        return (*jni_hook_list)[name##_orig_idx];        \
-    }                      \
+    static void *name##_orig; \
     extern const JNINativeMethod name##_methods[];       \
     extern const int name##_methods_num;
 
@@ -44,9 +89,9 @@ DCL_JNI_FUNC(nativeForkSystemServer)
 }
 
 #define HOOK_JNI(method) \
-if (hooked < 3 && methods[i].name == #method##sv) { \
+if (methods[i].name == #method##sv) { \
     jni_hook_list->push_back(methods[i]);              \
-    method##_orig_idx = jni_hook_list->size() - 1;     \
+    method##_orig = methods[i].fnPtr; \
     for (int j = 0; j < method##_methods_num; ++j) {   \
         if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) { \
             newMethods[i] = method##_methods[j];       \
@@ -78,22 +123,18 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
     auto &class_map = (*jni_method_map)[className];
     for (int i = 0; i < numMethods; ++i) {
         class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
-        HOOK_JNI(nativeForkAndSpecialize);
-        HOOK_JNI(nativeSpecializeAppProcess);
-        HOOK_JNI(nativeForkSystemServer);
+        if (hooked < 3) {
+            HOOK_JNI(nativeForkAndSpecialize);
+            HOOK_JNI(nativeSpecializeAppProcess);
+            HOOK_JNI(nativeForkSystemServer);
+        }
     }
 
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
 
 DCL_HOOK_FUNC(int, fork) {
-    if (prev_fork_pid < 0)
-        return old_fork();
-
-    // Skip an actual fork and return the previous fork result
-    int pid = prev_fork_pid;
-    prev_fork_pid = -1;
-    return pid;
+    return current_ctx ? current_ctx->pid : old_fork();
 }
 
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
@@ -114,102 +155,72 @@ static int sigmask(int how, int signum) {
     return sigprocmask(how, &set, nullptr);
 }
 
-static int pre_specialize_fork() {
-    // First block SIGCHLD, unblock after original fork is done
-    sigmask(SIG_BLOCK, SIGCHLD);
-    prev_fork_pid = old_fork();
-    return prev_fork_pid;
-}
-
 // -----------------------------------------------------------------
 
-static void nativeSpecializeAppProcess_pre(HookContext *ctx,
-        JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-        jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
-        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
-        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
-        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
-        jboolean &mount_storage_dirs) {
-
+static void nativeSpecializeAppProcess_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
     current_ctx = ctx;
-
-    const char *process = env->GetStringUTFChars(nice_name, nullptr);
+    const char *process = env->GetStringUTFChars(ctx->args->nice_name, nullptr);
     LOGD("hook: %s %s\n", __FUNCTION__, process);
 
-    if (mount_external != 0  /* TODO: Handle MOUNT_EXTERNAL_NONE cases */
-        && remote_check_hide(uid, process)) {
+    if (ctx->args->mount_external != 0  /* TODO: Handle MOUNT_EXTERNAL_NONE cases */
+        && remote_check_hide(ctx->args->uid, process)) {
         ctx->do_hide = true;
         LOGI("hook: [%s] should be hidden\n", process);
     }
 
-    env->ReleaseStringUTFChars(nice_name, process);
+    env->ReleaseStringUTFChars(ctx->args->nice_name, process);
 }
 
 static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    current_ctx = nullptr;
     LOGD("hook: %s\n", __FUNCTION__);
 
     if (ctx->do_hide)
         self_unload();
-
-    current_ctx = nullptr;
 }
 
 // -----------------------------------------------------------------
 
-static void nativeForkAndSpecialize_pre(HookContext *ctx,
-        JNIEnv *env, jclass clazz, jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-        jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
-        jintArray fds_to_close, jintArray fds_to_ignore,  /* These 2 arguments are unique to fork */
-        jboolean &is_child_zygote, jstring &instruction_set, jstring &app_data_dir,
-        jboolean &is_top_app, jobjectArray &pkg_data_info_list,
-        jobjectArray &whitelisted_data_info_list, jboolean &mount_data_dirs,
-        jboolean &mount_storage_dirs) {
-
-    // Do our own fork before loading any 3rd party code
-    ctx->pid = pre_specialize_fork();
-    if (ctx->pid != 0)
+// Do our own fork before loading any 3rd party code
+// First block SIGCHLD, unblock after original fork is done
+#define PRE_FORK() \
+    current_ctx = ctx; \
+    sigmask(SIG_BLOCK, SIGCHLD); \
+    ctx->pid = old_fork();       \
+    if (ctx->pid != 0)           \
         return;
 
-    nativeSpecializeAppProcess_pre(
-            ctx, env, clazz, uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
-            nice_name, is_child_zygote, instruction_set, app_data_dir, is_top_app,
-            pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs);
+// Unblock SIGCHLD in case the original method didn't
+#define POST_FORK() \
+    current_ctx = nullptr; \
+    sigmask(SIG_UNBLOCK, SIGCHLD); \
+    if (ctx->pid != 0)\
+        return;
+
+static void nativeForkAndSpecialize_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    PRE_FORK();
+    nativeSpecializeAppProcess_pre(ctx, env, clazz);
 }
 
 static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
-    // Unblock SIGCHLD in case the original method didn't
-    sigmask(SIG_UNBLOCK, SIGCHLD);
-    if (ctx->pid != 0)
-        return;
-
+    POST_FORK();
     nativeSpecializeAppProcess_post(ctx, env, clazz);
 }
 
 // -----------------------------------------------------------------
 
-static void nativeForkSystemServer_pre(HookContext *ctx,
-        JNIEnv *env, jclass clazz, uid_t &uid, gid_t &gid, jintArray &gids, jint &runtime_flags,
-        jobjectArray &rlimits, jlong &permitted_capabilities, jlong &effective_capabilities) {
-
-    // Do our own fork before loading any 3rd party code
-    ctx->pid = pre_specialize_fork();
-    if (ctx->pid != 0)
-        return;
-
-    current_ctx = ctx;
+static void nativeForkSystemServer_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    PRE_FORK();
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
 static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
-    // Unblock SIGCHLD in case the original method didn't
-    sigmask(SIG_UNBLOCK, SIGCHLD);
-
-    if (ctx->pid != 0)
-        return;
-
+    POST_FORK();
     LOGD("hook: %s\n", __FUNCTION__);
-    current_ctx = nullptr;
 }
+
+#undef PRE_FORK
+#undef POST_FORK
 
 // -----------------------------------------------------------------
 
@@ -282,4 +293,5 @@ bool unhook_functions() {
     return hook_refresh();
 }
 
+// JNI method definitions, include all method signatures of past Android versions
 #include "jni_hooks.hpp"
