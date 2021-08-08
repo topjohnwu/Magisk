@@ -2,19 +2,19 @@
 
 TMPDIR=/dev/tmp
 rm -rf $TMPDIR
-mkdir -p $TMPDIR 2>/dev/null
+mkdir -p $TMPDIR/bb 2>/dev/null
 
 export BBBIN=$TMPDIR/busybox
-unzip -o "$3" "lib/*/libbusybox.so" -d $TMPDIR >&2
-chmod -R 755 $TMPDIR/lib
+unzip -o "$3" -d $TMPDIR/bb >&2
+chmod -R 755 $TMPDIR/bb/lib
 for arch in "x86_64" "x86" "arm64-v8a" "armeabi-v7a"; do
-  libpath="$TMPDIR/lib/$arch/libbusybox.so"
+  libpath="$TMPDIR/bb/lib/$arch/libbusybox.so"
   if [ -x $libpath ] && $libpath >/dev/null 2>&1; then
     mv -f $libpath $BBBIN
     break
   fi
 done
-$BBBIN rm -rf $TMPDIR/lib
+$BBBIN rm -rf $TMPDIR/bb
 
 export INSTALLER=$TMPDIR/install
 $BBBIN mkdir -p $INSTALLER
