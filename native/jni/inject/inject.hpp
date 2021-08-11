@@ -11,11 +11,11 @@
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 
-// Get library name and base address that contains the function
-uintptr_t get_function_lib(uintptr_t addr, char *lib);
+// Get library name + offset (from start of ELF), given function address
+uintptr_t get_function_off(int pid, uintptr_t addr, char *lib);
 
-// Get library base address with name
-uintptr_t get_remote_lib(int pid, const char *lib);
+// Get function address, given library name + offset
+uintptr_t get_function_addr(int pid, const char *lib, uintptr_t off);
 
 void self_unload();
 void hook_functions();

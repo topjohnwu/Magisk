@@ -226,16 +226,15 @@ uintptr_t remote_call_abi(int pid, uintptr_t func_addr, int nargs, va_list va) {
 
 uintptr_t remote_call_vararg(int pid, uintptr_t addr, int nargs, ...) {
     char lib_name[4096];
-    auto local = get_function_lib(addr, lib_name);
-    if (local == 0)
+    auto off = get_function_off(getpid(), addr, lib_name);
+    if (off == 0)
         return 0;
-    auto remote = get_remote_lib(pid, lib_name);
+    auto remote = get_function_addr(pid, lib_name, off);
     if (remote == 0)
         return 0;
-    addr = addr - local + remote;
     va_list va;
     va_start(va, nargs);
-    auto result = remote_call_abi(pid, addr, nargs, va);
+    auto result = remote_call_abi(pid, remote, nargs, va);
     va_end(va);
     return result;
 }

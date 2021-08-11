@@ -5,7 +5,8 @@ namespace jni_hook {
 // We know our minimum alignment is WORD size (size of pointer)
 static constexpr size_t ALIGN = sizeof(long);
 
-static constexpr size_t CAPACITY = (1 << 24);
+// 4MB is more than enough
+static constexpr size_t CAPACITY = (1 << 22);
 
 // No need to be thread safe as the initial mmap always happens on the main thread
 static uint8_t *_area = nullptr;

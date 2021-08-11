@@ -87,9 +87,8 @@ static void inject_cleanup_wait() {
 
 __attribute__((constructor))
 static void inject_init() {
-    inject_logging();
-
     if (getenv(INJECT_ENV_2)) {
+        inject_logging();
         LOGD("zygote: inject 2nd stage\n");
         active_threads = 1;
         unsetenv(INJECT_ENV_2);
@@ -97,6 +96,7 @@ static void inject_init() {
         // Get our own handle
         self_handle = dlopen(INJECT_LIB_2, RTLD_LAZY);
         dlclose(self_handle);
+        unlink(INJECT_LIB_2);
 
         hook_functions();
 
@@ -105,6 +105,7 @@ static void inject_init() {
         active_threads++;
         new_daemon_thread(&unload_first_stage);
     } else if (char *env = getenv(INJECT_ENV_1)) {
+        inject_logging();
         LOGD("zygote: inject 1st stage\n");
 
         if (env[0] == '1')
@@ -117,6 +118,7 @@ static void inject_init() {
         cp_afc(INJECT_LIB_1, INJECT_LIB_2);
         dlopen(INJECT_LIB_2, RTLD_LAZY);
 
+        unlink(INJECT_LIB_1);
         unsetenv(INJECT_ENV_1);
     }
 }
@@ -128,7 +130,7 @@ int app_process_main(int argc, char *argv[]) {
         return 1;
 
     int in = xopen(buf, O_RDONLY);
-    int out = xopen(INJECT_LIB_1, O_CREAT | O_WRONLY | O_TRUNC, 0777);
+    int out = xopen(INJECT_LIB_1, O_WRONLY | O_CREAT, 0644);
     sendfile(out, in, nullptr, INT_MAX);
     close(in);
     close(out);

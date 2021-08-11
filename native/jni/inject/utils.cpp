@@ -1,3 +1,4 @@
+#include <cinttypes>
 #include <utils.hpp>
 
 #include "inject.hpp"
@@ -9,10 +10,11 @@ namespace {
 struct map_info {
     uintptr_t start;
     uintptr_t end;
+    uintptr_t off;
     int perms;
     char *path;
 
-    map_info() : start(0), end(0), perms(0), path(nullptr) {}
+    map_info() : start(0), end(0), off(0), perms(0), path(nullptr) {}
 
     enum {
         EXEC = (1 << 0),
@@ -30,27 +32,24 @@ static void parse_maps(int pid, Func fn) {
     // format: start-end perms offset dev inode path
     sprintf(file, "/proc/%d/maps", pid);
     file_readline(true, file, [=](string_view l) -> bool {
-        char *pos = (char *) l.data();
+        char *line = (char *) l.data();
         map_info info;
+        char perm[5];
+        int path_off;
 
-        // Parse address hex strings
-        info.start = strtoul(pos, &pos, 16);
-        info.end = strtoul(++pos, &pos, 16);
+        if (sscanf(line, "%" PRIxPTR "-%" PRIxPTR " %4s %" PRIxPTR " %*x:%*x %*d %n%*s",
+                   &info.start, &info.end, perm, &info.off, &path_off) != 4)
+            return true;
 
         // Parse permissions
-        if (*(++pos) != '-')
+        if (perm[0] != '-')
             info.perms |= map_info::READ;
-        if (*(++pos) != '-')
+        if (perm[1] != '-')
             info.perms |= map_info::WRITE;
-        if (*(++pos) != '-')
+        if (perm[2] != '-')
             info.perms |= map_info::EXEC;
-        pos += 3;
 
-        // Skip everything except path
-        int path_off;
-        sscanf(pos, "%*s %*s %*s %n%*s", &path_off);
-        pos += path_off;
-        info.path = pos;
+        info.path = line + path_off;
 
         return fn(info);
     });
@@ -74,28 +73,28 @@ void unmap_all(const char *name) {
     }
 }
 
-uintptr_t get_function_lib(uintptr_t addr, char *lib) {
-    uintptr_t base = 0;
-    parse_maps(getpid(), [=, &base](map_info &info) -> bool {
+uintptr_t get_function_off(int pid, uintptr_t addr, char *lib) {
+    uintptr_t off = 0;
+    parse_maps(pid, [=, &off](map_info &info) -> bool {
         if (addr >= info.start && addr < info.end) {
             if (lib)
                 strcpy(lib, info.path);
-            base = info.start;
+            off = addr - info.start + info.off;
             return false;
         }
         return true;
     });
-    return base;
+    return off;
 }
 
-uintptr_t get_remote_lib(int pid, const char *lib) {
-    uintptr_t base = 0;
-    parse_maps(pid, [=, &base](map_info &info) -> bool {
+uintptr_t get_function_addr(int pid, const char *lib, uintptr_t off) {
+    uintptr_t addr = 0;
+    parse_maps(pid, [=, &addr](map_info &info) -> bool {
         if (strcmp(info.path, lib) == 0 && (info.perms & map_info::EXEC)) {
-            base = info.start;
+            addr = info.start - info.off + off;
             return false;
         }
         return true;
     });
-    return base;
+    return addr;
 }

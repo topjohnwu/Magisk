@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <xhook.h>
 #include <utils.hpp>
 #include <flags.hpp>
@@ -64,13 +65,17 @@ struct HookContext {
         void *raw_args;
     };
 };
+struct vtable_t;
 
 static vector<tuple<const char *, const char *, void **>> *xhook_list;
 static vector<JNINativeMethod> *jni_hook_list;
 static hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
-static JavaVM *g_jvm;
 static HookContext *current_ctx;
+static JavaVM *g_jvm;
+static vtable_t *gAppRuntimeVTable;
+static const JNINativeInterface *old_functions;
+static JNINativeInterface *new_functions;
 
 #define DCL_HOOK_FUNC(ret, func, ...) \
     static ret (*old_##func)(__VA_ARGS__); \
@@ -103,10 +108,8 @@ if (methods[i].name == #method##sv) { \
     continue;            \
 }
 
-DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
+static unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
-    LOGD("hook: jniRegisterNativeMethods %s", className);
-
     if (g_jvm == nullptr) {
         // Save for later unhooking
         env->GetJavaVM(&g_jvm);
@@ -129,7 +132,40 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
             HOOK_JNI(nativeForkSystemServer);
         }
     }
+    return newMethods;
+}
 
+static jclass gClassRef;
+static jmethodID class_getName;
+static string get_class_name(JNIEnv *env, jclass clazz) {
+    if (!gClassRef) {
+        jclass cls = env->FindClass("java/lang/Class");
+        gClassRef = (jclass) env->NewGlobalRef(cls);
+        env->DeleteLocalRef(cls);
+        class_getName = env->GetMethodID(gClassRef, "getName", "()Ljava/lang/String;");
+    }
+    auto nameRef = (jstring) env->CallObjectMethod(clazz, class_getName);
+    const char *name = env->GetStringUTFChars(nameRef, nullptr);
+    string className(name);
+    env->ReleaseStringUTFChars(nameRef, name);
+    std::replace(className.begin(), className.end(), '.', '/');
+    return className;
+}
+
+// -----------------------------------------------------------------
+
+static jint new_env_RegisterNatives(
+        JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
+    auto className = get_class_name(env, clazz);
+    LOGD("hook: JNIEnv->RegisterNatives %s\n", className.data());
+    auto newMethods = hookAndSaveJNIMethods(env, className.data(), methods, numMethods);
+    return old_functions->RegisterNatives(env, clazz, newMethods.get() ?: methods, numMethods);
+}
+
+DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
+        JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
+    LOGD("hook: jniRegisterNativeMethods %s\n", className);
+    auto newMethods = hookAndSaveJNIMethods(env, className, methods, numMethods);
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
 
@@ -148,11 +184,56 @@ DCL_HOOK_FUNC(int, selinux_android_setcontext,
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }
 
-static int sigmask(int how, int signum) {
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, signum);
-    return sigprocmask(how, &set, nullptr);
+// -----------------------------------------------------------------
+
+// android::AndroidRuntime vtable layout
+struct vtable_t {
+    void *rtti;
+    void *dtor;
+    void (*onVmCreated)(void *self, JNIEnv* env);
+    void (*onStarted)(void *self);
+    void (*onZygoteInit)(void *self);
+    void (*onExit)(void *self, int code);
+};
+
+// This method is a trampoline for hooking JNIEnv->RegisterNatives
+DCL_HOOK_FUNC(void, onVmCreated, void *self, JNIEnv *env) {
+    LOGD("hook: AppRuntime::onVmCreated\n");
+
+    // Restore the virtual table, we no longer need it
+    auto *new_table = *reinterpret_cast<vtable_t**>(self);
+    *reinterpret_cast<vtable_t**>(self) = gAppRuntimeVTable;
+    delete new_table;
+
+    // Replace the function table in JNIEnv to hook RegisterNatives
+    old_functions = env->functions;
+    new_functions = new JNINativeInterface();
+    memcpy(new_functions, env->functions, sizeof(*new_functions));
+    new_functions->RegisterNatives = new_env_RegisterNatives;
+    env->functions = new_functions;
+    old_onVmCreated(self, env);
+}
+
+// This method is a trampoline for swizzling android::AppRuntime vtable
+static bool swizzled = false;
+DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
+    if (swizzled) {
+        old_setArgv0(self, argv0, setProcName);
+        return;
+    }
+
+    LOGD("hook: AndroidRuntime::setArgv0\n");
+
+    // Swizzle C++ vtable to hook virtual function
+    gAppRuntimeVTable = *reinterpret_cast<vtable_t**>(self);
+    old_onVmCreated = gAppRuntimeVTable->onVmCreated;
+    auto *new_table = new vtable_t();
+    memcpy(new_table, gAppRuntimeVTable, sizeof(vtable_t));
+    new_table->onVmCreated = &new_onVmCreated;
+    *reinterpret_cast<vtable_t**>(self) = new_table;
+    swizzled = true;
+
+    old_setArgv0(self, argv0, setProcName);
 }
 
 // -----------------------------------------------------------------
@@ -180,6 +261,13 @@ static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclas
 }
 
 // -----------------------------------------------------------------
+
+static int sigmask(int how, int signum) {
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, signum);
+    return sigprocmask(how, &set, nullptr);
+}
 
 // Do our own fork before loading any 3rd party code
 // First block SIGCHLD, unblock after original fork is done
@@ -210,6 +298,16 @@ static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass c
 // -----------------------------------------------------------------
 
 static void nativeForkSystemServer_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+    if (env->functions == new_functions) {
+        // Restore JNIEnv
+        env->functions = old_functions;
+        if (gClassRef) {
+            env->DeleteGlobalRef(gClassRef);
+            gClassRef = nullptr;
+            class_getName = nullptr;
+        }
+    }
+
     PRE_FORK();
     LOGD("hook: %s\n", __FUNCTION__);
 }
@@ -245,22 +343,50 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
     return 0;
 }
 
+template<class T>
+static inline void default_new(T *&p) { p = new T(); }
+
+#define XHOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
+    hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
+
 #define XHOOK_REGISTER(PATH_REGEX, NAME) \
-    hook_register(PATH_REGEX, #NAME, (void*) new_##NAME, (void **) &old_##NAME)
+    XHOOK_REGISTER_SYM(PATH_REGEX, #NAME, NAME)
+
+#define ANDROID_RUNTIME ".*/libandroid_runtime.so$"
+#define APP_PROCESS "^/system/bin/app_process.*"
 
 void hook_functions() {
 #ifdef MAGISK_DEBUG
     xhook_enable_debug(1);
     xhook_enable_sigsegv_protection(0);
 #endif
-    xhook_list = new remove_pointer_t<decltype(xhook_list)>();
-    jni_hook_list = new remove_pointer_t<decltype(jni_hook_list)>();
-    jni_method_map = new remove_pointer_t<decltype(jni_method_map)>();
+    default_new(xhook_list);
+    default_new(jni_hook_list);
+    default_new(jni_method_map);
 
-    XHOOK_REGISTER(".*\\libandroid_runtime.so$", jniRegisterNativeMethods);
-    XHOOK_REGISTER(".*\\libandroid_runtime.so$", fork);
-    XHOOK_REGISTER(".*\\libandroid_runtime.so$", selinux_android_setcontext);
+    XHOOK_REGISTER(ANDROID_RUNTIME, fork);
+    XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
+    XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
     hook_refresh();
+
+    // Remove unhooked methods
+    xhook_list->erase(
+            std::remove_if(xhook_list->begin(), xhook_list->end(),
+            [](auto &t) { return *std::get<2>(t) == nullptr;}),
+            xhook_list->end());
+
+    if (old_jniRegisterNativeMethods == nullptr) {
+        LOGD("hook: jniRegisterNativeMethods not used\n");
+
+        // android::AndroidRuntime::setArgv0(const char *, bool)
+        XHOOK_REGISTER_SYM(APP_PROCESS, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
+        hook_refresh();
+
+        // We still need old_jniRegisterNativeMethods as other code uses it
+        // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char *, const JNINativeMethod *, int)
+        constexpr char sig[] = "_ZN7android14AndroidRuntime21registerNativeMethodsEP7_JNIEnvPKcPK15JNINativeMethodi";
+        *(void **) &old_jniRegisterNativeMethods = dlsym(RTLD_DEFAULT, sig);
+    }
 }
 
 bool unhook_functions() {
