@@ -6,55 +6,14 @@
 
 #include "inject.hpp"
 #include "memory.hpp"
+#include "api.hpp"
 
 using namespace std;
 using jni_hook::hash_map;
 using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
-struct SpecializeAppProcessArgs {
-    jint &uid;
-    jint &gid;
-    jintArray &gids;
-    jint &runtime_flags;
-    jint &mount_external;
-    jstring &se_info;
-    jstring &nice_name;
-    jstring &instruction_set;
-    jstring &app_data_dir;
-
-    /* Optional */
-    jboolean *is_child_zygote = nullptr;
-    jboolean *is_top_app = nullptr;
-    jobjectArray *pkg_data_info_list = nullptr;
-    jobjectArray *whitelisted_data_info_list = nullptr;
-    jboolean *mount_data_dirs = nullptr;
-    jboolean *mount_storage_dirs = nullptr;
-
-    SpecializeAppProcessArgs(
-            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-            jint &mount_external, jstring &se_info, jstring &nice_name,
-            jstring &instruction_set, jstring &app_data_dir) :
-            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
-            mount_external(mount_external), se_info(se_info), nice_name(nice_name),
-            instruction_set(instruction_set), app_data_dir(app_data_dir) {}
-};
-
-struct ForkSystemServerArgs {
-    jint &uid;
-    jint &gid;
-    jintArray &gids;
-    jint &runtime_flags;
-    jlong &permitted_capabilities;
-    jlong &effective_capabilities;
-
-    ForkSystemServerArgs(
-            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-            jlong &permitted_capabilities, jlong &effective_capabilities) :
-            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
-            permitted_capabilities(permitted_capabilities),
-            effective_capabilities(effective_capabilities) {}
-};
+namespace {
 
 struct HookContext {
     int pid;
@@ -65,33 +24,32 @@ struct HookContext {
         void *raw_args;
     };
 };
-struct vtable_t;
 
-static vector<tuple<const char *, const char *, void **>> *xhook_list;
-static vector<JNINativeMethod> *jni_hook_list;
-static hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
+// Global variables
+vector<tuple<const char *, const char *, void **>> *xhook_list;
+vector<JNINativeMethod> *jni_hook_list;
+hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
-static HookContext *current_ctx;
-static JavaVM *g_jvm;
-static vtable_t *gAppRuntimeVTable;
-static const JNINativeInterface *old_functions;
-static JNINativeInterface *new_functions;
-
-#define DCL_HOOK_FUNC(ret, func, ...) \
-    static ret (*old_##func)(__VA_ARGS__); \
-    static ret new_##func(__VA_ARGS__)
+HookContext *current_ctx;
+JavaVM *g_jvm;
+const JNINativeInterface *old_functions;
+JNINativeInterface *new_functions;
 
 #define DCL_JNI_FUNC(name) \
-    static void *name##_orig; \
-    extern const JNINativeMethod name##_methods[];       \
-    extern const int name##_methods_num;
+void *name##_orig;         \
+void name##_pre(HookContext *ctx, JNIEnv *env, jclass clazz); \
+void name##_post(HookContext *ctx, JNIEnv *env, jclass clazz);
 
-namespace {
 // JNI method declarations
 DCL_JNI_FUNC(nativeForkAndSpecialize)
 DCL_JNI_FUNC(nativeSpecializeAppProcess)
 DCL_JNI_FUNC(nativeForkSystemServer)
-}
+
+#undef DCL_JNI_FUNC
+
+// JNI method definitions
+// Includes all method signatures of all supported Android versions
+#include "jni_hooks.hpp"
 
 #define HOOK_JNI(method) \
 if (methods[i].name == #method##sv) { \
@@ -108,7 +66,7 @@ if (methods[i].name == #method##sv) { \
     continue;            \
 }
 
-static unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(
+unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
     if (g_jvm == nullptr) {
         // Save for later unhooking
@@ -135,9 +93,11 @@ static unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(
     return newMethods;
 }
 
-static jclass gClassRef;
-static jmethodID class_getName;
-static string get_class_name(JNIEnv *env, jclass clazz) {
+#undef HOOK_JNI
+
+jclass gClassRef;
+jmethodID class_getName;
+string get_class_name(JNIEnv *env, jclass clazz) {
     if (!gClassRef) {
         jclass cls = env->FindClass("java/lang/Class");
         gClassRef = (jclass) env->NewGlobalRef(cls);
@@ -154,7 +114,11 @@ static string get_class_name(JNIEnv *env, jclass clazz) {
 
 // -----------------------------------------------------------------
 
-static jint new_env_RegisterNatives(
+#define DCL_HOOK_FUNC(ret, func, ...) \
+ret (*old_##func)(__VA_ARGS__);       \
+ret new_##func(__VA_ARGS__)
+
+jint new_env_RegisterNatives(
         JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
     auto className = get_class_name(env, clazz);
     LOGD("hook: JNIEnv->RegisterNatives %s\n", className.data());
@@ -196,6 +160,8 @@ struct vtable_t {
     void (*onExit)(void *self, int code);
 };
 
+vtable_t *gAppRuntimeVTable;
+
 // This method is a trampoline for hooking JNIEnv->RegisterNatives
 DCL_HOOK_FUNC(void, onVmCreated, void *self, JNIEnv *env) {
     LOGD("hook: AppRuntime::onVmCreated\n");
@@ -215,7 +181,7 @@ DCL_HOOK_FUNC(void, onVmCreated, void *self, JNIEnv *env) {
 }
 
 // This method is a trampoline for swizzling android::AppRuntime vtable
-static bool swizzled = false;
+bool swizzled = false;
 DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
     if (swizzled) {
         old_setArgv0(self, argv0, setProcName);
@@ -236,9 +202,11 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
     old_setArgv0(self, argv0, setProcName);
 }
 
+#undef DCL_HOOK_FUNC
+
 // -----------------------------------------------------------------
 
-static void nativeSpecializeAppProcess_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeSpecializeAppProcess_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
     current_ctx = ctx;
     const char *process = env->GetStringUTFChars(ctx->args->nice_name, nullptr);
     LOGD("hook: %s %s\n", __FUNCTION__, process);
@@ -252,7 +220,7 @@ static void nativeSpecializeAppProcess_pre(HookContext *ctx, JNIEnv *env, jclass
     env->ReleaseStringUTFChars(ctx->args->nice_name, process);
 }
 
-static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
     current_ctx = nullptr;
     LOGD("hook: %s\n", __FUNCTION__);
 
@@ -262,7 +230,7 @@ static void nativeSpecializeAppProcess_post(HookContext *ctx, JNIEnv *env, jclas
 
 // -----------------------------------------------------------------
 
-static int sigmask(int how, int signum) {
+int sigmask(int how, int signum) {
     sigset_t set;
     sigemptyset(&set);
     sigaddset(&set, signum);
@@ -285,19 +253,19 @@ static int sigmask(int how, int signum) {
     if (ctx->pid != 0)\
         return;
 
-static void nativeForkAndSpecialize_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeForkAndSpecialize_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
     PRE_FORK();
     nativeSpecializeAppProcess_pre(ctx, env, clazz);
 }
 
-static void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeForkAndSpecialize_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
     POST_FORK();
     nativeSpecializeAppProcess_post(ctx, env, clazz);
 }
 
 // -----------------------------------------------------------------
 
-static void nativeForkSystemServer_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeForkSystemServer_pre(HookContext *ctx, JNIEnv *env, jclass clazz) {
     if (env->functions == new_functions) {
         // Restore JNIEnv
         env->functions = old_functions;
@@ -312,7 +280,7 @@ static void nativeForkSystemServer_pre(HookContext *ctx, JNIEnv *env, jclass cla
     LOGD("hook: %s\n", __FUNCTION__);
 }
 
-static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
+void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass clazz) {
     POST_FORK();
     LOGD("hook: %s\n", __FUNCTION__);
 }
@@ -322,7 +290,7 @@ static void nativeForkSystemServer_post(HookContext *ctx, JNIEnv *env, jclass cl
 
 // -----------------------------------------------------------------
 
-static bool hook_refresh() {
+bool hook_refresh() {
     if (xhook_refresh(0) == 0) {
         xhook_clear();
         LOGI("hook: xhook success\n");
@@ -333,7 +301,7 @@ static bool hook_refresh() {
     }
 }
 
-static int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
+int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
     int ret = xhook_register(path, symbol, new_func, old_func);
     if (ret != 0) {
         LOGE("hook: Failed to register hook \"%s\"\n", symbol);
@@ -342,6 +310,8 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
     xhook_list->emplace_back(path, symbol, old_func);
     return 0;
 }
+
+} // namespace
 
 template<class T>
 static inline void default_new(T *&p) { p = new T(); }
@@ -418,6 +388,3 @@ bool unhook_functions() {
     delete xhook_list;
     return hook_refresh();
 }
-
-// JNI method definitions, include all method signatures of past Android versions
-#include "jni_hooks.hpp"

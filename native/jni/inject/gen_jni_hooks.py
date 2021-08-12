@@ -150,7 +150,7 @@ def gen_definitions(methods, base_name):
         jni_ret = 'V'
     for m in methods:
         func_name = f'{base_name}_{m.name}'
-        decl += ind(0) + f'static {cpp_ret} {func_name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
+        decl += ind(0) + f'{cpp_ret} {func_name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
         decl += ind(1) + 'HookContext ctx{};'
         if base_name == 'nativeForkSystemServer':
             decl += ind(1) + 'ForkSystemServerArgs args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
@@ -168,7 +168,6 @@ def gen_definitions(methods, base_name):
         decl += ret_stat
         decl += ind(0) + '}'
 
-    decl += ind(0) + 'namespace {'
     decl += ind(0) + f'const JNINativeMethod {base_name}_methods[] = {{'
     for m in methods:
         decl += ind(1) + '{'
@@ -177,8 +176,7 @@ def gen_definitions(methods, base_name):
         decl += ind(2) + f'(void *) &{base_name}_{m.name}'
         decl += ind(1) + '},'
     decl += ind(0) + '};'
-    decl += ind(0) + f'const int {base_name}_methods_num = std::size({base_name}_methods);'
-    decl += ind(0) + '} // namespace'
+    decl += ind(0) + f'constexpr int {base_name}_methods_num = std::size({base_name}_methods);'
     decl += ind(0)
     return decl
 
