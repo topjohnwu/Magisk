@@ -39,15 +39,16 @@ static bool verify_client(pid_t pid) {
 static bool check_zygote(pid_t pid) {
     char buf[32];
     sprintf(buf, "/proc/%d/attr/current", pid);
-    auto fp = open_file(buf, "r");
-    if (!fp)
+    if (auto fp = open_file(buf, "r")) {
+        fscanf(fp.get(), "%s", buf);
+        return buf == "u:r:zygote:s0"sv;
+    } else {
         return false;
-    fscanf(fp.get(), "%s", buf);
-    return buf == "u:r:zygote:s0"sv;
+    }
 }
 
-static void request_handler(int client, int req_code, ucred cred) {
-    switch (req_code) {
+static void handle_request_async(int client, int code, ucred cred) {
+    switch (code) {
     case MAGISKHIDE:
         magiskhide_handler(client, &cred);
         break;
@@ -78,26 +79,43 @@ static void request_handler(int client, int req_code, ucred cred) {
     }
 }
 
+static void handle_request_sync(int client, int code) {
+    switch (code) {
+    case CHECK_VERSION:
+        write_string(client, MAGISK_VERSION ":MAGISK");
+        break;
+    case CHECK_VERSION_CODE:
+        write_int(client, MAGISK_VER_CODE);
+        break;
+    case GET_PATH:
+        write_string(client, MAGISKTMP.data());
+        break;
+    case START_DAEMON:
+        setup_logfile(true);
+        break;
+    }
+}
+
 static void handle_request(int client) {
-    int req_code;
+    int code;
 
     // Verify client credentials
     ucred cred;
     get_client_cred(client, &cred);
 
     bool is_root = cred.uid == 0;
-    bool is_zygote = check_zygote(cred.pid);
     bool is_client = verify_client(cred.pid);
+    bool is_zygote = !is_client && check_zygote(cred.pid);
 
     if (!is_root && !is_zygote && !is_client)
-        goto shortcut;
+        goto done;
 
-    req_code = read_int(client);
-    if (req_code < 0 || req_code >= DAEMON_CODE_END)
-        goto shortcut;
+    code = read_int(client);
+    if (code < 0 || (code & DAEMON_CODE_MASK) >= DAEMON_CODE_END)
+        goto done;
 
     // Check client permissions
-    switch (req_code) {
+    switch (code) {
     case POST_FS_DATA:
     case LATE_START:
     case BOOT_COMPLETE:
@@ -105,44 +123,33 @@ static void handle_request(int client) {
     case GET_PATH:
         if (!is_root) {
             write_int(client, ROOT_REQUIRED);
-            goto shortcut;
+            goto done;
         }
         break;
     case REMOVE_MODULES:
-        if (cred.uid != UID_SHELL && cred.uid != UID_ROOT) {
+        if (!is_root && cred.uid != UID_SHELL) {
             write_int(client, 1);
-            goto shortcut;
+            goto done;
         }
         break;
     case MAGISKHIDE:  // accept hide request from zygote
         if (!is_root && !is_zygote) {
             write_int(client, ROOT_REQUIRED);
-            goto shortcut;
+            goto done;
         }
         break;
     }
 
-    // Simple requests
-    switch (req_code) {
-    case CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
-        goto shortcut;
-    case CHECK_VERSION_CODE:
-        write_int(client, MAGISK_VER_CODE);
-        goto shortcut;
-    case GET_PATH:
-        write_string(client, MAGISKTMP.data());
-        goto shortcut;
-    case START_DAEMON:
-        setup_logfile(true);
-        goto shortcut;
+    if (code & SYNC_FLAG) {
+        handle_request_sync(client, code);
+        goto done;
     }
 
     // Create new thread to handle complex requests
-    new_daemon_thread([=] { return request_handler(client, req_code, cred); });
+    new_daemon_thread([=] { handle_request_async(client, code, cred); });
     return;
 
-shortcut:
+done:
     close(client);
 }
 
