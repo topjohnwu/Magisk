@@ -87,7 +87,7 @@ permitted_capabilities = Argument('permitted_capabilities', jlong)
 effective_capabilities = Argument('effective_capabilities', jlong)
 
 # Method definitions
-fork_m = Method('m', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+fork_l = Method('l', [uid, gid, gids, runtime_flags, rlimits, mount_external,
     se_info, nice_name, fds_to_close, instruction_set, app_data_dir])
 
 fork_o = Method('o', [uid, gid, gids, runtime_flags, rlimits, mount_external,
@@ -183,7 +183,7 @@ def gen_definitions(methods, base_name):
     return decl
 
 def gen_fork():
-    methods = [fork_m, fork_o, fork_p, fork_q_alt, fork_r, fork_samsung_m, fork_samsung_n, fork_samsung_o, fork_samsung_p]
+    methods = [fork_l, fork_o, fork_p, fork_q_alt, fork_r, fork_samsung_m, fork_samsung_n, fork_samsung_o, fork_samsung_p]
     return gen_definitions(methods, 'nativeForkAndSpecialize')
 
 def gen_spec():
