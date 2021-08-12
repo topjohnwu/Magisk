@@ -118,7 +118,7 @@ string get_class_name(JNIEnv *env, jclass clazz) {
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
 
-jint new_env_RegisterNatives(
+jint jniRegisterNatives(
         JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
     auto className = get_class_name(env, clazz);
     LOGD("hook: JNIEnv->RegisterNatives %s\n", className.data());
@@ -150,34 +150,33 @@ DCL_HOOK_FUNC(int, selinux_android_setcontext,
 
 // -----------------------------------------------------------------
 
-// android::AndroidRuntime vtable layout
-struct vtable_t {
-    void *rtti;
-    void *dtor;
-    void (*onVmCreated)(void *self, JNIEnv* env);
-    void (*onStarted)(void *self);
-    void (*onZygoteInit)(void *self);
-    void (*onExit)(void *self, int code);
-};
-
-vtable_t *gAppRuntimeVTable;
+// The original android::AppRuntime virtual table
+void **gAppRuntimeVTable;
 
 // This method is a trampoline for hooking JNIEnv->RegisterNatives
-DCL_HOOK_FUNC(void, onVmCreated, void *self, JNIEnv *env) {
+void onVmCreated(void *self, JNIEnv* env) {
     LOGD("hook: AppRuntime::onVmCreated\n");
 
-    // Restore the virtual table, we no longer need it
-    auto *new_table = *reinterpret_cast<vtable_t**>(self);
-    *reinterpret_cast<vtable_t**>(self) = gAppRuntimeVTable;
-    delete new_table;
+    // Restore virtual table
+    auto new_table = *reinterpret_cast<void***>(self);
+    *reinterpret_cast<void***>(self) = gAppRuntimeVTable;
+    delete[] new_table;
+
+    new_functions = new JNINativeInterface();
+    memcpy(new_functions, env->functions, sizeof(*new_functions));
+    new_functions->RegisterNatives = &jniRegisterNatives;
 
     // Replace the function table in JNIEnv to hook RegisterNatives
     old_functions = env->functions;
-    new_functions = new JNINativeInterface();
-    memcpy(new_functions, env->functions, sizeof(*new_functions));
-    new_functions->RegisterNatives = new_env_RegisterNatives;
     env->functions = new_functions;
-    old_onVmCreated(self, env);
+}
+
+template<int N>
+void vtable_entry(void *self, JNIEnv* env) {
+    // The first invocation will be onVmCreated
+    onVmCreated(self, env);
+    // Call original function
+    reinterpret_cast<decltype(&onVmCreated)>(gAppRuntimeVTable[N])(self, env);
 }
 
 // This method is a trampoline for swizzling android::AppRuntime vtable
@@ -190,13 +189,21 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
 
     LOGD("hook: AndroidRuntime::setArgv0\n");
 
+    // We don't know which entry is onVmCreated, so overwrite every one
+    // We also don't know the size of the vtable, but 8 is more than enough
+    auto new_table = new void*[8];
+    new_table[0] = reinterpret_cast<void*>(&vtable_entry<0>);
+    new_table[1] = reinterpret_cast<void*>(&vtable_entry<1>);
+    new_table[2] = reinterpret_cast<void*>(&vtable_entry<2>);
+    new_table[3] = reinterpret_cast<void*>(&vtable_entry<3>);
+    new_table[4] = reinterpret_cast<void*>(&vtable_entry<4>);
+    new_table[5] = reinterpret_cast<void*>(&vtable_entry<5>);
+    new_table[6] = reinterpret_cast<void*>(&vtable_entry<6>);
+    new_table[7] = reinterpret_cast<void*>(&vtable_entry<7>);
+
     // Swizzle C++ vtable to hook virtual function
-    gAppRuntimeVTable = *reinterpret_cast<vtable_t**>(self);
-    old_onVmCreated = gAppRuntimeVTable->onVmCreated;
-    auto *new_table = new vtable_t();
-    memcpy(new_table, gAppRuntimeVTable, sizeof(vtable_t));
-    new_table->onVmCreated = &new_onVmCreated;
-    *reinterpret_cast<vtable_t**>(self) = new_table;
+    gAppRuntimeVTable = *reinterpret_cast<void***>(self);
+    *reinterpret_cast<void***>(self) = new_table;
     swizzled = true;
 
     old_setArgv0(self, argv0, setProcName);
