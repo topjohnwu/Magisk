@@ -1,11 +1,7 @@
-#include <fcntl.h>
-#include <pthread.h>
 #include <csignal>
 #include <libgen.h>
 #include <sys/un.h>
-#include <sys/types.h>
 #include <sys/mount.h>
-#include <android/log.h>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -14,7 +10,6 @@
 #include <db.hpp>
 #include <resetprop.hpp>
 #include <flags.hpp>
-#include <stream.hpp>
 
 #include "core.hpp"
 
@@ -103,7 +98,7 @@ static void handle_request(int client) {
     ucred cred;
     get_client_cred(client, &cred);
 
-    bool is_root = cred.uid == 0;
+    bool is_root = cred.uid == UID_ROOT;
     bool is_client = verify_client(cred.pid);
     bool is_zygote = !is_client && check_zygote(cred.pid);
 
@@ -167,9 +162,6 @@ static int switch_cgroup(const char *cgroup, int pid) {
     close(fd);
     return 0;
 }
-
-static void magisk_logging();
-static void start_log_daemon();
 
 [[noreturn]] static void daemon_entry() {
     magisk_logging();
@@ -247,10 +239,10 @@ static void start_log_daemon();
         return true;
     });
 
-    struct sockaddr_un sun;
+    sockaddr_un sun;
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (xbind(fd, (struct sockaddr*) &sun, len))
+    if (xbind(fd, (sockaddr*) &sun, len))
         exit(1);
     xlisten(fd, 10);
 
@@ -265,8 +257,8 @@ int connect_daemon(bool create) {
     sockaddr_un sun;
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (connect(fd, (struct sockaddr*) &sun, len)) {
-        if (!create || getuid() != UID_ROOT || getgid() != UID_ROOT) {
+    if (connect(fd, (sockaddr*) &sun, len)) {
+        if (!create || getuid() != UID_ROOT) {
             LOGE("No daemon is currently running!\n");
             exit(1);
         }
@@ -280,163 +272,4 @@ int connect_daemon(bool create) {
             usleep(10000);
     }
     return fd;
-}
-
-struct log_meta {
-    int prio;
-    int len;
-    int pid;
-    int tid;
-};
-
-static atomic<int> log_sockfd = -1;
-
-void setup_logfile(bool reset) {
-    if (log_sockfd < 0)
-        return;
-
-    msghdr msg{};
-    iovec iov{};
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-
-    log_meta meta = {
-        .prio = -1,
-        .len = reset
-    };
-
-    iov.iov_base = &meta;
-    iov.iov_len = sizeof(meta);
-    sendmsg(log_sockfd, &msg, MSG_NOSIGNAL);
-}
-
-static void logfile_writer(int sockfd) {
-    run_finally close_socket([=] {
-        // Close up all logging sockets when thread dies
-        close(sockfd);
-        close(log_sockfd.exchange(-1));
-    });
-
-    char *log_buf;
-    size_t buf_len;
-    stream *log_strm = new byte_stream(log_buf, buf_len);
-
-    msghdr msg{};
-    iovec iov{};
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-
-    log_meta meta{};
-    char buf[4096];
-
-    for (;;) {
-        // Read meta data
-        iov.iov_base = &meta;
-        iov.iov_len = sizeof(meta);
-        if (recvmsg(sockfd, &msg, 0) <= 0)
-            return;
-
-        if (meta.prio < 0 && buf_len >= 0) {
-            run_finally free_buf([&] {
-                free(log_buf);
-                log_buf = nullptr;
-                buf_len = -1;
-            });
-
-            if (meta.len)
-                rename(LOGFILE, LOGFILE ".bak");
-
-            int fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-            if (fd < 0)
-                return;
-            if (log_buf)
-                write(fd, log_buf, buf_len);
-
-            delete log_strm;
-            log_strm = new fd_stream(fd);
-            continue;
-        }
-
-        timeval tv;
-        tm tm;
-        gettimeofday(&tv, nullptr);
-        localtime_r(&tv.tv_sec, &tm);
-
-        // Format detailed info
-        char type;
-        switch (meta.prio) {
-            case ANDROID_LOG_DEBUG:
-                type = 'D';
-                break;
-            case ANDROID_LOG_INFO:
-                type = 'I';
-                break;
-            case ANDROID_LOG_WARN:
-                type = 'W';
-                break;
-            default:
-                type = 'E';
-                break;
-        }
-        size_t off = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
-        int ms = tv.tv_usec / 1000;
-        off += snprintf(buf + off, sizeof(buf) - off,
-                ".%03d %5d %5d %c : ", ms, meta.pid, meta.tid, type);
-
-        // Read log msg
-        iov.iov_base = buf + off;
-        iov.iov_len = meta.len;
-        if (recvmsg(sockfd, &msg, 0) <= 0)
-            return;
-        log_strm->write(buf, off + meta.len);
-    }
-}
-
-static int magisk_log(int prio, const char *fmt, va_list ap) {
-    char buf[4000];
-    int len = vsnprintf(buf, sizeof(buf), fmt, ap) + 1;
-
-    if (log_sockfd >= 0) {
-        log_meta meta = {
-            .prio = prio,
-            .len = len,
-            .pid = getpid(),
-            .tid = gettid()
-        };
-
-        msghdr msg{};
-        iovec iov[2];
-        msg.msg_iov = iov;
-        msg.msg_iovlen = 2;
-
-        iov[0].iov_base = &meta;
-        iov[0].iov_len = sizeof(meta);
-        iov[1].iov_base = buf;
-        iov[1].iov_len = len;
-
-        if (sendmsg(log_sockfd, &msg, MSG_NOSIGNAL) < 0) {
-            // Stop trying to write to file
-            close(log_sockfd.exchange(-1));
-        }
-    }
-    __android_log_write(prio, "Magisk", buf);
-
-    return len - 1;
-}
-
-static void start_log_daemon() {
-    int fds[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds) == 0) {
-        log_sockfd = fds[0];
-        new_daemon_thread([=] { logfile_writer(fds[1]); });
-    }
-}
-
-#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
-static void magisk_logging() {
-    log_cb.d = mlog(DEBUG);
-    log_cb.i = mlog(INFO);
-    log_cb.w = mlog(WARN);
-    log_cb.e = mlog(ERROR);
-    log_cb.ex = nop_ex;
 }

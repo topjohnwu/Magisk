@@ -8,6 +8,8 @@ extern int DAEMON_STATE;
 
 void unlock_blocks();
 void reboot();
+void magisk_logging();
+void start_log_daemon();
 void setup_logfile(bool reset);
 
 // Module stuffs
@@ -23,4 +25,3 @@ void exec_common_scripts(const char *stage);
 void exec_module_scripts(const char *stage, const std::vector<std::string> &module_list);
 void install_apk(const char *apk);
 [[noreturn]] void install_module(const char *file);
-
