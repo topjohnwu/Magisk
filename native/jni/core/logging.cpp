@@ -80,10 +80,6 @@ static void logfile_writer(int pipefd) {
             continue;
         }
 
-        // Read message
-        if (xread(pipefd, buf + TIME_FMT_LEN + 1, meta.len) != meta.len)
-            return;
-
         timeval tv;
         tm tm;
         gettimeofday(&tv, nullptr);
@@ -107,10 +103,14 @@ static void logfile_writer(int pipefd) {
         }
         size_t off = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
         int ms = tv.tv_usec / 1000;
-        snprintf(buf + off, sizeof(buf) - off,
+        off += snprintf(buf + off, sizeof(buf) - off,
                 ".%03d %5d %5d %c : ", ms, meta.pid, meta.tid, type);
 
-        strm->write(buf, TIME_FMT_LEN + meta.len);
+        // Read message
+        if (xread(pipefd, buf + off, meta.len) != meta.len)
+            return;
+
+        strm->write(buf, off + meta.len);
     }
 }
 
