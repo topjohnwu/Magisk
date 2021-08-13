@@ -243,31 +243,3 @@ void cpio_rw::load_cpio(const char *buf, size_t sz) {
         pos_align(pos);
     }
 }
-
-cpio_mmap::cpio_mmap(const char *file) {
-    mmap_ro(file, buf, sz);
-    fprintf(stderr, "Loading cpio: [%s]\n", file);
-    size_t pos = 0;
-    cpio_newc_header *header;
-    unique_ptr<cpio_entry_base> entry;
-    while (pos < sz) {
-        header = (cpio_newc_header *)(buf + pos);
-        entry = make_unique<cpio_entry_base>(header);
-        pos += sizeof(*header);
-        string_view name_view(buf + pos);
-        pos += x8u(header->namesize);
-        pos_align(pos);
-        if (name_view == "." || name_view == "..")
-            continue;
-        if (name_view == "TRAILER!!!")
-            break;
-        entry->data = buf + pos;
-        pos += entry->filesize;
-        entries[name_view] = std::move(entry);
-        pos_align(pos);
-    }
-}
-
-cpio_mmap::~cpio_mmap() {
-    munmap(buf, sz);
-}

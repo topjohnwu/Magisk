@@ -6,8 +6,6 @@
 
 using namespace std;
 
-constexpr char RAMDISK_XZ[] = "ramdisk.cpio.xz";
-
 static const char *UNSUPPORT_LIST[] =
         { "sbin/launch_daemonsu.sh", "sbin/su", "init.xposed.rc",
           "boot/sbin/launch_daemonsu.sh" };
@@ -18,15 +16,12 @@ static const char *MAGISK_LIST[] =
 
 class magisk_cpio : public cpio_rw {
 public:
-    magisk_cpio() = default;
-    explicit magisk_cpio(const char *filename) : cpio_rw(filename) {}
+    using cpio_rw::cpio_rw;
     void patch();
     int test();
     char *sha1();
     void restore();
     void backup(const char *orig);
-    void compress();
-    void decompress();
 };
 
 bool check_env(const char *name) {
@@ -68,35 +63,25 @@ void magisk_cpio::patch() {
 #define STOCK_BOOT        0
 #define MAGISK_PATCHED    (1 << 0)
 #define UNSUPPORTED_CPIO  (1 << 1)
-#define COMPRESSED_CPIO   (1 << 2)
 
 int magisk_cpio::test() {
-    for (auto file : UNSUPPORT_LIST)
-        if (exists(file))
-            return UNSUPPORTED_CPIO;
-
-    int flags = STOCK_BOOT;
-
-    if (exists(RAMDISK_XZ)) {
-        flags |= COMPRESSED_CPIO | MAGISK_PATCHED;
-        decompress();
-    }
-
-    for (auto file : MAGISK_LIST) {
+    for (auto file : UNSUPPORT_LIST) {
         if (exists(file)) {
-            flags |= MAGISK_PATCHED;
-            break;
+            return UNSUPPORTED_CPIO;
         }
     }
-
-    return flags;
+    for (auto file : MAGISK_LIST) {
+        if (exists(file)) {
+            return MAGISK_PATCHED;
+        }
+    }
+    return STOCK_BOOT;
 }
 
 #define for_each_line(line, buf, size) \
 for (line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(line + 1, '\n') + 1)
 
 char *magisk_cpio::sha1() {
-    decompress();
     char sha1[41];
     char *line;
     for (auto &e : entries) {
@@ -127,8 +112,6 @@ char *magisk_cpio::sha1() {
 for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1)
 
 void magisk_cpio::restore() {
-    decompress();
-
     if (auto it = entries.find(".backup/.rmlist"); it != entries.end()) {
         char *file;
         for_each_str(file, it->second->data, it->second->filesize)
@@ -231,43 +214,6 @@ void magisk_cpio::backup(const char *orig) {
         entries.merge(bkup_entries);
 }
 
-void magisk_cpio::compress() {
-    if (exists(RAMDISK_XZ))
-        return;
-    fprintf(stderr, "Compressing cpio -> [%s]\n", RAMDISK_XZ);
-    auto init = entries.extract("init");
-
-    uint8_t *data;
-    size_t len;
-    auto strm = make_stream_fp(get_encoder(XZ, make_unique<byte_stream>(data, len)));
-    dump(strm.release());
-
-    entries.clear();
-    entries.insert(std::move(init));
-    auto xz = new cpio_entry(RAMDISK_XZ, S_IFREG);
-    xz->data = data;
-    xz->filesize = len;
-    insert(xz);
-}
-
-void magisk_cpio::decompress() {
-    auto it = entries.find(RAMDISK_XZ);
-    if (it == entries.end())
-        return;
-    fprintf(stderr, "Decompressing cpio [%s]\n", RAMDISK_XZ);
-
-    char *data;
-    size_t len;
-    {
-        auto strm = get_decoder(XZ, make_unique<byte_stream>(data, len));
-        strm->write(it->second->data, it->second->filesize);
-    }
-
-    entries.erase(it);
-    load_cpio(data, len);
-    free(data);
-}
-
 int cpio_commands(int argc, char *argv[]) {
     char *incpio = argv[0];
     ++argv;
@@ -305,10 +251,6 @@ int cpio_commands(int argc, char *argv[]) {
             char *sha1 = cpio.sha1();
             if (sha1) printf("%s\n", sha1);
             return 0;
-        } else if (cmdv[0] == "compress"sv){
-            cpio.compress();
-        } else if (cmdv[0] == "decompress"sv){
-            cpio.decompress();
         } else if (cmdv[0] == "patch"sv) {
             cpio.patch();
         } else if (cmdc == 2 && cmdv[0] == "exists"sv) {

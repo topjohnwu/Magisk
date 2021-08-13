@@ -66,12 +66,3 @@ protected:
     void mv(entry_map::iterator &it, const char *to);
     void load_cpio(const char *buf, size_t sz);
 };
-
-class cpio_mmap : public cpio {
-public:
-    explicit cpio_mmap(const char *file);
-    ~cpio_mmap();
-private:
-    char *buf;
-    size_t sz;
-};
