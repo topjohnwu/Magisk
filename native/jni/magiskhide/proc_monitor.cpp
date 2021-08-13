@@ -77,13 +77,13 @@ static bool is_zygote_done() {
 
 static void check_zygote() {
     crawl_procfs([](int pid) -> bool {
-        char buf[512];
-        snprintf(buf, sizeof(buf), "/proc/%d/cmdline", pid);
-        if (FILE *f = fopen(buf, "re")) {
-            fgets(buf, sizeof(buf), f);
-            if (strncmp(buf, "zygote", 6) == 0 && parse_ppid(pid) == 1)
+        char buf[32];
+        sprintf(buf, "/proc/%d/attr/current", pid);
+        auto fp = open_file(buf, "r");
+        if (fp) {
+            fscanf(fp.get(), "%s", buf);
+            if (buf == "u:r:zygote:s0"sv && parse_ppid(pid) == 1)
                 new_zygote(pid);
-            fclose(f);
         }
         return true;
     });
