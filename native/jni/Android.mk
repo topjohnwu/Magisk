@@ -97,7 +97,7 @@ LOCAL_SRC_FILES := \
     magiskboot/dtb.cpp \
     magiskboot/ramdisk.cpp \
     magiskboot/pattern.cpp \
-    utils/cpio.cpp
+    magiskboot/cpio.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)

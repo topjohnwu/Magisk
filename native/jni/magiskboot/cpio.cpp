@@ -1,11 +1,10 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
 #include <algorithm>
 
 #include <utils.hpp>
-#include <cpio.hpp>
+
+#include "cpio.hpp"
 
 using namespace std;
 
@@ -43,8 +42,11 @@ static uint32_t x8u(const char *hex) {
     return val;
 }
 
-cpio_entry_base::cpio_entry_base(const cpio_newc_header *h)
-: mode(x8u(h->mode)), uid(x8u(h->uid)), gid(x8u(h->gid)), filesize(x8u(h->filesize)) {};
+cpio_entry::cpio_entry(uint32_t mode) : mode(mode), uid(0), gid(0), filesize(0), data(nullptr) {}
+
+cpio_entry::cpio_entry(const cpio_newc_header *h) :
+mode(x8u(h->mode)), uid(x8u(h->uid)), gid(x8u(h->gid)), filesize(x8u(h->filesize)), data(nullptr)
+{}
 
 void cpio::dump(const char *file) {
     fprintf(stderr, "Dump cpio: [%s]\n", file);
@@ -71,12 +73,12 @@ void cpio::rm(const char *name, bool r) {
     }
 }
 
-static void extract_entry(const entry_map::value_type &e, const char *file) {
+void cpio::extract_entry(const entry_map::value_type &e, const char *file) {
     fprintf(stderr, "Extract [%s] to [%s]\n", e.first.data(), file);
     unlink(file);
     rmdir(file);
     if (S_ISDIR(e.second->mode)) {
-        mkdir(file, e.second->mode & 0777);
+        ::mkdir(file, e.second->mode & 0777);
     } else if (S_ISREG(e.second->mode)) {
         int fd = creat(file, e.second->mode & 0777);
         xwrite(fd, e.second->data, e.second->filesize);
@@ -148,11 +150,7 @@ void cpio::dump(FILE *out) {
     fclose(out);
 }
 
-cpio_rw::cpio_rw(const char *file) {
-    load_cpio(file);
-}
-
-void cpio_rw::load_cpio(const char *file) {
+void cpio::load_cpio(const char *file) {
     char *buf;
     size_t sz;
     mmap_ro(file, buf, sz);
@@ -161,54 +159,49 @@ void cpio_rw::load_cpio(const char *file) {
     munmap(buf, sz);
 }
 
-void cpio_rw::insert(cpio_entry *e) {
-    auto ex = entries.extract(e->filename);
-    if (!ex) {
-        entries[e->filename].reset(e);
+void cpio::insert(string_view name, cpio_entry *e) {
+    auto it = entries.find(name);
+    if (it != entries.end()) {
+        it->second.reset(e);
     } else {
-        ex.key() = e->filename;
-        ex.mapped().reset(e);
-        entries.insert(std::move(ex));
+        entries.emplace(name, e);
     }
 }
 
-void cpio_rw::add(mode_t mode, const char *name, const char *file) {
+void cpio::add(mode_t mode, const char *name, const char *file) {
     void *buf;
     size_t sz;
     mmap_ro(file, buf, sz);
-    auto e = new cpio_entry(name, S_IFREG | mode);
+    auto e = new cpio_entry(S_IFREG | mode);
     e->filesize = sz;
     e->data = xmalloc(sz);
     memcpy(e->data, buf, sz);
     munmap(buf, sz);
-    insert(e);
+    insert(name, e);
     fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
 }
 
-void cpio_rw::mkdir(mode_t mode, const char *name) {
-    insert(new cpio_entry(name, S_IFDIR | mode));
+void cpio::mkdir(mode_t mode, const char *name) {
+    insert(name, new cpio_entry(S_IFDIR | mode));
     fprintf(stderr, "Create directory [%s] (%04o)\n", name, mode);
 }
 
-void cpio_rw::ln(const char *target, const char *name) {
-    auto e = new cpio_entry(name, S_IFLNK);
+void cpio::ln(const char *target, const char *name) {
+    auto e = new cpio_entry(S_IFLNK);
     e->filesize = strlen(target);
     e->data = strdup(target);
-    insert(e);
+    insert(name, e);
     fprintf(stderr, "Create symlink [%s] -> [%s]\n", name, target);
 }
 
-void cpio_rw::mv(entry_map::iterator &it, const char *to) {
-    fprintf(stderr, "Move [%s] -> [%s]\n", it->first.data(), to);
-    auto ex = entries.extract(it);
-    auto &name = static_cast<cpio_entry*>(ex.mapped().get())->filename;
-    name = to;
-    ex.key() = name;
-    entries.erase(name);
-    entries.insert(std::move(ex));
+void cpio::mv(entry_map::iterator &it, const char *name) {
+    fprintf(stderr, "Move [%s] -> [%s]\n", it->first.data(), name);
+    auto e = it->second.release();
+    entries.erase(it);
+    insert(name, e);
 }
 
-bool cpio_rw::mv(const char *from, const char *to) {
+bool cpio::mv(const char *from, const char *to) {
     auto it = entries.find(from);
     if (it != entries.end()) {
         mv(it, to);
@@ -220,26 +213,23 @@ bool cpio_rw::mv(const char *from, const char *to) {
 
 #define pos_align(p) p = do_align(p, 4)
 
-void cpio_rw::load_cpio(const char *buf, size_t sz) {
+void cpio::load_cpio(const char *buf, size_t sz) {
     size_t pos = 0;
-    const cpio_newc_header *header;
-    unique_ptr<cpio_entry> entry;
     while (pos < sz) {
-        header = reinterpret_cast<const cpio_newc_header *>(buf + pos);
-        entry = make_unique<cpio_entry>(header);
-        pos += sizeof(*header);
-        string_view name_view(buf + pos);
+        auto header = reinterpret_cast<const cpio_newc_header *>(buf + pos);
+        pos += sizeof(cpio_newc_header);
+        string_view name(buf + pos);
         pos += x8u(header->namesize);
         pos_align(pos);
-        if (name_view == "." || name_view == "..")
+        if (name == "." || name == "..")
             continue;
-        if (name_view == "TRAILER!!!")
+        if (name == "TRAILER!!!")
             break;
-        entry->filename = name_view;
+        auto entry = new cpio_entry(header);
         entry->data = xmalloc(entry->filesize);
         memcpy(entry->data, buf + pos, entry->filesize);
         pos += entry->filesize;
-        entries[entry->filename] = std::move(entry);
+        insert(name, entry);
         pos_align(pos);
     }
 }

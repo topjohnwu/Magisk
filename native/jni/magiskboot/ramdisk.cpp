@@ -1,6 +1,6 @@
 #include <utils.hpp>
-#include <cpio.hpp>
 
+#include "cpio.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
 
@@ -14,9 +14,8 @@ static const char *MAGISK_LIST[] =
         { ".backup/.magisk", "init.magisk.rc",
           "overlay/init.magisk.rc" };
 
-class magisk_cpio : public cpio_rw {
+class magisk_cpio : public cpio {
 public:
-    using cpio_rw::cpio_rw;
     void patch();
     int test();
     char *sha1();
@@ -95,7 +94,7 @@ char *magisk_cpio::sha1() {
             }
         } else if (e.first == ".backup/.magisk") {
             for_each_line(line, e.second->data, e.second->filesize) {
-                if (strncmp(line, "SHA1=", 5) == 0) {
+                if (str_starts(line, "SHA1=")) {
                     strncpy(sha1, line + 5, 40);
                     sha1[40] = '\0';
                     return strdup(sha1);
@@ -114,15 +113,16 @@ for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1
 void magisk_cpio::restore() {
     if (auto it = entries.find(".backup/.rmlist"); it != entries.end()) {
         char *file;
-        for_each_str(file, it->second->data, it->second->filesize)
-            rm(file, false);
+        for_each_str(file, it->second->data, it->second->filesize) {
+            rm(file);
+        }
         rm(it);
     }
 
     for (auto it = entries.begin(); it != entries.end();) {
         auto cur = it++;
         if (str_starts(cur->first, ".backup")) {
-            if (cur->first.length() == 7 || cur->first.substr(8) == ".magisk") {
+            if (cur->first.length() == 7 || &cur->first[8] == ".magisk"sv) {
                 rm(cur);
             } else {
                 mv(cur, &cur->first[8]);
@@ -140,15 +140,15 @@ void magisk_cpio::restore() {
 void magisk_cpio::backup(const char *orig) {
     if (access(orig, R_OK))
         return;
-    entry_map bkup_entries;
-    string remv;
 
-    auto b = new cpio_entry(".backup", S_IFDIR);
-    bkup_entries[b->filename].reset(b);
+    entry_map backups;
+    string rm_list;
+    backups.emplace(".backup", new cpio_entry(S_IFDIR));
 
-    magisk_cpio o(orig);
+    magisk_cpio o;
+    o.load_cpio(orig);
 
-    // Remove possible backups in original ramdisk
+    // Remove existing backups in original ramdisk
     o.rm(".backup", true);
     rm(".backup", true);
 
@@ -157,7 +157,7 @@ void magisk_cpio::backup(const char *orig) {
 
     while (lhs != o.entries.end() || rhs != entries.end()) {
         int res;
-        bool backup = false;
+        bool do_backup = false;
         if (lhs != o.entries.end() && rhs != entries.end()) {
             res = lhs->first.compare(rhs->first);
         } else if (lhs == o.entries.end()) {
@@ -167,29 +167,28 @@ void magisk_cpio::backup(const char *orig) {
         }
 
         if (res < 0) {
-            // Something is missing in new ramdisk, backup!
-            backup = true;
+            // Something is missing in new ramdisk, do_backup!
+            do_backup = true;
             fprintf(stderr, "Backup missing entry: ");
         } else if (res == 0) {
             if (lhs->second->filesize != rhs->second->filesize ||
                 memcmp(lhs->second->data, rhs->second->data, lhs->second->filesize) != 0) {
                 // Not the same!
-                backup = true;
+                do_backup = true;
                 fprintf(stderr, "Backup mismatch entry: ");
             }
         } else {
             // Something new in ramdisk
-            remv += rhs->first;
-            remv += (char) '\0';
+            rm_list += rhs->first;
+            rm_list += (char) '\0';
             fprintf(stderr, "Record new entry: [%s] -> [.backup/.rmlist]\n", rhs->first.data());
         }
-        if (backup) {
-            string back_name(".backup/");
-            back_name += lhs->first;
-            fprintf(stderr, "[%s] -> [%s]\n", lhs->first.data(), back_name.data());
-            auto ex = static_cast<cpio_entry*>(lhs->second.release());
-            ex->filename = back_name;
-            bkup_entries[ex->filename].reset(ex);
+
+        if (do_backup) {
+            string name = ".backup/" + lhs->first;
+            fprintf(stderr, "[%s] -> [%s]\n", lhs->first.data(), name.data());
+            auto e = lhs->second.release();
+            backups.emplace(name, e);
         }
 
         // Increment positions
@@ -202,16 +201,16 @@ void magisk_cpio::backup(const char *orig) {
         }
     }
 
-    if (!remv.empty()) {
-        auto rmlist = new cpio_entry(".backup/.rmlist", S_IFREG);
-        rmlist->filesize = remv.length();
-        rmlist->data = xmalloc(remv.length());
-        memcpy(rmlist->data, remv.data(), remv.length());
-        bkup_entries[rmlist->filename].reset(rmlist);
+    if (!rm_list.empty()) {
+        auto rm_list_file = new cpio_entry(S_IFREG);
+        rm_list_file->filesize = rm_list.length();
+        rm_list_file->data = xmalloc(rm_list.length());
+        memcpy(rm_list_file->data, rm_list.data(), rm_list.length());
+        backups.emplace(".backup/.rmlist", rm_list_file);
     }
 
-    if (bkup_entries.size() > 1)
-        entries.merge(bkup_entries);
+    if (backups.size() > 1)
+        entries.merge(backups);
 }
 
 int cpio_commands(int argc, char *argv[]) {

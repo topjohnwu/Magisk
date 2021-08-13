@@ -3,8 +3,7 @@ LOCAL_PATH := $(call my-dir)
 # Header only library
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libphmap
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/parallel-hashmap
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/parallel-hashmap
 include $(BUILD_STATIC_LIBRARY)
 
 # libxz.a
