@@ -36,7 +36,6 @@ void setup_logfile(bool reset) {
 
 // Maximum message length for pipes to transfer atomically
 #define MAX_MSG_LEN  (PIPE_BUF - sizeof(log_meta))
-#define TIME_FMT_LEN 35
 
 static void logfile_writer(int pipefd) {
     run_finally close_socket([=] {
@@ -52,7 +51,12 @@ static void logfile_writer(int pipefd) {
     stream *strm = new byte_stream(tmp_buf.data, tmp_buf.len);
 
     log_meta meta{};
-    char buf[MAX_MSG_LEN + TIME_FMT_LEN];
+    char buf[MAX_MSG_LEN];
+    char aux[64];
+
+    iovec iov[2];
+    iov[0].iov_base = aux;
+    iov[1].iov_base = buf;
 
     for (;;) {
         // Read meta data
@@ -80,6 +84,10 @@ static void logfile_writer(int pipefd) {
             continue;
         }
 
+        // Read message
+        if (xread(pipefd, buf, meta.len) != meta.len)
+            return;
+
         timeval tv;
         tm tm;
         gettimeofday(&tv, nullptr);
@@ -101,16 +109,15 @@ static void logfile_writer(int pipefd) {
                 type = 'E';
                 break;
         }
-        size_t off = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
         int ms = tv.tv_usec / 1000;
-        off += snprintf(buf + off, sizeof(buf) - off,
+        size_t off = strftime(aux, sizeof(aux), "%m-%d %T", &tm);
+        off += snprintf(aux + off, sizeof(aux) - off,
                 ".%03d %5d %5d %c : ", ms, meta.pid, meta.tid, type);
 
-        // Read message
-        if (xread(pipefd, buf + off, meta.len) != meta.len)
-            return;
+        iov[0].iov_len = off;
+        iov[1].iov_len = meta.len;
 
-        strm->write(buf, off + meta.len);
+        strm->writev(iov, 2);
     }
 }
 

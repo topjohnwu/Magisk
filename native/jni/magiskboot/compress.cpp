@@ -25,11 +25,14 @@ class cpr_stream : public filter_stream {
 public:
     using filter_stream::filter_stream;
     using stream::read;
+    ssize_t writeFully(void *buf, size_t len) override {
+        return write(buf, len);
+    }
 };
 
 class gz_strm : public cpr_stream {
 public:
-    int write(const void *buf, size_t len) override {
+    ssize_t write(const void *buf, size_t len) override {
         return len ? write(buf, len, Z_NO_FLUSH) : 0;
     }
 
@@ -67,8 +70,8 @@ private:
     z_stream strm;
     uint8_t outbuf[CHUNK];
 
-    int write(const void *buf, size_t len, int flush) {
-        int ret = 0;
+    ssize_t write(const void *buf, size_t len, int flush) {
+        size_t ret = 0;
         strm.next_in = (Bytef *) buf;
         strm.avail_in = len;
         do {
@@ -105,7 +108,7 @@ public:
 
 class bz_strm : public cpr_stream {
 public:
-    int write(const void *buf, size_t len) override {
+    ssize_t write(const void *buf, size_t len) override {
         return len ? write(buf, len, BZ_RUN) : 0;
     }
 
@@ -143,8 +146,8 @@ private:
     bz_stream strm;
     char outbuf[CHUNK];
 
-    int write(const void *buf, size_t len, int flush) {
-        int ret = 0;
+    ssize_t write(const void *buf, size_t len, int flush) {
+        size_t ret = 0;
         strm.next_in = (char *) buf;
         strm.avail_in = len;
         do {
@@ -181,7 +184,7 @@ public:
 
 class lzma_strm : public cpr_stream {
 public:
-    int write(const void *buf, size_t len) override {
+    ssize_t write(const void *buf, size_t len) override {
         return len ? write(buf, len, LZMA_RUN) : 0;
     }
 
@@ -229,8 +232,8 @@ private:
     lzma_stream strm;
     uint8_t outbuf[CHUNK];
 
-    int write(const void *buf, size_t len, lzma_action flush) {
-        int ret = 0;
+    ssize_t write(const void *buf, size_t len, lzma_action flush) {
+        size_t ret = 0;
         strm.next_in = (uint8_t *) buf;
         strm.avail_in = len;
         do {
@@ -274,8 +277,8 @@ public:
         delete[] outbuf;
     }
 
-    int write(const void *buf, size_t len) override {
-        int ret = 0;
+    ssize_t write(const void *buf, size_t len) override {
+        size_t ret = 0;
         auto inbuf = reinterpret_cast<const uint8_t *>(buf);
         if (!outbuf)
             read_header(inbuf, len);
@@ -325,8 +328,8 @@ public:
         LZ4F_createCompressionContext(&ctx, LZ4F_VERSION);
     }
 
-    int write(const void *buf, size_t len) override {
-        int ret = 0;
+    ssize_t write(const void *buf, size_t len) override {
+        size_t ret = 0;
         if (!outbuf)
             ret += write_header();
         if (len == 0)
@@ -390,8 +393,8 @@ public:
         delete[] buf;
     }
 
-    int write(const void *in, size_t size) override {
-        int ret = 0;
+    ssize_t write(const void *in, size_t size) override {
+        size_t ret = 0;
         auto inbuf = static_cast<const char *>(in);
         if (!init) {
             // Skip magic
@@ -399,7 +402,7 @@ public:
             size -= 4;
             init = true;
         }
-        for (int consumed; size != 0;) {
+        for (size_t consumed; size != 0;) {
             if (block_sz == 0) {
                 if (buf_off + size >= sizeof(block_sz)) {
                     consumed = sizeof(block_sz) - buf_off;
@@ -452,8 +455,8 @@ public:
         cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]),
         buf(new char[LZ4_UNCOMPRESSED]), init(false), lg(lg), buf_off(0), in_total(0) {}
 
-    int write(const void *in, size_t size) override {
-        int ret = 0;
+    ssize_t write(const void *in, size_t size) override {
+        size_t ret = 0;
         if (!init) {
             ret += bwrite("\x02\x21\x4c\x18", 4);
             init = true;
