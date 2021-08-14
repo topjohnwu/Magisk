@@ -15,6 +15,10 @@ static vector<string> rc_list;
 
 static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
     FILE *rc = xfopen(dest, "we");
+    if (!rc) {
+        PLOGE("%s: open %s failed", __PRETTY_FUNCTION__, src);
+        return;
+    }
     file_readline(src, [=](string_view line) -> bool {
         // Do not start vaultkeeper
         if (str_contains(line, "start vaultkeeper")) {
@@ -157,6 +161,7 @@ static string magic_mount_list;
 
 static void magic_mount(const string &sdir, const string &ddir = "") {
     auto dir = xopen_dir(sdir.data());
+    if (!dir) return;
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         string src = sdir + "/" + entry->d_name;
         string dest = ddir + "/" + entry->d_name;
@@ -321,7 +326,7 @@ void SARBase::patch_rootdir() {
 #define TMP_MNTDIR "/dev/mnt"
 #define TMP_RULESDIR "/.backup/.sepolicy.rules"
 
-void RootFSInit::patch_rootfs() {
+void RootFSBase::patch_rootfs() {
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");
@@ -338,8 +343,11 @@ void RootFSInit::patch_rootfs() {
     }
 
     if (patch_sepolicy("/sepolicy")) {
-        auto init = mmap_data::rw("/init");
+        auto init = mmap_data::ro(access("/system/bin/init",F_OK) == 0 ? "/system/bin/init" : "/init");
         init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
+        int dest = xopen("/init", O_TRUNC | O_WRONLY | O_CLOEXEC, 0);
+        xwrite(dest, init.buf, init.sz);
+        close(dest);
     }
 
     // Handle overlays

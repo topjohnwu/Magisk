@@ -42,8 +42,8 @@ void setup_klog();
 
 class BaseInit {
 protected:
-    cmdline *cmd;
-    char **argv;
+    cmdline *cmd = nullptr;
+    char **argv = nullptr;
 
     [[noreturn]] void exec_init();
     void read_dt_fstab(std::vector<fstab_entry> &fstab);
@@ -67,7 +67,7 @@ public:
     MagiskInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {}
 };
 
-class SARBase : public MagiskInit {
+class SARBase : virtual public MagiskInit {
 protected:
     std::vector<raw_file> overlays;
 
@@ -75,7 +75,7 @@ protected:
     void patch_rootdir();
     void mount_system_root();
 public:
-    SARBase(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {}
+    SARBase() = default;
 };
 
 /***************
@@ -95,20 +95,6 @@ public:
     }
 };
 
-class SecondStageInit : public SARBase {
-private:
-    void prepare();
-public:
-    SecondStageInit(char *argv[]) : SARBase(argv, nullptr) {
-        LOGD("%s\n", __FUNCTION__);
-    };
-    void start() override {
-        prepare();
-        patch_rootdir();
-        exec_init();
-    }
-};
-
 /*************
  * Legacy SAR
  *************/
@@ -120,7 +106,7 @@ private:
     void early_mount();
     void first_stage_prep();
 public:
-    SARInit(char *argv[], cmdline *cmd) : SARBase(argv, cmd), is_two_stage(false) {
+    SARInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd), is_two_stage(false) {
         LOGD("%s\n", __FUNCTION__);
     };
     void start() override {
@@ -137,10 +123,18 @@ public:
  * Initramfs
  ************/
 
-class RootFSInit : public MagiskInit {
+class RootFSBase : virtual public MagiskInit {
+protected:
+    void patch_rootfs();
+public:
+    RootFSBase() = default;
+    void start() = 0;
+};
+
+class RootFSInit : public RootFSBase {
 private:
     void early_mount();
-    void patch_rootfs();
+
 public:
     RootFSInit(char *argv[], cmdline *cmd) : MagiskInit(argv, cmd) {
         LOGD("%s\n", __FUNCTION__);
@@ -151,6 +145,22 @@ public:
         exec_init();
     }
 };
+
+class SecondStageInit : public RootFSBase, public SARBase {
+private:
+    bool prepare();
+public:
+    SecondStageInit(char *argv[]) : MagiskInit(argv, nullptr) {
+        LOGD("%s\n", __FUNCTION__);
+    };
+
+    void start() override {
+        if (prepare()) patch_rootfs();
+        else patch_rootdir();
+        exec_init();
+    }
+};
+
 
 class MagiskProxy : public MagiskInit {
 public:
