@@ -135,7 +135,7 @@ ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskinit $MAGISKTMP/magiskpolicy
 
-mkdir -p $MAGISKTMP/.magisk/mirror
+mkdir -p $MAGISKTMP/.magisk/mirror/sepolicy.rules
 mkdir $MAGISKTMP/.magisk/block
 touch $MAGISKTMP/.magisk/config
 
