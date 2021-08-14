@@ -185,7 +185,7 @@ static void switch_root(const string &path) {
     });
     for (auto &dir : mounts) {
         auto new_path = path + dir;
-        mkdir(new_path.data(), 0755);
+        xmkdir(new_path.data(), 0755);
         xmount(dir.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
     }
     chdir(path.data());
@@ -355,14 +355,24 @@ void SARInit::early_mount() {
     }
 }
 
-void SecondStageInit::prepare() {
+bool SecondStageInit::prepare() {
     backup_files();
 
     umount2("/init", MNT_DETACH);
     umount2("/proc/self/exe", MNT_DETACH);
 
-    if (access("/system_root", F_OK) == 0)
-        switch_root("/system_root");
+    // some weird devices, like meizu, embrace two stage init but still have legacy rootfs behaviour
+    bool legacy = false;
+    if (access("/system_root", F_OK) == 0) {
+        if (access("/system_root/proc", F_OK) == 0) {
+            switch_root("/system_root");
+        } else {
+            xmount("/system_root", "/system", nullptr, MS_MOVE, nullptr);
+            rmdir("/system_root");
+            legacy = true;
+        }
+    }
+    return legacy;
 }
 
 void BaseInit::exec_init() {
