@@ -299,12 +299,6 @@ int launch_magiskhide(bool late_props) {
     if (late_props)
         hide_late_sensitive_props();
 
-#if !ENABLE_INJECT
-    // Start monitoring
-    if (new_daemon_thread(&proc_monitor))
-        return DAEMON_ERROR;
-#endif
-
     hide_state = true;
     update_hide_config();
 
@@ -322,9 +316,6 @@ int stop_magiskhide() {
         LOGI("* Disable MagiskHide\n");
         uid_proc_map.clear();
         hide_set.clear();
-#if !ENABLE_INJECT
-        pthread_kill(monitor_thread, SIGTERMTHRD);
-#endif
     }
 
     hide_state = false;
@@ -334,9 +325,6 @@ int stop_magiskhide() {
 
 void auto_start_magiskhide(bool late_props) {
     if (hide_enabled()) {
-#if !ENABLE_INJECT
-        pthread_kill(monitor_thread, SIGALRM);
-#endif
         hide_late_sensitive_props();
     } else {
         db_settings dbs;
@@ -375,22 +363,3 @@ bool is_hide_target(int uid, string_view process, int max_len) {
     }
     return false;
 }
-
-#if !ENABLE_INJECT
-void test_proc_monitor() {
-    if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-        exit(1);
-    proc_monitor();
-}
-#endif
-
-#if ENABLE_INJECT
-int check_uid_map(int client) {
-    if (!hide_enabled())
-        return 0;
-
-    int uid = read_int(client);
-    string process = read_string(client);
-    return is_hide_target(uid, process) ? 1 : 0;
-}
-#endif

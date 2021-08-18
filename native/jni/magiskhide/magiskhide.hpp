@@ -21,16 +21,6 @@ int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
 
-#if !ENABLE_INJECT
-// Process monitoring
-extern pthread_t monitor_thread;
-[[noreturn]] void proc_monitor();
-[[noreturn]] void test_proc_monitor();
-#else
-// Response whether target process should be hidden
-int check_uid_map(int client);
-#endif
-
 // Utility functions
 void crawl_procfs(const std::function<bool (int)> &fn);
 void crawl_procfs(DIR *dir, const std::function<bool (int)> &fn);
@@ -54,8 +44,6 @@ enum {
     RM_HIDELIST,
     LS_HIDELIST,
     HIDE_STATUS,
-    REMOTE_CHECK_HIDE,
-    REMOTE_DO_HIDE
 };
 
 enum {

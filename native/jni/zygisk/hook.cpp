@@ -114,6 +114,12 @@ string get_class_name(JNIEnv *env, jclass clazz) {
 
 // -----------------------------------------------------------------
 
+// TODOs
+int remote_check_hide(int uid, const char *process) { return 0; }
+void remote_request_hide() {}
+
+// -----------------------------------------------------------------
+
 #define DCL_HOOK_FUNC(ret, func, ...) \
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)

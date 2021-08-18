@@ -11,7 +11,7 @@ ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libphmap
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libphmap libxhook
 LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
@@ -33,23 +33,13 @@ LOCAL_SRC_FILES := \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
-    su/su_daemon.cpp
-
-LOCAL_LDLIBS := -llog
-LOCAL_CPPFLAGS := -DENABLE_INJECT=$(ENABLE_INJECT)
-
-ifeq ($(DISABLE_ZYGISK),1)
-LOCAL_SRC_FILES += magiskhide/proc_monitor.cpp
-LOCAL_CPPFLAGS := -DENABLE_INJECT=0
-else
-LOCAL_STATIC_LIBRARIES += libxhook
-LOCAL_SRC_FILES += \
+    su/su_daemon.cpp \
     zygisk/entry.cpp \
     zygisk/utils.cpp \
     zygisk/hook.cpp \
     zygisk/memory.cpp
-LOCAL_CPPFLAGS := -DENABLE_INJECT=1
-endif
+
+LOCAL_LDLIBS := -llog
 
 include $(BUILD_EXECUTABLE)
 

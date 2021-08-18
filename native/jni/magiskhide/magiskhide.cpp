@@ -62,17 +62,6 @@ void magiskhide_handler(int client, ucred *cred) {
     case HIDE_STATUS:
         res = hide_enabled() ? HIDE_IS_ENABLED : HIDE_NOT_ENABLED;
         break;
-#if ENABLE_INJECT
-    case REMOTE_CHECK_HIDE:
-        res = check_uid_map(client);
-        break;
-    case REMOTE_DO_HIDE:
-        kill(cred->pid, SIGSTOP);
-        write_int(client, 0);
-        hide_daemon(cred->pid);
-        close(client);
-        return;
-#endif
     }
 
     write_int(client, res);
@@ -107,13 +96,9 @@ int magiskhide_main(int argc, char *argv[]) {
         hide_unmount();
         execvp(argv[2], argv + 2);
         exit(1);
-    }
-#if 0 && !ENABLE_INJECT
-    else if (opt == "test"sv)
-        test_proc_monitor();
-#endif
-    else
+    } else {
         usage(argv[0]);
+    }
 
     // Send request
     int fd = connect_daemon();
@@ -169,28 +154,3 @@ int magiskhide_main(int argc, char *argv[]) {
 return_code:
     return req == HIDE_STATUS ? (code == HIDE_IS_ENABLED ? 0 : 1) : code != DAEMON_SUCCESS;
 }
-
-#if ENABLE_INJECT
-int remote_check_hide(int uid, const char *process) {
-    int fd = connect_daemon();
-    write_int(fd, MAGISKHIDE);
-    write_int(fd, REMOTE_CHECK_HIDE);
-    write_int(fd, uid);
-    write_string(fd, process);
-    int res = read_int(fd);
-    close(fd);
-    return res;
-}
-
-void remote_request_hide() {
-    int fd = connect_daemon();
-    write_int(fd, MAGISKHIDE);
-    write_int(fd, REMOTE_DO_HIDE);
-
-    // Should receive SIGSTOP before reading anything
-    // During process stop, magiskd will cleanup our mount ns
-    read_int(fd);
-
-    close(fd);
-}
-#endif
