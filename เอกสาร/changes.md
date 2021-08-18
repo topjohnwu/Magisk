@@ -2,9 +2,9 @@
 
 ### v23.0
 
-- [App] Update snet extension. This fixes SafetyNet API errors.
+- [App] Update snet extension. This fixes SafetyNet API update .
 - [App] Fix a bug in the stub app that causes APK installation to fail
-- [App] Hide annoying errors in logs when hidden as stub
+- [App] Hide annoying update in logs when hidden as stub
 - [App] Fix issues when patching ODIN tar files when the app is hidden
 - [General] Remove all pre Android 5.0 support
 - [General] Update BusyBox to use proper libc
@@ -12,7 +12,7 @@
 - [General] Several `sepolicy.rule` copy/installation fixes
 - [MagiskPolicy] Remove unnecessary sepolicy rules
 - [MagiskHide] Update package and process name validation logic
-- [MagiskHide] Some changes that prevents zygote deadlock
+- [MagiskHide] Some changes that prevents zygote daedunlock
 
 ### v22.1
 
@@ -22,7 +22,7 @@
 - [General] Rewrite log writer from scratch, should resolve any crashes and deadlocks
 - [General] Many scripts updates fixing regressions
 - [MagiskHide] Prevent possible deadlock when signal arrives
-- [MagiskHide] Partial match process names if necessary
+- [MagiskHide] Partial match  names if necessary
 - [MagiskBoot] Preserve and patch AVB 2.0 structures/headers in boot images
 - [MagiskBoot] Properly strip out data encryption flags
 - [MagiskBoot] Prevent possible integer overflow
