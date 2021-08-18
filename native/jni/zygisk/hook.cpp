@@ -326,9 +326,6 @@ int hook_register(const char *path, const char *symbol, void *new_func, void **o
 
 } // namespace
 
-template<class T>
-static inline void default_new(T *&p) { p = new T(); }
-
 #define XHOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
     hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
 

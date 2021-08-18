@@ -13,16 +13,16 @@
 
 using namespace std;
 
-static bool hide_state = false;
-static set<pair<string, string>> hide_set;   /* set of <pkg, process> pair */
-map<int, vector<string_view>> uid_proc_map;  /* uid -> list of process */
+static set<pair<string, string>> *hide_set;          /* set of <pkg, process> pair */
+static map<int, vector<string_view>> *uid_proc_map;  /* uid -> list of process */
 
 // Locks the variables above
-pthread_mutex_t hide_state_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t hide_data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void update_uid_map() {
-    mutex_guard lock(hide_state_lock);
-    uid_proc_map.clear();
+static atomic<bool> hide_state = false;
+
+static void rebuild_uid_map() {
+    uid_proc_map->clear();
     string data_path(APP_DATA_DIR);
     size_t len = data_path.length();
     auto dir = open_dir(APP_DATA_DIR);
@@ -34,17 +34,17 @@ void update_uid_map() {
         data_path += '/';
         size_t user_len = data_path.length();
         struct stat st;
-        for (auto &hide : hide_set) {
+        for (const auto &hide : *hide_set) {
             if (hide.first == ISOLATED_MAGIC) {
                 if (!first_iter) continue;
                 // Setup isolated processes
-                uid_proc_map[-1].emplace_back(hide.second);
+                (*uid_proc_map)[-1].emplace_back(hide.second);
             }
             data_path.resize(user_len);
             data_path += hide.first;
             if (stat(data_path.data(), &st))
                 continue;
-            uid_proc_map[st.st_uid].emplace_back(hide.second);
+            (*uid_proc_map)[st.st_uid].emplace_back(hide.second);
         }
         first_iter = false;
     }
@@ -52,24 +52,17 @@ void update_uid_map() {
 
 // Leave /proc fd opened as we're going to read from it repeatedly
 static DIR *procfp;
-void crawl_procfs(const function<bool(int)> &fn) {
-    rewinddir(procfp);
-    crawl_procfs(procfp, fn);
-}
 
-void crawl_procfs(DIR *dir, const function<bool(int)> &fn) {
-    struct dirent *dp;
+template<class F>
+static void crawl_procfs(F &&fn) {
+    rewinddir(procfp);
+    dirent *dp;
     int pid;
-    while ((dp = readdir(dir))) {
+    while ((dp = readdir(procfp))) {
         pid = parse_int(dp->d_name);
         if (pid > 0 && !fn(pid))
             break;
     }
-}
-
-bool hide_enabled() {
-    mutex_guard g(hide_state_lock);
-    return hide_state;
 }
 
 template <bool str_op(string_view, string_view)>
@@ -86,12 +79,12 @@ static bool proc_name_match(int pid, const char *name) {
     return false;
 }
 
-static inline bool str_eql(string_view s, string_view ss) { return s == ss; }
+static inline bool str_eql(string_view a, string_view b) { return a == b; }
 
-static void kill_process(const char *name, bool multi = false,
-        bool (*filter)(int, const char *) = proc_name_match<&str_eql>) {
+template<bool str_op(string_view, string_view) = &str_eql>
+static void kill_process(const char *name, bool multi = false) {
     crawl_procfs([=](int pid) -> bool {
-        if (filter(pid, name)) {
+        if (proc_name_match<str_op>(pid, name)) {
             kill(pid, SIGKILL);
             return multi;
         }
@@ -137,10 +130,10 @@ static bool validate(const char *pkg, const char *proc) {
 
 static void add_hide_set(const char *pkg, const char *proc) {
     LOGI("hide_list add: [%s/%s]\n", pkg, proc);
-    hide_set.emplace(pkg, proc);
+    hide_set->emplace(pkg, proc);
     if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
         // Kill all matching isolated processes
-        kill_process(proc, true, proc_name_match<&str_starts>);
+        kill_process<&str_starts>(proc, true);
     } else {
         kill_process(proc);
     }
@@ -153,9 +146,15 @@ static int add_list(const char *pkg, const char *proc) {
     if (!validate(pkg, proc))
         return HIDE_INVALID_PKG;
 
-    for (auto &hide : hide_set)
-        if (hide.first == pkg && hide.second == proc)
-            return HIDE_ITEM_EXIST;
+    {
+        // Critical region
+        mutex_guard lock(hide_data_lock);
+        for (const auto &hide : *hide_set)
+            if (hide.first == pkg && hide.second == proc)
+                return HIDE_ITEM_EXIST;
+        add_hide_set(pkg, proc);
+        rebuild_uid_map();
+    }
 
     // Add to database
     char sql[4096];
@@ -163,42 +162,33 @@ static int add_list(const char *pkg, const char *proc) {
             "INSERT INTO hidelist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DAEMON_ERROR);
-
-    {
-        // Critical region
-        mutex_guard lock(hide_state_lock);
-        add_hide_set(pkg, proc);
-    }
-
     return DAEMON_SUCCESS;
 }
 
 int add_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
-    int ret = add_list(pkg.data(), proc.data());
-    if (ret == DAEMON_SUCCESS)
-        update_uid_map();
-    return ret;
+    return add_list(pkg.data(), proc.data());
 }
 
 static int rm_list(const char *pkg, const char *proc) {
     bool remove = false;
     {
         // Critical region
-        mutex_guard lock(hide_state_lock);
-        for (auto it = hide_set.begin(); it != hide_set.end();) {
+        mutex_guard lock(hide_data_lock);
+        for (auto it = hide_set->begin(); it != hide_set->end();) {
             if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
                 remove = true;
                 LOGI("hide_list rm: [%s/%s]\n", it->first.data(), it->second.data());
-                it = hide_set.erase(it);
+                it = hide_set->erase(it);
             } else {
                 ++it;
             }
         }
+        if (!remove)
+            return HIDE_ITEM_NOT_EXIST;
+        rebuild_uid_map();
     }
-    if (!remove)
-        return HIDE_ITEM_NOT_EXIST;
 
     char sql[4096];
     if (proc[0] == '\0')
@@ -207,17 +197,14 @@ static int rm_list(const char *pkg, const char *proc) {
         snprintf(sql, sizeof(sql),
                 "DELETE FROM hidelist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
-    db_err(err);
+    db_err_cmd(err, return DAEMON_ERROR);
     return DAEMON_SUCCESS;
 }
 
 int rm_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
-    int ret = rm_list(pkg.data(), proc.data());
-    if (ret == DAEMON_SUCCESS)
-        update_uid_map();
-    return ret;
+    return rm_list(pkg.data(), proc.data());
 }
 
 static bool str_ends_safe(string_view s, string_view ss) {
@@ -226,9 +213,6 @@ static bool str_ends_safe(string_view s, string_view ss) {
         return false;
     return str_ends(s, ss);
 }
-
-#define SNET_PROC    "com.google.android.gms.unstable"
-#define GMS_PKG      "com.google.android.gms"
 
 static bool init_list() {
     LOGD("hide: initialize\n");
@@ -243,27 +227,22 @@ static bool init_list() {
     if (SDK_INT >= 29) {
         kill_process("usap32", true);
         kill_process("usap64", true);
-        kill_process("_zygote", true, proc_name_match<&str_ends_safe>);
+        kill_process<&str_ends_safe>("_zygote", true);
     }
-
-    // Add SafetyNet by default
-    add_hide_set(GMS_PKG, SNET_PROC);
-
-    // We also need to hide the default GMS process if MAGISKTMP != /sbin
-    // The snet process communicates with the main process and get additional info
-    if (MAGISKTMP != "/sbin")
-        add_hide_set(GMS_PKG, GMS_PKG);
 
     return true;
 }
 
 void ls_list(int client) {
     write_int(client, DAEMON_SUCCESS);
-    for (auto &hide : hide_set) {
-        write_int(client, hide.first.size() + hide.second.size() + 1);
-        xwrite(client, hide.first.data(), hide.first.size());
-        xwrite(client, "|", 1);
-        xwrite(client, hide.second.data(), hide.second.size());
+    {
+        mutex_guard lock(hide_data_lock);
+        for (const auto &hide : *hide_set) {
+            write_int(client, hide.first.size() + hide.second.size() + 1);
+            xwrite(client, hide.first.data(), hide.first.size());
+            xwrite(client, "|", 1);
+            xwrite(client, hide.second.data(), hide.second.size());
+        }
     }
     write_int(client, 0);
     close(client);
@@ -272,14 +251,12 @@ void ls_list(int client) {
 static void update_hide_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-            DB_SETTING_KEYS[HIDE_CONFIG], hide_state);
+            DB_SETTING_KEYS[HIDE_CONFIG], hide_state.load());
     char *err = db_exec(sql);
     db_err(err);
 }
 
-int launch_magiskhide(bool late_props) {
-    mutex_guard lock(hide_state_lock);
-
+int enable_hide() {
     if (hide_state)
         return HIDE_IS_ENABLED;
 
@@ -291,31 +268,30 @@ int launch_magiskhide(bool late_props) {
 
     LOGI("* Enable MagiskHide\n");
 
+    mutex_guard lock(hide_data_lock);
+    default_new(hide_set);
+    default_new(uid_proc_map);
+
     // Initialize the hide list
     if (!init_list())
         return DAEMON_ERROR;
 
-    hide_sensitive_props();
-    if (late_props)
-        hide_late_sensitive_props();
-
     hide_state = true;
     update_hide_config();
 
-    // Unlock here or else we'll be stuck in deadlock
-    lock.unlock();
-
-    update_uid_map();
+    rebuild_uid_map();
     return DAEMON_SUCCESS;
 }
 
-int stop_magiskhide() {
-    mutex_guard g(hide_state_lock);
+int disable_hide() {
+    mutex_guard lock(hide_data_lock);
 
     if (hide_state) {
         LOGI("* Disable MagiskHide\n");
-        uid_proc_map.clear();
-        hide_set.clear();
+        delete uid_proc_map;
+        delete hide_set;
+        uid_proc_map = nullptr;
+        hide_set = nullptr;
     }
 
     hide_state = false;
@@ -323,43 +299,41 @@ int stop_magiskhide() {
     return DAEMON_SUCCESS;
 }
 
-void auto_start_magiskhide(bool late_props) {
-    if (hide_enabled()) {
-        hide_late_sensitive_props();
-    } else {
+void check_enable_hide() {
+    if (!hide_state) {
         db_settings dbs;
         get_db_settings(dbs, HIDE_CONFIG);
         if (dbs[HIDE_CONFIG])
-            launch_magiskhide(late_props);
+            enable_hide();
     }
 }
 
-bool is_hide_target(int uid, string_view process, int max_len) {
-    mutex_guard lock(hide_state_lock);
+bool is_hide_target(int uid, string_view process) {
+    mutex_guard lock(hide_data_lock);
 
     if (uid % 100000 >= 90000) {
         // Isolated processes
-        auto it = uid_proc_map.find(-1);
-        if (it == uid_proc_map.end())
+        auto it = uid_proc_map->find(-1);
+        if (it == uid_proc_map->end())
             return false;
 
         for (auto &s : it->second) {
-            if (s.length() > max_len && process.length() > max_len && str_starts(s, process))
-                return true;
             if (str_starts(process, s))
                 return true;
         }
     } else {
-        auto it = uid_proc_map.find(uid);
-        if (it == uid_proc_map.end())
+        auto it = uid_proc_map->find(uid);
+        if (it == uid_proc_map->end())
             return false;
 
         for (auto &s : it->second) {
-            if (s.length() > max_len && process.length() > max_len && str_starts(s, process))
-                return true;
             if (s == process)
                 return true;
         }
     }
     return false;
+}
+
+bool hide_enabled() {
+    return hide_state;
 }

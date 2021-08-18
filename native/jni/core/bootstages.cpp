@@ -298,10 +298,10 @@ void post_fs_data(int client) {
         safe_mode = true;
         // Disable all modules and magiskhide so next boot will be clean
         disable_modules();
-        stop_magiskhide();
+        disable_hide();
     } else {
         exec_common_scripts("post-fs-data");
-        auto_start_magiskhide(false);
+        check_enable_hide();
         handle_modules();
     }
 
@@ -350,7 +350,7 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    auto_start_magiskhide(true);
+    check_enable_hide();
 
     if (!check_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {

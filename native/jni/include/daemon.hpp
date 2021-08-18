@@ -55,5 +55,5 @@ void magiskhide_handler(int client, ucred *cred);
 void su_daemon_handler(int client, ucred *credential);
 
 // MagiskHide
-void auto_start_magiskhide(bool late_props);
-int stop_magiskhide();
+void check_enable_hide();
+int disable_hide();
