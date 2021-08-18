@@ -25,6 +25,7 @@ enum : int {
     MAGISKHIDE,
     SQLITE_CMD,
     REMOVE_MODULES,
+    ZYGISK_REQUEST,
     DAEMON_CODE_END,
 };
 
@@ -47,12 +48,15 @@ enum : int {
 
 int connect_daemon(bool create = false);
 
+void android_logging();
+
 // Daemon handlers
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
 void magiskhide_handler(int client, ucred *cred);
 void su_daemon_handler(int client, ucred *credential);
+void zygisk_handler(int client, ucred *cred);
 
 // MagiskHide
 void check_enable_hide();

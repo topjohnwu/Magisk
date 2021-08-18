@@ -23,7 +23,7 @@ abort() {
 
 mount_sbin() {
   mount -t tmpfs -o 'mode=0755' tmpfs /sbin
-  $SELINUX && chcon u:object_r:rootfs:s0 /sbin
+  chcon u:object_r:rootfs:s0 /sbin
 }
 
 if [ ! -f /system/build.prop ]; then
@@ -56,14 +56,14 @@ fi
 pgrep magiskd >/dev/null && pkill -9 magiskd
 [ -f /sbin/magisk ] && umount -l /sbin
 [ -f /system/bin/magisk ] && umount -l /system/bin
+if [ -d /dev/magisk ]; then
+  umount -l /dev/magisk 2>/dev/null
+  rm -rf /dev/magisk
+fi
 
 # SELinux stuffs
-SELINUX=false
-[ -e /sys/fs/selinux ] && SELINUX=true
-if $SELINUX; then
-  ln -sf ./magiskinit magiskpolicy
-  ./magiskpolicy --live --magisk
-fi
+ln -sf ./magiskinit magiskpolicy
+./magiskpolicy --live --magisk
 
 BINDIR=/sbin
 
@@ -99,12 +99,14 @@ elif [ -e /sbin ]; then
   done
 else
   # Android Q+ without sbin, use overlayfs
-  BINDIR=/system/bin
-  rm -rf /dev/magisk
-  mkdir -p /dev/magisk/upper
+  BINDIR=/dev/magisk/upper
+  mkdir /dev/magisk
+  mount -t tmpfs -o 'mode=0755' tmpfs /dev/magisk
+  chcon u:object_r:system_file:s0 /dev/magisk
+  mkdir /dev/magisk/upper
   mkdir /dev/magisk/work
   ./magisk --clone-attr /system/bin /dev/magisk/upper
-  mount -t overlay overlay -olowerdir=/system/bin,upperdir=/dev/magisk/upper,workdir=/dev/magisk/work /system/bin
+  mount -t overlay overlay -o lowerdir=/system/bin,upperdir=/dev/magisk/upper,workdir=/dev/magisk/work /system/bin
 fi
 
 # Magisk stuffs

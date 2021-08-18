@@ -68,6 +68,9 @@ static void handle_request_async(int client, int code, ucred cred) {
         close(client);
         reboot();
         break;
+    case ZYGISK_REQUEST:
+        zygisk_handler(client, &cred);
+        break;
     default:
         close(client);
         break;
@@ -116,6 +119,7 @@ static void handle_request(int client) {
     case BOOT_COMPLETE:
     case SQLITE_CMD:
     case GET_PATH:
+    case MAGISKHIDE:
         if (!is_root) {
             write_int(client, ROOT_REQUIRED);
             goto done;
@@ -127,9 +131,9 @@ static void handle_request(int client) {
             goto done;
         }
         break;
-    case MAGISKHIDE:  // accept hide request from zygote
-        if (!is_root && !is_zygote) {
-            write_int(client, ROOT_REQUIRED);
+    case ZYGISK_REQUEST:
+        if (!is_zygote) {
+            write_int(client, DAEMON_ERROR);
             goto done;
         }
         break;
@@ -260,7 +264,7 @@ int connect_daemon(bool create) {
     if (connect(fd, (sockaddr*) &sun, len)) {
         if (!create || getuid() != UID_ROOT) {
             LOGE("No daemon is currently running!\n");
-            exit(1);
+            return 1;
         }
 
         if (fork_dont_care() == 0) {

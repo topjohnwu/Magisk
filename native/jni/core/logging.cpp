@@ -158,6 +158,16 @@ void magisk_logging() {
     log_cb.ex = nop_ex;
 }
 
+#define alog(prio) [](auto fmt, auto ap){ \
+return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
+void android_logging() {
+    log_cb.d = alog(DEBUG);
+    log_cb.i = alog(INFO);
+    log_cb.w = alog(WARN);
+    log_cb.e = alog(ERROR);
+    log_cb.ex = nop_ex;
+}
+
 void start_log_daemon() {
     int fds[2];
     if (pipe2(fds, O_CLOEXEC) == 0) {

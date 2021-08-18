@@ -3,9 +3,10 @@
 #include <sys/mount.h>
 #include <sys/sendfile.h>
 #include <sys/prctl.h>
-#include <android/log.h>
 
 #include <utils.hpp>
+#include <daemon.hpp>
+#include <magisk.hpp>
 
 #include "inject.hpp"
 
@@ -13,16 +14,6 @@ using namespace std;
 
 static void *self_handle = nullptr;
 static atomic<int> active_threads = -1;
-
-#define alog(prio) [](auto fmt, auto ap){ \
-return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
-static void inject_logging() {
-    log_cb.d = alog(DEBUG);
-    log_cb.i = alog(INFO);
-    log_cb.w = alog(WARN);
-    log_cb.e = alog(ERROR);
-    log_cb.ex = nop_ex;
-}
 
 void self_unload() {
     LOGD("hook: Request to self unload\n");
@@ -33,7 +24,7 @@ void self_unload() {
     active_threads--;
 }
 
-static void *unload_first_stage(void *) {
+static void *unload_first_stage(void *v) {
     // Setup 1ms
     timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
 
@@ -43,7 +34,8 @@ static void *unload_first_stage(void *) {
     // Wait another 1ms to make sure all threads left our code
     nanosleep(&ts, nullptr);
 
-    unmap_all(INJECT_LIB_1);
+    char *path = static_cast<char *>(v);
+    unmap_all(path);
     active_threads--;
     return nullptr;
 }
@@ -87,66 +79,108 @@ static void inject_cleanup_wait() {
 
 __attribute__((constructor))
 static void inject_init() {
-    if (getenv(INJECT_ENV_2)) {
-        inject_logging();
+    if (char *env = getenv(INJECT_ENV_2)) {
+        android_logging();
         LOGD("zygote: inject 2nd stage\n");
         active_threads = 1;
         unsetenv(INJECT_ENV_2);
 
         // Get our own handle
-        self_handle = dlopen(INJECT_LIB_2, RTLD_LAZY);
+        self_handle = dlopen(env, RTLD_LAZY);
         dlclose(self_handle);
-        unlink(INJECT_LIB_2);
 
         hook_functions();
+
+        // Update path to 1st stage lib
+        *(strrchr(env, '.') - 1) = '1';
 
         // Some cleanup
         sanitize_environ();
         active_threads++;
-        new_daemon_thread(&unload_first_stage);
-    } else if (char *env = getenv(INJECT_ENV_1)) {
-        inject_logging();
+        new_daemon_thread(&unload_first_stage, env);
+    } else if (getenv(INJECT_ENV_1)) {
+        android_logging();
         LOGD("zygote: inject 1st stage\n");
 
-        if (env[0] == '1')
+        char *ld = getenv("LD_PRELOAD");
+        char *path;
+        if (char *c = strrchr(ld, ':')) {
+            *c = '\0';
+            setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
+            path = c + 1;
+        } else {
             unsetenv("LD_PRELOAD");
-        else
-            setenv("LD_PRELOAD", env, 1);  // Restore original LD_PRELOAD
+            path = ld;
+        }
+
+        // Update path to 2nd stage lib
+        *(strrchr(path, '.') - 1) = '2';
 
         // Setup second stage
-        setenv(INJECT_ENV_2, "1", 1);
-        cp_afc(INJECT_LIB_1, INJECT_LIB_2);
-        dlopen(INJECT_LIB_2, RTLD_LAZY);
+        setenv(INJECT_ENV_2, path, 1);
+        dlopen(path, RTLD_LAZY);
 
-        unlink(INJECT_LIB_1);
         unsetenv(INJECT_ENV_1);
     }
 }
 
 int app_process_main(int argc, char *argv[]) {
-    inject_logging();
-    char buf[4096];
-    if (realpath("/proc/self/exe", buf) == nullptr)
-        return 1;
+    android_logging();
 
-    int in = xopen(buf, O_RDONLY);
-    int out = xopen(INJECT_LIB_1, O_WRONLY | O_CREAT, 0644);
-    sendfile(out, in, nullptr, INT_MAX);
-    close(in);
-    close(out);
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_SETUP);
 
-    if (char *ld = getenv("LD_PRELOAD")) {
-        char env[128];
-        sprintf(env, "%s:" INJECT_LIB_1, ld);
-        setenv("LD_PRELOAD", env, 1);
-        setenv(INJECT_ENV_1, ld, 1);  // Backup original LD_PRELOAD
-    } else {
-        setenv("LD_PRELOAD", INJECT_LIB_1, 1);
-        setenv(INJECT_ENV_1, "1", 1);
+        if (read_int(fd) == 0) {
+            string path = read_string(fd);
+            string lib = path + ".1.so";
+            if (char *ld = getenv("LD_PRELOAD")) {
+                char env[256];
+                sprintf(env, "%s:%s", ld, lib.data());
+                setenv("LD_PRELOAD", env, 1);
+            } else {
+                setenv("LD_PRELOAD", lib.data(), 1);
+            }
+            setenv(INJECT_ENV_1, "1", 1);
+        }
+        close(fd);
     }
 
     // Execute real app_process
-    xumount2(buf, MNT_DETACH);
+    char buf[256];
+    xreadlink("/proc/self/exe", buf, sizeof(buf));
+    xumount2("/proc/self/exe", MNT_DETACH);
     execve(buf, argv, environ);
     return 1;
+}
+
+// The following code runs in magiskd
+
+static void setup_files(int client, ucred *cred) {
+    LOGD("zygisk: setup files\n");
+
+    char buf[PATH_MAX];
+    sprintf(buf, "/proc/%d/exe", cred->pid);
+    if (realpath(buf, buf) == nullptr) {
+        write_int(client, 1);
+        return;
+    }
+
+    write_int(client, 0);
+
+    string path = MAGISKTMP + "/zygisk." + basename(buf);
+    cp_afc(buf, (path + ".1.so").data());
+    cp_afc(buf, (path + ".2.so").data());
+
+    write_string(client, path);
+}
+
+void zygisk_handler(int client, ucred *cred) {
+    int code = read_int(client);
+    switch (code) {
+    case ZYGISK_SETUP:
+        setup_files(client, cred);
+        break;
+    }
+    close(client);
 }
