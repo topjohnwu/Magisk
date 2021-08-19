@@ -33,10 +33,10 @@ template <class Func>
 class run_finally {
     DISALLOW_COPY_AND_MOVE(run_finally)
 public:
-    explicit run_finally(const Func &fn) : fn(fn) {}
+    explicit run_finally(Func &&fn) : fn(std::move(fn)) {}
     ~run_finally() { fn(); }
 private:
-    const Func &fn;
+    Func fn;
 };
 
 template <typename T>

@@ -128,7 +128,7 @@ spec_r = Method('r', [uid, gid, gids, runtime_flags, rlimits, mount_external, se
 spec_samsung_q = Method('samsung_q', [uid, gid, gids, runtime_flags, rlimits, mount_external,
     se_info, i1, i2, nice_name, is_child_zygote, instruction_set, app_data_dir])
 
-server_m = Method('m', [uid, gid, gids, runtime_flags, rlimits,
+server_l = Method('l', [uid, gid, gids, runtime_flags, rlimits,
     permitted_capabilities, effective_capabilities])
 
 server_samsung_q = Method('samsung_q', [uid, gid, gids, runtime_flags, i1, i2, rlimits,
@@ -151,7 +151,6 @@ def gen_definitions(methods, base_name):
     for m in methods:
         func_name = f'{base_name}_{m.name}'
         decl += ind(0) + f'{cpp_ret} {func_name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
-        decl += ind(1) + 'HookContext ctx{};'
         if base_name == 'nativeForkSystemServer':
             decl += ind(1) + 'ForkSystemServerArgs args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
         else:
@@ -159,12 +158,15 @@ def gen_definitions(methods, base_name):
         for a in m.args:
             if a.set_arg:
                 decl += ind(1) + f'args.{a.name} = &{a.name};'
+        decl += ind(1) + 'HookContext ctx;'
+        decl += ind(1) + 'ctx.env = env;'
+        decl += ind(1) + 'ctx.clazz = clazz;'
         decl += ind(1) + 'ctx.raw_args = &args;'
-        decl += ind(1) + f'{base_name}_pre(&ctx, env, clazz);'
-        decl += ind(1) + f'reinterpret_cast<decltype(&{func_name})>({base_name}_orig)('
+        decl += ind(1) + f'ctx.{base_name}_pre();'
+        decl += ind(1) + f'reinterpret_cast<decltype(&{func_name})>(HookContext::{base_name}_orig)('
         decl += ind(2) + f'env, clazz, {m.name_list()}'
         decl += ind(1) + ');'
-        decl += ind(1) + f'{base_name}_post(&ctx, env, clazz);'
+        decl += ind(1) + f'ctx.{base_name}_post();'
         decl += ret_stat
         decl += ind(0) + '}'
 
@@ -189,7 +191,7 @@ def gen_spec():
     return gen_definitions(methods, 'nativeSpecializeAppProcess')
 
 def gen_server():
-    methods = [server_m, server_samsung_q]
+    methods = [server_l, server_samsung_q]
     return gen_definitions(methods, 'nativeForkSystemServer')
 
 with open('jni_hooks.hpp', 'w') as f:

@@ -16,8 +16,8 @@ static void *self_handle = nullptr;
 static atomic<int> active_threads = -1;
 
 void self_unload() {
-    LOGD("hook: Request to self unload\n");
-    // If unhook failed, do not unload or else it will cause SIGSEGV
+    LOGD("zygisk: Request to self unload\n");
+    // If deny failed, do not unload or else it will cause SIGSEGV
     if (!unhook_functions())
         return;
     new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
@@ -81,7 +81,7 @@ __attribute__((constructor))
 static void inject_init() {
     if (char *env = getenv(INJECT_ENV_2)) {
         android_logging();
-        LOGD("zygote: inject 2nd stage\n");
+        LOGD("zygisk: inject 2nd stage\n");
         active_threads = 1;
         unsetenv(INJECT_ENV_2);
 
@@ -100,7 +100,7 @@ static void inject_init() {
         new_daemon_thread(&unload_first_stage, env);
     } else if (getenv(INJECT_ENV_1)) {
         android_logging();
-        LOGD("zygote: inject 1st stage\n");
+        LOGD("zygisk: inject 1st stage\n");
 
         char *ld = getenv("LD_PRELOAD");
         char *path;
