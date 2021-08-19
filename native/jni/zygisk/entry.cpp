@@ -9,6 +9,7 @@
 #include <magisk.hpp>
 
 #include "inject.hpp"
+#include "../magiskhide/magiskhide.hpp"
 
 using namespace std;
 
@@ -124,6 +125,8 @@ static void inject_init() {
     }
 }
 
+// Start code for magiskd IPC
+
 int app_process_main(int argc, char *argv[]) {
     android_logging();
 
@@ -154,6 +157,34 @@ int app_process_main(int argc, char *argv[]) {
     return 1;
 }
 
+bool remote_check_denylist(int uid, const char *process) {
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_CHECK_DENYLIST);
+
+        int ret = -1;
+        if (read_int(fd) == 0) {
+            write_int(fd, uid);
+            write_string(fd, process);
+            ret = read_int(fd);
+        }
+        close(fd);
+        return ret >= 0 && ret;
+    }
+    return false;
+}
+
+int remote_request_unmount() {
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_UNMOUNT);
+        int ret = read_int(fd);
+        close(fd);
+        return ret;
+    }
+    return DAEMON_ERROR;
+}
+
 // The following code runs in magiskd
 
 static void setup_files(int client, ucred *cred) {
@@ -175,11 +206,37 @@ static void setup_files(int client, ucred *cred) {
     write_string(client, path);
 }
 
+static void check_denylist(int client) {
+    if (!hide_enabled()) {
+        write_int(client, HIDE_NOT_ENABLED);
+        return;
+    }
+    write_int(client, 0);
+    int uid = read_int(client);
+    string process = read_string(client);
+    write_int(client, is_hide_target(uid, process));
+}
+
+static void do_unmount(int client, ucred *cred) {
+    LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
+    if (hide_enabled()) {
+        hide_daemon(cred->pid, client);
+    } else {
+        write_int(client, HIDE_NOT_ENABLED);
+    }
+}
+
 void zygisk_handler(int client, ucred *cred) {
     int code = read_int(client);
     switch (code) {
     case ZYGISK_SETUP:
         setup_files(client, cred);
+        break;
+    case ZYGISK_CHECK_DENYLIST:
+        check_denylist(client);
+        break;
+    case ZYGISK_UNMOUNT:
+        do_unmount(client, cred);
         break;
     }
     close(client);

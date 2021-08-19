@@ -129,12 +129,6 @@ string get_class_name(JNIEnv *env, jclass clazz) {
 
 // -----------------------------------------------------------------
 
-// TODO
-int remote_check_denylist(int uid, const char *process) { return 0; }
-void remote_request_unmount() {}
-
-// -----------------------------------------------------------------
-
 #define DCL_HOOK_FUNC(ret, func, ...) \
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
@@ -161,10 +155,11 @@ DCL_HOOK_FUNC(int, fork) {
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
     if (g_ctx && g_ctx->flags[DENY_FLAG]) {
-        // Ask magiskd to cleanup the mount namespace before switching context
+        // Ask magiskd to cleanup our mount namespace before switching context
         // This is the latest point where we can still connect to the magiskd main socket
-        remote_request_unmount();
-        LOGD("zygisk: process successfully hidden\n");
+        if (remote_request_unmount() == 0) {
+            LOGD("zygisk: mount namespace cleaned up\n");
+        }
     }
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }

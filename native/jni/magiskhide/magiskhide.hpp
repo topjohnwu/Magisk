@@ -21,7 +21,7 @@ bool hide_enabled();
 bool is_hide_target(int uid, std::string_view process);
 
 // Hide policies
-void hide_daemon(int pid);
+void hide_daemon(int pid, int client);
 void hide_unmount(int pid = -1);
 
 enum {
