@@ -15,25 +15,24 @@ using jni_hook::hash_map;
 using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
+// Extreme verbose logging
+#define VLOG(...) LOGD(__VA_ARGS__)
+//#define VLOG(...)
+
 namespace {
-
-#define DCL_JNI_FUNC(name) \
-static void *name##_orig;  \
-void name##_pre();         \
-void name##_post();
-
-#define DEF_STATIC(name) \
-void *HookContext::name##_orig = nullptr;
 
 enum {
     DENY_FLAG,
-    APP_FORK,
+    FORK_AND_SPECIALIZE,
     FLAG_MAX
 };
 
+#define DCL_JNI_FUNC(name) \
+void name##_pre();         \
+void name##_post();
+
 struct HookContext {
     JNIEnv *env;
-    jclass clazz;
     union {
         SpecializeAppProcessArgs *args;
         ForkSystemServerArgs *server_args;
@@ -43,23 +42,26 @@ struct HookContext {
     int pid;
     bitset<FLAG_MAX> flags;
 
-    HookContext() : process(nullptr), pid(0) {}
+    HookContext() : pid(-1) {}
 
-    // JNI method declarations
+    void pre_fork();
+    static void post_fork();
+
     DCL_JNI_FUNC(nativeForkAndSpecialize)
     DCL_JNI_FUNC(nativeSpecializeAppProcess)
     DCL_JNI_FUNC(nativeForkSystemServer)
 };
-DEF_STATIC(nativeForkAndSpecialize)
-DEF_STATIC(nativeSpecializeAppProcess)
-DEF_STATIC(nativeForkSystemServer)
 
 #undef DCL_JNI_FUNC
-#undef DEF_STATIC
+
+struct StringCmp {
+    using is_transparent = void;
+    bool operator()(string_view a, string_view b) const { return a < b; }
+};
 
 // Global variables
 vector<tuple<const char *, const char *, void **>> *xhook_list;
-vector<JNINativeMethod> *jni_hook_list;
+map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
 hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
 // Current context
@@ -67,46 +69,23 @@ HookContext *g_ctx;
 const JNINativeInterface *old_functions;
 JNINativeInterface *new_functions;
 
-// JNI method definitions
-// Includes method signatures of all supported Android versions
-#include "jni_hooks.hpp"
-
 #define HOOK_JNI(method) \
 if (methods[i].name == #method##sv) { \
-    jni_hook_list->push_back(methods[i]);              \
-    HookContext::method##_orig = methods[i].fnPtr;     \
-    for (int j = 0; j < method##_methods_num; ++j) {   \
+    for (int j = 0; j < method##_methods_num; ++j) { \
         if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) { \
-            newMethods[i] = method##_methods[j];       \
-            LOGI("zygisk: replaced #" #method "\n");   \
-            ++hooked;    \
+            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]); \
+            method##_orig = methods[i].fnPtr;        \
+            newMethods[i] = method##_methods[j];     \
+            LOGI("zygisk: replaced %s#" #method "\n", className);               \
+            --hook_cnt;  \
             break;       \
         }                \
     }                    \
     continue;            \
 }
 
-unique_ptr<JNINativeMethod[]>hookAndSaveJNIMethods(
-        const char *className, const JNINativeMethod *methods, int numMethods) {
-    unique_ptr<JNINativeMethod[]> newMethods;
-    int hooked = numeric_limits<int>::max();
-    if (className == "com/android/internal/os/Zygote"sv) {
-        hooked = 0;
-        newMethods = make_unique<JNINativeMethod[]>(numMethods);
-        memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods);
-    }
-
-    auto &class_map = (*jni_method_map)[className];
-    for (int i = 0; i < numMethods; ++i) {
-        class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
-        if (hooked < 3) {
-            HOOK_JNI(nativeForkAndSpecialize)
-            HOOK_JNI(nativeSpecializeAppProcess)
-            HOOK_JNI(nativeForkSystemServer)
-        }
-    }
-    return newMethods;
-}
+// JNI method hook definitions, auto generated
+#include "jni_hooks.hpp"
 
 #undef HOOK_JNI
 
@@ -133,29 +112,29 @@ string get_class_name(JNIEnv *env, jclass clazz) {
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
 
-jint jniRegisterNatives(
+jint env_RegisterNatives(
         JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
     auto className = get_class_name(env, clazz);
-    LOGD("zygisk: JNIEnv->RegisterNatives [%s]\n", className.data());
+    VLOG("zygisk: JNIEnv->RegisterNatives [%s]\n", className.data());
     auto newMethods = hookAndSaveJNIMethods(className.data(), methods, numMethods);
     return old_functions->RegisterNatives(env, clazz, newMethods.get() ?: methods, numMethods);
 }
 
 DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
-    LOGD("zygisk: jniRegisterNativeMethods [%s]\n", className);
+    VLOG("zygisk: jniRegisterNativeMethods [%s]\n", className);
     auto newMethods = hookAndSaveJNIMethods(className, methods, numMethods);
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
 
 DCL_HOOK_FUNC(int, fork) {
-    return g_ctx ? g_ctx->pid : old_fork();
+    return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
 
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
     if (g_ctx && g_ctx->flags[DENY_FLAG]) {
-        // Ask magiskd to cleanup our mount namespace before switching context
+        // Request magiskd to cleanup our mount namespace before switching secontext
         // This is the latest point where we can still connect to the magiskd main socket
         if (remote_request_unmount() == 0) {
             LOGD("zygisk: mount namespace cleaned up\n");
@@ -180,7 +159,7 @@ void onVmCreated(void *self, JNIEnv* env) {
 
     new_functions = new JNINativeInterface();
     memcpy(new_functions, env->functions, sizeof(*new_functions));
-    new_functions->RegisterNatives = &jniRegisterNatives;
+    new_functions->RegisterNatives = &env_RegisterNatives;
 
     // Replace the function table in JNIEnv to hook RegisterNatives
     old_functions = env->functions;
@@ -189,7 +168,7 @@ void onVmCreated(void *self, JNIEnv* env) {
 
 template<int N>
 void vtable_entry(void *self, JNIEnv* env) {
-    // The first invocation will be onVmCreated
+    // The first invocation will be onVmCreated. It will also restore the vtable.
     onVmCreated(self, env);
     // Call original function
     reinterpret_cast<decltype(&onVmCreated)>(gAppRuntimeVTable[N])(self, env);
@@ -232,10 +211,10 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
 void HookContext::nativeSpecializeAppProcess_pre() {
     g_ctx = this;
     process = env->GetStringUTFChars(args->nice_name, nullptr);
-    if (flags[APP_FORK]) {
-        LOGD("zygisk: pre app fork [%s]\n", process);
+    if (flags[FORK_AND_SPECIALIZE]) {
+        VLOG("zygisk: pre  forkAndSpecialize [%s]\n", process);
     } else {
-        LOGD("zygisk: pre specialize [%s]\n", process);
+        VLOG("zygisk: pre  specialize [%s]\n", process);
     }
 
     /* TODO: Handle MOUNT_EXTERNAL_NONE */
@@ -246,16 +225,28 @@ void HookContext::nativeSpecializeAppProcess_pre() {
 }
 
 void HookContext::nativeSpecializeAppProcess_post() {
-    if (flags[APP_FORK]) {
-        LOGD("zygisk: post app fork [%s]\n", process);
+    if (flags[FORK_AND_SPECIALIZE]) {
+        VLOG("zygisk: post forkAndSpecialize [%s]\n", process);
     } else {
-        LOGD("zygisk: post specialize [%s]\n", process);
+        VLOG("zygisk: post specialize [%s]\n", process);
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
     if (flags[DENY_FLAG])
         self_unload();
     g_ctx = nullptr;
+}
+
+void HookContext::nativeForkSystemServer_pre() {
+    pre_fork();
+    if (pid) return;
+    VLOG("zygisk: pre  forkSystemServer\n");
+}
+
+void HookContext::nativeForkSystemServer_post() {
+    run_finally f([]{ post_fork(); });
+    if (pid) return;
+    VLOG("zygisk: post forkSystemServer\n");
 }
 
 // -----------------------------------------------------------------
@@ -269,49 +260,34 @@ int sigmask(int how, int signum) {
 
 // Do our own fork before loading any 3rd party code
 // First block SIGCHLD, unblock after original fork is done
-#define PRE_FORK() \
-    g_ctx = this;  \
-    sigmask(SIG_BLOCK, SIGCHLD); \
-    pid = old_fork();            \
-    if (pid != 0)  \
-        return;
+void HookContext::pre_fork() {
+    g_ctx = this;
+    sigmask(SIG_BLOCK, SIGCHLD);
+    pid = old_fork();
+}
 
 // Unblock SIGCHLD in case the original method didn't
-#define POST_FORK() \
-    run_finally f([]{g_ctx = nullptr;}); \
-    sigmask(SIG_UNBLOCK, SIGCHLD);       \
-    if (pid != 0)   \
-        return;
+void HookContext::post_fork() {
+    sigmask(SIG_UNBLOCK, SIGCHLD);
+    g_ctx = nullptr;
+}
 
 void HookContext::nativeForkAndSpecialize_pre() {
-    PRE_FORK()
-    flags[APP_FORK] = true;
-    nativeSpecializeAppProcess_pre();
+    pre_fork();
+    flags[FORK_AND_SPECIALIZE] = true;
+    if (pid == 0)
+        nativeSpecializeAppProcess_pre();
 }
 
 void HookContext::nativeForkAndSpecialize_post() {
-    POST_FORK()
-    nativeSpecializeAppProcess_post();
+    if (pid == 0)
+        nativeSpecializeAppProcess_post();
+    post_fork();
 }
 
-// -----------------------------------------------------------------
+} // namespace
 
-void HookContext::nativeForkSystemServer_pre() {
-    PRE_FORK()
-    LOGD("zygisk: pre server fork\n");
-}
-
-void HookContext::nativeForkSystemServer_post() {
-    POST_FORK()
-    LOGD("zygisk: post server fork\n");
-}
-
-#undef PRE_FORK
-#undef POST_FORK
-
-// -----------------------------------------------------------------
-
-bool hook_refresh() {
+static bool hook_refresh() {
     if (xhook_refresh(0) == 0) {
         xhook_clear();
         LOGI("zygisk: xhook success\n");
@@ -322,7 +298,7 @@ bool hook_refresh() {
     }
 }
 
-int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
+static int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
     int ret = xhook_register(path, symbol, new_func, old_func);
     if (ret != 0) {
         LOGE("hook: Failed to register hook \"%s\"\n", symbol);
@@ -331,8 +307,6 @@ int hook_register(const char *path, const char *symbol, void *new_func, void **o
     xhook_list->emplace_back(path, symbol, old_func);
     return 0;
 }
-
-} // namespace
 
 #define XHOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
     hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
@@ -366,18 +340,20 @@ void hook_functions() {
     if (old_jniRegisterNativeMethods == nullptr) {
         LOGD("zygisk: jniRegisterNativeMethods not hooked, using fallback\n");
 
-        // android::AndroidRuntime::setArgv0(const char *, bool)
+        // android::AndroidRuntime::setArgv0(const char*, bool)
         XHOOK_REGISTER_SYM(APP_PROCESS, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
         hook_refresh();
 
         // We still need old_jniRegisterNativeMethods as other code uses it
-        // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char *, const JNINativeMethod *, int)
+        // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char*, const JNINativeMethod*, int)
         constexpr char sig[] = "_ZN7android14AndroidRuntime21registerNativeMethodsEP7_JNIEnvPKcPK15JNINativeMethodi";
         *(void **) &old_jniRegisterNativeMethods = dlsym(RTLD_DEFAULT, sig);
     }
 }
 
 bool unhook_functions() {
+    bool success = true;
+
     // Restore JNIEnv
     if (g_ctx->env->functions == new_functions) {
         g_ctx->env->functions = old_functions;
@@ -394,21 +370,27 @@ bool unhook_functions() {
     jni_hook::memory_block::release();
 
     // Unhook JNI methods
-    if (!jni_hook_list->empty() && old_jniRegisterNativeMethods(g_ctx->env,
-            "com/android/internal/os/Zygote",
-            jni_hook_list->data(), jni_hook_list->size()) != 0) {
-        LOGE("hook: Failed to register JNI hook\n");
-        return false;
+    for (const auto &[clz, methods] : *jni_hook_list) {
+        if (!methods.empty() && old_jniRegisterNativeMethods(
+                g_ctx->env, clz.data(), methods.data(), methods.size()) != 0) {
+            LOGE("zygisk: Failed to restore JNI hook of class [%s]\n", clz.data());
+            success = false;
+        }
     }
     delete jni_hook_list;
 
     // Unhook xhook
-    for (auto &[path, sym, old_func] : *xhook_list) {
+    for (const auto &[path, sym, old_func] : *xhook_list) {
         if (xhook_register(path, sym, *old_func, nullptr) != 0) {
-            LOGE("hook: Failed to register hook \"%s\"\n", sym);
-            return false;
+            LOGE("zygisk: Failed to register xhook [%s]\n", sym);
+            success = false;
         }
     }
     delete xhook_list;
-    return hook_refresh();
+    if (!hook_refresh()) {
+        LOGE("zygisk: Failed to restore xhook\n");
+        success = false;
+    }
+
+    return success;
 }

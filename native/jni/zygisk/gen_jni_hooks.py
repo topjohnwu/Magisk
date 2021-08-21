@@ -3,44 +3,73 @@
 primitives = ['jint', 'jboolean', 'jlong']
 
 class JType:
-    def __init__(self, name, sig) -> None:
-        self.name = name
-        self.sig = sig
+    def __init__(self, cpp, jni):
+        self.cpp = cpp
+        self.jni = jni
 
 
 class JArray(JType):
-    def __init__(self, type) -> None:
-        if type.name in primitives:
-            name = type.name + 'Array'
+    def __init__(self, type):
+        if type.cpp in primitives:
+            name = type.cpp + 'Array'
         else:
             name = 'jobjectArray'
-        super().__init__(name, '[' + type.sig)
+        super().__init__(name, '[' + type.jni)
 
 
 class Argument:
-    def __init__(self, name, type, set_arg = False) -> None:
+    def __init__(self, name, type, set_arg = False):
         self.name = name
         self.type = type
         self.set_arg = set_arg
 
     def cpp(self):
-        return f'{self.type.name} {self.name}'
+        return f'{self.type.cpp} {self.name}'
 
+# Args we don't care, give it an auto generated name
+class Anon(Argument):
+    cnt = 0
+    def __init__(self, type):
+        super().__init__(f'_{Anon.cnt}', type)
+        Anon.cnt += 1
+
+class Return:
+    def __init__(self, value, type):
+        self.value = value
+        self.type = type
 
 class Method:
-    def __init__(self, name, args) -> None:
+    def __init__(self, name, ret, args):
         self.name = name
+        self.ret = ret
         self.args = args
 
     def cpp(self):
-        return ', '.join(map(lambda a: a.cpp(), self.args))
+        return ', '.join(map(lambda x: x.cpp(), self.args))
 
     def name_list(self):
-        return ', '.join(map(lambda a: a.name, self.args))
+        return ', '.join(map(lambda x: x.name, self.args))
 
     def jni(self):
-        return ''.join(map(lambda a: a.type.sig, self.args))
+        args = ''.join(map(lambda x: x.type.jni, self.args))
+        return f'({args}){self.ret.type.jni}'
 
+    def body(self):
+        return ''
+
+class JNIHook(Method):
+    def __init__(self, ver, ret, args):
+        name = f'{self.base_name()}_{ver}'
+        super().__init__(name, ret, args)
+
+    def base_name(self):
+        return ''
+
+    def orig_method(self):
+        return f'reinterpret_cast<decltype(&{self.name})>({self.base_name()}_orig)'
+
+def ind(i):
+    return '\n' + '    ' * i
 
 # Common types
 jint = JType('jint', 'I')
@@ -48,6 +77,48 @@ jintArray = JArray(jint)
 jstring = JType('jstring', 'Ljava/lang/String;')
 jboolean = JType('jboolean', 'Z')
 jlong = JType('jlong', 'J')
+void = JType('void', 'V')
+
+class ForkAndSpec(JNIHook):
+    def __init__(self, ver, args):
+        super().__init__(ver, Return('ctx.pid', jint), args)
+
+    def base_name(self):
+        return 'nativeForkAndSpecialize'
+
+    def init_args(self):
+        return 'SpecializeAppProcessArgs args(uid, gid, gids, runtime_flags, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
+
+    def body(self):
+        decl = ''
+        decl += ind(1) + self.init_args()
+        for a in self.args:
+            if a.set_arg:
+                decl += ind(1) + f'args.{a.name} = &{a.name};'
+        decl += ind(1) + 'HookContext ctx;'
+        decl += ind(1) + 'ctx.env = env;'
+        decl += ind(1) + 'ctx.raw_args = &args;'
+        decl += ind(1) + f'ctx.{self.base_name()}_pre();'
+        decl += ind(1) + self.orig_method() + '('
+        decl += ind(2) + f'env, clazz, {self.name_list()}'
+        decl += ind(1) + ');'
+        decl += ind(1) + f'ctx.{self.base_name()}_post();'
+        return decl
+
+class SpecApp(ForkAndSpec):
+    def __init__(self, ver, args):
+        super().__init__(ver, args)
+        self.ret = Return('', void)
+
+    def base_name(self):
+        return 'nativeSpecializeAppProcess'
+
+class ForkServer(ForkAndSpec):
+    def base_name(self):
+        return 'nativeForkSystemServer'
+
+    def init_args(self):
+        return 'ForkSystemServerArgs args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
 
 # Common args
 uid = Argument('uid', jint)
@@ -77,125 +148,143 @@ whitelisted_data_info_list = Argument('whitelisted_data_info_list', JArray(jstri
 mount_data_dirs = Argument('mount_data_dirs', jboolean, True)
 mount_storage_dirs = Argument('mount_storage_dirs', jboolean, True)
 
-# samsung (non-standard arguments)
-i1 = Argument('i1', jint)
-i2 = Argument('i2', jint)
-i3 = Argument('i3', jint)
-
 # server
 permitted_capabilities = Argument('permitted_capabilities', jlong)
 effective_capabilities = Argument('effective_capabilities', jlong)
 
 # Method definitions
-fork_l = Method('l', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+fas_l = ForkAndSpec('l', [uid, gid, gids, runtime_flags, rlimits, mount_external,
     se_info, nice_name, fds_to_close, instruction_set, app_data_dir])
 
-fork_o = Method('o', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+fas_o = ForkAndSpec('o', [uid, gid, gids, runtime_flags, rlimits, mount_external,
     se_info, nice_name, fds_to_close, fds_to_ignore, instruction_set, app_data_dir])
 
-fork_p = Method('p', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+fas_p = ForkAndSpec('p', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir])
 
-fork_q_alt = Method('q_alt', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+fas_q_alt = ForkAndSpec('q_alt', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir, is_top_app])
 
-fork_r = Method('r', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+fas_r = ForkAndSpec('r', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir, is_top_app,
     pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs])
 
-fork_samsung_m = Method('samsung_m', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, i1, i2, nice_name, fds_to_close, instruction_set, app_data_dir])
+fas_samsung_m = ForkAndSpec('samsung_m', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, Anon(jint), Anon(jint), nice_name, fds_to_close, instruction_set, app_data_dir])
 
-fork_samsung_n = Method('samsung_n', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, i1, i2, nice_name, fds_to_close, instruction_set, app_data_dir, i3])
+fas_samsung_n = ForkAndSpec('samsung_n', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, Anon(jint), Anon(jint), nice_name, fds_to_close, instruction_set, app_data_dir, Anon(jint)])
 
-fork_samsung_o = Method('samsung_o', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, i1, i2, nice_name, fds_to_close, fds_to_ignore, instruction_set, app_data_dir])
+fas_samsung_o = ForkAndSpec('samsung_o', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, Anon(jint), Anon(jint), nice_name, fds_to_close, fds_to_ignore, instruction_set, app_data_dir])
 
-fork_samsung_p = Method('samsung_p', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, i1, i2, nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir])
+fas_samsung_p = ForkAndSpec('samsung_p', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, Anon(jint), Anon(jint), nice_name, fds_to_close, fds_to_ignore, is_child_zygote,
+    instruction_set, app_data_dir])
 
-spec_q = Method('q', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+spec_q = SpecApp('q', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, is_child_zygote, instruction_set, app_data_dir])
 
-spec_q_alt = Method('q_alt', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
+spec_q_alt = SpecApp('q_alt', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, is_child_zygote, instruction_set, app_data_dir, is_top_app])
 
-spec_r = Method('r', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name,
+spec_r = SpecApp('r', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name,
     is_child_zygote, instruction_set, app_data_dir, is_top_app, pkg_data_info_list,
     whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs])
 
-spec_samsung_q = Method('samsung_q', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, i1, i2, nice_name, is_child_zygote, instruction_set, app_data_dir])
+spec_samsung_q = SpecApp('samsung_q', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, Anon(jint), Anon(jint), nice_name, is_child_zygote, instruction_set, app_data_dir])
 
-server_l = Method('l', [uid, gid, gids, runtime_flags, rlimits,
+server_l = ForkServer('l', [uid, gid, gids, runtime_flags, rlimits,
     permitted_capabilities, effective_capabilities])
 
-server_samsung_q = Method('samsung_q', [uid, gid, gids, runtime_flags, i1, i2, rlimits,
+server_samsung_q = ForkServer('samsung_q', [uid, gid, gids, runtime_flags, Anon(jint), Anon(jint), rlimits,
     permitted_capabilities, effective_capabilities])
 
+hook_map = {}
 
-def ind(i):
-    return '\n' + '    ' * i
+def gen_jni_def(clz, methods):
+    if clz not in hook_map:
+        hook_map[clz] = []
 
-def gen_definitions(methods, base_name):
     decl = ''
-    if base_name != 'nativeSpecializeAppProcess':
-        ret_stat = ind(1) + 'return ctx.pid;'
-        cpp_ret = 'jint'
-        jni_ret = 'I'
-    else:
-        ret_stat = ''
-        cpp_ret = 'void'
-        jni_ret = 'V'
     for m in methods:
-        func_name = f'{base_name}_{m.name}'
-        decl += ind(0) + f'{cpp_ret} {func_name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
-        if base_name == 'nativeForkSystemServer':
-            decl += ind(1) + 'ForkSystemServerArgs args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
-        else:
-            decl += ind(1) + 'SpecializeAppProcessArgs args(uid, gid, gids, runtime_flags, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
-        for a in m.args:
-            if a.set_arg:
-                decl += ind(1) + f'args.{a.name} = &{a.name};'
-        decl += ind(1) + 'HookContext ctx;'
-        decl += ind(1) + 'ctx.env = env;'
-        decl += ind(1) + 'ctx.clazz = clazz;'
-        decl += ind(1) + 'ctx.raw_args = &args;'
-        decl += ind(1) + f'ctx.{base_name}_pre();'
-        decl += ind(1) + f'reinterpret_cast<decltype(&{func_name})>(HookContext::{base_name}_orig)('
-        decl += ind(2) + f'env, clazz, {m.name_list()}'
-        decl += ind(1) + ');'
-        decl += ind(1) + f'ctx.{base_name}_post();'
-        decl += ret_stat
+        decl += ind(0) + f'{m.ret.type.cpp} {m.name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
+        decl += m.body()
+        if m.ret.value:
+            decl += ind(1) + f'return {m.ret.value};'
         decl += ind(0) + '}'
 
-    decl += ind(0) + f'const JNINativeMethod {base_name}_methods[] = {{'
+    decl += ind(0) + f'const JNINativeMethod {m.base_name()}_methods[] = {{'
     for m in methods:
         decl += ind(1) + '{'
-        decl += ind(2) + f'"{base_name}",'
-        decl += ind(2) + f'"({m.jni()}){jni_ret}",'
-        decl += ind(2) + f'(void *) &{base_name}_{m.name}'
+        decl += ind(2) + f'"{m.base_name()}",'
+        decl += ind(2) + f'"{m.jni()}",'
+        decl += ind(2) + f'(void *) &{m.name}'
         decl += ind(1) + '},'
     decl += ind(0) + '};'
-    decl += ind(0) + f'constexpr int {base_name}_methods_num = std::size({base_name}_methods);'
+    decl = ind(0) + f'void *{m.base_name()}_orig = nullptr;' + decl
+    decl += ind(0) + f'constexpr int {m.base_name()}_methods_num = std::size({m.base_name()}_methods);'
     decl += ind(0)
+
+    hook_map[clz].append(m.base_name())
+
     return decl
 
-def gen_fork():
-    methods = [fork_l, fork_o, fork_p, fork_q_alt, fork_r, fork_samsung_m, fork_samsung_n, fork_samsung_o, fork_samsung_p]
-    return gen_definitions(methods, 'nativeForkAndSpecialize')
+def gen_jni_hook():
+    decl = ''
+    decl += ind(0) + 'unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(const char *className, const JNINativeMethod *methods, int numMethods) {'
+    decl += ind(1) + 'unique_ptr<JNINativeMethod[]> newMethods;'
+    decl += ind(1) + 'int clz_id = -1;'
+    decl += ind(1) + 'int hook_cnt = 0;'
+    decl += ind(1) + 'do {'
 
-def gen_spec():
-    methods = [spec_q, spec_q_alt, spec_r, spec_samsung_q]
-    return gen_definitions(methods, 'nativeSpecializeAppProcess')
+    for index, (clz, methods) in enumerate(hook_map.items()):
+        decl += ind(2) + f'if (className == "{clz}"sv) {{'
+        decl += ind(3) + f'clz_id = {index};'
+        decl += ind(3) + f'hook_cnt = {len(methods)};'
+        decl += ind(3) + 'break;'
+        decl += ind(2) + '}'
 
-def gen_server():
-    methods = [server_l, server_samsung_q]
-    return gen_definitions(methods, 'nativeForkSystemServer')
+    decl += ind(1) + '} while (false);'
+
+    decl += ind(1) + 'if (hook_cnt) {'
+    decl += ind(2) + 'newMethods = make_unique<JNINativeMethod[]>(numMethods);'
+    decl += ind(2) + 'memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods);'
+    decl += ind(1) + '}'
+
+    decl += ind(1) + 'auto &class_map = (*jni_method_map)[className];'
+    decl += ind(1) + 'for (int i = 0; i < numMethods; ++i) {'
+    decl += ind(2) + 'class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;'
+    decl += ind(2) + 'if (hook_cnt == 0) continue;'
+
+    for index, methods in enumerate(hook_map.values()):
+        decl += ind(2) + f'if (clz_id == {index}) {{'
+        for m in methods:
+            decl += ind(3) + f'HOOK_JNI({m})'
+        decl += ind(3) + 'continue;'
+        decl += ind(2) + '}'
+
+    decl += ind(1) + '}'
+
+    decl += ind(1) + 'return newMethods;'
+    decl += ind(0) + '}'
+    return decl
 
 with open('jni_hooks.hpp', 'w') as f:
     f.write('// Generated by gen_jni_hooks.py\n')
-    f.write(gen_fork())
-    f.write(gen_spec())
-    f.write(gen_server())
+
+    zygote = 'com/android/internal/os/Zygote'
+
+    methods = [fas_l, fas_o, fas_p, fas_q_alt, fas_r, fas_samsung_m, fas_samsung_n, fas_samsung_o, fas_samsung_p]
+    f.write(gen_jni_def(zygote, methods))
+
+    methods = [spec_q, spec_q_alt, spec_r, spec_samsung_q]
+    f.write(gen_jni_def(zygote, methods))
+
+    methods = [server_l, server_samsung_q]
+    f.write(gen_jni_def(zygote, methods))
+
+    f.write(gen_jni_hook())
+
+    f.write('\n')
