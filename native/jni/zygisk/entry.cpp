@@ -3,6 +3,7 @@
 #include <sys/mount.h>
 #include <sys/sendfile.h>
 #include <sys/prctl.h>
+#include <android/log.h>
 
 #include <utils.hpp>
 #include <daemon.hpp>
@@ -15,6 +16,17 @@ using namespace std;
 
 static void *self_handle = nullptr;
 static atomic<int> active_threads = -1;
+
+static int zygisk_log(int prio, const char *fmt, va_list ap);
+
+#define zlog(prio) [](auto fmt, auto ap){ return zygisk_log(ANDROID_LOG_##prio, fmt, ap); }
+static void zygisk_logging() {
+    log_cb.d = zlog(DEBUG);
+    log_cb.i = zlog(INFO);
+    log_cb.w = zlog(WARN);
+    log_cb.e = zlog(ERROR);
+    log_cb.ex = nop_ex;
+}
 
 void self_unload() {
     LOGD("zygisk: Request to self unload\n");
@@ -81,7 +93,7 @@ static void inject_cleanup_wait() {
 __attribute__((constructor))
 static void inject_init() {
     if (char *env = getenv(INJECT_ENV_2)) {
-        magisk_logging();
+        zygisk_logging();
         LOGD("zygisk: inject 2nd stage\n");
         active_threads = 1;
         unsetenv(INJECT_ENV_2);
@@ -100,7 +112,7 @@ static void inject_init() {
         active_threads++;
         new_daemon_thread(&unload_first_stage, env);
     } else if (getenv(INJECT_ENV_1)) {
-        magisk_logging();
+        android_logging();
         LOGD("zygisk: inject 1st stage\n");
 
         char *ld = getenv("LD_PRELOAD");
@@ -128,7 +140,7 @@ static void inject_init() {
 // Start code for magiskd IPC
 
 int app_process_main(int argc, char *argv[]) {
-    magisk_logging();
+    android_logging();
 
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
@@ -155,6 +167,42 @@ int app_process_main(int argc, char *argv[]) {
     xumount2("/proc/self/exe", MNT_DETACH);
     execve(buf, argv, environ);
     return 1;
+}
+
+static int zygisk_log(int prio, const char *fmt, va_list ap) {
+    // If we don't have log pipe set, ask magiskd for it
+    // This could happen multiple times in zygote because it was closed to prevent crashing
+    if (logd_fd < 0) {
+        // Change logging temporarily to prevent infinite recursion and stack overflow
+        android_logging();
+        if (int fd = connect_daemon(); fd >= 0) {
+            write_int(fd, ZYGISK_REQUEST);
+            write_int(fd, ZYGISK_GET_LOG_PIPE);
+            if (read_int(fd) == 0) {
+                logd_fd = recv_fd(fd);
+            }
+            close(fd);
+        }
+        zygisk_logging();
+    }
+
+    sigset_t mask;
+    sigset_t orig_mask;
+    bool sig = false;
+    // Make sure SIGPIPE won't crash zygote
+    if (logd_fd >= 0) {
+        sig = true;
+        sigemptyset(&mask);
+        sigaddset(&mask, SIGPIPE);
+        pthread_sigmask(SIG_BLOCK, &mask, &orig_mask);
+    }
+    int ret = magisk_log(prio, fmt, ap);
+    if (sig) {
+        timespec ts{};
+        sigtimedwait(&mask, nullptr, &ts);
+        pthread_sigmask(SIG_SETMASK, &orig_mask, nullptr);
+    }
+    return ret;
 }
 
 bool remote_check_denylist(int uid, const char *process) {
@@ -226,6 +274,16 @@ static void do_unmount(int client, ucred *cred) {
     }
 }
 
+static void send_log_pipe(int fd) {
+    // There is race condition here, but we can't really do much about it...
+    if (logd_fd) {
+        write_int(fd, 0);
+        send_fd(fd, logd_fd);
+    } else {
+        write_int(fd, 1);
+    }
+}
+
 void zygisk_handler(int client, ucred *cred) {
     int code = read_int(client);
     switch (code) {
@@ -237,6 +295,9 @@ void zygisk_handler(int client, ucred *cred) {
         break;
     case ZYGISK_UNMOUNT:
         do_unmount(client, cred);
+        break;
+    case ZYGISK_GET_LOG_PIPE:
+        send_log_pipe(client);
         break;
     }
     close(client);

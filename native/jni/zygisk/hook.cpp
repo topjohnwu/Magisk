@@ -24,10 +24,12 @@ namespace {
 enum {
     DENY_FLAG,
     FORK_AND_SPECIALIZE,
+    APP_SPECIALIZE,
+    SERVER_SPECIALIZE,
     FLAG_MAX
 };
 
-#define DCL_JNI_FUNC(name) \
+#define DCL_PRE_POST(name) \
 void name##_pre();         \
 void name##_post();
 
@@ -44,15 +46,17 @@ struct HookContext {
 
     HookContext() : pid(-1) {}
 
-    void pre_fork();
-    static void post_fork();
+    static void close_fds();
 
-    DCL_JNI_FUNC(nativeForkAndSpecialize)
-    DCL_JNI_FUNC(nativeSpecializeAppProcess)
-    DCL_JNI_FUNC(nativeForkSystemServer)
+    DCL_PRE_POST(fork)
+    DCL_PRE_POST(run_modules)
+
+    DCL_PRE_POST(nativeForkAndSpecialize)
+    DCL_PRE_POST(nativeSpecializeAppProcess)
+    DCL_PRE_POST(nativeForkSystemServer)
 };
 
-#undef DCL_JNI_FUNC
+#undef DCL_PRE_POST
 
 struct StringCmp {
     using is_transparent = void;
@@ -127,20 +131,30 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
 
+// Skip actual fork and return cached result if applicable
 DCL_HOOK_FUNC(int, fork) {
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
 
+// This is the latest point where we can still connect to the magiskd main socket
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
     if (g_ctx && g_ctx->flags[DENY_FLAG]) {
-        // Request magiskd to cleanup our mount namespace before switching secontext
-        // This is the latest point where we can still connect to the magiskd main socket
         if (remote_request_unmount() == 0) {
             LOGD("zygisk: mount namespace cleaned up\n");
         }
     }
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
+}
+
+// A place to clean things up before calling into zygote::ForkCommon/SpecializeCommon
+DCL_HOOK_FUNC(void, android_log_close) {
+    HookContext::close_fds();
+    if (g_ctx && g_ctx->pid <= 0) {
+        // In child process, no longer be able to access to magiskd
+        android_logging();
+    }
+    old_android_log_close();
 }
 
 // -----------------------------------------------------------------
@@ -208,8 +222,18 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
 
 // -----------------------------------------------------------------
 
+void HookContext::run_modules_pre()  { /* TODO */ }
+void HookContext::run_modules_post() { /* TODO */ }
+
+void HookContext::close_fds() {
+    close(logd_fd.exchange(-1));
+}
+
+// -----------------------------------------------------------------
+
 void HookContext::nativeSpecializeAppProcess_pre() {
     g_ctx = this;
+    flags[APP_SPECIALIZE] = true;
     process = env->GetStringUTFChars(args->nice_name, nullptr);
     if (flags[FORK_AND_SPECIALIZE]) {
         VLOG("zygisk: pre  forkAndSpecialize [%s]\n", process);
@@ -221,6 +245,8 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     if (args->mount_external != 0 && remote_check_denylist(args->uid, process)) {
         flags[DENY_FLAG] = true;
         LOGI("zygisk: [%s] is on the denylist\n", process);
+    } else {
+        run_modules_pre();
     }
 }
 
@@ -232,24 +258,49 @@ void HookContext::nativeSpecializeAppProcess_post() {
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
-    if (flags[DENY_FLAG])
+    if (flags[DENY_FLAG]) {
         self_unload();
+    } else {
+        run_modules_post();
+    }
     g_ctx = nullptr;
 }
 
 void HookContext::nativeForkSystemServer_pre() {
-    pre_fork();
-    if (pid) return;
-    VLOG("zygisk: pre  forkSystemServer\n");
+    fork_pre();
+    flags[SERVER_SPECIALIZE] = true;
+    if (pid == 0) {
+        VLOG("zygisk: pre  forkSystemServer\n");
+        run_modules_pre();
+        close_fds();
+    }
 }
 
 void HookContext::nativeForkSystemServer_post() {
-    run_finally f([]{ post_fork(); });
-    if (pid) return;
-    VLOG("zygisk: post forkSystemServer\n");
+    if (pid == 0) {
+        android_logging();
+        VLOG("zygisk: post forkSystemServer\n");
+        run_modules_post();
+    }
+    fork_post();
 }
 
-// -----------------------------------------------------------------
+void HookContext::nativeForkAndSpecialize_pre() {
+    fork_pre();
+    flags[FORK_AND_SPECIALIZE] = true;
+    if (pid == 0) {
+        nativeSpecializeAppProcess_pre();
+        close_fds();
+    }
+}
+
+void HookContext::nativeForkAndSpecialize_post() {
+    if (pid == 0) {
+        android_logging();
+        nativeSpecializeAppProcess_post();
+    }
+    fork_post();
+}
 
 int sigmask(int how, int signum) {
     sigset_t set;
@@ -260,29 +311,16 @@ int sigmask(int how, int signum) {
 
 // Do our own fork before loading any 3rd party code
 // First block SIGCHLD, unblock after original fork is done
-void HookContext::pre_fork() {
+void HookContext::fork_pre() {
     g_ctx = this;
     sigmask(SIG_BLOCK, SIGCHLD);
     pid = old_fork();
 }
 
 // Unblock SIGCHLD in case the original method didn't
-void HookContext::post_fork() {
+void HookContext::fork_post() {
     sigmask(SIG_UNBLOCK, SIGCHLD);
     g_ctx = nullptr;
-}
-
-void HookContext::nativeForkAndSpecialize_pre() {
-    pre_fork();
-    flags[FORK_AND_SPECIALIZE] = true;
-    if (pid == 0)
-        nativeSpecializeAppProcess_pre();
-}
-
-void HookContext::nativeForkAndSpecialize_post() {
-    if (pid == 0)
-        nativeSpecializeAppProcess_post();
-    post_fork();
 }
 
 } // namespace
@@ -315,7 +353,7 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
     XHOOK_REGISTER_SYM(PATH_REGEX, #NAME, NAME)
 
 #define ANDROID_RUNTIME ".*/libandroid_runtime.so$"
-#define APP_PROCESS "^/system/bin/app_process.*"
+#define APP_PROCESS     "^/system/bin/app_process.*"
 
 void hook_functions() {
 #ifdef MAGISK_DEBUG
@@ -329,6 +367,7 @@ void hook_functions() {
     XHOOK_REGISTER(ANDROID_RUNTIME, fork);
     XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
     XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
+    XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
     hook_refresh();
 
     // Remove unhooked methods

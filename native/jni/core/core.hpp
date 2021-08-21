@@ -10,6 +10,7 @@ void unlock_blocks();
 void reboot();
 void start_log_daemon();
 void setup_logfile(bool reset);
+void magisk_logging();
 
 // Module stuffs
 void handle_modules();

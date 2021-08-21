@@ -10,6 +10,7 @@ enum : int {
     ZYGISK_SETUP,
     ZYGISK_CHECK_DENYLIST,
     ZYGISK_UNMOUNT,
+    ZYGISK_GET_LOG_PIPE,
 };
 
 // Unmap all pages matching the name

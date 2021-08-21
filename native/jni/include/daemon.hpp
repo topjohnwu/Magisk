@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <string>
 #include <limits>
+#include <atomic>
 
 #include <socket.hpp>
 
@@ -48,7 +49,9 @@ enum : int {
 
 int connect_daemon(bool create = false);
 
-void magisk_logging();
+extern std::atomic<int> logd_fd;
+int magisk_log(int prio, const char *fmt, va_list ap);
+void android_logging();
 
 // Daemon handlers
 void post_fs_data(int client);

@@ -17,7 +17,7 @@ struct log_meta {
     int tid;
 };
 
-static atomic<int> logd_fd = -1;
+atomic<int> logd_fd = -1;
 
 void setup_logfile(bool reset) {
     if (logd_fd < 0)
@@ -121,7 +121,7 @@ static void logfile_writer(int pipefd) {
     }
 }
 
-static int magisk_log(int prio, const char *fmt, va_list ap) {
+int magisk_log(int prio, const char *fmt, va_list ap) {
     char buf[MAX_MSG_LEN + 1];
     int len = vsnprintf(buf, sizeof(buf), fmt, ap);
 
@@ -169,6 +169,15 @@ void magisk_logging() {
     log_cb.i = mlog(INFO);
     log_cb.w = mlog(WARN);
     log_cb.e = mlog(ERROR);
+    log_cb.ex = nop_ex;
+}
+
+#define alog(prio) [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
+void android_logging() {
+    log_cb.d = alog(DEBUG);
+    log_cb.i = alog(INFO);
+    log_cb.w = alog(WARN);
+    log_cb.e = alog(ERROR);
     log_cb.ex = nop_ex;
 }
 
