@@ -81,7 +81,7 @@ static void inject_cleanup_wait() {
 __attribute__((constructor))
 static void inject_init() {
     if (char *env = getenv(INJECT_ENV_2)) {
-        android_logging();
+        magisk_logging();
         LOGD("zygisk: inject 2nd stage\n");
         active_threads = 1;
         unsetenv(INJECT_ENV_2);
@@ -100,7 +100,7 @@ static void inject_init() {
         active_threads++;
         new_daemon_thread(&unload_first_stage, env);
     } else if (getenv(INJECT_ENV_1)) {
-        android_logging();
+        magisk_logging();
         LOGD("zygisk: inject 1st stage\n");
 
         char *ld = getenv("LD_PRELOAD");
@@ -128,7 +128,7 @@ static void inject_init() {
 // Start code for magiskd IPC
 
 int app_process_main(int argc, char *argv[]) {
-    android_logging();
+    magisk_logging();
 
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);

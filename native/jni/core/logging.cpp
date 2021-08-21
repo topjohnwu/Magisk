@@ -149,22 +149,26 @@ static int magisk_log(int prio, const char *fmt, va_list ap) {
     return len;
 }
 
+// Used to override external C library logging
+extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
+    char buf[4096];
+    auto len = strlcpy(buf, tag, sizeof(buf));
+    // Prevent format specifications in the tag
+    std::replace(buf, buf + len, '%', '_');
+    snprintf(buf + len, sizeof(buf) - len, ": %s", fmt);
+    va_list argv;
+    va_start(argv, fmt);
+    int ret = magisk_log(prio, buf, argv);
+    va_end(argv);
+    return ret;
+}
+
 #define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
 void magisk_logging() {
     log_cb.d = mlog(DEBUG);
     log_cb.i = mlog(INFO);
     log_cb.w = mlog(WARN);
     log_cb.e = mlog(ERROR);
-    log_cb.ex = nop_ex;
-}
-
-#define alog(prio) [](auto fmt, auto ap){ \
-return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
-void android_logging() {
-    log_cb.d = alog(DEBUG);
-    log_cb.i = alog(INFO);
-    log_cb.w = alog(WARN);
-    log_cb.e = alog(ERROR);
     log_cb.ex = nop_ex;
 }
 

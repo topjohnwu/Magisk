@@ -8,7 +8,6 @@ extern int DAEMON_STATE;
 
 void unlock_blocks();
 void reboot();
-void magisk_logging();
 void start_log_daemon();
 void setup_logfile(bool reset);
 

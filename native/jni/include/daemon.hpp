@@ -48,7 +48,7 @@ enum : int {
 
 int connect_daemon(bool create = false);
 
-void android_logging();
+void magisk_logging();
 
 // Daemon handlers
 void post_fs_data(int client);
