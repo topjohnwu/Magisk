@@ -264,7 +264,7 @@ int connect_daemon(bool create) {
     if (connect(fd, (sockaddr*) &sun, len)) {
         if (!create || getuid() != UID_ROOT) {
             LOGE("No daemon is currently running!\n");
-            return 1;
+            return -1;
         }
 
         if (fork_dont_care() == 0) {

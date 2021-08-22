@@ -236,11 +236,11 @@ int remote_request_unmount() {
 // The following code runs in magiskd
 
 static void setup_files(int client, ucred *cred) {
-    LOGD("zygisk: setup files\n");
+    LOGD("zygisk: setup files for pid=[%d]\n", cred->pid);
 
-    char buf[PATH_MAX];
-    sprintf(buf, "/proc/%d/exe", cred->pid);
-    if (realpath(buf, buf) == nullptr) {
+    char buf[256];
+    snprintf(buf, sizeof(buf), "/proc/%d/exe", cred->pid);
+    if (xreadlink(buf, buf, sizeof(buf)) < 0) {
         write_int(client, 1);
         return;
     }
@@ -276,7 +276,7 @@ static void do_unmount(int client, ucred *cred) {
 
 static void send_log_pipe(int fd) {
     // There is race condition here, but we can't really do much about it...
-    if (logd_fd) {
+    if (logd_fd >= 0) {
         write_int(fd, 0);
         send_fd(fd, logd_fd);
     } else {
