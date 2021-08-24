@@ -185,6 +185,6 @@ void start_log_daemon() {
     int fds[2];
     if (pipe2(fds, O_CLOEXEC) == 0) {
         logd_fd = fds[1];
-        new_daemon_thread([fd = fds[0]] { logfile_writer(fd); });
+        exec_task([fd = fds[0]] { logfile_writer(fd); });
     }
 }

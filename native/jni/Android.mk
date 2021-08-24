@@ -25,6 +25,7 @@ LOCAL_SRC_FILES := \
     core/restorecon.cpp \
     core/module.cpp \
     core/logging.cpp \
+    core/thread.cpp \
     magiskhide/magiskhide.cpp \
     magiskhide/hide_utils.cpp \
     magiskhide/hide_policy.cpp \

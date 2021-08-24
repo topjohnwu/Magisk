@@ -144,8 +144,8 @@ static void handle_request(int client) {
         goto done;
     }
 
-    // Create new thread to handle complex requests
-    new_daemon_thread([=] { handle_request_async(client, code, cred); });
+    // Handle complex requests in another thread
+    exec_task([=] { handle_request_async(client, code, cred); });
     return;
 
 done:

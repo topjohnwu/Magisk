@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 extern bool RECOVERY_MODE;
 extern int DAEMON_STATE;
@@ -11,6 +12,9 @@ void reboot();
 void start_log_daemon();
 void setup_logfile(bool reset);
 void magisk_logging();
+
+// Thread pool
+void exec_task(std::function<void()> &&task);
 
 // Module stuffs
 void handle_modules();
