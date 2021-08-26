@@ -25,14 +25,15 @@ void hide_daemon(int pid, int client) {
 #define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && str_starts(mentry->mnt_dir, "/" #dir))
 
 void hide_unmount(int pid) {
-    if (pid > 0 && switch_mnt_ns(pid))
-        return;
-
-    LOGD("hide: handling PID=[%d]\n", pid > 0 ? pid : getpid());
+    if (pid > 0) {
+        if (switch_mnt_ns(pid))
+            return;
+        LOGD("hide: handling PID=[%d]\n", pid);
+    }
 
     vector<string> targets;
 
-    // Unmount dummy skeletons and /sbin links
+    // Unmount dummy skeletons and MAGISKTMP
     targets.push_back(MAGISKTMP);
     parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
         if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(product) || TMPFS_MNT(system_ext))

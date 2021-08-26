@@ -25,6 +25,11 @@ using namespace std;
 }
 
 void magiskhide_handler(int client, ucred *cred) {
+    if (client < 0) {
+        hide_unmount();
+        return;
+    }
+
     int req = read_int(client);
     int res = DAEMON_ERROR;
 

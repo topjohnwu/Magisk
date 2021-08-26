@@ -126,7 +126,7 @@ int exec_command_sync(exec_t &exec, Args &&...args) {
 }
 template <class ...Args>
 int exec_command_sync(Args &&...args) {
-    exec_t exec{};
+    exec_t exec;
     return exec_command_sync(exec, args...);
 }
 template <class ...Args>

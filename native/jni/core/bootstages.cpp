@@ -23,9 +23,9 @@ static bool safe_mode = false;
  * Setup *
  *********/
 
-#define MNT_DIR_IS(dir)   (me->mnt_dir == string_view(dir))
-#define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
+#define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
+#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
+#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
 #define do_mount_mirror(part, flag) {\
     SETMIR(buf1, part); \

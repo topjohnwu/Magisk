@@ -28,6 +28,7 @@ Options:
 
 Advanced Options (Internal APIs):
    --daemon                  manually start magisk daemon
+   --stop                    remove all magisk changes and stop daemon
    --[init trigger]          start service for init trigger
                              Supported init triggers:
                              post-fs-data, service, boot-complete
@@ -84,6 +85,10 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(true);
         write_int(fd, START_DAEMON);
         return 0;
+    } else if (argv[1] == "--stop"sv) {
+        int fd = connect_daemon();
+        write_int(fd, STOP_DAEMON);
+        return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
         int fd = connect_daemon(true);
         write_int(fd, POST_FS_DATA);
