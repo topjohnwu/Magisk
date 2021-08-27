@@ -97,11 +97,12 @@ static bool dload_sqlite() {
     return true;
 }
 
-int db_strings::getKeyIdx(string_view key) const {
-    int idx = DB_STRING_NUM;
-    for (int i = 0; i < DB_STRING_NUM; ++i) {
-        if (key == DB_STRING_KEYS[i])
-            idx = i;
+int db_strings::get_idx(string_view key) const {
+    int idx = 0;
+    for (const char *k : DB_STRING_KEYS) {
+        if (key == k)
+            break;
+        ++idx;
     }
     return idx;
 }
@@ -114,11 +115,12 @@ db_settings::db_settings() {
     data[HIDE_CONFIG] = false;
 }
 
-int db_settings::getKeyIdx(string_view key) const {
-    int idx = DB_SETTINGS_NUM;
-    for (int i = 0; i < DB_SETTINGS_NUM; ++i) {
-        if (key == DB_SETTING_KEYS[i])
-            idx = i;
+int db_settings::get_idx(string_view key) const {
+    int idx = 0;
+    for (const char *k : DB_SETTING_KEYS) {
+        if (key == k)
+            break;
+        ++idx;
     }
     return idx;
 }
@@ -256,6 +258,14 @@ char *db_exec(const char *sql) {
     return nullptr;
 }
 
+static int sqlite_db_row_callback(void *cb, int col_num, char **data, char **col_name) {
+    auto &func = *static_cast<const db_row_cb*>(cb);
+    db_row row;
+    for (int i = 0; i < col_num; ++i)
+        row[col_name[i]] = data[i];
+    return func(row) ? 0 : 1;
+}
+
 char *db_exec(const char *sql, const db_row_cb &fn) {
     char *err;
     if (mDB == nullptr) {
@@ -268,13 +278,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
         );
     }
     if (mDB) {
-        sqlite3_exec(mDB, sql, [](void *cb, int col_num, char **data, char **col_name) -> int {
-            auto &func = *reinterpret_cast<const db_row_cb*>(cb);
-            db_row row;
-            for (int i = 0; i < col_num; ++i)
-                row[col_name[i]] = data[i];
-            return func(row) ? 0 : 1;
-        }, (void *) &fn, &err);
+        sqlite3_exec(mDB, sql, sqlite_db_row_callback, (void *) &fn, &err);
         return err;
     }
     return nullptr;
@@ -289,10 +293,10 @@ int get_db_settings(db_settings &cfg, int key) {
     };
     if (key >= 0) {
         char query[128];
-        sprintf(query, "SELECT key, value FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
+        snprintf(query, sizeof(query), "SELECT * FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
         err = db_exec(query, settings_cb);
     } else {
-        err = db_exec("SELECT key, value FROM settings", settings_cb);
+        err = db_exec("SELECT * FROM settings", settings_cb);
     }
     db_err_cmd(err, return 1);
     return 0;
@@ -302,14 +306,15 @@ int get_db_strings(db_strings &str, int key) {
     char *err;
     auto string_cb = [&](db_row &row) -> bool {
         str[row["key"]] = row["value"];
+        LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
         return true;
     };
     if (key >= 0) {
         char query[128];
-        sprintf(query, "SELECT key, value FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
+        snprintf(query, sizeof(query), "SELECT * FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
         err = db_exec(query, string_cb);
     } else {
-        err = db_exec("SELECT key, value FROM strings", string_cb);
+        err = db_exec("SELECT * FROM strings", string_cb);
     }
     db_err_cmd(err, return 1);
     return 0;

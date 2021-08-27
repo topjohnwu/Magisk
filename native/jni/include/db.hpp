@@ -6,15 +6,15 @@
 #include <string_view>
 #include <functional>
 
-template <class T, size_t num>
-class db_data_base {
+template <class T, size_t N>
+class db_dict {
 public:
     T& operator [](std::string_view key) {
-        return data[getKeyIdx(key)];
+        return data[get_idx(key)];
     }
 
     const T& operator [](std::string_view key) const {
-        return data[getKeyIdx(key)];
+        return data[get_idx(key)];
     }
 
     T& operator [](int key) {
@@ -26,25 +26,22 @@ public:
     }
 
 protected:
-    T data[num + 1];
-    virtual int getKeyIdx(std::string_view key) const = 0;
+    T data[N + 1];
+    virtual int get_idx(std::string_view key) const = 0;
 };
 
 /***************
  * DB Settings *
  ***************/
 
-#define DB_SETTING_KEYS \
-((const char *[]) { \
-"root_access", \
-"multiuser_mode", \
-"mnt_ns", \
-"magiskhide", \
-})
+constexpr const char *DB_SETTING_KEYS[] = {
+    "root_access",
+    "multiuser_mode",
+    "mnt_ns",
+    "magiskhide"
+};
 
-#define DB_SETTINGS_NUM 4
-
-// Settings keys
+// Settings key indices
 enum {
     ROOT_ACCESS = 0,
     SU_MULTIUSER_MODE,
@@ -74,33 +71,27 @@ enum {
     NAMESPACE_MODE_ISOLATE
 };
 
-class db_settings : public db_data_base<int, DB_SETTINGS_NUM> {
+class db_settings : public db_dict<int, std::size(DB_SETTING_KEYS)> {
 public:
     db_settings();
-
 protected:
-    int getKeyIdx(std::string_view key) const override;
+    int get_idx(std::string_view key) const override;
 };
 
 /**************
  * DB Strings *
  **************/
 
-#define DB_STRING_KEYS \
-((const char *[]) { \
-"requester", \
-})
+constexpr const char *DB_STRING_KEYS[] = { "requester" };
 
-#define DB_STRING_NUM 1
-
-// Strings keys
+// Strings keys indices
 enum {
     SU_MANAGER = 0
 };
 
-class db_strings : public db_data_base<std::string, DB_STRING_NUM> {
+class db_strings : public db_dict<std::string, std::size(DB_STRING_KEYS)> {
 protected:
-    int getKeyIdx(std::string_view key) const override;
+    int get_idx(std::string_view key) const override;
 };
 
 /*************
@@ -119,30 +110,16 @@ struct su_access {
     int notify;
 };
 
-#define DEFAULT_SU_ACCESS (su_access) { \
-.policy = QUERY, \
-.log = 1, \
-.notify = 1 \
-}
-
-#define SILENT_SU_ACCESS (su_access) { \
-.policy = ALLOW, \
-.log = 0, \
-.notify = 0 \
-}
-
-#define NO_SU_ACCESS (su_access) { \
-.policy = DENY, \
-.log = 0, \
-.notify = 0 \
-}
+#define DEFAULT_SU_ACCESS { QUERY, 1, 1 }
+#define SILENT_SU_ACCESS  { ALLOW, 0, 0 }
+#define NO_SU_ACCESS      { DENY,  0, 0 }
 
 /********************
  * Public Functions *
  ********************/
 
-typedef std::map<std::string_view, std::string_view> db_row;
-typedef std::function<bool(db_row&)> db_row_cb;
+using db_row = std::map<std::string_view, std::string_view>;
+using db_row_cb = std::function<bool(db_row&)>;
 
 int get_db_settings(db_settings &cfg, int key = -1);
 int get_db_strings(db_strings &str, int key = -1);
