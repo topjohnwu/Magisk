@@ -173,8 +173,10 @@
     <string name="settings_doh_title">DNS mbi HTTPS</string>
     <string name="settings_doh_description">Helmimi i paqartë nga DNS në disa kombe</string>
     <string name="multiuser_mode">Modaliteti i shumë përdoruesit</string>
-    <string name="settings_owner_only">Vetëm zotëruesi i pajisjes</string>
-    <string name="settings_owner_manage">Pronari i Pajisjes i Menaxhuar</string>
+    <string name="settings_owner_only">Vetëm pronari i pajisjes</string>
+    <string name="settings_owner_manage">Pronari i pajisjes e menaxhon</string>
+    <string name="owner_manage_summary">Vetëm pronari mund të menaxhojë qasjen në rrënjë dhe të marrë kërkesat e aksesit</string>
+    <string name="owner_only_summary">Vetëm pronari ka akses në rrënjë</string>
     <string name="settings_user_independent">Përdorues i Pavarur</string>
     <string name="user_indepenent_summary">Çdo përdorues ka rregullat e tij/saj të veçanta rrënjësore</string>
     <string name="mount_namespace_mode">Modaliteti i hapësirës së emrave të malit</string>
