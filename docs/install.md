@@ -1,3 +1,4 @@
+![1630178594846](https://user-images.githubusercontent.com/50253051/131228686-f26c5b9b-290b-4359-8a8d-a81748cf72d6.jpg)
 # Installation
 
 If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
