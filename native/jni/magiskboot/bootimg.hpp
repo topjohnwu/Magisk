@@ -45,14 +45,9 @@ struct zimage_hdr {
     uint8_t head[36];
     uint32_t magic;         /* zImage magic */
     uint32_t load_addr;     /* absolute load/run zImage address */
-    uint32_t end_addr;      /* zImage end address */
+    uint32_t end_offset;    /* zImage end offset */
     uint32_t endianess;     /* endianess flag */
     uint8_t code[];
-} __attribute__((packed));
-
-struct zimage_tail {
-    uint8_t *data;
-    uint32_t size;
 } __attribute__((packed));
 
 /**************
@@ -488,9 +483,20 @@ struct boot_img {
     mtk_hdr *k_hdr;
     mtk_hdr *r_hdr;
 
-    // ZIMAGE data
+    // The pointers/values after parse_image
+    // +---------------+
+    // | z_hdr         | z_info.hdr_sz
+    // +---------------+
+    // | kernel        | hdr->kernel_size()
+    // +---------------+
+    // | z_info.tail   | z_info.tail_sz
+    // +---------------+
     zimage_hdr *z_hdr;
-    zimage_tail z_tail;
+    struct {
+        uint32_t hdr_sz;
+        uint32_t tail_sz = 0;
+        uint8_t *tail = nullptr;
+    } z_info;
 
     // Pointer to dtb that is embedded in kernel
     uint8_t *kernel_dtb;
