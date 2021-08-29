@@ -232,7 +232,7 @@
     <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
     <string name="unsupport_general_title">Abnormal State</string>
     <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
-    <string name="unsupport_other_su_msg">Please remove that just tried to handle a \"su\" command and handle all requests through Magisk.</string>
+    <string name="unsupport_other_su_msg">Please remove the app that just tried to handle a \"su\" command and handle all requests through Magisk instead.</string>
     <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
     <string name="unsupport_nonroot_stub_msg">The app cannot stay hidden as root was lost. Please restore it back to the original APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
