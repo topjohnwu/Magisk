@@ -1,5 +1,5 @@
 #include <sys/mount.h>
-#include <unordered_map>
+#include <map>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -125,7 +125,7 @@ exit_loop:
     if (access("oplus.fstab", F_OK) == 0) {
         LOGD("Found fstab file: %s\n", "oplus.fstab");
         vector<fstab_entry> oplus_fstab;
-        unordered_map<string, string> bind_map;
+        map<string, string> bind_map;
 
         read_fstab_file("oplus.fstab", oplus_fstab);
 
