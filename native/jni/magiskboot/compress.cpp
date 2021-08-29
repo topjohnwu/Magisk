@@ -624,8 +624,9 @@ stream_ptr get_encoder(format_t type, stream_ptr &&base) {
             return make_unique<LZ4_encoder>(std::move(base), false);
         case LZ4_LG:
             return make_unique<LZ4_encoder>(std::move(base), true);
-        case GZIP:
+        case ZOPFLI:
             return make_unique<zopfli_encoder>(std::move(base));
+        case GZIP:
         default:
             return make_unique<gz_encoder>(std::move(base));
     }
@@ -643,6 +644,7 @@ stream_ptr get_decoder(format_t type, stream_ptr &&base) {
         case LZ4_LEGACY:
         case LZ4_LG:
             return make_unique<LZ4_decoder>(std::move(base));
+        case ZOPFLI:
         case GZIP:
         default:
             return make_unique<gz_decoder>(std::move(base));

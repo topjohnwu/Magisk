@@ -12,6 +12,7 @@ typedef enum {
     BLOB,
 /* Compression formats */
     GZIP,
+    ZOPFLI,
     XZ,
     LZMA,
     BZIP2,

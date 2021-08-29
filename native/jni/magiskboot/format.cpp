@@ -47,6 +47,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
             return "gzip";
+        case ZOPFLI:
+            return "zopfli";
         case LZOP:
             return "lzop";
         case XZ:
@@ -73,6 +75,7 @@ const char *Fmt2Name::operator[](format_t fmt) {
 const char *Fmt2Ext::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
+        case ZOPFLI:
             return ".gz";
         case LZOP:
             return ".lzo";
@@ -96,6 +99,7 @@ const char *Fmt2Ext::operator[](format_t fmt) {
 format_t Name2Fmt::operator[](std::string_view name) {
     if (0) {}
     CHECK("gzip", GZIP)
+    CHECK("zopfli", ZOPFLI)
     CHECK("xz", XZ)
     CHECK("lzma", LZMA)
     CHECK("bzip2", BZIP2)

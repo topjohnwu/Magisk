@@ -541,6 +541,14 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         } else {
             hdr->kernel_size() = xwrite(fd, raw_buf, raw_size);
         }
+
+        if (boot.flags[ZIMAGE_KERNEL] &&
+            boot.k_fmt == GZIP && hdr->kernel_size() > boot.hdr->kernel_size()) {
+            // Revert and try zipfoli
+            ftruncate(fd, lseek(fd, -hdr->kernel_size(), SEEK_CUR));
+            hdr->kernel_size() = compress(ZOPFLI, fd, raw_buf, raw_size);
+        }
+
         munmap(raw_buf, raw_size);
     }
     if (boot.flags[ZIMAGE_KERNEL]) {
