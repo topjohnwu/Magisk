@@ -117,16 +117,12 @@ public:
 class zopfli_encoder : public cpr_stream {
 public:
     ssize_t write(const void *buf, size_t len) override {
-        return len ? write(buf, len, 0) : 0;
+        return len ? write(static_cast<const unsigned char *>(buf), len) : 0;
     }
 
     explicit zopfli_encoder(stream_ptr &&base) : cpr_stream(std::move(base)),
-        zo({}), out(nullptr), outsize(0), bp(0), crcvalue(crc32_z(0L, Z_NULL, 0)), in_read(0) {
+        zo({}), out(nullptr), outsize(0), bp(0), crcvalue(crc32_z(0L, Z_NULL, 0)), in_size(0) {
         ZopfliInitOptions(&zo);
-
-        // Speed things up a bit, this still leads to better compression than zlib
-        zo.numiterations = 1;
-        zo.blocksplitting = 0;
 
         ZOPFLI_APPEND_DATA(31, &out, &outsize);  /* ID1 */
         ZOPFLI_APPEND_DATA(139, &out, &outsize); /* ID2 */
@@ -143,7 +139,22 @@ public:
     }
 
     ~zopfli_encoder() override {
-        write(nullptr, 0, 1);
+        ZopfliDeflate(&zo, 2, 1, nullptr, 0, &bp, &out, &outsize);
+
+        /* CRC */
+        ZOPFLI_APPEND_DATA(crcvalue % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crcvalue >> 8) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crcvalue >> 16) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crcvalue >> 24) % 256, &out, &outsize);
+
+        /* ISIZE */
+        ZOPFLI_APPEND_DATA(in_size % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_size >> 8) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_size >> 16) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_size >> 24) % 256, &out, &outsize);
+
+        bwrite(out, outsize);
+        free(out);
     }
 
 private:
@@ -152,58 +163,35 @@ private:
     size_t outsize;
     unsigned char bp;
     unsigned long crcvalue;
-    uint32_t in_read;
+    uint32_t in_size;
 
-    ssize_t write(const void *buf, size_t len, int flush) {
+    void free_out() {
+        free(out);
+        out = nullptr;
+        outsize = 0;
+    }
+
+    ssize_t write(const unsigned char *buf, size_t len) {
         ssize_t ret = 0;
-        in_read += len;
-        if (len)
-            crcvalue = crc32_z(crcvalue, (Bytef *)buf, len);
-        if (flush) {
-            ZopfliDeflate(&zo, 2, 1, (const unsigned char *)buf, len, &bp, &out, &outsize);
+        in_size += len;
+        crcvalue = crc32_z(crcvalue, buf, len);
 
-            /* CRC */
-            ZOPFLI_APPEND_DATA(crcvalue % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((crcvalue >> 8) % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((crcvalue >> 16) % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((crcvalue >> 24) % 256, &out, &outsize);
+        for (size_t offset = 0; offset < len; offset += ZOPFLI_CHUNK) {
+            size_t end_offset = std::min(len, offset + ZOPFLI_CHUNK);
+            ZopfliDeflatePart(&zo, 2, 0, buf, offset, end_offset, &bp, &out, &outsize);
 
-            /* ISIZE */
-            ZOPFLI_APPEND_DATA(in_read % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((in_read >> 8) % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((in_read >> 16) % 256, &out, &outsize);
-            ZOPFLI_APPEND_DATA((in_read >> 24) % 256, &out, &outsize);
-            ret += bwrite(out, outsize);
-            free(out);
-            out = nullptr;
-            bp = 0;
-            outsize = 0;
-        } else {
-            for (size_t offset = 0; offset < len; offset += ZOPFLI_CHUNK) {
-                ZopfliDeflatePart(&zo, 2, 0, (const unsigned char *)buf, offset, offset + ((len - offset) < ZOPFLI_CHUNK ? len - offset : ZOPFLI_CHUNK), &bp, &out, &outsize);
-                bp &= 7;
-                if (bp & 1) {
-                    if (bp == 7)
-                    ZOPFLI_APPEND_DATA(0, &out, &outsize);
-                    ZOPFLI_APPEND_DATA(0, &out, &outsize);
-                    ZOPFLI_APPEND_DATA(0, &out, &outsize);
-                    ZOPFLI_APPEND_DATA(0xff, &out, &outsize);
-                    ZOPFLI_APPEND_DATA(0xff, &out, &outsize);
-                } else if (bp) {
-                    do {
-                        out[outsize - 1] += 2 << bp;
-                        ZOPFLI_APPEND_DATA(0, &out, &outsize);
-                        bp += 2;
-                    } while (bp < 8);
-                }
-
+            if (bp) {
+                // The last byte is not complete
+                ret += bwrite(out, outsize - 1);
+                uint8_t b = out[outsize - 1];
+                free_out();
+                ZOPFLI_APPEND_DATA(b, &out, &outsize);
+            } else {
                 ret += bwrite(out, outsize);
-                free(out);
-                out = nullptr;
-                bp = 0;
-                outsize = 0;
+                free_out();
             }
         }
+
         return ret;
     }
 };
