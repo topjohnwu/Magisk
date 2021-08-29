@@ -44,7 +44,7 @@
     <string name="install_inactive_slot_msg">Pajisja juaj do të detyrohet të nisë në vendndodhjen aktuale joaktive pas një rindezjeje! \n Të përdorni vetëm këtë mundësi pasi të keni mbaruar OTA. \n Vazhdoni? </string>
     <string name="setup_title">Konfigurimi shtesë</string>
     <string name="select_patch_file">Zgjidhni dhe Patch një Skedar</string>
-    <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (* .img) ose një tarifë ODIN (* .tar)</string>
+    <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (* .img) ose një (* .tar) për IDIN</string>
     <string name="reboot_delay_toast">Rinisje pas 5 sekonda…</string>
     <string name="flash_screen_title">Instalimi</string>
 
@@ -96,7 +96,7 @@
     <!--MagiskHide-->
     <string name="show_system_app">Shfaq aplikacionet e sistemit</string>
     <string name="show_os_app">Shfaq aplikacionet e sistemit operativ</string>
-    <string name="hide_filter_hint">Filtro me emër</string>
+    <string name="hide_filter_hint">Filtro sipas emrit</string>
     <string name="hide_scroll_up">Lëviz lart</string>
     <string name="hide_filters">Filtrat</string>
     <string name="hide_search">Kërko</string>
@@ -124,10 +124,10 @@
     <string name="settings_restore_app_summary">Zh-fshehni aplikacionin dhe rikthejeni atë përsëri në APK-në origjinale</string>
     <string name="settings_dark_mode_title">Modaliteti i temës</string>
     <string name="settings_dark_mode_message">Zgjidhni mënyrën e cila i përshtatet më mirë stilit tuaj!</string>
-    <string name="settings_dark_mode_light">Gjithmonë e lehtë</string>
+    <string name="settings_dark_mode_light">Gjithmonë e bardhë</string>
     <string name="settings_dark_mode_system">Ndiqni sistemin</string>
     <string name="settings_dark_mode_dark">Gjithmonë e errët</string>
-    <string name="settings_download_path_title">Shtegu i shkarkimit</string>
+    <string name="settings_download_path_title">Vendodhja e shkarkimeve</string>
     <string name="settings_download_path_message">Skedarët do të ruhen në %1$s</string>
     <string name="settings_clear_cache_title">Pastro Cache të Repos</string>
     <string name="settings_clear_cache_summary">Pastroni informacionin e memorizuar për repot në internet. Kjo e detyron aplikacionin të rifreskohet në internet</string>
@@ -172,7 +172,7 @@
     <string name="setting_add_shortcut_summary">"Shtoni një shkurtore të bukur në ekranin kryesor në rast se emri dhe ikona janë të vështira për t'u njohur pasi të keni fshehur aplikacionin"</string>
     <string name="settings_doh_title">DNS mbi HTTPS</string>
     <string name="settings_doh_description">Helmimi i paqartë nga DNS në disa kombe</string>
-    <string name="multiuser_mode">Modaliteti i shumë përdoruesit</string>
+    <string name="multiuser_mode">Modaliteti i shumë përdoruesve</string>
     <string name="settings_owner_only">Vetëm pronari i pajisjes</string>
     <string name="settings_owner_manage">Pronari i pajisjes e menaxhon</string>
     <string name="owner_manage_summary">Vetëm pronari mund të menaxhojë qasjen në rrënjë dhe të marrë kërkesat e aksesit</string>
@@ -183,16 +183,17 @@
     <string name="settings_ns_global">Hapësira Globale e Emrave</string>
     <string name="settings_ns_requester">Trashëgoni Hapësirën e Emrave</string>
     <string name="settings_ns_isolate">Hapësira e izoluar e emrave</string>
-    <string name="global_summary">Të gjitha sesionet rrënjësore përdorin hapësirën globale të emrave të montimit</string>
-    <string name="requester_summary">Seancat rrënjësore do të trashëgojnë hapësirën e emrave të kërkuesit të tyre</string>
-    <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
+    <string name="global_summary">Të gjitha seksionet rrënjësore përdorin hapësirën globale të emrave të montimit</string>
+    <string name="requester_summary">Seksionët rrënjësore do të trashëgojnë hapësirën e emrave të kërkuesit të tyre</string>
+    <string name="isolate_summary">Çdo seksion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
 
     <!--Notifications-->
     <string name="update_channel">Përditësimet e Magisk</string>
     <string name="progress_channel">Njoftimet e Progresit</string>
     <string name="download_complete">Shkarkimi përfundoi</string>
     <string name="download_file_error">Gabim në shkarkimin e skedarit</string>
-    <string name="magisk_update_title">Mundësohet azhurnimi i Magisk!</string>
+    <string name="home_notice_content">Shkarkoni Magisk VETËM nga faqja zyrtare e GitHub. Skedarët nga burime të panjohura mund të jenë me qëllim të keq!</string>
+    <string name="magisk_update_title">Mundësohet përditësim i ri i Magisk!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
@@ -203,7 +204,7 @@
     <string name="reboot">Ristartoni</string>
     <string name="release_notes">Lëshoni shënime</string>
     <string name="repo_cache_cleared">Depoja e repos u pastrua</string>
-    <string name="flashing">Ndezje…</string>
+    <string name="flashing">Duke u instaluar…</string>
     <string name="done">U krye!</string>
     <string name="failure">Dështoi!</string>
     <string name="open_link_failed_toast">Asnjë aplikacion nuk u gjet për të hapur lidhjen</string>
