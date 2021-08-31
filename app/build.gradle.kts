@@ -232,7 +232,7 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference:1.1.1")

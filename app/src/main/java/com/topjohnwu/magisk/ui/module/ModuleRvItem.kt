@@ -39,34 +39,27 @@ class SectionTitle(
     override fun contentSameAs(other: SectionTitle): Boolean = this === other
 }
 
-sealed class RepoItem(val item: OnlineModule) : ObservableItem<RepoItem>() {
+class OnlineModuleRvItem(val item: OnlineModule) : ObservableItem<OnlineModuleRvItem>() {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     @get:Bindable
     var progress = 0
         set(value) = set(value, field, { field = it }, BR.progress)
 
-    abstract val isUpdate: Boolean
+    var hasUpdate = false
 
-    override fun contentSameAs(other: RepoItem): Boolean = item == other.item
-    override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
+    override fun contentSameAs(other: OnlineModuleRvItem): Boolean = item == other.item
+    override fun itemSameAs(other: OnlineModuleRvItem): Boolean = item.id == other.item.id
 
-    class Update(item: OnlineModule) : RepoItem(item) {
-        override val isUpdate get() = true
-    }
-
-    class Remote(item: OnlineModule) : RepoItem(item) {
-        override val isUpdate get() = false
-    }
 }
 
-class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
+class LocalModuleRvItem(val item: LocalModule) : ObservableItem<LocalModuleRvItem>() {
 
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
-    var repo: OnlineModule? = null
-        set(value) = set(value, field, { field = it }, BR.repo)
+    var online: OnlineModule? = null
+        set(value) = set(value, field, { field = it }, BR.online)
 
     @get:Bindable
     var isEnabled = item.enable
@@ -88,11 +81,10 @@ class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
         viewModel.updateActiveState()
     }
 
-    override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version
+    override fun contentSameAs(other: LocalModuleRvItem): Boolean = item.version == other.item.version
             && item.versionCode == other.item.versionCode
             && item.description == other.item.description
             && item.name == other.item.name
 
-    override fun itemSameAs(other: ModuleItem): Boolean = item.id == other.item.id
+    override fun itemSameAs(other: LocalModuleRvItem): Boolean = item.id == other.item.id
 }
-
