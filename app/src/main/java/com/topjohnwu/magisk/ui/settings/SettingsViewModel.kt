@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.adapterOf
-import com.topjohnwu.magisk.arch.diffListOf
 import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -32,7 +31,7 @@ class SettingsViewModel(
 
     val adapter = adapterOf<BaseSettingsItem>()
     val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
-    val items = diffListOf(createItems())
+    val items = createItems()
 
     init {
         viewModelScope.launch {

@@ -5,22 +5,20 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.databinding.ObservableItem
+import com.topjohnwu.magisk.databinding.DiffRvItem
+import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
+import com.topjohnwu.magisk.databinding.RvContainer
 import com.topjohnwu.magisk.utils.set
 
-object InstallModule : ComparableRvItem<InstallModule>() {
+object InstallModule : DiffRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
-
-    override fun contentSameAs(other: InstallModule) = this == other
-    override fun itemSameAs(other: InstallModule) = this === other
 }
 
 class SectionTitle(
     val title: Int,
     _button: Int = 0,
     _icon: Int = 0
-) : ObservableItem<SectionTitle>() {
+) : ObservableDiffRvItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
 
     @get:Bindable
@@ -34,12 +32,11 @@ class SectionTitle(
     @get:Bindable
     var hasButton = _button != 0 && _icon != 0
         set(value) = set(value, field, { field = it }, BR.hasButton)
-
-    override fun itemSameAs(other: SectionTitle): Boolean = this === other
-    override fun contentSameAs(other: SectionTitle): Boolean = this === other
 }
 
-class OnlineModuleRvItem(val item: OnlineModule) : ObservableItem<OnlineModuleRvItem>() {
+class OnlineModuleRvItem(
+    override val item: OnlineModule
+) : ObservableDiffRvItem<OnlineModuleRvItem>(), RvContainer<OnlineModule> {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     @get:Bindable
@@ -48,12 +45,12 @@ class OnlineModuleRvItem(val item: OnlineModule) : ObservableItem<OnlineModuleRv
 
     var hasUpdate = false
 
-    override fun contentSameAs(other: OnlineModuleRvItem): Boolean = item == other.item
     override fun itemSameAs(other: OnlineModuleRvItem): Boolean = item.id == other.item.id
-
 }
 
-class LocalModuleRvItem(val item: LocalModule) : ObservableItem<LocalModuleRvItem>() {
+class LocalModuleRvItem(
+    override val item: LocalModule
+) : ObservableDiffRvItem<LocalModuleRvItem>(), RvContainer<LocalModule> {
 
     override val layoutRes = R.layout.item_module_md2
 
@@ -80,11 +77,6 @@ class LocalModuleRvItem(val item: LocalModule) : ObservableItem<LocalModuleRvIte
         isRemoved = !isRemoved
         viewModel.updateActiveState()
     }
-
-    override fun contentSameAs(other: LocalModuleRvItem): Boolean = item.version == other.item.version
-            && item.versionCode == other.item.versionCode
-            && item.description == other.item.description
-            && item.name == other.item.name
 
     override fun itemSameAs(other: LocalModuleRvItem): Boolean = item.id == other.item.id
 }

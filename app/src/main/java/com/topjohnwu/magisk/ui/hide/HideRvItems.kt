@@ -5,7 +5,8 @@ import android.view.ViewGroup
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.ObservableItem
+import com.topjohnwu.magisk.databinding.ComparableRv
+import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.utils.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.utils.set
@@ -14,7 +15,7 @@ import kotlin.math.roundToInt
 
 class HideRvItem(
     val info: HideAppInfo
-) : ObservableItem<HideRvItem>(), Comparable<HideRvItem> {
+) : ObservableDiffRvItem<HideRvItem>(), ComparableRv<HideRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_md2
 
@@ -89,7 +90,7 @@ class HideRvItem(
 
 class HideProcessRvItem(
     val process: HideProcessInfo
-) : ObservableItem<HideProcessRvItem>() {
+) : ObservableDiffRvItem<HideProcessRvItem>() {
 
     override val layoutRes get() = R.layout.item_hide_process_md2
 

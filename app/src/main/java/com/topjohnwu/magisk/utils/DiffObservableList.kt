@@ -13,11 +13,10 @@ import kotlin.collections.ArrayList
  * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
  */
 open class DiffObservableList<T>(
-        private val callback: Callback<T>,
-        private val detectMoves: Boolean = true
+    private val callback: Callback<T>,
+    private val detectMoves: Boolean = true
 ) : AbstractList<T>(), ObservableList<T> {
 
-    private val LIST_LOCK = Object()
     protected var list: MutableList<T> = ArrayList()
     private val listeners = ListChangeRegistry()
     protected val listCallback = ObservableListUpdateCallback()
@@ -32,27 +31,25 @@ open class DiffObservableList<T>(
      * list into the given one.
      */
     fun calculateDiff(newItems: List<T>): DiffUtil.DiffResult {
-        val frozenList = synchronized(LIST_LOCK) {
-            ArrayList(list)
-        }
+        val frozenList = ArrayList(list)
         return doCalculateDiff(frozenList, newItems)
     }
 
-    protected fun doCalculateDiff(oldItems: List<T>, newItems: List<T>?): DiffUtil.DiffResult {
+    protected fun doCalculateDiff(oldItems: List<T>, newItems: List<T>): DiffUtil.DiffResult {
         return DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun getOldListSize() = oldItems.size
 
-            override fun getNewListSize() = newItems?.size ?: 0
+            override fun getNewListSize() = newItems.size
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems!![newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return callback.areItemsTheSame(oldItem, newItem)
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val oldItem = oldItems[oldItemPosition]
-                val newItem = newItems!![newItemPosition]
+                val newItem = newItems[newItemPosition]
                 return callback.areContentsTheSame(oldItem, newItem)
             }
         }, detectMoves)
@@ -67,9 +64,7 @@ open class DiffObservableList<T>(
      */
     @MainThread
     fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
-        synchronized(LIST_LOCK) {
-            list = newItems.toMutableList()
-        }
+        list = newItems.toMutableList()
         diffResult.dispatchUpdatesTo(listCallback)
     }
 
@@ -97,29 +92,14 @@ open class DiffObservableList<T>(
         listeners.remove(listener)
     }
 
-    override fun get(index: Int): T {
-        return list[index]
-    }
-
-    override fun add(element: T): Boolean {
-        list.add(element)
-        notifyAdd(size - 1, 1)
-        return true
-    }
+    override fun get(index: Int) = list[index]
 
     override fun add(index: Int, element: T) {
         list.add(index, element)
         notifyAdd(index, 1)
     }
 
-    override fun addAll(elements: Collection<T>): Boolean {
-        val oldSize = size
-        val added = list.addAll(elements)
-        if (added) {
-            notifyAdd(oldSize, size - oldSize)
-        }
-        return added
-    }
+    override fun addAll(elements: Collection<T>) = addAll(size, elements)
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
         val added = list.addAll(index, elements)
@@ -151,14 +131,6 @@ open class DiffObservableList<T>(
         val element = list.removeAt(index)
         notifyRemove(index, 1)
         return element
-    }
-
-    fun removeLast(): T? {
-        if (size > 0) {
-            val index = size - 1
-            return removeAt(index)
-        }
-        return null
     }
 
     override fun set(index: Int, element: T): T {
@@ -228,6 +200,5 @@ open class DiffObservableList<T>(
             modCount += 1
             listeners.notifyRemoved(this@DiffObservableList, position, count)
         }
-
     }
 }
