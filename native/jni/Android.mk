@@ -4,9 +4,6 @@ LOCAL_PATH := $(call my-dir)
 # Binaries
 ########################
 
-# Global toggle for Zygisk
-DISABLE_ZYGISK := 0
-
 ifdef B_MAGISK
 
 include $(CLEAR_VARS)
