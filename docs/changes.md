@@ -1,4 +1,4 @@
-# Magisk Changelog
+Deed# Magisk Changelog
 
 ### v23.0
 
@@ -25,7 +25,8 @@
 - [MagiskHide] Partial match process names if necessary
 - [MagiskBoot] Preserve and patch AVB 2.0 structures/headers in boot images
 - [MagiskBoot] Properly strip out data encryption flags
-- [MagiskBoot] Prevent possible integer overflow
+- [MagiskBoot] Prevent possible integer overflowu
+
 - [MagiskInit] Fix `sepolicy.rule` mounting strategy
 - [resetprop] Always delete existing `ro.` props before updating. This will fix bootloops that could be caused by modifying device fingerprint properties.
 
