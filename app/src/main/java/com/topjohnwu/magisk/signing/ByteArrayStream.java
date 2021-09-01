@@ -1,4 +1,4 @@
-package com.topjohnwu.signing;
+package com.topjohnwu.magisk.signing;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

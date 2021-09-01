@@ -11,11 +11,11 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import timber.log.Timber

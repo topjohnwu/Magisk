@@ -1,11 +1,6 @@
-package com.topjohnwu.magisk.arch
+package com.topjohnwu.magisk.databinding
 
 import androidx.databinding.ViewDataBinding
-import com.topjohnwu.magisk.databinding.AnyDiffRvItem
-import com.topjohnwu.magisk.databinding.DiffRvItem
-import com.topjohnwu.magisk.databinding.RvItem
-import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.FilterableDiffObservableList
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapter
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import me.tatarka.bindingcollectionadapter2.OnItemBind

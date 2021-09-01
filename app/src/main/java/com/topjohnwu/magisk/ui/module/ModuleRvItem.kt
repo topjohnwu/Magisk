@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.databinding.DiffRvItem
 import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
 import com.topjohnwu.magisk.databinding.RvContainer
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.databinding.set
 
 object InstallModule : DiffRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download

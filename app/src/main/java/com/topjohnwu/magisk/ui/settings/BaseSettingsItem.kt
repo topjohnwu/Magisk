@@ -8,8 +8,8 @@ import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableRvItem
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.utils.TextHolder
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.MagiskDialog
 
 sealed class BaseSettingsItem : ObservableRvItem() {

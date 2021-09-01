@@ -144,7 +144,7 @@ tasks["preBuild"]?.dependsOn(syncResources)
 android.applicationVariants.all {
     val keysDir = rootProject.file("tools/keys")
     val outSrcDir = File(buildDir, "generated/source/keydata/$name")
-    val outSrc = File(outSrcDir, "com/topjohnwu/signing/KeyData.java")
+    val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
 
     fun PrintStream.newField(name: String, file: File) {
         println("public static byte[] $name() {")
@@ -162,7 +162,7 @@ android.applicationVariants.all {
         doLast {
             outSrc.parentFile.mkdirs()
             PrintStream(outSrc).use {
-                it.println("package com.topjohnwu.signing;")
+                it.println("package com.topjohnwu.magisk.signing;")
                 it.println("public final class KeyData {")
 
                 it.newField("testCert", File(keysDir, "testkey.x509.pem"))

@@ -9,12 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.Queryable
-import com.topjohnwu.magisk.arch.filterableListOf
-import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.databinding.filterableListOf
+import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

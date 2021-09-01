@@ -6,9 +6,9 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
 import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.ktx.timeDateFormat
 import com.topjohnwu.magisk.ktx.toTime
-import com.topjohnwu.magisk.utils.set
 
 class LogRvItem(
     override val item: SuLog

@@ -16,10 +16,10 @@ import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.signing.JarMap
+import com.topjohnwu.magisk.signing.SignApk
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.signing.JarMap
-import com.topjohnwu.signing.SignApk
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

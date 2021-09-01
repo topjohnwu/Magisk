@@ -5,8 +5,6 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.utils.DiffObservableList
-import com.topjohnwu.magisk.utils.ObservableHost
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 abstract class RvItem {

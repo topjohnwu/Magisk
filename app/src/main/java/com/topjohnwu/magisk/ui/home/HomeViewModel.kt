@@ -4,12 +4,17 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.*
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
@@ -17,7 +22,6 @@ import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.utils.asText
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BR

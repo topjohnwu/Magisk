@@ -15,8 +15,8 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.createClassLoader
 import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.signing.CryptoUtils
 import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.signing.CryptoUtils
 import com.topjohnwu.superuser.Shell
 import dalvik.system.BaseDexClassLoader
 import dalvik.system.DexFile

@@ -21,10 +21,10 @@ import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
