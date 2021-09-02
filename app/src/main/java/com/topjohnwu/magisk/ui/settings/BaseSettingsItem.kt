@@ -7,12 +7,12 @@ import androidx.annotation.CallSuper
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.ObservableItem
+import com.topjohnwu.magisk.databinding.ObservableRvItem
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.utils.TextHolder
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.MagiskDialog
 
-sealed class BaseSettingsItem : ObservableItem<BaseSettingsItem>() {
+sealed class BaseSettingsItem : ObservableRvItem() {
 
     override val layoutRes get() = R.layout.item_settings
 
@@ -41,9 +41,6 @@ sealed class BaseSettingsItem : ObservableItem<BaseSettingsItem>() {
     }
 
     open fun refresh() {}
-
-    override fun itemSameAs(other: BaseSettingsItem) = this === other
-    override fun contentSameAs(other: BaseSettingsItem) = itemSameAs(other)
 
     // ---
 

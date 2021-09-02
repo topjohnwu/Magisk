@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.utils
+package com.topjohnwu.magisk.databinding
 
 import android.os.Handler
 import android.os.HandlerThread

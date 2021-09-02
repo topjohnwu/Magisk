@@ -5,15 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.adapterOf
-import com.topjohnwu.magisk.arch.diffListOf
-import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.databinding.ComparableRvItem
+import com.topjohnwu.magisk.databinding.AnyDiffRvItem
+import com.topjohnwu.magisk.databinding.adapterOf
+import com.topjohnwu.magisk.databinding.diffListOf
+import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
@@ -35,13 +35,13 @@ class SuperuserViewModel(
     private val itemsPolicies = diffListOf<PolicyRvItem>()
     private val itemsHelpers = ObservableArrayList<TextItem>()
 
-    val adapter = adapterOf<ComparableRvItem<*>>()
-    val items = MergeObservableList<ComparableRvItem<*>>().apply {
+    val adapter = adapterOf<AnyDiffRvItem>()
+    val items = MergeObservableList<AnyDiffRvItem>().apply {
         if (Config.magiskHide)
             insertItem(TappableHeadlineItem.Hide)
     }.insertList(itemsHelpers)
         .insertList(itemsPolicies)
-    val itemBinding = itemBindingOf<ComparableRvItem<*>> {
+    val itemBinding = itemBindingOf<AnyDiffRvItem> {
         it.bindExtra(BR.listener, this)
     }
 
@@ -84,7 +84,7 @@ class SuperuserViewModel(
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {
             db.delete(item.item.uid)
-            itemsPolicies.removeAll { it.genericItemSameAs(item) }
+            itemsPolicies.removeAll { it.itemSameAs(item) }
             if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
                 itemsHelpers.add(itemNoData)
             }

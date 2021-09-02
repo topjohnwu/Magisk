@@ -7,13 +7,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class LocalModule(path: String) : Module() {
-    override var id: String = ""
-    override var name: String = ""
-    override var author: String = ""
-    override var version: String = ""
-    override var versionCode: Int = -1
-    override var description: String = ""
+data class LocalModule(
+    private val path: String,
+    override var id: String = "",
+    override var name: String = "",
+    override var author: String = "",
+    override var version: String = "",
+    override var versionCode: Int = -1,
+    override var description: String = "",
+) : Module() {
 
     private val removeFile = SuFile(path, "remove")
     private val disableFile = SuFile(path, "disable")

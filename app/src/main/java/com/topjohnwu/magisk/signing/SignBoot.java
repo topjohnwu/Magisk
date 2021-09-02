@@ -1,4 +1,4 @@
-package com.topjohnwu.signing;
+package com.topjohnwu.magisk.signing;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;

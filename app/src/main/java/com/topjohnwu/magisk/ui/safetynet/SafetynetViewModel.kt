@@ -4,7 +4,7 @@ import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.databinding.set
 
 class SafetyNetResult(
     val response: SafetyNetResponse? = null,

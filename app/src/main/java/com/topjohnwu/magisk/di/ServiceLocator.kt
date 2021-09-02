@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.log.LogViewModel
-import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.ui.settings.SettingsViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
@@ -61,7 +60,6 @@ object ServiceLocator {
             return when (clz) {
                 HomeViewModel::class.java -> HomeViewModel(networkService)
                 LogViewModel::class.java -> LogViewModel(logRepo)
-                ModuleViewModel::class.java -> ModuleViewModel(repoDB, repoUpdater)
                 SettingsViewModel::class.java -> SettingsViewModel(repoDB)
                 SuperuserViewModel::class.java -> SuperuserViewModel(policyDB)
                 InstallViewModel::class.java -> InstallViewModel(networkService)

@@ -6,21 +6,22 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.diffListOf
-import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.databinding.diffListOf
+import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.now
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.FileInputStream
 
 class LogViewModel(
     private val repo: LogRepository
@@ -62,9 +63,11 @@ class LogViewModel(
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---System Properties---\n\n")
-
                 ProcessBuilder("getprop").start()
                     .inputStream.reader().use { it.copyTo(file) }
+
+                file.write("---System MountInfo---\n\n")
+                FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")

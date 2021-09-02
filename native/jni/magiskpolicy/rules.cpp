@@ -54,18 +54,6 @@ void sepolicy::magisk_rules() {
         allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
         allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
 
-        const char *pts[] {
-            "devpts", "untrusted_app_devpts",
-            "untrusted_app_25_devpts", "untrusted_app_all_devpts" };
-        for (auto type : pts) {
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "open");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
-            allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5400-0x54FF");
-        }
-
         // Allow these processes to access MagiskSU
         vector<const char *> clients{ "init", "shell", "update_engine", "appdomain" };
         for (auto type : clients) {
@@ -89,9 +77,9 @@ void sepolicy::magisk_rules() {
         }
 
         // type transition require actual types, not attributes
-        const char *app_types[] {
-            "system_app", "priv_app", "platform_app", "untrusted_app",
-            "untrusted_app_25", "untrusted_app_27", "untrusted_app_29" };
+        const char *app_types[]{
+            "system_app", "priv_app", "platform_app", "untrusted_app", "untrusted_app_25",
+            "untrusted_app_27", "untrusted_app_29", "untrusted_app_30"};
         clients.pop_back();
         clients.insert(clients.end(), app_types, app_types + std::size(app_types));
         for (auto type : clients) {
@@ -119,14 +107,6 @@ void sepolicy::magisk_rules() {
                 continue;
             allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
             allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-
-            // Allow termios ioctl
-            const char *pts[] { "devpts", "untrusted_app_devpts" };
-            for (auto pts_type : pts) {
-                allow(type, pts_type, "chr_file", "ioctl");
-                if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL)
-                    allowxperm(type, pts_type, "chr_file", "0x5400-0x54FF");
-            }
         }
     }
 

@@ -11,7 +11,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.module.ModuleItem" />
+            type="com.topjohnwu.magisk.ui.module.LocalModuleRvItem" />
 
         <variable
             name="viewModel"
@@ -120,7 +120,7 @@
                 <ImageView
                     android:id="@+id/module_info"
                     style="@style/WidgetFoundation.Icon"
-                    gone="@{item.repo == null}"
+                    gone="@{item.online == null}"
                     android:layout_width="wrap_content"
                     android:alpha=".5"
                     android:clickable="true"
