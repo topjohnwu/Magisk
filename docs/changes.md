@@ -1,4 +1,4 @@
-# Magisk Changelog
+Ini# Magisk Changelog
 
 ### v23.0
 
