@@ -26,6 +26,7 @@ class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
 
     private fun Project.applyPlugin() {
+        initRandom(rootProject.file("dict.txt"))
         props.clear()
         rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by this

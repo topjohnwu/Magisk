@@ -20,6 +20,9 @@ import java.net.HttpURLConnection;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class Request implements Closeable {
     private HttpURLConnection conn;
     private Executor executor = null;

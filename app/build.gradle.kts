@@ -1,5 +1,4 @@
 import org.apache.tools.ant.filters.FixCrLfFilter
-import java.io.PrintStream
 
 plugins {
     id("com.android.application")
@@ -143,32 +142,11 @@ android.applicationVariants.all {
     val outSrcDir = File(buildDir, "generated/source/keydata/$name")
     val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
 
-    fun PrintStream.newField(name: String, file: File) {
-        println("public static byte[] $name() {")
-        print("byte[] buf = {")
-        val bytes = file.readBytes()
-        print(bytes.joinToString(",") { "(byte)(${it.toInt() and 0xff})" })
-        println("};")
-        println("return buf;")
-        println("}")
-    }
-
     val genSrcTask = tasks.register("generate${name.capitalize()}KeyData") {
         inputs.dir(keysDir)
         outputs.file(outSrc)
         doLast {
-            outSrc.parentFile.mkdirs()
-            PrintStream(outSrc).use {
-                it.println("package com.topjohnwu.magisk.signing;")
-                it.println("public final class KeyData {")
-
-                it.newField("testCert", File(keysDir, "testkey.x509.pem"))
-                it.newField("testKey", File(keysDir, "testkey.pk8"))
-                it.newField("verityCert", File(keysDir, "verity.x509.pem"))
-                it.newField("verityKey", File(keysDir, "verity.pk8"))
-
-                it.println("}")
-            }
+            genKeyData(keysDir, outSrc)
         }
     }
     registerJavaGeneratingTask(genSrcTask, outSrcDir)

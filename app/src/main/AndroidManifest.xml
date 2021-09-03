@@ -71,11 +71,6 @@
             android:exported="false"
             android:grantUriPermissions="true" />
 
-        <!-- Hardcode GMS version -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="12451000" />
-
         <!-- Initialize WorkManager on-demand -->
         <provider
             android:name="androidx.startup.InitializationProvider"

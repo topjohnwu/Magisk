@@ -17,6 +17,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class InjectAPK {
 
     static Object componentFactory;

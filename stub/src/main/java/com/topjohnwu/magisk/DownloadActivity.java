@@ -1,5 +1,14 @@
 package com.topjohnwu.magisk;
 
+import static android.R.string.no;
+import static android.R.string.ok;
+import static android.R.string.yes;
+import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
+import static com.topjohnwu.magisk.A.string.dling;
+import static com.topjohnwu.magisk.A.string.no_internet_msg;
+import static com.topjohnwu.magisk.A.string.relaunch_app;
+import static com.topjohnwu.magisk.A.string.upgrade_msg;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -16,17 +25,22 @@ import com.topjohnwu.magisk.utils.APKInstall;
 
 import org.json.JSONException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 
-import static android.R.string.no;
-import static android.R.string.ok;
-import static android.R.string.yes;
-import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
-import static com.topjohnwu.magisk.R.string.dling;
-import static com.topjohnwu.magisk.R.string.no_internet_msg;
-import static com.topjohnwu.magisk.R.string.relaunch_app;
-import static com.topjohnwu.magisk.R.string.upgrade_msg;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
@@ -40,6 +54,9 @@ public class DownloadActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
+
+        // Inject resources
+        loadResources();
 
         if (Networking.checkNetworkStatus(this)) {
             if (apkLink == null) {
@@ -109,6 +126,28 @@ public class DownloadActivity extends Activity {
                 });
             }
         });
+    }
+
+    private void loadResources() {
+        File apk = new File(getCacheDir(), "res.apk");
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
+            IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            InputStream is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
+            try (InputStream gzip = new GZIPInputStream(is);
+                 OutputStream out = new FileOutputStream(apk)) {
+                byte[] buf = new byte[4096];
+                for (int read; (read = gzip.read(buf)) >= 0;) {
+                    out.write(buf, 0, read);
+                }
+            }
+            DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
+        } catch (Exception e) {
+            // Should not happen
+            e.printStackTrace();
+        }
     }
 
 }

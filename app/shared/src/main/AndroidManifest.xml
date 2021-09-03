@@ -24,4 +24,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute" />
 
+    <!-- Hardcode GMS version -->
+    <meta-data
+        android:name="com.google.android.gms.version"
+        android:value="12451000" />
+
 </manifest>

@@ -19,9 +19,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
 /**
  * Modified from androidx.core.content.FileProvider
  */
+@Obfuscate
 public class FileProvider extends ContentProvider {
     private static final String[] COLUMNS = {OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE};
 
