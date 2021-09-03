@@ -1,15 +1,19 @@
 package com.topjohnwu.magisk.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.WindowManager
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
+import androidx.core.view.isGone
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
@@ -21,7 +25,6 @@ import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
-import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
@@ -119,40 +122,44 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     @Suppress("UNCHECKED_CAST")
     internal fun requestNavigationHidden(hide: Boolean = true) {
-        val topView = binding.mainToolbarWrapper
-        val bottomView = binding.mainBottomBar
+        val bottomView = binding.mainNavigation
 
-        if (!binding.mainBottomBar.isAttachedToWindow) {
-            binding.mainBottomBar.viewTreeObserver.addOnWindowAttachListener(object :
-                ViewTreeObserver.OnWindowAttachListener {
+        // A copy of HideBottomViewOnScrollBehavior's animation
 
-                init {
-                    val listener =
-                        binding.mainBottomBar.tag as? ViewTreeObserver.OnWindowAttachListener
-                    if (listener != null) {
-                        binding.mainBottomBar.viewTreeObserver.removeOnWindowAttachListener(listener)
-                    }
-                    binding.mainBottomBar.tag = this
-                }
-
-                override fun onWindowAttached() {
-                    requestNavigationHidden(hide)
-                }
-
-                override fun onWindowDetached() {
-                }
-            })
-            return
+        fun animateTranslationY(
+            view: View, targetY: Int, duration: Long, interpolator: TimeInterpolator
+        ) {
+            view.tag = view
+                .animate()
+                .translationY(targetY.toFloat())
+                .setInterpolator(interpolator)
+                .setDuration(duration)
+                .setListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            view.tag = null
+                        }
+                    })
         }
 
-        val topParams = topView.layoutParams as? CoordinatorLayout.LayoutParams
-        val bottomParams = bottomView.layoutParams as? CoordinatorLayout.LayoutParams
+        (bottomView.tag as? Animator)?.cancel()
+        bottomView.clearAnimation()
 
-        val topBehavior = topParams?.behavior as? HideableBehavior<View>
-        val bottomBehavior = bottomParams?.behavior as? HideableBehavior<View>
-
-        topBehavior?.setHidden(topView, hide = false, lockState = false)
-        bottomBehavior?.setHidden(bottomView, hide, hide)
+        if (hide) {
+            animateTranslationY(
+                bottomView,
+                bottomView.measuredHeight,
+                175L,
+                FastOutLinearInInterpolator()
+            )
+        } else {
+            animateTranslationY(
+                bottomView,
+                0,
+                225L,
+                LinearOutSlowInInterpolator()
+            )
+        }
     }
 
     fun invalidateToolbar() {

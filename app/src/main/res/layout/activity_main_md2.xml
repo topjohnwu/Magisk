@@ -35,7 +35,6 @@
             style="@style/WidgetFoundation.Appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="com.topjohnwu.magisk.utils.HideTopViewOnScrollBehavior"
             app:fitsSystemWindowsInsets="top">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -49,51 +48,22 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!--
-        todo(diareuse) this stupid-ass bottom menu doesn't fit with the fab-s, so either of those
-         things need to be removed, probably the fab-s.
-
-         Using the BottomAppBar is not viable as it looks terrible with the blank space in the
-         middle and / or with the "animation" which BottomNavigationView performs when it's
-         reinflating its menu items. This bullshit cockblocks the entire feature. Terrific.
-
-         Possibility is then to keep the middle fab and assign it some other functionality on all
-         screens. Which -ha-ha- good luck finding something on superuser and homepage...
-         -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/main_bottom_bar"
-            style="@style/WidgetFoundation.Card.Elevated"
-            android:layout_width="224dp"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/main_navigation"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginStart="@dimen/l1"
-            android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l1"
             android:fitsSystemWindows="false"
-            app:layout_fitsSystemWindowsInsets="bottom"
-            app:layout_behavior="com.topjohnwu.magisk.utils.HideBottomViewOnScrollBehavior"
-            tools:layout_marginBottom="64dp">
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/main_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:textStyle="bold"
-                android:fitsSystemWindows="false"
-                android:paddingBottom="0dp"
-                app:fitsSystemWindowsInsets="start|end"
-                app:elevation="0dp"
-                app:itemHorizontalTranslationEnabled="false"
-                app:itemIconTint="@color/color_menu_tint"
-                app:itemRippleColor="?colorPrimary"
-                app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
-                app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
-                app:itemTextColor="@color/color_menu_tint"
-                app:labelVisibilityMode="unlabeled"
-                app:menu="@menu/menu_bottom_nav" />
-
-        </com.google.android.material.card.MaterialCardView>
+            android:paddingBottom="0dp"
+            app:fitsSystemWindowsInsets="start|end|bottom"
+            app:itemHorizontalTranslationEnabled="false"
+            app:itemIconTint="@color/color_menu_tint"
+            app:itemRippleColor="?colorPrimary"
+            app:itemTextAppearanceActive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextAppearanceInactive="@style/AppearanceFoundation.Tiny.Bold"
+            app:itemTextColor="@color/color_menu_tint"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/menu_bottom_nav" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
