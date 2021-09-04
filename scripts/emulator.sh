@@ -3,7 +3,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support emulator ABI: x86_64 *only*
+# Support emulator ABI: ALL
 # Support API level: 23 - 31 (21 and 22 images do not have SELinux)
 #
 # This script will stop zygote, simulate the Magisk start up process
@@ -47,7 +47,11 @@ fi
 pm install -r $(pwd)/app-debug.apk
 
 # Extract files from APK
-unzip -oj app-debug.apk 'lib/x86_64/*' 'lib/x86/libmagisk32.so' -x 'lib/x86_64/busybox.so'
+ABI=$(getprop ro.product.cpu.abi)
+ABILIST=$(getprop ro.product.cpu.abilist | tr "," " ")
+EXTRACT_FILES=$(echo $ABILIST | xargs printf "lib/%s/libmagisk??.so\n")
+unzip -oj app-debug.apk "lib/$ABI/*" $EXTRACT_FILES -x "lib/$ABI/busybox.so"
+
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
@@ -125,7 +129,7 @@ done
 cp -af ./magiskboot /data/adb/magisk/magiskboot
 cp -af ./busybox /data/adb/magisk/busybox
 
-ln -s ./magisk64 $MAGISKTMP/magisk
+if [ -f ./magisk64 ]; then ln -s ./magisk64 $MAGISKTMP/magisk; else ln -s ./magisk32 $MAGISKTMP/magisk; fi
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
