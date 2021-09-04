@@ -20,3 +20,16 @@ android {
         }
     }
 }
+
+afterEvaluate {
+    val adb = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+
+    val pushTask = task("pushEmulator", Exec::class) {
+        commandLine(adb, "push", "native/out/x86_64/busybox", "out/app-debug.apk", "scripts/emulator.sh", "/data/local/tmp")
+        workingDir(rootDir)
+    }
+    task("setupEmulator", Exec::class) {
+        dependsOn(pushTask)
+        commandLine(adb, "shell", "sh", "/data/local/tmp/emulator.sh")
+    }
+}

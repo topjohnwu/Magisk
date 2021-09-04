@@ -29,14 +29,6 @@ mount_sbin() {
   chcon u:object_r:rootfs:s0 /sbin
 }
 
-if [ ! -f /system/build.prop ]; then
-  # Running on PC
-  cd "$(dirname "$0")/.."
-  adb push native/out/x86_64/busybox out/app-debug.apk scripts/emulator.sh /data/local/tmp
-  adb shell sh /data/local/tmp/emulator.sh
-  exit 0
-fi
-
 cd /data/local/tmp
 chmod 755 busybox
 
