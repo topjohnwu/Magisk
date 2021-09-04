@@ -17,7 +17,6 @@ import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.signing.CryptoUtils
 import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.superuser.Shell
 import dalvik.system.BaseDexClassLoader
 import dalvik.system.DexFile
 import kotlinx.coroutines.Dispatchers
@@ -45,13 +44,14 @@ class CheckSafetyNetEvent(
     private lateinit var nonce: ByteArray
 
     override fun invoke(context: Context) {
-        jar = File("${context.filesDir.parent}/snet", "snet.jar")
+        val snet = File("${context.filesDir.parent}/snet")
+        jar = File(snet, "snet.jar")
 
         scope.launch(Dispatchers.IO) {
             attest(context) {
                 // Download and retry
-                Shell.sh("rm -rf " + jar.parent).exec()
-                jar.parentFile?.mkdir()
+                snet.deleteRecursively()
+                snet.mkdir()
                 withContext(Dispatchers.Main) {
                     showDialog(context)
                 }
@@ -66,7 +66,7 @@ class CheckSafetyNetEvent(
 
             // Scan through the dex and find our helper class
             var clazz: Class<*>? = null
-            loop@for (dex in loader.getDexFiles()) {
+            loop@ for (dex in loader.getDexFiles()) {
                 for (name in dex.entries()) {
                     val cls = loader.loadClass(name)
                     if (InvocationHandler::class.java.isAssignableFrom(cls)) {
