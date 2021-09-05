@@ -1,4 +1,5 @@
 #include <utils.hpp>
+#include <vector>
 #include <magiskpolicy.hpp>
 
 #include "sepolicy.hpp"
@@ -23,6 +24,7 @@ Options:
                      Magisk selinux environment
    --apply FILE      apply rules from FILE, read and parsed
                      line by line as policy statements
+                     (multiple --apply allows)
 
 If neither --load or --compile-split is specified, it will load
 from current live policies (/sys/fs/selinux/policy)
@@ -34,7 +36,7 @@ from current live policies (/sys/fs/selinux/policy)
 int magiskpolicy_main(int argc, char *argv[]) {
     cmdline_logging();
     const char *out_file = nullptr;
-    const char *rule_file = nullptr;
+    std::vector<std::string_view> rule_files;
     sepolicy *sepol = nullptr;
     bool magisk = false;
     bool live = false;
@@ -78,7 +80,7 @@ int magiskpolicy_main(int argc, char *argv[]) {
             } else if (option == "apply"sv) {
                 if (argv[i + 1] == nullptr)
                     usage(argv[0]);
-                rule_file = argv[i + 1];
+                rule_files.emplace_back(argv[i + 1]);
                 ++i;
             } else if (option == "help"sv) {
                 statement_help();
@@ -99,8 +101,9 @@ int magiskpolicy_main(int argc, char *argv[]) {
     if (magisk)
         sepol->magisk_rules();
 
-    if (rule_file)
-        sepol->load_rule_file(rule_file);
+    if (!rule_files.empty())
+        for (const auto &rule_file : rule_files)
+            sepol->load_rule_file(rule_file.data());
 
     for (; i < argc; ++i)
         sepol->parse_statement(argv[i]);

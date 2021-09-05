@@ -553,6 +553,7 @@ void magic_mount() {
     char buf[4096];
 
     LOGI("* Loading modules\n");
+    std::vector<std::string> policy_paths;
     for (const auto &m : module_list) {
         auto module = m.data();
         char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
@@ -570,15 +571,15 @@ void magic_mount() {
             char mirror_path[PATH_MAX];
             sprintf(mirror_path, "%s/" RULESDIR "/%s/sepolicy.rule", MAGISKTMP.data(), module);
             if (access(mirror_path, F_OK) != 0) {
-                LOGI("%s: applying [sepolicy.rule]\n", module);
+                LOGI("%s: loading missing [sepolicy.rule]\n", module);
                 // copy rule file since user may have cleaned /cache.
                 xmkdir(dirname(mirror_path), 0755);
                 cp_afc(buf, mirror_path);
                 // magiskinit cannot load sepolicy properly, try to live path it
-                auto ret = exec_command_sync("magiskpolicy", "--live", "--apply", buf);
-                if (ret != 0) LOGW("%s: failed to apply [sepolicy.rule]\n", module);
+                policy_paths.emplace_back(buf);
             }
         }
+
 
         // Check whether skip mounting
         strcpy(b, "skip_mount");
@@ -595,6 +596,23 @@ void magic_mount() {
         int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
         system->collect_files(module, fd);
         close(fd);
+    }
+
+    if (!policy_paths.empty()) {
+        LOGI("* Applying missing sepolicies\n");
+        std::vector<const char*> argv;
+        argv.reserve(policy_paths.size() * 2 + 3);
+        argv.emplace_back("magiskpolicy");
+        argv.emplace_back("--live");
+        for (const auto &path: policy_paths) {
+            argv.emplace_back("--apply");
+            argv.emplace_back(path.data());
+        }
+        argv.emplace_back(nullptr);
+        exec_t exec {
+                .argv = argv.data()
+        };
+        if (exec_command_sync(exec) != 0) LOGW("* Failed to apply sepolicies\n");
     }
 
     if (MAGISKTMP != "/sbin") {
