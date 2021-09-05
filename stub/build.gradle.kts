@@ -1,4 +1,3 @@
-
 import io.michaelrocks.paranoid.plugin.ParanoidExtension
 import org.gradle.internal.os.OperatingSystem
 import java.io.OutputStream
@@ -21,7 +20,7 @@ buildscript {
 apply(plugin = "io.michaelrocks.paranoid")
 
 extensions.configure<ParanoidExtension>("paranoid") {
-    obfuscationSeed = if (RAND_SEED != 0) RAND_SEED else null
+    obfuscationSeed = if (Codegen.RAND_SEED != 0) Codegen.RAND_SEED else null
     includeSubprojects = true
 }
 
@@ -85,7 +84,7 @@ android.applicationVariants.all {
 
     val genSrcTask = tasks.register("generate${name.capitalize()}ObfuscatedSources") {
         doLast {
-            val xml = genStubManifest(templateDir, outSrcDir)
+            val xml = Codegen.genStubManifest(templateDir, outSrcDir)
             PrintStream(manifest).use {
                 it.print(xml)
             }
@@ -127,7 +126,7 @@ android.applicationVariants.all {
                     errorOutput = dummy
                 }
 
-                genEncryptedResources(optTmp, outSrcDir)
+                Codegen.genEncryptedResources(optTmp, outSrcDir)
             } finally {
                 compileTmp.delete()
                 linkTmp.delete()

@@ -146,7 +146,7 @@ android.applicationVariants.all {
         inputs.dir(keysDir)
         outputs.file(outSrc)
         doLast {
-            genKeyData(keysDir, outSrc)
+            Codegen.genKeyData(keysDir, outSrc)
         }
     }
     registerJavaGeneratingTask(genSrcTask, outSrcDir)
