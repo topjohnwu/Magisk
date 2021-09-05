@@ -6,7 +6,7 @@
 #include <magisk.hpp>
 #include <selinux.hpp>
 #include <resetprop.hpp>
-
+#include <libgen.h>
 #include "core.hpp"
 
 using namespace std;
@@ -55,7 +55,7 @@ public:
     bool is_dir() { return file_type() == DT_DIR; }
     bool is_lnk() { return file_type() == DT_LNK; }
     bool is_reg() { return file_type() == DT_REG; }
-    uint8_t type() { return node_type; }
+    uint8_t type() const { return node_type; }
     const string &name() { return _name; }
     const string &node_path();
     string mirror_path() { return mirror_dir + node_path(); }
@@ -80,9 +80,9 @@ protected:
     void create_and_mount(const string &src);
 
     // Use top bit of _file_type for node exist status
-    bool exist() { return static_cast<bool>(_file_type & (1 << 7)); }
+    bool exist() const { return static_cast<bool>(_file_type & (1 << 7)); }
     void set_exist(bool b) { if (b) _file_type |= (1 << 7); else _file_type &= ~(1 << 7); }
-    uint8_t file_type() { return static_cast<uint8_t>(_file_type & ~(1 << 7)); }
+    uint8_t file_type() const { return static_cast<uint8_t>(_file_type & ~(1 << 7)); }
 
 private:
     friend class dir_node;
@@ -90,14 +90,14 @@ private:
     static bool should_be_tmpfs(node_entry *child);
 
     // Node properties
-    string _name;
-    uint8_t _file_type;
-    uint8_t node_type;
+    string _name{};
+    uint8_t _file_type{0};
+    uint8_t node_type{0};
 
-    dir_node *_parent = nullptr;
+    dir_node *_parent{nullptr};
 
     // Cache
-    string _node_path;
+    string _node_path{};
 };
 
 class dir_node : public node_entry {
@@ -221,14 +221,14 @@ class root_node : public dir_node {
 public:
     explicit root_node(const char *name) : dir_node(name, this), prefix("") {}
     explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {}
-    const char * const prefix;
+    const char * const prefix{nullptr};
 };
 
 class inter_node : public dir_node {
 public:
     inter_node(const char *name, const char *module) : dir_node(name, this), module(module) {}
 private:
-    const char *module;
+    const char *module{nullptr};
     friend class module_node;
 };
 
@@ -386,7 +386,7 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
 // - Target does not exist
 // - Source or target is a symlink
 bool node_entry::should_be_tmpfs(node_entry *child) {
-    struct stat st;
+    struct stat st{};
     if (lstat(child->node_path().data(), &st) != 0) {
         return true;
     } else {
@@ -485,7 +485,7 @@ void tmpfs_node::mount() {
         return;
     string src = mirror_path();
     const string &dest = node_path();
-    file_attr a;
+    file_attr a{};
     getattr(src.data(), &a);
     mkdir(dest.data(), 0);
     if (!isa<tmpfs_node>(parent())) {
@@ -551,6 +551,7 @@ void magic_mount() {
     root->insert(system);
 
     char buf[4096];
+
     LOGI("* Loading modules\n");
     for (const auto &m : module_list) {
         auto module = m.data();
@@ -561,6 +562,22 @@ void magic_mount() {
         if (access(buf, F_OK) == 0) {
             LOGI("%s: loading [system.prop]\n", module);
             load_prop_file(buf, false);
+        }
+
+        // Load sepolicy.rule
+        strcpy(b, "sepolicy.rule");
+        if (access(buf, F_OK) == 0) {
+            char mirror_path[PATH_MAX];
+            sprintf(mirror_path, "%s/" RULESDIR "/%s/sepolicy.rule", MAGISKTMP.data(), module);
+            if (access(mirror_path, F_OK) != 0) {
+                LOGI("%s: applying [sepolicy.rule]\n", module);
+                // copy rule file since user may have cleaned /cache.
+                xmkdir(dirname(mirror_path), 0755);
+                cp_afc(buf, mirror_path);
+                // magiskinit cannot load sepolicy properly, try to live path it
+                auto ret = exec_command_sync("magiskpolicy", "--live", "--apply", buf);
+                if (ret != 0) LOGW("%s: failed to apply [sepolicy.rule]\n", module);
+            }
         }
 
         // Check whether skip mounting
@@ -590,7 +607,7 @@ void magic_mount() {
 
     // Handle special read-only partitions
     for (const char *part : { "/vendor", "/product", "/system_ext" }) {
-        struct stat st;
+        struct stat st{};
         if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
             if (auto old = system->extract(part + 1); old) {
                 auto new_node = new root_node(old);
