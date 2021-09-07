@@ -2,9 +2,10 @@ plugins {
     id("com.android.library")
 }
 
+setupCommon()
+
 android {
     defaultConfig {
-        vectorDrawables.useSupportLibrary = true
         consumerProguardFiles("proguard-rules.pro")
     }
 }
