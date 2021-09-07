@@ -1,5 +1,3 @@
-
-import io.michaelrocks.paranoid.plugin.ParanoidExtension
 import org.gradle.internal.os.OperatingSystem
 import java.io.OutputStream
 import java.io.PrintStream
@@ -7,23 +5,15 @@ import java.nio.file.Paths
 
 plugins {
     id("com.android.application")
+    id("io.michaelrocks.paranoid")
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("io.michaelrocks:paranoid-gradle-plugin:0.3.5")
-    }
-}
-
-apply(plugin = "io.michaelrocks.paranoid")
-
-extensions.configure<ParanoidExtension>("paranoid") {
+paranoid {
     obfuscationSeed = if (RAND_SEED != 0) RAND_SEED else null
     includeSubprojects = true
 }
+
+setupApp()
 
 android {
     val canary = !Config.version.contains(".")
@@ -40,7 +30,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles("proguard-rules.pro")
@@ -63,7 +53,9 @@ val ensureManifest by tasks.registering {
     }
 }
 
-tasks["preBuild"]?.dependsOn(ensureManifest)
+tasks.preBuild {
+    dependsOn(ensureManifest)
+}
 
 android.applicationVariants.all {
     val manifest = file("src/main/AndroidManifest.xml")

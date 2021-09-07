@@ -20,6 +20,8 @@ kapt {
     }
 }
 
+setupApp()
+
 android {
     defaultConfig {
         applicationId = "com.topjohnwu.magisk"
@@ -30,7 +32,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles("proguard-rules.pro")
@@ -135,7 +137,9 @@ val syncResources by tasks.registering(Sync::class) {
     }
 }
 
-tasks["preBuild"]?.dependsOn(syncResources)
+tasks.preBuild {
+    dependsOn(syncResources)
+}
 
 android.applicationVariants.all {
     val keysDir = rootProject.file("tools/keys")
@@ -203,7 +207,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav: String by rootProject.extra
+    val vNav = "2.4.0-alpha07"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
