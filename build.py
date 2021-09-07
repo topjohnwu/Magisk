@@ -61,10 +61,12 @@ archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
 support_targets = default_targets + ['magiskpolicy', 'resetprop', 'test']
 
-ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
+sdk_path = os.environ['ANDROID_SDK_ROOT']
+ndk_root = op.join(sdk_path, 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
+adb_path = op.join(sdk_path, 'platform-tools', 'adb' + ('.exe' if is_windows else ''))
 
 # Global vars
 config = {}
@@ -277,6 +279,9 @@ def build_binary(args):
     if props['Pkg.Revision'] != config['fullNdkVersion']:
         error('Incorrect NDK. Please install/upgrade NDK with "build.py ndk"')
 
+    if 'target' not in vars(args):
+        vars(args)['target'] = []
+
     if args.target:
         args.target = set(args.target) & set(support_targets)
         if not args.target:
@@ -360,7 +365,7 @@ def build_app(args):
 
 
 def build_stub(args):
-    header('* Building stub APK')
+    header('* Building the stub app')
     build_apk(args, 'stub')
 
 
@@ -444,8 +449,24 @@ def setup_ndk(args):
                 vprint(f'Replaced {path}')
 
 
+def setup_avd(args):
+    build_binary(args)
+    build_app(args)
+
+    header('* Setting up emulator')
+
+    abi = cmd_out([adb_path, 'shell', 'getprop', 'ro.product.cpu.abi'])
+    proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'out/app-debug.apk',
+           'scripts/emulator.sh', '/data/local/tmp'])
+    if proc.returncode != 0:
+        error('adb push failed!')
+
+    proc = execv([adb_path, 'shell', 'sh', '/data/local/tmp/emulator.sh'])
+    if proc.returncode != 0:
+        error('emulator.sh failed!')
+
+
 def build_all(args):
-    vars(args)['target'] = []
     build_stub(args)
     build_binary(args)
     build_app(args)
@@ -474,14 +495,16 @@ binary_parser.set_defaults(func=build_binary)
 app_parser = subparsers.add_parser('app', help='build the Magisk app')
 app_parser.set_defaults(func=build_app)
 
-stub_parser = subparsers.add_parser(
-    'stub', help='build stub APK')
+stub_parser = subparsers.add_parser('stub', help='build the stub app')
 stub_parser.set_defaults(func=build_stub)
+
+avd_parser = subparsers.add_parser(
+    'emulator', help='build and setup AVD for development')
+avd_parser.set_defaults(func=setup_avd)
 
 # Need to bind mount snet sources on top of stub folder
 # Note: source code for the snet extension is *NOT* public
-snet_parser = subparsers.add_parser(
-    'snet', help='build snet extension')
+snet_parser = subparsers.add_parser('snet', help='build snet extension')
 snet_parser.set_defaults(func=build_snet)
 
 clean_parser = subparsers.add_parser('clean', help='cleanup')
