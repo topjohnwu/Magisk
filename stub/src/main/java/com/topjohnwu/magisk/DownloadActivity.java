@@ -4,10 +4,10 @@ import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
 import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
-import static com.topjohnwu.magisk.A.string.dling;
-import static com.topjohnwu.magisk.A.string.no_internet_msg;
-import static com.topjohnwu.magisk.A.string.relaunch_app;
-import static com.topjohnwu.magisk.A.string.upgrade_msg;
+import static com.topjohnwu.magisk.R2.string.dling;
+import static com.topjohnwu.magisk.R2.string.no_internet_msg;
+import static com.topjohnwu.magisk.R2.string.relaunch_app;
+import static com.topjohnwu.magisk.R2.string.upgrade_msg;
 
 import android.app.Activity;
 import android.app.AlertDialog;
