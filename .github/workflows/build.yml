@@ -25,7 +25,7 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
       NDK_CCACHE: ${{ github.workspace }}/ccache
-      CCACHE_DIR: ~/.ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
 
     steps:
       - name: Check out
@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ~/.ccache
+            ${{ github.workspace }}/.ccache
             ~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-build-cache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-cache-
