@@ -9,7 +9,7 @@
 #include <selinux.hpp>
 #include <db.hpp>
 #include <resetprop.hpp>
-#include <flags.hpp>
+#include <flags.h>
 
 #include "core.hpp"
 

@@ -3,7 +3,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support emulator ABI: x86_64 *only*
+# Support emulator ABI: x86_64 and arm64
 # Support API level: 23 - 31 (21 and 22 images do not have SELinux)
 #
 # This script will stop zygote, simulate the Magisk start up process
@@ -15,14 +15,7 @@
 # This only covers the "core" features of Magisk. Testing magiskinit
 # and magiskboot require additional setups that are not covered here.
 #
-# Build everything by `./build.py all` before running this script.
-#
 #####################################################################
-
-abort() {
-  echo "$@"
-  exit 1
-}
 
 mount_sbin() {
   mount -t tmpfs -o 'mode=0755' tmpfs /sbin
@@ -31,10 +24,8 @@ mount_sbin() {
 
 if [ ! -f /system/build.prop ]; then
   # Running on PC
-  cd "$(dirname "$0")/.."
-  adb push native/out/x86_64/busybox out/app-debug.apk scripts/emulator.sh /data/local/tmp
-  adb shell sh /data/local/tmp/emulator.sh
-  exit 0
+  echo 'Please run `./build.py emulator` instead of directly executing the script!'
+  exit 1
 fi
 
 cd /data/local/tmp
@@ -43,7 +34,7 @@ chmod 755 busybox
 if [ -z "$FIRST_STAGE" ]; then
   export FIRST_STAGE=1
   export ASH_STANDALONE=1
-  if [ `./busybox id -u` -ne 0 ]; then
+  if [ $(./busybox id -u) -ne 0 ]; then
     # Re-exec script with root
     exec /system/xbin/su 0 ./busybox sh $0
   else
@@ -55,7 +46,12 @@ fi
 pm install -r $(pwd)/app-debug.apk
 
 # Extract files from APK
-unzip -oj app-debug.apk 'lib/x86_64/*' 'lib/x86/libmagisk32.so' -x 'lib/x86_64/busybox.so'
+unzip -oj app-debug.apk 'assets/util_functions.sh'
+. ./util_functions.sh
+
+api_level_arch_detect
+
+unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/busybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
@@ -72,11 +68,11 @@ fi
 # SELinux stuffs
 ln -sf ./magiskinit magiskpolicy
 if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
-  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk
+  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
 elif [ -f /sepolicy ]; then
-  ./magiskpolicy --load /sepolicy --live --magisk
+  ./magiskpolicy --load /sepolicy --live --magisk 2>&1
 else
-  ./magiskpolicy --live --magisk
+  ./magiskpolicy --live --magisk 2>&1
 fi
 
 MAGISKTMP=/sbin

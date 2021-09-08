@@ -10,10 +10,12 @@ import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
+import kotlin.random.asKotlinRandom
 
-// Set non-zero value here to fix the random seed to create reproducible builds
+// Set non-zero value here to fix the random seed for reproducible builds
 const val RAND_SEED = 0
 private lateinit var RANDOM: Random
+private val kRANDOM get() = RANDOM.asKotlinRandom()
 
 private val c1 = mutableListOf<String>()
 private val c2 = mutableListOf<String>()
@@ -195,15 +197,19 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     names.addAll(c3.subList(0, 10))
     names.shuffle(RANDOM)
 
+    // Decapitalize as older Android versions do not allow capitalized package names
+    // Distinct by lower case to support case insensitive file systems
+    val pkgNames = names.map { it.decapitalize(Locale.ROOT) }
+        .distinctBy { it.toLowerCase(Locale.ROOT) }
+
     var idx = 0
-    fun genCmpName(): String {
-        val name = "${names[idx++]}.${names[idx++]}"
-        return name[0].toLowerCase() + name.substring(1)
-    }
+    fun genCmpName() = "${pkgNames[idx++]}.${names.random(kRANDOM)}"
 
     fun genClass(clzName: String, type: String) {
         val (pkg, name) = clzName.split('.')
-        PrintStream(File(mainPkgDir, "$name.java")).use {
+        val pkgDir = File(outDir, pkg)
+        pkgDir.mkdir()
+        PrintStream(File(pkgDir, "$name.java")).use {
             it.println("package $pkg;")
             it.println("public class $name extends com.topjohnwu.magisk.$type {}")
         }
@@ -254,7 +260,7 @@ fun genEncryptedResources(res: File, outDir: File) {
         it.delete()
         txt
     }
-    File(mainPkgDir, "A.java").writeText(r.replace("class R", "class A"))
+    File(mainPkgDir, "R2.java").writeText(r.replace("class R", "class R2"))
 
     // Generate iv and key
     val iv = ByteArray(16)

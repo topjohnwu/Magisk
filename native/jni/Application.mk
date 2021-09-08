@@ -10,10 +10,4 @@ APP_STRIP_MODE   := --strip-all
 # Busybox should use stock libc.a
 ifdef B_BB
 APP_PLATFORM     := android-22
-else
-# Make Busybox cflag stable
-APP_CFLAGS       += -D__MVSTR=${MAGISK_VERSION} -D__MCODE=${MAGISK_VER_CODE}
-ifdef MAGISK_DEBUG
-APP_CFLAGS       += -D__MDBG
-endif
 endif

@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <flags.hpp>
+#include <flags.h>
 
 #include "logging.hpp"
 
@@ -47,7 +47,7 @@ void cmdline_logging() {
 }
 
 // LTO will optimize out the NOP function
-#ifdef MAGISK_DEBUG
+#if MAGISK_DEBUG
 void LOGD(const char *fmt, ...) { LOG_BODY(d) }
 #else
 void LOGD(const char *fmt, ...) {}

@@ -6,10 +6,11 @@
 #include <vector>
 
 #include <xz.h>
+
 #include <magisk.hpp>
 #include <utils.hpp>
+#include <binaries.h>
 
-#include "binaries.h"
 #include "init.hpp"
 
 using namespace std;

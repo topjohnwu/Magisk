@@ -3,7 +3,7 @@
 #include <bitset>
 
 #include <utils.hpp>
-#include <flags.hpp>
+#include <flags.h>
 #include <daemon.hpp>
 
 #include "inject.hpp"
@@ -356,7 +356,7 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
 #define APP_PROCESS     "^/system/bin/app_process.*"
 
 void hook_functions() {
-#ifdef MAGISK_DEBUG
+#if MAGISK_DEBUG
     xhook_enable_debug(1);
     xhook_enable_sigsegv_protection(0);
 #endif

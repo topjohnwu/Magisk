@@ -5,7 +5,7 @@
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <flags.hpp>
+#include <flags.h>
 
 #include "core.hpp"
 
