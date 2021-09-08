@@ -83,6 +83,9 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             tools:node="remove" />
 
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
     </application>
 
 </manifest>

@@ -218,4 +218,5 @@ dependencies {
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.6.0")
     implementation("com.google.android.material:material:1.4.0")
+    implementation("com.google.android.gms:play-services-safetynet:17.0.1")
 }
