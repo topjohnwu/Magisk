@@ -10,6 +10,7 @@ on:
       - 'buildSrc/**'
       - 'build.py'
       - 'gradle.properties'
+      - '.github/workflows/build.yml'
   pull_request:
     branches: [ master ]
   workflow_dispatch:
@@ -22,6 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+    env:
+      NDK_CCACHE: ${{ github.workspace }}/ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
 
     steps:
       - name: Check out
@@ -40,12 +44,8 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up GitHub env
-        run: |
-          ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' gradle.properties)
-          echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
-          echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
-        shell: bash
+      - name: Set up ccache
+        run: bash .github/ccache.sh
 
       - name: Cache Gradle
         uses: actions/cache@v2
@@ -56,14 +56,26 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
+      - name: Cache ccache
+        id: ccache-cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-ccache-
+
       - name: Set up NDK
         run: python build.py ndk
 
       - name: Build release
-        run: python build.py -vr all
+        run: |
+          ./ccache -zp
+          python build.py -vr all
 
       - name: Build debug
-        run: python build.py -v all
+        run: |
+          python build.py -v all
+          ./ccache -s
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
