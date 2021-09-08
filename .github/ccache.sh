@@ -15,3 +15,5 @@ case $OS in
     unzip -j ccache-*-windows-64.zip '*/ccache.exe'
     ;;
 esac
+mkdir ./.ccache
+./ccache -o compiler_check='%compiler% -dumpmachine; %compiler% -dumpversion'
