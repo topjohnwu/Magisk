@@ -98,7 +98,7 @@ object Config : PreferenceModel, DBConfig {
         const val SU_AUTO_ALLOW = 2
 
         // su timeout
-        val TIMEOUT_LIST = intArrayOf(0, -1, 10, 20, 30, 60)
+        val TIMEOUT_LIST = longArrayOf(0, -1, 10, 20, 30, 60)
 
         // repo order
         const val ORDER_NAME = 0

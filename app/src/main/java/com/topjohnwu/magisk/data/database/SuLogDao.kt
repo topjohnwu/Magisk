@@ -1,12 +1,14 @@
 package com.topjohnwu.magisk.data.database
 
 import androidx.room.*
+import com.topjohnwu.magisk.core.model.su.Converters
 import com.topjohnwu.magisk.core.model.su.SuLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.time.OffsetDateTime
 
-@Database(version = 1, entities = [SuLog::class], exportSchema = false)
+@Database(version = 2, entities = [SuLog::class], exportSchema = false)
+@TypeConverters(Converters::class)
 abstract class SuLogDatabase : RoomDatabase() {
 
     abstract fun suLogDao(): SuLogDao
@@ -15,8 +17,7 @@ abstract class SuLogDatabase : RoomDatabase() {
 @Dao
 abstract class SuLogDao(private val db: SuLogDatabase) {
 
-    private val twoWeeksAgo =
-        Calendar.getInstance().apply { add(Calendar.WEEK_OF_YEAR, -2) }.timeInMillis
+    private val twoWeeksAgo = OffsetDateTime.now().minusWeeks(2)
 
     suspend fun deleteAll() = withContext(Dispatchers.IO) { db.clearAllTables() }
 
@@ -28,8 +29,8 @@ abstract class SuLogDao(private val db: SuLogDatabase) {
     @Query("SELECT * FROM logs ORDER BY time DESC")
     protected abstract suspend fun fetch(): MutableList<SuLog>
 
-    @Query("DELETE FROM logs WHERE time < :timeout")
-    protected abstract suspend fun deleteOutdated(timeout: Long = twoWeeksAgo)
+    @Query("DELETE FROM logs WHERE datetime(time) < datetime(:timeout)")
+    protected abstract suspend fun deleteOutdated(timeout: OffsetDateTime = twoWeeksAgo)
 
     @Insert
     abstract suspend fun insert(log: SuLog)

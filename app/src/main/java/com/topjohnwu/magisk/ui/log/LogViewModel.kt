@@ -14,14 +14,12 @@ import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.now
-import com.topjohnwu.magisk.ktx.timeFormatStandard
-import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.FileInputStream
+import java.time.LocalDateTime
 
 class LogViewModel(
     private val repo: LogRepository
@@ -59,7 +57,7 @@ class LogViewModel(
 
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
+            val filename = "magisk_log_%s.log".format(LocalDateTime.now().toString())
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---System Properties---\n\n")
