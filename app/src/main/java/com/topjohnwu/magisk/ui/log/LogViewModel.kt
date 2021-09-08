@@ -66,7 +66,7 @@ class LogViewModel(
                 ProcessBuilder("getprop").start()
                     .inputStream.reader().use { it.copyTo(file) }
 
-                file.write("---System MountInfo---\n\n")
+                file.write("\n\n---System MountInfo---\n\n")
                 FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
