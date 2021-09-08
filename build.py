@@ -10,6 +10,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import textwrap
 import urllib.request
 import zipfile
 from distutils.dir_util import copy_tree
@@ -67,6 +68,7 @@ ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
 adb_path = op.join(sdk_path, 'platform-tools', 'adb' + ('.exe' if is_windows else ''))
+native_gen_path = op.join('native', 'out', 'generated')
 
 # Global vars
 config = {}
@@ -244,33 +246,60 @@ def sign_zip(unsigned):
         error('Signing failed!')
 
 
-def binary_dump(src, out, var_name):
-    out.write(f'constexpr unsigned char {var_name}[] = {{')
+def binary_dump(src, var_name):
+    out_str = f'constexpr unsigned char {var_name}[] = {{'
     for i, c in enumerate(xz(src.read())):
         if i % 16 == 0:
-            out.write('\n')
-        out.write(f'0x{c:02X},')
-    out.write('\n};\n')
-    out.flush()
+            out_str += '\n'
+        out_str += f'0x{c:02X},'
+    out_str += '\n};\n'
+    return out_str
 
 
 def run_ndk_build(flags):
     os.chdir('native')
-    proc = system(f'{ndk_build} {base_flags} {flags} -j{cpu_count}')
+    proc = system(f'{ndk_build} {flags} -j{cpu_count}')
     if proc.returncode != 0:
         error('Build binary failed!')
     os.chdir('..')
     collect_binary()
 
 
-def dump_bin_headers():
+def write_if_diff(file_name, text):
+    do_write = True
+    if op.exists(file_name):
+        with open(file_name, 'r') as f:
+            orig = f.read()
+        do_write = orig != text
+    if do_write:
+        with open(file_name, 'w') as f:
+            f.write(text)
+
+
+def dump_bin_header():
     stub = op.join(config['outdir'], 'stub-release.apk')
     if not op.exists(stub):
         error('Build stub APK before building "magiskinit"')
-    mkdir_p(op.join('native', 'out'))
-    with open(op.join('native', 'out', 'binaries.h'), 'w') as out:
-        with open(stub, 'rb') as src:
-            binary_dump(src, out, 'manager_xz')
+    mkdir_p(native_gen_path)
+    with open(stub, 'rb') as src:
+        text = binary_dump(src, 'manager_xz')
+        write_if_diff(op.join(native_gen_path, 'binaries.h'), text)
+
+
+def dump_flag_header():
+    flag_txt = textwrap.dedent('''\
+        #pragma once
+        #define quote(s)            #s
+        #define str(s)              quote(s)
+        #define MAGISK_FULL_VER     MAGISK_VERSION "(" str(MAGISK_VER_CODE) ")"
+        #define NAME_WITH_VER(name) str(name) " " MAGISK_FULL_VER
+        ''')
+    flag_txt += f'#define MAGISK_VERSION      "{config["version"]}"\n'
+    flag_txt += f'#define MAGISK_VER_CODE     {config["versionCode"]}\n'
+    flag_txt += f'#define MAGISK_DEBUG        {0 if args.release else 1}\n'
+
+    mkdir_p(native_gen_path)
+    write_if_diff(op.join(native_gen_path, 'flags.h'), flag_txt)
 
 
 def build_binary(args):
@@ -291,25 +320,7 @@ def build_binary(args):
 
     header('* Building binaries: ' + ' '.join(args.target))
 
-    update_flags = False
-    flags = op.join('native', 'jni', 'include', 'flags.hpp')
-    flags_stat = os.stat(flags)
-
-    if op.exists(args.config):
-        if os.stat(args.config).st_mtime_ns > flags_stat.st_mtime_ns:
-            update_flags = True
-
-    if os.stat('gradle.properties').st_mtime_ns > flags_stat.st_mtime_ns:
-        update_flags = True
-
-    if update_flags:
-        os.utime(flags)
-
-    # Basic flags
-    global base_flags
-    base_flags = f'MAGISK_VERSION={config["version"]} MAGISK_VER_CODE={config["versionCode"]}'
-    if not args.release:
-        base_flags += ' MAGISK_DEBUG=1'
+    dump_flag_header()
 
     flag = ''
 
@@ -320,7 +331,7 @@ def build_binary(args):
         flag += ' B_TEST=1'
 
     if 'magiskinit' in args.target:
-        dump_bin_headers()
+        dump_bin_header()
         flag += ' B_INIT=1'
 
     if 'magiskpolicy' in args.target:
