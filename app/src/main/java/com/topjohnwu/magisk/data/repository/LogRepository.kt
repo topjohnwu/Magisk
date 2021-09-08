@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.data.repository
 
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.data.database.SuLogDao
 import com.topjohnwu.magisk.ktx.await
@@ -27,7 +28,11 @@ class LogRepository(
                 }
             }
         }
-        Shell.su("cat ${Const.MAGISK_LOG}").to(list).await()
+        if (Info.env.isActive) {
+            Shell.su("cat ${Const.MAGISK_LOG} || logcat -d -s Magisk").to(list).await()
+        } else {
+            Shell.sh("logcat -d").to(list).await()
+        }
         return list.buf.toString()
     }
 

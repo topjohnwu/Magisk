@@ -100,7 +100,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         super.onResume()
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
-            findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
     }
 
