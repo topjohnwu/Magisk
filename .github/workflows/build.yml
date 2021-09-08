@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     steps:
       - name: Check out
@@ -56,23 +56,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Cache NDK
-        id: ndk-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.ANDROID_SDK_ROOT }}/ndk/magisk
-          key: ${{ runner.os }}-ndk-${{ env.MAGISK_NDK_VERSION }}
-
       - name: Set up NDK
-        if: steps.ndk-cache.outputs.cache-hit != 'true'
         run: python build.py ndk
 
       - name: Build release
         run: python build.py -vr all
-
-      - name: Refresh flag
-        run: touch gradle.properties
-        shell: bash
 
       - name: Build debug
         run: python build.py -v all
