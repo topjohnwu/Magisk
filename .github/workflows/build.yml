@@ -25,7 +25,7 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
       NDK_CCACHE: ${{ github.workspace }}/ccache
-      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_DIR: ~/.ccache
 
     steps:
       - name: Check out
@@ -47,25 +47,27 @@ jobs:
       - name: Set up ccache
         run: bash .github/ccache.sh
 
-      - name: Cache Gradle
+      - name: Cache Gradle dependencies
         uses: actions/cache@v2
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            !~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Cache ccache
-        id: ccache-cache
+      - name: Cache build cache
         uses: actions/cache@v2
         with:
-          path: ${{ github.workspace }}/.ccache
-          key: ${{ runner.os }}-ccache-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-ccache-
+          path: |
+            ~/.ccache
+            ~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-build-cache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-cache-
 
       - name: Set up NDK
-        run: python build.py ndk
+        run: python build.py -v ndk
 
       - name: Build release
         run: |

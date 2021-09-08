@@ -431,7 +431,7 @@ def setup_ndk(args):
     rm_rf(ndk_path)
     with zipfile.ZipFile(ndk_zip, 'r') as zf:
         for info in zf.infolist():
-            print(f'Extracting {info.filename}')
+            vprint(f'Extracting {info.filename}')
             if info.external_attr == 2716663808:  # symlink
                 src = zf.read(info).decode("utf-8")
                 dest = op.join(ndk_root, info.filename)
