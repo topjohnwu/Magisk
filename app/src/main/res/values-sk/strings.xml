@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastný kanál</string>
     <string name="settings_update_custom_msg">Zadajte vlastnú URL</string>
-    <string name="settings_magiskhide_summary">Skryje Magisk pred rôznymi formami detekcie</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre Adblock aplikácie so systemless hosts</string>
     <string name="settings_hosts_toast">Pridaný modul systemless hosts</string>

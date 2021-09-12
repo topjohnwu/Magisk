@@ -140,7 +140,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kanali i personalizuar</string>
     <string name="settings_update_custom_msg">Vendos një URL të personalizuar</string>
-    <string name="settings_magiskhide_summary">Fshih Magisk nga forma të ndryshme të zbulimit</string>
     <string name="settings_hosts_title">Pritës pa sistem</string>
     <string name="settings_hosts_summary">Mbështetja e hostëve pa sistem për aplikacionet Adblock</string>
     <string name="settings_hosts_toast">Moduli i pritur i sistemit pa sistem</string>

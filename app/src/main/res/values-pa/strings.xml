@@ -139,7 +139,6 @@
     <string name="settings_update_beta">ਬੀਟਾ</string>
     <string name="settings_update_custom">ਕਸਟਮ ਚੈਨਲ</string>
     <string name="settings_update_custom_msg">ਇੱਕ ਕਸਟਮ URL ਦਾਖਲ ਕਰੋ</string>
-    <string name="settings_magiskhide_summary">ਵੱਖ ਵੱਖ ਕਿਸਮਾਂ ਦੀਆਂ ਖੋਜਾਂ ਤੋਂ ਬਚਣ ਲਈ ਮੈਜਿਸਕ ਨੂੰ ਓਹਲੇ ਕਰੋ</string>
     <string name="settings_hosts_title">Systemless ਹੋਸਟ</string>
     <string name="settings_hosts_summary">Adblock ਐਪਸ ਲਈ Systemless ਹੋਸਟ ਦੀ ਸਹਿਯੋਗ</string>
     <string name="settings_hosts_toast">Systemless ਹੋਸਟ ਮੋਡੀਊਲ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ</string>

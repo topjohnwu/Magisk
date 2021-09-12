@@ -136,7 +136,6 @@
     <string name="settings_update_beta">تجريبي</string>
     <string name="settings_update_custom">مخصص</string>
     <string name="settings_update_custom_msg">أدخل الرابط لمصدرك المخصص</string>
-    <string name="settings_magiskhide_summary">إخفاء مـاجـيسك من معظم طرق الاكتشاف</string>
     <string name="settings_hosts_title">موانع الاعلانات</string>
     <string name="settings_hosts_summary">حجب الاعلانات دون تعديل النظام</string>
     <string name="settings_hosts_toast">تم تمكين خاصية حجب الاعلانات</string>

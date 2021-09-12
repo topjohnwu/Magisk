@@ -252,14 +252,14 @@ object Magisk : BaseSettingsItem.Section() {
     override val title = R.string.magisk.asText()
 }
 
-object MagiskHide : BaseSettingsItem.Toggle() {
-    override val title = R.string.magiskhide.asText()
-    override val description = R.string.settings_magiskhide_summary.asText()
-    override var value = Config.magiskHide
+object DenyList : BaseSettingsItem.Toggle() {
+    override val title = R.string.denylist.asText()
+    override val description = R.string.settings_denylist_summary.asText()
+    override var value = Info.env.denyListEnforced
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
-            Shell.su("magiskhide $cmd").submit { cb ->
-                if (cb.isSuccess) Config.magiskHide = it
+            Shell.su("magisk --denylist $cmd").submit { cb ->
+                if (cb.isSuccess) Info.env.denyListEnforced = it
                 else field = !it
             }
         }

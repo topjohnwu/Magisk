@@ -146,7 +146,6 @@
     <string name="settings_update_beta">ბეტა</string>
     <string name="settings_update_custom">პერსონალიზირებული</string>
     <string name="settings_update_custom_msg">სხვა URL-ის ჩასმა</string>
-    <string name="settings_magiskhide_summary">Magisk-ის დამალვა დაცვის ხერხებისგან</string>
     <string name="settings_hosts_title">გარესისტემური ჰოსტები</string>
     <string name="settings_hosts_summary">გარესისტემური ჰოსტები Adblock-ებისთვის</string>
     <string name="settings_hosts_toast">გარესისტემური ჰოსტების მოდული დამატებულია</string>

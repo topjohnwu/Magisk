@@ -7,7 +7,7 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
-#define DB_VERSION 10
+#define DB_VERSION 11
 
 using namespace std;
 
@@ -112,7 +112,7 @@ db_settings::db_settings() {
     data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    data[HIDE_CONFIG] = false;
+    data[DENYLIST_CONFIG] = false;
 }
 
 int db_settings::get_idx(string_view key) const {
@@ -174,12 +174,6 @@ static char *open_and_init_db(sqlite3 *&db) {
                 "(key TEXT, value TEXT, PRIMARY KEY(key))",
                 nullptr, nullptr, &err);
         err_ret(err);
-        ver = 4;
-        upgrade = true;
-    }
-    if (ver < 5) {
-        sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
-        err_ret(err);
         /* Directly jump to version 6 */
         ver = 6;
         upgrade = true;
@@ -227,6 +221,17 @@ static char *open_and_init_db(sqlite3 *&db) {
         sqlite3_exec(db, "DROP TABLE IF EXISTS logs", nullptr, nullptr, &err);
         err_ret(err);
         ver = 10;
+        upgrade = true;
+    }
+    if (ver < 11) {
+        sqlite3_exec(db,
+                "DROP TABLE IF EXISTS hidelist;"
+                "CREATE TABLE IF NOT EXISTS denylist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+                "DELETE FROM settings WHERE key='magiskhide';",
+                nullptr, nullptr, &err);
+        err_ret(err);
+        ver = 11;
         upgrade = true;
     }
 

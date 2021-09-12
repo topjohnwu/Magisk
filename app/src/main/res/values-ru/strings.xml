@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta канал</string>
     <string name="settings_update_custom">Сторонний канал</string>
     <string name="settings_update_custom_msg">Укажите ссылку</string>
-    <string name="settings_magiskhide_summary">Скрывать Magisk от различных обнаружений</string>
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
     <string name="settings_hosts_summary">Поддержка внесистемного hosts файла для приложений, блокирующих рекламу</string>
     <string name="settings_hosts_toast">Добавлен модуль внесистемного hosts файла</string>

@@ -145,7 +145,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizado</string>
     <string name="settings_update_custom_msg">Insira um URL personalizado</string>
-    <string name="settings_magiskhide_summary">Esconda o Magisk de várias formas de detecção</string>
     <string name="settings_hosts_title">Hosts sem sistema</string>
     <string name="settings_hosts_summary">Suporte de hosts sem sistema para aplicativos Adblock</string>
     <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>

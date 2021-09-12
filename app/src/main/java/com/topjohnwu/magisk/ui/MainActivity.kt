@@ -60,7 +60,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.homeFragment,
                 R.id.modulesFragment,
                 R.id.superuserFragment,
-                R.id.hideFragment,
+                R.id.denyFragment,
                 R.id.logFragment -> true
                 else -> false
             }
@@ -170,7 +170,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     private fun getScreen(name: String?): NavDirections? {
         return when (name) {
             Const.Nav.SUPERUSER -> MainDirections.actionSuperuserFragment()
-            Const.Nav.HIDE -> MainDirections.actionHideFragment()
             Const.Nav.MODULES -> MainDirections.actionModuleFragment()
             Const.Nav.SETTINGS -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
             else -> null
@@ -183,7 +182,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             R.id.modulesFragment -> MainDirections.actionModuleFragment()
             R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
             R.id.logFragment -> MainDirections.actionLogFragment()
-            R.id.hideFragment -> MainDirections.actionHideFragment()
+            R.id.denyFragment -> MainDirections.actionDenylistFragment()
             else -> null
         }
     }

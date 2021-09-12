@@ -145,7 +145,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
-    <string name="settings_magiskhide_summary">Skryjete Magisk před různými detekcemi.</string>
     <string name="settings_hosts_title">Nesystémový hostitel</string>
     <string name="settings_hosts_summary">Přidáte modul pro podporu nesystémových hostitelů v aplikaci AdBlock.</string>
     <string name="settings_hosts_toast">Přidán systémový modul hostitelů</string>

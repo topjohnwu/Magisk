@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+            type="com.topjohnwu.magisk.ui.deny.DenyListViewModel" />
 
     </data>
 
@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/hide_content"
+            android:id="@+id/app_list"
             invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
@@ -31,7 +31,7 @@
             tools:paddingTop="40dp" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/hide_filter_toggle"
+            android:id="@+id/filter_toggle"
             invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             tools:layout_marginBottom="64dp" />
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-            android:id="@+id/hide_filter"
+            android:id="@+id/process_filter"
             style="@style/WidgetFoundation.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,8 +56,8 @@
             app:cardCornerRadius="0dp">
 
             <include
-                android:id="@+id/hide_filter_include"
-                layout="@layout/include_hide_filter"
+                android:id="@+id/app_filter_include"
+                layout="@layout/app_list_filter"
                 viewModel="@{viewModel}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

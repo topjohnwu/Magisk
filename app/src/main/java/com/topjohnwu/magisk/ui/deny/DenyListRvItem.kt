@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.hide
+package com.topjohnwu.magisk.ui.deny
 
 import android.view.View
 import android.view.ViewGroup
@@ -13,13 +13,13 @@ import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
 
-class HideRvItem(
-    val info: HideAppInfo
-) : ObservableDiffRvItem<HideRvItem>(), ComparableRv<HideRvItem> {
+class DenyListRvItem(
+    val info: AppProcessInfo
+) : ObservableDiffRvItem<DenyListRvItem>(), ComparableRv<DenyListRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_md2
 
-    val processes = info.processes.map { HideProcessRvItem(it) }
+    val processes = info.processes.map { ProcessRvItem(it) }
 
     @get:Bindable
     var isExpanded = false
@@ -31,25 +31,24 @@ class HideRvItem(
     @get:Bindable
     val checkedPercent get() = (itemsChecked.toFloat() / processes.size * 100).roundToInt()
 
-    private var state: Boolean? = false
-        set(value) = set(value, field, { field = it }, BR.hiddenState)
+    private var _state: Boolean? = false
+        set(value) = set(value, field, { field = it }, BR.state)
 
     @get:Bindable
-    var hiddenState: Boolean?
-        get() = state
-        set(value) = set(value, state, { state = it }, BR.hiddenState) {
+    var state: Boolean?
+        get() = _state
+        set(value) = set(value, _state, { _state = it }, BR.state) {
             if (value == true) {
                 processes
-                    .filterNot { it.isHidden }
+                    .filterNot { it.isEnabled }
                     .filter { isExpanded || it.defaultSelection }
             } else {
-                processes
-                    .filter { it.isHidden }
+                processes.filter { it.isEnabled }
             }.forEach { it.toggle() }
         }
 
     init {
-        processes.forEach { it.addOnPropertyChangedCallback(BR.hidden) { recalculateChecked() } }
+        processes.forEach { it.addOnPropertyChangedCallback(BR.enabled) { recalculateChecked() } }
         addOnPropertyChangedCallback(BR.expanded) { recalculateChecked() }
         recalculateChecked()
     }
@@ -60,8 +59,8 @@ class HideRvItem(
     }
 
     private fun recalculateChecked() {
-        itemsChecked = processes.count { it.isHidden }
-        state = if (isExpanded) {
+        itemsChecked = processes.count { it.isEnabled }
+        _state = if (isExpanded) {
             when (itemsChecked) {
                 0 -> false
                 processes.size -> true
@@ -69,7 +68,7 @@ class HideRvItem(
             }
         } else {
             val defaultProcesses = processes.filter { it.defaultSelection }
-            when (defaultProcesses.count { it.isHidden }) {
+            when (defaultProcesses.count { it.isEnabled }) {
                 0 -> false
                 defaultProcesses.size -> true
                 else -> null
@@ -77,10 +76,10 @@ class HideRvItem(
         }
     }
 
-    override fun compareTo(other: HideRvItem) = comparator.compare(this, other)
+    override fun compareTo(other: DenyListRvItem) = comparator.compare(this, other)
 
     companion object {
-        private val comparator = compareBy<HideRvItem>(
+        private val comparator = compareBy<DenyListRvItem>(
             { it.itemsChecked == 0 },
             { it.info }
         )
@@ -88,34 +87,34 @@ class HideRvItem(
 
 }
 
-class HideProcessRvItem(
-    val process: HideProcessInfo
-) : ObservableDiffRvItem<HideProcessRvItem>() {
+class ProcessRvItem(
+    val process: ProcessInfo
+) : ObservableDiffRvItem<ProcessRvItem>() {
 
     override val layoutRes get() = R.layout.item_hide_process_md2
 
     val displayName = if (process.isIsolated) "(isolated) ${process.name}" else process.name
 
     @get:Bindable
-    var isHidden
-        get() = process.isHidden
-        set(value) = set(value, process.isHidden, { process.isHidden = it }, BR.hidden) {
+    var isEnabled
+        get() = process.isEnabled
+        set(value) = set(value, process.isEnabled, { process.isEnabled = it }, BR.enabled) {
             val arg = if (it) "add" else "rm"
             val (name, pkg) = process
-            Shell.su("magiskhide $arg $pkg \'$name\'").submit()
+            Shell.su("magisk --denylist $arg $pkg \'$name\'").submit()
         }
 
     fun toggle() {
-        isHidden = !isHidden
+        isEnabled = !isEnabled
     }
 
     val defaultSelection get() =
         process.isIsolated || process.isAppZygote || process.name == process.packageName
 
-    override fun contentSameAs(other: HideProcessRvItem) =
-        process.isHidden == other.process.isHidden
+    override fun contentSameAs(other: ProcessRvItem) =
+        process.isEnabled == other.process.isEnabled
 
-    override fun itemSameAs(other: HideProcessRvItem) =
+    override fun itemSameAs(other: ProcessRvItem) =
         process.name == other.process.name && process.packageName == other.process.packageName
 
 }

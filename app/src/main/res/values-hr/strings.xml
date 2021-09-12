@@ -137,7 +137,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastiti kanal</string>
     <string name="settings_update_custom_msg">Umetnite prilagođeni URL</string>
-    <string name="settings_magiskhide_summary">Sakrij Magisk od različitih oblika otkrivanja</string>
     <string name="settings_hosts_title">Hostovi bez sistema</string>
     <string name="settings_hosts_summary">Podrška za hostove bez sistema za Adblock aplikacije</string>
     <string name="settings_hosts_toast">Dodan je modul hosta bez sistema</string>

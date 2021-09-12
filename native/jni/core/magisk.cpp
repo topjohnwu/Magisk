@@ -38,6 +38,7 @@ Advanced Options (Internal APIs):
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
    --path                    print Magisk tmpfs mount path
+   --denylist ARGS           denylist config CLI
 
 Available applets:
 )EOF");
@@ -101,7 +102,9 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(true);
         write_int(fd, BOOT_COMPLETE);
         return read_int(fd);
-    } else if (argc >= 3 && argv[1] == "--sqlite"sv) {
+    } else if (argv[1] == "--denylist"sv) {
+        return denylist_cli(argc - 1, argv + 1);
+    }else if (argc >= 3 && argv[1] == "--sqlite"sv) {
         int fd = connect_daemon();
         write_int(fd, SQLITE_CMD);
         write_string(fd, argv[2]);

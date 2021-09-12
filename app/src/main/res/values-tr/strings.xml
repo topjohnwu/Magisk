@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel Kanal</string>
     <string name="settings_update_custom_msg">Özel URL ekleyin</string>
-    <string name="settings_magiskhide_summary">Magisk\'i çeşitli algılamalardan gizle</string>
     <string name="settings_hosts_title">Sistemsiz hosts</string>
     <string name="settings_hosts_summary">Reklam engelleme uygulamaları için sistemsiz hosts desteği</string>
     <string name="settings_hosts_toast">Sistemsiz hosts modülü eklendi</string>

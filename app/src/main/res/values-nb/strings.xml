@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Egendefinert kanal</string>
     <string name="settings_update_custom_msg">Sett inn en egendefinert nettadresse</string>
-    <string name="settings_magiskhide_summary">Skjul Magisk fra å bli oppdaget</string>
     <string name="settings_hosts_title">Systemløs vertsfil</string>
     <string name="settings_hosts_summary">Systemløs vertsfilstøtte for reklameblokkeringsprogrammer</string>
     <string name="settings_hosts_toast">La til modul for systemløs vertsfil</string>

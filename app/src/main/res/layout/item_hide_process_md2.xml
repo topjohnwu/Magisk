@@ -7,11 +7,11 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.hide.HideProcessRvItem" />
+            type="com.topjohnwu.magisk.ui.deny.ProcessRvItem" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+            type="com.topjohnwu.magisk.ui.deny.DenyListViewModel" />
 
     </data>
 
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:alpha="@{item.hidden ? 1f : .7f}">
+        android:alpha="@{item.enabled ? 1f : .7f}">
 
         <TextView
             android:layout_width="0dp"
@@ -40,7 +40,7 @@
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/hide_process_checkbox"
-            android:checked="@={item.hidden}"
+            android:checked="@={item.enabled}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/l_50"

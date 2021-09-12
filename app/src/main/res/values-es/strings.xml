@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
-    <string name="settings_magiskhide_summary">Ocultar Magisk de varias detecciones</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para bloqueadores de publicidad fuera de la partición system</string>
     <string name="settings_hosts_toast">Módulo systemless hosts agregado</string>

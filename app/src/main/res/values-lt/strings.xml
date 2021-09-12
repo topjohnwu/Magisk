@@ -74,7 +74,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Pasirinktiniai</string>
     <string name="settings_update_custom_msg">Įvesti pasirinktinį URL</string>
-    <string name="settings_magiskhide_summary">Paslėpti Magisk nuo įvairių susekimų</string>
     <string name="settings_hosts_title">Sistemos padejėjai</string>
     <string name="settings_hosts_summary">Įgalinti sistemos padejėjus Adblock programėlėms</string>
 

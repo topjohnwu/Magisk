@@ -77,7 +77,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
     <string name="settings_hosts_toast">Mô-đun được thêm vào systemless hosts</string>

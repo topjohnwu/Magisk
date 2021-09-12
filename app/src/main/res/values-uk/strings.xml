@@ -140,7 +140,6 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
-    <string name="settings_magiskhide_summary">Приховати Magisk від різних форм виявлень</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для застосунків блокування реклами</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>

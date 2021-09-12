@@ -56,7 +56,6 @@
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update_stable">Estável</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_magiskhide_summary">Oculta Magisk de várias deteções</string>
     <string name="settings_hosts_title">Ativar systemless hosts</string>
     <string name="settings_hosts_summary">Suporte de systemless para aplicações Adblock</string>
 

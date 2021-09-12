@@ -146,7 +146,6 @@
     <string name="settings_update_beta">测试版</string>
     <string name="settings_update_custom">自定义通道</string>
     <string name="settings_update_custom_msg">自定义通道网址</string>
-    <string name="settings_magiskhide_summary">隐藏 Magisk 避免被检测</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>

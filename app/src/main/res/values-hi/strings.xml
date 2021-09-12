@@ -139,7 +139,6 @@
     <string name="settings_update_beta">बीटा</string>
     <string name="settings_update_custom">कस्टम चैनल</string>
     <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
-    <string name="settings_magiskhide_summary">विभिन्न रूप की खोजों से बचने के लिए मैजिस्क को छिपाएं</string>
     <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
     <string name="settings_hosts_summary">Adblock ऐप्स के लिए सिस्टमलेस होस्ट सपोर्ट</string>
     <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>

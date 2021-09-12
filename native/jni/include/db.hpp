@@ -38,7 +38,7 @@ constexpr const char *DB_SETTING_KEYS[] = {
     "root_access",
     "multiuser_mode",
     "mnt_ns",
-    "magiskhide"
+    "denylist"
 };
 
 // Settings key indices
@@ -46,7 +46,7 @@ enum {
     ROOT_ACCESS = 0,
     SU_MULTIUSER_MODE,
     SU_MNT_NS,
-    HIDE_CONFIG
+    DENYLIST_CONFIG
 };
 
 // Values for root_access

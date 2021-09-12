@@ -27,7 +27,7 @@ extern std::string  MAGISKTMP;
 #define SHELLPTS    INTLROOT "/pts"
 #define ROOTMNT     ROOTOVL "/.mount_list"
 
-constexpr const char *applet_names[] = { "su", "resetprop", "magiskhide", nullptr };
+constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };
 
 #define POST_FS_DATA_WAIT_TIME       40
@@ -38,7 +38,6 @@ extern int SDK_INT;
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
-int magiskhide_main(int argc, char *argv[]);
 int magiskpolicy_main(int argc, char *argv[]);
 int su_client_main(int argc, char *argv[]);
 int resetprop_main(int argc, char *argv[]);

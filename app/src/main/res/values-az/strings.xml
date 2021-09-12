@@ -82,7 +82,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özəl</string>
     <string name="settings_update_custom_msg">Özəl URL daxil edin</string>
-    <string name="settings_magiskhide_summary">Magisk\'i fərqli növdə aşkarlamalardan gizləyin.</string>
     <string name="settings_hosts_title">Sistemsiz host\'lar</string>
     <string name="settings_hosts_summary">Adblock tətbiqləri üçün Sistemsiz host dəstəyi.</string>
     <string name="settings_hosts_toast">Sistemsiz host əlavəsi quraşdırıldı</string>

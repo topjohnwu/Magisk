@@ -44,8 +44,8 @@ static bool check_zygote(pid_t pid) {
 
 static void handle_request_async(int client, int code, ucred cred) {
     switch (code) {
-    case MAGISKHIDE:
-        magiskhide_handler(client, &cred);
+    case DENYLIST:
+        denylist_handler(client, &cred);
         break;
     case SUPERUSER:
         su_daemon_handler(client, &cred);
@@ -92,7 +92,7 @@ static void handle_request_sync(int client, int code) {
         setup_logfile(true);
         break;
     case STOP_DAEMON:
-        magiskhide_handler(-1, nullptr);
+        denylist_handler(-1, nullptr);
         write_int(client, 0);
         // Terminate the daemon!
         exit(0);
@@ -124,7 +124,7 @@ static void handle_request(int client) {
     case BOOT_COMPLETE:
     case SQLITE_CMD:
     case GET_PATH:
-    case MAGISKHIDE:
+    case DENYLIST:
     case STOP_DAEMON:
         if (!is_root) {
             write_int(client, ROOT_REQUIRED);

@@ -27,6 +27,7 @@ object Const {
 
     // Misc
     val USER_ID = Process.myUid() / 100000
+    val APP_IS_CANARY get() = Version.isCanary(BuildConfig.VERSION_CODE)
 
     object Version {
         const val MIN_VERSION = "v20.4"
@@ -34,7 +35,9 @@ object Const {
 
         fun atLeast_21_0() = Info.env.magiskVersionCode >= 21000 || isCanary()
         fun atLeast_21_2() = Info.env.magiskVersionCode >= 21200 || isCanary()
-        fun isCanary() = Info.env.magiskVersionCode % 100 != 0
+        fun isCanary() = isCanary(Info.env.magiskVersionCode)
+
+        fun isCanary(ver: Int) = ver > 0 && ver % 100 != 0
     }
 
     object ID {
@@ -49,7 +52,7 @@ object Const {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
         const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
 
-        val CHANGELOG_URL = if (BuildConfig.VERSION_CODE % 100 != 0) Info.remote.magisk.note
+        val CHANGELOG_URL = if (APP_IS_CANARY) Info.remote.magisk.note
         else "https://topjohnwu.github.io/Magisk/releases/${BuildConfig.VERSION_CODE}.md"
 
         const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
@@ -76,7 +79,6 @@ object Const {
     object Nav {
         const val HOME = "home"
         const val SETTINGS = "settings"
-        const val HIDE = "hide"
         const val MODULES = "modules"
         const val SUPERUSER = "superuser"
     }

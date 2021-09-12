@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
-    <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare</string>
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
     <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor adblock</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>

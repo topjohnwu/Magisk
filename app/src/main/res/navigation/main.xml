@@ -6,10 +6,10 @@
     app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/hideFragment"
-        android:name="com.topjohnwu.magisk.ui.hide.HideFragment"
-        android:label="HideFragment"
-        tools:layout="@layout/fragment_hide_md2" />
+        android:id="@+id/denyFragment"
+        android:name="com.topjohnwu.magisk.ui.deny.DenyListFragment"
+        android:label="DenyListFragment"
+        tools:layout="@layout/fragment_deny_md2" />
 
     <fragment
         android:id="@+id/homeFragment"
@@ -165,8 +165,8 @@
         app:popUpTo="@id/homeFragment" />
 
     <action
-        android:id="@+id/action_hideFragment"
-        app:destination="@id/hideFragment"
+        android:id="@+id/action_denylistFragment"
+        app:destination="@id/denyFragment"
         app:enterAnim="@anim/fragment_enter"
         app:exitAnim="@anim/fragment_exit"
         app:popEnterAnim="@anim/fragment_enter_pop"

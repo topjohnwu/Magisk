@@ -9,7 +9,7 @@
     <string name="section_home">Hem</string>
     <string name="section_theme">Tema</string>
     <string name="safetynet">SafetyNet</string>
-	
+
 	<!--Home-->
     <string name="no_connection">Ingen anslutning tillgänglig</string>
     <string name="app_changelog">Ändringslogg</string>
@@ -145,7 +145,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Anpassad kanal</string>
     <string name="settings_update_custom_msg">Lägg till en anpassad URL</string>
-    <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemfri hosts</string>
     <string name="settings_hosts_summary">Stöd för Adblock-appar med systemfri hosts-fil</string>
     <string name="settings_hosts_toast">Lagt till modul för systemfri hosts-fil</string>

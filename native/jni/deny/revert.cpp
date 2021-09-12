@@ -5,18 +5,18 @@
 #include <selinux.hpp>
 #include <resetprop.hpp>
 
-#include "magiskhide.hpp"
+#include "deny.hpp"
 
 using namespace std;
 
 static void lazy_unmount(const char* mountpoint) {
     if (umount2(mountpoint, MNT_DETACH) != -1)
-        LOGD("hide: Unmounted (%s)\n", mountpoint);
+        LOGD("denylist: Unmounted (%s)\n", mountpoint);
 }
 
-void hide_daemon(int pid, int client) {
+void revert_daemon(int pid, int client) {
     if (fork_dont_care() == 0) {
-        hide_unmount(pid);
+        revert_unmount(pid);
         write_int(client, 0);
         _exit(0);
     }
@@ -24,11 +24,11 @@ void hide_daemon(int pid, int client) {
 
 #define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && str_starts(mentry->mnt_dir, "/" #dir))
 
-void hide_unmount(int pid) {
+void revert_unmount(int pid) {
     if (pid > 0) {
         if (switch_mnt_ns(pid))
             return;
-        LOGD("hide: handling PID=[%d]\n", pid);
+        LOGD("denylist: handling PID=[%d]\n", pid);
     }
 
     vector<string> targets;

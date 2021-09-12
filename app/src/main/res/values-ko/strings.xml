@@ -137,7 +137,6 @@
     <string name="settings_update_beta">베타</string>
     <string name="settings_update_custom">사용자 지정</string>
     <string name="settings_update_custom_msg">사용자 지정 URL 입력</string>
-    <string name="settings_magiskhide_summary">다양한 감지로부터 Magisk를 숨깁니다.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">광고 차단 앱에서 사용하는 systemless hosts를 지원합니다.</string>
     <string name="settings_hosts_toast">Systemless hosts 모듈 추가됨</string>

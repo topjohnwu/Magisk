@@ -9,17 +9,17 @@
 #include <utils.hpp>
 #include <db.hpp>
 
-#include "magiskhide.hpp"
+#include "deny.hpp"
 
 using namespace std;
 
-static set<pair<string, string>> *hide_set;          /* set of <pkg, process> pair */
+static set<pair<string, string>> *deny_set;          /* set of <pkg, process> pair */
 static map<int, vector<string_view>> *uid_proc_map;  /* uid -> list of process */
 
 // Locks the variables above
-static pthread_mutex_t hide_data_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static atomic<bool> hide_state = false;
+static atomic<bool> enforcement_status = false;
 
 static void rebuild_uid_map() {
     uid_proc_map->clear();
@@ -34,7 +34,7 @@ static void rebuild_uid_map() {
         data_path += '/';
         size_t user_len = data_path.length();
         struct stat st;
-        for (const auto &hide : *hide_set) {
+        for (const auto &hide : *deny_set) {
             if (hide.first == ISOLATED_MAGIC) {
                 if (!first_iter) continue;
                 // Setup isolated processes
@@ -72,7 +72,7 @@ static bool proc_name_match(int pid, const char *name) {
     if (auto fp = open_file(buf, "re")) {
         fgets(buf, sizeof(buf), fp.get());
         if (str_op(buf, name)) {
-            LOGD("hide: kill PID=[%d] (%s)\n", pid, buf);
+            LOGD("denylist: kill PID=[%d] (%s)\n", pid, buf);
             return true;
         }
     }
@@ -129,8 +129,8 @@ static bool validate(const char *pkg, const char *proc) {
 }
 
 static void add_hide_set(const char *pkg, const char *proc) {
-    LOGI("hide_list add: [%s/%s]\n", pkg, proc);
-    hide_set->emplace(pkg, proc);
+    LOGI("denylist add: [%s/%s]\n", pkg, proc);
+    deny_set->emplace(pkg, proc);
     if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
         // Kill all matching isolated processes
         kill_process<&str_starts>(proc, true);
@@ -144,14 +144,14 @@ static int add_list(const char *pkg, const char *proc) {
         proc = pkg;
 
     if (!validate(pkg, proc))
-        return HIDE_INVALID_PKG;
+        return DENYLIST_INVALID_PKG;
 
     {
         // Critical region
-        mutex_guard lock(hide_data_lock);
-        for (const auto &hide : *hide_set)
+        mutex_guard lock(data_lock);
+        for (const auto &hide : *deny_set)
             if (hide.first == pkg && hide.second == proc)
-                return HIDE_ITEM_EXIST;
+                return DENYLIST_ITEM_EXIST;
         add_hide_set(pkg, proc);
         rebuild_uid_map();
     }
@@ -159,7 +159,7 @@ static int add_list(const char *pkg, const char *proc) {
     // Add to database
     char sql[4096];
     snprintf(sql, sizeof(sql),
-            "INSERT INTO hidelist (package_name, process) VALUES('%s', '%s')", pkg, proc);
+            "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DAEMON_ERROR);
     return DAEMON_SUCCESS;
@@ -175,27 +175,27 @@ static int rm_list(const char *pkg, const char *proc) {
     bool remove = false;
     {
         // Critical region
-        mutex_guard lock(hide_data_lock);
-        for (auto it = hide_set->begin(); it != hide_set->end();) {
+        mutex_guard lock(data_lock);
+        for (auto it = deny_set->begin(); it != deny_set->end();) {
             if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
                 remove = true;
-                LOGI("hide_list rm: [%s/%s]\n", it->first.data(), it->second.data());
-                it = hide_set->erase(it);
+                LOGI("denylist rm: [%s/%s]\n", it->first.data(), it->second.data());
+                it = deny_set->erase(it);
             } else {
                 ++it;
             }
         }
         if (!remove)
-            return HIDE_ITEM_NOT_EXIST;
+            return DENYLIST_ITEM_NOT_EXIST;
         rebuild_uid_map();
     }
 
     char sql[4096];
     if (proc[0] == '\0')
-        snprintf(sql, sizeof(sql), "DELETE FROM hidelist WHERE package_name='%s'", pkg);
+        snprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'", pkg);
     else
         snprintf(sql, sizeof(sql),
-                "DELETE FROM hidelist WHERE package_name='%s' AND process='%s'", pkg, proc);
+                "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DAEMON_ERROR);
     return DAEMON_SUCCESS;
@@ -215,9 +215,9 @@ static bool str_ends_safe(string_view s, string_view ss) {
 }
 
 static bool init_list() {
-    LOGD("hide: initialize\n");
+    LOGD("denylist: initialize\n");
 
-    char *err = db_exec("SELECT * FROM hidelist", [](db_row &row) -> bool {
+    char *err = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
         add_hide_set(row["package_name"].data(), row["process"].data());
         return true;
     });
@@ -236,8 +236,8 @@ static bool init_list() {
 void ls_list(int client) {
     write_int(client, DAEMON_SUCCESS);
     {
-        mutex_guard lock(hide_data_lock);
-        for (const auto &hide : *hide_set) {
+        mutex_guard lock(data_lock);
+        for (const auto &hide : *deny_set) {
             write_int(client, hide.first.size() + hide.second.size() + 1);
             xwrite(client, hide.first.data(), hide.first.size());
             xwrite(client, "|", 1);
@@ -251,65 +251,65 @@ void ls_list(int client) {
 static void update_hide_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-            DB_SETTING_KEYS[HIDE_CONFIG], hide_state.load());
+            DB_SETTING_KEYS[DENYLIST_CONFIG], enforcement_status.load());
     char *err = db_exec(sql);
     db_err(err);
 }
 
 int enable_hide() {
-    if (hide_state)
-        return HIDE_IS_ENABLED;
+    if (enforcement_status)
+        return DENY_IS_ENFORCED;
 
     if (access("/proc/self/ns/mnt", F_OK) != 0)
-        return HIDE_NO_NS;
+        return DENY_NO_NS;
 
     if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
         return DAEMON_ERROR;
 
-    LOGI("* Enable MagiskHide\n");
+    LOGI("* Enforce DenyList\n");
 
-    mutex_guard lock(hide_data_lock);
-    default_new(hide_set);
+    mutex_guard lock(data_lock);
+    default_new(deny_set);
     default_new(uid_proc_map);
 
     // Initialize the hide list
     if (!init_list())
         return DAEMON_ERROR;
 
-    hide_state = true;
+    enforcement_status = true;
     update_hide_config();
 
     rebuild_uid_map();
     return DAEMON_SUCCESS;
 }
 
-int disable_hide() {
-    mutex_guard lock(hide_data_lock);
+int disable_deny() {
+    mutex_guard lock(data_lock);
 
-    if (hide_state) {
-        LOGI("* Disable MagiskHide\n");
+    if (enforcement_status) {
+        LOGI("* Disable DenyList\n");
         delete uid_proc_map;
-        delete hide_set;
+        delete deny_set;
         uid_proc_map = nullptr;
-        hide_set = nullptr;
+        deny_set = nullptr;
     }
 
-    hide_state = false;
+    enforcement_status = false;
     update_hide_config();
     return DAEMON_SUCCESS;
 }
 
-void check_enable_hide() {
-    if (!hide_state) {
+void check_enforce_denylist() {
+    if (!enforcement_status) {
         db_settings dbs;
-        get_db_settings(dbs, HIDE_CONFIG);
-        if (dbs[HIDE_CONFIG])
+        get_db_settings(dbs, DENYLIST_CONFIG);
+        if (dbs[DENYLIST_CONFIG])
             enable_hide();
     }
 }
 
-bool is_hide_target(int uid, string_view process) {
-    mutex_guard lock(hide_data_lock);
+bool is_deny_target(int uid, string_view process) {
+    mutex_guard lock(data_lock);
 
     if (uid % 100000 >= 90000) {
         // Isolated processes
@@ -334,6 +334,6 @@ bool is_hide_target(int uid, string_view process) {
     return false;
 }
 
-bool hide_enabled() {
-    return hide_state;
+bool deny_enforced() {
+    return enforcement_status;
 }

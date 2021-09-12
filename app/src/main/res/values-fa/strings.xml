@@ -134,7 +134,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom Channel</string>
     <string name="settings_update_custom_msg">اضافه کردن یک URL سفارشی</string>
-    <string name="settings_magiskhide_summary">پنهان کردن Magisk از اشکال مختلف</string>
     <string name="settings_hosts_title">نصب بدون حذف یا تغییر در فایل ها</string>
     <string name="settings_hosts_summary">نصب بدون حذف یا تغییر در فایل ها رای ساپورت از برنامه های Adblock</string>
     <string name="settings_hosts_toast">ماژول نصب بدون حذف یا تغییر در فایل ها اضافه شد</string>

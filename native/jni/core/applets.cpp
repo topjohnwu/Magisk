@@ -10,7 +10,7 @@ using namespace std;
 
 using main_fun = int (*)(int, char *[]);
 
-static main_fun applet_main[] = { su_client_main, resetprop_main, magiskhide_main, nullptr };
+static main_fun applet_main[] = { su_client_main, resetprop_main, nullptr };
 
 static int call_applet(int argc, char *argv[]) {
     // Applets

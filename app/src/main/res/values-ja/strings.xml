@@ -146,7 +146,6 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタム URL を入力</string>
-    <string name="settings_magiskhide_summary">さまざまな検出方法から Magisk を隠します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>

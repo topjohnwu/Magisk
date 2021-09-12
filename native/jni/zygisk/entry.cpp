@@ -10,7 +10,7 @@
 #include <magisk.hpp>
 
 #include "inject.hpp"
-#include "../magiskhide/magiskhide.hpp"
+#include "../deny/deny.hpp"
 
 using namespace std;
 
@@ -255,22 +255,22 @@ static void setup_files(int client, ucred *cred) {
 }
 
 static void check_denylist(int client) {
-    if (!hide_enabled()) {
-        write_int(client, HIDE_NOT_ENABLED);
+    if (!deny_enforced()) {
+        write_int(client, DENY_NOT_ENFORCED);
         return;
     }
     write_int(client, 0);
     int uid = read_int(client);
     string process = read_string(client);
-    write_int(client, is_hide_target(uid, process));
+    write_int(client, is_deny_target(uid, process));
 }
 
 static void do_unmount(int client, ucred *cred) {
-    LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
-    if (hide_enabled()) {
-        hide_daemon(cred->pid, client);
+    if (deny_enforced()) {
+        LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
+        revert_daemon(cred->pid, client);
     } else {
-        write_int(client, HIDE_NOT_ENABLED);
+        write_int(client, DENY_NOT_ENFORCED);
     }
 }
 

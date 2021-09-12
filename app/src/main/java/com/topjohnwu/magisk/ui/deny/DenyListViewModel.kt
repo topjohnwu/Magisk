@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.hide
+package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class HideViewModel : BaseViewModel(), Queryable {
+class DenyListViewModel : BaseViewModel(), Queryable {
 
     override val queryDelay = 1000L
 
@@ -43,11 +43,11 @@ class HideViewModel : BaseViewModel(), Queryable {
             submitQuery()
         }
 
-    val items = filterableListOf<HideRvItem>()
-    val itemBinding = itemBindingOf<HideRvItem> {
+    val items = filterableListOf<DenyListRvItem>()
+    val itemBinding = itemBindingOf<DenyListRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
-    val itemInternalBinding = itemBindingOf<HideProcessRvItem> {
+    val itemInternalBinding = itemBindingOf<ProcessRvItem> {
         it.bindExtra(BR.viewModel, this)
     }
 
@@ -60,14 +60,14 @@ class HideViewModel : BaseViewModel(), Queryable {
         state = State.LOADING
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
-            val hideList = Shell.su("magiskhide ls").exec().out.map { CmdlineHiddenItem(it) }
+            val hideList = Shell.su("magisk --denylist ls").exec().out.map { CmdlineListItem(it) }
             val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES)
                 .asSequence()
                 .filterNot { blacklist.contains(it.packageName) }
-                .map { HideAppInfo(it, pm, hideList) }
+                .map { AppProcessInfo(it, pm, hideList) }
                 .filter { it.processes.isNotEmpty() }
-                .filter { info -> info.enabled || info.processes.any { it.isHidden } }
-                .map { HideRvItem(it) }
+                .filter { info -> info.enabled || info.processes.any { it.isEnabled } }
+                .map { DenyListRvItem(it) }
                 .toList()
                 .sorted()
             apps to items.calculateDiff(apps)

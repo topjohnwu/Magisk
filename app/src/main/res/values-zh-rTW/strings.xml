@@ -146,7 +146,6 @@
     <string name="settings_update_beta">測試版</string>
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
-    <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>
     <string name="settings_hosts_title">主機（Hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>

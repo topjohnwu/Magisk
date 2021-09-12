@@ -144,7 +144,6 @@
     <string name="settings_update_beta">בטא</string>
     <string name="settings_update_custom">ערוץ מותאם אישית</string>
     <string name="settings_update_custom_msg">הזן כתובת מותאמת אישית</string>
-    <string name="settings_magiskhide_summary">הסתר את Magisk מצורות זיהוי שונות</string>
     <string name="settings_hosts_title">מארחים חסרי מערכת</string>
     <string name="settings_hosts_summary">מארחים חסרי מערכת תומכים ביישומים חוסמי פרסומות</string>
     <string name="settings_hosts_toast">הוסף מודול מארחים חסרי מערכת</string>
@@ -190,7 +189,7 @@
     <string name="global_summary">כלל חיבורי השורש משתמשים במרחב שם הגלובלי</string>
     <string name="requester_summary">חיבורי השורש יירשו את מרחב השם של המבקש</string>
     <string name="isolate_summary">לכל חיבור שורש יהיה מרחב שם מבודד</string>
-	
+
     <!--Notifications-->
     <string name="update_channel">עדכוני Magisk</string>
     <string name="progress_channel">התראות התקדמות</string>

@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+            type="com.topjohnwu.magisk.ui.deny.DenyListViewModel" />
 
     </data>
 
@@ -27,7 +27,7 @@
         tools:paddingBottom="64dp">
 
         <TextView
-            android:id="@+id/hide_filter_title_filter"
+            android:id="@+id/filter_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/hide_filters"
@@ -45,7 +45,7 @@
             app:chipSpacing="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_filter">
+            app:layout_constraintTop_toBottomOf="@+id/filter_title">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/hide_filter_system_chip"
@@ -83,7 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checkable="false"
-                android:nextFocusRight="@id/hide_filter_done"
+                android:nextFocusRight="@id/filter_done"
                 android:nextFocusDown="@id/hide_filter_search_field"
                 android:text="@{viewModel.query}"
                 android:textAppearance="@style/AppearanceFoundation.Caption"
@@ -113,7 +113,7 @@
             android:layout_marginBottom="@dimen/l_50"
             app:cardCornerRadius="18dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/hide_filter_done"
+            app:layout_constraintEnd_toStartOf="@+id/filter_done"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/hide_filter_title_search">
 
@@ -136,7 +136,7 @@
                 android:hint="@string/hide_filter_hint"
                 android:inputType="textUri"
                 android:minHeight="36dp"
-                android:nextFocusRight="@id/hide_filter_done"
+                android:nextFocusRight="@id/filter_done"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/l1"
                 android:singleLine="true"
@@ -148,7 +148,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/hide_filter_done"
+            android:id="@+id/filter_done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:nextFocusLeft="@id/hide_filter_system_chip"

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.hide
+package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.ktx.isIsolated
 import com.topjohnwu.magisk.ktx.useAppZygote
 
-class CmdlineHiddenItem(line: String) {
+class CmdlineListItem(line: String) {
     val packageName: String
     val process: String
 
@@ -27,19 +27,19 @@ class CmdlineHiddenItem(line: String) {
 const val ISOLATED_MAGIC = "isolated"
 
 @SuppressLint("InlinedApi")
-class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<CmdlineHiddenItem>)
-    : ApplicationInfo(info), Comparable<HideAppInfo> {
+class AppProcessInfo(info: ApplicationInfo, pm: PackageManager, denyList: List<CmdlineListItem>)
+    : ApplicationInfo(info), Comparable<AppProcessInfo> {
 
     val label = info.getLabel(pm)
     val iconImage: Drawable = info.loadIcon(pm)
-    val processes = fetchProcesses(pm, hideList)
+    val processes = fetchProcesses(pm, denyList)
 
-    override fun compareTo(other: HideAppInfo) = comparator.compare(this, other)
+    override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
 
     private fun fetchProcesses(
         pm: PackageManager,
-        hideList: List<CmdlineHiddenItem>
-    ): List<HideProcessInfo> {
+        denylist: List<CmdlineListItem>
+    ): List<ProcessInfo> {
         // Fetch full PackageInfo
         val baseFlag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES
         val packageInfo = try {
@@ -58,9 +58,9 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
             }
         }
 
-        val hidden = hideList.filter { it.packageName == packageName || it.packageName == ISOLATED_MAGIC }
-        fun createProcess(name: String, pkg: String = packageName): HideProcessInfo {
-            return HideProcessInfo(name, pkg, hidden.any { it.process == name && it.packageName == pkg })
+        val enabledList = denylist.filter { it.packageName == packageName || it.packageName == ISOLATED_MAGIC }
+        fun createProcess(name: String, pkg: String = packageName): ProcessInfo {
+            return ProcessInfo(name, pkg, enabledList.any { it.process == name && it.packageName == pkg })
         }
 
         var haveAppZygote = false
@@ -90,17 +90,17 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
     }
 
     companion object {
-        private val comparator = compareBy<HideAppInfo>(
-            { it.label.toLowerCase(currentLocale) },
+        private val comparator = compareBy<AppProcessInfo>(
+            { it.label.lowercase(currentLocale) },
             { it.packageName }
         )
     }
 }
 
-data class HideProcessInfo(
+data class ProcessInfo(
     val name: String,
     val packageName: String,
-    var isHidden: Boolean
+    var isEnabled: Boolean
 ) {
     val isIsolated get() = packageName == ISOLATED_MAGIC
     val isAppZygote get() = name.endsWith("_zygote")

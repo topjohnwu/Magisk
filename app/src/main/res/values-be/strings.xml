@@ -136,7 +136,6 @@
     <string name="settings_update_beta">Бэта</string>
     <string name="settings_update_custom">Адвольны канал</string>
     <string name="settings_update_custom_msg">Устаўце URL</string>
-    <string name="settings_magiskhide_summary">Хаваць Magisk ад выяўлення</string>
     <string name="settings_hosts_title">Пазасістэмны файл hosts</string>
     <string name="settings_hosts_summary">Падтрымка пазасістэмнага файла hosts для праграм, якія блакуюць рэкламу</string>
     <string name="settings_hosts_toast">Дададзены модуль пазасістэмнага файла hosts</string>

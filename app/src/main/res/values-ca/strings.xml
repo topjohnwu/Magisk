@@ -146,7 +146,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
     <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
-    <string name="settings_magiskhide_summary">Amagar Magisk de diverses deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>

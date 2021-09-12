@@ -10,6 +10,7 @@
     <string name="section_home">Home</string>
     <string name="section_theme">Themes</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">DenyList</string>
 
     <!--Home-->
     <string name="no_connection">No connection available</string>
@@ -146,7 +147,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom Channel</string>
     <string name="settings_update_custom_msg">Insert a custom URL</string>
-    <string name="settings_magiskhide_summary">Hide Magisk from various forms of detection</string>
+    <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>

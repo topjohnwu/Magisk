@@ -9,11 +9,11 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.hide.HideRvItem" />
+            type="com.topjohnwu.magisk.ui.deny.DenyListRvItem" />
 
         <variable
             name="viewModel"
-            type="com.topjohnwu.magisk.ui.hide.HideViewModel" />
+            type="com.topjohnwu.magisk.ui.deny.DenyListViewModel" />
 
     </data>
 
@@ -80,7 +80,7 @@
 
                 <com.topjohnwu.widget.IndeterminateCheckBox
                     android:id="@+id/hide_expand_icon"
-                    state="@={item.hiddenState}"
+                    state="@={item.state}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/l1"

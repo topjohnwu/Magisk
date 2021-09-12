@@ -140,7 +140,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kanal khusus</string>
     <string name="settings_update_custom_msg">Masukkan URL khusus</string>
-    <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian</string>
     <string name="settings_hosts_title">Host systemless</string>
     <string name="settings_hosts_summary">Dukungan host secara systemless untuk aplikasi pemblokir iklan</string>
     <string name="settings_hosts_toast">Menambahkan modul host systemless</string>

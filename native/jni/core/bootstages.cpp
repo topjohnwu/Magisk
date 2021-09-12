@@ -296,12 +296,12 @@ void post_fs_data(int client) {
 
     if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
         safe_mode = true;
-        // Disable all modules and magiskhide so next boot will be clean
+        // Disable all modules and denylist so next boot will be clean
         disable_modules();
-        disable_hide();
+        disable_deny();
     } else {
         exec_common_scripts("post-fs-data");
-        check_enable_hide();
+        check_enforce_denylist();
         handle_modules();
     }
 
@@ -350,7 +350,7 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    check_enable_hide();
+    check_enforce_denylist();
 
     if (!check_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {

@@ -141,7 +141,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canale personalizzato</string>
     <string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
-    <string name="settings_magiskhide_summary">Nasconde Magisk da numerosi sistemi di rilevazione</string>
     <string name="settings_hosts_title">File hosts systemless</string>
     <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
     <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>

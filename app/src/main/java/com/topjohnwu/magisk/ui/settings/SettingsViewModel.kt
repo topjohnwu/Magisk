@@ -70,8 +70,11 @@ class SettingsViewModel(
         if (Info.env.isActive) {
             list.addAll(listOf(
                 Magisk,
-                MagiskHide, SystemlessHosts
+                SystemlessHosts
             ))
+            if (Const.Version.isCanary()) {
+                list.add(DenyList)
+            }
         }
 
         // Superuser

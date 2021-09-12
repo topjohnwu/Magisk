@@ -146,7 +146,6 @@
     <string name="settings_update_beta">தற்காலிகமானது</string>
     <string name="settings_update_custom">தனிப்பயன் வழி</string>
     <string name="settings_update_custom_msg">தனிப்பயன் URL ஐ உள்ளிடவும்</string>
-    <string name="settings_magiskhide_summary">பல்வேறு வகையான கண்டறிதலில் இருந்து மேகிஸ்கை மறைக்கவும்</string>
     <string name="settings_hosts_title">கணினி இல்லாத ஹோஸ்ட்கள்</string>
     <string name="settings_hosts_summary">கணினி இல்லாத ஹோஸ்ட்கள் Adblock பயன்பாடுகளுக்கு ஆதரவளிக்கின்றன</string>
     <string name="settings_hosts_toast">கணினி இல்லாத ஹோஸ்ட்கள் தொகுதி சேர்க்கப்பட்டது</string>

@@ -63,7 +63,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">По наруџби</string>
     <string name="settings_update_custom_msg">Унеси наруџбени УРЛ</string>
-    <string name="settings_magiskhide_summary">Сакриј Магиск од разних детекција</string>
     <string name="settings_hosts_title">Без-системски домаћини (hosts)</string>
     <string name="settings_hosts_summary">Подршка без-системских домаћина за апликације за блокирање реклама</string>
 
