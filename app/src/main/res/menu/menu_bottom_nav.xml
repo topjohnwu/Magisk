@@ -15,6 +15,12 @@
         tools:showAsAction="always" />
 
     <item
+        android:id="@+id/hideFragment"
+        android:icon="@drawable/ic_hide_md2"
+        android:title="@string/magiskhide"
+        tools:showAsAction="always" />
+
+    <item
         android:id="@+id/logFragment"
         android:icon="@drawable/ic_bug_md2"
         android:title="@string/logs"

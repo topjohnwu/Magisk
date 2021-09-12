@@ -11,7 +11,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
-import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
@@ -61,6 +60,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.homeFragment,
                 R.id.modulesFragment,
                 R.id.superuserFragment,
+                R.id.hideFragment,
                 R.id.logFragment -> true
                 else -> false
             }
@@ -77,11 +77,11 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         setSupportActionBar(binding.mainToolbar)
 
-        binding.mainNavigation.setOnNavigationItemSelectedListener {
+        binding.mainNavigation.setOnItemSelectedListener {
             getScreen(it.itemId)?.navigate()
             true
         }
-        binding.mainNavigation.setOnNavigationItemReselectedListener {
+        binding.mainNavigation.setOnItemReselectedListener {
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
 
@@ -183,6 +183,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             R.id.modulesFragment -> MainDirections.actionModuleFragment()
             R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
             R.id.logFragment -> MainDirections.actionLogFragment()
+            R.id.hideFragment -> MainDirections.actionHideFragment()
             else -> null
         }
     }

@@ -38,7 +38,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l1"
+            android:layout_marginBottom="72dp"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:layout_fitsSystemWindowsInsets="bottom"
             app:srcCompat="@drawable/ic_search_md2"
@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:visibility="invisible"
+            app:layout_fitsSystemWindowsInsets="bottom"
             app:cardCornerRadius="0dp">
 
             <include

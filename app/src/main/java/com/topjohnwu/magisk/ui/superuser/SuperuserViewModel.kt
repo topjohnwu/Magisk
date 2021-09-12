@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
@@ -19,7 +18,6 @@ import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
-import com.topjohnwu.magisk.view.TappableHeadlineItem
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +26,7 @@ import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
     private val db: PolicyDao
-) : BaseViewModel(), TappableHeadlineItem.Listener {
+) : BaseViewModel() {
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
@@ -36,10 +34,8 @@ class SuperuserViewModel(
     private val itemsHelpers = ObservableArrayList<TextItem>()
 
     val adapter = adapterOf<AnyDiffRvItem>()
-    val items = MergeObservableList<AnyDiffRvItem>().apply {
-        if (Config.magiskHide)
-            insertItem(TappableHeadlineItem.Hide)
-    }.insertList(itemsHelpers)
+    val items = MergeObservableList<AnyDiffRvItem>()
+        .insertList(itemsHelpers)
         .insertList(itemsPolicies)
     val itemBinding = itemBindingOf<AnyDiffRvItem> {
         it.bindExtra(BR.listener, this)
@@ -72,14 +68,6 @@ class SuperuserViewModel(
     }
 
     // ---
-
-    override fun onItemPressed(item: TappableHeadlineItem) = when (item) {
-        TappableHeadlineItem.Hide -> hidePressed()
-        else -> Unit
-    }
-
-    private fun hidePressed() =
-        SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().navigate()
 
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {

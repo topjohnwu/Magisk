@@ -110,17 +110,7 @@
         android:id="@+id/superuserFragment"
         android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
         android:label="SuperuserFragment"
-        tools:layout="@layout/fragment_superuser_md2">
-
-        <action
-            android:id="@+id/action_superuserFragment_to_hideFragment"
-            app:destination="@id/hideFragment"
-            app:enterAnim="@anim/fragment_enter"
-            app:exitAnim="@anim/fragment_exit"
-            app:popEnterAnim="@anim/fragment_enter_pop"
-            app:popExitAnim="@anim/fragment_exit_pop" />
-
-    </fragment>
+        tools:layout="@layout/fragment_superuser_md2" />
 
     <fragment
         android:id="@+id/themeFragment"
@@ -180,6 +170,7 @@
         app:enterAnim="@anim/fragment_enter"
         app:exitAnim="@anim/fragment_exit"
         app:popEnterAnim="@anim/fragment_enter_pop"
-        app:popExitAnim="@anim/fragment_exit_pop" />
+        app:popExitAnim="@anim/fragment_exit_pop"
+        app:popUpTo="@id/homeFragment"/>
 
 </navigation>
