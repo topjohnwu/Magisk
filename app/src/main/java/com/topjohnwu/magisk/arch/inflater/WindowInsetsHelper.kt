@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package com.topjohnwu.magisk.ui.inflater
+package com.topjohnwu.magisk.arch.inflater
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi

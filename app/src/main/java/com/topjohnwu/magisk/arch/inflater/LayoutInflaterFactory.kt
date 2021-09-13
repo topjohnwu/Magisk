@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ui.inflater
+package com.topjohnwu.magisk.arch.inflater
 
 import android.content.Context
 import android.util.AttributeSet

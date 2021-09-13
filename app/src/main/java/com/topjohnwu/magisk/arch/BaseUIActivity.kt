@@ -14,9 +14,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.arch.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ui.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
