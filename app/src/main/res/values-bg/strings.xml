@@ -43,13 +43,13 @@
     <string name="repo_install_msg">Желаете ли да инсталирате %1$s сега?</string>
     <string name="download">Изтегляне</string>
     <string name="reboot">Рестартиране</string>
-    <string name="magisk_update_title">Налице е нова версия на Magisk.</string>
+    <string name="magisk_update_title">Достъпно е издание на Magisk.</string>
     <string name="release_notes">Бележки</string>
     <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
-    <string name="open_link_failed_toast">Не бе намерено приложение за отваряне на линка.</string>
+    <string name="open_link_failed_toast">Не е намерено приложение за отваряне на препратката.</string>
     <string name="direct_install">Директно инсталиране (Препоръчва се.)</string>
     <string name="install_inactive_slot">Инсталиране на неактивен слот (След OTA)</string>
     <string name="install_inactive_slot_msg">Вашето устройство НАЛОЖИТЕЛНО ще стартира текущия неактивен слот при следващото рестартиране.\nИзползвайте тази опция само след като приключи инсталирането на OTA.\nПродължаване?</string>
@@ -64,7 +64,7 @@
     <string name="env_fix_title">Изисква допълнително настройване</string>
     <string name="setup_title">Допълнително надстройване</string>
     <string name="setup_msg">Надстройването на средата е в ход…</string>
-    <string name="download_file_error">Грешка при изтеглянето на файла.</string>
+    <string name="download_file_error">Грешка при изтегляне на файла.</string>
 
     <!--Settings Activity -->
     <string name="language">Език</string>
@@ -75,10 +75,10 @@
     <string name="settings_update_stable">Стабилен</string>
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Потребителски</string>
-    <string name="settings_update_custom_msg">Въведете потребителски URL</string>
+    <string name="settings_update_custom_msg">Въведете потребителски адрес</string>
     <string name="settings_hosts_title">Несистемни хостове</string>
     <string name="settings_hosts_summary">Поддръжка на несистемни хостове за използване на приложения, блокиращи реклами.</string>
-    <string name="settings_hosts_toast">Бе добавен модул с несистемни хостове.</string>
+    <string name="settings_hosts_toast">Добавен е модул с несистемни хостове.</string>
 
     <string name="settings_su_app_adb">Приложения и ADB</string>
     <string name="settings_su_app">Само приложения</string>
@@ -118,23 +118,23 @@
     <string name="deny">Отказ</string>
     <string name="prompt">Запитване</string>
     <string name="grant">Разрешаване</string>
-    <string name="su_warning">Дава пълен достъп до устройството Ви.\Откажете, ако не сте сигурен/на.</string>
+    <string name="su_warning">Дава пълен достъп до устройството.\Откажете, ако не сте сигурни.</string>
     <string name="forever">Завинаги</string>
     <string name="once">Веднъж</string>
     <string name="tenmin">10 мин</string>
     <string name="twentymin">20 мин</string>
     <string name="thirtymin">30 мин</string>
     <string name="sixtymin">60 мин</string>
-    <string name="su_allow_toast">На %1$s бе разрешен Superuser достъп.</string>
-    <string name="su_deny_toast">На %1$s бе отказан Superuser достъп.</string>
+    <string name="su_allow_toast">На %1$s е разрешен Superuser достъп.</string>
+    <string name="su_deny_toast">На %1$s е отказан Superuser достъп.</string>
     <string name="su_snack_grant">На %1$s е предоставен Superuser достъп.</string>
     <string name="su_snack_deny">На %1$s е отказан Superuser достъп.</string>
     <string name="su_snack_notif_on">Известията за %1$s са включени.</string>
     <string name="su_snack_notif_off">Известията за %1$s са изключени.</string>
     <string name="su_snack_log_on">Записването в дневника за %1$s е включено.</string>
     <string name="su_snack_log_off">Записването в дневника за %1$s е изключено.</string>
-    <string name="su_revoke_title">Анулиране?</string>
-    <string name="su_revoke_msg">Потвърждавате ли анулирането на настройките за достъп на %1$s?</string>
+    <string name="su_revoke_title">Оттегляне?</string>
+    <string name="su_revoke_msg">Потвърждавате ли оттегляне на достъпа на %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Без</string>
 
