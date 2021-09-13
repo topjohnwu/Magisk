@@ -33,14 +33,6 @@
             app:popEnterAnim="@anim/fragment_enter_pop"
             app:popExitAnim="@anim/fragment_exit_pop" />
 
-        <action
-            android:id="@+id/action_homeFragment_to_safetynetFragment"
-            app:destination="@id/safetynetFragment"
-            app:enterAnim="@anim/fragment_enter"
-            app:exitAnim="@anim/fragment_exit"
-            app:popEnterAnim="@anim/fragment_enter_pop"
-            app:popExitAnim="@anim/fragment_exit_pop" />
-
     </fragment>
 
     <fragment
@@ -83,12 +75,6 @@
         android:name="com.topjohnwu.magisk.ui.module.ModuleFragment"
         android:label="ModuleFragment"
         tools:layout="@layout/fragment_module_md2" />
-
-    <fragment
-        android:id="@+id/safetynetFragment"
-        android:name="com.topjohnwu.magisk.ui.safetynet.SafetynetFragment"
-        android:label="SafetynetFragment"
-        tools:layout="@layout/fragment_safetynet_md2" />
 
     <fragment
         android:id="@+id/settingsFragment"
