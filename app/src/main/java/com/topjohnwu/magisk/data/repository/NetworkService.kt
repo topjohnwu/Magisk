@@ -6,7 +6,6 @@ import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CUSTOM_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.network.*
 import retrofit2.HttpException
@@ -59,13 +58,7 @@ class NetworkService(
         }
     }
 
-    // Modules related
-    suspend fun fetchRepoInfo(url: String = Const.Url.OFFICIAL_REPO) = safe {
-        raw.fetchRepoInfo(url)
-    }
-
     // Fetch files
-    suspend fun fetchSafetynet() = wrap { jsd.fetchSafetynet() }
     suspend fun fetchBootctl() = wrap { jsd.fetchBootctl() }
     suspend fun fetchInstaller() = wrap {
         val sha = fetchMainVersion()
