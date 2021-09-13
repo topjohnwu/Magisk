@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">எப்போதும் இருண்டது</string>
     <string name="settings_download_path_title">பதிவிறக்க இடம்</string>
     <string name="settings_download_path_message">%1$s ல் கோப்புகள் சேமிக்கப்படும்</string>
-    <string name="settings_clear_cache_title">ரெப்போ கேச் அழிக்கவும்</string>
-    <string name="settings_clear_cache_summary">ஆன்லைன் களஞ்சியங்களுக்கான தற்காலிக சேமிப்பை அழிக்கவும். இது ஆன்லைனில் புதுப்பிக்க பயன்பாட்டை கட்டாயப்படுத்துகிறது</string>
     <string name="settings_hide_app_title">மேஜிஸ்க் செயலியை மறைக்கவும்</string>
     <string name="settings_hide_app_summary">சீரற்ற தொகுப்பு ஐடி மற்றும் தனிப்பயன் பயன்பாட்டு லேபிளுடன் ப்ராக்ஸி பயன்பாட்டை நிறுவவும்</string>
     <string name="settings_restore_app_title">மேஜிஸ்க் பயன்பாட்டை மீட்டமை</string>

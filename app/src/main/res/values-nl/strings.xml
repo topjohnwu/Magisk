@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Donker</string>
     <string name="settings_download_path_title">Downloadpad</string>
     <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
-    <string name="settings_clear_cache_title">Pakketbroncache wissen</string>
-    <string name="settings_clear_cache_summary">Wis de opgeslagen informatie van de online-pakketbronnen. Hierdoor wordt de app online ververst.</string>
     <string name="language">Taal</string>
     <string name="system_default">(systeemstandaard)</string>
     <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>

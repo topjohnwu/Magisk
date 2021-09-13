@@ -123,8 +123,6 @@
     <string name="settings_dark_mode_dark">همیشه تاریک</string>
     <string name="settings_download_path_title">مسیر دانلود</string>
     <string name="settings_download_path_message">فایل ها در %1$s ذخیره خواهند شد.</string>
-    <string name="settings_clear_cache_title">پاک کردن حافظه پنهان</string>
-    <string name="settings_clear_cache_summary">پاک کردن اطلاعات ذخیره شده برای ریپوسیتوری های آنلاین. این کار برنامه را مجبور به دریافت دوباره اطللاعات هنگام آنلاین شدن میکند</string>
     <string name="language">زبان</string>
     <string name="system_default">(پیش فرض سیستم)</string>
     <string name="settings_check_update_title">چک کردن بروز رسانی ها</string>

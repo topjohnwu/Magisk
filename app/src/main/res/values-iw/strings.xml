@@ -129,8 +129,6 @@
     <string name="settings_dark_mode_dark">תמיד כהה</string>
     <string name="settings_download_path_title">נתיב הורדה</string>
     <string name="settings_download_path_message">הקבצים ישמרו אל %1$s</string>
-    <string name="settings_clear_cache_title">נקה מטמון ריפו</string>
-    <string name="settings_clear_cache_summary">נקה מידע זיכרון מטמון עבור ריפו מקוונים, זה יכריח את היישום לרענן באופן מקוון</string>
     <string name="settings_hide_app_title">הסתר את היישום Magisk</string>
     <string name="settings_hide_app_summary">התקן יישום מתווך עם מזהה חבילה אקראי ותווית שם מותאמת אישית</string>
     <string name="settings_restore_app_title">שחזר את יישום Magisk</string>

@@ -130,8 +130,6 @@
     ]]>
     <string name="settings_download_path_title">Caminho de Download</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
-    <string name="settings_clear_cache_title">Limpar cache do repositório</string>
-    <string name="settings_clear_cache_summary">Limpe as informações em cache para repositórios online. Isso força o aplicativo a atualizar on-line</string>
     <string name="settings_hide_app_title">Esconder o app do Magisk</string>
     <string name="settings_hide_app_summary">Instala um app proxy com ID de pacote aleatorio e nome de app personalizado</string>
     <string name="settings_restore_app_title">Restaura o app do Magisk</string>

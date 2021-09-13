@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Toujours sombre</string>
     <string name="settings_download_path_title">Répertoire de téléchargement</string>
     <string name="settings_download_path_message">Les fichiers seront enregistrés sous %1$s</string>
-    <string name="settings_clear_cache_title">Vider le cache des dépôts</string>
-    <string name="settings_clear_cache_summary">Effacer les informations en cache concerant les dépôts en ligne. Ceci force l’application à télécharger des informations à jour.</string>
     <string name="settings_hide_app_title">Masquer l’application Magisk</string>
     <string name="settings_hide_app_summary">Installer une application intermédiaire avec un identifiant de paquet aléatoire et un nom personnalisé</string>
     <string name="settings_restore_app_title">Restaurer l’application Magisk</string>

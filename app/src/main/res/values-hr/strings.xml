@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Uvijek crna</string>
     <string name="settings_download_path_title">Putanja preuzimanja</string>
     <string name="settings_download_path_message">Datoteke će biti spremljene u %1$s</string>
-    <string name="settings_clear_cache_title">Obriši predmemoriju repozitorija</string>
-    <string name="settings_clear_cache_summary">Obrišite predmemorirane podatke za mrežne repozitorije. To prisiljava aplikaciju da se osvježi na mreži</string>
     <string name="language">Jezik</string>
     <string name="system_default">(Zadano sustavom)</string>
     <string name="settings_check_update_title">Provjeri za ažuriranja</string>

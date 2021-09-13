@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Tmavý</string>
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
-    <string name="settings_clear_cache_title">Smazat mezipaměť</string>
-    <string name="settings_clear_cache_summary">Smažete online informace o použití z mezipaměti, a tím na aplikaci vynutíte obnovení online informací.</string>
     <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
     <string name="settings_hide_app_summary">Skryjete aplikaci náhodným ID balíčku a vlastním názvem aplikace.</string>
     <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>

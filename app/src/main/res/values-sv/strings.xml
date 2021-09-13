@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Alltid mörk</string>
     <string name="settings_download_path_title">Nedladdningsmapp</string>
     <string name="settings_download_path_message">Filer kommer att spara till %1$s</string>
-    <string name="settings_clear_cache_title">Rensa Repo Cache</string>
-    <string name="settings_clear_cache_summary">Rensa den lagrade informationen för online-repos. Tvingar appen att uppdatera online</string>
     <string name="settings_hide_app_title">Göm Magisk-appen</string>
     <string name="settings_hide_app_summary">Installera en proxy-app med ett slumpmässigt paket-ID och appnamn</string>
     <string name="settings_restore_app_title">Återställ Magisk-appen</string>

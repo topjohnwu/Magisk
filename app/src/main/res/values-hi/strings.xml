@@ -128,8 +128,6 @@
     <string name="settings_dark_mode_dark">हमेशा गहरे रंग वाली</string>
     <string name="settings_download_path_title">डाउनलोड पथ</string>
     <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
-    <string name="settings_clear_cache_title">रेपो कैश साफ़ करें</string>
-    <string name="settings_clear_cache_summary">ऑनलाइन रेपो के लिए कैश्ड जानकारी साफ़ करें। यह एप्लिकेशन को ऑनलाइन रिफ्रेश करने के लिए मजबूर करता है</string>
     <string name="language">भाषा</string>
     <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
     <string name="settings_check_update_title">अपडेट जांचें</string>

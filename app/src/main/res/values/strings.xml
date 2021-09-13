@@ -132,8 +132,6 @@
     <string name="settings_dark_mode_dark">Always Dark</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
-    <string name="settings_clear_cache_title">Clear Repo Cache</string>
-    <string name="settings_clear_cache_summary">Clear the cached information for online repos. This forces the app to refresh online</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
     <string name="settings_hide_app_summary">Install a proxy app with random package ID and custom app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>

@@ -13,7 +13,6 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.data.database.RepoDao
 import com.topjohnwu.magisk.databinding.adapterOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.di.AppContext
@@ -25,9 +24,7 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(
-    private val repositoryDao: RepoDao
-) : BaseViewModel(), BaseSettingsItem.Callback {
+class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
 
     val adapter = adapterOf<BaseSettingsItem>()
     val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
@@ -57,7 +54,6 @@ class SettingsViewModel(
             UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
-            list.add(ClearRepoCache)
             if (Const.USER_ID == 0) {
                 if (hidden)
                     list.add(Restore)
@@ -106,7 +102,6 @@ class SettingsViewModel(
         is Biometrics -> authenticate(callback)
         is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
         is DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
-        is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
         is Restore -> HideAPK.restore(view.activity)
         is AddShortcut -> AddHomeIconEvent().publish()
@@ -134,13 +129,6 @@ class SettingsViewModel(
             // allow the change on success
             onSuccess { callback() }
         }.publish()
-    }
-
-    private fun clearRepoCache() {
-        viewModelScope.launch {
-            repositoryDao.clear()
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
-        }
     }
 
     private fun createHosts() {

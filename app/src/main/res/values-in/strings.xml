@@ -129,8 +129,6 @@
     <string name="settings_dark_mode_dark">Selalu gelap</string>
     <string name="settings_download_path_title">Lokasi download</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
-    <string name="settings_clear_cache_title">Hapus cache repo</string>
-    <string name="settings_clear_cache_summary">Hapus cache informasi repo online. Tindakan ini memaksa aplikasi untuk memperbarui repo online</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default sistem)</string>
     <string name="settings_check_update_title">Periksa update</string>

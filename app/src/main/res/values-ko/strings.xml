@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">다크 모드</string>
     <string name="settings_download_path_title">다운로드 경로</string>
     <string name="settings_download_path_message">파일이 %1$s에 저장됩니다</string>
-    <string name="settings_clear_cache_title">저장소 캐시 비우기</string>
-    <string name="settings_clear_cache_summary">온라인 저장소에 대해 캐시된 정보를 지우고, 온라인에서 정보를 강제로 새로 고칩니다.</string>
     <string name="language">언어</string>
     <string name="system_default">(시스템 기본값)</string>
     <string name="settings_check_update_title">업데이트 확인</string>

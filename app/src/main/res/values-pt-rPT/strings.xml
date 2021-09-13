@@ -50,8 +50,6 @@
     <string name="download_file_error">Erro ao transferir ficheiro</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Apagar Cache de Repositório</string>
-    <string name="settings_clear_cache_summary">Apaga a informação cache de repositórios online. online, forçando a aplicação a atualizar online</string>
     <string name="language">Língua</string>
     <string name="system_default">(Padrão do Sistema)</string>
     <string name="settings_update_stable">Estável</string>

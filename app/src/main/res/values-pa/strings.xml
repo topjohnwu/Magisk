@@ -128,8 +128,6 @@
     <string name="settings_dark_mode_dark">ਹਮੇਸ਼ਾ ਗਹਿਰੇ ਰੰਗ ਦੀ</string>
     <string name="settings_download_path_title">ਡਾਊਨਲੋਡ ਮਾਰਗ</string>
     <string name="settings_download_path_message">ਫਾਈਲਾਂ ਨੂੰ %1$s ਵਿੱਚ ਸੇਵ ਕੀਤਾ ਜਾਏਗਾ</string>
-    <string name="settings_clear_cache_title">ਰੈਪੋ ਕੈਚੇ ਸਾਫ਼ ਕਰੋ</string>
-    <string name="settings_clear_cache_summary">ਆਨਲਾਈਨਨ ਰਿਪੋਜ਼ ਲਈ ਕੈਸ਼ ਕੀਤੀ ਜਾਣਕਾਰੀ ਸਾਫ ਕਰੋ। ਇਹ ਐਪਲੀਕੇਸ਼ਨ ਨੂੰ ਆਨਲਾਈਨ ਤਾਜ਼ਾ ਕਰਨ ਲਈ ਮਜਬੂਰ ਕਰਦਾ ਹੈ।</string>
     <string name="language">ਭਾਸ਼ਾ</string>
     <string name="system_default">(ਸਿਸਟਮ ਡਿਫੌਲਟ)</string>
     <string name="settings_check_update_title">ਚੈੱਕ ਅੱਪਡੇਟ</string>

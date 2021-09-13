@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">深色模式</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
-    <string name="settings_clear_cache_title">清除仓库缓存</string>
-    <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新数据</string>
     <string name="settings_hide_app_title">隐藏 Magisk 应用</string>
     <string name="settings_hide_app_summary">安装具有随机包名和自定义应用名称的代理应用</string>
     <string name="settings_restore_app_title">还原 Magisk 应用</string>

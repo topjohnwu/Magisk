@@ -71,8 +71,6 @@
     <string name="setup_msg">Quraşdırma yerinə yetirilir…</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Repo Keşini Təmizlə</string>
-    <string name="settings_clear_cache_summary">Onlayn repolar üçün keşlənmiş məlumatı silin. Bu tətbiqi onlayn şəkildə yenilənməyə məcbur edir.</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Dili)</string>
     <string name="settings_check_update_title">Yeniləmələri Yoxla</string>

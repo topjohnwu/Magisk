@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Her Zaman Karanlık</string>
     <string name="settings_download_path_title">İndirme dizini</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
-    <string name="settings_clear_cache_title">Depo Önbelleğini Temizle</string>
-    <string name="settings_clear_cache_summary">Çevrim içi depolar için önbellek bilgilerini temizle, uygulamayı çevrim içi yenilemeye zorla</string>
     <string name="settings_hide_app_title">Magisk uygulamasını gizle</string>
     <string name="settings_hide_app_summary">Rastgele paket kimliğine ve isme sabip bir vekil uygulama yükle</string>
     <string name="settings_restore_app_title">Magisk uygulamasını geri yükle</string>

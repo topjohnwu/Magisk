@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Πάντα Dark</string>
     <string name="settings_download_path_title">Διαδρομή λήψης</string>
     <string name="settings_download_path_message">Τα αρχεία θα αποθηκευτούν στο %1$s</string>
-    <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
-    <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
     <string name="settings_hide_app_title">Απόκρυψη της εφαρμογής Magisk</string>
     <string name="settings_hide_app_summary">Εγκαταστήστε μια εφαρμογή με τυχαίο αναγνωριστικό πακέτου και προσαρμοσμένη ετικέτα εφαρμογής</string>
     <string name="settings_restore_app_title">Επαναφέρετε την εφαρμογή Magisk</string>

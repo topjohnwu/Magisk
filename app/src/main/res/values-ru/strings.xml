@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
-    <string name="settings_clear_cache_title">Очистить кэш репозитория</string>
-    <string name="settings_clear_cache_summary">Стереть кэш репозитория модулей (будет создан заново)</string>
     <string name="settings_hide_app_title">Скрытие приложения Magisk</string>
     <string name="settings_hide_app_summary">Пересобрать приложение Magisk со случайным названием и именем пакета</string>
     <string name="settings_restore_app_title">Восстановление приложения Magisk</string>

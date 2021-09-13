@@ -75,8 +75,6 @@
     <string name="setup_msg">Надградба на работната околина…</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Исчисти го кешот од репозиториумот</string>
-    <string name="settings_clear_cache_summary">Исчисти ги кешираните информации за онлајн репозиториумот. Ова ја принудува апликацијата да се освежи онлајн.</string>
     <string name="language">Јазик</string>
     <string name="system_default">(Стандарден системски)</string>
     <string name="settings_check_update_title">Провери за ажурирања</string>

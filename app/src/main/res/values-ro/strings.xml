@@ -131,12 +131,10 @@
     <string name="settings_dark_mode_dark">Mereu întunecat</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
-    <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
     <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
     <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
     <string name="settings_restore_app_summary">Dezvăluie aplicația și restaureaz-o înapoi în APK-ul original</string>
-    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>

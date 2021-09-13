@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Immer dunkel</string>
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
-    <string name="settings_clear_cache_title">Repo-Cache leeren</string>
-    <string name="settings_clear_cache_summary">Löscht die zwischengespeicherten Informationen des Online-Repos. Erzwingt eine Aktualisierung</string>
     <string name="settings_hide_app_title">Verstecke die Magisk App</string>
     <string name="settings_hide_app_summary">Installiere eine Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label</string>
     <string name="settings_restore_app_title">Stelle die Magisk App wiederher</string>

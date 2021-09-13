@@ -67,8 +67,6 @@
     <string name="download_file_error">Грешка при изтеглянето на файла.</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Изчистване кеша на хранилището</string>
-    <string name="settings_clear_cache_summary">Изчистване на кешираната информация на онлайн хранилището за принудителното му обновяване.</string>
     <string name="language">Език</string>
     <string name="system_default">(Системен)</string>
     <string name="settings_check_update_title">Проверка за актуализации</string>

@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">暗色模式</string>
     <string name="settings_download_path_title">下載路徑</string>
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
-    <string name="settings_clear_cache_title">清除線上模組庫快取</string>
-    <string name="settings_clear_cache_summary">將強制重新載入線上模組庫</string>
     <string name="language">語言</string>
     <string name="settings_hide_app_title">隱藏 Magisk</string>
     <string name="settings_hide_app_summary">安裝一個隨機包裝和可客製化應用程式名稱的代理應用程式</string>

@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
-    <string name="settings_clear_cache_title">Limpiar caché del repositorio</string>
-    <string name="settings_clear_cache_summary">Limpiar la información en caché para los repositorios en línea, fuerza a la aplicación a actualizar en línea</string>
     <string name="settings_hide_app_title">Esconder la app de Magisk</string>
     <string name="settings_hide_app_summary">Instalar una nueva app proxy con una ID de paquete aleatoria y una etiqueta personalizada</string>
     <string name="settings_restore_app_title">Restaurar la app de Magisk</string>

@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Alati tume</string>
     <string name="settings_download_path_title">Allalaadimise failitee</string>
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
-    <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
-    <string name="settings_clear_cache_summary">Tühjenda vahemälus olev teave võrgus olevate hoidlate kohta. See sunnib rakendust võrgust värskendama</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_check_update_title">Kontrolli uuendusi</string>

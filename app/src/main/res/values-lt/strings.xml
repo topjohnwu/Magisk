@@ -63,8 +63,6 @@
     <string name="download_file_error">Atsisiunčiant failą įvyko klaida</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Išvalyti nereikalingus saugyklos failus</string>
-    <string name="settings_clear_cache_summary">Išvalyti patalpintą informaciją talpykloms internete, priverčia perkrauti interneto jungtį</string>
     <string name="language">Kalba</string>
     <string name="system_default">(Sistemos)</string>
     <string name="settings_check_update_title">Automatiškas atnaujinimų ieškojimas</string>

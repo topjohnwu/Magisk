@@ -68,8 +68,6 @@
     <string name="setup_msg">กำลังรันการตั้งค่า…</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">ล้างแคช Repo</string>
-    <string name="settings_clear_cache_summary">ล้างข้อมูล repo ออนไลน์ที่ถูกแคชไว้</string>
     <string name="language">ภาษา</string>
     <string name="system_default">(มาตรฐานระบบ)</string>
     <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>

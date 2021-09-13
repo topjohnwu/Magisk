@@ -129,8 +129,6 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
-    <string name="settings_clear_cache_title">Очистити кеш</string>
-    <string name="settings_clear_cache_summary">Очистити збережену інформацію про мережеві репозиторії. Кеш заново завантажиться через Інтернет</string>
     <string name="language">Мова</string>
     <string name="system_default">(системна)</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>

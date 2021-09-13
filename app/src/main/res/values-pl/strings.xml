@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_download_path_title">Ścieżka pobierania plików</string>
     <string name="settings_download_path_message">Pliki zostaną zapisane do %1$s</string>
-    <string name="settings_clear_cache_title">Wyczyść pamięć podr. repozytoriów</string>
-    <string name="settings_clear_cache_summary">Wyczyść informacje z pamięci podr. dotyczące repozytoriów. Zmusza to aplikację do odświeżenia informacji online</string>
     <string name="settings_hide_app_title">Ukryj aplikację Magisk</string>
     <string name="settings_hide_app_summary">Zainstaluj aplikację z losowym ID pakietu i własną etykietą.</string>
     <string name="settings_restore_app_title">Przywróć aplikację Magisk</string>

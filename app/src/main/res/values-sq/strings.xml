@@ -129,8 +129,6 @@
     <string name="settings_dark_mode_dark">Gjithmonë e errët</string>
     <string name="settings_download_path_title">Vendodhja e shkarkimeve</string>
     <string name="settings_download_path_message">Skedarët do të ruhen në %1$s</string>
-    <string name="settings_clear_cache_title">Pastro Cache të Repos</string>
-    <string name="settings_clear_cache_summary">Pastroni informacionin e memorizuar për repot në internet. Kjo e detyron aplikacionin të rifreskohet në internet</string>
     <string name="language">Gjuha</string>
     <string name="system_default">(Parazgjedhja e Sistemit)</string>
     <string name="settings_check_update_title">Kontrolloni azhurnimet</string>

@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">ダークモード</string>
     <string name="settings_download_path_title">ファイルの保存場所</string>
     <string name="settings_download_path_message">ファイルは %1$s に保存されます</string>
-    <string name="settings_clear_cache_title">キャッシュを消去</string>
-    <string name="settings_clear_cache_summary">モジュールリポジトリのキャッシュを消去します</string>
     <string name="settings_hide_app_title">Magisk アプリを隠す</string>
     <string name="settings_hide_app_summary">ランダムなパッケージ ID と任意のアプリ名のプロキシアプリをインストールします</string>
     <string name="settings_restore_app_title">Magisk アプリを復元する</string>

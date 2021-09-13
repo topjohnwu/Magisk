@@ -54,8 +54,6 @@
     <string name="download_file_error">Грешка при преузимању фајла</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Обриши кеш спремишта</string>
-    <string name="settings_clear_cache_summary">Очисти кеширану имформацију за онлајн спремишта, форсира апликацију да освежи онлајн</string>
     <string name="language">Језик</string>
     <string name="system_default">(Фабрички Система)</string>
     <string name="settings_update_channel_title">Канал Ажурирања</string>

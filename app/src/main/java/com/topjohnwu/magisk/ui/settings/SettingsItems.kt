@@ -77,15 +77,6 @@ object AppSettings : BaseSettingsItem.Section() {
     override val title = R.string.home_app_title.asText()
 }
 
-object ClearRepoCache : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_clear_cache_title.asText()
-    override val description = R.string.settings_clear_cache_summary.asText()
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
-    }
-}
-
 object Hide : BaseSettingsItem.Input() {
     override val title = R.string.settings_hide_app_title.asText()
     override val description = R.string.settings_hide_app_summary.asText()
