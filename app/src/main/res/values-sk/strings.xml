@@ -10,6 +10,7 @@
     <string name="section_home">Domov</string>
     <string name="section_theme">Motívy</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Zoznam zamietnutých</string>
 
     <!--Home-->
     <string name="no_connection">Žiadne pripojenie</string>
@@ -81,7 +82,7 @@
     <string name="superuser_policy_none">Žiadna aplikácia zatiaľ nepožiadala o povolenie Superužívateľa.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva Superužívateľa</string>
+    <string name="log_data_none">Nie sú žiadne záznamy, skúste nejakú appku vyžadujúcu práva superpoužívateľa</string>
     <string name="log_data_magisk_none">Záznamy Magisku sú prázdne, to je divné</string>
     <string name="menuSaveLog">Uložiť záznam</string>
     <string name="menuClearLog">Odstrániť záznam</string>
@@ -144,6 +145,10 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastný kanál</string>
     <string name="settings_update_custom_msg">Zadajte vlastnú URL</string>
+    <string name="settings_denylist_title">Vynútiť zoznam zamietnutých</string>
+    <string name="settings_denylist_summary">Pre procesy na zozname zamietnutých budú všetky úpravy Magiskom vrátené</string>
+    <string name="settings_denylist_config_title">Nastavenie zoznamu zamietnutých</string>
+    <string name="settings_denylist_config_summary">Vyberte procesy, ktoré majú byť zahrnuté do zoznamu blokovaných</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Podpora pre Adblock aplikácie so systemless hosts</string>
     <string name="settings_hosts_toast">Pridaný modul systemless hosts</string>
@@ -225,9 +230,15 @@
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
     <string name="unsupport_magisk_msg">Táto verzia aplikácie nepodporuje Magisk s verziou nižšou ako %1$s.\n\nAplikácia sa bude správať, akoby Magisk nebol nainštalový, aktualizujte Magisk čo najskôr.</string>
+    <string name="unsupport_general_title">Abnormálny stav</string>
+    <string name="unsupport_system_app_msg">Spustenie tejto apky ako systémovej nie je podporované. Preveďte apku na používateľskú.</string>
+    <string name="unsupport_other_su_msg">Bol zaznamenaný príkaz \"su\", ktorý nie je pre Magisk. Odstráňte, prosím, ostatné nepodporované su.</string>
+    <string name="unsupport_external_storage_msg">Magisk je nainštalovaný na externom úložisku. Prosím, presuňte apku na interné úložisko.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplikácia nemôže pokračovať v práci v skrytom stave, lebo root sa stratil. Prosím, obnovte ju z pôvodného APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznantelnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
+    <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznateľnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
 
 </resources>
