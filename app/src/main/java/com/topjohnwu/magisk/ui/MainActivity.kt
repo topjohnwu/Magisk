@@ -60,7 +60,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
                 R.id.homeFragment,
                 R.id.modulesFragment,
                 R.id.superuserFragment,
-                R.id.denyFragment,
                 R.id.logFragment -> true
                 else -> false
             }
@@ -182,7 +181,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
             R.id.modulesFragment -> MainDirections.actionModuleFragment()
             R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
             R.id.logFragment -> MainDirections.actionLogFragment()
-            R.id.denyFragment -> MainDirections.actionDenylistFragment()
             else -> null
         }
     }

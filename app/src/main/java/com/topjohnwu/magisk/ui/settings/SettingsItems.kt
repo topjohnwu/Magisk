@@ -253,7 +253,7 @@ object Magisk : BaseSettingsItem.Section() {
 }
 
 object DenyList : BaseSettingsItem.Toggle() {
-    override val title = R.string.denylist.asText()
+    override val title = R.string.settings_denylist_title.asText()
     override val description = R.string.settings_denylist_summary.asText()
     override var value = Info.env.denyListEnforced
         set(value) = setV(value, field, { field = it }) {
@@ -262,7 +262,13 @@ object DenyList : BaseSettingsItem.Toggle() {
                 if (cb.isSuccess) Info.env.denyListEnforced = it
                 else field = !it
             }
+            DenyListConfig.isEnabled = it
         }
+}
+
+object DenyListConfig : BaseSettingsItem.Blank() {
+    override val title = R.string.settings_denylist_config_title.asText()
+    override val description = R.string.settings_denylist_config_summary.asText()
 }
 
 // --- Superuser

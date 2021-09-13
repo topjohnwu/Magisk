@@ -73,7 +73,7 @@ class SettingsViewModel(
                 SystemlessHosts
             ))
             if (Const.Version.isCanary()) {
-                list.add(DenyList)
+                list.addAll(listOf(DenyList, DenyListConfig))
             }
         }
 
@@ -105,6 +105,7 @@ class SettingsViewModel(
         is DownloadPath -> withExternalRW(callback)
         is Biometrics -> authenticate(callback)
         is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+        is DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
         is ClearRepoCache -> clearRepoCache()
         is SystemlessHosts -> createHosts()
         is Restore -> HideAPK.restore(view.activity)

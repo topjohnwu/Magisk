@@ -38,7 +38,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="72dp"
+            android:layout_marginBottom="@dimen/l1"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:layout_fitsSystemWindowsInsets="bottom"
             app:srcCompat="@drawable/ic_search_md2"
