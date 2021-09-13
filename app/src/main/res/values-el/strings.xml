@@ -174,8 +174,6 @@
     <string name="no_biometric">Δεν υποστηρίζεται η συσκευή ή δεν υπάρχει καμία βιομετρική ρύθμιση</string>
     <string name="settings_customization">Προσαρμογή</string>
     <string name="setting_add_shortcut_summary">Προσθέστε μια όμορφη συντόμευση στην αρχική οθόνη σε περίπτωση που το όνομα και το εικονίδιο είναι δύσκολο να αναγνωριστούν αφού κρύψετε την εφαρμογή</string>
-    <string name="settings_doh_title">DNS μέσω HTTPS</string>
-    <string name="settings_doh_description">Λύση DNS poisoning για μερικά έθνη</string>
 
     <string name="multiuser_mode">Λειτουργία Πολλών Χρηστών</string>
     <string name="settings_owner_only">Μόνο Ιδιοκτήτης Συσκευής</string>

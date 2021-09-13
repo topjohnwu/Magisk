@@ -169,8 +169,6 @@
     <string name="no_biometric">Pajisja e pambështetur ose nuk janë aktivizuar cilësime biometrike</string>
     <string name="settings_customization">Përshtatje</string>
     <string name="setting_add_shortcut_summary">"Shtoni një shkurtore të bukur në ekranin kryesor në rast se emri dhe ikona janë të vështira për t'u njohur pasi të keni fshehur aplikacionin"</string>
-    <string name="settings_doh_title">DNS mbi HTTPS</string>
-    <string name="settings_doh_description">Helmimi i paqartë nga DNS në disa kombe</string>
     <string name="multiuser_mode">Modaliteti i shumë përdoruesve</string>
     <string name="settings_owner_only">Vetëm pronari i pajisjes</string>
     <string name="settings_owner_manage">Pronari i pajisjes e menaxhon</string>

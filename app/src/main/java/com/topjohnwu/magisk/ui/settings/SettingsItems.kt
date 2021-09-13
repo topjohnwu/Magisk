@@ -198,15 +198,6 @@ object UpdateChecker : BaseSettingsItem.Toggle() {
         }
 }
 
-object DoHToggle : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_doh_title.asText()
-    override val description = R.string.settings_doh_description.asText()
-    override var value = Config.doh
-        set(value) = setV(value, field, { field = it }) {
-            Config.doh = it
-        }
-}
-
 // check whether is module already installed beforehand?
 object SystemlessHosts : BaseSettingsItem.Blank() {
     override val title = R.string.settings_hosts_title.asText()

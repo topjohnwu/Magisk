@@ -106,7 +106,6 @@ dependencies {
     val vOkHttp = "4.9.1"
     implementation("com.squareup.okhttp3:okhttp:${vOkHttp}")
     implementation("com.squareup.okhttp3:logging-interceptor:${vOkHttp}")
-    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
     val vMoshi = "1.12.0"
     implementation("com.squareup.moshi:moshi:${vMoshi}")

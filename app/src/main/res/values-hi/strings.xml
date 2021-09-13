@@ -166,8 +166,6 @@
     <string name="no_biometric">असमर्थित डिवाइस या कोई बायोमेट्रिक सेटिंग सक्षम नहीं हैं</string>
     <string name="settings_customization">कस्टमाईजेशन</string>
     <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
-    <string name="settings_doh_title">DNS पर HTTPS</string>
-    <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
 
     <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
     <string name="settings_owner_only">केवल डिवाइस का मालिक</string>

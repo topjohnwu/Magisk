@@ -170,8 +170,6 @@
     <string name="no_biometric">Il dispositivo non è supportato o le impostazioni biometriche sono disattivate</string>
     <string name="settings_customization">Personalizzazione</string>
     <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
-    <string name="settings_doh_title">DNS over HTTPS</string>
-    <string name="settings_doh_description">Soluzione alternativa al DNS poisoning in alcune nazioni</string>
     <string name="settings_hide_app_title">Nascondi l\'app di Magisk</string>
     <string name="settings_hide_app_summary">Installa un\'app \"proxy\" con un ID pacchetto casuale e un nome personalizzato</string>
     <string name="settings_restore_app_title">Ripristina l\'app di Magisk</string>

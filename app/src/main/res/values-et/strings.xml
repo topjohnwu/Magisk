@@ -164,8 +164,6 @@
     <string name="no_biometric">Mittetoetatud seade või ükski biomeetriaseadistus pole lubatud</string>
     <string name="settings_customization">Kohandamine</string>
     <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee, juhul kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
-    <string name="settings_doh_title">DNS üle HTTPSi</string>
-    <string name="settings_doh_description">Väldi mõnes riigis DNSi mürgitamist</string>
 
     <string name="multiuser_mode">Mitmikkasutaja režiim</string>
     <string name="settings_owner_only">Ainult seadme omanik</string>

@@ -166,8 +166,6 @@
     <string name="no_biometric">ਅਸਮਰਥਿਤ ਡਿਵਾਈਸ ਜਾਂ ਕੋਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਸੈਟਿੰਗ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ</string>
     <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
     <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
-    <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>
-    <string name="settings_doh_description">ਕੁਝ ਦੇਸ਼ਾਂ ਵਿੱਚ ਚੱਲ ਰਹੇ DNS ਵਿਸ਼ਾਕਤਤਾ ਦਾ ਹੱਲ</string>
 
     <string name="multiuser_mode">ਮਲਟੀ ਯੂਜ਼ਰ ਮੋਡ</string>
     <string name="settings_owner_only">ਸਿਰਫ ਡਿਵਾਈਸ ਮਾਲਕ</string>

@@ -175,8 +175,6 @@
     <string name="no_biometric">生体認証に対応していないか、有効化されていません</string>
     <string name="settings_customization">カスタマイズ</string>
     <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
-    <string name="settings_doh_title">DNS over HTTPS</string>
-    <string name="settings_doh_description">一部の国で DNS キャッシュポイズニングから守ります</string>
 
     <string name="multiuser_mode">複数ユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>

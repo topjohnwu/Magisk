@@ -175,8 +175,6 @@
     <string name="no_biometric">Gerät unterstützt keine biometrischen Daten oder ist nicht mit diesen konfiguriert</string>
     <string name="settings_customization">Personalisierung</string>
     <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
-    <string name="settings_doh_title">DNS über HTTPS</string>
-    <string name="settings_doh_description">Umgehung des DNS-Poisoning in einigen Ländern</string>
 
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
