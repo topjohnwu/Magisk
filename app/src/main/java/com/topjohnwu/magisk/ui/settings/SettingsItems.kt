@@ -234,23 +234,44 @@ object Magisk : BaseSettingsItem.Section() {
     override val title = R.string.magisk.asText()
 }
 
+object Zygisk : BaseSettingsItem.Toggle() {
+    override val title = R.string.zygisk.asText()
+    override val description = R.string.settings_zygisk_summary.asText()
+    override var value = Config.zygisk
+        set(value) = setV(value, field, { field = it }) {
+            Config.zygisk = it
+            DenyList.isEnabled = it
+            DenyListConfig.isEnabled = it
+        }
+}
+
 object DenyList : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_denylist_title.asText()
-    override val description = R.string.settings_denylist_summary.asText()
+    override val description get() =
+        if (isEnabled) R.string.settings_denylist_summary.asText()
+        else R.string.settings_denylist_error.asText(R.string.zygisk.asText())
+
     override var value = Info.env.denyListEnforced
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
-            Shell.su("magisk --denylist $cmd").submit { cb ->
-                if (cb.isSuccess) Info.env.denyListEnforced = it
+            Shell.su("magisk --denylist $cmd").submit { result ->
+                if (result.isSuccess) Info.env.denyListEnforced = it
                 else field = !it
             }
             DenyListConfig.isEnabled = it
         }
+
+    override fun refresh() {
+        isEnabled = Zygisk.value
+    }
 }
 
 object DenyListConfig : BaseSettingsItem.Blank() {
     override val title = R.string.settings_denylist_config_title.asText()
     override val description = R.string.settings_denylist_config_summary.asText()
+    override fun refresh() {
+        isEnabled = Zygisk.value
+    }
 }
 
 // --- Superuser

@@ -34,7 +34,7 @@ sealed class BaseSettingsItem : ObservableRvItem() {
 
     @get:Bindable
     var isEnabled = true
-        set(value) = set(value, field, { field = it }, BR.enabled)
+        set(value) = set(value, field, { field = it }, BR.enabled, BR.description)
 
     open fun onPressed(view: View, callback: Callback) {
         callback.onItemPressed(view, this)

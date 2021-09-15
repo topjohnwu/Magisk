@@ -113,6 +113,7 @@ db_settings::db_settings() {
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;
+    data[ZYGISK_CONFIG] = false;
 }
 
 int db_settings::get_idx(string_view key) const {

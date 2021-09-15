@@ -6,6 +6,7 @@
 
 extern bool RECOVERY_MODE;
 extern int DAEMON_STATE;
+extern bool zygisk_enabled;
 
 void unlock_blocks();
 void reboot();

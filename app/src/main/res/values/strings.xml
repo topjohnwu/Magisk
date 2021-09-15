@@ -145,8 +145,10 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Custom Channel</string>
     <string name="settings_update_custom_msg">Insert a custom URL</string>
+    <string name="settings_zygisk_summary">Run parts of Magisk in the zygote daemon</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
+    <string name="settings_denylist_error">This feature requires %1$s to be enabled</string>
     <string name="settings_denylist_config_title">Configure DenyList</string>
     <string name="settings_denylist_config_summary">Select the processes to be included on the denylist</string>
     <string name="settings_hosts_title">Systemless hosts</string>

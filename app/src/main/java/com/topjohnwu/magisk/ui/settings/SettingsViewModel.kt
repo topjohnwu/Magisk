@@ -69,7 +69,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
                 SystemlessHosts
             ))
             if (Const.Version.isCanary()) {
-                list.addAll(listOf(DenyList, DenyListConfig))
+                list.addAll(listOf(Zygisk, DenyList, DenyListConfig))
             }
         }
 

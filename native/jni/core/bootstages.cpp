@@ -18,6 +18,7 @@
 using namespace std;
 
 static bool safe_mode = false;
+bool zygisk_enabled = false;
 
 /*********
  * Setup *
@@ -301,7 +302,12 @@ void post_fs_data(int client) {
         disable_deny();
     } else {
         exec_common_scripts("post-fs-data");
-        check_enforce_denylist();
+        db_settings dbs;
+        get_db_settings(dbs, ZYGISK_CONFIG);
+        if (dbs[ZYGISK_CONFIG]) {
+            zygisk_enabled = true;
+            check_enforce_denylist();
+        }
         handle_modules();
     }
 
@@ -349,8 +355,6 @@ void boot_complete(int client) {
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
-
-    check_enforce_denylist();
 
     if (!check_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {

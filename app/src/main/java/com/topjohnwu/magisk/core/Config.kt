@@ -37,6 +37,7 @@ object Config : PreferenceModel, DBConfig {
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
         const val SU_BIOMETRIC = "su_biometric"
+        const val ZYGISK = "zygisk"
         const val SU_MANAGER = "requester"
         const val KEYSTORE = "keystore"
 
@@ -143,6 +144,7 @@ object Config : PreferenceModel, DBConfig {
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    var zygisk by dbSettings(Key.ZYGISK, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 

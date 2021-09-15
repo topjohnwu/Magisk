@@ -616,10 +616,12 @@ void magic_mount() {
     root->mount();
 
     // Mount on top of modules to enable zygisk
-    string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
-    mkdir(zygisk_bin.data(), 0);
-    mount_zygisk(32)
-    mount_zygisk(64)
+    if (zygisk_enabled) {
+        string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
+        mkdir(zygisk_bin.data(), 0);
+        mount_zygisk(32)
+        mount_zygisk(64)
+    }
 }
 
 static void prepare_modules() {
