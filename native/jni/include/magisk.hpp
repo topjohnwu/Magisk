@@ -26,6 +26,7 @@ extern std::string  MAGISKTMP;
 #define ROOTOVL     INTLROOT "/rootdir"
 #define SHELLPTS    INTLROOT "/pts"
 #define ROOTMNT     ROOTOVL "/.mount_list"
+#define ZYGISKBIN   INTLROOT "/zygisk"
 
 constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 constexpr const char *init_applet[] = { "magiskpolicy", "supolicy", nullptr };

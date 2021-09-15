@@ -247,7 +247,7 @@ static void setup_files(int client, ucred *cred) {
 
     write_int(client, 0);
 
-    string path = MAGISKTMP + "/zygisk." + basename(buf);
+    string path = MAGISKTMP + "/" ZYGISKBIN "/zygisk." + basename(buf);
     cp_afc(buf, (path + ".1.so").data());
     cp_afc(buf, (path + ".2.so").data());
 

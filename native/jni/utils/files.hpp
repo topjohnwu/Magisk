@@ -32,7 +32,7 @@ struct raw_file {
 
 ssize_t fd_path(int fd, char *path, size_t size);
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
-int mkdirs(std::string path, mode_t mode);
+int mkdirs(std::string_view path, mode_t mode);
 void rm_rf(const char *path);
 void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);

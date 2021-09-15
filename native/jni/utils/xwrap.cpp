@@ -466,7 +466,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags,
 
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
     ssize_t ret = sendfile(out_fd, in_fd, offset, count);
-    if (count != ret) {
+    if (ret < 0) {
         PLOGE("sendfile");
     }
     return ret;

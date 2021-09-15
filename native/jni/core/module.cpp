@@ -542,6 +542,19 @@ static void inject_magisk_bins(root_node *system) {
         delete bin->extract(init_applet[i]);
 }
 
+#define mount_zygisk(bit) \
+if (access("/system/bin/app_process" #bit, F_OK) == 0) { \
+    string zbin = zygisk_bin + "/app_process" #bit;      \
+    string mbin = MAGISKTMP + "/magisk" #bit;            \
+    int src = xopen(mbin.data(), O_RDONLY);              \
+    int out = xopen(zbin.data(), O_CREAT | O_WRONLY, 0); \
+    xsendfile(out, src, nullptr, INT_MAX);               \
+    close(src);           \
+    close(out);           \
+    clone_attr("/system/bin/app_process" #bit, zbin.data());    \
+    bind_mount(zbin.data(), "/system/bin/app_process" #bit);    \
+}
+
 void magic_mount() {
     node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
     node_entry::module_mnt = MAGISKTMP + "/" MODULEMNT "/";
@@ -592,7 +605,7 @@ void magic_mount() {
     for (const char *part : { "/vendor", "/product", "/system_ext" }) {
         struct stat st;
         if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
-            if (auto old = system->extract(part + 1); old) {
+            if (auto old = system->extract(part + 1)) {
                 auto new_node = new root_node(old);
                 root->insert(new_node);
             }
@@ -601,6 +614,12 @@ void magic_mount() {
 
     root->prepare();
     root->mount();
+
+    // Mount on top of modules to enable zygisk
+    string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
+    mkdir(zygisk_bin.data(), 0);
+    mount_zygisk(32)
+    mount_zygisk(64)
 }
 
 static void prepare_modules() {

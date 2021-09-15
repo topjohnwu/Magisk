@@ -26,7 +26,7 @@ int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
     return 0;
 }
 
-int mkdirs(string path, mode_t mode) {
+int mkdirs(string_view path, mode_t mode) {
     errno = 0;
     for (char *p = path.data() + 1; *p; ++p) {
         if (*p == '/') {
@@ -420,7 +420,7 @@ void restore_folder(const char *dir, vector<raw_file> &files) {
     for (raw_file &file : files) {
         string path = base + "/" + file.path;
         if (S_ISDIR(file.attr.st.st_mode)) {
-            mkdirs(path.data(), 0);
+            mkdirs(path, 0);
         } else if (S_ISREG(file.attr.st.st_mode)) {
             auto fp = xopen_file(path.data(), "we");
             if (fp) fwrite(file.buf, 1, file.sz, fp.get());
