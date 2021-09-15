@@ -7,7 +7,6 @@ magiskinit                 /* binary */
 magiskpolicy -> magiskinit
 supolicy -> magiskinit
 magisk                     /* binary */
-magiskhide -> magisk
 resetprop -> magisk
 su -> magisk
 ```
@@ -218,7 +217,7 @@ Advanced Options (Internal APIs):
    --path                    print Magisk tmpfs mount path
 
 Available applets:
-    su, resetprop, magiskhide
+    su, resetprop
 ```
 
 ### su
@@ -262,21 +261,4 @@ Flags:
            (this flag only affects setprop)
    -p      read/write props from/to persistent storage
            (this flag only affects getprop and delprop)
-```
-
-### magiskhide
-An applet of `magisk`, the CLI to control MagiskHide. Use this tool to communicate with the daemon to change MagiskHide settings.
-
-```
-Usage: magiskhide [action [arguments...] ]
-
-Actions:
-   status          Return the status of magiskhide
-   enable          Start magiskhide
-   disable         Stop magiskhide
-   add PKG [PROC]  Add a new target to the hide list
-   rm PKG [PROC]   Remove target(s) from the hide list
-   ls              Print the current hide list
-   exec CMDs...    Execute commands in isolated mount
-                   namespace and do all hide unmounts
 ```
