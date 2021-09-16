@@ -10,6 +10,7 @@
     <string name="section_home">Shtëpia</string>
     <string name="section_theme">Temat</string>
     <string name="safetynet">Rrjeti i Sigurisë</string>
+    <string name="denylist">Lista e Mohimit</string>
 
     <!--Home-->
     <string name="no_connection">Nuk ka lidhje interneti</string>
@@ -181,6 +182,10 @@
     <string name="global_summary">Të gjitha seksionet rrënjësore përdorin hapësirën globale të emrave të montimit</string>
     <string name="requester_summary">Seksionët rrënjësore do të trashëgojnë hapësirën e emrave të kërkuesit të tyre</string>
     <string name="isolate_summary">Çdo seksion rrënjë do të ketë hapësirën e vet të izoluar të tij</string>
+    <string name="settings_denylist_title">Zbato Listën e Mohimit</string>
+    <string name="settings_denylist_summary">Proceset në listën e mohimit do të kenë të gjitha modifikimet e Magisk</string>
+    <string name="settings_denylist_config_title">Konfiguro Listën e Mohimit</string>
+    <string name="settings_denylist_config_summary">Zgjidhni proceset që do të përfshihen në listën e mohimit</string>
 
     <!--Notifications-->
     <string name="update_channel">Përditësimet e Magisk</string>
@@ -223,6 +228,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
+    <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për t'u njohur. Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
 
 </resources>
