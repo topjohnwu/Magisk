@@ -223,6 +223,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jep leje për ruajtje për të mundësuar këtë funksionalitet</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin kryesor</string>
+    <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për t'u njohur. Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
 
 </resources>
