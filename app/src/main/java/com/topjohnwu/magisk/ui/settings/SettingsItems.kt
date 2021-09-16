@@ -251,11 +251,11 @@ object DenyList : BaseSettingsItem.Toggle() {
         if (isEnabled) R.string.settings_denylist_summary.asText()
         else R.string.settings_denylist_error.asText(R.string.zygisk.asText())
 
-    override var value = Info.env.denyListEnforced
+    override var value = Config.denyList
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
             Shell.su("magisk --denylist $cmd").submit { result ->
-                if (result.isSuccess) Info.env.denyListEnforced = it
+                if (result.isSuccess) Config.denyList = it
                 else field = !it
             }
             DenyListConfig.isEnabled = it

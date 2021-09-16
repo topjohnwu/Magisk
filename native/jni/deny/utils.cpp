@@ -19,7 +19,7 @@ static map<int, vector<string_view>> *uid_proc_map;  /* uid -> list of process *
 // Locks the variables above
 static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-static atomic<bool> enforcement_status = false;
+atomic<bool> denylist_enabled = false;
 
 static void rebuild_uid_map() {
     uid_proc_map->clear();
@@ -147,7 +147,6 @@ static int add_list(const char *pkg, const char *proc) {
         return DENYLIST_INVALID_PKG;
 
     {
-        // Critical region
         mutex_guard lock(data_lock);
         for (const auto &hide : *deny_set)
             if (hide.first == pkg && hide.second == proc)
@@ -172,9 +171,8 @@ int add_list(int client) {
 }
 
 static int rm_list(const char *pkg, const char *proc) {
-    bool remove = false;
     {
-        // Critical region
+        bool remove = false;
         mutex_guard lock(data_lock);
         for (auto it = deny_set->begin(); it != deny_set->end();) {
             if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
@@ -248,63 +246,68 @@ void ls_list(int client) {
     close(client);
 }
 
-static void update_hide_config() {
+static void update_deny_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-            DB_SETTING_KEYS[DENYLIST_CONFIG], enforcement_status.load());
+            DB_SETTING_KEYS[DENYLIST_CONFIG], denylist_enabled.load());
     char *err = db_exec(sql);
     db_err(err);
 }
 
-int enable_hide() {
-    if (enforcement_status)
-        return DENY_IS_ENFORCED;
+int enable_deny() {
+    if (denylist_enabled) {
+        return DAEMON_SUCCESS;
+    } else {
+        mutex_guard lock(data_lock);
 
-    if (access("/proc/self/ns/mnt", F_OK) != 0)
-        return DENY_NO_NS;
+        if (access("/proc/self/ns/mnt", F_OK) != 0) {
+            LOGW("The kernel does not support mount namespace\n");
+            return DENY_NO_NS;
+        }
 
-    if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-        return DAEMON_ERROR;
+        if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
+            return DAEMON_ERROR;
 
-    LOGI("* Enforce DenyList\n");
+        LOGI("* Enable DenyList\n");
 
-    mutex_guard lock(data_lock);
-    default_new(deny_set);
-    default_new(uid_proc_map);
+        default_new(deny_set);
+        if (!init_list()) {
+            delete deny_set;
+            deny_set = nullptr;
+            return DAEMON_ERROR;
+        }
 
-    // Initialize the hide list
-    if (!init_list())
-        return DAEMON_ERROR;
+        denylist_enabled = true;
 
-    enforcement_status = true;
-    update_hide_config();
+        default_new(uid_proc_map);
+        rebuild_uid_map();
+    }
 
-    rebuild_uid_map();
+    update_deny_config();
     return DAEMON_SUCCESS;
 }
 
 int disable_deny() {
-    mutex_guard lock(data_lock);
-
-    if (enforcement_status) {
+    if (denylist_enabled) {
+        denylist_enabled = false;
         LOGI("* Disable DenyList\n");
+
+        mutex_guard lock(data_lock);
         delete uid_proc_map;
         delete deny_set;
         uid_proc_map = nullptr;
         deny_set = nullptr;
     }
-
-    enforcement_status = false;
-    update_hide_config();
+    update_deny_config();
     return DAEMON_SUCCESS;
 }
 
-void check_enforce_denylist() {
-    if (!enforcement_status) {
+void initialize_denylist() {
+    if (!denylist_enabled) {
         db_settings dbs;
         get_db_settings(dbs, DENYLIST_CONFIG);
         if (dbs[DENYLIST_CONFIG])
-            enable_hide();
+            enable_deny();
     }
 }
 
@@ -332,8 +335,4 @@ bool is_deny_target(int uid, string_view process) {
         }
     }
     return false;
-}
-
-bool deny_enforced() {
-    return enforcement_status;
 }

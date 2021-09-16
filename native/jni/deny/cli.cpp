@@ -35,11 +35,10 @@ void denylist_handler(int client, ucred *cred) {
     int res = DAEMON_ERROR;
 
     switch (req) {
-    case DISABLE_DENY:
     case ADD_LIST:
     case RM_LIST:
     case LS_LIST:
-        if (!deny_enforced()) {
+        if (!denylist_enabled) {
             write_int(client, DENY_NOT_ENFORCED);
             close(client);
             return;
@@ -48,7 +47,7 @@ void denylist_handler(int client, ucred *cred) {
 
     switch (req) {
     case ENFORCE_DENY:
-        res = enable_hide();
+        res = enable_deny();
         break;
     case DISABLE_DENY:
         res = disable_deny();
@@ -63,7 +62,7 @@ void denylist_handler(int client, ucred *cred) {
         ls_list(client);
         return;
     case DENY_STATUS:
-        res = deny_enforced() ? DENY_IS_ENFORCED : DENY_NOT_ENFORCED;
+        res = (zygisk_enabled && denylist_enabled) ? DENY_IS_ENFORCED : DENY_NOT_ENFORCED;
         break;
     }
 

@@ -255,7 +255,7 @@ static void setup_files(int client, ucred *cred) {
 }
 
 static void check_denylist(int client) {
-    if (!deny_enforced()) {
+    if (!denylist_enabled) {
         write_int(client, DENY_NOT_ENFORCED);
         return;
     }
@@ -266,7 +266,7 @@ static void check_denylist(int client) {
 }
 
 static void do_unmount(int client, ucred *cred) {
-    if (deny_enforced()) {
+    if (denylist_enabled) {
         LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
         revert_daemon(cred->pid, client);
     } else {

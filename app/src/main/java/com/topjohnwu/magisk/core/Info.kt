@@ -64,9 +64,5 @@ object Info {
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = magiskVersionCode >= 0
-        var denyListEnforced = if (Const.Version.isCanary(code))
-            Shell.su("magisk --denylist status").exec().isSuccess
-        else
-            false
     }
 }

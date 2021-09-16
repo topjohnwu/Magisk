@@ -26,7 +26,7 @@ int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
     return 0;
 }
 
-int mkdirs(string_view path, mode_t mode) {
+int mkdirs(string path, mode_t mode) {
     errno = 0;
     for (char *p = path.data() + 1; *p; ++p) {
         if (*p == '/') {

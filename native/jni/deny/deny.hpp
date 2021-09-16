@@ -4,25 +4,27 @@
 #include <string_view>
 #include <functional>
 #include <map>
+#include <atomic>
 
 #include <daemon.hpp>
 
 #define ISOLATED_MAGIC "isolated"
 
 // CLI entries
-int enable_hide();
+int enable_deny();
 int disable_deny();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
 
 // Utility functions
-bool deny_enforced();
 bool is_deny_target(int uid, std::string_view process);
 
 // Revert
 void revert_daemon(int pid, int client);
 void revert_unmount(int pid = -1);
+
+extern std::atomic<bool> denylist_enabled;
 
 enum : int {
     ENFORCE_DENY,

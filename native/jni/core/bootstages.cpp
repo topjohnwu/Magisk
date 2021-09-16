@@ -304,10 +304,8 @@ void post_fs_data(int client) {
         exec_common_scripts("post-fs-data");
         db_settings dbs;
         get_db_settings(dbs, ZYGISK_CONFIG);
-        if (dbs[ZYGISK_CONFIG]) {
-            zygisk_enabled = true;
-            check_enforce_denylist();
-        }
+        zygisk_enabled = dbs[ZYGISK_CONFIG];
+        initialize_denylist();
         handle_modules();
     }
 

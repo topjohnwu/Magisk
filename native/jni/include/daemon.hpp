@@ -39,14 +39,7 @@ enum : int {
     DAEMON_LAST
 };
 
-// Daemon state
-enum : int {
-    STATE_NONE,
-    STATE_POST_FS_DATA,
-    STATE_POST_FS_DATA_DONE,
-    STATE_LATE_START_DONE,
-    STATE_BOOT_COMPLETE
-};
+extern bool zygisk_enabled;
 
 int connect_daemon(bool create = false);
 
@@ -63,6 +56,6 @@ void su_daemon_handler(int client, ucred *credential);
 void zygisk_handler(int client, ucred *cred);
 
 // Denylist
-void check_enforce_denylist();
+void initialize_denylist();
 int disable_deny();
 int denylist_cli(int argc, char **argv);

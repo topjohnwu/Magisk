@@ -4,6 +4,7 @@
 
 #include <utils.hpp>
 #include <magisk.hpp>
+#include <daemon.hpp>
 #include <selinux.hpp>
 #include <resetprop.hpp>
 
