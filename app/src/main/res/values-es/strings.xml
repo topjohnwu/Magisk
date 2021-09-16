@@ -10,6 +10,7 @@
     <string name="section_home">Inicio</string>
     <string name="section_theme">Temas</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Lista de Denegacion</string>
 
     <!--Home-->
     <string name="no_connection">Conexión no disponible</string>
@@ -144,6 +145,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insertar una URL personalizada</string>
+    <string name="settings_zygisk_summary">Corre partes de magisk en zygote</string>
+    <string name="settings_denylist_title">Aplicar lista de denegacion</string>
+    <string name="settings_denylist_summary">Los procesos en la lista de denegacion tandran todas las modificaciones de magisk revertidas</string>
+    <string name="settings_denylist_error">Esta requere de %1$s para ser activada</string>
+    <string name="settings_denylist_config_title">Configurar lista de denegacion</string>
+    <string name="settings_denylist_config_summary">Seleccione los procesos para ser incluidos en la lista de denegacion</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Soporte para bloqueadores de publicidad fuera de la partición system</string>
     <string name="settings_hosts_toast">Módulo systemless hosts agregado</string>
