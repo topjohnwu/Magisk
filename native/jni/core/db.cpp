@@ -341,41 +341,39 @@ int get_uid_policy(su_access &su, int uid) {
     return 0;
 }
 
-bool check_manager(string *pkg) {
+bool get_manager(int user_id, std::string *pkg, struct stat *st) {
     db_strings str;
     get_db_strings(str, SU_MANAGER);
-    bool ret = validate_manager(str[SU_MANAGER], 0, nullptr);
-    if (pkg) {
-        if (ret)
-            pkg->swap(str[SU_MANAGER]);
-        else
-            *pkg = "xxx";  /* Make sure the return pkg can never exist */
-    }
-    return ret;
-}
-
-bool validate_manager(string &pkg, int userid, struct stat *st) {
-    struct stat tmp_st;
-    if (st == nullptr)
-        st = &tmp_st;
-
-    // Prefer DE storage
     char app_path[128];
-    sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, pkg.data());
-    if (pkg.empty() || stat(app_path, st)) {
-        // Check the official package name
-        sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
-        if (stat(app_path, st)) {
-            LOGE("su: cannot find manager\n");
-            memset(st, 0, sizeof(*st));
-            pkg.clear();
-            return false;
-        } else {
-            // Switch to official package if exists
-            pkg = JAVA_PACKAGE_NAME;
+
+    if (!str[SU_MANAGER].empty()) {
+        // App is repackaged
+        sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, user_id, str[SU_MANAGER].data());
+        if (stat(app_path, st) == 0) {
+            if (pkg)
+                pkg->swap(str[SU_MANAGER]);
+            return true;
         }
     }
-    return true;
+
+    // Check the official package name
+    sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, user_id);
+    if (stat(app_path, st) == 0) {
+        if (pkg)
+            *pkg = JAVA_PACKAGE_NAME;
+        return true;
+    } else {
+        LOGE("su: cannot find manager\n");
+        memset(st, 0, sizeof(*st));
+        if (pkg)
+            pkg->clear();
+        return false;
+    }
+}
+
+bool get_manager(string *pkg) {
+    struct stat st;
+    return get_manager(0, pkg, &st);
 }
 
 void exec_sql(int client) {

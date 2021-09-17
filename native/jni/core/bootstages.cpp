@@ -106,9 +106,10 @@ static bool magisk_env() {
     LOGI("* Initializing Magisk environment\n");
 
     string pkg;
-    check_manager(&pkg);
+    get_manager(&pkg);
 
-    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
+            pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths
     const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
@@ -354,7 +355,7 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    if (!check_manager()) {
+    if (!get_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {
             // Only try to install APK when no manager is installed
             // Magisk Manager should be upgraded by itself, not through recovery installs

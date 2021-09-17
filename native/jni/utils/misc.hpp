@@ -12,6 +12,9 @@
 clazz(const clazz &) = delete; \
 clazz(clazz &&) = delete;
 
+#define to_app_id(uid)  (uid % 100000)
+#define to_user_id(uid) (uid / 100000)
+
 class mutex_guard {
     DISALLOW_COPY_AND_MOVE(mutex_guard)
 public:

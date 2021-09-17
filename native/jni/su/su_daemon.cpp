@@ -47,18 +47,17 @@ void su_info::refresh() {
 static void database_check(const shared_ptr<su_info> &info) {
     int uid = info->uid;
     get_db_settings(info->cfg);
-    get_db_strings(info->str);
 
     // Check multiuser settings
     switch (info->cfg[SU_MULTIUSER_MODE]) {
         case MULTIUSER_MODE_OWNER_ONLY:
-            if (info->uid / 100000) {
+            if (to_user_id(uid) != 0) {
                 uid = -1;
                 info->access = NO_SU_ACCESS;
             }
             break;
         case MULTIUSER_MODE_OWNER_MANAGED:
-            uid = info->uid % 100000;
+            uid = to_app_id(uid);
             break;
         case MULTIUSER_MODE_USER:
         default:
@@ -70,7 +69,7 @@ static void database_check(const shared_ptr<su_info> &info) {
 
     // We need to check our manager
     if (info->access.log || info->access.notify)
-        validate_manager(info->str[SU_MANAGER], uid / 100000, &info->mgr_st);
+        get_manager(to_user_id(uid), &info->mgr_pkg, &info->mgr_st);
 }
 
 static shared_ptr<su_info> get_su_info(unsigned uid) {
@@ -93,7 +92,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         database_check(info);
 
         // If it's root or the manager, allow it silently
-        if (info->uid == UID_ROOT || (info->uid % 100000) == (info->mgr_st.st_uid % 100000)) {
+        if (info->uid == UID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_st.st_uid)) {
             info->access = SILENT_SU_ACCESS;
             return info;
         }
@@ -125,7 +124,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
             return info;
 
         // If still not determined, check if manager exists
-        if (info->str[SU_MANAGER].empty()) {
+        if (info->mgr_pkg.empty()) {
             info->access = NO_SU_ACCESS;
             return info;
         }
