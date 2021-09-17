@@ -10,6 +10,7 @@
     <string name="section_home">Início</string>
     <string name="section_theme">Temas</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Lista de Negação</string>
 
     <!--Home-->
     <string name="no_connection">Nenhuma conexão disponível</string>
@@ -143,6 +144,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizado</string>
     <string name="settings_update_custom_msg">Insira um URL personalizado</string>
+    <string name="settings_zygisk_summary">Roda partes do Magisk no Zygote</string>
+    <string name="settings_denylist_title">Aplicar lista de negação</string>
+    <string name="settings_denylist_summary">Os processos na lista de negação terão todas as modificações do Magisk revertidas</string>
+    <string name="settings_denylist_error">Isso requer %1$s para ser ativado</string>
+    <string name="settings_denylist_config_title">Configurar lista de negação</string>
+    <string name="settings_denylist_config_summary">Selecione os processos a serem incluidos na lista de negação</string>
     <string name="settings_hosts_title">Hosts sem sistema</string>
     <string name="settings_hosts_summary">Suporte de hosts sem sistema para aplicativos Adblock</string>
     <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>
