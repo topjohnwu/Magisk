@@ -23,6 +23,101 @@ int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
 
+static map<int, poll_callback> *poll_map;
+static vector<pollfd> *poll_fds;
+static int poll_ctrl;
+
+enum {
+    POLL_CTRL_NEW,
+    POLL_CTRL_RM,
+};
+
+void register_poll(const pollfd *pfd, poll_callback callback) {
+    if (gettid() == getpid()) {
+        // On main thread, directly modify
+        poll_map->try_emplace(pfd->fd, callback);
+        poll_fds->emplace_back(*pfd);
+    } else {
+        // Send it to poll_ctrl
+        write_int(poll_ctrl, POLL_CTRL_NEW);
+        xwrite(poll_ctrl, pfd, sizeof(*pfd));
+        xwrite(poll_ctrl, &callback, sizeof(callback));
+    }
+}
+
+void unregister_poll(int fd, bool auto_close) {
+    if (gettid() == getpid()) {
+        // On main thread, directly modify
+        poll_map->erase(fd);
+        for (auto &poll_fd : *poll_fds) {
+            if (poll_fd.fd == fd) {
+                if (auto_close) {
+                    close(poll_fd.fd);
+                }
+                // Cannot modify while iterating, invalidate it instead
+                // It will be removed in the next poll loop
+                poll_fd.fd = -1;
+                break;
+            }
+        }
+    } else {
+        // Send it to poll_ctrl
+        write_int(poll_ctrl, POLL_CTRL_RM);
+        write_int(poll_ctrl, fd);
+        write_int(poll_ctrl, auto_close);
+    }
+}
+
+static void poll_ctrl_handler(pollfd *pfd) {
+    int code = read_int(pfd->fd);
+    switch (code) {
+        case POLL_CTRL_NEW: {
+            pollfd new_fd;
+            poll_callback cb;
+            xxread(pfd->fd, &new_fd, sizeof(new_fd));
+            xxread(pfd->fd, &cb, sizeof(cb));
+            register_poll(&new_fd, cb);
+            break;
+        }
+        case POLL_CTRL_RM: {
+            int fd = read_int(pfd->fd);
+            bool auto_close = read_int(pfd->fd);
+            unregister_poll(fd, auto_close);
+            break;
+        }
+    }
+}
+
+[[noreturn]] static void poll_loop() {
+    // Register poll_ctrl
+    int pipefd[2];
+    xpipe2(pipefd, O_CLOEXEC);
+    poll_ctrl = pipefd[1];
+    pollfd poll_ctrl_pfd = { pipefd[0], POLLIN, 0 };
+    register_poll(&poll_ctrl_pfd, poll_ctrl_handler);
+
+    for (;;) {
+        if (poll(poll_fds->data(), poll_fds->size(), -1) <= 0)
+            continue;
+
+        // MUST iterate with index because any poll_callback could add new elements to poll_fds
+        for (int i = 0; i < poll_fds->size();) {
+            auto &pfd = (*poll_fds)[i];
+            if (pfd.revents) {
+                if (pfd.revents & POLLERR || pfd.revents & POLLNVAL) {
+                    poll_map->erase(pfd.fd);
+                    poll_fds->erase(poll_fds->begin() + i);
+                    continue;
+                }
+                if (auto it = poll_map->find(pfd.fd); it != poll_map->end()) {
+                    it->second(&pfd);
+                }
+            }
+            ++i;
+        }
+    }
+}
+
 static bool verify_client(pid_t pid) {
     // Verify caller is the same as server
     char path[32];
@@ -99,8 +194,8 @@ static void handle_request_sync(int client, int code) {
     }
 }
 
-static void handle_request(int client) {
-    int code;
+static void handle_request(pollfd *pfd) {
+    int client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
 
     // Verify client credentials
     ucred cred;
@@ -109,6 +204,7 @@ static void handle_request(int client) {
     bool is_root = cred.uid == UID_ROOT;
     bool is_client = verify_client(cred.pid);
     bool is_zygote = !is_client && check_zygote(cred.pid);
+    int code;
 
     if (!is_root && !is_zygote && !is_client)
         goto done;
@@ -173,7 +269,7 @@ static int switch_cgroup(const char *cgroup, int pid) {
     return 0;
 }
 
-[[noreturn]] static void daemon_entry() {
+static void daemon_entry() {
     magisk_logging();
 
     // Block all signals
@@ -269,11 +365,15 @@ static int switch_cgroup(const char *cgroup, int pid) {
         exit(1);
     xlisten(fd, 10);
 
+    default_new(poll_map);
+    default_new(poll_fds);
+
+    // Register handler for main socket
+    pollfd main_socket_pfd = { fd, POLLIN, 0 };
+    register_poll(&main_socket_pfd, handle_request);
+
     // Loop forever to listen for requests
-    for (;;) {
-        int client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
-        handle_request(client);
-    }
+    poll_loop();
 }
 
 int connect_daemon(bool create) {
