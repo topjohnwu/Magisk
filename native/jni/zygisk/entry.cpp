@@ -54,25 +54,26 @@ static void *unload_first_stage(void *v) {
     return nullptr;
 }
 
-// Make sure /proc/self/environ does not reveal our secrets
-// Copy all env to a contiguous memory and set the memory region as MM_ENV
+// Make sure /proc/self/environ is sanitized
+// Filter env and reset MM_ENV_END
 static void sanitize_environ() {
-    static string env;
+    char *cur = environ[0];
 
     for (int i = 0; environ[i]; ++i) {
-        if (str_starts(environ[i], INJECT_ENV_1 "="))
+        if (str_starts(environ[i], INJECT_ENV_1 "=")) {
+            // This specific env has to live in heap
+            environ[i] = strdup(environ[i]);
             continue;
-        env += environ[i];
-        env += '\0';
+        }
+
+        // Copy all filtered env onto the original stack
+        int len = strlen(environ[i]);
+        memmove(cur, environ[i], len + 1);
+        environ[i] = cur;
+        cur += len + 1;
     }
 
-    for (int i = 0; i < 2; ++i) {
-        bool success = true;
-        success &= (0 <= prctl(PR_SET_MM, PR_SET_MM_ENV_START, env.data(), 0, 0));
-        success &= (0 <= prctl(PR_SET_MM, PR_SET_MM_ENV_END, env.data() + env.size(), 0, 0));
-        if (success)
-            break;
-    }
+    prctl(PR_SET_MM, PR_SET_MM_ENV_END, cur, 0, 0);
 }
 
 __attribute__((destructor))
@@ -108,24 +109,23 @@ static void inject_init() {
         // Update path to 1st stage lib
         *(strrchr(env, '.') - 1) = '1';
 
-        // Some cleanup
-        sanitize_environ();
         active_threads++;
         new_daemon_thread(&unload_first_stage, env);
     } else if (getenv(INJECT_ENV_1)) {
         android_logging();
         LOGD("zygisk: inject 1st stage\n");
 
-        char *ld = getenv("LD_PRELOAD");
+        string ld = getenv("LD_PRELOAD");
         char *path;
-        if (char *c = strrchr(ld, ':')) {
+        if (char *c = strrchr(ld.data(), ':')) {
             *c = '\0';
-            setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
+            setenv("LD_PRELOAD", ld.data(), 1);  // Restore original LD_PRELOAD
             path = c + 1;
         } else {
             unsetenv("LD_PRELOAD");
-            path = ld;
+            path = ld.data();
         }
+        sanitize_environ();
 
         // Update path to 2nd stage lib
         *(strrchr(path, '.') - 1) = '2';

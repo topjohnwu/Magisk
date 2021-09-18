@@ -165,6 +165,9 @@ void sepolicy::magisk_rules() {
     // For changing file context
     allow("rootfs", "tmpfs", "filesystem", "associate");
 
+    // Allow Zygisk to prctl PR_SET_MM
+    allow("zygote", "zygote", "capability", "sys_resource");
+
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");
 
