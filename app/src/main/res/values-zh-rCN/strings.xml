@@ -242,5 +242,6 @@
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
     <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
+    <string name="reboot_apply_change">重启后生效</string>
 
 </resources>
