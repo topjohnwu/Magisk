@@ -22,9 +22,6 @@ LOCAL_SRC_FILES := \
     core/module.cpp \
     core/logging.cpp \
     core/thread.cpp \
-    deny/cli.cpp \
-    deny/utils.cpp \
-    deny/revert.cpp \
     resetprop/persist_properties.cpp \
     resetprop/resetprop.cpp \
     su/su.cpp \
@@ -34,7 +31,10 @@ LOCAL_SRC_FILES := \
     zygisk/entry.cpp \
     zygisk/utils.cpp \
     zygisk/hook.cpp \
-    zygisk/memory.cpp
+    zygisk/memory.cpp \
+    zygisk/deny/cli.cpp \
+    zygisk/deny/utils.cpp \
+    zygisk/deny/revert.cpp
 
 LOCAL_LDLIBS := -llog
 

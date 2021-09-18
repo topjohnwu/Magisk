@@ -11,7 +11,7 @@
 #include <db.hpp>
 
 #include "inject.hpp"
-#include "../deny/deny.hpp"
+#include "deny/deny.hpp"
 
 using namespace std;
 
