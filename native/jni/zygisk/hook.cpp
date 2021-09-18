@@ -43,8 +43,9 @@ struct HookContext {
     const char *process;
     int pid;
     bitset<FLAG_MAX> flags;
+    AppInfo info;
 
-    HookContext() : pid(-1) {}
+    HookContext() : pid(-1), info{} {}
 
     static void close_fds();
 
@@ -139,7 +140,7 @@ DCL_HOOK_FUNC(int, fork) {
 // This is the latest point where we can still connect to the magiskd main socket
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
-    if (g_ctx && g_ctx->flags[DENY_FLAG]) {
+    if (g_ctx && g_ctx->info.on_denylist) {
         if (remote_request_unmount() == 0) {
             LOGD("zygisk: mount namespace cleaned up\n");
         }
@@ -241,9 +242,10 @@ void HookContext::nativeSpecializeAppProcess_pre() {
         VLOG("zygisk: pre  specialize [%s]\n", process);
     }
 
+    remote_get_app_info(args->uid, process, &info);
+
     /* TODO: Handle MOUNT_EXTERNAL_NONE */
-    if (args->mount_external != 0 && remote_check_denylist(args->uid, process)) {
-        flags[DENY_FLAG] = true;
+    if (args->mount_external != 0 && info.on_denylist) {
         LOGI("zygisk: [%s] is on the denylist\n", process);
     } else {
         run_modules_pre();
@@ -258,10 +260,13 @@ void HookContext::nativeSpecializeAppProcess_post() {
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
-    if (flags[DENY_FLAG]) {
+    if (info.on_denylist) {
         self_unload();
     } else {
         run_modules_post();
+    }
+    if (info.is_magisk_app) {
+        setenv("ZYGISK_ENABLED", "1", 1);
     }
     g_ctx = nullptr;
 }

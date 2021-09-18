@@ -376,6 +376,13 @@ bool get_manager(string *pkg) {
     return get_manager(0, pkg, &st);
 }
 
+int get_manager_app_id() {
+    struct stat st;
+    if (get_manager(0, nullptr, &st))
+        return to_app_id(st.st_uid);
+    return -1;
+}
+
 void exec_sql(int client) {
     run_finally f([=]{ close(client); });
     string sql = read_string(client);

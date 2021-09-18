@@ -128,6 +128,7 @@ int get_db_strings(db_strings &str, int key = -1);
 int get_uid_policy(su_access &su, int uid);
 bool get_manager(int user_id, std::string *pkg, struct stat *st);
 bool get_manager(std::string *pkg = nullptr);
+int get_manager_app_id();
 void exec_sql(int client);
 char *db_exec(const char *sql);
 char *db_exec(const char *sql, const db_row_cb &fn);

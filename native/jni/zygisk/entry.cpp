@@ -8,6 +8,7 @@
 #include <utils.hpp>
 #include <daemon.hpp>
 #include <magisk.hpp>
+#include <db.hpp>
 
 #include "inject.hpp"
 #include "../deny/deny.hpp"
@@ -205,21 +206,17 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     return ret;
 }
 
-bool remote_check_denylist(int uid, const char *process) {
+void remote_get_app_info(int uid, const char *process, AppInfo *info) {
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_CHECK_DENYLIST);
+        write_int(fd, ZYGISK_GET_APPINFO);
 
-        int ret = -1;
-        if (read_int(fd) == 0) {
-            write_int(fd, uid);
-            write_string(fd, process);
-            ret = read_int(fd);
-        }
+        write_int(fd, uid);
+        write_string(fd, process);
+        xxread(fd, info, sizeof(*info));
+
         close(fd);
-        return ret >= 0 && ret;
     }
-    return false;
 }
 
 int remote_request_unmount() {
@@ -254,15 +251,16 @@ static void setup_files(int client, ucred *cred) {
     write_string(client, path);
 }
 
-static void check_denylist(int client) {
-    if (!denylist_enabled) {
-        write_int(client, DENY_NOT_ENFORCED);
-        return;
-    }
-    write_int(client, 0);
+static void get_app_info(int client) {
+    AppInfo info{};
     int uid = read_int(client);
     string process = read_string(client);
-    write_int(client, is_deny_target(uid, process));
+    if (to_app_id(uid) == get_manager_app_id()) {
+        info.is_magisk_app = true;
+    } else if (denylist_enabled) {
+        info.on_denylist = is_deny_target(uid, process);
+    }
+    xwrite(client, &info, sizeof(info));
 }
 
 static void do_unmount(int client, ucred *cred) {
@@ -290,8 +288,8 @@ void zygisk_handler(int client, ucred *cred) {
     case ZYGISK_SETUP:
         setup_files(client, cred);
         break;
-    case ZYGISK_CHECK_DENYLIST:
-        check_denylist(client);
+    case ZYGISK_GET_APPINFO:
+        get_app_info(client);
         break;
     case ZYGISK_UNMOUNT:
         do_unmount(client, cred);
