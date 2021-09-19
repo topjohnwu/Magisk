@@ -38,7 +38,7 @@ void setup_logfile(bool reset) {
 #define MAX_MSG_LEN  (PIPE_BUF - sizeof(log_meta))
 
 static void logfile_writer(int pipefd) {
-    run_finally close_socket([=] {
+    run_finally close_pipes([=] {
         // Close up all logging pipes when thread dies
         close(pipefd);
         close(logd_fd.exchange(-1));
@@ -47,8 +47,9 @@ static void logfile_writer(int pipefd) {
     struct {
         void *data;
         size_t len;
-    } tmp_buf{};
-    stream *strm = new byte_stream(tmp_buf.data, tmp_buf.len);
+    } tmp{};
+    stream_ptr strm = make_unique<byte_stream>(tmp.data, tmp.len);
+    bool switched = false;
 
     log_meta meta{};
     char buf[MAX_MSG_LEN];
@@ -60,32 +61,32 @@ static void logfile_writer(int pipefd) {
 
     for (;;) {
         // Read meta data
-        if (xread(pipefd, &meta, sizeof(meta)) != sizeof(meta))
+        if (read(pipefd, &meta, sizeof(meta)) != sizeof(meta))
             return;
 
-        if (meta.prio < 0 && tmp_buf.len >= 0) {
-            run_finally free_buf([&] {
-                free(tmp_buf.data);
-                tmp_buf.data = nullptr;
-                tmp_buf.len = -1;
-            });
+        if (meta.prio < 0) {
+            if (!switched) {
+                run_finally free_tmp([&] {
+                    free(tmp.data);
+                    tmp.data = nullptr;
+                    tmp.len = 0;
+                });
 
-            if (meta.len)
                 rename(LOGFILE, LOGFILE ".bak");
+                int fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
+                if (fd < 0)
+                    return;
+                if (tmp.data)
+                    write(fd, tmp.data, tmp.len);
 
-            int fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-            if (fd < 0)
-                return;
-            if (tmp_buf.data)
-                write(fd, tmp_buf.data, tmp_buf.len);
-
-            delete strm;
-            strm = new fd_stream(fd);
+                strm = make_unique<fd_stream>(fd);
+                switched = true;
+            }
             continue;
         }
 
         // Read message
-        if (xread(pipefd, buf, meta.len) != meta.len)
+        if (read(pipefd, buf, meta.len) != meta.len)
             return;
 
         timeval tv;
@@ -109,10 +110,10 @@ static void logfile_writer(int pipefd) {
                 type = 'E';
                 break;
         }
-        int ms = tv.tv_usec / 1000;
+        long ms = tv.tv_usec / 1000;
         size_t off = strftime(aux, sizeof(aux), "%m-%d %T", &tm);
         off += snprintf(aux + off, sizeof(aux) - off,
-                ".%03d %5d %5d %c : ", ms, meta.pid, meta.tid, type);
+                ".%03ld %5d %5d %c : ", ms, meta.pid, meta.tid, type);
 
         iov[0].iov_len = off;
         iov[1].iov_len = meta.len;
