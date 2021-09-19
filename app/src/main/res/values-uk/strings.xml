@@ -10,16 +10,19 @@
     <string name="section_home">Домашня</string>
     <string name="section_theme">Теми</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">DenyList</string>
 
     <!--Home-->
-    <string name="no_connection">Немає з\'єднання</string>
+    <string name="no_connection">Немає з\’єднання</string>
     <string name="app_changelog">Список змін</string>
     <string name="loading">Завантаження…</string>
     <string name="update">Оновити</string>
     <string name="not_available">Н/Д</string>
     <string name="hide">Сховати</string>
     <string name="home_package">Пакунок</string>
+    <string name="home_app_title">Застосунок</string>
 
+    <string name="home_notice_content">Завантажуйте Magisk ЛИШЕ з офіційної сторінки на GitHub. Файли з невідомих джерел можуть містити шкідливий функціонал!</string>
     <string name="home_support_title">Підтримати нас</string>
     <string name="home_item_source">Джерело</string>
     <string name="home_support_content">Magisk є, і завжди буде безкоштовним та з відкритим кодом. Однак, якщо вам не байдуже, можете зробити невеличке пожертвування.</string>
@@ -91,11 +94,11 @@
     <string name="safetynet_api_error">Помилка SafetyNet API</string>
     <string name="safetynet_res_invalid">Невірна відповідь</string>
     <string name="safetynet_attest_success">Успішно!</string>
-    <string name="safetynet_attest_failure">Провірку не пройдено!</string>
+    <string name="safetynet_attest_failure">Перевірку не пройдено!</string>
     <string name="safetynet_attest_loading">Секунду…</string>
     <string name="safetynet_attest_restart">Спробувати знову</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Показувати системні застосунки</string>
     <string name="show_os_app">Показувати вбудовані застосунки</string>
     <string name="hide_filter_hint">Фільтрувати за назвою</string>
@@ -103,7 +106,7 @@
     <string name="hide_filters">Фільтри</string>
     <string name="hide_search">Пошук</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(немає наданої інформації)</string>
     <string name="reboot_userspace">Швидке перезавантаження</string>
     <string name="reboot_recovery">Перезавантажити в Recovery</string>
@@ -129,6 +132,10 @@
     <string name="settings_dark_mode_dark">Завжди темний</string>
     <string name="settings_download_path_title">Шлях завантаження</string>
     <string name="settings_download_path_message">Файли зберігатимуться в %1$s</string>
+    <string name="settings_hide_app_title">Сховати застосунок Magisk</string>
+    <string name="settings_hide_app_summary">Встановити проксі-застосунок з довільним ID пакунку та назвою</string>
+    <string name="settings_restore_app_title">Відновити застосунок Magisk</string>
+    <string name="settings_restore_app_summary">Відновити застосунок з оригінального APK та показати його</string>
     <string name="language">Мова</string>
     <string name="system_default">(системна)</string>
     <string name="settings_check_update_title">Перевіряти оновлення</string>
@@ -138,11 +145,17 @@
     <string name="settings_update_beta">Бета реліз</string>
     <string name="settings_update_custom">Власний</string>
     <string name="settings_update_custom_msg">Вставте власний URL</string>
+    <string name="settings_zygisk_summary">Запускати частини Magisk в сервісі zygote</string>
+    <string name="settings_denylist_title">Enforce DenyList</string>
+    <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
+    <string name="settings_denylist_error">Для цієї функції потрібно увімкнути %1$s</string>
+    <string name="settings_denylist_config_title">Налаштувати DenyList</string>
+    <string name="settings_denylist_config_summary">Вибрати процеси, які будуть додані до denylist</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
     <string name="settings_hosts_summary">Підтримка позасистемних хостів для застосунків блокування реклами</string>
     <string name="settings_hosts_toast">Додано модуль позасистемних хостів</string>
-    <string name="settings_app_name_hint">Нове ім\'я</string>
-    <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\'ям</string>
+    <string name="settings_app_name_hint">Нове ім\’я</string>
+    <string name="settings_app_name_helper">Застосунок буде перезібрано з цим ім\’ям</string>
     <string name="settings_app_name_error">Неправильний формат</string>
     <string name="settings_su_app_adb">Застосунки і ADB</string>
     <string name="settings_su_app">Застосунки</string>
@@ -159,7 +172,7 @@
     <string name="request_timeout">Час запиту</string>
     <string name="superuser_notification">Сповіщення суперкористувача</string>
     <string name="settings_su_reauth_title">Повторна автентифікація</string>
-    <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення програ</string>
+    <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення застосунку</string>
     <string name="settings_su_tapjack_title">Увімкнути захист від Tapjack</string>
     <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
     <string name="settings_su_biometric_title">Біометрична автентифікація</string>
@@ -202,7 +215,8 @@
     <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
     <string name="flashing">Прошивання…</string>
     <string name="done">Готово!</string>
-    <string name="failure">Не вдалося</string>
+    <string name="failure">Не вдалося!</string>
+    <string name="hide_app_title">Ховання застосунку Magisk…</string>
     <string name="open_link_failed_toast">Не знайдено застосунку для відкриття посилання</string>
     <string name="complete_uninstall">Повне видалення</string>
     <string name="restore_img">Відновити розділи</string>
@@ -210,13 +224,24 @@
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає оригінальної резервної копії!</string>
     <string name="proprietary_title">Завантажити пропрієтарний код</string>
+    <string name="proprietary_notice">Magisk — це безкоштовний застосунок з відкритим вихідним кодом, тому він не містить пропрієтарний код Google для перевірки SafetyNet.\n\nБажаєте завантажити розширення SafetyNet API?</string>
     <string name="setup_fail">Не вдалося налаштувати</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
+    <string name="env_fix_msg">Для вашого пристрою необхідне додаткове налаштування, щоб Magisk працював як слід. Бажаєте виконати налаштування та перезавантажити пристрій?</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
     <string name="authenticate">Автентифікувати</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
+    <string name="unsupport_magisk_msg">Ця версія застосунку не підтримує версію Magisk, нижчу за %1$s.\n\nЗастосунок буде працювати так, ніби немає встановленого Magisk. Будь ласка, оновіть Magisk якнайшвидше.</string>
+    <string name="unsupport_general_title">Ненормальний стан</string>
+    <string name="unsupport_system_app_msg">Запуск цього застосунку як системний застосунок не підтримується. Будь ласка, перевстановіть цей застосунок, щоб він був як звичайний застосунок, який встановлений користувачем.</string>
+    <string name="unsupport_other_su_msg">Виявлено команду \"su\", яка не належить до Magisk. Будь ласка, видаліть інші непідтримувані su.</string>
+    <string name="unsupport_external_storage_msg">Magisk встановлено на зовнішнє сховище. Будь ласка, перемістіть застосунок на внутрішнє сховище.</string>
+    <string name="unsupport_nonroot_stub_msg">Застосунок не може продовжувати працювати в прихованому режимі, тому що втрачено root. Будь ласка, відновіть оригінальний застосунок з APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Надайте доступ до сховища, щоб увімкнути цей функціонал</string>
     <string name="add_shortcut_title">Ярлик на домашньому екрані</string>
-    <string name="app_not_found">Не знайдено застосунку, який повинен опрацювати цю дію</string>
+    <string name="add_shortcut_msg">Після приховування цього застосунку, його значок та ім\’я будуть іншими, тому застосунок буде важко впізнати. Хочете додати ярлик на домашній екран?</string>
+    <string name="app_not_found">Не знайдено застосунок, який повинен опрацювати цю дію</string>
+    <string name="reboot_apply_change">Перезавантажити, щоб застосувати зміни</string>
 
 </resources>
