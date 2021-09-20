@@ -149,7 +149,7 @@ static char *open_and_init_db(sqlite3 *&db) {
     if (ver > DB_VERSION) {
         // Don't support downgrading database
         sqlite3_close(db);
-        return nullptr;
+        return strdup("Downgrading database is not supported");
     }
     if (ver < 3) {
         // Policies
