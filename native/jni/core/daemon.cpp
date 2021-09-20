@@ -257,19 +257,20 @@ done:
     close(client);
 }
 
-static int switch_cgroup(const char *cgroup, int pid) {
+static void switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
     snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
-    int fd = open(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
+    if (access(buf, F_OK) != 0)
+        return;
+    int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
     if (fd == -1)
-        return -1;
+        return;
     snprintf(buf, sizeof(buf), "%d\n", pid);
     if (xwrite(fd, buf, strlen(buf)) == -1) {
         close(fd);
-        return -1;
+        return;
     }
     close(fd);
-    return 0;
 }
 
 static void daemon_entry() {
@@ -302,8 +303,9 @@ static void daemon_entry() {
 
     // Escape from cgroup
     int pid = getpid();
-    if (switch_cgroup("/acct", pid) && switch_cgroup("/sys/fs/cgroup", pid))
-        LOGW("Can't switch cgroup\n");
+    switch_cgroup("/acct", pid);
+    switch_cgroup("/dev/cg2_bpf", pid);
+    switch_cgroup("/sys/fs/cgroup", pid);
 
     // Get self stat
     char buf[64];
