@@ -2,6 +2,8 @@
 
 #include <utils.hpp>
 
+#include <daemon.hpp>
+
 using namespace std;
 
 #define THREAD_IDLE_MAX_SEC 60

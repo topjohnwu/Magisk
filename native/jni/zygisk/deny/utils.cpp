@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/inotify.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <dirent.h>
@@ -15,6 +16,7 @@ using namespace std;
 
 static set<pair<string, string>> *deny_set;          /* set of <pkg, process> pair */
 static map<int, vector<string_view>> *uid_proc_map;  /* uid -> list of process */
+static int inotify_fd = -1;
 
 // Locks the variables above
 static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
@@ -254,6 +256,20 @@ static void update_deny_config() {
     db_err(err);
 }
 
+static void inotify_handler(pollfd *pfd) {
+    union {
+        inotify_event event;
+        char buf[512];
+    } u{};
+    read(pfd->fd, u.buf, sizeof(u.buf));
+    if (u.event.name == "packages.xml"sv) {
+        exec_task([] {
+            mutex_guard lock(data_lock);
+            rebuild_uid_map();
+        });
+    }
+}
+
 int enable_deny() {
     if (denylist_enabled) {
         return DAEMON_SUCCESS;
@@ -281,6 +297,14 @@ int enable_deny() {
 
         default_new(uid_proc_map);
         rebuild_uid_map();
+
+        inotify_fd = xinotify_init1(IN_CLOEXEC);
+        if (inotify_fd >= 0) {
+            // Monitor packages.xml
+            inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
+            pollfd inotify_pfd = { inotify_fd, POLLIN, 0 };
+            register_poll(&inotify_pfd, inotify_handler);
+        }
     }
 
     update_deny_config();
@@ -297,6 +321,8 @@ int disable_deny() {
         delete deny_set;
         uid_proc_map = nullptr;
         deny_set = nullptr;
+        unregister_poll(inotify_fd, true);
+        inotify_fd = -1;
     }
     update_deny_config();
     return DAEMON_SUCCESS;

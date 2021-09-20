@@ -5,6 +5,7 @@
 #include <string>
 #include <limits>
 #include <atomic>
+#include <functional>
 
 #include <socket.hpp>
 
@@ -49,6 +50,10 @@ using poll_callback = void(*)(pollfd*);
 void register_poll(const pollfd *pfd, poll_callback callback);
 void unregister_poll(int fd, bool auto_close);
 
+// Thread pool
+void exec_task(std::function<void()> &&task);
+
+// Logging
 extern std::atomic<int> logd_fd;
 int magisk_log(int prio, const char *fmt, va_list ap);
 void android_logging();
