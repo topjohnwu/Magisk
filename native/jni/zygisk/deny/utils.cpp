@@ -276,6 +276,7 @@ static void inotify_handler(pollfd *pfd) {
     } u{};
     read(pfd->fd, u.buf, sizeof(u.buf));
     if (u.event.name == "packages.xml"sv) {
+        cached_manager_app_id = -1;
         exec_task([] {
             mutex_guard lock(data_lock);
             rebuild_map();

@@ -251,11 +251,41 @@ static void setup_files(int client, ucred *cred) {
     write_string(client, path);
 }
 
+int cached_manager_app_id = -1;
+static time_t last_modified = 0;
+
 static void get_app_info(int client) {
     AppInfo info{};
     int uid = read_int(client);
     string process = read_string(client);
-    if (to_app_id(uid) == get_manager_app_id()) {
+
+    // This function is called on every single zygote app process specialization,
+    // so performance is critical. get_manager_app_id() is expensive as it goes
+    // through a SQLite query and potentially multiple filesystem stats, so we
+    // really want to cache the app ID value. Check the last modify timestamp of
+    // packages.xml and only re-fetch the manager app ID if something changed since
+    // we last checked. Granularity in seconds is good enough.
+    // If denylist is enabled, inotify will invalidate the app ID cache for us.
+    // In this case, we can skip the timestamp check all together.
+
+    int manager_app_id = cached_manager_app_id;
+
+    // Denylist not enabled, check packages.xml timestamp
+    if (!denylist_enabled && manager_app_id > 0) {
+        struct stat st{};
+        stat("/data/system/packages.xml", &st);
+        if (st.st_atim.tv_sec > last_modified) {
+            manager_app_id = -1;
+            last_modified = st.st_atim.tv_sec;
+        }
+    }
+
+    if (manager_app_id < 0) {
+        manager_app_id = get_manager_app_id();
+        cached_manager_app_id = manager_app_id;
+    }
+
+    if (to_app_id(uid) == manager_app_id) {
         info.is_magisk_app = true;
     } else if (denylist_enabled) {
         info.on_denylist = is_deny_target(uid, process);
