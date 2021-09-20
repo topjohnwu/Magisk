@@ -14,8 +14,8 @@
 
 using namespace std;
 
-static set<pair<string, string>> *deny_set;          /* set of <pkg, process> pair */
-static map<int, vector<string_view>> *uid_proc_map;  /* uid -> list of process */
+static set<pair<string, string>> *deny_set;             /* set of <pkg, process> pair */
+static map<int, vector<string_view>> *app_id_proc_map;  /* app ID -> list of process */
 static int inotify_fd = -1;
 
 // Locks the variables above
@@ -23,32 +23,45 @@ static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 atomic<bool> denylist_enabled = false;
 
-static void rebuild_uid_map() {
-    uid_proc_map->clear();
+static void rebuild_map() {
+    app_id_proc_map->clear();
     string data_path(APP_DATA_DIR);
     size_t len = data_path.length();
-    auto dir = open_dir(APP_DATA_DIR);
-    bool first_iter = true;
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        data_path.resize(len);
-        data_path += '/';
-        data_path += entry->d_name;  // multiuser user id
-        data_path += '/';
-        size_t user_len = data_path.length();
-        struct stat st;
-        for (const auto &hide : *deny_set) {
-            if (hide.first == ISOLATED_MAGIC) {
-                if (!first_iter) continue;
-                // Setup isolated processes
-                (*uid_proc_map)[-1].emplace_back(hide.second);
-            }
-            data_path.resize(user_len);
-            data_path += hide.first;
-            if (stat(data_path.data(), &st))
-                continue;
-            (*uid_proc_map)[st.st_uid].emplace_back(hide.second);
+
+    // Collect all user IDs
+    vector<string> users;
+    if (auto dir = open_dir(APP_DATA_DIR)) {
+        for (dirent *entry; (entry = xreaddir(dir.get()));) {
+            users.emplace_back(entry->d_name);
         }
-        first_iter = false;
+    } else {
+        return;
+    }
+
+    string_view prev_pkg;
+    struct stat st;
+    for (const auto &target : *deny_set) {
+        if (target.first == ISOLATED_MAGIC) {
+            // Isolated process
+            (*app_id_proc_map)[-1].emplace_back(target.second);
+        } else if (prev_pkg == target.first) {
+            // Optimize the case when it's the same package as previous iteration
+            (*app_id_proc_map)[to_app_id(st.st_uid)].emplace_back(target.second);
+        } else {
+            // Traverse the filesystem to find app ID
+            for (const auto &user_id : users) {
+                data_path.resize(len);
+                data_path += '/';
+                data_path += user_id;
+                data_path += '/';
+                data_path += target.first;
+                if (stat(data_path.data(), &st) == 0) {
+                    prev_pkg = target.first;
+                    (*app_id_proc_map)[to_app_id(st.st_uid)].emplace_back(target.second);
+                    break;
+                }
+            }
+        }
     }
 }
 
@@ -154,7 +167,7 @@ static int add_list(const char *pkg, const char *proc) {
             if (hide.first == pkg && hide.second == proc)
                 return DENYLIST_ITEM_EXIST;
         add_hide_set(pkg, proc);
-        rebuild_uid_map();
+        rebuild_map();
     }
 
     // Add to database
@@ -187,7 +200,7 @@ static int rm_list(const char *pkg, const char *proc) {
         }
         if (!remove)
             return DENYLIST_ITEM_NOT_EXIST;
-        rebuild_uid_map();
+        rebuild_map();
     }
 
     char sql[4096];
@@ -265,7 +278,7 @@ static void inotify_handler(pollfd *pfd) {
     if (u.event.name == "packages.xml"sv) {
         exec_task([] {
             mutex_guard lock(data_lock);
-            rebuild_uid_map();
+            rebuild_map();
         });
     }
 }
@@ -295,8 +308,8 @@ int enable_deny() {
 
         denylist_enabled = true;
 
-        default_new(uid_proc_map);
-        rebuild_uid_map();
+        default_new(app_id_proc_map);
+        rebuild_map();
 
         inotify_fd = xinotify_init1(IN_CLOEXEC);
         if (inotify_fd >= 0) {
@@ -317,9 +330,9 @@ int disable_deny() {
         LOGI("* Disable DenyList\n");
 
         mutex_guard lock(data_lock);
-        delete uid_proc_map;
+        delete app_id_proc_map;
         delete deny_set;
-        uid_proc_map = nullptr;
+        app_id_proc_map = nullptr;
         deny_set = nullptr;
         unregister_poll(inotify_fd, true);
         inotify_fd = -1;
@@ -340,22 +353,23 @@ void initialize_denylist() {
 bool is_deny_target(int uid, string_view process) {
     mutex_guard lock(data_lock);
 
-    if (uid % 100000 >= 90000) {
+    int app_id = to_app_id(uid);
+    if (app_id >= 90000) {
         // Isolated processes
-        auto it = uid_proc_map->find(-1);
-        if (it == uid_proc_map->end())
+        auto it = app_id_proc_map->find(-1);
+        if (it == app_id_proc_map->end())
             return false;
 
-        for (auto &s : it->second) {
+        for (const auto &s : it->second) {
             if (str_starts(process, s))
                 return true;
         }
     } else {
-        auto it = uid_proc_map->find(uid);
-        if (it == uid_proc_map->end())
+        auto it = app_id_proc_map->find(app_id);
+        if (it == app_id_proc_map->end())
             return false;
 
-        for (auto &s : it->second) {
+        for (const auto &s : it->second) {
             if (s == process)
                 return true;
         }
