@@ -349,13 +349,15 @@ static void daemon_entry() {
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {
         auto pts = MAGISKTMP + "/" SHELLPTS;
-        xmkdirs(pts.data(), 0755);
-        xmount("devpts", pts.data(), "devpts",
-               MS_NOSUID | MS_NOEXEC, "newinstance");
-        auto ptmx = pts + "/ptmx";
-        if (access(ptmx.data(), F_OK)) {
-            xumount(pts.data());
-            rmdir(pts.data());
+        if (access(pts.data(), F_OK)) {
+            xmkdirs(pts.data(), 0755);
+            xmount("devpts", pts.data(), "devpts",
+                   MS_NOSUID | MS_NOEXEC, "newinstance");
+            auto ptmx = pts + "/ptmx";
+            if (access(ptmx.data(), F_OK)) {
+                xumount(pts.data());
+                rmdir(pts.data());
+            }
         }
     }
 
