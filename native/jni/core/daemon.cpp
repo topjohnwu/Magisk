@@ -336,6 +336,7 @@ static void daemon_entry() {
         });
     }
     unlink("/dev/.se");
+    unlink(mount_list.data());
 
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
