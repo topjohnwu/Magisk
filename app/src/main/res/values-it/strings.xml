@@ -148,7 +148,7 @@
     <string name="settings_zygisk_summary">Esegui parti di Magisk nel processo zygote</string>
 	<string name="settings_denylist_title">Applica lista di blocco</string>
 	<string name="settings_denylist_summary">Tutte le modifiche Magisk verranno annullate per i processi in lista di blocco</string>
-    <string name="settings_denylist_error">Questa funzione richiede %1$s abilitato</string>
+    <string name="settings_denylist_error">Questa funzione richiede che %1$s sia abilitato</string>
     <string name="settings_denylist_config_title">Configura lista di blocco</string>
     <string name="settings_denylist_config_summary">Seleziona i processi da includere nella lista di blocco</string>
     <string name="settings_hosts_title">File hosts systemless</string>
