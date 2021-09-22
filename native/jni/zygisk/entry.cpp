@@ -16,7 +16,6 @@
 using namespace std;
 
 static void *self_handle = nullptr;
-static atomic<int> active_threads = -1;
 
 static int zygisk_log(int prio, const char *fmt, va_list ap);
 
@@ -31,23 +30,19 @@ static void zygisk_logging() {
 
 void self_unload() {
     LOGD("zygisk: Request to self unload\n");
-    // If deny failed, do not unload or else it will cause SIGSEGV
+    // If unhooking failed, do not unload or else it will cause SIGSEGV
     if (!unhook_functions())
         return;
     new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
-    active_threads--;
 }
 
-static void *unload_first_stage(void *v) {
-    // Wait 1ms to make sure first stage is completely done
-    timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
-    nanosleep(&ts, nullptr);
-
-    auto path = static_cast<const char *>(v);
+static void unload_first_stage(int, siginfo_t *info, void *) {
+    auto path = static_cast<char *>(info->si_value.sival_ptr);
     unmap_all(path);
-    free(v);
-    active_threads--;
-    return nullptr;
+    free(path);
+    struct sigaction action{};
+    action.sa_handler = SIG_DFL;
+    sigaction(SIGUSR1, &action, nullptr);
 }
 
 // Make sure /proc/self/environ is sanitized
@@ -68,17 +63,8 @@ static void sanitize_environ() {
 
 __attribute__((destructor))
 static void zygisk_cleanup_wait() {
-    if (active_threads < 0)
-        return;
-
-    // Setup 1ms
-    timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
-
-    // Check flag in busy loop
-    while (active_threads)
-        nanosleep(&ts, nullptr);
-
-    // Wait another 1ms to make sure all threads left our code
+    // Wait 10us to make sure none of our code is executing
+    timespec ts = { .tv_sec = 0, .tv_nsec = 10000L };
     nanosleep(&ts, nullptr);
 }
 
@@ -86,17 +72,12 @@ static void zygisk_cleanup_wait() {
 
 static decltype(&unload_first_stage) second_stage_entry(void *handle) {
     self_handle = handle;
-
     unsetenv(INJECT_ENV_2);
     unsetenv(SECOND_STAGE_PTR);
 
     zygisk_logging();
     LOGD("zygisk: inject 2nd stage\n");
-    active_threads = 1;
-
     hook_functions();
-
-    active_threads++;
     return &unload_first_stage;
 }
 
@@ -131,10 +112,23 @@ static void first_stage_entry() {
     char *env = getenv(SECOND_STAGE_PTR);
     decltype(&second_stage_entry) second_stage;
     sscanf(env, "%p", &second_stage);
-    auto unload = second_stage(handle);
+    auto unload_handler = second_stage(handle);
 
-    // Schedule to unload 1st stage
-    new_daemon_thread(unload, path);
+    // Register signal handler to unload 1st stage
+    struct sigaction action{};
+    action.sa_sigaction = unload_handler;
+    sigaction(SIGUSR1, &action, nullptr);
+
+    // Schedule to unload 1st stage 10us later
+    timer_t timer;
+    sigevent_t event{};
+    event.sigev_notify = SIGEV_SIGNAL;
+    event.sigev_signo = SIGUSR1;
+    event.sigev_value.sival_ptr = path;
+    timer_create(CLOCK_MONOTONIC, &event, &timer);
+    itimerspec time{};
+    time.it_value.tv_nsec = 10000L;
+    timer_settime(&timer, 0, &time, nullptr);
 }
 
 __attribute__((constructor))

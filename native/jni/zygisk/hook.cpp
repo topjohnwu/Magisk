@@ -265,9 +265,9 @@ void HookContext::nativeSpecializeAppProcess_post() {
         self_unload();
     } else {
         run_modules_post();
-    }
-    if (info.is_magisk_app) {
-        setenv("ZYGISK_ENABLED", "1", 1);
+        if (info.is_magisk_app) {
+            setenv("ZYGISK_ENABLED", "1", 1);
+        }
     }
     g_ctx = nullptr;
 }
