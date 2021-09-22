@@ -150,7 +150,7 @@
 	<string name="settings_denylist_summary">Tutte le modifiche Magisk verranno annullate per i processi in lista di blocco</string>
     <string name="settings_denylist_error">Questa funzione richiede %1$s abilitato</string>
     <string name="settings_denylist_config_title">Configura lista di blocco</string>
-    <string name="settings_denylist_config_summary">Seleziona i processi da incluidere nella lista di blocco</string>
+    <string name="settings_denylist_config_summary">Seleziona i processi da includere nella lista di blocco</string>
     <string name="settings_hosts_title">File hosts systemless</string>
     <string name="settings_hosts_summary">Supporto al file hosts systemless per le app che bloccano le pubblicità</string>
     <string name="settings_hosts_toast">Aggiunto modulo per il supporto al file hosts systemless</string>
