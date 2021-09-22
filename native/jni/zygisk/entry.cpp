@@ -63,9 +63,11 @@ static void sanitize_environ() {
 
 __attribute__((destructor))
 static void zygisk_cleanup_wait() {
-    // Wait 10us to make sure none of our code is executing
-    timespec ts = { .tv_sec = 0, .tv_nsec = 10000L };
-    nanosleep(&ts, nullptr);
+    if (self_handle) {
+        // Wait 10us to make sure none of our code is executing
+        timespec ts = { .tv_sec = 0, .tv_nsec = 10000L };
+        nanosleep(&ts, nullptr);
+    }
 }
 
 #define SECOND_STAGE_PTR "ZYGISK_PTR"
