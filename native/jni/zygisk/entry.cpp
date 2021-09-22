@@ -39,17 +39,13 @@ void self_unload() {
 }
 
 static void *unload_first_stage(void *v) {
-    // Setup 1ms
+    // Wait 1ms to make sure first stage is completely done
     timespec ts = { .tv_sec = 0, .tv_nsec = 1000000L };
-
-    while (getenv(INJECT_ENV_1))
-        nanosleep(&ts, nullptr);
-
-    // Wait another 1ms to make sure all threads left our code
     nanosleep(&ts, nullptr);
 
-    char *path = static_cast<char *>(v);
+    auto path = static_cast<const char *>(v);
     unmap_all(path);
+    free(v);
     active_threads--;
     return nullptr;
 }
@@ -60,13 +56,7 @@ static void sanitize_environ() {
     char *cur = environ[0];
 
     for (int i = 0; environ[i]; ++i) {
-        if (str_starts(environ[i], INJECT_ENV_1 "=")) {
-            // This specific env has to live in heap
-            environ[i] = strdup(environ[i]);
-            continue;
-        }
-
-        // Copy all filtered env onto the original stack
+        // Copy all env onto the original stack
         int len = strlen(environ[i]);
         memmove(cur, environ[i], len + 1);
         environ[i] = cur;
@@ -77,7 +67,7 @@ static void sanitize_environ() {
 }
 
 __attribute__((destructor))
-static void inject_cleanup_wait() {
+static void zygisk_cleanup_wait() {
     if (active_threads < 0)
         return;
 
@@ -92,49 +82,70 @@ static void inject_cleanup_wait() {
     nanosleep(&ts, nullptr);
 }
 
+#define SECOND_STAGE_PTR "ZYGISK_PTR"
+
+static decltype(&unload_first_stage) second_stage_entry(void *handle) {
+    self_handle = handle;
+
+    unsetenv(INJECT_ENV_2);
+    unsetenv(SECOND_STAGE_PTR);
+
+    zygisk_logging();
+    LOGD("zygisk: inject 2nd stage\n");
+    active_threads = 1;
+
+    hook_functions();
+
+    active_threads++;
+    return &unload_first_stage;
+}
+
+static void first_stage_entry() {
+    android_logging();
+    LOGD("zygisk: inject 1st stage\n");
+
+    char *ld = getenv("LD_PRELOAD");
+    char *path;
+    if (char *c = strrchr(ld, ':')) {
+        *c = '\0';
+        setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
+        path = strdup(c + 1);
+    } else {
+        unsetenv("LD_PRELOAD");
+        path = strdup(ld);
+    }
+    unsetenv(INJECT_ENV_1);
+    sanitize_environ();
+
+    // Update path to 2nd stage lib
+    *(strrchr(path, '.') - 1) = '2';
+
+    // Load second stage
+    setenv(INJECT_ENV_2, "1", 1);
+    void *handle = dlopen(path, RTLD_LAZY);
+
+    // Revert path to 1st stage lib
+    *(strrchr(path, '.') - 1) = '1';
+
+    // Run second stage entry
+    char *env = getenv(SECOND_STAGE_PTR);
+    decltype(&second_stage_entry) second_stage;
+    sscanf(env, "%p", &second_stage);
+    auto unload = second_stage(handle);
+
+    // Schedule to unload 1st stage
+    new_daemon_thread(unload, path);
+}
+
 __attribute__((constructor))
-static void inject_init() {
-    if (char *env = getenv(INJECT_ENV_2)) {
-        zygisk_logging();
-        LOGD("zygisk: inject 2nd stage\n");
-        active_threads = 1;
-        unsetenv(INJECT_ENV_2);
-
-        // Get our own handle
-        self_handle = dlopen(env, RTLD_LAZY);
-        dlclose(self_handle);
-
-        hook_functions();
-
-        // Update path to 1st stage lib
-        *(strrchr(env, '.') - 1) = '1';
-
-        active_threads++;
-        new_daemon_thread(&unload_first_stage, env);
+static void zygisk_init() {
+    if (getenv(INJECT_ENV_2)) {
+        // Return function pointer to first stage
+        char buf[128];
+        snprintf(buf, sizeof(buf), "%p", &second_stage_entry);
+        setenv(SECOND_STAGE_PTR, buf, 1);
     } else if (getenv(INJECT_ENV_1)) {
-        android_logging();
-        LOGD("zygisk: inject 1st stage\n");
-
-        string ld = getenv("LD_PRELOAD");
-        char *path;
-        if (char *c = strrchr(ld.data(), ':')) {
-            *c = '\0';
-            setenv("LD_PRELOAD", ld.data(), 1);  // Restore original LD_PRELOAD
-            path = c + 1;
-        } else {
-            unsetenv("LD_PRELOAD");
-            path = ld.data();
-        }
-        sanitize_environ();
-
-        // Update path to 2nd stage lib
-        *(strrchr(path, '.') - 1) = '2';
-
-        // Setup second stage
-        setenv(INJECT_ENV_2, path, 1);
-        dlopen(path, RTLD_LAZY);
-
-        unsetenv(INJECT_ENV_1);
+        first_stage_entry();
     }
 }
 
