@@ -3,7 +3,7 @@
     <!--Sections-->
     <string name="modules">Modulet</string>
     <string name="superuser">Super-përdoruesi</string>
-    <string name="logs">Shkrimet</string>
+    <string name="logs">Regjistrat</string>
     <string name="settings">Cilësimet</string>
     <string name="refresh">Rifresko të dhënat lokale</string>
     <string name="install">Instalo</string>
@@ -62,7 +62,7 @@
     <string name="once">Një herë</string>
     <string name="tenmin">10 minuta</string>
     <string name="twentymin">20 minuta</string>
-    <string name="thirtymin">30 minutas</string>
+    <string name="thirtymin">30 minuta</string>
     <string name="sixtymin">60 minuta</string>
     <string name="su_allow_toast">%1$s iu dha aksesi te Super-përdoruesi</string>
     <string name="su_deny_toast">%1$s iu refuzua aksesi te Super -përdoruesi</string>
@@ -128,7 +128,7 @@
     <string name="settings_dark_mode_title">Mënyra e temës</string>
     <string name="settings_dark_mode_message">Zgjidhni mënyrën që i përshtatet më shumë stilit tuaj!</string>
     <string name="settings_dark_mode_light">Gjithmonë e bardhë</string>
-    <string name="settings_dark_mode_system">Sipas sitemit</string>
+    <string name="settings_dark_mode_system">Sipas sistemit</string>
     <string name="settings_dark_mode_dark">Gjithmonë e zezë</string>
     <string name="settings_download_path_title">Vendodhje e shkarkimit</string>
     <string name="settings_download_path_message">Shkarkimet do të ruhen në %1$s</string>
@@ -169,10 +169,10 @@
     <string name="settings_su_request_60">60 Sekonda</string>
     <string name="superuser_access">Aksesi i Super-përdorues</string>
     <string name="auto_response">Përgjigje automatike</string>
-    <string name="request_timeout">Kërkesë i mbaroi koha</string>
+    <string name="request_timeout">Kërkesës i mbaroi koha</string>
     <string name="superuser_notification">Njoftimi i Super-përdoruesit</string>
     <string name="settings_su_reauth_title">Ri-vërtetimi pas azhurnimit</string>
-    <string name="settings_su_reauth_summary">Ri-vërtetoni lejet e super -përdoruesit pas azhurnimit të aplikacionit</string>
+    <string name="settings_su_reauth_summary">Ri-vërtetoni lejet e super-përdoruesit pas azhurnimit të aplikacionit</string>
     <string name="settings_su_tapjack_title">Aktivizo mbrojtjen tapjacking</string>
     <string name="settings_su_tapjack_summary">Dialogu i menjëhershëm i super-përdoruesit nuk do ti përgjigjet hyrjes ndërsa është i errësuar nga ndonjë dritare ose mbivendosje tjetër</string>
     <string name="settings_su_biometric_title">Aktivizo vërtetimin biometrik</string>
@@ -198,7 +198,7 @@
     <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të emrave</string>
 
     <!--Notifications-->
-    <string name="update_channel">Përditësime e magisk</string>
+    <string name="update_channel">Përditësimet e magisk</string>
     <string name="progress_channel">Njoftimet e progresit</string>
     <string name="download_complete">Shkarkimi përfundoi</string>
     <string name="download_file_error">Gabim në shkarkimin e skedarit</string>
@@ -224,7 +224,7 @@
     <string name="restore_done">Rivendosja u krye!</string>
     <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
     <string name="proprietary_title">Shkarkoni Kodin e Pronësisë</string>
-    <string name="proprietary_notice">Magisk është FOSS dhe nuk përfshin kodin për API -në në pronësi te rrjetit i sigurisë Google.\n\nDëshironi të shkarkoni një shtesë të pronarit për kontrollet e rrjetit të sigurisë?</string>
+    <string name="proprietary_notice">Magisk është FOSS dhe nuk përfshin kodin për API-në në pronësi te rrjetit i sigurisë Google.\n\nDëshironi të shkarkoni një shtesë të pronarit për kontrollet e rrjetit të sigurisë?</string>
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim shtesë</string>
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet.  Dëshironi të vazhdoni dhe rindizni?</string>
@@ -234,13 +234,13 @@
     <string name="unsupport_magisk_msg">Ky version i aplikacionit nuk e mbështet versionin Magisk më të ulët se %1$s.\n\nAplikacioni do të sillet sikur të mos jetë i instaluar Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</string>
     <string name="unsupport_general_title">Gjendje jonormale</string>
     <string name="unsupport_system_app_msg">Drejtimi i këtij aplikacioni si një aplikacion sistemi nuk mbështetet.  Ju lutemi kthejeni aplikacionin në një aplikacion përdoruesi.</string>
-    <string name="unsupport_other_su_msg">Një komandë \"su"\ që nuk i përket Magisk është zbuluar.  Ju lutemi hiqni su -në tjetër të pambështetur.</string>
+    <string name="unsupport_other_su_msg">Një komandë \"su"\ që nuk i përket Magisk është zbuluar.  Ju lutemi hiqni SU-në tjetër të pambështetur.</string>
     <string name="unsupport_external_storage_msg">Magisk është instaluar në ruajtjen e jashtme.  Ju lutemi zhvendosni aplikacionin në ruajtjen e brendshme.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplikacioni nuk mund të vazhdojë të punojë në gjendjen e fshehur pasi rrënja ishte e humbur.  Ju lutemi rivendoseni përsëri në APK -në origjinale.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplikacioni nuk mund të vazhdojë të punojë në gjendjen e fshehur pasi rrënja ishte e humbur.  Ju lutemi rivendoseni përsëri në APK-në origjinale.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jepni lejen e ruajtjes për të aktivizuar këtë funksion</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin bazë</string>
     <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për tu njohur.  Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
-
+<string name="reboot_apply_change">Rinisni për të aplikuar ndryshimet</string>
 </resources>
