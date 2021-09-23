@@ -361,7 +361,7 @@ static void daemon_entry() {
         }
     }
 
-    sockaddr_un sun;
+    sockaddr_un sun{};
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (xbind(fd, (sockaddr*) &sun, len))
@@ -380,12 +380,13 @@ static void daemon_entry() {
 }
 
 int connect_daemon(bool create) {
-    sockaddr_un sun;
+    sockaddr_un sun{};
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (connect(fd, (sockaddr*) &sun, len)) {
         if (!create || getuid() != UID_ROOT) {
             LOGE("No daemon is currently running!\n");
+            close(fd);
             return -1;
         }
 
