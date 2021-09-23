@@ -10,24 +10,24 @@
     <string name="section_home">Home</string>
     <string name="section_theme">Temi</string>
     <string name="safetynet">SafetyNet</string>
-	<string name="denylist">Lista di blocco</string>
+    <string name="denylist">Lista di blocco</string>
 
     <!--Home-->
     <string name="no_connection">Connessione non disponibile</string>
     <string name="app_changelog">Changelog</string>
-	<string name="loading">Caricamento…</string>
+    <string name="loading">Caricamento…</string>
     <string name="update">Aggiorna</string>
     <string name="not_available">N/D</string>
     <string name="hide">Hide</string>	
-	<string name="home_package">Pacchetto</string>
+    <string name="home_package">Pacchetto</string>
     <string name="home_app_title">App</string>
-	
+    
     <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
     <string name="home_support_title">Supportaci</string>
     <string name="home_item_source">Codice sorgente</string>
     <string name="home_support_content">Magisk è e sempre sarà gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento inviando una piccola donazione.</string>
-	<string name="home_installed_version">Installata</string>  
-	<string name="home_latest_version">Ultima</string>
+    <string name="home_installed_version">Installata</string>  
+    <string name="home_latest_version">Ultima</string>
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
@@ -146,8 +146,8 @@
     <string name="settings_update_custom">Canale personalizzato</string>
     <string name="settings_update_custom_msg">Inserisci un URL personalizzato</string>
     <string name="settings_zygisk_summary">Esegui parti di Magisk nel processo zygote</string>
-	<string name="settings_denylist_title">Applica lista di blocco</string>
-	<string name="settings_denylist_summary">Tutte le modifiche apportate da Magisk verranno annullate per i processi in lista di blocco</string>
+    <string name="settings_denylist_title">Applica lista di blocco</string>
+    <string name="settings_denylist_summary">Tutte le modifiche apportate da Magisk verranno annullate per i processi in lista di blocco</string>
     <string name="settings_denylist_error">Questa funzione richiede che %1$s sia abilitato</string>
     <string name="settings_denylist_config_title">Configura lista di blocco</string>
     <string name="settings_denylist_config_summary">Seleziona i processi da includere nella lista di blocco</string>
@@ -216,7 +216,7 @@
     <string name="flashing">Flash in corso…</string>
     <string name="done">Completato!</string>
     <string name="failure">Fallito</string>
-	<string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string> 
+    <string name="hide_app_title">Sto nascondendo l\'app di Magisk…</string> 
     <string name="open_link_failed_toast">Nessuna app disponibile per aprire il link</string>
     <string name="complete_uninstall">Disinstalla completamente</string>
     <string name="restore_img">Ripristina immagini</string>
@@ -232,20 +232,16 @@
     <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
     <string name="unsupport_magisk_msg">Questa versione dell\'app non supporta versioni di Magisk inferiori a %1$s.\n\nL\'app si comporterà come se Magisk non fosse installato: aggiornalo il prima possibile.</string>
-	<string name="unsupport_general_title">Stato anomalo rilevato</string>
+    <string name="unsupport_general_title">Stato anomalo rilevato</string>
     <string name="unsupport_system_app_msg">L\'esecuzione di quest\'app come app di sistema non è supportata. Reinstallala come applicazione utente.</string>
     <string name="unsupport_other_su_msg">È stato rilevato un comando \"su\" che non appartiene a Magisk. Rimuovilo per evitare malfunzionamenti.</string>
-	<string name="unsupport_external_storage_msg">Magisk è installato nella memoria esterna. Sposta l\'app nella memoria interna.</string>
+    <string name="unsupport_external_storage_msg">Magisk è installato nella memoria esterna. Sposta l\'app nella memoria interna.</string>
     <string name="unsupport_nonroot_stub_msg">Dal momento che i permessi di root sono stati persi, l\'app non può più funzionare rimanendo nascosta. Ripristina l\'APK originale.</string>
-	<string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
     <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
     <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
     <string name="reboot_apply_change">Riavvia per applicare le modifiche</string>
-	
-
-
-
 
 </resources>
