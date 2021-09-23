@@ -243,6 +243,8 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     }
 
     remote_get_app_info(args->uid, process, &info);
+    /* TODO: app_zygote can't connect to magiskd.
+     * Need to unhook to treat app_zygote as a normal process? */
 
     /* TODO: Handle MOUNT_EXTERNAL_NONE */
     if (args->mount_external != 0 && info.on_denylist) {
