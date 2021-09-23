@@ -16,6 +16,9 @@ enum : int {
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 
+// Remap all matching pages with anonymous pages
+void remap_all(const char *name);
+
 // Get library name + offset (from start of ELF), given function address
 uintptr_t get_function_off(int pid, uintptr_t addr, char *lib);
 

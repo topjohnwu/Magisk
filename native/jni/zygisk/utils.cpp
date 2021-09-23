@@ -12,15 +12,9 @@ struct map_info {
     uintptr_t end;
     uintptr_t off;
     int perms;
-    char *path;
+    const char *path;
 
     map_info() : start(0), end(0), off(0), perms(0), path(nullptr) {}
-
-    enum {
-        EXEC = (1 << 0),
-        WRITE = (1 << 1),
-        READ = (1 << 2),
-    };
 };
 
 } // namespace
@@ -43,11 +37,11 @@ static void parse_maps(int pid, Func fn) {
 
         // Parse permissions
         if (perm[0] != '-')
-            info.perms |= map_info::READ;
+            info.perms |= PROT_READ;
         if (perm[1] != '-')
-            info.perms |= map_info::WRITE;
+            info.perms |= PROT_WRITE;
         if (perm[2] != '-')
-            info.perms |= map_info::EXEC;
+            info.perms |= PROT_EXEC;
 
         info.path = line + path_off;
 
@@ -55,21 +49,43 @@ static void parse_maps(int pid, Func fn) {
     });
 }
 
-void unmap_all(const char *name) {
-    vector<map_info> unmaps;
-    parse_maps(getpid(), [=, &unmaps](map_info &info) -> bool {
+static vector<map_info> find_maps(const char *name) {
+    vector<map_info> maps;
+    parse_maps(getpid(), [=, &maps](map_info &info) -> bool {
         if (strcmp(info.path, name) == 0)
-            unmaps.emplace_back(info);
+            maps.emplace_back(info);
         return true;
     });
-    for (map_info &info : unmaps) {
+    return maps;
+}
+
+void unmap_all(const char *name) {
+    vector<map_info> maps = find_maps(name);
+    for (map_info &info : maps) {
         void *addr = reinterpret_cast<void *>(info.start);
         size_t size = info.end - info.start;
-        munmap(addr, size);
-        if (info.perms & map_info::READ) {
+        if (info.perms & PROT_READ) {
             // Make sure readable pages are still readable
-            xmmap(addr, size, PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, 0, 0);
+            void *dummy = xmmap(nullptr, size, PROT_READ, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+            mremap(dummy, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, addr);
+        } else {
+            munmap(addr, size);
         }
+    }
+}
+
+void remap_all(const char *name) {
+    vector<map_info> maps = find_maps(name);
+    for (map_info &info : maps) {
+        void *addr = reinterpret_cast<void *>(info.start);
+        size_t size = info.end - info.start;
+        void *copy = xmmap(nullptr, size, PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+        if ((info.perms & PROT_READ) == 0) {
+            mprotect(addr, size, PROT_READ);
+        }
+        memcpy(copy, addr, size);
+        mremap(copy, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, addr);
+        mprotect(addr, size, info.perms);
     }
 }
 
@@ -90,7 +106,7 @@ uintptr_t get_function_off(int pid, uintptr_t addr, char *lib) {
 uintptr_t get_function_addr(int pid, const char *lib, uintptr_t off) {
     uintptr_t addr = 0;
     parse_maps(pid, [=, &addr](map_info &info) -> bool {
-        if (strcmp(info.path, lib) == 0 && (info.perms & map_info::EXEC)) {
+        if (strcmp(info.path, lib) == 0 && (info.perms & PROT_EXEC)) {
             addr = info.start - info.off + off;
             return false;
         }

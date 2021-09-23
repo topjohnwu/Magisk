@@ -106,6 +106,7 @@ static void first_stage_entry() {
     // Load second stage
     setenv(INJECT_ENV_2, "1", 1);
     void *handle = dlopen(path, RTLD_LAZY);
+    remap_all(path);
 
     // Revert path to 1st stage lib
     *(strrchr(path, '.') - 1) = '1';
