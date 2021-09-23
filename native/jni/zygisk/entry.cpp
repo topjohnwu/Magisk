@@ -72,7 +72,7 @@ static void zygisk_cleanup_wait() {
 
 #define SECOND_STAGE_PTR "ZYGISK_PTR"
 
-static decltype(&unload_first_stage) second_stage_entry(void *handle) {
+static void second_stage_entry(void *handle, char *path) {
     self_handle = handle;
     unsetenv(INJECT_ENV_2);
     unsetenv(SECOND_STAGE_PTR);
@@ -80,7 +80,22 @@ static decltype(&unload_first_stage) second_stage_entry(void *handle) {
     zygisk_logging();
     LOGD("zygisk: inject 2nd stage\n");
     hook_functions();
-    return &unload_first_stage;
+
+    // Register signal handler to unload 1st stage
+    struct sigaction action{};
+    action.sa_sigaction = unload_first_stage;
+    sigaction(SIGUSR1, &action, nullptr);
+
+    // Schedule to unload 1st stage 10us later
+    timer_t timer;
+    sigevent_t event{};
+    event.sigev_notify = SIGEV_SIGNAL;
+    event.sigev_signo = SIGUSR1;
+    event.sigev_value.sival_ptr = path;
+    timer_create(CLOCK_MONOTONIC, &event, &timer);
+    itimerspec time{};
+    time.it_value.tv_nsec = 10000L;
+    timer_settime(&timer, 0, &time, nullptr);
 }
 
 static void first_stage_entry() {
@@ -115,23 +130,7 @@ static void first_stage_entry() {
     char *env = getenv(SECOND_STAGE_PTR);
     decltype(&second_stage_entry) second_stage;
     sscanf(env, "%p", &second_stage);
-    auto unload_handler = second_stage(handle);
-
-    // Register signal handler to unload 1st stage
-    struct sigaction action{};
-    action.sa_sigaction = unload_handler;
-    sigaction(SIGUSR1, &action, nullptr);
-
-    // Schedule to unload 1st stage 10us later
-    timer_t timer;
-    sigevent_t event{};
-    event.sigev_notify = SIGEV_SIGNAL;
-    event.sigev_signo = SIGUSR1;
-    event.sigev_value.sival_ptr = path;
-    timer_create(CLOCK_MONOTONIC, &event, &timer);
-    itimerspec time{};
-    time.it_value.tv_nsec = 10000L;
-    timer_settime(&timer, 0, &time, nullptr);
+    second_stage(handle, path);
 }
 
 __attribute__((constructor))
