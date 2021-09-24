@@ -24,6 +24,8 @@ static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 atomic<bool> denylist_enabled = false;
 
 static void rebuild_map() {
+    if (!zygisk_enabled)
+        return;
     app_id_proc_map->clear();
     string data_path(APP_DATA_DIR);
     size_t len = data_path.length();
@@ -146,6 +148,8 @@ static bool validate(const char *pkg, const char *proc) {
 static void add_hide_set(const char *pkg, const char *proc) {
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
     deny_set->emplace(pkg, proc);
+    if (!zygisk_enabled)
+        return;
     if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
         // Kill all matching isolated processes
         kill_process<&str_starts>(proc, true);
@@ -237,7 +241,7 @@ static bool init_list() {
     db_err_cmd(err, return false);
 
     // If Android Q+, also kill blastula pool and all app zygotes
-    if (SDK_INT >= 29) {
+    if (SDK_INT >= 29 && zygisk_enabled) {
         kill_process("usap32", true);
         kill_process("usap64", true);
         kill_process<&str_ends_safe>("_zygote", true);
@@ -309,15 +313,17 @@ int enable_deny() {
 
         denylist_enabled = true;
 
-        default_new(app_id_proc_map);
-        rebuild_map();
+        if (zygisk_enabled) {
+            default_new(app_id_proc_map);
+            rebuild_map();
 
-        inotify_fd = xinotify_init1(IN_CLOEXEC);
-        if (inotify_fd >= 0) {
-            // Monitor packages.xml
-            inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
-            pollfd inotify_pfd = { inotify_fd, POLLIN, 0 };
-            register_poll(&inotify_pfd, inotify_handler);
+            inotify_fd = xinotify_init1(IN_CLOEXEC);
+            if (inotify_fd >= 0) {
+                // Monitor packages.xml
+                inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
+                pollfd inotify_pfd = { inotify_fd, POLLIN, 0 };
+                register_poll(&inotify_pfd, inotify_handler);
+            }
         }
     }
 
