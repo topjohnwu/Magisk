@@ -9,8 +9,6 @@
     <string name="install">설치</string>
     <string name="section_home">홈</string>
     <string name="section_theme">테마</string>
-    <string name="safetynet">SafetyNet</string>
-    <string name="denylist">DenyList</string>
 
     <!--Home-->
     <string name="no_connection">사용 가능한 연결 없음</string>
@@ -99,7 +97,7 @@
     <string name="safetynet_attest_restart">다시 시도하십시오</string>
 
     <!--MagiskHide-->
-	<string name="show_system_app">시스템 앱 표시</string>
+    <string name="show_system_app">시스템 앱 표시</string>
     <string name="show_os_app">OS 앱 표시</string>
     <string name="hide_filter_hint">이름 검색</string>
     <string name="hide_scroll_up">최상단으로</string>
@@ -147,8 +145,6 @@
     <string name="settings_update_custom_msg">사용자 지정 URL 입력</string>
     <string name="settings_zygisk_summary">zygote 데몬에서 Magisk 부분 실행</string>
     <string name="settings_denylist_title">DenyList 적용</string>
-    <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
-    <string name="settings_denylist_error">This feature requires %1$s to be enabled</string>
     <string name="settings_denylist_config_title">DenyList 구성</string>
     <string name="settings_denylist_config_summary">denylist에 포함할 프로세스를 선택합니다.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -231,13 +227,6 @@
     <string name="setup_msg">환경 설정 진행 중…</string>
     <string name="authenticate">인증</string>
     <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
-    <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
-    <string name="unsupport_general_title">Abnormal State</string>
-    <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
-    <string name="unsupport_other_su_msg">An \"su\" command that does not belong to Magisk is detected. Please remove the other unsupported su.</string>
-    <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
-    <string name="unsupport_nonroot_stub_msg">The app cannot continue to work in the hidden state as root was lost. Please restore it back to the original APK.</string>
-    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">해당 기능을 사용하려면 저장소 권한을 허용해 주십시오.</string>
     <string name="add_shortcut_title">홈 화면에 바로가기 추가</string>
     <string name="add_shortcut_msg">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
