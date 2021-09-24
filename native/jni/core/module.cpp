@@ -688,8 +688,15 @@ static void collect_modules() {
             return;
         }
         unlinkat(modfd, "update", 0);
-        if (faccessat(modfd, "disable", F_OK, 0) != 0)
-            module_list.emplace_back(entry->d_name);
+        if (faccessat(modfd, "disable", F_OK, 0) == 0)
+            return;
+        // Riru and its modules are not compatible with zygisk
+        if (zygisk_enabled && (
+                entry->d_name == "riru-core"sv ||
+                faccessat(modfd, "riru", F_OK, 0) == 0))
+            return;
+
+        module_list.emplace_back(entry->d_name);
     });
 }
 
