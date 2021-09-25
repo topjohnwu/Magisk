@@ -108,6 +108,7 @@ error:
 int get_pty_num(int fd) {
     int pty_num = -1;
     if (ioctl(fd, TIOCGPTN, &pty_num) != 0) {
+        LOGW("get_pty_num failed with %d: %s\n", errno, std::strerror(errno));
         return -1;
     }
     return pty_num;

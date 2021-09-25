@@ -240,10 +240,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
             ptmx = magiskpts + "/ptmx";
         }
         int ptmx_fd = xopen(ptmx.data(), O_RDWR);
-        int unlock = 0;
-        ioctl(ptmx_fd, TIOCSPTLCK, &unlock);
-        send_fd(client, ptmx_fd);
+        grantpt(ptmx_fd);
+        unlockpt(ptmx_fd);
         int pty_num = get_pty_num(ptmx_fd);
+        if (pty_num < 0) {
+            // Kernel issue? Fallback to /dev/pts
+            close(ptmx_fd);
+            pts = "/dev/pts";
+            ptmx_fd = xopen("/dev/ptmx", O_RDWR);
+            grantpt(ptmx_fd);
+            unlockpt(ptmx_fd);
+            pty_num = get_pty_num(ptmx_fd);
+        }
+        send_fd(client, ptmx_fd);
         close(ptmx_fd);
 
         string pts_slave = pts + "/" + to_string(pty_num);
