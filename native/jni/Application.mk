@@ -10,6 +10,7 @@ APP_STRIP_MODE   := --strip-all
 # Busybox should use stock libc.a
 ifdef B_BB
 APP_PLATFORM     := android-22
+APP_CFLAGS       += -DBB_GLOBAL_CONST=""
 ifeq ($(OS),Windows_NT)
 APP_SHORT_COMMANDS := true
 endif
