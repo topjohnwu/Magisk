@@ -599,22 +599,21 @@ void magic_mount() {
         inject_magisk_bins(system);
     }
 
-    if (system->is_empty())
-        return;
-
-    // Handle special read-only partitions
-    for (const char *part : { "/vendor", "/product", "/system_ext" }) {
-        struct stat st;
-        if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
-            if (auto old = system->extract(part + 1)) {
-                auto new_node = new root_node(old);
-                root->insert(new_node);
+    if (!system->is_empty()) {
+        // Handle special read-only partitions
+        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
+            struct stat st{};
+            if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
+                if (auto old = system->extract(part + 1)) {
+                    auto new_node = new root_node(old);
+                    root->insert(new_node);
+                }
             }
         }
-    }
 
-    root->prepare();
-    root->mount();
+        root->prepare();
+        root->mount();
+    }
 
     // Mount on top of modules to enable zygisk
     if (zygisk_enabled) {
@@ -693,8 +692,10 @@ static void collect_modules() {
         // Riru and its modules are not compatible with zygisk
         if (zygisk_enabled && (
                 entry->d_name == "riru-core"sv ||
-                faccessat(modfd, "riru", F_OK, 0) == 0))
+                faccessat(modfd, "riru", F_OK, 0) == 0)) {
+            LOGI("%s: ignore\n", entry->d_name);
             return;
+        }
 
         module_list.emplace_back(entry->d_name);
     });
