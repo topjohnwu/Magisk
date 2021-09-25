@@ -232,7 +232,7 @@
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
     <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
-    <string name="unsupport_general_title">Abnormal State</string>
+    <string name="unsupport_general_title">WARNING!</string>
     <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
     <string name="unsupport_other_su_msg">An \"su\" command that does not belong to Magisk is detected. Please remove the other unsupported su.</string>
     <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
