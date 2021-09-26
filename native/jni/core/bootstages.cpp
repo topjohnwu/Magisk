@@ -275,7 +275,6 @@ void post_fs_data(int client) {
 
     LOGI("** post-fs-data mode running\n");
 
-    unlock_blocks();
     mount_mirrors();
 
     if (access(SECURE_DIR, F_OK) != 0) {
