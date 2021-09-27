@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 
-#define FDT_MAGIC_STR   "\xd0\x0d\xfe\xed"
 #define DT_TABLE_MAGIC  "\xd7\xb7\xab\x1e"
 #define QCDT_MAGIC      "QCDT"
 #define DTBH_MAGIC      "DTBH"

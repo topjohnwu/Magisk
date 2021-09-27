@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.core.tasks
 
-import android.content.Context
 import android.net.Uri
+import android.system.Os
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
@@ -12,14 +12,12 @@ import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.di.Protected
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.ktx.symlink
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.signing.SignBoot
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.NOPList
@@ -34,26 +32,25 @@ import org.kamranzafar.jtar.TarEntry
 import org.kamranzafar.jtar.TarHeader
 import org.kamranzafar.jtar.TarInputStream
 import org.kamranzafar.jtar.TarOutputStream
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import timber.log.Timber
 import java.io.*
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.*
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
 abstract class MagiskInstallImpl protected constructor(
     protected val console: MutableList<String> = NOPList.getInstance(),
     private val logs: MutableList<String> = NOPList.getInstance()
-) : KoinComponent {
+) {
 
     protected var installDir = File("xxx")
     private lateinit var srcBoot: File
 
     private val shell = Shell.getShell()
-    private val service: NetworkService by inject()
-    protected val context: Context by inject(Protected)
+    private val service get() = ServiceLocator.networkService
+    protected val context get() = ServiceLocator.deContext
     private val useRootDir = shell.isRoot && Info.noDataExec
 
     private fun findImage(): Boolean {
@@ -97,8 +94,14 @@ abstract class MagiskInstallImpl protected constructor(
             // Extract binaries
             if (isRunningAsStub) {
                 val zf = ZipFile(DynAPK.current(context))
+
+                // Also extract magisk32 on non 64-bit only 64-bit devices
+                val is32lib = Const.CPU_ABI_32?.let {
+                    { entry: ZipEntry -> entry.name == "lib/$it/libmagisk32.so" }
+                } ?: { false }
+
                 zf.entries().asSequence().filter {
-                    !it.isDirectory && it.name.startsWith("lib/${Const.CPU_ABI_32}/")
+                    !it.isDirectory && (it.name.startsWith("lib/${Const.CPU_ABI}/") || is32lib(it))
                 }.forEach {
                     val n = it.name.substring(it.name.lastIndexOf('/') + 1)
                     val name = n.substring(3, n.length - 3)
@@ -106,12 +109,20 @@ abstract class MagiskInstallImpl protected constructor(
                     zf.getInputStream(it).writeTo(dest)
                 }
             } else {
-                val libs = Const.NATIVE_LIB_DIR.listFiles { _, name ->
+                val info = context.applicationInfo
+                var libs = File(info.nativeLibraryDir).listFiles { _, name ->
                     name.startsWith("lib") && name.endsWith(".so")
                 } ?: emptyArray()
+
+                // Also symlink magisk32 on non 64-bit only 64-bit devices
+                val lib32 = info.javaClass.getDeclaredField("secondaryNativeLibraryDir").get(info) as String?
+                if (lib32 != null) {
+                    libs += File(lib32, "libmagisk32.so")
+                }
+
                 for (lib in libs) {
                     val name = lib.name.substring(3, lib.name.length - 3)
-                    symlink(lib.path, "$installDir/$name")
+                    Os.symlink(lib.path, "$installDir/$name")
                 }
             }
 
@@ -216,6 +227,7 @@ abstract class MagiskInstallImpl protected constructor(
             // Repack boot image to prevent auto restore
             arrayOf(
                 "cd $installDir",
+                "chmod -R 755 .",
                 "./magiskboot unpack boot.img",
                 "./magiskboot repack boot.img",
                 "cat new-boot.img > boot.img",
@@ -253,9 +265,9 @@ abstract class MagiskInstallImpl protected constructor(
                 src.reset()
 
                 val alpha = "abcdefghijklmnopqrstuvwxyz"
-                val alphaNum = "$alpha${alpha.toUpperCase(Locale.ROOT)}0123456789"
+                val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
                 val random = SecureRandom()
-                val filename = StringBuilder("magisk_patched_").run {
+                val filename = StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
                     for (i in 1..5) {
                         append(alphaNum[random.nextInt(alphaNum.length)])
                     }

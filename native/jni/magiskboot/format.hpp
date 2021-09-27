@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <string_view>
 
 typedef enum {
@@ -13,6 +12,7 @@ typedef enum {
     BLOB,
 /* Compression formats */
     GZIP,
+    ZOPFLI,
     XZ,
     LZMA,
     BZIP2,
@@ -24,10 +24,13 @@ typedef enum {
 /* Misc */
     MTK,
     DTB,
+    ZIMAGE,
 } format_t;
 
 #define COMPRESSED(fmt)      ((fmt) >= GZIP && (fmt) < LZOP)
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
+
+#define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
 
 #define BOOT_MAGIC      "ANDROID!"
 #define VENDOR_BOOT_MAGIC "VNDRBOOT"
@@ -54,6 +57,9 @@ typedef enum {
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
+#define AVB_FOOTER_MAGIC "AVBf"
+#define AVB_MAGIC "AVB0"
+#define ZIMAGE_MAGIC "\x18\x28\x6f\x01"
 
 class Fmt2Name {
 public:
@@ -65,8 +71,13 @@ public:
     const char *operator[](format_t fmt);
 };
 
+class Name2Fmt {
+public:
+    format_t operator[](std::string_view name);
+};
+
 format_t check_fmt(const void *buf, size_t len);
 
-extern std::map<std::string_view, format_t> name2fmt;
+extern Name2Fmt name2fmt;
 extern Fmt2Name fmt2name;
 extern Fmt2Ext fmt2ext;

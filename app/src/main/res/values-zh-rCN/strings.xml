@@ -10,6 +10,7 @@
     <string name="section_home">主页</string>
     <string name="section_theme">主题</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">排除列表</string>
 
     <!--Home-->
     <string name="no_connection">无法连接</string>
@@ -131,8 +132,6 @@
     <string name="settings_dark_mode_dark">深色模式</string>
     <string name="settings_download_path_title">下载路径</string>
     <string name="settings_download_path_message">文件将保存到 %1$s</string>
-    <string name="settings_clear_cache_title">清除仓库缓存</string>
-    <string name="settings_clear_cache_summary">清除已缓存的在线仓库信息，强制刷新数据</string>
     <string name="settings_hide_app_title">隐藏 Magisk 应用</string>
     <string name="settings_hide_app_summary">安装具有随机包名和自定义应用名称的代理应用</string>
     <string name="settings_restore_app_title">还原 Magisk 应用</string>
@@ -146,7 +145,12 @@
     <string name="settings_update_beta">测试版</string>
     <string name="settings_update_custom">自定义通道</string>
     <string name="settings_update_custom_msg">自定义通道网址</string>
-    <string name="settings_magiskhide_summary">隐藏 Magisk 避免被检测</string>
+    <string name="settings_zygisk_summary">在 Zygote 中运行 Magisk</string>
+    <string name="settings_denylist_title">遵守排除列表</string>
+    <string name="settings_denylist_summary">Magisk 不会修改列表中的进程</string>
+    <string name="settings_denylist_error">此功能需要先启用 %1$s</string>
+    <string name="settings_denylist_config_title">配置排除列表</string>
+    <string name="settings_denylist_config_summary">选择加入排除列表的进程</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">为广告屏蔽应用提供 Systemless hosts 支持</string>
     <string name="settings_hosts_toast">已添加 systemless hosts 模块</string>
@@ -176,8 +180,6 @@
     <string name="no_biometric">设备不支持或未配置生物识别功能</string>
     <string name="settings_customization">个性化</string>
     <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
-    <string name="settings_doh_title">安全 DNS（DoH）</string>
-    <string name="settings_doh_description">解决某些地区的 DNS 污染问题</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
@@ -229,7 +231,7 @@
     <string name="setup_msg">正在修复运行环境</string>
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
-    <string name="unsupport_magisk_msg">应用不支持低于 %1$s 版本的 Magisk，表现为未安装状态。仅升级功能可用，请尽快升级 Magisk。</string>
+    <string name="unsupport_magisk_msg">应用不支持低于 %1$s 版本的 Magisk，表现为未安装状态。但升级功能可用，请尽快在应用内升级 Magisk。</string>
     <string name="unsupport_general_title">异常状态</string>
     <string name="unsupport_system_app_msg">Magisk 不支持安装为系统应用，请还原为用户应用。</string>
     <string name="unsupport_other_su_msg">检测到不属于 Magisk 的 su 文件，请删除其他超级用户程序。</string>
@@ -240,5 +242,6 @@
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
     <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
+    <string name="reboot_apply_change">重启后生效</string>
 
 </resources>

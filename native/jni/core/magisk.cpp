@@ -5,7 +5,7 @@
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <flags.hpp>
+#include <flags.h>
 
 #include "core.hpp"
 
@@ -28,6 +28,7 @@ Options:
 
 Advanced Options (Internal APIs):
    --daemon                  manually start magisk daemon
+   --stop                    remove all magisk changes and stop daemon
    --[init trigger]          start service for init trigger
                              Supported init triggers:
                              post-fs-data, service, boot-complete
@@ -37,6 +38,7 @@ Advanced Options (Internal APIs):
    --clone SRC DEST          clone SRC to DEST
    --sqlite SQL              exec SQL commands to Magisk database
    --path                    print Magisk tmpfs mount path
+   --denylist ARGS           denylist config CLI
 
 Available applets:
 )EOF");
@@ -84,6 +86,10 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(true);
         write_int(fd, START_DAEMON);
         return 0;
+    } else if (argv[1] == "--stop"sv) {
+        int fd = connect_daemon();
+        write_int(fd, STOP_DAEMON);
+        return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
         int fd = connect_daemon(true);
         write_int(fd, POST_FS_DATA);
@@ -96,7 +102,9 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(true);
         write_int(fd, BOOT_COMPLETE);
         return read_int(fd);
-    } else if (argc >= 3 && argv[1] == "--sqlite"sv) {
+    } else if (argv[1] == "--denylist"sv) {
+        return denylist_cli(argc - 1, argv + 1);
+    }else if (argc >= 3 && argv[1] == "--sqlite"sv) {
         int fd = connect_daemon();
         write_int(fd, SQLITE_CMD);
         write_string(fd, argv[2]);

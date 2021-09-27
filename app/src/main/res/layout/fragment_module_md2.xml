@@ -39,6 +39,7 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="@dimen/internal_action_bar_size"
+            android:paddingBottom="56dp"
             app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_module_md2" />
@@ -50,9 +51,9 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l1"
-            app:layout_fitsSystemWindowsInsets="bottom"
+            android:layout_marginBottom="72dp"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
+            app:layout_fitsSystemWindowsInsets="bottom"
             app:srcCompat="@drawable/ic_search_md2"
             app:tint="?colorPrimary"
             tools:layout_marginBottom="64dp" />
@@ -60,11 +61,11 @@
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView
             android:id="@+id/module_filter"
             style="@style/WidgetFoundation.Card"
-            app:cardBackgroundColor="?colorSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom"
             android:visibility="invisible"
+            app:cardBackgroundColor="?colorSurface"
             app:cardCornerRadius="0dp">
 
             <include

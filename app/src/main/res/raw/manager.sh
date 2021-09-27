@@ -1,5 +1,5 @@
 ##################################
-# Magisk Manager internal scripts
+# Magisk app internal scripts
 ##################################
 
 run_delay() {
@@ -10,6 +10,8 @@ env_check() {
   for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
   done
+  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
+  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 1
   return 0
 }
 
@@ -115,8 +117,8 @@ id=hosts
 name=Systemless Hosts
 version=1.0
 versionCode=1
-author=Magisk Manager
-description=Magisk Manager built-in systemless hosts module
+author=Magisk
+description=Magisk app built-in systemless hosts module
 EOF
   magisk --clone /system/etc/hosts hosts/system/etc/hosts
   touch hosts/update

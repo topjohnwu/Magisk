@@ -129,8 +129,6 @@
     <string name="settings_dark_mode_dark">Selalu gelap</string>
     <string name="settings_download_path_title">Lokasi download</string>
     <string name="settings_download_path_message">File akan disimpan ke %1$s</string>
-    <string name="settings_clear_cache_title">Hapus cache repo</string>
-    <string name="settings_clear_cache_summary">Hapus cache informasi repo online. Tindakan ini memaksa aplikasi untuk memperbarui repo online</string>
     <string name="language">Bahasa</string>
     <string name="system_default">(Default sistem)</string>
     <string name="settings_check_update_title">Periksa update</string>
@@ -140,7 +138,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kanal khusus</string>
     <string name="settings_update_custom_msg">Masukkan URL khusus</string>
-    <string name="settings_magiskhide_summary">Sembunyikan Magisk dari berbagai bentuk pendeteksian</string>
     <string name="settings_hosts_title">Host systemless</string>
     <string name="settings_hosts_summary">Dukungan host secara systemless untuk aplikasi pemblokir iklan</string>
     <string name="settings_hosts_toast">Menambahkan modul host systemless</string>
@@ -170,8 +167,6 @@
     <string name="no_biometric">Perangkat tidak mendukung atau setelan biometrik tidak diaktifkan</string>
     <string name="settings_customization">Personalisasi</string>
     <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik pada layar utama seandainya nama dan ikon sulit untuk dikenali setelah menyembunyikan aplikasi</string>
-    <string name="settings_doh_title">DNS melalui HTTPS</string>
-    <string name="settings_doh_description">Solusi untuk DNS poisoning di beberapa negara</string>
 
     <string name="multiuser_mode">Mode multi pengguna</string>
     <string name="settings_owner_only">Pemilik perangkat saja</string>

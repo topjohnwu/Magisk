@@ -272,6 +272,14 @@ int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
     return errno;
 }
 
+int xaccess(const char *path, int mode) {
+    int ret = access(path, mode);
+    if (ret < 0) {
+        PLOGE("access %s", path);
+    }
+    return ret;
+}
+
 int xstat(const char *pathname, struct stat *buf) {
     int ret = stat(pathname, buf);
     if (ret < 0) {
@@ -349,6 +357,20 @@ ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
     }
     return ret;
 #endif
+}
+
+int xfaccessat(int dirfd, const char *pathname) {
+    int ret = faccessat(dirfd, pathname, F_OK, 0);
+    if (ret < 0) {
+        PLOGE("faccessat %s", pathname);
+    }
+#if defined(__i386__) || defined(__x86_64__)
+    if (ret > 0 && errno == 0) {
+        LOGD("faccessat success but ret is %d\n", ret);
+        ret = 0;
+    }
+#endif
+    return ret;
 }
 
 int xsymlink(const char *target, const char *linkpath) {
@@ -444,7 +466,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags,
 
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
     ssize_t ret = sendfile(out_fd, in_fd, offset, count);
-    if (count != ret) {
+    if (ret < 0) {
         PLOGE("sendfile");
     }
     return ret;

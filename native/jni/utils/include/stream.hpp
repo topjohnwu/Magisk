@@ -1,14 +1,19 @@
 #pragma once
 
-#include <stdio.h>
+#include <sys/uio.h>
+#include <cstdio>
 #include <memory>
 
 #include "../files.hpp"
 
 class stream {
 public:
-    virtual int read(void *buf, size_t len);
-    virtual int write(const void *buf, size_t len);
+    virtual ssize_t read(void *buf, size_t len);
+    virtual ssize_t readFully(void *buf, size_t len);
+    virtual ssize_t readv(const iovec *iov, int iovcnt);
+    virtual ssize_t write(const void *buf, size_t len);
+    virtual ssize_t writeFully(void *buf, size_t len);
+    virtual ssize_t writev(const iovec *iov, int iovcnt);
     virtual off_t seek(off_t off, int whence);
     virtual ~stream() = default;
 };
@@ -20,8 +25,11 @@ class filter_stream : public stream {
 public:
     filter_stream(stream_ptr &&base) : base(std::move(base)) {}
 
-    int read(void *buf, size_t len) override;
-    int write(const void *buf, size_t len) override;
+    ssize_t read(void *buf, size_t len) override;
+    ssize_t write(const void *buf, size_t len) override;
+
+    // Seeking while filtering does not make sense
+    off_t seek(off_t off, int whence) final { return stream::seek(off, whence); }
 
 protected:
     stream_ptr base;
@@ -31,10 +39,11 @@ protected:
 class byte_stream : public stream {
 public:
     byte_stream(uint8_t *&buf, size_t &len);
-    template <class byte>
-    byte_stream(byte *&buf, size_t &len) : byte_stream(reinterpret_cast<uint8_t *&>(buf), len) {}
-    int read(void *buf, size_t len) override;
-    int write(const void *buf, size_t len) override;
+    template <class Byte>
+    byte_stream(Byte *&buf, size_t &len) : byte_stream(reinterpret_cast<uint8_t *&>(buf), len) {}
+
+    ssize_t read(void *buf, size_t len) override;
+    ssize_t write(const void *buf, size_t len) override;
     off_t seek(off_t off, int whence) override;
 
 private:
@@ -50,8 +59,10 @@ private:
 class fd_stream : public stream {
 public:
     fd_stream(int fd) : fd(fd) {}
-    int read(void *buf, size_t len) override;
-    int write(const void *buf, size_t len) override;
+    ssize_t read(void *buf, size_t len) override;
+    ssize_t readv(const iovec *iov, int iovcnt) override;
+    ssize_t write(const void *buf, size_t len) override;
+    ssize_t writev(const iovec *iov, int iovcnt) override;
     off_t seek(off_t off, int whence) override;
 
 private:
@@ -67,8 +78,9 @@ class fp_stream final : public stream {
 public:
     fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
     fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
-    int read(void *buf, size_t len) override;
-    int write(const void *buf, size_t len) override;
+
+    ssize_t read(void *buf, size_t len) override;
+    ssize_t write(const void *buf, size_t len) override;
     off_t seek(off_t off, int whence) override;
 
 private:

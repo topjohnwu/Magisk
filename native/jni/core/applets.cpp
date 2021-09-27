@@ -10,7 +10,7 @@ using namespace std;
 
 using main_fun = int (*)(int, char *[]);
 
-static main_fun applet_main[] = { su_client_main, resetprop_main, magiskhide_main, nullptr };
+static main_fun applet_main[] = { su_client_main, resetprop_main, nullptr };
 
 static int call_applet(int argc, char *argv[]) {
     // Applets
@@ -20,18 +20,16 @@ static int call_applet(int argc, char *argv[]) {
             return (*applet_main[i])(argc, argv);
         }
     }
-#if ENABLE_INJECT
     if (str_starts(base, "app_process")) {
         return app_process_main(argc, argv);
     }
-#endif
     fprintf(stderr, "%s: applet not found\n", base.data());
     return 1;
 }
 
 int main(int argc, char *argv[]) {
     umask(0);
-    dload_selinux();
+    enable_selinux();
     cmdline_logging();
     init_argv0(argc, argv);
 
@@ -48,4 +46,3 @@ int main(int argc, char *argv[]) {
 
     return call_applet(argc, argv);
 }
-

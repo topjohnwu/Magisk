@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.arch.BaseUIActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.topjohnwu.magisk.di.viewModel
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
@@ -30,6 +30,9 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         lockOrientation()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.addFlags(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            window.setHideOverlayWindows(true)
+        }
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
@@ -62,9 +65,6 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
     }
 
     private fun lockOrientation() {
-        requestedOrientation = if (Build.VERSION.SDK_INT < 18)
-            resources.configuration.orientation
-        else
-            ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
     }
 }

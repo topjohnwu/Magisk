@@ -108,23 +108,9 @@
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
             <Space
-                gone="@{!viewModel.showSafetyNet &amp;&amp; !Info.env.isActive}"
+                goneUnless="@{Info.env.isActive}"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/l1" />
-
-            <Button
-                style="@style/WidgetFoundation.Button.Outlined"
-                gone="@{!viewModel.showSafetyNet}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:onClick="@{() -> viewModel.onSafetyNetPressed()}"
-                android:text="@string/home_check_safetynet"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                app:cornerRadius="@dimen/r1"
-                app:icon="@drawable/ic_safetynet_md2" />
 
             <Button
                 style="@style/WidgetFoundation.Button.Outlined.Error"

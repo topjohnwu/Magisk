@@ -54,7 +54,7 @@ if [ -z $SOURCEDMODE ]; then
   # Load utility functions
   . ./util_functions.sh
   # Check if 64-bit
-  [ -d /system/lib64 ] && IS64BIT=true || IS64BIT=false
+  api_level_arch_detect
 fi
 
 BOOTIMAGE="$1"
@@ -86,12 +86,16 @@ ui_print "- Unpacking boot image"
 ./magiskboot unpack "$BOOTIMAGE"
 
 case $? in
+  0 ) ;;
   1 )
     abort "! Unsupported/Unknown image format"
     ;;
   2 )
     ui_print "- ChromeOS boot image detected"
     CHROMEOS=true
+    ;;
+  * )
+    abort "! Unable to unpack boot image"
     ;;
 esac
 
@@ -143,15 +147,22 @@ echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
 # Compress to save precious ramdisk space
-./magiskboot compress=xz magisk32 magisk32.xz
-./magiskboot compress=xz magisk64 magisk64.xz
-$IS64BIT && SKIP64="" || SKIP64="#"
+SKIP32="#"
+SKIP64="#"
+if [ -f magisk32 ]; then
+  ./magiskboot compress=xz magisk32 magisk32.xz
+  unset SKIP32
+fi
+if [ -f magisk64 ]; then
+  ./magiskboot compress=xz magisk64 magisk64.xz
+  unset SKIP64
+fi
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
-"add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
+"$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
 "$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
@@ -191,7 +202,7 @@ fi
 #################
 
 ui_print "- Repacking boot image"
-./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image!"
+./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos

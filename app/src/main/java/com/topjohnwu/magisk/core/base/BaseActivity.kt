@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
+import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.ktx.set
 import com.topjohnwu.magisk.utils.Utils
 import kotlin.random.Random
@@ -41,6 +43,15 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base.wrap(true))
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Overwrite private members to avoid nasty "false" stack traces being logged
+        val delegate = delegate
+        val clz = delegate.javaClass
+        clz.reflectField("mActivityHandlesUiModeChecked").set(delegate, true)
+        clz.reflectField("mActivityHandlesUiMode").set(delegate, false)
+        super.onCreate(savedInstanceState)
     }
 
     fun withPermission(permission: String, builder: PermissionRequestBuilder.() -> Unit) {
@@ -72,6 +83,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         var success = true
         for (res in grantResults) {
             if (res != PackageManager.PERMISSION_GRANTED) {

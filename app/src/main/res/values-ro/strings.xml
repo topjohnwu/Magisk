@@ -131,12 +131,10 @@
     <string name="settings_dark_mode_dark">Mereu întunecat</string>
     <string name="settings_download_path_title">Cale de descărcare</string>
     <string name="settings_download_path_message">Fișierele vor fi salvate în %1$s</string>
-    <string name="settings_clear_cache_title">Golește cache-ul depozitelor</string>
     <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
     <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
     <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
     <string name="settings_restore_app_summary">Dezvăluie aplicația și restaureaz-o înapoi în APK-ul original</string>
-    <string name="settings_clear_cache_summary">Golește informațiile memorate în cache pentru depozitele online. Acest lucru forțează actualizarea aplicației online</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
@@ -146,7 +144,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
-    <string name="settings_magiskhide_summary">Ascunde Magisk de diferite forme de detectare</string>
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
     <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor adblock</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
@@ -176,8 +173,6 @@
     <string name="no_biometric">Dispozitiv nesuportat sau nu sunt activate setări biometrice</string>
     <string name="settings_customization">Personalizare</string>
     <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
-    <string name="settings_doh_title">DNS prin HTTPS</string>
-    <string name="settings_doh_description">Soluție ocolitoare pentru poisoningul DNS în anumite țări</string>
 
     <string name="multiuser_mode">Mod de multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>

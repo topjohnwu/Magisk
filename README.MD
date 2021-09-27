@@ -1,25 +1,25 @@
 ![](docs/images/logo.png)
 
-![ZIP Downloads](https://img.shields.io/badge/dynamic/json?color=blue&label=ZIP%20Downloads&query=magisk&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk_files%2Fcount%2Fcount.json&cacheSeconds=1800)
-![APK Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=APK%20Downloads&query=manager&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk_files%2Fcount%2Fcount.json&cacheSeconds=1800)
+[![Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
+
+#### This is not an officially supported Google product
 
 ## Introduction
 
-Magisk is a suite of open source tools for customizing Android, supporting devices higher than Android 4.2. It covers fundamental parts of Android customization: root, boot scripts, SELinux patches, AVB2.0 / dm-verity / forceencrypt removals etc.
+Magisk is a suite of open source software for customizing Android, supporting devices higher than Android 5.0.<br>
+Some highlight features:
 
-Here are some feature highlights:
-
-- **MagiskSU**: Provide root access to your device
+- **MagiskSU**: Provide root access for applications
 - **Magisk Modules**: Modify read-only partitions by installing modules
-- **MagiskHide**: Hide Magisk from root detections / system integrity checks
+- **MagiskBoot**: The most complete tool for unpacking and repacking Android boot images
 
 ## Downloads
 
-Please note that the only source of official Magisk information and downloads is [Github](https://github.com/topjohnwu/Magisk/). Beware of any other websites.
+[Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
 
-[![](https://img.shields.io/badge/Magisk-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
-[![](https://img.shields.io/badge/Magisk%20Beta-v22.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v22.0)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk_files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk-v23.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v23.0)
+[![](https://img.shields.io/badge/Magisk%20Beta-v23.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v23.0)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -27,13 +27,6 @@ Please note that the only source of official Magisk information and downloads is
 - [Frequently Asked Questions](https://topjohnwu.github.io/Magisk/faq.html)
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 - [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
-
-## Android Version Support
-
-- Android 4.2+: MagiskSU and Magisk Modules Only
-- Android 4.4+: All core features available
-- Android 6.0+: Guaranteed MagiskHide support
-- Android 7.0+: Full MagiskHide protection
 
 ## Bug Reports
 
@@ -50,7 +43,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - Install Python 3.6+ \
 (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
 - Configure to use the JDK bundled in Android Studio:
-	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
+	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`
 	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
 - Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)

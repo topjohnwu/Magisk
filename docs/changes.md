@@ -1,5 +1,34 @@
 # Magisk Changelog
 
+### v23.0
+
+- [App] Update snet extension. This fixes SafetyNet API errors.
+- [App] Fix a bug in the stub app that causes APK installation to fail
+- [App] Hide annoying errors in logs when hidden as stub
+- [App] Fix issues when patching ODIN tar files when the app is hidden
+- [General] Remove all pre Android 5.0 support
+- [General] Update BusyBox to use proper libc
+- [General] Fix C++ undefined behaviors
+- [General] Several `sepolicy.rule` copy/installation fixes
+- [MagiskPolicy] Remove unnecessary sepolicy rules
+- [MagiskHide] Update package and process name validation logic
+- [MagiskHide] Some changes that prevents zygote deadlock
+
+### v22.1
+
+- [App] Prevent multiple installation sessions running in parallel
+- [App] Prevent OutOfMemory crashes when checking boot signature on PXA boot images
+- [General] Proper cgroup migration implementation
+- [General] Rewrite log writer from scratch, should resolve any crashes and deadlocks
+- [General] Many scripts updates fixing regressions
+- [MagiskHide] Prevent possible deadlock when signal arrives
+- [MagiskHide] Partial match process names if necessary
+- [MagiskBoot] Preserve and patch AVB 2.0 structures/headers in boot images
+- [MagiskBoot] Properly strip out data encryption flags
+- [MagiskBoot] Prevent possible integer overflow
+- [MagiskInit] Fix `sepolicy.rule` mounting strategy
+- [resetprop] Always delete existing `ro.` props before updating. This will fix bootloops that could be caused by modifying device fingerprint properties.
+
 ### v22.0
 
 - [General] Magisk and Magisk Manager is now merged into the same package!

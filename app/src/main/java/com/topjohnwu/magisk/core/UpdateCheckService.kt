@@ -4,16 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.work.*
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.Notifications
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.util.concurrent.TimeUnit
 
 class UpdateCheckService(context: Context, workerParams: WorkerParameters)
-    : CoroutineWorker(context, workerParams), KoinComponent {
+    : CoroutineWorker(context, workerParams) {
 
-    private val svc: NetworkService by inject()
+    private val svc get() = ServiceLocator.networkService
 
     override suspend fun doWork(): Result {
         return svc.fetchUpdate()?.run {

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
@@ -12,13 +11,13 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import org.koin.core.get
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -65,8 +64,7 @@ class InstallViewModel(
     init {
         viewModelScope.launch {
             try {
-                val context = get<Context>()
-                File(context.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
+                File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
                     notes = when {
                         exists() -> readText()
                         Const.Url.CHANGELOG_URL.isEmpty() -> ""
@@ -89,9 +87,9 @@ class InstallViewModel(
 
     fun install() {
         when (method) {
-            R.id.method_patch -> FlashFragment.patch(data!!)
-            R.id.method_direct -> FlashFragment.flash(false)
-            R.id.method_inactive_slot -> FlashFragment.flash(true)
+            R.id.method_patch -> FlashFragment.patch(data!!).navigate()
+            R.id.method_direct -> FlashFragment.flash(false).navigate()
+            R.id.method_inactive_slot -> FlashFragment.flash(true).navigate()
             else -> error("Unknown value")
         }
         state = State.LOADING

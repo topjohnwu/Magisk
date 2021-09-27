@@ -21,6 +21,9 @@ static bool verbose = false;
 #define system_property_read_callback __system_property_read_callback
 #define system_property_foreach       __system_property_foreach
 #define system_property_read(...)
+extern "C" int fsetxattr(int fd, const char* name, const void* value, size_t size, int flags) {
+    return syscall(__NR_fsetxattr, fd, name, value, size, flags);
+}
 #else
 static int (*system_property_set)(const char*, const char*);
 static int (*system_property_read)(const prop_info*, char*, char*);
@@ -169,10 +172,16 @@ struct resetprop : public sysprop {
 
         int ret;
         auto pi = const_cast<prop_info *>(__system_property_find(name));
+
+        // Always delete existing read-only properties, because they could be
+        // long properties and cannot directly go through __system_property_update
+        if (pi != nullptr && str_starts(name, "ro.")) {
+            delprop(name, false);
+            pi = nullptr;
+        }
+
         if (pi != nullptr) {
             if (prop_svc) {
-                if (strncmp(name, "ro.", 3) == 0)
-                    delprop(name, false);
                 ret = system_property_set(name, value);
             } else {
                 ret = __system_property_update(pi, value, strlen(value));
@@ -213,13 +222,18 @@ struct resetprop : public sysprop {
             callback(key.data(), val.data(), cookie);
     }
 
+    // Not an error when something is deleted
     int delprop(const char *name, bool persist) override {
         if (!check_legal_property_name(name))
             return 1;
         LOGD("resetprop: delete prop [%s]\n", name);
-        if (persist && strncmp(name, "persist.", 8) == 0)
-            persist = persist_deleteprop(name);
-        return __system_property_delete(name) && !(persist && strncmp(name, "persist.", 8) == 0);
+
+        int ret = __system_property_delete(name);
+        if (persist && str_starts(name, "persist.")) {
+            if (persist_deleteprop(name))
+                ret = 0;
+        }
+        return ret;
     }
 };
 

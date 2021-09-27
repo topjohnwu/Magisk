@@ -13,8 +13,7 @@ import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toLog
 import com.topjohnwu.magisk.core.model.su.toPolicy
-import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.startActivity
 import com.topjohnwu.magisk.ktx.startActivityWithRoot
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
@@ -104,9 +103,8 @@ object SuCallbackHandler {
             command = command
         )
 
-        val logRepo = get<LogRepository>()
         GlobalScope.launch {
-            logRepo.insert(log)
+            ServiceLocator.logRepo.insert(log)
         }
     }
 

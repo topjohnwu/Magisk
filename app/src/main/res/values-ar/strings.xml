@@ -125,8 +125,6 @@
     <string name="settings_dark_mode_dark">وضـع الظلام</string>
     <string name="settings_download_path_title">مسار التحميل</string>
     <string name="settings_download_path_message">ستحمل الملفات إلى %1$s</string>
-    <string name="settings_clear_cache_title">حذف الذاكرة المؤقتة للإضافات</string>
-    <string name="settings_clear_cache_summary">حذف المعلومات المخزنة محليا، هذا سيجبر التطبيق على التحديث الإضافات عبر الانترنت</string>
     <string name="language">اللغة</string>
     <string name="system_default">(الأفتراضي)</string>
     <string name="settings_check_update_title">تحقق من التحديثات</string>
@@ -136,7 +134,6 @@
     <string name="settings_update_beta">تجريبي</string>
     <string name="settings_update_custom">مخصص</string>
     <string name="settings_update_custom_msg">أدخل الرابط لمصدرك المخصص</string>
-    <string name="settings_magiskhide_summary">إخفاء مـاجـيسك من معظم طرق الاكتشاف</string>
     <string name="settings_hosts_title">موانع الاعلانات</string>
     <string name="settings_hosts_summary">حجب الاعلانات دون تعديل النظام</string>
     <string name="settings_hosts_toast">تم تمكين خاصية حجب الاعلانات</string>

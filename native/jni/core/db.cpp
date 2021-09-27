@@ -7,7 +7,7 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
-#define DB_VERSION 10
+#define DB_VERSION 11
 
 using namespace std;
 
@@ -97,11 +97,12 @@ static bool dload_sqlite() {
     return true;
 }
 
-int db_strings::getKeyIdx(string_view key) const {
-    int idx = DB_STRING_NUM;
-    for (int i = 0; i < DB_STRING_NUM; ++i) {
-        if (key == DB_STRING_KEYS[i])
-            idx = i;
+int db_strings::get_idx(string_view key) const {
+    int idx = 0;
+    for (const char *k : DB_STRING_KEYS) {
+        if (key == k)
+            break;
+        ++idx;
     }
     return idx;
 }
@@ -111,14 +112,16 @@ db_settings::db_settings() {
     data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    data[HIDE_CONFIG] = false;
+    data[DENYLIST_CONFIG] = false;
+    data[ZYGISK_CONFIG] = false;
 }
 
-int db_settings::getKeyIdx(string_view key) const {
-    int idx = DB_SETTINGS_NUM;
-    for (int i = 0; i < DB_SETTINGS_NUM; ++i) {
-        if (key == DB_SETTING_KEYS[i])
-            idx = i;
+int db_settings::get_idx(string_view key) const {
+    int idx = 0;
+    for (const char *k : DB_SETTING_KEYS) {
+        if (key == k)
+            break;
+        ++idx;
     }
     return idx;
 }
@@ -146,7 +149,7 @@ static char *open_and_init_db(sqlite3 *&db) {
     if (ver > DB_VERSION) {
         // Don't support downgrading database
         sqlite3_close(db);
-        return nullptr;
+        return strdup("Downgrading database is not supported");
     }
     if (ver < 3) {
         // Policies
@@ -171,12 +174,6 @@ static char *open_and_init_db(sqlite3 *&db) {
                 "CREATE TABLE IF NOT EXISTS strings "
                 "(key TEXT, value TEXT, PRIMARY KEY(key))",
                 nullptr, nullptr, &err);
-        err_ret(err);
-        ver = 4;
-        upgrade = true;
-    }
-    if (ver < 5) {
-        sqlite3_exec(db, "UPDATE policies SET uid=uid%100000", nullptr, nullptr, &err);
         err_ret(err);
         /* Directly jump to version 6 */
         ver = 6;
@@ -227,6 +224,17 @@ static char *open_and_init_db(sqlite3 *&db) {
         ver = 10;
         upgrade = true;
     }
+    if (ver < 11) {
+        sqlite3_exec(db,
+                "DROP TABLE IF EXISTS hidelist;"
+                "CREATE TABLE IF NOT EXISTS denylist "
+                "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process));"
+                "DELETE FROM settings WHERE key='magiskhide';",
+                nullptr, nullptr, &err);
+        err_ret(err);
+        ver = 11;
+        upgrade = true;
+    }
 
     if (upgrade) {
         // Set version
@@ -256,6 +264,14 @@ char *db_exec(const char *sql) {
     return nullptr;
 }
 
+static int sqlite_db_row_callback(void *cb, int col_num, char **data, char **col_name) {
+    auto &func = *static_cast<const db_row_cb*>(cb);
+    db_row row;
+    for (int i = 0; i < col_num; ++i)
+        row[col_name[i]] = data[i];
+    return func(row) ? 0 : 1;
+}
+
 char *db_exec(const char *sql, const db_row_cb &fn) {
     char *err;
     if (mDB == nullptr) {
@@ -268,13 +284,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
         );
     }
     if (mDB) {
-        sqlite3_exec(mDB, sql, [](void *cb, int col_num, char **data, char **col_name) -> int {
-            auto &func = *reinterpret_cast<const db_row_cb*>(cb);
-            db_row row;
-            for (int i = 0; i < col_num; ++i)
-                row[col_name[i]] = data[i];
-            return func(row) ? 0 : 1;
-        }, (void *) &fn, &err);
+        sqlite3_exec(mDB, sql, sqlite_db_row_callback, (void *) &fn, &err);
         return err;
     }
     return nullptr;
@@ -289,10 +299,10 @@ int get_db_settings(db_settings &cfg, int key) {
     };
     if (key >= 0) {
         char query[128];
-        sprintf(query, "SELECT key, value FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
+        snprintf(query, sizeof(query), "SELECT * FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
         err = db_exec(query, settings_cb);
     } else {
-        err = db_exec("SELECT key, value FROM settings", settings_cb);
+        err = db_exec("SELECT * FROM settings", settings_cb);
     }
     db_err_cmd(err, return 1);
     return 0;
@@ -302,14 +312,15 @@ int get_db_strings(db_strings &str, int key) {
     char *err;
     auto string_cb = [&](db_row &row) -> bool {
         str[row["key"]] = row["value"];
+        LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
         return true;
     };
     if (key >= 0) {
         char query[128];
-        sprintf(query, "SELECT key, value FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
+        snprintf(query, sizeof(query), "SELECT * FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
         err = db_exec(query, string_cb);
     } else {
-        err = db_exec("SELECT key, value FROM strings", string_cb);
+        err = db_exec("SELECT * FROM strings", string_cb);
     }
     db_err_cmd(err, return 1);
     return 0;
@@ -330,41 +341,46 @@ int get_uid_policy(su_access &su, int uid) {
     return 0;
 }
 
-bool check_manager(string *pkg) {
+bool get_manager(int user_id, std::string *pkg, struct stat *st) {
     db_strings str;
     get_db_strings(str, SU_MANAGER);
-    bool ret = validate_manager(str[SU_MANAGER], 0, nullptr);
-    if (pkg) {
-        if (ret)
-            pkg->swap(str[SU_MANAGER]);
-        else
-            *pkg = "xxx";  /* Make sure the return pkg can never exist */
-    }
-    return ret;
-}
-
-bool validate_manager(string &pkg, int userid, struct stat *st) {
-    struct stat tmp_st;
-    if (st == nullptr)
-        st = &tmp_st;
-
-    // Prefer DE storage
     char app_path[128];
-    sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, userid, pkg.data());
-    if (pkg.empty() || stat(app_path, st)) {
-        // Check the official package name
-        sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, userid);
-        if (stat(app_path, st)) {
-            LOGE("su: cannot find manager\n");
-            memset(st, 0, sizeof(*st));
-            pkg.clear();
-            return false;
-        } else {
-            // Switch to official package if exists
-            pkg = JAVA_PACKAGE_NAME;
+
+    if (!str[SU_MANAGER].empty()) {
+        // App is repackaged
+        sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, user_id, str[SU_MANAGER].data());
+        if (stat(app_path, st) == 0) {
+            if (pkg)
+                pkg->swap(str[SU_MANAGER]);
+            return true;
         }
     }
-    return true;
+
+    // Check the official package name
+    sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, user_id);
+    if (stat(app_path, st) == 0) {
+        if (pkg)
+            *pkg = JAVA_PACKAGE_NAME;
+        return true;
+    } else {
+        LOGE("su: cannot find manager\n");
+        memset(st, 0, sizeof(*st));
+        if (pkg)
+            pkg->clear();
+        return false;
+    }
+}
+
+bool get_manager(string *pkg) {
+    struct stat st;
+    return get_manager(0, pkg, &st);
+}
+
+int get_manager_app_id() {
+    struct stat st;
+    if (get_manager(0, nullptr, &st))
+        return to_app_id(st.st_uid);
+    return -1;
 }
 
 void exec_sql(int client) {

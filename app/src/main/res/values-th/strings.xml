@@ -68,8 +68,6 @@
     <string name="setup_msg">กำลังรันการตั้งค่า…</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">ล้างแคช Repo</string>
-    <string name="settings_clear_cache_summary">ล้างข้อมูล repo ออนไลน์ที่ถูกแคชไว้</string>
     <string name="language">ภาษา</string>
     <string name="system_default">(มาตรฐานระบบ)</string>
     <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>
@@ -79,7 +77,6 @@
     <string name="settings_update_beta">เบต้า</string>
     <string name="settings_update_custom">กำหนดเอง</string>
     <string name="settings_update_custom_msg">ใส่ URL</string>
-    <string name="settings_magiskhide_summary">ซ่อน Magisk จากการตรวจสอบในหลากหลายรูปแบบ</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">การรองรับ Systemless hosts เพื่อแอพ Adblock ต่างๆ</string>
     <string name="settings_hosts_toast">ทำการเพิ่มโมดูล systemless hosts แล้ว</string>

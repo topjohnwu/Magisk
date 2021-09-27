@@ -7,8 +7,7 @@ import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.ktx.get
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Notifications
@@ -68,7 +67,7 @@ open class SplashActivity : BaseActivity() {
         Shortcuts.setupDynamic(this)
 
         // Pre-fetch network services
-        get<NetworkService>()
+        ServiceLocator.networkService
 
         DONE = true
         startActivity(redirect<MainActivity>())

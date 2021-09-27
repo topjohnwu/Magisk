@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Donker</string>
     <string name="settings_download_path_title">Downloadpad</string>
     <string name="settings_download_path_message">Bestanden worden opgeslagen in %1$s</string>
-    <string name="settings_clear_cache_title">Pakketbroncache wissen</string>
-    <string name="settings_clear_cache_summary">Wis de opgeslagen informatie van de online-pakketbronnen. Hierdoor wordt de app online ververst.</string>
     <string name="language">Taal</string>
     <string name="system_default">(systeemstandaard)</string>
     <string name="settings_check_update_summary">Controleer automatisch op updates op de achtergrond.</string>
@@ -136,7 +134,6 @@
     <string name="settings_update_beta">Bèta</string>
     <string name="settings_update_custom">Aangepast</string>
     <string name="settings_update_custom_msg">Voer een aangepaste url in</string>
-    <string name="settings_magiskhide_summary">Maak Magisk onzichtbaar voor detectiesystemen.</string>
     <string name="settings_hosts_title">Systeemloze hosts</string>
     <string name="settings_hosts_summary">Systeemloze hosts-ondersteuning voor advertentieblokkeringsapps.</string>
     <string name="settings_hosts_toast">De systeemloze hosts-module is toegevoegd</string>

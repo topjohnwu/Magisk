@@ -9,7 +9,7 @@
     <string name="section_home">Hem</string>
     <string name="section_theme">Tema</string>
     <string name="safetynet">SafetyNet</string>
-	
+
 	<!--Home-->
     <string name="no_connection">Ingen anslutning tillgänglig</string>
     <string name="app_changelog">Ändringslogg</string>
@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Alltid mörk</string>
     <string name="settings_download_path_title">Nedladdningsmapp</string>
     <string name="settings_download_path_message">Filer kommer att spara till %1$s</string>
-    <string name="settings_clear_cache_title">Rensa Repo Cache</string>
-    <string name="settings_clear_cache_summary">Rensa den lagrade informationen för online-repos. Tvingar appen att uppdatera online</string>
     <string name="settings_hide_app_title">Göm Magisk-appen</string>
     <string name="settings_hide_app_summary">Installera en proxy-app med ett slumpmässigt paket-ID och appnamn</string>
     <string name="settings_restore_app_title">Återställ Magisk-appen</string>
@@ -145,7 +143,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Anpassad kanal</string>
     <string name="settings_update_custom_msg">Lägg till en anpassad URL</string>
-    <string name="settings_magiskhide_summary">Dölj Magisk från att bli upptäckt</string>
     <string name="settings_hosts_title">Systemfri hosts</string>
     <string name="settings_hosts_summary">Stöd för Adblock-appar med systemfri hosts-fil</string>
     <string name="settings_hosts_toast">Lagt till modul för systemfri hosts-fil</string>
@@ -175,8 +172,6 @@
     <string name="no_biometric">Denna enhet stöds ej eller så är inte biometrisk autentisering aktiverad</string>
     <string name="settings_customization">Anpassning</string>
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
-    <string name="settings_doh_title">DNS över HTTPS</string>
-    <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
 
     <string name="multiuser_mode">Multiuser-läge</string>
     <string name="settings_owner_only">Endast enhetsägare</string>

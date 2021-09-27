@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Zawsze ciemny</string>
     <string name="settings_download_path_title">Ścieżka pobierania plików</string>
     <string name="settings_download_path_message">Pliki zostaną zapisane do %1$s</string>
-    <string name="settings_clear_cache_title">Wyczyść pamięć podr. repozytoriów</string>
-    <string name="settings_clear_cache_summary">Wyczyść informacje z pamięci podr. dotyczące repozytoriów. Zmusza to aplikację do odświeżenia informacji online</string>
     <string name="settings_hide_app_title">Ukryj aplikację Magisk</string>
     <string name="settings_hide_app_summary">Zainstaluj aplikację z losowym ID pakietu i własną etykietą.</string>
     <string name="settings_restore_app_title">Przywróć aplikację Magisk</string>
@@ -146,7 +144,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny kanał</string>
     <string name="settings_update_custom_msg">Wprowadź adres URL własnego kanału</string>
-    <string name="settings_magiskhide_summary">Ukryj Magisk przed różnymi formami detekcji</string>
     <string name="settings_hosts_title">Hosty Systemless</string>
     <string name="settings_hosts_summary">Wsparcie hostów Systemless dla aplikacji typu Adblock</string>
     <string name="settings_hosts_toast">Dodano moduł hostów Systemless</string>
@@ -176,8 +173,6 @@
     <string name="no_biometric">Urządzenie jest nieobsługiwane lub ustawienia biometryczne nie są włączone</string>
     <string name="settings_customization">Personalizacja</string>
     <string name="setting_add_shortcut_summary">Dodaj ładny skrót na ekranie głównym na wypadek, gdyby nazwa i ikona były trudne do rozpoznania po ukryciu aplikacji</string>
-    <string name="settings_doh_title">DNS over HTTPS</string>
-    <string name="settings_doh_description">Zapobiegaj zatruwaniu DNS (DNS poisoning) w niektórych krajach</string>
 
     <string name="multiuser_mode">Tryb wielu użytkowników (Multiuser)</string>
     <string name="settings_owner_only">Tylko właściciel urządzenia</string>

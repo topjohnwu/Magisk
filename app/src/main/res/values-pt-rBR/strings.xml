@@ -10,6 +10,7 @@
     <string name="section_home">Início</string>
     <string name="section_theme">Temas</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Lista de Negação</string>
 
     <!--Home-->
     <string name="no_connection">Nenhuma conexão disponível</string>
@@ -130,8 +131,6 @@
     ]]>
     <string name="settings_download_path_title">Caminho de Download</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
-    <string name="settings_clear_cache_title">Limpar cache do repositório</string>
-    <string name="settings_clear_cache_summary">Limpe as informações em cache para repositórios online. Isso força o aplicativo a atualizar on-line</string>
     <string name="settings_hide_app_title">Esconder o app do Magisk</string>
     <string name="settings_hide_app_summary">Instala um app proxy com ID de pacote aleatorio e nome de app personalizado</string>
     <string name="settings_restore_app_title">Restaura o app do Magisk</string>
@@ -145,7 +144,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizado</string>
     <string name="settings_update_custom_msg">Insira um URL personalizado</string>
-    <string name="settings_magiskhide_summary">Esconda o Magisk de várias formas de detecção</string>
+    <string name="settings_zygisk_summary">Roda partes do Magisk no Zygote</string>
+    <string name="settings_denylist_title">Aplicar lista de negação</string>
+    <string name="settings_denylist_summary">Os processos na lista de negação terão todas as modificações do Magisk revertidas</string>
+    <string name="settings_denylist_error">Isso requer %1$s para ser ativado</string>
+    <string name="settings_denylist_config_title">Configurar lista de negação</string>
+    <string name="settings_denylist_config_summary">Selecione os processos a serem incluidos na lista de negação</string>
     <string name="settings_hosts_title">Hosts sem sistema</string>
     <string name="settings_hosts_summary">Suporte de hosts sem sistema para aplicativos Adblock</string>
     <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>
@@ -175,8 +179,6 @@
     <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o aplicativo</string>
-    <string name="settings_doh_title">DNS sobre HTTPS</string>
-    <string name="settings_doh_description">Solução alternativa para envenenamento de DNS em alguns países</string>
 
     <string name="multiuser_mode">Modo multiusuário</string>
     <string name="settings_owner_only">Somente proprietário do dispositivo</string>

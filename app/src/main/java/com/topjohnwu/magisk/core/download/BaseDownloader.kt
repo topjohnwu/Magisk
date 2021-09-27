@@ -9,15 +9,13 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
-import org.koin.android.ext.android.inject
-import org.koin.core.KoinComponent
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
@@ -25,13 +23,13 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.random.Random.Default.nextInt
 
-abstract class BaseDownloader : BaseService(), KoinComponent {
+abstract class BaseDownloader : BaseService() {
 
     private val hasNotifications get() = notifications.isNotEmpty()
     private val notifications = Collections.synchronizedMap(HashMap<Int, Notification.Builder>())
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    val service: NetworkService by inject()
+    val service get() = ServiceLocator.networkService
 
     // -- Service overrides
 
@@ -174,10 +172,10 @@ abstract class BaseDownloader : BaseService(), KoinComponent {
 
     // ---
 
-    companion object : KoinComponent {
+    companion object {
         const val ACTION_KEY = "download_action"
 
-        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>>()
+        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>?>()
 
         fun observeProgress(owner: LifecycleOwner, callback: (Float, Subject) -> Unit) {
             progressBroadcast.value = null

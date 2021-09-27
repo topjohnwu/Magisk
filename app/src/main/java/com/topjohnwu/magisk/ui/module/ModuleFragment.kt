@@ -10,14 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.arch.ReselectionTarget
-import com.topjohnwu.magisk.arch.ViewEvent
-import com.topjohnwu.magisk.core.download.BaseDownloader
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
     ReselectionTarget {
@@ -42,13 +40,10 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
         super.onStart()
         setHasOptionsMenu(true)
         activity.title = resources.getString(R.string.modules)
-        BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setEndlessScroller()
-        setEndlessSearch()
 
         binding.moduleFilterToggle.setOnClickListener {
             isFilterVisible = true
@@ -116,13 +111,6 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     // ---
 
-    override fun onEventDispatched(event: ViewEvent) = when (event) {
-        is EndlessRecyclerScrollListener.ResetState -> listeners.forEach { it.resetState() }
-        else -> super.onEventDispatched(event)
-    }
-
-    // ---
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_module_md2, menu)
     }
@@ -137,32 +125,12 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
     // ---
 
     override fun onReselected() {
-        binding.moduleList
-            .also { it.scrollToPosition(10) }
-            .let { binding.moduleList }
-            .also { it.post { it.smoothScrollToPosition(0) } }
+        binding.moduleList.scrollToPosition(10)
+        binding.moduleList.also { it.post { it.smoothScrollToPosition(0) } }
     }
 
     // ---
 
     override fun onPreBind(binding: FragmentModuleMd2Binding) = Unit
-
-    private fun setEndlessScroller() {
-        val lama = binding.moduleList.layoutManager ?: return
-        lama.isAutoMeasureEnabled = false
-
-        val listener = EndlessRecyclerScrollListener(lama, viewModel::loadRemote)
-        binding.moduleList.addOnScrollListener(listener)
-        listeners.add(listener)
-    }
-
-    private fun setEndlessSearch() {
-        val lama = binding.moduleFilterInclude.moduleFilterList.layoutManager ?: return
-        lama.isAutoMeasureEnabled = false
-
-        val listener = EndlessRecyclerScrollListener(lama, viewModel::loadMoreQuery)
-        binding.moduleFilterInclude.moduleFilterList.addOnScrollListener(listener)
-        listeners.add(listener)
-    }
 
 }

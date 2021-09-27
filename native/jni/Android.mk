@@ -4,15 +4,11 @@ LOCAL_PATH := $(call my-dir)
 # Binaries
 ########################
 
-# Global toggle for the WIP zygote injection features
-ENABLE_INJECT := 0
-
 ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
-LOCAL_C_INCLUDES := jni/include
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libphmap libxhook
 
 LOCAL_SRC_FILES := \
     core/applets.cpp \
@@ -24,28 +20,23 @@ LOCAL_SRC_FILES := \
     core/scripting.cpp \
     core/restorecon.cpp \
     core/module.cpp \
-    magiskhide/magiskhide.cpp \
-    magiskhide/hide_utils.cpp \
-    magiskhide/hide_policy.cpp \
+    core/logging.cpp \
+    core/thread.cpp \
     resetprop/persist_properties.cpp \
     resetprop/resetprop.cpp \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
-    su/su_daemon.cpp
+    su/su_daemon.cpp \
+    zygisk/entry.cpp \
+    zygisk/utils.cpp \
+    zygisk/hook.cpp \
+    zygisk/memory.cpp \
+    zygisk/deny/cli.cpp \
+    zygisk/deny/utils.cpp \
+    zygisk/deny/revert.cpp
 
 LOCAL_LDLIBS := -llog
-LOCAL_CPPFLAGS := -DENABLE_INJECT=$(ENABLE_INJECT)
-
-ifeq ($(ENABLE_INJECT),1)
-LOCAL_STATIC_LIBRARIES += libxhook
-LOCAL_SRC_FILES += \
-    inject/entry.cpp \
-    inject/utils.cpp \
-    inject/hook.cpp
-else
-LOCAL_SRC_FILES += magiskhide/proc_monitor.cpp
-endif
 
 include $(BUILD_EXECUTABLE)
 
@@ -57,7 +48,6 @@ ifdef B_INIT
 
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
-LOCAL_C_INCLUDES := jni/include out
 
 LOCAL_SRC_FILES := \
     init/init.cpp \
@@ -83,8 +73,7 @@ ifdef B_BOOT
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
-LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils
-LOCAL_C_INCLUDES := jni/include
+LOCAL_STATIC_LIBRARIES := libmincrypt liblzma liblz4 libbz2 libfdt libutils libz libzopfli
 
 LOCAL_SRC_FILES := \
     magiskboot/main.cpp \
@@ -95,9 +84,8 @@ LOCAL_SRC_FILES := \
     magiskboot/dtb.cpp \
     magiskboot/ramdisk.cpp \
     magiskboot/pattern.cpp \
-    utils/cpio.cpp
+    magiskboot/cpio.cpp
 
-LOCAL_LDLIBS := -lz
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
@@ -108,7 +96,6 @@ ifdef B_POLICY
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskpolicy
 LOCAL_STATIC_LIBRARIES := libsepol libutils
-LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \
@@ -129,7 +116,6 @@ ifdef B_PROP
 include $(CLEAR_VARS)
 LOCAL_MODULE := resetprop
 LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils
-LOCAL_C_INCLUDES := jni/include
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \
@@ -147,8 +133,7 @@ ifneq (,$(wildcard jni/test.cpp))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
-LOCAL_STATIC_LIBRARIES := libutils
-LOCAL_C_INCLUDES := jni/include
+LOCAL_STATIC_LIBRARIES := libutils libphmap
 LOCAL_SRC_FILES := test.cpp
 include $(BUILD_EXECUTABLE)
 

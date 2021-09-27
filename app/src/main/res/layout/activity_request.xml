@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="java.util.Arrays"/>
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.surequest.SuRequestViewModel" />
@@ -99,7 +101,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:enabled="@{viewModel.grantEnabled}"
-                android:adapter="@{viewModel.adapter}"
+                app:items="@{Arrays.asList(@stringArray/allow_timeout)}"
+                app:itemBinding="@{viewModel.itemBinding}"
                 android:selection="@={viewModel.selectedItemPosition}" />
 
             <TextView

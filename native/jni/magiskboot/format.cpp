@@ -1,58 +1,43 @@
-#include <string.h>
-
 #include "format.hpp"
 
-std::map<std::string_view, format_t> name2fmt;
+Name2Fmt name2fmt;
 Fmt2Name fmt2name;
 Fmt2Ext fmt2ext;
 
-class FormatInit {
-public:
-    FormatInit() {
-        name2fmt["gzip"] = GZIP;
-        name2fmt["xz"] = XZ;
-        name2fmt["lzma"] = LZMA;
-        name2fmt["bzip2"] = BZIP2;
-        name2fmt["lz4"] = LZ4;
-        name2fmt["lz4_legacy"] = LZ4_LEGACY;
-        name2fmt["lz4_lg"] = LZ4_LG;
-    }
-};
-
-static FormatInit init;
-
-#define MATCH(s) (len >= (sizeof(s) - 1) && memcmp(buf, s, sizeof(s) - 1) == 0)
+#define CHECKED_MATCH(s) (len >= (sizeof(s) - 1) && BUFFER_MATCH(buf, s))
 
 format_t check_fmt(const void *buf, size_t len) {
-    if (MATCH(CHROMEOS_MAGIC)) {
+    if (CHECKED_MATCH(CHROMEOS_MAGIC)) {
         return CHROMEOS;
-    } else if (MATCH(BOOT_MAGIC)) {
+    } else if (CHECKED_MATCH(BOOT_MAGIC)) {
         return AOSP;
-    } else if (MATCH(VENDOR_BOOT_MAGIC)) {
+    } else if (CHECKED_MATCH(VENDOR_BOOT_MAGIC)) {
         return AOSP_VENDOR;
-    } else if (MATCH(GZIP1_MAGIC) || MATCH(GZIP2_MAGIC)) {
+    } else if (CHECKED_MATCH(GZIP1_MAGIC) || CHECKED_MATCH(GZIP2_MAGIC)) {
         return GZIP;
-    } else if (MATCH(LZOP_MAGIC)) {
+    } else if (CHECKED_MATCH(LZOP_MAGIC)) {
         return LZOP;
-    } else if (MATCH(XZ_MAGIC)) {
+    } else if (CHECKED_MATCH(XZ_MAGIC)) {
         return XZ;
     } else if (len >= 13 && memcmp(buf, "\x5d\x00\x00", 3) == 0
             && (((char *)buf)[12] == '\xff' || ((char *)buf)[12] == '\x00')) {
         return LZMA;
-    } else if (MATCH(BZIP_MAGIC)) {
+    } else if (CHECKED_MATCH(BZIP_MAGIC)) {
         return BZIP2;
-    } else if (MATCH(LZ41_MAGIC) || MATCH(LZ42_MAGIC)) {
+    } else if (CHECKED_MATCH(LZ41_MAGIC) || CHECKED_MATCH(LZ42_MAGIC)) {
         return LZ4;
-    } else if (MATCH(LZ4_LEG_MAGIC)) {
+    } else if (CHECKED_MATCH(LZ4_LEG_MAGIC)) {
         return LZ4_LEGACY;
-    } else if (MATCH(MTK_MAGIC)) {
+    } else if (CHECKED_MATCH(MTK_MAGIC)) {
         return MTK;
-    } else if (MATCH(DTB_MAGIC)) {
+    } else if (CHECKED_MATCH(DTB_MAGIC)) {
         return DTB;
-    } else if (MATCH(DHTB_MAGIC)) {
+    } else if (CHECKED_MATCH(DHTB_MAGIC)) {
         return DHTB;
-    } else if (MATCH(TEGRABLOB_MAGIC)) {
+    } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
         return BLOB;
+    } else if (len >= 0x28 && memcmp(&((char *)buf)[0x24], ZIMAGE_MAGIC, 4) == 0) {
+        return ZIMAGE;
     } else {
         return UNKNOWN;
     }
@@ -62,6 +47,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
             return "gzip";
+        case ZOPFLI:
+            return "zopfli";
         case LZOP:
             return "lzop";
         case XZ:
@@ -78,6 +65,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
             return "lz4_lg";
         case DTB:
             return "dtb";
+        case ZIMAGE:
+            return "zimage";
         default:
             return "raw";
     }
@@ -86,6 +75,7 @@ const char *Fmt2Name::operator[](format_t fmt) {
 const char *Fmt2Ext::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
+        case ZOPFLI:
             return ".gz";
         case LZOP:
             return ".lzo";
@@ -102,4 +92,19 @@ const char *Fmt2Ext::operator[](format_t fmt) {
         default:
             return "";
     }
+}
+
+#define CHECK(s, f) else if (name == s) return f;
+
+format_t Name2Fmt::operator[](std::string_view name) {
+    if (0) {}
+    CHECK("gzip", GZIP)
+    CHECK("zopfli", ZOPFLI)
+    CHECK("xz", XZ)
+    CHECK("lzma", LZMA)
+    CHECK("bzip2", BZIP2)
+    CHECK("lz4", LZ4)
+    CHECK("lz4_legacy", LZ4_LEGACY)
+    CHECK("lz4_lg", LZ4_LG)
+    else return UNKNOWN;
 }

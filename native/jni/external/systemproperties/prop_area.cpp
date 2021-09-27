@@ -26,6 +26,8 @@
  * SUCH DAMAGE.
  */
 
+#include "system_properties/prop_area.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -38,8 +40,6 @@
 #include <new>
 
 #include <async_safe/log.h>
-
-#include "system_properties/prop_area.h"
 
 constexpr size_t PA_SIZE = 128 * 1024;
 constexpr uint32_t PROP_AREA_MAGIC = 0x504f5250;
@@ -104,8 +104,7 @@ prop_area* prop_area::map_prop_area_rw(const char* filename, const char* context
   return pa;
 }
 
-/* resetprop: map_fd_ro -> map_fd_rw */
-prop_area* prop_area::map_fd_rw(const int fd) {
+prop_area* prop_area::map_fd_ro(const int fd) {
   struct stat fd_stat;
   if (fstat(fd, &fd_stat) < 0) {
     return nullptr;
@@ -140,7 +139,7 @@ prop_area* prop_area::map_prop_area(const char* filename) {
   int fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);
   if (fd == -1) return nullptr;
 
-  prop_area* map_result = map_fd_rw(fd);
+  prop_area* map_result = map_fd_ro(fd);
   close(fd);
 
   return map_result;
@@ -275,6 +274,8 @@ prop_bt* prop_area::find_prop_bt(prop_bt* const bt, const char* name, uint32_t n
   }
 }
 
+/* resetprop new: traverse through the trie and find the node.
+ * This was originally part of prop_area::find_property. */
 prop_bt *prop_area::find_prop_bt(prop_bt *const trie, const char *name, bool alloc_if_needed) {
   if (!trie) return nullptr;
 
@@ -317,6 +318,7 @@ prop_bt *prop_area::find_prop_bt(prop_bt *const trie, const char *name, bool all
   return current;
 }
 
+/* resetprop: move trie traversal logic out of the function */
 const prop_info* prop_area::find_property(prop_bt* const trie, const char* name, uint32_t namelen,
                                           const char* value, uint32_t valuelen,
                                           bool alloc_if_needed) {
@@ -378,7 +380,7 @@ bool prop_area::add(const char* name, unsigned int namelen, const char* value,
   return find_property(root_node(), name, namelen, value, valuelen, true);
 }
 
-bool prop_area::del(const char *name) {
+bool prop_area::rm(const char *name) {
   prop_bt* node = find_prop_bt(root_node(), name, false);
   if (!node)
     return false;

@@ -22,6 +22,7 @@
 #define linkat        compat_linkat
 #define inotify_init1 compat_inotify_init1
 #define faccessat     compat_faccessat
+#define sigtimedwait  compat_sigtimedwait
 
 ssize_t compat_getline(char **lineptr, size_t *n, FILE *stream);
 ssize_t compat_getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
@@ -65,4 +66,13 @@ static inline int compat_inotify_init1(int flags) {
 
 static inline int compat_faccessat(int dirfd, const char *pathname, int mode, int flags) {
     return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
+}
+
+static inline int compat_sigtimedwait(const sigset_t* set, siginfo_t* info, const timespec* timeout) {
+    union {
+        sigset_t set;
+        sigset_t set64;
+    } s{};
+    s.set = *set;
+    return syscall(__NR_rt_sigtimedwait, &s.set64, info, timeout, sizeof(sigset64_t));
 }

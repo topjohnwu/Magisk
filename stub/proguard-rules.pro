@@ -20,6 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-obfuscationdictionary ../dict.txt
+-classobfuscationdictionary ../dict.txt
+-packageobfuscationdictionary ../dict.txt
+
 # Excessive obfuscation
 -repackageclasses
 -allowaccessmodification

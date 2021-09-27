@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 import android.content.Context;
 import android.content.res.AssetManager;
 
@@ -7,8 +9,9 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import static android.os.Build.VERSION.SDK_INT;
+import io.michaelrocks.paranoid.Obfuscate;
 
+@Obfuscate
 public class DynAPK {
 
     // Indices of the object array

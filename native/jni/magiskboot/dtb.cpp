@@ -1,5 +1,3 @@
-#include <unistd.h>
-#include <sys/mman.h>
 #include <bitset>
 #include <vector>
 #include <map>
@@ -8,6 +6,7 @@
 
 #include "magiskboot.hpp"
 #include "dtb.hpp"
+#include "format.hpp"
 extern "C" {
 #include <libfdt.h>
 }
@@ -103,22 +102,23 @@ static void dtb_print(const char *file, bool fstab) {
     mmap_ro(file, dtb, size);
     // Loop through all the dtbs
     int dtb_num = 0;
-    for (int i = 0; i < size; ++i) {
-        if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
-            auto fdt = dtb + i;
-            if (fstab) {
-                int node = find_fstab(fdt);
-                if (node >= 0) {
-                    fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num);
-                    print_node(fdt, node);
-                }
-            } else {
-                fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
-                print_node(fdt);
+    uint8_t * const end = dtb + size;
+    for (uint8_t *fdt = dtb; fdt < end;) {
+        fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
+        if (fdt == nullptr)
+            break;
+        if (fstab) {
+            int node = find_fstab(fdt);
+            if (node >= 0) {
+                fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num);
+                print_node(fdt, node);
             }
-            ++dtb_num;
-            i += fdt_totalsize(fdt) - 1;
+        } else {
+            fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
+            print_node(fdt);
         }
+        ++dtb_num;
+        fdt += fdt_totalsize(fdt);
     }
     fprintf(stderr, "\n");
     munmap(dtb, size);
@@ -136,21 +136,22 @@ static bool dtb_patch(const char *file) {
     mmap_rw(file, dtb, size);
 
     bool patched = false;
-    for (int i = 0; i < size; ++i) {
-        if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
-            auto fdt = dtb + i;
-            if (int fstab = find_fstab(fdt); fstab >= 0) {
-                int node;
-                fdt_for_each_subnode(node, fdt, fstab) {
-                    if (!keep_verity) {
-                        int len;
-                        char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
-                        patched |= patch_verity(value, len) != len;
-                    }
+    uint8_t * const end = dtb + size;
+    for (uint8_t *fdt = dtb; fdt < end;) {
+        fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
+        if (fdt == nullptr)
+            break;
+        if (int fstab = find_fstab(fdt); fstab >= 0) {
+            int node;
+            fdt_for_each_subnode(node, fdt, fstab) {
+                if (!keep_verity) {
+                    int len;
+                    char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
+                    patched |= patch_verity(value, len) != len;
                 }
             }
-            i += fdt_totalsize(fdt) - 1;
         }
+        fdt += fdt_totalsize(fdt);
     }
 
     munmap(dtb, size);
@@ -312,18 +313,20 @@ static bool blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
     vector<uint8_t *> fdt_list;
     vector<uint32_t> padding_list;
 
-    for (int i = 0; i < dtb_sz; ++i) {
-        if (memcmp(dtb + i, FDT_MAGIC_STR, 4) == 0) {
-            auto len = fdt_totalsize(dtb + i);
-            auto fdt = static_cast<uint8_t *>(xmalloc(len + MAX_FDT_GROWTH));
-            memcpy(fdt, dtb + i, len);
-            fdt_pack(fdt);
-            uint32_t padding = len - fdt_totalsize(fdt);
-            padding_list.push_back(padding);
-            fdt_open_into(fdt, fdt, len + MAX_FDT_GROWTH);
-            fdt_list.push_back(fdt);
-            i += len - 1;
-        }
+    uint8_t * const end = dtb + dtb_sz;
+    for (uint8_t *curr = dtb; curr < end;) {
+        curr = static_cast<uint8_t*>(memmem(curr, end - curr, DTB_MAGIC, sizeof(fdt32_t)));
+        if (curr == nullptr)
+            break;
+        auto len = fdt_totalsize(curr);
+        auto fdt = static_cast<uint8_t *>(xmalloc(len + MAX_FDT_GROWTH));
+        memcpy(fdt, curr, len);
+        fdt_pack(fdt);
+        uint32_t padding = len - fdt_totalsize(fdt);
+        padding_list.push_back(padding);
+        fdt_open_into(fdt, fdt, len + MAX_FDT_GROWTH);
+        fdt_list.push_back(fdt);
+        curr += len;
     }
 
     bool modified = false;
@@ -351,10 +354,10 @@ static bool blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
     return true;
 }
 
-#define MATCH(s) (memcmp(dtb, s, sizeof(s) - 1) == 0)
+#define DTB_MATCH(s) BUFFER_MATCH(dtb, s)
 
 static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
-    if (MATCH(QCDT_MAGIC)) {
+    if (DTB_MATCH(QCDT_MAGIC)) {
         auto hdr = reinterpret_cast<qcdt_hdr*>(dtb);
         switch (hdr->version) {
             case 1:
@@ -369,7 +372,7 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
             default:
                 return false;
         }
-    } else if (MATCH(DTBH_MAGIC)) {
+    } else if (DTB_MATCH(DTBH_MAGIC)) {
         auto hdr = reinterpret_cast<dtbh_hdr *>(dtb);
         switch (hdr->version) {
             case 2:
@@ -378,7 +381,7 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
             default:
                 return false;
         }
-    } else if (MATCH(PXADT_MAGIC)) {
+    } else if (DTB_MATCH(PXADT_MAGIC)) {
         auto hdr = reinterpret_cast<pxadt_hdr *>(dtb);
         switch (hdr->version) {
             case 1:
@@ -387,7 +390,7 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
             default:
                 return false;
         }
-    } else if (MATCH(PXA19xx_MAGIC)) {
+    } else if (DTB_MATCH(PXA19xx_MAGIC)) {
         auto hdr = reinterpret_cast<pxa19xx_hdr *>(dtb);
         switch (hdr->version) {
             case 1:
@@ -396,7 +399,7 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
             default:
                 return false;
         }
-    } else if (MATCH(SPRD_MAGIC)) {
+    } else if (DTB_MATCH(SPRD_MAGIC)) {
         auto hdr = reinterpret_cast<sprd_hdr *>(dtb);
         switch (hdr->version) {
             case 1:
@@ -405,7 +408,7 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
             default:
                 return false;
         }
-    } else if (MATCH(DT_TABLE_MAGIC)) {
+    } else if (DTB_MATCH(DT_TABLE_MAGIC)) {
         auto hdr = reinterpret_cast<dt_table_header *>(dtb);
         switch (hdr->version) {
             case 0:

@@ -15,6 +15,7 @@
         <!-- Splash -->
         <activity
             android:name=".core.SplashActivity"
+            android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,6 +50,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
+                <action android:name="android.intent.action.UID_REMOVED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
@@ -69,17 +71,12 @@
             android:exported="false"
             android:grantUriPermissions="true" />
 
-        <!-- Hardcode GMS version -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="12451000" />
-
         <!-- Initialize WorkManager on-demand -->
         <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove"
-            tools:ignore="ExportedContentProvider" />
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
 
         <!-- We don't invalidate Room -->
         <service

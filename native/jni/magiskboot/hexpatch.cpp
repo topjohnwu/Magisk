@@ -1,43 +1,44 @@
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include <sys/mman.h>
 
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
 
-static void hex2byte(uint8_t *hex, uint8_t *str) {
+using namespace std;
+
+static void hex2byte(const char *hex, uint8_t *buf) {
     char high, low;
-    for (int i = 0, length = strlen((char *) hex); i < length; i += 2) {
+    for (int i = 0, length = strlen(hex); i < length; i += 2) {
         high = toupper(hex[i]) - '0';
         low = toupper(hex[i + 1]) - '0';
-        str[i / 2] = ((high > 9 ? high - 7 : high) << 4) + (low > 9 ? low - 7 : low);
+        buf[i / 2] = ((high > 9 ? high - 7 : high) << 4) + (low > 9 ? low - 7 : low);
     }
 }
 
 int hexpatch(const char *image, const char *from, const char *to) {
-    int patternsize = strlen(from) / 2, patchsize = strlen(to) / 2;
     int patched = 1;
-    size_t filesize;
-    uint8_t *file, *pattern, *patch;
-    mmap_rw(image, file, filesize);
-    pattern = (uint8_t *) xmalloc(patternsize);
-    patch = (uint8_t *) xmalloc(patchsize);
-    hex2byte((uint8_t *) from, pattern);
-    hex2byte((uint8_t *) to, patch);
-    for (size_t i = 0; filesize > 0 && i < filesize - patternsize; ++i) {
-        if (memcmp(file + i, pattern, patternsize) == 0) {
-            fprintf(stderr, "Patch @ %08X [%s]->[%s]\n", (unsigned) i, from, to);
-            memset(file + i, 0, patternsize);
-            memcpy(file + i, patch, patchsize);
-            i += patternsize - 1;
-            patched = 0;
-        }
+
+    uint8_t *buf;
+    size_t sz;
+    mmap_rw(image, buf, sz);
+    run_finally f([=]{ munmap(buf, sz); });
+
+    vector<uint8_t> pattern(strlen(from) / 2);
+    vector<uint8_t> patch(strlen(to) / 2);
+
+    hex2byte(from, pattern.data());
+    hex2byte(to, patch.data());
+
+    uint8_t * const end = buf + sz;
+    for (uint8_t *curr = buf; curr < end; curr += pattern.size()) {
+        curr = static_cast<uint8_t*>(memmem(curr, end - curr, pattern.data(), pattern.size()));
+        if (curr == nullptr)
+            return patched;
+        fprintf(stderr, "Patch @ %08X [%s] -> [%s]\n", (unsigned)(curr - buf), from, to);
+        memset(curr, 0, pattern.size());
+        memcpy(curr, patch.data(), patch.size());
+        patched = 0;
     }
-    munmap(file, filesize);
-    free(pattern);
-    free(patch);
 
     return patched;
 }

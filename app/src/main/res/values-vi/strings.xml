@@ -66,8 +66,6 @@
     <string name="download_file_error">Lỗi tải tập tin</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Xoá bộ đệm kho</string>
-    <string name="settings_clear_cache_summary">Xoá thông tin được lưu trong bộ nhớ cache của các bản thử nghiệm trực tuyến. Điều này buộc ứng dụng phải làm mới trực tuyến.</string>
     <string name="language">Ngôn ngữ</string>
     <string name="system_default">(Mặc định hệ thống)</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>
@@ -77,7 +75,6 @@
     <string name="settings_update_beta">Dùng thử</string>
     <string name="settings_update_custom">Tuỳ chỉnh</string>
     <string name="settings_update_custom_msg">Chèn URL tuỳ chỉnh</string>
-    <string name="settings_magiskhide_summary">Ẩn Magisk khỏi nhiều phương thức phát hiện</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts hỗ trợ các ứng dụng chặn quảng cáo</string>
     <string name="settings_hosts_toast">Mô-đun được thêm vào systemless hosts</string>

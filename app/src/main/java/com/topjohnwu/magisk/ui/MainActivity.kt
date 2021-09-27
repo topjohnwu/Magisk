@@ -1,16 +1,18 @@
 package com.topjohnwu.magisk.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.WindowManager
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
@@ -19,13 +21,12 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
-import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
 class MainViewModel : BaseViewModel()
@@ -34,7 +35,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
-    override val navHost: Int = R.id.main_nav_host
+    override val navHostId: Int = R.id.main_nav_host
 
     private var isRootFragment = true
 
@@ -75,11 +76,11 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         setSupportActionBar(binding.mainToolbar)
 
-        binding.mainNavigation.setOnNavigationItemSelectedListener {
+        binding.mainNavigation.setOnItemSelectedListener {
             getScreen(it.itemId)?.navigate()
             true
         }
-        binding.mainNavigation.setOnNavigationItemReselectedListener {
+        binding.mainNavigation.setOnItemReselectedListener {
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
 
@@ -98,7 +99,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         super.onResume()
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
-            findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
     }
 
@@ -120,43 +120,44 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     @Suppress("UNCHECKED_CAST")
     internal fun requestNavigationHidden(hide: Boolean = true) {
-        val topView = binding.mainToolbarWrapper
-        val bottomView = binding.mainBottomBar
+        val bottomView = binding.mainNavigation
 
-        if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
-            !binding.mainBottomBar.isAttachedToWindow
+        // A copy of HideBottomViewOnScrollBehavior's animation
+
+        fun animateTranslationY(
+            view: View, targetY: Int, duration: Long, interpolator: TimeInterpolator
         ) {
-            binding.mainBottomBar.viewTreeObserver.addOnWindowAttachListener(object :
-                ViewTreeObserver.OnWindowAttachListener {
-
-                init {
-                    val listener =
-                        binding.mainBottomBar.tag as? ViewTreeObserver.OnWindowAttachListener
-                    if (listener != null) {
-                        binding.mainBottomBar.viewTreeObserver.removeOnWindowAttachListener(listener)
-                    }
-                    binding.mainBottomBar.tag = this
-                }
-
-                override fun onWindowAttached() {
-                    requestNavigationHidden(hide)
-                }
-
-                override fun onWindowDetached() {
-                }
-            })
-            return
+            view.tag = view
+                .animate()
+                .translationY(targetY.toFloat())
+                .setInterpolator(interpolator)
+                .setDuration(duration)
+                .setListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            view.tag = null
+                        }
+                    })
         }
 
-        val topParams = topView.layoutParams as? CoordinatorLayout.LayoutParams
-        val bottomParams = bottomView.layoutParams as? CoordinatorLayout.LayoutParams
+        (bottomView.tag as? Animator)?.cancel()
+        bottomView.clearAnimation()
 
-        val topBehavior = topParams?.behavior as? HideableBehavior<View>
-        val bottomBehavior = bottomParams?.behavior as? HideableBehavior<View>
-
-        topBehavior?.setHidden(topView, hide = false, lockState = false)
-        bottomBehavior?.setHidden(bottomView, hide, hide)
+        if (hide) {
+            animateTranslationY(
+                bottomView,
+                bottomView.measuredHeight,
+                175L,
+                FastOutLinearInInterpolator()
+            )
+        } else {
+            animateTranslationY(
+                bottomView,
+                0,
+                225L,
+                LinearOutSlowInInterpolator()
+            )
+        }
     }
 
     fun invalidateToolbar() {
@@ -166,9 +167,8 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     private fun getScreen(name: String?): NavDirections? {
         return when (name) {
-            Const.Nav.SUPERUSER -> HomeFragmentDirections.actionSuperuserFragment()
-            Const.Nav.HIDE -> HomeFragmentDirections.actionHideFragment()
-            Const.Nav.MODULES -> HomeFragmentDirections.actionModuleFragment()
+            Const.Nav.SUPERUSER -> MainDirections.actionSuperuserFragment()
+            Const.Nav.MODULES -> MainDirections.actionModuleFragment()
             Const.Nav.SETTINGS -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
             else -> null
         }

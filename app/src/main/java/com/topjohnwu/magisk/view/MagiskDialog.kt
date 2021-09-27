@@ -22,11 +22,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.itemBindingOf
-import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
-import com.topjohnwu.magisk.utils.ObservableHost
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.databinding.*
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 
@@ -188,12 +184,10 @@ class MagiskDialog(
     }
 
     class DialogItem(
-        val item: CharSequence,
+        override val item: CharSequence,
         val position: Int
-    ) : ComparableRvItem<DialogItem>() {
+    ) : DiffRvItem<DialogItem>(), RvContainer<CharSequence> {
         override val layoutRes = R.layout.item_list_single_line
-        override fun itemSameAs(other: DialogItem) = item == other.item
-        override fun contentSameAs(other: DialogItem) = itemSameAs(other)
     }
 
     interface ActualOnDialogClickListener {

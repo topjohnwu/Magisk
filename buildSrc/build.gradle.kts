@@ -2,7 +2,8 @@ plugins {
     `kotlin-dsl`
 }
 repositories {
-    jcenter()
+    google()
+    mavenCentral()
 }
 
 gradlePlugin {
@@ -15,5 +16,9 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r")
+    implementation(kotlin("gradle-plugin", "1.5.30"))
+    implementation("com.android.tools.build:gradle:7.0.2")
+    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.4.0-alpha08")
+    implementation("io.michaelrocks:paranoid-gradle-plugin:0.3.5")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
 }

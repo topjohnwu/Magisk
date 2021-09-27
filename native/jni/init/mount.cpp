@@ -10,13 +10,6 @@
 
 using namespace std;
 
-static string rtrim(string &&str) {
-    // Trim space, newline, and null byte from end of string
-    while (memchr(" \n\r", str[str.length() - 1], 4))
-        str.pop_back();
-    return std::move(str);
-}
-
 struct devinfo {
     int major;
     int minor;
@@ -192,7 +185,7 @@ static void switch_root(const string &path) {
     });
     for (auto &dir : mounts) {
         auto new_path = path + dir;
-        mkdir(new_path.data(), 0755);
+        xmkdir(new_path.data(), 0755);
         xmount(dir.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
     }
     chdir(path.data());
@@ -234,16 +227,20 @@ void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
         goto cache;
 
     strcpy(p, "/data/unencrypted");
-    if (access(path, F_OK) == 0) {
+    if (xaccess(path, F_OK) == 0) {
         // FBE, need to use an unencrypted path
         custom_rules_dir = path + "/magisk"s;
     } else {
         // Skip if /data/adb does not exist
-        strcpy(p, "/data/adb");
-        if (access(path, F_OK) != 0)
+        strcpy(p, SECURE_DIR);
+        if (xaccess(path, F_OK) != 0)
             return;
+        strcpy(p, MODULEROOT);
+        if (xaccess(path, F_OK) != 0) {
+            goto cache;
+        }
         // Unencrypted, directly use module paths
-        custom_rules_dir = string(mnt_base) + MODULEROOT;
+        custom_rules_dir = string(path);
     }
     goto success;
 
@@ -358,14 +355,24 @@ void SARInit::early_mount() {
     }
 }
 
-void SecondStageInit::prepare() {
+bool SecondStageInit::prepare() {
     backup_files();
 
     umount2("/init", MNT_DETACH);
     umount2("/proc/self/exe", MNT_DETACH);
 
-    if (access("/system_root", F_OK) == 0)
-        switch_root("/system_root");
+    // some weird devices, like meizu, embrace two stage init but still have legacy rootfs behaviour
+    bool legacy = false;
+    if (access("/system_root", F_OK) == 0) {
+        if (access("/system_root/proc", F_OK) == 0) {
+            switch_root("/system_root");
+        } else {
+            xmount("/system_root", "/system", nullptr, MS_MOVE, nullptr);
+            rmdir("/system_root");
+            legacy = true;
+        }
+    }
+    return legacy;
 }
 
 void BaseInit::exec_init() {

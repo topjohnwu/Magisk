@@ -4,13 +4,12 @@ import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;
 
-class InjectedClassLoader extends DynamicClassLoader {
+// Wrap the actual classloader as we only want to resolve classname
+// mapping when loading from platform (via LoadedApk.mClassLoader)
+class InjectedClassLoader extends ClassLoader {
 
     InjectedClassLoader(File apk) {
-        super(apk,
-                /* Use the base classloader as we do not want stub
-                 * APK classes accessible from the main app */
-                Object.class.getClassLoader());
+        super(new DynamicClassLoader(apk));
     }
 
     @Override

@@ -4,20 +4,24 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.*
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
-import com.topjohnwu.magisk.utils.asTransitive
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.BR
@@ -54,13 +58,13 @@ class HomeViewModel(
 
     val magiskInstalledVersion get() = Info.env.run {
         if (isActive)
-            "$magiskVersionString ($magiskVersionCode)".asTransitive()
+            "$magiskVersionString ($magiskVersionCode)".asText()
         else
-            R.string.not_available.asTransitive()
+            R.string.not_available.asText()
     }
 
     @get:Bindable
-    var managerRemoteVersion = R.string.loading.asTransitive()
+    var managerRemoteVersion = R.string.loading.asText()
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
     val managerInstalledVersion = Info.stub?.let {
@@ -71,9 +75,6 @@ class HomeViewModel(
     var stateManagerProgress = 0
         set(value) = set(value, field, { field = it }, BR.stateManagerProgress)
 
-    @get:Bindable
-    val showSafetyNet get() = Info.hasGMS && isConnected.get()
-
     val itemBinding = itemBindingOf<IconLink> {
         it.bindExtra(BR.viewModel, this)
     }
@@ -82,7 +83,6 @@ class HomeViewModel(
 
     override fun refresh() = viewModelScope.launch {
         state = State.LOADING
-        notifyPropertyChanged(BR.showSafetyNet)
         Info.getRemote(svc)?.apply {
             state = State.LOADED
 
@@ -92,15 +92,15 @@ class HomeViewModel(
             }
 
             managerRemoteVersion =
-                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asTransitive()
+                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asText()
 
             launch {
                 ensureEnv()
             }
-        } ?: {
+        } ?: run {
             state = State.LOADING_FAILED
-            managerRemoteVersion = R.string.not_available.asTransitive()
-        }()
+            managerRemoteVersion = R.string.not_available.asText()
+        }
     }
 
     val showTest = false
@@ -127,11 +127,8 @@ class HomeViewModel(
     }
 
     fun onMagiskPressed() = withExternalRW {
-        HomeFragmentDirections.actionHomeFragmentToInstallFragment().publish()
+        HomeFragmentDirections.actionHomeFragmentToInstallFragment().navigate()
     }
-
-    fun onSafetyNetPressed() =
-        HomeFragmentDirections.actionHomeFragmentToSafetynetFragment().publish()
 
     fun hideNotice() {
         Config.safetyNotice = false
@@ -145,7 +142,7 @@ class HomeViewModel(
         )
         if (invalidStates.any { it == stateMagisk } || shownDialog) return
 
-        val result = Shell.su("env_check").await()
+        val result = Shell.su("env_check ${Info.env.magiskVersionString} ${Info.env.magiskVersionCode}").await()
         if (!result.isSuccess) {
             shownDialog = true
             EnvFixDialog().publish()

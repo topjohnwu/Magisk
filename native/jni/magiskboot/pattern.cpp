@@ -1,13 +1,10 @@
-#include <malloc.h>
-#include <string.h>
-
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
 
 #define MATCH(p) else if (strncmp(s + skip, p, sizeof(p) - 1) == 0) skip += (sizeof(p) - 1)
 
-static int check_verity_pattern(const char *s) {
+static int skip_verity_pattern(const char *s) {
     int skip = s[0] == ',';
 
     if (0) {}
@@ -20,25 +17,29 @@ static int check_verity_pattern(const char *s) {
     else return -1;
 
     if (s[skip] == '=') {
-        while (s[skip] != '\0' && s[skip] != ' ' && s[skip] != '\n' && s[skip] != ',')
+        while (!strchr(" \n,", s[skip]))
             ++skip;
     }
     return skip;
 }
 
-#undef MATCH
-#define MATCH(p) else if (strncmp(s, p, sizeof(p) - 1) == 0) return (sizeof(p) - 1)
+static int skip_encryption_pattern(const char *s) {
+    int skip = s[0] == ',';
 
-static int check_encryption_pattern(const char *s) {
     if (0) {}
     MATCH("forceencrypt");
     MATCH("forcefdeorfbe");
     MATCH("fileencryption");
     else return -1;
+
+    if (s[skip] == '=') {
+        while (!strchr(" \n,", s[skip]))
+            ++skip;
+    }
+    return skip;
 }
 
-static uint32_t remove_pattern(void *buf, uint32_t size, int(*pattern_skip)(const char *)) {
-    auto src = static_cast<char *>(buf);
+static uint32_t remove_pattern(char *src, uint32_t size, int(*pattern_skip)(const char *)) {
     int orig_sz = size;
     int write = 0;
     for (int read = 0; read < orig_sz;) {
@@ -55,9 +56,9 @@ static uint32_t remove_pattern(void *buf, uint32_t size, int(*pattern_skip)(cons
 }
 
 uint32_t patch_verity(void *buf, uint32_t size) {
-    return remove_pattern(buf, size, check_verity_pattern);
+    return remove_pattern(static_cast<char *>(buf), size, skip_verity_pattern);
 }
 
 uint32_t patch_encryption(void *buf, uint32_t size) {
-    return remove_pattern(buf, size, check_encryption_pattern);
+    return remove_pattern(static_cast<char *>(buf), size, skip_encryption_pattern);
 }

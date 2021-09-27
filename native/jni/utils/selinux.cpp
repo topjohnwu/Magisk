@@ -99,7 +99,7 @@ void setfilecon_at(int dirfd, const char *name, const char *con) {
     lsetfilecon(path, con);
 }
 
-void selinux_builtin_impl() {
+void enable_selinux() {
     setcon = __setcon;
     getfilecon = __getfilecon;
     lgetfilecon = __lgetfilecon;
@@ -107,14 +107,4 @@ void selinux_builtin_impl() {
     setfilecon = __setfilecon;
     lsetfilecon = __lsetfilecon;
     fsetfilecon = __fsetfilecon;
-}
-
-void dload_selinux() {
-    if (access("/system/lib/libselinux.so", F_OK) && access("/system/lib64/libselinux.so", F_OK))
-        return;
-    /* We only check whether libselinux.so exists but don't dlopen.
-     * For some reason calling symbols returned from dlsym
-     * will result to SEGV_ACCERR on some devices.
-     * Always use builtin implementations for SELinux stuffs. */
-    selinux_builtin_impl();
 }

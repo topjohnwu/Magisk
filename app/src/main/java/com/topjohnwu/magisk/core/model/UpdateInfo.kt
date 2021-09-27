@@ -16,8 +16,7 @@ data class MagiskJson(
     val version: String = "",
     val versionCode: Int = -1,
     val link: String = "",
-    val note: String = "",
-    val md5: String = ""
+    val note: String = ""
 ) : Parcelable
 
 @Parcelize
@@ -34,13 +33,6 @@ data class ModuleJson(
     val prop_url: String,
     val zip_url: String,
     val notes_url: String
-)
-
-@JsonClass(generateAdapter = true)
-data class RepoJson(
-    val name: String,
-    val last_update: Long,
-    val modules: List<ModuleJson>
 )
 
 @JsonClass(generateAdapter = true)

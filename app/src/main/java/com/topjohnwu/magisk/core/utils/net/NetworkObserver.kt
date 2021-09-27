@@ -20,11 +20,10 @@ abstract class NetworkObserver(
 
     companion object {
         fun observe(context: Context, callback: ConnectionCallback): NetworkObserver {
-            return when (Build.VERSION.SDK_INT) {
-                in 23 until Int.MAX_VALUE -> MarshmallowNetworkObserver(context, callback)
-                in 21 until 23 -> LollipopNetworkObserver(context, callback)
-                else -> PreLollipopNetworkObserver(context, callback)
-            }.apply { getCurrentState() }
+            val observer: NetworkObserver = if (Build.VERSION.SDK_INT >= 23)
+                MarshmallowNetworkObserver(context, callback)
+            else LollipopNetworkObserver(context, callback)
+            return observer.apply { getCurrentState() }
         }
     }
 }

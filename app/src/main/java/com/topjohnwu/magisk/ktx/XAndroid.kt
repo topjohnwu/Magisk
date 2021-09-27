@@ -22,7 +22,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
-import android.system.Os
 import android.text.PrecomputedText
 import android.view.View
 import android.view.ViewGroup
@@ -57,25 +56,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.lang.reflect.Method
 import java.lang.reflect.Array as JArray
-
-val packageName: String get() = get<Context>().packageName
-
-private lateinit var osSymlink: Method
-private lateinit var os: Any
-
-fun symlink(oldPath: String, newPath: String) {
-    if (SDK_INT >= 21) {
-        Os.symlink(oldPath, newPath)
-    } else {
-        if (!::osSymlink.isInitialized) {
-            os = Class.forName("libcore.io.Libcore").getField("os").get(null)!!
-            osSymlink = os.javaClass.getMethod("symlink", String::class.java, String::class.java)
-        }
-        osSymlink.invoke(os, oldPath, newPath)
-    }
-}
 
 val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
 
@@ -264,8 +245,7 @@ fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
 
 fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
 
-@Suppress("FunctionName")
-inline fun <reified T> T.DynamicClassLoader(apk: File) =
+inline fun <reified T> T.createClassLoader(apk: File) =
     DynamicClassLoader(apk, T::class.java.classLoader)
 
 fun Context.unwrap(): Context {
@@ -338,16 +318,6 @@ var TextView.precomputedText: CharSequence
     get() = text
     set(value) {
         val callback = tag as? Runnable
-
-        // Don't even bother pre 21
-        if (SDK_INT < 21) {
-            post {
-                text = value
-                isGone = false
-                callback?.run()
-            }
-            return
-        }
 
         coroutineScope.launch(Dispatchers.IO) {
             if (SDK_INT >= 29) {

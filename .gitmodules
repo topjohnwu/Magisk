@@ -6,7 +6,7 @@
 	url = https://github.com/topjohnwu/ndk-busybox.git
 [submodule "dtc"]
 	path = native/jni/external/dtc
-	url = https://github.com/dgibson/dtc
+	url = https://github.com/dgibson/dtc.git
 [submodule "lz4"]
 	path = native/jni/external/lz4
 	url = https://github.com/lz4/lz4.git
@@ -28,6 +28,18 @@
 [submodule "xhook"]
 	path = native/jni/external/xhook
 	url = https://github.com/iqiyi/xHook.git
+[submodule "libcxx"]
+	path = native/jni/external/libcxx
+	url = https://github.com/topjohnwu/libcxx.git
+[submodule "zlib"]
+	path = native/jni/external/zlib
+	url = https://android.googlesource.com/platform/external/zlib
+[submodule "parallel-hashmap"]
+	path = native/jni/external/parallel-hashmap
+	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git
+[submodule "zopfli"]
+	path = native/jni/external/zopfli
+	url = https://github.com/google/zopfli.git

@@ -106,7 +106,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // First try content provider call method
     if (mode >= CONTENT_PROVIDER) {
-        sprintf(target, "content://%s.provider", info->str[SU_MANAGER].data());
+        sprintf(target, "content://%s.provider", info->mgr_pkg.data());
         vector<const char *> args{ CALL_PROVIDER };
         for (auto &e : data) {
             e.add_bind(args);
@@ -137,7 +137,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     if (mode >= PKG_ACTIVITY) {
         // Then try start activity without component name
-        strcpy(target, info->str[SU_MANAGER].data());
+        strcpy(target, info->mgr_pkg.data());
         exec_command_sync(exec);
         if (check_no_error(exec.fd))
             return;
@@ -145,7 +145,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->str[SU_MANAGER].data());
+    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);

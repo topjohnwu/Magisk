@@ -9,12 +9,12 @@ import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
+import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
 import com.topjohnwu.magisk.ktx.addVerticalPadding
 import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.MotionRevealHelper
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
 

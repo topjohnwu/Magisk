@@ -1,8 +1,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <flags.h>
+
 #include "logging.hpp"
-#include <flags.hpp>
 
 using namespace std;
 
@@ -38,30 +39,19 @@ void cmdline_logging() {
     log_cb.ex = exit;
 }
 
-template <int type>
-void log_handler(const char *fmt, ...) {
-    va_list argv;
-    va_start(argv, fmt);
-    if constexpr (type == L_DEBUG) {
-        log_cb.d(fmt, argv);
-    } else if constexpr (type == L_INFO) {
-        log_cb.i(fmt, argv);
-    } else if constexpr (type == L_WARN) {
-        log_cb.w(fmt, argv);
-    } else if constexpr (type == L_ERR) {
-        log_cb.e(fmt, argv);
-        log_cb.ex(1);
-    }
-    va_end(argv);
+#define LOG_BODY(prio) { \
+    va_list argv;        \
+    va_start(argv, fmt); \
+    log_cb.prio(fmt, argv); \
+    va_end(argv);        \
 }
 
-template void log_handler<L_INFO>(const char *fmt, ...);
-template void log_handler<L_WARN>(const char *fmt, ...);
-template void log_handler<L_ERR>(const char *fmt, ...);
-
-#ifdef MAGISK_DEBUG
-template void log_handler<L_DEBUG>(const char *fmt, ...);
+// LTO will optimize out the NOP function
+#if MAGISK_DEBUG
+void LOGD(const char *fmt, ...) { LOG_BODY(d) }
 #else
-// Strip debug logging for release builds
-template <> void log_handler<L_DEBUG>(const char *fmt, ...) {}
+void LOGD(const char *fmt, ...) {}
 #endif
+void LOGI(const char *fmt, ...) { LOG_BODY(i) }
+void LOGW(const char *fmt, ...) { LOG_BODY(w) }
+void LOGE(const char *fmt, ...) { LOG_BODY(e); log_cb.ex(EXIT_FAILURE); }

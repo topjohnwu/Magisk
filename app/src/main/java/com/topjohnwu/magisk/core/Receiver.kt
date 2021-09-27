@@ -1,44 +1,48 @@
 package com.topjohnwu.magisk.core
 
+import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
-import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.su.SuCallbackHandler
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.koin.core.inject
 
 open class Receiver : BaseReceiver() {
 
-    private val policyDB: PolicyDao by inject()
+    private val policyDB get() = ServiceLocator.policyDB
 
-    private fun getPkg(intent: Intent): String {
-        return intent.data?.encodedSchemeSpecificPart.orEmpty()
+    @SuppressLint("InlinedApi")
+    private fun getPkg(intent: Intent): String? {
+        val pkg = intent.getStringExtra(Intent.EXTRA_PACKAGE_NAME)
+        return pkg ?: intent.data?.schemeSpecificPart
+    }
+
+    private fun getUid(intent: Intent): Int? {
+        val uid = intent.getIntExtra(Intent.EXTRA_UID, -1)
+        return if (uid == -1) null else uid
     }
 
     override fun onReceive(context: ContextWrapper, intent: Intent?) {
         intent ?: return
 
-        fun rmPolicy(pkg: String) = GlobalScope.launch {
-            policyDB.delete(pkg)
+        fun rmPolicy(uid: Int) = GlobalScope.launch {
+            policyDB.delete(uid)
         }
 
         when (intent.action ?: return) {
-            Intent.ACTION_REBOOT -> {
-                SuCallbackHandler(context, intent.getStringExtra("action"), intent.extras)
-            }
             Intent.ACTION_PACKAGE_REPLACED -> {
                 // This will only work pre-O
                 if (Config.suReAuth)
-                    rmPolicy(getPkg(intent))
+                    getUid(intent)?.let { rmPolicy(it) }
+            }
+            Intent.ACTION_UID_REMOVED -> {
+                getUid(intent)?.let { rmPolicy(it) }
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
-                val pkg = getPkg(intent)
-                rmPolicy(pkg)
-                Shell.su("magiskhide --rm $pkg").submit()
+                getPkg(intent)?.let { Shell.su("magisk --denylist rm $it").submit() }
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
         }

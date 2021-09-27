@@ -8,7 +8,15 @@
 #define UID_ROOT   0
 #define UID_SHELL  2000
 
+#define DISALLOW_COPY_AND_MOVE(clazz) \
+clazz(const clazz &) = delete; \
+clazz(clazz &&) = delete;
+
+#define to_app_id(uid)  (uid % 100000)
+#define to_user_id(uid) (uid / 100000)
+
 class mutex_guard {
+    DISALLOW_COPY_AND_MOVE(mutex_guard)
 public:
     explicit mutex_guard(pthread_mutex_t &m): mutex(&m) {
         pthread_mutex_lock(mutex);
@@ -26,11 +34,12 @@ private:
 
 template <class Func>
 class run_finally {
+    DISALLOW_COPY_AND_MOVE(run_finally)
 public:
-    explicit run_finally(const Func &fn) : fn(fn) {}
+    explicit run_finally(Func &&fn) : fn(std::move(fn)) {}
     ~run_finally() { fn(); }
 private:
-    const Func &fn;
+    Func fn;
 };
 
 template <typename T>
@@ -52,23 +61,51 @@ reversed_container<T> reversed(T &base) {
     return reversed_container<T>(base);
 }
 
+template<class T>
+static inline void default_new(T *&p) { p = new T(); }
+
+template<typename T, typename Impl>
+class stateless_allocator {
+public:
+    using value_type = T;
+    T *allocate(size_t num) { return static_cast<T*>(Impl::allocate(sizeof(T) * num)); }
+    void deallocate(T *ptr, size_t num) { Impl::deallocate(ptr, sizeof(T) * num); }
+    stateless_allocator()                           = default;
+    stateless_allocator(const stateless_allocator&) = default;
+    stateless_allocator(stateless_allocator&&)      = default;
+    template <typename U>
+    stateless_allocator(const stateless_allocator<U, Impl>&) {}
+    bool operator==(const stateless_allocator&) { return true; }
+    bool operator!=(const stateless_allocator&) { return false; }
+};
+
 int parse_int(const char *s);
 static inline int parse_int(const std::string &s) { return parse_int(s.data()); }
 static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
 
 using thread_entry = void *(*)(void *);
 int new_daemon_thread(thread_entry entry, void *arg = nullptr);
-int new_daemon_thread(void(*entry)());
-int new_daemon_thread(std::function<void()> &&entry);
 
 static inline bool str_contains(std::string_view s, std::string_view ss) {
     return s.find(ss) != std::string::npos;
 }
 static inline bool str_starts(std::string_view s, std::string_view ss) {
-    return s.rfind(ss, 0) == 0;
+    return s.size() >= ss.size() && s.compare(0, ss.size(), ss) == 0;
 }
 static inline bool str_ends(std::string_view s, std::string_view ss) {
     return s.size() >= ss.size() && s.compare(s.size() - ss.size(), std::string::npos, ss) == 0;
+}
+static inline std::string ltrim(std::string &&s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+    return std::move(s);
+}
+static inline std::string rtrim(std::string &&s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch) && ch != '\0';
+    }).base(), s.end());
+    return std::move(s);
 }
 
 int fork_dont_care();
@@ -79,6 +116,7 @@ uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
 int gen_rand_str(char *buf, int len, bool varlen = true);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
+std::vector<std::string> split(const std::string& s, const std::string& delimiters);
 
 struct exec_t {
     bool err = false;
@@ -104,7 +142,7 @@ int exec_command_sync(exec_t &exec, Args &&...args) {
 }
 template <class ...Args>
 int exec_command_sync(Args &&...args) {
-    exec_t exec{};
+    exec_t exec;
     return exec_command_sync(exec, args...);
 }
 template <class ...Args>

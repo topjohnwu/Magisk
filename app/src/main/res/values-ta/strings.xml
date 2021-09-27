@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">எப்போதும் இருண்டது</string>
     <string name="settings_download_path_title">பதிவிறக்க இடம்</string>
     <string name="settings_download_path_message">%1$s ல் கோப்புகள் சேமிக்கப்படும்</string>
-    <string name="settings_clear_cache_title">ரெப்போ கேச் அழிக்கவும்</string>
-    <string name="settings_clear_cache_summary">ஆன்லைன் களஞ்சியங்களுக்கான தற்காலிக சேமிப்பை அழிக்கவும். இது ஆன்லைனில் புதுப்பிக்க பயன்பாட்டை கட்டாயப்படுத்துகிறது</string>
     <string name="settings_hide_app_title">மேஜிஸ்க் செயலியை மறைக்கவும்</string>
     <string name="settings_hide_app_summary">சீரற்ற தொகுப்பு ஐடி மற்றும் தனிப்பயன் பயன்பாட்டு லேபிளுடன் ப்ராக்ஸி பயன்பாட்டை நிறுவவும்</string>
     <string name="settings_restore_app_title">மேஜிஸ்க் பயன்பாட்டை மீட்டமை</string>
@@ -146,7 +144,6 @@
     <string name="settings_update_beta">தற்காலிகமானது</string>
     <string name="settings_update_custom">தனிப்பயன் வழி</string>
     <string name="settings_update_custom_msg">தனிப்பயன் URL ஐ உள்ளிடவும்</string>
-    <string name="settings_magiskhide_summary">பல்வேறு வகையான கண்டறிதலில் இருந்து மேகிஸ்கை மறைக்கவும்</string>
     <string name="settings_hosts_title">கணினி இல்லாத ஹோஸ்ட்கள்</string>
     <string name="settings_hosts_summary">கணினி இல்லாத ஹோஸ்ட்கள் Adblock பயன்பாடுகளுக்கு ஆதரவளிக்கின்றன</string>
     <string name="settings_hosts_toast">கணினி இல்லாத ஹோஸ்ட்கள் தொகுதி சேர்க்கப்பட்டது</string>
@@ -176,8 +173,6 @@
     <string name="no_biometric">ஆதரிக்கப்படாத சாதனம் அல்லது பயோமெட்ரிக் அமைப்புகள் எதுவும் செயல்படுத்தப்படவில்லை</string>
     <string name="settings_customization">தனிப்பயனாக்கம்</string>
     <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
-    <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>
-    <string name="settings_doh_description">சில நாடுகளில் டி.என்.எஸ் பணிபுரியும்</string>
 
     <string name="multiuser_mode">மல்டியூசர் பயன்முறை</string>
     <string name="settings_owner_only">சாதன உரிமையாளர் மட்டுமே</string>

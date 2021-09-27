@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Alati tume</string>
     <string name="settings_download_path_title">Allalaadimise failitee</string>
     <string name="settings_download_path_message">Failid salvestatakse kausta %1$s</string>
-    <string name="settings_clear_cache_title">Tühjenda hoidla vahemälu</string>
-    <string name="settings_clear_cache_summary">Tühjenda vahemälus olev teave võrgus olevate hoidlate kohta. See sunnib rakendust võrgust värskendama</string>
     <string name="language">Keel</string>
     <string name="system_default">(Süsteemi vaikesäte)</string>
     <string name="settings_check_update_title">Kontrolli uuendusi</string>
@@ -137,7 +135,6 @@
     <string name="settings_update_beta">Beeta</string>
     <string name="settings_update_custom">Kohandatud</string>
     <string name="settings_update_custom_msg">Sisesta kohandatud URL</string>
-    <string name="settings_magiskhide_summary">Peida Magisk erinevate tuvastuste eest</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
     <string name="settings_hosts_summary">Süsteemivaba hosts-tugi reklaamiblokeerijatest rakendustele</string>
     <string name="settings_hosts_toast">Süsteemivaba hostsi moodul lisatud</string>
@@ -165,8 +162,6 @@
     <string name="no_biometric">Mittetoetatud seade või ükski biomeetriaseadistus pole lubatud</string>
     <string name="settings_customization">Kohandamine</string>
     <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee, juhul kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
-    <string name="settings_doh_title">DNS üle HTTPSi</string>
-    <string name="settings_doh_description">Väldi mõnes riigis DNSi mürgitamist</string>
 
     <string name="multiuser_mode">Mitmikkasutaja režiim</string>
     <string name="settings_owner_only">Ainult seadme omanik</string>

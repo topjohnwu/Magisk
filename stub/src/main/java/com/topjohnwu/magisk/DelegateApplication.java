@@ -4,10 +4,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Configuration;
-import android.os.Build;
 
 import java.lang.reflect.Method;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class DelegateApplication extends Application {
 
     static boolean dynLoad = false;
@@ -18,9 +20,8 @@ public class DelegateApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        // Only dynamic load full APK if hidden and supported
-        dynLoad = Build.VERSION.SDK_INT >= 21 &&
-                !base.getPackageName().equals(BuildConfig.APPLICATION_ID);
+        // Only dynamic load full APK if hidden
+        dynLoad = !base.getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         receiver = InjectAPK.setup(this);
         if (receiver != null) try {

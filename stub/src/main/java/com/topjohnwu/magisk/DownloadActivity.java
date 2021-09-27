@@ -1,5 +1,14 @@
 package com.topjohnwu.magisk;
 
+import static android.R.string.no;
+import static android.R.string.ok;
+import static android.R.string.yes;
+import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
+import static com.topjohnwu.magisk.R2.string.dling;
+import static com.topjohnwu.magisk.R2.string.no_internet_msg;
+import static com.topjohnwu.magisk.R2.string.relaunch_app;
+import static com.topjohnwu.magisk.R2.string.upgrade_msg;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -15,37 +24,46 @@ import com.topjohnwu.magisk.net.Request;
 import com.topjohnwu.magisk.utils.APKInstall;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 
-import static android.R.string.no;
-import static android.R.string.ok;
-import static android.R.string.yes;
-import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
-import static com.topjohnwu.magisk.R.string.dling;
-import static com.topjohnwu.magisk.R.string.no_internet_msg;
-import static com.topjohnwu.magisk.R.string.relaunch_app;
-import static com.topjohnwu.magisk.R.string.upgrade_msg;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
-    private static final String CDN_URL = "https://cdn.jsdelivr.net/gh/topjohnwu/magisk_files@%s/%s";
+    private static final String CANARY_URL = "https://topjohnwu.github.io/magisk-files/canary.json";
 
-    private String apkLink;
-    private String sha;
+    private String apkLink = BuildConfig.APK_URL;
     private Context themed;
     private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Networking.init(this);
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
+        // Inject resources
+        loadResources();
+
         if (Networking.checkNetworkStatus(this)) {
-            fetchAPKURL();
+            if (apkLink == null) {
+                fetchCanary();
+            } else {
+                showDialog();
+            }
         } else {
             new AlertDialog.Builder(themed)
                     .setCancelable(false)
@@ -54,21 +72,6 @@ public class DownloadActivity extends Activity {
                     .setNegativeButton(ok, (d, w) -> finish())
                     .show();
         }
-    }
-
-    private void fetchAPKURL() {
-        dialog = ProgressDialog.show(themed, "", "", true);
-        String url;
-        if (BuildConfig.DEV_CHANNEL != null) {
-            url = BuildConfig.DEV_CHANNEL;
-        } else if (!BuildConfig.CANARY) {
-            url = "https://topjohnwu.github.io/magisk_files/stable.json";
-        } else {
-            url = "https://api.github.com/repos/topjohnwu/magisk_files/branches/canary";
-            request(url).getAsJSONObject(this::handleCanary);
-            return;
-        }
-        request(url).getAsJSONObject(this::handleJSON);
     }
 
     private void error(Throwable e) {
@@ -80,32 +83,27 @@ public class DownloadActivity extends Activity {
         return Networking.get(url).setErrorHandler((conn, e) -> error(e));
     }
 
-    private void handleCanary(JSONObject json) {
-        try {
-            sha = json.getJSONObject("commit").getString("sha");
-            String url = String.format(CDN_URL, sha, "canary.json");
-            request(url).getAsJSONObject(this::handleJSON);
-        } catch (JSONException e) {
-            error(e);
-        }
+    private void showDialog() {
+        new AlertDialog.Builder(themed)
+                .setCancelable(false)
+                .setTitle(APP_NAME)
+                .setMessage(getString(upgrade_msg))
+                .setPositiveButton(yes, (d, w) -> dlAPK())
+                .setNegativeButton(no, (d, w) -> finish())
+                .show();
     }
 
-    private void handleJSON(JSONObject json) {
-        dialog.dismiss();
-        try {
-            apkLink = json.getJSONObject("app").getString("link");
-            if (!apkLink.startsWith("http"))
-                apkLink = String.format(CDN_URL, sha, apkLink);
-            new AlertDialog.Builder(themed)
-                    .setCancelable(false)
-                    .setTitle(APP_NAME)
-                    .setMessage(getString(upgrade_msg))
-                    .setPositiveButton(yes, (d, w) -> dlAPK())
-                    .setNegativeButton(no, (d, w) -> finish())
-                    .show();
-        } catch (JSONException e) {
-            error(e);
-        }
+    private void fetchCanary() {
+        dialog = ProgressDialog.show(themed, "", "", true);
+        request(CANARY_URL).getAsJSONObject(json -> {
+            dialog.dismiss();
+            try {
+                apkLink = json.getJSONObject("magisk").getString("link");
+                showDialog();
+            } catch (JSONException e) {
+                error(e);
+            }
+        });
     }
 
     private void dlAPK() {
@@ -128,6 +126,28 @@ public class DownloadActivity extends Activity {
                 });
             }
         });
+    }
+
+    private void loadResources() {
+        File apk = new File(getCacheDir(), "res.apk");
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
+            IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            InputStream is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
+            try (InputStream gzip = new GZIPInputStream(is);
+                 OutputStream out = new FileOutputStream(apk)) {
+                byte[] buf = new byte[4096];
+                for (int read; (read = gzip.read(buf)) >= 0;) {
+                    out.write(buf, 0, read);
+                }
+            }
+            DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
+        } catch (Exception e) {
+            // Should not happen
+            e.printStackTrace();
+        }
     }
 
 }

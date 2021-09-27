@@ -75,8 +75,6 @@
     <string name="setup_msg">Надградба на работната околина…</string>
 
     <!--Settings Activity -->
-    <string name="settings_clear_cache_title">Исчисти го кешот од репозиториумот</string>
-    <string name="settings_clear_cache_summary">Исчисти ги кешираните информации за онлајн репозиториумот. Ова ја принудува апликацијата да се освежи онлајн.</string>
     <string name="language">Јазик</string>
     <string name="system_default">(Стандарден системски)</string>
     <string name="settings_check_update_title">Провери за ажурирања</string>
@@ -86,7 +84,6 @@
     <string name="settings_update_beta">Бета</string>
     <string name="settings_update_custom">Прилагодено</string>
     <string name="settings_update_custom_msg">Внеси прилагоден URL линк</string>
-    <string name="settings_magiskhide_summary">Сокриј го Magisk од различни форми на откривање.</string>
     <string name="settings_hosts_title">Несистемски хостови</string>
     <string name="settings_hosts_summary">Поддршка за несистемски хостови за Adblock апликации.</string>
     <string name="settings_hosts_toast">Додаден е модул за несистемски хостови</string>

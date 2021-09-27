@@ -33,13 +33,23 @@ grep_prop() {
   cat $FILES 2>/dev/null | dos2unix | sed -n "$REGEX" | head -n 1
 }
 
+grep_get_prop() {
+  local result=$(grep_prop $@)
+  if [ -z "$result" ]; then
+    # Fallback to getprop
+    getprop "$1"
+  else
+    echo $result
+  fi
+}
+
 getvar() {
   local VARNAME=$1
   local VALUE
   local PROPPATH='/data/.magisk /cache/.magisk'
-  [ -n $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
-  [ -n $VALUE ] && eval $VARNAME=\$VALUE
+  [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
 
 is_mounted() {
@@ -50,7 +60,7 @@ is_mounted() {
 abort() {
   ui_print "$1"
   $BOOTMODE || recovery_cleanup
-  [ -n $MODPATH ] && rm -rf $MODPATH
+  [ ! -z $MODPATH ] && rm -rf $MODPATH
   rm -rf $TMPDIR
   exit 1
 }
@@ -394,7 +404,7 @@ find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
     BOOTIMAGE=`find_block recovery_ramdisk$SLOT recovery$SLOT sos`
-  elif [ -n $SLOT ]; then
+  elif [ ! -z $SLOT ]; then
     BOOTIMAGE=`find_block ramdisk$SLOT recovery_ramdisk$SLOT boot$SLOT`
   else
     BOOTIMAGE=`find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg boot lnx boot_a`
@@ -438,7 +448,7 @@ flash_image() {
 install_magisk() {
   cd $MAGISKBIN
 
-  if [ $API -ge 21 -a ! -c $BOOTIMAGE ]; then
+  if [ ! -c $BOOTIMAGE ]; then
     eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi
@@ -508,18 +518,26 @@ remove_system_su() {
 }
 
 api_level_arch_detect() {
-  API=`grep_prop ro.build.version.sdk`
-  ABI=`grep_prop ro.product.cpu.abi | cut -c-3`
-  ABI2=`grep_prop ro.product.cpu.abi2 | cut -c-3`
-  ABILONG=`grep_prop ro.product.cpu.abi`
-
-  ARCH=arm
-  ARCH32=arm
-  IS64BIT=false
-  if [ "$ABI" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
-  if [ "$ABI2" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
-  if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; ARCH32=arm; IS64BIT=true; fi;
-  if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
+  API=$(grep_get_prop ro.build.version.sdk)
+  ABI=$(grep_get_prop ro.product.cpu.abi)
+  if [ "$ABI" = "x86" ]; then
+    ARCH=x86
+    ABI32=x86
+    IS64BIT=false
+  elif [ "$ABI" = "arm64-v8a" ]; then
+    ARCH=arm64
+    ABI32=armeabi-v7a
+    IS64BIT=true
+  elif [ "$ABI" = "x86_64" ]; then
+    ARCH=x64
+    ABI32=x86
+    IS64BIT=true
+  else
+    ARCH=arm
+    ABI=armeabi-v7a
+    ABI32=armeabi-v7a
+    IS64BIT=false
+  fi
 }
 
 check_data() {
@@ -528,9 +546,8 @@ check_data() {
   if grep ' /data ' /proc/mounts | grep -vq 'tmpfs'; then
     # Test if data is writable
     touch /data/.rw && rm /data/.rw && DATA=true
-    # Test if DE storage is writable
+    # Test if data is decrypted
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
-    # Some recovery have broken FDE implementations, which cannot access existing folders
     $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
   fi
   NVBASE=/data
@@ -539,18 +556,20 @@ check_data() {
   resolve_vars
 }
 
-find_manager_apk() {
+find_magisk_apk() {
   local DBAPK
   [ -z $APK ] && APK=/data/adb/magisk.apk
   [ -f $APK ] || APK=/data/magisk/magisk.apk
   [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
+  [ -f $APK ] || APK=/data/app/*/com.topjohnwu.magisk*/*.apk
   if [ ! -f $APK ]; then
     DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
-    [ -z $DBAPK ] && DBAPK=$(strings /data/adb/magisk.db | grep -E '^.requester.' | cut -c11-)
+    [ -z $DBAPK ] && DBAPK=$(strings /data/adb/magisk.db | grep -oE 'requester..*' | cut -c10-)
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
+    [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/*/$DBAPK*/*.apk
   fi
-  [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"
+  [ -f $APK ] || ui_print "! Unable to detect Magisk app APK for BootSigner"
 }
 
 run_migrations() {
@@ -595,8 +614,9 @@ copy_sepolicy_rules() {
   # Find current active RULESDIR
   local RULESDIR
   local active_dir=$(magisk --path)/.magisk/mirror/sepolicy.rules
-  if [ -e $active_dir ]; then
-    RULESDIR=$(readlink -f $active_dir)
+  if [ -L $active_dir ]; then
+    RULESDIR=$(readlink $active_dir)
+    [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(magisk --path)/.magisk/mirror/$RULESDIR"
   elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
     RULESDIR=/data/unencrypted/magisk
   elif grep -q ' /cache ' /proc/mounts; then
@@ -608,7 +628,15 @@ copy_sepolicy_rules() {
   elif grep -q ' /mnt/vendor/persist ' /proc/mounts; then
     RULESDIR=/mnt/vendor/persist/magisk
   else
-    return
+    ui_print "- Unable to find sepolicy rules dir"
+    return 1
+  fi
+
+  if [ -d ${RULESDIR%/magisk} ]; then
+    ui_print "- Sepolicy rules dir is ${RULESDIR%/magisk}"
+  else
+    ui_print "- Sepolicy rules dir ${RULESDIR%/magisk} not found"
+    return 1
   fi
 
   # Copy all enabled sepolicy.rule
@@ -743,8 +771,10 @@ install_module() {
   done
 
   if $BOOTMODE; then
-    # Update info for Magisk Manager
+    # Update info for Magisk app
     mktouch $NVBASE/modules/$MODID/update
+    rm -rf $NVBASE/modules/$MODID/remove 2>/dev/null
+    rm -rf $NVBASE/modules/$MODID/disable 2>/dev/null
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
 
@@ -754,10 +784,11 @@ install_module() {
     copy_sepolicy_rules
   fi
 
-  # Remove stuffs that don't belong to modules
+  # Remove stuff that doesn't belong to modules and clean up any empty directories
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
   $MODPATH/README.md $MODPATH/.git*
+  rmdir -p $MODPATH
 
   cd /
   $BOOTMODE || recovery_cleanup

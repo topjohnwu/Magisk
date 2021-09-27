@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.settings
 
-import android.content.Context
 import android.os.Build
 import android.view.View
 import android.widget.Toast
@@ -10,30 +9,27 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.adapterOf
-import com.topjohnwu.magisk.arch.diffListOf
-import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.data.database.RepoDao
+import com.topjohnwu.magisk.databinding.adapterOf
+import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
+import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import org.koin.core.get
 
-class SettingsViewModel(
-    private val repositoryDao: RepoDao
-) : BaseViewModel(), BaseSettingsItem.Callback {
+class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
 
     val adapter = adapterOf<BaseSettingsItem>()
     val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
-    val items = diffListOf(createItems())
+    val items = createItems()
 
     init {
         viewModelScope.launch {
@@ -42,7 +38,7 @@ class SettingsViewModel(
     }
 
     private fun createItems(): List<BaseSettingsItem> {
-        val context = get<Context>()
+        val context = AppContext
         val hidden = context.packageName != BuildConfig.APPLICATION_ID
 
         // Customization
@@ -56,11 +52,10 @@ class SettingsViewModel(
         // Manager
         list.addAll(listOf(
             AppSettings,
-            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
-            list.add(ClearRepoCache)
-            if (Build.VERSION.SDK_INT >= 21 && Const.USER_ID == 0) {
+            if (Const.USER_ID == 0) {
                 if (hidden)
                     list.add(Restore)
                 else if (Info.isConnected.get())
@@ -72,11 +67,10 @@ class SettingsViewModel(
         if (Info.env.isActive) {
             list.addAll(listOf(
                 Magisk,
-                MagiskHide, SystemlessHosts
+                SystemlessHosts
             ))
-            if (Build.VERSION.SDK_INT < 19) {
-                // MagiskHide is only available on 4.4+
-                list.remove(MagiskHide)
+            if (Const.Version.isCanary()) {
+                list.addAll(listOf(Zygisk, DenyList, DenyListConfig))
             }
         }
 
@@ -95,20 +89,28 @@ class SettingsViewModel(
                 // Re-authenticate is not feasible on 8.0+
                 list.add(Reauthenticate)
             }
+            if (Build.VERSION.SDK_INT >= 31) {
+                // Can hide overlay windows on 12.0+
+                list.remove(Tapjack)
+            }
         }
 
         return list
     }
 
-    override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) = when (item) {
-        is DownloadPath -> withExternalRW(callback)
-        is Biometrics -> authenticate(callback)
-        is Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().publish()
-        is ClearRepoCache -> clearRepoCache()
-        is SystemlessHosts -> createHosts()
-        is Restore -> HideAPK.restore(view.activity)
-        is AddShortcut -> AddHomeIconEvent().publish()
-        else -> callback()
+    override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) {
+        when (item) {
+            is DownloadPath -> withExternalRW(callback)
+            is Biometrics -> authenticate(callback)
+            is Theme ->
+                SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+            is DenyListConfig ->
+                SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
+            is SystemlessHosts -> createHosts()
+            is Restore -> HideAPK.restore(view.activity)
+            is AddShortcut -> AddHomeIconEvent().publish()
+            else -> callback()
+        }
     }
 
     override fun onItemChanged(view: View, item: BaseSettingsItem) {
@@ -116,6 +118,7 @@ class SettingsViewModel(
             is Language -> RecreateEvent().publish()
             is UpdateChannel -> openUrlIfNecessary(view)
             is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
+            is Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
     }
@@ -132,13 +135,6 @@ class SettingsViewModel(
             // allow the change on success
             onSuccess { callback() }
         }.publish()
-    }
-
-    private fun clearRepoCache() {
-        viewModelScope.launch {
-            repositoryDao.clear()
-            Utils.toast(R.string.repo_cache_cleared, Toast.LENGTH_SHORT)
-        }
     }
 
     private fun createHosts() {

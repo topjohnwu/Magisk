@@ -12,6 +12,9 @@ import com.topjohnwu.magisk.FileProvider;
 
 import java.io.File;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class APKInstall {
 
     public static Intent installIntent(Context c, File apk) {
