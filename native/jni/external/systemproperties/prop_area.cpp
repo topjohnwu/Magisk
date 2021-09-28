@@ -380,13 +380,17 @@ bool prop_area::add(const char* name, unsigned int namelen, const char* value,
   return find_property(root_node(), name, namelen, value, valuelen, true);
 }
 
-bool prop_area::rm(const char *name) {
+prop_info* prop_area::rm(const char *name) {
   prop_bt* node = find_prop_bt(root_node(), name, false);
   if (!node)
-    return false;
+    return nullptr;
+  atomic_uint_least32_t prev_offset(atomic_load_explicit(&node->prop, memory_order_acquire));
+  if (!prev_offset)
+    return nullptr;
+  prop_info* prev = to_prop_info(&prev_offset);
   uint_least32_t new_offset = 0;
   atomic_store_explicit(&node->prop, new_offset, memory_order_release);
-  return true;
+  return prev;
 }
 
 bool prop_area::foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {

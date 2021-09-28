@@ -244,7 +244,8 @@ int SystemProperties::Update(prop_info* pi, const char* value, unsigned int len)
   // used memory_order_relaxed atomics, and use the analogous
   // counterintuitive fence.
   atomic_thread_fence(memory_order_release);
-  strlcpy(pi->value, value, len + 1);
+  // resetprop changed: use strncpy() instead of strlcpy() as it ensures zero padding
+  strncpy(pi->value, value, PROP_VALUE_MAX);
 
   atomic_store_explicit(&pi->serial, (len << 24) | ((serial + 1) & 0xffffff), memory_order_release);
   __futex_wake(&pi->serial, INT32_MAX);
@@ -311,10 +312,45 @@ int SystemProperties::Delete(const char *name) {
     return -1;
   }
 
-  bool ret = pa->rm(name);
-  if (!ret) {
+  prop_info* prev = pa->rm(name);
+  if (!prev) {
     return -1;
   }
+
+  // We removed the prop info from the trie but not the area
+  // Erase the prev contents to prevent apps from 
+  // finding original values by memory searching.
+  uint32_t serial = Serial(prev);
+  constexpr static uint32_t kLongFlag = 1 << 16;
+  bool is_long = is_read_only(name) && (serial & kLongFlag) != 0;
+  size_t valuelen = SERIAL_VALUE_LEN(serial);
+
+  // Mark the prop info is dirty.
+  serial |= 1;
+  atomic_store_explicit(&prev->serial, serial, memory_order_relaxed);
+
+  memset(prev->name, 0, strlen(name));
+
+  // High 8 bit of serial stores the value len
+  // We will fill the value with '\0'
+  // Make sure SERIAL_VALUE_LEN(serial) == strlen(pi->value)
+  serial = ((serial + 1) & 0xffffff);
+  
+  memset(prev->value, 0, valuelen);
+  
+  if (is_long) {
+    // Maybe overflow, recover long flag
+    serial |= kLongFlag;
+    
+    // Long values are stores in extra memory and pi->value is just error message
+    char* long_value = const_cast<char*>(prev->long_value());
+    memset(long_value, 0, strlen(long_value));
+  } 
+  
+  atomic_store_explicit(&prev->serial, serial, memory_order_release);
+  
+  // We rewrited the prop value, just like updating a prop to wake up other threads
+  __futex_wake(&prev->serial, INT32_MAX);
 
   // There is only a single mutator, but we want to make sure that
   // updates are visible to a reader waiting for the update.
