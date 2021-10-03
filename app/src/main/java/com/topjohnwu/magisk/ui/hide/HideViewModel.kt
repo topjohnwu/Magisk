@@ -66,7 +66,6 @@ class HideViewModel : BaseViewModel(), Queryable {
                 .filterNot { blacklist.contains(it.packageName) }
                 .map { HideAppInfo(it, pm, hideList) }
                 .filter { it.processes.isNotEmpty() }
-                .filter { info -> info.enabled || info.processes.any { it.isHidden } }
                 .map { HideRvItem(it) }
                 .toList()
                 .sorted()

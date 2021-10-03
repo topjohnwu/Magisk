@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.data.preference.PreferenceModel
@@ -71,6 +70,7 @@ object Config : PreferenceModel, DBConfig {
         const val BETA_CHANNEL = 1
         const val CUSTOM_CHANNEL = 2
         const val CANARY_CHANNEL = 3
+        const val LITE_CHANNEL = 4
 
         // root access mode
         const val ROOT_ACCESS_DISABLED = 0
@@ -105,11 +105,7 @@ object Config : PreferenceModel, DBConfig {
         const val ORDER_DATE = 1
     }
 
-    private val defaultChannel =
-        if (BuildConfig.DEBUG)
-            Value.CANARY_CHANNEL
-        else
-            Value.DEFAULT_CHANNEL
+    private val defaultChannel = Value.LITE_CHANNEL
 
     @JvmStatic var keepVerity = false
     @JvmStatic var keepEnc = false
@@ -132,7 +128,7 @@ object Config : PreferenceModel, DBConfig {
     var suReAuth by preference(Key.SU_REAUTH, false)
     var suTapjack by preference(Key.SU_TAPJACK, true)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    var doh by preference(Key.DOH, false)
+    var doh by preference(Key.DOH, true)
     var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
@@ -170,8 +166,8 @@ object Config : PreferenceModel, DBConfig {
             prefs.getString(Key.UPDATE_CHANNEL, null).also {
                 if (it == null)
                     putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-                else if (it.toInt() > Value.CANARY_CHANNEL)
-                    putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
+                else if (it.toInt() > Value.LITE_CHANNEL)
+                    putString(Key.UPDATE_CHANNEL, Value.LITE_CHANNEL.toString())
             }
 
             // Write database configs

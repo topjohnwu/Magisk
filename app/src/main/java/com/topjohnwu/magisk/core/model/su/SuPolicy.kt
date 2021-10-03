@@ -1,20 +1,20 @@
 @file:SuppressLint("InlinedApi")
+@file:Suppress("DEPRECATION")
 
 package com.topjohnwu.magisk.core.model.su
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.INTERACTIVE
+import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.ktx.getLabel
 
 data class SuPolicy(
-    var uid: Int,
+    val uid: Int,
     val packageName: String,
     val appName: String,
     val icon: Drawable,
     var policy: Int = INTERACTIVE,
-    var until: Long = -1L,
     val logging: Boolean = true,
     val notification: Boolean = true
 ) {
@@ -30,17 +30,18 @@ data class SuPolicy(
 fun SuPolicy.toMap() = mapOf(
     "uid" to uid,
     "package_name" to packageName,
-    "policy" to policy,
-    "until" to until,
+    "process" to packageName,
     "logging" to logging,
     "notification" to notification
 )
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
-    val uid = get("uid")?.toIntOrNull() ?: -1
+fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy? {
+    val uid = get("uid")?.toIntOrNull()
     val packageName = get("package_name").orEmpty()
-    val info = pm.getApplicationInfo(packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+    val process = get("process")
+    if (packageName.isEmpty() || process.isNullOrEmpty() || packageName != process) return null
+    val info = pm.getApplicationInfo(packageName, 0)
 
     if (info.uid != uid)
         throw PackageManager.NameNotFoundException()
@@ -50,23 +51,32 @@ fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
         packageName = packageName,
         appName = info.getLabel(pm),
         icon = info.loadIcon(pm),
-        policy = get("policy")?.toIntOrNull() ?: INTERACTIVE,
-        until = get("until")?.toLongOrNull() ?: -1L,
+        policy = ALLOW,
         logging = get("logging")?.toIntOrNull() != 0,
         notification = get("notification")?.toIntOrNull() != 0
     )
 }
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): SuPolicy {
+fun Int.toPolicy(pm: PackageManager, policy: Int): SuPolicy {
     val pkg = pm.getPackagesForUid(this)?.firstOrNull()
         ?: throw PackageManager.NameNotFoundException()
-    val info = pm.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
+    val info = pm.getApplicationInfo(pkg, 0)
     return SuPolicy(
         uid = info.uid,
         packageName = pkg,
         appName = info.getLabel(pm),
         icon = info.loadIcon(pm),
+        policy = policy
+    )
+}
+
+fun Int.toUidPolicy(pm: PackageManager, policy: Int): SuPolicy {
+    return SuPolicy(
+        uid = this,
+        packageName = "[UID] $this",
+        appName = "[UID] $this",
+        icon = pm.defaultActivityIcon,
         policy = policy
     )
 }

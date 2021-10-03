@@ -32,7 +32,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         super.onCreate(savedInstanceState)
 
         fun showRequest() {
-            viewModel.handleRequest(intent)
+            finish()
         }
 
         fun runHandler(action: String?) {

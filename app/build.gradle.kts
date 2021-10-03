@@ -73,42 +73,34 @@ val syncLibs by tasks.registering(Sync::class) {
             include("busybox", "magiskboot", "magiskinit", "magisk")
             rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
         }
-        from(rootProject.file("native/out/arm64-v8a")) {
-            include("magisk")
-            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
-        }
     }
     into("x86") {
         from(rootProject.file("native/out/x86")) {
             include("busybox", "magiskboot", "magiskinit", "magisk")
             rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
         }
+    }
+    into("arm64-v8a") {
+        from(rootProject.file("native/out/arm64-v8a")) {
+            include("busybox", "magiskboot", "magiskinit", "magisk")
+            rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+        }
+    }
+    into("x86_64") {
         from(rootProject.file("native/out/x86_64")) {
-            include("magisk")
+            include("busybox", "magiskboot", "magiskinit", "magisk")
             rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
         }
     }
     onlyIf {
-        if (inputs.sourceFiles.files.size != 10)
+        if (inputs.sourceFiles.files.size != 16)
             throw StopExecutionException("Please build binaries first! (./build.py binary)")
         true
     }
 }
 
-val createStubLibs by tasks.registering {
-    dependsOn(syncLibs)
-    doLast {
-        val arm64 = project.file("src/main/jniLibs/arm64-v8a/libstub.so")
-        arm64.parentFile.mkdirs()
-        arm64.createNewFile()
-        val x64 = project.file("src/main/jniLibs/x86_64/libstub.so")
-        x64.parentFile.mkdirs()
-        x64.createNewFile()
-    }
-}
-
 val syncAssets by tasks.registering(Sync::class) {
-    dependsOn(createStubLibs)
+    dependsOn(syncLibs)
     inputs.property("version", Config.version)
     inputs.property("versionCode", Config.versionCode)
     into("src/main/assets")
@@ -125,7 +117,8 @@ val syncAssets by tasks.registering(Sync::class) {
         filter {
             it.replace("#MAGISK_VERSION_STUB",
                 "MAGISK_VER='${Config.version}'\n" +
-                "MAGISK_VER_CODE=${Config.versionCode}")
+                "MAGISK_VER_CODE=${Config.versionCode}"
+            )
         }
         filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
     }

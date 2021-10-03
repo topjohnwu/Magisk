@@ -64,7 +64,7 @@ object Shortcuts {
                     .build()
             )
         }
-        if (Info.env.magiskHide) {
+        if (Utils.showSuperUser()) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, Const.Nav.HIDE)
                     .setShortLabel(context.getString(R.string.magiskhide))

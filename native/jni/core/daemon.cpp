@@ -24,6 +24,7 @@ int SDK_INT = -1;
 string MAGISKTMP;
 
 bool RECOVERY_MODE = false;
+string SUMODULE;
 int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
@@ -33,7 +34,7 @@ static bool verify_client(pid_t pid) {
     char path[32];
     sprintf(path, "/proc/%d/exe", pid);
     struct stat st;
-    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
+    return !(stat(path, &st) || st.st_size != self_st.st_size);
 }
 
 static bool check_zygote(pid_t pid) {
@@ -146,20 +147,19 @@ shortcut:
     close(client);
 }
 
-static void switch_cgroup(const char *cgroup, int pid) {
+static int switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
     snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
-     if (access(buf, F_OK) != 0)
-        return;
-    int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
+    int fd = open(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
     if (fd == -1)
-        return ;
+        return -1;
     snprintf(buf, sizeof(buf), "%d\n", pid);
     if (xwrite(fd, buf, strlen(buf)) == -1) {
         close(fd);
-        return ;
+        return -1;
     }
     close(fd);
+    return 0;
 }
 
 static void magisk_logging();
@@ -195,9 +195,8 @@ static void start_log_daemon();
 
     // Escape from cgroup
     int pid = getpid();
-    switch_cgroup("/acct", pid);
-    switch_cgroup("/dev/cg2_bpf", pid);
-    switch_cgroup("/sys/fs/cgroup", pid);
+    if (switch_cgroup("/acct", pid) && switch_cgroup("/sys/fs/cgroup", pid))
+        LOGW("Can't switch cgroup\n");
 
     // Get self stat
     char buf[64];

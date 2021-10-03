@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-import sys
-import os
-import subprocess
 import argparse
-import multiprocessing
-import zipfile
 import errno
-import shutil
 import lzma
-import platform
-import urllib.request
+import multiprocessing
+import os
 import os.path as op
+import platform
+import shutil
 import stat
+import subprocess
+import sys
+import urllib.request
+import zipfile
 from distutils.dir_util import copy_tree
 
 
@@ -40,6 +40,7 @@ is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
 
 if not is_ci and is_windows:
     import colorama
+
     colorama.init()
 
 # Environment checks
@@ -56,10 +57,9 @@ except FileNotFoundError:
     error('Please install JDK and make sure \'javac\' is available in PATH')
 
 cpu_count = multiprocessing.cpu_count()
-archs = ['armeabi-v7a', 'x86']
-arch64 = ['arm64-v8a', 'x86_64']
-support_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'resetprop', 'busybox', 'test']
+archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
+support_targets = default_targets + ['magiskpolicy', 'resetprop', 'test']
 
 ndk_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
@@ -178,7 +178,7 @@ def load_config(args):
 
 
 def collect_binary():
-    for arch in archs + arch64:
+    for arch in archs:
         mkdir_p(op.join('native', 'out', arch))
         for bin in support_targets:
             source = op.join('native', 'libs', arch, bin)
@@ -196,7 +196,7 @@ def clean_elf():
                    '-o', elf_cleaner])
     args = [elf_cleaner]
     args.extend(op.join('native', 'out', arch, 'magisk')
-                for arch in archs + arch64)
+                for arch in archs)
     execv(args)
 
 
@@ -211,6 +211,7 @@ def find_build_tools():
     build_tools = op.join(build_tools_root, ls[-1])
     return build_tools
 
+
 # Unused but keep this code
 def sign_zip(unsigned):
     if 'keyStore' not in config:
@@ -220,18 +221,18 @@ def sign_zip(unsigned):
     apksigner = op.join(find_build_tools(), 'apksigner' + ('.bat' if is_windows else ''))
 
     exec_args = [apksigner, 'sign',
-                '--ks', config['keyStore'],
-                '--ks-pass', f'pass:{config["keyStorePass"]}',
-                '--ks-key-alias', config['keyAlias'],
-                '--key-pass', f'pass:{config["keyPass"]}',
-                '--v1-signer-name', 'CERT',
-                '--v4-signing-enabled', 'false']
+                 '--ks', config['keyStore'],
+                 '--ks-pass', f'pass:{config["keyStorePass"]}',
+                 '--ks-key-alias', config['keyAlias'],
+                 '--key-pass', f'pass:{config["keyPass"]}',
+                 '--v1-signer-name', 'CERT',
+                 '--v4-signing-enabled', 'false']
 
     if unsigned.endswith('.zip'):
         msg = '* Signing zip'
         exec_args.extend(['--min-sdk-version', '17',
-                         '--v2-signing-enabled', 'false',
-                         '--v3-signing-enabled', 'false'])
+                          '--v2-signing-enabled', 'false',
+                          '--v3-signing-enabled', 'false'])
 
     exec_args.append(unsigned)
 
@@ -264,6 +265,7 @@ def dump_bin_headers():
     stub = op.join(config['outdir'], 'stub-release.apk')
     if not op.exists(stub):
         error('Build stub APK before building "magiskinit"')
+    mkdir_p(op.join('native', 'out'))
     with open(op.join('native', 'out', 'binaries.h'), 'w') as out:
         with open(stub, 'rb') as src:
             binary_dump(src, out, 'manager_xz')
@@ -304,18 +306,13 @@ def build_binary(args):
     if not args.release:
         base_flags += ' MAGISK_DEBUG=1'
 
+    flag = ''
+
     if 'magisk' in args.target:
-        run_ndk_build('B_MAGISK=1 B_64BIT=1')
-        clean_elf()
+        flag += ' B_MAGISK=1'
 
     if 'test' in args.target:
-        run_ndk_build('B_TEST=1 B_64BIT=1')
-
-    if 'busybox' in args.target:
-        run_ndk_build('B_BB=1')
-
-    # 32-bit only targets can be built in one command
-    flag = ''
+        flag += ' B_TEST=1'
 
     if 'magiskinit' in args.target:
         dump_bin_headers()
@@ -333,6 +330,12 @@ def build_binary(args):
     if flag:
         run_ndk_build(flag)
 
+    if 'magisk' in args.target:
+        clean_elf()
+
+    if 'busybox' in args.target:
+        run_ndk_build('B_BB=1')
+
 
 def build_apk(args, module):
     build_type = 'Release' if args.release or module == 'stub' else 'Debug'
@@ -343,13 +346,12 @@ def build_apk(args, module):
         error(f'Build {module} failed!')
 
     build_type = build_type.lower()
-    apk = f'{module}-{build_type}.apk'
 
+    apk = f'{module}-{build_type}.apk'
     source = op.join(module, 'build', 'outputs', 'apk', build_type, apk)
     target = op.join(config['outdir'], apk)
     mv(source, target)
     header('Output: ' + target)
-    return target
 
 
 def build_app(args):

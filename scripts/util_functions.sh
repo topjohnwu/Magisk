@@ -519,17 +519,25 @@ remove_system_su() {
 
 api_level_arch_detect() {
   API=$(grep_get_prop ro.build.version.sdk)
-  ABI=$(grep_get_prop ro.product.cpu.abi | cut -c-3)
-  ABI2=$(grep_get_prop ro.product.cpu.abi2 | cut -c-3)
-  ABILONG=$(grep_get_prop ro.product.cpu.abi)
-
-  ARCH=arm
-  ARCH32=arm
-  IS64BIT=false
-  if [ "$ABI" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
-  if [ "$ABI2" = "x86" ]; then ARCH=x86; ARCH32=x86; fi;
-  if [ "$ABILONG" = "arm64-v8a" ]; then ARCH=arm64; ARCH32=arm; IS64BIT=true; fi;
-  if [ "$ABILONG" = "x86_64" ]; then ARCH=x64; ARCH32=x86; IS64BIT=true; fi;
+  ABI=$(grep_get_prop ro.product.cpu.abi)
+  if [ "$ABI" = "x86" ]; then
+    ARCH=x86
+    ABI32=x86
+    IS64BIT=false
+  elif [ "$ABI" = "arm64-v8a" ]; then
+    ARCH=arm64
+    ABI32=armeabi-v7a
+    IS64BIT=true
+  elif [ "$ABI" = "x86_64" ]; then
+    ARCH=x64
+    ABI32=x86
+    IS64BIT=true
+  else
+    ARCH=arm
+    ABI=armeabi-v7a
+    ABI32=armeabi-v7a
+    IS64BIT=false
+  fi
 }
 
 check_data() {
@@ -613,18 +621,19 @@ copy_sepolicy_rules() {
     RULESDIR=/data/unencrypted/magisk
   elif grep -q ' /cache ' /proc/mounts; then
     RULESDIR=/cache/magisk
-  elif grep -q ' /metadata ' /proc/mounts; then
-    RULESDIR=/metadata/magisk
   elif grep -q ' /persist ' /proc/mounts; then
     RULESDIR=/persist/magisk
   elif grep -q ' /mnt/vendor/persist ' /proc/mounts; then
     RULESDIR=/mnt/vendor/persist/magisk
+  elif grep -q ' /metadata ' /proc/mounts; then
+    RULESDIR=/metadata/magisk
   else
     return
   fi
+  ui_print "- Sepolicy rules dir is $RULESDIR"
 
   # Copy all enabled sepolicy.rule
-  for r in /data/adb/modules*/*/sepolicy.rule; do
+  for r in /data/adb/lite_modules*/*/sepolicy.rule; do
     [ -f "$r" ] || continue
     local MODDIR=${r%/*}
     [ -f $MODDIR/disable ] && continue
@@ -699,8 +708,8 @@ install_module() {
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
   [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
 
-  local MODDIRNAME=modules
-  $BOOTMODE && MODDIRNAME=modules_update
+  local MODDIRNAME=lite_modules
+  $BOOTMODE && MODDIRNAME=lite_modules_update
   local MODULEROOT=$NVBASE/$MODDIRNAME
   MODID=`grep_prop id $TMPDIR/module.prop`
   MODNAME=`grep_prop name $TMPDIR/module.prop`
@@ -756,8 +765,10 @@ install_module() {
 
   if $BOOTMODE; then
     # Update info for Magisk app
-    mktouch $NVBASE/modules/$MODID/update
-    cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
+    mktouch $NVBASE/lite_modules/$MODID/update
+    rm -rf $NVBASE/lite_modules/$MODID/remove 2>/dev/null
+    rm -rf $NVBASE/lite_modules/$MODID/disable 2>/dev/null
+    cp -af $MODPATH/module.prop $NVBASE/lite_modules/$MODID/module.prop
   fi
 
   # Copy over custom sepolicy rules

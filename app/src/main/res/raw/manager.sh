@@ -10,6 +10,8 @@ env_check() {
   for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
   done
+  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
+  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 1
   return 0
 }
 
@@ -85,7 +87,7 @@ restore_imgs() {
     flash_image $BACKUPDIR/${name}.img.gz $IMAGE
   done
   [ -f $BACKUPDIR/boot.img.gz ] || return 1
-  flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
+  flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE && rm -rf $BACKUPDIR
 }
 
 post_ota() {

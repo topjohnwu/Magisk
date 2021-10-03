@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -109,10 +108,6 @@ object Hide : BaseSettingsItem.Input() {
 
     override fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
-
-    override fun refresh() {
-        isEnabled = Info.remote.stub.versionCode > 0
-    }
 }
 
 object Restore : BaseSettingsItem.Blank() {
@@ -156,13 +151,6 @@ object UpdateChannel : BaseSettingsItem.Selector() {
     override val title = R.string.settings_update_channel_title.asText()
 
     override val entryRes = R.array.update_channel
-    override fun entries(res: Resources): Array<String> {
-        return super.entries(res).let {
-            if (!BuildConfig.DEBUG)
-                it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
-            else it
-        }
-    }
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {

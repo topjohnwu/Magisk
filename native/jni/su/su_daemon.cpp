@@ -91,33 +91,11 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         // Not cached, get data from database
         database_check(info);
 
-        // If it's root or the manager, allow it silently
-        if (info->uid == UID_ROOT || (info->uid % 100000) == (info->mgr_st.st_uid % 100000)) {
+        // If it's root/shell or the manager, allow it silently
+        if (info->uid == UID_ROOT || info->uid == UID_SHELL ||
+            (info->uid % 100000) == (info->mgr_st.st_uid % 100000)) {
             info->access = SILENT_SU_ACCESS;
             return info;
-        }
-
-        // Check su access settings
-        switch (info->cfg[ROOT_ACCESS]) {
-            case ROOT_ACCESS_DISABLED:
-                LOGW("Root access is disabled!\n");
-                info->access = NO_SU_ACCESS;
-                break;
-            case ROOT_ACCESS_ADB_ONLY:
-                if (info->uid != UID_SHELL) {
-                    LOGW("Root access limited to ADB only!\n");
-                    info->access = NO_SU_ACCESS;
-                }
-                break;
-            case ROOT_ACCESS_APPS_ONLY:
-                if (info->uid == UID_SHELL) {
-                    LOGW("Root access is disabled for ADB!\n");
-                    info->access = NO_SU_ACCESS;
-                }
-                break;
-            case ROOT_ACCESS_APPS_AND_ADB:
-            default:
-                break;
         }
 
         if (info->access.policy != QUERY)
@@ -132,15 +110,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         return info;
     }
 
-    // If still not determined, ask manager
-    int fd = app_request(info);
-    if (fd < 0) {
-        info->access.policy = DENY;
-    } else {
-        int ret = read_int_be(fd);
-        info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
-        close(fd);
-    }
+    info->access.policy = DENY;
 
     return info;
 }

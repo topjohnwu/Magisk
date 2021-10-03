@@ -7,20 +7,20 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
-import android.os.Build.VERSION.SDK_INT
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.ktx.isIsolated
-import com.topjohnwu.magisk.ktx.useAppZygote
 
 class CmdlineHiddenItem(line: String) {
     val packageName: String
     val process: String
+    val uid: Int
 
     init {
-        val split = line.split(Regex("\\|"), 2)
-        packageName = split[0]
-        process = split.getOrElse(1) { packageName }
+        val split = line.split(Regex("\\|"), 3)
+        uid = split[0].toInt()
+        packageName = split[1]
+        process = split.getOrElse(2) { packageName }
     }
 }
 
@@ -58,23 +58,15 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
             }
         }
 
-        val hidden = hideList.filter { it.packageName == packageName || it.packageName == ISOLATED_MAGIC }
-        fun createProcess(name: String, pkg: String = packageName): HideProcessInfo {
-            return HideProcessInfo(name, pkg, hidden.any { it.process == name && it.packageName == pkg })
+        val hidden = hideList.filter { it.packageName == packageName && it.uid == uid }
+        fun createProcess(name: String): HideProcessInfo {
+            return HideProcessInfo(name, packageName, uid, hidden.any { it.process == name })
         }
 
-        var haveAppZygote = false
         fun Array<out ComponentInfo>.processes() = map { createProcess(it.processName) }
         fun Array<ServiceInfo>.processes() = map {
             if (it.isIsolated) {
-                if (it.useAppZygote) {
-                    haveAppZygote = true
-                    // Using app zygote, don't need to track the process
-                    null
-                } else {
-                    val proc = if (SDK_INT >= 29) "${it.processName}:${it.name}" else it.processName
-                    createProcess(proc, ISOLATED_MAGIC)
-                }
+                null
             } else {
                 createProcess(it.processName)
             }
@@ -84,8 +76,7 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
             activities?.processes().orEmpty() +
             services?.processes().orEmpty() +
             receivers?.processes().orEmpty() +
-            providers?.processes().orEmpty() +
-            listOf(if (haveAppZygote) createProcess("${processName}_zygote") else null)
+            providers?.processes().orEmpty()
         }.filterNotNull().distinct().sortedBy { it.name }
     }
 
@@ -100,6 +91,7 @@ class HideAppInfo(info: ApplicationInfo, pm: PackageManager, hideList: List<Cmdl
 data class HideProcessInfo(
     val name: String,
     val packageName: String,
+    val uid: Int,
     var isHidden: Boolean
 ) {
     val isIsolated get() = packageName == ISOLATED_MAGIC

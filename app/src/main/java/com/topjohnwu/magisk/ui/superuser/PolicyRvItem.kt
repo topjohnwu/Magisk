@@ -23,12 +23,6 @@ class PolicyRvItem(
     var policyState = item.policy == SuPolicy.ALLOW
         set(value) = set(value, field, { field = it }, BR.enabled)
 
-    // This property binds with the UI state
-    @get:Bindable
-    var isEnabled
-        get() = policyState
-        set(value) = set(value, policyState, { viewModel.togglePolicy(this, it) }, BR.enabled)
-
     @get:Bindable
     var shouldNotify = item.notification
         set(value) = set(value, field, { field = it }, BR.shouldNotify) {
@@ -58,10 +52,6 @@ class PolicyRvItem(
 
     fun toggleLog() {
         shouldLog = !shouldLog
-    }
-
-    fun revoke() {
-        viewModel.deletePressed(this)
     }
 
     override fun contentSameAs(other: PolicyRvItem) = itemSameAs(other)

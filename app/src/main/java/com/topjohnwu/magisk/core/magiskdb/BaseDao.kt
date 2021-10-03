@@ -5,13 +5,12 @@ import androidx.annotation.StringDef
 abstract class BaseDao {
 
     object Table {
-        const val POLICY = "policies"
-        const val LOG = "logs"
+        const val POLICY = "sulist"
         const val SETTINGS = "settings"
         const val STRINGS = "strings"
     }
 
-    @StringDef(Table.POLICY, Table.LOG, Table.SETTINGS, Table.STRINGS)
+    @StringDef(Table.POLICY, Table.SETTINGS, Table.STRINGS)
     @Retention(AnnotationRetention.SOURCE)
     annotation class TableStrict
 

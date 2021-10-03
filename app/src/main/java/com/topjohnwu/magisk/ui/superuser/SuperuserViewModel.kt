@@ -11,12 +11,9 @@ import com.topjohnwu.magisk.arch.itemBindingOf
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.ComparableRvItem
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.BiometricEvent
-import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.TappableHeadlineItem
@@ -54,7 +51,6 @@ class SuperuserViewModel(
         }
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.Default) {
-            db.deleteOutdated()
             val policies = db.fetchAll {
                 PolicyRvItem(it, it.icon, this@SuperuserViewModel)
             }.sortedWith(compareBy(
@@ -81,29 +77,6 @@ class SuperuserViewModel(
     private fun hidePressed() =
         SuperuserFragmentDirections.actionSuperuserFragmentToHideFragment().navigate()
 
-    fun deletePressed(item: PolicyRvItem) {
-        fun updateState() = viewModelScope.launch {
-            db.delete(item.item.uid)
-            itemsPolicies.removeAll { it.genericItemSameAs(item) }
-            if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
-                itemsHelpers.add(itemNoData)
-            }
-        }
-
-        if (BiometricHelper.isEnabled) {
-            BiometricEvent {
-                onSuccess { updateState() }
-            }.publish()
-        } else {
-            SuperuserRevokeDialog {
-                appName = item.item.appName
-                onSuccess { updateState() }
-            }.publish()
-        }
-    }
-
-    //---
-
     fun updatePolicy(policy: SuPolicy, isLogging: Boolean) = viewModelScope.launch {
         db.update(policy)
         val res = when {
@@ -117,29 +90,5 @@ class SuperuserViewModel(
             }
         }
         SnackbarEvent(res.asText(policy.appName)).publish()
-    }
-
-    fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
-        fun updateState() {
-            item.policyState = enable
-
-            val policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
-            val app = item.item.copy(policy = policy)
-
-            viewModelScope.launch {
-                db.update(app)
-                val res = if (app.policy == SuPolicy.ALLOW) R.string.su_snack_grant
-                else R.string.su_snack_deny
-                SnackbarEvent(res.asText(item.item.appName)).publish()
-            }
-        }
-
-        if (BiometricHelper.isEnabled) {
-            BiometricEvent {
-                onSuccess { updateState() }
-            }.publish()
-        } else {
-            updateState()
-        }
     }
 }

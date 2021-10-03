@@ -16,7 +16,7 @@ buildscript {
     extra["vNav"] = vNav
 
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.0")
+        classpath("com.android.tools.build:gradle:4.2.1")
         classpath(kotlin("gradle-plugin", version = "1.5.0"))
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${vNav}")
 
@@ -48,9 +48,9 @@ subprojects {
                 ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
 
                 defaultConfig {
-                    if (minSdkVersion == null)
-                        minSdkVersion(21)
-                    targetSdkVersion(30)
+                    if (minSdk == null)
+                        minSdk = 21
+                    targetSdk = 30
                 }
 
                 compileOptions {

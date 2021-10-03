@@ -5,12 +5,9 @@ import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
@@ -19,12 +16,9 @@ import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 import java.io.IOException
 
-class InstallViewModel(
-    svc: NetworkService
-) : BaseViewModel() {
+class InstallViewModel : BaseViewModel() {
 
     val isRooted = Shell.rootAccess()
     val skipOptions = Info.isEmulator || (Info.ramdisk && !Info.isFDE && Info.isSAR)
@@ -64,17 +58,8 @@ class InstallViewModel(
     init {
         viewModelScope.launch {
             try {
-                File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
-                    notes = when {
-                        exists() -> readText()
-                        Const.Url.CHANGELOG_URL.isEmpty() -> ""
-                        else -> {
-                            val text = svc.fetchString(Const.Url.CHANGELOG_URL)
-                            writeText(text)
-                            text
-                        }
-                    }
-                }
+                notes = AppContext.resources.openRawResource(R.raw.changelog)
+                    .bufferedReader().use { it.readText() }
             } catch (e: IOException) {
                 Timber.e(e)
             }

@@ -3,17 +3,19 @@ package com.topjohnwu.magisk.core
 import android.os.Build
 import android.os.Process
 import com.topjohnwu.magisk.BuildConfig
-import java.io.File
 
 @Suppress("DEPRECATION")
 object Const {
 
-    val CPU_ABI: String = Build.SUPPORTED_ABIS[0]
-    val CPU_ABI_32: String = Build.SUPPORTED_32_BIT_ABIS.firstOrNull() ?: CPU_ABI
+    val CPU_ABI: String get() = Build.SUPPORTED_ABIS[0]
+
+    // Null if 32-bit only or 64-bit only
+    val CPU_ABI_32 =
+        if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) null
+        else Build.SUPPORTED_32_BIT_ABIS.firstOrNull()
 
     // Paths
     lateinit var MAGISKTMP: String
-    lateinit var NATIVE_LIB_DIR: File
     val MAGISK_PATH get() = "$MAGISKTMP/modules"
     const val TMPDIR = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
@@ -45,7 +47,7 @@ object Const {
 
     object Url {
         const val PATREON_URL = "https://www.patreon.com/topjohnwu"
-        const val SOURCE_CODE_URL = "https://github.com/topjohnwu/Magisk"
+        const val SOURCE_CODE_URL = "https://github.com/vvb2060/Magisk"
 
         val CHANGELOG_URL = if (BuildConfig.VERSION_CODE % 100 != 0) Info.remote.magisk.note
         else "https://topjohnwu.github.io/Magisk/releases/${BuildConfig.VERSION_CODE}.md"

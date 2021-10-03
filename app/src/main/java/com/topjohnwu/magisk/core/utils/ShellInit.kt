@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core.utils
 
 import android.content.Context
-import android.os.Build
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.*
@@ -34,13 +33,13 @@ class BusyBoxInit : BaseShellInit() {
                 if (!shell.isRoot)
                     return true
                 val jar = JarFile(DynAPK.current(context))
-                val bb = jar.getJarEntry("lib/${Const.CPU_ABI_32}/libbusybox.so")
+                val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
                 localBB.delete()
                 jar.getInputStream(bb).writeTo(localBB)
                 localBB.setExecutable(true)
             } else {
-                localBB = File(Const.NATIVE_LIB_DIR, "libbusybox.so")
+                localBB = File(context.applicationInfo.nativeLibraryDir, "libbusybox.so")
             }
 
             if (shell.isRoot) {

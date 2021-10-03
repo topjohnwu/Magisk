@@ -3,17 +3,11 @@ plugins {
 }
 
 android {
-    val canary = !Config.version.contains(".")
-
-    val url = Config["DEV_CHANNEL"] ?: if (canary) null
-    else "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@${Config.version}/app-release.apk"
-
     defaultConfig {
         applicationId = "com.topjohnwu.magisk"
         versionCode = 1
         versionName = Config.version
         buildConfigField("int", "STUB_VERSION", Config.stubVersion)
-        buildConfigField("String", "APK_URL", url?.let { "\"$it\"" } ?: "null" )
     }
 
     buildTypes {

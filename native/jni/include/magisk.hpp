@@ -7,14 +7,16 @@
 #define LOGFILE         "/cache/magisk.log"
 #define UNBLOCKFILE     "/dev/.magisk_unblock"
 #define SECURE_DIR      "/data/adb"
-#define MODULEROOT      SECURE_DIR "/modules"
-#define MODULEUPGRADE   SECURE_DIR "/modules_update"
+#define MODULEROOT      SECURE_DIR "/lite_modules"
+#define MODULEUPGRADE   SECURE_DIR "/lite_modules_update"
 #define DATABIN         SECURE_DIR "/magisk"
 #define MAGISKDB        SECURE_DIR "/magisk.db"
+#define LITE_MAGISKDB   SECURE_DIR "/lite_magisk.db"
 #define MANAGERAPK      DATABIN "/magisk.apk"
 
 // tmpfs paths
 extern std::string  MAGISKTMP;
+extern std::string  SUMODULE;
 #define INTLROOT    ".magisk"
 #define MIRRDIR     INTLROOT "/mirror"
 #define RULESDIR    MIRRDIR "/sepolicy.rules"

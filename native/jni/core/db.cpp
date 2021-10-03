@@ -7,7 +7,7 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
-#define DB_VERSION 10
+#define DB_VERSION 11
 
 using namespace std;
 
@@ -111,7 +111,7 @@ db_settings::db_settings() {
     data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
-    data[HIDE_CONFIG] = false;
+    data[HIDE_CONFIG] = true;
 }
 
 int db_settings::getKeyIdx(string_view key) const {
@@ -134,7 +134,11 @@ static char *open_and_init_db(sqlite3 *&db) {
     if (!dload_sqlite())
         return strdup("Cannot load libsqlite.so");
 
-    int ret = sqlite3_open_v2(MAGISKDB, &db,
+    if (access(MAGISKDB, R_OK) == 0 && access(LITE_MAGISKDB, F_OK) == -1) {
+        cp_afc(MAGISKDB, LITE_MAGISKDB);
+    }
+
+    int ret = sqlite3_open_v2(LITE_MAGISKDB, &db,
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
     if (ret)
         return strdup(sqlite3_errmsg(db));
@@ -227,6 +231,22 @@ static char *open_and_init_db(sqlite3 *&db) {
         ver = 10;
         upgrade = true;
     }
+    if (ver < 11) {
+        sqlite3_exec(db,
+                "BEGIN TRANSACTION;"
+                "CREATE TABLE IF NOT EXISTS sulist "
+                "(uid INT, package_name TEXT, process TEXT, "
+                "logging INT, notification INT, PRIMARY KEY(uid, process));"
+                "INSERT INTO sulist SELECT uid, package_name, package_name as process, "
+                "logging, notification FROM policies WHERE policy=2;"
+                "DROP TABLE policies;"
+                "DROP TABLE hidelist;"
+                "COMMIT;",
+                nullptr, nullptr, &err);
+        err_ret(err);
+        ver = 11;
+        upgrade = true;
+    }
 
     if (upgrade) {
         // Set version
@@ -244,7 +264,7 @@ char *db_exec(const char *sql) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
             // Open fails, remove and reconstruct
-            unlink(MAGISKDB);
+            unlink(LITE_MAGISKDB);
             err = open_and_init_db(mDB);
             err_ret(err);
         );
@@ -262,7 +282,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
             // Open fails, remove and reconstruct
-            unlink(MAGISKDB);
+            unlink(LITE_MAGISKDB);
             err = open_and_init_db(mDB);
             err_ret(err);
         );
@@ -317,10 +337,10 @@ int get_db_strings(db_strings &str, int key) {
 
 int get_uid_policy(su_access &su, int uid) {
     char query[256], *err;
-    sprintf(query, "SELECT policy, logging, notification FROM policies "
-            "WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
+    sprintf(query, "SELECT package_name, process, logging, notification FROM sulist WHERE uid=%d", uid);
     err = db_exec(query, [&](db_row &row) -> bool {
-        su.policy = (policy_t) parse_int(row["policy"]);
+        if (row["package_name"] != row["process"]) return true;
+        su.policy = ALLOW;
         su.log = parse_int(row["logging"]);
         su.notify = parse_int(row["notification"]);
         LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", su.policy, su.log, su.notify);

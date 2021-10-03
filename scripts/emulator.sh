@@ -29,7 +29,7 @@ mount_sbin() {
 if [ ! -f /system/build.prop ]; then
   # Running on PC
   cd "$(dirname "$0")/.."
-  adb push native/out/x86/busybox native/out/x86/magiskinit \
+  adb push native/out/x86_64/busybox native/out/x86_64/magiskinit \
   native/out/x86_64/magisk scripts/emulator.sh /data/local/tmp
   adb shell sh /data/local/tmp/emulator.sh
   exit 0

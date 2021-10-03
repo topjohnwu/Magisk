@@ -6,6 +6,7 @@
 #include <resetprop.hpp>
 
 #include "magiskhide.hpp"
+#include "core/core.hpp"
 
 using namespace std;
 
@@ -80,8 +81,6 @@ static void lazy_unmount(const char* mountpoint) {
 void hide_daemon(int pid) {
     if (fork_dont_care() == 0) {
         hide_unmount(pid);
-        // Send resume signal
-        kill(pid, SIGCONT);
         _exit(0);
     }
 }
@@ -130,3 +129,33 @@ void hide_unmount(int pid) {
         lazy_unmount(s.data());
 }
 
+void root_mount(int pid) {
+    if (switch_mnt_ns(pid))
+        return;
+
+    LOGD("su_policy: handling PID=[%d]\n", pid);
+
+    xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
+
+    chdir(SUMODULE.data());
+    if (!system_mnt_type.empty()) {
+        xmount(BLOCKDIR "/system", MIRRDIR "/system", system_mnt_type.data(),
+               MS_RDONLY, nullptr);
+    }
+    if (!system_root_mnt_type.empty()) {
+        xmount(BLOCKDIR "/system_root", MIRRDIR "/system_root", system_root_mnt_type.data(),
+               MS_RDONLY, nullptr);
+    }
+    chdir("/");
+
+    su_mount();
+}
+
+void su_daemon(int pid) {
+    if (fork_dont_care() == 0) {
+        root_mount(pid);
+        // Send resume signal
+        kill(pid, SIGCONT);
+        _exit(0);
+    }
+}

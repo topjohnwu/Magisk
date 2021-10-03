@@ -20,7 +20,6 @@
             style="@style/WidgetFoundation.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="@{item.enabled ? 1f : .5f}"
             android:onClick="@{() -> item.toggleExpand()}">
 
             <LinearLayout
@@ -49,8 +48,7 @@
                         android:id="@+id/policy_app_name"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/margin_generic"
-                        android:layout_marginRight="@dimen/margin_generic"
+                        android:layout_marginStart="@dimen/margin_generic"
                         android:ellipsize="middle"
                         android:gravity="start"
                         android:maxLines="2"
@@ -58,7 +56,7 @@
                         android:textAppearance="@style/AppearanceFoundation.Body"
                         android:textIsSelectable="false"
                         android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@+id/policy_indicator"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/policy_app_icon"
                         app:layout_constraintTop_toTopOf="@+id/policy_app_icon"
                         tools:text="@string/magisk" />
@@ -81,16 +79,6 @@
                         app:layout_constraintTop_toBottomOf="@id/policy_app_name"
                         app:layout_constraintVertical_bias="0"
                         tools:text="com.topjohnwu.magisk" />
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/policy_indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="@={item.enabled}"
-                        android:layout_marginEnd="@dimen/l1"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -143,29 +131,6 @@
                         app:icon="@drawable/ic_bug_md2"
                         app:iconTint="@color/color_state_primary_transient"
                         app:tint="@color/color_state_primary_transient" />
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/l_50"
-                        android:layout_marginBottom="@dimen/l_50"
-                        android:background="?colorSurfaceSurfaceVariant" />
-
-                    <Button
-                        android:id="@+id/policy_delete"
-                        style="@style/WidgetFoundation.Button.Text"
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:minHeight="24dp"
-                        android:onClick="@{() -> item.revoke()}"
-                        android:text="@string/superuser_toggle_revoke"
-                        android:textAllCaps="false"
-                        android:textColor="?colorError"
-                        android:textSize="12sp"
-                        app:icon="@drawable/ic_delete_md2"
-                        app:iconTint="?colorError"
-                        app:rippleColor="?colorError" />
 
                 </LinearLayout>
 

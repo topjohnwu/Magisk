@@ -110,7 +110,7 @@ class prop_area {
 
   const prop_info* find(const char* name);
   bool add(const char* name, unsigned int namelen, const char* value, unsigned int valuelen);
-  prop_info* rm(const char *name);
+  bool rm(const char *name);
 
   bool foreach (void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
 

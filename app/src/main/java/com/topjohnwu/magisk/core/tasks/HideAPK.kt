@@ -101,6 +101,8 @@ object HideAPK {
 
         private fun launchApp(): Unit = activity.get()?.run {
             val intent = packageManager.getLaunchIntentForPackage(pkg) ?: return
+            val uid = packageManager.getApplicationInfo(pkg, 0).uid
+            Shell.su("magiskhide add $uid $pkg").exec()
             Config.suManager = if (pkg == APPLICATION_ID) "" else pkg
             grantUriPermission(pkg, APK_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             grantUriPermission(pkg, PREFS_URI, Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -129,7 +131,9 @@ object HideAPK {
             svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
         } catch (e: IOException) {
             Timber.e(e)
-            return false
+            stub.createNewFile()
+            val cmd = "\$MAGISKBIN/magiskinit -x manager ${stub.path}"
+            if (!Shell.su(cmd).exec().isSuccess) return false
         }
 
         // Generate a new random package name and signature
@@ -147,19 +151,33 @@ object HideAPK {
         return true
     }
 
+    @Suppress("DEPRECATION")
     suspend fun hide(activity: Activity, label: String) {
+        val dialog = android.app.ProgressDialog(activity).apply {
+            setTitle(activity.getString(R.string.hide_app_title))
+            isIndeterminate = true
+            show()
+        }
         val result = withContext(Dispatchers.IO) {
             patchAndHide(activity, label)
         }
+        dialog.dismiss()
         if (!result) {
             Utils.toast(R.string.failure, Toast.LENGTH_LONG)
         }
     }
 
+    @Suppress("DEPRECATION")
     fun restore(activity: Activity) {
+        val dialog = android.app.ProgressDialog(activity).apply {
+            setTitle(activity.getString(R.string.restore_img_msg))
+            isIndeterminate = true
+            show()
+        }
         val apk = DynAPK.current(activity)
         APKInstall.registerInstallReceiver(activity, WaitPackageReceiver(APPLICATION_ID, activity))
         Shell.su("adb_pm_install $apk").submit {
+            dialog.dismiss()
             if (!it.isSuccess)
                 APKInstall.installHideResult(activity, apk)
         }

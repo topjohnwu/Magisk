@@ -30,19 +30,6 @@
         <!-- Main -->
         <activity android:name="xt.R" />
 
-        <!-- Superuser -->
-        <activity
-            android:name="lt5.a"
-            android:directBootAware="true"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            tools:ignore="AppLinkUrlError">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <!-- Receiver -->
         <receiver
             android:name="yy.E"
@@ -54,6 +41,7 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
 
                 <data android:scheme="package" />
             </intent-filter>

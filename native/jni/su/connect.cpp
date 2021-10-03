@@ -123,32 +123,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
             return;
     }
 
-    vector<const char *> args{ START_ACTIVITY };
-    for (auto &e : data) {
-        e.add_intent(args);
-    }
-    args.push_back(nullptr);
-    exec_t exec {
-        .err = true,
-        .fd = -1,
-        .pre_exec = [] { setenv("CLASSPATH", "/system/framework/am.jar", 1); },
-        .argv = args.data()
-    };
-
-    if (mode >= PKG_ACTIVITY) {
-        // Then try start activity without component name
-        strcpy(target, info->str[SU_MANAGER].data());
-        exec_command_sync(exec);
-        if (check_no_error(exec.fd))
-            return;
-    }
-
-    // Finally, fallback to start activity with component name
-    args[4] = "-n";
-    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->str[SU_MANAGER].data());
-    exec.fd = -2;
-    exec.fork = fork_dont_care;
-    exec_command(exec);
+    LOGE("Connection failed, provider call error.");
 }
 
 void app_log(const su_context &ctx) {

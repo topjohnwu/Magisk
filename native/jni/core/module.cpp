@@ -598,6 +598,52 @@ void magic_mount() {
     root->mount();
 }
 
+class su_node : public node_entry {
+public:
+    su_node(const char *name) : node_entry(name, DT_REG, this) {}
+
+    void mount() override {
+        const string &dir_name = parent()->node_path();
+        if (name() == "magisk") {
+            for (int i = 0; applet_names[i]; ++i) {
+                string dest = dir_name + "/" + applet_names[i];
+                VLOGD("create", "./magisk", dest.data());
+                xsymlink("./magisk", dest.data());
+            }
+        } else {
+            for (int i = 0; init_applet[i]; ++i) {
+                string dest = dir_name + "/" + init_applet[i];
+                VLOGD("create", "./magiskinit", dest.data());
+                xsymlink("./magiskinit", dest.data());
+            }
+        }
+        auto src = SUMODULE + "/" + name();
+        VLOGD("copy", src.data(), node_path().data());
+        cp_afc(src.data(), node_path().data());
+    }
+};
+
+void su_mount() {
+    node_entry::mirror_dir = SUMODULE + "/" MIRRDIR;
+
+    auto root = make_unique<root_node>("");
+    auto system = new root_node("system");
+    root->insert(system);
+
+
+    auto bin = system->child<inter_node>("bin");
+    if (!bin) {
+        bin = new inter_node("bin", "");
+        system->insert(bin);
+    }
+
+    bin->insert(new su_node("magisk"));
+    bin->insert(new su_node("magiskinit"));
+
+    root->prepare();
+    root->mount();
+}
+
 static void prepare_modules() {
     // Upgrade modules
     if (auto dir = open_dir(MODULEUPGRADE); dir) {

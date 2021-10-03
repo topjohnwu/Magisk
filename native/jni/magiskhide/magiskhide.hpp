@@ -40,12 +40,15 @@ bool is_hide_target(int uid, std::string_view process, int max_len = 1024);
 
 // Hide policies
 void hide_daemon(int pid);
+void su_daemon(int pid);
 void hide_unmount(int pid = -1);
 void hide_sensitive_props();
 void hide_late_sensitive_props();
 
 extern pthread_mutex_t hide_state_lock;
 extern std::map<int, std::vector<std::string_view>> uid_proc_map;
+extern std::string system_mnt_type;
+extern std::string system_root_mnt_type;
 
 enum {
     LAUNCH_MAGISKHIDE,
@@ -64,5 +67,6 @@ enum {
     HIDE_ITEM_EXIST,
     HIDE_ITEM_NOT_EXIST,
     HIDE_NO_NS,
-    HIDE_INVALID_PKG
+    HIDE_INVALID_PKG,
+    HIDE_NO_SUPPORT
 };

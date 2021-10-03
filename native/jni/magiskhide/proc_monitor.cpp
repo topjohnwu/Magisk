@@ -230,7 +230,7 @@ static bool check_pid(int pid) {
     // The hide daemon will resume the process after hiding it
     LOGI("proc_monitor: [%s] PID=[%d] UID=[%d]\n", cmdline, pid, uid);
     detach_pid(pid, SIGSTOP);
-    hide_daemon(pid);
+    su_daemon(pid);
     return true;
 
 not_target:
@@ -272,6 +272,7 @@ static void new_zygote(int pid) {
 
     LOGD("proc_monitor: ptrace zygote PID=[%d]\n", pid);
     zygote_map[pid] = st;
+    hide_daemon(pid);
 
     xptrace(PTRACE_ATTACH, pid);
 
