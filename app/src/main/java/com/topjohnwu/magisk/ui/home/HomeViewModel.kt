@@ -1,13 +1,12 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.content.Context
+import androidx.core.net.toUri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.ActivityExecutor
-import com.topjohnwu.magisk.arch.BaseUIActivity
-import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
@@ -15,12 +14,12 @@ import com.topjohnwu.magisk.core.download.Subject.Manager
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.events.OpenInappLinkEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
 import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
 import com.topjohnwu.magisk.events.dialog.UninstallDialog
 import com.topjohnwu.magisk.ktx.await
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -116,7 +115,9 @@ class HomeViewModel(
             stateManagerProgress = progress.times(100f).roundToInt()
     }
 
-    fun onLinkPressed(link: String) = OpenInappLinkEvent(link).publish()
+    fun onLinkPressed(link: String) = object : ViewEvent(), ContextExecutor {
+        override fun invoke(context: Context) = Utils.openLink(context, link.toUri())
+    }.publish()
 
     fun onDeletePressed() = UninstallDialog().publish()
 

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -29,13 +30,10 @@ object Utils {
     fun openLink(context: Context, link: Uri) {
         val intent = Intent(Intent.ACTION_VIEW, link)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        if (intent.resolveActivity(context.packageManager) != null) {
+        try {
             context.startActivity(intent)
-        } else {
-            toast(
-                R.string.open_link_failed_toast,
-                Toast.LENGTH_SHORT
-            )
+        } catch (e: ActivityNotFoundException) {
+            toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
         }
     }
 }
