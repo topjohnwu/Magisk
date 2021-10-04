@@ -93,7 +93,7 @@ static int64_t setup_block(bool write_block) {
 }
 
 static bool is_lnk(const char *name) {
-    struct stat st;
+    struct stat st{};
     if (lstat(name, &st))
         return false;
     return S_ISLNK(st.st_mode);
@@ -194,6 +194,29 @@ static void switch_root(const string &path) {
 
     LOGD("Cleaning rootfs\n");
     frm_rf(root);
+}
+
+bool is_dsu() {
+    strcpy(blk_info.partname, "metadata");
+    xmkdir("/metadata", 0755);
+    if (setup_block(true) < 0 ||
+        xmount(blk_info.block_dev, "/metadata", "ext4", MS_RDONLY, nullptr)) {
+        PLOGE("Failed to mount /metadata");
+        return false;
+    } else {
+        run_finally finally([] {
+            xumount2("/metadata", MNT_DETACH);
+        });
+        constexpr auto dsu_status = "/metadata/gsi/dsu/install_status";
+        if (xaccess(dsu_status, F_OK) == 0) {
+            char buf[PATH_MAX] = {0};
+            auto f = xopen_file(dsu_status, "r");
+            fgets(buf, sizeof(buf), f.get());
+            std::string_view status = buf;
+            if (status == "ok" || status == "0") return true;
+        }
+    }
+    return false;
 }
 
 void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
