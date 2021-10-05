@@ -87,7 +87,7 @@ class ForkAndSpec(JNIHook):
         return 'nativeForkAndSpecialize'
 
     def init_args(self):
-        return 'SpecializeAppProcessArgs args(uid, gid, gids, runtime_flags, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
+        return 'AppSpecializeArgsImpl args(uid, gid, gids, runtime_flags, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
 
     def body(self):
         decl = ''
@@ -118,7 +118,7 @@ class ForkServer(ForkAndSpec):
         return 'nativeForkSystemServer'
 
     def init_args(self):
-        return 'ForkSystemServerArgs args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
+        return 'ServerSpecializeArgsImpl args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
 
 # Common args
 uid = Argument('uid', jint)
