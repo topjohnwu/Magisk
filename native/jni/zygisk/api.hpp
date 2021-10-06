@@ -186,7 +186,8 @@ struct Api {
 
 private:
     internal::api_table *impl;
-    friend void internal::entry_impl<class T>(internal::api_table *, JNIEnv *);
+    template<class T>
+    friend void internal::entry_impl(internal::api_table *, JNIEnv *);
 };
 
 // Register a class as a Zygisk module
@@ -253,7 +254,7 @@ struct api_table {
 
 template <class T>
 void entry_impl(api_table *table, JNIEnv *env) {
-    auto module = new T();
+    ModuleBase* module = new T();
     if (!table->registerModule(table, new module_abi(module)))
         return;
     auto api = new Api();

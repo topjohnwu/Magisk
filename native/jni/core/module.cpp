@@ -691,9 +691,9 @@ static void collect_modules() {
         if (faccessat(modfd, "disable", F_OK, 0) == 0)
             return;
         // Riru and its modules are not compatible with zygisk
-        if (zygisk_enabled && (
-                entry->d_name == "riru-core"sv ||
-                faccessat(modfd, "riru", F_OK, 0) == 0))
+        if (zygisk_enabled && faccessat(modfd, "zygisk", F_OK, 0) == -1 &&
+                (std::string_view(entry->d_name).rfind("riru") == 0 ||
+                        faccessat(modfd, "riru", F_OK, 0) == 0))
             return;
 
         module_list.emplace_back(entry->d_name);
