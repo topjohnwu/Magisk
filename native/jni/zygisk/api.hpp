@@ -22,23 +22,27 @@ Example code:
 static jint (*orig_logger_entry_max)(JNIEnv *env);
 static jint my_logger_entry_max(JNIEnv *env) { return orig_logger_entry_max(env); }
 
+static void example_handler(int socket) { ... }
+
 class ExampleModule : public zygisk::ModuleBase {
 public:
-    void onLoad(zygisk::Api *api) override {
-        _api = api;
+    void onLoad(zygisk::Api *api, JNIEnv *env) override {
+        this->api = api;
     }
-    void preAppSpecialize(JNIEnv *env, zygisk::AppSpecializeArgs *args) override {
+    void preAppSpecialize(zygisk::AppSpecializeArgs *args) override {
         JNINativeMethod methods[] = {
             { "logger_entry_max_payload_native", "()I", (void*) my_logger_entry_max },
         };
-        _api->hookJniNativeMethods("android/util/Log", methods, 1);
+        api->hookJniNativeMethods("android/util/Log", methods, 1);
         *(void **) &orig_logger_entry_max = methods[0].fnPtr;
     }
 private:
-    zygisk::Api *_api;
+    zygisk::Api *api;
 };
 
 REGISTER_ZYGISK_MODULE(ExampleModule)
+
+REGISTER_ZYGISK_COMPANION(example_handler)
 
 */
 
@@ -54,15 +58,7 @@ public:
     // This function is called when the module is loaded into the target process.
     // A Zygisk API handle will be sent as an argument; call utility functions or interface
     // with Zygisk through this handle.
-    virtual void onLoad(Api *api) {}
-
-    // Handles a root companion request from your module in a target process.
-    // This function runs in a root companion process.
-    // See Api::connectCompanion() for more info.
-    //
-    // NOTE: this function can run concurrently on multiple threads.
-    // Be aware of race conditions if you have a globally shared resource.
-    virtual void onCompanionRequest(int client) {}
+    virtual void onLoad(Api *api, JNIEnv *env) {}
 
     // This function is called before the app process is specialized.
     // At this point, the process just got forked from zygote, but no app specific specialization
@@ -76,20 +72,20 @@ public:
     // If you need to run some operations as superuser, you can call Api::connectCompanion() to
     // get a socket to do IPC calls with a root companion process.
     // See Api::connectCompanion() for more info.
-    virtual void preAppSpecialize(JNIEnv *env, AppSpecializeArgs *args) {}
+    virtual void preAppSpecialize(AppSpecializeArgs *args) {}
 
     // This function is called after the app process is specialized.
     // At this point, the process has all sandbox restrictions enabled for this application.
     // This means that this function runs as the same privilege of the app's own code.
-    virtual void postAppSpecialize(JNIEnv *env) {}
+    virtual void postAppSpecialize(const AppSpecializeArgs *args) {}
 
     // This function is called before the system server process is specialized.
     // See preAppSpecialize(args) for more info.
-    virtual void preServerSpecialize(JNIEnv *env, ServerSpecializeArgs *args) {}
+    virtual void preServerSpecialize(ServerSpecializeArgs *args) {}
 
     // This function is called after the app process is specialized.
     // At this point, the process runs with the privilege of system_server.
-    virtual void postServerSpecialize(JNIEnv *env) {}
+    virtual void postServerSpecialize(const ServerSpecializeArgs *args) {}
 };
 
 struct AppSpecializeArgs {
@@ -128,7 +124,7 @@ struct ServerSpecializeArgs {
 
 namespace internal {
 struct api_table;
-template <class T> void entry_impl(api_table *);
+template <class T> void entry_impl(api_table *, JNIEnv *);
 }
 
 struct Api {
@@ -138,8 +134,8 @@ struct Api {
     // This API only works in the pre[XXX]Specialize functions due to SELinux restrictions.
     //
     // The pre[XXX]Specialize functions run with the same privilege of zygote.
-    // If you would like to do some operations with superuser permissions, implement the
-    // onCompanionRequest(int) function as that function will be called in the root process.
+    // If you would like to do some operations with superuser permissions, register a handler
+    // function that would be called in the root process with REGISTER_ZYGISK_COMPANION(func).
     // Another good use case for a companion process is that if you want to share some resources
     // across multiple processes, hold the resources in the companion process and pass it over.
     //
@@ -171,7 +167,7 @@ struct Api {
     // Hook JNI native methods for a class
     //
     // Lookup all registered JNI native methods and replace it with your own functions.
-    // The original function pointer will be returned in each JNINativeMethod's fnPtr.
+    // The original function pointer will be saved in each JNINativeMethod's fnPtr.
     // If no matching class, method name, or signature is found, that specific JNINativeMethod.fnPtr
     // will be set to nullptr.
     void hookJniNativeMethods(const char *className, JNINativeMethod *methods, int numMethods);
@@ -181,7 +177,7 @@ struct Api {
     void pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc);
 
     // For ELFs loaded in memory matching `regex`, exclude hooks registered for `symbol`.
-    // If `symbol` is nullptr, then all symbols will be ignored.
+    // If `symbol` is nullptr, then all symbols will be excluded.
     void pltHookExclude(const char *regex, const char *symbol);
 
     // Commit all the hooks that was previously registered.
@@ -190,13 +186,28 @@ struct Api {
 
 private:
     internal::api_table *impl;
-    friend void internal::entry_impl<class T>(internal::api_table *);
+    friend void internal::entry_impl<class T>(internal::api_table *, JNIEnv *);
 };
 
+// Register a class as a Zygisk module
+
 #define REGISTER_ZYGISK_MODULE(clazz) \
-void zygisk_module_entry(zygisk::internal::api_table *table) { \
-    zygisk::internal::entry_impl<clazz>(table);                \
+void zygisk_module_entry(zygisk::internal::api_table *table, JNIEnv *env) { \
+    zygisk::internal::entry_impl<clazz>(table, env);                        \
 }
+
+// Register a root companion request handler function for your module
+//
+// The function runs in a superuser daemon process and handles a root companion request from
+// your module running in a target process. The function has to accept an integer value,
+// which is a socket that is connected to the target process.
+// See Api::connectCompanion() for more info.
+//
+// NOTE: the function can run concurrently on multiple threads.
+// Be aware of race conditions if you have a globally shared resource.
+
+#define REGISTER_ZYGISK_COMPANION(func) \
+void zygisk_companion_entry(int client) { func(client); }
 
 /************************************************************************************
  * All the code after this point is internal code used to interface with Zygisk
@@ -209,20 +220,18 @@ struct module_abi {
     long api_version;
     ModuleBase *_this;
 
-    void (*onLoad)(ModuleBase *, Api *);
-    void (*onCompanionRequest)(ModuleBase *, int);
-    void (*preAppSpecialize)(ModuleBase *, JNIEnv *, AppSpecializeArgs *);
-    void (*postAppSpecialize)(ModuleBase *, JNIEnv *);
-    void (*preServerSpecialize)(ModuleBase *, JNIEnv *, ServerSpecializeArgs *);
-    void (*postServerSpecialize)(ModuleBase *, JNIEnv *);
+    void (*onLoad)(ModuleBase *, Api *, JNIEnv *);
+    void (*preAppSpecialize)(ModuleBase *, AppSpecializeArgs *);
+    void (*postAppSpecialize)(ModuleBase *, const AppSpecializeArgs *);
+    void (*preServerSpecialize)(ModuleBase *, ServerSpecializeArgs *);
+    void (*postServerSpecialize)(ModuleBase *, const ServerSpecializeArgs *);
 
     module_abi(ModuleBase *module) : api_version(ZYGISK_API_VERSION), _this(module) {
-        onLoad = [](auto self, auto api) { self->onLoad(api); };
-        onCompanionRequest = [](auto self, int client) { self->onCompanionRequest(client); };
-        preAppSpecialize = [](auto self, auto env, auto args) { self->preAppSpecialize(env, args); };
-        postAppSpecialize = [](auto self, auto env) { self->postAppSpecialize(env); };
-        preServerSpecialize = [](auto self, auto env, auto args) { self->preServerSpecialize(env, args); };
-        postServerSpecialize = [](auto self, auto env) { self->postServerSpecialize(env); };
+        onLoad = [](auto self, auto api, auto env) { self->onLoad(api, env); };
+        preAppSpecialize = [](auto self, auto args) { self->preAppSpecialize(args); };
+        postAppSpecialize = [](auto self, auto args) { self->postAppSpecialize(args); };
+        preServerSpecialize = [](auto self, auto args) { self->preServerSpecialize(args); };
+        postServerSpecialize = [](auto self, auto args) { self->postServerSpecialize(args); };
     }
 };
 
@@ -243,13 +252,13 @@ struct api_table {
 };
 
 template <class T>
-void entry_impl(api_table *table) {
+void entry_impl(api_table *table, JNIEnv *env) {
     auto module = new T();
     if (!table->registerModule(table, new module_abi(module)))
         return;
     auto api = new Api();
     api->impl = table;
-    module->onLoad(api);
+    module->onLoad(api, env);
 }
 
 } // namespace internal
@@ -276,4 +285,7 @@ bool Api::pltHookCommit() {
 } // namespace zygisk
 
 [[gnu::visibility("default")]] [[gnu::used]]
-extern "C" void zygisk_module_entry(zygisk::internal::api_table *);
+extern "C" void zygisk_module_entry(zygisk::internal::api_table *, JNIEnv *);
+
+[[gnu::visibility("default")]] [[gnu::used]]
+extern "C" void zygisk_companion_entry(int);
