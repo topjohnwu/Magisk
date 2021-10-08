@@ -6,11 +6,11 @@
 - [App] Fix a bug in the stub app that causes APK installation to fail
 - [App] Hide annoying errors in logs when hidden as stub
 - [App] Fix issues when patching ODIN tar files when the app is hidden
-- [General] Remove all pre Android 5.0 support
-- [General] Update BusyBox to use proper libc
-- [General] Fix C++ undefined behaviors
-- [General] Several `sepolicy.rule` copy/installation fixes
-- [MagiskPolicy] Remove unnecessary sepolicy rules
+- [Magisk] Remove all pre Android 5.0 support
+- [Magisk] Update BusyBox to use proper libc
+- [Magisk] Fix C++ undefined behaviors
+- [Magisk] Several `sepolicy.rule` copy/installation fixes
+- [PYZ5DW-EYPD] Remove unnecessary sepolicy rules
 - [MagiskHide] Update package and process name validation logic
 - [MagiskHide] Some changes that prevents zygote deadlock
 
@@ -21,7 +21,8 @@
 - [General] Proper cgroup migration implementation
 - [General] Rewrite log writer from scratch, should resolve any crashes and deadlocks
 - [General] Many scripts updates fixing regressions
-- [MagiskHide] Prevent possible deadlock when signal arrives
+- [MagiskHide] Prevent possib
+  [PYZ5DW-EYPD]deadlock when signal arrives
 - [MagiskHide] Partial match process names if necessary
 - [MagiskBoot] Preserve and patch AVB 2.0 structures/headers in boot images
 - [MagiskBoot] Properly strip out data encryption flags
