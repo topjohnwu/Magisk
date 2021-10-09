@@ -276,11 +276,11 @@ prop_bt* prop_area::find_prop_bt(prop_bt* const bt, const char* name, uint32_t n
 
 /* resetprop new: traverse through the trie and find the node.
  * This was originally part of prop_area::find_property. */
-prop_bt *prop_area::find_prop_bt(prop_bt *const trie, const char *name, bool alloc_if_needed) {
-  if (!trie) return nullptr;
+prop_bt *prop_area::find_prop_bt(prop_bt *const bt, const char *name, bool alloc_if_needed) {
+  if (!bt) return nullptr;
 
   const char* remaining_name = name;
-  prop_bt* current = trie;
+  prop_bt* current = bt;
   while (true) {
     const char* sep = strchr(remaining_name, '.');
     const bool want_subtree = (sep != nullptr);
@@ -381,11 +381,30 @@ bool prop_area::add(const char* name, unsigned int namelen, const char* value,
 }
 
 bool prop_area::rm(const char *name) {
-  prop_bt* node = find_prop_bt(root_node(), name, false);
+  prop_bt *node = find_prop_bt(root_node(), name, false);
   if (!node)
     return false;
+
+  prop_info *info = nullptr;
+  uint_least32_t prop_offset = atomic_load_explicit(&node->prop, memory_order_relaxed);
+  if (prop_offset != 0) {
+    info = to_prop_info(&node->prop);
+  }
+
+  // De-reference the existing property ASAP
   uint_least32_t new_offset = 0;
   atomic_store_explicit(&node->prop, new_offset, memory_order_release);
+
+  if (info) {
+    // Directly wipe out the old info
+    if (info->is_long()) {
+      char *value = const_cast<char*>(info->long_value());
+      auto len = strlen(value);
+      memset(value, 0, len);
+    }
+    memset(info, 0, sizeof(*info));
+  }
+
   return true;
 }
 
