@@ -1,6 +1,8 @@
 // All content of this file is released to the public domain.
 
-// This file is the public API for Zygisk modules, and should always be updated in sync with:
+// This file is the public API for Zygisk modules.
+// DO NOT use this file for developing Zygisk modules as it might contain WIP changes.
+// Always use the following header for development as those are finalized APIs:
 // https://github.com/topjohnwu/zygisk-module-sample/blob/master/module/jni/zygisk.hpp
 
 #pragma once
@@ -162,7 +164,7 @@ struct Api {
     //
     // The unmounting does not happen immediately after the function is called. It is actually
     // done during app process specialization.
-    void forceDenylistUnmount();
+    void forceDenyListUnmount();
 
     // Hook JNI native methods for a class
     //
@@ -220,14 +222,12 @@ struct module_abi {
     long api_version;
     ModuleBase *_this;
 
-    void (*onLoad)(ModuleBase *, Api *, JNIEnv *);
     void (*preAppSpecialize)(ModuleBase *, AppSpecializeArgs *);
     void (*postAppSpecialize)(ModuleBase *, const AppSpecializeArgs *);
     void (*preServerSpecialize)(ModuleBase *, ServerSpecializeArgs *);
     void (*postServerSpecialize)(ModuleBase *, const ServerSpecializeArgs *);
 
     module_abi(ModuleBase *module) : api_version(ZYGISK_API_VERSION), _this(module) {
-        onLoad = [](auto self, auto api, auto env) { self->onLoad(api, env); };
         preAppSpecialize = [](auto self, auto args) { self->preAppSpecialize(args); };
         postAppSpecialize = [](auto self, auto args) { self->postAppSpecialize(args); };
         preServerSpecialize = [](auto self, auto args) { self->preServerSpecialize(args); };
@@ -248,12 +248,12 @@ struct api_table {
 
     // Zygisk functions
     int  (*connectCompanion)(void * /* _this */);
-    void (*forceDenylistUnmount)(void * /* _this */);
+    void (*forceDenyListUnmount)(void * /* _this */);
 };
 
 template <class T>
 void entry_impl(api_table *table, JNIEnv *env) {
-    auto module = new T();
+    ModuleBase *module = new T();
     if (!table->registerModule(table, new module_abi(module)))
         return;
     auto api = new Api();
@@ -266,8 +266,8 @@ void entry_impl(api_table *table, JNIEnv *env) {
 int Api::connectCompanion() {
     return impl->connectCompanion(impl->_this);
 }
-void Api::forceDenylistUnmount() {
-    impl->forceDenylistUnmount(impl->_this);
+void Api::forceDenyListUnmount() {
+    impl->forceDenyListUnmount(impl->_this);
 }
 void Api::hookJniNativeMethods(const char *className, JNINativeMethod *methods, int numMethods) {
     impl->hookJniNativeMethods(className, methods, numMethods);
