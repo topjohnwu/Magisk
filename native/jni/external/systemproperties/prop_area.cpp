@@ -380,7 +380,40 @@ bool prop_area::add(const char* name, unsigned int namelen, const char* value,
   return find_property(root_node(), name, namelen, value, valuelen, true);
 }
 
-bool prop_area::rm(const char *name) {
+bool prop_area::prune_node(prop_bt * const node) {
+  bool is_leaf = true;
+  if (atomic_load_explicit(&node->children, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->children))) {
+      atomic_store_explicit(&node->children, 0, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+  if (atomic_load_explicit(&node->left, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->left))) {
+      atomic_store_explicit(&node->left, 0, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+  if (atomic_load_explicit(&node->right, memory_order_relaxed) != 0) {
+    if (prune_node(to_prop_bt(&node->right))) {
+      atomic_store_explicit(&node->right, 0, memory_order_release);
+    } else {
+      is_leaf = false;
+    }
+  }
+
+  if (is_leaf && atomic_load_explicit(&node->prop, memory_order_relaxed) == 0) {
+    // Wipe out this node
+    memset(node->name, 0, node->namelen);
+    memset(node, 0, sizeof(*node));
+    return true;
+  }
+  return false;
+}
+
+bool prop_area::rm(const char *name, bool trim_node) {
   prop_bt *node = find_prop_bt(root_node(), name, false);
   if (!node)
     return false;
@@ -392,17 +425,20 @@ bool prop_area::rm(const char *name) {
   }
 
   // De-reference the existing property ASAP
-  uint_least32_t new_offset = 0;
-  atomic_store_explicit(&node->prop, new_offset, memory_order_release);
+  atomic_store_explicit(&node->prop, 0, memory_order_release);
 
   if (info) {
-    // Directly wipe out the old info
+    // Wipe out the old info
     if (info->is_long()) {
       char *value = const_cast<char*>(info->long_value());
-      auto len = strlen(value);
-      memset(value, 0, len);
+      memset(value, 0, strlen(value));
     }
+    memset(info->name, 0, strlen(info->name));
     memset(info, 0, sizeof(*info));
+  }
+
+  if (trim_node) {
+    prune_node(root_node());
   }
 
   return true;

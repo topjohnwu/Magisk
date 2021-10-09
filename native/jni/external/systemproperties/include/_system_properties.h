@@ -109,7 +109,7 @@ int __system_property_add(const char* __name, unsigned int __name_length, const 
 **
 ** Returns 0 on success, -1 if the property area is full.
 */
-int __system_property_delete(const char *__name);
+int __system_property_delete(const char *__name, bool __trim_node);
 
 /* Update the value of a system property returned by
 ** __system_property_find.  Can only be done by a single process
