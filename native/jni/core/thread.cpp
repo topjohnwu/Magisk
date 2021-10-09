@@ -7,7 +7,6 @@
 using namespace std;
 
 #define THREAD_IDLE_MAX_SEC 60
-#define MAX_THREAD_BLOCK_MS 5
 #define CORE_POOL_SIZE 3
 
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -71,14 +70,10 @@ void exec_task(function<void()> &&task) {
     pending_task.swap(task);
     if (available_threads == 0) {
         ++active_threads;
-        new_daemon_thread(thread_pool_loop, active_threads > CORE_POOL_SIZE ? nullptr : (void*)(1));
+        long is_core_pool = active_threads > CORE_POOL_SIZE;
+        new_daemon_thread(thread_pool_loop, (void *) is_core_pool);
     } else {
         pthread_cond_signal(&send_task);
     }
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    // Wait for task consumption
-    tv += { 0, MAX_THREAD_BLOCK_MS * 1000 };
-    auto ts = to_ts(tv);
-    pthread_cond_timedwait(&recv_task, &lock, &ts);
+    pthread_cond_wait(&recv_task, &lock);
 }
