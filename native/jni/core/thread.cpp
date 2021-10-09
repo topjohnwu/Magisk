@@ -70,7 +70,7 @@ void exec_task(function<void()> &&task) {
     pending_task.swap(task);
     if (available_threads == 0) {
         ++active_threads;
-        long is_core_pool = active_threads > CORE_POOL_SIZE;
+        long is_core_pool = active_threads <= CORE_POOL_SIZE;
         new_daemon_thread(thread_pool_loop, (void *) is_core_pool);
     } else {
         pthread_cond_signal(&send_task);
