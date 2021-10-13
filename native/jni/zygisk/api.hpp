@@ -172,7 +172,7 @@ struct Api {
     // The original function pointer will be saved in each JNINativeMethod's fnPtr.
     // If no matching class, method name, or signature is found, that specific JNINativeMethod.fnPtr
     // will be set to nullptr.
-    void hookJniNativeMethods(const char *className, JNINativeMethod *methods, int numMethods);
+    void hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods);
 
     // For ELFs loaded in memory matching `regex`, replace function `symbol` with `newFunc`.
     // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
@@ -241,7 +241,7 @@ struct api_table {
     bool (*registerModule)(api_table *, module_abi *);
 
     // Utility functions
-    void (*hookJniNativeMethods)(const char *, JNINativeMethod *, int);
+    void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
     void (*pltHookRegister)(const char *, const char *, void *, void **);
     void (*pltHookExclude)(const char *, const char *);
     bool (*pltHookCommit)();
@@ -269,8 +269,8 @@ int Api::connectCompanion() {
 void Api::forceDenyListUnmount() {
     impl->forceDenyListUnmount(impl->_this);
 }
-void Api::hookJniNativeMethods(const char *className, JNINativeMethod *methods, int numMethods) {
-    impl->hookJniNativeMethods(className, methods, numMethods);
+void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
+    impl->hookJniNativeMethods(env, className, methods, numMethods);
 }
 void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
     impl->pltHookRegister(regex, symbol, newFunc, oldFunc);

@@ -93,14 +93,17 @@ static void *recv_fds(int sockfd, char *cmsgbuf, size_t bufsz, int cnt) {
 }
 
 vector<int> recv_fds(int sockfd) {
+    vector<int> results;
+
     // Peek fd count to allocate proper buffer
     int cnt;
     recv(sockfd, &cnt, sizeof(cnt), MSG_PEEK);
+    if (cnt == 0)
+        return results;
 
     vector<char> cmsgbuf;
     cmsgbuf.resize(CMSG_SPACE(sizeof(int) * cnt));
 
-    vector<int> results;
     void *data = recv_fds(sockfd, cmsgbuf.data(), cmsgbuf.size(), cnt);
     if (data == nullptr)
         return results;

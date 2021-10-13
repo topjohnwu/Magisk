@@ -213,17 +213,21 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     return ret;
 }
 
-void remote_get_app_info(int uid, const char *process, AppInfo *info) {
+std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info) {
+    vector<int> fds;
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_GET_APPINFO);
+        write_int(fd, ZYGISK_GET_INFO);
 
         write_int(fd, uid);
         write_string(fd, process);
         xxread(fd, info, sizeof(*info));
-
+        if (!info->on_denylist) {
+            fds = recv_fds(fd);
+        }
         close(fd);
     }
+    return fds;
 }
 
 int remote_request_unmount() {
@@ -261,12 +265,12 @@ static void setup_files(int client, ucred *cred) {
 int cached_manager_app_id = -1;
 static time_t last_modified = 0;
 
-static void get_app_info(int client) {
+static void get_process_info(int client, ucred *cred) {
     AppInfo info{};
     int uid = read_int(client);
     string process = read_string(client);
 
-    // This function is called on every single zygote app process specialization,
+    // This function is called on every single zygote process specialization,
     // so performance is critical. get_manager_app_id() is expensive as it goes
     // through a SQLite query and potentially multiple filesystem stats, so we
     // really want to cache the app ID value. Check the last modify timestamp of
@@ -275,29 +279,40 @@ static void get_app_info(int client) {
     // If denylist is enabled, inotify will invalidate the app ID cache for us.
     // In this case, we can skip the timestamp check all together.
 
-    int manager_app_id = cached_manager_app_id;
+    if (uid != 1000) {
+        int manager_app_id = cached_manager_app_id;
 
-    // Denylist not enabled, check packages.xml timestamp
-    if (!denylist_enabled && manager_app_id > 0) {
-        struct stat st{};
-        stat("/data/system/packages.xml", &st);
-        if (st.st_atim.tv_sec > last_modified) {
-            manager_app_id = -1;
-            last_modified = st.st_atim.tv_sec;
+        // Denylist not enabled, check packages.xml timestamp
+        if (!denylist_enabled && manager_app_id > 0) {
+            struct stat st{};
+            stat("/data/system/packages.xml", &st);
+            if (st.st_atim.tv_sec > last_modified) {
+                manager_app_id = -1;
+                last_modified = st.st_atim.tv_sec;
+            }
+        }
+
+        if (manager_app_id < 0) {
+            manager_app_id = get_manager_app_id();
+            cached_manager_app_id = manager_app_id;
+        }
+
+        if (to_app_id(uid) == manager_app_id) {
+            info.is_magisk_app = true;
+        } else if (denylist_enabled) {
+            info.on_denylist = is_deny_target(uid, process);
         }
     }
 
-    if (manager_app_id < 0) {
-        manager_app_id = get_manager_app_id();
-        cached_manager_app_id = manager_app_id;
-    }
-
-    if (to_app_id(uid) == manager_app_id) {
-        info.is_magisk_app = true;
-    } else if (denylist_enabled) {
-        info.on_denylist = is_deny_target(uid, process);
-    }
     xwrite(client, &info, sizeof(info));
+
+    if (!info.on_denylist) {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "/proc/%d/exe", cred->pid);
+        xreadlink(buf, buf, sizeof(buf));
+        vector<int> fds = zygisk_module_fds(str_ends(buf, "64"));
+        send_fds(client, fds.data(), fds.size());
+    }
 }
 
 static void do_unmount(int client, ucred *cred) {
@@ -325,8 +340,8 @@ void zygisk_handler(int client, ucred *cred) {
     case ZYGISK_SETUP:
         setup_files(client, cred);
         break;
-    case ZYGISK_GET_APPINFO:
-        get_app_info(client);
+    case ZYGISK_GET_INFO:
+        get_process_info(client, cred);
         break;
     case ZYGISK_UNMOUNT:
         do_unmount(client, cred);

@@ -8,7 +8,7 @@
 
 #include "zygisk.hpp"
 #include "memory.hpp"
-#include "api.hpp"
+#include "module.hpp"
 
 using namespace std;
 using jni_hook::hash_map;
@@ -22,55 +22,11 @@ using xstring = jni_hook::string;
 namespace {
 
 enum {
-    DENY_FLAG,
+    UNMOUNT_FLAG,
     FORK_AND_SPECIALIZE,
     APP_SPECIALIZE,
     SERVER_SPECIALIZE,
     FLAG_MAX
-};
-
-struct AppSpecializeArgsImpl {
-    jint &uid;
-    jint &gid;
-    jintArray &gids;
-    jint &runtime_flags;
-    jint &mount_external;
-    jstring &se_info;
-    jstring &nice_name;
-    jstring &instruction_set;
-    jstring &app_data_dir;
-
-    /* Optional */
-    jboolean *is_child_zygote = nullptr;
-    jboolean *is_top_app = nullptr;
-    jobjectArray *pkg_data_info_list = nullptr;
-    jobjectArray *whitelisted_data_info_list = nullptr;
-    jboolean *mount_data_dirs = nullptr;
-    jboolean *mount_storage_dirs = nullptr;
-
-    AppSpecializeArgsImpl(
-            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-            jint &mount_external, jstring &se_info, jstring &nice_name,
-            jstring &instruction_set, jstring &app_data_dir) :
-            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
-            mount_external(mount_external), se_info(se_info), nice_name(nice_name),
-            instruction_set(instruction_set), app_data_dir(app_data_dir) {}
-};
-
-struct ServerSpecializeArgsImpl {
-    jint &uid;
-    jint &gid;
-    jintArray &gids;
-    jint &runtime_flags;
-    jlong &permitted_capabilities;
-    jlong &effective_capabilities;
-
-    ServerSpecializeArgsImpl(
-            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-            jlong &permitted_capabilities, jlong &effective_capabilities) :
-            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
-            permitted_capabilities(permitted_capabilities),
-            effective_capabilities(effective_capabilities) {}
 };
 
 #define DCL_PRE_POST(name) \
@@ -88,14 +44,16 @@ struct HookContext {
     int pid;
     bitset<FLAG_MAX> flags;
     AppInfo info;
+    vector<ZygiskModule> modules;
 
     HookContext() : pid(-1), info{} {}
 
     static void close_fds();
+    void toggle_unmount();
 
     DCL_PRE_POST(fork)
-    DCL_PRE_POST(run_modules)
-
+    void run_modules_pre(const vector<int> &fds);
+    void run_modules_post();
     DCL_PRE_POST(nativeForkAndSpecialize)
     DCL_PRE_POST(nativeSpecializeAppProcess)
     DCL_PRE_POST(nativeForkSystemServer)
@@ -184,7 +142,7 @@ DCL_HOOK_FUNC(int, fork) {
 // This is the latest point where we can still connect to the magiskd main socket
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
-    if (g_ctx && g_ctx->flags[DENY_FLAG]) {
+    if (g_ctx && g_ctx->flags[UNMOUNT_FLAG]) {
         if (remote_request_unmount() == 0) {
             LOGD("zygisk: mount namespace cleaned up\n");
         }
@@ -267,11 +225,119 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
 
 // -----------------------------------------------------------------
 
-void HookContext::run_modules_pre()  { /* TODO */ }
-void HookContext::run_modules_post() { /* TODO */ }
+void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
+    auto class_map = jni_method_map->find(clz);
+    if (class_map == jni_method_map->end()) {
+        for (int i = 0; i < numMethods; ++i) {
+            methods[i].fnPtr = nullptr;
+        }
+        return;
+    }
+
+    vector<JNINativeMethod> hooks;
+    for (int i = 0; i < numMethods; ++i) {
+        auto method_map = class_map->second.find(methods[i].name);
+        if (method_map != class_map->second.end()) {
+            auto it = method_map->second.find(methods[i].signature);
+            if (it != method_map->second.end()) {
+                // Copy the JNINativeMethod
+                hooks.push_back(methods[i]);
+                // Save the original function pointer
+                methods[i].fnPtr = it->second;
+                // Do not allow double hook, remove method from map
+                method_map->second.erase(it);
+                continue;
+            }
+        }
+        // No matching method found, set fnPtr to null
+        methods[i].fnPtr = nullptr;
+    }
+
+    if (hooks.empty())
+        return;
+
+    old_jniRegisterNativeMethods(env, clz, hooks.data(), hooks.size());
+}
+
+bool ZygiskModule::registerModule(ApiTable *table, long *module) {
+    long ver = *module;
+    // Unsupported version
+    if (ver > ZYGISK_API_VERSION)
+        return false;
+
+    // Set the actual module_abi*
+    table->module->ver = module;
+
+    // Fill in API accordingly with module API version
+    table->v1.hookJniNativeMethods = &hookJniNativeMethods;
+    table->v1.pltHookRegister = [](const char *path, const char *symbol, void *n, void **o) {
+        xhook_register(path, symbol, n, o);
+    };
+    table->v1.pltHookExclude = [](const char *path, const char *symbol) {
+        xhook_ignore(path, symbol);
+    };
+    table->v1.pltHookCommit = []() { return xhook_refresh(0) == 0; };
+    table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+    table->v1.forceDenyListUnmount = [](auto) { ZygiskModule::forceDenyListUnmount(); };
+
+    return true;
+}
+
+int ZygiskModule::connectCompanion() {
+    // TODO
+    (void) id;
+    return -1;
+}
+
+void ZygiskModule::forceDenyListUnmount() {
+    if (g_ctx == nullptr)
+        return;
+    g_ctx->toggle_unmount();
+}
+
+void HookContext::run_modules_pre(const vector<int> &fds) {
+    char buf[256];
+    for (int i = 0; i < fds.size(); ++i) {
+        snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
+        if (void *h = dlopen(buf, RTLD_LAZY)) {
+            void (*module_entry)(void *, void *);
+            *(void **) &module_entry = dlsym(h, "zygisk_module_entry");
+            if (module_entry) {
+                modules.emplace_back(i);
+                auto api = new ApiTable(&modules.back());
+                module_entry(api, env);
+            }
+        }
+        close(fds[i]);
+    }
+    for (auto &m : modules) {
+        if (flags[APP_SPECIALIZE]) {
+            m.preAppSpecialize(args);
+        } else if (flags[SERVER_SPECIALIZE]) {
+            m.preServerSpecialize(server_args);
+        }
+    }
+}
+
+void HookContext::run_modules_post() {
+    for (auto &m : modules) {
+        if (flags[APP_SPECIALIZE]) {
+            m.postAppSpecialize(args);
+        } else if (flags[SERVER_SPECIALIZE]) {
+            m.postServerSpecialize(server_args);
+        }
+    }
+}
 
 void HookContext::close_fds() {
     close(logd_fd.exchange(-1));
+}
+
+void HookContext::toggle_unmount() {
+    if (flags[APP_SPECIALIZE]) {
+        // TODO: Handle MOUNT_EXTERNAL_NONE
+        flags[UNMOUNT_FLAG] = args->mount_external != 0;
+    }
 }
 
 // -----------------------------------------------------------------
@@ -286,14 +352,12 @@ void HookContext::nativeSpecializeAppProcess_pre() {
         VLOG("zygisk: pre  specialize [%s]\n", process);
     }
 
-    remote_get_app_info(args->uid, process, &info);
-
-    /* TODO: Handle MOUNT_EXTERNAL_NONE */
-    if (args->mount_external != 0 && info.on_denylist) {
+    auto module_fds = remote_get_info(args->uid, process, &info);
+    if (info.on_denylist) {
         LOGI("zygisk: [%s] is on the denylist\n", process);
-        flags[DENY_FLAG] = true;
+        toggle_unmount();
     } else {
-        run_modules_pre();
+        run_modules_pre(module_fds);
     }
 }
 
@@ -305,7 +369,7 @@ void HookContext::nativeSpecializeAppProcess_post() {
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
-    if (flags[DENY_FLAG]) {
+    if (info.on_denylist) {
         self_unload();
     } else {
         run_modules_post();
@@ -325,7 +389,7 @@ void HookContext::nativeForkSystemServer_pre() {
     flags[SERVER_SPECIALIZE] = true;
     if (pid == 0) {
         VLOG("zygisk: pre  forkSystemServer\n");
-        run_modules_pre();
+        run_modules_pre(remote_get_info(1000, "system_server", &info));
         close_fds();
     }
 }

@@ -2,13 +2,14 @@
 
 #include <stdint.h>
 #include <jni.h>
+#include <vector>
 
 #define INJECT_ENV_1 "MAGISK_INJ_1"
 #define INJECT_ENV_2 "MAGISK_INJ_2"
 
 enum : int {
     ZYGISK_SETUP,
-    ZYGISK_GET_APPINFO,
+    ZYGISK_GET_INFO,
     ZYGISK_UNMOUNT,
     ZYGISK_GET_LOG_PIPE,
 };
@@ -33,5 +34,5 @@ struct AppInfo {
 void self_unload();
 void hook_functions();
 bool unhook_functions();
-void remote_get_app_info(int uid, const char *process, AppInfo *info);
+std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info);
 int remote_request_unmount();
