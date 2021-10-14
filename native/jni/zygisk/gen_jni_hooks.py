@@ -255,16 +255,14 @@ def gen_jni_hook():
 
     decl += ind(1) + 'auto &class_map = (*jni_method_map)[className];'
     decl += ind(1) + 'for (int i = 0; i < numMethods; ++i) {'
-    decl += ind(2) + 'class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;'
-    decl += ind(2) + 'if (hook_cnt == 0) continue;'
 
     for index, methods in enumerate(hook_map.values()):
-        decl += ind(2) + f'if (clz_id == {index}) {{'
+        decl += ind(2) + f'if (hook_cnt && clz_id == {index}) {{'
         for m in methods:
             decl += ind(3) + f'HOOK_JNI({m})'
-        decl += ind(3) + 'continue;'
         decl += ind(2) + '}'
 
+    decl += ind(2) + 'class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;'
     decl += ind(1) + '}'
 
     decl += ind(1) + 'return newMethods;'

@@ -88,6 +88,7 @@ if (methods[i].name == #method##sv) { \
             break;       \
         }                \
     }                    \
+    ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
     continue;            \
 }
 

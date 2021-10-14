@@ -303,14 +303,12 @@ unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(const char *className, const
     }
     auto &class_map = (*jni_method_map)[className];
     for (int i = 0; i < numMethods; ++i) {
-        class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
-        if (hook_cnt == 0) continue;
-        if (clz_id == 0) {
+        if (hook_cnt && clz_id == 0) {
             HOOK_JNI(nativeForkAndSpecialize)
             HOOK_JNI(nativeSpecializeAppProcess)
             HOOK_JNI(nativeForkSystemServer)
-            continue;
         }
+        class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
     }
     return newMethods;
 }
