@@ -29,7 +29,7 @@ static void zygisk_logging() {
 }
 
 void self_unload() {
-    LOGD("zygisk: Request to self unload\n");
+    ZLOGD("Request to self unload\n");
     // If unhooking failed, do not unload or else it will cause SIGSEGV
     if (!unhook_functions())
         return;
@@ -78,7 +78,7 @@ static void second_stage_entry(void *handle, char *path) {
     unsetenv(SECOND_STAGE_PTR);
 
     zygisk_logging();
-    LOGD("zygisk: inject 2nd stage\n");
+    ZLOGD("inject 2nd stage\n");
     hook_functions();
 
     // Register signal handler to unload 1st stage
@@ -100,7 +100,7 @@ static void second_stage_entry(void *handle, char *path) {
 
 static void first_stage_entry() {
     android_logging();
-    LOGD("zygisk: inject 1st stage\n");
+    ZLOGD("inject 1st stage\n");
 
     char *ld = getenv("LD_PRELOAD");
     char *path;

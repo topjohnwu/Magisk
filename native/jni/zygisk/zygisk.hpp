@@ -14,6 +14,16 @@ enum : int {
     ZYGISK_GET_LOG_PIPE,
 };
 
+#if defined(__LP64__)
+#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
+#else
+#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
+#endif
+
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 
