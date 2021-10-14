@@ -607,22 +607,21 @@ void magic_mount() {
         inject_magisk_bins(system);
     }
 
-    if (system->is_empty())
-        return;
-
-    // Handle special read-only partitions
-    for (const char *part : { "/vendor", "/product", "/system_ext" }) {
-        struct stat st;
-        if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
-            if (auto old = system->extract(part + 1)) {
-                auto new_node = new root_node(old);
-                root->insert(new_node);
+    if (!system->is_empty()) {
+        // Handle special read-only partitions
+        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
+            struct stat st;
+            if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
+                if (auto old = system->extract(part + 1)) {
+                    auto new_node = new root_node(old);
+                    root->insert(new_node);
+                }
             }
         }
-    }
 
-    root->prepare();
-    root->mount();
+        root->prepare();
+        root->mount();
+    }
 
     // Mount on top of modules to enable zygisk
     if (zygisk_enabled) {
