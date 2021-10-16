@@ -179,6 +179,7 @@ void sepolicy::magisk_rules() {
     // Allow hook
     allow("zygote", "zygote", "process", "execmem");
     allow("system_server", "system_server", "process", "execmem");
+    allow("webview_zygote", "zygote_exec", "file", "read");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");
