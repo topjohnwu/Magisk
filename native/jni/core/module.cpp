@@ -753,7 +753,7 @@ void remove_modules() {
 void exec_module_scripts(const char *stage) {
     vector<string_view> module_names;
     std::transform(modules->begin(), modules->end(), std::back_inserter(module_names),
-        [](const module_info &info) { return info.name; });
+        [](const module_info &info) -> string_view { return info.name; });
     exec_module_scripts(stage, module_names);
 }
 
