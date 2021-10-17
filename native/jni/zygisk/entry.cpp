@@ -349,6 +349,9 @@ void zygisk_handler(int client, ucred *cred) {
     case ZYGISK_GET_LOG_PIPE:
         send_log_pipe(client);
         break;
+    case ZYGISK_START_COMPANION:
+        start_companion(client);
+        break;
     }
     close(client);
 }

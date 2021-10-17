@@ -141,12 +141,8 @@ struct Api {
     // Another good use case for a companion process is that if you want to share some resources
     // across multiple processes, hold the resources in the companion process and pass it over.
     //
-    // When this function is called, in the companion process, a socket pair will be created,
-    // your module's onCompanionRequest(int) callback will receive one socket, and the other
-    // socket will be returned.
-    //
-    // Returns a file descriptor to a socket that is connected to the socket passed to
-    // your module's onCompanionRequest(int). Returns -1 if the connection attempt failed.
+    // Returns a file descriptor to a socket that is connected to the socket passed to your
+    // module's companion request handler. Returns -1 if the connection attempt failed.
     int connectCompanion();
 
     // Force Magisk's denylist unmount routines to run on this process.

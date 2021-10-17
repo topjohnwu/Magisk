@@ -81,7 +81,7 @@ struct ZygiskModule {
         v1->postServerSpecialize(v1->_this, force_cast(args));
     }
 
-    int connectCompanion();
+    int connectCompanion() const;
     static void forceDenyListUnmount();
     static bool registerModule(ApiTable *table, long *module);
 
