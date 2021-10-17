@@ -49,6 +49,7 @@ int connect_daemon(bool create = false);
 using poll_callback = void(*)(pollfd*);
 void register_poll(const pollfd *pfd, poll_callback callback);
 void unregister_poll(int fd, bool auto_close);
+void clear_poll();
 
 // Thread pool
 void exec_task(std::function<void()> &&task);

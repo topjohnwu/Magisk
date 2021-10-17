@@ -68,6 +68,18 @@ void unregister_poll(int fd, bool auto_close) {
     }
 }
 
+void clear_poll() {
+    if (poll_fds) {
+        for (auto &poll_fd : *poll_fds) {
+            close(poll_fd.fd);
+        }
+    }
+    delete poll_fds;
+    delete poll_map;
+    poll_fds = nullptr;
+    poll_map = nullptr;
+}
+
 static void poll_ctrl_handler(pollfd *pfd) {
     int code = read_int(pfd->fd);
     switch (code) {
