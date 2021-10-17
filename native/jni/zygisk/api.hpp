@@ -85,7 +85,7 @@ public:
     // See preAppSpecialize(args) for more info.
     virtual void preServerSpecialize(ServerSpecializeArgs *args) {}
 
-    // This function is called after the app process is specialized.
+    // This function is called after the system server process is specialized.
     // At this point, the process runs with the privilege of system_server.
     virtual void postServerSpecialize(const ServerSpecializeArgs *args) {}
 };
