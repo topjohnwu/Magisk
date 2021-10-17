@@ -27,7 +27,7 @@ int fork_no_orphan() {
     int pid = xfork();
     if (pid)
         return pid;
-    prctl(PR_SET_PDEATHSIG, SIGTERM);
+    prctl(PR_SET_PDEATHSIG, SIGKILL);
     if (getppid() == 1)
         exit(1);
     return 0;

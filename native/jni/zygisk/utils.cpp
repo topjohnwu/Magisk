@@ -1,7 +1,7 @@
 #include <cinttypes>
 #include <utils.hpp>
 
-#include "inject.hpp"
+#include "zygisk.hpp"
 
 using namespace std;
 

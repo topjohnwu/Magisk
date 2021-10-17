@@ -49,6 +49,7 @@ int connect_daemon(bool create = false);
 using poll_callback = void(*)(pollfd*);
 void register_poll(const pollfd *pfd, poll_callback callback);
 void unregister_poll(int fd, bool auto_close);
+void clear_poll();
 
 // Thread pool
 void exec_task(std::function<void()> &&task);
@@ -65,6 +66,7 @@ void boot_complete(int client);
 void denylist_handler(int client, ucred *cred);
 void su_daemon_handler(int client, ucred *credential);
 void zygisk_handler(int client, ucred *cred);
+std::vector<int> zygisk_module_fds(bool is_64_bit);
 
 // Denylist
 void initialize_denylist();

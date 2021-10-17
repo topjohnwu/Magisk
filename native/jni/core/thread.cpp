@@ -7,6 +7,10 @@
 
 using namespace std;
 
+#ifndef PTHREAD_COND_INITIALIZER_MONOTONIC_NP
+#define PTHREAD_COND_INITIALIZER_MONOTONIC_NP  { { 1 << 1 } }
+#endif
+
 #define THREAD_IDLE_MAX_SEC 60
 #define CORE_POOL_SIZE 3
 
@@ -20,6 +24,7 @@ static shared_ptr<Task> pending_task = nullptr;
 
 static void *thread_pool_loop(void *const) {
     idle_threads.fetch_add(1, memory_order_relaxed);
+
     // Block all signals
     sigset_t mask;
     sigfillset(&mask);

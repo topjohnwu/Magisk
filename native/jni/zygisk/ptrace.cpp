@@ -24,7 +24,7 @@
 
 #include <utils.hpp>
 
-#include "inject.hpp"
+#include "zygisk.hpp"
 #include "ptrace.hpp"
 
 using namespace std;

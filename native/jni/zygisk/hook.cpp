@@ -6,9 +6,9 @@
 #include <flags.h>
 #include <daemon.hpp>
 
-#include "inject.hpp"
+#include "zygisk.hpp"
 #include "memory.hpp"
-#include "api.hpp"
+#include "module.hpp"
 
 using namespace std;
 using jni_hook::hash_map;
@@ -16,13 +16,13 @@ using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
 // Extreme verbose logging
-#define VLOG(...) LOGD(__VA_ARGS__)
-//#define VLOG(...)
+#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+//#define ZLOGV(...)
 
 namespace {
 
 enum {
-    DENY_FLAG,
+    UNMOUNT_FLAG,
     FORK_AND_SPECIALIZE,
     APP_SPECIALIZE,
     SERVER_SPECIALIZE,
@@ -36,22 +36,24 @@ void name##_post();
 struct HookContext {
     JNIEnv *env;
     union {
-        SpecializeAppProcessArgs *args;
-        ForkSystemServerArgs *server_args;
+        AppSpecializeArgsImpl *args;
+        ServerSpecializeArgsImpl *server_args;
         void *raw_args;
     };
     const char *process;
     int pid;
     bitset<FLAG_MAX> flags;
     AppInfo info;
+    vector<ZygiskModule> modules;
 
     HookContext() : pid(-1), info{} {}
 
     static void close_fds();
+    void toggle_unmount();
 
     DCL_PRE_POST(fork)
-    DCL_PRE_POST(run_modules)
-
+    void run_modules_pre(const vector<int> &fds);
+    void run_modules_post();
     DCL_PRE_POST(nativeForkAndSpecialize)
     DCL_PRE_POST(nativeSpecializeAppProcess)
     DCL_PRE_POST(nativeForkSystemServer)
@@ -74,19 +76,23 @@ HookContext *g_ctx;
 const JNINativeInterface *old_functions;
 JNINativeInterface *new_functions;
 
-#define HOOK_JNI(method) \
-if (methods[i].name == #method##sv) { \
-    for (int j = 0; j < method##_methods_num; ++j) { \
-        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) { \
-            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]); \
-            method##_orig = methods[i].fnPtr;        \
-            newMethods[i] = method##_methods[j];     \
-            LOGI("zygisk: replaced %s#" #method "\n", className);               \
-            --hook_cnt;  \
-            break;       \
-        }                \
-    }                    \
-    continue;            \
+#define HOOK_JNI(method)                                                                     \
+if (methods[i].name == #method##sv) {                                                        \
+    int j = 0;                                                                               \
+    for (; j < method##_methods_num; ++j) {                                                  \
+        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) {              \
+            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]);       \
+            method##_orig = methods[i].fnPtr;                                                \
+            newMethods[i] = method##_methods[j];                                             \
+            ZLOGI("replaced %s#" #method "\n", className);                                   \
+            --hook_cnt;                                                                      \
+            break;                                                                           \
+        }                                                                                    \
+    }                                                                                        \
+    if (j == method##_methods_num) {                                                         \
+        ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
+    }                                                                                        \
+    continue;                                                                                \
 }
 
 // JNI method hook definitions, auto generated
@@ -120,14 +126,14 @@ ret new_##func(__VA_ARGS__)
 jint env_RegisterNatives(
         JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
     auto className = get_class_name(env, clazz);
-    VLOG("zygisk: JNIEnv->RegisterNatives [%s]\n", className.data());
+    ZLOGV("JNIEnv->RegisterNatives [%s]\n", className.data());
     auto newMethods = hookAndSaveJNIMethods(className.data(), methods, numMethods);
     return old_functions->RegisterNatives(env, clazz, newMethods.get() ?: methods, numMethods);
 }
 
 DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
         JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
-    VLOG("zygisk: jniRegisterNativeMethods [%s]\n", className);
+    ZLOGV("jniRegisterNativeMethods [%s]\n", className);
     auto newMethods = hookAndSaveJNIMethods(className, methods, numMethods);
     return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
 }
@@ -140,9 +146,9 @@ DCL_HOOK_FUNC(int, fork) {
 // This is the latest point where we can still connect to the magiskd main socket
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
-    if (g_ctx && g_ctx->flags[DENY_FLAG]) {
+    if (g_ctx && g_ctx->flags[UNMOUNT_FLAG]) {
         if (remote_request_unmount() == 0) {
-            LOGD("zygisk: mount namespace cleaned up\n");
+            ZLOGD("mount namespace cleaned up\n");
         }
     }
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
@@ -165,7 +171,7 @@ void **gAppRuntimeVTable;
 
 // This method is a trampoline for hooking JNIEnv->RegisterNatives
 void onVmCreated(void *self, JNIEnv* env) {
-    LOGD("zygisk: AppRuntime::onVmCreated\n");
+    ZLOGD("AppRuntime::onVmCreated\n");
 
     // Restore virtual table
     auto new_table = *reinterpret_cast<void***>(self);
@@ -197,7 +203,7 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
         return;
     }
 
-    LOGD("zygisk: AndroidRuntime::setArgv0\n");
+    ZLOGD("AndroidRuntime::setArgv0\n");
 
     // We don't know which entry is onVmCreated, so overwrite every one
     // We also don't know the size of the vtable, but 8 is more than enough
@@ -223,11 +229,123 @@ DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
 
 // -----------------------------------------------------------------
 
-void HookContext::run_modules_pre()  { /* TODO */ }
-void HookContext::run_modules_post() { /* TODO */ }
+void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
+    auto class_map = jni_method_map->find(clz);
+    if (class_map == jni_method_map->end()) {
+        for (int i = 0; i < numMethods; ++i) {
+            methods[i].fnPtr = nullptr;
+        }
+        return;
+    }
+
+    vector<JNINativeMethod> hooks;
+    for (int i = 0; i < numMethods; ++i) {
+        auto method_map = class_map->second.find(methods[i].name);
+        if (method_map != class_map->second.end()) {
+            auto it = method_map->second.find(methods[i].signature);
+            if (it != method_map->second.end()) {
+                // Copy the JNINativeMethod
+                hooks.push_back(methods[i]);
+                // Save the original function pointer
+                methods[i].fnPtr = it->second;
+                // Do not allow double hook, remove method from map
+                method_map->second.erase(it);
+                continue;
+            }
+        }
+        // No matching method found, set fnPtr to null
+        methods[i].fnPtr = nullptr;
+    }
+
+    if (hooks.empty())
+        return;
+
+    old_jniRegisterNativeMethods(env, clz, hooks.data(), hooks.size());
+}
+
+bool ZygiskModule::registerModule(ApiTable *table, long *module) {
+    long ver = *module;
+    // Unsupported version
+    if (ver > ZYGISK_API_VERSION)
+        return false;
+
+    // Set the actual module_abi*
+    table->module->ver = module;
+
+    // Fill in API accordingly with module API version
+    table->v1.hookJniNativeMethods = &hookJniNativeMethods;
+    table->v1.pltHookRegister = [](const char *path, const char *symbol, void *n, void **o) {
+        xhook_register(path, symbol, n, o);
+    };
+    table->v1.pltHookExclude = [](const char *path, const char *symbol) {
+        xhook_ignore(path, symbol);
+    };
+    table->v1.pltHookCommit = []() { return xhook_refresh(0) == 0; };
+    table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+    table->v1.forceDenyListUnmount = [](auto) { ZygiskModule::forceDenyListUnmount(); };
+
+    return true;
+}
+
+int ZygiskModule::connectCompanion() const {
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_START_COMPANION);
+        write_int(fd, id);
+        return fd;
+    }
+    return -1;
+}
+
+void ZygiskModule::forceDenyListUnmount() {
+    if (g_ctx == nullptr)
+        return;
+    g_ctx->toggle_unmount();
+}
+
+void HookContext::run_modules_pre(const vector<int> &fds) {
+    char buf[256];
+    for (int i = 0; i < fds.size(); ++i) {
+        snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
+        if (void *h = dlopen(buf, RTLD_LAZY)) {
+            void (*module_entry)(void *, void *);
+            *(void **) &module_entry = dlsym(h, "zygisk_module_entry");
+            if (module_entry) {
+                modules.emplace_back(i);
+                auto api = new ApiTable(&modules.back());
+                module_entry(api, env);
+            }
+        }
+        close(fds[i]);
+    }
+    for (auto &m : modules) {
+        if (flags[APP_SPECIALIZE]) {
+            m.preAppSpecialize(args);
+        } else if (flags[SERVER_SPECIALIZE]) {
+            m.preServerSpecialize(server_args);
+        }
+    }
+}
+
+void HookContext::run_modules_post() {
+    for (auto &m : modules) {
+        if (flags[APP_SPECIALIZE]) {
+            m.postAppSpecialize(args);
+        } else if (flags[SERVER_SPECIALIZE]) {
+            m.postServerSpecialize(server_args);
+        }
+    }
+}
 
 void HookContext::close_fds() {
     close(logd_fd.exchange(-1));
+}
+
+void HookContext::toggle_unmount() {
+    if (flags[APP_SPECIALIZE]) {
+        // TODO: Handle MOUNT_EXTERNAL_NONE
+        flags[UNMOUNT_FLAG] = args->mount_external != 0;
+    }
 }
 
 // -----------------------------------------------------------------
@@ -237,31 +355,29 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     flags[APP_SPECIALIZE] = true;
     process = env->GetStringUTFChars(args->nice_name, nullptr);
     if (flags[FORK_AND_SPECIALIZE]) {
-        VLOG("zygisk: pre  forkAndSpecialize [%s]\n", process);
+        ZLOGV("pre  forkAndSpecialize [%s]\n", process);
     } else {
-        VLOG("zygisk: pre  specialize [%s]\n", process);
+        ZLOGV("pre  specialize [%s]\n", process);
     }
 
-    remote_get_app_info(args->uid, process, &info);
-
-    /* TODO: Handle MOUNT_EXTERNAL_NONE */
-    if (args->mount_external != 0 && info.on_denylist) {
-        LOGI("zygisk: [%s] is on the denylist\n", process);
-        flags[DENY_FLAG] = true;
+    auto module_fds = remote_get_info(args->uid, process, &info);
+    if (info.on_denylist) {
+        ZLOGI("[%s] is on the denylist\n", process);
+        toggle_unmount();
     } else {
-        run_modules_pre();
+        run_modules_pre(module_fds);
     }
 }
 
 void HookContext::nativeSpecializeAppProcess_post() {
     if (flags[FORK_AND_SPECIALIZE]) {
-        VLOG("zygisk: post forkAndSpecialize [%s]\n", process);
+        ZLOGV("post forkAndSpecialize [%s]\n", process);
     } else {
-        VLOG("zygisk: post specialize [%s]\n", process);
+        ZLOGV("post specialize [%s]\n", process);
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
-    if (flags[DENY_FLAG]) {
+    if (info.on_denylist) {
         self_unload();
     } else {
         run_modules_post();
@@ -280,8 +396,8 @@ void HookContext::nativeForkSystemServer_pre() {
     fork_pre();
     flags[SERVER_SPECIALIZE] = true;
     if (pid == 0) {
-        VLOG("zygisk: pre  forkSystemServer\n");
-        run_modules_pre();
+        ZLOGV("pre  forkSystemServer\n");
+        run_modules_pre(remote_get_info(1000, "system_server", &info));
         close_fds();
     }
 }
@@ -289,7 +405,7 @@ void HookContext::nativeForkSystemServer_pre() {
 void HookContext::nativeForkSystemServer_post() {
     if (pid == 0) {
         android_logging();
-        VLOG("zygisk: post forkSystemServer\n");
+        ZLOGV("post forkSystemServer\n");
         run_modules_post();
     }
     fork_post();
@@ -338,10 +454,10 @@ void HookContext::fork_post() {
 static bool hook_refresh() {
     if (xhook_refresh(0) == 0) {
         xhook_clear();
-        LOGI("zygisk: xhook success\n");
+        ZLOGI("xhook success\n");
         return true;
     } else {
-        LOGE("zygisk: xhook failed\n");
+        ZLOGE("xhook failed\n");
         return false;
     }
 }
@@ -349,7 +465,7 @@ static bool hook_refresh() {
 static int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
     int ret = xhook_register(path, symbol, new_func, old_func);
     if (ret != 0) {
-        LOGE("hook: Failed to register hook \"%s\"\n", symbol);
+        ZLOGE("Failed to register hook \"%s\"\n", symbol);
         return ret;
     }
     xhook_list->emplace_back(path, symbol, old_func);
@@ -387,7 +503,7 @@ void hook_functions() {
             xhook_list->end());
 
     if (old_jniRegisterNativeMethods == nullptr) {
-        LOGD("zygisk: jniRegisterNativeMethods not hooked, using fallback\n");
+        ZLOGD("jniRegisterNativeMethods not hooked, using fallback\n");
 
         // android::AndroidRuntime::setArgv0(const char*, bool)
         XHOOK_REGISTER_SYM(APP_PROCESS, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
@@ -422,7 +538,7 @@ bool unhook_functions() {
     for (const auto &[clz, methods] : *jni_hook_list) {
         if (!methods.empty() && old_jniRegisterNativeMethods(
                 g_ctx->env, clz.data(), methods.data(), methods.size()) != 0) {
-            LOGE("zygisk: Failed to restore JNI hook of class [%s]\n", clz.data());
+            ZLOGE("Failed to restore JNI hook of class [%s]\n", clz.data());
             success = false;
         }
     }
@@ -431,13 +547,13 @@ bool unhook_functions() {
     // Unhook xhook
     for (const auto &[path, sym, old_func] : *xhook_list) {
         if (xhook_register(path, sym, *old_func, nullptr) != 0) {
-            LOGE("zygisk: Failed to register xhook [%s]\n", sym);
+            ZLOGE("Failed to register xhook [%s]\n", sym);
             success = false;
         }
     }
     delete xhook_list;
     if (!hook_refresh()) {
-        LOGE("zygisk: Failed to restore xhook\n");
+        ZLOGE("Failed to restore xhook\n");
         success = false;
     }
 

@@ -2,16 +2,28 @@
 
 #include <stdint.h>
 #include <jni.h>
+#include <vector>
 
 #define INJECT_ENV_1 "MAGISK_INJ_1"
 #define INJECT_ENV_2 "MAGISK_INJ_2"
 
 enum : int {
     ZYGISK_SETUP,
-    ZYGISK_GET_APPINFO,
+    ZYGISK_GET_INFO,
     ZYGISK_UNMOUNT,
     ZYGISK_GET_LOG_PIPE,
+    ZYGISK_START_COMPANION,
 };
+
+#if defined(__LP64__)
+#define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
+#else
+#define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
+#define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
+#define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
+#endif
 
 // Unmap all pages matching the name
 void unmap_all(const char *name);
@@ -33,5 +45,6 @@ struct AppInfo {
 void self_unload();
 void hook_functions();
 bool unhook_functions();
-void remote_get_app_info(int uid, const char *process, AppInfo *info);
+std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info);
 int remote_request_unmount();
+void start_companion(int client);
