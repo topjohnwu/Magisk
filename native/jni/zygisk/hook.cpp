@@ -91,8 +91,8 @@ if (methods[i].name == #method##sv) {                                           
     }                                                                                        \
     if (j == method##_methods_num) {                                                         \
         ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
-        continue;                                                                            \
     }                                                                                        \
+    continue;                                                                                \
 }
 
 // JNI method hook definitions, auto generated
