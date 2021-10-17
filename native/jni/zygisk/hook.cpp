@@ -76,20 +76,23 @@ HookContext *g_ctx;
 const JNINativeInterface *old_functions;
 JNINativeInterface *new_functions;
 
-#define HOOK_JNI(method) \
-if (methods[i].name == #method##sv) { \
-    for (int j = 0; j < method##_methods_num; ++j) { \
-        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) { \
-            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]); \
-            method##_orig = methods[i].fnPtr;        \
-            newMethods[i] = method##_methods[j];     \
-            ZLOGI("replaced %s#" #method "\n", className);                      \
-            --hook_cnt;  \
-            break;       \
-        }                \
-    }                    \
-    ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
-    continue;            \
+#define HOOK_JNI(method)                                                                     \
+if (methods[i].name == #method##sv) {                                                        \
+    int j = 0;                                                                               \
+    for (; j < method##_methods_num; ++j) {                                                  \
+        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) {              \
+            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]);       \
+            method##_orig = methods[i].fnPtr;                                                \
+            newMethods[i] = method##_methods[j];                                             \
+            ZLOGI("replaced %s#" #method "\n", className);                                   \
+            --hook_cnt;                                                                      \
+            break;                                                                           \
+        }                                                                                    \
+    }                                                                                        \
+    if (j == method##_methods_num) {                                                         \
+        ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
+    }                                                                                        \
+    continue;                                                                                \
 }
 
 // JNI method hook definitions, auto generated
