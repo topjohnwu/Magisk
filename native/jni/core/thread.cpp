@@ -22,8 +22,17 @@ static atomic_int idle_threads = 0;
 static atomic_int running_threads = 0;
 static shared_ptr<Task> pending_task = nullptr;
 
+static void reset_pool() {
+    clear_poll();
+    idle_threads.store(0, std::memory_order_relaxed);
+    running_threads.store(0, std::memory_order_relaxed);
+    atomic_store_explicit(&pending_task, std::shared_ptr<Task>(nullptr), std::memory_order_relaxed);
+}
+
 static void *thread_pool_loop(void *const) {
     idle_threads.fetch_add(1, memory_order_relaxed);
+
+    pthread_atfork(nullptr, nullptr, &reset_pool);
 
     // Block all signals
     sigset_t mask;
@@ -64,6 +73,8 @@ static void *thread_pool_loop(void *const) {
         // notify for potential new thread
         idle_threads.notify_one();
         (*local_task)();
+        // forked from this thread
+        if (getpid() == gettid()) pthread_exit(nullptr);
         running_threads.fetch_sub(1, memory_order_relaxed);
         idle_threads.fetch_add(1, memory_order_acq_rel);
         idle_threads.notify_one();
