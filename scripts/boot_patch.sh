@@ -189,8 +189,14 @@ rm -f ramdisk.cpio.orig config magisk*.xz
 # Binary Patches
 #################
 
-for dt in dtb kernel_dtb extra; do
-  [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patch fstab in $dt"
+for DT in dtb kernel_dtb extra; do
+  if [ -f $DT ]; then
+    ./magiskboot dtb $DT patch && ui_print "- Patch fstab in $DT"
+    # Patch Samsung dtb cmdline skip_initramfs -> uses_initramfs
+    ./magiskboot hexpatch $DT \
+    736B69705F696E697472616D667300 \
+    757365735F696E697472616D667300
+  fi
 done
 
 if [ -f kernel ]; then
