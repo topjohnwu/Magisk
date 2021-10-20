@@ -8,7 +8,7 @@ ifdef B_MAGISK
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
-LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils libphmap libxhook
+LOCAL_STATIC_LIBRARIES := libnanopb libsystemproperties libutils-shared libphmap libxhook
 
 LOCAL_SRC_FILES := \
     core/applets.cpp \
@@ -134,7 +134,7 @@ ifneq (,$(wildcard jni/test.cpp))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
-LOCAL_STATIC_LIBRARIES := libutils libphmap
+LOCAL_STATIC_LIBRARIES := libutils-shared libphmap
 LOCAL_SRC_FILES := test.cpp
 include $(BUILD_EXECUTABLE)
 

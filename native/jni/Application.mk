@@ -3,9 +3,18 @@ APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
 APP_LDFLAGS      := -flto
 APP_CPPFLAGS     := -std=c++17
 APP_STL          := none
-APP_PLATFORM     := android-16
+APP_PLATFORM     := android-21
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := --strip-all
+
+ifneq ($(TARGET_ARCH),arm64)
+ifneq ($(TARGET_ARCH),x86_64)
+ifndef B_SHARED
+# Disable fortify on static 32-bit targets
+APP_CFLAGS       += -D_FORTIFY_SOURCE=0 -Wno-macro-redefined
+endif
+endif
+endif
 
 # Busybox should use stock libc.a
 ifdef B_BB

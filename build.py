@@ -330,6 +330,12 @@ def build_binary(args):
     if 'test' in args.target:
         flag += ' B_TEST=1'
 
+    if flag:
+        run_ndk_build(flag + ' B_SHARED=1')
+
+    if 'magisk' in args.target:
+        clean_elf()
+
     if 'magiskinit' in args.target:
         dump_bin_header()
         flag += ' B_INIT=1'
@@ -345,9 +351,6 @@ def build_binary(args):
 
     if flag:
         run_ndk_build(flag)
-
-    if 'magisk' in args.target:
-        clean_elf()
 
     if 'busybox' in args.target:
         run_ndk_build('B_BB=1')
@@ -445,19 +448,18 @@ def setup_ndk(args):
     mv(op.join(ndk_root, f'android-ndk-r{ndk_ver}'), ndk_path)
 
     header('* Patching static libs')
-    for api in ['16', '21']:
-        for target in ['aarch64-linux-android', 'arm-linux-androideabi',
-                       'i686-linux-android', 'x86_64-linux-android']:
-            arch = target.split('-')[0]
-            lib_dir = op.join(
-                ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-                'sysroot', 'usr', 'lib', f'{target}', api)
-            if not op.exists(lib_dir):
-                continue
-            src_dir = op.join('tools', 'ndk-bins', api, arch)
-            rm(op.join(src_dir, '.DS_Store'))
-            for path in copy_tree(src_dir, lib_dir):
-                vprint(f'Replaced {path}')
+    for target in ['aarch64-linux-android', 'arm-linux-androideabi',
+                   'i686-linux-android', 'x86_64-linux-android']:
+        arch = target.split('-')[0]
+        lib_dir = op.join(
+            ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
+            'sysroot', 'usr', 'lib', f'{target}', '21')
+        if not op.exists(lib_dir):
+            continue
+        src_dir = op.join('tools', 'ndk-bins', '21', arch)
+        rm(op.join(src_dir, '.DS_Store'))
+        for path in copy_tree(src_dir, lib_dir):
+            vprint(f'Replaced {path}')
 
 
 def setup_avd(args):

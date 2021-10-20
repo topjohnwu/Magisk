@@ -1,3 +1,11 @@
+// Force using legacy_signal_inlines.h
+#define __ANDROID_API_BACKUP__  __ANDROID_API__
+#undef  __ANDROID_API__
+#define __ANDROID_API__ 20
+#include <android/legacy_signal_inlines.h>
+#undef  __ANDROID_API__
+#define __ANDROID_API__ __ANDROID_API_BACKUP__
+
 #include <sys/mount.h>
 #include <map>
 
