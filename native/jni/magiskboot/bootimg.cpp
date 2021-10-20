@@ -60,7 +60,7 @@ void dyn_img_hdr::print() {
         fprintf(stderr, "%-*s [%u]\n", PADDING, "EXTRA_SZ", extra_size());
     if (ver == 1 || ver == 2)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
-    if (ver == 2)
+    if (dtb_size())
         fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
 
     if (uint32_t os_ver = os_version()) {
@@ -79,7 +79,7 @@ void dyn_img_hdr::print() {
     }
 
     fprintf(stderr, "%-*s [%u]\n", PADDING, "PAGESIZE", page_size());
-    if (ver < 3) {
+    if (name()) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", name());
     }
     fprintf(stderr, "%-*s [%.*s%.*s]\n", PADDING, "CMDLINE",
