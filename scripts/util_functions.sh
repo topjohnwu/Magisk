@@ -72,17 +72,17 @@ resolve_vars() {
 }
 
 print_title() {
-  local len line1len line2len pounds
+  local len line1len line2len bar
   line1len=$(echo -n $1 | wc -c)
   line2len=$(echo -n $2 | wc -c)
   len=$line2len
   [ $line1len -gt $line2len ] && len=$line1len
   len=$((len + 2))
-  pounds=$(printf "%${len}s" | tr ' ' '*')
-  ui_print "$pounds"
+  bar=$(printf "%${len}s" | tr ' ' '*')
+  ui_print "$bar"
   ui_print " $1 "
   [ "$2" ] && ui_print " $2 "
-  ui_print "$pounds"
+  ui_print "$bar"
 }
 
 ######################
