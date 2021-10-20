@@ -130,26 +130,7 @@ static void poll_ctrl_handler(pollfd *pfd) {
     }
 }
 
-static bool verify_client(pid_t pid) {
-    // Verify caller is the same as server
-    char path[32];
-    sprintf(path, "/proc/%d/exe", pid);
-    struct stat st;
-    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
-}
-
-static bool check_zygote(pid_t pid) {
-    char buf[32];
-    sprintf(buf, "/proc/%d/attr/current", pid);
-    if (auto fp = open_file(buf, "r")) {
-        fscanf(fp.get(), "%s", buf);
-        return buf == "u:r:zygote:s0"sv;
-    } else {
-        return false;
-    }
-}
-
-static void handle_request_async(int client, int code, ucred cred) {
+static void handle_request_async(int client, int code, const sock_cred &cred) {
     switch (code) {
     case DENYLIST:
         denylist_handler(client, &cred);
@@ -206,19 +187,29 @@ static void handle_request_sync(int client, int code) {
     }
 }
 
+static bool is_client(pid_t pid) {
+    // Verify caller is the same as server
+    char path[32];
+    sprintf(path, "/proc/%d/exe", pid);
+    struct stat st;
+    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
+}
+
 static void handle_request(pollfd *pfd) {
     int client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
 
     // Verify client credentials
-    ucred cred;
-    get_client_cred(client, &cred);
-
-    bool is_root = cred.uid == UID_ROOT;
-    bool is_client = verify_client(cred.pid);
-    bool is_zygote = !is_client && check_zygote(cred.pid);
+    sock_cred cred;
+    bool is_root;
+    bool is_zygote;
     int code;
 
-    if (!is_root && !is_zygote && !is_client)
+    if (!get_client_cred(client, &cred))
+        goto done;
+    is_root = cred.uid == UID_ROOT;
+    is_zygote = cred.context == "u:r:zygote:s0";
+
+    if (!is_root && !is_zygote && !is_client(cred.pid))
         goto done;
 
     code = read_int(client);

@@ -20,9 +20,17 @@ socklen_t setup_sockaddr(sockaddr_un *sun, const char *name) {
     return socket_len(sun);
 }
 
-void get_client_cred(int fd, ucred *cred) {
-    socklen_t len = sizeof(*cred);
-    getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &len);
+bool get_client_cred(int fd, sock_cred *cred) {
+    socklen_t len = sizeof(ucred);
+    if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, cred, &len) != 0)
+        return false;
+    char buf[4096];
+    len = sizeof(buf);
+    if (getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len) != 0)
+        return false;
+    buf[len] = '\0';
+    cred->context = buf;
+    return true;
 }
 
 static int send_fds(int sockfd, void *cmsgbuf, size_t bufsz, const int *fds, int cnt) {

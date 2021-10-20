@@ -3,10 +3,15 @@
 #include <sys/un.h>
 #include <sys/socket.h>
 #include <string_view>
+#include <string>
 #include <vector>
 
+struct sock_cred : public ucred {
+    std::string context;
+};
+
 socklen_t setup_sockaddr(sockaddr_un *sun, const char *name);
-void get_client_cred(int fd, ucred *cred);
+bool get_client_cred(int fd, sock_cred *cred);
 std::vector<int> recv_fds(int sockfd);
 int recv_fd(int sockfd);
 int send_fds(int sockfd, const int *fds, int cnt);

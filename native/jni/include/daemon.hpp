@@ -63,9 +63,9 @@ void android_logging();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
-void denylist_handler(int client, ucred *cred);
-void su_daemon_handler(int client, ucred *credential);
-void zygisk_handler(int client, ucred *cred);
+void denylist_handler(int client, const sock_cred *cred);
+void su_daemon_handler(int client, const sock_cred *cred);
+void zygisk_handler(int client, const sock_cred *cred);
 std::vector<int> zygisk_module_fds(bool is_64_bit);
 
 // Denylist

@@ -25,7 +25,7 @@ Actions:
     exit(1);
 }
 
-void denylist_handler(int client, ucred *cred) {
+void denylist_handler(int client, const sock_cred *cred) {
     if (client < 0) {
         revert_unmount();
         return;

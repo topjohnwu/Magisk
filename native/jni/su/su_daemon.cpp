@@ -158,13 +158,13 @@ static void set_identity(unsigned uid) {
     }
 }
 
-void su_daemon_handler(int client, struct ucred *credential) {
-    LOGD("su: request from pid=[%d], client=[%d]\n", credential->pid, client);
+void su_daemon_handler(int client, const sock_cred *cred) {
+    LOGD("su: request from pid=[%d], client=[%d]\n", cred->pid, client);
 
     su_context ctx = {
-        .info = get_su_info(credential->uid),
+        .info = get_su_info(cred->uid),
         .req = su_request(),
-        .pid = credential->pid
+        .pid = cred->pid
     };
 
     // Read su_request
