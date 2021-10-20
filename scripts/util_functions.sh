@@ -658,7 +658,7 @@ copy_sepolicy_rules() {
 set_perm() {
   chown $2:$3 $1 || return 1
   chmod $4 $1 || return 1
-  CON=$5
+  local CON=$5
   [ -z $CON ] && CON=u:object_r:system_file:s0
   chcon $CON $1 || return 1
 }
@@ -758,6 +758,10 @@ install_module() {
 
       # Default permissions
       set_perm_recursive $MODPATH 0 0 0755 0644
+      set_perm_recursive $MODPATH/system/bin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/xbin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/system_ext/bin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/vendor/bin 0 2000 0755 0755 u:object_r:vendor_file:s0
     fi
 
     # Load customization script
