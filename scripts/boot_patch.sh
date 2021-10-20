@@ -158,8 +158,16 @@ if [ -f magisk64 ]; then
   unset SKIP64
 fi
 
+# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+INIT=init
+SKIPSONY="#"
+if ./magiskboot cpio ramdisk.cpio "exists init.real"; then
+  INIT=init.real
+  unset SKIPSONY
+fi
+
 ./magiskboot cpio ramdisk.cpio \
-"add 0750 init magiskinit" \
+"add 0750 $INIT magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
 "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
@@ -167,6 +175,7 @@ fi
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
+"$SKIPSONY mv .backup/init.real .backup/init" \
 "add 000 .backup/.magisk config"
 
 rm -f ramdisk.cpio.orig config magisk*.xz
