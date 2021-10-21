@@ -204,8 +204,7 @@ fi
 ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
 ./magiskboot hexpatch new-boot.img "0300000000617662746F6F6C20" "0000000000617662746F6F6C20"
-# Sign chromeos boot
-$CHROMEOS && sign_chromeos
+
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
 
