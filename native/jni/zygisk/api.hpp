@@ -30,16 +30,18 @@ class ExampleModule : public zygisk::ModuleBase {
 public:
     void onLoad(zygisk::Api *api, JNIEnv *env) override {
         this->api = api;
+        this->env = env;
     }
     void preAppSpecialize(zygisk::AppSpecializeArgs *args) override {
         JNINativeMethod methods[] = {
             { "logger_entry_max_payload_native", "()I", (void*) my_logger_entry_max },
         };
-        api->hookJniNativeMethods("android/util/Log", methods, 1);
+        api->hookJniNativeMethods(env, "android/util/Log", methods, 1);
         *(void **) &orig_logger_entry_max = methods[0].fnPtr;
     }
 private:
     zygisk::Api *api;
+    JNIEnv *env;
 };
 
 REGISTER_ZYGISK_MODULE(ExampleModule)
@@ -129,6 +131,27 @@ struct api_table;
 template <class T> void entry_impl(api_table *, JNIEnv *);
 }
 
+// These values are used in Api::setOption(Option)
+enum Option : int {
+    // Force Magisk's denylist unmount routines to run on this process.
+    //
+    // Setting this option only makes sense in preAppSpecialize.
+    // The actual unmounting happens during app process specialization.
+    //
+    // Processes added to Magisk's denylist will have all Magisk and its modules' files unmounted
+    // from its mount namespace. In addition, all Zygisk code will be unloaded from memory, which
+    // also implies that no Zygisk modules (including yours) are loaded.
+    //
+    // However, if for any reason your module still wants the unmount part of the denylist
+    // operation to be enabled EVEN IF THE PROCESS IS NOT ON THE DENYLIST, set this option.
+    FORCE_DENYLIST_UNMOUNT = 0,
+
+    // When this option is set, your module's library will be dlclose-ed after post[XXX]Specialize.
+    // Be aware that after dlclose-ing your module, all of your code will be unmapped.
+    // YOU SHOULD NOT ENABLE THIS OPTION AFTER HOOKING ANY FUNCTION IN THE PROCESS.
+    DLCLOSE_MODULE_LIBRARY = 1,
+};
+
 struct Api {
 
     // Connect to a root companion process and get a Unix domain socket for IPC.
@@ -145,22 +168,10 @@ struct Api {
     // module's companion request handler. Returns -1 if the connection attempt failed.
     int connectCompanion();
 
-    // Force Magisk's denylist unmount routines to run on this process.
-    //
-    // This API only works in preAppSpecialize.
-    //
-    // Processes added to Magisk's denylist will have all Magisk and its modules' files unmounted
-    // from its mount namespace. In addition, all Zygisk code will be unloaded from memory, which
-    // also implies that no Zygisk modules (including yours) are loaded.
-    //
-    // However, if for any reason your module still wants the unmount part of the denylist
-    // operation to be enabled EVEN IF THE PROCESS IS NOT ON THE DENYLIST, call this function.
-    // No code will be unloaded from memory (including your module) because there is no way to
-    // guarantee no crashes will occur.
-    //
-    // The unmounting does not happen immediately after the function is called. It is actually
-    // done during app process specialization.
-    void forceDenyListUnmount();
+    // Set various options for your module.
+    // Please note that this function accepts one single option at a time.
+    // Check zygisk::Option for the full list of options available.
+    void setOption(Option opt);
 
     // Hook JNI native methods for a class
     //
@@ -244,7 +255,7 @@ struct api_table {
 
     // Zygisk functions
     int  (*connectCompanion)(void * /* _this */);
-    void (*forceDenyListUnmount)(void * /* _this */);
+    void (*setOption)(void * /* _this */, Option);
 };
 
 template <class T>
@@ -262,8 +273,8 @@ void entry_impl(api_table *table, JNIEnv *env) {
 int Api::connectCompanion() {
     return impl->connectCompanion(impl->_this);
 }
-void Api::forceDenyListUnmount() {
-    impl->forceDenyListUnmount(impl->_this);
+void Api::setOption(Option opt) {
+    impl->setOption(impl->_this, opt);
 }
 void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     impl->hookJniNativeMethods(env, className, methods, numMethods);
