@@ -164,6 +164,9 @@ struct Api {
     // Another good use case for a companion process is that if you want to share some resources
     // across multiple processes, hold the resources in the companion process and pass it over.
     //
+    // The root companion process is ABI aware; that is, when calling this function from a 32-bit
+    // process, you will be connected to a 32-bit companion process, and vice versa for 64-bit.
+    //
     // Returns a file descriptor to a socket that is connected to the socket passed to your
     // module's companion request handler. Returns -1 if the connection attempt failed.
     int connectCompanion();

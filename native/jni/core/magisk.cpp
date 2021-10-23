@@ -39,6 +39,7 @@ Advanced Options (Internal APIs):
    --sqlite SQL              exec SQL commands to Magisk database
    --path                    print Magisk tmpfs mount path
    --denylist ARGS           denylist config CLI
+   --companion FD            start zygisk root companion
 
 Available applets:
 )EOF");
@@ -127,6 +128,8 @@ int magisk_main(int argc, char *argv[]) {
         return 0;
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
+    } else if (argc >= 3 && argv[1] == "--companion"sv) {
+        zygiskd(parse_int(argv[2]));
     }
 #if 0
     /* Entry point for testing stuffs */

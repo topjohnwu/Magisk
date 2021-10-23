@@ -290,7 +290,7 @@ bool ZygiskModule::registerModule(ApiTable *table, long *module) {
 int ZygiskModule::connectCompanion() const {
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_START_COMPANION);
+        write_int(fd, ZYGISK_CONNECT_COMPANION);
         write_int(fd, id);
         return fd;
     }

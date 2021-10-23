@@ -12,7 +12,7 @@ enum : int {
     ZYGISK_GET_INFO,
     ZYGISK_UNMOUNT,
     ZYGISK_GET_LOG_PIPE,
-    ZYGISK_START_COMPANION,
+    ZYGISK_CONNECT_COMPANION,
 };
 
 #if defined(__LP64__)
@@ -47,4 +47,4 @@ void hook_functions();
 bool unhook_functions();
 std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info);
 int remote_request_unmount();
-void start_companion(int client);
+void connect_companion(int client, bool is_64_bit);
