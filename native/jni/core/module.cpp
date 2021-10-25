@@ -574,34 +574,35 @@ void magic_mount() {
 
     char buf[4096];
     LOGI("* Loading modules\n");
-    for (const auto &m : *modules) {
-        const char *module = m.name.data();
-        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
+    if (modules) {
+        for (const auto &m : *modules) {
+            const char *module = m.name.data();
+            char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
 
-        // Read props
-        strcpy(b, "system.prop");
-        if (access(buf, F_OK) == 0) {
-            LOGI("%s: loading [system.prop]\n", module);
-            load_prop_file(buf, false);
+            // Read props
+            strcpy(b, "system.prop");
+            if (access(buf, F_OK) == 0) {
+                LOGI("%s: loading [system.prop]\n", module);
+                load_prop_file(buf, false);
+            }
+
+            // Check whether skip mounting
+            strcpy(b, "skip_mount");
+            if (access(buf, F_OK) == 0)
+                continue;
+
+            // Double check whether the system folder exists
+            strcpy(b, "system");
+            if (access(buf, F_OK) != 0)
+                continue;
+
+            LOGI("%s: loading mount files\n", module);
+            b[-1] = '\0';
+            int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
+            system->collect_files(module, fd);
+            close(fd);
         }
-
-        // Check whether skip mounting
-        strcpy(b, "skip_mount");
-        if (access(buf, F_OK) == 0)
-            continue;
-
-        // Double check whether the system folder exists
-        strcpy(b, "system");
-        if (access(buf, F_OK) != 0)
-            continue;
-
-        LOGI("%s: loading mount files\n", module);
-        b[-1] = '\0';
-        int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
-        system->collect_files(module, fd);
-        close(fd);
     }
-
     if (MAGISKTMP != "/sbin") {
         // Need to inject our binaries into /system/bin
         inject_magisk_bins(system);
