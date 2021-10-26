@@ -372,7 +372,7 @@ void MagiskProxy::start() {
 
     // Backup stuffs before removing them
     self = mmap_data::ro("/sbin/magisk");
-    config = mmap_data::ro("/.backup/.magisk");
+    magisk_config = mmap_data::ro("/.backup/.magisk");
     auto magisk = mmap_data::ro("/sbin/magisk32.xz");
     auto magisk64 = mmap_data::ro("/sbin/magisk64.xz");
     char custom_rules_dir[64];

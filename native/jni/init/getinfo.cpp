@@ -15,57 +15,58 @@ vector<string> mount_list;
 
 template<char... cs> using chars = integer_sequence<char, cs...>;
 
+// If quoted, parsing ends when we find char in [breaks]
+// If not quoted, parsing ends when we find char in [breaks] + [escapes]
 template<char... escapes, char... breaks>
-static string extract_qutoed_str_until(chars<escapes...>, chars<breaks...>,
-                                       string_view sv, size_t &begin, bool &quoted) {
+static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
+        string_view str, size_t &pos, bool &quoted) {
     string result;
     char match_array[] = {escapes..., breaks..., '"'};
-    string_view match(match_array, sizeof(match_array));
-    for (auto end = begin;; ++end) {
-        end = sv.find_first_of(match, end);
-        if (end == string_view::npos || ((sv[end] == breaks) || ...) ||
-            (!quoted && ((sv[end] == escapes) || ...))) {
-            result.append(sv.substr(begin, end - begin));
-            begin = end;
+    string_view match(match_array, std::size(match_array));
+    for (size_t cur = pos;; ++cur) {
+        cur = str.find_first_of(match, cur);
+        if (cur == string_view::npos ||
+            ((str[cur] == breaks) || ...) ||
+            (!quoted && ((str[cur] == escapes) || ...))) {
+            result.append(str.substr(pos, cur - pos));
+            pos = cur;
             return result;
         }
-        if (sv[end] == '"') {
+        if (str[cur] == '"') {
             quoted = !quoted;
-            result.append(sv.substr(begin, end - begin));
-            begin = end + 1;
+            result.append(str.substr(pos, cur - pos));
+            pos = cur + 1;
         }
     }
 }
 
-//[pair_split][key][assign_split][assign][assign_split][value][pair_split]
-template<char... pair_spilt, char... assign, char... assign_split>
-static auto parse(chars<pair_spilt...>, chars<assign...>, chars<assign_split...>, string_view sv) {
-    vector<pair<string, string>> kv;
-    char next_array[] = {pair_spilt...};
-    string_view next(next_array, sizeof(next_array));
-    char skip_array[] = {assign..., assign_split...};
-    string_view skip(skip_array, sizeof(skip_array));
+// Parse string into key value pairs.
+// The string format: [delim][key][padding]=[padding][value][delim]
+template<char delim, char... padding>
+static kv_pairs parse_impl(chars<padding...>, string_view str) {
+    kv_pairs kv;
+    char skip_array[] = {'=', padding...};
+    string_view skip(skip_array, std::size(skip_array));
     bool quoted = false;
-    for (size_t cur = 0u; cur < sv.size();
-         cur = sv.find_first_not_of(next, cur)) {
-        auto key = extract_qutoed_str_until(chars<assign_split..., pair_spilt...>{},
-                                            chars<assign...>{}, sv, cur, quoted);
-        cur = sv.find_first_not_of(skip, cur);
-        if (((cur == string_view::npos) || ... || (sv[cur] == pair_spilt))) {
+    for (size_t pos = 0u; pos < str.size(); pos = str.find_first_not_of(delim, pos)) {
+        auto key = extract_quoted_str_until(
+                chars<padding..., delim>{}, chars<'='>{}, str, pos, quoted);
+        pos = str.find_first_not_of(skip, pos);
+        if (pos == string_view::npos || str[pos] == delim) {
             kv.emplace_back(key, "");
             continue;
         }
-        auto value = extract_qutoed_str_until(chars<pair_spilt...>{}, chars<>{}, sv, cur, quoted);
+        auto value = extract_quoted_str_until(chars<delim>{}, chars<>{}, str, pos, quoted);
         kv.emplace_back(key, value);
     }
     return kv;
 }
 
-static auto parse_cmdline(string_view sv) {
-    return parse(chars<' '>{}, chars<'='>{}, chars<>{}, sv);
+static kv_pairs parse_cmdline(string_view str) {
+    return parse_impl<' '>(chars<>{}, str);
 }
-static auto parse_bootconfig(string_view sv) {
-    return parse(chars<'\n'>{}, chars<'='>{}, chars<' '>{}, sv);
+static kv_pairs parse_bootconfig(string_view str) {
+    return parse_impl<'\n'>(chars<' '>{}, str);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
@@ -158,17 +159,54 @@ void setup_klog() {
     }
 }
 
-#define read_dt(name, key) \
-sprintf(file_name, "%s/" name, cmd->dt_dir); \
-if (access(file_name, R_OK) == 0){ \
-    string data = full_read(file_name); \
-    if (!data.empty()) { \
-        data.pop_back(); \
-        strcpy(cmd->key, data.data()); \
-    } \
+void BootConfig::set(const kv_pairs &kv) {
+    for (const auto &[key, value] : kv) {
+        if (key == "androidboot.slot_suffix") {
+            strlcpy(slot, value.data(), sizeof(slot));
+        } else if (key == "androidboot.slot") {
+            slot[0] = '_';
+            strlcpy(slot + 1, value.data(), sizeof(slot) - 1);
+        } else if (key == "skip_initramfs") {
+            skip_initramfs = true;
+        } else if (key == "androidboot.force_normal_boot") {
+            force_normal_boot = !value.empty() && value[0] == '1';
+        } else if (key == "rootwait") {
+            rootwait = true;
+        } else if (key == "androidboot.android_dt_dir") {
+            strlcpy(dt_dir, value.data(), sizeof(dt_dir));
+        } else if (key == "androidboot.hardware") {
+            strlcpy(hardware, value.data(), sizeof(hardware));
+        } else if (key == "androidboot.hardware.platform") {
+            strlcpy(hardware_plat, value.data(), sizeof(hardware_plat));
+        } else if (key == "androidboot.fstab_suffix") {
+            strlcpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
+        }
+    }
 }
 
-void load_kernel_info(cmdline *cmd) {
+void BootConfig::print() {
+    LOGD("skip_initramfs=[%d]\n", skip_initramfs);
+    LOGD("force_normal_boot=[%d]\n", force_normal_boot);
+    LOGD("rootwait=[%d]\n", rootwait);
+    LOGD("slot=[%s]\n", slot);
+    LOGD("dt_dir=[%s]\n", dt_dir);
+    LOGD("fstab_suffix=[%s]\n", fstab_suffix);
+    LOGD("hardware=[%s]\n", hardware);
+    LOGD("hardware.platform=[%s]\n", hardware_plat);
+}
+
+#define read_dt(name, key)                                          \
+snprintf(file_name, sizeof(file_name), "%s/" name, config->key);    \
+if (access(file_name, R_OK) == 0) {                                 \
+    string data = full_read(file_name);                             \
+    if (!data.empty()) {                                            \
+        data.pop_back();                                            \
+        LOGD(name "=[%s]\n", data.data());                          \
+        strlcpy(config->key, data.data(), sizeof(config->key));     \
+    }                                                               \
+}
+
+void load_kernel_info(BootConfig *config) {
     // Get kernel data using procfs and sysfs
     xmkdir("/proc", 0755);
     xmount("proc", "/proc", "proc", 0, nullptr);
@@ -181,85 +219,31 @@ void load_kernel_info(cmdline *cmd) {
     // Log to kernel
     setup_klog();
 
-    for (const auto&[key, value] : parse_cmdline(full_read("/proc/cmdline"))) {
-        if (key == "androidboot.slot_suffix") {
-            strcpy(cmd->slot, value.data());
-        } else if (key == "androidboot.slot") {
-            cmd->slot[0] = '_';
-            strcpy(cmd->slot + 1, value.data());
-        } else if (key == "skip_initramfs") {
-            cmd->skip_initramfs = true;
-        } else if (key == "androidboot.force_normal_boot") {
-            cmd->force_normal_boot = value[0] == '1';
-        } else if (key == "rootwait") {
-            cmd->rootwait = true;
-        } else if (key == "androidboot.android_dt_dir") {
-            strcpy(cmd->dt_dir, value.data());
-        } else if (key == "androidboot.hardware") {
-            strcpy(cmd->hardware, value.data());
-        } else if (key == "androidboot.hardware.platform") {
-            strcpy(cmd->hardware_plat, value.data());
-        } else if (key == "androidboot.fstab_suffix") {
-            strcpy(cmd->fstab_suffix, value.data());
-        }
-    }
-
+    config->set(parse_cmdline(full_read("/proc/cmdline")));
     LOGD("Kernel cmdline info:\n");
-    LOGD("skip_initramfs=[%d]\n", cmd->skip_initramfs);
-    LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
-    LOGD("rootwait=[%d]\n", cmd->rootwait);
-    LOGD("slot=[%s]\n", cmd->slot);
-    LOGD("dt_dir=[%s]\n", cmd->dt_dir);
-    LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
-    LOGD("hardware=[%s]\n", cmd->hardware);
-    LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
+    config->print();
 
-    for (const auto&[key, value] : parse_bootconfig(full_read("/proc/bootconfig"))) {
-        if (key == "androidboot.slot_suffix") {
-            strcpy(cmd->slot, value.data());
-        } else if (key == "androidboot.force_normal_boot") {
-            cmd->force_normal_boot = value[0] == '1';
-        } else if (key == "androidboot.android_dt_dir") {
-            strcpy(cmd->dt_dir, value.data());
-        } else if (key == "androidboot.hardware") {
-            strcpy(cmd->hardware, value.data());
-        } else if (key == "androidboot.hardware.platform") {
-            strcpy(cmd->hardware_plat, value.data());
-        } else if (key == "androidboot.fstab_suffix") {
-            strcpy(cmd->fstab_suffix, value.data());
-        }
-    }
-
+    config->set(parse_bootconfig(full_read("/proc/bootconfig")));
     LOGD("Boot config info:\n");
-    LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
-    LOGD("slot=[%s]\n", cmd->slot);
-    LOGD("dt_dir=[%s]\n", cmd->dt_dir);
-    LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
-    LOGD("hardware=[%s]\n", cmd->hardware);
-    LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
+    config->print();
 
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
             LOGD("Running in recovery mode, waiting for key...\n");
-            cmd->skip_initramfs = !check_key_combo();
+            config->skip_initramfs = !check_key_combo();
             return false;
         }
         return true;
     });
 
-    if (cmd->dt_dir[0] == '\0')
-        strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
+    if (config->dt_dir[0] == '\0')
+        strlcpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
 
+    LOGD("Device tree:\n");
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)
     read_dt("hardware", hardware)
     read_dt("hardware.platform", hardware_plat)
-
-    LOGD("Device tree info:\n");
-    LOGD("dt_dir=[%s]\n", cmd->dt_dir);
-    LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
-    LOGD("hardware=[%s]\n", cmd->hardware);
-    LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
 }
 
 bool check_two_stage() {
