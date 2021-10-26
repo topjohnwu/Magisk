@@ -549,7 +549,7 @@ struct module_info {
 #endif
 };
 
-static vector<module_info> *modules;
+static vector<module_info> *modules = nullptr;
 
 #define mount_zygisk(bit) \
 if (access("/system/bin/app_process" #bit, F_OK) == 0) { \
