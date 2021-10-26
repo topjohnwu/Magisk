@@ -427,9 +427,15 @@ def setup_ndk(args):
     ndk_zip = url.split('/')[-1]
 
     header(f'* Downloading {ndk_zip}')
-    with urllib.request.urlopen(url) as response, open(ndk_zip, 'wb') as out_file:
-        shutil.copyfileobj(response, out_file)
-
+    # do not re-download ndk zip if local file satisfied
+    with urllib.request.urlopen(url) as response:
+        netlen = response.length
+        if os.path.exists(ndk_zip) and os.path.getsize(ndk_zip) == netlen:
+            header('* Local NDK zip satisfied -- give up download')
+            response.close()
+        else:
+            out_file = open(ndk_zip, 'wb')
+            shutil.copyfileobj(response, out_file)
     header('* Extracting NDK zip')
     rm_rf(ndk_path)
     with zipfile.ZipFile(ndk_zip, 'r') as zf:
