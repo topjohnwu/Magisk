@@ -67,7 +67,9 @@ open class App() : Application() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        resources.updateConfig(newConfig)
+        if (resources.configuration.diff(newConfig) != 0) {
+            resources.updateConfig(newConfig)
+        }
         if (!isRunningAsStub)
             super.onConfigurationChanged(newConfig)
     }
