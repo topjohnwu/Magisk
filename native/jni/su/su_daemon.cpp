@@ -314,7 +314,9 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     umask(022);
     char path[32];
     snprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
-    chdir(path);
+    char cwd[PATH_MAX];
+    if (realpath(path, cwd))
+        chdir(cwd);
     snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
     char buf[4096] = { 0 };
     int fd = xopen(path, O_RDONLY);
