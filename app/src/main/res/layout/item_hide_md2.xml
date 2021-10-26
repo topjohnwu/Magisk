@@ -70,7 +70,7 @@
                     android:id="@+id/hide_package"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@{item.info.packageName}"
+                    android:text="@{item.info.applicationInfo.packageName}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/hide_name"
