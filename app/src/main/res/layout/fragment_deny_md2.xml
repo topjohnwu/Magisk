@@ -17,7 +17,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/app_list"
-            invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
+            invisibleUnless="@{viewModel.loaded}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
@@ -30,42 +30,8 @@
             tools:listitem="@layout/item_hide_md2"
             tools:paddingTop="40dp" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/filter_toggle"
-            invisibleUnless="@{viewModel.loaded || !viewModel.items.empty}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginStart="@dimen/l1"
-            android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l1"
-            app:backgroundTint="?colorSurfaceSurfaceVariant"
-            app:layout_fitsSystemWindowsInsets="bottom"
-            app:srcCompat="@drawable/ic_search_md2"
-            app:tint="?colorPrimary"
-            tools:layout_marginBottom="64dp" />
-
-        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-            android:id="@+id/process_filter"
-            style="@style/WidgetFoundation.Card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:visibility="invisible"
-            app:layout_fitsSystemWindowsInsets="bottom"
-            app:cardCornerRadius="0dp">
-
-            <include
-                android:id="@+id/app_filter_include"
-                layout="@layout/app_list_filter"
-                viewModel="@{viewModel}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
-
         <LinearLayout
-            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            goneUnless="@{viewModel.loading}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

@@ -6,8 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
@@ -17,19 +16,13 @@ import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
 import com.topjohnwu.magisk.ktx.addVerticalPadding
 import com.topjohnwu.magisk.ktx.fixEdgeEffect
 import com.topjohnwu.magisk.ktx.hideKeyboard
-import com.topjohnwu.magisk.utils.MotionRevealHelper
 
 class DenyListFragment : BaseUIFragment<DenyListViewModel, FragmentDenyMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_deny_md2
     override val viewModel by viewModel<DenyListViewModel>()
 
-    private var isFilterVisible
-        get() = binding.processFilter.isVisible
-        set(value) {
-            if (!value) hideKeyboard()
-            MotionRevealHelper.withViews(binding.processFilter, binding.filterToggle, value)
-        }
+    private lateinit var searchView: SearchView
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -40,12 +33,6 @@ class DenyListFragment : BaseUIFragment<DenyListViewModel, FragmentDenyMd2Bindin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.filterToggle.setOnClickListener {
-            isFilterVisible = true
-        }
-        binding.appFilterInclude.filterDone.setOnClickListener {
-            isFilterVisible = false
-        }
         binding.appList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
@@ -66,36 +53,56 @@ class DenyListFragment : BaseUIFragment<DenyListViewModel, FragmentDenyMd2Bindin
             bottom = l_50,
         )
         binding.appList.fixEdgeEffect()
-
-        val lama = binding.appList.layoutManager ?: return
-        lama.isAutoMeasureEnabled = false
     }
 
     override fun onPreBind(binding: FragmentDenyMd2Binding) = Unit
 
     override fun onBackPressed(): Boolean {
-        if (isFilterVisible) {
-            isFilterVisible = false
+        if (searchView.isIconfiedByDefault && !searchView.isIconified) {
+            searchView.isIconified = true
             return true
         }
         return super.onBackPressed()
     }
 
-    // ---
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_hide_md2, menu)
+        inflater.inflate(R.menu.menu_deny_md2, menu)
+        searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView.queryHint = searchView.context.getString(R.string.hide_filter_hint)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                viewModel.query = query ?: ""
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                viewModel.query = newText ?: ""
+                return true
+            }
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_focus_up -> binding.appList
-                .takeIf { (it.layoutManager as? LinearLayoutManager)?.findFirstVisibleItemPosition() ?: 0 > 10 }
-                ?.also { it.scrollToPosition(10) }
-                .let { binding.appList }
-                .also { it.post { it.smoothScrollToPosition(0) } }
+            R.id.action_show_system -> {
+                val check = !item.isChecked
+                viewModel.isShowSystem = check
+                item.isChecked = check
+                return true
+            }
+            R.id.action_show_OS -> {
+                val check = !item.isChecked
+                viewModel.isShowOS = check
+                item.isChecked = check
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val showSystem = menu.findItem(R.id.action_show_system)
+        val showOS = menu.findItem(R.id.action_show_OS)
+        showOS.isEnabled = showSystem.isChecked
+    }
 }
