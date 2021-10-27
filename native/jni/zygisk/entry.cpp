@@ -70,8 +70,9 @@ static void zygisk_cleanup_wait() {
 
 #define SECOND_STAGE_PTR "ZYGISK_PTR"
 
-static void second_stage_entry(void *handle, char *path) {
+static void second_stage_entry(void *handle, const char *tmp, char *path) {
     self_handle = handle;
+    MAGISKTMP = tmp;
     unsetenv(INJECT_ENV_2);
     unsetenv(SECOND_STAGE_PTR);
 
@@ -101,6 +102,8 @@ static void first_stage_entry() {
     ZLOGD("inject 1st stage\n");
 
     char *ld = getenv("LD_PRELOAD");
+    char tmp[128];
+    strlcpy(tmp, getenv("MAGISKTMP"), sizeof(tmp));
     char *path;
     if (char *c = strrchr(ld, ':')) {
         *c = '\0';
@@ -111,6 +114,7 @@ static void first_stage_entry() {
         path = strdup(ld);
     }
     unsetenv(INJECT_ENV_1);
+    unsetenv("MAGISKTMP");
     sanitize_environ();
 
     // Update path to 2nd stage lib
@@ -128,7 +132,7 @@ static void first_stage_entry() {
     char *env = getenv(SECOND_STAGE_PTR);
     decltype(&second_stage_entry) second_stage;
     sscanf(env, "%p", &second_stage);
-    second_stage(handle, path);
+    second_stage(handle, tmp, path);
 }
 
 __attribute__((constructor))
@@ -308,7 +312,7 @@ static void setup_files(int client, const sock_cred *cred) {
     string path = MAGISKTMP + "/" ZYGISKBIN "/zygisk." + basename(buf);
     cp_afc(buf, (path + ".1.so").data());
     cp_afc(buf, (path + ".2.so").data());
-    write_string(client, path);
+    write_string(client, MAGISKTMP);
 }
 
 static void magiskd_passthrough(int client) {

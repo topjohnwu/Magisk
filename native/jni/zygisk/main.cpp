@@ -69,8 +69,12 @@ int app_process_main(int argc, char *argv[]) {
             if (app_proc_fd < 0)
                 break;
 
-            string path = read_string(socket);
-            string lib = path + ".1.so";
+            string tmp = read_string(socket);
+#if defined(__LP64__)
+            string lib = tmp + "/" ZYGISKBIN "/zygisk.app_process64.1.so";
+#else
+            string lib = tmp + "/" ZYGISKBIN "/zygisk.app_process32.1.so";
+#endif
             if (char *ld = getenv("LD_PRELOAD")) {
                 char env[256];
                 sprintf(env, "%s:%s", ld, lib.data());
@@ -79,6 +83,7 @@ int app_process_main(int argc, char *argv[]) {
                 setenv("LD_PRELOAD", lib.data(), 1);
             }
             setenv(INJECT_ENV_1, "1", 1);
+            setenv("MAGISKTMP", tmp.data(), 1);
 
             close(socket);
 
