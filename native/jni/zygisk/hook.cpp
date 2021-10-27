@@ -18,8 +18,8 @@ using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
 // Extreme verbose logging
-#define ZLOGV(...) ZLOGD(__VA_ARGS__)
-//#define ZLOGV(...)
+//#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+#define ZLOGV(...)
 
 namespace {
 
@@ -491,7 +491,7 @@ static int hook_register(const char *path, const char *symbol, void *new_func, v
 
 void hook_functions() {
 #if MAGISK_DEBUG
-    xhook_enable_debug(1);
+    // xhook_enable_debug(1);
     xhook_enable_sigsegv_protection(0);
 #endif
     default_new(xhook_list);
