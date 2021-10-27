@@ -5,6 +5,7 @@
 #include <selinux.hpp>
 
 #include "su.hpp"
+#include "daemon.hpp"
 
 using namespace std;
 
@@ -15,11 +16,11 @@ enum {
 };
 
 #define CALL_PROVIDER \
-"/system/bin/app_process", "/system/bin", "com.android.commands.content.Content", \
+exe, "/system/bin", "com.android.commands.content.Content", \
 "call", "--uri", target, "--user", user, "--method", action
 
 #define START_ACTIVITY \
-"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+exe, "/system/bin", "com.android.commands.am.Am", \
 "start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
 "-f", "0x18000020", "--es", "action", action
 
@@ -100,9 +101,20 @@ static bool check_no_error(int fd) {
 
 static void exec_cmd(const char *action, vector<Extra> &data,
                      const shared_ptr<su_info> &info, int mode = CONTENT_PROVIDER) {
+    char exe[128];
     char target[128];
     char user[4];
-    sprintf(user, "%d", get_user(info));
+    snprintf(user, sizeof(user), "%d", get_user(info));
+
+    if (zygisk_enabled) {
+#if defined(__LP64__)
+        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_64);
+#else
+        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
+#endif
+    } else {
+        strlcpy(exe, "/system/bin/app_process", sizeof(exe));
+    }
 
     // First try content provider call method
     if (mode >= CONTENT_PROVIDER) {

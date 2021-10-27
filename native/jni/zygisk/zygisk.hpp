@@ -47,4 +47,3 @@ void hook_functions();
 bool unhook_functions();
 std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info);
 int remote_request_unmount();
-void connect_companion(int client, bool is_64_bit);

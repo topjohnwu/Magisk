@@ -157,6 +157,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         reboot();
         break;
     case ZYGISK_REQUEST:
+    case ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
         break;
     default:

@@ -550,18 +550,21 @@ struct module_info {
 };
 
 static vector<module_info> *modules;
+int app_process_32 = -1;
+int app_process_64 = -1;
 
-#define mount_zygisk(bit) \
-if (access("/system/bin/app_process" #bit, F_OK) == 0) { \
-    string zbin = zygisk_bin + "/app_process" #bit;      \
-    string mbin = MAGISKTMP + "/magisk" #bit;            \
-    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);  \
-    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0); \
-    xsendfile(out, src, nullptr, INT_MAX);               \
-    close(src);           \
-    close(out);           \
-    clone_attr("/system/bin/app_process" #bit, zbin.data());    \
-    bind_mount(zbin.data(), "/system/bin/app_process" #bit);    \
+#define mount_zygisk(bit)                                                               \
+if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
+    app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
+    string zbin = zygisk_bin + "/app_process" #bit;                                     \
+    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
+    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
+    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
+    xsendfile(out, src, nullptr, INT_MAX);                                              \
+    close(src);                                                                         \
+    close(out);                                                                         \
+    clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
+    bind_mount(zbin.data(), "/system/bin/app_process" #bit);                            \
 }
 
 void magic_mount() {

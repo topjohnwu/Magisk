@@ -1,4 +1,5 @@
 #include <dlfcn.h>
+#include <sys/mount.h>
 #include <xhook.h>
 #include <bitset>
 
@@ -141,6 +142,16 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
 // Skip actual fork and return cached result if applicable
 DCL_HOOK_FUNC(int, fork) {
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
+}
+
+// Unmount app_process overlays in the process's private mount namespace
+DCL_HOOK_FUNC(int, unshare, int flags) {
+    int res = old_unshare(flags);
+    if (g_ctx && res == 0) {
+        umount2("/system/bin/app_process64", MNT_DETACH);
+        umount2("/system/bin/app_process32", MNT_DETACH);
+    }
+    return res;
 }
 
 // This is the latest point where we can still connect to the magiskd main socket
@@ -501,6 +512,7 @@ void hook_functions() {
     default_new(jni_method_map);
 
     XHOOK_REGISTER(ANDROID_RUNTIME, fork);
+    XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
     XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
     XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
     XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);

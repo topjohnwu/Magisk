@@ -1,7 +1,5 @@
 #include <libgen.h>
 #include <dlfcn.h>
-#include <sys/mount.h>
-#include <sys/sendfile.h>
 #include <sys/prctl.h>
 #include <android/log.h>
 
@@ -145,37 +143,7 @@ static void zygisk_init() {
     }
 }
 
-// Start code for magiskd IPC
-
-int app_process_main(int argc, char *argv[]) {
-    android_logging();
-
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_SETUP);
-
-        if (read_int(fd) == 0) {
-            string path = read_string(fd);
-            string lib = path + ".1.so";
-            if (char *ld = getenv("LD_PRELOAD")) {
-                char env[256];
-                sprintf(env, "%s:%s", ld, lib.data());
-                setenv("LD_PRELOAD", env, 1);
-            } else {
-                setenv("LD_PRELOAD", lib.data(), 1);
-            }
-            setenv(INJECT_ENV_1, "1", 1);
-        }
-        close(fd);
-    }
-
-    // Execute real app_process
-    char buf[256];
-    xreadlink("/proc/self/exe", buf, sizeof(buf));
-    xumount2("/proc/self/exe", MNT_DETACH);
-    execve(buf, argv, environ);
-    return 1;
-}
+// The following code runs in zygote/app process
 
 static int zygisk_log(int prio, const char *fmt, va_list ap) {
     // If we don't have log pipe set, ask magiskd for it
@@ -248,6 +216,50 @@ static bool get_exe(int pid, char *buf, size_t sz) {
     return xreadlink(buf, buf, sz) > 0;
 }
 
+static int zygiskd_sockets[] = { -1, -1 };
+#define zygiskd_socket zygiskd_sockets[is_64_bit]
+
+static void connect_companion(int client, bool is_64_bit) {
+    if (zygiskd_socket >= 0) {
+        // Make sure the socket is still valid
+        pollfd pfd = { zygiskd_socket, 0, 0 };
+        poll(&pfd, 1, 0);
+        if (pfd.revents) {
+            // Any revent means error
+            close(zygiskd_socket);
+            zygiskd_socket = -1;
+        }
+    }
+    if (zygiskd_socket < 0) {
+        int fds[2];
+        socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds);
+        zygiskd_socket = fds[0];
+        if (fork_dont_care() == 0) {
+            string exe = MAGISKTMP + "/magisk" + (is_64_bit ? "64" : "32");
+            // This fd has to survive exec
+            fcntl(fds[1], F_SETFD, 0);
+            char buf[16];
+            snprintf(buf, sizeof(buf), "%d", fds[1]);
+            execl(exe.data(), "zygisk", "companion", buf, (char *) nullptr);
+            exit(-1);
+        }
+        close(fds[1]);
+        vector<int> module_fds = zygisk_module_fds(is_64_bit);
+        send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
+        // Wait for ack
+        if (read_int(zygiskd_socket) != 0) {
+            return;
+        }
+    }
+    send_fd(zygiskd_socket, client);
+}
+
+static timespec last_zygote_start;
+static int zygote_start_counts[] = { 0, 0 };
+#define zygote_start_count zygote_start_counts[is_64_bit]
+#define zygote_started (zygote_start_counts[0] + zygote_start_counts[1])
+#define zygote_start_reset(val) { zygote_start_counts[0] = val; zygote_start_counts[1] = val; }
+
 static void setup_files(int client, const sock_cred *cred) {
     LOGD("zygisk: setup files for pid=[%d]\n", cred->pid);
 
@@ -257,13 +269,52 @@ static void setup_files(int client, const sock_cred *cred) {
         return;
     }
 
+    bool is_64_bit = str_ends(buf, "64");
+
+    if (!zygote_started) {
+        // First zygote launch, record time
+        clock_gettime(CLOCK_MONOTONIC, &last_zygote_start);
+    }
+
+    if (zygote_start_count) {
+        // This zygote ABI had started before, kill existing zygiskd
+        close(zygiskd_sockets[0]);
+        close(zygiskd_sockets[1]);
+        zygiskd_sockets[0] = -1;
+        zygiskd_sockets[1] = -1;
+    }
+    ++zygote_start_count;
+
+    if (zygote_start_count >= 5) {
+        // Bootloop prevention
+        timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        if (ts.tv_sec - last_zygote_start.tv_sec > 60) {
+            // This is very likely manual soft reboot
+            memcpy(&last_zygote_start, &ts, sizeof(ts));
+            zygote_start_reset(1);
+        } else {
+            // If any zygote relaunched more than 5 times within a minute,
+            // don't do any setups further to prevent bootloop.
+            zygote_start_reset(999);
+            write_int(client, 1);
+            return;
+        }
+    }
+
     write_int(client, 0);
+    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 
     string path = MAGISKTMP + "/" ZYGISKBIN "/zygisk." + basename(buf);
     cp_afc(buf, (path + ".1.so").data());
     cp_afc(buf, (path + ".2.so").data());
-
     write_string(client, path);
+}
+
+static void magiskd_passthrough(int client) {
+    bool is_64_bit = read_int(client);
+    write_int(client, 0);
+    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 }
 
 int cached_manager_app_id = -1;
@@ -343,6 +394,9 @@ void zygisk_handler(int client, const sock_cred *cred) {
     switch (code) {
     case ZYGISK_SETUP:
         setup_files(client, cred);
+        break;
+    case ZYGISK_PASSTHROUGH:
+        magiskd_passthrough(client);
         break;
     case ZYGISK_GET_INFO:
         get_process_info(client, cred);
