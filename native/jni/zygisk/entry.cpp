@@ -202,17 +202,6 @@ std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info) {
     return fds;
 }
 
-int remote_request_unmount() {
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_UNMOUNT);
-        int ret = read_int(fd);
-        close(fd);
-        return ret;
-    }
-    return DAEMON_ERROR;
-}
-
 // The following code runs in magiskd
 
 static bool get_exe(int pid, char *buf, size_t sz) {
@@ -373,15 +362,6 @@ static void get_process_info(int client, const sock_cred *cred) {
     }
 }
 
-static void do_unmount(int client, const sock_cred *cred) {
-    if (denylist_enabled) {
-        LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
-        revert_daemon(cred->pid, client);
-    } else {
-        write_int(client, DENY_NOT_ENFORCED);
-    }
-}
-
 static void send_log_pipe(int fd) {
     // There is race condition here, but we can't really do much about it...
     if (logd_fd >= 0) {
@@ -404,9 +384,6 @@ void zygisk_handler(int client, const sock_cred *cred) {
         break;
     case ZYGISK_GET_INFO:
         get_process_info(client, cred);
-        break;
-    case ZYGISK_UNMOUNT:
-        do_unmount(client, cred);
         break;
     case ZYGISK_GET_LOG_PIPE:
         send_log_pipe(client);

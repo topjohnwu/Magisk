@@ -10,6 +10,7 @@
 #include "zygisk.hpp"
 #include "memory.hpp"
 #include "module.hpp"
+#include "deny/deny.hpp"
 
 using namespace std;
 using jni_hook::hash_map;
@@ -50,7 +51,6 @@ struct HookContext {
     HookContext() : pid(-1), info{} {}
 
     static void close_fds();
-    void toggle_unmount();
 
     DCL_PRE_POST(fork)
     void run_modules_pre(const vector<int> &fds);
@@ -144,25 +144,18 @@ DCL_HOOK_FUNC(int, fork) {
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
 
-// Unmount app_process overlays in the process's private mount namespace
+// Unmount stuffs in the process's private mount namespace
 DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && res == 0) {
-        umount2("/system/bin/app_process64", MNT_DETACH);
-        umount2("/system/bin/app_process32", MNT_DETACH);
-    }
-    return res;
-}
-
-// This is the latest point where we can still connect to the magiskd main socket
-DCL_HOOK_FUNC(int, selinux_android_setcontext,
-        uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
-    if (g_ctx && g_ctx->flags[UNMOUNT_FLAG]) {
-        if (remote_request_unmount() == 0) {
-            ZLOGD("mount namespace cleaned up\n");
+        if (g_ctx->flags[UNMOUNT_FLAG]) {
+            revert_unmount();
+        } else {
+            umount2("/system/bin/app_process64", MNT_DETACH);
+            umount2("/system/bin/app_process32", MNT_DETACH);
         }
     }
-    return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
+    return res;
 }
 
 // A place to clean things up before calling into zygote::ForkCommon/SpecializeCommon
@@ -313,7 +306,7 @@ void ZygiskModule::setOption(zygisk::Option opt) {
         return;
     switch (opt) {
     case zygisk::FORCE_DENYLIST_UNMOUNT:
-        g_ctx->toggle_unmount();
+        g_ctx->flags[UNMOUNT_FLAG] = true;
         break;
     case zygisk::DLCLOSE_MODULE_LIBRARY:
         unload = true;
@@ -362,13 +355,6 @@ void HookContext::close_fds() {
     close(logd_fd.exchange(-1));
 }
 
-void HookContext::toggle_unmount() {
-    if (flags[APP_SPECIALIZE]) {
-        // TODO: Handle MOUNT_EXTERNAL_NONE
-        flags[UNMOUNT_FLAG] = args->mount_external != 0;
-    }
-}
-
 // -----------------------------------------------------------------
 
 void HookContext::nativeSpecializeAppProcess_pre() {
@@ -383,8 +369,9 @@ void HookContext::nativeSpecializeAppProcess_pre() {
 
     auto module_fds = remote_get_info(args->uid, process, &info);
     if (info.on_denylist) {
+        // TODO: Handle MOUNT_EXTERNAL_NONE on older platforms
         ZLOGI("[%s] is on the denylist\n", process);
-        toggle_unmount();
+        flags[UNMOUNT_FLAG] = true;
     } else {
         run_modules_pre(module_fds);
     }
@@ -513,7 +500,6 @@ void hook_functions() {
 
     XHOOK_REGISTER(ANDROID_RUNTIME, fork);
     XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
-    XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
     XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
     XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
     hook_refresh();
