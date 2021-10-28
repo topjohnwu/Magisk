@@ -79,9 +79,7 @@ public:
     bool operator!=(const stateless_allocator&) { return false; }
 };
 
-int parse_int(const char *s);
-static inline int parse_int(const std::string &s) { return parse_int(s.data()); }
-static inline int parse_int(std::string_view s) { return parse_int(s.data()); }
+int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
 int new_daemon_thread(thread_entry entry, void *arg = nullptr);

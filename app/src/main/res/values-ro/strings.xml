@@ -10,6 +10,7 @@
     <string name="section_home">Start</string>
     <string name="section_theme">Teme</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Listă de refuzări</string>
 
     <!--Home-->
     <string name="no_connection">Nu există conexiune disponibilă</string>
@@ -144,6 +145,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalizat</string>
     <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
+    <string name="settings_zygisk_summary">Rulează părți ale Magisk în daemonul zygote</string>
+    <string name="settings_denylist_title">Impune lista de refuzări</string>
+    <string name="settings_denylist_summary">Procesele din lista de refuzări vor avea toate modificările Magisk anulate</string>
+    <string name="settings_denylist_error">Această funcție necesită ca %1$s să fie activat</string>
+    <string name="settings_denylist_config_title">Configurează lista de refuzări</string>
+    <string name="settings_denylist_config_summary">Selectează procesele care vor fi incluse în lista de refuzări</string>
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
     <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor adblock</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
@@ -182,7 +189,7 @@
     <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească cereri</string>
     <string name="user_indepenent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
 
-    <string name="mount_namespace_mode">Modul spațiului de nume pentru montare</string>
+    <string name="mount_namespace_mode">Mod de montare a spațiului de nume</string>
     <string name="settings_ns_global">Spațiu de nume global</string>
     <string name="settings_ns_requester">Spațiu de nume moștenit</string>
     <string name="settings_ns_isolate">Spațiu de nume izolat</string>
@@ -235,5 +242,6 @@
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
     <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
+	<string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
 
 </resources>

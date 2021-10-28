@@ -29,10 +29,10 @@ LOCAL_SRC_FILES := \
     su/pts.cpp \
     su/su_daemon.cpp \
     zygisk/entry.cpp \
+    zygisk/main.cpp \
     zygisk/utils.cpp \
     zygisk/hook.cpp \
     zygisk/memory.cpp \
-    zygisk/companion.cpp \
     zygisk/deny/cli.cpp \
     zygisk/deny/utils.cpp \
     zygisk/deny/revert.cpp

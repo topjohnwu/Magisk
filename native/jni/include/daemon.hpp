@@ -30,6 +30,7 @@ enum : int {
     SQLITE_CMD,
     REMOVE_MODULES,
     ZYGISK_REQUEST,
+    ZYGISK_PASSTHROUGH,
     DAEMON_CODE_END,
 };
 
@@ -42,6 +43,8 @@ enum : int {
 };
 
 extern bool zygisk_enabled;
+extern int app_process_32;
+extern int app_process_64;
 
 int connect_daemon(bool create = false);
 

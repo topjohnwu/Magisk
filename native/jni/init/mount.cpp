@@ -105,12 +105,12 @@ if (access(#val, F_OK) == 0) {\
 }
 
 void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
-    if (access(cmd->dt_dir, F_OK) != 0)
+    if (access(config->dt_dir, F_OK) != 0)
         return;
 
     char cwd[128];
     getcwd(cwd, sizeof(cwd));
-    chdir(cmd->dt_dir);
+    chdir(config->dt_dir);
     run_finally cd([&]{ chdir(cwd); });
 
     if (access("fstab", F_OK) != 0)
@@ -159,7 +159,7 @@ void MagiskInit::mount_with_dt() {
         if (is_lnk(entry.mnt_point.data()))
             continue;
         // Derive partname from dev
-        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), cmd->slot);
+        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
         setup_block(true);
         xmkdir(entry.mnt_point.data(), 0755);
         xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
@@ -300,7 +300,7 @@ void SARBase::backup_files() {
 
     self = mmap_data::ro("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
-        config = mmap_data::ro("/.backup/.magisk");
+        magisk_config = mmap_data::ro("/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
@@ -320,13 +320,13 @@ void SARBase::mount_system_root() {
         if (dev >= 0)
             goto mount_root;
 
-        sprintf(blk_info.partname, "system%s", cmd->slot);
+        sprintf(blk_info.partname, "system%s", config->slot);
         dev = setup_block(false);
         if (dev >= 0)
             goto mount_root;
 
         // Poll forever if rootwait was given in cmdline
-    } while (cmd->rootwait);
+    } while (config->rootwait);
 
     // We don't really know what to do at this point...
     LOGE("Cannot find root partition, abort\n");
@@ -396,7 +396,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
 
     int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
-    xwrite(fd, config.buf, config.sz);
+    xwrite(fd, magisk_config.buf, magisk_config.sz);
     close(fd);
     fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
     xwrite(fd, self.buf, self.sz);

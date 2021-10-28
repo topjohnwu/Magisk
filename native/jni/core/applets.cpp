@@ -10,14 +10,15 @@ using namespace std;
 
 using main_fun = int (*)(int, char *[]);
 
-static main_fun applet_main[] = { su_client_main, resetprop_main, nullptr };
+constexpr const char *applets[] = { "su", "resetprop", "zygisk", nullptr };
+static main_fun applet_mains[] = { su_client_main, resetprop_main, zygisk_main, nullptr };
 
 static int call_applet(int argc, char *argv[]) {
     // Applets
     string_view base = basename(argv[0]);
-    for (int i = 0; applet_names[i]; ++i) {
-        if (base == applet_names[i]) {
-            return (*applet_main[i])(argc, argv);
+    for (int i = 0; applets[i]; ++i) {
+        if (base == applets[i]) {
+            return (*applet_mains[i])(argc, argv);
         }
     }
     if (str_starts(base, "app_process")) {

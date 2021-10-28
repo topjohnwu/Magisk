@@ -20,9 +20,7 @@ void ls_list(int client);
 // Utility functions
 bool is_deny_target(int uid, std::string_view process);
 
-// Revert
-void revert_daemon(int pid, int client);
-void revert_unmount(int pid = -1);
+void revert_unmount();
 
 extern std::atomic<bool> denylist_enabled;
 extern int cached_manager_app_id;

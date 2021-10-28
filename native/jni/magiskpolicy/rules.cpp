@@ -37,6 +37,7 @@ void sepolicy::magisk_rules() {
     allow(ALL, SEPOL_FILE_TYPE, "dir", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
 
     if (new_rules) {
         // Make client type literally untrusted_app

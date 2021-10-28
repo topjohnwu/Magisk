@@ -57,7 +57,7 @@ static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
 extern uint32_t patch_verity(void *buf, uint32_t size);
 
 void FirstStageInit::prepare() {
-    if (cmd->force_normal_boot) {
+    if (config->force_normal_boot) {
         xmkdirs(FSR "/system/bin", 0755);
         rename("/init" /* magiskinit */, FSR "/system/bin/init");
         symlink("/system/bin/init", FSR "/init");
@@ -78,7 +78,7 @@ void FirstStageInit::prepare() {
     fstab_file[0] = '\0';
 
     // Find existing fstab file
-    for (const char *suffix : { cmd->fstab_suffix, cmd->hardware, cmd->hardware_plat }) {
+    for (const char *suffix : {config->fstab_suffix, config->hardware, config->hardware_plat }) {
         if (suffix[0] == '\0')
             continue;
         for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "fstab" }) {
@@ -111,9 +111,9 @@ exit_loop:
 
         if (fstab_file[0] == '\0') {
             const char *suffix =
-                    cmd->fstab_suffix[0] ? cmd->fstab_suffix :
-                    (cmd->hardware[0] ? cmd->hardware :
-                    (cmd->hardware_plat[0] ? cmd->hardware_plat : nullptr));
+                    config->fstab_suffix[0] ? config->fstab_suffix :
+                    (config->hardware[0] ? config->hardware :
+                     (config->hardware_plat[0] ? config->hardware_plat : nullptr));
             if (suffix == nullptr) {
                 LOGE("Cannot determine fstab suffix!\n");
                 return;
@@ -241,7 +241,7 @@ void SARInit::first_stage_prep() {
         string tmp_dir = read_string(client);
         chdir(tmp_dir.data());
         int cfg = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
-        xwrite(cfg, config.buf, config.sz);
+        xwrite(cfg, magisk_config.buf, magisk_config.sz);
         close(cfg);
         restore_folder(ROOTOVL, overlays);
 

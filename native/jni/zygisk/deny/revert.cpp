@@ -2,8 +2,6 @@
 
 #include <magisk.hpp>
 #include <utils.hpp>
-#include <selinux.hpp>
-#include <resetprop.hpp>
 
 #include "deny.hpp"
 
@@ -14,23 +12,9 @@ static void lazy_unmount(const char* mountpoint) {
         LOGD("denylist: Unmounted (%s)\n", mountpoint);
 }
 
-void revert_daemon(int pid, int client) {
-    if (fork_dont_care() == 0) {
-        revert_unmount(pid);
-        write_int(client, 0);
-        _exit(0);
-    }
-}
-
 #define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && str_starts(mentry->mnt_dir, "/" #dir))
 
-void revert_unmount(int pid) {
-    if (pid > 0) {
-        if (switch_mnt_ns(pid))
-            return;
-        LOGD("denylist: handling PID=[%d]\n", pid);
-    }
-
+void revert_unmount() {
     vector<string> targets;
 
     // Unmount dummy skeletons and MAGISKTMP
