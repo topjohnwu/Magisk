@@ -285,7 +285,7 @@ void SARBase::patch_rootdir() {
     }
 
     // Patch init.rc
-    if (access("/init.rc", F_OK) == 0) {
+    if (access(NEW_INITRC, F_OK) != 0) {
         patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
     } else {
         // Android 11's new init.rc
