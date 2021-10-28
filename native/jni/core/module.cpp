@@ -726,6 +726,31 @@ static void collect_modules(bool open_zygisk) {
         info.name = entry->d_name;
         modules->push_back(info);
     });
+    if (zygisk_enabled) {
+        bool use_memfd = true;
+        auto convert_to_memfd = [&](int fd) -> int {
+            if (fd < 0)
+                return -1;
+            if (use_memfd) {
+                int memfd = syscall(__NR_memfd_create, "jit-cache", MFD_CLOEXEC);
+                if (memfd >= 0) {
+                    xsendfile(memfd, fd, nullptr, INT_MAX);
+                    close(fd);
+                    return memfd;
+                } else {
+                    // memfd_create failed, just use what we had
+                    use_memfd = false;
+                }
+            }
+            return fd;
+        };
+        std::for_each(modules->begin(), modules->end(), [&](module_info &info) {
+            info.z32 = convert_to_memfd(info.z32);
+#if defined(__LP64__)
+            info.z64 = convert_to_memfd(info.z64);
+#endif
+        });
+    }
 }
 
 void handle_modules() {
