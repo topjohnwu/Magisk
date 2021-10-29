@@ -343,11 +343,16 @@ void RootFSBase::patch_rootfs() {
     }
 
     if (patch_sepolicy("/sepolicy")) {
-        auto init = mmap_data::ro(access("/system/bin/init",F_OK) == 0 ? "/system/bin/init" : "/init");
-        init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
-        int dest = xopen("/init", O_TRUNC | O_WRONLY | O_CLOEXEC, 0);
-        xwrite(dest, init.buf, init.sz);
-        close(dest);
+        if (access("/system/bin/init", F_OK) == 0) {
+            auto init = mmap_data::ro("/system/bin/init");
+            init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
+            int dest = xopen("/init", O_TRUNC | O_WRONLY | O_CLOEXEC, 0);
+            xwrite(dest, init.buf, init.sz);
+            close(dest);
+        } else {
+            auto init = mmap_data::rw("/init");
+            init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
+        }
     }
 
     // Handle overlays
