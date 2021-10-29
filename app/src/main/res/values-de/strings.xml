@@ -3,13 +3,14 @@
     <!--Sections-->
     <string name="modules">Module</string>
     <string name="superuser">Superuser</string>
-    <string name="logs">Logs</string>
+    <string name="logs">Protokolle</string>
     <string name="settings">Einstellungen</string>
     <string name="refresh">Lokale Dateien aktualisieren</string>
     <string name="install">Installieren</string>
     <string name="section_home">Startseite</string>
     <string name="section_theme">Themen</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Verweigerungsliste</string>
 
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
@@ -21,14 +22,14 @@
     <string name="home_package">Paket</string>
     <string name="home_app_title">App</string>
 
-    <string name="home_notice_content">Laden sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
+    <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
     <string name="home_installed_version">Installiert</string>
     <string name="home_latest_version">Neueste</string>
     <string name="invalid_update_channel">Ungültiger Update-Kanal</string>
-    <string name="uninstall_magisk_title">Deinstalliere Magisk</string>
+    <string name="uninstall_magisk_title">Magisk deinstallieren</string>
     <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nIhre Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>
     <string name="home_check_safetynet">SafetyNet überprüfen</string>
 
@@ -42,7 +43,7 @@
     <string name="install_start">Los geht\'s</string>
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
-    <string name="install_inactive_slot">Installiere in inaktiven Slot (Nach OTA)</string>
+    <string name="install_inactive_slot">In inaktiven Slot installieren (nach OTA)</string>
     <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
@@ -81,8 +82,8 @@
     <string name="superuser_policy_none">Bisher hat noch keine App um die Erlaubnis des Superusers gebeten.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Sie sind protokollfrei, versuchen Sie, Ihre SU-fähigen Apps mehr zu nutzen.</string>
-    <string name="log_data_magisk_none">Die Magisk-Protokolle sind leer, das ist seltsam.</string>
+    <string name="log_data_none">Sie sind protokollfrei, versuchen Sie Ihre SU-fähigen Apps mehr zu nutzen.</strin
+    <string name="log_data_magisk_none">Magisk-Protokolle sind leer, das ist seltsam.</string>
     <string name="menuSaveLog">Protokoll speichern</string>
     <string name="menuClearLog">Protokoll jetzt löschen</string>
     <string name="logs_cleared">Protokoll erfolgreich gelöscht.</string>
@@ -92,7 +93,7 @@
     <!--SafetyNet-->
     <string name="safetynet_api_error">SafetyNet API Fehler</string>
     <string name="safetynet_res_invalid">Die Antwort ist ungültig</string>
-    <string name="safetynet_attest_success">Erfolg!</string>
+    <string name="safetynet_attest_success">Erfolgreich!</string>
     <string name="safetynet_attest_failure">Bestätigung fehlgeschlagen!</string>
     <string name="safetynet_attest_loading">Einen Moment…</string>
     <string name="safetynet_attest_restart">Erneut versuchen</string>
@@ -113,7 +114,7 @@
     <string name="reboot_download">Neustart zum Download</string>
     <string name="reboot_edl">Neustart zum EDL</string>
     <string name="module_version_author">%1$s von %2$s</string>
-    <string name="module_section_pending">Aktualisierungen</string>
+    <string name="module_section_pending">Updates</string>
     <string name="module_section_pending_action">Alle aktualisieren</string>
     <string name="module_state_remove">Entfernen</string>
     <string name="module_state_restore">Wiederherstellen</string>
@@ -131,24 +132,30 @@
     <string name="settings_dark_mode_dark">Immer dunkel</string>
     <string name="settings_download_path_title">Download-Verzeichnis</string>
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
-    <string name="settings_hide_app_title">Verstecke die Magisk App</string>
-    <string name="settings_hide_app_summary">Installiere eine Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label</string>
-    <string name="settings_restore_app_title">Stelle die Magisk App wiederher</string>
-    <string name="settings_restore_app_summary">Blende die App wieder ein und stelle die original APK wieder her</string>
+    <string name="settings_hide_app_title">Magisk-App verstecken</string>
+    <string name="settings_hide_app_summary">Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label installieren</string>
+   <string name="settings_restore_app_title">Magisk-App wiederherstellen</string>
+    <string name="settings_restore_app_summary">App wieder einblenden und original APK wiederherstellen</string>
     <string name="language">Sprache</string>
     <string name="system_default">Systemstandard</string>
-    <string name="settings_check_update_title">Auf Aktualisierungen prüfen</string>
+    <string name="settings_check_update_title">Auf Updates prüfen</string>
     <string name="settings_check_update_summary">Regelmäßig im Hintergrund auf Aktualisierungen prüfen</string>
     <string name="settings_update_channel_title">Aktualisierungs-Kanal</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
-    <string name="settings_update_custom_msg">Eine benutzerdefinierte URL eingeben</string>
+    <string name="settings_update_custom_msg">Benutzerdefinierte URL einfügen</string>
+    <string name="settings_zygisk_summary">Teile von Magisk im Zygoten-Daemon ausführen</string>
+    <string name="settings_denylist_title">Verweigerungsliste erzwingen</string>
+    <string name="settings_denylist_summary">Bei Prozessen, die auf der Verweigerungsliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
+    <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
+    <string name="settings_denylist_config_title">Verweigerungsliste konfigurieren</string>
+    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Verweigerungsliste aufgenommen werden sollen</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemloses Hosts-Modul hinzugefügt</string>
     <string name="settings_app_name_hint">Neuer Name</string>
-    <string name="settings_app_name_helper">Die App wird unter diesem Namen neu gepackt</string>
+    <string name="settings_app_name_helper">App wird unter diesem Namen neu gepackt</string>
     <string name="settings_app_name_error">Ungültiges Format</string>
     <string name="settings_su_app_adb">Apps und ADB</string>
     <string name="settings_su_app">Nur Apps</string>
@@ -194,7 +201,7 @@
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Fortschrittsmitteilungen</string>
     <string name="download_complete">Download abgeschlossen</string>
-    <string name="download_file_error">Fehler beim herunterladen der Datei</string>
+    <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="magisk_update_title">Magisk Update verfügbar!</string>
 
     <!--Toasts, Dialogs-->
@@ -209,7 +216,7 @@
     <string name="flashing">Flashen…</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-    <string name="hide_app_title">Verstecke die Magisk App…</string>
+   <string name="hide_app_title">Magisk-App verstecken…</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
@@ -224,10 +231,17 @@
     <string name="setup_msg">Laufzeitumgebung einrichten…</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
-    <string name="unsupport_magisk_msg">Diese Version der App unterstütz keine Magisk version niedriger, als %1$s.\n\nDie App wird sich verhalten, als wäre Magisk nicht installiert, bitte aktualisiere Magisk so schnell, wie möglich.</string>
+    <string name="unsupport_magisk_msg">Diese App-Version unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre. Bitte Magisk so bald wie möglich aktualisieren.</string>
+    <string name="unsupport_general_title">Abnormaler Zustand</string>
+    <string name="unsupport_system_app_msg">Ausführung dieser App als System-App wird nicht unterstützt. App bitte in eine Benutzer-App umwandeln.</string>
+    <string name="unsupport_other_su_msg">Es wurde ein \"su\"-Befehl erkannt, der nicht zu Magisk gehört. Das andere nicht unterstützte \"su\" bitte entfernen.</string>
+    <string name="unsupport_external_storage_msg">Magisk ist auf einem externen Speicher installiert. Die App bitte in internen Speicher verschieben.</string>
+    <string name="unsupport_nonroot_stub_msg">App kann im versteckten Zustand nicht weiter funktionieren, da Root verloren gegangen ist. Ursprüngliche APK bitte wiederherstellen.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
-    <string name="add_shortcut_msg">Nachdem du diese App versteckst, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
+    <string name="add_shortcut_msg">Nachdem Sie diese App verstecken, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten Sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
+    <string name="reboot_apply_change">Neustart zum Änderungen übernehmen</string>
 
 </resources>
