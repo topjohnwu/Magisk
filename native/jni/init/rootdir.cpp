@@ -285,12 +285,12 @@ void SARBase::patch_rootdir() {
     }
 
     // Patch init.rc
-    if (access("/init.rc", F_OK) == 0) {
-        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
-    } else {
+    if (access(NEW_INITRC, F_OK) == 0) {
         // Android 11's new init.rc
         xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
         patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data());
+    } else {
+        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());        
     }
 
     // Extract magisk
