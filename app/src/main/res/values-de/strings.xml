@@ -150,7 +150,7 @@
     <string name="settings_denylist_summary">Bei Prozessen, die auf der Verweigerungsliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
     <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
     <string name="settings_denylist_config_title">Verweigerungsliste konfigurieren</string>
-    <string name="settings_update_custom_msg">Eine benutzerdefinierte URL eingeben</string>
+    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Verweigerungsliste aufgenommen werden sollen</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemloses Hosts-Modul hinzugefügt</string>
