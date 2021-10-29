@@ -10,6 +10,7 @@
     <string name="section_home">Startseite</string>
     <string name="section_theme">Themen</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Verweigerungsliste</string>
 
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
@@ -143,6 +144,12 @@
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Benutzerdefiniert</string>
+    <string name="settings_update_custom_msg">Benutzerdefinierte URL einfügen</string>
+    <string name="settings_zygisk_summary">Teile von Magisk im Zygoten-Daemon ausführen</string>
+    <string name="settings_denylist_title">Verweigerungsliste erzwingen</string>
+    <string name="settings_denylist_summary">Bei Prozessen, die auf der Verweigerungsliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
+    <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
+    <string name="settings_denylist_config_title">Verweigerungsliste konfigurieren</string>
     <string name="settings_update_custom_msg">Eine benutzerdefinierte URL eingeben</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
@@ -225,9 +232,15 @@
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
     <string name="unsupport_magisk_msg">Diese Version der App unterstütz keine Magisk version niedriger, als %1$s.\n\nDie App wird sich verhalten, als wäre Magisk nicht installiert, bitte aktualisiere Magisk so schnell, wie möglich.</string>
+    <string name="unsupport_general_title">Abnormaler Zustand</string>
+    <string name="unsupport_system_app_msg">Ausführung dieser App als System-App wird nicht unterstützt. App bitte in eine Benutzer-App umwandeln.</string>
+    <string name="unsupport_other_su_msg">Es wurde ein \"su\"-Befehl erkannt, der nicht zu Magisk gehört. Das andere nicht unterstützte \"su\" bitte entfernen.</string>
+    <string name="unsupport_external_storage_msg">Magisk ist auf einem externen Speicher installiert. Die App bitte in internen Speicher verschieben.</string>
+    <string name="unsupport_nonroot_stub_msg">App kann im versteckten Zustand nicht weiter funktionieren, da Root verloren gegangen ist. Ursprüngliche APK bitte wiederherstellen.</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
     <string name="add_shortcut_msg">Nachdem du diese App versteckst, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
+    <string name="reboot_apply_change">Neustart zum Änderungen übernehmen</string>
 
 </resources>
