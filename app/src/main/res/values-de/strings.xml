@@ -82,7 +82,7 @@
     <string name="superuser_policy_none">Bisher hat noch keine App um die Erlaubnis des Superusers gebeten.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Sie sind protokollfrei, versuchen Sie Ihre SU-fähigen Apps mehr zu nutzen.</strin
+    <string name="log_data_none">Sie sind protokollfrei, versuchen Sie Ihre SU-fähigen Apps mehr zu nutzen.</string>
     <string name="log_data_magisk_none">Magisk-Protokolle sind leer, das ist seltsam.</string>
     <string name="menuSaveLog">Protokoll speichern</string>
     <string name="menuClearLog">Protokoll jetzt löschen</string>
