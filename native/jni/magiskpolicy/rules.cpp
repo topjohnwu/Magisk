@@ -39,6 +39,7 @@ void sepolicy::magisk_rules() {
     allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "sock_file", ALL);
 
     if (new_rules) {
         // Make client type literally untrusted_app
@@ -62,7 +63,6 @@ void sepolicy::magisk_rules() {
             allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
             allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
             allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
-            allowxperm(SEPOL_CLIENT_DOMAIN, type, "chr_file", "0x5404");
         }
 
         // Allow these processes to access MagiskSU
