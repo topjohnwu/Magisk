@@ -27,11 +27,6 @@
 	public static void throw*(...);
 }
 
-# Snet
--keepclassmembers class com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback { *; }
-
 # Stub
 -keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }
 -keepclassmembers class androidx.appcompat.app.AppCompatDelegateImpl {

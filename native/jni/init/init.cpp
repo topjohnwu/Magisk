@@ -68,7 +68,7 @@ public:
 #if ENABLE_TEST
 class TestInit : public BaseInit {
 public:
-    TestInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+    TestInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {};
     void start() override {
         // Place init tests here
     }

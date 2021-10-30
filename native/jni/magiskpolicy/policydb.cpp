@@ -144,6 +144,10 @@ sepolicy *sepolicy::compile_split() {
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 
+    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
+    if (access(path, R_OK) == 0)
+        load_cil(db, path);
+
     cil_file = SYSEXT_POLICY_DIR "system_ext_sepolicy.cil";
     if (access(cil_file, R_OK) == 0)
         load_cil(db, cil_file);
