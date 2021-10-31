@@ -125,10 +125,6 @@ case $((STATUS & 3)) in
     else
       ui_print "! Boot image backup unavailable"
       ui_print "- Restoring ramdisk with internal backup"
-      if ./magiskboot cpio ramdisk.cpio "exists init.real"; then
-        # Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
-        ./magiskboot cpio ramdisk.cpio "mv .backup/init .backup/init.real"
-      fi
       ./magiskboot cpio ramdisk.cpio restore
       if ! ./magiskboot cpio ramdisk.cpio "exists init"; then
         # A only system-as-root
