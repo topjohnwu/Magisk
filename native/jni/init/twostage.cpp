@@ -61,7 +61,7 @@ void FirstStageInit::prepare() {
         xmkdirs(FSR "/system/bin", 0755);
         rename("/init" /* magiskinit */, FSR "/system/bin/init");
         symlink("/system/bin/init", FSR "/init");
-        rename("/.backup/init", "/init");
+        rename(backup_init(), "/init");
 
         rename("/.backup", FSR "/.backup");
         rename("/overlay.d", FSR "/overlay.d");
@@ -71,7 +71,7 @@ void FirstStageInit::prepare() {
         xmkdir("/system", 0755);
         xmkdir("/system/bin", 0755);
         rename("/init" /* magiskinit */ , "/system/bin/init");
-        rename("/.backup/init", "/init");
+        rename(backup_init(), "/init");
     }
 
     char fstab_file[128];
