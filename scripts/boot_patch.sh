@@ -135,6 +135,12 @@ case $((STATUS & 3)) in
     ;;
 esac
 
+# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+INIT=init
+if [ $((status & 0x4)) -ne 0 ]; then
+  INIT=init.real
+fi
+
 ##################
 # Ramdisk Patches
 ##################
@@ -175,7 +181,6 @@ fi
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
-"$SKIPSONY mv .backup/init.real .backup/init" \
 "add 000 .backup/.magisk config"
 
 rm -f ramdisk.cpio.orig config magisk*.xz

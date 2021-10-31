@@ -252,6 +252,12 @@ bool check_two_stage() {
     if (access("/system/bin/init", F_OK) == 0)
         return true;
     // If we still have no indication, parse the original init and see what's up
-    auto init = mmap_data::ro("/.backup/init");
+    auto init = mmap_data::ro(backup_init());
     return init.contains("selinux_setup");
+}
+
+const char *backup_init() {
+    if (access("/.backup/init.real", F_OK) == 0)
+        return "/.backup/init.real";
+    return "/.backup/init";
 }

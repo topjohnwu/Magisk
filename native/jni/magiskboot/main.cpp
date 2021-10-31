@@ -58,9 +58,9 @@ Supported actions:
       extract [ENTRY OUT]
         Extract ENTRY to OUT, or extract all entries to current directory
       test
-        Test the current cpio's patch status
-        Return values:
-        0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
+        Test the current cpio's status
+        Return value is 0 or bitwise or-ed of following values:
+        0x1:Magisk    0x2:unsupported    0x4:Sony
       patch
         Apply ramdisk patches
         Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT

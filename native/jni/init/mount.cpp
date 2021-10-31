@@ -289,7 +289,7 @@ void RootFSInit::early_mount() {
     self = mmap_data::ro("/init");
 
     LOGD("Restoring /init\n");
-    rename("/.backup/init", "/init");
+    rename(backup_init(), "/init");
 
     mount_with_dt();
 }
