@@ -60,7 +60,7 @@ void dyn_img_hdr::print() {
         fprintf(stderr, "%-*s [%u]\n", PADDING, "EXTRA_SZ", extra_size());
     if (ver == 1 || ver == 2)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
-    if (ver == 2)
+    if (ver == 2 || is_vendor)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
 
     if (uint32_t os_ver = os_version()) {
@@ -79,15 +79,15 @@ void dyn_img_hdr::print() {
     }
 
     fprintf(stderr, "%-*s [%u]\n", PADDING, "PAGESIZE", page_size());
-    if (ver < 3) {
-        fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", name());
+    if (char *n = name()) {
+        fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", n);
     }
     fprintf(stderr, "%-*s [%.*s%.*s]\n", PADDING, "CMDLINE",
             BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
-    if (auto chksum = reinterpret_cast<uint8_t*>(id())) {
+    if (char *checksum = id()) {
         fprintf(stderr, "%-*s [", PADDING, "CHECKSUM");
         for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
-            fprintf(stderr, "%02hhx", chksum[i]);
+            fprintf(stderr, "%02hhx", checksum[i]);
         fprintf(stderr, "]\n");
     }
 }
@@ -241,13 +241,13 @@ off += hdr->name##_size(); \
 off = do_align(off, hdr->page_size()); \
 }
 
-#define CMD_MATCH(s) BUFFER_MATCH(hp->cmdline, s)
+#define CMD_MATCH(s) BUFFER_MATCH(h->cmdline, s)
 
 void boot_img::parse_image(uint8_t *addr, format_t type) {
-    auto hp = reinterpret_cast<boot_img_hdr*>(addr);
+    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
     if (type == AOSP_VENDOR) {
         fprintf(stderr, "VENDOR_BOOT_HDR\n");
-        switch (hp->header_version) {
+        switch (h->header_version) {
         case 4:
             hdr = new dyn_img_vnd_v4(addr);
             break;
@@ -256,7 +256,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             hdr = new dyn_img_vnd_v3(addr);
             break;
         }
-    } else if (hp->page_size >= 0x02000000) {
+    } else if (h->page_size >= 0x02000000) {
         fprintf(stderr, "PXA_BOOT_HDR\n");
         hdr = new dyn_img_pxa(addr);
     } else {
@@ -268,13 +268,13 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             flags[NOOKHD_FLAG] = true;
             fprintf(stderr, "NOOKHD_LOADER\n");
             addr += NOOKHD_PRE_HEADER_SZ;
-        } else if (memcmp(hp->name, ACCLAIM_MAGIC, 10) == 0) {
+        } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
             flags[ACCLAIM_FLAG] = true;
             fprintf(stderr, "ACCLAIM_LOADER\n");
             addr += ACCLAIM_PRE_HEADER_SZ;
         }
 
-        switch (hp->header_version) {
+        switch (h->header_version) {
         case 1:
             hdr = new dyn_img_v1(addr);
             break;
