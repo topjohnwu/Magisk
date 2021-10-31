@@ -273,22 +273,22 @@ void entry_impl(api_table *table, JNIEnv *env) {
 
 } // namespace internal
 
-int Api::connectCompanion() {
+inline int Api::connectCompanion() {
     return impl->connectCompanion(impl->_this);
 }
-void Api::setOption(Option opt) {
+inline void Api::setOption(Option opt) {
     impl->setOption(impl->_this, opt);
 }
-void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
+inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     impl->hookJniNativeMethods(env, className, methods, numMethods);
 }
-void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
+inline void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
     impl->pltHookRegister(regex, symbol, newFunc, oldFunc);
 }
-void Api::pltHookExclude(const char *regex, const char *symbol) {
+inline void Api::pltHookExclude(const char *regex, const char *symbol) {
     impl->pltHookExclude(regex, symbol);
 }
-bool Api::pltHookCommit() {
+inline bool Api::pltHookCommit() {
     return impl->pltHookCommit();
 }
 
