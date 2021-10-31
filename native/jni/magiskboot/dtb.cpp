@@ -141,8 +141,22 @@ static bool dtb_patch(const char *file) {
         fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
         if (fdt == nullptr)
             break;
+        int node;
+        // Patch the chosen node for bootargs
+        fdt_for_each_subnode(node, fdt, 0) {
+            if (fdt_get_name(fdt, node, nullptr) != "chosen"sv)
+                continue;
+            int len;
+            if (char *value = (char *) fdt_getprop(fdt, node, "bootargs", &len)) {
+                if (char *skip = strstr(value, "skip_initramfs")) {
+                    fprintf(stderr, "Patch [skip_initramfs] -> [want_initramfs]\n");
+                    // Don't use strcpy, we do NOT want it null terminated
+                    memcpy(skip, "want", 4);
+                    patched = true;
+                }
+            }
+        }
         if (int fstab = find_fstab(fdt); fstab >= 0) {
-            int node;
             fdt_for_each_subnode(node, fdt, fstab) {
                 if (!keep_verity) {
                     int len;
