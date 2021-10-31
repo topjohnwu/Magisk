@@ -1,15 +1,13 @@
 #include <bitset>
 #include <vector>
 #include <map>
+#include <libfdt.h>
 
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
 #include "dtb.hpp"
 #include "format.hpp"
-extern "C" {
-#include <libfdt.h>
-}
 
 using namespace std;
 
@@ -147,14 +145,14 @@ static bool dtb_patch(const char *file) {
             if (fdt_get_name(fdt, node, nullptr) != "chosen"sv)
                 continue;
             int len;
-            if (char *value = (char *) fdt_getprop(fdt, node, "bootargs", &len)) {
-                if (char *skip = strstr(value, "skip_initramfs")) {
+            if (auto value = fdt_getprop(fdt, node, "bootargs", &len)) {
+                if (void *skip = memmem(value, len, "skip_initramfs", 14)) {
                     fprintf(stderr, "Patch [skip_initramfs] -> [want_initramfs]\n");
-                    // Don't use strcpy, we do NOT want it null terminated
                     memcpy(skip, "want", 4);
                     patched = true;
                 }
             }
+            break;
         }
         if (int fstab = find_fstab(fdt); fstab >= 0) {
             fdt_for_each_subnode(node, fdt, fstab) {
