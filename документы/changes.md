@@ -625,16 +625,6 @@ Fully support recovery with no /data access, Magisk uninstallation with Magisk M
 - Use minimal sepolicy patch in boot image for smaller ramdisk size. Live patch policies after bootup
 - Include updated open source sepolicy injection tool (source code available), support nearly all SuperSU supolicy tool's functionality
 
-### v3
-
-- Fix bootimg-extract for Exynos Samsung devices (thanks to @phhusson), should fix all Samsung device issues
-- Add supolicy back to patch sepolicy (stock Samsung do not accept permissive domain)
-- Update sepolicy-injection to patch su domain for Samsung devices to use phh's root
-- Update root disable method, using more aggressive approach
-- Use lazy unmount to unmount root from system, should fix some issues with custom roms
-- Use the highest possible compression rate for ramdisk, hope to fix some devices with no boot partition space
-- Detect boot partition space insufficient, will abort installer instead of breaking your device
-
 ### v2
 
 - Fix verity patch. It should now work on all devices (might fix some of the unable-to-boot issues)
@@ -645,5 +635,4 @@ Fully support recovery with no /data access, Magisk uninstallation with Magisk M
 - Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
 - Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
 
-### v1
-- Initial release
+
