@@ -261,10 +261,13 @@ mount_ro_ensure() {
 
 mount_partitions() {
   # Check A/B slot
-  SLOT=`grep_cmdline androidboot.slot_suffix`
+  SLOT=`getprop ro.boot.slot_suffix`
   if [ -z $SLOT ]; then
-    SLOT=`grep_cmdline androidboot.slot`
-    [ -z $SLOT ] || SLOT=_${SLOT}
+    SLOT=`grep_cmdline androidboot.slot_suffix`
+    if [ -z $SLOT ]; then
+      SLOT=`grep_cmdline androidboot.slot`
+      [ -z $SLOT ] || SLOT=_${SLOT}
+    fi
   fi
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
