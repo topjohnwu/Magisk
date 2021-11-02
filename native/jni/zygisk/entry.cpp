@@ -40,7 +40,7 @@ static void unload_first_stage(int, siginfo_t *info, void *) {
     free(path);
     struct sigaction action{};
     action.sa_handler = SIG_DFL;
-    sigaction(SIGUSR1, &action, nullptr);
+    sigaction(SIGALRM, &action, nullptr);
 }
 
 // Make sure /proc/self/environ is sanitized
@@ -82,19 +82,20 @@ static void second_stage_entry(void *handle, const char *tmp, char *path) {
 
     // Register signal handler to unload 1st stage
     struct sigaction action{};
-    action.sa_sigaction = unload_first_stage;
-    sigaction(SIGUSR1, &action, nullptr);
+    action.sa_sigaction = &unload_first_stage;
+    action.sa_flags = SA_SIGINFO;
+    sigaction(SIGALRM, &action, nullptr);
 
     // Schedule to unload 1st stage 10us later
     timer_t timer;
     sigevent_t event{};
     event.sigev_notify = SIGEV_SIGNAL;
-    event.sigev_signo = SIGUSR1;
+    event.sigev_signo = SIGALRM;
     event.sigev_value.sival_ptr = path;
     timer_create(CLOCK_MONOTONIC, &event, &timer);
     itimerspec time{};
     time.it_value.tv_nsec = 10000L;
-    timer_settime(&timer, 0, &time, nullptr);
+    timer_settime(timer, 0, &time, nullptr);
 }
 
 static void first_stage_entry() {
