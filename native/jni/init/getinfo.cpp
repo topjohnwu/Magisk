@@ -196,7 +196,7 @@ void BootConfig::print() {
 }
 
 #define read_dt(name, key)                                          \
-snprintf(file_name, sizeof(file_name), "%s/" name, config->key);    \
+snprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
