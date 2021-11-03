@@ -335,7 +335,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         if (k_fmt == ZIMAGE) {
             z_hdr = reinterpret_cast<zimage_hdr *>(kernel);
             uint32_t end = z_hdr->end_offset;
-            if (void *gzip_offset = memmem(kernel, hdr->kernel_size(), GZIP1_MAGIC, 2)) {
+            if (void *gzip_offset = memmem(kernel, hdr->kernel_size(), GZIP1_MAGIC "\x08\x00", 4)) {
                 fprintf(stderr, "ZIMAGE_KERNEL\n");
                 z_info.hdr_sz = (uint8_t *) gzip_offset - kernel;
                 uint8_t *end_addr = kernel + z_hdr->end_offset;
@@ -347,8 +347,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
                     }
                 }
                 if (end == z_hdr->end_offset) {
-                    fprintf(stderr, "Could not find end of zImage gzip data\n");
-                    exit(1);
+                    fprintf(stderr, "Could not find end of zImage gzip data, keeping raw kernel\n");
                 } else {
                     flags[ZIMAGE_KERNEL] = true;
                     z_info.tail = kernel + end;
@@ -358,8 +357,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
                     k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
                 }
             } else {
-                fprintf(stderr, "Could not find zImage gzip data\n");
-                exit(1);
+                fprintf(stderr, "Could not find zImage gzip data, keeping raw kernel\n");
             }
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
