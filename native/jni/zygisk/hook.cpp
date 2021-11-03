@@ -140,7 +140,9 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
 }
 
 // Skip actual fork and return cached result if applicable
+// Also unload first stage zygisk if necessary
 DCL_HOOK_FUNC(int, fork) {
+    unload_first_stage();
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
 

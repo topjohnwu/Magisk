@@ -41,6 +41,7 @@ struct AppInfo {
     bool on_denylist;
 };
 
+void unload_first_stage();
 void self_unload();
 void hook_functions();
 bool unhook_functions();

@@ -34,13 +34,13 @@ void self_unload() {
     new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
 }
 
-static void unload_first_stage(int, siginfo_t *info, void *) {
-    auto path = static_cast<char *>(info->si_value.sival_ptr);
-    unmap_all(path);
-    free(path);
-    struct sigaction action{};
-    action.sa_handler = SIG_DFL;
-    sigaction(SIGALRM, &action, nullptr);
+static char *first_stage_path = nullptr;
+void unload_first_stage() {
+    if (first_stage_path) {
+        unmap_all(first_stage_path);
+        free(first_stage_path);
+        first_stage_path = nullptr;
+    }
 }
 
 // Make sure /proc/self/environ is sanitized
@@ -80,22 +80,8 @@ static void second_stage_entry(void *handle, const char *tmp, char *path) {
     ZLOGD("inject 2nd stage\n");
     hook_functions();
 
-    // Register signal handler to unload 1st stage
-    struct sigaction action{};
-    action.sa_sigaction = &unload_first_stage;
-    action.sa_flags = SA_SIGINFO;
-    sigaction(SIGALRM, &action, nullptr);
-
-    // Schedule to unload 1st stage 10us later
-    timer_t timer;
-    sigevent_t event{};
-    event.sigev_notify = SIGEV_SIGNAL;
-    event.sigev_signo = SIGALRM;
-    event.sigev_value.sival_ptr = path;
-    timer_create(CLOCK_MONOTONIC, &event, &timer);
-    itimerspec time{};
-    time.it_value.tv_nsec = 10000L;
-    timer_settime(timer, 0, &time, nullptr);
+    // First stage will be unloaded before the first fork
+    first_stage_path = path;
 }
 
 static void first_stage_entry() {
@@ -118,8 +104,10 @@ static void first_stage_entry() {
     unsetenv("MAGISKTMP");
     sanitize_environ();
 
+    char *num = strrchr(path, '.') - 1;
+
     // Update path to 2nd stage lib
-    *(strrchr(path, '.') - 1) = '2';
+    *num = '2';
 
     // Load second stage
     setenv(INJECT_ENV_2, "1", 1);
@@ -127,7 +115,7 @@ static void first_stage_entry() {
     remap_all(path);
 
     // Revert path to 1st stage lib
-    *(strrchr(path, '.') - 1) = '1';
+    *num = '1';
 
     // Run second stage entry
     char *env = getenv(SECOND_STAGE_PTR);
