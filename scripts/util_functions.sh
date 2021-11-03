@@ -22,7 +22,7 @@ toupper() {
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  local CMDLINE=$(cat /proc/cmdline 2>/dev/null)
+  local CL=$(cat /proc/cmdline 2>/dev/null)
   POSTFIX=$([ $(expr $(echo "$CL" | tr -d -c '"' | wc -m) % 2) == 0 ] && echo -n '' || echo -n '"')
   { eval "for i in $CL$POSTFIX; do echo \$i; done" ; cat /proc/bootconfig 2>/dev/null | sed 's/[[:space:]]*=[[:space:]]*\"\(.*\)\"/=\1/g'; } | sed -n "$REGEX" 2>/dev/null
 }
