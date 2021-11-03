@@ -124,6 +124,10 @@ public:
         zo({}), out(nullptr), outsize(0), bp(0), crcvalue(crc32_z(0L, Z_NULL, 0)), in_size(0) {
         ZopfliInitOptions(&zo);
 
+        // Speed things up a bit, this still leads to better compression than zlib
+        zo.numiterations = 1;
+        zo.blocksplitting = 0;
+
         ZOPFLI_APPEND_DATA(31, &out, &outsize);  /* ID1 */
         ZOPFLI_APPEND_DATA(139, &out, &outsize); /* ID2 */
         ZOPFLI_APPEND_DATA(8, &out, &outsize);   /* CM */
