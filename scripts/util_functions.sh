@@ -22,7 +22,7 @@ toupper() {
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  { cat /proc/cmdline 2>/dev/null | tr '[:space:]' '\n'; cat /proc/bootconfig 2>/dev/null | sed 's/[[:space:]]*=[[:space:]]*/=/g'; } | sed -n "$REGEX" 2>/dev/null
+  { cat /proc/cmdline 2>/dev/null | tr '[:space:]' '\n'; cat /proc/bootconfig 2>/dev/null | sed 's/[[:space:]]*=[[:space:]]*\"\(.*\)\"/=\1/g'; } | sed -n "$REGEX" 2>/dev/null
 }
 
 grep_prop() {
