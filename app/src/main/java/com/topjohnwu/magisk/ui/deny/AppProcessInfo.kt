@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.ktx.getLabel
+import java.util.*
 
 class CmdlineListItem(line: String) {
     val packageName: String
@@ -25,31 +26,39 @@ class CmdlineListItem(line: String) {
 const val ISOLATED_MAGIC = "isolated"
 
 @SuppressLint("InlinedApi")
-class AppProcessInfo(val applicationInfo: ApplicationInfo, pm: PackageManager,
-                     denyList: List<CmdlineListItem>) : Comparable<AppProcessInfo> {
+class AppProcessInfo(
+    info: ApplicationInfo,
+    pm: PackageManager,
+    denyList: List<CmdlineListItem>
+) : ApplicationInfo(info), Comparable<AppProcessInfo> {
 
     private val denyList = denyList.filter {
-        it.packageName == applicationInfo.packageName || it.packageName == ISOLATED_MAGIC
+        it.packageName == packageName || it.packageName == ISOLATED_MAGIC
     }
-    val label = applicationInfo.getLabel(pm)
-    val iconImage: Drawable = applicationInfo.loadIcon(pm)
+
+    val label = getLabel(pm)
+    val iconImage: Drawable = loadIcon(pm)
     val processes = fetchProcesses(pm)
 
     override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
 
-    private fun createProcess(name: String, pkg: String = applicationInfo.packageName) =
+    private fun createProcess(name: String, pkg: String = packageName) =
         ProcessInfo(name, pkg, denyList.any { it.process == name && it.packageName == pkg })
 
     private fun ComponentInfo.getProcName(): String = processName
         ?: applicationInfo.processName
         ?: applicationInfo.packageName
 
-    private fun Array<out ComponentInfo>.processes() = map { createProcess(it.getProcName()) }
+    private val ServiceInfo.isIsolated get() = (flags and ServiceInfo.FLAG_ISOLATED_PROCESS) != 0
+    private val ServiceInfo.useAppZygote get() = (flags and ServiceInfo.FLAG_USE_APP_ZYGOTE) != 0
 
-    private fun Array<ServiceInfo>.processes() = map {
-        if ((it.flags and ServiceInfo.FLAG_ISOLATED_PROCESS) != 0) {
-            if ((it.flags and ServiceInfo.FLAG_USE_APP_ZYGOTE) != 0) {
-                val proc = applicationInfo.processName ?: applicationInfo.packageName
+    private fun Array<out ComponentInfo>?.toProcessList() =
+        this?.map { createProcess(it.getProcName()) }.orEmpty()
+
+    private fun Array<ServiceInfo>?.toProcessList() = this?.map {
+        if (it.isIsolated) {
+            if (it.useAppZygote) {
+                val proc = processName ?: packageName
                 createProcess("${proc}_zygote")
             } else {
                 val proc = if (SDK_INT >= 29) "${it.getProcName()}:${it.name}" else it.getProcName()
@@ -58,30 +67,30 @@ class AppProcessInfo(val applicationInfo: ApplicationInfo, pm: PackageManager,
         } else {
             createProcess(it.getProcName())
         }
-    }
+    }.orEmpty()
 
-    private fun fetchProcesses(pm: PackageManager): List<ProcessInfo> {
+    private fun fetchProcesses(pm: PackageManager): Collection<ProcessInfo> {
         val flag = MATCH_DISABLED_COMPONENTS or MATCH_UNINSTALLED_PACKAGES or
             GET_ACTIVITIES or GET_SERVICES or GET_RECEIVERS or GET_PROVIDERS
         val packageInfo = try {
-            pm.getPackageInfo(applicationInfo.packageName, flag)
+            pm.getPackageInfo(packageName, flag)
         } catch (e: Exception) {
-            // Exceed binder data transfer limit, local parsing package
-            pm.getPackageArchiveInfo(applicationInfo.sourceDir, flag) ?: return emptyList()
+            // Exceed binder data transfer limit, parse the package locally
+            pm.getPackageArchiveInfo(sourceDir, flag) ?: return emptyList()
         }
 
-        val list = LinkedHashSet<ProcessInfo>()
-        list += packageInfo.activities?.processes().orEmpty()
-        list += packageInfo.services?.processes().orEmpty()
-        list += packageInfo.receivers?.processes().orEmpty()
-        list += packageInfo.providers?.processes().orEmpty()
-        return list.sortedBy { it.name }
+        val processSet = TreeSet<ProcessInfo>(compareBy{ it.name })
+        processSet += packageInfo.activities.toProcessList()
+        processSet += packageInfo.services.toProcessList()
+        processSet += packageInfo.receivers.toProcessList()
+        processSet += packageInfo.providers.toProcessList()
+        return processSet
     }
 
     companion object {
         private val comparator = compareBy<AppProcessInfo>(
             { it.label.lowercase(currentLocale) },
-            { it.applicationInfo.packageName }
+            { it.packageName }
         )
     }
 }
