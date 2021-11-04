@@ -82,7 +82,7 @@ static void print_node(const void *fdt, int node = 0, int depth = 0) {
 }
 
 static int find_fstab(const void *fdt, int node = 0) {
-    if (fdt_get_name(fdt, node, nullptr) == "fstab"sv)
+    if (auto name = fdt_get_name(fdt, node, nullptr); name && name == "fstab"sv)
         return node;
     int child;
     fdt_for_each_subnode(child, fdt, node) {
@@ -142,7 +142,7 @@ static bool dtb_patch(const char *file) {
         int node;
         // Patch the chosen node for bootargs
         fdt_for_each_subnode(node, fdt, 0) {
-            if (fdt_get_name(fdt, node, nullptr) != "chosen"sv)
+            if (auto name = fdt_get_name(fdt, node, nullptr); !name || name != "chosen"sv)
                 continue;
             int len;
             if (auto value = fdt_getprop(fdt, node, "bootargs", &len)) {
