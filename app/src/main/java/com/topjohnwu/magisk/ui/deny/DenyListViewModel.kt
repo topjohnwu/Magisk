@@ -81,13 +81,13 @@ class DenyListViewModel : BaseViewModel(), Queryable {
         fun isSystemApp(flag: Int) = flag and ApplicationInfo.FLAG_SYSTEM != 0
 
         items.filter {
-            fun filterSystem() = isShowSystem || !isSystemApp(it.info.applicationInfo.flags)
+            fun filterSystem() = isShowSystem || !isSystemApp(it.info.flags)
 
-            fun filterOS() = (isShowSystem && isShowOS) || isApp(it.info.applicationInfo.uid)
+            fun filterOS() = (isShowSystem && isShowOS) || isApp(it.info.uid)
 
             fun filterQuery(): Boolean {
                 fun inName() = it.info.label.contains(query, true)
-                fun inPackage() = it.info.applicationInfo.packageName.contains(query, true)
+                fun inPackage() = it.info.packageName.contains(query, true)
                 fun inProcesses() = it.processes.any { p -> p.process.name.contains(query, true) }
                 return inName() || inPackage() || inProcesses()
             }
