@@ -139,7 +139,7 @@
     <string name="language">Gjuha</string>
     <string name="system_default">(Parazgjedhja e sistemit)</string>
     <string name="settings_check_update_title">Kontrollo për përditësime</string>
-    <string name="settings_check_update_summary">Kontrolloni periodikisht për përditësime në sfond</string>
+    <string name="settings_check_update_summary">Kontrolloni automatikisht për përditësime në sfond</string>
     <string name="settings_update_channel_title">Perditeso kanalin</string>
     <string name="settings_update_stable">E qëndrueshme</string>
     <string name="settings_update_beta">Beta</string>
@@ -183,7 +183,7 @@
 
     <string name="multiuser_mode">Mënyra Multi-përdoruesit</string>
     <string name="settings_owner_only">Vetëm pronari i paisjes</string>
-    <string name="settings_owner_manage">Pronari i paisjes e manaxhon</string>
+    <string name="settings_owner_manage">Pronari i paisjes që e manaxhon</string>
     <string name="settings_user_independent">I pavarur nga përdoruesi</string>
     <string name="owner_only_summary">Vetëm pronari ka akses në rrënjë</string>
     <string name="owner_manage_summary">Vetëm pronari mund të menaxhojë aksesin në rrënjë dhe të marrë kërkesat</string>
