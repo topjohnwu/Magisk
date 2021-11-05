@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.install
 
-import android.app.Activity
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
@@ -42,10 +41,7 @@ class InstallViewModel(
         set(value) = set(value, _method, { _method = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
-                    MagiskInstallFileEvent { code, intent ->
-                        if (code == Activity.RESULT_OK)
-                            data = intent?.data
-                    }.publish()
+                    MagiskInstallFileEvent { uri -> data = uri }.publish()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().publish()

@@ -1,8 +1,10 @@
 package com.topjohnwu.magisk.arch
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
@@ -23,11 +25,12 @@ import java.util.concurrent.CountDownLatch
 abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
     : BaseUIActivity<VM, Binding>() {
 
-    private val latch = CountDownLatch(1)
-
     companion object {
         private var doPreload = true
     }
+
+    private val latch = CountDownLatch(1)
+    private val uninstallPkg = registerForActivityResult(UninstallPackage) { latch.countDown() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Theme.selected.themeRes)
@@ -107,19 +110,24 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
             if (Config.suManager.isNotEmpty())
                 Config.suManager = ""
             pkg ?: return
-            if (!Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess)
-                uninstallApp(pkg)
+            if (!Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess) {
+                uninstallPkg.launch(pkg)
+                // Wait for the uninstallation to finish
+                latch.await()
+            }
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun uninstallApp(pkg: String) {
-        val uri = Uri.Builder().scheme("package").opaquePart(pkg).build()
-        val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri)
-        intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
-        startActivityForResult(intent) { _, _ ->
-            latch.countDown()
+    object UninstallPackage : ActivityResultContract<String, Boolean>() {
+
+        @Suppress("DEPRECATION")
+        override fun createIntent(context: Context, input: String): Intent {
+            val uri = Uri.Builder().scheme("package").opaquePart(input).build()
+            val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri)
+            intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
+            return intent
         }
-        latch.await()
+
+        override fun parseResult(resultCode: Int, intent: Intent?) = resultCode == RESULT_OK
     }
 }
