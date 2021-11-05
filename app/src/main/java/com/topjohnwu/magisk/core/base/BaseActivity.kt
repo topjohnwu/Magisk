@@ -69,4 +69,9 @@ abstract class BaseActivity : AppCompatActivity() {
         startActivity(Intent().setComponent(intent.component))
         finish()
     }
+
+    fun relaunch() {
+        startActivity(Intent(intent).setFlags(0))
+        finish()
+    }
 }

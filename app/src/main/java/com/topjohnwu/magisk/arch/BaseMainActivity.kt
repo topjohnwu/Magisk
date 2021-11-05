@@ -59,7 +59,7 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
                     doPreload = false
                     if (isRunningAsStub) {
                         // Re-launch main activity without splash theme
-                        recreate()
+                        relaunch()
                     } else {
                         showMainUI(savedInstanceState)
                     }
