@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.di.viewModel
+import com.topjohnwu.magisk.ui.theme.Theme
 
 open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityRequestBinding>() {
 
@@ -33,6 +34,7 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setHideOverlayWindows(true)
         }
+        setTheme(Theme.selected.themeRes)
         super.onCreate(savedInstanceState)
 
         fun showRequest() {

@@ -129,5 +129,6 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.3.6")
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.core:core-splashscreen:1.0.0-alpha02")
     implementation("com.google.android.material:material:1.4.0")
 }

@@ -13,7 +13,7 @@
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <activity
-            android:name=".core.SplashActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -25,10 +25,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.MainActivity"
-            android:exported="false" />
 
         <activity
             android:name=".ui.surequest.SuRequestActivity"

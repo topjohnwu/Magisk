@@ -137,7 +137,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     ))
 
     cmpList.add(Component(
-        "com.topjohnwu.magisk.core.SplashActivity",
+        "com.topjohnwu.magisk.ui.MainActivity",
         "DownloadActivity",
         """
         |<activity
@@ -148,15 +148,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |        <category android:name="android.intent.category.LAUNCHER" />
         |    </intent-filter>
         |</activity>""".ind(2)
-    ))
-
-    cmpList.add(Component(
-        "com.topjohnwu.magisk.ui.MainActivity",
-        "",
-        """
-        |<activity
-        |    android:name="%s"
-        |    android:exported="false" />""".ind(2)
     ))
 
     cmpList.add(Component(
