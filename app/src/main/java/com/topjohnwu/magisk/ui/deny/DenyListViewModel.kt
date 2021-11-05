@@ -94,7 +94,7 @@ class DenyListViewModel : BaseViewModel(), Queryable {
                 return inName() || inPackage() || inProcesses()
             }
 
-            filterSystem() && filterOS() && filterQuery()
+            (it.isChecked || (filterSystem() && filterOS())) && filterQuery()
         }
         state = State.LOADED
     }
