@@ -13,10 +13,10 @@ import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.stream.Collectors
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DenyListViewModel : BaseViewModel(), Queryable {
 
@@ -55,17 +55,19 @@ class DenyListViewModel : BaseViewModel(), Queryable {
             return@launch
         }
         state = State.LOADING
-        val (apps, diff) = withContext(Dispatchers.Default) {
+        val (apps, diff) = withContext(Dispatchers.IO) {
             val pm = AppContext.packageManager
             val denyList = Shell.su("magisk --denylist ls").exec().out
                 .map { CmdlineListItem(it) }
-            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).parallelStream()
+            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).asFlow()
                 .filter { AppContext.packageName != it.packageName }
-                .map { AppProcessInfo(it, pm, denyList) }
+                .map { async { AppProcessInfo(it, pm, denyList) } }
+                .map { it.await() }
                 .filter { it.processes.isNotEmpty() }
-                .map { DenyListRvItem(it) }
-                .sorted()
-                .collect(Collectors.toList())
+                .map { async { DenyListRvItem(it) } }
+                .map { it.await() }
+                .toCollection(ArrayList())
+            apps.sort()
             apps to items.calculateDiff(apps)
         }
         items.update(apps, diff)
