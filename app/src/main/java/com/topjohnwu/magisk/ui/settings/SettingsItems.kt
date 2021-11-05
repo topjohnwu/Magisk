@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.UpdateCheckService
+import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -185,7 +185,7 @@ object UpdateChecker : BaseSettingsItem.Toggle() {
     override var value = Config.checkUpdate
         set(value) = setV(value, field, { field = it }) {
             Config.checkUpdate = it
-            UpdateCheckService.schedule(AppContext)
+            JobService.schedule(AppContext)
         }
 }
 

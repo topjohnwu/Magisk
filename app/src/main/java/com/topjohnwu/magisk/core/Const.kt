@@ -41,9 +41,9 @@ object Const {
     object ID {
         // notifications
         const val APK_UPDATE_NOTIFICATION_ID = 5
+        const val JOB_SERVICE_ID = 7
         const val UPDATE_NOTIFICATION_CHANNEL = "update"
         const val PROGRESS_NOTIFICATION_CHANNEL = "progress"
-        const val CHECK_MAGISK_UPDATE_WORKER_ID = "magisk_update"
     }
 
     object Url {

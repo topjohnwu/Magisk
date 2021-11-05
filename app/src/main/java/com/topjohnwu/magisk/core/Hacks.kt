@@ -2,11 +2,7 @@
 
 package com.topjohnwu.magisk.core
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.app.job.JobWorkItem
 import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
@@ -15,7 +11,6 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.DisplayMetrics
-import androidx.annotation.RequiresApi
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.utils.refreshLocale
@@ -27,22 +22,6 @@ fun AssetManager.addAssetPath(path: String) {
 
 fun Context.wrap(inject: Boolean = false): Context =
     if (inject) ReInjectedContext(this) else InjectedContext(this)
-
-fun Context.wrapJob(): Context = object : InjectedContext(this) {
-
-    override fun getApplicationContext() = this
-
-    @SuppressLint("NewApi")
-    override fun getSystemService(name: String): Any? {
-        return super.getSystemService(name).let {
-            when {
-                !isRunningAsStub -> it
-                name == JOB_SCHEDULER_SERVICE -> JobSchedulerWrapper(it as JobScheduler)
-                else -> it
-            }
-        }
-    }
-}
 
 fun Class<*>.cmp(pkg: String) =
     ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
@@ -96,28 +75,6 @@ object AssetHack {
         val metrics = DisplayMetrics()
         metrics.setTo(resource.displayMetrics)
         return Resources(asset, metrics, config)
-    }
-}
-
-@RequiresApi(28)
-private class JobSchedulerWrapper(private val base: JobScheduler) : JobScheduler() {
-    override fun schedule(job: JobInfo) = base.schedule(job.patch())
-    override fun enqueue(job: JobInfo, work: JobWorkItem) = base.enqueue(job.patch(), work)
-    override fun cancel(jobId: Int) = base.cancel(jobId)
-    override fun cancelAll() = base.cancelAll()
-    override fun getAllPendingJobs(): List<JobInfo> = base.allPendingJobs
-    override fun getPendingJob(jobId: Int) = base.getPendingJob(jobId)
-    private fun JobInfo.patch(): JobInfo {
-        // Swap out the service of JobInfo
-        val component = service.run {
-            ComponentName(packageName,
-                Info.stub?.classToComponent?.get(className) ?: className)
-        }
-        javaClass.getDeclaredField("service").apply {
-            isAccessible = true
-        }.set(this, component)
-
-        return this
     }
 }
 

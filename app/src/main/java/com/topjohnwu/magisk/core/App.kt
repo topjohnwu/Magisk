@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.work.WorkManager
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.utils.AppShellInit
 import com.topjohnwu.magisk.core.utils.BusyBoxInit
@@ -58,7 +57,6 @@ open class App() : Application() {
         ServiceLocator.context = wrapped
         AssetHack.init(impl)
         app.registerActivityLifecycleCallbacks(ForegroundTracker)
-        WorkManager.initialize(impl.wrapJob(), androidx.work.Configuration.Builder().build())
     }
 
     // This is required as some platforms expect ContextImpl

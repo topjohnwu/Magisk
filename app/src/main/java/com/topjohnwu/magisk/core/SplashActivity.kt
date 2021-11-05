@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import java.util.concurrent.CountDownLatch
 
-open class SplashActivity : BaseActivity() {
+class SplashActivity : BaseActivity() {
 
     private val latch = CountDownLatch(1)
 
@@ -63,7 +63,7 @@ open class SplashActivity : BaseActivity() {
         Config.load(prevPkg)
         handleRepackage(prevPkg)
         Notifications.setup(this)
-        UpdateCheckService.schedule(this)
+        JobService.schedule(this)
         Shortcuts.setupDynamic(this)
 
         // Pre-fetch network services

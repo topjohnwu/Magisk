@@ -12,7 +12,6 @@
         android:multiArch="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
-        <!-- Splash -->
         <activity
             android:name=".core.SplashActivity"
             android:exported="true"
@@ -27,10 +26,10 @@
             </intent-filter>
         </activity>
 
-        <!-- Main -->
-        <activity android:name=".ui.MainActivity" />
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false" />
 
-        <!-- Superuser -->
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
@@ -43,7 +42,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Receiver -->
         <receiver
             android:name=".core.Receiver"
             android:directBootAware="true"
@@ -60,23 +58,21 @@
             </intent-filter>
         </receiver>
 
-        <!-- DownloadService -->
-        <service android:name=".core.download.DownloadService" />
+        <service
+            android:name=".core.download.DownloadService"
+            android:exported="false" />
 
-        <!-- FileProvider -->
+        <service
+            android:name=".core.JobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <provider
             android:name=".core.Provider"
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true" />
-
-        <!-- Initialize WorkManager on-demand -->
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove">
-        </provider>
 
         <!-- We don't invalidate Room -->
         <service
