@@ -28,6 +28,8 @@ class DenyListRvItem(
     var itemsChecked = 0
         set(value) = set(value, field, { field = it }, BR.checkedPercent)
 
+    val isChecked get() = itemsChecked != 0
+
     @get:Bindable
     val checkedPercent get() = (itemsChecked.toFloat() / processes.size * 100).roundToInt()
 
