@@ -137,7 +137,7 @@ esac
 
 # Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
 INIT=init
-if [ $((status & 0x4)) -ne 0 ]; then
+if [ $((STATUS & 4)) -ne 0 ]; then
   INIT=init.real
 fi
 
