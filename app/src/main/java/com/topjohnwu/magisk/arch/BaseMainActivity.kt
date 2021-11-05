@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.arch
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
@@ -35,11 +34,7 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
 
         if (isRunningAsStub && doPreload) {
             // Manually apply splash theme for stub
-            if (SDK_INT >= 31) {
-                theme.applyStyle(R.style.StubSplashTheme, true)
-            } else {
-                theme.applyStyle(R.style.SplashTheme, true)
-            }
+            theme.applyStyle(R.style.StubSplashTheme, true)
         }
 
         super.onCreate(savedInstanceState)

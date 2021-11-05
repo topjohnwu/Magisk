@@ -15,6 +15,7 @@ import androidx.collection.SparseArrayCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.reflectField
@@ -46,11 +47,13 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Overwrite private members to avoid nasty "false" stack traces being logged
-        val delegate = delegate
-        val clz = delegate.javaClass
-        clz.reflectField("mActivityHandlesUiModeChecked").set(delegate, true)
-        clz.reflectField("mActivityHandlesUiMode").set(delegate, false)
+        if (isRunningAsStub) {
+            // Overwrite private members to avoid nasty "false" stack traces being logged
+            val delegate = delegate
+            val clz = delegate.javaClass
+            clz.reflectField("mActivityHandlesUiModeChecked").set(delegate, true)
+            clz.reflectField("mActivityHandlesUiMode").set(delegate, false)
+        }
         super.onCreate(savedInstanceState)
     }
 

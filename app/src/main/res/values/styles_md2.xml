@@ -2,6 +2,7 @@
 <resources>
 
     <style name="SplashTheme" parent="Theme.Splash" />
+    <style name="StubSplashTheme" parent="Theme.Splash"/>
 
     <style name="Foundation" parent="Theme.Foundation.Light" />
 

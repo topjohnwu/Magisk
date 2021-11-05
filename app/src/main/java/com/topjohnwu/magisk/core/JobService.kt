@@ -39,7 +39,7 @@ class JobService : BaseJobService() {
 
     companion object {
         fun schedule(context: Context) {
-            val svc = context.getSystemService<JobScheduler>() ?: return
+            val scheduler = context.getSystemService<JobScheduler>() ?: return
             if (Config.checkUpdate) {
                 val cmp = JobService::class.java.cmp(context.packageName)
                 val info = JobInfo.Builder(Const.ID.JOB_SERVICE_ID, cmp)
@@ -47,9 +47,9 @@ class JobService : BaseJobService() {
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setRequiresDeviceIdle(true)
                     .build()
-                svc.schedule(info)
+                scheduler.schedule(info)
             } else {
-                svc.cancel(Const.ID.JOB_SERVICE_ID)
+                scheduler.cancel(Const.ID.JOB_SERVICE_ID)
             }
         }
     }
