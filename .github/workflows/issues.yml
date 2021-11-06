@@ -20,7 +20,20 @@ jobs:
         with:
           comment: This issue is being automatically closed because it does not follow the issue template.
       - if: steps.close.conclusion == 'skipped' && contains(github.event.issue.body, format('Magisk version code{0} {1}', ':', env.MAGISK_VERSION_CODE)) != true
+        id: close2
         name: Close Issue(latest canary)
         uses: peter-evans/close-issue@v1
         with:
           comment: This issue is being automatically closed because latest canary Magisk version code is ${{ env.MAGISK_VERSION_CODE }}.
+      - if: steps.close.conclusion == 'success' || steps.close2.conclusion == 'success'
+        id: label
+        name: Label Issue
+        uses: andymckay/labeler@1.0.4
+        with:
+          add-labels: "invalid"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - if: steps.label.conclusion == 'success'
+        name: Lock Issue
+        uses: OSDKDev/lock-issues@v1.1
+        with: 
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
