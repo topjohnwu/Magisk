@@ -52,6 +52,8 @@ sealed class Subject : Parcelable {
 
         val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
     }
+
+    fun notifyID() = hashCode()
 }
 
 sealed class Action : Parcelable {

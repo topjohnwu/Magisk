@@ -22,7 +22,7 @@ private fun Context.patch(apk: File) {
     patched.renameTo(apk)
 }
 
-private fun BaseDownloader.notifyHide(id: Int) {
+private fun DownloadService.notifyHide(id: Int) {
     update(id) {
         it.setProgress(0, 0, true)
             .setContentTitle(getString(R.string.hide_app_title))
@@ -48,7 +48,7 @@ private class DupOutputStream(
     }
 }
 
-suspend fun BaseDownloader.handleAPK(subject: Subject.Manager, stream: InputStream) {
+suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStream) {
     fun write(output: OutputStream) {
         val ext = subject.externalFile.outputStream()
         val o = DupOutputStream(ext, output)

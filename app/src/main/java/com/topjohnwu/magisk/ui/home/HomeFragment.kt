@@ -6,7 +6,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
-import com.topjohnwu.magisk.core.download.BaseDownloader
+import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.events.RebootEvent
@@ -21,7 +21,7 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         super.onStart()
         activity.title = resources.getString(R.string.section_home)
         setHasOptionsMenu(true)
-        BaseDownloader.observeProgress(this, viewModel::onProgressUpdate)
+        DownloadService.observeProgress(this, viewModel::onProgressUpdate)
     }
 
     private fun checkTitle(text: TextView, icon: ImageView) {
