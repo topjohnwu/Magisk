@@ -8,7 +8,7 @@ import android.content.pm.PackageManager.*
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION.SDK_INT
-import android.os.Process
+import androidx.core.os.ProcessCompat
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.ktx.getLabel
 import java.util.*
@@ -46,7 +46,7 @@ class AppProcessInfo(
 
     fun isSystemApp() = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
 
-    fun isApp() = Process.isApplicationUid(info.uid)
+    fun isApp() = ProcessCompat.isApplicationUid(info.uid)
 
     private fun createProcess(name: String, pkg: String = info.packageName) =
         ProcessInfo(name, pkg, denyList.any { it.process == name && it.packageName == pkg })
