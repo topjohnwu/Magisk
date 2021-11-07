@@ -1,9 +1,7 @@
 package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import android.os.Process
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
@@ -75,17 +73,10 @@ class DenyListViewModel : BaseViewModel(), Queryable {
     }
 
     override fun query() {
-        fun isApp(uid: Int) = run {
-            val appId: Int = uid % 100000
-            appId >= Process.FIRST_APPLICATION_UID && appId <= Process.LAST_APPLICATION_UID
-        }
-
-        fun isSystemApp(flag: Int) = flag and ApplicationInfo.FLAG_SYSTEM != 0
-
         items.filter {
-            fun filterSystem() = isShowSystem || !isSystemApp(it.info.flags)
+            fun filterSystem() = isShowSystem || !it.info.isSystemApp()
 
-            fun filterOS() = (isShowSystem && isShowOS) || isApp(it.info.uid)
+            fun filterOS() = (isShowSystem && isShowOS) || it.info.isApp()
 
             fun filterQuery(): Boolean {
                 fun inName() = it.info.label.contains(query, true)
