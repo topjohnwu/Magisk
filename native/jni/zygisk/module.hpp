@@ -88,6 +88,7 @@ struct ZygiskModule {
     ZygiskModule(int id, void *handle) : handle(handle), id(id) {}
 
     void * const handle;
+    ApiTable *table = nullptr;
     bool unload = false;
 
 private:

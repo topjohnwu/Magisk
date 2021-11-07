@@ -21,6 +21,8 @@ using xstring = jni_hook::string;
 //#define ZLOGV(...) ZLOGD(__VA_ARGS__)
 #define ZLOGV(...)
 
+static bool unhook_functions();
+
 namespace {
 
 enum {
@@ -28,6 +30,7 @@ enum {
     FORK_AND_SPECIALIZE,
     APP_SPECIALIZE,
     SERVER_SPECIALIZE,
+    CAN_DLCLOSE,
     FLAG_MAX
 };
 
@@ -51,6 +54,7 @@ struct HookContext {
     HookContext() : pid(-1), info{} {}
 
     static void close_fds();
+    void unload_zygisk();
 
     DCL_PRE_POST(fork)
     void run_modules_pre(const vector<int> &fds);
@@ -168,6 +172,15 @@ DCL_HOOK_FUNC(void, android_log_close) {
         android_logging();
     }
     old_android_log_close();
+}
+
+// Last point before process secontext changes
+DCL_HOOK_FUNC(int, selinux_android_setcontext,
+        uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
+    if (g_ctx) {
+        g_ctx->flags[CAN_DLCLOSE] = unhook_functions();
+    }
+    return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }
 
 // -----------------------------------------------------------------
@@ -327,6 +340,7 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
                 modules.emplace_back(i, h);
                 auto api = new ApiTable(&modules.back());
                 module_entry(api, env);
+                modules.back().table = api;
             }
         }
         close(fds[i]);
@@ -355,6 +369,22 @@ void HookContext::run_modules_post() {
 
 void HookContext::close_fds() {
     close(logd_fd.exchange(-1));
+}
+
+void HookContext::unload_zygisk() {
+    if (flags[CAN_DLCLOSE]) {
+        // Do NOT call the destructor
+        operator delete(jni_method_map);
+        // Directly unmap the whole memory block
+        jni_hook::memory_block::release();
+
+        // Strip out all API function pointers
+        for (auto &m : modules) {
+            memset(m.table, 0, sizeof(*m.table));
+        }
+
+        new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
+    }
 }
 
 // -----------------------------------------------------------------
@@ -387,19 +417,14 @@ void HookContext::nativeSpecializeAppProcess_post() {
     }
 
     env->ReleaseStringUTFChars(args->nice_name, process);
-    if (info.on_denylist) {
-        self_unload();
-    } else {
-        run_modules_post();
-        if (info.is_magisk_app) {
-            setenv("ZYGISK_ENABLED", "1", 1);
-        } else if (args->is_child_zygote && *args->is_child_zygote) {
-            // If we are in child zygote, unhook all zygisk hooks
-            // Modules still have their code loaded and can do whatever they want
-            unhook_functions();
-        }
+    run_modules_post();
+    if (info.is_magisk_app) {
+        setenv("ZYGISK_ENABLED", "1", 1);
     }
     g_ctx = nullptr;
+    if (!flags[FORK_AND_SPECIALIZE]) {
+        unload_zygisk();
+    }
 }
 
 void HookContext::nativeForkSystemServer_pre() {
@@ -457,6 +482,7 @@ void HookContext::fork_pre() {
 void HookContext::fork_post() {
     sigmask(SIG_UNBLOCK, SIGCHLD);
     g_ctx = nullptr;
+    unload_zygisk();
 }
 
 } // namespace
@@ -464,7 +490,6 @@ void HookContext::fork_post() {
 static bool hook_refresh() {
     if (xhook_refresh(0) == 0) {
         xhook_clear();
-        ZLOGI("xhook success\n");
         return true;
     } else {
         ZLOGE("xhook failed\n");
@@ -503,6 +528,7 @@ void hook_functions() {
     XHOOK_REGISTER(ANDROID_RUNTIME, fork);
     XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
     XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
+    XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
     XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
     hook_refresh();
 
@@ -526,7 +552,7 @@ void hook_functions() {
     }
 }
 
-bool unhook_functions() {
+static bool unhook_functions() {
     bool success = true;
 
     // Restore JNIEnv
@@ -538,11 +564,6 @@ bool unhook_functions() {
             class_getName = nullptr;
         }
     }
-
-    // Do NOT call the destructor
-    operator delete(jni_method_map);
-    // Directly unmap the whole memory block
-    jni_hook::memory_block::release();
 
     // Unhook JNI methods
     for (const auto &[clz, methods] : *jni_hook_list) {

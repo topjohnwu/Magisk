@@ -152,6 +152,8 @@ enum Option : int {
     DLCLOSE_MODULE_LIBRARY = 1,
 };
 
+// All API functions will stop working after post[XXX]Specialize as Zygisk will be unloaded
+// from the specialized process afterwards.
 struct Api {
 
     // Connect to a root companion process and get a Unix domain socket for IPC.
@@ -274,22 +276,22 @@ void entry_impl(api_table *table, JNIEnv *env) {
 } // namespace internal
 
 inline int Api::connectCompanion() {
-    return impl->connectCompanion(impl->_this);
+    return impl->connectCompanion ? impl->connectCompanion(impl->_this) : -1;
 }
 inline void Api::setOption(Option opt) {
-    impl->setOption(impl->_this, opt);
+    if (impl->setOption) impl->setOption(impl->_this, opt);
 }
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
-    impl->hookJniNativeMethods(env, className, methods, numMethods);
+    if (impl->hookJniNativeMethods) impl->hookJniNativeMethods(env, className, methods, numMethods);
 }
 inline void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
-    impl->pltHookRegister(regex, symbol, newFunc, oldFunc);
+    if (impl->pltHookRegister) impl->pltHookRegister(regex, symbol, newFunc, oldFunc);
 }
 inline void Api::pltHookExclude(const char *regex, const char *symbol) {
-    impl->pltHookExclude(regex, symbol);
+    if (impl->pltHookExclude) impl->pltHookExclude(regex, symbol);
 }
 inline bool Api::pltHookCommit() {
-    return impl->pltHookCommit();
+    return impl->pltHookCommit != nullptr && impl->pltHookCommit();
 }
 
 } // namespace zygisk

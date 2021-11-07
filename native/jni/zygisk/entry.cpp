@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static void *self_handle = nullptr;
+void *self_handle = nullptr;
 
 static int zygisk_log(int prio, const char *fmt, va_list ap);
 
@@ -24,14 +24,6 @@ static void zygisk_logging() {
     log_cb.w = zlog(WARN);
     log_cb.e = zlog(ERROR);
     log_cb.ex = nop_ex;
-}
-
-void self_unload() {
-    ZLOGD("Request to self unload\n");
-    // If unhooking failed, do not unload or else it will cause SIGSEGV
-    if (!unhook_functions())
-        return;
-    new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
 }
 
 static char *first_stage_path = nullptr;
