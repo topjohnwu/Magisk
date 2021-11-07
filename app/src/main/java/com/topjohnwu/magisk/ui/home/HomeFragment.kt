@@ -70,4 +70,8 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
         return true
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.stateManagerProgress = 0
+    }
 }

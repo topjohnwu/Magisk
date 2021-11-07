@@ -51,11 +51,6 @@
             app:argType="android.net.Uri"
             app:nullable="true" />
 
-        <argument
-            android:name="dismiss_id"
-            android:defaultValue="-1"
-            app:argType="integer" />
-
     </fragment>
 
     <fragment

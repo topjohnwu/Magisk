@@ -8,18 +8,21 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toIcon
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Const.ID.PROGRESS_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.Const.ID.UPDATE_NOTIFICATION_CHANNEL
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getBitmap
+import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("DEPRECATION")
 object Notifications {
 
     val mgr by lazy { AppContext.getSystemService<NotificationManager>()!! }
+
+    private const val APK_UPDATE_NOTIFICATION_ID = 5
+    private val nextId = AtomicInteger(APK_UPDATE_NOTIFICATION_ID)
 
     fun setup(context: Context) {
         if (SDK_INT >= 26) {
@@ -46,7 +49,7 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = DownloadService.pendingIntent(context, Subject.Manager())
+        val intent = DownloadService.getPendingIntent(context, Subject.Manager())
 
         val builder = updateBuilder(context)
             .setContentTitle(context.getString(R.string.magisk_update_title))
@@ -54,7 +57,7 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(intent)
 
-        mgr.notify(Const.ID.APK_UPDATE_NOTIFICATION_ID, builder.build())
+        mgr.notify(APK_UPDATE_NOTIFICATION_ID, builder.build())
     }
 
     fun progress(context: Context, title: CharSequence): Notification.Builder {
@@ -69,4 +72,6 @@ object Notifications {
             .setOngoing(true)
         return builder
     }
+
+    fun nextId() = nextId.incrementAndGet()
 }

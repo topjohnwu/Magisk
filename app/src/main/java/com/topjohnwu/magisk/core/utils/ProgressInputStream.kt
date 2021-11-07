@@ -5,7 +5,7 @@ import java.io.InputStream
 
 class ProgressInputStream(
     base: InputStream,
-    val progressEmitter: (Long) -> Unit = {}
+    val progressEmitter: (Long) -> Unit
 ) : FilterInputStream(base) {
 
     private var bytesRead = 0L
@@ -39,5 +39,10 @@ class ProgressInputStream(
             emitProgress()
         }
         return sz
+    }
+
+    override fun close() {
+        super.close()
+        progressEmitter(bytesRead)
     }
 }
