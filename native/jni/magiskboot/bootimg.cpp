@@ -735,7 +735,13 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(off.total);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
-        vbmeta->flags = __builtin_bswap32(3);
+        // Enabling 0x2 bootloop some devices, but fix boot on other devices.
+        if (boot.flags[SEANDROID_FLAG] || boot.flags[MTK_KERNEL]) {
+            vbmeta->flags = __builtin_bswap32(3);
+        } else {
+            // Use |= operator to keep 0x2 flag on custom kernels/ROMs
+            vbmeta->flags |= __builtin_bswap32(1);
+        }
     }
 
     if (boot.flags[DHTB_FLAG]) {
