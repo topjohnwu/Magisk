@@ -553,8 +553,12 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
         if (boot.flags[ZIMAGE_KERNEL] &&
             boot.k_fmt == GZIP && hdr->kernel_size() > boot.hdr->kernel_size()) {
-            // Revert and try zipfoli
+            // Revert and try zopfli
+#if __arm__
+            lseek(fd, -(off_t)hdr->kernel_size(), SEEK_CUR);
+#else
             ftruncate(fd, lseek(fd, -(off_t)hdr->kernel_size(), SEEK_CUR));
+#endif
             hdr->kernel_size() = compress(ZOPFLI, fd, raw_buf, raw_size);
         }
 
@@ -563,7 +567,11 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     if (boot.flags[ZIMAGE_KERNEL]) {
         if (hdr->kernel_size() > boot.hdr->kernel_size()) {
             LOGW("Recompressed kernel is too large, using original kernel\n");
+#if __arm__
+            lseek(fd, -(off_t)hdr->kernel_size(), SEEK_CUR);
+#else
             ftruncate(fd, lseek(fd, -(off_t)hdr->kernel_size(), SEEK_CUR));
+#endif
             hdr->kernel_size() = xwrite(fd, boot.z_info.tail - boot.hdr->kernel_size(), boot.hdr->kernel_size());
         } else {
             write_zero(fd, boot.hdr->kernel_size() - hdr->kernel_size() - 4);
