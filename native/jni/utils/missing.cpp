@@ -129,6 +129,19 @@ int faccessat(int dirfd, const char *pathname, int mode, int flags) {
     return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
 }
 
+#define SPLIT_64(v) (unsigned)((v) & 0xFFFFFFFF), (unsigned)((v) >> 32)
+
+#if defined(__arm__)
+// Why the additional 0 is required: https://man7.org/linux/man-pages/man2/syscall.2.html
+int ftruncate64(int fd, off64_t length) {
+    return syscall(__NR_ftruncate64, fd, 0, SPLIT_64(length));
+}
+#elif defined(__i386__)
+int ftruncate64(int fd, off64_t length) {
+    return syscall(__NR_ftruncate64, fd, SPLIT_64(length));
+}
+#endif
+
 #if !defined(__LP64__)
 void android_set_abort_message(const char *msg) {}
 #endif
