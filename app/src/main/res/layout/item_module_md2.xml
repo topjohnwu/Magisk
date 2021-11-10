@@ -28,7 +28,7 @@
             isEnabled="@{!item.removed}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="@{item.enabled ? 1f : .5f}"
+            android:alpha="@{(item.enabled &amp;&amp; !item.suspended) ? 1f : .5f}"
             android:nextFocusRight="@id/module_indicator"
             tools:layout_gravity="center"
             tools:layout_margin="@dimen/l1">
@@ -95,6 +95,22 @@
                     app:layout_constraintTop_toTopOf="@+id/module_title" />
 
                 <TextView
+                    android:id="@+id/module_suspend_text"
+                    goneUnless="@{item.suspended}"
+                    strikeThrough="@{item.removed}"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginTop="@dimen/l_50"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:text="@{item.suspendText}"
+                    android:textAppearance="@style/AppearanceFoundation.Tiny.Bold"
+                    android:textColor="?colorError"
+                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                    tools:lines="1"
+                    tools:text="@tools:sample/lorem/random" />
+
+                <TextView
                     android:id="@+id/module_description"
                     gone="@{item.item.description.empty}"
                     strikeThrough="@{item.removed}"
@@ -105,7 +121,7 @@
                     android:layout_marginEnd="@dimen/l1"
                     android:text="@{item.item.description}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                    app:layout_constraintTop_toBottomOf="@+id/module_suspend_text"
                     tools:lines="4"
                     tools:text="@tools:sample/lorem/random" />
 
