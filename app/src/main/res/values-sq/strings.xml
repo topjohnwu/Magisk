@@ -107,7 +107,7 @@
     <string name="hide_search">Kërko</string>
 
     <!--Module-->
-    <string name="no_info_provided">(Nuk jepet asnjë informacion)</string>
+    <string name="no_info_provided">(Nuk ka asnjë informacion)</string>
     <string name="reboot_userspace">Rinisje e shpejtë</string>
     <string name="reboot_recovery">Rinis te Recovery</string>
     <string name="reboot_bootloader">Rinis te Bootloader</string>
@@ -123,6 +123,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Në linjë</string>
     <string name="sorting_order">Renditje me Porosi</string>
+    <string name="suspend_text_riru">Moduli u pezullua sepse %1$s është aktivizuar</string>
+    <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
