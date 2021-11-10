@@ -123,6 +123,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Zoradenie</string>
+    <string name="suspend_text_riru">Modul bol pozastavený, lebo %1$s je povolené</string>
+    <string name="suspend_text_zygisk">Modul bol pozastavený, lebo  %1$s nie je povolené</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
