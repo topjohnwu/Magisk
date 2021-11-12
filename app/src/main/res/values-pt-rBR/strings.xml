@@ -114,6 +114,8 @@
     <string name="update_available">Atualização disponível</string>
     <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Ordem de classificação</string>
+    <string name="suspend_text_riru">Módulo suspenso porque %1$s está ativo</string>
+    <string name="suspend_text_zygisk">Módulo suspenso porque %1$s não está ativo</string>
 
 
     <!--Settings -->
