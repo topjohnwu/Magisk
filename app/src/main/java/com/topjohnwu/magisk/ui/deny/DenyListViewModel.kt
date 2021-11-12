@@ -46,6 +46,14 @@ class DenyListViewModel : BaseViewModel(), Queryable {
         it.bindExtra(BR.viewModel, this)
     }
 
+    @FlowPreview
+    private inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R): Flow<R> {
+        return flatMapMerge { value ->
+            flow { emit(transform(value)) }
+        }
+    }
+
+    @FlowPreview
     @SuppressLint("InlinedApi")
     override fun refresh() = viewModelScope.launch {
         if (!Utils.showSuperUser()) {
@@ -53,18 +61,18 @@ class DenyListViewModel : BaseViewModel(), Queryable {
             return@launch
         }
         state = State.LOADING
-        val (apps, diff) = withContext(Dispatchers.IO) {
+        val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
             val denyList = Shell.su("magisk --denylist ls").exec().out
                 .map { CmdlineListItem(it) }
-            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).asFlow()
-                .filter { AppContext.packageName != it.packageName }
-                .map { async { AppProcessInfo(it, pm, denyList) } }
-                .map { it.await() }
-                .filter { it.processes.isNotEmpty() }
-                .map { async { DenyListRvItem(it) } }
-                .map { it.await() }
-                .toCollection(ArrayList())
+            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).run {
+                asFlow()
+                    .filter { AppContext.packageName != it.packageName }
+                    .concurrentMap { AppProcessInfo(it, pm, denyList) }
+                    .filter { it.processes.isNotEmpty() }
+                    .concurrentMap { DenyListRvItem(it) }
+                    .toCollection(ArrayList(size))
+            }
             apps.sort()
             apps to items.calculateDiff(apps)
         }
