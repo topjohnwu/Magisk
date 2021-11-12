@@ -149,20 +149,18 @@ static void zygiskd(int socket) {
         int module_id = read_int(client);
         if (module_id >= 0 && module_id < modules.size() && modules[module_id]) {
             exec_task([=, entry = modules[module_id]] {
-                int dup = fcntl(client, F_DUPFD_CLOEXEC);
+                struct stat s1;
+                fstat(client, &s1);
                 entry(client);
-                // Only close client if it is the same as dup so we don't
+                // Only close client if it is the same file so we don't
                 // accidentally close a re-used file descriptor.
                 // This check is required because the module companion
                 // handler could've closed the file descriptor already.
-                if (struct stat s1; fstat(client, &s1) == 0) {
-                    struct stat s2{};
-                    fstat(dup, &s2);
+                if (struct stat s2; fstat(client, &s2) == 0) {
                     if (s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino) {
                         close(client);
                     }
                 }
-                close(dup);
             });
         } else {
             close(client);
