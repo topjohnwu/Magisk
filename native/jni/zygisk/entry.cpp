@@ -190,10 +190,13 @@ static bool get_exe(int pid, char *buf, size_t sz) {
     return xreadlink(buf, buf, sz) > 0;
 }
 
+static pthread_mutex_t zygiskd_lock = PTHREAD_MUTEX_INITIALIZER;
 static int zygiskd_sockets[] = { -1, -1 };
 #define zygiskd_socket zygiskd_sockets[is_64_bit]
 
 static void connect_companion(int client, bool is_64_bit) {
+    mutex_guard g(zygiskd_lock);
+
     if (zygiskd_socket >= 0) {
         // Make sure the socket is still valid
         pollfd pfd = { zygiskd_socket, 0, 0 };
@@ -222,6 +225,7 @@ static void connect_companion(int client, bool is_64_bit) {
         send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
         // Wait for ack
         if (read_int(zygiskd_socket) != 0) {
+            LOGE("zygiskd startup error\n");
             return;
         }
     }
