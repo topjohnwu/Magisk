@@ -25,6 +25,9 @@ import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class ModuleViewModel : BaseViewModel(), Queryable {
 
+    val bottomBarBarrierIds =
+        intArrayOf(R.id.module_info, R.id.module_remove)
+
     override val queryDelay = 1000L
 
     @get:Bindable

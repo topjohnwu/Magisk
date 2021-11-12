@@ -48,7 +48,7 @@
         <item name="colorSecondary">#3E78AF</item>
         <item name="colorSecondaryVariant">#803E78AF</item>
         <item name="colorSurface">#F9F9F9</item>
-        <item name="colorSurfaceVariant">#E8E8E8</item>
+        <item name="colorSurfaceVariant">#EEEEEE</item>
         <item name="colorSurfaceSurfaceVariant">?colorSurface</item>
         <item name="colorOnPrimary">#F9F9F9</item>
         <item name="colorOnPrimaryVariant">#D9E6E6E6</item>

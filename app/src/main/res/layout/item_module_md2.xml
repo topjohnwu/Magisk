@@ -25,11 +25,12 @@
 
         <com.google.android.material.card.MaterialCardView
             style="@style/WidgetFoundation.Card"
-            isEnabled="@{!item.removed}"
+            isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.suspended}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="@{(item.enabled &amp;&amp; !item.suspended) ? 1f : .5f}"
             android:nextFocusRight="@id/module_indicator"
+            app:cardBackgroundColor="@color/color_card_background_color_selector"
+            tools:isEnabled="false"
             tools:layout_gravity="center"
             tools:layout_margin="@dimen/l1">
 
@@ -43,6 +44,7 @@
                 android:adjustViewBounds="true"
                 android:alpha=".05"
                 android:background="@null"
+                android:duplicateParentState="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -52,7 +54,8 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true">
+                android:animateLayoutChanges="true"
+                android:duplicateParentState="true">
 
                 <TextView
                     android:id="@+id/module_title"
@@ -62,8 +65,10 @@
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l_50"
+                    android:duplicateParentState="true"
                     android:text="@{item.item.name}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textColor="?android:textColorPrimary"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toStartOf="@+id/module_indicator"
                     app:layout_constraintStart_toStartOf="parent"
@@ -75,12 +80,14 @@
                     strikeThrough="@{item.removed}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:duplicateParentState="true"
                     android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                    android:textColor="?android:textColorSecondary"
                     app:layout_constraintEnd_toEndOf="@+id/module_title"
                     app:layout_constraintStart_toStartOf="@+id/module_title"
                     app:layout_constraintTop_toBottomOf="@+id/module_title"
-                    tools:text="v1 by topjohnwu" />
+                    tools:text="@tools:sample/lorem" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/module_indicator"
@@ -95,22 +102,6 @@
                     app:layout_constraintTop_toTopOf="@+id/module_title" />
 
                 <TextView
-                    android:id="@+id/module_suspend_text"
-                    goneUnless="@{item.suspended}"
-                    strikeThrough="@{item.removed}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginTop="@dimen/l_50"
-                    android:layout_marginEnd="@dimen/l1"
-                    android:text="@{item.suspendText}"
-                    android:textAppearance="@style/AppearanceFoundation.Tiny.Bold"
-                    android:textColor="?colorError"
-                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
-                    tools:lines="1"
-                    tools:text="@tools:sample/lorem/random" />
-
-                <TextView
                     android:id="@+id/module_description"
                     gone="@{item.item.description.empty}"
                     strikeThrough="@{item.removed}"
@@ -119,9 +110,11 @@
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
+                    android:duplicateParentState="true"
                     android:text="@{item.item.description}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                    app:layout_constraintTop_toBottomOf="@+id/module_suspend_text"
+                    android:textColor="?android:textColorSecondary"
+                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
                     tools:lines="4"
                     tools:text="@tools:sample/lorem/random" />
 
@@ -165,6 +158,33 @@
                     app:layout_constraintTop_toBottomOf="@+id/module_divider"
                     tools:icon="@drawable/ic_delete_md2"
                     tools:text="Remove" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/bottom_bar_barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="start"
+                    app:referencedIds="@{viewModel.bottomBarBarrierIds}"
+                    tools:constraint_referenced_ids="module_info,module_remove" />
+
+                <TextView
+                    android:id="@+id/module_suspend_text"
+                    goneUnless="@{item.suspended}"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l_50"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@{item.suspendText}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption.Primary"
+                    android:textColor="?colorError"
+                    app:layout_constraintBottom_toBottomOf="@+id/module_remove"
+                    app:layout_constraintEnd_toStartOf="@+id/bottom_bar_barrier"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/module_remove"
+                    tools:lines="2"
+                    tools:text="@tools:sample/lorem/random"
+                    tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
