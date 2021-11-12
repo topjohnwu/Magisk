@@ -2,6 +2,7 @@
 #include <sys/mount.h>
 #include <xhook.h>
 #include <bitset>
+#include <list>
 
 #include <utils.hpp>
 #include <flags.h>
@@ -49,7 +50,7 @@ struct HookContext {
     int pid;
     bitset<FLAG_MAX> flags;
     AppInfo info;
-    vector<ZygiskModule> modules;
+    list<ZygiskModule> modules;
 
     HookContext() : pid(-1), info{} {}
 
@@ -331,10 +332,6 @@ void ZygiskModule::setOption(zygisk::Option opt) {
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
     char buf[256];
-
-    // Since we directly use the pointer to elements in the vector, in order to prevent dangling
-    // pointers, the vector has to be pre-allocated to ensure reallocation does not occur
-    modules.reserve(fds.size());
 
     for (int i = 0; i < fds.size(); ++i) {
         snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
