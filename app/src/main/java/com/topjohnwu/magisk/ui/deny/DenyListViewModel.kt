@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.arch.Queryable
 import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.*
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import kotlin.collections.ArrayList
 
+@FlowPreview
 class DenyListViewModel : BaseViewModel(), Queryable {
 
     override val queryDelay = 0L
@@ -46,14 +48,6 @@ class DenyListViewModel : BaseViewModel(), Queryable {
         it.bindExtra(BR.viewModel, this)
     }
 
-    @FlowPreview
-    private inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R): Flow<R> {
-        return flatMapMerge { value ->
-            flow { emit(transform(value)) }
-        }
-    }
-
-    @FlowPreview
     @SuppressLint("InlinedApi")
     override fun refresh() = viewModelScope.launch {
         if (!Utils.showSuperUser()) {
