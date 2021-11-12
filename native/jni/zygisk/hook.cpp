@@ -331,6 +331,11 @@ void ZygiskModule::setOption(zygisk::Option opt) {
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
     char buf[256];
+
+    // Since we directly use the pointer to elements in the vector, in order to prevent dangling
+    // pointers, the vector has to be pre-allocated to ensure reallocation does not occur
+    modules.reserve(fds.size());
+
     for (int i = 0; i < fds.size(); ++i) {
         snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
         if (void *h = dlopen(buf, RTLD_LAZY)) {
