@@ -145,7 +145,7 @@
     <string name="settings_update_beta">測試版</string>
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
-    <string name="settings_zygisk_summary">讓 Magisk 在 Zygote 背景程序運作</string>
+    <string name="settings_zygisk_summary">在 Zygote 中運行 Magisk</string>
     <string name="settings_denylist_title">強制黑名單</string>
     <string name="settings_denylist_summary">Magisk 將會把黑名單內執行的程序還原修改</string>
     <string name="settings_denylist_error">這個功能需要啟用 %1$s</string>
