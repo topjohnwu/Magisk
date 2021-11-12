@@ -36,6 +36,7 @@
     <!--Install-->
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">修补 boot 镜像中的 vbmeta</string>
     <string name="recovery_mode">安装到 Recovery</string>
     <string name="install_options_title">选项</string>
     <string name="install_method_title">方式</string>
@@ -123,8 +124,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">在线</string>
     <string name="sorting_order">排序方式</string>
-    <string name="suspend_text_riru">由于 %1$s 已被启用，此模块不再生效</string>
-    <string name="suspend_text_zygisk">由于 %1$s 未被启用，此模块不再生效</string>
+    <string name="suspend_text_riru">%1$s 已启用，此模块暂停加载</string>
+    <string name="suspend_text_zygisk">%1$s 未启用，此模块暂停加载</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">主题模式</string>
