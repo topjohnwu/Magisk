@@ -12,4 +12,6 @@
     <string name="patreon" translatable="false">Patreon</string>
     <string name="twitter" translatable="false">Twitter</string>
 
+    <drawable name="ic_launcher">@drawable/ic_logo</drawable>
+
 </resources>
