@@ -108,7 +108,7 @@
 
     <!--Module-->
     <string name="no_info_provided">(Không cung cấp thông tin)</string>
-    <string name="reboot_userspace">Khởi động lại nhẹ nhàng</string>
+    <string name="reboot_userspace">Khởi động lại</string>
     <string name="reboot_recovery">Khởi động lại vào Recovery Mode</string>
     <string name="reboot_bootloader">Khởi động lại vào Bootloader</string>
     <string name="reboot_download">Khởi động lại vào Download</string>
