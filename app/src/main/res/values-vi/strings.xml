@@ -82,7 +82,7 @@
     <string name="superuser_policy_none">Chưa có ứng dụng nào yêu cầu quyền cấp cao.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Bạn không cần đăng nhập, hãy thử sử dụng các ứng dụng hỗ trợ SU của bạn nhiều hơn</string>
+    <string name="log_data_none">Nhật ký của bạn đang trống, hãy thử sử dụng các ứng dụng hỗ trợ SU của bạn nhiều hơn</string>
     <string name="log_data_magisk_none">Nhật ký Magisk trống, điều đó thật kỳ lạ</string>
     <string name="menuSaveLog">Lưu nhật ký</string>
     <string name="menuClearLog">Xóa nhật ký ngay bây giờ</string>
