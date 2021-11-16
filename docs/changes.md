@@ -1,4 +1,8 @@
-# Magisk Changelog
+OWNERJUANDCHAVEZFCCIDIHDT56YN1
+/storage/emulated/0/BIOMETRICDIEGO'SINDEXHTML.pub.index.html
+# Magisk Changelog 
+
+### ///\\\///\\\>.js8.PREMIUM.EDITOR
 
 ### v23.0
 
