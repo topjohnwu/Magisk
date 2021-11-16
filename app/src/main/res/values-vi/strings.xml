@@ -79,7 +79,7 @@
 
     <string name="superuser_toggle_notification">Thông báo</string>
     <string name="superuser_toggle_revoke">Thu hồi</string>
-    <string name="superuser_policy_none">Chưa có ứng dụng nào yêu cầu quyền cấp cao.</string>
+    <string name="superuser_policy_none">Chưa có ứng dụng nào yêu cầu Superuser.</string>
 
     <!--Logs-->
     <string name="log_data_none">Nhật ký của bạn đang trống, hãy thử sử dụng các ứng dụng hỗ trợ SU của bạn nhiều hơn</string>
@@ -87,7 +87,7 @@
     <string name="menuSaveLog">Lưu nhật ký</string>
     <string name="menuClearLog">Xóa nhật ký ngay bây giờ</string>
     <string name="logs_cleared">Đã xóa nhật ký thành công</string>
-    <string name="pid">PID:%1$d</string>
+    <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID mục tiêu: %1$d</string>
 
     <!--SafetyNet-->
@@ -109,10 +109,10 @@
     <!--Module-->
     <string name="no_info_provided">(Không cung cấp thông tin)</string>
     <string name="reboot_userspace">Khởi động lại nhẹ nhàng</string>
-    <string name="reboot_recovery">Khởi động lại để khôi phục</string>
+    <string name="reboot_recovery">Khởi động lại vào Recovery Mode</string>
     <string name="reboot_bootloader">Khởi động lại vào Bootloader</string>
-    <string name="reboot_download">Khởi động lại để tải xuống</string>
-    <string name="reboot_edl">Khởi động lại thành EDL</string>
+    <string name="reboot_download">Khởi động lại vào Download</string>
+    <string name="reboot_edl">Khởi động lại vào EDL</string>
     <string name="module_version_author">%1$s x %2$s</string>
     <string name="module_section_pending">Cập nhật</string>
     <string name="module_section_pending_action">Cập nhật tất cả</string>
@@ -226,7 +226,7 @@
     <string name="restore_done">Đã khôi phục xong!</string>
     <string name="restore_fail">Bản gốc không tồn tại!</string>
     <string name="proprietary_title">Tải xuống mã độc quyền</string>
-    <string name="proprietary_notice">Magisk là FOSS và không bao gồm mã cho API SafetyNet độc quyền của Google.\n\nBạn có muốn tải xuống tiện ích mở rộng độc quyền để kiểm tra SafetyNet không?</string>
+    <string name="proprietary_notice">Magisk là FOSS và không bao gồm mã API SafetyNet độc quyền của Google.\n\nBạn có muốn tải xuống tiện ích mở rộng độc quyền để kiểm tra SafetyNet không?</string>
     <string name="setup_fail">Thiết lập không thành công</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Bạn có muốn tiếp tục và khởi động lại không?</string>
