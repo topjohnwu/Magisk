@@ -164,7 +164,7 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     return res;
 }
 
-// A place to clean things up before calling into zygote::ForkCommon/SpecializeCommon
+// A place to clean things up before zygote evaluates fd table
 DCL_HOOK_FUNC(void, android_log_close) {
     HookContext::close_fds();
     if (g_ctx && g_ctx->pid <= 0) {
@@ -282,7 +282,13 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
     old_jniRegisterNativeMethods(env, clz, hooks.data(), hooks.size());
 }
 
-bool ZygiskModule::registerModule(ApiTable *table, long *module) {
+ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
+: raw_entry(entry), api(this), id(id), handle(handle) {}
+
+ApiTable::ApiTable(ZygiskModule *m)
+: module(m), registerModule(&ZygiskModule::RegisterModule) {}
+
+bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
     long ver = *module;
     // Unsupported version
     if (ver > ZYGISK_API_VERSION)
@@ -339,36 +345,52 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
     for (int i = 0; i < fds.size(); ++i) {
         snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
         if (void *h = dlopen(buf, RTLD_LAZY)) {
-            void (*module_entry)(void *, void *);
-            *(void **) &module_entry = dlsym(h, "zygisk_module_entry");
-            if (module_entry) {
-                modules.emplace_back(i, h);
-                auto api = new ApiTable(&modules.back());
-                module_entry(api, env);
-                modules.back().table = api;
+            if (void *e = dlsym(h, "zygisk_module_entry")) {
+                modules.emplace_back(i, h, e);
             }
         }
         close(fds[i]);
     }
+
+    // Record all open fds
+    bitset<1024> open_fds;
+    auto dir = open_dir("/proc/self/fd");
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if (fd < 0 || fd >= 1024) {
+            close(fd);
+            continue;
+        }
+        open_fds[fd] = true;
+    }
+
     for (auto &m : modules) {
+        m.entry(&m.api, env);
         if (flags[APP_SPECIALIZE]) {
             m.preAppSpecialize(args);
         } else if (flags[SERVER_SPECIALIZE]) {
             m.preServerSpecialize(server_args);
         }
     }
+
+    // Close all unrecorded fds
+    rewinddir(dir.get());
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if (fd < 0 || fd >= 1024 || !open_fds[fd]) {
+            close(fd);
+        }
+    }
 }
 
 void HookContext::run_modules_post() {
-    for (auto &m : modules) {
+    for (const auto &m : modules) {
         if (flags[APP_SPECIALIZE]) {
             m.postAppSpecialize(args);
         } else if (flags[SERVER_SPECIALIZE]) {
             m.postServerSpecialize(server_args);
         }
-        if (m.unload) {
-            dlclose(m.handle);
-        }
+        m.doUnload();
     }
 }
 
@@ -385,7 +407,7 @@ void HookContext::unload_zygisk() {
 
         // Strip out all API function pointers
         for (auto &m : modules) {
-            memset(m.table, 0, sizeof(*m.table));
+            memset(&m.api, 0, sizeof(m.api));
         }
 
         new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
