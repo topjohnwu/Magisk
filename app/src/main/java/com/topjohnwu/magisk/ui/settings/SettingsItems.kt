@@ -237,7 +237,8 @@ object Magisk : BaseSettingsItem.Section() {
 object Zygisk : BaseSettingsItem.Toggle() {
     override val title = R.string.zygisk.asText()
     override val description get() =
-        if (mismatch) R.string.reboot_apply_change.asText()
+        if (!isEnabled) R.string.settings_zygisk_error.asText()
+        else if (mismatch) R.string.reboot_apply_change.asText()
         else R.string.settings_zygisk_summary.asText()
     override var value = Config.zygisk
         set(value) = setV(value, field, { field = it }) {
@@ -247,6 +248,10 @@ object Zygisk : BaseSettingsItem.Toggle() {
             DenyList.notifyPropertyChanged(BR.description)
         }
     val mismatch get() = value != Info.isZygiskEnabled
+    
+    init { 
+        isEnabled = Info.env.magiskVersionCode >= 23010
+    }
 }
 
 object DenyList : BaseSettingsItem.Toggle() {

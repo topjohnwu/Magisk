@@ -148,6 +148,7 @@
     <string name="settings_update_custom">自定义通道</string>
     <string name="settings_update_custom_msg">自定义通道网址</string>
     <string name="settings_zygisk_summary">在 Zygote 中运行 Magisk</string>
+    <string name="settings_zygisk_error">此功能需要先安装更新的 Magisk（23010+）</string>
     <string name="settings_denylist_title">遵守排除列表</string>
     <string name="settings_denylist_summary">Magisk 不会修改列表中的进程</string>
     <string name="settings_denylist_error">此功能需要先启用 %1$s</string>
