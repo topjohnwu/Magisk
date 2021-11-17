@@ -16,7 +16,7 @@
     <string name="no_connection">Nenhuma conexão disponível</string>
     <string name="hide">Ocultar</string>
     <string name="app_changelog">Registro de alterações</string>
-
+    <string name="loading">Carregando…</string>
     <string name="home_support_title">Contribua com o Projeto</string>
     <string name="home_notice_content">Baixe o Magisk SOMENTE pela pagina oficial do Github. Arquivos de fontes desconhecida podem ser maliciosos.</string>
     <string name="home_item_source">Origem</string>
@@ -114,6 +114,8 @@
     <string name="update_available">Atualização disponível</string>
     <string name="home_installed_version">Instalado</string>
     <string name="sorting_order">Ordem de classificação</string>
+    <string name="suspend_text_riru">Módulo suspenso porque %1$s está ativo</string>
+    <string name="suspend_text_zygisk">Módulo suspenso porque %1$s não está ativo</string>
 
 
     <!--Settings -->
