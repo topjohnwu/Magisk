@@ -114,20 +114,20 @@ else
   mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-magisk
 fi
 
-# Magisk stuffs
-mkdir -p /data/adb/magisk 2>/dev/null
-unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' -d /data/adb/magisk
-mkdir /data/adb/modules 2>/dev/null
-mkdir /data/adb/post-fs-data.d 2>/dev/null
-mkdir /data/adb/services.d 2>/dev/null
+# Magisk stuff
+mkdir -p $MAGISKBIN 2>/dev/null
+unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' -d $MAGISKBIN
+mkdir $NVBASE/modules 2>/dev/null
+mkdir $POSTFSDATAD 2>/dev/null
+mkdir $SERVICED 2>/dev/null
 
 for file in magisk32 magisk64 magiskinit; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
-  cp -af ./$file /data/adb/magisk/$file
+  cp -af ./$file $MAGISKBIN/$file
 done
-cp -af ./magiskboot /data/adb/magisk/magiskboot
-cp -af ./busybox /data/adb/magisk/busybox
+cp -af ./magiskboot $MAGISKBIN/magiskboot
+cp -af ./busybox $MAGISKBIN/busybox
 
 ln -s ./magisk64 $MAGISKTMP/magisk
 ln -s ./magisk $MAGISKTMP/su
