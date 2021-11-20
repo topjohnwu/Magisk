@@ -738,9 +738,9 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Enabling 0x2 bootloop some devices, but fix boot on other devices.
         if (boot.flags[SEANDROID_FLAG] || boot.flags[MTK_KERNEL]) {
             vbmeta->flags = __builtin_bswap32(3);
-        } else {
-            // Use |= operator to keep 0x2 flag on custom kernels/ROMs
-            vbmeta->flags |= __builtin_bswap32(1);
+        } else if (vbmeta->flags == 0) {
+            // Only patch flags if they are 0 to avoid conflicting with custom ROMs
+            vbmeta->flags = __builtin_bswap32(1);
         }
     }
 
