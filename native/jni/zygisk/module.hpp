@@ -6,7 +6,7 @@ namespace {
 
 using module_abi_v1 = zygisk::internal::module_abi;
 struct HookContext;
-struct ApiTable;
+struct ZygiskModule;
 
 struct AppSpecializeArgsImpl {
     jint &uid;
@@ -67,55 +67,60 @@ force_cast_wrapper<R> force_cast(R &&x) {
     return force_cast_wrapper<R>(std::forward<R>(x));
 }
 
+struct ApiTable {
+    // These first 2 entries are permanent
+    ZygiskModule *module;
+    bool (*registerModule)(ApiTable *, long *);
+
+    struct {
+        void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+        void (*pltHookRegister)(const char *, const char *, void *, void **);
+        void (*pltHookExclude)(const char *, const char *);
+        bool (*pltHookCommit)();
+
+        int (*connectCompanion)(ZygiskModule *);
+        void (*setOption)(ZygiskModule *, zygisk::Option);
+    } v1;
+
+    ApiTable(ZygiskModule *m);
+};
+
 struct ZygiskModule {
-    void preAppSpecialize(AppSpecializeArgsImpl *args) {
+    void preAppSpecialize(AppSpecializeArgsImpl *args) const {
         v1->preAppSpecialize(v1->_this, force_cast(args));
     }
-    void postAppSpecialize(const AppSpecializeArgsImpl *args) {
+    void postAppSpecialize(const AppSpecializeArgsImpl *args) const {
         v1->postAppSpecialize(v1->_this, force_cast(args));
     }
-    void preServerSpecialize(ServerSpecializeArgsImpl *args) {
+    void preServerSpecialize(ServerSpecializeArgsImpl *args) const {
         v1->preServerSpecialize(v1->_this, force_cast(args));
     }
-    void postServerSpecialize(const ServerSpecializeArgsImpl *args) {
+    void postServerSpecialize(const ServerSpecializeArgsImpl *args) const {
         v1->postServerSpecialize(v1->_this, force_cast(args));
     }
 
     int connectCompanion() const;
     void setOption(zygisk::Option opt);
-    static bool registerModule(ApiTable *table, long *module);
+    void doUnload() const { if (unload) dlclose(handle); }
 
-    ZygiskModule(int id, void *handle) : handle(handle), id(id) {}
+    ZygiskModule(int id, void *handle, void *entry);
 
-    void * const handle;
-    ApiTable *table = nullptr;
-    bool unload = false;
+    static bool RegisterModule(ApiTable *table, long *module);
+
+    union {
+        void (* const entry)(void *, void *);
+        void * const raw_entry;
+    };
+    ApiTable api;
 
 private:
-    int id;
+    const int id;
+    bool unload = false;
+    void * const handle;
     union {
         long *ver = nullptr;
         module_abi_v1 *v1;
     };
-};
-
-struct ApiTable {
-    ZygiskModule *module;
-    bool (*registerModule)(ApiTable *, long *);
-
-    union {
-        void *padding[6] = {};
-        struct {
-            void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-            void (*pltHookRegister)(const char *, const char *, void *, void **);
-            void (*pltHookExclude)(const char *, const char *);
-            bool (*pltHookCommit)();
-
-            int (*connectCompanion)(ZygiskModule *);
-            void (*setOption)(ZygiskModule *, zygisk::Option);
-        } v1;
-    };
-    ApiTable(ZygiskModule *m) : module(m), registerModule(&ZygiskModule::registerModule) {}
 };
 
 } // namespace

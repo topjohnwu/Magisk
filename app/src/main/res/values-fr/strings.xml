@@ -123,8 +123,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">En ligne</string>
     <string name="sorting_order">Ordre de tri</string>
-    <string name="suspend_text_riru">Module suspendue car %1$s est actif</string>
-    <string name="suspend_text_zygisk">Module suspendue car %1$s n’est pas actif</string>
+    <string name="suspend_text_riru">Module suspendu car %1$s est actif</string>
+    <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>

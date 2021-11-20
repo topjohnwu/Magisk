@@ -123,6 +123,8 @@
     <string name="module_installed">Установлены</string>
     <string name="module_section_online">Репозиторий</string>
     <string name="sorting_order">Сортировка</string>
+    <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
+    <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
