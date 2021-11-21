@@ -18,9 +18,9 @@
     <string name="app_changelog">Registro de alterações</string>
     <string name="loading">Carregando…</string>
     <string name="home_support_title">Contribua com o Projeto</string>
-    <string name="home_notice_content">Baixe o Magisk SOMENTE pela pagina oficial do Github. Arquivos de fontes desconhecida podem ser maliciosos.</string>
+    <string name="home_notice_content">Baixe o Magisk SOMENTE pela página oficial do Github. Arquivos de fontes desconhecidas podem ser maliciosos.</string>
     <string name="home_item_source">Origem</string>
-    <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos mostrar que se importa enviando uma pequena doação.</string>
+    <string name="home_support_content">Magisk é, e sempre será, gratuito e de código aberto. No entanto, você pode nos agradecer enviando uma pequena doação.</string>
     <string name="home_package">Pacote</string>
     <string name="home_app_title">App</string>
     <string name="invalid_update_channel">Canal de atualização inválido</string>
@@ -39,10 +39,10 @@
     <string name="manager_download_install">Pressione para baixar e instalar</string>
     <string name="direct_install">Instalação direta (recomendada)</string>
     <string name="install_inactive_slot">Instalar no slot inativo (após o OTA)</string>
-    <string name="install_inactive_slot_msg">Seu dispositivo será FORÇADO para inicializar no slot inativo atual após uma reinicialização!\nSó use esta opção após a conclusão do OTA.\nContinuar?</string>
+    <string name="install_inactive_slot_msg">Seu dispositivo será FORÇADO a inicializar no slot inativo atual após uma reinicialização!\nSó use esta opção após a conclusão do OTA.\nContinuar?</string>
     <string name="setup_title">Configuração adicional</string>
     <string name="select_patch_file">Selecione e corrija um arquivo</string>
-    <string name="patch_file_msg">Selecione uma imagem bruta (*.img) ou um arquivo tarin ODIN (*.tar)</string>
+    <string name="patch_file_msg">Selecione uma imagem raw (*.img) ou um arquivo tar ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reiniciando em 5 segundos…</string>
     <string name="flash_screen_title">Instalação</string>
 
@@ -60,14 +60,14 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s foi concedido Acesso superusuário</string>
     <string name="su_deny_toast">%1$s foi negado Acesso superusuário</string>
-    <string name="su_snack_grant">Acesso de superusuário de  %1$s são concedidos</string>
-    <string name="su_snack_deny">Os Acesso de superusuário de  %1$s são negados</string>
-    <string name="su_snack_notif_on">As notificações de  %1$s são habilitadas</string>
-    <string name="su_snack_notif_off">As notificações de  %1$s são desativadas</string>
-    <string name="su_snack_log_on">O registro de  %1$s é ativado</string>
-    <string name="su_snack_log_off">O registro de  %1$s é desativado</string>
+    <string name="su_snack_grant">Acesso de superusuário de %1$s foram concedidos</string>
+    <string name="su_snack_deny">Os Acesso de superusuário de %1$s foram negados</string>
+    <string name="su_snack_notif_on">As notificações de %1$s foram habilitadas</string>
+    <string name="su_snack_notif_off">As notificações de %1$s foram desativadas</string>
+    <string name="su_snack_log_on">O registro de %1$s foi ativado</string>
+    <string name="su_snack_log_off">O registro de %1$s foi desativado</string>
     <string name="su_revoke_title">Revogar?</string>
-    <string name="su_revoke_msg">Confirmar revogar Acesso de  %1$s?</string>
+    <string name="su_revoke_msg">Confirmar revogar Acesso de %1$s?</string>
     <string name="toast">Pop-up no estilo Toast</string>
     <string name="none">Nenhum</string>
 
@@ -85,8 +85,8 @@
     <string name="target_uid">Alvo UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Erro API SafetyNet</string>
-    <string name="safetynet_res_invalid">A resposta é inválida</string>
+    <string name="safetynet_api_error">Erro no API SafetyNet</string>
+    <string name="safetynet_res_invalid">Resposta inválida</string>
     <string name="safetynet_attest_success">Sucesso!</string>
     <string name="safetynet_attest_failure">O certificado falhou!</string>
     <string name="safetynet_attest_loading">Aguarde…</string>
@@ -101,9 +101,9 @@
 
     <!--Module Fragment-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
-    <string name="reboot_recovery">Reiniciar em Recovery</string>
-    <string name="reboot_bootloader">Reiniciar em Bootloader</string>
-    <string name="reboot_download">Reiniciar em Download</string>
+    <string name="reboot_recovery">Reiniciar para Recovery</string>
+    <string name="reboot_bootloader">Reiniciar para Bootloader</string>
+    <string name="reboot_download">Reiniciar para Download</string>
     <string name="reboot_edl">Reiniciar para EDL</string>
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_section_pending">Atualizações</string>
@@ -123,20 +123,13 @@
     <string name="settings_dark_mode_message">Selecione o modo mais adequado ao seu estilo!</string>
     <string name="settings_dark_mode_light">Sempre Claro</string>
     <string name="settings_dark_mode_system">Baseado no Sistema</string>
-    <string name="settings_dark_mode_dark">Sempre Escuro</string><![CDATA[
-
-
-        
-
-
-
-    ]]>
+    <string name="settings_dark_mode_dark">Sempre Escuro</string>
     <string name="settings_download_path_title">Caminho de Download</string>
-    <string name="settings_download_path_message">Os arquivos serão salvos em  %1$s</string>
-    <string name="settings_hide_app_title">Esconder o app do Magisk</string>
-    <string name="settings_hide_app_summary">Instala um app proxy com ID de pacote aleatorio e nome de app personalizado</string>
+    <string name="settings_download_path_message">Os arquivos serão salvos em %1$s</string>
+    <string name="settings_hide_app_title">Ocultar o app do Magisk</string>
+    <string name="settings_hide_app_summary">Instala um app proxy com ID de pacote aleatório e nome de app personalizado</string>
     <string name="settings_restore_app_title">Restaura o app do Magisk</string>
-    <string name="settings_restore_app_summary">Desesconder o app e restaura-lo ao seu APK original</string>
+    <string name="settings_restore_app_summary">Desocultar o app e restaurá-lo ao APK original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Padrão do sistema)</string>
     <string name="settings_check_update_title">Verificar atualizações</string>
@@ -151,10 +144,10 @@
     <string name="settings_denylist_summary">Os processos na lista de negação terão todas as modificações do Magisk revertidas</string>
     <string name="settings_denylist_error">Isso requer %1$s para ser ativado</string>
     <string name="settings_denylist_config_title">Configurar lista de negação</string>
-    <string name="settings_denylist_config_summary">Selecione os processos a serem incluidos na lista de negação</string>
-    <string name="settings_hosts_title">Hosts sem sistema</string>
-    <string name="settings_hosts_summary">Suporte de hosts sem sistema para aplicativos Adblock</string>
-    <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>
+    <string name="settings_denylist_config_summary">Selecione os processos a serem incluídos na lista de negação</string>
+    <string name="settings_hosts_title">Hosts systemless</string>
+    <string name="settings_hosts_summary">Suporte de hosts systemless para aplicativos Adblock</string>
+    <string name="settings_hosts_toast">Adicionado módulo de hosts systemless</string>
     <string name="settings_app_name_hint">Novo nome</string>
     <string name="settings_app_name_helper">O aplicativo será reinstalado para esse nome</string>
     <string name="settings_app_name_error">Formato inválido</string>
@@ -188,15 +181,15 @@
     <string name="settings_user_independent">Independente do usuário</string>
     <string name="owner_only_summary">Somente o proprietário tem acesso root</string>
     <string name="owner_manage_summary">Somente o proprietário pode gerenciar o acesso root e receber prompts de solicitação</string>
-    <string name="user_indepenent_summary">Cada usuário tem suas próprias regras raiz separadas</string>
+    <string name="user_indepenent_summary">Cada usuário tem suas próprias regras para root separadas</string>
 
     <string name="mount_namespace_mode">Montar modo de Namespace</string>
     <string name="settings_ns_global">Namespace global</string>
     <string name="settings_ns_requester">Herdar Namespace</string>
     <string name="settings_ns_isolate">Namespace isolado</string>
-    <string name="global_summary">Todas as sessões raiz usam o namespace de montagem global</string>
-    <string name="requester_summary">As sessões raiz herdarão o namespace do solicitante</string>
-    <string name="isolate_summary">Cada sessão raiz terá seu próprio namespace isolado</string>
+    <string name="global_summary">Todas as sessões root usam o namespace de montagem global</string>
+    <string name="requester_summary">As sessões root herdarão o namespace do solicitante</string>
+    <string name="isolate_summary">Cada sessão root terá seu próprio namespace isolado</string>
 
     <!--Notifications-->
     <string name="update_channel">Atualizações do Magisk</string>
@@ -212,30 +205,30 @@
     <string name="repo_install_msg">Deseja instalar %1$s agora?</string>
     <string name="download">Download</string>
     <string name="reboot">Reinicializar</string>
-    <string name="release_notes">Notas da versão</string>
+    <string name="release_notes">Notas de versão</string>
     <string name="repo_cache_cleared">Cache do repositório limpo</string>
-    <string name="flashing">Flechando…</string>
+    <string name="flashing">Flashando…</string>
     <string name="done">Concluído!</string>
     <string name="failure">Falha</string>
-    <string name="hide_app_title">Escondendo o app do Magisk…</string>
+    <string name="hide_app_title">Ocultando o app do Magisk…</string>
     <string name="open_link_failed_toast">Nenhum aplicativo encontrado para abrir o link</string>
     <string name="complete_uninstall">Desinstalação completa</string>
     <string name="restore_img">Restaurar imagens</string>
        
     <string name="restore_img_msg">Restaurando…</string>
     <string name="restore_done">Restauração concluída!</string>
-    <string name="restore_fail">O backup de estoque não existe!</string>
+    <string name="restore_fail">O backup stock não existe!</string>
     <string name="proprietary_title">Faça o download do código proprietário</string>
-    <string name="proprietary_notice">Magisk é FOSS e não inclui codigo pra API proprietaria do SafetyNet da Google.\n\nVoce quer baixar a extensão proprietaria pra checagem do SafetyNet?</string>
+    <string name="proprietary_notice">Magisk é FOSS e não inclui código pra API proprietária do SafetyNet da Google.\n\nVocê quer baixar a extensão proprietária para checagem do SafetyNet?</string>
     <string name="setup_fail">Falha na instalação</string>
     <string name="env_fix_title">Requer configuração adicional</string>
-    <string name="env_fix_msg">Seu dispositivo requer configuração adicional pro Magisk funcionar corretamente. Voce quer continuar e reiniciar?</string>
+    <string name="env_fix_msg">Seu dispositivo requer configuração adicional para o Magisk funcionar corretamente. Você quer continuar e reiniciar?</string>
     <string name="setup_msg">Executando a configuração do ambiente…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versão Magisk não suportada</string>
-    <string name="unsupport_magisk_msg">Essa versão do app não suporta versão do Magisk inferior a %1$s.\n\nO App ira se comportar como se nenhum Magisk estivesse instalado, por favor atualize o Magisk assim que possivel.</string>
+    <string name="unsupport_magisk_msg">Essa versão do app não suporta versão do Magisk inferior a %1$s.\n\nO App irá se comportar como se nenhum Magisk estivesse sido instalado, por favor atualize o Magisk assim que possivel.</string>
     <string name="add_shortcut_title">Adicionar atalho à tela inicial</string>
-    <string name="add_shortcut_msg">Depois de esconder o app o seu nome e icone ficarão dificeis de reconhecer. Voce quer adicionar um atalho bonitinho na tela inicial?</string>
+    <string name="add_shortcut_msg">Depois de ocultar o app, o seu nome e ícone ficarão difíceis de reconhecer. Você quer adicionar um atalho bonitinho na tela inicial?</string>
     <string name="app_not_found">Nenhum aplicativo encontrado para realizar esta ação</string>
 
 </resources>
