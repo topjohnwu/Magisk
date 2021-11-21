@@ -52,7 +52,8 @@ static size_t restore(int fd, const char *filename) {
 void dyn_img_hdr::print() {
     uint32_t ver = header_version();
     fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);
-    fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_SZ", kernel_size());
+    if (!is_vendor)
+        fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_SZ", kernel_size());
     fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK_SZ", ramdisk_size());
     if (ver < 3)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "SECOND_SZ", second_size());
@@ -94,7 +95,6 @@ void dyn_img_hdr::print() {
 
 void dyn_img_hdr::dump_hdr_file() {
     FILE *fp = xfopen(HEADER_FILE, "w");
-    fprintf(fp, "pagesize=%u\n", page_size());
     if (name())
         fprintf(fp, "name=%s\n", name());
     fprintf(fp, "cmdline=%.*s%.*s\n", BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
@@ -119,9 +119,7 @@ void dyn_img_hdr::dump_hdr_file() {
 
 void dyn_img_hdr::load_hdr_file() {
     parse_prop_file(HEADER_FILE, [=](string_view key, string_view value) -> bool {
-        if (key == "page_size") {
-            page_size() = parse_int(value);
-        } else if (key == "name" && name()) {
+        if (key == "name" && name()) {
             memset(name(), 0, 16);
             memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
         } else if (key == "cmdline") {
@@ -222,8 +220,8 @@ static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
     format_t fmt = check_fmt(buf, sz);
     if (fmt == LZ4_LEGACY) {
         // We need to check if it is LZ4_LG
-        unsigned off = 4;
-        unsigned block_sz;
+        uint32_t off = 4;
+        uint32_t block_sz;
         while (off + sizeof(block_sz) <= sz) {
             memcpy(&block_sz, buf + off, sizeof(block_sz));
             off += sizeof(block_sz);
@@ -235,63 +233,75 @@ static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
     return fmt;
 }
 
-#define get_block(name) {\
-name = addr + off; \
-off += hdr->name##_size(); \
-off = do_align(off, hdr->page_size()); \
-}
-
 #define CMD_MATCH(s) BUFFER_MATCH(h->cmdline, s)
 
-void boot_img::parse_image(uint8_t *addr, format_t type) {
-    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
     if (type == AOSP_VENDOR) {
         fprintf(stderr, "VENDOR_BOOT_HDR\n");
+        auto h = reinterpret_cast<boot_img_hdr_vnd_v3*>(addr);
+        hdr_addr = addr;
         switch (h->header_version) {
         case 4:
-            hdr = new dyn_img_vnd_v4(addr);
-            break;
-        case 3:
+            return new dyn_img_vnd_v4(addr);
         default:
-            hdr = new dyn_img_vnd_v3(addr);
-            break;
-        }
-    } else if (h->page_size >= 0x02000000) {
-        fprintf(stderr, "PXA_BOOT_HDR\n");
-        hdr = new dyn_img_pxa(addr);
-    } else {
-        if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
-            CMD_MATCH(NOOKHD_GL_MAGIC) ||
-            CMD_MATCH(NOOKHD_GR_MAGIC) ||
-            CMD_MATCH(NOOKHD_EB_MAGIC) ||
-            CMD_MATCH(NOOKHD_ER_MAGIC)) {
-            flags[NOOKHD_FLAG] = true;
-            fprintf(stderr, "NOOKHD_LOADER\n");
-            addr += NOOKHD_PRE_HEADER_SZ;
-        } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
-            flags[ACCLAIM_FLAG] = true;
-            fprintf(stderr, "ACCLAIM_LOADER\n");
-            addr += ACCLAIM_PRE_HEADER_SZ;
-        }
-
-        switch (h->header_version) {
-        case 1:
-            hdr = new dyn_img_v1(addr);
-            break;
-        case 2:
-            hdr = new dyn_img_v2(addr);
-            break;
-        case 3:
-            hdr = new dyn_img_v3(addr);
-            break;
-        case 4:
-            hdr = new dyn_img_v4(addr);
-            break;
-        default:
-            hdr = new dyn_img_v0(addr);
-            break;
+            return new dyn_img_vnd_v3(addr);
         }
     }
+
+    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+
+    if (h->page_size >= 0x02000000) {
+        fprintf(stderr, "PXA_BOOT_HDR\n");
+        hdr_addr = addr;
+        return new dyn_img_pxa(addr);
+    }
+
+    if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
+        CMD_MATCH(NOOKHD_GL_MAGIC) ||
+        CMD_MATCH(NOOKHD_GR_MAGIC) ||
+        CMD_MATCH(NOOKHD_EB_MAGIC) ||
+        CMD_MATCH(NOOKHD_ER_MAGIC)) {
+        flags[NOOKHD_FLAG] = true;
+        fprintf(stderr, "NOOKHD_LOADER\n");
+        addr += NOOKHD_PRE_HEADER_SZ;
+    } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
+        flags[ACCLAIM_FLAG] = true;
+        fprintf(stderr, "ACCLAIM_LOADER\n");
+        addr += ACCLAIM_PRE_HEADER_SZ;
+    }
+
+    // addr could be adjusted
+    h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+    hdr_addr = addr;
+
+    switch (h->header_version) {
+    case 1:
+        return new dyn_img_v1(addr);
+    case 2:
+        return new dyn_img_v2(addr);
+    case 3:
+        return new dyn_img_v3(addr);
+    case 4:
+        return new dyn_img_v4(addr);
+    default:
+        return new dyn_img_v0(addr);
+    }
+}
+
+#define get_block(name)                 \
+name = hdr_addr + off;                  \
+off += hdr->name##_size();              \
+off = do_align(off, hdr->page_size());
+
+#define get_ignore(name)                                            \
+if (hdr->name##_size()) {                                           \
+    auto blk_sz = do_align(hdr->name##_size(), hdr->page_size());   \
+    ignore_size += blk_sz;                                          \
+    off += blk_sz;                                                  \
+}
+
+void boot_img::parse_image(uint8_t *addr, format_t type) {
+    hdr = create_hdr(addr, type);
 
     if (char *id = hdr->id()) {
         for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
@@ -305,13 +315,17 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     hdr->print();
 
     size_t off = hdr->hdr_space();
-    hdr_addr = addr;
     get_block(kernel);
     get_block(ramdisk);
     get_block(second);
     get_block(extra);
     get_block(recovery_dtbo);
     get_block(dtb);
+
+    ignore = hdr_addr + off;
+    get_ignore(signature)
+    get_ignore(vendor_ramdisk_table)
+    get_ignore(bootconfig)
 
     if (int dtb_off = find_dtb_offset(kernel, hdr->kernel_size()); dtb_off > 0) {
         kernel_dtb = kernel + dtb_off;
@@ -363,7 +377,13 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
-        r_fmt = check_fmt_lg(ramdisk, size);
+        if (hdr->is_vendor && hdr->header_version() >= 4) {
+            // v4 vendor boot contains multiple ramdisks
+            // Do not try to mess with it for now
+            r_fmt = UNKNOWN;
+        } else {
+            r_fmt = check_fmt_lg(ramdisk, size);
+        }
         if (r_fmt == MTK) {
             fprintf(stderr, "MTK_RAMDISK_HDR\n");
             flags[MTK_RAMDISK] = true;
@@ -633,6 +653,12 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     if (access(DTB_FILE, R_OK) == 0) {
         hdr->dtb_size() = restore(fd, DTB_FILE);
         file_align();
+    }
+
+    // Directly copy ignored blobs
+    if (boot.ignore_size) {
+        // ignore_size should already be aligned
+        xwrite(fd, boot.ignore, boot.ignore_size);
     }
 
     // Proprietary stuffs

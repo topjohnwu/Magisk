@@ -91,7 +91,7 @@ restore_imgs() {
 }
 
 post_ota() {
-  cd /data/adb
+  cd $NVBASE
   cp -f $1 bootctl
   rm -f $1
   chmod 755 bootctl
