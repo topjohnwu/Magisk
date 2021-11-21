@@ -367,6 +367,11 @@ struct dyn_img_hdr {
     decl_var(header_size, 32)
     decl_var(dtb_size, 32)
 
+    // v4 specific
+    decl_val(signature_size, uint32_t)
+    decl_val(vendor_ramdisk_table_size, uint32_t)
+    decl_val(bootconfig_size, uint32_t)
+
     virtual ~dyn_img_hdr() {
         free(raw);
     }
@@ -495,6 +500,8 @@ struct dyn_img_v3 : public dyn_img_hdr_boot {
 
 struct dyn_img_v4 : public dyn_img_v3 {
     impl_cls(v4)
+
+    impl_val(signature_size)
 };
 
 struct dyn_img_hdr_vendor : public dyn_img_hdr {
@@ -524,6 +531,9 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
 
 struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
     impl_cls(vnd_v4)
+
+    impl_val(vendor_ramdisk_table_size)
+    impl_val(bootconfig_size)
 };
 
 #undef __impl_cls
@@ -609,6 +619,10 @@ struct boot_img {
     uint8_t *extra;
     uint8_t *recovery_dtbo;
     uint8_t *dtb;
+
+    // Pointer to blocks defined in header, but we do not care
+    uint8_t *ignore;
+    size_t ignore_size = 0;
 
     boot_img(const char *);
     ~boot_img();
