@@ -151,7 +151,15 @@ struct boot_img_hdr_v0_common {
 
 struct boot_img_hdr_v0 : public boot_img_hdr_v0_common {
     uint32_t tags_addr;    /* physical addr for kernel tags */
-    uint32_t page_size;    /* flash page size we assume */
+
+    // In AOSP headers, this field is used for page size.
+    // For Samsung PXA headers, the use of this field is unknown;
+    // however, its value is something unrealistic to be treated as page size.
+    // We use this fact to determine whether this is an AOSP or PXA header.
+    union {
+        uint32_t unknown;
+        uint32_t page_size;    /* flash page size we assume */
+    };
 
     // In header v1, this field is used for header version
     // However, on some devices like Samsung, this field is used to store DTB
@@ -374,13 +382,10 @@ struct dyn_img_hdr {
 
 protected:
     union {
-        // Main header could be either AOSP or PXA
         boot_img_hdr_v2 *v2_hdr;     /* AOSP v2 header */
-        boot_img_hdr_v3 *v3_hdr;     /* AOSP v3 header */
         boot_img_hdr_v4 *v4_hdr;     /* AOSP v4 header */
-        boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
-        boot_img_hdr_vnd_v3 *v3_vnd; /* AOSP vendor v3 header */
         boot_img_hdr_vnd_v4 *v4_vnd; /* AOSP vendor v4 header */
+        boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
         void *raw;                   /* Raw pointer */
     };
     dyn_img_hdr(bool b) : is_vendor(b) {}
@@ -394,30 +399,32 @@ private:
 #undef decl_var
 #undef decl_val
 
-#define __impl_cls(name, hdr) \
-protected: name() = default; \
-public: \
-name(void *ptr) { \
-    raw = xmalloc(sizeof(hdr)); \
-    memcpy(raw, ptr, sizeof(hdr)); \
-} \
-size_t hdr_size() override { return sizeof(hdr); } \
-dyn_img_hdr *clone() override { \
-    auto p = new name(this->raw); \
+#define __impl_cls(name, hdr)           \
+protected: name() = default;            \
+public:                                 \
+name(void *ptr) {                       \
+    raw = xmalloc(sizeof(hdr));         \
+    memcpy(raw, ptr, sizeof(hdr));      \
+}                                       \
+size_t hdr_size() override {            \
+    return sizeof(hdr);                 \
+}                                       \
+dyn_img_hdr *clone() override {         \
+    auto p = new name(raw);             \
     p->kernel_dt_size = kernel_dt_size; \
-    return p; \
+    return p;                           \
 };
 
 #define __impl_val(name, hdr_name) \
 decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_name->name; }
 
-#define impl_cls(ver) __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
-#define impl_val(name) __impl_val(name, v2_hdr)
-
 struct dyn_img_hdr_boot : public dyn_img_hdr {
 protected:
     dyn_img_hdr_boot() : dyn_img_hdr(false) {}
 };
+
+#define impl_cls(ver)  __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
+#define impl_val(name) __impl_val(name, v2_hdr)
 
 struct dyn_img_common : public dyn_img_hdr_boot {
     impl_val(kernel_size)
@@ -469,7 +476,7 @@ struct dyn_img_pxa : public dyn_img_common {
 };
 
 #undef impl_val
-#define impl_val(name) __impl_val(name, v3_hdr)
+#define impl_val(name) __impl_val(name, v4_hdr)
 
 struct dyn_img_v3 : public dyn_img_hdr_boot {
     impl_cls(v3)
@@ -483,14 +490,11 @@ struct dyn_img_v3 : public dyn_img_hdr_boot {
 
     // Make API compatible
     uint32_t &page_size() override { page_sz = 4096; return page_sz; }
-    char *extra_cmdline() override { return &v3_hdr->cmdline[BOOT_ARGS_SIZE]; }
+    char *extra_cmdline() override { return &v4_hdr->cmdline[BOOT_ARGS_SIZE]; }
 
 private:
     uint32_t page_sz = 4096;
 };
-
-#undef impl_val
-#define impl_val(name) __impl_val(name, v4_hdr)
 
 struct dyn_img_v4 : public dyn_img_v3 {
     impl_cls(v4)
@@ -502,7 +506,7 @@ protected:
 };
 
 #undef impl_val
-#define impl_val(name) __impl_val(name, v3_vnd)
+#define impl_val(name) __impl_val(name, v4_vnd)
 
 struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
     impl_cls(vnd_v3)
@@ -518,11 +522,8 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
     size_t hdr_space() override { auto sz = page_size(); return do_align(hdr_size(), sz); }
 
     // Make API compatible
-    char *extra_cmdline() override { return &v3_vnd->cmdline[BOOT_ARGS_SIZE]; }
+    char *extra_cmdline() override { return &v4_vnd->cmdline[BOOT_ARGS_SIZE]; }
 };
-
-#undef impl_val
-#define impl_val(name) __impl_val(name, v4_vnd)
 
 struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
     impl_cls(vnd_v4)
@@ -616,4 +617,5 @@ struct boot_img {
     ~boot_img();
 
     void parse_image(uint8_t *addr, format_t type);
+    dyn_img_hdr *create_hdr(uint8_t *addr, format_t type);
 };

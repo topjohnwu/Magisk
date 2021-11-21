@@ -235,63 +235,68 @@ static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
     return fmt;
 }
 
-#define get_block(name) {\
-name = addr + off; \
-off += hdr->name##_size(); \
-off = do_align(off, hdr->page_size()); \
-}
-
 #define CMD_MATCH(s) BUFFER_MATCH(h->cmdline, s)
 
-void boot_img::parse_image(uint8_t *addr, format_t type) {
-    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
     if (type == AOSP_VENDOR) {
         fprintf(stderr, "VENDOR_BOOT_HDR\n");
+        auto h = reinterpret_cast<boot_img_hdr_vnd_v3*>(addr);
+        hdr_addr = addr;
         switch (h->header_version) {
         case 4:
-            hdr = new dyn_img_vnd_v4(addr);
-            break;
-        case 3:
+            return new dyn_img_vnd_v4(addr);
         default:
-            hdr = new dyn_img_vnd_v3(addr);
-            break;
-        }
-    } else if (h->page_size >= 0x02000000) {
-        fprintf(stderr, "PXA_BOOT_HDR\n");
-        hdr = new dyn_img_pxa(addr);
-    } else {
-        if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
-            CMD_MATCH(NOOKHD_GL_MAGIC) ||
-            CMD_MATCH(NOOKHD_GR_MAGIC) ||
-            CMD_MATCH(NOOKHD_EB_MAGIC) ||
-            CMD_MATCH(NOOKHD_ER_MAGIC)) {
-            flags[NOOKHD_FLAG] = true;
-            fprintf(stderr, "NOOKHD_LOADER\n");
-            addr += NOOKHD_PRE_HEADER_SZ;
-        } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
-            flags[ACCLAIM_FLAG] = true;
-            fprintf(stderr, "ACCLAIM_LOADER\n");
-            addr += ACCLAIM_PRE_HEADER_SZ;
-        }
-
-        switch (h->header_version) {
-        case 1:
-            hdr = new dyn_img_v1(addr);
-            break;
-        case 2:
-            hdr = new dyn_img_v2(addr);
-            break;
-        case 3:
-            hdr = new dyn_img_v3(addr);
-            break;
-        case 4:
-            hdr = new dyn_img_v4(addr);
-            break;
-        default:
-            hdr = new dyn_img_v0(addr);
-            break;
+            return new dyn_img_vnd_v3(addr);
         }
     }
+
+    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+
+    if (h->page_size >= 0x02000000) {
+        fprintf(stderr, "PXA_BOOT_HDR\n");
+        hdr_addr = addr;
+        return new dyn_img_pxa(addr);
+    }
+
+    if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
+        CMD_MATCH(NOOKHD_GL_MAGIC) ||
+        CMD_MATCH(NOOKHD_GR_MAGIC) ||
+        CMD_MATCH(NOOKHD_EB_MAGIC) ||
+        CMD_MATCH(NOOKHD_ER_MAGIC)) {
+        flags[NOOKHD_FLAG] = true;
+        fprintf(stderr, "NOOKHD_LOADER\n");
+        addr += NOOKHD_PRE_HEADER_SZ;
+    } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
+        flags[ACCLAIM_FLAG] = true;
+        fprintf(stderr, "ACCLAIM_LOADER\n");
+        addr += ACCLAIM_PRE_HEADER_SZ;
+    }
+
+    // addr could be adjusted
+    h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+    hdr_addr = addr;
+
+    switch (h->header_version) {
+    case 1:
+        return new dyn_img_v1(addr);
+    case 2:
+        return new dyn_img_v2(addr);
+    case 3:
+        return new dyn_img_v3(addr);
+    case 4:
+        return new dyn_img_v4(addr);
+    default:
+        return new dyn_img_v0(addr);
+    }
+}
+
+#define get_block(name)                 \
+name = hdr_addr + off;                  \
+off += hdr->name##_size();              \
+off = do_align(off, hdr->page_size());
+
+void boot_img::parse_image(uint8_t *addr, format_t type) {
+    hdr = create_hdr(addr, type);
 
     if (char *id = hdr->id()) {
         for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
@@ -305,7 +310,6 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     hdr->print();
 
     size_t off = hdr->hdr_space();
-    hdr_addr = addr;
     get_block(kernel);
     get_block(ramdisk);
     get_block(second);
