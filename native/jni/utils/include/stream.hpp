@@ -35,6 +35,34 @@ protected:
     stream_ptr base;
 };
 
+// Buffered output stream, writing in chunks
+class chunk_out_stream : public filter_stream {
+public:
+    chunk_out_stream(stream_ptr &&base, size_t buf_sz, size_t chunk_sz)
+    : filter_stream(std::move(base)), chunk_sz(chunk_sz), buf_sz(buf_sz) {}
+
+    chunk_out_stream(stream_ptr &&base, size_t buf_sz = 4096)
+    : chunk_out_stream(std::move(base), buf_sz, buf_sz) {}
+
+    ~chunk_out_stream() { delete[] _buf; }
+
+    // Reading does not make sense
+    ssize_t read(void *buf, size_t len) final { return stream::read(buf, len); }
+    ssize_t write(const void *buf, size_t len) final;
+
+protected:
+    // Classes inheriting this class has to call close() in the destructor
+    void close();
+    virtual ssize_t write_chunk(const void *buf, size_t len) = 0;
+
+    size_t chunk_sz;
+
+private:
+    size_t buf_sz;
+    size_t buf_off = 0;
+    uint8_t *_buf = nullptr;
+};
+
 // Byte stream that dynamically allocates memory
 class byte_stream : public stream {
 public:

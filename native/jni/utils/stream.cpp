@@ -121,6 +121,51 @@ ssize_t filter_stream::write(const void *buf, size_t len) {
     return base->write(buf, len);
 }
 
+ssize_t chunk_out_stream::write(const void *_in, size_t len) {
+    ssize_t ret = 0;
+    auto in = static_cast<const uint8_t *>(_in);
+    while (len) {
+        if (buf_off + len >= chunk_sz) {
+            const uint8_t *src;
+            if (buf_off) {
+                // Copy the rest of the chunk to internal buffer
+                src = _buf;
+                auto copy = chunk_sz - buf_off;
+                memcpy(_buf + buf_off, in, copy);
+                in += copy;
+                len -= copy;
+                buf_off = 0;
+            } else {
+                src = in;
+                in += chunk_sz;
+                len -= chunk_sz;
+            }
+            auto r = write_chunk(src, chunk_sz);
+            if (r < 0)
+                return ret;
+            ret += r;
+        } else {
+            // Buffer internally
+            if (!_buf) {
+                _buf = new uint8_t[buf_sz];
+            }
+            memcpy(_buf + buf_off, in, len);
+            buf_off += len;
+            break;
+        }
+    }
+    return ret;
+}
+
+void chunk_out_stream::close() {
+    if (buf_off) {
+        write_chunk(_buf, buf_off);
+        delete[] _buf;
+        _buf = nullptr;
+        buf_off = 0;
+    }
+}
+
 byte_stream::byte_stream(uint8_t *&buf, size_t &len) : _buf(buf), _len(len) {
     buf = nullptr;
     len = 0;

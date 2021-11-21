@@ -476,142 +476,90 @@ private:
     }
 };
 
-class LZ4_decoder : public cpr_stream {
+class buf_cpr_stream : public chunk_out_stream {
+public:
+    using chunk_out_stream::chunk_out_stream;
+    ssize_t writeFully(void *buf, size_t len) override {
+        return write(buf, len);
+    }
+};
+
+class LZ4_decoder : public buf_cpr_stream {
 public:
     explicit LZ4_decoder(stream_ptr &&base) :
-        cpr_stream(std::move(base)), out_buf(new char[LZ4_UNCOMPRESSED]),
-        buf(new char[LZ4_COMPRESSED]), init(false), block_sz(0), buf_off(0) {}
+    buf_cpr_stream(std::move(base), LZ4_COMPRESSED, sizeof(block_sz) + 4),
+    out_buf(new char[LZ4_UNCOMPRESSED]), block_sz(0) {}
 
     ~LZ4_decoder() override {
+        close();
         delete[] out_buf;
-        delete[] buf;
     }
 
-    ssize_t write(const void *in, size_t size) override {
-        size_t ret = 0;
-        auto inbuf = static_cast<const char *>(in);
-        if (!init) {
-            // Skip magic
-            inbuf += 4;
-            size -= 4;
-            init = true;
-        }
-        for (size_t consumed; size != 0;) {
-            if (block_sz == 0) {
-                if (buf_off + size >= sizeof(block_sz)) {
-                    consumed = sizeof(block_sz) - buf_off;
-                    memcpy(buf + buf_off, inbuf, consumed);
-                    memcpy(&block_sz, buf, sizeof(block_sz));
-                    buf_off = 0;
-                } else {
-                    consumed = size;
-                    memcpy(buf + buf_off, inbuf, size);
-                }
-                inbuf += consumed;
-                size -= consumed;
-            } else if (buf_off + size >= block_sz) {
-                consumed = block_sz - buf_off;
-                memcpy(buf + buf_off, inbuf, consumed);
-                inbuf += consumed;
-                size -= consumed;
+protected:
+    ssize_t write_chunk(const void *buf, size_t len) override {
+        // This is an error
+        if (len != chunk_sz)
+            return -1;
 
-                int write = LZ4_decompress_safe(buf, out_buf, block_sz, LZ4_UNCOMPRESSED);
-                if (write < 0) {
-                    LOGW("LZ4HC decompression failure (%d)\n", write);
-                    return -1;
-                }
-                ret += bwrite(out_buf, write);
+        auto in = reinterpret_cast<const char *>(buf);
 
-                // Reset
-                buf_off = 0;
-                block_sz = 0;
+        if (block_sz == 0) {
+            if (chunk_sz == sizeof(block_sz) + 4) {
+                // Skip the first 4 bytes, which is magic
+                memcpy(&block_sz, in + 4, sizeof(block_sz));
             } else {
-                // Copy to internal buffer
-                memcpy(buf + buf_off, inbuf, size);
-                buf_off += size;
-                break;
+                memcpy(&block_sz, in, sizeof(block_sz));
             }
+            chunk_sz = block_sz;
+            return 0;
+        } else {
+            int r = LZ4_decompress_safe(in, out_buf, block_sz, LZ4_UNCOMPRESSED);
+            chunk_sz = sizeof(block_sz);
+            block_sz = 0;
+            if (r < 0) {
+                LOGW("LZ4HC decompression failure (%d)\n", r);
+                return -1;
+            }
+            return bwrite(out_buf, r);
         }
-        return ret;
     }
 
 private:
     char *out_buf;
-    char *buf;
-    bool init;
-    unsigned block_sz;
-    int buf_off;
+    uint32_t block_sz;
 };
 
-class LZ4_encoder : public cpr_stream {
+class LZ4_encoder : public buf_cpr_stream {
 public:
     explicit LZ4_encoder(stream_ptr &&base, bool lg) :
-        cpr_stream(std::move(base)), outbuf(new char[LZ4_COMPRESSED]),
-        buf(new char[LZ4_UNCOMPRESSED]), init(false), lg(lg), buf_off(0), in_total(0) {}
-
-    ssize_t write(const void *in, size_t size) override {
-        size_t ret = 0;
-        if (!init) {
-            ret += bwrite("\x02\x21\x4c\x18", 4);
-            init = true;
-        }
-        if (size == 0)
-            return 0;
-        in_total += size;
-        const char *inbuf = (const char *) in;
-        size_t consumed;
-        do {
-            if (buf_off + size >= LZ4_UNCOMPRESSED) {
-                consumed = LZ4_UNCOMPRESSED - buf_off;
-                memcpy(buf + buf_off, inbuf, consumed);
-                inbuf += consumed;
-                size -= consumed;
-                buf_off = LZ4_UNCOMPRESSED;
-
-                if (int written = write_block(); written < 0)
-                    return -1;
-                else
-                    ret += written;
-
-                // Reset buffer
-                buf_off = 0;
-            } else {
-                // Copy to internal buffer
-                memcpy(buf + buf_off, inbuf, size);
-                buf_off += size;
-                size = 0;
-            }
-        } while (size != 0);
-        return ret;
+            buf_cpr_stream(std::move(base), LZ4_UNCOMPRESSED),
+            out_buf(new char[LZ4_COMPRESSED]), lg(lg), in_total(0) {
+        bwrite("\x02\x21\x4c\x18", 4);
     }
 
     ~LZ4_encoder() override {
-        if (buf_off)
-            write_block();
+        close();
         if (lg)
             bwrite(&in_total, sizeof(in_total));
-        delete[] outbuf;
-        delete[] buf;
+        delete[] out_buf;
     }
 
-private:
-    char *outbuf;
-    char *buf;
-    bool init;
-    bool lg;
-    int buf_off;
-    unsigned in_total;
-
-    int write_block() {
-        int written = LZ4_compress_HC(buf, outbuf, buf_off, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
-        if (written == 0) {
+protected:
+    ssize_t write_chunk(const void *buf, size_t len) override {
+        int r = LZ4_compress_HC((const char *) buf, out_buf, len, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
+        if (r == 0) {
             LOGW("LZ4HC compression failure\n");
             return -1;
         }
-        bwrite(&written, sizeof(written));
-        bwrite(outbuf, written);
-        return written + sizeof(written);
+        bwrite(&r, sizeof(r));
+        bwrite(out_buf, r);
+        return r + sizeof(r);
     }
+
+private:
+    char *out_buf;
+    bool lg;
+    unsigned in_total;
 };
 
 stream_ptr get_encoder(format_t type, stream_ptr &&base) {
