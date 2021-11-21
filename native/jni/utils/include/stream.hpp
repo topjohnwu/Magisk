@@ -11,8 +11,7 @@ public:
     virtual ssize_t read(void *buf, size_t len);
     virtual ssize_t readFully(void *buf, size_t len);
     virtual ssize_t readv(const iovec *iov, int iovcnt);
-    virtual ssize_t write(const void *buf, size_t len);
-    virtual ssize_t writeFully(void *buf, size_t len);
+    virtual bool write(const void *buf, size_t len);
     virtual ssize_t writev(const iovec *iov, int iovcnt);
     virtual off_t seek(off_t off, int whence);
     virtual ~stream() = default;
@@ -26,7 +25,7 @@ public:
     filter_stream(stream_ptr &&base) : base(std::move(base)) {}
 
     ssize_t read(void *buf, size_t len) override;
-    ssize_t write(const void *buf, size_t len) override;
+    bool write(const void *buf, size_t len) override;
 
     // Seeking while filtering does not make sense
     off_t seek(off_t off, int whence) final { return stream::seek(off, whence); }
@@ -44,16 +43,16 @@ public:
     chunk_out_stream(stream_ptr &&base, size_t buf_sz = 4096)
     : chunk_out_stream(std::move(base), buf_sz, buf_sz) {}
 
-    ~chunk_out_stream() { delete[] _buf; }
+    ~chunk_out_stream() override { delete[] _buf; }
 
     // Reading does not make sense
     ssize_t read(void *buf, size_t len) final { return stream::read(buf, len); }
-    ssize_t write(const void *buf, size_t len) final;
+    bool write(const void *buf, size_t len) final;
 
 protected:
-    // Classes inheriting this class has to call close() in the destructor
+    // Classes inheriting this class has to call close() in its destructor
     void close();
-    virtual ssize_t write_chunk(const void *buf, size_t len) = 0;
+    virtual bool write_chunk(const void *buf, size_t len) = 0;
 
     size_t chunk_sz;
 
@@ -71,7 +70,7 @@ public:
     byte_stream(Byte *&buf, size_t &len) : byte_stream(reinterpret_cast<uint8_t *&>(buf), len) {}
 
     ssize_t read(void *buf, size_t len) override;
-    ssize_t write(const void *buf, size_t len) override;
+    bool write(const void *buf, size_t len) override;
     off_t seek(off_t off, int whence) override;
 
 private:
@@ -83,16 +82,23 @@ private:
     void resize(size_t new_pos, bool zero = false);
 };
 
+class file_stream : public stream {
+public:
+    bool write(const void *buf, size_t len) final;
+protected:
+    virtual ssize_t do_write(const void *buf, size_t len) = 0;
+};
+
 // File stream but does not close the file descriptor at any time
-class fd_stream : public stream {
+class fd_stream : public file_stream {
 public:
     fd_stream(int fd) : fd(fd) {}
     ssize_t read(void *buf, size_t len) override;
     ssize_t readv(const iovec *iov, int iovcnt) override;
-    ssize_t write(const void *buf, size_t len) override;
     ssize_t writev(const iovec *iov, int iovcnt) override;
     off_t seek(off_t off, int whence) override;
-
+protected:
+    ssize_t do_write(const void *buf, size_t len) override;
 private:
     int fd;
 };
@@ -102,15 +108,14 @@ private:
  * ****************************************/
 
 // sFILE -> stream_ptr
-class fp_stream final : public stream {
+class fp_stream final : public file_stream {
 public:
     fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
     fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
-
     ssize_t read(void *buf, size_t len) override;
-    ssize_t write(const void *buf, size_t len) override;
     off_t seek(off_t off, int whence) override;
-
+protected:
+    ssize_t do_write(const void *buf, size_t len) override;
 private:
     sFILE fp;
 };

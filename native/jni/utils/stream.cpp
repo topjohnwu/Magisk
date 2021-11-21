@@ -13,7 +13,9 @@ static int strm_read(void *v, char *buf, int len) {
 
 static int strm_write(void *v, const char *buf, int len) {
     auto strm = static_cast<stream *>(v);
-    return strm->write(buf, len);
+    if (!strm->write(buf, len))
+        return -1;
+    return len;
 }
 
 static fpos_t strm_seek(void *v, fpos_t off, int whence) {
@@ -64,33 +66,17 @@ ssize_t stream::readv(const iovec *iov, int iovcnt) {
     return read_sz;
 }
 
-ssize_t stream::write(const void *buf, size_t len) {
+bool stream::write(const void *buf, size_t len) {
     LOGE("This stream does not implement write\n");
-    return -1;
-}
-
-ssize_t stream::writeFully(void *buf, size_t len) {
-    size_t write_sz = 0;
-    ssize_t ret;
-    do {
-        ret = write((byte *) buf + write_sz, len - write_sz);
-        if (ret < 0) {
-            if (errno == EINTR)
-                continue;
-            return ret;
-        }
-        write_sz += ret;
-    } while (write_sz != len && ret != 0);
-    return write_sz;
+    return false;
 }
 
 ssize_t stream::writev(const iovec *iov, int iovcnt) {
     size_t write_sz = 0;
     for (int i = 0; i < iovcnt; ++i) {
-        auto ret = writeFully(iov[i].iov_base, iov[i].iov_len);
-        if (ret < 0)
-            return ret;
-        write_sz += ret;
+        if (!write(iov[i].iov_base, iov[i].iov_len))
+            return write_sz;
+        write_sz += iov[i].iov_len;
     }
     return write_sz;
 }
@@ -105,7 +91,7 @@ ssize_t fp_stream::read(void *buf, size_t len) {
     return ret ? ret : (ferror(fp.get()) ? -1 : 0);
 }
 
-ssize_t fp_stream::write(const void *buf, size_t len) {
+ssize_t fp_stream::do_write(const void *buf, size_t len) {
     return fwrite(buf, 1, len, fp.get());
 }
 
@@ -117,12 +103,11 @@ ssize_t filter_stream::read(void *buf, size_t len) {
     return base->read(buf, len);
 }
 
-ssize_t filter_stream::write(const void *buf, size_t len) {
+bool filter_stream::write(const void *buf, size_t len) {
     return base->write(buf, len);
 }
 
-ssize_t chunk_out_stream::write(const void *_in, size_t len) {
-    ssize_t ret = 0;
+bool chunk_out_stream::write(const void *_in, size_t len) {
     auto in = static_cast<const uint8_t *>(_in);
     while (len) {
         if (buf_off + len >= chunk_sz) {
@@ -140,10 +125,8 @@ ssize_t chunk_out_stream::write(const void *_in, size_t len) {
                 in += chunk_sz;
                 len -= chunk_sz;
             }
-            auto r = write_chunk(src, chunk_sz);
-            if (r < 0)
-                return ret;
-            ret += r;
+            if (!write_chunk(src, chunk_sz))
+                return false;
         } else {
             // Buffer internally
             if (!_buf) {
@@ -154,7 +137,7 @@ ssize_t chunk_out_stream::write(const void *_in, size_t len) {
             break;
         }
     }
-    return ret;
+    return true;
 }
 
 void chunk_out_stream::close() {
@@ -177,12 +160,12 @@ ssize_t byte_stream::read(void *buf, size_t len) {
     return len;
 }
 
-ssize_t byte_stream::write(const void *buf, size_t len) {
+bool byte_stream::write(const void *buf, size_t len) {
     resize(_pos + len);
     memcpy(_buf + _pos, buf, len);
     _pos += len;
     _len = std::max(_len, _pos);
-    return len;
+    return true;
 }
 
 off_t byte_stream::seek(off_t off, int whence) {
@@ -227,7 +210,7 @@ ssize_t fd_stream::readv(const iovec *iov, int iovcnt) {
     return ::readv(fd, iov, iovcnt);
 }
 
-ssize_t fd_stream::write(const void *buf, size_t len) {
+ssize_t fd_stream::do_write(const void *buf, size_t len) {
     return ::write(fd, buf, len);
 }
 
@@ -237,4 +220,19 @@ ssize_t fd_stream::writev(const iovec *iov, int iovcnt) {
 
 off_t fd_stream::seek(off_t off, int whence) {
     return lseek(fd, off, whence);
+}
+
+bool file_stream::write(const void *buf, size_t len) {
+    size_t write_sz = 0;
+    ssize_t ret;
+    do {
+        ret = do_write((byte *) buf + write_sz, len - write_sz);
+        if (ret < 0) {
+            if (errno == EINTR)
+                continue;
+            return false;
+        }
+        write_sz += ret;
+    } while (write_sz != len && ret != 0);
+    return true;
 }
