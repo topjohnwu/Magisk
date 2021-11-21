@@ -351,7 +351,7 @@ struct dyn_img_hdr {
     decl_var(kernel_size, 32)
     decl_var(ramdisk_size, 32)
     decl_var(second_size, 32)
-    decl_var(page_size, 32)
+    decl_val(page_size, uint32_t)
     decl_val(header_version, uint32_t)
     decl_var(extra_size, 32)
     decl_var(os_version, 32)
@@ -489,11 +489,8 @@ struct dyn_img_v3 : public dyn_img_hdr_boot {
     impl_val(cmdline)
 
     // Make API compatible
-    uint32_t &page_size() override { page_sz = 4096; return page_sz; }
+    uint32_t page_size() override { return 4096; }
     char *extra_cmdline() override { return &v4_hdr->cmdline[BOOT_ARGS_SIZE]; }
-
-private:
-    uint32_t page_sz = 4096;
 };
 
 struct dyn_img_v4 : public dyn_img_v3 {

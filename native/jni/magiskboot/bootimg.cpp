@@ -94,7 +94,6 @@ void dyn_img_hdr::print() {
 
 void dyn_img_hdr::dump_hdr_file() {
     FILE *fp = xfopen(HEADER_FILE, "w");
-    fprintf(fp, "pagesize=%u\n", page_size());
     if (name())
         fprintf(fp, "name=%s\n", name());
     fprintf(fp, "cmdline=%.*s%.*s\n", BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
@@ -119,9 +118,7 @@ void dyn_img_hdr::dump_hdr_file() {
 
 void dyn_img_hdr::load_hdr_file() {
     parse_prop_file(HEADER_FILE, [=](string_view key, string_view value) -> bool {
-        if (key == "page_size") {
-            page_size() = parse_int(value);
-        } else if (key == "name" && name()) {
+        if (key == "name" && name()) {
             memset(name(), 0, 16);
             memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());
         } else if (key == "cmdline") {
