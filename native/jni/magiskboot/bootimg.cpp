@@ -503,7 +503,7 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 #define file_align() \
 write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, boot.hdr->page_size()))
 
-void repack(const char *src_img, const char *out_img, bool skip_comp) {
+void repack(const char *src_img, const char *out_img, bool skip_comp, bool keep_vbmeta_verity) {
     const boot_img boot(src_img);
     fprintf(stderr, "Repack to boot image: [%s]\n", out_img);
 
@@ -761,7 +761,9 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(off.total);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
-        vbmeta->flags = __builtin_bswap32(3);
+        if(!keep_vbmeta_verity) {
+            vbmeta->flags = __builtin_bswap32(3);
+        }
     }
 
     if (boot.flags[DHTB_FLAG]) {

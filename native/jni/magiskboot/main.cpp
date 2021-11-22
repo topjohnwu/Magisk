@@ -34,6 +34,8 @@ Supported actions:
     to [outbootimg], or new-boot.img if not specified.
     If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
     otherwise it will compress ramdisk.cpio and kernel with the same method
+    If '-k' is provided, it will not attempt to disable dm_verity,
+    otherwise it will disable dm_verity
     in <origbootimg> if the file provided is not already compressed.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
@@ -166,13 +168,25 @@ int main(int argc, char *argv[]) {
         }
         return unpack(argv[idx], nodecomp, hdr);
     } else if (argc > 2 && action == "repack") {
-        if (argv[2] == "-n"sv) {
-            if (argc == 3)
+        int idx = 2;
+        bool skip_comp = false;
+        bool keep_vbmeta_verity = false;
+        for (;;) {
+            if (idx >= argc)
                 usage(argv[0]);
-            repack(argv[3], argv[4] ? argv[4] : NEW_BOOT, true);
-        } else {
-            repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
+            if (argv[idx][0] != '-')
+                break;
+            for (char *flag = &argv[idx][1]; *flag; ++flag) {
+                if (*flag == 'n')
+                    skip_comp = true;
+                else if (*flag == 'k')
+                    keep_vbmeta_verity = true;
+                else
+                    usage(argv[0]);
+            }
+            ++idx;
         }
+        repack(argv[idx], argv[idx+1] ? argv[idx+1] : NEW_BOOT, skip_comp, keep_vbmeta_verity);
     } else if (argc > 2 && action == "decompress") {
         decompress(argv[2], argv[3]);
     } else if (argc > 2 && str_starts(action, "compress")) {

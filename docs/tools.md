@@ -40,6 +40,8 @@ Supported actions:
     to [outbootimg], or new-boot.img if not specified.
     If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
     otherwise it will compress ramdisk.cpio and kernel with the same method
+    If '-k' is provided, it will not attempt to disable vbmeta_verity,
+    otherwise it will disable vbmeta_verity
     in <origbootimg> if the file provided is not already compressed.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
