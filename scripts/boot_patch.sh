@@ -208,8 +208,11 @@ fi
 #################
 
 ui_print "- Repacking boot image"
-./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
-
+if [ "$(grep_get_prop ro.product.brand)" == "Xiaomi" ] || [ "$(grep_get_prop ro.product.brand)" == "Redmi" ]; then
+  ./magiskboot repack -k "$BOOTIMAGE" || abort "! Unable to repack boot image"
+else
+  ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+fi
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos
 
