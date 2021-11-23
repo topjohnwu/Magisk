@@ -10,6 +10,8 @@
 #define KER_DTB_FILE    "kernel_dtb"
 #define RECV_DTBO_FILE  "recovery_dtbo"
 #define DTB_FILE        "dtb"
+#define RAMD_TABLE_FILE "ramdisk_table"
+#define BOOTCFG_FILE    "bootconfig"
 #define NEW_BOOT        "new-boot.img"
 
 int unpack(const char *image, bool skip_decomp = false, bool hdr = false);

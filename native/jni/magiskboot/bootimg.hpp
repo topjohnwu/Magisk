@@ -369,8 +369,8 @@ struct dyn_img_hdr {
 
     // v4 specific
     decl_val(signature_size, uint32_t)
-    decl_val(vendor_ramdisk_table_size, uint32_t)
-    decl_val(bootconfig_size, uint32_t)
+    decl_var(vendor_ramdisk_table_size, 32)
+    decl_var(bootconfig_size, 32)
 
     virtual ~dyn_img_hdr() {
         free(raw);
@@ -619,6 +619,8 @@ struct boot_img {
     uint8_t *extra;
     uint8_t *recovery_dtbo;
     uint8_t *dtb;
+    uint8_t *vendor_ramdisk_table;
+    uint8_t *bootconfig;
 
     // Pointer to blocks defined in header, but we do not care
     uint8_t *ignore;

@@ -63,6 +63,10 @@ void dyn_img_hdr::print() {
         fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
     if (ver == 2 || is_vendor)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
+    if (ver > 3 && is_vendor) {
+        fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK_TAB_SZ", vendor_ramdisk_table_size());
+        fprintf(stderr, "%-*s [%u]\n", PADDING, "BOOTCONFIG_SZ", bootconfig_size());
+    }
 
     if (uint32_t os_ver = os_version()) {
         int a,b,c,y,m = 0;
@@ -321,11 +325,11 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     get_block(extra);
     get_block(recovery_dtbo);
     get_block(dtb);
+    get_block(vendor_ramdisk_table);
+    get_block(bootconfig);
 
     ignore = hdr_addr + off;
     get_ignore(signature)
-    get_ignore(vendor_ramdisk_table)
-    get_ignore(bootconfig)
 
     if (int dtb_off = find_dtb_offset(kernel, hdr->kernel_size()); dtb_off > 0) {
         kernel_dtb = kernel + dtb_off;
@@ -497,6 +501,12 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     // Dump dtb
     dump(boot.dtb, boot.hdr->dtb_size(), DTB_FILE);
 
+    // Dump vendor ramdisk_table
+    dump(boot.vendor_ramdisk_table, boot.hdr->vendor_ramdisk_table_size(), RAMD_TABLE_FILE);
+
+    // Dump vendor bootconfig
+    dump(boot.bootconfig, boot.hdr->bootconfig_size(), BOOTCFG_FILE);
+
     return boot.flags[CHROMEOS_FLAG] ? 2 : 0;
 }
 
@@ -652,6 +662,18 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     off.dtb = lseek(fd, 0, SEEK_CUR);
     if (access(DTB_FILE, R_OK) == 0) {
         hdr->dtb_size() = restore(fd, DTB_FILE);
+        file_align();
+    }
+
+    // vendor ramdisk_table
+    if (access(RAMD_TABLE_FILE, R_OK) == 0) {
+        hdr->vendor_ramdisk_table_size() = restore(fd, RAMD_TABLE_FILE);
+        file_align();
+    }
+
+    // vendor bootconfig
+    if (access(BOOTCFG_FILE, R_OK) == 0) {
+        hdr->bootconfig_size() = restore(fd, BOOTCFG_FILE);
         file_align();
     }
 
