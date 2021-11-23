@@ -570,20 +570,17 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         void *raw_buf;
         mmap_ro(KERNEL_FILE, raw_buf, raw_size);
         if (!COMPRESSED_ANY(check_fmt(raw_buf, raw_size)) && COMPRESSED(boot.k_fmt)) {
-            hdr->kernel_size() = compress(boot.k_fmt, fd, raw_buf, raw_size);
+            // Always use zopfli for zImage compression
+            auto fmt = (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt == GZIP) ? ZOPFLI : boot.k_fmt;
+            hdr->kernel_size() = compress(fmt, fd, raw_buf, raw_size);
         } else {
             hdr->kernel_size() = xwrite(fd, raw_buf, raw_size);
         }
 
         if (boot.flags[ZIMAGE_KERNEL]) {
-            if (boot.k_fmt == GZIP && hdr->kernel_size() > boot.hdr->kernel_size()) {
-                // Revert and try zopfli
-                ftruncate64(fd, lseek64(fd, -(off64_t)hdr->kernel_size(), SEEK_CUR));
-                hdr->kernel_size() = compress(ZOPFLI, fd, raw_buf, raw_size);
-            }
             if (hdr->kernel_size() > boot.hdr->kernel_size()) {
-                LOGW("! Recompressed kernel is too large, using original kernel\n");
-                ftruncate64(fd, lseek64(fd, -(off64_t)hdr->kernel_size(), SEEK_CUR));
+                fprintf(stderr, "! Recompressed kernel is too large, using original kernel\n");
+                ftruncate64(fd, lseek64(fd, - (off64_t) hdr->kernel_size(), SEEK_CUR));
                 xwrite(fd, boot.kernel, boot.hdr->kernel_size());
             } else {
                 // Pad zeros to make sure the zImage file size does not change
