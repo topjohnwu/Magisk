@@ -42,12 +42,12 @@ struct blob_hdr {
 } __attribute__((packed));
 
 struct zimage_hdr {
-    uint8_t head[36];
-    uint32_t magic;         /* zImage magic */
-    uint32_t load_addr;     /* absolute load/run zImage address */
-    uint32_t end_offset;    /* zImage end offset */
-    uint32_t endianess;     /* endianess flag */
-    uint8_t code[];
+    uint32_t code[9];
+    uint32_t magic;      /* zImage magic */
+    uint32_t start;      /* absolute load/run zImage address */
+    uint32_t end;        /* zImage end address */
+    uint32_t endian;     /* endianess flag */
+    // There could be more fields, but we don't care
 } __attribute__((packed));
 
 /**************
