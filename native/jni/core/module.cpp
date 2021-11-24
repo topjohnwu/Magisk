@@ -695,13 +695,13 @@ static void collect_modules(bool open_zygisk) {
             return;
 
         module_info info;
-        if (open_zygisk) {
-            if (zygisk_enabled) {
-                // Riru and its modules are not compatible with zygisk
-                if (entry->d_name == "riru-core"sv || faccessat(modfd, "riru", F_OK, 0) == 0) {
-                    LOGI("%s: ignore\n", entry->d_name);
-                    return;
-                }
+        if (zygisk_enabled) {
+            // Riru and its modules are not compatible with zygisk
+            if (entry->d_name == "riru-core"sv || faccessat(modfd, "riru", F_OK, 0) == 0) {
+                LOGI("%s: ignore\n", entry->d_name);
+                return;
+            }
+            if (open_zygisk) {
 #if defined(__arm__)
                 info.z32 = openat(modfd, "zygisk/armeabi-v7a.so", O_RDONLY | O_CLOEXEC);
 #elif defined(__aarch64__)
@@ -715,18 +715,18 @@ static void collect_modules(bool open_zygisk) {
 #else
 #error Unsupported ABI
 #endif
-            } else {
-                // Ignore zygisk modules when zygisk is not enabled
-                if (faccessat(modfd, "zygisk", F_OK, 0) == 0) {
-                    LOGI("%s: ignore\n", entry->d_name);
-                    return;
-                }
+            }
+        } else {
+            // Ignore zygisk modules when zygisk is not enabled
+            if (faccessat(modfd, "zygisk", F_OK, 0) == 0) {
+                LOGI("%s: ignore\n", entry->d_name);
+                return;
             }
         }
         info.name = entry->d_name;
         module_list->push_back(info);
     });
-    if (open_zygisk && zygisk_enabled) {
+    if (zygisk_enabled) {
         bool use_memfd = true;
         auto convert_to_memfd = [&](int fd) -> int {
             if (fd < 0)
