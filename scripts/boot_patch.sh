@@ -70,9 +70,11 @@ fi
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+[ -z $KEEPVBMETAFLAG ] && KEEPVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
+export KEEPVBMETAFLAG
 
 chmod -R 755 .
 
@@ -149,6 +151,7 @@ ui_print "- Patching ramdisk"
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+echo "KEEPVBMETAFLAG=$KEEPVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 

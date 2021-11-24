@@ -6,7 +6,7 @@
 
 using namespace std;
 
-static void print_methods() {
+static void print_formats() {
     for (int fmt = GZIP; fmt < LZOP; ++fmt) {
         fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
     }
@@ -33,8 +33,10 @@ Supported actions:
     Repack boot image components from current directory
     to [outbootimg], or new-boot.img if not specified.
     If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
-    otherwise it will compress ramdisk.cpio and kernel with the same method
-    in <origbootimg> if the file provided is not already compressed.
+    otherwise it will compress ramdisk.cpio and kernel with the same format
+    as in <origbootimg> if the file provided is not already compressed.
+    All disable flags will be set in the vbmeta header, unless env variable
+    KEEPVBMETAFLAG is set to true.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace with <hexpattern2>
@@ -91,21 +93,21 @@ Supported actions:
   cleanup
     Cleanup the current working directory
 
-  compress[=method] <infile> [outfile]
-    Compress <infile> with [method] (default: gzip), optionally to [outfile]
+  compress[=format] <infile> [outfile]
+    Compress <infile> with [format] (default: gzip), optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: )EOF", arg0);
+    Supported formats: )EOF", arg0);
 
-    print_methods();
+    print_formats();
 
     fprintf(stderr, R"EOF(
 
   decompress <infile> [outfile]
-    Detect method and decompress <infile>, optionally to [outfile]
+    Detect format and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: )EOF");
+    Supported formats: )EOF");
 
-    print_methods();
+    print_formats();
 
     fprintf(stderr, "\n\n");
     exit(1);

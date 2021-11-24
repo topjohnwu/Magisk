@@ -382,6 +382,7 @@ get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
+  getvar KEEPVBMETAFLAG
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -402,6 +403,7 @@ get_flags() {
       KEEPFORCEENCRYPT=false
     fi
   fi
+  [ -z $KEEPVBMETAFLAG ] && KEEPVBMETAFLAG=false
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 

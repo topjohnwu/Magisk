@@ -768,7 +768,9 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(off.total);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
-        vbmeta->flags = __builtin_bswap32(3);
+        if (!check_env("KEEPVBMETAFLAG")) {
+            vbmeta->flags = __builtin_bswap32(3);
+        }
     }
 
     if (boot.flags[DHTB_FLAG]) {
