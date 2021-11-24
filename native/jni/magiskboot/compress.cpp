@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define bwrite base->write
+#define bwrite this->base->write
 
 constexpr size_t CHUNK = 0x40000;
 constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
@@ -31,11 +31,11 @@ class out_stream : public filter_stream {
 class gz_strm : public out_stream {
 public:
     bool write(const void *buf, size_t len) override {
-        return len == 0 || write(buf, len, Z_NO_FLUSH);
+        return len == 0 || do_write(buf, len, Z_NO_FLUSH);
     }
 
     ~gz_strm() override {
-        write(nullptr, 0, Z_FINISH);
+        do_write(nullptr, 0, Z_FINISH);
         switch(mode) {
         case DECODE:
             inflateEnd(&strm);
@@ -68,7 +68,7 @@ private:
     z_stream strm;
     uint8_t outbuf[CHUNK];
 
-    bool write(const void *buf, size_t len, int flush) {
+    bool do_write(const void *buf, size_t len, int flush) {
         strm.next_in = (Bytef *) buf;
         strm.avail_in = len;
         do {
@@ -181,7 +181,7 @@ private:
 class bz_strm : public out_stream {
 public:
     bool write(const void *buf, size_t len) override {
-        return len == 0 || write(buf, len, BZ_RUN);
+        return len == 0 || do_write(buf, len, BZ_RUN);
     }
 
     ~bz_strm() override {
@@ -190,7 +190,7 @@ public:
                 BZ2_bzDecompressEnd(&strm);
                 break;
             case ENCODE:
-                write(nullptr, 0, BZ_FINISH);
+                do_write(nullptr, 0, BZ_FINISH);
                 BZ2_bzCompressEnd(&strm);
                 break;
         }
@@ -218,7 +218,7 @@ private:
     bz_stream strm;
     char outbuf[CHUNK];
 
-    bool write(const void *buf, size_t len, int flush) {
+    bool do_write(const void *buf, size_t len, int flush) {
         strm.next_in = (char *) buf;
         strm.avail_in = len;
         do {
@@ -257,11 +257,11 @@ public:
 class lzma_strm : public out_stream {
 public:
     bool write(const void *buf, size_t len) override {
-        return len == 0 || write(buf, len, LZMA_RUN);
+        return len == 0 || do_write(buf, len, LZMA_RUN);
     }
 
     ~lzma_strm() override {
-        write(nullptr, 0, LZMA_FINISH);
+        do_write(nullptr, 0, LZMA_FINISH);
         lzma_end(&strm);
     }
 
@@ -304,7 +304,7 @@ private:
     lzma_stream strm;
     uint8_t outbuf[CHUNK];
 
-    bool write(const void *buf, size_t len, lzma_action flush) {
+    bool do_write(const void *buf, size_t len, lzma_action flush) {
         strm.next_in = (uint8_t *) buf;
         strm.avail_in = len;
         do {
