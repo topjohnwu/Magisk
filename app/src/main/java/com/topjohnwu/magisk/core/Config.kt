@@ -109,9 +109,10 @@ object Config : PreferenceModel, DBConfig {
         else
             Value.DEFAULT_CHANNEL
 
-    @JvmStatic var keepVerity = false
-    @JvmStatic var keepEnc = false
-    @JvmStatic var recovery = false
+    @JvmField var keepVerity = false
+    @JvmField var keepEnc = false
+    @JvmField var keepVbmeta = false
+    @JvmField var recovery = false
 
     var bootId by preference(Key.BOOT_ID, "")
     var askedHome by preference(Key.ASKED_HOME, false)

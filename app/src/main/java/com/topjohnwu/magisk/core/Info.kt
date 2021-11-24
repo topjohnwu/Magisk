@@ -36,6 +36,7 @@ object Info {
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
     @JvmField val isPixel = Build.BRAND == "google"
+    @JvmField val isMTK = getProperty("ro.mediatek.version.branch", "") != ""
     @JvmField val isEmulator =
         getProperty("ro.kernel.qemu", "0") == "1" ||
         getProperty("ro.boot.qemu", "0") == "1"

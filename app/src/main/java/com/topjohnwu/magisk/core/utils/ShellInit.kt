@@ -94,6 +94,7 @@ class AppShellInit : BaseShellInit() {
         Config.recovery = getBool("RECOVERYMODE")
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
+        Config.keepVbmeta = getBool("KEEPVBMETAFLAG")
 
         return true
     }

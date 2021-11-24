@@ -361,6 +361,7 @@ abstract class MagiskInstallImpl protected constructor(
             "cd $installDir",
             "KEEPFORCEENCRYPT=${Config.keepEnc} " +
             "KEEPVERITY=${Config.keepVerity} " +
+            "KEEPVBMETAFLAG=${Config.keepVbmeta} " +
             "RECOVERYMODE=${Config.recovery} " +
             "sh boot_patch.sh $srcBoot")
 
