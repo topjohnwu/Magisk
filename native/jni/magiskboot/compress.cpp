@@ -23,12 +23,6 @@ constexpr size_t CHUNK = 0x40000;
 constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
 constexpr size_t LZ4_COMPRESSED = LZ4_COMPRESSBOUND(LZ4_UNCOMPRESSED);
 
-#if defined(ZOPFLI_MASTER_BLOCK_SIZE) && ZOPFLI_MASTER_BLOCK_SIZE > 0
-constexpr size_t ZOPFLI_CHUNK = ZOPFLI_MASTER_BLOCK_SIZE;
-#else
-constexpr size_t ZOPFLI_CHUNK = CHUNK;
-#endif
-
 class out_stream : public filter_stream {
     using filter_stream::filter_stream;
     using stream::read;
@@ -110,45 +104,16 @@ public:
     explicit gz_encoder(stream_ptr &&base) : gz_strm(ENCODE, std::move(base)) {};
 };
 
-class zopfli_encoder : public out_stream {
+class zopfli_encoder : public chunk_out_stream {
 public:
-    bool write(const void *buf, size_t len) override {
-        if (len == 0)
-            return true;
-
-        auto in = static_cast<const unsigned char *>(buf);
-        in_size += len;
-        crcvalue = crc32_z(crcvalue, in, len);
-
-        for (size_t offset = 0; offset < len; offset += ZOPFLI_CHUNK) {
-            size_t end_offset = std::min(len, offset + ZOPFLI_CHUNK);
-            ZopfliDeflatePart(&zo, 2, 0, in, offset, end_offset, &bp, &out, &outsize);
-
-            if (bp) {
-                // The last byte is not complete
-                if (!bwrite(out, outsize - 1))
-                    return false;
-                uint8_t b = out[outsize - 1];
-                free_out();
-                ZOPFLI_APPEND_DATA(b, &out, &outsize);
-            } else {
-                if (!bwrite(out, outsize))
-                    return false;
-                free_out();
-            }
-        }
-
-        return true;
-    }
-
     explicit zopfli_encoder(stream_ptr &&base) :
-        out_stream(std::move(base)), zo({}), out(nullptr), outsize(0), bp(0),
-        crcvalue(crc32_z(0L, Z_NULL, 0)), in_size(0) {
+        chunk_out_stream(std::move(base), ZOPFLI_MASTER_BLOCK_SIZE),
+        zo{}, out(nullptr), outsize(0), crc(crc32_z(0L, Z_NULL, 0)),
+        in_total(0), bp(0), final(false) {
         ZopfliInitOptions(&zo);
 
-        // Speed things up a bit, this still leads to better compression than zlib
-        zo.numiterations = 1;
-        zo.blocksplitting = 0;
+        // 5 iterations is reasonable for large files
+        zo.numiterations = 5;
 
         ZOPFLI_APPEND_DATA(31, &out, &outsize);  /* ID1 */
         ZOPFLI_APPEND_DATA(139, &out, &outsize); /* ID2 */
@@ -165,37 +130,55 @@ public:
     }
 
     ~zopfli_encoder() override {
-        ZopfliDeflate(&zo, 2, 1, nullptr, 0, &bp, &out, &outsize);
+        final = true;
+        finalize();
 
         /* CRC */
-        ZOPFLI_APPEND_DATA(crcvalue % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((crcvalue >> 8) % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((crcvalue >> 16) % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((crcvalue >> 24) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA(crc % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crc >> 8) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crc >> 16) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((crc >> 24) % 256, &out, &outsize);
 
         /* ISIZE */
-        ZOPFLI_APPEND_DATA(in_size % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((in_size >> 8) % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((in_size >> 16) % 256, &out, &outsize);
-        ZOPFLI_APPEND_DATA((in_size >> 24) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA(in_total % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_total >> 8) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_total >> 16) % 256, &out, &outsize);
+        ZOPFLI_APPEND_DATA((in_total >> 24) % 256, &out, &outsize);
 
         bwrite(out, outsize);
         free(out);
+    }
+
+protected:
+    bool write_chunk(const void *buf, size_t len) override {
+        if (len == 0)
+            return true;
+
+        auto in = static_cast<const unsigned char *>(buf);
+
+        in_total += len;
+        crc = crc32_z(crc, in, len);
+
+        ZopfliDeflatePart(&zo, 2, final, in, 0, len, &bp, &out, &outsize);
+
+        // ZOPFLI_APPEND_DATA is extremely dumb, so we always preserve the
+        // last byte to make sure that realloc is used instead of malloc
+        if (!bwrite(out, outsize - 1))
+            return false;
+        out[0] = out[outsize - 1];
+        outsize = 1;
+
+        return true;
     }
 
 private:
     ZopfliOptions zo;
     unsigned char *out;
     size_t outsize;
+    unsigned long crc;
+    uint32_t in_total;
     unsigned char bp;
-    unsigned long crcvalue;
-    uint32_t in_size;
-
-    void free_out() {
-        free(out);
-        out = nullptr;
-        outsize = 0;
-    }
+    bool final;
 };
 
 class bz_strm : public out_stream {
@@ -477,7 +460,7 @@ public:
         out_buf(new char[LZ4_UNCOMPRESSED]), block_sz(0) {}
 
     ~LZ4_decoder() override {
-        close();
+        finalize();
         delete[] out_buf;
     }
 
@@ -524,7 +507,7 @@ public:
     }
 
     ~LZ4_encoder() override {
-        close();
+        finalize();
         if (lg)
             bwrite(&in_total, sizeof(in_total));
         delete[] out_buf;

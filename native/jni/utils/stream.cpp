@@ -140,7 +140,7 @@ bool chunk_out_stream::write(const void *_in, size_t len) {
     return true;
 }
 
-void chunk_out_stream::close() {
+void chunk_out_stream::finalize() {
     if (buf_off) {
         write_chunk(_buf, buf_off);
         delete[] _buf;

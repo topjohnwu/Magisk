@@ -50,8 +50,8 @@ public:
     bool write(const void *buf, size_t len) final;
 
 protected:
-    // Classes inheriting this class has to call close() in its destructor
-    void close();
+    // Classes inheriting this class has to call finalize() in its destructor
+    void finalize();
     virtual bool write_chunk(const void *buf, size_t len) = 0;
 
     size_t chunk_sz;
