@@ -120,7 +120,7 @@
     <string name="module_state_restore">Khôi phục</string>
     <string name="module_action_install_external">Cài đặt từ bộ nhớ</string>
     <string name="update_available">Cập nhật có sẵn</string>
-    <string name="module_installed">@stringhome_installed_version</string>
+    <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Trực tuyến</string>
     <string name="sorting_order">Sắp xếp thứ tự</string>
     <string name="suspend_text_riru">Mô-đun bị vô hiệu hóa vì %1$s được bật</string>
