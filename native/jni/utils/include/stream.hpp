@@ -26,6 +26,7 @@ public:
 
     ssize_t read(void *buf, size_t len) override;
     bool write(const void *buf, size_t len) override;
+    virtual bool write(const void *buf, size_t len, bool final);
 
     // Seeking while filtering does not make sense
     off_t seek(off_t off, int whence) final { return stream::seek(off, whence); }
@@ -33,6 +34,8 @@ public:
 protected:
     stream_ptr base;
 };
+
+using filter_strm_ptr = std::unique_ptr<filter_stream>;
 
 // Buffered output stream, writing in chunks
 class chunk_out_stream : public filter_stream {
@@ -48,11 +51,12 @@ public:
     // Reading does not make sense
     ssize_t read(void *buf, size_t len) final { return stream::read(buf, len); }
     bool write(const void *buf, size_t len) final;
+    bool write(const void *buf, size_t len, bool final) final;
 
 protected:
     // Classes inheriting this class has to call finalize() in its destructor
     void finalize();
-    virtual bool write_chunk(const void *buf, size_t len) = 0;
+    virtual bool write_chunk(const void *buf, size_t len, bool final) = 0;
 
     size_t chunk_sz;
 

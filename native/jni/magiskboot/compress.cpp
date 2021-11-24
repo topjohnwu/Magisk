@@ -17,7 +17,7 @@
 
 using namespace std;
 
-#define bwrite filter_stream::write
+#define bwrite base->write
 
 constexpr size_t CHUNK = 0x40000;
 constexpr size_t LZ4_UNCOMPRESSED = 0x800000;
@@ -108,8 +108,7 @@ class zopfli_encoder : public chunk_out_stream {
 public:
     explicit zopfli_encoder(stream_ptr &&base) :
         chunk_out_stream(std::move(base), ZOPFLI_MASTER_BLOCK_SIZE),
-        zo{}, out(nullptr), outsize(0), crc(crc32_z(0L, Z_NULL, 0)),
-        in_total(0), bp(0), final(false) {
+        zo{}, out(nullptr), outsize(0), crc(crc32_z(0L, Z_NULL, 0)), in_total(0), bp(0) {
         ZopfliInitOptions(&zo);
 
         // 5 iterations is reasonable for large files
@@ -130,7 +129,6 @@ public:
     }
 
     ~zopfli_encoder() override {
-        final = true;
         finalize();
 
         /* CRC */
@@ -150,7 +148,7 @@ public:
     }
 
 protected:
-    bool write_chunk(const void *buf, size_t len) override {
+    bool write_chunk(const void *buf, size_t len, bool final) override {
         if (len == 0)
             return true;
 
@@ -178,7 +176,6 @@ private:
     unsigned long crc;
     uint32_t in_total;
     unsigned char bp;
-    bool final;
 };
 
 class bz_strm : public out_stream {
@@ -465,7 +462,7 @@ public:
     }
 
 protected:
-    bool write_chunk(const void *buf, size_t len) override {
+    bool write_chunk(const void *buf, size_t len, bool final) override {
         // This is an error
         if (len != chunk_sz)
             return false;
@@ -514,22 +511,27 @@ public:
     }
 
 protected:
-    bool write_chunk(const void *buf, size_t len) override {
-        int r = LZ4_compress_HC((const char *) buf, out_buf, len, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
-        if (r == 0) {
+    bool write_chunk(const void *buf, size_t len, bool final) override {
+        auto in = static_cast<const char *>(buf);
+        uint32_t block_sz = LZ4_compress_HC(in, out_buf, len, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
+        if (block_sz == 0) {
             LOGW("LZ4HC compression failure\n");
             return false;
         }
-        return bwrite(&r, sizeof(r)) && bwrite(out_buf, r);
+        if (bwrite(&block_sz, sizeof(block_sz)) && bwrite(out_buf, block_sz)) {
+            in_total += sizeof(block_sz) + block_sz;
+            return true;
+        }
+        return false;
     }
 
 private:
     char *out_buf;
     bool lg;
-    unsigned in_total;
+    uint32_t in_total;
 };
 
-stream_ptr get_encoder(format_t type, stream_ptr &&base) {
+filter_strm_ptr get_encoder(format_t type, stream_ptr &&base) {
     switch (type) {
         case XZ:
             return make_unique<xz_encoder>(std::move(base));
@@ -551,7 +553,7 @@ stream_ptr get_encoder(format_t type, stream_ptr &&base) {
     }
 }
 
-stream_ptr get_decoder(format_t type, stream_ptr &&base) {
+filter_strm_ptr get_decoder(format_t type, stream_ptr &&base) {
     switch (type) {
         case XZ:
         case LZMA:

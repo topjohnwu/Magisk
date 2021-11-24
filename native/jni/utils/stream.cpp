@@ -107,13 +107,21 @@ bool filter_stream::write(const void *buf, size_t len) {
     return base->write(buf, len);
 }
 
-bool chunk_out_stream::write(const void *_in, size_t len) {
+bool filter_stream::write(const void *buf, size_t len, bool final) {
+    return write(buf, len);
+}
+
+bool chunk_out_stream::write(const void *buf, size_t len) {
+    return write(buf, len, false);
+}
+
+bool chunk_out_stream::write(const void *_in, size_t len, bool final) {
     auto in = static_cast<const uint8_t *>(_in);
     while (len) {
         if (buf_off + len >= chunk_sz) {
+            // Enough input for a chunk
             const uint8_t *src;
             if (buf_off) {
-                // Copy the rest of the chunk to internal buffer
                 src = _buf;
                 auto copy = chunk_sz - buf_off;
                 memcpy(_buf + buf_off, in, copy);
@@ -125,8 +133,21 @@ bool chunk_out_stream::write(const void *_in, size_t len) {
                 in += chunk_sz;
                 len -= chunk_sz;
             }
-            if (!write_chunk(src, chunk_sz))
+            if (!write_chunk(src, chunk_sz, final && len == 0))
                 return false;
+        } else if (final) {
+            // Final input data, write regardless whether it is chunk sized
+            if (buf_off) {
+                memcpy(_buf + buf_off, in, len);
+                auto avail = buf_off + len;
+                buf_off = 0;
+                if (!write_chunk(_buf, avail, true))
+                    return false;
+            } else {
+                if (!write_chunk(in, len, true))
+                    return false;
+            }
+            break;
         } else {
             // Buffer internally
             if (!_buf) {
@@ -142,7 +163,7 @@ bool chunk_out_stream::write(const void *_in, size_t len) {
 
 void chunk_out_stream::finalize() {
     if (buf_off) {
-        write_chunk(_buf, buf_off);
+        write_chunk(_buf, buf_off, true);
         delete[] _buf;
         _buf = nullptr;
         buf_off = 0;
