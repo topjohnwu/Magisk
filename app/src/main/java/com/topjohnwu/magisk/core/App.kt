@@ -6,7 +6,6 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.core.utils.AppShellInit
 import com.topjohnwu.magisk.core.utils.BusyBoxInit
@@ -25,7 +24,6 @@ open class App() : Application() {
     }
 
     init {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         Shell.setDefaultBuilder(Shell.Builder.create()
             .setFlags(Shell.FLAG_MOUNT_MASTER)
             .setInitializers(BusyBoxInit::class.java, AppShellInit::class.java)
