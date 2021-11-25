@@ -8,11 +8,9 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
-import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.withType
 import java.io.File
 import java.io.OutputStream
 import java.io.PrintStream
@@ -39,15 +37,6 @@ fun Project.setupCommon() {
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
-        }
-    }
-
-    if (plugins.hasPlugin("java")) {
-        tasks.withType<JavaCompile> {
-            // If building with JDK 9+, we need additional flags to generate compatible bytecode
-            if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
-                options.compilerArgs.addAll(listOf("--release", "8"))
-            }
         }
     }
 }
