@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -59,28 +60,9 @@ public class InjectAPK {
         if (apk.exists()) {
             ClassLoader cl = new InjectedClassLoader(apk);
             PackageManager pm = context.getPackageManager();
-            ApplicationInfo info = pm.getPackageArchiveInfo(apk.getPath(), 0).applicationInfo;
+            PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
             try {
-                // Create the receiver Application
-                Object app = cl.loadClass(info.className)
-                        .getConstructor(Object.class)
-                        .newInstance(DynAPK.pack(dynData()));
-
-                // Create the receiver component factory
-                Object factory = null;
-                if (Build.VERSION.SDK_INT >= 28) {
-                    factory = cl.loadClass(info.appComponentFactory).newInstance();
-                }
-
-                setClassLoader(context, cl);
-
-                // Finally, set variables
-                if (Build.VERSION.SDK_INT >= 28) {
-                    getComponentFactory().loader = cl;
-                    getComponentFactory().receiver = (AppComponentFactory) factory;
-                }
-
-                return (Application) app;
+                return createApp(context, cl, pkgInfo.applicationInfo);
             } catch (Exception e) {
                 Log.e(InjectAPK.class.getSimpleName(), "", e);
                 apk.delete();
@@ -99,6 +81,30 @@ public class InjectAPK {
         }
 
         return null;
+    }
+
+    private static Application createApp(Context context, ClassLoader cl, ApplicationInfo info)
+            throws ReflectiveOperationException {
+        // Create the receiver Application
+        Object app = cl.loadClass(info.className)
+                .getConstructor(Object.class)
+                .newInstance(DynAPK.pack(dynData()));
+
+        // Create the receiver component factory
+        Object factory = null;
+        if (Build.VERSION.SDK_INT >= 28) {
+            factory = cl.loadClass(info.appComponentFactory).newInstance();
+        }
+
+        setClassLoader(context, cl);
+
+        // Finally, set variables
+        if (Build.VERSION.SDK_INT >= 28) {
+            getComponentFactory().loader = cl;
+            getComponentFactory().receiver = (AppComponentFactory) factory;
+        }
+
+        return (Application) app;
     }
 
     // Replace LoadedApk mClassLoader
