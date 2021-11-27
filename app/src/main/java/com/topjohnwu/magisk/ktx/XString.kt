@@ -29,10 +29,10 @@ fun String.replaceRandomWithSpecial(): String {
     return replace(random, sp.random())
 }
 
-fun StringBuilder.appendIf(condition: Boolean, builder: StringBuilder.() -> Unit) =
+inline fun StringBuilder.appendIf(condition: Boolean, builder: StringBuilder.() -> Unit) =
     if (condition) apply(builder) else this
 
-fun String.trimEmptyToNull(): String? = if (isBlank()) null else this
+fun String.trimEmptyToNull(): String? = takeUnless { it.isBlank() }
 
 fun String.legalFilename() = replace(" ", "_").replace("'", "").replace("\"", "")
         .replace("$", "").replace("`", "").replace("*", "").replace("/", "_")
