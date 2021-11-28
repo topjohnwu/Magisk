@@ -504,8 +504,10 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     return boot.flags[CHROMEOS_FLAG] ? 2 : 0;
 }
 
-#define file_align() \
-write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, boot.hdr->page_size()))
+#define file_align_with(page_size) \
+write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
+
+#define file_align() file_align_with(boot.hdr->page_size())
 
 void repack(const char *src_img, const char *out_img, bool skip_comp) {
     const boot_img boot(src_img);
@@ -682,8 +684,11 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     file_align();
 
     // vbmeta
-    off.vbmeta = lseek(fd, 0, SEEK_CUR);
     if (boot.flags[AVB_FLAG]) {
+        // According to avbtool.py, if the input is not an Android sparse image
+        // (which boot images are not), the default block size is 4096
+        file_align_with(4096);
+        off.vbmeta = lseek(fd, 0, SEEK_CUR);
         uint64_t vbmeta_size = __builtin_bswap64(boot.avb_footer->vbmeta_size);
         xwrite(fd, boot.avb_meta, vbmeta_size);
     }
