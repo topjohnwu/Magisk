@@ -59,7 +59,7 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
-default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
+default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskvbmeta', 'busybox']
 support_targets = default_targets + ['magiskpolicy', 'resetprop', 'test']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
@@ -348,6 +348,9 @@ def build_binary(args):
 
     if 'magiskboot' in args.target:
         flag += ' B_BOOT=1'
+
+    if 'magiskvbmeta' in args.target:
+        flag += ' B_VBMETA=1'
 
     if flag:
         run_ndk_build(flag)

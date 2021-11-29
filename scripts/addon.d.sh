@@ -104,6 +104,7 @@ main() {
   fi
 
   find_boot_image
+  find_vbmeta_image
 
   [ -z $BOOTIMAGE ] && abort "! Unable to detect target image"
   ui_print "- Target image: $BOOTIMAGE"

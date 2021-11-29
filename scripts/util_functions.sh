@@ -422,6 +422,13 @@ find_boot_image() {
   fi
 }
 
+find_vbmeta_image() {
+  VBMETAIMAGE=
+  if [ ! -z $SLOT ]; then
+    VBMETAIMAGE=`find_block vbmeta$SLOT`
+  fi
+}
+
 flash_image() {
   case "$1" in
     *.gz) CMD1="gzip -d < '$1' 2>/dev/null";;
@@ -475,8 +482,22 @@ install_magisk() {
       ;;
   esac
 
+  . ./vbmeta_patch.sh "$VBMETAIMAGE"
+
+  ui_print "- Flashing new vbmeta image"
+  flash_image new-vbmeta.img "$VBMETAIMAGE"
+  case $? in
+    1)
+      abort "! Insufficient partition size"
+      ;;
+    2)
+      abort "! $VBMETAIMAGE is read only"
+      ;;
+  esac
+
   ./magiskboot cleanup
   rm -f new-boot.img
+  rm -f new-vbmeta.img
 
   run_migrations
 }
@@ -600,7 +621,7 @@ run_migrations() {
 
   # Stock backups
   LOCSHA1=$SHA1
-  for name in boot dtb dtbo dtbs; do
+  for name in boot dtb dtbo dtbs vbmeta; do
     BACKUP=$MAGISKBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then

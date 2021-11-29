@@ -15,11 +15,15 @@
 # boot_patch.sh      script    A script to patch boot image for Magisk.
 #                  (this file) The script will use files in its same
 #                              directory to complete the patching process
+# vbmeta_patch.sh    script    A script to patch vbmeta image for Magisk.
+#                              The script will use files in its same
+#                              directory to complete the patching process
 # util_functions.sh  script    A script which hosts all functions required
 #                              for this script to work properly
 # magiskinit         binary    The binary to replace /init
 # magisk(32/64)      binary    The magisk binaries
 # magiskboot         binary    A tool to manipulate boot images
+# magiskvbmeta       binary    A tool to manipulate vbmeta images
 # chromeos           folder    This folder includes the utility and keys to sign
 #                  (optional)  chromeos boot images. Only used for Pixel C.
 #

@@ -47,6 +47,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected var installDir = File("xxx")
     private lateinit var srcBoot: File
+    private lateinit var srcVbmeta: File
 
     private val shell = Shell.getShell()
     private val service get() = ServiceLocator.networkService
@@ -61,6 +62,13 @@ abstract class MagiskInstallImpl protected constructor(
         }
         srcBoot = SuFile(bootPath)
         console.add("- Target image: $bootPath")
+        val vbmetaPath = "find_vbmeta_image; echo \"\$VBMETAIMAGE\"".fsh()
+        if (vbmetaPath.isEmpty()) {
+            console.add("! Unable to detect target vbmeta image")
+            return false
+        }
+        srcVbmeta = SuFile(vbmetaPath)
+        console.add("- Target vbmeta image: $vbmetaPath")
         return true
     }
 
@@ -79,6 +87,17 @@ abstract class MagiskInstallImpl protected constructor(
         }
         srcBoot = SuFile(bootPath)
         console.add("- Target image: $bootPath")
+        val vbmetaPath = arrayOf(
+            "SLOT=$target",
+            "find_vbmeta_image",
+            "SLOT=$slot",
+            "echo \"\$VBMETAIMAGE\"").fsh()
+        if (vbmetaPath.isEmpty()) {
+            console.add("! Unable to detect target vbmeta image")
+            return false
+        }
+        srcVbmeta = SuFile(vbmetaPath)
+        console.add("- Target vbmeta image: $vbmetaPath")
         return true
     }
 
@@ -127,7 +146,7 @@ abstract class MagiskInstallImpl protected constructor(
             }
 
             // Extract scripts
-            for (script in listOf("util_functions.sh", "boot_patch.sh", "addon.d.sh")) {
+            for (script in listOf("util_functions.sh", "boot_patch.sh", "vbmeta_patch.sh", "addon.d.sh")) {
                 val dest = File(installDir, script)
                 context.assets.open(script).writeTo(dest)
             }
@@ -389,7 +408,26 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun flashBoot() = "direct_install $installDir $srcBoot".sh().isSuccess
+    private fun patchVbmeta(): Boolean {
+        val newVbmeta = installDirFile("new-vbmeta.img")
+        if (!useRootDir) {
+            // Create output files before hand
+            newVbmeta.createNewFile()
+            File(installDir, "stock_vbmeta.img").createNewFile()
+        }
+
+        val cmds = arrayOf(
+            "cd $installDir",
+            "sh vbmeta_patch.sh $srcVbmeta")
+
+        if (!cmds.sh().isSuccess)
+            return false
+
+        shell.newJob().add("cd /").exec()
+        return true
+    }
+
+    private fun flashBoth() = "direct_install $installDir $srcBoot $srcVbmeta".sh().isSuccess
 
     private suspend fun postOTA(): Boolean {
         try {
@@ -415,10 +453,10 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected fun doPatchFile(patchFile: Uri) = extractFiles() && handleFile(patchFile)
 
-    protected fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
+    protected fun direct() = findImage() && extractFiles() && patchBoot() && patchVbmeta() && flashBoth()
 
     protected suspend fun secondSlot() =
-        findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
+        findSecondary() && extractFiles() && patchBoot() && patchVbmeta() && flashBoth() && postOTA()
 
     protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 

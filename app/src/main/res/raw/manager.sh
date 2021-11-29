@@ -7,7 +7,7 @@ run_delay() {
 }
 
 env_check() {
-  for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
+  for file in busybox magiskboot magiskvbmeta magiskinit util_functions.sh boot_patch.sh vbmeta_patch.sh; do
     [ -f $MAGISKBIN/$file ] || return 1
   done
   grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
@@ -57,7 +57,21 @@ direct_install() {
       ;;
   esac
 
+  echo "- Flashing new vbmeta image"
+  flash_image $1/new-vbmeta.img $3
+  case $? in
+    1)
+      echo "! Insufficient partition size"
+      return 1
+      ;;
+    2)
+      echo "! $2 is read only"
+      return 2
+      ;;
+  esac
+
   rm -f $1/new-boot.img
+  rm -f $1/new-vbmeta.img
   fix_env $1
   run_migrations
   copy_sepolicy_rules
@@ -80,7 +94,7 @@ restore_imgs() {
   get_flags
   find_boot_image
 
-  for name in dtb dtbo; do
+  for name in dtb dtbo vbmeta; do
     [ -f $BACKUPDIR/${name}.img.gz ] || continue
     local IMAGE=$(find_block $name$SLOT)
     [ -z $IMAGE ] && continue

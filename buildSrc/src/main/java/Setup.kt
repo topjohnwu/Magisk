@@ -82,30 +82,30 @@ fun Project.setupApp() {
         into("src/main/jniLibs")
         into("armeabi-v7a") {
             from(rootProject.file("native/out/armeabi-v7a")) {
-                include("busybox", "magiskboot", "magiskinit", "magisk")
+                include("busybox", "magiskboot", "magiskvbmeta", "magiskinit", "magisk")
                 rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
             }
         }
         into("x86") {
             from(rootProject.file("native/out/x86")) {
-                include("busybox", "magiskboot", "magiskinit", "magisk")
+                include("busybox", "magiskboot", "magiskvbmeta", "magiskinit", "magisk")
                 rename { if (it == "magisk") "libmagisk32.so" else "lib$it.so" }
             }
         }
         into("arm64-v8a") {
             from(rootProject.file("native/out/arm64-v8a")) {
-                include("busybox", "magiskboot", "magiskinit", "magisk")
+                include("busybox", "magiskboot", "magiskvbmeta", "magiskinit", "magisk")
                 rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
             }
         }
         into("x86_64") {
             from(rootProject.file("native/out/x86_64")) {
-                include("busybox", "magiskboot", "magiskinit", "magisk")
+                include("busybox", "magiskboot", "magiskvbmeta", "magiskinit", "magisk")
                 rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
             }
         }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 16)
+            if (inputs.sourceFiles.files.size != 20)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }
@@ -117,7 +117,7 @@ fun Project.setupApp() {
         inputs.property("versionCode", Config.versionCode)
         into("src/main/assets")
         from(rootProject.file("scripts")) {
-            include("util_functions.sh", "boot_patch.sh", "uninstaller.sh", "addon.d.sh")
+            include("util_functions.sh", "boot_patch.sh", "vbmeta_patch.sh", "uninstaller.sh", "addon.d.sh")
         }
         into("chromeos") {
             from(rootProject.file("tools/futility"))

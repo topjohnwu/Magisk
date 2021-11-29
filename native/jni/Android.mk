@@ -91,6 +91,22 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
+ifdef B_VBMETA
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := magiskvbmeta
+LOCAL_STATIC_LIBRARIES := libutils
+
+LOCAL_SRC_FILES := \
+    magiskvbmeta/main.cpp \
+    magiskvbmeta/vbmeta.cpp
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/magiskboot
+LOCAL_LDFLAGS := -static
+include $(BUILD_EXECUTABLE)
+
+endif
+
 ifdef B_POLICY
 
 include $(CLEAR_VARS)

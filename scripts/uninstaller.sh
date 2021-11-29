@@ -115,7 +115,7 @@ case $((STATUS & 3)) in
     if [ -d $BACKUPDIR ]; then
       ui_print "- Restoring stock boot image"
       flash_image $BACKUPDIR/boot.img.gz $BOOTIMAGE
-      for name in dtb dtbo dtbs; do
+      for name in dtb dtbo dtbs vbmeta; do
         [ -f $BACKUPDIR/${name}.img.gz ] || continue
         IMAGE=$(find_block $name$SLOT)
         [ -z $IMAGE ] && continue
