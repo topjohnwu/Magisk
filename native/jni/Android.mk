@@ -22,7 +22,7 @@ LOCAL_SRC_FILES := \
     core/module.cpp \
     core/logging.cpp \
     core/thread.cpp \
-    resetprop/persist_properties.cpp \
+    resetprop/persist.cpp \
     resetprop/resetprop.cpp \
     su/su.cpp \
     su/connect.cpp \
