@@ -297,8 +297,8 @@ static bool dt_table_patch(const Header *hdr, const char *out) {
         auto size = fdt_totalsize(fdt);
         total_size += xwrite(fd, fdt, size);
         if constexpr (!is_aosp) {
-            val.second.len = do_align(size, align);
-            write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), align));
+            val.second.len = align_to(size, align);
+            write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR), align));
         }
         free(fdt);
     }

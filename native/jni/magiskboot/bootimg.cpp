@@ -291,11 +291,11 @@ dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
 #define get_block(name)                 \
 name = hdr_addr + off;                  \
 off += hdr->name##_size();              \
-off = do_align(off, hdr->page_size());
+off = align_to(off, hdr->page_size());
 
 #define get_ignore(name)                                            \
 if (hdr->name##_size()) {                                           \
-    auto blk_sz = do_align(hdr->name##_size(), hdr->page_size());   \
+    auto blk_sz = align_to(hdr->name##_size(), hdr->page_size());   \
     ignore_size += blk_sz;                                          \
     off += blk_sz;                                                  \
 }
@@ -505,7 +505,7 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 }
 
 #define file_align_with(page_size) \
-write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
+write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
 
 #define file_align() file_align_with(boot.hdr->page_size())
 

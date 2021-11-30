@@ -523,7 +523,7 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
     impl_val(header_size)
     impl_val(dtb_size)
 
-    size_t hdr_space() override { auto sz = page_size(); return do_align(hdr_size(), sz); }
+    size_t hdr_space() override { return align_to(hdr_size(), page_size()); }
 
     // Make API compatible
     char *extra_cmdline() override { return &v4_vnd->cmdline[BOOT_ARGS_SIZE]; }

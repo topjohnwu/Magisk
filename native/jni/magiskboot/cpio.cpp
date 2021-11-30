@@ -111,7 +111,7 @@ bool cpio::exists(const char *name) {
 }
 
 #define do_out(buf, len) pos += fwrite(buf, 1, len, out);
-#define out_align() do_out(zeros, align_off(pos, 4))
+#define out_align() do_out(zeros, align_padding(pos, 4))
 void cpio::dump(FILE *out) {
     size_t pos = 0;
     unsigned inode = 300000;
@@ -211,7 +211,7 @@ bool cpio::mv(const char *from, const char *to) {
     return false;
 }
 
-#define pos_align(p) p = do_align(p, 4)
+#define pos_align(p) p = align_to(p, 4)
 
 void cpio::load_cpio(const char *buf, size_t sz) {
     size_t pos = 0;

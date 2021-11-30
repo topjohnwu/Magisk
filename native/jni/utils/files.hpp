@@ -10,8 +10,16 @@
 
 #include "xwrap.hpp"
 
-#define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
-#define align_off(p, a) (do_align(p, a) - (p))
+template <typename T>
+static inline T align_to(T v, int a) {
+    static_assert(std::is_integral<T>::value);
+    return (v + a - 1) / a * a;
+}
+
+template <typename T>
+static inline T align_padding(T v, int a) {
+    return align_to(v, a) - v;
+}
 
 struct file_attr {
     struct stat st;
