@@ -15,13 +15,10 @@ static void hex2byte(const char *hex, uint8_t *buf) {
     }
 }
 
-int hexpatch(const char *image, const char *from, const char *to) {
+int hexpatch(const char *file, const char *from, const char *to) {
     int patched = 1;
 
-    uint8_t *buf;
-    size_t sz;
-    mmap_rw(image, buf, sz);
-    run_finally f([=]{ munmap(buf, sz); });
+    auto m = mmap_data(file, true);
 
     vector<uint8_t> pattern(strlen(from) / 2);
     vector<uint8_t> patch(strlen(to) / 2);
@@ -29,12 +26,12 @@ int hexpatch(const char *image, const char *from, const char *to) {
     hex2byte(from, pattern.data());
     hex2byte(to, patch.data());
 
-    uint8_t * const end = buf + sz;
-    for (uint8_t *curr = buf; curr < end; curr += pattern.size()) {
+    uint8_t * const end = m.buf + m.sz;
+    for (uint8_t *curr = m.buf; curr < end; curr += pattern.size()) {
         curr = static_cast<uint8_t*>(memmem(curr, end - curr, pattern.data(), pattern.size()));
         if (curr == nullptr)
             return patched;
-        fprintf(stderr, "Patch @ %08X [%s] -> [%s]\n", (unsigned)(curr - buf), from, to);
+        fprintf(stderr, "Patch @ %08X [%s] -> [%s]\n", (unsigned)(curr - m.buf), from, to);
         memset(curr, 0, pattern.size());
         memcpy(curr, patch.data(), patch.size());
         patched = 0;

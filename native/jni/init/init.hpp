@@ -1,7 +1,5 @@
 #include <utils.hpp>
 
-#include "raw_data.hpp"
-
 using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 
 struct BootConfig {

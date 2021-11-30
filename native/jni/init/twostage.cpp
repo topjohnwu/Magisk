@@ -122,7 +122,7 @@ exit_loop:
         }
 
         // Patch init to force IsDtFstabCompatible() return false
-        auto init = mmap_data::rw("/init");
+        auto init = mmap_data("/init", true);
         init.patch({ make_pair("android,fstab", "xxx") });
     } else {
         // Parse and load the fstab file
@@ -192,7 +192,7 @@ void SARInit::first_stage_prep() {
     int src = xopen("/init", O_RDONLY);
     int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
     {
-        auto init = mmap_data::ro("/init");
+        auto init = mmap_data("/init");
         init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
         write(dest, init.buf, init.sz);
         fclone_attr(src, dest);

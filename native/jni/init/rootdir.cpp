@@ -183,7 +183,7 @@ static void patch_socket_name(const char *path) {
     static char rstr[16] = { 0 };
     if (rstr[0] == '\0')
         gen_rand_str(rstr, sizeof(rstr));
-    auto bin = mmap_data::rw(path);
+    auto bin = mmap_data(path, true);
     bin.patch({ make_pair(MAIN_SOCKET, rstr) });
 }
 
@@ -224,7 +224,7 @@ void SARBase::patch_rootdir() {
     int patch_count;
     {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
-        auto init = mmap_data::ro("/init");
+        auto init = mmap_data("/init");
         patch_count = init.patch({
             make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
             make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
@@ -248,8 +248,8 @@ void SARBase::patch_rootdir() {
         if (path) {
             char ovl[128];
             sprintf(ovl, ROOTOVL "%s", path);
-            auto lib = mmap_data::ro(path);
-            lib.patch({make_pair(MONOPOLICY, sepol)});
+            auto lib = mmap_data(path);
+            lib.patch({ make_pair(MONOPOLICY, sepol) });
             xmkdirs(dirname(ovl), 0755);
             int dest = xopen(ovl, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
             xwrite(dest, lib.buf, lib.sz);
@@ -290,19 +290,19 @@ void SARBase::patch_rootdir() {
         xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
         patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data());
     } else {
-        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());        
+        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
     }
 
     // Extract magisk
     {
-        auto magisk = mmap_data::ro("magisk32.xz");
+        auto magisk = mmap_data("magisk32.xz");
         unlink("magisk32.xz");
         int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
         patch_socket_name("magisk32");
         if (access("magisk64.xz", F_OK) == 0) {
-            magisk = mmap_data::ro("magisk64.xz");
+            magisk = mmap_data("magisk64.xz");
             unlink("magisk64.xz");
             fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
             unxz(fd, magisk.buf, magisk.sz);
@@ -344,13 +344,13 @@ void RootFSBase::patch_rootfs() {
 
     if (patch_sepolicy("/sepolicy")) {
         if (access("/system/bin/init", F_OK) == 0) {
-            auto init = mmap_data::ro("/system/bin/init");
+            auto init = mmap_data("/system/bin/init");
             init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
             int dest = xopen("/init", O_TRUNC | O_WRONLY | O_CLOEXEC, 0);
             xwrite(dest, init.buf, init.sz);
             close(dest);
         } else {
-            auto init = mmap_data::rw("/init");
+            auto init = mmap_data("/init", true);
             init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
         }
     }
@@ -376,10 +376,10 @@ void MagiskProxy::start() {
     xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
     // Backup stuffs before removing them
-    self = mmap_data::ro("/sbin/magisk");
-    magisk_config = mmap_data::ro("/.backup/.magisk");
-    auto magisk = mmap_data::ro("/sbin/magisk32.xz");
-    auto magisk64 = mmap_data::ro("/sbin/magisk64.xz");
+    self = mmap_data("/sbin/magisk");
+    magisk_config = mmap_data("/.backup/.magisk");
+    auto magisk = mmap_data("/sbin/magisk32.xz");
+    auto magisk64 = mmap_data("/sbin/magisk64.xz");
     char custom_rules_dir[64];
     custom_rules_dir[0] = '\0';
     xreadlink(TMP_RULESDIR, custom_rules_dir, sizeof(custom_rules_dir));

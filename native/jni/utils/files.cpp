@@ -272,28 +272,6 @@ void fclone_attr(int src, int dest) {
     fsetattr(dest, &a);
 }
 
-void *__mmap(const char *filename, size_t *size, bool rw) {
-    int fd = xopen(filename, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
-    if (fd < 0) {
-        *size = 0;
-        return nullptr;
-    }
-    struct stat st;
-    if (fstat(fd, &st)) {
-        *size = 0;
-        return nullptr;
-    }
-    if (S_ISBLK(st.st_mode))
-        ioctl(fd, BLKGETSIZE64, size);
-    else
-        *size = st.st_size;
-    void *buf = *size > 0 ?
-            xmmap(nullptr, *size, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0) :
-            nullptr;
-    close(fd);
-    return buf;
-}
-
 void fd_full_read(int fd, void **buf, size_t *size) {
     *size = lseek(fd, 0, SEEK_END);
     lseek(fd, 0, SEEK_SET);
@@ -439,15 +417,58 @@ sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
 }
 
-raw_file::raw_file(raw_file &&o) {
-    path.swap(o.path);
-    attr = o.attr;
-    buf = o.buf;
-    sz = o.sz;
-    o.buf = nullptr;
-    o.sz = 0;
+int byte_data::patch(bool log, str_pairs list) {
+    if (buf == nullptr)
+        return 0;
+    int count = 0;
+    for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+        for (auto [from, to] : list) {
+            if (memcmp(p, from.data(), from.length() + 1) == 0) {
+                if (log) LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
+                memset(p, 0, from.length());
+                memcpy(p, to.data(), to.length());
+                ++count;
+                p += from.length();
+            }
+        }
+    }
+    return count;
 }
 
-raw_file::~raw_file() {
-    free(buf);
+bool byte_data::contains(string_view pattern, bool log) const {
+    if (buf == nullptr)
+        return false;
+    for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+        if (memcmp(p, pattern.data(), pattern.length() + 1) == 0) {
+            if (log) LOGD("Found pattern [%s]\n", pattern.data());
+            return true;
+        }
+    }
+    return false;
+}
+
+void byte_data::swap(byte_data &o) {
+    std::swap(buf, o.buf);
+    std::swap(sz, o.sz);
+}
+
+mmap_data::mmap_data(const char *name, bool rw) {
+    int fd = xopen(name, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
+    if (fd < 0)
+        return;
+    struct stat st;
+    if (fstat(fd, &st))
+        return;
+    if (S_ISBLK(st.st_mode)) {
+        uint64_t size;
+        ioctl(fd, BLKGETSIZE64, &size);
+        sz = size;
+    } else {
+        sz = st.st_size;
+    }
+    void *b = sz > 0
+            ? xmmap(nullptr, sz, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0)
+            : nullptr;
+    close(fd);
+    buf = static_cast<uint8_t *>(b);
 }

@@ -137,14 +137,11 @@ int main(int argc, char *argv[]) {
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[SHA_DIGEST_SIZE];
-        void *buf;
-        size_t size;
-        mmap_ro(argv[2], buf, size);
-        SHA_hash(buf, size, sha1);
+        auto m = mmap_data(argv[2]);
+        SHA_hash(m.buf, m.sz, sha1);
         for (uint8_t i : sha1)
             printf("%02x", i);
         printf("\n");
-        munmap(buf, size);
     } else if (argc > 2 && action == "split") {
         return split_image_dtb(argv[2]);
     } else if (argc > 2 && action == "unpack") {

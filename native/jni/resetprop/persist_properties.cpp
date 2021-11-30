@@ -137,12 +137,9 @@ static void pb_getprop(prop_cb *prop_cb) {
     PersistentProperties props = {};
     props.properties.funcs.decode = prop_decode;
     props.properties.arg = prop_cb;
-    pb_byte_t *buf;
-    size_t size;
-    mmap_ro(PERSISTENT_PROPERTY_DIR "/persistent_properties", buf, size);
-    pb_istream_t stream = pb_istream_from_buffer(buf, size);
+    auto m = mmap_data(PERSISTENT_PROPERTY_DIR "/persistent_properties");
+    pb_istream_t stream = pb_istream_from_buffer(m.buf, m.sz);
     pb_decode(&stream, &PersistentProperties_msg, &props);
-    munmap(buf, size);
 }
 
 static bool file_getprop(const char *name, char *value) {

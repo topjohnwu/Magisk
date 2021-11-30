@@ -563,8 +563,7 @@ enum {
 
 struct boot_img {
     // Memory map of the whole image
-    uint8_t *map_addr;
-    size_t map_size;
+    mmap_data map;
 
     // Android image header
     dyn_img_hdr *hdr;

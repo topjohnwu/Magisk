@@ -286,7 +286,7 @@ success:
 }
 
 void RootFSInit::early_mount() {
-    self = mmap_data::ro("/init");
+    self = mmap_data("/init");
 
     LOGD("Restoring /init\n");
     rename(backup_init(), "/init");
@@ -298,9 +298,9 @@ void SARBase::backup_files() {
     if (access("/overlay.d", F_OK) == 0)
         backup_folder("/overlay.d", overlays);
 
-    self = mmap_data::ro("/proc/self/exe");
+    self = mmap_data("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
-        magisk_config = mmap_data::ro("/.backup/.magisk");
+        magisk_config = mmap_data("/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
