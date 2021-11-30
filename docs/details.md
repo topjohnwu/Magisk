@@ -30,7 +30,8 @@ $MAGISKTMP/busybox
 $MAGISKTMP/modules
 
 # The current Magisk installation config
-$MAGISKTMP/config
+$MAGISKTMP/configmagisk --path
+
 
 # Partition mirrors
 # Each directory in this path will be mounted with the
@@ -115,7 +116,6 @@ Usually, system properties are designed to only be updated by `init` and read-on
 - persist properties (props that starts with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove it from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will be read from **BOTH** `prop_area` and persistent storage.
 
 ## Magic Mount
-
 The details of the actual implementation and algorithm of Magic Mount is omitted here, please directly dive into the source code if interested (`core/module.cpp`).
 
 Even though the mounting logic is very complicated, the final result of Magic Mount is actually pretty simple. For each module, the folder `$MODPATH/system` will be recursively merged into the real `/system`; that is: existing files in the real system will be replaced by the one in modules' system, and new files in modules' system will be added to the real system.
