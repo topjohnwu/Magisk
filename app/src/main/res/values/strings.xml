@@ -78,7 +78,7 @@
 
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
-    <string name="superuser_policy_none">No apps have asked for superuser permission.</string>
+    <string name="superuser_policy_none">No apps have asked for superuser permission yet.</string>
 
     <!--Logs-->
     <string name="log_data_none">You\'re log-free, try using your SU enabled apps more</string>
@@ -136,7 +136,7 @@
     <string name="settings_hide_app_title">Hide the Magisk app</string>
     <string name="settings_hide_app_summary">Install a proxy app with random package ID and custom app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>
-    <string name="settings_restore_app_summary">Un-hide the app and restore it back to its original APK</string>
+    <string name="settings_restore_app_summary">Un-hide the app and change it back to its original APK</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_check_update_title">Check Updates</string>
@@ -168,7 +168,7 @@
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
-    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after upgrading apps</string>
+    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after app upgrades</string>
     <string name="settings_su_tapjack_title">Tapjacking Protection</string>
     <string name="settings_su_tapjack_summary">The superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
     <string name="settings_su_biometric_title">Biometric Authentication</string>
