@@ -13,17 +13,17 @@ data class UpdateInfo(
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class MagiskJson(
-    val version: String = "",
+    val version: String = "N/A",
     val versionCode: Int = -1,
-    val link: String = "",
-    val note: String = ""
+    val link: String = "x",
+    val note: String = "x"
 ) : Parcelable
 
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class StubJson(
     val versionCode: Int = -1,
-    val link: String = ""
+    val link: String = "x"
 ) : Parcelable
 
 @JsonClass(generateAdapter = true)
