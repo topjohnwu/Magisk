@@ -9,15 +9,18 @@ import com.topjohnwu.magisk.ktx.precomputedText
 import com.topjohnwu.magisk.utils.MarkwonImagePlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.html.HtmlPlugin
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.io.File
 
-@Suppress("DEPRECATION")
+
 fun createOkHttpClient(context: Context): OkHttpClient {
-    val builder = OkHttpClient.Builder()
+    val appCache = Cache(File(context.cacheDir, "okhttp"), 10 * 1024 * 1024)
+    val builder = OkHttpClient.Builder().cache(appCache)
 
     if (BuildConfig.DEBUG) {
         builder.addInterceptor(HttpLoggingInterceptor().apply {
