@@ -82,7 +82,7 @@ object Hide : BaseSettingsItem.Input() {
     override val description = R.string.settings_hide_app_summary.asText()
 
     override var value = ""
-        set(value) = setV(value, field, { field = it })
+        set(value) = setV(value, field, {})
 
     override val inputResult
         get() = if (isError) null else result

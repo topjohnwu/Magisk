@@ -117,7 +117,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
         when (item) {
             is Language -> RecreateEvent().publish()
             is UpdateChannel -> openUrlIfNecessary(view)
-            is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
+            is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.result) }
             is Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
