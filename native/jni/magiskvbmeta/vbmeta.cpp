@@ -8,14 +8,6 @@
 #include "bootimg.hpp"
 #include "magiskvbmeta.hpp"
 
-vbmeta_img::vbmeta_img(const char *image) {
-    mmap_ro(image, map_addr, map_size);
-}
-
-vbmeta_img::~vbmeta_img() {
-    munmap(map_addr, map_size);
-}
-
 // https://android.googlesource.com/platform/external/avb/+/refs/tags/android-12.0.0_r12/avbtool.py#203
 uint64_t round_to_multiple(uint64_t number, uint16_t size) {
     uint16_t remainder = number % size;
@@ -35,8 +27,8 @@ uint64_t calculate_size(AvbVBMetaImageHeader *header) {
 }
 
 int test(const char *image) {
-    vbmeta_img vbmeta(image);
-    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.map_addr);
+    mmap_data vbmeta(image);
+    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.buf);
     if (memcmp(header->magic, AVB_MAGIC, AVB_MAGIC_LEN) == 0) {
         auto flags = __builtin_bswap32(header->flags);
         if (flags == 0) {
@@ -52,8 +44,8 @@ int test(const char *image) {
 }
 
 int size(const char *image) {
-    vbmeta_img vbmeta(image);
-    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.map_addr);
+    mmap_data vbmeta(image);
+    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.buf);
     if (memcmp(header->magic, AVB_MAGIC, AVB_MAGIC_LEN) == 0) {
         auto vbmeta_size = calculate_size(header);
         printf("%" PRIu64 "\n", vbmeta_size);
@@ -64,8 +56,8 @@ int size(const char *image) {
 }
 
 int patch(const char *src_img, const char *out_img) {
-    vbmeta_img vbmeta(src_img);
-    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.map_addr);
+    mmap_data vbmeta(src_img);
+    auto header = reinterpret_cast<AvbVBMetaImageHeader*>(vbmeta.buf);
     if (memcmp(header->magic, AVB_MAGIC, AVB_MAGIC_LEN) == 0) {
         auto flags = __builtin_bswap32(header->flags);
         if (flags == 0) {
