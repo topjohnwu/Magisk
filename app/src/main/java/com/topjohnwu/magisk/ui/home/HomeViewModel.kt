@@ -45,30 +45,32 @@ class HomeViewModel(
     var isNoticeVisible = Config.safetyNotice
         set(value) = set(value, field, { field = it }, BR.noticeVisible)
 
-    val stateMagisk = when {
-        !Info.env.isActive -> MagiskState.NOT_INSTALLED
-        Info.env.magiskVersionCode < BuildConfig.VERSION_CODE -> MagiskState.OBSOLETE
-        else -> MagiskState.UP_TO_DATE
-    }
+    val stateMagisk
+        get() = when {
+            !Info.env.isActive -> MagiskState.NOT_INSTALLED
+            Info.env.magiskVersionCode < BuildConfig.VERSION_CODE -> MagiskState.OBSOLETE
+            else -> MagiskState.UP_TO_DATE
+        }
 
     @get:Bindable
     var stateManager = MagiskState.LOADING
         set(value) = set(value, field, { field = it }, BR.stateManager)
 
-    val magiskInstalledVersion get() = Info.env.run {
-        if (isActive)
-            "$magiskVersionString ($magiskVersionCode)".asText()
-        else
-            R.string.not_available.asText()
-    }
+    val magiskInstalledVersion
+        get() = Info.env.run {
+            if (isActive)
+                "$magiskVersionString ($magiskVersionCode)".asText()
+            else
+                R.string.not_available.asText()
+        }
 
     @get:Bindable
     var managerRemoteVersion = R.string.loading.asText()
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
-    val managerInstalledVersion = Info.stub?.let {
-        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) (${it.version})"
-    } ?: "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    val managerInstalledVersion
+        get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
+            Info.stub?.let { " (${it.version})" }.orEmpty()
 
     @get:Bindable
     var stateManagerProgress = 0
@@ -92,14 +94,11 @@ class HomeViewModel(
 
             managerRemoteVersion =
                 "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asText()
-
-            launch {
-                ensureEnv()
-            }
         } ?: run {
             state = State.LOADING_FAILED
             managerRemoteVersion = R.string.not_available.asText()
         }
+        ensureEnv()
     }
 
     val showTest = false
@@ -137,14 +136,9 @@ class HomeViewModel(
     }
 
     private suspend fun ensureEnv() {
-        val invalidStates = listOf(
-            MagiskState.NOT_INSTALLED,
-            MagiskState.LOADING
-        )
-        if (invalidStates.any { it == stateMagisk } || shownDialog) return
-
-        val result = Shell.su("env_check ${Info.env.magiskVersionString} ${Info.env.magiskVersionCode}").await()
-        if (!result.isSuccess) {
+        if (MagiskState.NOT_INSTALLED == stateMagisk || shownDialog) return
+        val cmd = "env_check ${Info.env.magiskVersionString} ${Info.env.magiskVersionCode}"
+        if (!Shell.su(cmd).await().isSuccess) {
             shownDialog = true
             EnvFixDialog().publish()
         }
