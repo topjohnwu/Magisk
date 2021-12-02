@@ -10,6 +10,7 @@ on:
       - 'buildSrc/**'
       - 'build.py'
       - 'gradle.properties'
+      - '.github/workflows/build.yml'
   pull_request:
     branches: [ master ]
   workflow_dispatch:
@@ -21,7 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    env:
+      NDK_CCACHE: ${{ github.workspace }}/ccache
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
 
     steps:
       - name: Check out
@@ -40,42 +44,40 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set up GitHub env
-        run: |
-          ndk_ver=$(sed -n 's/^magisk.fullNdkVersion=//p' gradle.properties)
-          echo ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT >> $GITHUB_ENV
-          echo MAGISK_NDK_VERSION=$ndk_ver >> $GITHUB_ENV
-        shell: bash
+      - name: Set up ccache
+        run: bash .github/ccache.sh
 
-      - name: Cache Gradle
+      - name: Cache Gradle dependencies
         uses: actions/cache@v2
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            !~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Cache NDK
-        id: ndk-cache
+      - name: Cache build cache
         uses: actions/cache@v2
         with:
-          path: ${{ env.ANDROID_SDK_ROOT }}/ndk/magisk
-          key: ${{ runner.os }}-ndk-${{ env.MAGISK_NDK_VERSION }}
+          path: |
+            ${{ github.workspace }}/.ccache
+            ~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-build-cache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-cache-
 
       - name: Set up NDK
-        if: steps.ndk-cache.outputs.cache-hit != 'true'
-        run: python build.py ndk
+        run: python build.py -v ndk
 
       - name: Build release
-        run: python build.py -vr all
-
-      - name: Refresh flag
-        run: touch gradle.properties
-        shell: bash
+        run: |
+          ./ccache -zp
+          python build.py -vr all
 
       - name: Build debug
-        run: python build.py -v all
+        run: |
+          python build.py -v all
+          ./ccache -s
 
       - name: Stop gradle daemon
         run: ./gradlew --stop

@@ -5,6 +5,7 @@
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <selinux.hpp>
+#include <daemon.hpp>
 
 #include "core.hpp"
 
@@ -24,6 +25,8 @@ static void set_script_env() {
     char new_path[4096];
     sprintf(new_path, "%s:%s", getenv("PATH"), MAGISKTMP.data());
     setenv("PATH", new_path, 1);
+    if (zygisk_enabled)
+        setenv("ZYGISK_ENABLED", "1", 1);
 };
 
 void exec_script(const char *script) {
@@ -107,16 +110,15 @@ void exec_common_scripts(const char *stage) {
     PFS_DONE()
 }
 
-// Return if a > b
-static bool timespec_larger(timespec *a, timespec *b) {
-    if (a->tv_sec != b->tv_sec)
-        return a->tv_sec > b->tv_sec;
-    return a->tv_nsec > b->tv_nsec;
+static bool operator>(const timespec &a, const timespec &b) {
+    if (a.tv_sec != b.tv_sec)
+        return a.tv_sec > b.tv_sec;
+    return a.tv_nsec > b.tv_nsec;
 }
 
-void exec_module_scripts(const char *stage, const vector<string> &module_list) {
+void exec_module_scripts(const char *stage, const vector<string_view> &modules) {
     LOGI("* Running module %s scripts\n", stage);
-    if (module_list.empty())
+    if (modules.empty())
         return;
 
     bool pfs = stage == "post-fs-data"sv;
@@ -124,15 +126,15 @@ void exec_module_scripts(const char *stage, const vector<string> &module_list) {
         timespec now{};
         clock_gettime(CLOCK_MONOTONIC, &now);
         // If we had already timed out, treat it as service mode
-        if (timespec_larger(&now, &pfs_timeout))
+        if (now > pfs_timeout)
             pfs = false;
     }
     int timer_pid = -1;
     PFS_SETUP()
 
     char path[4096];
-    for (auto &m : module_list) {
-        const char* module = m.data();
+    for (auto &m : modules) {
+        const char *module = m.data();
         sprintf(path, MODULEROOT "/%s/%s.sh", module, stage);
         if (access(path, F_OK) == -1)
             continue;

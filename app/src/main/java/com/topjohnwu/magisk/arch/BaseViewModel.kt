@@ -13,12 +13,12 @@ import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.databinding.ObservableHost
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.BackPressEvent
 import com.topjohnwu.magisk.events.NavigationEvent
 import com.topjohnwu.magisk.events.PermissionEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.utils.ObservableHost
-import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.Job
 
 abstract class BaseViewModel(
@@ -77,7 +77,7 @@ abstract class BaseViewModel(
         PermissionEvent(permission, callback).publish()
     }
 
-    fun withExternalRW(callback: () -> Unit) {
+    inline fun withExternalRW(crossinline callback: () -> Unit) {
         withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()

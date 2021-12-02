@@ -19,7 +19,7 @@ static void restore_syscon(int dirfd) {
     char *con;
 
     if (fgetfilecon(dirfd, &con) >= 0) {
-        if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+        if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0 || strcmp(con, ADB_CON) == 0)
             fsetfilecon(dirfd, SYSTEM_CON);
         freecon(con);
     }
@@ -31,13 +31,13 @@ static void restore_syscon(int dirfd) {
             restore_syscon(fd);
         } else if (entry->d_type == DT_REG) {
             if (fgetfilecon(fd, &con) >= 0) {
-                if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
+                if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0 || strcmp(con, ADB_CON) == 0)
                     fsetfilecon(fd, SYSTEM_CON);
                 freecon(con);
             }
         } else if (entry->d_type == DT_LNK) {
             getfilecon_at(dirfd, entry->d_name, &con);
-            if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
+            if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0 || strcmp(con, ADB_CON) == 0)
                 setfilecon_at(dirfd, entry->d_name, con);
             freecon(con);
         }

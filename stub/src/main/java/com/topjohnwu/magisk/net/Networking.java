@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class Networking {
 
     private static final int READ_TIMEOUT = 15000;

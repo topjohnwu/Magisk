@@ -15,10 +15,4 @@
 
     <style name="Theme.Foundation" parent="Base.V27.Theme.Foundation" />
 
-    <style name="Base.V27.Theme.Splash.Light" parent="Base.V23.Theme.Splash.Light">
-        <item name="android:windowLightNavigationBar">false</item>
-    </style>
-
-    <style name="Theme.Splash.Light" parent="Base.V27.Theme.Splash.Light" />
-
 </resources>

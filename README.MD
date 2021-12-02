@@ -2,14 +2,15 @@
 
 [![Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
 
+#### This is not an officially supported Google product
+
 ## Introduction
 
 Magisk is a suite of open source software for customizing Android, supporting devices higher than Android 5.0.<br>
-Here are some feature highlights:
+Some highlight features:
 
 - **MagiskSU**: Provide root access for applications
 - **Magisk Modules**: Modify read-only partitions by installing modules
-- **MagiskHide**: Hide Magisk from root detections / system integrity checks
 - **MagiskBoot**: The most complete tool for unpacking and repacking Android boot images
 
 ## Downloads
@@ -42,7 +43,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - Install Python 3.6+ \
 (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
 - Configure to use the JDK bundled in Android Studio:
-	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"`
+	- macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`
 	- Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
 	- Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
 - Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)
@@ -58,7 +59,7 @@ For each action, use `-h` to access help (e.g. `./build.py all -h`)
 Default string resources for the Magisk app and its stub APK are located here:
 
 - `app/src/main/res/values/strings.xml`
-- `stub/src/main/res/values/strings.xml`
+- `stub/res/values/strings.xml`
 
 Translate each and place them in the respective locations (`[module]/src/main/res/values-[lang]/strings.xml`).
 

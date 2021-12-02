@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.module.RepoItem" />
+            type="com.topjohnwu.magisk.ui.module.OnlineModuleRvItem" />
 
         <variable
             name="viewModel"
@@ -25,7 +25,6 @@
         android:clickable="true"
         android:focusable="true"
         android:nextFocusRight="@id/module_info"
-        android:onClick="@{() -> viewModel.downloadPressed(item)}"
         tools:layout_gravity="center"
         tools:layout_marginBottom="@dimen/l1"
         tools:layout_marginEnd="@dimen/l1">
@@ -102,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:alpha=".5"
                 android:nextFocusLeft="@id/module_card"
-                android:onClick="@{() -> viewModel.infoPressed(item)}"
+                android:onClick="@{() -> viewModel.infoPressed(item.item)}"
                 android:paddingEnd="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="@+id/module_download"
                 app:layout_constraintEnd_toStartOf="@+id/module_download"
@@ -113,11 +112,11 @@
                 android:id="@+id/module_download"
                 style="@style/WidgetFoundation.Icon.Primary"
                 isEnabled="@{!(item.progress == -100 || (item.progress > 0 &amp;&amp; item.progress &lt; 100))}"
-                srcCompat="@{item.isUpdate ? R.drawable.ic_update_md2 : R.drawable.ic_download_md2}"
+                srcCompat="@{item.hasUpdate ? R.drawable.ic_update_md2 : R.drawable.ic_download_md2}"
                 android:layout_width="wrap_content"
                 android:contentDescription="@string/download"
                 android:nextFocusLeft="@id/module_info"
-                android:onClick="@{() -> viewModel.downloadPressed(item)}"
+                android:onClick="@{() -> viewModel.downloadPressed(item.item)}"
                 android:paddingStart="@dimen/l_50"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -154,4 +153,3 @@
     </com.google.android.material.card.MaterialCardView>
 
 </layout>
-

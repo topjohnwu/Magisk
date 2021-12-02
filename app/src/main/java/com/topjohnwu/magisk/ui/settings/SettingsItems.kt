@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.UpdateCheckService
+import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -21,10 +21,10 @@ import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -75,15 +75,6 @@ object Theme : BaseSettingsItem.Blank() {
 
 object AppSettings : BaseSettingsItem.Section() {
     override val title = R.string.home_app_title.asText()
-}
-
-object ClearRepoCache : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_clear_cache_title.asText()
-    override val description = R.string.settings_clear_cache_summary.asText()
-
-    override fun refresh() {
-        isEnabled = Info.env.isActive
-    }
 }
 
 object Hide : BaseSettingsItem.Input() {
@@ -194,16 +185,7 @@ object UpdateChecker : BaseSettingsItem.Toggle() {
     override var value = Config.checkUpdate
         set(value) = setV(value, field, { field = it }) {
             Config.checkUpdate = it
-            UpdateCheckService.schedule(AppContext)
-        }
-}
-
-object DoHToggle : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_doh_title.asText()
-    override val description = R.string.settings_doh_description.asText()
-    override var value = Config.doh
-        set(value) = setV(value, field, { field = it }) {
-            Config.doh = it
+            JobService.schedule(AppContext)
         }
 }
 
@@ -252,17 +234,54 @@ object Magisk : BaseSettingsItem.Section() {
     override val title = R.string.magisk.asText()
 }
 
-object MagiskHide : BaseSettingsItem.Toggle() {
-    override val title = R.string.magiskhide.asText()
-    override val description = R.string.settings_magiskhide_summary.asText()
-    override var value = Config.magiskHide
+object Zygisk : BaseSettingsItem.Toggle() {
+    override val title = R.string.zygisk.asText()
+    override val description get() =
+        if (mismatch) R.string.reboot_apply_change.asText()
+        else R.string.settings_zygisk_summary.asText()
+    override var value = Config.zygisk
+        set(value) = setV(value, field, { field = it }) {
+            Config.zygisk = it
+            DenyList.isEnabled = it
+            DenyListConfig.isEnabled = it
+            DenyList.notifyPropertyChanged(BR.description)
+        }
+    val mismatch get() = value != Info.isZygiskEnabled
+}
+
+object DenyList : BaseSettingsItem.Toggle() {
+    override val title = R.string.settings_denylist_title.asText()
+    override val description get() =
+        if (isEnabled) {
+            if (Zygisk.mismatch)
+                R.string.reboot_apply_change.asText()
+            else
+                R.string.settings_denylist_summary.asText()
+        } else {
+            R.string.settings_denylist_error.asText(R.string.zygisk.asText())
+        }
+
+    override var value = Config.denyList
         set(value) = setV(value, field, { field = it }) {
             val cmd = if (it) "enable" else "disable"
-            Shell.su("magiskhide $cmd").submit { cb ->
-                if (cb.isSuccess) Config.magiskHide = it
+            Shell.su("magisk --denylist $cmd").submit { result ->
+                if (result.isSuccess) Config.denyList = it
                 else field = !it
             }
+            DenyListConfig.isEnabled = it
         }
+
+    override fun refresh() {
+        isEnabled = Zygisk.value
+    }
+}
+
+object DenyListConfig : BaseSettingsItem.Blank() {
+    override val title = R.string.settings_denylist_config_title.asText()
+    override val description = R.string.settings_denylist_config_summary.asText()
+    override fun refresh() {
+        isEnabled = Zygisk.value
+    }
 }
 
 // --- Superuser

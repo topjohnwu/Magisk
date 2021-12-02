@@ -1,15 +1,13 @@
 #include <bitset>
 #include <vector>
 #include <map>
+#include <libfdt.h>
 
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
 #include "dtb.hpp"
 #include "format.hpp"
-extern "C" {
-#include <libfdt.h>
-}
 
 using namespace std;
 
@@ -84,7 +82,7 @@ static void print_node(const void *fdt, int node = 0, int depth = 0) {
 }
 
 static int find_fstab(const void *fdt, int node = 0) {
-    if (fdt_get_name(fdt, node, nullptr) == "fstab"sv)
+    if (auto name = fdt_get_name(fdt, node, nullptr); name && name == "fstab"sv)
         return node;
     int child;
     fdt_for_each_subnode(child, fdt, node) {
@@ -96,32 +94,29 @@ static int find_fstab(const void *fdt, int node = 0) {
 }
 
 static void dtb_print(const char *file, bool fstab) {
-    size_t size;
-    uint8_t *dtb;
     fprintf(stderr, "Loading dtbs from [%s]\n", file);
-    mmap_ro(file, dtb, size);
+    auto m = mmap_data(file);
     // Loop through all the dtbs
     int dtb_num = 0;
-    uint8_t * const end = dtb + size;
-    for (uint8_t *fdt = dtb; fdt < end;) {
+    uint8_t * const end = m.buf + m.sz;
+    for (uint8_t *fdt = m.buf; fdt < end;) {
         fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
         if (fdt == nullptr)
             break;
         if (fstab) {
             int node = find_fstab(fdt);
             if (node >= 0) {
-                fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num);
+                fprintf(stderr, "Found fstab in buf.%04d\n", dtb_num);
                 print_node(fdt, node);
             }
         } else {
-            fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
+            fprintf(stderr, "Printing buf.%04d\n", dtb_num);
             print_node(fdt);
         }
         ++dtb_num;
         fdt += fdt_totalsize(fdt);
     }
     fprintf(stderr, "\n");
-    munmap(dtb, size);
 }
 
 [[maybe_unused]]
@@ -130,19 +125,31 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file);
 static bool dtb_patch(const char *file) {
     bool keep_verity = check_env("KEEPVERITY");
 
-    size_t size;
-    uint8_t *dtb;
     fprintf(stderr, "Loading dtbs from [%s]\n", file);
-    mmap_rw(file, dtb, size);
+    auto m = mmap_data(file, true);
 
     bool patched = false;
-    uint8_t * const end = dtb + size;
-    for (uint8_t *fdt = dtb; fdt < end;) {
+    uint8_t * const end = m.buf + m.sz;
+    for (uint8_t *fdt = m.buf; fdt < end;) {
         fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
         if (fdt == nullptr)
             break;
+        int node;
+        // Patch the chosen node for bootargs
+        fdt_for_each_subnode(node, fdt, 0) {
+            if (auto name = fdt_get_name(fdt, node, nullptr); !name || name != "chosen"sv)
+                continue;
+            int len;
+            if (auto value = fdt_getprop(fdt, node, "bootargs", &len)) {
+                if (void *skip = memmem(value, len, "skip_initramfs", 14)) {
+                    fprintf(stderr, "Patch [skip_initramfs] -> [want_initramfs]\n");
+                    memcpy(skip, "want", 4);
+                    patched = true;
+                }
+            }
+            break;
+        }
         if (int fstab = find_fstab(fdt); fstab >= 0) {
-            int node;
             fdt_for_each_subnode(node, fdt, fstab) {
                 if (!keep_verity) {
                     int len;
@@ -153,8 +160,6 @@ static bool dtb_patch(const char *file) {
         }
         fdt += fdt_totalsize(fdt);
     }
-
-    munmap(dtb, size);
     return patched;
 }
 
@@ -285,8 +290,8 @@ static bool dt_table_patch(const Header *hdr, const char *out) {
         auto size = fdt_totalsize(fdt);
         total_size += xwrite(fd, fdt, size);
         if constexpr (!is_aosp) {
-            val.second.len = do_align(size, align);
-            write_zero(fd, align_off(lseek(fd, 0, SEEK_CUR), align));
+            val.second.len = align_to(size, align);
+            write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR), align));
         }
         free(fdt);
     }

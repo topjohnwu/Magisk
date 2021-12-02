@@ -14,8 +14,8 @@ class ModuleInstallDialog(private val item: OnlineModule) : DialogEvent() {
         with(dialog) {
 
             fun download(install: Boolean) {
-                val config = if (install) Action.Flash else Action.Download
-                val subject = Subject.Module(item, config)
+                val action = if (install) Action.Flash else Action.Download
+                val subject = Subject.Module(item, action)
                 DownloadService.start(context, subject)
             }
 

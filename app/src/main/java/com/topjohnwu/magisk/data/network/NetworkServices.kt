@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.BranchInfo
-import com.topjohnwu.magisk.core.model.RepoJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -23,10 +22,6 @@ interface GithubPageServices {
 
 interface JSDelivrServices {
 
-    @GET("$MAGISK_FILES@{$REVISION}/snet")
-    @Streaming
-    suspend fun fetchSafetynet(@Path(REVISION) revision: String = Const.SNET_REVISION): ResponseBody
-
     @GET("$MAGISK_FILES@{$REVISION}/bootctl")
     @Streaming
     suspend fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): ResponseBody
@@ -40,9 +35,6 @@ interface RawServices {
 
     @GET
     suspend fun fetchCustomUpdate(@Url url: String): UpdateInfo
-
-    @GET
-    suspend fun fetchRepoInfo(@Url url: String): RepoJson
 
     @GET
     @Streaming
@@ -62,4 +54,3 @@ interface GithubApiServices {
         @Path(BRANCH) branch: String
     ): BranchInfo
 }
-

@@ -131,8 +131,6 @@
     <string name="settings_dark_mode_dark">Sempre fosc</string>
     <string name="settings_download_path_title">Directori de baixades</string>
     <string name="settings_download_path_message">Els arxius es desaran a %1$s</string>
-    <string name="settings_clear_cache_title">Netejar memòria cau del repositori</string>
-    <string name="settings_clear_cache_summary">Neteja la informació en memòria cau per als repositoris en línia. Força a l\'aplicació a actualitzar-se en línia</string>
     <string name="settings_hide_app_title">Amagar Magisk Manager</string>
     <string name="settings_hide_app_summary">Torna a empaquetar Magisk Manager amb un nom de paquet a l\'atzar</string>
     <string name="settings_restore_app_title">Restaurar Magisk Manager</string>
@@ -146,7 +144,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
     <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
-    <string name="settings_magiskhide_summary">Amagar Magisk de diverses deteccions</string>
     <string name="settings_hosts_title">Systemless Hosts</string>
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
@@ -176,8 +173,6 @@
     <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
     <string name="settings_customization">Personalització</string>
     <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
-    <string name="settings_doh_title">DNS sobre HTTPS</string>
-    <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>

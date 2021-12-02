@@ -36,6 +36,8 @@ format_t check_fmt(const void *buf, size_t len) {
         return DHTB;
     } else if (CHECKED_MATCH(TEGRABLOB_MAGIC)) {
         return BLOB;
+    } else if (len >= 0x28 && memcmp(&((char *)buf)[0x24], ZIMAGE_MAGIC, 4) == 0) {
+        return ZIMAGE;
     } else {
         return UNKNOWN;
     }
@@ -45,6 +47,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
             return "gzip";
+        case ZOPFLI:
+            return "zopfli";
         case LZOP:
             return "lzop";
         case XZ:
@@ -61,6 +65,8 @@ const char *Fmt2Name::operator[](format_t fmt) {
             return "lz4_lg";
         case DTB:
             return "dtb";
+        case ZIMAGE:
+            return "zimage";
         default:
             return "raw";
     }
@@ -69,6 +75,7 @@ const char *Fmt2Name::operator[](format_t fmt) {
 const char *Fmt2Ext::operator[](format_t fmt) {
     switch (fmt) {
         case GZIP:
+        case ZOPFLI:
             return ".gz";
         case LZOP:
             return ".lzo";
@@ -92,6 +99,7 @@ const char *Fmt2Ext::operator[](format_t fmt) {
 format_t Name2Fmt::operator[](std::string_view name) {
     if (0) {}
     CHECK("gzip", GZIP)
+    CHECK("zopfli", ZOPFLI)
     CHECK("xz", XZ)
     CHECK("lzma", LZMA)
     CHECK("bzip2", BZIP2)

@@ -10,13 +10,6 @@
 
 using namespace std;
 
-static string rtrim(string &&str) {
-    // Trim space, newline, and null byte from end of string
-    while (memchr(" \n\r", str[str.length() - 1], 4))
-        str.pop_back();
-    return std::move(str);
-}
-
 struct devinfo {
     int major;
     int minor;
@@ -112,12 +105,12 @@ if (access(#val, F_OK) == 0) {\
 }
 
 void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
-    if (access(cmd->dt_dir, F_OK) != 0)
+    if (access(config->dt_dir, F_OK) != 0)
         return;
 
     char cwd[128];
     getcwd(cwd, sizeof(cwd));
-    chdir(cmd->dt_dir);
+    chdir(config->dt_dir);
     run_finally cd([&]{ chdir(cwd); });
 
     if (access("fstab", F_OK) != 0)
@@ -166,7 +159,7 @@ void MagiskInit::mount_with_dt() {
         if (is_lnk(entry.mnt_point.data()))
             continue;
         // Derive partname from dev
-        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), cmd->slot);
+        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
         setup_block(true);
         xmkdir(entry.mnt_point.data(), 0755);
         xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
@@ -192,7 +185,7 @@ static void switch_root(const string &path) {
     });
     for (auto &dir : mounts) {
         auto new_path = path + dir;
-        mkdir(new_path.data(), 0755);
+        xmkdir(new_path.data(), 0755);
         xmount(dir.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
     }
     chdir(path.data());
@@ -293,10 +286,10 @@ success:
 }
 
 void RootFSInit::early_mount() {
-    self = mmap_data::ro("/init");
+    self = mmap_data("/init");
 
     LOGD("Restoring /init\n");
-    rename("/.backup/init", "/init");
+    rename(backup_init(), "/init");
 
     mount_with_dt();
 }
@@ -305,9 +298,9 @@ void SARBase::backup_files() {
     if (access("/overlay.d", F_OK) == 0)
         backup_folder("/overlay.d", overlays);
 
-    self = mmap_data::ro("/proc/self/exe");
+    self = mmap_data("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
-        config = mmap_data::ro("/.backup/.magisk");
+        magisk_config = mmap_data("/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
@@ -327,13 +320,13 @@ void SARBase::mount_system_root() {
         if (dev >= 0)
             goto mount_root;
 
-        sprintf(blk_info.partname, "system%s", cmd->slot);
+        sprintf(blk_info.partname, "system%s", config->slot);
         dev = setup_block(false);
         if (dev >= 0)
             goto mount_root;
 
         // Poll forever if rootwait was given in cmdline
-    } while (cmd->rootwait);
+    } while (config->rootwait);
 
     // We don't really know what to do at this point...
     LOGE("Cannot find root partition, abort\n");
@@ -362,14 +355,24 @@ void SARInit::early_mount() {
     }
 }
 
-void SecondStageInit::prepare() {
+bool SecondStageInit::prepare() {
     backup_files();
 
     umount2("/init", MNT_DETACH);
     umount2("/proc/self/exe", MNT_DETACH);
 
-    if (access("/system_root", F_OK) == 0)
-        switch_root("/system_root");
+    // some weird devices, like meizu, embrace two stage init but still have legacy rootfs behaviour
+    bool legacy = false;
+    if (access("/system_root", F_OK) == 0) {
+        if (access("/system_root/proc", F_OK) == 0) {
+            switch_root("/system_root");
+        } else {
+            xmount("/system_root", "/system", nullptr, MS_MOVE, nullptr);
+            rmdir("/system_root");
+            legacy = true;
+        }
+    }
+    return legacy;
 }
 
 void BaseInit::exec_init() {
@@ -393,7 +396,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
 
     int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
-    xwrite(fd, config.buf, config.sz);
+    xwrite(fd, magisk_config.buf, magisk_config.sz);
     close(fd);
     fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
     xwrite(fd, self.buf, self.sz);

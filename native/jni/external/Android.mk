@@ -1,5 +1,11 @@
 LOCAL_PATH := $(call my-dir)
 
+# Header only library
+include $(CLEAR_VARS)
+LOCAL_MODULE:= libphmap
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/parallel-hashmap
+include $(BUILD_STATIC_LIBRARY)
+
 # libxz.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libxz
@@ -320,38 +326,38 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LIBPCRE2 := $(LOCAL_PATH)/pcre/include
 LOCAL_MODULE:= libpcre2
-LOCAL_CFLAGS := -DHAVE_CONFIG_H
+LOCAL_CFLAGS := -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 LOCAL_C_INCLUDES := $(LIBPCRE2) $(LIBPCRE2)_internal
 LOCAL_EXPORT_C_INCLUDES := $(LIBPCRE2)
 LOCAL_SRC_FILES := \
-    pcre/dist2/src/pcre2_auto_possess.c \
-    pcre/dist2/src/pcre2_chartables.c \
-    pcre/dist2/src/pcre2_compile.c \
-    pcre/dist2/src/pcre2_config.c \
-    pcre/dist2/src/pcre2_context.c \
-    pcre/dist2/src/pcre2_convert.c \
-    pcre/dist2/src/pcre2_dfa_match.c \
-    pcre/dist2/src/pcre2_error.c \
-    pcre/dist2/src/pcre2_extuni.c \
-    pcre/dist2/src/pcre2_find_bracket.c \
-    pcre/dist2/src/pcre2_fuzzsupport.c \
-    pcre/dist2/src/pcre2_jit_compile.c \
-    pcre/dist2/src/pcre2_maketables.c \
-    pcre/dist2/src/pcre2_match.c \
-    pcre/dist2/src/pcre2_match_data.c \
-    pcre/dist2/src/pcre2_newline.c \
-    pcre/dist2/src/pcre2_ord2utf.c \
-    pcre/dist2/src/pcre2_pattern_info.c \
-    pcre/dist2/src/pcre2_script_run.c \
-    pcre/dist2/src/pcre2_serialize.c \
-    pcre/dist2/src/pcre2_string_utils.c \
-    pcre/dist2/src/pcre2_study.c \
-    pcre/dist2/src/pcre2_substitute.c \
-    pcre/dist2/src/pcre2_substring.c \
-    pcre/dist2/src/pcre2_tables.c \
-    pcre/dist2/src/pcre2_ucd.c \
-    pcre/dist2/src/pcre2_valid_utf.c \
-    pcre/dist2/src/pcre2_xclass.c
+    pcre/src/pcre2_auto_possess.c \
+    pcre/src/pcre2_compile.c \
+    pcre/src/pcre2_config.c \
+    pcre/src/pcre2_context.c \
+    pcre/src/pcre2_convert.c \
+    pcre/src/pcre2_dfa_match.c \
+    pcre/src/pcre2_error.c \
+    pcre/src/pcre2_extuni.c \
+    pcre/src/pcre2_find_bracket.c \
+    pcre/src/pcre2_fuzzsupport.c \
+    pcre/src/pcre2_maketables.c \
+    pcre/src/pcre2_match.c \
+    pcre/src/pcre2_match_data.c \
+    pcre/src/pcre2_jit_compile.c \
+    pcre/src/pcre2_newline.c \
+    pcre/src/pcre2_ord2utf.c \
+    pcre/src/pcre2_pattern_info.c \
+    pcre/src/pcre2_script_run.c \
+    pcre/src/pcre2_serialize.c \
+    pcre/src/pcre2_string_utils.c \
+    pcre/src/pcre2_study.c \
+    pcre/src/pcre2_substitute.c \
+    pcre/src/pcre2_substring.c \
+    pcre/src/pcre2_tables.c \
+    pcre/src/pcre2_ucd.c \
+    pcre/src/pcre2_valid_utf.c \
+    pcre/src/pcre2_xclass.c \
+    pcre2_workaround.c
 include $(BUILD_STATIC_LIBRARY)
 
 # libxhook.a
@@ -359,7 +365,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libxhook
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/xhook/libxhook/jni
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_CFLAGS := -Wall -Wextra -Werror -fvisibility=hidden
+LOCAL_CFLAGS := -Wall -Wextra -Werror -fvisibility=hidden -D__android_log_print=magisk_log_print
 LOCAL_CONLYFLAGS := -std=c11
 LOCAL_SRC_FILES := \
     xhook/libxhook/jni/xh_log.c \
@@ -394,6 +400,27 @@ LOCAL_SRC_FILES := \
     zlib/trees.c \
     zlib/uncompr.c \
     zlib/zutil.c
+include $(BUILD_STATIC_LIBRARY)
+
+# libzopfli.a
+include $(CLEAR_VARS)
+LOCAL_MODULE:= libzopfli
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/zopfli/src
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
+LOCAL_CFLAGS := -Wall -Werror -Wno-unused -Wno-unused-parameter
+LOCAL_SRC_FILES := \
+    zopfli/src/zopfli/blocksplitter.c \
+    zopfli/src/zopfli/cache.c \
+    zopfli/src/zopfli/deflate.c \
+    zopfli/src/zopfli/gzip_container.c \
+    zopfli/src/zopfli/hash.c \
+    zopfli/src/zopfli/katajainen.c \
+    zopfli/src/zopfli/lz77.c \
+    zopfli/src/zopfli/squeeze.c \
+    zopfli/src/zopfli/tree.c \
+    zopfli/src/zopfli/util.c \
+    zopfli/src/zopfli/zlib_container.c \
+    zopfli/src/zopfli/zopfli_lib.c
 include $(BUILD_STATIC_LIBRARY)
 
 CWD := $(LOCAL_PATH)

@@ -1,11 +1,7 @@
-#include <fcntl.h>
-#include <pthread.h>
 #include <csignal>
 #include <libgen.h>
 #include <sys/un.h>
-#include <sys/types.h>
 #include <sys/mount.h>
-#include <android/log.h>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -13,8 +9,7 @@
 #include <selinux.hpp>
 #include <db.hpp>
 #include <resetprop.hpp>
-#include <flags.hpp>
-#include <stream.hpp>
+#include <flags.h>
 
 #include "core.hpp"
 
@@ -28,28 +23,117 @@ int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
 
-static bool verify_client(pid_t pid) {
-    // Verify caller is the same as server
-    char path[32];
-    sprintf(path, "/proc/%d/exe", pid);
-    struct stat st;
-    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
+static map<int, poll_callback> *poll_map;
+static vector<pollfd> *poll_fds;
+static int poll_ctrl;
+
+enum {
+    POLL_CTRL_NEW,
+    POLL_CTRL_RM,
+};
+
+void register_poll(const pollfd *pfd, poll_callback callback) {
+    if (gettid() == getpid()) {
+        // On main thread, directly modify
+        poll_map->try_emplace(pfd->fd, callback);
+        poll_fds->emplace_back(*pfd);
+    } else {
+        // Send it to poll_ctrl
+        write_int(poll_ctrl, POLL_CTRL_NEW);
+        xwrite(poll_ctrl, pfd, sizeof(*pfd));
+        xwrite(poll_ctrl, &callback, sizeof(callback));
+    }
 }
 
-static bool check_zygote(pid_t pid) {
-    char buf[32];
-    sprintf(buf, "/proc/%d/attr/current", pid);
-    auto fp = open_file(buf, "r");
-    if (!fp)
-        return false;
-    fscanf(fp.get(), "%s", buf);
-    return buf == "u:r:zygote:s0"sv;
+void unregister_poll(int fd, bool auto_close) {
+    if (gettid() == getpid()) {
+        // On main thread, directly modify
+        poll_map->erase(fd);
+        for (auto &poll_fd : *poll_fds) {
+            if (poll_fd.fd == fd) {
+                if (auto_close) {
+                    close(poll_fd.fd);
+                }
+                // Cannot modify while iterating, invalidate it instead
+                // It will be removed in the next poll loop
+                poll_fd.fd = -1;
+                break;
+            }
+        }
+    } else {
+        // Send it to poll_ctrl
+        write_int(poll_ctrl, POLL_CTRL_RM);
+        write_int(poll_ctrl, fd);
+        write_int(poll_ctrl, auto_close);
+    }
 }
 
-static void request_handler(int client, int req_code, ucred cred) {
-    switch (req_code) {
-    case MAGISKHIDE:
-        magiskhide_handler(client, &cred);
+void clear_poll() {
+    if (poll_fds) {
+        for (auto &poll_fd : *poll_fds) {
+            close(poll_fd.fd);
+        }
+    }
+    delete poll_fds;
+    delete poll_map;
+    poll_fds = nullptr;
+    poll_map = nullptr;
+}
+
+static void poll_ctrl_handler(pollfd *pfd) {
+    int code = read_int(pfd->fd);
+    switch (code) {
+        case POLL_CTRL_NEW: {
+            pollfd new_fd;
+            poll_callback cb;
+            xxread(pfd->fd, &new_fd, sizeof(new_fd));
+            xxread(pfd->fd, &cb, sizeof(cb));
+            register_poll(&new_fd, cb);
+            break;
+        }
+        case POLL_CTRL_RM: {
+            int fd = read_int(pfd->fd);
+            bool auto_close = read_int(pfd->fd);
+            unregister_poll(fd, auto_close);
+            break;
+        }
+    }
+}
+
+[[noreturn]] static void poll_loop() {
+    // Register poll_ctrl
+    int pipefd[2];
+    xpipe2(pipefd, O_CLOEXEC);
+    poll_ctrl = pipefd[1];
+    pollfd poll_ctrl_pfd = { pipefd[0], POLLIN, 0 };
+    register_poll(&poll_ctrl_pfd, poll_ctrl_handler);
+
+    for (;;) {
+        if (poll(poll_fds->data(), poll_fds->size(), -1) <= 0)
+            continue;
+
+        // MUST iterate with index because any poll_callback could add new elements to poll_fds
+        for (int i = 0; i < poll_fds->size();) {
+            auto &pfd = (*poll_fds)[i];
+            if (pfd.revents) {
+                if (pfd.revents & POLLERR || pfd.revents & POLLNVAL) {
+                    poll_map->erase(pfd.fd);
+                    poll_fds->erase(poll_fds->begin() + i);
+                    continue;
+                }
+                if (auto it = poll_map->find(pfd.fd); it != poll_map->end()) {
+                    it->second(&pfd);
+                }
+            }
+            ++i;
+        }
+    }
+}
+
+static void handle_request_async(int client, int code, const sock_cred &cred) {
+    switch (code) {
+    case DENYLIST:
+        denylist_handler(client, &cred);
         break;
     case SUPERUSER:
         su_daemon_handler(client, &cred);
@@ -72,99 +156,125 @@ static void request_handler(int client, int req_code, ucred cred) {
         close(client);
         reboot();
         break;
+    case ZYGISK_REQUEST:
+    case ZYGISK_PASSTHROUGH:
+        zygisk_handler(client, &cred);
+        break;
     default:
         close(client);
         break;
     }
 }
 
-static void handle_request(int client) {
-    int req_code;
+static void handle_request_sync(int client, int code) {
+    switch (code) {
+    case CHECK_VERSION:
+        write_string(client, MAGISK_VERSION ":MAGISK");
+        break;
+    case CHECK_VERSION_CODE:
+        write_int(client, MAGISK_VER_CODE);
+        break;
+    case GET_PATH:
+        write_string(client, MAGISKTMP.data());
+        break;
+    case START_DAEMON:
+        setup_logfile(true);
+        break;
+    case STOP_DAEMON:
+        denylist_handler(-1, nullptr);
+        write_int(client, 0);
+        // Terminate the daemon!
+        exit(0);
+    }
+}
+
+static bool is_client(pid_t pid) {
+    // Verify caller is the same as server
+    char path[32];
+    sprintf(path, "/proc/%d/exe", pid);
+    struct stat st;
+    return !(stat(path, &st) || st.st_dev != self_st.st_dev || st.st_ino != self_st.st_ino);
+}
+
+static void handle_request(pollfd *pfd) {
+    int client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
 
     // Verify client credentials
-    ucred cred;
-    get_client_cred(client, &cred);
+    sock_cred cred;
+    bool is_root;
+    bool is_zygote;
+    int code;
 
-    bool is_root = cred.uid == 0;
-    bool is_zygote = check_zygote(cred.pid);
-    bool is_client = verify_client(cred.pid);
+    if (!get_client_cred(client, &cred))
+        goto done;
+    is_root = cred.uid == UID_ROOT;
+    is_zygote = cred.context == "u:r:zygote:s0";
 
-    if (!is_root && !is_zygote && !is_client)
-        goto shortcut;
+    if (!is_root && !is_zygote && !is_client(cred.pid))
+        goto done;
 
-    req_code = read_int(client);
-    if (req_code < 0 || req_code >= DAEMON_CODE_END)
-        goto shortcut;
+    code = read_int(client);
+    if (code < 0 || (code & DAEMON_CODE_MASK) >= DAEMON_CODE_END)
+        goto done;
 
     // Check client permissions
-    switch (req_code) {
+    switch (code) {
     case POST_FS_DATA:
     case LATE_START:
     case BOOT_COMPLETE:
     case SQLITE_CMD:
     case GET_PATH:
+    case DENYLIST:
+    case STOP_DAEMON:
         if (!is_root) {
             write_int(client, ROOT_REQUIRED);
-            goto shortcut;
+            goto done;
         }
         break;
     case REMOVE_MODULES:
-        if (cred.uid != UID_SHELL && cred.uid != UID_ROOT) {
+        if (!is_root && cred.uid != UID_SHELL) {
             write_int(client, 1);
-            goto shortcut;
+            goto done;
         }
         break;
-    case MAGISKHIDE:  // accept hide request from zygote
-        if (!is_root && !is_zygote) {
-            write_int(client, ROOT_REQUIRED);
-            goto shortcut;
+    case ZYGISK_REQUEST:
+        if (!is_zygote) {
+            write_int(client, DAEMON_ERROR);
+            goto done;
         }
         break;
     }
 
-    // Simple requests
-    switch (req_code) {
-    case CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
-        goto shortcut;
-    case CHECK_VERSION_CODE:
-        write_int(client, MAGISK_VER_CODE);
-        goto shortcut;
-    case GET_PATH:
-        write_string(client, MAGISKTMP.data());
-        goto shortcut;
-    case START_DAEMON:
-        setup_logfile(true);
-        goto shortcut;
+    if (code & SYNC_FLAG) {
+        handle_request_sync(client, code);
+        goto done;
     }
 
-    // Create new thread to handle complex requests
-    new_daemon_thread([=] { return request_handler(client, req_code, cred); });
+    // Handle complex requests in another thread
+    exec_task([=] { handle_request_async(client, code, cred); });
     return;
 
-shortcut:
+done:
     close(client);
 }
 
-static int switch_cgroup(const char *cgroup, int pid) {
+static void switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
     snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
-    int fd = open(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
+    if (access(buf, F_OK) != 0)
+        return;
+    int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
     if (fd == -1)
-        return -1;
+        return;
     snprintf(buf, sizeof(buf), "%d\n", pid);
     if (xwrite(fd, buf, strlen(buf)) == -1) {
         close(fd);
-        return -1;
+        return;
     }
     close(fd);
-    return 0;
 }
 
-static void magisk_logging();
-static void start_log_daemon();
-
-[[noreturn]] static void daemon_entry() {
+static void daemon_entry() {
     magisk_logging();
 
     // Block all signals
@@ -194,8 +304,9 @@ static void start_log_daemon();
 
     // Escape from cgroup
     int pid = getpid();
-    if (switch_cgroup("/acct", pid) && switch_cgroup("/sys/fs/cgroup", pid))
-        LOGW("Can't switch cgroup\n");
+    switch_cgroup("/acct", pid);
+    switch_cgroup("/dev/cg2_bpf", pid);
+    switch_cgroup("/sys/fs/cgroup", pid);
 
     // Get self stat
     char buf[64];
@@ -231,6 +342,7 @@ static void start_log_daemon();
         });
     }
     unlink("/dev/.se");
+    unlink(mount_list.data());
 
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
@@ -240,28 +352,48 @@ static void start_log_daemon();
         return true;
     });
 
-    struct sockaddr_un sun;
+    // Use isolated devpts if kernel support
+    if (access("/dev/pts/ptmx", F_OK) == 0) {
+        auto pts = MAGISKTMP + "/" SHELLPTS;
+        if (access(pts.data(), F_OK)) {
+            xmkdirs(pts.data(), 0755);
+            xmount("devpts", pts.data(), "devpts",
+                   MS_NOSUID | MS_NOEXEC, "newinstance");
+            auto ptmx = pts + "/ptmx";
+            if (access(ptmx.data(), F_OK)) {
+                xumount(pts.data());
+                rmdir(pts.data());
+            }
+        }
+    }
+
+    sockaddr_un sun{};
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (xbind(fd, (struct sockaddr*) &sun, len))
+    if (xbind(fd, (sockaddr*) &sun, len))
         exit(1);
     xlisten(fd, 10);
 
+    default_new(poll_map);
+    default_new(poll_fds);
+
+    // Register handler for main socket
+    pollfd main_socket_pfd = { fd, POLLIN, 0 };
+    register_poll(&main_socket_pfd, handle_request);
+
     // Loop forever to listen for requests
-    for (;;) {
-        int client = xaccept4(fd, nullptr, nullptr, SOCK_CLOEXEC);
-        handle_request(client);
-    }
+    poll_loop();
 }
 
 int connect_daemon(bool create) {
-    sockaddr_un sun;
+    sockaddr_un sun{};
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (connect(fd, (struct sockaddr*) &sun, len)) {
-        if (!create || getuid() != UID_ROOT || getgid() != UID_ROOT) {
+    if (connect(fd, (sockaddr*) &sun, len)) {
+        if (!create || getuid() != UID_ROOT) {
             LOGE("No daemon is currently running!\n");
-            exit(1);
+            close(fd);
+            return -1;
         }
 
         if (fork_dont_care() == 0) {
@@ -273,163 +405,4 @@ int connect_daemon(bool create) {
             usleep(10000);
     }
     return fd;
-}
-
-struct log_meta {
-    int prio;
-    int len;
-    int pid;
-    int tid;
-};
-
-static atomic<int> log_sockfd = -1;
-
-void setup_logfile(bool reset) {
-    if (log_sockfd < 0)
-        return;
-
-    msghdr msg{};
-    iovec iov{};
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-
-    log_meta meta = {
-        .prio = -1,
-        .len = reset
-    };
-
-    iov.iov_base = &meta;
-    iov.iov_len = sizeof(meta);
-    sendmsg(log_sockfd, &msg, MSG_NOSIGNAL);
-}
-
-static void logfile_writer(int sockfd) {
-    run_finally close_socket([=] {
-        // Close up all logging sockets when thread dies
-        close(sockfd);
-        close(log_sockfd.exchange(-1));
-    });
-
-    char *log_buf;
-    size_t buf_len;
-    stream *log_strm = new byte_stream(log_buf, buf_len);
-
-    msghdr msg{};
-    iovec iov{};
-    msg.msg_iov = &iov;
-    msg.msg_iovlen = 1;
-
-    log_meta meta{};
-    char buf[4096];
-
-    for (;;) {
-        // Read meta data
-        iov.iov_base = &meta;
-        iov.iov_len = sizeof(meta);
-        if (recvmsg(sockfd, &msg, 0) <= 0)
-            return;
-
-        if (meta.prio < 0 && buf_len >= 0) {
-            run_finally free_buf([&] {
-                free(log_buf);
-                log_buf = nullptr;
-                buf_len = -1;
-            });
-
-            if (meta.len)
-                rename(LOGFILE, LOGFILE ".bak");
-
-            int fd = open(LOGFILE, O_WRONLY | O_APPEND | O_CREAT | O_CLOEXEC, 0644);
-            if (fd < 0)
-                return;
-            if (log_buf)
-                write(fd, log_buf, buf_len);
-
-            delete log_strm;
-            log_strm = new fd_stream(fd);
-            continue;
-        }
-
-        timeval tv;
-        tm tm;
-        gettimeofday(&tv, nullptr);
-        localtime_r(&tv.tv_sec, &tm);
-
-        // Format detailed info
-        char type;
-        switch (meta.prio) {
-            case ANDROID_LOG_DEBUG:
-                type = 'D';
-                break;
-            case ANDROID_LOG_INFO:
-                type = 'I';
-                break;
-            case ANDROID_LOG_WARN:
-                type = 'W';
-                break;
-            default:
-                type = 'E';
-                break;
-        }
-        size_t off = strftime(buf, sizeof(buf), "%m-%d %T", &tm);
-        int ms = tv.tv_usec / 1000;
-        off += snprintf(buf + off, sizeof(buf) - off,
-                ".%03d %5d %5d %c : ", ms, meta.pid, meta.tid, type);
-
-        // Read log msg
-        iov.iov_base = buf + off;
-        iov.iov_len = meta.len;
-        if (recvmsg(sockfd, &msg, 0) <= 0)
-            return;
-        log_strm->write(buf, off + meta.len);
-    }
-}
-
-static int magisk_log(int prio, const char *fmt, va_list ap) {
-    char buf[4000];
-    int len = vsnprintf(buf, sizeof(buf), fmt, ap) + 1;
-
-    if (log_sockfd >= 0) {
-        log_meta meta = {
-            .prio = prio,
-            .len = len,
-            .pid = getpid(),
-            .tid = gettid()
-        };
-
-        msghdr msg{};
-        iovec iov[2];
-        msg.msg_iov = iov;
-        msg.msg_iovlen = 2;
-
-        iov[0].iov_base = &meta;
-        iov[0].iov_len = sizeof(meta);
-        iov[1].iov_base = buf;
-        iov[1].iov_len = len;
-
-        if (sendmsg(log_sockfd, &msg, MSG_NOSIGNAL) < 0) {
-            // Stop trying to write to file
-            close(log_sockfd.exchange(-1));
-        }
-    }
-    __android_log_write(prio, "Magisk", buf);
-
-    return len - 1;
-}
-
-static void start_log_daemon() {
-    int fds[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds) == 0) {
-        log_sockfd = fds[0];
-        new_daemon_thread([=] { logfile_writer(fds[1]); });
-    }
-}
-
-#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
-static void magisk_logging() {
-    log_cb.d = mlog(DEBUG);
-    log_cb.i = mlog(INFO);
-    log_cb.w = mlog(WARN);
-    log_cb.e = mlog(ERROR);
-    log_cb.ex = nop_ex;
 }

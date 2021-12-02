@@ -295,7 +295,7 @@ int SystemProperties::Add(const char* name, unsigned int namelen, const char* va
   return 0;
 }
 
-int SystemProperties::Delete(const char *name) {
+int SystemProperties::Delete(const char *name, bool trim_node) {
   if (!initialized_) {
     return -1;
   }
@@ -311,7 +311,7 @@ int SystemProperties::Delete(const char *name) {
     return -1;
   }
 
-  bool ret = pa->rm(name);
+  bool ret = pa->rm(name, trim_node);
   if (!ret) {
     return -1;
   }

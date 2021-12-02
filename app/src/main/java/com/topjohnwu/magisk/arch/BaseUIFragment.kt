@@ -35,7 +35,7 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
     ): View? {
         binding = DataBindingUtil.inflate<Binding>(inflater, layoutRes, container, false).also {
             it.setVariable(BR.viewModel, viewModel)
-            it.lifecycleOwner = this
+            it.lifecycleOwner = viewLifecycleOwner
         }
         return binding.root
     }

@@ -12,9 +12,8 @@
         android:multiArch="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
-        <!-- Splash -->
         <activity
-            android:name=".core.SplashActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -27,10 +26,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Main -->
-        <activity android:name=".ui.MainActivity" />
-
-        <!-- Superuser -->
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
@@ -43,7 +38,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Receiver -->
         <receiver
             android:name=".core.Receiver"
             android:directBootAware="true"
@@ -54,33 +48,27 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
 
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
 
-        <!-- DownloadService -->
-        <service android:name=".core.download.DownloadService" />
+        <service
+            android:name=".core.download.DownloadService"
+            android:exported="false" />
 
-        <!-- FileProvider -->
+        <service
+            android:name=".core.JobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <provider
             android:name=".core.Provider"
             android:authorities="${applicationId}.provider"
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="true" />
-
-        <!-- Hardcode GMS version -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="12451000" />
-
-        <!-- Initialize WorkManager on-demand -->
-        <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            tools:node="remove"
-            tools:ignore="ExportedContentProvider" />
 
         <!-- We don't invalidate Room -->
         <service

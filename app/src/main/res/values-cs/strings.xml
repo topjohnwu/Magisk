@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Tmavý</string>
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
-    <string name="settings_clear_cache_title">Smazat mezipaměť</string>
-    <string name="settings_clear_cache_summary">Smažete online informace o použití z mezipaměti, a tím na aplikaci vynutíte obnovení online informací.</string>
     <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
     <string name="settings_hide_app_summary">Skryjete aplikaci náhodným ID balíčku a vlastním názvem aplikace.</string>
     <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
@@ -145,7 +143,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
-    <string name="settings_magiskhide_summary">Skryjete Magisk před různými detekcemi.</string>
     <string name="settings_hosts_title">Nesystémový hostitel</string>
     <string name="settings_hosts_summary">Přidáte modul pro podporu nesystémových hostitelů v aplikaci AdBlock.</string>
     <string name="settings_hosts_toast">Přidán systémový modul hostitelů</string>
@@ -175,8 +172,6 @@
     <string name="no_biometric">Nepodporované zařízení nebo není biometrické ověření povolené</string>
     <string name="settings_customization">Přizpůsobit</string>
     <string name="setting_add_shortcut_summary">Přidejte odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
-    <string name="settings_doh_title">DNS nebo HTTPS</string>
-    <string name="settings_doh_description">Řešení pro opravy DNS v některých zemích.</string>
 
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Vlastník zařízení</string>

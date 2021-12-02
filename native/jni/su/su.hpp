@@ -20,8 +20,8 @@ public:
 
     /* These should be guarded with internal lock */
     db_settings cfg;
-    db_strings str;
     su_access access;
+    std::string mgr_pkg;
     struct stat mgr_st;
 
     /* This should be guarded with global cache lock */

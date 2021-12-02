@@ -10,6 +10,7 @@
     <string name="section_home">首頁</string>
     <string name="section_theme">主題</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">黑名單</string>
 
     <!--Home-->
     <string name="no_connection">無法連線</string>
@@ -131,8 +132,6 @@
     <string name="settings_dark_mode_dark">暗色模式</string>
     <string name="settings_download_path_title">下載路徑</string>
     <string name="settings_download_path_message">檔案將被儲存在：%1$s</string>
-    <string name="settings_clear_cache_title">清除線上模組庫快取</string>
-    <string name="settings_clear_cache_summary">將強制重新載入線上模組庫</string>
     <string name="language">語言</string>
     <string name="settings_hide_app_title">隱藏 Magisk</string>
     <string name="settings_hide_app_summary">安裝一個隨機包裝和可客製化應用程式名稱的代理應用程式</string>
@@ -146,7 +145,12 @@
     <string name="settings_update_beta">測試版</string>
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
-    <string name="settings_magiskhide_summary">隱藏 Magisk 以避免被偵測</string>
+    <string name="settings_zygisk_summary">在 Zygote 中運行 Magisk</string>
+    <string name="settings_denylist_title">強制黑名單</string>
+    <string name="settings_denylist_summary">Magisk 將會把黑名單內執行的程序還原修改</string>
+    <string name="settings_denylist_error">這個功能需要啟用 %1$s</string>
+    <string name="settings_denylist_config_title">配置黑名單</string>
+    <string name="settings_denylist_config_summary">選擇要包含在黑名單的程序</string>
     <string name="settings_hosts_title">主機（Hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
@@ -176,8 +180,6 @@
     <string name="no_biometric">不支援的裝置或是未啟用生物特徵設定</string>
     <string name="settings_customization">客製化</string>
     <string name="setting_add_shortcut_summary">在隱藏應用程式後，名稱和圖示難以辨識的情況下，新增一個精緻的捷徑到首頁</string>
-    <string name="settings_doh_title">安全化的域名解析（DoH）</string>
-    <string name="settings_doh_description">解決某些地區的 DNS 汙染問題</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
@@ -240,5 +242,6 @@
     <string name="add_shortcut_title">新增捷徑到首頁</string>
     <string name="add_shortcut_msg">在隱藏 Magisk 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
     <string name="app_not_found">沒有可以處理這個操作的應用程式</string>
+<string name="reboot_apply_change">重新啟動裝置以套用設變更</string>
 
 </resources>

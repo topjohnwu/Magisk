@@ -18,14 +18,15 @@
 using namespace std;
 
 static bool safe_mode = false;
+bool zygisk_enabled = false;
 
 /*********
  * Setup *
  *********/
 
-#define MNT_DIR_IS(dir)   (me->mnt_dir == string_view(dir))
-#define SETMIR(b, part)   sprintf(b, "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part)   sprintf(b, "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
+#define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
+#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
+#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
 #define do_mount_mirror(part, flag) {\
     SETMIR(buf1, part); \
@@ -105,9 +106,10 @@ static bool magisk_env() {
     LOGI("* Initializing Magisk environment\n");
 
     string pkg;
-    check_manager(&pkg);
+    get_manager(&pkg);
 
-    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR, pkg.data());
+    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
+            pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths
     const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
@@ -296,12 +298,15 @@ void post_fs_data(int client) {
 
     if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
         safe_mode = true;
-        // Disable all modules and magiskhide so next boot will be clean
+        // Disable all modules and denylist so next boot will be clean
         disable_modules();
-        stop_magiskhide();
+        disable_deny();
     } else {
         exec_common_scripts("post-fs-data");
-        auto_start_magiskhide(false);
+        db_settings dbs;
+        get_db_settings(dbs, ZYGISK_CONFIG);
+        zygisk_enabled = dbs[ZYGISK_CONFIG];
+        initialize_denylist();
         handle_modules();
     }
 
@@ -350,9 +355,7 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    auto_start_magiskhide(true);
-
-    if (!check_manager()) {
+    if (!get_manager()) {
         if (access(MANAGERAPK, F_OK) == 0) {
             // Only try to install APK when no manager is installed
             // Magisk Manager should be upgraded by itself, not through recovery installs

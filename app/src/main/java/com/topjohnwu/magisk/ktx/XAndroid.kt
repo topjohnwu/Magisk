@@ -9,9 +9,6 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
-import android.content.pm.ServiceInfo
-import android.content.pm.ServiceInfo.FLAG_ISOLATED_PROCESS
-import android.content.pm.ServiceInfo.FLAG_USE_APP_ZYGOTE
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.database.Cursor
@@ -57,11 +54,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.reflect.Array as JArray
-
-val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
-
-@get:SuppressLint("InlinedApi")
-val ServiceInfo.useAppZygote get() = (flags and FLAG_USE_APP_ZYGOTE) != 0
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 

@@ -70,9 +70,11 @@ fi
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
+[ -z $KEEPVBMETAFLAG ] && KEEPVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
+export KEEPVBMETAFLAG
 
 chmod -R 755 .
 
@@ -135,6 +137,12 @@ case $((STATUS & 3)) in
     ;;
 esac
 
+# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+INIT=init
+if [ $((STATUS & 4)) -ne 0 ]; then
+  INIT=init.real
+fi
+
 ##################
 # Ramdisk Patches
 ##################
@@ -143,6 +151,7 @@ ui_print "- Patching ramdisk"
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+echo "KEEPVBMETAFLAG=$KEEPVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
@@ -159,7 +168,7 @@ if [ -f magisk64 ]; then
 fi
 
 ./magiskboot cpio ramdisk.cpio \
-"add 0750 init magiskinit" \
+"add 0750 $INIT magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
 "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \

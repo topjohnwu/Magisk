@@ -13,33 +13,60 @@ using namespace std;
 
 vector<string> mount_list;
 
-template<typename Func>
-static void parse_cmdline(const Func &fn) {
-    char cmdline[4096];
-    int fd = xopen("/proc/cmdline", O_RDONLY | O_CLOEXEC);
-    cmdline[read(fd, cmdline, sizeof(cmdline))] = '\0';
-    close(fd);
+template<char... cs> using chars = integer_sequence<char, cs...>;
 
-    char *tok, *eql, *tmp, *saveptr;
-    saveptr = cmdline;
-    while ((tok = strtok_r(nullptr, " \n", &saveptr)) != nullptr) {
-        eql = strchr(tok, '=');
-        if (eql) {
-            *eql = '\0';
-            if (eql[1] == '"') {
-                tmp = strchr(saveptr, '"');
-                if (tmp != nullptr) {
-                    *tmp = '\0';
-                    saveptr[-1] = ' ';
-                    saveptr = tmp + 1;
-                    eql++;
-                }
-            }
-            fn(tok, eql + 1);
-        } else {
-            fn(tok, "");
+// If quoted, parsing ends when we find char in [breaks]
+// If not quoted, parsing ends when we find char in [breaks] + [escapes]
+template<char... escapes, char... breaks>
+static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
+        string_view str, size_t &pos, bool &quoted) {
+    string result;
+    char match_array[] = {escapes..., breaks..., '"'};
+    string_view match(match_array, std::size(match_array));
+    for (size_t cur = pos;; ++cur) {
+        cur = str.find_first_of(match, cur);
+        if (cur == string_view::npos ||
+            ((str[cur] == breaks) || ...) ||
+            (!quoted && ((str[cur] == escapes) || ...))) {
+            result.append(str.substr(pos, cur - pos));
+            pos = cur;
+            return result;
+        }
+        if (str[cur] == '"') {
+            quoted = !quoted;
+            result.append(str.substr(pos, cur - pos));
+            pos = cur + 1;
         }
     }
+}
+
+// Parse string into key value pairs.
+// The string format: [delim][key][padding]=[padding][value][delim]
+template<char delim, char... padding>
+static kv_pairs parse_impl(chars<padding...>, string_view str) {
+    kv_pairs kv;
+    char skip_array[] = {'=', padding...};
+    string_view skip(skip_array, std::size(skip_array));
+    bool quoted = false;
+    for (size_t pos = 0u; pos < str.size(); pos = str.find_first_not_of(delim, pos)) {
+        auto key = extract_quoted_str_until(
+                chars<padding..., delim>{}, chars<'='>{}, str, pos, quoted);
+        pos = str.find_first_not_of(skip, pos);
+        if (pos == string_view::npos || str[pos] == delim) {
+            kv.emplace_back(key, "");
+            continue;
+        }
+        auto value = extract_quoted_str_until(chars<delim>{}, chars<>{}, str, pos, quoted);
+        kv.emplace_back(key, value);
+    }
+    return kv;
+}
+
+static kv_pairs parse_cmdline(string_view str) {
+    return parse_impl<' '>(chars<>{}, str);
+}
+static kv_pairs parse_bootconfig(string_view str) {
+    return parse_impl<'\n'>(chars<' '>{}, str);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
@@ -66,7 +93,7 @@ static bool check_key_combo() {
     if (events.empty())
         return false;
 
-    run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
+    run_finally fin([&] { for_each(events.begin(), events.end(), close); });
 
     // Return true if volume up key is held for more than 3 seconds
     int count = 0;
@@ -132,17 +159,54 @@ void setup_klog() {
     }
 }
 
-#define read_dt(name, key) \
-sprintf(file_name, "%s/" name, cmd->dt_dir); \
-if (access(file_name, R_OK) == 0){ \
-    string data = full_read(file_name); \
-    if (!data.empty()) { \
-        data.pop_back(); \
-        strcpy(cmd->key, data.data()); \
-    } \
+void BootConfig::set(const kv_pairs &kv) {
+    for (const auto &[key, value] : kv) {
+        if (key == "androidboot.slot_suffix") {
+            strlcpy(slot, value.data(), sizeof(slot));
+        } else if (key == "androidboot.slot") {
+            slot[0] = '_';
+            strlcpy(slot + 1, value.data(), sizeof(slot) - 1);
+        } else if (key == "skip_initramfs") {
+            skip_initramfs = true;
+        } else if (key == "androidboot.force_normal_boot") {
+            force_normal_boot = !value.empty() && value[0] == '1';
+        } else if (key == "rootwait") {
+            rootwait = true;
+        } else if (key == "androidboot.android_dt_dir") {
+            strlcpy(dt_dir, value.data(), sizeof(dt_dir));
+        } else if (key == "androidboot.hardware") {
+            strlcpy(hardware, value.data(), sizeof(hardware));
+        } else if (key == "androidboot.hardware.platform") {
+            strlcpy(hardware_plat, value.data(), sizeof(hardware_plat));
+        } else if (key == "androidboot.fstab_suffix") {
+            strlcpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
+        }
+    }
 }
 
-void load_kernel_info(cmdline *cmd) {
+void BootConfig::print() {
+    LOGD("skip_initramfs=[%d]\n", skip_initramfs);
+    LOGD("force_normal_boot=[%d]\n", force_normal_boot);
+    LOGD("rootwait=[%d]\n", rootwait);
+    LOGD("slot=[%s]\n", slot);
+    LOGD("dt_dir=[%s]\n", dt_dir);
+    LOGD("fstab_suffix=[%s]\n", fstab_suffix);
+    LOGD("hardware=[%s]\n", hardware);
+    LOGD("hardware.platform=[%s]\n", hardware_plat);
+}
+
+#define read_dt(name, key)                                          \
+snprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
+if (access(file_name, R_OK) == 0) {                                 \
+    string data = full_read(file_name);                             \
+    if (!data.empty()) {                                            \
+        data.pop_back();                                            \
+        LOGD(name "=[%s]\n", data.data());                          \
+        strlcpy(config->key, data.data(), sizeof(config->key));     \
+    }                                                               \
+}
+
+void load_kernel_info(BootConfig *config) {
     // Get kernel data using procfs and sysfs
     xmkdir("/proc", 0755);
     xmount("proc", "/proc", "proc", 0, nullptr);
@@ -155,61 +219,31 @@ void load_kernel_info(cmdline *cmd) {
     // Log to kernel
     setup_klog();
 
-    parse_cmdline([=](string_view key, const char *value) {
-        if (key == "androidboot.slot_suffix") {
-            strcpy(cmd->slot, value);
-        } else if (key == "androidboot.slot") {
-            cmd->slot[0] = '_';
-            strcpy(cmd->slot + 1, value);
-        } else if (key == "skip_initramfs") {
-            cmd->skip_initramfs = true;
-        } else if (key == "androidboot.force_normal_boot") {
-            cmd->force_normal_boot = value[0] == '1';
-        } else if (key == "rootwait") {
-            cmd->rootwait = true;
-        } else if (key == "androidboot.android_dt_dir") {
-            strcpy(cmd->dt_dir, value);
-        } else if (key == "androidboot.hardware") {
-            strcpy(cmd->hardware, value);
-        } else if (key == "androidboot.hardware.platform") {
-            strcpy(cmd->hardware_plat, value);
-        } else if (key == "androidboot.fstab_suffix") {
-            strcpy(cmd->fstab_suffix, value);
-        }
-    });
-
+    config->set(parse_cmdline(full_read("/proc/cmdline")));
     LOGD("Kernel cmdline info:\n");
-    LOGD("skip_initramfs=[%d]\n", cmd->skip_initramfs);
-    LOGD("force_normal_boot=[%d]\n", cmd->force_normal_boot);
-    LOGD("rootwait=[%d]\n", cmd->rootwait);
-    LOGD("slot=[%s]\n", cmd->slot);
-    LOGD("dt_dir=[%s]\n", cmd->dt_dir);
-    LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
-    LOGD("hardware=[%s]\n", cmd->hardware);
-    LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
+    config->print();
+
+    config->set(parse_bootconfig(full_read("/proc/bootconfig")));
+    LOGD("Boot config info:\n");
+    config->print();
 
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
             LOGD("Running in recovery mode, waiting for key...\n");
-            cmd->skip_initramfs = !check_key_combo();
+            config->skip_initramfs = !check_key_combo();
             return false;
         }
         return true;
     });
 
-    if (cmd->dt_dir[0] == '\0')
-        strcpy(cmd->dt_dir, DEFAULT_DT_DIR);
+    if (config->dt_dir[0] == '\0')
+        strlcpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
 
+    LOGD("Device tree:\n");
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)
     read_dt("hardware", hardware)
     read_dt("hardware.platform", hardware_plat)
-
-    LOGD("Device tree info:\n");
-    LOGD("dt_dir=[%s]\n", cmd->dt_dir);
-    LOGD("fstab_suffix=[%s]\n", cmd->fstab_suffix);
-    LOGD("hardware=[%s]\n", cmd->hardware);
-    LOGD("hardware.platform=[%s]\n", cmd->hardware_plat);
 }
 
 bool check_two_stage() {
@@ -218,6 +252,12 @@ bool check_two_stage() {
     if (access("/system/bin/init", F_OK) == 0)
         return true;
     // If we still have no indication, parse the original init and see what's up
-    auto init = mmap_data::ro("/.backup/init");
+    auto init = mmap_data(backup_init());
     return init.contains("selinux_setup");
+}
+
+const char *backup_init() {
+    if (access("/.backup/init.real", F_OK) == 0)
+        return "/.backup/init.real";
+    return "/.backup/init";
 }

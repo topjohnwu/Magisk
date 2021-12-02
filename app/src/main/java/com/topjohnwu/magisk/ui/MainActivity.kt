@@ -1,19 +1,22 @@
 package com.topjohnwu.magisk.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.WindowManager
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.*
@@ -21,7 +24,6 @@ import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
-import com.topjohnwu.magisk.utils.HideableBehavior
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
@@ -29,7 +31,7 @@ import java.io.File
 
 class MainViewModel : BaseViewModel()
 
-open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>() {
+class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
@@ -37,16 +39,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     private var isRootFragment = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Make sure Splash is always ran before us
-        if (!SplashActivity.DONE) {
-            redirect<SplashActivity>().also { startActivity(it) }
-            finish()
-            return
-        }
-
+    override fun showMainUI(savedInstanceState: Bundle?) {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
@@ -74,30 +67,30 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
         setSupportActionBar(binding.mainToolbar)
 
-        binding.mainNavigation.setOnNavigationItemSelectedListener {
+        binding.mainNavigation.setOnItemSelectedListener {
             getScreen(it.itemId)?.navigate()
             true
         }
-        binding.mainNavigation.setOnNavigationItemReselectedListener {
+        binding.mainNavigation.setOnItemReselectedListener {
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
+        binding.mainNavigation.menu.apply {
+            findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
+            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
+        }
 
-        val section = if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
-        else intent.getStringExtra(Const.Key.OPEN_SECTION)
+        val section =
+            if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES)
+                Const.Nav.SETTINGS
+            else
+                intent.getStringExtra(Const.Key.OPEN_SECTION)
+
         getScreen(section)?.navigate()
 
         if (savedInstanceState != null) {
             if (!isRootFragment) {
                 requestNavigationHidden()
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.mainNavigation.menu.apply {
-            findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
-            findItem(R.id.logFragment)?.isEnabled = Info.env.isActive
         }
     }
 
@@ -119,40 +112,44 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     @Suppress("UNCHECKED_CAST")
     internal fun requestNavigationHidden(hide: Boolean = true) {
-        val topView = binding.mainToolbarWrapper
-        val bottomView = binding.mainBottomBar
+        val bottomView = binding.mainNavigation
 
-        if (!binding.mainBottomBar.isAttachedToWindow) {
-            binding.mainBottomBar.viewTreeObserver.addOnWindowAttachListener(object :
-                ViewTreeObserver.OnWindowAttachListener {
+        // A copy of HideBottomViewOnScrollBehavior's animation
 
-                init {
-                    val listener =
-                        binding.mainBottomBar.tag as? ViewTreeObserver.OnWindowAttachListener
-                    if (listener != null) {
-                        binding.mainBottomBar.viewTreeObserver.removeOnWindowAttachListener(listener)
-                    }
-                    binding.mainBottomBar.tag = this
-                }
-
-                override fun onWindowAttached() {
-                    requestNavigationHidden(hide)
-                }
-
-                override fun onWindowDetached() {
-                }
-            })
-            return
+        fun animateTranslationY(
+            view: View, targetY: Int, duration: Long, interpolator: TimeInterpolator
+        ) {
+            view.tag = view
+                .animate()
+                .translationY(targetY.toFloat())
+                .setInterpolator(interpolator)
+                .setDuration(duration)
+                .setListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            view.tag = null
+                        }
+                    })
         }
 
-        val topParams = topView.layoutParams as? CoordinatorLayout.LayoutParams
-        val bottomParams = bottomView.layoutParams as? CoordinatorLayout.LayoutParams
+        (bottomView.tag as? Animator)?.cancel()
+        bottomView.clearAnimation()
 
-        val topBehavior = topParams?.behavior as? HideableBehavior<View>
-        val bottomBehavior = bottomParams?.behavior as? HideableBehavior<View>
-
-        topBehavior?.setHidden(topView, hide = false, lockState = false)
-        bottomBehavior?.setHidden(bottomView, hide, hide)
+        if (hide) {
+            animateTranslationY(
+                bottomView,
+                bottomView.measuredHeight,
+                175L,
+                FastOutLinearInInterpolator()
+            )
+        } else {
+            animateTranslationY(
+                bottomView,
+                0,
+                225L,
+                LinearOutSlowInInterpolator()
+            )
+        }
     }
 
     fun invalidateToolbar() {
@@ -163,7 +160,6 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
     private fun getScreen(name: String?): NavDirections? {
         return when (name) {
             Const.Nav.SUPERUSER -> MainDirections.actionSuperuserFragment()
-            Const.Nav.HIDE -> MainDirections.actionHideFragment()
             Const.Nav.MODULES -> MainDirections.actionModuleFragment()
             Const.Nav.SETTINGS -> HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
             else -> null

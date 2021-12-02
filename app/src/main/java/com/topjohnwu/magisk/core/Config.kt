@@ -6,9 +6,9 @@ import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.data.preference.PreferenceModel
+import com.topjohnwu.magisk.data.repository.DBBoolSettingsNoWrite
 import com.topjohnwu.magisk.data.repository.DBConfig
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
@@ -37,6 +37,8 @@ object Config : PreferenceModel, DBConfig {
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
         const val SU_BIOMETRIC = "su_biometric"
+        const val ZYGISK = "zygisk"
+        const val DENYLIST = "denylist"
         const val SU_MANAGER = "requester"
         const val KEYSTORE = "keystore"
 
@@ -58,10 +60,6 @@ object Config : PreferenceModel, DBConfig {
         const val THEME_ORDINAL = "theme_ordinal"
         const val BOOT_ID = "boot_id"
         const val ASKED_HOME = "asked_home"
-        const val DOH = "doh"
-
-        // system state
-        const val MAGISKHIDE = "magiskhide"
     }
 
     object Value {
@@ -132,8 +130,6 @@ object Config : PreferenceModel, DBConfig {
     var suReAuth by preference(Key.SU_REAUTH, false)
     var suTapjack by preference(Key.SU_TAPJACK, true)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
-    var doh by preference(Key.DOH, false)
-    var magiskHide by preference(Key.MAGISKHIDE, true)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
@@ -149,6 +145,8 @@ object Config : PreferenceModel, DBConfig {
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    var zygisk by dbSettings(Key.ZYGISK, false)
+    var denyList by DBBoolSettingsNoWrite(Key.DENYLIST, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
@@ -173,12 +171,6 @@ object Config : PreferenceModel, DBConfig {
                 else if (it.toInt() > Value.CANARY_CHANNEL)
                     putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
             }
-
-            // Write database configs
-            putString(Key.ROOT_ACCESS, rootMode.toString())
-            putString(Key.SU_MNT_NS, suMntNamespaceMode.toString())
-            putString(Key.SU_MULTIUSER_MODE, suMultiuserMode.toString())
-            putBoolean(Key.SU_BIOMETRIC, BiometricHelper.isEnabled)
         }
     }
 

@@ -5,21 +5,28 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.*
 
-class LocalModule(path: String) : Module() {
-    override var id: String = ""
-    override var name: String = ""
-    override var author: String = ""
-    override var version: String = ""
-    override var versionCode: Int = -1
-    override var description: String = ""
+data class LocalModule(
+    private val path: String,
+    override var id: String = "",
+    override var name: String = "",
+    override var author: String = "",
+    override var version: String = "",
+    override var versionCode: Int = -1,
+    override var description: String = "",
+) : Module() {
 
     private val removeFile = SuFile(path, "remove")
     private val disableFile = SuFile(path, "disable")
     private val updateFile = SuFile(path, "update")
     private val ruleFile = SuFile(path, "sepolicy.rule")
+    private val riruFolder = SuFile(path, "riru")
+    private val zygiskFolder = SuFile(path, "zygisk")
 
     val updated: Boolean get() = updateFile.exists()
+    val isRiru: Boolean get() = (id == "riru-core") || riruFolder.exists()
+    val isZygisk: Boolean get() = zygiskFolder.exists()
 
     var enable: Boolean
         get() = !disableFile.exists()
@@ -44,13 +51,14 @@ class LocalModule(path: String) : Module() {
         get() = removeFile.exists()
         set(remove) {
             if (remove) {
+                if (updateFile.exists()) return
                 removeFile.createNewFile()
                 if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
                     Shell.su("rm -rf $PERSIST/$id").submit()
             } else {
-                !removeFile.delete()
+                removeFile.delete()
                 if (Const.Version.atLeast_21_2())
                     Shell.su("copy_sepolicy_rules").submit()
                 else
@@ -83,7 +91,7 @@ class LocalModule(path: String) : Module() {
                 .orEmpty()
                 .filter { !it.isFile }
                 .map { LocalModule("${Const.MAGISK_PATH}/${it.name}") }
-                .sortedBy { it.name.toLowerCase() }
+                .sortedBy { it.name.lowercase(Locale.ROOT) }
         }
     }
 }

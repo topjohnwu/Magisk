@@ -5,14 +5,15 @@ import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.databinding.ObservableItem
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
+import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.set
 
 class PolicyRvItem(
-    val item: SuPolicy,
+    override val item: SuPolicy,
     val icon: Drawable,
     val viewModel: SuperuserViewModel
-) : ObservableItem<PolicyRvItem>() {
+) : ObservableDiffRvItem<PolicyRvItem>(), RvContainer<SuPolicy> {
     override val layoutRes = R.layout.item_policy_md2
 
     @get:Bindable
@@ -64,7 +65,6 @@ class PolicyRvItem(
         viewModel.deletePressed(this)
     }
 
-    override fun contentSameAs(other: PolicyRvItem) = itemSameAs(other)
     override fun itemSameAs(other: PolicyRvItem) = item.uid == other.item.uid
 
 }

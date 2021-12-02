@@ -11,6 +11,7 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="contentInsetStartWithNavigation">0dp</item>
         <item name="android:layout_height">?actionBarSize</item>
+        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.ActionBar</item>
     </style>
 
 

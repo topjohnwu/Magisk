@@ -7,6 +7,9 @@ import android.content.res.Configuration;
 
 import java.lang.reflect.Method;
 
+import io.michaelrocks.paranoid.Obfuscate;
+
+@Obfuscate
 public class DelegateApplication extends Application {
 
     static boolean dynLoad = false;

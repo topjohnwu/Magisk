@@ -1,19 +1,19 @@
-/*
- * Host all missing/incomplete implementation in bionic
- * Copied from various sources
- * */
+// This file implements all missing symbols that should exist in normal API 21
+// libc.a but missing in our extremely lean libc.a replacements.
 
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
 #include <mntent.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 
-#include "missing.hpp"
+extern "C" {
 
 /* Original source: https://github.com/freebsd/freebsd/blob/master/contrib/file/src/getline.c
  * License: BSD, full copyright notice please check original source */
 
-ssize_t compat_getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp) {
+ssize_t getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp) {
     char *ptr, *eptr;
 
     if (*buf == nullptr || *bufsiz == 0) {
@@ -49,14 +49,14 @@ ssize_t compat_getdelim(char **buf, size_t *bufsiz, int delimiter, FILE *fp) {
     }
 }
 
-ssize_t compat_getline(char **buf, size_t *bufsiz, FILE *fp) {
+ssize_t getline(char **buf, size_t *bufsiz, FILE *fp) {
     return getdelim(buf, bufsiz, '\n', fp);
 }
 
 /* Original source: https://android.googlesource.com/platform/bionic/+/master/libc/bionic/mntent.cpp
  * License: AOSP, full copyright notice please check original source */
 
-struct mntent *compat_getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf_len) {
+struct mntent *getmntent_r(FILE *fp, struct mntent *e, char *buf, int buf_len) {
     memset(e, 0, sizeof(*e));
     while (fgets(buf, buf_len, fp) != nullptr) {
         // Entries look like "proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0".
@@ -79,31 +79,71 @@ struct mntent *compat_getmntent_r(FILE* fp, struct mntent* e, char* buf, int buf
     return nullptr;
 }
 
-FILE *compat_setmntent(const char* path, const char* mode) {
+FILE *setmntent(const char *path, const char *mode) {
     return fopen(path, mode);
 }
 
-int compat_endmntent(FILE* fp) {
+int endmntent(FILE *fp) {
     if (fp != nullptr) {
         fclose(fp);
     }
     return 1;
 }
 
-char *compat_hasmntopt(const struct mntent* mnt, const char* opt) {
-    char* token = mnt->mnt_opts;
-    char* const end = mnt->mnt_opts + strlen(mnt->mnt_opts);
-    const size_t optLen = strlen(opt);
-    while (token) {
-        char* const tokenEnd = token + optLen;
-        if (tokenEnd > end) break;
-        if (memcmp(token, opt, optLen) == 0 &&
-            (*tokenEnd == '\0' || *tokenEnd == ',' || *tokenEnd == '=')) {
-            return token;
-        }
-        token = strchr(token, ',');
-        if (token) token++;
-    }
-    return nullptr;
+// Missing system call wrappers
+
+int setns(int fd, int nstype) {
+    return syscall(__NR_setns, fd, nstype);
 }
 
+int unshare(int flags) {
+    return syscall(__NR_unshare, flags);
+}
+
+int accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
+    return syscall(__NR_accept4, sockfd, addr, addrlen, flags);
+}
+
+int dup3(int oldfd, int newfd, int flags) {
+    return syscall(__NR_dup3, oldfd, newfd, flags);
+}
+
+ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
+    return syscall(__NR_readlinkat, dirfd, pathname, buf, bufsiz);
+}
+
+int symlinkat(const char *target, int newdirfd, const char *linkpath) {
+    return syscall(__NR_symlinkat, target, newdirfd, linkpath);
+}
+
+int linkat(int olddirfd, const char *oldpath,
+           int newdirfd, const char *newpath, int flags) {
+    return syscall(__NR_linkat, olddirfd, oldpath, newdirfd, newpath, flags);
+}
+
+int inotify_init1(int flags) {
+    return syscall(__NR_inotify_init1, flags);
+}
+
+int faccessat(int dirfd, const char *pathname, int mode, int flags) {
+    return syscall(__NR_faccessat, dirfd, pathname, mode, flags);
+}
+
+#define SPLIT_64(v) (unsigned)((v) & 0xFFFFFFFF), (unsigned)((v) >> 32)
+
+#if defined(__arm__)
+// Why the additional 0 is required: https://man7.org/linux/man-pages/man2/syscall.2.html
+int ftruncate64(int fd, off64_t length) {
+    return syscall(__NR_ftruncate64, fd, 0, SPLIT_64(length));
+}
+#elif defined(__i386__)
+int ftruncate64(int fd, off64_t length) {
+    return syscall(__NR_ftruncate64, fd, SPLIT_64(length));
+}
+#endif
+
+#if !defined(__LP64__)
+void android_set_abort_message(const char *msg) {}
+#endif
+
+} // extern "C"

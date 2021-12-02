@@ -74,12 +74,9 @@ static bool check_precompiled(const char *precompiled) {
 }
 
 static void load_cil(struct cil_db *db, const char *file) {
-    char *addr;
-    size_t size;
-    mmap_ro(file, addr, size);
-    cil_add_file(db, (char *) file, addr, size);
+    auto d = mmap_data(file);
+    cil_add_file(db, (char *) file, (char *) d.buf, d.sz);
     LOGD("cil_add [%s]\n", file);
-    munmap(addr, size);
 }
 
 sepolicy *sepolicy::from_file(const char *file) {
@@ -141,6 +138,10 @@ sepolicy *sepolicy::compile_split() {
 
     // system_ext
     sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.cil", plat_ver);
+    if (access(path, R_OK) == 0)
+        load_cil(db, path);
+
+    sprintf(path, SYSEXT_POLICY_DIR "mapping/%s.compat.cil", plat_ver);
     if (access(path, R_OK) == 0)
         load_cil(db, path);
 

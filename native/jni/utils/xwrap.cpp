@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <sys/sendfile.h>
 #include <sys/ptrace.h>
+#include <sys/inotify.h>
 
 #include <utils.hpp>
 
@@ -198,26 +199,9 @@ int xlisten(int sockfd, int backlog) {
     return ret;
 }
 
-static int accept4_compat(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
-    int fd = accept(sockfd, addr, addrlen);
-    if (fd < 0) {
-        PLOGE("accept");
-    } else {
-        if (flags & SOCK_CLOEXEC)
-            fcntl(fd, F_SETFD, FD_CLOEXEC);
-        if (flags & SOCK_NONBLOCK) {
-            int i = fcntl(fd, F_GETFL);
-            fcntl(fd, F_SETFL, i | O_NONBLOCK);
-        }
-    }
-    return fd;
-}
-
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
     int fd = accept4(sockfd, addr, addrlen, flags);
     if (fd < 0) {
-        if (errno == ENOSYS)
-            return accept4_compat(sockfd, addr, addrlen, flags);
         PLOGE("accept4");
     }
     return fd;
@@ -466,7 +450,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags,
 
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count) {
     ssize_t ret = sendfile(out_fd, in_fd, offset, count);
-    if (count != ret) {
+    if (ret < 0) {
         PLOGE("sendfile");
     }
     return ret;

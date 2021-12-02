@@ -29,7 +29,7 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="@dimen/l1"
+            android:layout_marginBottom="72dp"
             app:layout_fitsSystemWindowsInsets="bottom"
             app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:srcCompat="@drawable/ic_folder_list"

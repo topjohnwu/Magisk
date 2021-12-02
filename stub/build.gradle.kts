@@ -1,5 +1,11 @@
 plugins {
     id("com.android.application")
+    id("io.michaelrocks.paranoid")
+}
+
+paranoid {
+    obfuscationSeed = if (RAND_SEED != 0) RAND_SEED else null
+    includeSubprojects = true
 }
 
 android {
@@ -11,21 +17,17 @@ android {
     defaultConfig {
         applicationId = "com.topjohnwu.magisk"
         versionCode = 1
-        versionName = Config.version
+        versionName = "1.0"
         buildConfigField("int", "STUB_VERSION", Config.stubVersion)
         buildConfigField("String", "APK_URL", url?.let { "\"$it\"" } ?: "null" )
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles("proguard-rules.pro")
         }
-    }
-
-    aaptOptions {
-        additionalParameters("--package-id", "0x80")
     }
 
     dependenciesInfo {
@@ -34,7 +36,8 @@ android {
     }
 }
 
+setupStub()
+
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":app:shared"))
 }

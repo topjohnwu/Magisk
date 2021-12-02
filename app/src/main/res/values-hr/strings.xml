@@ -126,8 +126,6 @@
     <string name="settings_dark_mode_dark">Uvijek crna</string>
     <string name="settings_download_path_title">Putanja preuzimanja</string>
     <string name="settings_download_path_message">Datoteke će biti spremljene u %1$s</string>
-    <string name="settings_clear_cache_title">Obriši predmemoriju repozitorija</string>
-    <string name="settings_clear_cache_summary">Obrišite predmemorirane podatke za mrežne repozitorije. To prisiljava aplikaciju da se osvježi na mreži</string>
     <string name="language">Jezik</string>
     <string name="system_default">(Zadano sustavom)</string>
     <string name="settings_check_update_title">Provjeri za ažuriranja</string>
@@ -137,7 +135,6 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastiti kanal</string>
     <string name="settings_update_custom_msg">Umetnite prilagođeni URL</string>
-    <string name="settings_magiskhide_summary">Sakrij Magisk od različitih oblika otkrivanja</string>
     <string name="settings_hosts_title">Hostovi bez sistema</string>
     <string name="settings_hosts_summary">Podrška za hostove bez sistema za Adblock aplikacije</string>
     <string name="settings_hosts_toast">Dodan je modul hosta bez sistema</string>
@@ -165,8 +162,6 @@
     <string name="no_biometric">Nepodržani uređaj ili nije omogućena biometrijska provjera autentičnosti</string>
     <string name="settings_customization">Prilagodba</string>
     <string name="setting_add_shortcut_summary">Dodajte lijepi prečac na početni zaslon u slučaju da je naziv i ikonu teško prepoznati nakon skrivanja aplikacije</string>
-    <string name="settings_doh_title">DNS preko HTTPS-a</string>
-    <string name="settings_doh_description">Zaobilazno trovanje DNS-om u nekim zemljama</string>
 
     <string name="multiuser_mode">Višekorisnički način rada</string>
     <string name="settings_owner_only">Samo vlasnik uređaja</string>

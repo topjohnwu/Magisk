@@ -16,16 +16,16 @@
 #   public *;
 #}
 
+# Parcelable
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
 # Kotlin
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
 	public static void check*(...);
 	public static void throw*(...);
 }
-
-# Snet
--keepclassmembers class com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper { *; }
--keep,allowobfuscation interface com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback
--keepclassmembers class * implements com.topjohnwu.magisk.ui.safetynet.SafetyNetHelper$Callback { *; }
 
 # Stub
 -keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }
@@ -43,6 +43,10 @@
 # Excessive obfuscation
 -repackageclasses 'a'
 -allowaccessmodification
+
+-obfuscationdictionary ../dict.txt
+-classobfuscationdictionary ../dict.txt
+-packageobfuscationdictionary ../dict.txt
 
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket

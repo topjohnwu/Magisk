@@ -34,7 +34,7 @@ class ThemeFragment : BaseUIFragment<ThemeViewModel, FragmentThemeMd2Binding>() 
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
 
         for ((a, b) in Theme.values().paired()) {
@@ -48,7 +48,7 @@ class ThemeFragment : BaseUIFragment<ThemeViewModel, FragmentThemeMd2Binding>() 
                 ItemThemeBindingImpl.inflate(LayoutInflater.from(themed), view, true).also {
                     it.setVariable(BR.viewModel, viewModel)
                     it.setVariable(BR.theme, theme)
-                    it.lifecycleOwner = this
+                    it.lifecycleOwner = viewLifecycleOwner
                 }
             }
 

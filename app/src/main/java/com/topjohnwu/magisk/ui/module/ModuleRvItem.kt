@@ -3,24 +3,24 @@ package com.topjohnwu.magisk.ui.module
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.ComparableRvItem
-import com.topjohnwu.magisk.databinding.ObservableItem
-import com.topjohnwu.magisk.utils.set
+import com.topjohnwu.magisk.databinding.DiffRvItem
+import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
+import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.utils.asText
 
-object InstallModule : ComparableRvItem<InstallModule>() {
+object InstallModule : DiffRvItem<InstallModule>() {
     override val layoutRes = R.layout.item_module_download
-
-    override fun contentSameAs(other: InstallModule) = this == other
-    override fun itemSameAs(other: InstallModule) = this === other
 }
 
 class SectionTitle(
     val title: Int,
     _button: Int = 0,
     _icon: Int = 0
-) : ObservableItem<SectionTitle>() {
+) : ObservableDiffRvItem<SectionTitle>() {
     override val layoutRes = R.layout.item_section_md2
 
     @get:Bindable
@@ -34,39 +34,31 @@ class SectionTitle(
     @get:Bindable
     var hasButton = _button != 0 && _icon != 0
         set(value) = set(value, field, { field = it }, BR.hasButton)
-
-    override fun itemSameAs(other: SectionTitle): Boolean = this === other
-    override fun contentSameAs(other: SectionTitle): Boolean = this === other
 }
 
-sealed class RepoItem(val item: OnlineModule) : ObservableItem<RepoItem>() {
+class OnlineModuleRvItem(
+    override val item: OnlineModule
+) : ObservableDiffRvItem<OnlineModuleRvItem>(), RvContainer<OnlineModule> {
     override val layoutRes: Int = R.layout.item_repo_md2
 
     @get:Bindable
     var progress = 0
         set(value) = set(value, field, { field = it }, BR.progress)
 
-    abstract val isUpdate: Boolean
+    var hasUpdate = false
 
-    override fun contentSameAs(other: RepoItem): Boolean = item == other.item
-    override fun itemSameAs(other: RepoItem): Boolean = item.id == other.item.id
-
-    class Update(item: OnlineModule) : RepoItem(item) {
-        override val isUpdate get() = true
-    }
-
-    class Remote(item: OnlineModule) : RepoItem(item) {
-        override val isUpdate get() = false
-    }
+    override fun itemSameAs(other: OnlineModuleRvItem): Boolean = item.id == other.item.id
 }
 
-class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
+class LocalModuleRvItem(
+    override val item: LocalModule
+) : ObservableDiffRvItem<LocalModuleRvItem>(), RvContainer<LocalModule> {
 
     override val layoutRes = R.layout.item_module_md2
 
     @get:Bindable
-    var repo: OnlineModule? = null
-        set(value) = set(value, field, { field = it }, BR.repo)
+    var online: OnlineModule? = null
+        set(value) = set(value, field, { field = it }, BR.online)
 
     @get:Bindable
     var isEnabled = item.enable
@@ -80,6 +72,13 @@ class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
             item.remove = value
         }
 
+    val isSuspended =
+        (Info.isZygiskEnabled && item.isRiru) || (!Info.isZygiskEnabled && item.isZygisk)
+
+    val suspendText =
+        if (item.isRiru) R.string.suspend_text_riru.asText(R.string.zygisk.asText())
+        else R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
+
     val isUpdated get() = item.updated
     val isModified get() = isRemoved || isUpdated
 
@@ -88,11 +87,5 @@ class ModuleItem(val item: LocalModule) : ObservableItem<ModuleItem>() {
         viewModel.updateActiveState()
     }
 
-    override fun contentSameAs(other: ModuleItem): Boolean = item.version == other.item.version
-            && item.versionCode == other.item.versionCode
-            && item.description == other.item.description
-            && item.name == other.item.name
-
-    override fun itemSameAs(other: ModuleItem): Boolean = item.id == other.item.id
+    override fun itemSameAs(other: LocalModuleRvItem): Boolean = item.id == other.item.id
 }
-

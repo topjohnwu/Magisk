@@ -27,27 +27,23 @@ int fork_no_orphan() {
     int pid = xfork();
     if (pid)
         return pid;
-    prctl(PR_SET_PDEATHSIG, SIGTERM);
+    prctl(PR_SET_PDEATHSIG, SIGKILL);
     if (getppid() == 1)
         exit(1);
     return 0;
 }
 
-constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-static bool seeded = false;
-static std::mt19937 gen;
-static std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
 int gen_rand_str(char *buf, int len, bool varlen) {
-    if (!seeded) {
+    constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    static std::mt19937 gen([]{
         if (access("/dev/urandom", F_OK) != 0)
             mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
         int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
         unsigned seed;
         xxread(fd, &seed, sizeof(seed));
-        gen.seed(seed);
-        close(fd);
-        seeded = true;
-    }
+        return seed;
+    }());
+    std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
     if (varlen) {
         std::uniform_int_distribution<int> len_dist(len / 2, len);
         len = len_dist(gen);
@@ -121,24 +117,6 @@ int new_daemon_thread(thread_entry entry, void *arg) {
     return xpthread_create(&thread, &attr, entry, arg);
 }
 
-int new_daemon_thread(void(*entry)()) {
-    thread_entry proxy = [](void *entry) -> void * {
-        reinterpret_cast<void(*)()>(entry)();
-        return nullptr;
-    };
-    return new_daemon_thread(proxy, (void *) entry);
-}
-
-int new_daemon_thread(std::function<void()> &&entry) {
-    thread_entry proxy = [](void *fp) -> void * {
-        auto fn = reinterpret_cast<std::function<void()>*>(fp);
-        (*fn)();
-        delete fn;
-        return nullptr;
-    };
-    return new_daemon_thread(proxy, new std::function<void()>(std::move(entry)));
-}
-
 static char *argv0;
 static size_t name_len;
 void init_argv0(int argc, char **argv) {
@@ -156,10 +134,10 @@ void set_nice_name(const char *name) {
  * Bionic's atoi runs through strtol().
  * Use our own implementation for faster conversion.
  */
-int parse_int(const char *s) {
+int parse_int(string_view s) {
     int val = 0;
-    char c;
-    while ((c = *(s++))) {
+    for (char c : s) {
+        if (!c) break;
         if (c > '9' || c < '0')
             return -1;
         val = val * 10 + c - '0';
@@ -205,4 +183,17 @@ string &replace_all(string &str, string_view from, string_view to) {
         pos += to.length();
     }
     return str;
+}
+
+vector<string> split(const string& s, const string& delimiters) {
+    vector<string> result;
+    size_t base = 0;
+    size_t found;
+    while (true) {
+        found = s.find_first_of(delimiters, base);
+        result.push_back(s.substr(base, found - base));
+        if (found == string::npos) break;
+        base = found + 1;
+    }
+    return result;
 }

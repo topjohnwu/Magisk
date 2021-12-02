@@ -35,14 +35,12 @@ class DBSettingsValue(
     private val default: Int
 ) : ReadWriteProperty<DBConfig, Int> {
 
-    private var value: Int? = null
+    var value: Int? = null
 
     @Synchronized
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): Int {
         if (value == null)
-            value = runBlocking {
-                thisRef.settingsDB.fetch(name, default)
-            }
+            value = runBlocking { thisRef.settingsDB.fetch(name, default) }
         return value as Int
     }
 
@@ -56,7 +54,7 @@ class DBSettingsValue(
     }
 }
 
-class DBBoolSettings(
+open class DBBoolSettings(
     name: String,
     default: Boolean
 ) : ReadWriteProperty<DBConfig, Boolean> {
@@ -68,6 +66,17 @@ class DBBoolSettings(
 
     override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) =
         base.setValue(thisRef, property, if (value) 1 else 0)
+}
+
+class DBBoolSettingsNoWrite(
+    name: String,
+    default: Boolean
+) : DBBoolSettings(name, default) {
+    override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) {
+        synchronized(base) {
+            base.value = if (value) 1 else 0
+        }
+    }
 }
 
 class DBStringsValue(

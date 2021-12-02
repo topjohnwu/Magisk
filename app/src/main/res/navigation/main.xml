@@ -6,10 +6,10 @@
     app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/hideFragment"
-        android:name="com.topjohnwu.magisk.ui.hide.HideFragment"
-        android:label="HideFragment"
-        tools:layout="@layout/fragment_hide_md2" />
+        android:id="@+id/denyFragment"
+        android:name="com.topjohnwu.magisk.ui.deny.DenyListFragment"
+        android:label="DenyListFragment"
+        tools:layout="@layout/fragment_deny_md2" />
 
     <fragment
         android:id="@+id/homeFragment"
@@ -33,14 +33,6 @@
             app:popEnterAnim="@anim/fragment_enter_pop"
             app:popExitAnim="@anim/fragment_exit_pop" />
 
-        <action
-            android:id="@+id/action_homeFragment_to_safetynetFragment"
-            app:destination="@id/safetynetFragment"
-            app:enterAnim="@anim/fragment_enter"
-            app:exitAnim="@anim/fragment_exit"
-            app:popEnterAnim="@anim/fragment_enter_pop"
-            app:popExitAnim="@anim/fragment_exit_pop" />
-
     </fragment>
 
     <fragment
@@ -58,11 +50,6 @@
             android:defaultValue="@null"
             app:argType="android.net.Uri"
             app:nullable="true" />
-
-        <argument
-            android:name="dismiss_id"
-            android:defaultValue="-1"
-            app:argType="integer" />
 
     </fragment>
 
@@ -85,12 +72,6 @@
         tools:layout="@layout/fragment_module_md2" />
 
     <fragment
-        android:id="@+id/safetynetFragment"
-        android:name="com.topjohnwu.magisk.ui.safetynet.SafetynetFragment"
-        android:label="SafetynetFragment"
-        tools:layout="@layout/fragment_safetynet_md2" />
-
-    <fragment
         android:id="@+id/settingsFragment"
         android:name="com.topjohnwu.magisk.ui.settings.SettingsFragment"
         android:label="SettingsFragment"
@@ -104,23 +85,21 @@
             app:popEnterAnim="@anim/fragment_enter_pop"
             app:popExitAnim="@anim/fragment_exit_pop" />
 
-    </fragment>
-
-    <fragment
-        android:id="@+id/superuserFragment"
-        android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
-        android:label="SuperuserFragment"
-        tools:layout="@layout/fragment_superuser_md2">
-
         <action
-            android:id="@+id/action_superuserFragment_to_hideFragment"
-            app:destination="@id/hideFragment"
+            android:id="@+id/action_settingsFragment_to_denyFragment"
+            app:destination="@id/denyFragment"
             app:enterAnim="@anim/fragment_enter"
             app:exitAnim="@anim/fragment_exit"
             app:popEnterAnim="@anim/fragment_enter_pop"
             app:popExitAnim="@anim/fragment_exit_pop" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/superuserFragment"
+        android:name="com.topjohnwu.magisk.ui.superuser.SuperuserFragment"
+        android:label="SuperuserFragment"
+        tools:layout="@layout/fragment_superuser_md2" />
 
     <fragment
         android:id="@+id/themeFragment"
@@ -173,13 +152,5 @@
         app:popEnterAnim="@anim/fragment_enter_pop"
         app:popExitAnim="@anim/fragment_exit_pop"
         app:popUpTo="@id/homeFragment" />
-
-    <action
-        android:id="@+id/action_hideFragment"
-        app:destination="@id/hideFragment"
-        app:enterAnim="@anim/fragment_enter"
-        app:exitAnim="@anim/fragment_exit"
-        app:popEnterAnim="@anim/fragment_enter_pop"
-        app:popExitAnim="@anim/fragment_exit_pop" />
 
 </navigation>

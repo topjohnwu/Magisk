@@ -16,8 +16,8 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.signing.SignBoot
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.signing.SignBoot
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.NOPList

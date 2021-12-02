@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.ui.install
 
-import android.app.Activity
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
@@ -11,11 +10,11 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -42,10 +41,7 @@ class InstallViewModel(
         set(value) = set(value, _method, { _method = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
-                    MagiskInstallFileEvent { code, intent ->
-                        if (code == Activity.RESULT_OK)
-                            data = intent?.data
-                    }.publish()
+                    MagiskInstallFileEvent { uri -> data = uri }.publish()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().publish()

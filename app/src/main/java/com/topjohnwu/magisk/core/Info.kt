@@ -28,9 +28,10 @@ object Info {
 
     // Device state
     @JvmStatic val env by lazy { loadState() }
-    @JvmField var isSAR = false
-    @JvmField var isAB = false
-    @JvmField val isVirtualAB = getProperty("ro.virtual_ab.enabled", "false") == "true"
+    @JvmStatic var isSAR = false
+    var isAB = false
+    val isVirtualAB = getProperty("ro.virtual_ab.enabled", "false") == "true"
+    @JvmField val isZygiskEnabled = System.getenv("ZYGISK_ENABLED") == "1"
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
     @JvmField var hasGMS = true
@@ -51,25 +52,18 @@ object Info {
 
     private fun loadState() = Env(
         fastCmd("magisk -v").split(":".toRegex())[0],
-        runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1),
-        Shell.su("magiskhide status").exec().isSuccess
+        runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
     )
 
     class Env(
         val magiskVersionString: String = "",
-        code: Int = -1,
-        hide: Boolean = false
+        code: Int = -1
     ) {
-        val magiskHide get() = Config.magiskHide
         val magiskVersionCode = when {
             code < Const.Version.MIN_VERCODE -> -1
             else -> if (Shell.rootAccess()) code else -1
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = magiskVersionCode >= 0
-
-        init {
-            Config.magiskHide = hide
-        }
     }
 }

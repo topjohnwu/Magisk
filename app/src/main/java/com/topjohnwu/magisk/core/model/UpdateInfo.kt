@@ -36,13 +36,6 @@ data class ModuleJson(
 )
 
 @JsonClass(generateAdapter = true)
-data class RepoJson(
-    val name: String,
-    val last_update: Long,
-    val modules: List<ModuleJson>
-)
-
-@JsonClass(generateAdapter = true)
 data class CommitInfo(
     val sha: String
 )

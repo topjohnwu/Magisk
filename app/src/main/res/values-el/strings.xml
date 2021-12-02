@@ -50,7 +50,7 @@
     <string name="reboot_delay_toast">Επανεκκίνηση σε 5 δευτερόλεπτα…</string>
     <string name="flash_screen_title">Εγκατάσταση</string>
 
-    <!--Superuser-->	
+    <!--Superuser-->
     <string name="su_request_title">Αίτημα υπερχρήστη</string>
     <string name="touch_filtered_warning">Επειδή μια εφαρμογή αποκρύπτει ένα αίτημα υπερχρήστη, το Magisk δεν μπορεί να επαληθεύσει την απάντησή σας</string>
     <string name="deny">Άρνηση</string>
@@ -76,7 +76,7 @@
     <string name="toast">Αναδυόμενο παράθυρο</string>
     <string name="none">Κανένα</string>
 
-    <string name="superuser_toggle_notification">Ειδοποιήσεις</string>			   
+    <string name="superuser_toggle_notification">Ειδοποιήσεις</string>
     <string name="superuser_toggle_revoke">Ανακάλεσε</string>
     <string name="superuser_policy_none">Καμία εφαρμογή δεν έχει ζητήσει άδεια υπερχρήστη.</string>
     <!--Logs-->
@@ -130,8 +130,6 @@
     <string name="settings_dark_mode_dark">Πάντα Dark</string>
     <string name="settings_download_path_title">Διαδρομή λήψης</string>
     <string name="settings_download_path_message">Τα αρχεία θα αποθηκευτούν στο %1$s</string>
-    <string name="settings_clear_cache_title">Εκκαθάριση προσωρινής μνήμης αποθετηρίων</string>
-    <string name="settings_clear_cache_summary">Καθαρίζει τις κρυφές πληροφορίες για απευθείας συνδεδεμένα αποθετήρια, αναγκάζει την εφαρμογή να κάνει ανανέωση σε απευθείας σύνδεση</string>
     <string name="settings_hide_app_title">Απόκρυψη της εφαρμογής Magisk</string>
     <string name="settings_hide_app_summary">Εγκαταστήστε μια εφαρμογή με τυχαίο αναγνωριστικό πακέτου και προσαρμοσμένη ετικέτα εφαρμογής</string>
     <string name="settings_restore_app_title">Επαναφέρετε την εφαρμογή Magisk</string>
@@ -145,7 +143,6 @@
     <string name="settings_update_beta">Δοκιμαστικό</string>
     <string name="settings_update_custom">Προσαρμοσμένο</string>
     <string name="settings_update_custom_msg">Εισαγωγή ενός custom URL</string>
-    <string name="settings_magiskhide_summary">Κρύβει το Magisk από διάφορες ανιχνεύσεις</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Υποστήριξη Systemless hosts για εφαρμογές Adblock</string>
     <string name="settings_hosts_toast">Προσθήκη αρθρώματος systemless hosts</string>
@@ -175,8 +172,6 @@
     <string name="no_biometric">Δεν υποστηρίζεται η συσκευή ή δεν υπάρχει καμία βιομετρική ρύθμιση</string>
     <string name="settings_customization">Προσαρμογή</string>
     <string name="setting_add_shortcut_summary">Προσθέστε μια όμορφη συντόμευση στην αρχική οθόνη σε περίπτωση που το όνομα και το εικονίδιο είναι δύσκολο να αναγνωριστούν αφού κρύψετε την εφαρμογή</string>
-    <string name="settings_doh_title">DNS μέσω HTTPS</string>
-    <string name="settings_doh_description">Λύση DNS poisoning για μερικά έθνη</string>
 
     <string name="multiuser_mode">Λειτουργία Πολλών Χρηστών</string>
     <string name="settings_owner_only">Μόνο Ιδιοκτήτης Συσκευής</string>
@@ -184,7 +179,7 @@
     <string name="settings_user_independent">Ανεξάρτητη από τον χρήστη</string>
     <string name="owner_only_summary">Μόνο ο ιδιοκτήτης έχει πρόσβαση root</string>
     <string name="owner_manage_summary">Μόνο ο ιδιοκτήτης μπορεί να διαχειριστεί την πρόσβαση root και να δεχτεί προτροπές αίτημάτων</string>
-    <string name="user_indepenent_summary">Κάθε χρήστης έχει τους δικούς του ξεχωριστούς κανόνες root</string>																																						  
+    <string name="user_indepenent_summary">Κάθε χρήστης έχει τους δικούς του ξεχωριστούς κανόνες root</string>
 
     <string name="mount_namespace_mode">Λειτουργία προσάρτησης χώρου ονομάτων</string>
     <string name="settings_ns_global">Καθολικός Χώρος Ονομάτων</string>
@@ -199,7 +194,7 @@
     <string name="progress_channel">Ειδοποιήσεις προόδου</string>
     <string name="download_complete">Η λήψη ολοκληρώθηκε</string>
     <string name="download_file_error">Σφάλμα στη λήψη του αρχείου</string>
-    <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>																																				  
+    <string name="magisk_update_title">Νέα Ενημέρωση Magisk Διαθέσιμη!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ναι</string>
@@ -232,7 +227,7 @@
     <string name="external_rw_permission_denied">Παραχωρήστε άδεια αποθήκευσης για να ενεργοποιήσετε αυτήν τη λειτουργία</string>
     <string name="add_shortcut_title">Προσθέστε συντόμευση στην αρχική οθόνη</string>
     <string name="add_shortcut_msg">Μετά την απόκρυψη αυτής της εφαρμογής, το όνομα και το εικονίδιο της ενδέχεται να είναι δύσκολο να αναγνωριστούν. Θέλετε να προσθέσετε μια όμορφη συντόμευση στην αρχική οθόνη;</string>
-																	   
+
     <string name="app_not_found">Δεν βρέθηκε εφαρμογή που να χειρίζεται αυτήν την ενέργεια</string>
-										 
+
 </resources>

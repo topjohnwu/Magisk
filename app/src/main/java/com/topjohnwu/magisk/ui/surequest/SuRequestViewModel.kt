@@ -26,13 +26,13 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.utils.set
 import kotlinx.coroutines.launch
 import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS

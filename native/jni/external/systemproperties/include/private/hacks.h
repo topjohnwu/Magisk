@@ -11,10 +11,6 @@
 #define PR_SET_VMA_ANON_NAME 0
 #endif
 
-// Missing functions
-#define getline compat_getline
-ssize_t compat_getline(char **, size_t *, FILE *);
-
 // Rename symbols
 #pragma redefine_extname __system_property_set _system_property_set2
 #pragma redefine_extname __system_property_find _system_property_find2

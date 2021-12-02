@@ -3,47 +3,38 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# This script will setup an environment with minimal Magisk that
-# the Magisk app will be happy to run properly within the official
-# emulator bundled with Android Studio (AVD).
+# Support emulator ABI: x86_64 and arm64
+# Support API level: 23 - 31 (21 and 22 images do not have SELinux)
 #
-# ONLY use this script for developing the Magisk app or root apps
-# in the emulator. The constructed Magisk environment is not a
-# fully functional one as if it is running on an actual device.
+# This script will stop zygote, simulate the Magisk start up process
+# that would've happened before zygote was started, and finally
+# restart zygote. This is useful for setting up the emulator for
+# developing Magisk, testing modules, and developing root apps using
+# the official Android emulator (AVD) instead of a real device.
 #
-# The script assumes you are using x64 emulator images.
-# Build binaries with `./build.py binary` before running this script.
+# This only covers the "core" features of Magisk. Testing magiskinit
+# and magiskboot require additional setups that are not covered here.
 #
 #####################################################################
 
-abort() {
-  echo "$@"
-  exit 1
-}
-
 mount_sbin() {
   mount -t tmpfs -o 'mode=0755' tmpfs /sbin
-  $SELINUX && chcon u:object_r:rootfs:s0 /sbin
+  chcon u:object_r:rootfs:s0 /sbin
 }
 
 if [ ! -f /system/build.prop ]; then
   # Running on PC
-  cd "$(dirname "$0")/.."
-  adb push native/out/x86_64/busybox native/out/x86_64/magiskinit \
-  native/out/x86_64/magisk scripts/emulator.sh /data/local/tmp
-  adb shell sh /data/local/tmp/emulator.sh
-  exit 0
+  echo 'Please run `./build.py emulator` instead of directly executing the script!'
+  exit 1
 fi
 
 cd /data/local/tmp
-chmod 777 busybox
-chmod 777 magiskinit
-chmod 777 magisk
+chmod 755 busybox
 
 if [ -z "$FIRST_STAGE" ]; then
   export FIRST_STAGE=1
   export ASH_STANDALONE=1
-  if [ `./busybox id -u` -ne 0 ]; then
+  if [ $(./busybox id -u) -ne 0 ]; then
     # Re-exec script with root
     exec /system/xbin/su 0 ./busybox sh $0
   else
@@ -52,20 +43,39 @@ if [ -z "$FIRST_STAGE" ]; then
   fi
 fi
 
-# Remove previous setup if exist
-pgrep magiskd >/dev/null && pkill -9 magiskd
-[ -f /sbin/magisk ] && umount -l /sbin
-[ -f /system/bin/magisk ] && umount -l /system/bin
+pm install -r $(pwd)/app-debug.apk
 
-# SELinux stuffs
-SELINUX=false
-[ -e /sys/fs/selinux ] && SELINUX=true
-if $SELINUX; then
-  ln -sf ./magiskinit magiskpolicy
-  ./magiskpolicy --live --magisk
+# Extract files from APK
+unzip -oj app-debug.apk 'assets/util_functions.sh'
+. ./util_functions.sh
+
+api_level_arch_detect
+
+unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/busybox.so"
+for file in lib*.so; do
+  chmod 755 $file
+  mv "$file" "${file:3:${#file}-6}"
+done
+
+# Stop zygote (and previous setup if exists)
+magisk --stop 2>/dev/null
+stop
+if [ -d /dev/avd-magisk ]; then
+  umount -l /dev/avd-magisk 2>/dev/null
+  rm -rf /dev/avd-magisk 2>/dev/null
 fi
 
-BINDIR=/sbin
+# SELinux stuffs
+ln -sf ./magiskinit magiskpolicy
+if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
+  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
+elif [ -f /sepolicy ]; then
+  ./magiskpolicy --load /sepolicy --live --magisk 2>&1
+else
+  ./magiskpolicy --live --magisk 2>&1
+fi
+
+MAGISKTMP=/sbin
 
 # Setup bin overlay
 if mount | grep -q rootfs; then
@@ -81,13 +91,11 @@ if mount | grep -q rootfs; then
 elif [ -e /sbin ]; then
   # Legacy SAR
   mount_sbin
-  if ! grep -q '/sbin/.magisk/mirror/system_root' /proc/mounts; then
-    mkdir -p /sbin/.magisk/mirror/system_root
-    block=$(mount | grep ' / ' | awk '{ print $1 }')
-    [ $block = "/dev/root" ] && block=/dev/block/dm-0
-    mount -o ro $block /sbin/.magisk/mirror/system_root
-  fi
-  for file in /sbin/.magisk/mirror/system_root/sbin/*; do
+  mkdir -p /dev/sysroot
+  block=$(mount | grep ' / ' | awk '{ print $1 }')
+  [ $block = "/dev/root" ] && block=/dev/block/dm-0
+  mount -o ro $block /dev/sysroot
+  for file in /dev/sysroot/sbin/*; do
     [ ! -e $file ] && break
     if [ -L $file ]; then
       cp -af $file /sbin
@@ -97,23 +105,43 @@ elif [ -e /sbin ]; then
       mount -o bind $file $sfile
     fi
   done
+  umount -l /dev/sysroot
+  rm -rf /dev/sysroot
 else
-  # Android Q+ without sbin, use overlayfs
-  BINDIR=/system/bin
-  rm -rf /dev/magisk
-  mkdir -p /dev/magisk/upper
-  mkdir /dev/magisk/work
-  ./magisk --clone-attr /system/bin /dev/magisk/upper
-  mount -t overlay overlay -olowerdir=/system/bin,upperdir=/dev/magisk/upper,workdir=/dev/magisk/work /system/bin
+  # Android Q+ without sbin
+  MAGISKTMP=/dev/avd-magisk
+  mkdir /dev/avd-magisk
+  mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-magisk
 fi
 
-# Magisk stuffs
-cp -af ./magisk $BINDIR/magisk
-chmod 755 $BINDIR/magisk
-ln -s ./magisk $BINDIR/su
-ln -s ./magisk $BINDIR/resetprop
-ln -s ./magisk $BINDIR/magiskhide
-mkdir -p /data/adb/modules 2>/dev/null
-mkdir /data/adb/post-fs-data.d 2>/dev/null
-mkdir /data/adb/services.d 2>/dev/null
-$BINDIR/magisk --daemon
+# Magisk stuff
+mkdir -p $MAGISKBIN 2>/dev/null
+unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' -d $MAGISKBIN
+mkdir $NVBASE/modules 2>/dev/null
+mkdir $POSTFSDATAD 2>/dev/null
+mkdir $SERVICED 2>/dev/null
+
+for file in magisk32 magisk64 magiskinit; do
+  chmod 755 ./$file
+  cp -af ./$file $MAGISKTMP/$file
+  cp -af ./$file $MAGISKBIN/$file
+done
+cp -af ./magiskboot $MAGISKBIN/magiskboot
+cp -af ./busybox $MAGISKBIN/busybox
+
+ln -s ./magisk64 $MAGISKTMP/magisk
+ln -s ./magisk $MAGISKTMP/su
+ln -s ./magisk $MAGISKTMP/resetprop
+ln -s ./magisk $MAGISKTMP/magiskhide
+ln -s ./magiskinit $MAGISKTMP/magiskpolicy
+
+mkdir -p $MAGISKTMP/.magisk/mirror
+mkdir $MAGISKTMP/.magisk/block
+touch $MAGISKTMP/.magisk/config
+
+# Boot up
+$MAGISKTMP/magisk --post-fs-data
+while [ ! -f /dev/.magisk_unblock ]; do sleep 1; done
+rm /dev/.magisk_unblock
+start
+$MAGISKTMP/magisk --service

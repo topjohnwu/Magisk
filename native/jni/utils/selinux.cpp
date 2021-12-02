@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <sys/syscall.h>
 #include <sys/xattr.h>
 
 #include <utils.hpp>

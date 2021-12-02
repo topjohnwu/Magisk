@@ -21,29 +21,9 @@
 
     <style name="Theme.Foundation" parent="Base.V21.Theme.Foundation" />
 
-    <style name="Base.V21.Theme.Splash.Light" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
-
-    <style name="Base.V21.Theme.Splash" parent="Theme.MaterialComponents.NoActionBar">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    </style>
-
-    <style name="Theme.Splash.Light" parent="Base.V21.Theme.Splash.Light" />
-
-    <style name="Theme.Splash" parent="Base.V21.Theme.Splash" />
 
     <style name="Base.V21.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
         <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>

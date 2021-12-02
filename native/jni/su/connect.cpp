@@ -5,6 +5,7 @@
 #include <selinux.hpp>
 
 #include "su.hpp"
+#include "daemon.hpp"
 
 using namespace std;
 
@@ -15,11 +16,11 @@ enum {
 };
 
 #define CALL_PROVIDER \
-"/system/bin/app_process", "/system/bin", "com.android.commands.content.Content", \
+exe, "/system/bin", "com.android.commands.content.Content", \
 "call", "--uri", target, "--user", user, "--method", action
 
 #define START_ACTIVITY \
-"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
+exe, "/system/bin", "com.android.commands.am.Am", \
 "start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
 "-f", "0x18000020", "--es", "action", action
 
@@ -100,13 +101,24 @@ static bool check_no_error(int fd) {
 
 static void exec_cmd(const char *action, vector<Extra> &data,
                      const shared_ptr<su_info> &info, int mode = CONTENT_PROVIDER) {
+    char exe[128];
     char target[128];
     char user[4];
-    sprintf(user, "%d", get_user(info));
+    snprintf(user, sizeof(user), "%d", get_user(info));
+
+    if (zygisk_enabled) {
+#if defined(__LP64__)
+        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_64);
+#else
+        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
+#endif
+    } else {
+        strlcpy(exe, "/system/bin/app_process", sizeof(exe));
+    }
 
     // First try content provider call method
     if (mode >= CONTENT_PROVIDER) {
-        sprintf(target, "content://%s.provider", info->str[SU_MANAGER].data());
+        sprintf(target, "content://%s.provider", info->mgr_pkg.data());
         vector<const char *> args{ CALL_PROVIDER };
         for (auto &e : data) {
             e.add_bind(args);
@@ -137,7 +149,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     if (mode >= PKG_ACTIVITY) {
         // Then try start activity without component name
-        strcpy(target, info->str[SU_MANAGER].data());
+        strcpy(target, info->mgr_pkg.data());
         exec_command_sync(exec);
         if (check_no_error(exec.fd))
             return;
@@ -145,7 +157,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->str[SU_MANAGER].data());
+    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);

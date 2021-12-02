@@ -7,7 +7,7 @@
     <string name="settings">सेटिंग्स</string>
     <string name="refresh">स्थानीय डेटा रिफ्रेश करें</string>
     <string name="install">इंस्टॉल</string>
-    <string name="section_home">घर</string>
+    <string name="section_home">होम</string>
     <string name="section_theme">थीम</string>
     <string name="safetynet">सेफ्टीनेट</string>
 
@@ -16,13 +16,13 @@
     <string name="app_changelog">बदलाव</string>
     <string name="loading">लोड हो रहा है…</string>
     <string name="update">अपडेट करें</string>
-    <string name="not_available">N/A</string>
+    <string name="not_available">उपलब्ध नहीं है</string>
     <string name="hide">छिपाएँ</string>
     <string name="home_package">पैकेज</string>
 
     <string name="home_support_title">हमें सहयोग दीजिये</string>
     <string name="home_item_source">स्रोत</string>
-    <string name="home_support_content">मैजिस्क है, और हमेशा मुफ्त और ओपन-सोर्स रहेगा। हालाँकि आप एक छोटा सा दान भेजकर यह दिखा सकते हैं कि आप देख-भाल करते हैं।</string>
+    <string name="home_support_content">मैजिस्क है, और हमेशा मुफ्त और ओपन-सोर्स रहेगा। हालाँकि आप एक छोटा सा दान भेजकर हमारी मदद कर सकते है।</string>
     <string name="home_installed_version">इंस्टॉल्ड</string>
     <string name="home_latest_version">नवीनतम</string>
     <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
@@ -125,11 +125,9 @@
     <string name="settings_dark_mode_message">ऐसी थीम का चयन करें जो आपकी शैली के अनुकूल हो!</string>
     <string name="settings_dark_mode_light">हमेशा सफेद रंग वाली</string>
     <string name="settings_dark_mode_system">सिस्टम के अनुसार</string>
-    <string name="settings_dark_mode_dark">हमेशा गहरे रंग वाली</string>
+    <string name="settings_dark_mode_dark">डार्क मोड</string>
     <string name="settings_download_path_title">डाउनलोड पथ</string>
     <string name="settings_download_path_message">फ़ाइलों को %1$s में सहेजा जाएगा</string>
-    <string name="settings_clear_cache_title">रेपो कैश साफ़ करें</string>
-    <string name="settings_clear_cache_summary">ऑनलाइन रेपो के लिए कैश्ड जानकारी साफ़ करें। यह एप्लिकेशन को ऑनलाइन रिफ्रेश करने के लिए मजबूर करता है</string>
     <string name="language">भाषा</string>
     <string name="system_default">(सिस्टम डिफ़ॉल्ट)</string>
     <string name="settings_check_update_title">अपडेट जांचें</string>
@@ -139,7 +137,6 @@
     <string name="settings_update_beta">बीटा</string>
     <string name="settings_update_custom">कस्टम चैनल</string>
     <string name="settings_update_custom_msg">एक कस्टम URL डालें</string>
-    <string name="settings_magiskhide_summary">विभिन्न रूप की खोजों से बचने के लिए मैजिस्क को छिपाएं</string>
     <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
     <string name="settings_hosts_summary">Adblock ऐप्स के लिए सिस्टमलेस होस्ट सपोर्ट</string>
     <string name="settings_hosts_toast">सिस्टमलेस होस्ट मॉड्यूल जोड़ा गया</string>
@@ -167,8 +164,6 @@
     <string name="no_biometric">असमर्थित डिवाइस या कोई बायोमेट्रिक सेटिंग सक्षम नहीं हैं</string>
     <string name="settings_customization">कस्टमाईजेशन</string>
     <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
-    <string name="settings_doh_title">DNS पर HTTPS</string>
-    <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
 
     <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
     <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
@@ -191,7 +186,7 @@
     <string name="progress_channel">प्रगति सूचनाएँ</string>
     <string name="download_complete">डाउनलोड सम्पन्न हुआ</string>
     <string name="download_file_error">फ़ाइल डाउनलोड करने में त्रुटि</string>
-    <string name="magisk_update_title">मैजिस्क अपडेट उपलब्ध!</string>
+    <string name="magisk_update_title">मैजिस्क अपडेट उपलब्ध है!</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">हाँ</string>
@@ -204,7 +199,7 @@
     <string name="repo_cache_cleared">रेपो कैश साफ़ किया</string>
     <string name="flashing">फ़्लैश हो रहा है...</string>
     <string name="done">सफल हुआ!</string>
-    <string name="failure">असफल हुआ</string>
+    <string name="failure">असफल हुआ !</string>
     <string name="open_link_failed_toast">लिंक खोलने के लिए कोई एप्लिकेशन नहीं मिला</string>
     <string name="complete_uninstall">पूर्ण रूप से अनइंस्टॉल करें</string>
     <string name="restore_img">इमेज रिस्टोर करें</string>

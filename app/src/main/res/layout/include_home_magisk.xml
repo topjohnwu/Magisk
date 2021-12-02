@@ -128,10 +128,27 @@
                         </LinearLayout>
 
                         <LinearLayout
+                            android:id="@+id/home_device_details_zygisk"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
+                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/zygisk" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{Info.isZygiskEnabled ? @string/yes : @string/no}"
+                                tools:text="Yes" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:id="@+id/home_device_details_ramdisk"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
-                            app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
+                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_zygisk">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
@@ -140,48 +157,6 @@
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"
                                 android:text="@{Info.ramdisk ? @string/yes : @string/no }"
-                                tools:text="Yes" />
-
-                        </LinearLayout>
-
-                        <androidx.constraintlayout.widget.Barrier
-                            android:id="@+id/home_magisk_barrier"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:barrierDirection="end"
-                            app:referencedIds="@{viewModel.magiskDetailBarrierIds}"
-                            tools:constraint_referenced_ids="home_magisk_installed_version,home_device_details_ramdisk"/>
-
-                        <LinearLayout
-                            android:id="@+id/home_device_details_ab"
-                            style="@style/W.Home.Item.Top"
-                            app:layout_constraintStart_toStartOf="@id/home_magisk_barrier"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="A/B" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.isAB ? @string/yes : @string/no}"
-                                tools:text="Yes" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/home_device_details_sar"
-                            style="@style/W.Home.Item.Bottom"
-                            app:layout_constraintStart_toStartOf="@+id/home_device_details_ab"
-                            app:layout_constraintTop_toBottomOf="@+id/home_device_details_ab">
-
-                            <TextView
-                                style="@style/W.Home.ItemContent"
-                                android:text="SAR" />
-
-                            <TextView
-                                style="@style/W.Home.ItemContent.Right"
-                                android:text="@{Info.isSAR ? @string/yes : @string/no}"
                                 tools:text="Yes" />
 
                         </LinearLayout>
