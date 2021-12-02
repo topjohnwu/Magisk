@@ -41,7 +41,7 @@ class Keygen(context: Context) : CertKeyProvider {
     }
 
     private val start = Calendar.getInstance().apply { add(Calendar.MONTH, -3) }
-    private val end = start.apply { add(Calendar.YEAR, 30) }
+    private val end = (start.clone() as Calendar).apply { add(Calendar.YEAR, 30) }
 
     override val cert get() = provider.cert
     override val key get() = provider.key
