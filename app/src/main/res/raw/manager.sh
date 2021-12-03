@@ -57,18 +57,20 @@ direct_install() {
       ;;
   esac
 
-  echo "- Flashing new vbmeta image"
-  flash_image $1/new-vbmeta.img $3
-  case $? in
-    1)
-      echo "! Insufficient partition size"
-      return 1
-      ;;
-    2)
-      echo "! $2 is read only"
-      return 2
-      ;;
-  esac
+  if [ ! -z $3 ]; then
+    echo "- Flashing new vbmeta image"
+    flash_image $1/new-vbmeta.img $3
+    case $? in
+      1)
+        echo "! Insufficient partition size"
+        return 1
+        ;;
+      2)
+        echo "! $2 is read only"
+        return 2
+        ;;
+    esac
+  fi
 
   rm -f $1/new-boot.img
   rm -f $1/new-vbmeta.img

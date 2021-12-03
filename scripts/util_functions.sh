@@ -426,6 +426,9 @@ find_vbmeta_image() {
   VBMETAIMAGE=
   if [ ! -z $SLOT ]; then
     VBMETAIMAGE=`find_block vbmeta$SLOT`
+    if [ ! -z $VBMETAIMAGE ]; then
+      export KEEPVBMETAFLAG=true
+    fi
   fi
 }
 
@@ -482,18 +485,20 @@ install_magisk() {
       ;;
   esac
 
-  . ./vbmeta_patch.sh "$VBMETAIMAGE"
+  if [ ! -z $VBMETAIMAGE ]; then
+    . ./vbmeta_patch.sh "$VBMETAIMAGE"
 
-  ui_print "- Flashing new vbmeta image"
-  flash_image new-vbmeta.img "$VBMETAIMAGE"
-  case $? in
-    1)
-      abort "! Insufficient partition size"
-      ;;
-    2)
-      abort "! $VBMETAIMAGE is read only"
-      ;;
-  esac
+    ui_print "- Flashing new vbmeta image"
+    flash_image new-vbmeta.img "$VBMETAIMAGE"
+    case $? in
+      1)
+        abort "! Insufficient partition size"
+        ;;
+      2)
+        abort "! $VBMETAIMAGE is read only"
+        ;;
+    esac
+  fi
 
   ./magiskboot cleanup
   rm -f new-boot.img

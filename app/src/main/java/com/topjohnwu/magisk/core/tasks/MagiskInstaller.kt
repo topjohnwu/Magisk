@@ -47,7 +47,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected var installDir = File("xxx")
     private lateinit var srcBoot: File
-    private lateinit var srcVbmeta: File
+    private var srcVbmeta: File? = null
 
     private val shell = Shell.getShell()
     private val service get() = ServiceLocator.networkService
@@ -65,10 +65,10 @@ abstract class MagiskInstallImpl protected constructor(
         val vbmetaPath = "find_vbmeta_image; echo \"\$VBMETAIMAGE\"".fsh()
         if (vbmetaPath.isEmpty()) {
             console.add("! Unable to detect target vbmeta image")
-            return false
+        } else {
+            srcVbmeta = SuFile(vbmetaPath)
+            console.add("- Target vbmeta image: $vbmetaPath")
         }
-        srcVbmeta = SuFile(vbmetaPath)
-        console.add("- Target vbmeta image: $vbmetaPath")
         return true
     }
 
@@ -94,10 +94,10 @@ abstract class MagiskInstallImpl protected constructor(
             "echo \"\$VBMETAIMAGE\"").fsh()
         if (vbmetaPath.isEmpty()) {
             console.add("! Unable to detect target vbmeta image")
-            return false
+        } else {
+            srcVbmeta = SuFile(vbmetaPath)
+            console.add("- Target vbmeta image: $vbmetaPath")
         }
-        srcVbmeta = SuFile(vbmetaPath)
-        console.add("- Target vbmeta image: $vbmetaPath")
         return true
     }
 
@@ -409,25 +409,35 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     private fun patchVbmeta(): Boolean {
-        val newVbmeta = installDirFile("new-vbmeta.img")
-        if (!useRootDir) {
-            // Create output files before hand
-            newVbmeta.createNewFile()
-            File(installDir, "stock_vbmeta.img").createNewFile()
+        if (srcVbmeta != null) {
+            val newVbmeta = installDirFile("new-vbmeta.img")
+            if (!useRootDir) {
+                // Create output files before hand
+                newVbmeta.createNewFile()
+                File(installDir, "stock_vbmeta.img").createNewFile()
+            }
+
+            val cmds = arrayOf(
+                "cd $installDir",
+                "sh vbmeta_patch.sh $srcVbmeta")
+
+            if (!cmds.sh().isSuccess)
+                return false
+
+            shell.newJob().add("cd /").exec()
+            return true
+        } else {
+            return true
         }
-
-        val cmds = arrayOf(
-            "cd $installDir",
-            "sh vbmeta_patch.sh $srcVbmeta")
-
-        if (!cmds.sh().isSuccess)
-            return false
-
-        shell.newJob().add("cd /").exec()
-        return true
     }
 
-    private fun flashBoth() = "direct_install $installDir $srcBoot $srcVbmeta".sh().isSuccess
+    private fun flashBoth(): Boolean {
+        if (srcVbmeta != null) {
+            return "direct_install $installDir $srcBoot $srcVbmeta".sh().isSuccess
+        } else {
+            return "direct_install $installDir $srcBoot".sh().isSuccess
+        }
+    }
 
     private suspend fun postOTA(): Boolean {
         try {
