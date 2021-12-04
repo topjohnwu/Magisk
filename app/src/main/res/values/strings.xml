@@ -30,7 +30,7 @@
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">All root privileges will be removed\nAll Magisk modules will be turned of and removed!\nStorages decrypted in Magisk will be re-encrypted!</string>
+    <string name="uninstall_magisk_msg">Root will be removed!\nAll modules will be removed!\nAny storage devices decrypted through the use of Magisk will be re-encrypted!</string>
     <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
