@@ -262,3 +262,20 @@ Flags:
    -p      read/write props from/to persistent storage
            (this flag only affects getprop and delprop)
 ```
+
+### denylist
+An applet of `magisk`, the CLI to control DenyList. Use this tool to communicate with the daemon to change DenyList settings.
+
+```
+Usage: magisk --denylist [action [arguments...] ]
+
+Actions:
+   status          Return the enforcement status
+   enable          Enable denylist enforcement
+   disable         Disable denylist enforcement
+   add PKG [PROC]  Add a new target to the denylist
+   rm PKG [PROC]   Remove target(s) from the denylist
+   ls              Print the current denylist
+   exec CMDs...    Execute commands in isolated mount
+                   namespace and do all unmounts
+```
