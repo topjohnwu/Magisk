@@ -7,6 +7,7 @@ magiskinit                 /* binary */
 magiskpolicy -> magiskinit
 supolicy -> magiskinit
 magisk                     /* binary */
+magiskdenylist -> magisk
 resetprop -> magisk
 su -> magisk
 ```
@@ -217,7 +218,7 @@ Advanced Options (Internal APIs):
    --path                    print Magisk tmpfs mount path
 
 Available applets:
-    su, resetprop
+    su, resetprop, denylist
 ```
 
 ### su
