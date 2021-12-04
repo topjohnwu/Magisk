@@ -7,7 +7,7 @@ magiskinit                 /* binary */
 magiskpolicy -> magiskinit
 supolicy -> magiskinit
 magisk                     /* binary */
-magiskdenylist -> magisk
+denylist -> magisk
 resetprop -> magisk
 su -> magisk
 ```
