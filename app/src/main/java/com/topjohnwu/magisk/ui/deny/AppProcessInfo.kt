@@ -85,7 +85,7 @@ class AppProcessInfo(
             pm.getPackageArchiveInfo(info.sourceDir, flag) ?: return emptyList()
         }
 
-        val processSet = TreeSet<ProcessInfo>(compareBy{ it.name })
+        val processSet = TreeSet<ProcessInfo>(compareBy({ it.name }, { it.isIsolated }))
         processSet += packageInfo.activities.toProcessList()
         processSet += packageInfo.services.toProcessList()
         processSet += packageInfo.receivers.toProcessList()
@@ -106,6 +106,6 @@ data class ProcessInfo(
     val packageName: String,
     var isEnabled: Boolean
 ) {
-    val isIsolated get() = packageName == ISOLATED_MAGIC
-    val isAppZygote get() = name.endsWith("_zygote")
+    val isIsolated = packageName == ISOLATED_MAGIC
+    val isAppZygote = name.endsWith("_zygote")
 }
