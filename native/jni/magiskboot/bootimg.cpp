@@ -2,8 +2,7 @@
 #include <memory>
 
 #include <libfdt.h>
-#include <mincrypt/sha.h>
-#include <mincrypt/sha256.h>
+#include <openssl/sha.h>
 #include <utils.hpp>
 
 #include "bootimg.hpp"
@@ -87,7 +86,7 @@ void dyn_img_hdr::print() {
             BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
     if (char *checksum = id()) {
         fprintf(stderr, "%-*s [", PADDING, "CHECKSUM");
-        for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
+        for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i)
             fprintf(stderr, "%02hhx", checksum[i]);
         fprintf(stderr, "]\n");
     }
@@ -302,7 +301,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
     hdr = create_hdr(addr, type);
 
     if (char *id = hdr->id()) {
-        for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
+        for (int i = SHA_DIGEST_LENGTH + 4; i < SHA256_DIGEST_LENGTH; ++i) {
             if (id[i]) {
                 flags[SHA256_FLAG] = true;
                 break;
@@ -712,35 +711,36 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
     // Update checksum
     if (char *id = hdr->id()) {
-        HASH_CTX ctx;
-        boot.flags[SHA256_FLAG] ? SHA256_init(&ctx) : SHA_init(&ctx);
+        // FIXME: untested
+        SHA256_CTX ctx;
+        boot.flags[SHA256_FLAG] ? SHA256_Init(&ctx) : SHA1_Init((SHA_CTX *)&ctx);
         uint32_t size = hdr->kernel_size();
-        HASH_update(&ctx, out.buf + off.kernel, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        SHA256_Update(&ctx, out.buf + off.kernel, size);
+        SHA256_Update(&ctx, &size, sizeof(size));
         size = hdr->ramdisk_size();
-        HASH_update(&ctx, out.buf + off.ramdisk, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        SHA256_Update(&ctx, out.buf + off.ramdisk, size);
+        SHA256_Update(&ctx, &size, sizeof(size));
         size = hdr->second_size();
-        HASH_update(&ctx, out.buf + off.second, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        SHA256_Update(&ctx, out.buf + off.second, size);
+        SHA256_Update(&ctx, &size, sizeof(size));
         size = hdr->extra_size();
         if (size) {
-            HASH_update(&ctx, out.buf + off.extra, size);
-            HASH_update(&ctx, &size, sizeof(size));
+            SHA256_Update(&ctx, out.buf + off.extra, size);
+            SHA256_Update(&ctx, &size, sizeof(size));
         }
         uint32_t ver = hdr->header_version();
         if (ver == 1 || ver == 2) {
             size = hdr->recovery_dtbo_size();
-            HASH_update(&ctx, out.buf + hdr->recovery_dtbo_offset(), size);
-            HASH_update(&ctx, &size, sizeof(size));
+            SHA256_Update(&ctx, out.buf + hdr->recovery_dtbo_offset(), size);
+            SHA256_Update(&ctx, &size, sizeof(size));
         }
         if (ver == 2) {
             size = hdr->dtb_size();
-            HASH_update(&ctx, out.buf + off.dtb, size);
-            HASH_update(&ctx, &size, sizeof(size));
+            SHA256_Update(&ctx, out.buf + off.dtb, size);
+            SHA256_Update(&ctx, &size, sizeof(size));
         }
         memset(id, 0, BOOT_ID_SIZE);
-        memcpy(id, HASH_final(&ctx), boot.flags[SHA256_FLAG] ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
+        boot.flags[SHA256_FLAG] ? SHA256_Final((uint8_t *)id, &ctx) : SHA1_Final((uint8_t *)id, (SHA_CTX *)&ctx);
     }
 
     // Print new header info
@@ -766,7 +766,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         auto d_hdr = reinterpret_cast<dhtb_hdr *>(out.buf);
         memcpy(d_hdr, DHTB_MAGIC, 8);
         d_hdr->size = off.total - sizeof(dhtb_hdr);
-        SHA256_hash(out.buf + sizeof(dhtb_hdr), d_hdr->size, d_hdr->checksum);
+        SHA256(out.buf + sizeof(dhtb_hdr), d_hdr->size, d_hdr->checksum);
     } else if (boot.flags[BLOB_FLAG]) {
         // Blob header
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf);

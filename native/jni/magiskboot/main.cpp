@@ -1,4 +1,4 @@
-#include <mincrypt/sha.h>
+#include <openssl/sha.h>
 #include <utils.hpp>
 
 #include "magiskboot.hpp"
@@ -109,6 +109,20 @@ Supported actions:
 
     print_formats();
 
+    fprintf(stderr, R"EOF(
+
+  avb2 <bootimg> <action> [args...]
+    Do avb2 related actions to <bootimg>
+    Supported commands:
+      verify
+        Verify avb2 hashes and signature
+        Return values:
+        0:valid    2:invalid    4:unsupported
+      sign <privkey>
+        Updates avb2 hashes and signature using <privkey>
+        Return values:
+        0:valid    2:invalid    4:unsupported)EOF");
+
     fprintf(stderr, "\n\n");
     exit(1);
 }
@@ -136,9 +150,9 @@ int main(int argc, char *argv[]) {
         unlink(RECV_DTBO_FILE);
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
-        uint8_t sha1[SHA_DIGEST_SIZE];
+        uint8_t sha1[SHA_DIGEST_LENGTH];
         auto m = mmap_data(argv[2]);
-        SHA_hash(m.buf, m.sz, sha1);
+        SHA1(m.buf, m.sz, sha1);
         for (uint8_t i : sha1)
             printf("%02x", i);
         printf("\n");
@@ -184,6 +198,12 @@ int main(int argc, char *argv[]) {
     } else if (argc > 3 && action == "dtb") {
         if (dtb_commands(argc - 2, argv + 2))
             usage(argv[0]);
+    } else if (argc > 3 && action == "avb2") {
+        int status = avb2_commands(argc - 2, argv + 2);
+        if (status == 1)
+            usage(argv[0]);
+        else
+            return status;
     } else {
         usage(argv[0]);
     }

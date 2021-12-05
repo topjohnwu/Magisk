@@ -43,3 +43,9 @@
 [submodule "zopfli"]
 	path = native/jni/external/zopfli
 	url = https://github.com/google/zopfli.git
+[submodule "native/jni/external/avb"]
+	path = native/jni/external/avb
+	url = git@github.com:capntrips/android_external_avb.git
+[submodule "native/jni/external/boringssl"]
+	path = native/jni/external/boringssl
+	url = git@github.com:capntrips/android_external_boringssl.git
