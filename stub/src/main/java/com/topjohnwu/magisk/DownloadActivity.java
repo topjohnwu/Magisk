@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,6 +77,7 @@ public class DownloadActivity extends Activity {
 
     private void error(Throwable e) {
         Log.e(getClass().getSimpleName(), "", e);
+        Toast.makeText(themed, e.getMessage(), Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -108,22 +110,22 @@ public class DownloadActivity extends Activity {
 
     private void dlAPK() {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
+        Runnable onSuccess = () -> {
+            dialog.dismiss();
+            Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();
+            finish();
+        };
         // Download and upgrade the app
         File apk = dynLoad ? DynAPK.current(this) : new File(getCacheDir(), "manager.apk");
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
                 InjectAPK.setup(this);
-                runOnUiThread(() -> {
-                    dialog.dismiss();
-                    Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();
-                    finish();
-                });
+                onSuccess.run();
             } else {
-                runOnUiThread(() -> {
-                    dialog.dismiss();
-                    APKInstall.install(this, file);
-                    finish();
-                });
+                var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
+                APKInstall.installapk(this, file);
+                Intent intent = receiver.waitIntent();
+                if (intent != null) startActivity(intent);
             }
         });
     }
@@ -138,15 +140,10 @@ public class DownloadActivity extends Activity {
             InputStream is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
             try (InputStream gzip = new GZIPInputStream(is);
                  OutputStream out = new FileOutputStream(apk)) {
-                byte[] buf = new byte[4096];
-                for (int read; (read = gzip.read(buf)) >= 0;) {
-                    out.write(buf, 0, read);
-                }
+                APKInstall.transfer(gzip, out);
             }
             DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
-        } catch (Exception e) {
-            // Should not happen
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 

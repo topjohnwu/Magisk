@@ -105,7 +105,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
 
     cmpList.add(Component(
         "com.topjohnwu.magisk.core.Provider",
-        "FileProvider",
+        "dummy.DummyProvider",
         """
         |<provider
         |    android:name="%s"
