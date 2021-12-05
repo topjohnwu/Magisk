@@ -25,12 +25,12 @@
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_item_source">Source</string>
-    <string name="home_support_content">Magisk will always be copylefted libre software.\nUse,study, change and share; with all.\nShow you care by sending a donation.</string>
+    <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">Root will be removed!\nAll modules will be removed!\nAny storage devices decrypted through the use of Magisk will be re-encrypted!</string>
+    <string name="uninstall_magisk_msg">Root permissions will be lost!\nAll modules will be removed!\nAny internal storages decrypted by Magisk will be re-encrypted!</string>
     <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
@@ -135,7 +135,7 @@
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
-    <string name="settings_hide_app_summary">Install a proxy app with a random app ID and custom app label</string>
+    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>
     <string name="settings_restore_app_summary">Un-hide the app and restore the original Magisk APK</string>
     <string name="language">Language</string>
@@ -157,6 +157,7 @@
     <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
     <string name="settings_app_name_hint">New name for repackaged app</string>
+    <string name="settings_app_name_helper"></string>
     <string name="settings_app_name_error">Invalid format</string>
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
