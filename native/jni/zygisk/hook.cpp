@@ -153,7 +153,7 @@ DCL_HOOK_FUNC(int, fork) {
 // Unmount stuffs in the process's private mount namespace
 DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
-    if (g_ctx && res == 0) {
+    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->flags[UNMOUNT_FLAG]) {
             revert_unmount();
         } else {
