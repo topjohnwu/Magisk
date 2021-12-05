@@ -140,7 +140,7 @@ class HomeViewModel(
         val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
         if (!Shell.su(cmd).await().isSuccess) {
             shownDialog = true
-            EnvFixDialog().publish()
+            EnvFixDialog(this).publish()
         }
     }
 
