@@ -47,13 +47,14 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected var installDir = File("xxx")
     private lateinit var srcBoot: File
+    private var srcVbmeta: File? = null
 
     private val shell = Shell.getShell()
     private val service get() = ServiceLocator.networkService
     protected val context get() = ServiceLocator.deContext
     private val useRootDir = shell.isRoot && Info.noDataExec
 
-    private fun findImage(): Boolean {
+    private fun findImages(): Boolean {
         val bootPath = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
@@ -61,10 +62,15 @@ abstract class MagiskInstallImpl protected constructor(
         }
         srcBoot = SuFile(bootPath)
         console.add("- Target image: $bootPath")
+        val vbmetaPath = "find_vbmeta_image; echo \"\$VBMETAIMAGE\"".fsh()
+        if (!vbmetaPath.isEmpty()) {
+            srcVbmeta = SuFile(vbmetaPath)
+            console.add("- vbmeta partition detected")
+        }
         return true
     }
 
-    private fun findSecondary(): Boolean {
+    private fun findSecondaries(): Boolean {
         val slot = "echo \$SLOT".fsh()
         val target = if (slot == "_a") "_b" else "_a"
         console.add("- Target slot: $target")
@@ -79,6 +85,15 @@ abstract class MagiskInstallImpl protected constructor(
         }
         srcBoot = SuFile(bootPath)
         console.add("- Target image: $bootPath")
+        val vbmetaPath = arrayOf(
+            "SLOT=$target",
+            "find_vbmeta_image",
+            "SLOT=$slot",
+            "echo \"\$VBMETAIMAGE\"").fsh()
+        if (!vbmetaPath.isEmpty()) {
+            srcVbmeta = SuFile(vbmetaPath)
+            console.add("- vbmeta partition detected")
+        }
         return true
     }
 
@@ -415,10 +430,10 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected fun doPatchFile(patchFile: Uri) = extractFiles() && handleFile(patchFile)
 
-    protected fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
+    protected fun direct() = findImages() && extractFiles() && patchBoot() && flashBoot()
 
     protected suspend fun secondSlot() =
-        findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
+        findSecondaries() && extractFiles() && patchBoot() && flashBoot() && postOTA()
 
     protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 

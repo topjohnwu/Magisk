@@ -111,15 +111,15 @@ Supported actions:
 
     fprintf(stderr, R"EOF(
 
-  avb2 <bootimg> <action> [args...]
-    Do avb2 related actions to <bootimg>
+  avbv2 <bootimg> <action> [args...]
+    Do AVBv2 related actions to <bootimg>
     Supported commands:
       verify
-        Verify avb2 hashes and signature
+        Verify AVBb2 hashes and signature
         Return values:
         0:valid    2:invalid    4:unsupported
       sign <privkey>
-        Updates avb2 hashes and signature using <privkey>
+        Updates AVBv2 hashes and signature using <privkey>
         Return values:
         0:valid    2:invalid    4:unsupported)EOF");
 
@@ -198,8 +198,8 @@ int main(int argc, char *argv[]) {
     } else if (argc > 3 && action == "dtb") {
         if (dtb_commands(argc - 2, argv + 2))
             usage(argv[0]);
-    } else if (argc > 3 && action == "avb2") {
-        int status = avb2_commands(argc - 2, argv + 2);
+    } else if (argc > 3 && action == "avbv2") {
+        int status = avbv2_commands(argc - 2, argv + 2);
         if (status == 1)
             usage(argv[0]);
         else

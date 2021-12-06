@@ -629,3 +629,79 @@ struct boot_img {
     void parse_image(uint8_t *addr, format_t type);
     dyn_img_hdr *create_hdr(uint8_t *addr, format_t type);
 };
+
+class HASH_CTX {
+  public:
+    virtual ~HASH_CTX() = default;
+    virtual int init();
+    virtual int update(const void *data, size_t len);
+    virtual int final(uint8_t out[]);
+    virtual size_t length();
+};
+
+class SHA_HASH_CTX : public HASH_CTX {
+    SHA_CTX ctx;
+  public:
+    int init() {
+        printf("initializing\n");
+        return SHA1_Init(&ctx);
+    }
+    int update(const void *data, size_t len) {
+        printf("updating\n");
+        return SHA1_Update(&ctx, data, len);
+    }
+    int final(uint8_t out[SHA_DIGEST_LENGTH]) {
+        printf("finalizing\n");
+        return SHA1_Final(out, &ctx);
+    }
+    size_t length() {
+        return SHA_DIGEST_LENGTH;
+    }
+};
+
+class SHA256_HASH_CTX : public HASH_CTX {
+    SHA256_CTX ctx;
+  public:
+    int init() {
+        printf("initializing 256\n");
+        return SHA256_Init(&ctx);
+    }
+    int update(const void *data, size_t len) {
+        printf("updating 256\n");
+        return SHA256_Update(&ctx, data, len);
+    }
+    int final(uint8_t out[SHA256_DIGEST_LENGTH]) {
+        printf("finalizing 256\n");
+        return SHA256_Final(out, &ctx);
+    }
+    size_t length() {
+        return SHA256_DIGEST_LENGTH;
+    }
+};
+
+class HASH_WRAPPER {
+    HASH_CTX *ctx;
+  public:
+    HASH_WRAPPER(bool is_sha256) {
+        if (is_sha256) {
+            ctx = new SHA256_HASH_CTX;
+        } else {
+            ctx = new SHA_HASH_CTX;
+        }
+    }
+    int init() {
+        return ctx->init();
+    }
+    int update(const void *data, size_t len) {
+        return ctx->update(data, len);
+    }
+    int final(uint8_t out[SHA256_DIGEST_LENGTH]) {
+        return ctx->final(out);
+    }
+    size_t length() {
+        return ctx->length();
+    }
+    ~HASH_WRAPPER() {
+        delete &ctx;
+    }
+};

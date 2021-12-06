@@ -18,7 +18,7 @@ int split_image_dtb(const char *filename);
 int hexpatch(const char *file, const char *from, const char *to);
 int cpio_commands(int argc, char *argv[]);
 int dtb_commands(int argc, char *argv[]);
-int avb2_commands(int argc, char *argv[]);
+int avbv2_commands(int argc, char *argv[]);
 
 uint32_t patch_verity(void *buf, uint32_t size);
 uint32_t patch_encryption(void *buf, uint32_t size);

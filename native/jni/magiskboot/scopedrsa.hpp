@@ -34,10 +34,12 @@
 
 class ScopedRSA {
  public:
-  ScopedRSA(const char* pem_key_path) {
-    FILE* file = fopen(pem_key_path, "r");
-    rsa_ = PEM_read_RSAPrivateKey(file, nullptr, nullptr, nullptr);
-    fclose(file);
+  ScopedRSA(const void* privkey) {
+    BIO *b = BIO_new_mem_buf(privkey, -1);
+    if (b == NULL) {
+        return;
+    }
+    rsa_ = PEM_read_bio_RSAPrivateKey(b, nullptr, nullptr, nullptr);
   }
 
   ScopedRSA(const uint8_t* key_buffer, size_t size) {

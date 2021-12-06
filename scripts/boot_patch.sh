@@ -72,6 +72,7 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $KEEPVBMETAFLAG ] && KEEPVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+[ -z $AVBV2 ] && AVBV2=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export KEEPVBMETAFLAG
@@ -212,6 +213,10 @@ fi
 
 ui_print "- Repacking boot image"
 ./magiskboot repack "$BOOTIMAGE" || abort "! Unable to repack boot image"
+
+if $AVBV2; then
+  ./magiskboot avbv2 new-boot.img sign || abort "! Unable to AVBv2 sign boot image"
+fi
 
 # Sign chromeos boot
 $CHROMEOS && sign_chromeos

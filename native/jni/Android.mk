@@ -85,7 +85,7 @@ LOCAL_SRC_FILES := \
     magiskboot/ramdisk.cpp \
     magiskboot/pattern.cpp \
     magiskboot/cpio.cpp \
-    magiskboot/avb2.cpp \
+    magiskboot/avbv2.cpp \
     magiskboot/android_pubkey.cpp
 
 LOCAL_LDFLAGS := -static

@@ -422,6 +422,17 @@ find_boot_image() {
   fi
 }
 
+find_vbmeta_image() {
+  VBMETAIMAGE=
+  if [ ! -z $SLOT ]; then
+    VBMETAIMAGE=`find_block vbmeta$SLOT`
+    if [ ! -z $VBMETAIMAGE ]; then
+      export KEEPVBMETAFLAG=true
+      export AVBV2=true
+    fi
+  fi
+}
+
 flash_image() {
   case "$1" in
     *.gz) CMD1="gzip -d < '$1' 2>/dev/null";;

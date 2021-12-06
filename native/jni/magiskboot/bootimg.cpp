@@ -711,36 +711,35 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
     // Update checksum
     if (char *id = hdr->id()) {
-        // FIXME: untested
-        SHA256_CTX ctx;
-        boot.flags[SHA256_FLAG] ? SHA256_Init(&ctx) : SHA1_Init((SHA_CTX *)&ctx);
+        HASH_WRAPPER hash(boot.flags[SHA256_FLAG]);
+        hash.init();
         uint32_t size = hdr->kernel_size();
-        SHA256_Update(&ctx, out.buf + off.kernel, size);
-        SHA256_Update(&ctx, &size, sizeof(size));
+        hash.update(out.buf + off.kernel, size);
+        hash.update(&size, sizeof(size));
         size = hdr->ramdisk_size();
-        SHA256_Update(&ctx, out.buf + off.ramdisk, size);
-        SHA256_Update(&ctx, &size, sizeof(size));
+        hash.update(out.buf + off.ramdisk, size);
+        hash.update(&size, sizeof(size));
         size = hdr->second_size();
-        SHA256_Update(&ctx, out.buf + off.second, size);
-        SHA256_Update(&ctx, &size, sizeof(size));
+        hash.update(out.buf + off.second, size);
+        hash.update(&size, sizeof(size));
         size = hdr->extra_size();
         if (size) {
-            SHA256_Update(&ctx, out.buf + off.extra, size);
-            SHA256_Update(&ctx, &size, sizeof(size));
+            hash.update(out.buf + off.extra, size);
+            hash.update(&size, sizeof(size));
         }
         uint32_t ver = hdr->header_version();
         if (ver == 1 || ver == 2) {
             size = hdr->recovery_dtbo_size();
-            SHA256_Update(&ctx, out.buf + hdr->recovery_dtbo_offset(), size);
-            SHA256_Update(&ctx, &size, sizeof(size));
+            hash.update(out.buf + hdr->recovery_dtbo_offset(), size);
+            hash.update(&size, sizeof(size));
         }
         if (ver == 2) {
             size = hdr->dtb_size();
-            SHA256_Update(&ctx, out.buf + off.dtb, size);
-            SHA256_Update(&ctx, &size, sizeof(size));
+            hash.update(out.buf + off.dtb, size);
+            hash.update(&size, sizeof(size));
         }
         memset(id, 0, BOOT_ID_SIZE);
-        boot.flags[SHA256_FLAG] ? SHA256_Final((uint8_t *)id, &ctx) : SHA1_Final((uint8_t *)id, (SHA_CTX *)&ctx);
+        hash.final((uint8_t *)id);
     }
 
     // Print new header info
