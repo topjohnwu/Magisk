@@ -32,6 +32,7 @@ enum : int {
     ZYGISK_REQUEST,
     ZYGISK_PASSTHROUGH,
     DAEMON_CODE_END,
+    DISABLE_MODULES,
 };
 
 // Return codes for daemon

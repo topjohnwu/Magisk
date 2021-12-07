@@ -24,6 +24,7 @@ Options:
    -V                        print running daemon version code
    --list                    list all available applets
    --remove-modules          remove all modules and reboot
+   --disable-modules         disable all modules and reboot
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
@@ -118,6 +119,10 @@ int magisk_main(int argc, char *argv[]) {
     } else if (argv[1] == "--remove-modules"sv) {
         int fd = connect_daemon();
         write_int(fd, REMOVE_MODULES);
+        return read_int(fd);
+    } else if (argv[1] == "--disable-modules"sv) {
+        int fd = connect_daemon();
+        write_int(fd, DISABLE_MODULES);
         return read_int(fd);
     } else if (argv[1] == "--path"sv) {
         int fd = connect_daemon();

@@ -156,6 +156,12 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         close(client);
         reboot();
         break;
+    case DISABLE_MODULES:
+        disable_modules();
+        write_int(client, 0);
+        close(client);
+        reboot();
+        break;
     case ZYGISK_REQUEST:
     case ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
@@ -232,6 +238,12 @@ static void handle_request(pollfd *pfd) {
         }
         break;
     case REMOVE_MODULES:
+        if (!is_root && cred.uid != UID_SHELL) {
+            write_int(client, 1);
+            goto done;
+        }
+        break;
+    case DISABLE_MODULES:
         if (!is_root && cred.uid != UID_SHELL) {
             write_int(client, 1);
             goto done;
