@@ -32,44 +32,59 @@
 
 #include "android_pubkey.h"
 
+// https://android.googlesource.com/platform/external/avb/+/refs/tags/android-12.0.0_r12/test/avb_atx_validate_unittest.cc#52
 class ScopedRSA {
- public:
-  ScopedRSA(const void* privkey) {
-    BIO *b = BIO_new_mem_buf(privkey, -1);
-    if (b == NULL) {
-        return;
+  public:
+    ScopedRSA(const void* privkey) {
+        // https://android.googlesource.com/platform/external/boringssl/+/refs/tags/android-12.0.0_r12/src/crypto/pem/pem_pkey.c#154
+        // https://android.googlesource.com/platform/external/boringssl/+/refs/tags/android-12.0.0_r12/src/crypto/pem/pem_test.cc#24
+        BIO *b = BIO_new_mem_buf(privkey, strlen((const char*)privkey));
+        if (b == NULL) {
+                return;
+        }
+        rsa_ = PEM_read_bio_RSAPrivateKey(b, nullptr, nullptr, nullptr);
+        initialized = true;
     }
-    rsa_ = PEM_read_bio_RSAPrivateKey(b, nullptr, nullptr, nullptr);
-  }
 
-  ScopedRSA(const uint8_t* key_buffer, size_t size) {
-    android_pubkey_decode(key_buffer, size, &rsa_);
-  }
-
-  ~ScopedRSA() {
-    if (rsa_) {
-      RSA_free(rsa_);
+    ScopedRSA(const uint8_t* key_buffer, size_t size) {
+        if (android_pubkey_decode((uint8_t*)key_buffer, size, &rsa_)) {
+            initialized = true;
+        }
     }
-  }
 
-  bool encode(uint8_t* key_buffer, size_t size) {
-    return android_pubkey_encode(rsa_, key_buffer, size);
-  }
+    ~ScopedRSA() {
+        if (initialized && rsa_) {
+            RSA_free(rsa_);
+        }
+    }
 
-  // PKCS #1 v1.5 signature using SHA256. Returns true on success.
-  bool sign(const uint8_t* digest, size_t digest_size, uint8_t signature[]) {
-    uint32_t signature_length = 0;
-    return RSA_sign(NID_sha256, digest, digest_size, signature, &signature_length, rsa_);
-  }
+    // PKCS #1 v1.5 signature using SHA256/SHA512. Returns true on success.
+    bool sign(int hash_nid, const uint8_t* digest, size_t digest_size, uint8_t signature[]) {
+        uint32_t signature_length = 0;
+        return RSA_sign(hash_nid, digest, digest_size, signature, &signature_length, rsa_);
+    }
 
-  bool verify(const uint8_t* digest, size_t digest_size, const uint8_t signature[], size_t signature_length) {
-    return RSA_verify(NID_sha256, digest, digest_size, signature, signature_length, rsa_);
-  }
+    bool verify(const uint8_t* digest, size_t digest_size, const uint8_t signature[], size_t signature_length) {
+        return RSA_verify(NID_sha256, digest, digest_size, signature, signature_length, rsa_);
+    }
 
-  int size() {
-    return RSA_size(rsa_);
-  }
+    bool encode(uint8_t* key_buffer, size_t size) {
+        return android_pubkey_encode(rsa_, key_buffer, size);
+    }
 
- private:
-  RSA* rsa_;
+    int size() {
+        return RSA_size(rsa_);
+    }
+
+    int encoded_size() {
+        return 2 * sizeof(uint32_t) + 2 * RSA_size(rsa_);
+    }
+
+    bool is_initialized() {
+        return initialized;
+    }
+
+  private:
+    RSA* rsa_;
+    bool initialized = false;
 };

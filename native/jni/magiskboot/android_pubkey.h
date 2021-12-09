@@ -27,31 +27,26 @@
 extern "C" {
 #endif
 
-// Size of an RSA modulus such as an encrypted block or a signature.
-#define ANDROID_PUBKEY_MODULUS_SIZE (4096 / 8)
-
-// Size of an encoded RSA key.
-#define ANDROID_PUBKEY_ENCODED_SIZE (2 * sizeof(uint32_t) + 2 * ANDROID_PUBKEY_MODULUS_SIZE)
+// https://android.googlesource.com/platform/system/core/+/refs/tags/android-12.0.0_r12/libcrypto_utils/include/crypto_utils/android_pubkey.h
 
 /* Allocates a new RSA |key| object, decodes a public RSA key stored in
- * Android's custom binary format from |key_buffer| and sets the key parameters
- * in |key|. |size| specifies the size of the key buffer and must be at least
- * |ANDROID_PUBKEY_ENCODED_SIZE|. The resulting |*key| can be used with the
+ * |AvbRSAPublicKeyHeader| format from |key_buffer| and sets the key parameters
+ * in |key|. |size| specifies the size of the key buffer.
+ * The resulting |*key| can be used with the
  * standard BoringSSL API to perform public operations.
  *
  * Returns true if successful, in which case the caller receives ownership of
  * the |*key| object, i.e. needs to call RSA_free() when done with it. If there
  * is an error, |key| is left untouched and the return value will be false.
  */
-bool android_pubkey_decode(const uint8_t* key_buffer, size_t size, RSA** key);
+bool android_pubkey_decode(const uint8_t* data, size_t length, RSA** key);
 
-/* Encodes |key| in the Android RSA public key binary format and stores the
- * bytes in |key_buffer|. |key_buffer| should be of size at least
- * |ANDROID_PUBKEY_ENCODED_SIZE|.
+/* Encodes |key| in the |AvbRSAPublicKeyHeader| format and stores the
+ * bytes in |key_buffer|.
  *
  * Returns true if successful, false on error.
  */
-bool android_pubkey_encode(const RSA* key, uint8_t* key_buffer, size_t size);
+bool android_pubkey_encode(const RSA* key, uint8_t* data, size_t length);
 
 #ifdef __cplusplus
 } // extern "C"
