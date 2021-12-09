@@ -140,7 +140,7 @@ int avbv2_verify_sign(const char *image, bool rw) {
         SHA256_Update(&sha256_ctx, boot.buf, boot_desc.image_size);
         SHA256_Final(actual_boot_digest, &sha256_ctx);
         actual_boot_digest_length = SHA256_DIGEST_LENGTH;
-    } else  if (avb_strcmp((const char*)boot_desc.hash_algorithm, "sha512") != 0) {
+    } else if (avb_strcmp((const char*)boot_desc.hash_algorithm, "sha512") == 0) {
         SHA512_Init(&sha512_ctx);
         SHA512_Update(&sha512_ctx, boot_salt, boot_desc.salt_len);
         SHA512_Update(&sha512_ctx, boot.buf, boot_desc.image_size);
