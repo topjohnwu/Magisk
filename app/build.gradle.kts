@@ -94,7 +94,7 @@ dependencies {
     implementation("io.noties.markwon:image:${vMarkwon}")
     implementation("com.caverock:androidsvg:1.4")
 
-    val vLibsu = "3.1.2"
+    val vLibsu = "3.2.0"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
 
@@ -116,17 +116,17 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.4.0-alpha10"
+    val vNav = "2.4.0-beta02"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.browser:browser:1.4.0")
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.fragment:fragment-ktx:1.3.6")
+    implementation("androidx.fragment:fragment-ktx:1.4.0")
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.core:core-splashscreen:1.0.0-alpha02")
