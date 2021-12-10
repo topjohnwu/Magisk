@@ -1,6 +1,4 @@
-# Magisk Changelog
-
-### v23.0
+Root
 
 - [App] Update snet extension. This fixes SafetyNet API errors.
 - [App] Fix a bug in the stub app that causes APK installation to fail
@@ -645,5 +643,3 @@ Fully support recovery with no /data access, Magisk uninstallation with Magisk M
 - Remove sepolicy patches that uses SuperSU's supolicy tool; it is now using a minimal set of modifications
 - Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
 
-### v1
-- Initial release
