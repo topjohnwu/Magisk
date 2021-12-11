@@ -628,13 +628,13 @@ copy_sepolicy_rules() {
     RULESDIR=$NVBASE/modules
   elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
     RULESDIR=/data/unencrypted/magisk
-  elif grep -q ' /cache ' /proc/mounts; then
+  elif grep ' /cache ' /proc/mounts | grep -q 'ext4' ; then
     RULESDIR=/cache/magisk
-  elif grep -q ' /metadata ' /proc/mounts; then
+  elif grep ' /metadata ' /proc/mounts | grep -q 'ext4' ; then
     RULESDIR=/metadata/magisk
-  elif grep -q ' /persist ' /proc/mounts; then
+  elif grep ' /persist ' /proc/mounts | grep -q 'ext4' ; then
     RULESDIR=/persist/magisk
-  elif grep -q ' /mnt/vendor/persist ' /proc/mounts; then
+  elif grep ' /mnt/vendor/persist ' /proc/mounts | grep -q 'ext4' ; then
     RULESDIR=/mnt/vendor/persist/magisk
   else
     ui_print "- Unable to find sepolicy rules dir"
