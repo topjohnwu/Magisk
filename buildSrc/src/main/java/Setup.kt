@@ -1,30 +1,30 @@
-
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
-import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
-import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.filter
-import org.gradle.kotlin.dsl.named
-import java.io.File
-import java.io.OutputStream
-import java.io.PrintStream
-import java.nio.file.Paths
+import java.io.*
 import java.util.*
+import java.util.zip.Deflater
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
-private fun Project.android(configure: Action<BaseExtension>) =
+private fun Project.androidBase(configure: Action<BaseExtension>) =
     extensions.configure("android", configure)
 
-private val Project.android: BaseAppModuleExtension get() =
-    extensions.getByName("android") as BaseAppModuleExtension
+private fun Project.android(configure: Action<BaseAppModuleExtension>) =
+    extensions.configure("android", configure)
+
+private val Project.android: BaseAppModuleExtension
+    get() = extensions.getByName("android") as BaseAppModuleExtension
 
 fun Project.setupCommon() {
-    android {
+    androidBase {
         compileSdkVersion(31)
         buildToolsVersion = "31.0.0"
         ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
@@ -69,8 +69,12 @@ private fun Project.setupAppCommon() {
             }
         }
 
-        lintOptions {
+        lint {
             disable += "MissingTranslation"
+        }
+
+        dependenciesInfo {
+            includeInApk = false
         }
     }
 }
@@ -147,11 +151,9 @@ fun Project.setupApp() {
         }
     }
 
-    tasks.named<DefaultTask>("preBuild") {
-        dependsOn(syncResources)
-    }
-
     android.applicationVariants.all {
+        preBuildProvider.get().dependsOn(syncResources)
+
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
         val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
@@ -170,91 +172,67 @@ fun Project.setupApp() {
 fun Project.setupStub() {
     setupAppCommon()
 
-    // Make sure we have a working manifest while building
-    val ensureManifest = tasks.register("ensureManifest") {
-        val manifest = file("src/main/AndroidManifest.xml")
-        if (!manifest.exists()) {
-            PrintStream(manifest).use {
-                it.println("<manifest package=\"com.topjohnwu.magisk\"/>")
-            }
-        }
-    }
-
-    tasks.named<DefaultTask>("preBuild") {
-        dependsOn(ensureManifest)
-    }
-
     android.applicationVariants.all {
-        val manifest = file("src/main/AndroidManifest.xml")
-        val outSrcDir = File(buildDir, "generated/source/obfuscate/$name")
+        val variantCapped = name.capitalize(Locale.ROOT)
+        val variantLowered = name.toLowerCase(Locale.ROOT)
+        val manifest = file("src/${variantLowered}/AndroidManifest.xml")
+        val outSrcDir = File(buildDir, "generated/source/obfuscate/${variantLowered}")
         val templateDir = file("template")
-        val resDir = file("res")
+        val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
+        val apk = File(buildDir, "intermediates/processed_res/" +
+            "${variantLowered}/out/resources-${variantLowered}.ap_")
+        val apkTmp = File("${apk}.tmp")
 
-        val androidJar = Paths.get(android.sdkDirectory.path, "platforms",
-            android.compileSdkVersion, "android.jar")
-
-        val aaptCommand = if (OperatingSystem.current().isWindows) "aapt2.exe" else "aapt2"
-        val aapt = Paths.get(android.sdkDirectory.path,
-            "build-tools", android.buildToolsVersion, aaptCommand)
-
-        val dummy = object : OutputStream() {
-            override fun write(b: Int) {}
-            override fun write(bytes: ByteArray, off: Int, len: Int) {}
-        }
-
-        val genSrcTask = tasks.register("generate${name.capitalize(Locale.ROOT)}ObfuscatedSources") {
+        val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
             doLast {
                 val xml = genStubManifest(templateDir, outSrcDir)
+                manifest.parentFile.mkdirs()
                 PrintStream(manifest).use {
                     it.print(xml)
                 }
+            }
+        }
+        mergeResourcesProvider.get().dependsOn(genManifestTask)
 
-                val compileTmp = File.createTempFile("tmp", ".zip")
-                val linkTmp = File.createTempFile("tmp", ".zip")
-                val optTmp = File.createTempFile("tmp", ".zip")
-                val stubXml = File.createTempFile("tmp", ".xml")
-                try {
-                    PrintStream(stubXml).use {
-                        it.println("<manifest package=\"com.topjohnwu.magisk\"/>")
-                    }
-
-                    exec {
-                        commandLine(aapt, "compile",
-                            "-o", compileTmp,
-                            "--dir", resDir)
-                        standardOutput = dummy
-                        errorOutput = dummy
-                    }
-
-                    exec {
-                        commandLine(aapt, "link",
-                            "-o", linkTmp,
-                            "-I", androidJar,
-                            "--min-sdk-version", android.defaultConfig.minSdk,
-                            "--target-sdk-version", android.defaultConfig.targetSdk,
-                            "--manifest", stubXml,
-                            "--java", outSrcDir, compileTmp)
-                        standardOutput = dummy
-                        errorOutput = dummy
-                    }
-
-                    exec {
-                        commandLine(aapt, "optimize",
-                            "-o", optTmp,
-                            "--collapse-resource-names", linkTmp)
-                        standardOutput = dummy
-                        errorOutput = dummy
-                    }
-
-                    genEncryptedResources(optTmp, outSrcDir)
-                } finally {
-                    compileTmp.delete()
-                    linkTmp.delete()
-                    optTmp.delete()
-                    stubXml.delete()
+        val genSrcTask = tasks.register("generate${variantCapped}ObfuscatedSources") {
+            dependsOn(":stub:process${variantCapped}Resources")
+            doLast {
+                exec {
+                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
+
+                val buffer = ByteArrayOutputStream(apk.length().toInt())
+                val newApk = ZipOutputStream(FileOutputStream(apk))
+                ZipFile(apkTmp).use {
+                    newApk.use { new ->
+                        new.setLevel(Deflater.BEST_COMPRESSION)
+                        new.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        it.getInputStream(it.getEntry("AndroidManifest.xml")).transferTo(new)
+                        new.closeEntry()
+                        new.finish()
+                    }
+                    ZipOutputStream(buffer).use { arsc ->
+                        arsc.setLevel(Deflater.BEST_COMPRESSION)
+                        arsc.putNextEntry(ZipEntry("resources.arsc"))
+                        it.getInputStream(it.getEntry("resources.arsc")).transferTo(arsc)
+                        arsc.closeEntry()
+                        arsc.finish()
+                    }
+                }
+                apkTmp.delete()
+                genEncryptedResources(ByteArrayInputStream(buffer.toByteArray()), outSrcDir)
             }
         }
         registerJavaGeneratingTask(genSrcTask, outSrcDir)
+    }
+    // Override optimizeReleaseResources task
+    tasks.whenTaskAdded {
+        val apk = File(buildDir, "intermediates/processed_res/" +
+            "release/out/resources-release.ap_")
+        val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
+            "release/resources-release-optimize.ap_")
+        if (name == "optimizeReleaseResources") {
+            doLast { apk.copyTo(optRes, true) }
+        }
     }
 }
