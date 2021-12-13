@@ -153,7 +153,7 @@ exit_loop:
                     bind_map.emplace(std::move(entry.dev), std::move(entry.mnt_point));
                 } else {
                     // skip duplicated entry in the same file
-                    entry_map.insert_or_assign(entry.mnt_point, std::move(entry));
+                    entry_map.insert_or_assign(decltype(entry.mnt_point){entry.mnt_point}, std::move(entry));
                 }
             }
         }
