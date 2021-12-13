@@ -3,7 +3,10 @@ package com.topjohnwu.magisk.core.utils
 import android.content.Context
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.ktx.rawResource
@@ -13,18 +16,12 @@ import com.topjohnwu.superuser.ShellUtils
 import java.io.File
 import java.util.jar.JarFile
 
-abstract class BaseShellInit : Shell.Initializer() {
-    final override fun onInit(context: Context, shell: Shell): Boolean {
-        return init(context.wrap(), shell)
-    }
-
-    abstract fun init(context: Context, shell: Shell): Boolean
-}
-
-
-class BusyBoxInit : BaseShellInit() {
-
-    override fun init(context: Context, shell: Shell): Boolean {
+class ShellInit : Shell.Initializer() {
+    override fun onInit(context: Context, shell: Shell): Boolean {
+        if (shell.isRoot) {
+            RootRegistry.bindTask?.run()
+            RootRegistry.bindTask = null
+        }
         shell.newJob().apply {
             add("export ASH_STANDALONE=1")
 
@@ -63,26 +60,17 @@ class BusyBoxInit : BaseShellInit() {
                 // Directly execute the file
                 add("exec $localBB sh")
             }
-        }.exec()
-        return true
-    }
-}
 
-class AppShellInit : BaseShellInit() {
-
-    override fun init(context: Context, shell: Shell): Boolean {
-
-        fun fastCmd(cmd: String) = ShellUtils.fastCmd(shell, cmd)
-        fun getVar(name: String) = fastCmd("echo \$$name")
-        fun getBool(name: String) = getVar(name).toBoolean()
-
-        shell.newJob().apply {
             add(context.rawResource(R.raw.manager))
             if (shell.isRoot) {
                 add(context.assets.open("util_functions.sh"))
             }
             add("app_init")
         }.exec()
+
+        fun fastCmd(cmd: String) = ShellUtils.fastCmd(shell, cmd)
+        fun getVar(name: String) = fastCmd("echo \$$name")
+        fun getBool(name: String) = getVar(name).toBoolean()
 
         Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
@@ -94,6 +82,9 @@ class AppShellInit : BaseShellInit() {
         Config.recovery = getBool("RECOVERYMODE")
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
+
+        // Pre-fetch env
+        Info.env
 
         return true
     }

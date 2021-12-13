@@ -1,13 +1,19 @@
 package com.topjohnwu.magisk.core.utils
 
 import kotlinx.coroutines.*
-import java.util.concurrent.*
+import java.util.concurrent.AbstractExecutorService
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class IODispatcherExecutor : AbstractExecutorService() {
 
-    private val job = SupervisorJob().apply { invokeOnCompletion { future.run() } }
+    private val job = SupervisorJob()
     private val scope = CoroutineScope(job + Dispatchers.IO)
-    private val future = FutureTask(Callable { true })
+    private val latch = CountDownLatch(1)
+
+    init {
+        job.invokeOnCompletion { latch.countDown() }
+    }
 
     override fun execute(command: Runnable) {
         scope.launch {
@@ -26,11 +32,5 @@ class IODispatcherExecutor : AbstractExecutorService() {
 
     override fun isTerminated() = job.isCancelled && job.isCompleted
 
-    override fun awaitTermination(timeout: Long, unit: TimeUnit): Boolean {
-        return try {
-            future.get(timeout, unit)
-        } catch (e: TimeoutException) {
-            false
-        }
-    }
+    override fun awaitTermination(timeout: Long, unit: TimeUnit) = latch.await(timeout, unit)
 }

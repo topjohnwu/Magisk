@@ -7,13 +7,15 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.core.utils.AppShellInit
-import com.topjohnwu.magisk.core.utils.BusyBoxInit
 import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
+import com.topjohnwu.magisk.core.utils.RootRegistry
+import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.magisk.core.utils.updateConfig
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.unwrap
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.internal.UiThreadHandler
+import com.topjohnwu.superuser.ipc.RootService
 import timber.log.Timber
 import kotlin.system.exitProcess
 
@@ -26,7 +28,7 @@ open class App() : Application() {
     init {
         Shell.setDefaultBuilder(Shell.Builder.create()
             .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(BusyBoxInit::class.java, AppShellInit::class.java)
+            .setInitializers(ShellInit::class.java)
             .setTimeout(2))
         Shell.EXECUTOR = IODispatcherExecutor()
 
@@ -55,6 +57,15 @@ open class App() : Application() {
         ServiceLocator.context = wrapped
         AssetHack.init(impl)
         app.registerActivityLifecycleCallbacks(ForegroundTracker)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        RootRegistry.bindTask = RootService.createBindTask(
+            intent<RootRegistry>(),
+            UiThreadHandler.executor,
+            RootRegistry.Connection
+        )
     }
 
     // This is required as some platforms expect ContextImpl

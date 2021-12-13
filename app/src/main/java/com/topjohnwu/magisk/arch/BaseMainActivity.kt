@@ -9,11 +9,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.RootRegistry
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -21,6 +19,7 @@ import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
     : BaseUIActivity<VM, Binding>() {
@@ -48,13 +47,15 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
         }
 
         if (doPreload) {
-            // Pre-initialize root shell
             Shell.getShell(null) {
-                if (isRunningAsStub && !Shell.rootAccess()) {
+                if (isRunningAsStub && !it.isRoot) {
                     showInvalidStateMessage()
                     return@getShell
                 }
                 preLoad()
+                if (it.isRoot) {
+                    RootRegistry.Connection.await(2, TimeUnit.SECONDS)
+                }
                 runOnUiThread {
                     doPreload = false
                     if (isRunningAsStub) {
