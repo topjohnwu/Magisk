@@ -3,7 +3,6 @@ package com.topjohnwu.magisk;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
-import static com.topjohnwu.magisk.DelegateApplication.dynLoad;
 import static com.topjohnwu.magisk.R2.string.dling;
 import static com.topjohnwu.magisk.R2.string.no_internet_msg;
 import static com.topjohnwu.magisk.R2.string.relaunch_app;
@@ -49,11 +48,15 @@ public class DownloadActivity extends Activity {
     private String apkLink = BuildConfig.APK_URL;
     private Context themed;
     private ProgressDialog dialog;
+    private boolean dynLoad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
+
+        // Only download and dynamic load full APK if hidden
+        dynLoad = getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         // Inject resources
         loadResources();

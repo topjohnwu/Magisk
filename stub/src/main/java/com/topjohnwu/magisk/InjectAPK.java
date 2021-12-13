@@ -13,7 +13,9 @@ import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -29,6 +31,17 @@ public class InjectAPK {
         return (DelegateComponentFactory) componentFactory;
     }
 
+    private static void copy(InputStream src, OutputStream dest) throws IOException {
+        try (InputStream s = src) {
+            try (OutputStream o = dest) {
+                byte[] buf = new byte[8192];
+                for (int read; (read = s.read(buf)) >= 0;) {
+                    o.write(buf, 0, read);
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     static Application setup(Context context) {
         // Get ContextImpl
@@ -38,25 +51,44 @@ public class InjectAPK {
 
         File apk = DynAPK.current(context);
         File update = DynAPK.update(context);
-        if (update.exists())
+
+        if (update.exists()) {
+            // Rename from update
             update.renameTo(apk);
-        if (!apk.exists()) {
-            // Try copying APK
+        }
+
+        if (BuildConfig.DEBUG) {
+            // Copy from external for easier development
+            File external = new File(context.getExternalFilesDir(null), "magisk.apk");
+            if (external.exists()) {
+                try {
+                    copy(new FileInputStream(external), new FileOutputStream(apk));
+                } catch (IOException e) {
+                    Log.e(InjectAPK.class.getSimpleName(), "", e);
+                    apk.delete();
+                } finally {
+                    external.delete();
+                }
+            }
+        }
+
+        if (!apk.exists() && !context.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
+            // Copy from previous app
             Uri uri = new Uri.Builder().scheme("content")
                     .authority("com.topjohnwu.magisk.provider")
                     .encodedPath("apk_file").build();
             ContentResolver resolver = context.getContentResolver();
-            try (InputStream src = resolver.openInputStream(uri)) {
+            try {
+                InputStream src = resolver.openInputStream(uri);
                 if (src != null) {
-                    try (OutputStream out = new FileOutputStream(apk)) {
-                        byte[] buf = new byte[4096];
-                        for (int read; (read = src.read(buf)) >= 0;) {
-                            out.write(buf, 0, read);
-                        }
-                    }
+                    copy(src, new FileOutputStream(apk));
                 }
-            } catch (Exception ignored) {}
+            } catch (IOException e) {
+                Log.e(InjectAPK.class.getSimpleName(), "", e);
+                apk.delete();
+            }
         }
+
         if (apk.exists()) {
             ClassLoader cl = new InjectedClassLoader(apk);
             PackageManager pm = context.getPackageManager();
@@ -124,5 +156,4 @@ public class InjectAPK {
         data.classToComponent = Mapping.inverseMap;
         return data;
     }
-
 }

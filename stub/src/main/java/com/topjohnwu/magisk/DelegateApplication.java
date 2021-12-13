@@ -12,16 +12,11 @@ import io.michaelrocks.paranoid.Obfuscate;
 @Obfuscate
 public class DelegateApplication extends Application {
 
-    static boolean dynLoad = false;
-
     private Application receiver;
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-
-        // Only dynamic load full APK if hidden
-        dynLoad = !base.getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         receiver = InjectAPK.setup(this);
         if (receiver != null) try {
