@@ -22,16 +22,15 @@ import kotlin.system.exitProcess
 open class App() : Application() {
 
     constructor(o: Any) : this() {
-        Info.stub = DynAPK.load(o)
+        val data = DynAPK.Data(o)
+        // Add the root service name mapping
+        data.classToComponent[RootRegistry::class.java.name] = data.rootService.name
+        // Send back the actual root service class
+        data.rootService = RootRegistry::class.java
+        Info.stub = data
     }
 
     init {
-        Shell.setDefaultBuilder(Shell.Builder.create()
-            .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(ShellInit::class.java)
-            .setTimeout(2))
-        Shell.EXECUTOR = IODispatcherExecutor()
-
         // Always log full stack trace with Timber
         Timber.plant(Timber.DebugTree())
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -41,6 +40,12 @@ open class App() : Application() {
     }
 
     override fun attachBaseContext(base: Context) {
+        Shell.setDefaultBuilder(Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .setInitializers(ShellInit::class.java)
+            .setTimeout(2))
+        Shell.EXECUTOR = IODispatcherExecutor()
+
         // Some context magic
         val app: Application
         val impl: Context

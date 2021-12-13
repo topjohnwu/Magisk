@@ -115,7 +115,7 @@ public class DownloadActivity extends Activity {
         File apk = dynLoad ? DynAPK.current(this) : new File(getCacheDir(), "manager.apk");
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
-                InjectAPK.setup(this);
+                DynLoad.setup(this);
                 runOnUiThread(() -> {
                     dialog.dismiss();
                     Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();

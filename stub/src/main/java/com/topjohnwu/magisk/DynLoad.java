@@ -23,13 +23,10 @@ import java.lang.reflect.Field;
 import io.michaelrocks.paranoid.Obfuscate;
 
 @Obfuscate
-public class InjectAPK {
+public class DynLoad {
 
     static Object componentFactory;
-
-    private static DelegateComponentFactory getComponentFactory() {
-        return (DelegateComponentFactory) componentFactory;
-    }
+    static final DynAPK.Data apkData = createApkData();
 
     private static void copy(InputStream src, OutputStream dest) throws IOException {
         try (InputStream s = src) {
@@ -42,13 +39,9 @@ public class InjectAPK {
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    static Application setup(Context context) {
-        // Get ContextImpl
-        while (context instanceof ContextWrapper) {
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-
+    // Dynamically load APK, inject ClassLoader into ContextImpl, then
+    // create the actual Application instance from the loaded APK
+    static Application inject(Context context) {
         File apk = DynAPK.current(context);
         File update = DynAPK.update(context);
 
@@ -64,7 +57,7 @@ public class InjectAPK {
                 try {
                     copy(new FileInputStream(external), new FileOutputStream(apk));
                 } catch (IOException e) {
-                    Log.e(InjectAPK.class.getSimpleName(), "", e);
+                    Log.e(DynLoad.class.getSimpleName(), "", e);
                     apk.delete();
                 } finally {
                     external.delete();
@@ -84,7 +77,7 @@ public class InjectAPK {
                     copy(src, new FileOutputStream(apk));
                 }
             } catch (IOException e) {
-                Log.e(InjectAPK.class.getSimpleName(), "", e);
+                Log.e(DynLoad.class.getSimpleName(), "", e);
                 apk.delete();
             }
         }
@@ -95,21 +88,30 @@ public class InjectAPK {
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
             try {
                 return createApp(context, cl, pkgInfo.applicationInfo);
-            } catch (Exception e) {
-                Log.e(InjectAPK.class.getSimpleName(), "", e);
+            } catch (ReflectiveOperationException e) {
+                Log.e(DynLoad.class.getSimpleName(), "", e);
                 apk.delete();
             }
-            // fallthrough
+
+        }
+        return null;
+    }
+
+    // Inject and create Application, or setup redirections for the current app
+    static Application setup(Context context) {
+        Application app = inject(context);
+        if (app != null) {
+            return app;
         }
 
         ClassLoader cl = new RedirectClassLoader();
         try {
             setClassLoader(context, cl);
             if (Build.VERSION.SDK_INT >= 28) {
-                getComponentFactory().loader = cl;
+                ((DelegateComponentFactory) componentFactory).loader = cl;
             }
         } catch (Exception e) {
-            Log.e(InjectAPK.class.getSimpleName(), "", e);
+            Log.e(DynLoad.class.getSimpleName(), "", e);
         }
 
         return null;
@@ -120,40 +122,42 @@ public class InjectAPK {
         // Create the receiver Application
         Object app = cl.loadClass(info.className)
                 .getConstructor(Object.class)
-                .newInstance(DynAPK.pack(dynData()));
+                .newInstance(apkData.getObject());
 
         // Create the receiver component factory
-        Object factory = null;
-        if (Build.VERSION.SDK_INT >= 28) {
-            factory = cl.loadClass(info.appComponentFactory).newInstance();
+        if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
+            Object factory = cl.loadClass(info.appComponentFactory).newInstance();
+            DelegateComponentFactory delegate = (DelegateComponentFactory) componentFactory;
+            delegate.loader = cl;
+            delegate.receiver = (AppComponentFactory) factory;
         }
 
         setClassLoader(context, cl);
-
-        // Finally, set variables
-        if (Build.VERSION.SDK_INT >= 28) {
-            getComponentFactory().loader = cl;
-            getComponentFactory().receiver = (AppComponentFactory) factory;
-        }
 
         return (Application) app;
     }
 
     // Replace LoadedApk mClassLoader
-    private static void setClassLoader(Context impl, ClassLoader cl)
+    private static void setClassLoader(Context context, ClassLoader cl)
             throws NoSuchFieldException, IllegalAccessException {
-        Field mInfo = impl.getClass().getDeclaredField("mPackageInfo");
+        // Get ContextImpl
+        while (context instanceof ContextWrapper) {
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+
+        Field mInfo = context.getClass().getDeclaredField("mPackageInfo");
         mInfo.setAccessible(true);
-        Object loadedApk = mInfo.get(impl);
+        Object loadedApk = mInfo.get(context);
         Field mcl = loadedApk.getClass().getDeclaredField("mClassLoader");
         mcl.setAccessible(true);
         mcl.set(loadedApk, cl);
     }
 
-    private static DynAPK.Data dynData() {
+    private static DynAPK.Data createApkData() {
         DynAPK.Data data = new DynAPK.Data();
-        data.version = BuildConfig.STUB_VERSION;
-        data.classToComponent = Mapping.inverseMap;
+        data.setVersion(BuildConfig.STUB_VERSION);
+        data.setClassToComponent(Mapping.inverseMap);
+        data.setRootService(DelegateRootService.class);
         return data;
     }
 }
