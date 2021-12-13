@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
+import com.topjohnwu.magisk.core.utils.DispatcherExecutor
 import com.topjohnwu.magisk.core.utils.RootRegistry
 import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.magisk.core.utils.updateConfig
@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.ktx.unwrap
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import kotlin.system.exitProcess
 
@@ -44,7 +45,7 @@ open class App() : Application() {
             .setFlags(Shell.FLAG_MOUNT_MASTER)
             .setInitializers(ShellInit::class.java)
             .setTimeout(2))
-        Shell.EXECUTOR = IODispatcherExecutor()
+        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
 
         // Some context magic
         val app: Application

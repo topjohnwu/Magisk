@@ -5,10 +5,10 @@ import java.util.concurrent.AbstractExecutorService
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class IODispatcherExecutor : AbstractExecutorService() {
+class DispatcherExecutor(dispatcher: CoroutineDispatcher) : AbstractExecutorService() {
 
     private val job = SupervisorJob()
-    private val scope = CoroutineScope(job + Dispatchers.IO)
+    private val scope = CoroutineScope(job + dispatcher)
     private val latch = CountDownLatch(1)
 
     init {
