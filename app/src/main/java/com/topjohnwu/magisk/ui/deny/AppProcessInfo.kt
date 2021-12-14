@@ -38,7 +38,7 @@ class AppProcessInfo(
     }
 
     val label = info.getLabel(pm)
-    val iconImage: Drawable = info.loadIcon(pm)
+    val iconImage: Drawable = runCatching { info.loadIcon(pm) }.getOrDefault(pm.defaultActivityIcon)
     val packageName: String get() = info.packageName
     val processes = fetchProcesses(pm)
 
