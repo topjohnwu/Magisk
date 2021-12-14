@@ -3,10 +3,10 @@ package com.topjohnwu.magisk;
 import static android.R.string.no;
 import static android.R.string.ok;
 import static android.R.string.yes;
-import static com.topjohnwu.magisk.R2.string.dling;
-import static com.topjohnwu.magisk.R2.string.no_internet_msg;
-import static com.topjohnwu.magisk.R2.string.relaunch_app;
-import static com.topjohnwu.magisk.R2.string.upgrade_msg;
+import static com.topjohnwu.magisk.R.string.dling;
+import static com.topjohnwu.magisk.R.string.no_internet_msg;
+import static com.topjohnwu.magisk.R.string.relaunch_app;
+import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,9 +28,6 @@ import org.json.JSONException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -140,10 +137,13 @@ public class DownloadActivity extends Activity {
             SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
             IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            InputStream is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
-            try (InputStream gzip = new GZIPInputStream(is);
-                 OutputStream out = new FileOutputStream(apk)) {
-                APKInstall.transfer(gzip, out);
+            var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
+            var out = new FileOutputStream(apk);
+            try (is; out) {
+                byte[] buf = new byte[4096];
+                for (int read; (read = is.read(buf)) >= 0;) {
+                    out.write(buf, 0, read);
+                }
             }
             DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
         } catch (Exception ignored) {

@@ -39,11 +39,6 @@ android {
         dataBinding = true
     }
 
-    dependenciesInfo {
-        includeInApk = false
-        includeInBundle = false
-    }
-
     packagingOptions {
         resources {
             excludes += "/META-INF/*"
