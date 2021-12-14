@@ -31,9 +31,9 @@ object Const {
         const val MIN_VERSION = "v20.4"
         const val MIN_VERCODE = 20400
 
-        fun atLeast_21_0() = Info.env.magiskVersionCode >= 21000 || isCanary()
-        fun atLeast_21_2() = Info.env.magiskVersionCode >= 21200 || isCanary()
-        fun isCanary() = isCanary(Info.env.magiskVersionCode)
+        fun atLeast_21_0() = Info.env.versionCode >= 21000 || isCanary()
+        fun atLeast_21_2() = Info.env.versionCode >= 21200 || isCanary()
+        fun isCanary() = isCanary(Info.env.versionCode)
 
         fun isCanary(ver: Int) = ver > 0 && ver % 100 != 0
     }
