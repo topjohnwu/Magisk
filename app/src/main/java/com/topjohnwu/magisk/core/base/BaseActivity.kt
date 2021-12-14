@@ -36,7 +36,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base.wrap(true))
+        super.attachBaseContext(base.wrap())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

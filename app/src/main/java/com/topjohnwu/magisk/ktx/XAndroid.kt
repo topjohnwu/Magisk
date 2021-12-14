@@ -41,10 +41,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.AssetHack
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
@@ -342,7 +342,7 @@ var TextView.precomputedText: CharSequence
     }
 
 fun Int.dpInPx(): Int {
-    val scale = AssetHack.resource.displayMetrics.density
+    val scale = AppContext.resources.displayMetrics.density
     return (this * scale + 0.5).toInt()
 }
 
