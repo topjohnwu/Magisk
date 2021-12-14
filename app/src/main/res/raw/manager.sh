@@ -179,6 +179,12 @@ check_encryption() {
   fi
 }
 
+check_vbmeta_partition() {
+  if [ -e /dev/block/by-name/vbmeta_a ] || [ -e /dev/block/by-name/vbmeta ]; then
+    VBMETAEXIST=true
+  fi
+}
+
 ##########################
 # Non-root util_functions
 ##########################
@@ -211,6 +217,7 @@ app_init() {
   SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
   check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
   check_encryption
+  check_vbmeta_partition
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
