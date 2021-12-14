@@ -73,8 +73,12 @@ sealed class Subject : Parcelable {
 
         val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
 
-        override fun pendingIntent(context: Context) =
-            APKInstall.installIntent(context, file.toFile()).toPending(context)
+        override fun pendingIntent(context: Context): PendingIntent {
+            val receiver = APKInstall.register(context, null, null)
+            APKInstall.installapk(context, file.toFile())
+            val intent = receiver.waitIntent() ?: Intent()
+            return intent.toPending(context)
+        }
     }
 
     @SuppressLint("InlinedApi")

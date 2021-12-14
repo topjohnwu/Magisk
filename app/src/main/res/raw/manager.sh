@@ -129,9 +129,11 @@ adb_pm_install() {
   local tmp=/data/local/tmp/temp.apk
   cp -f "$1" $tmp
   chmod 644 $tmp
-  su 2000 -c pm install $tmp || pm install $tmp
+  su 2000 -c pm install $tmp || pm install $tmp || su 1000 -c pm install $tmp
   local res=$?
   rm -f $tmp
+  # Note: change this will kill self
+  [ $res != 0 ] && appops set "$2" REQUEST_INSTALL_PACKAGES allow
   return $res
 }
 

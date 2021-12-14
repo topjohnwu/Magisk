@@ -7,29 +7,27 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.core.utils.AppShellInit
-import com.topjohnwu.magisk.core.utils.BusyBoxInit
-import com.topjohnwu.magisk.core.utils.IODispatcherExecutor
-import com.topjohnwu.magisk.core.utils.updateConfig
+import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.di.ServiceLocator
-import com.topjohnwu.magisk.ktx.unwrap
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.internal.UiThreadHandler
+import com.topjohnwu.superuser.ipc.RootService
+import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import kotlin.system.exitProcess
 
 open class App() : Application() {
 
     constructor(o: Any) : this() {
-        Info.stub = DynAPK.load(o)
+        val data = DynAPK.Data(o)
+        // Add the root service name mapping
+        data.classToComponent[RootRegistry::class.java.name] = data.rootService.name
+        // Send back the actual root service class
+        data.rootService = RootRegistry::class.java
+        Info.stub = data
     }
 
     init {
-        Shell.setDefaultBuilder(Shell.Builder.create()
-            .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(BusyBoxInit::class.java, AppShellInit::class.java)
-            .setTimeout(2))
-        Shell.EXECUTOR = IODispatcherExecutor()
-
         // Always log full stack trace with Timber
         Timber.plant(Timber.DebugTree())
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -38,33 +36,49 @@ open class App() : Application() {
         }
     }
 
-    override fun attachBaseContext(base: Context) {
-        // Some context magic
+    override fun attachBaseContext(context: Context) {
+        Shell.setDefaultBuilder(Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .setInitializers(ShellInit::class.java)
+            .setTimeout(2))
+        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
+
+        // Get the actual ContextImpl
         val app: Application
-        val impl: Context
-        if (base is Application) {
-            app = base
-            impl = base.baseContext
+        val base: Context
+        if (context is Application) {
+            app = context
+            base = context.baseContext
         } else {
             app = this
-            impl = base
+            base = context
         }
-        val wrapped = impl.wrap()
-        super.attachBaseContext(wrapped)
+        super.attachBaseContext(base)
+        ServiceLocator.context = base
 
-        ServiceLocator.context = wrapped
-        AssetHack.init(impl)
+        refreshLocale()
+        AppApkPath = if (isRunningAsStub) {
+            DynAPK.current(base).path
+        } else {
+            base.packageResourcePath
+        }
+
+        base.resources.patch()
         app.registerActivityLifecycleCallbacks(ForegroundTracker)
     }
 
-    // This is required as some platforms expect ContextImpl
-    override fun getBaseContext(): Context {
-        return super.getBaseContext().unwrap()
+    override fun onCreate() {
+        super.onCreate()
+        RootRegistry.bindTask = RootService.createBindTask(
+            intent<RootRegistry>(),
+            UiThreadHandler.executor,
+            RootRegistry.Connection
+        )
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         if (resources.configuration.diff(newConfig) != 0) {
-            resources.updateConfig(newConfig)
+            resources.setConfig(newConfig)
         }
         if (!isRunningAsStub)
             super.onConfigurationChanged(newConfig)

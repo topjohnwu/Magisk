@@ -153,7 +153,7 @@ DCL_HOOK_FUNC(int, fork) {
 // Unmount stuffs in the process's private mount namespace
 DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
-    if (g_ctx && res == 0) {
+    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->flags[UNMOUNT_FLAG]) {
             revert_unmount();
         } else {
@@ -301,7 +301,7 @@ bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
     table->v1.pltHookExclude = [](const char *path, const char *symbol) {
         xhook_ignore(path, symbol);
     };
-    table->v1.pltHookCommit = []() { return xhook_refresh(0) == 0; };
+    table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
     table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
     table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
 

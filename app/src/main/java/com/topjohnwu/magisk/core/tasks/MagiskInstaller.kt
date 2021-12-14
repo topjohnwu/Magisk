@@ -422,7 +422,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
-    protected fun uninstall() = "run_uninstaller ${AssetHack.apk}".sh().isSuccess
+    protected fun uninstall() = "run_uninstaller $AppApkPath".sh().isSuccess
 
     @WorkerThread
     protected abstract suspend fun operations(): Boolean

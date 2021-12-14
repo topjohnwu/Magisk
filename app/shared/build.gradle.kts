@@ -11,5 +11,5 @@ android {
 }
 
 dependencies {
-    api("io.michaelrocks:paranoid-core:0.3.5")
+    api("io.michaelrocks:paranoid-core:0.3.7")
 }
