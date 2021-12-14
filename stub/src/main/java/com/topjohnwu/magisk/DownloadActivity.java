@@ -140,10 +140,7 @@ public class DownloadActivity extends Activity {
             var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
             var out = new FileOutputStream(apk);
             try (is; out) {
-                byte[] buf = new byte[4096];
-                for (int read; (read = is.read(buf)) >= 0;) {
-                    out.write(buf, 0, read);
-                }
+                APKInstall.transfer(is, out);
             }
             DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
         } catch (Exception ignored) {

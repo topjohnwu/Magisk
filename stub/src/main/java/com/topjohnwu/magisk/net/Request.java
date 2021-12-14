@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.net;
 
 import android.os.AsyncTask;
 
+import com.topjohnwu.magisk.utils.APKInstall;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +26,7 @@ import io.michaelrocks.paranoid.Obfuscate;
 
 @Obfuscate
 public class Request implements Closeable {
-    private HttpURLConnection conn;
+    private final HttpURLConnection conn;
     private Executor executor = null;
     private int code = -1;
 
@@ -192,13 +194,9 @@ public class Request implements Closeable {
     }
 
     private File dlFile(File f) throws IOException {
-        try (InputStream in  = getInputStream();
+        try (InputStream in = getInputStream();
              OutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
-            int len;
-            byte[] buf = new byte[4096];
-            while ((len = in.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
+            APKInstall.transfer(in, out);
         }
         return f;
     }
@@ -207,11 +205,8 @@ public class Request implements Closeable {
         int len = conn.getContentLength();
         len = len > 0 ? len : 32;
         ByteArrayOutputStream out = new ByteArrayOutputStream(len);
-        try (InputStream in  = getInputStream()) {
-            byte[] buf = new byte[4096];
-            while ((len = in.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
+        try (InputStream in = getInputStream()) {
+            APKInstall.transfer(in, out);
         }
         return out.toByteArray();
     }
