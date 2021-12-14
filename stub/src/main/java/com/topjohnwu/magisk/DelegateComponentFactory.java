@@ -16,7 +16,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     AppComponentFactory receiver;
 
     public DelegateComponentFactory() {
-        InjectAPK.componentFactory = this;
+        DynLoad.componentFactory = this;
     }
 
     @Override

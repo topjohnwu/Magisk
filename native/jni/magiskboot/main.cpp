@@ -35,8 +35,8 @@ Supported actions:
     If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
     otherwise it will compress ramdisk.cpio and kernel with the same format
     as in <origbootimg> if the file provided is not already compressed.
-    All disable flags will be set in the vbmeta header, unless env variable
-    KEEPVBMETAFLAG is set to true.
+    If env variable PATCHVBMETAFLAG is set to true, all disable flags will
+    be set in the vbmeta header.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace with <hexpattern2>

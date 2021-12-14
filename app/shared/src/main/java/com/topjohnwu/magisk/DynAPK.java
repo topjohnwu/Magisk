@@ -13,11 +13,6 @@ import io.michaelrocks.paranoid.Obfuscate;
 
 @Obfuscate
 public class DynAPK {
-
-    // Indices of the object array
-    private static final int STUB_VERSION_ENTRY = 0;
-    private static final int CLASS_COMPONENT_MAP = 1;
-
     private static File dynDir;
     private static Method addAssetPath;
 
@@ -41,21 +36,6 @@ public class DynAPK {
         return new File(getDynDir(c), "update.apk");
     }
 
-    public static Data load(Object o) {
-        Object[] arr = (Object[]) o;
-        Data data = new Data();
-        data.version = (int) arr[STUB_VERSION_ENTRY];
-        data.classToComponent = (Map<String, String>) arr[CLASS_COMPONENT_MAP];
-        return data;
-    }
-
-    public static Object pack(Data data) {
-        Object[] arr = new Object[2];
-        arr[STUB_VERSION_ENTRY] = data.version;
-        arr[CLASS_COMPONENT_MAP] = data.classToComponent;
-        return arr;
-    }
-
     public static void addAssetPath(AssetManager asset, String path) {
         try {
             if (addAssetPath == null)
@@ -65,7 +45,28 @@ public class DynAPK {
     }
 
     public static class Data {
-        public int version;
-        public Map<String, String> classToComponent;
+        // Indices of the object array
+        private static final int STUB_VERSION = 0;
+        private static final int CLASS_COMPONENT_MAP = 1;
+        private static final int ROOT_SERVICE = 2;
+        private static final int ARR_SIZE = 3;
+
+        private final Object[] arr;
+
+        public Data() { arr = new Object[ARR_SIZE]; }
+        public Data(Object o) { arr = (Object[]) o; }
+        public Object getObject() { return arr; }
+
+        public int getVersion() { return (int) arr[STUB_VERSION]; }
+        public void setVersion(int version) { arr[STUB_VERSION] = version; }
+        public Map<String, String> getClassToComponent() {
+            // noinspection unchecked
+            return (Map<String, String>) arr[CLASS_COMPONENT_MAP];
+        }
+        public void setClassToComponent(Map<String, String> map) {
+            arr[CLASS_COMPONENT_MAP] = map;
+        }
+        public Class<?> getRootService() { return (Class<?>) arr[ROOT_SERVICE]; }
+        public void setRootService(Class<?> service) { arr[ROOT_SERVICE] = service; }
     }
 }

@@ -26,6 +26,8 @@ struct fstab_entry {
     fstab_entry() = default;
     fstab_entry(const fstab_entry &) = delete;
     fstab_entry(fstab_entry &&) = default;
+    fstab_entry &operator=(const fstab_entry&) = delete;
+    fstab_entry &operator=(fstab_entry&&) = default;
     void to_file(FILE *fp);
 };
 
