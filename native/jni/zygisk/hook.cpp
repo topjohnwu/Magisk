@@ -301,7 +301,7 @@ bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
     table->v1.pltHookExclude = [](const char *path, const char *symbol) {
         xhook_ignore(path, symbol);
     };
-    table->v1.pltHookCommit = []{ run_finally clear(&xhook_clear); return xhook_refresh(0) == 0; };
+    table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
     table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
     table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
 
