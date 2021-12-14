@@ -59,7 +59,7 @@ For each action, use `-h` to access help (e.g. `./build.py all -h`)
 Default string resources for the Magisk app and its stub APK are located here:
 
 - `app/src/main/res/values/strings.xml`
-- `stub/res/values/strings.xml`
+- `stub/src/main/res/values/strings.xml`
 
 Translate each and place them in the respective locations (`[module]/src/main/res/values-[lang]/strings.xml`).
 
