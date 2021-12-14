@@ -58,6 +58,7 @@ static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
 extern uint32_t patch_verity(void *buf, uint32_t size);
 
 void FirstStageInit::prepare() {
+    run_finally finally([]{ chdir("/"); });
     if (config->force_normal_boot) {
         xmkdirs(FSR "/system/bin", 0755);
         rename("/init" /* magiskinit */, FSR "/system/bin/init");
@@ -82,7 +83,7 @@ void FirstStageInit::prepare() {
     for (const char *suffix : {config->fstab_suffix, config->hardware, config->hardware_plat }) {
         if (suffix[0] == '\0')
             continue;
-        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "fstab" }) {
+        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "system/etc/fstab", "fstab" }) {
             sprintf(fstab_file, "%s.%s", prefix, suffix);
             if (access(fstab_file, F_OK) != 0) {
                 fstab_file[0] = '\0';
@@ -126,6 +127,10 @@ exit_loop:
         auto init = mmap_data("/init", true);
         init.patch({ make_pair("android,fstab", "xxx") });
     } else {
+        if (fstab_file[0] == '\0') {
+            LOGE("Cannot find fstab");
+            return;
+        }
         // Parse and load the fstab file
         read_fstab_file(fstab_file, fstab);
     }
@@ -192,8 +197,6 @@ exit_loop:
         }
     }
     chmod(fstab_file, 0644);
-
-    chdir("/");
 }
 
 #define INIT_PATH  "/system/bin/init"
