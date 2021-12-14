@@ -12,32 +12,23 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import com.topjohnwu.magisk.utils.APKInstall;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
 @Obfuscate
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DynLoad {
 
     static Object componentFactory;
     static final DynAPK.Data apkData = createApkData();
-
-    private static void copy(InputStream src, OutputStream dest) throws IOException {
-        try (InputStream s = src) {
-            try (OutputStream o = dest) {
-                byte[] buf = new byte[8192];
-                for (int read; (read = s.read(buf)) >= 0;) {
-                    o.write(buf, 0, read);
-                }
-            }
-        }
-    }
 
     // Dynamically load APK, inject ClassLoader into ContextImpl, then
     // create the actual Application instance from the loaded APK
@@ -55,7 +46,11 @@ public class DynLoad {
             File external = new File(context.getExternalFilesDir(null), "magisk.apk");
             if (external.exists()) {
                 try {
-                    copy(new FileInputStream(external), new FileOutputStream(apk));
+                    var in = new FileInputStream(external);
+                    var out = new FileOutputStream(apk);
+                    try (in; out) {
+                        APKInstall.transfer(in, out);
+                    }
                 } catch (IOException e) {
                     Log.e(DynLoad.class.getSimpleName(), "", e);
                     apk.delete();
@@ -74,7 +69,10 @@ public class DynLoad {
             try {
                 InputStream src = resolver.openInputStream(uri);
                 if (src != null) {
-                    copy(src, new FileOutputStream(apk));
+                    var out = new FileOutputStream(apk);
+                    try (src; out) {
+                        APKInstall.transfer(src, out);
+                    }
                 }
             } catch (IOException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
@@ -148,6 +146,7 @@ public class DynLoad {
         Field mInfo = context.getClass().getDeclaredField("mPackageInfo");
         mInfo.setAccessible(true);
         Object loadedApk = mInfo.get(context);
+        assert loadedApk != null;
         Field mcl = loadedApk.getClass().getDeclaredField("mClassLoader");
         mcl.setAccessible(true);
         mcl.set(loadedApk, cl);
