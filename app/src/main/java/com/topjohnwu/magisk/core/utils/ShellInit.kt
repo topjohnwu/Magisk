@@ -75,6 +75,7 @@ class ShellInit : Shell.Initializer() {
         Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
+        Info.vbmeta = getBool("VBMETAEXIST")
         Info.isAB = getBool("ISAB")
         Info.crypto = getVar("CRYPTOTYPE")
 
@@ -82,6 +83,7 @@ class ShellInit : Shell.Initializer() {
         Config.recovery = getBool("RECOVERYMODE")
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
+        Config.patchVbmeta = getBool("PATCHVBMETAFLAG")
 
         return true
     }

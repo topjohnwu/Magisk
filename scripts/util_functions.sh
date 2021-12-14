@@ -403,7 +403,14 @@ get_flags() {
       KEEPFORCEENCRYPT=false
     fi
   fi
-  [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
+  if [ -z $PATCHVBMETAFLAG ]; then
+    if [ -e /dev/block/by-name/vbmeta_a ] || [ -e /dev/block/by-name/vbmeta ]; then
+      PATCHVBMETAFLAG=false
+    else
+      PATCHVBMETAFLAG=true
+      ui_print "- Not found vbmeta partition, patch vbmetaflag"
+    fi
+  fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
