@@ -77,7 +77,7 @@ public class DownloadActivity extends Activity {
 
     private void error(Throwable e) {
         Log.e(getClass().getSimpleName(), "", e);
-        Toast.makeText(themed, e.getMessage(), Toast.LENGTH_LONG).show();
+        runOnUiThread(Toast.makeText(themed, e.getMessage(), Toast.LENGTH_LONG)::show);
         finish();
     }
 
@@ -112,7 +112,7 @@ public class DownloadActivity extends Activity {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
         Runnable onSuccess = () -> {
             dialog.dismiss();
-            Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();
+            runOnUiThread(Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG)::show);
             finish();
         };
         // Download and upgrade the app
@@ -141,7 +141,7 @@ public class DownloadActivity extends Activity {
             var out = new FileOutputStream(apk);
             try (is; out) {
                 byte[] buf = new byte[4096];
-                for (int read; (read = is.read(buf)) >= 0;) {
+                for (int read; (read = is.read(buf)) >= 0; ) {
                     out.write(buf, 0, read);
                 }
             }
