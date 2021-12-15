@@ -77,7 +77,6 @@ public class DownloadActivity extends Activity {
 
     private void error(Throwable e) {
         Log.e(getClass().getSimpleName(), "", e);
-        Toast.makeText(themed, e.getMessage(), Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -120,7 +119,7 @@ public class DownloadActivity extends Activity {
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
                 DynLoad.setup(this);
-                onSuccess.run();
+                runOnUiThread(onSuccess);
             } else {
                 var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
                 APKInstall.installapk(this, file);
