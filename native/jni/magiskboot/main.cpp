@@ -6,7 +6,7 @@
 
 using namespace std;
 
-static void print_methods() {
+static void print_formats() {
     for (int fmt = GZIP; fmt < LZOP; ++fmt) {
         fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
     }
@@ -33,8 +33,10 @@ Supported actions:
     Repack boot image components from current directory
     to [outbootimg], or new-boot.img if not specified.
     If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
-    otherwise it will compress ramdisk.cpio and kernel with the same method
-    in <origbootimg> if the file provided is not already compressed.
+    otherwise it will compress ramdisk.cpio and kernel with the same format
+    as in <origbootimg> if the file provided is not already compressed.
+    If env variable PATCHVBMETAFLAG is set to true, all disable flags will
+    be set in the vbmeta header.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace with <hexpattern2>
@@ -58,9 +60,9 @@ Supported actions:
       extract [ENTRY OUT]
         Extract ENTRY to OUT, or extract all entries to current directory
       test
-        Test the current cpio's patch status
-        Return values:
-        0:stock    1:Magisk    2:unsupported (phh, SuperSU, Xposed)
+        Test the current cpio's status
+        Return value is 0 or bitwise or-ed of following values:
+        0x1:Magisk    0x2:unsupported    0x4:Sony
       patch
         Apply ramdisk patches
         Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
@@ -91,21 +93,21 @@ Supported actions:
   cleanup
     Cleanup the current working directory
 
-  compress[=method] <infile> [outfile]
-    Compress <infile> with [method] (default: gzip), optionally to [outfile]
+  compress[=format] <infile> [outfile]
+    Compress <infile> with [format] (default: gzip), optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: )EOF", arg0);
+    Supported formats: )EOF", arg0);
 
-    print_methods();
+    print_formats();
 
     fprintf(stderr, R"EOF(
 
   decompress <infile> [outfile]
-    Detect method and decompress <infile>, optionally to [outfile]
+    Detect format and decompress <infile>, optionally to [outfile]
     <infile>/[outfile] can be '-' to be STDIN/STDOUT
-    Supported methods: )EOF");
+    Supported formats: )EOF");
 
-    print_methods();
+    print_formats();
 
     fprintf(stderr, "\n\n");
     exit(1);
@@ -135,14 +137,11 @@ int main(int argc, char *argv[]) {
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[SHA_DIGEST_SIZE];
-        void *buf;
-        size_t size;
-        mmap_ro(argv[2], buf, size);
-        SHA_hash(buf, size, sha1);
+        auto m = mmap_data(argv[2]);
+        SHA_hash(m.buf, m.sz, sha1);
         for (uint8_t i : sha1)
             printf("%02x", i);
         printf("\n");
-        munmap(buf, size);
     } else if (argc > 2 && action == "split") {
         return split_image_dtb(argv[2]);
     } else if (argc > 2 && action == "unpack") {

@@ -196,7 +196,7 @@ void BootConfig::print() {
 }
 
 #define read_dt(name, key)                                          \
-snprintf(file_name, sizeof(file_name), "%s/" name, config->key);    \
+snprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
@@ -252,6 +252,12 @@ bool check_two_stage() {
     if (access("/system/bin/init", F_OK) == 0)
         return true;
     // If we still have no indication, parse the original init and see what's up
-    auto init = mmap_data::ro("/.backup/init");
+    auto init = mmap_data(backup_init());
     return init.contains("selinux_setup");
+}
+
+const char *backup_init() {
+    if (access("/.backup/init.real", F_OK) == 0)
+        return "/.backup/init.real";
+    return "/.backup/init";
 }

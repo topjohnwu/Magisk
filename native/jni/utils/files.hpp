@@ -10,24 +10,52 @@
 
 #include "xwrap.hpp"
 
-#define do_align(p, a)  (((p) + (a) - 1) / (a) * (a))
-#define align_off(p, a) (do_align(p, a) - (p))
+template <typename T>
+static inline T align_to(T v, int a) {
+    static_assert(std::is_integral<T>::value);
+    return (v + a - 1) / a * a;
+}
+
+template <typename T>
+static inline T align_padding(T v, int a) {
+    return align_to(v, a) - v;
+}
 
 struct file_attr {
     struct stat st;
     char con[128];
 };
 
-struct raw_file {
+struct byte_data {
+    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+
+    uint8_t *buf = nullptr;
+    size_t sz = 0;
+
+    int patch(str_pairs list) { return patch(true, list); }
+    int patch(bool log, str_pairs list);
+    bool contains(std::string_view pattern, bool log = true) const;
+protected:
+    void swap(byte_data &o);
+};
+
+struct raw_file : public byte_data {
     std::string path;
     file_attr attr;
-    uint8_t *buf;
-    size_t sz;
 
-    raw_file() : attr({}), buf(nullptr), sz(0) {}
+    raw_file() : attr{} {}
     raw_file(const raw_file&) = delete;
-    raw_file(raw_file &&o);
-    ~raw_file();
+    raw_file(raw_file &&o) : path(std::move(o.path)), attr(o.attr) { swap(o); }
+    ~raw_file() { free(buf); }
+};
+
+struct mmap_data : public byte_data {
+    mmap_data() = default;
+    mmap_data(const mmap_data&) = delete;
+    mmap_data(mmap_data &&o) { swap(o); }
+    mmap_data(const char *name, bool rw = false);
+    ~mmap_data() { if (buf) munmap(buf, sz); }
+    mmap_data& operator=(mmap_data &&other) { swap(other); return *this; }
 };
 
 ssize_t fd_path(int fd, char *path, size_t size);
@@ -59,7 +87,6 @@ static inline void file_readline(const char *file,
 }
 void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
-void *__mmap(const char *filename, size_t *size, bool rw);
 void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
@@ -76,30 +103,6 @@ template <typename T>
 void fd_full_read(int fd, T &buf, size_t &size) {
     static_assert(std::is_pointer<T>::value);
     fd_full_read(fd, reinterpret_cast<void**>(&buf), &size);
-}
-
-template <typename B>
-void mmap_ro(const char *filename, B &buf, size_t &sz) {
-    buf = (B) __mmap(filename, &sz, false);
-}
-
-template <typename B, typename L>
-void mmap_ro(const char *filename, B &buf, L &sz) {
-    size_t __sz;
-    buf = (B) __mmap(filename, &__sz, false);
-    sz = __sz;
-}
-
-template <typename B>
-void mmap_rw(const char *filename, B &buf, size_t &sz) {
-    buf = (B) __mmap(filename, &sz, true);
-}
-
-template <typename B, typename L>
-void mmap_rw(const char *filename, B &buf, L &sz) {
-    size_t __sz;
-    buf = (B) __mmap(filename, &__sz, true);
-    sz = __sz;
 }
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;

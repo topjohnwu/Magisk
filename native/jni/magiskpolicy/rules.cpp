@@ -30,6 +30,7 @@ void sepolicy::magisk_rules() {
     if (db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
         allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL);
         allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL);
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL);
     }
 
     // Create unconstrained file type
@@ -38,6 +39,7 @@ void sepolicy::magisk_rules() {
     allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
+    allow(ALL, SEPOL_FILE_TYPE, "sock_file", ALL);
 
     if (new_rules) {
         // Make client type literally untrusted_app
@@ -174,12 +176,15 @@ void sepolicy::magisk_rules() {
     // For changing file context
     allow("rootfs", "tmpfs", "filesystem", "associate");
 
-    // Allow Zygisk to prctl PR_SET_MM
-    allow("zygote", "zygote", "capability", "sys_resource");
-
-    // Allow hook
+    // Zygisk rules
+    allow("zygote", "zygote", "capability", "sys_resource");  // prctl PR_SET_MM
     allow("zygote", "zygote", "process", "execmem");
+    allow("zygote", "fs_type", "filesystem", "unmount");
     allow("system_server", "system_server", "process", "execmem");
+
+    // Shut llkd up
+    dontaudit("llkd", SEPOL_PROC_DOMAIN, "process", "ptrace");
+    dontaudit("llkd", SEPOL_CLIENT_DOMAIN, "process", "ptrace");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");

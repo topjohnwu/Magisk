@@ -25,12 +25,12 @@
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
     <string name="home_item_source">Source</string>
-    <string name="home_support_content">Magisk is, and always will be, free and open-source. You can however show us that you care by sending a small donation.</string>
+    <string name="home_support_content">Magisk is, and always will be, free, and open source. You can however show us that you care by making a donation.</string>
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
-    <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nYour data potentially encrypted if not already!</string>
+    <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
     <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
@@ -53,7 +53,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser Request</string>
-    <string name="touch_filtered_warning">Because an app is obscuring a superuser request, Magisk can’t verify your response</string>
+    <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>
     <string name="grant">Grant</string>
@@ -73,16 +73,16 @@
     <string name="su_snack_log_on">Logging of %1$s is enabled</string>
     <string name="su_snack_log_off">Logging of %1$s is disabled</string>
     <string name="su_revoke_title">Revoke?</string>
-    <string name="su_revoke_msg">Confirm to revoke %1$s rights?</string>
+    <string name="su_revoke_msg">Confirm to revoke %1$s Superuser rights</string>
     <string name="toast">Toast</string>
     <string name="none">None</string>
 
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
-    <string name="superuser_policy_none">No app has asked for superuser permission yet.</string>
+    <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
 
     <!--Logs-->
-    <string name="log_data_none">You\'re log-free, try using your SU enabled apps more</string>
+    <string name="log_data_none">You\'re log-free, try using your root apps more</string>
     <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird</string>
     <string name="menuSaveLog">Save log</string>
     <string name="menuClearLog">Clear log now</string>
@@ -123,6 +123,8 @@
     <string name="module_installed">@string/home_installed_version</string>
     <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
+    <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
+    <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -133,9 +135,9 @@
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
-    <string name="settings_hide_app_summary">Install a proxy app with random package ID and custom app label</string>
+    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>
-    <string name="settings_restore_app_summary">Un-hide the app and restore it back to the original APK</string>
+    <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
     <string name="language">Language</string>
     <string name="system_default">(System Default)</string>
     <string name="settings_check_update_title">Check Updates</string>
@@ -152,10 +154,10 @@
     <string name="settings_denylist_config_title">Configure DenyList</string>
     <string name="settings_denylist_config_summary">Select the processes to be included on the denylist</string>
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts support for Adblock apps</string>
+    <string name="settings_hosts_summary">Systemless hosts support for ad blocking apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
     <string name="settings_app_name_hint">New name</string>
-    <string name="settings_app_name_helper">App will be repackaged to this name</string>
+    <string name="settings_app_name_helper">App will be repackaged with this name</string>
     <string name="settings_app_name_error">Invalid format</string>
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
@@ -172,14 +174,14 @@
     <string name="request_timeout">Request Timeout</string>
     <string name="superuser_notification">Superuser Notification</string>
     <string name="settings_su_reauth_title">Reauthenticate after upgrade</string>
-    <string name="settings_su_reauth_summary">Reauthenticate superuser permissions after an application upgrades</string>
-    <string name="settings_su_tapjack_title">Enable Tapjacking Protection</string>
-    <string name="settings_su_tapjack_summary">The superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
-    <string name="settings_su_biometric_title">Enable Biometric Authentication</string>
-    <string name="settings_su_biometric_summary">Use biometric authentication to allow superuser requests</string>
+    <string name="settings_su_reauth_summary">Ask for Superuser permissions again after upgrading apps</string>
+    <string name="settings_su_tapjack_title">Tapjacking Protection</string>
+    <string name="settings_su_tapjack_summary">The Superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
+    <string name="settings_su_biometric_title">Biometric Authentication</string>
+    <string name="settings_su_biometric_summary">Use biometric authentication to allow Superuser requests</string>
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
     <string name="settings_customization">Customization</string>
-    <string name="setting_add_shortcut_summary">Add a pretty shortcut in the home screen in case the name and icon are difficult to recognize after hiding the app</string>
+    <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
@@ -187,7 +189,7 @@
     <string name="settings_user_independent">User-Independent</string>
     <string name="owner_only_summary">Only owner has root access</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
-    <string name="user_indepenent_summary">Each user has his/her own separate root rules</string>
+    <string name="user_indepenent_summary">Each user has their own separate root rules</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
@@ -217,7 +219,7 @@
     <string name="done">Done!</string>
     <string name="failure">Failed!</string>
     <string name="hide_app_title">Hiding the Magisk app…</string>
-    <string name="open_link_failed_toast">No application found to open the link</string>
+    <string name="open_link_failed_toast">No app found to open the link</string>
     <string name="complete_uninstall">Complete Uninstall</string>
     <string name="restore_img">Restore Images</string>
     <string name="restore_img_msg">Restoring…</string>
@@ -231,17 +233,17 @@
     <string name="setup_msg">Running environment setup…</string>
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
-    <string name="unsupport_magisk_msg">This version of the app does not support Magisk version lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
+    <string name="unsupport_magisk_msg">This version of the app does not support Magisk versions lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
     <string name="unsupport_general_title">Abnormal State</string>
     <string name="unsupport_system_app_msg">Running this app as a system app is not supported. Please revert the app to a user app.</string>
-    <string name="unsupport_other_su_msg">An \"su\" command that does not belong to Magisk is detected. Please remove the other unsupported su.</string>
+    <string name="unsupport_other_su_msg">A \"su\" binary not from Magisk has been detected. Please remove any competing root solution and/or reinstall Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk is installed to external storage. Please move the app to internal storage.</string>
-    <string name="unsupport_nonroot_stub_msg">The app cannot continue to work in the hidden state as root was lost. Please restore it back to the original APK.</string>
+    <string name="unsupport_nonroot_stub_msg">The hidden Magisk app cannot continue to work because root was lost. Please restore the original APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
-    <string name="app_not_found">No application found to handle this action</string>
+    <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
 
 </resources>

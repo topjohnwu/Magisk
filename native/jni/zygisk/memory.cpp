@@ -20,7 +20,7 @@ void *memory_block::allocate(size_t sz) {
                 nullptr, CAPACITY, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
         _curr = _area;
     }
-    return _curr.fetch_add(do_align(sz, ALIGN));
+    return _curr.fetch_add(align_to(sz, ALIGN));
 }
 
 void memory_block::release() {

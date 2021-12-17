@@ -20,7 +20,6 @@ import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +49,7 @@ class FlashViewModel : BaseViewModel() {
     }
 
     fun startFlashing() {
-        val (action, uri, id) = args
-        if (id != -1)
-            Notifications.mgr.cancel(id)
+        val (action, uri) = args
 
         viewModelScope.launch {
             val result = when (action) {

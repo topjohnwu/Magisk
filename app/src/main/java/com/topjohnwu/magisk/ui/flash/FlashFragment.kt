@@ -111,16 +111,14 @@ class FlashFragment : BaseUIFragment<FlashViewModel, FragmentFlashMd2Binding>() 
 
         /* Installing is understood as flashing modules / zips */
 
-        fun installIntent(context: Context, file: Uri, id: Int = -1) = FlashFragmentArgs(
+        fun installIntent(context: Context, file: Uri) = FlashFragmentArgs(
             action = Const.Value.FLASH_ZIP,
             additionalData = file,
-            dismissId = id
         ).let { createIntent(context, it) }
 
-        fun install(file: Uri, id: Int) = MainDirections.actionFlashFragment(
+        fun install(file: Uri) = MainDirections.actionFlashFragment(
             action = Const.Value.FLASH_ZIP,
             additionalData = file,
-            dismissId = id
         )
     }
 

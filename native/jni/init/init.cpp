@@ -59,7 +59,7 @@ public:
     RecoveryInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {}
     void start() override {
         LOGD("Ramdisk is recovery, abort\n");
-        rename("/.backup/init", "/init");
+        rename(backup_init(), "/init");
         rm_rf("/.backup");
         exec_init();
     }
@@ -68,7 +68,7 @@ public:
 #if ENABLE_TEST
 class TestInit : public BaseInit {
 public:
-    TestInit(char *argv[], cmdline *cmd) : BaseInit(argv, cmd) {};
+    TestInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {};
     void start() override {
         // Place init tests here
     }

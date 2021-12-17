@@ -8,6 +8,7 @@
 
 #include <sys/mount.h>
 #include <map>
+#include <set>
 
 #include <magisk.hpp>
 #include <utils.hpp>
@@ -57,11 +58,12 @@ static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
 extern uint32_t patch_verity(void *buf, uint32_t size);
 
 void FirstStageInit::prepare() {
+    run_finally finally([]{ chdir("/"); });
     if (config->force_normal_boot) {
         xmkdirs(FSR "/system/bin", 0755);
         rename("/init" /* magiskinit */, FSR "/system/bin/init");
         symlink("/system/bin/init", FSR "/init");
-        rename("/.backup/init", "/init");
+        rename(backup_init(), "/init");
 
         rename("/.backup", FSR "/.backup");
         rename("/overlay.d", FSR "/overlay.d");
@@ -71,7 +73,7 @@ void FirstStageInit::prepare() {
         xmkdir("/system", 0755);
         xmkdir("/system/bin", 0755);
         rename("/init" /* magiskinit */ , "/system/bin/init");
-        rename("/.backup/init", "/init");
+        rename(backup_init(), "/init");
     }
 
     char fstab_file[128];
@@ -81,7 +83,7 @@ void FirstStageInit::prepare() {
     for (const char *suffix : {config->fstab_suffix, config->hardware, config->hardware_plat }) {
         if (suffix[0] == '\0')
             continue;
-        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "fstab" }) {
+        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "system/etc/fstab", "fstab" }) {
             sprintf(fstab_file, "%s.%s", prefix, suffix);
             if (access(fstab_file, F_OK) != 0) {
                 fstab_file[0] = '\0';
@@ -122,9 +124,13 @@ exit_loop:
         }
 
         // Patch init to force IsDtFstabCompatible() return false
-        auto init = mmap_data::rw("/init");
+        auto init = mmap_data("/init", true);
         init.patch({ make_pair("android,fstab", "xxx") });
     } else {
+        if (fstab_file[0] == '\0') {
+            LOGE("Cannot find fstab");
+            return;
+        }
         // Parse and load the fstab file
         read_fstab_file(fstab_file, fstab);
     }
@@ -132,29 +138,42 @@ exit_loop:
     // Append oppo's custom fstab
     if (access("oplus.fstab", F_OK) == 0) {
         LOGD("Found fstab file: %s\n", "oplus.fstab");
-        vector<fstab_entry> oplus_fstab;
+        set<string> main_mount_point;
         map<string, string> bind_map;
+        map<string, fstab_entry> entry_map;
 
-        read_fstab_file("oplus.fstab", oplus_fstab);
+        // used to avoid duplication
+        for (auto &entry: fstab) {
+            main_mount_point.emplace(entry.mnt_point);
+        }
 
-        for (auto &entry : oplus_fstab) {
-            if (entry.mnt_flags.find("bind") != string::npos) {
-                bind_map.emplace(entry.dev, entry.mnt_point);
-                entry.dev = "";
+        {
+            vector<fstab_entry> oplus_fstab;
+            read_fstab_file("oplus.fstab", oplus_fstab);
+
+            for (auto &entry : oplus_fstab) {
+                // skip duplicated entry between the main file and the oplus one
+                if (main_mount_point.count(entry.mnt_point)) continue;
+                if (entry.mnt_flags.find("bind") != string::npos) {
+                    bind_map.emplace(std::move(entry.dev), std::move(entry.mnt_point));
+                } else {
+                    // skip duplicated entry in the same file
+                    entry_map.insert_or_assign(decltype(entry.mnt_point){entry.mnt_point}, std::move(entry));
+                }
             }
         }
 
-        for (auto &entry : oplus_fstab) {
-            // Merge bind entries
-            if (entry.dev.empty())
-                continue;
-            auto got = bind_map.find(entry.mnt_point);
-            if (got != bind_map.end())
-                entry.mnt_point = got->second;
-
-            // Mount befor switch root, fix img path
+        for (auto &[_, entry] : entry_map) {
+            // Mount before switch root, fix img path
             if (str_starts(entry.dev, "loop@/system/"))
                 entry.dev.insert(5, "/system_root");
+
+            // change bind mount entries to dev mount since some users reported bind is not working
+            // in this case, we drop the original mount point and leave only the one from bind entry
+            // because some users reported keeping the original mount point causes bootloop
+            if (auto got = bind_map.find(entry.mnt_point); got != bind_map.end()) {
+                entry.mnt_point = got->second;
+            }
 
             fstab.push_back(move(entry));
         }
@@ -178,8 +197,6 @@ exit_loop:
         }
     }
     chmod(fstab_file, 0644);
-
-    chdir("/");
 }
 
 #define INIT_PATH  "/system/bin/init"
@@ -192,7 +209,7 @@ void SARInit::first_stage_prep() {
     int src = xopen("/init", O_RDONLY);
     int dest = xopen("/dev/init", O_CREAT | O_WRONLY, 0);
     {
-        auto init = mmap_data::ro("/init");
+        auto init = mmap_data("/init");
         init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
         write(dest, init.buf, init.sz);
         fclone_attr(src, dest);

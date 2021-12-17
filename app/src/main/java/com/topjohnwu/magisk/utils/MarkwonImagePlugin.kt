@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.annotation.WorkerThread
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
-import com.topjohnwu.magisk.core.AssetHack
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.superuser.internal.WaitRunnable
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.MarkwonSpansFactory
@@ -216,7 +216,7 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
                 return PictureDrawable(picture)
             }
 
-            val density: Float = AssetHack.resource.displayMetrics.density
+            val density: Float = AppContext.resources.displayMetrics.density
 
             val width = (w * density + .5f).toInt()
             val height = (h * density + .5f).toInt()
@@ -226,7 +226,7 @@ class MarkwonImagePlugin(okHttp: OkHttpClient) : AbstractMarkwonPlugin() {
             canvas.scale(density, density)
             svg.renderToCanvas(canvas)
 
-            return BitmapDrawable(AssetHack.resource, bitmap)
+            return BitmapDrawable(AppContext.resources, bitmap)
         }
 
     }

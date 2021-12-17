@@ -10,6 +10,7 @@
     <string name="section_home">首頁</string>
     <string name="section_theme">主題</string>
     <string name="safetynet">SafetyNet</string>
+    <string name="denylist">黑名單</string>
 
     <!--Home-->
     <string name="no_connection">無法連線</string>
@@ -144,6 +145,12 @@
     <string name="settings_update_beta">測試版</string>
     <string name="settings_update_custom">自訂頻道</string>
     <string name="settings_update_custom_msg">輸入一個自訂的網址</string>
+    <string name="settings_zygisk_summary">在 Zygote 中運行 Magisk</string>
+    <string name="settings_denylist_title">強制黑名單</string>
+    <string name="settings_denylist_summary">Magisk 將會把黑名單內執行的程序還原修改</string>
+    <string name="settings_denylist_error">這個功能需要啟用 %1$s</string>
+    <string name="settings_denylist_config_title">配置黑名單</string>
+    <string name="settings_denylist_config_summary">選擇要包含在黑名單的程序</string>
     <string name="settings_hosts_title">主機（Hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
@@ -235,5 +242,6 @@
     <string name="add_shortcut_title">新增捷徑到首頁</string>
     <string name="add_shortcut_msg">在隱藏 Magisk 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
     <string name="app_not_found">沒有可以處理這個操作的應用程式</string>
+<string name="reboot_apply_change">重新啟動裝置以套用設變更</string>
 
 </resources>

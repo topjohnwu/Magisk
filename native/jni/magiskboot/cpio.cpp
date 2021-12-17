@@ -111,7 +111,7 @@ bool cpio::exists(const char *name) {
 }
 
 #define do_out(buf, len) pos += fwrite(buf, 1, len, out);
-#define out_align() do_out(zeros, align_off(pos, 4))
+#define out_align() do_out(zeros, align_padding(pos, 4))
 void cpio::dump(FILE *out) {
     size_t pos = 0;
     unsigned inode = 300000;
@@ -151,12 +151,9 @@ void cpio::dump(FILE *out) {
 }
 
 void cpio::load_cpio(const char *file) {
-    char *buf;
-    size_t sz;
-    mmap_ro(file, buf, sz);
     fprintf(stderr, "Loading cpio: [%s]\n", file);
-    load_cpio(buf, sz);
-    munmap(buf, sz);
+    auto m = mmap_data(file);
+    load_cpio(reinterpret_cast<char *>(m.buf), m.sz);
 }
 
 void cpio::insert(string_view name, cpio_entry *e) {
@@ -169,14 +166,11 @@ void cpio::insert(string_view name, cpio_entry *e) {
 }
 
 void cpio::add(mode_t mode, const char *name, const char *file) {
-    void *buf;
-    size_t sz;
-    mmap_ro(file, buf, sz);
+    auto m = mmap_data(file);
     auto e = new cpio_entry(S_IFREG | mode);
-    e->filesize = sz;
-    e->data = xmalloc(sz);
-    memcpy(e->data, buf, sz);
-    munmap(buf, sz);
+    e->filesize = m.sz;
+    e->data = xmalloc(m.sz);
+    memcpy(e->data, m.buf, m.sz);
     insert(name, e);
     fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
 }
@@ -211,7 +205,7 @@ bool cpio::mv(const char *from, const char *to) {
     return false;
 }
 
-#define pos_align(p) p = do_align(p, 4)
+#define pos_align(p) p = align_to(p, 4)
 
 void cpio::load_cpio(const char *buf, size_t sz) {
     size_t pos = 0;

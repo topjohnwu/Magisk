@@ -10,7 +10,6 @@
 enum : int {
     ZYGISK_SETUP,
     ZYGISK_GET_INFO,
-    ZYGISK_UNMOUNT,
     ZYGISK_GET_LOG_PIPE,
     ZYGISK_CONNECT_COMPANION,
 };
@@ -42,9 +41,9 @@ struct AppInfo {
     bool on_denylist;
 };
 
-void self_unload();
+extern void *self_handle;
+
+void unload_first_stage();
 void hook_functions();
-bool unhook_functions();
 std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info);
 int remote_request_unmount();
-void connect_companion(int client, bool is_64_bit);

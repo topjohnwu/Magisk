@@ -16,7 +16,7 @@ import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.*
@@ -31,7 +31,7 @@ import java.io.File
 
 class MainViewModel : BaseViewModel()
 
-open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>() {
+class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
@@ -39,16 +39,7 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
 
     private var isRootFragment = true
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // Make sure Splash is always ran before us
-        if (!SplashActivity.DONE) {
-            redirect<SplashActivity>().also { startActivity(it) }
-            finish()
-            return
-        }
-
+    override fun showMainUI(savedInstanceState: Bundle?) {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
@@ -83,22 +74,23 @@ open class MainActivity : BaseUIActivity<MainViewModel, ActivityMainMd2Binding>(
         binding.mainNavigation.setOnItemReselectedListener {
             (currentFragment as? ReselectionTarget)?.onReselected()
         }
+        binding.mainNavigation.menu.apply {
+            findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
+            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
+        }
 
-        val section = if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES) Const.Nav.SETTINGS
-        else intent.getStringExtra(Const.Key.OPEN_SECTION)
+        val section =
+            if (intent.action == Intent.ACTION_APPLICATION_PREFERENCES)
+                Const.Nav.SETTINGS
+            else
+                intent.getStringExtra(Const.Key.OPEN_SECTION)
+
         getScreen(section)?.navigate()
 
         if (savedInstanceState != null) {
             if (!isRootFragment) {
                 requestNavigationHidden()
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.mainNavigation.menu.apply {
-            findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
         }
     }
 

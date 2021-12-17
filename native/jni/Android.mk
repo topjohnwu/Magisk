@@ -22,17 +22,17 @@ LOCAL_SRC_FILES := \
     core/module.cpp \
     core/logging.cpp \
     core/thread.cpp \
-    resetprop/persist_properties.cpp \
+    resetprop/persist.cpp \
     resetprop/resetprop.cpp \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
     su/su_daemon.cpp \
     zygisk/entry.cpp \
+    zygisk/main.cpp \
     zygisk/utils.cpp \
     zygisk/hook.cpp \
     zygisk/memory.cpp \
-    zygisk/companion.cpp \
     zygisk/deny/cli.cpp \
     zygisk/deny/utils.cpp \
     zygisk/deny/revert.cpp
@@ -56,7 +56,6 @@ LOCAL_SRC_FILES := \
     init/rootdir.cpp \
     init/getinfo.cpp \
     init/twostage.cpp \
-    init/raw_data.cpp \
     core/socket.cpp \
     magiskpolicy/sepolicy.cpp \
     magiskpolicy/magiskpolicy.cpp \

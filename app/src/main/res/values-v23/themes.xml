@@ -8,10 +8,9 @@
 
     <style name="Theme.Foundation.Light" parent="Base.V23.Theme.Foundation.Light" />
 
-    <style name="Base.V23.Theme.Splash.Light" parent="Base.V21.Theme.Splash.Light">
-        <item name="android:windowLightStatusBar">false</item>
+    <style name="Theme.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_magisk_padded</item>
     </style>
-
-    <style name="Theme.Splash.Light" parent="Base.V23.Theme.Splash.Light" />
 
 </resources>

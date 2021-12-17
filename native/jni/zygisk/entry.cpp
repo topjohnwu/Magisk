@@ -1,7 +1,5 @@
 #include <libgen.h>
 #include <dlfcn.h>
-#include <sys/mount.h>
-#include <sys/sendfile.h>
 #include <sys/prctl.h>
 #include <android/log.h>
 
@@ -15,7 +13,7 @@
 
 using namespace std;
 
-static void *self_handle = nullptr;
+void *self_handle = nullptr;
 
 static int zygisk_log(int prio, const char *fmt, va_list ap);
 
@@ -28,21 +26,13 @@ static void zygisk_logging() {
     log_cb.ex = nop_ex;
 }
 
-void self_unload() {
-    ZLOGD("Request to self unload\n");
-    // If unhooking failed, do not unload or else it will cause SIGSEGV
-    if (!unhook_functions())
-        return;
-    new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
-}
-
-static void unload_first_stage(int, siginfo_t *info, void *) {
-    auto path = static_cast<char *>(info->si_value.sival_ptr);
-    unmap_all(path);
-    free(path);
-    struct sigaction action{};
-    action.sa_handler = SIG_DFL;
-    sigaction(SIGUSR1, &action, nullptr);
+static char *first_stage_path = nullptr;
+void unload_first_stage() {
+    if (first_stage_path) {
+        unmap_all(first_stage_path);
+        free(first_stage_path);
+        first_stage_path = nullptr;
+    }
 }
 
 // Make sure /proc/self/environ is sanitized
@@ -72,8 +62,9 @@ static void zygisk_cleanup_wait() {
 
 #define SECOND_STAGE_PTR "ZYGISK_PTR"
 
-static void second_stage_entry(void *handle, char *path) {
+static void second_stage_entry(void *handle, const char *tmp, char *path) {
     self_handle = handle;
+    MAGISKTMP = tmp;
     unsetenv(INJECT_ENV_2);
     unsetenv(SECOND_STAGE_PTR);
 
@@ -81,21 +72,8 @@ static void second_stage_entry(void *handle, char *path) {
     ZLOGD("inject 2nd stage\n");
     hook_functions();
 
-    // Register signal handler to unload 1st stage
-    struct sigaction action{};
-    action.sa_sigaction = unload_first_stage;
-    sigaction(SIGUSR1, &action, nullptr);
-
-    // Schedule to unload 1st stage 10us later
-    timer_t timer;
-    sigevent_t event{};
-    event.sigev_notify = SIGEV_SIGNAL;
-    event.sigev_signo = SIGUSR1;
-    event.sigev_value.sival_ptr = path;
-    timer_create(CLOCK_MONOTONIC, &event, &timer);
-    itimerspec time{};
-    time.it_value.tv_nsec = 10000L;
-    timer_settime(&timer, 0, &time, nullptr);
+    // First stage will be unloaded before the first fork
+    first_stage_path = path;
 }
 
 static void first_stage_entry() {
@@ -103,6 +81,8 @@ static void first_stage_entry() {
     ZLOGD("inject 1st stage\n");
 
     char *ld = getenv("LD_PRELOAD");
+    char tmp[128];
+    strlcpy(tmp, getenv("MAGISKTMP"), sizeof(tmp));
     char *path;
     if (char *c = strrchr(ld, ':')) {
         *c = '\0';
@@ -113,10 +93,13 @@ static void first_stage_entry() {
         path = strdup(ld);
     }
     unsetenv(INJECT_ENV_1);
+    unsetenv("MAGISKTMP");
     sanitize_environ();
 
+    char *num = strrchr(path, '.') - 1;
+
     // Update path to 2nd stage lib
-    *(strrchr(path, '.') - 1) = '2';
+    *num = '2';
 
     // Load second stage
     setenv(INJECT_ENV_2, "1", 1);
@@ -124,13 +107,13 @@ static void first_stage_entry() {
     remap_all(path);
 
     // Revert path to 1st stage lib
-    *(strrchr(path, '.') - 1) = '1';
+    *num = '1';
 
     // Run second stage entry
     char *env = getenv(SECOND_STAGE_PTR);
     decltype(&second_stage_entry) second_stage;
     sscanf(env, "%p", &second_stage);
-    second_stage(handle, path);
+    second_stage(handle, tmp, path);
 }
 
 __attribute__((constructor))
@@ -145,37 +128,7 @@ static void zygisk_init() {
     }
 }
 
-// Start code for magiskd IPC
-
-int app_process_main(int argc, char *argv[]) {
-    android_logging();
-
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_SETUP);
-
-        if (read_int(fd) == 0) {
-            string path = read_string(fd);
-            string lib = path + ".1.so";
-            if (char *ld = getenv("LD_PRELOAD")) {
-                char env[256];
-                sprintf(env, "%s:%s", ld, lib.data());
-                setenv("LD_PRELOAD", env, 1);
-            } else {
-                setenv("LD_PRELOAD", lib.data(), 1);
-            }
-            setenv(INJECT_ENV_1, "1", 1);
-        }
-        close(fd);
-    }
-
-    // Execute real app_process
-    char buf[256];
-    xreadlink("/proc/self/exe", buf, sizeof(buf));
-    xumount2("/proc/self/exe", MNT_DETACH);
-    execve(buf, argv, environ);
-    return 1;
-}
+// The following code runs in zygote/app process
 
 static int zygisk_log(int prio, const char *fmt, va_list ap) {
     // If we don't have log pipe set, ask magiskd for it
@@ -230,23 +183,60 @@ std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info) {
     return fds;
 }
 
-int remote_request_unmount() {
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_UNMOUNT);
-        int ret = read_int(fd);
-        close(fd);
-        return ret;
-    }
-    return DAEMON_ERROR;
-}
-
 // The following code runs in magiskd
 
 static bool get_exe(int pid, char *buf, size_t sz) {
     snprintf(buf, sz, "/proc/%d/exe", pid);
     return xreadlink(buf, buf, sz) > 0;
 }
+
+static pthread_mutex_t zygiskd_lock = PTHREAD_MUTEX_INITIALIZER;
+static int zygiskd_sockets[] = { -1, -1 };
+#define zygiskd_socket zygiskd_sockets[is_64_bit]
+
+static void connect_companion(int client, bool is_64_bit) {
+    mutex_guard g(zygiskd_lock);
+
+    if (zygiskd_socket >= 0) {
+        // Make sure the socket is still valid
+        pollfd pfd = { zygiskd_socket, 0, 0 };
+        poll(&pfd, 1, 0);
+        if (pfd.revents) {
+            // Any revent means error
+            close(zygiskd_socket);
+            zygiskd_socket = -1;
+        }
+    }
+    if (zygiskd_socket < 0) {
+        int fds[2];
+        socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds);
+        zygiskd_socket = fds[0];
+        if (fork_dont_care() == 0) {
+            string exe = MAGISKTMP + "/magisk" + (is_64_bit ? "64" : "32");
+            // This fd has to survive exec
+            fcntl(fds[1], F_SETFD, 0);
+            char buf[16];
+            snprintf(buf, sizeof(buf), "%d", fds[1]);
+            execl(exe.data(), "zygisk", "companion", buf, (char *) nullptr);
+            exit(-1);
+        }
+        close(fds[1]);
+        vector<int> module_fds = zygisk_module_fds(is_64_bit);
+        send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
+        // Wait for ack
+        if (read_int(zygiskd_socket) != 0) {
+            LOGE("zygiskd startup error\n");
+            return;
+        }
+    }
+    send_fd(zygiskd_socket, client);
+}
+
+static timespec last_zygote_start;
+static int zygote_start_counts[] = { 0, 0 };
+#define zygote_start_count zygote_start_counts[is_64_bit]
+#define zygote_started (zygote_start_counts[0] + zygote_start_counts[1])
+#define zygote_start_reset(val) { zygote_start_counts[0] = val; zygote_start_counts[1] = val; }
 
 static void setup_files(int client, const sock_cred *cred) {
     LOGD("zygisk: setup files for pid=[%d]\n", cred->pid);
@@ -257,13 +247,52 @@ static void setup_files(int client, const sock_cred *cred) {
         return;
     }
 
+    bool is_64_bit = str_ends(buf, "64");
+
+    if (!zygote_started) {
+        // First zygote launch, record time
+        clock_gettime(CLOCK_MONOTONIC, &last_zygote_start);
+    }
+
+    if (zygote_start_count) {
+        // This zygote ABI had started before, kill existing zygiskd
+        close(zygiskd_sockets[0]);
+        close(zygiskd_sockets[1]);
+        zygiskd_sockets[0] = -1;
+        zygiskd_sockets[1] = -1;
+    }
+    ++zygote_start_count;
+
+    if (zygote_start_count >= 5) {
+        // Bootloop prevention
+        timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
+        if (ts.tv_sec - last_zygote_start.tv_sec > 60) {
+            // This is very likely manual soft reboot
+            memcpy(&last_zygote_start, &ts, sizeof(ts));
+            zygote_start_reset(1);
+        } else {
+            // If any zygote relaunched more than 5 times within a minute,
+            // don't do any setups further to prevent bootloop.
+            zygote_start_reset(999);
+            write_int(client, 1);
+            return;
+        }
+    }
+
     write_int(client, 0);
+    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 
     string path = MAGISKTMP + "/" ZYGISKBIN "/zygisk." + basename(buf);
     cp_afc(buf, (path + ".1.so").data());
     cp_afc(buf, (path + ".2.so").data());
+    write_string(client, MAGISKTMP);
+}
 
-    write_string(client, path);
+static void magiskd_passthrough(int client) {
+    bool is_64_bit = read_int(client);
+    write_int(client, 0);
+    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 }
 
 int cached_manager_app_id = -1;
@@ -318,15 +347,6 @@ static void get_process_info(int client, const sock_cred *cred) {
     }
 }
 
-static void do_unmount(int client, const sock_cred *cred) {
-    if (denylist_enabled) {
-        LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
-        revert_daemon(cred->pid, client);
-    } else {
-        write_int(client, DENY_NOT_ENFORCED);
-    }
-}
-
 static void send_log_pipe(int fd) {
     // There is race condition here, but we can't really do much about it...
     if (logd_fd >= 0) {
@@ -344,11 +364,11 @@ void zygisk_handler(int client, const sock_cred *cred) {
     case ZYGISK_SETUP:
         setup_files(client, cred);
         break;
+    case ZYGISK_PASSTHROUGH:
+        magiskd_passthrough(client);
+        break;
     case ZYGISK_GET_INFO:
         get_process_info(client, cred);
-        break;
-    case ZYGISK_UNMOUNT:
-        do_unmount(client, cred);
         break;
     case ZYGISK_GET_LOG_PIPE:
         send_log_pipe(client);

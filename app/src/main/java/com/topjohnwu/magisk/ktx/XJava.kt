@@ -19,9 +19,6 @@ inline fun ZipInputStream.forEach(callback: (ZipEntry) -> Unit) {
     }
 }
 
-fun InputStream.writeTo(file: File) =
-    withStreams(this, file.outputStream()) { reader, writer -> reader.copyTo(writer) }
-
 inline fun <In : InputStream, Out : OutputStream> withStreams(
     inStream: In,
     outStream: Out,
@@ -34,18 +31,19 @@ inline fun <In : InputStream, Out : OutputStream> withStreams(
     }
 }
 
-fun <T> MutableList<T>.update(newList: List<T>) {
-    clear()
-    addAll(newList)
-}
+fun InputStream.copyAndClose(out: OutputStream) = withStreams(this, out) { i, o -> i.copyTo(o) }
+
+fun InputStream.writeTo(file: File) = copyAndClose(file.outputStream())
 
 operator fun <E> SparseArrayCompat<E>.set(key: Int, value: E) {
     put(key, value)
 }
 
-fun <T> MutableList<T>.synchronized() = Collections.synchronizedList(this)
-fun <T> MutableSet<T>.synchronized() = Collections.synchronizedSet(this)
-fun <K, V> MutableMap<K, V>.synchronized() = Collections.synchronizedMap(this)
+fun <T> MutableList<T>.synchronized(): MutableList<T> = Collections.synchronizedList(this)
+
+fun <T> MutableSet<T>.synchronized(): MutableSet<T> = Collections.synchronizedSet(this)
+
+fun <K, V> MutableMap<K, V>.synchronized(): MutableMap<K, V> = Collections.synchronizedMap(this)
 
 fun SimpleDateFormat.parseOrNull(date: String) =
     runCatching { parse(date) }.onFailure { Timber.e(it) }.getOrNull()

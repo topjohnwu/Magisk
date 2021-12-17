@@ -59,11 +59,12 @@ void magisk_cpio::patch() {
     }
 }
 
-#define STOCK_BOOT        0
 #define MAGISK_PATCHED    (1 << 0)
 #define UNSUPPORTED_CPIO  (1 << 1)
+#define SONY_INIT         (1 << 2)
 
 int magisk_cpio::test() {
+    int ret = 0;
     for (auto file : UNSUPPORT_LIST) {
         if (exists(file)) {
             return UNSUPPORTED_CPIO;
@@ -71,10 +72,13 @@ int magisk_cpio::test() {
     }
     for (auto file : MAGISK_LIST) {
         if (exists(file)) {
-            return MAGISK_PATCHED;
+            ret |= MAGISK_PATCHED;
+            break;
         }
     }
-    return STOCK_BOOT;
+    if (exists("init.real"))
+        ret |= SONY_INIT;
+    return ret;
 }
 
 #define for_each_line(line, buf, size) \

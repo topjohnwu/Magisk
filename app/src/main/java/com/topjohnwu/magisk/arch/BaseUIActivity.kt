@@ -17,14 +17,12 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ui.theme.Theme
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     BaseActivity(), BaseUIComponent<VM> {
 
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
-    protected open val themeRes: Int = Theme.selected.themeRes
 
     private val navHostFragment by lazy {
         supportFragmentManager.findFragmentById(navHostId) as? NavHostFragment
@@ -46,7 +44,6 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
 
-        setTheme(themeRes)
         super.onCreate(savedInstanceState)
 
         startObserveEvents()

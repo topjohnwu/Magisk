@@ -1,11 +1,9 @@
-
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
+import java.io.InputStream
 import java.io.PrintStream
 import java.security.SecureRandom
 import java.util.*
-import java.util.zip.GZIPOutputStream
 import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
@@ -54,7 +52,7 @@ private fun <T> chain(vararg iters: Iterable<T>) = sequence {
 private fun PrintStream.byteField(name: String, bytes: ByteArray) {
     println("public static byte[] $name() {")
     print("byte[] buf = {")
-    print(bytes.joinToString(",") { "(byte)(${it.toInt() and 0xff})" })
+    print(bytes.joinToString(",") { it.toString() })
     println("};")
     println("return buf;")
     println("}")
@@ -105,7 +103,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
 
     cmpList.add(Component(
         "com.topjohnwu.magisk.core.Provider",
-        "FileProvider",
+        "dummy.DummyProvider",
         """
         |<provider
         |    android:name="%s"
@@ -137,7 +135,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     ))
 
     cmpList.add(Component(
-        "com.topjohnwu.magisk.core.SplashActivity",
+        "com.topjohnwu.magisk.ui.MainActivity",
         "DownloadActivity",
         """
         |<activity
@@ -148,12 +146,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |        <category android:name="android.intent.category.LAUNCHER" />
         |    </intent-filter>
         |</activity>""".ind(2)
-    ))
-
-    cmpList.add(Component(
-        "com.topjohnwu.magisk.ui.MainActivity",
-        "",
-        """|<activity android:name="%s" />""".ind(2)
     ))
 
     cmpList.add(Component(
@@ -176,18 +168,19 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(Component(
         "com.topjohnwu.magisk.core.download.DownloadService",
         "",
-        """|<service android:name="%s" />""".ind(2)
+        """
+        |<service
+        |    android:name="%s"
+        |    android:exported="false" />""".trimIndent().ind(2)
     ))
 
     cmpList.add(Component(
-        "androidx.work.impl.background.systemjob.SystemJobService",
+        "com.topjohnwu.magisk.core.JobService",
         "",
         """
         |<service
         |    android:name="%s"
-        |    android:directBootAware="false"
-        |    android:enabled="true"
-        |    android:exported="true"
+        |    android:exported="false"
         |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
     ))
 
@@ -197,10 +190,8 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     names.addAll(c3.subList(0, 10))
     names.shuffle(RANDOM)
 
-    // Decapitalize as older Android versions do not allow capitalized package names
     // Distinct by lower case to support case insensitive file systems
-    val pkgNames = names.map { it.decapitalize(Locale.ROOT) }
-        .distinctBy { it.toLowerCase(Locale.ROOT) }
+    val pkgNames = names.distinctBy { it.toLowerCase(Locale.ROOT) }
 
     var idx = 0
     fun genCmpName() = "${pkgNames[idx++]}.${names.random(kRANDOM)}"
@@ -252,15 +243,8 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     return genXml
 }
 
-fun genEncryptedResources(res: File, outDir: File) {
+fun genEncryptedResources(res: InputStream, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
-    // Rename R.java
-    val r = File(mainPkgDir, "R.java").let {
-        val txt = it.readText()
-        it.delete()
-        txt
-    }
-    File(mainPkgDir, "R2.java").writeText(r.replace("class R", "class R2"))
 
     // Generate iv and key
     val iv = ByteArray(16)
@@ -272,9 +256,8 @@ fun genEncryptedResources(res: File, outDir: File) {
     cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(iv))
     val bos = ByteArrayOutputStream()
 
-    FileInputStream(res).use {
-        // First compress, then encrypt
-        GZIPOutputStream(CipherOutputStream(bos, cipher)).use { os ->
+    res.use {
+        CipherOutputStream(bos, cipher).use { os ->
             it.transferTo(os)
         }
     }

@@ -77,7 +77,7 @@ abstract class BaseViewModel(
         PermissionEvent(permission, callback).publish()
     }
 
-    fun withExternalRW(callback: () -> Unit) {
+    inline fun withExternalRW(crossinline callback: () -> Unit) {
         withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()

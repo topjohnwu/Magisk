@@ -22,7 +22,9 @@ toupper() {
 
 grep_cmdline() {
   local REGEX="s/^$1=//p"
-  cat /proc/cmdline | tr '[:space:]' '\n' | sed -n "$REGEX" 2>/dev/null
+  { echo $(cat /proc/cmdline)$(sed -e 's/[^"]//g' -e 's/""//g' /proc/cmdline) | xargs -n 1; \
+    sed -e 's/ = /=/g' -e 's/, /,/g' -e 's/"//g' /proc/bootconfig; \
+  } 2>/dev/null | sed -n "$REGEX"
 }
 
 grep_prop() {
@@ -72,17 +74,17 @@ resolve_vars() {
 }
 
 print_title() {
-  local len line1len line2len pounds
+  local len line1len line2len bar
   line1len=$(echo -n $1 | wc -c)
   line2len=$(echo -n $2 | wc -c)
   len=$line2len
   [ $line1len -gt $line2len ] && len=$line1len
   len=$((len + 2))
-  pounds=$(printf "%${len}s" | tr ' ' '*')
-  ui_print "$pounds"
+  bar=$(printf "%${len}s" | tr ' ' '*')
+  ui_print "$bar"
   ui_print " $1 "
   [ "$2" ] && ui_print " $2 "
-  ui_print "$pounds"
+  ui_print "$bar"
 }
 
 ######################
@@ -321,6 +323,9 @@ mount_apex() {
   local PATTERN='s/.*"name":[^"]*"\([^"]*\).*/\1/p'
   for APEX in /system/apex/*; do
     if [ -f $APEX ]; then
+      # handle CAPEX APKs, extract actual APEX APK first
+      unzip -qo $APEX original_apex -d /apex
+      [ -f /apex/original_apex ] && APEX=/apex/original_apex # unzip doesn't do return codes
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
       DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
@@ -333,7 +338,7 @@ mount_apex() {
         ui_print "- Mounting $DEST"
         mount -t ext4 -o ro,noatime $LOOPDEV $DEST
       fi
-      rm -f /apex/apex_payload.img
+      rm -f /apex/original_apex /apex/apex_payload.img
     elif [ -d $APEX ]; then
       # APEX folders, bind mount directory
       if [ -f $APEX/apex_manifest.json ]; then
@@ -377,6 +382,7 @@ get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
+  getvar PATCHVBMETAFLAG
   if [ -z $KEEPVERITY ]; then
     if $SYSTEM_ROOT; then
       KEEPVERITY=true
@@ -397,6 +403,7 @@ get_flags() {
       KEEPFORCEENCRYPT=false
     fi
   fi
+  [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
@@ -558,13 +565,13 @@ check_data() {
 
 find_magisk_apk() {
   local DBAPK
-  [ -z $APK ] && APK=/data/adb/magisk.apk
-  [ -f $APK ] || APK=/data/magisk/magisk.apk
+  [ -z $APK ] && APK=$NVBASE/magisk.apk
+  [ -f $APK ] || APK=$MAGISKBIN/magisk.apk
   [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk
   [ -f $APK ] || APK=/data/app/*/com.topjohnwu.magisk*/*.apk
   if [ ! -f $APK ]; then
     DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
-    [ -z $DBAPK ] && DBAPK=$(strings /data/adb/magisk.db | grep -oE 'requester..*' | cut -c10-)
+    [ -z $DBAPK ] && DBAPK=$(strings $NVBASE/magisk.db | grep -oE 'requester..*' | cut -c10-)
     [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk
     [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/*/$DBAPK*/*.apk
@@ -576,7 +583,7 @@ run_migrations() {
   local LOCSHA1
   local TARGET
   # Legacy app installation
-  local BACKUP=/data/adb/magisk/stock_boot*.gz
+  local BACKUP=$MAGISKBIN/stock_boot*.gz
   if [ -f $BACKUP ]; then
     cp $BACKUP /data
     rm -f $BACKUP
@@ -594,7 +601,7 @@ run_migrations() {
   # Stock backups
   LOCSHA1=$SHA1
   for name in boot dtb dtbo dtbs; do
-    BACKUP=/data/adb/magisk/stock_${name}.img
+    BACKUP=$MAGISKBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
       LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`
@@ -613,10 +620,12 @@ copy_sepolicy_rules() {
 
   # Find current active RULESDIR
   local RULESDIR
-  local active_dir=$(magisk --path)/.magisk/mirror/sepolicy.rules
-  if [ -L $active_dir ]; then
-    RULESDIR=$(readlink $active_dir)
+  local ACTIVEDIR=$(magisk --path)/.magisk/mirror/sepolicy.rules
+  if [ -L $ACTIVEDIR ]; then
+    RULESDIR=$(readlink $ACTIVEDIR)
     [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(magisk --path)/.magisk/mirror/$RULESDIR"
+  elif ! $ISENCRYPTED; then
+    RULESDIR=$NVBASE/modules
   elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
     RULESDIR=/data/unencrypted/magisk
   elif grep -q ' /cache ' /proc/mounts; then
@@ -640,7 +649,7 @@ copy_sepolicy_rules() {
   fi
 
   # Copy all enabled sepolicy.rule
-  for r in /data/adb/modules*/*/sepolicy.rule; do
+  for r in $NVBASE/modules*/*/sepolicy.rule; do
     [ -f "$r" ] || continue
     local MODDIR=${r%/*}
     [ -f $MODDIR/disable ] && continue
@@ -658,7 +667,7 @@ copy_sepolicy_rules() {
 set_perm() {
   chown $2:$3 $1 || return 1
   chmod $4 $1 || return 1
-  CON=$5
+  local CON=$5
   [ -z $CON ] && CON=u:object_r:system_file:s0
   chcon $CON $1 || return 1
 }
@@ -758,6 +767,10 @@ install_module() {
 
       # Default permissions
       set_perm_recursive $MODPATH 0 0 0755 0644
+      set_perm_recursive $MODPATH/system/bin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/xbin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/system_ext/bin 0 2000 0755 0755
+      set_perm_recursive $MODPATH/system/vendor/bin 0 2000 0755 0755 u:object_r:vendor_file:s0
     fi
 
     # Load customization script

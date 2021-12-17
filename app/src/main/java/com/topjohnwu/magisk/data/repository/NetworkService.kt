@@ -26,7 +26,7 @@ class NetworkService(
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
-        if (info.magisk.versionCode < Info.env.magiskVersionCode &&
+        if (info.magisk.versionCode < Info.env.versionCode &&
             Config.updateChannel == DEFAULT_CHANNEL
         ) {
             Config.updateChannel = BETA_CHANNEL

@@ -9,9 +9,6 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
-import android.content.pm.ServiceInfo
-import android.content.pm.ServiceInfo.FLAG_ISOLATED_PROCESS
-import android.content.pm.ServiceInfo.FLAG_USE_APP_ZYGOTE
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.database.Cursor
@@ -44,10 +41,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.AssetHack
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
@@ -57,11 +54,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.lang.reflect.Array as JArray
-
-val ServiceInfo.isIsolated get() = (flags and FLAG_ISOLATED_PROCESS) != 0
-
-@get:SuppressLint("InlinedApi")
-val ServiceInfo.useAppZygote get() = (flags and FLAG_USE_APP_ZYGOTE) != 0
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
@@ -350,7 +342,7 @@ var TextView.precomputedText: CharSequence
     }
 
 fun Int.dpInPx(): Int {
-    val scale = AssetHack.resource.displayMetrics.density
+    val scale = AppContext.resources.displayMetrics.density
     return (this * scale + 0.5).toInt()
 }
 

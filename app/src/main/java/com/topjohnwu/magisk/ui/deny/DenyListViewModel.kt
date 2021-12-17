@@ -1,45 +1,42 @@
 package com.topjohnwu.magisk.ui.deny
 
 import android.annotation.SuppressLint
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
-import android.os.Process
-import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.arch.Queryable
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import java.util.*
+import kotlin.collections.ArrayList
 
+@FlowPreview
 class DenyListViewModel : BaseViewModel(), Queryable {
 
-    override val queryDelay = 1000L
+    override val queryDelay = 0L
 
-    @get:Bindable
-    var isShowSystem = Config.showSystemApp
-        set(value) = set(value, field, { field = it }, BR.showSystem) {
-            Config.showSystemApp = it
+    var isShowSystem = false
+        set(value) {
+            field = value
             submitQuery()
         }
 
-    @get:Bindable
     var isShowOS = false
-        set(value) = set(value, field, { field = it }, BR.showOS) {
+        set(value) {
+            field = value
             submitQuery()
         }
 
-    @get:Bindable
     var query = ""
-        set(value) = set(value, field, { field = it }, BR.query) {
+        set(value) {
+            field = value
             submitQuery()
         }
 
@@ -60,36 +57,28 @@ class DenyListViewModel : BaseViewModel(), Queryable {
         state = State.LOADING
         val (apps, diff) = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
-            val hideList = Shell.su("magisk --denylist ls").exec().out.map { CmdlineListItem(it) }
-            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES)
-                .asSequence()
-                .filterNot { blacklist.contains(it.packageName) }
-                .map { AppProcessInfo(it, pm, hideList) }
-                .filter { it.processes.isNotEmpty() }
-                .filter { info -> info.enabled || info.processes.any { it.isEnabled } }
-                .map { DenyListRvItem(it) }
-                .toList()
-                .sorted()
+            val denyList = Shell.su("magisk --denylist ls").exec().out
+                .map { CmdlineListItem(it) }
+            val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).run {
+                asFlow()
+                    .filter { AppContext.packageName != it.packageName }
+                    .concurrentMap { AppProcessInfo(it, pm, denyList) }
+                    .filter { it.processes.isNotEmpty() }
+                    .concurrentMap { DenyListRvItem(it) }
+                    .toCollection(ArrayList(size))
+            }
+            apps.sort()
             apps to items.calculateDiff(apps)
         }
         items.update(apps, diff)
         submitQuery()
     }
 
-    // ---
-
     override fun query() {
         items.filter {
-            fun showHidden() = it.itemsChecked != 0
+            fun filterSystem() = isShowSystem || !it.info.isSystemApp()
 
-            fun filterSystem() = isShowSystem || it.info.flags and ApplicationInfo.FLAG_SYSTEM == 0
-
-            fun isApp(uid: Int) = run {
-                val appId: Int = uid % 100000
-                appId >= Process.FIRST_APPLICATION_UID && appId <= Process.LAST_APPLICATION_UID
-            }
-
-            fun filterOS() = (isShowSystem && isShowOS) || isApp(it.info.uid)
+            fun filterOS() = (isShowSystem && isShowOS) || it.info.isApp()
 
             fun filterQuery(): Boolean {
                 fun inName() = it.info.label.contains(query, true)
@@ -98,26 +87,8 @@ class DenyListViewModel : BaseViewModel(), Queryable {
                 return inName() || inPackage() || inProcesses()
             }
 
-            showHidden() || (filterSystem() && filterOS() && filterQuery())
+            (it.isChecked || (filterSystem() && filterOS())) && filterQuery()
         }
         state = State.LOADED
-    }
-
-    // ---
-
-    fun resetQuery() {
-        query = ""
-    }
-
-    companion object {
-        private val blacklist by lazy { listOf(
-            AppContext.packageName,
-            "com.android.chrome",
-            "com.chrome.beta",
-            "com.chrome.dev",
-            "com.chrome.canary",
-            "com.android.webview",
-            "com.google.android.webview"
-        ) }
     }
 }

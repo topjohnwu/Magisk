@@ -1,7 +1,5 @@
 #include <utils.hpp>
 
-#include "raw_data.hpp"
-
 using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 
 struct BootConfig {
@@ -28,6 +26,8 @@ struct fstab_entry {
     fstab_entry() = default;
     fstab_entry(const fstab_entry &) = delete;
     fstab_entry(fstab_entry &&) = default;
+    fstab_entry &operator=(const fstab_entry&) = delete;
+    fstab_entry &operator=(fstab_entry&&) = default;
     void to_file(FILE *fp);
 };
 
@@ -40,6 +40,7 @@ bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(BootConfig *config);
 bool check_two_stage();
 void setup_klog();
+const char *backup_init();
 
 /***************
  * Base classes

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="SplashTheme" parent="Theme.Splash" />
-
     <style name="Foundation" parent="Theme.Foundation" />
 
 </resources>

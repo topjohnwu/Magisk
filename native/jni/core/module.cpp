@@ -550,18 +550,21 @@ struct module_info {
 };
 
 static vector<module_info> *modules;
+int app_process_32 = -1;
+int app_process_64 = -1;
 
-#define mount_zygisk(bit) \
-if (access("/system/bin/app_process" #bit, F_OK) == 0) { \
-    string zbin = zygisk_bin + "/app_process" #bit;      \
-    string mbin = MAGISKTMP + "/magisk" #bit;            \
-    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);  \
-    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0); \
-    xsendfile(out, src, nullptr, INT_MAX);               \
-    close(src);           \
-    close(out);           \
-    clone_attr("/system/bin/app_process" #bit, zbin.data());    \
-    bind_mount(zbin.data(), "/system/bin/app_process" #bit);    \
+#define mount_zygisk(bit)                                                               \
+if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
+    app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
+    string zbin = zygisk_bin + "/app_process" #bit;                                     \
+    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
+    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
+    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
+    xsendfile(out, src, nullptr, INT_MAX);                                              \
+    close(src);                                                                         \
+    close(out);                                                                         \
+    clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
+    bind_mount(zbin.data(), "/system/bin/app_process" #bit);                            \
 }
 
 void magic_mount() {
@@ -700,11 +703,13 @@ static void collect_modules(bool open_zygisk) {
             return;
 
         module_info info;
-        if (zygisk_enabled) {
-            // Riru and its modules are not compatible with zygisk
-            if (entry->d_name == "riru-core"sv || faccessat(modfd, "riru", F_OK, 0) == 0)
-                return;
-            if (open_zygisk) {
+        if (open_zygisk) {
+            if (zygisk_enabled) {
+                // Riru and its modules are not compatible with zygisk
+                if (entry->d_name == "riru-core"sv || faccessat(modfd, "riru", F_OK, 0) == 0) {
+                    LOGI("%s: ignore\n", entry->d_name);
+                    return;
+                }
 #if defined(__arm__)
                 info.z32 = openat(modfd, "zygisk/armeabi-v7a.so", O_RDONLY | O_CLOEXEC);
 #elif defined(__aarch64__)
@@ -718,11 +723,42 @@ static void collect_modules(bool open_zygisk) {
 #else
 #error Unsupported ABI
 #endif
+            } else {
+                // Ignore zygisk modules when zygisk is not enabled
+                if (faccessat(modfd, "zygisk", F_OK, 0) == 0) {
+                    LOGI("%s: ignore\n", entry->d_name);
+                    return;
+                }
             }
         }
         info.name = entry->d_name;
         modules->push_back(info);
     });
+    if (open_zygisk && zygisk_enabled) {
+        bool use_memfd = true;
+        auto convert_to_memfd = [&](int fd) -> int {
+            if (fd < 0)
+                return -1;
+            if (use_memfd) {
+                int memfd = syscall(__NR_memfd_create, "jit-cache", MFD_CLOEXEC);
+                if (memfd >= 0) {
+                    xsendfile(memfd, fd, nullptr, INT_MAX);
+                    close(fd);
+                    return memfd;
+                } else {
+                    // memfd_create failed, just use what we had
+                    use_memfd = false;
+                }
+            }
+            return fd;
+        };
+        std::for_each(modules->begin(), modules->end(), [&](module_info &info) {
+            info.z32 = convert_to_memfd(info.z32);
+#if defined(__LP64__)
+            info.z64 = convert_to_memfd(info.z64);
+#endif
+        });
+    }
 }
 
 void handle_modules() {

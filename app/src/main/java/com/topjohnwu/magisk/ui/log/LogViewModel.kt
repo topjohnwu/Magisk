@@ -75,7 +75,7 @@ class LogViewModel(
                 FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
-                file.write("${Info.env.magiskVersionString} (${Info.env.magiskVersionCode})\n\n")
+                file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
                 file.write(consoleText)
 
                 file.write("\n---Manager Logs---\n")
