@@ -20,13 +20,13 @@ Download the [latest Magisk APK](https://github.com/topjohnwu/Magisk/releases) f
 
 Follow the steps below:
 
-1. **Does the Magisk app report that your device has ramdisk in the boot partition (`Ramdisk = Yes`)?**
-   - **Yes.** Continue to next question.
-   - **No.** Read the [Magisk in Recovery](#magisk-in-recovery) section before installing. The information in that section is VERY important!
-2. **Are you using a Huawei device?**
+1. **Are you using a Huawei device?**
    - **Yes.** Huawei devices are not supported. Sorry.
    - **No.** Continue to next question.
-4. **Are you using a Samsung device _and_ the Magisk app reports `SAR = Yes`?**
+2. **Does the Magisk app report that your device has ramdisk in the boot partition (`Ramdisk = Yes`)?**
+   - **Yes.** Continue to next question.
+   - **No.** Read the [Magisk in Recovery](#magisk-in-recovery) section before installing. The information in that section is VERY important!
+3. **Are you using a Samsung device _and_ the Magisk app reports `SAR = Yes`?**
    - **Yes.** Please read the section on [Samsung (System-as-root)](#samsung-system-as-root).
    - **No.** Continue to [Patching Images](#patching-images) section.
 
