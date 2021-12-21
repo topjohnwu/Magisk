@@ -30,6 +30,7 @@ BOOTIMAGE=<path to boot>
 # You only need to do this on system-as-root devices
 ./magiskboot hexpatch kernel \
 736B69705F696E697472616D6673 \
+Boot device's
 77616E745F696E697472616D6673
 
 # Repack the boot image
@@ -43,7 +44,8 @@ WIP
 
 ```
 # Currently not available
-```
+```boot recovery mod
+
 
 ## Emulators (Official AVB Only)
 The script `scripts/emulator.sh` allows you to establish a minimal Magisk environment within the official Android Virtual Device included along with Android Studio / SDK. Please check the comments in the script for further information.
