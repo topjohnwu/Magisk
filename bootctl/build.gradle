@@ -1,0 +1,29 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 31
+    ndkVersion "23.0.7599858"
+
+    defaultConfig {
+        minSdk 30
+        targetSdk 31
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++17'
+                arguments "-DANDROID_STL=none"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.18.1'
+        }
+    }
+}

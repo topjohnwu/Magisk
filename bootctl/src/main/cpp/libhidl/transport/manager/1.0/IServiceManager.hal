@@ -1,0 +1,164 @@
+/*
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hidl.manager@1.0;
+
+import IServiceNotification;
+import android.hidl.base@1.0::DebugInfo.Architecture;
+
+/**
+ * Manages all the hidl hals on a device.
+ *
+ * All examples in this file assume that there is one service registered with
+ * the service manager, "android.hidl.manager@1.0::IServiceManager/manager"
+ *
+ * Terminology:
+ *   Package: "android.hidl.manager"
+ *   Major version: "1"
+ *   Minor version: "0"
+ *   Version: "1.0"
+ *   Interface name: "IServiceManager"
+ *   Fully-qualified interface name: "android.hidl.manager@1.0::IServiceManager"
+ *   Instance name: "manager"
+ *   Fully-qualified instance name: "android.hidl.manager@1.0::IServiceManager/manager"
+ */
+interface IServiceManager {
+
+    /**
+     * Retrieve an existing service that supports the requested version.
+     *
+     * WARNING: This function is for libhidl/HwBinder use only. You are likely
+     * looking for 'IMyInterface::getService("name")' instead.
+     *
+     * @param fqName   Fully-qualified interface name.
+     * @param name     Instance name. Same as in IServiceManager::add.
+     *
+     * @return service Handle to requested service, same as provided in
+     *                 IServiceManager::add. Will be nullptr if not available.
+     */
+    get(string fqName, string name) generates (interface service);
+
+    /**
+     * Register a service. The service manager must retrieve the (inherited)
+     * interfaces that this service implements, and register them along with
+     * the service.
+     *
+     * Each interface must have its own namespace for instance names. If you
+     * have two unrelated interfaces IFoo and IBar, it must be valid to call:
+     *
+     * add("my_instance", foo); // foo implements IFoo
+     * add("my_instance", bar); // bar implements IBar
+     *
+     * WARNING: This function is for libhidl/HwBinder use only. You are likely
+     * looking for 'INTERFACE::registerAsService("name")' instead.
+     *
+     * @param name           Instance name. Must also be used to retrieve service.
+     * @param service        Handle to registering service.
+     *
+     * @return success       Whether or not the service was registered.
+     *
+     */
+    add(string name, interface service) generates (bool success);
+
+    enum Transport : uint8_t {
+        EMPTY,
+        HWBINDER,
+        PASSTHROUGH,
+    };
+
+    /**
+     * Get the transport of a service.
+     *
+     * @param fqName     Fully-qualified interface name.
+     * @param name       Instance name. Same as in IServiceManager::add
+     *
+     * @return transport Transport of service if known.
+     */
+    getTransport(string fqName, string name) generates (Transport transport);
+
+    /**
+     * List all registered services. Must be sorted.
+     *
+     * @return fqInstanceNames List of fully-qualified instance names.
+     */
+    list() generates (vec<string> fqInstanceNames);
+
+    /**
+     * List all instances of a particular service. Must be sorted.
+     *
+     * @param fqName         Fully-qualified interface name.
+     *
+     * @return instanceNames List of instance names running the particular service.
+     */
+    listByInterface(string fqName) generates (vec<string> instanceNames);
+
+    /**
+     * Register for service notifications for a particular service. Must support
+     * multiple registrations.
+     *
+     * onRegistration must be sent out for all services which support the
+     * version provided in the fqName. For instance, if a client registers for
+     * notifications from "android.hardware.foo@1.0", they must also get
+     * notifications from "android.hardware.foo@1.1". If a matching service
+     * is already registered, onRegistration must be sent out with preexisting
+     * = true.
+     *
+     * @param fqName   Fully-qualified interface name.
+     * @param name     Instance name. If name is empty, notifications must be
+     *                 sent out for all names.
+     * @param callback Client callback to recieve notifications.
+     *
+     * @return success Whether or not registration was successful.
+     */
+    registerForNotifications(string fqName,
+                             string name,
+                             IServiceNotification callback)
+        generates (bool success);
+
+    /**
+     * Special values for InstanceDebugInfo pids.
+     */
+    enum PidConstant : int32_t {
+        NO_PID = -1,
+    };
+
+    /**
+     * Returned object for debugDump().
+     */
+    struct InstanceDebugInfo {
+        string interfaceName;
+        string instanceName;
+        int32_t pid; // PidConstants:NO_PID if unavailable
+        vec<int32_t> clientPids;
+        Architecture arch;
+    };
+
+    /**
+     * Similar to list, but contains more information for each instance.
+     * @return info a vector where each item contains debug information for each
+     *         instance.
+     */
+    debugDump() generates (vec<InstanceDebugInfo> info);
+
+    /**
+     * When the passthrough service manager returns a service via
+     * get(string, string), it must dispatch a registerPassthroughClient call
+     * to the binderized service manager to indicate the current process has
+     * called get(). Binderized service manager must record this PID, which can
+     * be retrieved via debugDump.
+     */
+    registerPassthroughClient(string fqName, string name);
+};

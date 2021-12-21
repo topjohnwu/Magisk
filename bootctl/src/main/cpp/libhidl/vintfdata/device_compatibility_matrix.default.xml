@@ -1,0 +1,10 @@
+<compatibility-matrix version="1.0" type="device">
+    <hal format="hidl" optional="false">
+        <name>android.hidl.manager</name>
+        <version>1.0</version>
+        <interface>
+            <name>IServiceManager</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

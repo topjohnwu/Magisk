@@ -1,0 +1,39 @@
+@AUTO_GEN_COMMENT@
+config.cxx_under_test           = "@LIBCXX_COMPILER@"
+config.project_obj_root         = "@CMAKE_BINARY_DIR@"
+config.libcxx_src_root          = "@LIBCXX_SOURCE_DIR@"
+config.libcxx_obj_root          = "@LIBCXX_BINARY_DIR@"
+config.cxx_library_root         = "@LIBCXX_LIBRARY_DIR@"
+config.enable_exceptions        = "@LIBCXX_ENABLE_EXCEPTIONS@"
+config.enable_experimental      = "@LIBCXX_ENABLE_EXPERIMENTAL_LIBRARY@"
+config.enable_filesystem        = "@LIBCXX_ENABLE_FILESYSTEM@"
+config.enable_rtti              = "@LIBCXX_ENABLE_RTTI@"
+config.enable_shared            = "@LIBCXX_ENABLE_SHARED@"
+config.enable_32bit             = "@LIBCXX_BUILD_32_BITS@"
+config.cxx_abi                  = "@LIBCXX_CXX_ABI_LIBNAME@"
+config.use_sanitizer            = "@LLVM_USE_SANITIZER@"
+config.sanitizer_library        = "@LIBCXX_SANITIZER_LIBRARY@"
+config.abi_library_path         = "@LIBCXX_CXX_ABI_LIBRARY_PATH@"
+config.configuration_variant    = "@LIBCXX_LIT_VARIANT@"
+config.host_triple              = "@LLVM_HOST_TRIPLE@"
+config.target_triple            = "@TARGET_TRIPLE@"
+config.use_target               = len("@LIBCXX_TARGET_TRIPLE@") > 0
+config.sysroot                  = "@LIBCXX_SYSROOT@"
+config.gcc_toolchain            = "@LIBCXX_GCC_TOOLCHAIN@"
+config.generate_coverage        = "@LIBCXX_GENERATE_COVERAGE@"
+config.target_info              = "@LIBCXX_TARGET_INFO@"
+config.test_linker_flags        = "@LIBCXX_TEST_LINKER_FLAGS@"
+config.test_compiler_flags      = "@LIBCXX_TEST_COMPILER_FLAGS@"
+
+config.executor                 = "@LIBCXX_EXECUTOR@"
+config.llvm_unwinder            = "@LIBCXXABI_USE_LLVM_UNWINDER@"
+config.compiler_rt              = "@LIBCXX_USE_COMPILER_RT@"
+config.has_libatomic            = "@LIBCXX_HAS_ATOMIC_LIB@"
+config.use_libatomic            = "@LIBCXX_HAVE_CXX_ATOMICS_WITH_LIB@"
+config.debug_build              = "@LIBCXX_DEBUG_BUILD@"
+config.libcxxabi_shared         = "@LIBCXXABI_ENABLE_SHARED@"
+config.cxx_ext_threads          = "@LIBCXX_BUILD_EXTERNAL_THREAD_LIBRARY@"
+
+# Let the main config do the real work.
+config.loaded_site_config = True
+lit_config.load_config(config, "@LIBCXX_SOURCE_DIR@/test/lit.cfg")

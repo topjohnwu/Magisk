@@ -1,0 +1,102 @@
+{
+  "context": {
+    "date": "2016-08-02 17:44:46",
+    "num_cpus": 4,
+    "mhz_per_cpu": 4228,
+    "cpu_scaling_enabled": false,
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_SameTimes",
+      "iterations": 1000,
+      "real_time": 10,
+      "cpu_time": 10,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_2xFaster",
+      "iterations": 1000,
+      "real_time": 25,
+      "cpu_time": 25,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_2xSlower",
+      "iterations": 20833333,
+      "real_time": 100,
+      "cpu_time": 100,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_1PercentFaster",
+      "iterations": 1000,
+      "real_time": 98.9999999,
+      "cpu_time": 98.9999999,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_1PercentSlower",
+      "iterations": 1000,
+      "real_time": 100.9999999,
+      "cpu_time": 100.9999999,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_10PercentFaster",
+      "iterations": 1000,
+      "real_time": 90,
+      "cpu_time": 90,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_10PercentSlower",
+      "iterations": 1000,
+      "real_time": 110,
+      "cpu_time": 110,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_100xSlower",
+      "iterations": 1000,
+      "real_time": 1.0000e+04,
+      "cpu_time": 1.0000e+04,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_100xFaster",
+      "iterations": 1000,
+      "real_time": 100,
+      "cpu_time": 100,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_10PercentCPUToTime",
+      "iterations": 1000,
+      "real_time": 110,
+      "cpu_time": 90,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_ThirdFaster",
+      "iterations": 1000,
+      "real_time": 66.665,
+      "cpu_time": 66.664,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_BadTimeUnit",
+      "iterations": 1000,
+      "real_time": 0.04,
+      "cpu_time": 0.6,
+      "time_unit": "s"
+    },
+    {
+      "name": "BM_DifferentTimeUnit",
+      "iterations": 1,
+      "real_time": 1,
+      "cpu_time": 1,
+      "time_unit": "ns"
+    }
+  ]
+}

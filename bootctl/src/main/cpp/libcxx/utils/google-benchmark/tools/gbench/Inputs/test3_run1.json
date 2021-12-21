@@ -1,0 +1,65 @@
+{
+  "context": {
+    "date": "2016-08-02 17:44:46",
+    "num_cpus": 4,
+    "mhz_per_cpu": 4228,
+    "cpu_scaling_enabled": false,
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_One",
+      "iterations": 1000,
+      "real_time": 9,
+      "cpu_time": 110,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_Two",
+      "run_type": "aggregate",
+      "iterations": 1000,
+      "real_time": 10,
+      "cpu_time": 89,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_Two",
+      "iterations": 1000,
+      "real_time": 7,
+      "cpu_time": 72,
+      "time_unit": "ns"
+    },
+    {
+      "name": "short",
+      "run_type": "aggregate",
+      "iterations": 1000,
+      "real_time": 7,
+      "cpu_time": 75,
+      "time_unit": "ns"
+    },
+    {
+      "name": "short",
+      "run_type": "aggregate",
+      "iterations": 762,
+      "real_time": 4.54,
+      "cpu_time": 66.6,
+      "time_unit": "ns"
+    },
+    {
+      "name": "short",
+      "run_type": "iteration",
+      "iterations": 1000,
+      "real_time": 800,
+      "cpu_time": 1,
+      "time_unit": "ns"
+    },
+    {
+      "name": "medium",
+      "run_type": "iteration",
+      "iterations": 1200,
+      "real_time": 5,
+      "cpu_time": 53,
+      "time_unit": "ns"
+    }
+  ]
+}

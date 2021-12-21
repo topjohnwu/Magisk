@@ -1,0 +1,30 @@
+// TODO(b/110363419): remove or make failures harder
+// Deprecated: most minijail users should either use libavservices_minijail
+// or reinstitute this (w/ fatal checks).
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "system_libhidl_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["system_libhidl_license"],
+}
+
+cc_library_shared {
+    name: "libhwminijail",
+    defaults: ["hidl_defaults"],
+    vendor: true,
+    export_include_dirs: ["include"],
+
+    srcs: ["HardwareMinijail.cpp"],
+
+    shared_libs: [
+        "libbase",
+        "libminijail",
+    ],
+    visibility: [
+        ":__subpackages__",
+        "//hardware/interfaces/configstore/1.1/default",
+        "//vendor:__subpackages__",
+    ],
+}

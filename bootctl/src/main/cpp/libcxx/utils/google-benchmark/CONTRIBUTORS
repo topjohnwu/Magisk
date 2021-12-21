@@ -1,0 +1,68 @@
+# People who have agreed to one of the CLAs and can contribute patches.
+# The AUTHORS file lists the copyright holders; this file
+# lists people.  For example, Google employees are listed here
+# but not in AUTHORS, because Google holds the copyright.
+#
+# Names should be added to this file only after verifying that
+# the individual or the individual's organization has agreed to
+# the appropriate Contributor License Agreement, found here:
+#
+# https://developers.google.com/open-source/cla/individual
+# https://developers.google.com/open-source/cla/corporate
+#
+# The agreement for individuals can be filled out on the web.
+#
+# When adding J Random Contributor's name to this file,
+# either J's name or J's organization's name should be
+# added to the AUTHORS file, depending on whether the
+# individual or corporate CLA was used.
+#
+# Names should be added to this file as:
+#     Name <email address>
+#
+# Please keep the list sorted.
+
+Albert Pretorius <pretoalb@gmail.com>
+Arne Beer <arne@twobeer.de>
+Billy Robert O'Neal III <billy.oneal@gmail.com> <bion@microsoft.com>
+Chris Kennelly <ckennelly@google.com> <ckennelly@ckennelly.com>
+Christopher Seymour <chris.j.seymour@hotmail.com>
+Cyrille Faucheux <cyrille.faucheux@gmail.com>
+David Coeurjolly <david.coeurjolly@liris.cnrs.fr>
+Deniz Evrenci <denizevrenci@gmail.com>
+Dominic Hamon <dma@stripysock.com> <dominic@google.com>
+Dominik Czarnota <dominik.b.czarnota@gmail.com>
+Eric Fiselier <eric@efcs.ca>
+Eugene Zhuk <eugene.zhuk@gmail.com>
+Evgeny Safronov <division494@gmail.com>
+Federico Ficarelli <federico.ficarelli@gmail.com>
+Felix Homann <linuxaudio@showlabor.de>
+Ismael Jimenez Martinez <ismael.jimenez.martinez@gmail.com>
+Jern-Kuan Leong <jernkuan@gmail.com>
+JianXiong Zhou <zhoujianxiong2@gmail.com>
+Joao Paulo Magalhaes <joaoppmagalhaes@gmail.com>
+John Millikin <jmillikin@stripe.com>
+Jussi Knuuttila <jussi.knuuttila@gmail.com>
+Kai Wolf <kai.wolf@gmail.com>
+Kishan Kumar <kumar.kishan@outlook.com>
+Kaito Udagawa <umireon@gmail.com>
+Lei Xu <eddyxu@gmail.com>
+Matt Clarkson <mattyclarkson@gmail.com>
+Maxim Vafin <maxvafin@gmail.com>
+Nick Hutchinson <nshutchinson@gmail.com>
+Oleksandr Sochka <sasha.sochka@gmail.com>
+Ori Livneh <ori.livneh@gmail.com>
+Pascal Leroy <phl@google.com>
+Paul Redmond <paul.redmond@gmail.com>
+Pierre Phaneuf <pphaneuf@google.com>
+Radoslav Yovchev <radoslav.tm@gmail.com>
+Raul Marin <rmrodriguez@cartodb.com>
+Ray Glover <ray.glover@uk.ibm.com>
+Robert Guo <robert.guo@mongodb.com>
+Roman Lebedev <lebedev.ri@gmail.com>
+Shuo Chen <chenshuo@chenshuo.com>
+Tobias Ulvgård <tobias.ulvgard@dirac.se>
+Tom Madams <tom.ej.madams@gmail.com> <tmadams@google.com>
+Yixuan Qiu <yixuanq@gmail.com>
+Yusuke Suzuki <utatane.tea@gmail.com>
+Zbigniew Skowron <zbychs@gmail.com>

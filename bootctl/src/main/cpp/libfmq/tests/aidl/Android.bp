@@ -1,0 +1,29 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+aidl_interface {
+    name: "android.fmq.test",
+    host_supported: true,
+    vendor_available: true,
+    unstable: true,
+    srcs: [
+        "android/fmq/test/*.aidl",
+    ],
+    imports: [
+        "android.hardware.common-V2",
+        "android.hardware.common.fmq-V1",
+    ],
+    gen_trace: true,
+    backend: {
+        java: {
+            enabled: false,
+        },
+        ndk: {
+            enabled: true,
+        },
+        cpp: {
+            enabled: false,
+        }
+    },
+}

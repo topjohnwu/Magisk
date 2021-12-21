@@ -1,0 +1,40 @@
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hidl.manager@1.1;
+
+import @1.0::IServiceManager;
+import @1.0::IServiceNotification;
+
+interface IServiceManager extends @1.0::IServiceManager {
+
+    /**
+     * Unregister for service notifications for a specific callback.
+     *
+     * @param fqName   Fully-qualified interface name. If empty, unregister for
+     *                 all notifications the callback receives.
+     * @param name     Instance name. If name is empty, unregister for all instance
+     *                 names.
+     * @param callback Client callback that was previously registered.
+     *
+     * @return success Whether or not deregistration was successful.
+     */
+    unregisterForNotifications(string fqName,
+                               string name,
+                               IServiceNotification callback)
+                    generates (bool success);
+
+};

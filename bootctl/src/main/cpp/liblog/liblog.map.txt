@@ -1,0 +1,93 @@
+LIBLOG {
+  global:
+    android_name_to_log_id; # apex llndk
+    android_log_id_to_name; # llndk
+    __android_log_assert;
+    __android_log_buf_print;
+    __android_log_buf_write;
+    __android_log_print;
+    __android_log_vprint;
+    __android_log_write;
+  local:
+    *;
+};
+
+LIBLOG_L {
+  global:
+    android_logger_clear; # llndk
+    android_logger_get_id; # llndk
+    android_logger_get_log_readable_size; # llndk
+    android_logger_get_log_version; # llndk
+    android_logger_get_log_size; # llndk
+    android_logger_list_alloc; # apex llndk
+    android_logger_list_alloc_time; # apex llndk
+    android_logger_list_free; # apex llndk
+    android_logger_list_open; # apex llndk
+    android_logger_list_read; # apex llndk
+    android_logger_open; # apex llndk
+    android_logger_set_log_size; # llndk
+};
+
+LIBLOG_M {
+  global:
+    android_logger_get_prune_list; # llndk
+    android_logger_set_prune_list; # llndk
+    android_logger_get_statistics; # llndk
+    __android_log_error_write; # apex llndk
+    __android_log_is_loggable;
+    create_android_logger; # apex llndk
+    android_log_destroy; # apex llndk
+    android_log_write_list_begin; # apex llndk
+    android_log_write_list_end; # apex llndk
+    android_log_write_int32; # apex llndk
+    android_log_write_int64; # apex llndk
+    android_log_write_string8; # apex llndk
+    android_log_write_string8_len; # apex llndk
+    android_log_write_float32; # apex llndk
+    android_log_write_list; # apex llndk
+
+};
+
+LIBLOG_O {
+  global:
+    __android_log_is_loggable_len;
+    __android_log_is_debuggable; # apex llndk
+};
+
+LIBLOG_Q { # introduced=29
+  global:
+    __android_log_bswrite; # apex
+    __android_log_btwrite; # apex
+    __android_log_bwrite; # apex
+    __android_log_close; # apex
+    __android_log_security; # apex
+    android_log_reset; # llndk
+    android_log_parser_reset; # llndk
+};
+
+LIBLOG_R { # introduced=30
+  global:
+    __android_log_call_aborter;
+    __android_log_default_aborter;
+    __android_log_get_minimum_priority;
+    __android_log_logd_logger;
+    __android_log_security_bswrite; # apex
+    __android_log_set_aborter;
+    __android_log_set_default_tag;
+    __android_log_set_logger;
+    __android_log_set_minimum_priority;
+    __android_log_stderr_logger;
+    __android_log_write_log_message;
+};
+
+LIBLOG_PRIVATE {
+  global:
+    __android_log_pmsg_file_read;
+    __android_log_pmsg_file_write;
+    android_openEventTagMap;
+    android_log_processBinaryLogBuffer;
+    android_log_processLogBuffer;
+    android_log_read_next;
+    android_log_write_list_buffer;
+    create_android_log_parser;
+};

@@ -1,0 +1,37 @@
+# The entries in this file map a sparse set of log tag numbers to tag names.
+# This is installed on the device, in /system/etc, and parsed by logcat.
+#
+# Tag numbers are decimal integers, from 0 to 2^31.  (Let's leave the
+# negative values alone for now.)
+#
+# Tag names are one or more ASCII letters and numbers or underscores, i.e.
+# "[A-Z][a-z][0-9]_".  Do not include spaces or punctuation (the former
+# impacts log readability, the latter makes regex searches more annoying).
+#
+# Tag numbers and names are separated by whitespace.  Blank lines and lines
+# starting with '#' are ignored.
+#
+# Optionally, after the tag names can be put a description for the value(s)
+# of the tag. Description are in the format
+#    (<name>|data type[|data unit])
+# Multiple values are separated by commas.
+#
+# The data type is a number from the following values:
+# 1: int
+# 2: long
+# 3: string
+# 4: list
+#
+# The data unit is a number taken from the following list:
+# 1: Number of objects
+# 2: Number of bytes
+# 3: Number of milliseconds
+# 4: Number of allocations
+# 5: Id
+# 6: Percent
+# s: Number of seconds (monotonic time)
+# Default value for data of type int/long is 2 (bytes).
+#
+# TODO: generate ".java" and ".h" files with integer constants from this file.
+
+1006  liblog (dropped|1)

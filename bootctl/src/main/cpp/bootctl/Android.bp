@@ -1,0 +1,36 @@
+// Copyright 2015 The Android Open Source Project
+
+package {
+    default_applicable_licenses: ["system_extras_bootctl_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_extras_bootctl_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_binary {
+    name: "bootctl",
+    srcs: ["bootctl.cpp"],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+
+    shared_libs: [
+        "android.hardware.boot@1.0",
+        "android.hardware.boot@1.1",
+        "android.hardware.boot@1.2",
+        "libhidlbase",
+        "libutils",
+    ],
+}

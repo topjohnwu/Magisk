@@ -1,0 +1,127 @@
+#!/bin/sh
+# //===--------------------------- testit ---------------------------------===//
+# //
+# //                     The LLVM Compiler Infrastructure
+# //
+# // This file is distributed under the University of Illinois Open Source
+# // License. See LICENSE.TXT for details.
+# //
+# //===--------------------------------------------------------------------===//
+
+if [ -z "$CC" ]
+then
+	CC=clang++
+fi
+
+if [ -z "$OPTIONS" ]
+then
+	OPTIONS="-std=c++0x -stdlib=libc++"
+fi
+
+case $TRIPLE in
+  *-*-mingw* | *-*-cygwin* | *-*-win*)
+	TEST_EXE=test.exe
+    ;;
+  *)
+    TEST_EXE=a.out
+    ;;
+esac
+
+FAIL=0
+PASS=0
+UNIMPLEMENTED=0
+IMPLEMENTED_FAIL=0
+IMPLEMENTED_PASS=0
+
+afunc()
+{
+	fail=0
+	pass=0
+	if (ls *.fail.cpp > /dev/null 2>&1)
+	then
+		for FILE in $(ls *.fail.cpp); do
+			if $CC $OPTIONS $HEADER_INCLUDE $SOURCE_LIB $FILE $LIBS -o ./$TEST_EXE > /dev/null 2>&1
+			then
+				rm ./$TEST_EXE
+				echo "$FILE should not compile"
+				fail=$(($fail + 1))
+			else
+				pass=$(($pass + 1))
+			fi
+		done
+	fi
+
+	if (ls *.cpp > /dev/null 2>&1)
+	then
+		for FILE in $(ls *.pass.cpp); do
+			if $CC $OPTIONS $HEADER_INCLUDE $SOURCE_LIB $FILE $LIBS -o ./$TEST_EXE
+			then
+				if ./$TEST_EXE
+				then
+					rm ./$TEST_EXE
+					pass=$(($pass + 1))
+				else
+					echo "$FILE failed at run time"
+					fail=$(($fail + 1))
+					rm ./$TEST_EXE
+				fi
+			else
+				echo "$FILE failed to compile"
+				fail=$(($fail + 1))
+			fi
+		done
+	fi
+
+	if [ $fail -gt 0 ]
+	then
+		echo "failed $fail tests in `pwd`"
+		IMPLEMENTED_FAIL=$(($IMPLEMENTED_FAIL + 1))
+	fi
+	if [ $pass -gt 0 ]
+	then
+		echo "passed $pass tests in `pwd`"
+		if [ $fail -eq 0 ]
+		then
+			IMPLEMENTED_PASS=$(($IMPLEMENTED_PASS + 1))
+		fi
+	fi
+	if [ $fail -eq 0 -a $pass -eq 0 ]
+	then
+		echo "not implemented:  `pwd`"
+		UNIMPLEMENTED=$(($UNIMPLEMENTED + 1))
+	fi
+
+	FAIL=$(($FAIL + $fail))
+	PASS=$(($PASS + $pass))
+
+	for FILE in *
+	do
+		if [ -d "$FILE" ];
+		then
+			cd $FILE
+			afunc
+			cd ..
+		fi
+	done
+}
+
+afunc
+
+echo "****************************************************"
+echo "Results for `pwd`:"
+echo "using `$CC --version`"
+echo "with $OPTIONS $HEADER_INCLUDE $SOURCE_LIB"
+echo "----------------------------------------------------"
+echo "sections without tests   : $UNIMPLEMENTED"
+echo "sections with failures   : $IMPLEMENTED_FAIL"
+echo "sections without failures: $IMPLEMENTED_PASS"
+echo "                       +   ----"
+echo "total number of sections : $(($UNIMPLEMENTED+$IMPLEMENTED_FAIL+$IMPLEMENTED_PASS))"
+echo "----------------------------------------------------"
+echo "number of tests failed   : $FAIL"
+echo "number of tests passed   : $PASS"
+echo "                       +   ----"
+echo "total number of tests    : $(($FAIL+$PASS))"
+echo "****************************************************"
+
+exit $FAIL

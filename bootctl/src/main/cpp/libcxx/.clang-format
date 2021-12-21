@@ -1,0 +1,13 @@
+BasedOnStyle: LLVM
+
+---
+Language: Cpp
+Standard: Cpp03
+
+AlwaysBreakTemplateDeclarations: true
+PointerAlignment: Left
+
+# Disable formatting options which may break tests.
+SortIncludes: false
+ReflowComments: false
+---

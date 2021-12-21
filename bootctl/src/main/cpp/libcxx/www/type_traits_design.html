@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>type traits intrinsic design</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>Type traits intrinsic design</h1>
+  <!--*********************************************************************-->
+
+<p>
+This is a survey of the type traits intrinsics clang has, and those needed.
+The names and definitions of several of the needed type traits has recently
+changed.  Please see:
+<a href="https://wg21.link/n3142">N3142</a>.
+</p>
+
+<blockquote>
+<table border="1">
+<caption>Legend</caption>
+
+<tr>
+<td>clang supplies it and it is absolutely necessary</td>
+<td bgcolor="#80FF80"><tt>some_trait(T)</tt></td>
+</tr>
+
+<tr>
+<td>clang supplies it and it is useful</td>
+<td bgcolor="#96B9FF"><tt>some_trait(T)</tt></td>
+</tr>
+
+<tr>
+<td>clang supplies it and it is not needed</td>
+<td><tt>some_trait(T)</tt></td>
+</tr>
+
+<tr>
+<td>clang does not supply it and it is not needed</td>
+<td></td>
+</tr>
+
+<tr>
+<td>clang does not supply it and it is absolutely necessary</td>
+<td bgcolor="#FF5965"><tt>some_trait(T)</tt></td>
+</tr>
+
+</table>
+
+<p></p>
+
+<table border="1">
+<caption>Needed type traits vs clang type traits</caption>
+
+<tr>
+<th>libc++ Needs</th>
+<th>clang Has</th>
+</tr>
+
+<tr>
+<td><tt>is_union&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_union(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_class&lt;T&gt;</tt></td>
+<td bgcolor="#96B9FF"><tt>__is_class(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_enum&lt;T&gt;</tt></td>
+<td bgcolor="#96B9FF"><tt>__is_enum(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_pod&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_pod(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>has_virtual_destructor&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__has_virtual_destructor(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_constructible&lt;T, Args...&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_default_constructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_copy_constructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_move_constructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_assignable&lt;T, U&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_copy_assignable&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_move_assignable&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_destructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_constructible&lt;T, Args...&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_trivially_constructible(T, U)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_default_constructible&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__has_trivial_constructor(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_copy_constructible&lt;T&gt;</tt></td>
+<td><tt>__has_trivial_copy(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_move_constructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_assignable&lt;T, U&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_trivially_assignable(T, U)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_copy_assignable&lt;T&gt;</tt></td>
+<td><tt>__has_trivial_assign(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_move_assignable&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_destructible&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__has_trivial_destructor(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_constructible&lt;T, Args...&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_default_constructible&lt;T&gt;</tt></td>
+<td><tt>__has_nothrow_constructor(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_copy_constructible&lt;T&gt;</tt></td>
+<td><tt>__has_nothrow_copy(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_move_constructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_assignable&lt;T, U&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_copy_assignable&lt;T&gt;</tt></td>
+<td><tt>__has_nothrow_assign(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_move_assignable&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_nothrow_destructible&lt;T&gt;</tt></td>
+<td></td>
+</tr>
+
+<tr>
+<td><tt>is_trivial&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_trivial(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_trivially_copyable&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_trivially_copyable(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_standard_layout&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_standard_layout(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_literal_type&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_literal_type(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_convertible&lt;T, U&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_convertible_to(T, U)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_base_of&lt;T, U&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__is_base_of(T, U)</tt></td>
+</tr>
+
+<tr>
+<td><tt>underlying_type&lt;T&gt;</tt></td>
+<td bgcolor="#80FF80"><tt>__underlying_type(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_polymorphic&lt;T&gt;</tt></td>
+<td><tt>__is_polymorphic(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_empty&lt;T&gt;</tt></td>
+<td><tt>__is_empty(T)</tt></td>
+</tr>
+
+<tr>
+<td><tt>is_abstract&lt;T&gt;</tt></td>
+<td><tt>__is_abstract(T)</tt></td>
+</tr>
+
+</table>
+</blockquote>
+
+</div>
+</body>
+</html>

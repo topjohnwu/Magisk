@@ -1,0 +1,105 @@
+/*
+ * Copyright (C) 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hidl.manager@1.2;
+
+import @1.1::IServiceManager;
+
+import IClientCallback;
+
+interface IServiceManager extends @1.1::IServiceManager {
+    /**
+     * Adds a callback that must be called when the specified server has no clients.
+     *
+     * If the service has clients at the time of registration, the callback is called with
+     * hasClients true. After that, it is called based on the changes in clientele.
+     *
+     * @param fqName Fully-qualified interface name (used to register)
+     * @param name Instance name (of the registered service)
+     * @param server non-null service waiting to have no clients (previously registered)
+     * @param cb non-null callback to call when there are no clients
+     * @return success
+     *     true on success
+     *     false if either
+     *      - the server or cb parameters are null
+     *      - this is called by a process other than the server process
+     */
+    registerClientCallback(string fqName,
+                           string name,
+                           interface server,
+                           IClientCallback cb)
+        generates (bool success);
+
+    /**
+     * Removes a callback previously registered with registerClientCallback.
+     *
+     * If server is null, then this must remove the cb from all matching services.
+     *
+     * @param server service registered with registerClientCallback
+     * @param cb non-null callback to remove
+     * @return success
+     *     true if the server(s) have been removed
+     *     false if cb is null or if the client callback or server could not be found
+     */
+    unregisterClientCallback(interface server, IClientCallback cb) generates (bool success);
+
+    /**
+     * Exactly the same as @1.0::IServiceManager.add, but the interfaceChain of the service is
+     * provided in the same call.
+     *
+     * @param name Instance name. Must also be used to retrieve service.
+     * @param service Handle to registering service.
+     * @param chain service->interfaceChain
+     *
+     * @return success Whether or not the service was registered.
+     */
+    addWithChain(string name, interface service, vec<string> chain) generates (bool success);
+
+    /**
+     * List all instances of a particular service from the manifest. Must be sorted. These HALs
+     * may not be started if they are lazy.
+     *
+     * See also @1.0::IServiceManager's listByInterface function.
+     *
+     * @param fqName Fully-qualified interface name.
+     *
+     * @return instanceNames List of instance names running the particular service.
+     */
+    listManifestByInterface(string fqName) generates (vec<string> instanceNames);
+
+    /**
+     * Unregisters a service if there are no clients for it. This must only unregister the
+     * service if it is called from the same process that registered the service.
+     *
+     * This unregisters all instances of the service, even if they are under a different instance
+     * name.
+     *
+     * Recommended usage is when creating a lazy process, try unregistering when IClientCallback's
+     * onClients(*, false) is called. If this unregister is successful, then it is safe to exit. If
+     * it is unsuccessful, then you can assume a client re-associated with the server. If a process
+     * has multiple servers, and only some succeed in unregistration, then the unregistered services
+     * can be re-registered.
+     *
+     * See also addWithChain and @1.0::IServiceManager's add.
+     *
+     * @param fqName Fully-qualified interface name.
+     * @param name Instance name.
+     * @param service Handle to registering service.
+     *
+     * @return success Whether the service was successfully unregistered.
+     */
+    tryUnregister(string fqName, string name, interface service) generates (bool success);
+};

@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>libc++ C++14 Status</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>libc++ C++14 Status</h1>
+  <!--*********************************************************************-->
+
+  <p>In April 2013, the C++ standard committee approved the draft for the next version of the C++ standard, initially known as "C++1y".</p>
+  <p>The draft standard includes papers and issues that were voted on at the previous three meetings (Kona, Portland, and Bristol)</p>
+  <p>In August 2014, this draft was approved by ISO as C++14</p>
+  <p>This page shows the status of libc++; the status of clang's support of the language features is <a href="https://clang.llvm.org/cxx_status.html#cxx14">here</a>.</p>
+
+  <p>The groups that have contributed papers:
+  <ul>
+    <li>CWG - Core Language Working group</li>
+    <li>LWG - Library working group</li>
+    <li>SG1 - Study group #1 (Concurrency working group)</li>
+  </ul>
+  </p>
+
+  <h3>Paper Status</h3>
+  <table id="papers" border="1">
+	<tr><th>Paper #</th><th>Group</th><th>Paper Name</th><th>Meeting</th><th>Status</th><th>First released version</th></tr>
+
+	<tr><td><a href="https://wg21.link/n3346">3346</a></td><td>LWG</td><td>Terminology for Container Element Requirements - Rev 1</td><td>Kona</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+<!-- 	<tr><td>3323</td><td>CWG</td><td>A Proposal to Tweak Certain C++ Contextual Conversions, v3</td><td>Portland</td><td></td><td></td></tr> -->
+
+	<tr><td><a href="https://wg21.link/n3421">3421</a></td><td>LWG</td><td>Making Operator Functors greater&lt;&gt;</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3462">3462</a></td><td>LWG</td><td>std::result_of and SFINAE</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3469">3469</a></td><td>LWG</td><td>Constexpr Library Additions: chrono, v3</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3470">3470</a></td><td>LWG</td><td>Constexpr Library Additions: containers, v2</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3471">3471</a></td><td>LWG</td><td>Constexpr Library Additions: utilities, v3</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3302">3302</a></td><td>LWG</td><td>Constexpr Library Additions: complex, v2</td><td>Portland</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+<!-- 	<tr><td>3472</td><td>CWG</td><td>Binary Literals in the C++ Core Language</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3624</td><td>CWG</td><td>Core Issue 1512: Pointer comparison vs qualification conversions (revision 3)</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3639</td><td>CWG</td><td>Runtime-sized arrays with automatic storage duration (revision 5)</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3638</td><td>CWG</td><td>Return type deduction for normal functions</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3648</td><td>CWG</td><td>Wording Changes for Generalized Lambda-capture</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3653</td><td>CWG</td><td>Member initializers and aggregates</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3667</td><td>CWG</td><td>Drafting for Core 1402</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3652</td><td>CWG</td><td>Relaxing constraints on constexpr functions" and "constexpr member functions and implicit const</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3664</td><td>CWG</td><td>Clarifying Memory Allocation</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3651</td><td>CWG</td><td>Variable Templates (Revision 1)</td><td>Bristol</td><td></td><td></td></tr> -->
+<!-- 	<tr><td>3649</td><td>CWG</td><td>Generic (Polymorphic) Lambda Expressions (Revision 3)</td><td>Bristol</td><td></td><td></td></tr> -->
+
+	<tr><td><a href="https://wg21.link/n3545">3545</a></td><td>LWG</td><td>An Incremental Improvement to integral_constant</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3644">3644</a></td><td>LWG</td><td>Null Forward Iterators</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3668">3668</a></td><td>LWG</td><td>std::exchange()</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3658">3658</a></td><td>LWG</td><td>Compile-time integer sequences</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3670">3670</a></td><td>LWG</td><td>Addressing Tuples by Type</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3671">3671</a></td><td>LWG</td><td>Making non-modifying sequence operations more robust</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3656">3656</a></td><td>LWG</td><td>make_unique</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3654">3654</a></td><td>LWG</td><td>Quoted Strings</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3642">3642</a></td><td>LWG</td><td>User-defined Literals</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3655">3655</a></td><td>LWG</td><td>TransformationTraits Redux (excluding part 4)</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3657">3657</a></td><td>LWG</td><td>Adding heterogeneous comparison lookup to associative containers</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3672">3672</a></td><td>LWG</td><td>A proposal to add a utility class to represent optional objects</td><td>Bristol</td><td><I>Removed from Draft Standard</I></td><td>n/a</td></tr>
+	<tr><td><a href="https://wg21.link/n3669">3669</a></td><td>LWG</td><td>Fixing constexpr member functions without const</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3662">3662</a></td><td>LWG</td><td>C++ Dynamic Arrays (dynarray)</td><td>Bristol</td><td><I>Removed from Draft Standard</I></td><td>n/a</td></tr>
+
+	<tr><td><a href="https://wg21.link/n3659">3659</a></td><td>SG1</td><td>Shared Locking in C++</td><td>Bristol</td><td>Complete</td><td>3.4</td></tr>
+
+ 	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/n3779">3779</a></td><td>LWG</td><td>User-defined Literals for std::complex</td><td>Chicago</td><td>Complete</td><td>3.4</td></tr>
+	<tr><td><a href="https://wg21.link/n3789">3789</a></td><td>LWG</td><td>Constexpr Library Additions: functional</td><td>Chicago</td><td>Complete</td><td>3.4</td></tr>
+ 	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+	<tr><td><a href="https://wg21.link/n3924">3924</a></td><td>LWG</td><td>Discouraging rand() in C++14</td><td>Issaquah</td><td>Complete</td><td>3.5</td></tr>
+	<tr><td><a href="https://wg21.link/n3887">3887</a></td><td>LWG</td><td>Consistent Metafunction Aliases</td><td>Issaquah</td><td>Complete</td><td>3.5</td></tr>
+	<tr><td><a href="https://wg21.link/n3891">3891</a></td><td>SG1</td><td>A proposal to rename shared_mutex to shared_timed_mutex</td><td>Issaquah</td><td>Complete</td><td>3.5</td></tr>
+
+<!--  	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr> -->
+  </table>
+
+  <h3>Library Working group Issues Status</h3>
+<!--   <I>Note: "NAD" means that the issue was deemed "Not a defect"</I> -->
+  <table id="issues" border="1">
+	<tr><th>Issue #</th><th>Issue Name</th><th>Meeting</th><th>Status</th></tr>
+	<tr><td><a href="https://wg21.link/lwg1214">1214</a></td><td>Insufficient/inconsistent key immutability requirements for associative containers</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2009">2009</a></td><td>Reporting out-of-bound values on numeric string conversions</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2010">2010</a></td><td>is_* traits for binding operations can't be meaningfully specialized</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2015">2015</a></td><td>Incorrect pre-conditions for some type traits</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2021">2021</a></td><td>Further incorrect usages of result_of</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2028">2028</a></td><td>messages_base::catalog overspecified</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2033">2033</a></td><td>Preconditions of reserve, shrink_to_fit, and resize functions</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2039">2039</a></td><td>Issues with std::reverse and std::copy_if</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2044">2044</a></td><td>No definition of "Stable" for copy algorithms</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2045">2045</a></td><td>forward_list::merge and forward_list::splice_after with unequal allocators</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2047">2047</a></td><td>Incorrect "mixed" move-assignment semantics of unique_ptr</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2050">2050</a></td><td>Unordered associative containers do not use allocator_traits to define member types</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2053">2053</a></td><td>Errors in regex bitmask types</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2061">2061</a></td><td>make_move_iterator and arrays</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2064">2064</a></td><td>More noexcept issues in basic_string</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2065">2065</a></td><td>Minimal allocator interface</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2067">2067</a></td><td>packaged_task should have deleted copy c'tor with const parameter</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2069">2069</a></td><td>Inconsistent exception spec for basic_string move constructor</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2096">2096</a></td><td>Incorrect constraints of future::get in regard to MoveAssignable</td><td>Kona</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2102">2102</a></td><td>Why is std::launch an implementation-defined type?</td><td>Kona</td><td>Complete</td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/lwg2071">2071</a></td><td>std::valarray move-assignment</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2074">2074</a></td><td>Off by one error in std::reverse_copy</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2081">2081</a></td><td>Allocator requirements should include CopyConstructible</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2083">2083</a></td><td>const-qualification on weak_ptr::owner_before</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2086">2086</a></td><td>Overly generic type support for math functions</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2099">2099</a></td><td>Unnecessary constraints of va_start() usage</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2103">2103</a></td><td>std::allocator_traits&lt;std::allocator&lt;T&gt;&gt;::propagate_on_container_move_assignment</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2105">2105</a></td><td>Inconsistent requirements on const_iterator's value_type</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2110">2110</a></td><td>remove can't swap but note says it might</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2123">2123</a></td><td>merge() allocator requirements for lists versus forward lists</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2005">2005</a></td><td>unordered_map::insert(T&&) protection should apply to map too</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2011">2011</a></td><td>Unexpected output required of strings</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2048">2048</a></td><td>Unnecessary mem_fn overloads</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2049">2049</a></td><td>is_destructible is underspecified</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2056">2056</a></td><td>future_errc enums start with value 0 (invalid value for broken_promise)</td><td>Portland</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2058">2058</a></td><td>valarray and begin/end</td><td>Portland</td><td>Complete</td></tr>
+  <tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/lwg2091">2091</a></td><td>Misplaced effect in m.try_lock_for()</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2092">2092</a></td><td>Vague Wording for condition_variable_any</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2093">2093</a></td><td>Throws clause of condition_variable::wait with predicate</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2094">2094</a></td><td>duration conversion overflow shouldn't participate in overload resolution</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2122">2122</a></td><td>merge() stability for lists versus forward lists</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2128">2128</a></td><td>Absence of global functions cbegin/cend</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2145">2145</a></td><td>error_category default constructor</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2147">2147</a></td><td>Unclear hint type in Allocator's allocate function</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2148">2148</a></td><td>Hashing enums should be supported directly by std::hash</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2149">2149</a></td><td>Concerns about 20.8/5</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2162">2162</a></td><td>allocator_traits::max_size missing noexcept</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2163">2163</a></td><td>nth_element requires inconsistent post-conditions</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2169">2169</a></td><td>Missing reset() requirements in unique_ptr specialization</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2172">2172</a></td><td>Does atomic_compare_exchange_* accept v == nullptr arguments?</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2080">2080</a></td><td>Specify when once_flag becomes invalid</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2098">2098</a></td><td>promise throws clauses</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2109">2109</a></td><td>Incorrect requirements for hash specializations</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2130">2130</a></td><td>missing ordering constraints for fences</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2138">2138</a></td><td>atomic_flag::clear ordering constraints</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2140">2140</a></td><td>notify_all_at_thread_exit synchronization</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2144">2144</a></td><td>Missing noexcept specification in type_index</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2174">2174</a></td><td>wstring_convert::converted() should be noexcept</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2175">2175</a></td><td>string_convert and wbuffer_convert validity</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2176">2176</a></td><td>Special members for wstring_convert and wbuffer_convert</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2177">2177</a></td><td>Requirements on Copy/MoveInsertable</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2185">2185</a></td><td>Missing throws clause for future/shared_future::wait_for/wait_until</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2187">2187</a></td><td>vector&lt;bool&gt; is missing emplace and emplace_back member functions</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2190">2190</a></td><td>ordering of condition variable operations, reflects Posix discussion</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2196">2196</a></td><td>Specification of is_*[copy/move]_[constructible/assignable] unclear for non-referencable types</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2197">2197</a></td><td>Specification of is_[un]signed unclear for non-arithmetic types</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2200">2200</a></td><td>Data race avoidance for all containers, not only for sequences</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2203">2203</a></td><td>scoped_allocator_adaptor uses wrong argument types for piecewise construction</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2207">2207</a></td><td>basic_string::at should not have a Requires clause</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2209">2209</a></td><td>assign() overspecified for sequence containers</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2210">2210</a></td><td>Missing allocator-extended constructor for allocator-aware containers</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2211">2211</a></td><td>Replace ambiguous use of "Allocator" in container requirements</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2222">2222</a></td><td>Inconsistency in description of forward_list::splice_after single-element overload</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2225">2225</a></td><td>Unrealistic header inclusion checks required</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2229">2229</a></td><td>Standard code conversion facets underspecified</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2231">2231</a></td><td>DR 704 removes complexity guarantee for clear()</td><td>Bristol</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2235">2235</a></td><td>Undefined behavior without proper requirements on basic_string constructors</td><td>Bristol</td><td>Complete</td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/lwg2141">2141</a></td><td>common_type trait produces reference types</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2246">2246</a></td><td>unique_ptr assignment effects w.r.t. deleter</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2247">2247</a></td><td>Type traits and std::nullptr_t</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2085">2085</a></td><td>Wrong description of effect 1 of basic_istream::ignore</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2087">2087</a></td><td>iostream_category() and noexcept</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2143">2143</a></td><td>ios_base::xalloc should be thread-safe</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2150">2150</a></td><td>Unclear specification of find_end</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2180">2180</a></td><td>Exceptions from std::seed_seq operations</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2194">2194</a></td><td>Impossible container requirements for adaptor types</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2013">2013</a></td><td>Do library implementers have the freedom to add constexpr?</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2018">2018</a></td><td>regex_traits::isctype Returns clause is wrong</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2078">2078</a></td><td>Throw specification of async() incomplete</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2097">2097</a></td><td>packaged_task constructors should be constrained</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2100">2100</a></td><td>Timed waiting functions cannot timeout if launch::async policy used</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2120">2120</a></td><td>What should async do if neither 'async' nor 'deferred' is set in policy?</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2159">2159</a></td><td>atomic_flag initialization</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2275">2275</a></td><td>Why is forward_as_tuple not constexpr?</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2284">2284</a></td><td>Inconsistency in allocator_traits::max_size</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2298">2298</a></td><td>is_nothrow_constructible is always false because of create&lt;&gt;</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2300">2300</a></td><td>Redundant sections for map and multimap members should be removed</td><td>Chicago</td><td>Complete</td></tr>
+	<tr><td>NB comment: GB9</td>                                                                     <td>Remove gets from C++14</td><td>Chicago</td><td>Complete</td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/lwg2135">2135</a></td><td>Unclear requirement for exceptions thrown in condition_variable::wait()</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2291">2291</a></td><td>std::hash is vulnerable to collision DoS attack</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2142">2142</a></td><td>packaged_task::operator() synchronization too broad?</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2240">2240</a></td><td>Probable misuse of term "function scope" in [thread.condition]</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2252">2252</a></td><td>Strong guarantee on vector::push_back() still broken with C++11?</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2257">2257</a></td><td>Simplify container requirements with the new algorithms</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2268">2268</a></td><td>Setting a default argument in the declaration of a member function assign of std::basic_string</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2271">2271</a></td><td>regex_traits::lookup_classname specification unclear</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2272">2272</a></td><td>quoted should use char_traits::eq for character comparison</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2278">2278</a></td><td>User-defined literals for Standard Library types</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2280">2280</a></td><td>begin / end for arrays should be constexpr and noexcept</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2285">2285</a></td><td>make_reverse_iterator</td><td>Issaquah</td><td>Complete</td></tr>
+
+	<tr><td><a href="https://wg21.link/lwg2299">2299</a></td><td>Effects of inaccessible key_compare::is_transparent type are not clear</td><td>Issaquah</td><td>Complete</td></tr>
+
+	<tr><td><a href="https://wg21.link/lwg1450">1450</a></td><td>Contradiction in regex_constants</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2003">2003</a></td><td>String exception inconsistency in erase.</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2112">2112</a></td><td>User-defined classes that cannot be derived from</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2132">2132</a></td><td>std::function ambiguity</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2182">2182</a></td><td>Container::[const_]reference types are misleadingly specified</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2188">2188</a></td><td>Reverse iterator does not fully support targets that overload operator&</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2193">2193</a></td><td>Default constructors for standard library containers are explicit</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2205">2205</a></td><td>Problematic postconditions of regex_match and regex_search</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2213">2213</a></td><td>Return value of std::regex_replace</td><td>Issaquah</td><td>Complete</td></tr>
+
+	<tr><td><a href="https://wg21.link/lwg2258">2258</a></td><td>a.erase(q1, q2) unable to directly return q2</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2263">2263</a></td><td>Comparing iterators and allocator pointers with different const-character</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2293">2293</a></td><td>Wrong facet used by num_put::do_put</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2301">2301</a></td><td>Why is std::tie not constexpr?</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2304">2304</a></td><td>Complexity of count in unordered associative containers</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2306">2306</a></td><td>match_results::reference should be value_type&, not const value_type&</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2308">2308</a></td><td>Clarify container destructor requirements w.r.t. std::array</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2313">2313</a></td><td>tuple_size should always derive from integral_constant<size_t, N></td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2314">2314</a></td><td>apply() should return decltype(auto) and use decay_t before tuple_size</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2315">2315</a></td><td>weak_ptr should be movable</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2316">2316</a></td><td>weak_ptr::lock() should be atomic</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2317">2317</a></td><td>The type property queries should be UnaryTypeTraits returning size_t</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2320">2320</a></td><td>select_on_container_copy_construction() takes allocators, not containers</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2322">2322</a></td><td>Associative(initializer_list, stuff) constructors are underspecified</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2323">2323</a></td><td>vector::resize(n, t)'s specification should be simplified</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2324">2324</a></td><td>Insert iterator constructors should use addressof()</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2329">2329</a></td><td>regex_match()/regex_search() with match_results should forbid temporary strings</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2330">2330</a></td><td>regex("meow", regex::icase) is technically forbidden but should be permitted</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2332">2332</a></td><td>regex_iterator/regex_token_iterator should forbid temporary regexes</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2339">2339</a></td><td>Wording issue in nth_element</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2341">2341</a></td><td>Inconsistency between basic_ostream::seekp(pos) and basic_ostream::seekp(off, dir)</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2344">2344</a></td><td>quoted()'s interaction with padding is unclear</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2346">2346</a></td><td>integral_constant's member functions should be marked noexcept</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2350">2350</a></td><td>min, max, and minmax should be constexpr</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2356">2356</a></td><td>Stability of erasure in unordered associative containers</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2357">2357</a></td><td>Remaining "Assignable" requirement</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2359">2359</a></td><td>How does regex_constants::nosubs affect basic_regex::mark_count()?</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2360">2360</a></td><td>reverse_iterator::operator*() is unimplementable</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2104">2104</a></td><td>unique_lock move-assignment should not be noexcept</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2186">2186</a></td><td>Incomplete action on async/launch::deferred</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2075">2075</a></td><td>Progress guarantees, lock-free property, and scheduling assumptions</td><td>Issaquah</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/lwg2288">2288</a></td><td>Inconsistent requirements for shared mutexes</td><td>Issaquah</td><td>Complete</td></tr>
+<!-- 	<tr><td></td><td></td><td></td><td></td></tr> -->
+  </table>
+
+  <p>Last Updated: 25-Mar-2014</p>
+</div>
+</body>
+</html>

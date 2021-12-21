@@ -1,0 +1,1016 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>libc++abi spec</title>
+</head>
+<body>
+
+<table border=1>
+<tr>
+<th rowspan=2>libc++abi Specification</th>
+<th colspan=3>Completed ?</th>
+</tr>
+
+<tr>
+<th>darwin</th><th>linux</th><th>arm</th>
+</tr>
+
+<tr>
+<td  colspan=4 align="center">Memory management</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_allocate_exception(size_t thrown_size) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Allocates memory to hold the exception to be thrown.
+<tt>thrown_size</tt> is the size of the exception object. Can allocate
+additional memory to hold private data. If memory can not be allocated, call
+<tt>std::terminate()</tt>.
+</p>
+<p>
+<i>Returns:</i> A pointer to the memory allocated for the exception object.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_free_exception(void * thrown_exception) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Frees memory allocated by <tt>__cxa_allocate_exception</tt>.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_allocate_dependent_exception() throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Allocates memory to hold a "dependent" exception to be thrown.
+<tt>thrown_size</tt> is the size of the exception object. Can allocate
+additional memory to hold private data. If memory can not be allocated, call
+<tt>std::terminate()</tt>.
+</p>
+<p>
+<i>Returns:</i> A pointer to the memory allocated for the exception object.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_free_dependent_exception (void* dependent_exception) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Frees memory allocated by <tt>__cxa_allocate_dependent_exception</tt>.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td  colspan=4 align="center">Exception Handling</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_throw(void* thrown_exception, struct std::type_info * tinfo, 
+                        void (*dest)(void*));</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_get_exception_ptr(void* exceptionObject) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Returns:</i> The adjusted pointer to the exception object. (The adjusted
+pointer is typically computed by the personality routine during phase 1 and
+saved in the exception object.)
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_begin_catch(void* exceptionObject) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<ul>
+<li>Increment's the exception's handler count.</li>
+<li>Places the exception on the stack of currently-caught exceptions if it is
+not already there, linking the exception to the previous top of the stack.</li>
+<li>Decrements the uncaught_exception count.</li>
+</ul>
+<p>
+If the initialization of the catch parameter is trivial (e,g., there is no
+formal catch parameter, or the parameter has no copy constructor), the calls to
+<tt>__cxa_get_exception_ptr()</tt> and <tt>__cxa_begin_catch()</tt> may be
+combined into a single call to <tt>__cxa_begin_catch()</tt>.
+</p>
+<p>
+When the personality routine encounters a termination condition, it will call
+<tt>__cxa_begin_catch()</tt> to mark the exception as handled and then call
+<tt>terminate()</tt>, which shall not return to its caller.
+</p>
+<p>
+<i>Returns:</i> The adjusted pointer to the exception object.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_end_catch();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Locates the most recently caught exception and decrements its
+handler count. Removes the exception from the caughtÓexception stack, if the
+handler count goes to zero. Destroys the exception if the handler count goes to
+zero, and the exception was not re-thrown by throw. Collaboration between
+__cxa_rethrow() and __cxa_end_catch() is necessary to handle the last point.
+Though implementation-defined, one possibility is for __cxa_rethrow() to set a
+flag in the handlerCount member of the exception header to mark an exception
+being rethrown.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>std::type_info* __cxa_current_exception_type();</code>
+</p>
+<blockquote>
+<p>
+<i>Returns:</i> the type of the currently handled exception, or null if there
+are no caught exceptions.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_rethrow();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Marks the exception object on top of the caughtExceptions stack
+(in an implementation-defined way) as being rethrown. If the caughtExceptions
+stack is empty, it calls terminate() (see [C++FDIS] [except.throw], 15.1.8). It
+then returns to the handler that called it, which must call __cxa_end_catch(),
+perform any necessary cleanup, and finally call _Unwind_Resume() to continue
+unwinding.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_current_primary_exception() throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Increments the ownership count of the currently handled
+exception (if any) by one.
+</p>
+<p>
+<i>Returns:</i> the type of the currently handled exception, or null if there
+are no caught exceptions.  
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_decrement_exception_refcount(void* primary_exception) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Decrements the ownership count of the exception by 1, and on
+zero calls <tt>_Unwind_DeleteException</tt> with the exception object.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>__cxa_eh_globals* __cxa_get_globals() throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Returns:</i> A pointer to the __cxa_eh_globals structure for the current
+thread, initializing it if necessary.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>__cxa_eh_globals* __cxa_get_globals_fast() throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Requires:</i> At least one prior call to __cxa_get_globals has been made from
+the current thread.
+</p>
+<p>
+<i>Returns:</i> A pointer to the __cxa_eh_globals structure for the current
+thread.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_increment_exception_refcount(void* primary_exception) throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Increments the ownership count of the referenced exception.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_rethrow_primary_exception(void* primary_exception);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Implements <tt>std::rethrow_exception(exception_ptr p)</tt>.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>bool __cxa_uncaught_exception() throw();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>_Unwind_Reason_Code __gxx_personality_v0
+     (int, _Unwind_Action, _Unwind_Exception_Class,
+      struct _Unwind_Exception *, struct _Unwind_Context *);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td colspan=4 align="center">Guard objects</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>int  __cxa_guard_acquire(uint64_t* guard_object);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> This function is called before initialization takes place. If
+this function returns 1, either <code>__cxa_guard_release</code> or
+<code>__cxa_guard_abort</code> must be called with the same argument. The first
+byte of the <code>guard_object</code> is not modified by this function.
+</p>
+<p>
+On Darwin the implementation checks for deadlock.
+</p>
+<p>
+<i>Returns:</i> 1 if the initialization is not yet complete, otherwise 0.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_guard_release(uint64_t*);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Sets the first byte of the guard object to a non-zero value.
+This function is called after initialization is complete. A thread-safe
+implementation will release the mutex acquired by __cxa_guard_acquire after
+setting the first byte of the guard object.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_guard_abort(uint64_t*);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> This function is called if the initialization terminates by
+throwing an exception.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td colspan=4 align="center">Vector construction and destruction</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_vec_new(size_t element_count, 
+						   size_t element_size, 
+                           size_t padding_size, 
+						   void (*constructor)(void*),
+						   void (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_vec_new2(size_t element_count,
+ 						    size_t element_size, 
+                            size_t padding_size,
+						    void  (*constructor)(void*),
+						    void  (*destructor)(void*),
+                            void* (*alloc)(size_t), 
+                            void  (*dealloc)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void* __cxa_vec_new3(size_t element_count,
+ 						    size_t element_size, 
+                            size_t padding_size,
+						    void  (*constructor)(void*),
+						    void  (*destructor)(void*),
+                            void* (*alloc)(size_t), 
+                            void  (*dealloc)(void*, size_t) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_ctor(void*  array_address, 
+                           size_t element_count,
+                           size_t element_size, 
+						   void (*constructor)(void*),
+						   void (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_dtor(void*  array_address, 
+                           size_t element_count,
+						   size_t element_size, 
+						   void (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_cleanup(void* array_address, 
+                             size_t element_count,
+                             size_t element_size, 
+						     void (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_delete(void*  array_address, 
+                             size_t element_size, 
+                             size_t padding_size, 
+						     void  (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_delete2(void* array_address, 
+                             size_t element_size, 
+                             size_t padding_size, 
+						     void  (*destructor)(void*),
+                             void  (*dealloc)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_delete3(void* __array_address, 
+                             size_t element_size, 
+                             size_t padding_size, 
+						     void  (*destructor)(void*),
+							 void  (*dealloc) (void*, size_t));</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_vec_cctor(void*  dest_array, 
+							void*  src_array, 
+							size_t element_count, 
+							size_t element_size, 
+							void  (*constructor) (void*, void*), 
+							void  (*destructor)(void*) );</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td colspan=4 align="center">Handlers</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void (*__cxa_new_handler)();</code>
+</p>
+<blockquote>
+<p>
+The currently installed new handler.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void (*__cxa_terminate_handler)();</code>
+</p>
+<blockquote>
+<p>
+The currently installed terminate handler.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void (*__cxa_unexpected_handler)();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+
+
+<tr>
+<td colspan=4 align="center">Utilities</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>[[noreturn]] void __cxa_bad_cast()</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>  Throws an exception of type <tt>bad_cast</tt>.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>[[noreturn]] void __cxa_bad_typeid();</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>  Throws an exception of type <tt>bad_typeid</tt>.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_pure_virtual(void);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Called if the user calls a non-overridden pure virtual function,
+which has undefined behavior according to the C++ Standard. Ends the program.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void __cxa_call_unexpected (void*) __attribute__((noreturn));</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> Handles re-checking the exception specification if
+unexpectedHandler throws, and if <tt>bad_exception</tt> needs to be thrown. 
+Called from the compiler.
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>char* __cxa_demangle(const char* mangled_name, 
+							char*       output_buffer,
+							size_t*     length, 
+							int*        status);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i> 
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+<tr>
+<td>
+<p>
+<code>void*
+  __dynamic_cast(const void* __src_ptr,
+		 const __class_type_info* __src_type,
+		 const __class_type_info* __dst_type,
+		 ptrdiff_t __src2dst);</code>
+</p>
+<blockquote>
+<p>
+<i>Effects:</i>
+</p>
+<p>
+<i>Returns:</i>
+</p>
+</blockquote>
+</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+<td>&#10003;</td>
+</tr>
+
+</table>
+
+<!-- 
+000000000000d570 (__DATA,__const) external typeinfo for char32_t
+000000000000cfd0 (__DATA,__const) external typeinfo for std::nullptr_t
+000000000000d520 (__DATA,__const) external typeinfo for char16_t
+000000000000d580 (__DATA,__const) external typeinfo for char32_t*
+000000000000cfe0 (__DATA,__const) external typeinfo for std::nullptr_t*
+000000000000d530 (__DATA,__const) external typeinfo for char16_t*
+000000000000d5a0 (__DATA,__const) external typeinfo for char32_t const*
+000000000000d000 (__DATA,__const) external typeinfo for std::nullptr_t const*
+000000000000d550 (__DATA,__const) external typeinfo for char16_t const*
+000000000000d190 (__DATA,__const) external typeinfo for signed char const*
+000000000000d050 (__DATA,__const) external typeinfo for bool const*
+000000000000d0f0 (__DATA,__const) external typeinfo for char const*
+000000000000d4b0 (__DATA,__const) external typeinfo for double const*
+000000000000d500 (__DATA,__const) external typeinfo for long double const*
+000000000000d460 (__DATA,__const) external typeinfo for float const*
+000000000000d140 (__DATA,__const) external typeinfo for unsigned char const*
+000000000000d280 (__DATA,__const) external typeinfo for int const*
+000000000000d2d0 (__DATA,__const) external typeinfo for unsigned int const*
+000000000000d320 (__DATA,__const) external typeinfo for long const*
+000000000000d370 (__DATA,__const) external typeinfo for unsigned long const*
+000000000000d1e0 (__DATA,__const) external typeinfo for short const*
+000000000000d230 (__DATA,__const) external typeinfo for unsigned short const*
+000000000000cfb0 (__DATA,__const) external typeinfo for void const*
+000000000000d0a0 (__DATA,__const) external typeinfo for wchar_t const*
+000000000000d3c0 (__DATA,__const) external typeinfo for long long const*
+000000000000d410 (__DATA,__const) external typeinfo for unsigned long long const*
+000000000000d170 (__DATA,__const) external typeinfo for signed char*
+000000000000d030 (__DATA,__const) external typeinfo for bool*
+000000000000d0d0 (__DATA,__const) external typeinfo for char*
+000000000000d490 (__DATA,__const) external typeinfo for double*
+000000000000d4e0 (__DATA,__const) external typeinfo for long double*
+000000000000d440 (__DATA,__const) external typeinfo for float*
+000000000000d120 (__DATA,__const) external typeinfo for unsigned char*
+000000000000d260 (__DATA,__const) external typeinfo for int*
+000000000000d2b0 (__DATA,__const) external typeinfo for unsigned int*
+000000000000d300 (__DATA,__const) external typeinfo for long*
+000000000000d350 (__DATA,__const) external typeinfo for unsigned long*
+000000000000d1c0 (__DATA,__const) external typeinfo for short*
+000000000000d210 (__DATA,__const) external typeinfo for unsigned short*
+000000000000cf90 (__DATA,__const) external typeinfo for void*
+000000000000d080 (__DATA,__const) external typeinfo for wchar_t*
+000000000000d3a0 (__DATA,__const) external typeinfo for long long*
+000000000000d3f0 (__DATA,__const) external typeinfo for unsigned long long*
+000000000000d160 (__DATA,__const) external typeinfo for signed char
+000000000000d020 (__DATA,__const) external typeinfo for bool
+000000000000d0c0 (__DATA,__const) external typeinfo for char
+000000000000d480 (__DATA,__const) external typeinfo for double
+000000000000d4d0 (__DATA,__const) external typeinfo for long double
+000000000000d430 (__DATA,__const) external typeinfo for float
+000000000000d110 (__DATA,__const) external typeinfo for unsigned char
+000000000000d250 (__DATA,__const) external typeinfo for int
+000000000000d2a0 (__DATA,__const) external typeinfo for unsigned int
+000000000000d2f0 (__DATA,__const) external typeinfo for long
+000000000000d340 (__DATA,__const) external typeinfo for unsigned long
+000000000000d1b0 (__DATA,__const) external typeinfo for short
+000000000000d200 (__DATA,__const) external typeinfo for unsigned short
+000000000000cf78 (__DATA,__const) external typeinfo for void
+000000000000d070 (__DATA,__const) external typeinfo for wchar_t
+000000000000d390 (__DATA,__const) external typeinfo for long long
+000000000000d3e0 (__DATA,__const) external typeinfo for unsigned long long
+00000000000093f9 (__TEXT,__cstring) external typeinfo name for char32_t
+0000000000009351 (__TEXT,__cstring) external typeinfo name for std::nullptr_t
+00000000000093ed (__TEXT,__cstring) external typeinfo name for char16_t
+0000000000009470 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__enum_type_info
+0000000000009410 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__array_type_info
+0000000000009290 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__class_type_info
+00000000000094a0 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__pbase_type_info
+00000000000094d0 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__pointer_type_info
+0000000000009440 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__function_type_info
+00000000000092c0 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__si_class_type_info
+00000000000092f0 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__vmi_class_type_info
+0000000000009320 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__fundamental_type_info
+0000000000009500 (__TEXT,__cstring) external typeinfo name for __cxxabiv1::__pointer_to_member_type_info
+00000000000093fc (__TEXT,__cstring) external typeinfo name for char32_t*
+0000000000009354 (__TEXT,__cstring) external typeinfo name for std::nullptr_t*
+00000000000093f0 (__TEXT,__cstring) external typeinfo name for char16_t*
+0000000000009400 (__TEXT,__cstring) external typeinfo name for char32_t const*
+0000000000009358 (__TEXT,__cstring) external typeinfo name for std::nullptr_t const*
+00000000000093f4 (__TEXT,__cstring) external typeinfo name for char16_t const*
+0000000000009386 (__TEXT,__cstring) external typeinfo name for signed char const*
+0000000000009362 (__TEXT,__cstring) external typeinfo name for bool const*
+0000000000009374 (__TEXT,__cstring) external typeinfo name for char const*
+00000000000093e0 (__TEXT,__cstring) external typeinfo name for double const*
+00000000000093e9 (__TEXT,__cstring) external typeinfo name for long double const*
+00000000000093d7 (__TEXT,__cstring) external typeinfo name for float const*
+000000000000937d (__TEXT,__cstring) external typeinfo name for unsigned char const*
+00000000000093a1 (__TEXT,__cstring) external typeinfo name for int const*
+00000000000093aa (__TEXT,__cstring) external typeinfo name for unsigned int const*
+00000000000093b3 (__TEXT,__cstring) external typeinfo name for long const*
+00000000000093bc (__TEXT,__cstring) external typeinfo name for unsigned long const*
+000000000000938f (__TEXT,__cstring) external typeinfo name for short const*
+0000000000009398 (__TEXT,__cstring) external typeinfo name for unsigned short const*
+000000000000934d (__TEXT,__cstring) external typeinfo name for void const*
+000000000000936b (__TEXT,__cstring) external typeinfo name for wchar_t const*
+00000000000093c5 (__TEXT,__cstring) external typeinfo name for long long const*
+00000000000093ce (__TEXT,__cstring) external typeinfo name for unsigned long long const*
+0000000000009383 (__TEXT,__cstring) external typeinfo name for signed char*
+000000000000935f (__TEXT,__cstring) external typeinfo name for bool*
+0000000000009371 (__TEXT,__cstring) external typeinfo name for char*
+00000000000093dd (__TEXT,__cstring) external typeinfo name for double*
+00000000000093e6 (__TEXT,__cstring) external typeinfo name for long double*
+00000000000093d4 (__TEXT,__cstring) external typeinfo name for float*
+000000000000937a (__TEXT,__cstring) external typeinfo name for unsigned char*
+000000000000939e (__TEXT,__cstring) external typeinfo name for int*
+00000000000093a7 (__TEXT,__cstring) external typeinfo name for unsigned int*
+00000000000093b0 (__TEXT,__cstring) external typeinfo name for long*
+00000000000093b9 (__TEXT,__cstring) external typeinfo name for unsigned long*
+000000000000938c (__TEXT,__cstring) external typeinfo name for short*
+0000000000009395 (__TEXT,__cstring) external typeinfo name for unsigned short*
+000000000000934a (__TEXT,__cstring) external typeinfo name for void*
+0000000000009368 (__TEXT,__cstring) external typeinfo name for wchar_t*
+00000000000093c2 (__TEXT,__cstring) external typeinfo name for long long*
+00000000000093cb (__TEXT,__cstring) external typeinfo name for unsigned long long*
+0000000000009381 (__TEXT,__cstring) external typeinfo name for signed char
+000000000000935d (__TEXT,__cstring) external typeinfo name for bool
+000000000000936f (__TEXT,__cstring) external typeinfo name for char
+00000000000093db (__TEXT,__cstring) external typeinfo name for double
+00000000000093e4 (__TEXT,__cstring) external typeinfo name for long double
+00000000000093d2 (__TEXT,__cstring) external typeinfo name for float
+0000000000009378 (__TEXT,__cstring) external typeinfo name for unsigned char
+000000000000939c (__TEXT,__cstring) external typeinfo name for int
+00000000000093a5 (__TEXT,__cstring) external typeinfo name for unsigned int
+00000000000093ae (__TEXT,__cstring) external typeinfo name for long
+00000000000093b7 (__TEXT,__cstring) external typeinfo name for unsigned long
+000000000000938a (__TEXT,__cstring) external typeinfo name for short
+0000000000009393 (__TEXT,__cstring) external typeinfo name for unsigned short
+0000000000009348 (__TEXT,__cstring) external typeinfo name for void
+0000000000009366 (__TEXT,__cstring) external typeinfo name for wchar_t
+00000000000093c0 (__TEXT,__cstring) external typeinfo name for long long
+00000000000093c9 (__TEXT,__cstring) external typeinfo name for unsigned long long
+000000000000ce30 (__DATA,__const) external vtable for __cxxabiv1::__enum_type_info
+000000000000cdb0 (__DATA,__const) external vtable for __cxxabiv1::__array_type_info
+000000000000cbe0 (__DATA,__const) external vtable for __cxxabiv1::__class_type_info
+000000000000ce70 (__DATA,__const) external vtable for __cxxabiv1::__pbase_type_info
+000000000000cec0 (__DATA,__const) external vtable for __cxxabiv1::__pointer_type_info
+000000000000cdf0 (__DATA,__const) external vtable for __cxxabiv1::__function_type_info
+000000000000cc40 (__DATA,__const) external vtable for __cxxabiv1::__si_class_type_info
+000000000000cca0 (__DATA,__const) external vtable for __cxxabiv1::__vmi_class_type_info
+000000000000cd70 (__DATA,__const) external vtable for __cxxabiv1::__fundamental_type_info
+000000000000cf10 (__DATA,__const) external vtable for __cxxabiv1::__pointer_to_member_type_info
+
+                 (undefined) external ___stack_chk_fail (from libSystem)
+                 (undefined) external ___stack_chk_guard (from libSystem)
+                 (undefined) external ___stderrp (from libSystem)
+                 (undefined) external ___strcat_chk (from libSystem)
+                 (undefined) external _abort (from libSystem)
+                 (undefined) external _calloc (from libSystem)
+                 (undefined) external _dlsym (from libSystem)
+                 (undefined) external _free (from libSystem)
+                 (undefined) external _malloc (from libSystem)
+                 (undefined) external _memcpy (from libSystem)
+                 (undefined) external _pthread_getspecific (from libSystem)
+                 (undefined) external _pthread_key_create (from libSystem)
+                 (undefined) external _pthread_mutex_init (from libSystem)
+                 (undefined) external _pthread_mutex_lock (from libSystem)
+                 (undefined) external _pthread_mutex_unlock (from libSystem)
+                 (undefined) external _pthread_mutexattr_init (from libSystem)
+                 (undefined) external _pthread_mutexattr_settype (from libSystem)
+                 (undefined) external _pthread_once (from libSystem)
+                 (undefined) external _pthread_setspecific (from libSystem)
+                 (undefined) external _realloc (from libSystem)
+                 (undefined) external _strcmp (from libSystem)
+                 (undefined) external _strcpy (from libSystem)
+                 (undefined) external _strlen (from libSystem)
+                 (undefined) external _strncmp (from libSystem)
+                 (undefined) external _vasprintf (from libSystem)
+                 (undefined) external _vfprintf (from libSystem)
+                 (undefined) external dyld_stub_binder (from libSystem)
+                 (undefined) external __Unwind_DeleteException (from libSystem)
+                 (undefined) external __Unwind_GetIP (from libSystem)
+                 (undefined) external __Unwind_GetLanguageSpecificData (from libSystem)
+                 (undefined) external __Unwind_GetRegionStart (from libSystem)
+                 (undefined) external __Unwind_RaiseException (from libSystem)
+                 (undefined) external __Unwind_Resume_or_Rethrow (from libSystem)
+                 (undefined) external __Unwind_SetGR (from libSystem)
+                 (undefined) external __Unwind_SetIP (from libSystem)
+                 (undefined) external ___bzero (from libSystem)
+ -->
+
+</body>
+</html>

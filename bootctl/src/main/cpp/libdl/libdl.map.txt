@@ -1,0 +1,48 @@
+#
+# Copyright (C) 2015 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+LIBC {
+  global:
+    android_dlopen_ext; # introduced=21
+    dl_iterate_phdr; # introduced-arm=21
+    dl_unwind_find_exidx; # arm
+    dladdr;
+    dlclose;
+    dlerror;
+    dlopen;
+    dlsym;
+  local:
+    *;
+};
+
+LIBC_N {
+  global:
+    android_get_application_target_sdk_version; # introduced=24 versioned=29
+    dlvsym; # introduced=24
+} LIBC;
+
+LIBC_OMR1 { # introduced=27
+  global:
+    __cfi_shadow_size;
+    __cfi_slowpath;
+    __cfi_slowpath_diag;
+} LIBC_N;
+
+LIBC_PLATFORM {
+  global:
+    android_get_LD_LIBRARY_PATH;
+    __cfi_init;
+} LIBC_OMR1;

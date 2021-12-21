@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>&lt;atomic&gt; design</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>&lt;atomic&gt; design</h1>
+  <!--*********************************************************************-->
+
+<p>
+This is a variation of design A which puts the burden on the library to arrange
+for the correct manipulation of the run time memory ordering arguments, and only
+calls the compiler for well-defined memory orderings.  I think of this design as
+the worst of A and C, instead of the best of A and C.  But I offer it as an
+option in the spirit of completeness.
+</p>
+
+<blockquote><pre>
+<font color="#C80000">// type must be trivially copyable</font>
+bool __atomic_is_lock_free(const type* atomic_obj);
+
+<font color="#C80000">// type must be trivially copyable</font>
+type __atomic_load_relaxed(const volatile type* atomic_obj);
+type __atomic_load_consume(const volatile type* atomic_obj);
+type __atomic_load_acquire(const volatile type* atomic_obj);
+type __atomic_load_seq_cst(const volatile type* atomic_obj);
+
+<font color="#C80000">// type must be trivially copyable</font>
+type __atomic_store_relaxed(volatile type* atomic_obj, type desired);
+type __atomic_store_release(volatile type* atomic_obj, type desired);
+type __atomic_store_seq_cst(volatile type* atomic_obj, type desired);
+
+<font color="#C80000">// type must be trivially copyable</font>
+type __atomic_exchange_relaxed(volatile type* atomic_obj, type desired);
+type __atomic_exchange_consume(volatile type* atomic_obj, type desired);
+type __atomic_exchange_acquire(volatile type* atomic_obj, type desired);
+type __atomic_exchange_release(volatile type* atomic_obj, type desired);
+type __atomic_exchange_acq_rel(volatile type* atomic_obj, type desired);
+type __atomic_exchange_seq_cst(volatile type* atomic_obj, type desired);
+
+<font color="#C80000">// type must be trivially copyable</font>
+bool __atomic_compare_exchange_strong_relaxed_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_consume_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_consume_consume(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acquire_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acquire_consume(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acquire_acquire(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_release_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_release_consume(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_release_acquire(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acq_rel_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acq_rel_consume(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_acq_rel_acquire(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_seq_cst_relaxed(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_seq_cst_consume(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_seq_cst_acquire(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+bool __atomic_compare_exchange_strong_seq_cst_seq_cst(volatile type* atomic_obj,
+                                                      type* expected,
+                                                      type desired);
+
+<font color="#C80000">// type must be trivially copyable</font>
+bool __atomic_compare_exchange_weak_relaxed_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_consume_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_consume_consume(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acquire_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acquire_consume(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acquire_acquire(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_release_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_release_consume(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_release_acquire(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acq_rel_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acq_rel_consume(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_acq_rel_acquire(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_seq_cst_relaxed(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_seq_cst_consume(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_seq_cst_acquire(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+bool __atomic_compare_exchange_weak_seq_cst_seq_cst(volatile type* atomic_obj,
+                                                    type* expected,
+                                                    type desired);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+type __atomic_fetch_add_relaxed(volatile type* atomic_obj, type operand);
+type __atomic_fetch_add_consume(volatile type* atomic_obj, type operand);
+type __atomic_fetch_add_acquire(volatile type* atomic_obj, type operand);
+type __atomic_fetch_add_release(volatile type* atomic_obj, type operand);
+type __atomic_fetch_add_acq_rel(volatile type* atomic_obj, type operand);
+type __atomic_fetch_add_seq_cst(volatile type* atomic_obj, type operand);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+type __atomic_fetch_sub_relaxed(volatile type* atomic_obj, type operand);
+type __atomic_fetch_sub_consume(volatile type* atomic_obj, type operand);
+type __atomic_fetch_sub_acquire(volatile type* atomic_obj, type operand);
+type __atomic_fetch_sub_release(volatile type* atomic_obj, type operand);
+type __atomic_fetch_sub_acq_rel(volatile type* atomic_obj, type operand);
+type __atomic_fetch_sub_seq_cst(volatile type* atomic_obj, type operand);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+type __atomic_fetch_and_relaxed(volatile type* atomic_obj, type operand);
+type __atomic_fetch_and_consume(volatile type* atomic_obj, type operand);
+type __atomic_fetch_and_acquire(volatile type* atomic_obj, type operand);
+type __atomic_fetch_and_release(volatile type* atomic_obj, type operand);
+type __atomic_fetch_and_acq_rel(volatile type* atomic_obj, type operand);
+type __atomic_fetch_and_seq_cst(volatile type* atomic_obj, type operand);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+type __atomic_fetch_or_relaxed(volatile type* atomic_obj, type operand);
+type __atomic_fetch_or_consume(volatile type* atomic_obj, type operand);
+type __atomic_fetch_or_acquire(volatile type* atomic_obj, type operand);
+type __atomic_fetch_or_release(volatile type* atomic_obj, type operand);
+type __atomic_fetch_or_acq_rel(volatile type* atomic_obj, type operand);
+type __atomic_fetch_or_seq_cst(volatile type* atomic_obj, type operand);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+type __atomic_fetch_xor_relaxed(volatile type* atomic_obj, type operand);
+type __atomic_fetch_xor_consume(volatile type* atomic_obj, type operand);
+type __atomic_fetch_xor_acquire(volatile type* atomic_obj, type operand);
+type __atomic_fetch_xor_release(volatile type* atomic_obj, type operand);
+type __atomic_fetch_xor_acq_rel(volatile type* atomic_obj, type operand);
+type __atomic_fetch_xor_seq_cst(volatile type* atomic_obj, type operand);
+
+void* __atomic_fetch_add_relaxed(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_add_consume(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_add_acquire(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_add_release(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_add_acq_rel(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_add_seq_cst(void* volatile* atomic_obj, ptrdiff_t operand);
+
+void* __atomic_fetch_sub_relaxed(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_sub_consume(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_sub_acquire(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_sub_release(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_sub_acq_rel(void* volatile* atomic_obj, ptrdiff_t operand);
+void* __atomic_fetch_sub_seq_cst(void* volatile* atomic_obj, ptrdiff_t operand);
+
+void __atomic_thread_fence_relaxed();
+void __atomic_thread_fence_consume();
+void __atomic_thread_fence_acquire();
+void __atomic_thread_fence_release();
+void __atomic_thread_fence_acq_rel();
+void __atomic_thread_fence_seq_cst();
+
+void __atomic_signal_fence_relaxed();
+void __atomic_signal_fence_consume();
+void __atomic_signal_fence_acquire();
+void __atomic_signal_fence_release();
+void __atomic_signal_fence_acq_rel();
+void __atomic_signal_fence_seq_cst();
+</pre></blockquote>
+
+</div>
+</body>
+</html>

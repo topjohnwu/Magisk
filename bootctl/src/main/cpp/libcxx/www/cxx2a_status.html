@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>libc++ C++2a Status</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>libc++ C++2a Status</h1>
+  <!--*********************************************************************-->
+
+  <p>In July 2017, the C++ standard committee created a draft for the next version of the C++ standard, known here as "C++2a" (probably to be C++20).</p>
+  <p>This page shows the status of libc++; the status of clang's support of the language features is <a href="https://clang.llvm.org/cxx_status.html#cxx2a">here</a>.</p>
+
+  <p>Reminder: Features in unreleased drafts of the standard are subject to change.</p>
+
+  <p>The groups that have contributed papers:
+  <ul>
+    <li>LWG - Library working group</li>
+    <li>CWG - Core Language Working group</li>
+    <li>SG1 - Study group #1 (Concurrency working group)</li>
+  </ul>
+  </p>
+
+  <h3>Paper Status</h3>
+  <table id="papers" border="1">
+	<tr><th>Paper #</th><th>Group</th><th>Paper Name</th><th>Meeting</th><th>Status</th><th>First released version</th></tr>
+<!--
+	<tr><td><a href="https://wg21.link/n3346">3346</a></td><td>LWG</td><td>Terminology for Container Element Requirements - Rev 1</td><td>Kona</td><td>Complete</td><td>3.4</td></tr>
+-->
+	<tr><td><a href="https://wg21.link/P0463R1">P0463R1</a></td><td>LWG</td><td>Endian just Endian</td><td>Toronto</td><td>Complete</td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0674R1">P0674R1</a></td><td>LWG</td><td>Extending make_shared to Support Arrays</td><td>Toronto</td><td></td><td></td></tr>
+
+  	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0020R6">P0020R6</a></td><td>LWG</td><td>Floating Point Atomic</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0053R7">P0053R7</a></td><td>LWG</td><td>C++ Synchronized Buffered Ostream</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0202R3">P0202R3</a></td><td>LWG</td><td>Add constexpr modifiers to functions in &lt;algorithm&gt; and &lt;utility&gt; Headers</td><td>Albuquerque</td><td><I>In Progress</I></td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0415R1">P0415R1</a></td><td>LWG</td><td>Constexpr for <tt>std::complex</tt></td><td>Albuquerque</td><td><I>In Progress</I></td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0439R0">P0439R0</a></td><td>LWG</td><td>Make <tt>std::memory_order</tt> a scoped enumeration</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0457R2">P0457R2</a></td><td>LWG</td><td>String Prefix and Suffix Checking</td><td>Albuquerque</td><td>Complete</td><td>6.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0550R2">P0550R2</a></td><td>LWG</td><td>Transformation Trait <tt>remove_cvref</tt></td><td>Albuquerque</td><td>Complete</td><td>6.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0600R1">P0600R1</a></td><td>LWG</td><td>nodiscard in the Library</td><td>Albuquerque</td><td><I>In Progress</I></td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0616R0">P0616R0</a></td><td>LWG</td><td>de-pessimize legacy <numeric> algorithms with std::move</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0653R2">P0653R2</a></td><td>LWG</td><td>Utility to convert a pointer to a raw pointer</td><td>Albuquerque</td><td>Complete</td><td>6.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0718R2">P0718R2</a></td><td>LWG</td><td>Atomic shared_ptr</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0767R1">P0767R1</a></td><td>CWG</td><td>Deprecate POD</td><td>Albuquerque</td><td>Complete</td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0768R1">P0768R1</a></td><td>CWG</td><td>Library Support for the Spaceship (Comparison) Operator</td><td>Albuquerque</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0777R1">P0777R1</a></td><td>LWG</td><td>Treating Unnecessary <tt>decay</tt></td><td>Albuquerque</td><td>Complete</td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0122R7">P0122R7</a></td><td>LWG</td><td>&lt;span&gt;</td><td>Jacksonville</td><td>Complete</td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0355R7">P0355R7</a></td><td>LWG</td><td>Extending chrono to Calendars and Time Zones</td><td>Jacksonville</td><td><i>In progress</i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0551R3">P0551R3</a></td><td>LWG</td><td>Thou Shalt Not Specialize <tt>std</tt> Function Templates!</td><td>Jacksonville</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0753R2">P0753R2</a></td><td>LWG</td><td>Manipulators for C++ Synchronized Buffered Ostream</td><td>Jacksonville</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0754R2">P0754R2</a></td><td>LWG</td><td>&lt;version&gt;</td><td>Jacksonville</td><td>Complete</td><td>7.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0809R0">P0809R0</a></td><td>LWG</td><td>Comparing Unordered Containers</td><td>Jacksonville</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0858R0">P0858R0</a></td><td>LWG</td><td>Constexpr iterator requirements</td><td>Jacksonville</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0905R1">P0905R1</a></td><td>CWG</td><td>Symmetry for spaceship</td><td>Jacksonville</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0966R1">P0966R1</a></td><td>LWG</td><td><tt>string::reserve</tt> Should Not Shrink</td><td>Jacksonville</td><td>Complete</td><td>8.0</td></tr>
+
+  	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0019R8">P0019R8</a></td><td>LWG</td><td>Atomic Ref</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0458R2">P0458R2</a></td><td>LWG</td><td>Checking for Existence of an Element in Associative Containers</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0475R1">P0475R1</a></td><td>LWG</td><td>LWG 2511: guaranteed copy elision for piecewise construction</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0476R2">P0476R2</a></td><td>LWG</td><td>Bit-casting object representations</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0528R3">P0528R3</a></td><td>CWG</td><td>The Curious Case of Padding Bits, Featuring Atomic Compare-and-Exchange</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0542R5">P0542R5</a></td><td>CWG</td><td>Support for contract based programming in C++</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0556R3">P0556R3</a></td><td>LWG</td><td>Integral power-of-2 operations</td><td>Rapperswil</td><td><i>In Progress</i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0619R4">P0619R4</a></td><td>LWG</td><td>Reviewing Deprecated Facilities of C++17 for C++20</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0646R1">P0646R1</a></td><td>LWG</td><td>Improving the Return Value of Erase-Like Algorithms</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0722R3">P0722R3</a></td><td>CWG</td><td>Efficient sized delete for variable sized classes</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0758R1">P0758R1</a></td><td>LWG</td><td>Implicit conversion traits and utility functions</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0759R1">P0759R1</a></td><td>LWG</td><td>fpos Requirements</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0769R2">P0769R2</a></td><td>LWG</td><td>Add shift to &lt;algorithm&gt;</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0788R3">P0788R3</a></td><td>LWG</td><td>Standard Library Specification in a Concepts and Contracts World</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0879R0">P0879R0</a></td><td>LWG</td><td>Constexpr for swap and swap related functions Also resolves LWG issue 2800.</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0887R1">P0887R1</a></td><td>LWG</td><td>The identity metafunction</td><td>Rapperswil</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0892R2">P0892R2</a></td><td>CWG</td><td>explicit(bool)</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0898R3">P0898R3</a></td><td>LWG</td><td>Standard Library Concepts</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0935R0">P0935R0</a></td><td>LWG</td><td>Eradicating unnecessarily explicit default constructors from the standard library</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0941R2">P0941R2</a></td><td>CWG</td><td>Integrating feature-test macros into the C++ WD</td><td>Rapperswil</td><td><i>In progress</i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1023R0">P1023R0</a></td><td>LWG</td><td>constexpr comparison operators for std::array</td><td>Rapperswil</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P1025R1">P1025R1</a></td><td>CWG</td><td>Update The Reference To The Unicode Standard</td><td>Rapperswil</td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1120R0">P1120R0</a></td><td>CWG</td><td>Consistency improvements for &lt;=&gt; and other comparison operators</td><td>Rapperswil</td><td></td><td></td></tr>
+
+ 	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0318R1">P0318R1</a></td><td>LWG</td><td>unwrap_ref_decay and unwrap_reference</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0356R5">P0356R5</a></td><td>LWG</td><td>Simplified partial function application</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0357R3">P0357R3</a></td><td>LWG</td><td>reference_wrapper for incomplete types</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0482R6">P0482R6</a></td><td>CWG</td><td>char8_t: A type for UTF-8 characters and strings</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0487R1">P0487R1</a></td><td>LWG</td><td>Fixing operator&gt;&gt;(basic_istream&amp;, CharT*) (LWG 2499)</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0591R4">P0591R4</a></td><td>LWG</td><td>Utility functions to implement uses-allocator construction</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0595R2">P0595R2</a></td><td>CWG</td><td>P0595R2 std::is_constant_evaluated()</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0602R4">P0602R4</a></td><td>LWG</td><td>variant and optional should propagate copy/move triviality</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0608R3">P0608R3</a></td><td>LWG</td><td>A sane variant converting constructor</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0655R1">P0655R1</a></td><td>LWG</td><td>visit&lt;R&gt;: Explicit Return Type for visit</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0771R1">P0771R1</a></td><td>LWG</td><td>std::function move constructor should be noexcept</td><td>San Diego</td><td>Complete</td><td>6.0</td></tr>
+	<tr><td><a href="https://wg21.link/P0896R4">P0896R4</a></td><td>LWG</td><td>The One Ranges Proposal</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0899R1">P0899R1</a></td><td>LWG</td><td>P0899R1 - LWG 3016 is not a defect</td><td>San Diego</td><td><i>Nothing to do</i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0919R3">P0919R3</a></td><td>LWG</td><td>Heterogeneous lookup for unordered containers</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P0972R0">P0972R0</a></td><td>LWG</td><td>&lt;chrono&gt; <tt>zero()</tt>, <tt>min()</tt>, and <tt>max()</tt> should be noexcept</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P1006R1">P1006R1</a></td><td>LWG</td><td>Constexpr in std::pointer_traits</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P1007R3">P1007R3</a></td><td>LWG</td><td><tt>std::assume_aligned</tt></td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1020R1">P1020R1</a></td><td>LWG</td><td>Smart pointer creation with default initialization</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1032R1">P1032R1</a></td><td>LWG</td><td>Misc constexpr bits</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1085R2">P1085R2</a></td><td>LWG</td><td>Should Span be Regular?</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P1123R0">P1123R0</a></td><td>LWG</td><td>Editorial Guidance for merging P0019r8 and P0528r3</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1148R0">P1148R0</a></td><td>LWG</td><td>Cleaning up Clause 20</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1165R1">P1165R1</a></td><td>LWG</td><td>Make stateful allocator propagation more consistent for <tt>operator+(basic_string)</tt></td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1209R0">P1209R0</a></td><td>LWG</td><td>Adopt Consistent Container Erasure from Library Fundamentals 2 for C++20</td><td>San Diego</td><td>Complete</td><td>8.0</td></tr>
+	<tr><td><a href="https://wg21.link/P1210R0">P1210R0</a></td><td>LWG</td><td>Completing the Rebase of Library Fundamentals, Version 3, Working Draft</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1236R1">P1236R1</a></td><td>CWG</td><td>Alternative Wording for P0907R4 Signed Integers are Two's Complement</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1248R1">P1248R1</a></td><td>LWG</td><td>Remove CommonReference requirement from StrictWeakOrdering (a.k.a Fixing Relations)</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1285R0">P1285R0</a></td><td>LWG</td><td>Improving Completeness Requirements for Type Traits</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/P1353R0">P1353R0</a></td><td>CWG</td><td>Missing feature test macros</td><td>San Diego</td><td><i> </i></td><td></td></tr>
+
+<!--  	<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr> -->
+  </table>
+
+<p><i>[ Note: "Nothing to do" means that no library changes were needed to implement this change -- end note]</i></p>
+
+<p>The missing bits in P0600 are in [mem.res.class], [mem.poly.allocator.class], and [container.node.overview]</p>
+
+<p>The missing bits in P0202 are in <tt>copy</tt>, <tt>copy_backwards</tt>, <tt>move</tt>, and <tt>move_backwards</tt> (and the ones that call them: <tt>copy_n</tt>, <tt>rotate_copy</tt>, <tt>merge</tt>, <tt>set_union</tt>, <tt>set_difference</tt>, and <tt>set_symmetric_difference</tt>). This is because the first four algorithms have specializations that call <tt>memmove</tt> which is not constexpr. See <a href="https://bugs.llvm.org/show_bug.cgi?id=25165">Bug 25165</a></p>
+
+
+  <h3>Library Working group Issues Status</h3>
+<!--   <I>Note: "NAD" means that the issue was deemed "Not a defect"</I> -->
+  <table id="issues" border="1">
+	<tr><th>Issue #</th><th>Issue Name</th><th>Meeting</th><th>Status</th></tr>
+<!--
+	<tr><td><a href="https://wg21.link/LWG1214">1214</a></td><td>Insufficient/inconsistent key immutability requirements for associative containers</td><td>Urbana</td><td></td></tr>
+-->
+	<tr><td><a href="https://wg21.link/LWG2070">2070</a></td><td><tt>allocate_shared</tt> should use <tt>allocator_traits&lt;A&gt;::construct</tt></td><td>Toronto</td><td>Resolved by <a href="https://wg21.link/P0674R1">P0674R1</a></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2444">2444</a></td><td>Inconsistent complexity for <tt>std::sort_heap</tt></td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2593">2593</a></td><td>Moved-from state of Allocators</td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2597">2597</a></td><td><tt>std::log</tt> misspecified for complex numbers</td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2783">2783</a></td><td><tt>stack::emplace()</tt> and <tt>queue::emplace()</tt> should return <tt>decltype(auto)</tt></td><td>Toronto</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2932">2932</a></td><td>Constraints on parallel algorithm implementations are underspecified</td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2937">2937</a></td><td>Is <tt>equivalent("existing_thing", "not_existing_thing")</tt> an error</td><td>Toronto</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2940">2940</a></td><td><tt>result_of</tt> specification also needs a little cleanup</td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2942">2942</a></td><td>LWG 2873's resolution missed <tt>weak_ptr::owner_before</tt></td><td>Toronto</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2954">2954</a></td><td>Specialization of the convenience variable templates should be prohibited</td><td>Toronto</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2961">2961</a></td><td>Bad postcondition for <tt>set_default_resource</tt></td><td>Toronto</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2966">2966</a></td><td>Incomplete resolution of US 74</td><td>Toronto</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2974">2974</a></td><td>Diagnose out of bounds <tt>tuple_element/variant_alternative</tt></td><td>Toronto</td><td>Complete</td></tr>
+
+ 	<tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2779">2779</a></td><td>[networking.ts] Relax requirements on buffer sequence iterators</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2870">2870</a></td><td>Default value of parameter theta of polar should be dependent</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2935">2935</a></td><td>What should create_directories do when p already exists but is not a directory?</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2941">2941</a></td><td>[thread.req.timing] wording should apply to both member and namespace-level functions</td><td>Albuquerque</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2944">2944</a></td><td>LWG 2905 accidentally removed requirement that construction of the deleter doesn't throw an exception</td><td>Albuquerque</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2945">2945</a></td><td>Order of template parameters in optional comparisons</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2948">2948</a></td><td>unique_ptr does not define operator<< for stream output</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2950">2950</a></td><td>std::byte operations are misspecified</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2952">2952</a></td><td>iterator_traits should work for pointers to cv T</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2953">2953</a></td><td>LWG 2853 should apply to deque::erase too</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2958">2958</a></td><td>Moves improperly defined as deleted</td><td>Albuquerque</td><td><I>We already do this</I></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2964">2964</a></td><td>Apparently redundant requirement for dynamic_pointer_cast</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2965">2965</a></td><td>Non-existing path::native_string() in filesystem_error::what() specification</td><td>Albuquerque</td><td>Nothing to do</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2972">2972</a></td><td>What is is_trivially_destructible_v&lt;int&gt;?</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2976">2976</a></td><td>Dangling uses_allocator specialization for packaged_task</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2977">2977</a></td><td>unordered_meow::merge() has incorrect Throws: clause</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2978">2978</a></td><td>Hash support for pmr::string and friends</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2979">2979</a></td><td>aligned_union should require complete object types</td><td>Albuquerque</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2980">2980</a></td><td>Cannot compare_exchange empty pointers</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2981">2981</a></td><td>Remove redundant deduction guides from standard library</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2982">2982</a></td><td>Making size_type consistent in associative container deduction guides</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2988">2988</a></td><td>Clause 32 cleanup missed one typename</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2993">2993</a></td><td>reference_wrapper<T> conversion from T&&</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2998">2998</a></td><td>Requirements on function objects passed to {forward_,}list-specific algorithms</td><td>Albuquerque</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3001">3001</a></td><td>weak_ptr::element_type needs remove_extent_t</td><td>Albuquerque</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3024">3024</a></td><td>variant's copies must be deleted instead of disabled via SFINAE</td><td>Albuquerque</td><td></td></tr>
+
+ 	<tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2164">2164</a></td><td>What are the semantics of <tt>vector.emplace(vector.begin(), vector.back())</tt>?</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2243">2243</a></td><td><tt>istream::putback</tt> problem</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2816">2816</a></td><td><tt>resize_file</tt> has impossible postcondition</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2843">2843</a></td><td>Unclear behavior of <tt>std::pmr::memory_resource::do_allocate()</tt></td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2849">2849</a></td><td>Why does <tt>!is_regular_file(from)</tt> cause <tt>copy_file</tt> to report a "file already exists" error?</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2851">2851</a></td><td><tt>std::filesystem</tt> enum classes are now underspecified</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2946">2946</a></td><td>LWG 2758's resolution missed further corrections</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2969">2969</a></td><td><tt>polymorphic_allocator::construct()</tt> shouldn't pass <tt>resource()</tt></td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2975">2975</a></td><td>Missing case for <tt>pair</tt> construction in scoped and polymorphic allocators</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2989">2989</a></td><td><tt>path</tt>'s stream insertion operator lets you insert everything under the sun</td><td>Jacksonville</td><td>Completed</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3000">3000</a></td><td><tt>monotonic_memory_resource::do_is_equal</tt> uses <tt>dynamic_cast</tt> unnecessarily</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3002">3002</a></td><td>[networking.ts] <tt>basic_socket_acceptor::is_open()</tt> isn't <tt>noexcept</tt></td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3004">3004</a></td><td>&sect;[string.capacity] and &sect;[vector.capacity] should specify time complexity for <tt>capacity()</tt></td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3005">3005</a></td><td>Destruction order of arrays by <tt>make_shared/allocate_shared</tt> only recommended?</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3007">3007</a></td><td><tt>allocate_shared</tt> should rebind allocator to <i>cv</i>-unqualified <tt>value_type</tt> for construction</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3009">3009</a></td><td>Including <tt>&lt;string_view&gt;</tt> doesn't provide <tt>std::size/empty/data</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3010">3010</a></td><td>[networking.ts] <tt>uses_executor</tt> says "if a type <tt>T::executor_type</tt> exists"</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3013">3013</a></td><td><tt>(recursive_)directory_iterator</tt> construction and traversal should not be <tt>noexcept</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3014">3014</a></td><td>More <tt>noexcept</tt> issues with filesystem operations</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3015">3015</a></td><td><tt>copy_options::<i>unspecified</i></tt> underspecified</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3017">3017</a></td><td><tt>list splice</tt> functions should use <tt>addressof</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3020">3020</a></td><td>[networking.ts] Remove spurious nested <tt>value_type</tt> buffer sequence requirement</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3026">3026</a></td><td><tt>filesystem::weakly_canonical</tt> still defined in terms of <tt>canonical(p, base)</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3030">3030</a></td><td>Who shall meet the requirements of <tt>try_lock</tt>?</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3034">3034</a></td><td>P0767R1 breaks previously-standard-layout types</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3035">3035</a></td><td><tt>std::allocator</tt>'s constructors should be <tt>constexpr</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3039">3039</a></td><td>Unnecessary <tt>decay</tt> in <tt>thread</tt> and <tt>packaged_task</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3041">3041</a></td><td>Unnecessary <tt>decay</tt> in <tt>reference_wrapper</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3042">3042</a></td><td><tt>is_literal_type_v</tt> should be inline</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3043">3043</a></td><td>Bogus postcondition for <tt>filesystem_error</tt> constructor</td><td>Jacksonville</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3045">3045</a></td><td><tt>atomic&lt;<i>floating-point</i>&gt;</tt> doesn't have <tt>value_type</tt> or <tt>difference_type</tt></td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3048">3048</a></td><td><tt>transform_reduce(exec, first1, last1, first2, init)</tt> discards execution policy</td><td>Jacksonville</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3051">3051</a></td><td>Floating point classifications were inadvertently changed in P0175</td><td>Jacksonville</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3075">3075</a></td><td><tt>basic_string</tt> needs deduction guides from <tt>basic_string_view</tt></td><td>Jacksonville</td><td>Complete</td></tr>
+
+ 	<tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2139">2139</a></td><td>What is a user-defined type?</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2970">2970</a></td><td>Return type of std::visit misspecified</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3058">3058</a></td><td>Parallel adjacent_difference shouldn't require creating temporaries</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3062">3062</a></td><td>Unnecessary decay_t in is_execution_policy_v should be remove_cvref_t</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3067">3067</a></td><td>recursive_directory_iterator::pop must invalidate</td><td>Rapperswil</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3071">3071</a></td><td>[networking.ts] read_until still refers to "input sequence"</td><td>Rapperswil</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3074">3074</a></td><td>Non-member functions for valarray should only deduce from the valarray</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3076">3076</a></td><td>basic_string CTAD ambiguity</td><td>Rapperswil</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3079">3079</a></td><td>LWG 2935 forgot to fix the existing_p overloads of create_directory</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3080">3080</a></td><td>Floating point from_chars pattern specification breaks round-tripping</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3083">3083</a></td><td>What should ios::iword(-1) do?</td><td>Rapperswil</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3094">3094</a></td><td>[time.duration.io]p4 makes surprising claims about encoding</td><td>Rapperswil</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3100">3100</a></td><td>Unnecessary and confusing "empty span" wording</td><td>Rapperswil</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3102">3102</a></td><td>Clarify span iterator and const_iterator behavior</td><td>Rapperswil</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3104">3104</a></td><td>Fixing duration division</td><td>Rapperswil</td><td>Complete</td></tr>
+
+	<tr><td></td><td></td><td></td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2183">2183</a></td><td>Muddled allocator requirements for <tt>match_results</tt> constructors</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2184">2184</a></td><td>Muddled allocator requirements for <tt>match_results</tt> assignments</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2412">2412</a></td><td><tt>promise::set_value()</tt> and <tt>promise::get_future()</tt> should not race</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2499">2499</a></td><td><tt>operator&gt;&gt;(basic_istream&amp;, CharT*)</tt> makes it hard to avoid buffer overflows</td><td>San Diego</td><td>Resolved by P0487R1</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2682">2682</a></td><td><code>filesystem::copy()</code> won't create a symlink to a directory</td><td>San Diego</td><td>Nothing to do</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2697">2697</a></td><td>[concurr.ts] Behavior of <tt>future/shared_future</tt> unwrapping constructor when given an invalid <tt>future</tt></td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2797">2797</a></td><td>Trait precondition violations</td><td>San Diego</td><td>Resolved by 1285R0</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2936">2936</a></td><td>Path comparison is defined in terms of the generic format</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2943">2943</a></td><td>Problematic specification of the wide version of <tt>basic_filebuf::open</tt></td><td>San Diego</td><td>Nothing to do</td></tr>
+	<tr><td><a href="https://wg21.link/LWG2960">2960</a></td><td>[fund.ts.v3] <tt>nonesuch</tt> is insufficiently useless</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2995">2995</a></td><td><tt>basic_stringbuf</tt> default constructor forbids it from using SSO capacity</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG2996">2996</a></td><td>Missing rvalue overloads for <tt>shared_ptr</tt> operations</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3008">3008</a></td><td><tt>make_shared</tt> (sub)object destruction semantics are not specified</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3022">3022</a></td><td><tt>is_convertible&lt;derived*, base*&gt;</tt> may lead to ODR</td><td>San Diego</td><td>Resolved by 1285R0</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3025">3025</a></td><td>Map-like container deduction guides should use <tt>pair&lt;Key, T&gt;</tt>, not <tt>pair&lt;const Key, T&gt;</tt></td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3031">3031</a></td><td>Algorithms and predicates with non-const reference arguments</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3037">3037</a></td><td><tt>polymorphic_allocator</tt> and incomplete types</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3038">3038</a></td><td><tt>polymorphic_allocator::allocate</tt> should not allow integer overflow to create vulnerabilities</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3054">3054</a></td><td><tt>uninitialized_copy</tt> appears to not be able to meet its exception-safety guarantee</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3065">3065</a></td><td>LWG 2989 missed that all <tt>path</tt>'s other operators should be hidden friends as well</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3096">3096</a></td><td><tt>path::lexically_relative</tt> is confused by trailing slashes</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3116">3116</a></td><td><tt><i>OUTERMOST_ALLOC_TRAITS</i></tt> needs <tt>remove_reference_t</tt></td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3122">3122</a></td><td><tt>__cpp_lib_chrono_udls</tt> was accidentally dropped</td><td>San Diego</td><td><i>We've already made the update; but we don't support all the test macros. When we do, this will be closed</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3127">3127</a></td><td><tt>basic_osyncstream::rdbuf</tt> needs a <tt>const_cast</tt></td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3128">3128</a></td><td><tt>strstream::rdbuf</tt> needs a <tt>const_cast</tt></td><td>San Diego</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3129">3129</a></td><td><tt>regex_token_iterator</tt> constructor uses wrong pointer arithmetic</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3130">3130</a></td><td>&sect;[input.output] needs many <tt>addressof</tt></td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3131">3131</a></td><td><tt>addressof</tt> all the things</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3132">3132</a></td><td>Library needs to ban macros named <tt>expects</tt> or <tt>ensures</tt></td><td>San Diego</td><td><i>Nothing to do</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3134">3134</a></td><td>[fund.ts.v3] LFTSv3 contains extraneous [meta] variable templates that should have been deleted by P09961</td><td>San Diego</td><td>Resolved by P1210R0</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3137">3137</a></td><td>Header for <tt>__cpp_lib_to_chars</tt></td><td>San Diego</td><td><i>We've already made the update; but we don't support all the test macros. When we do, this will be closed</i></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3145">3145</a></td><td><tt>file_clock</tt> breaks ABI for C++17 implementations</td><td>San Diego</td><td>Complete</td></tr>
+	<tr><td><a href="https://wg21.link/LWG3147">3147</a></td><td>Definitions of "likely" and "unlikely" are likely to cause problems</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3148">3148</a></td><td><tt>&lt;concepts&gt;</tt> should be freestanding</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3153">3153</a></td><td><tt>Common</tt> and <tt>common_type</tt> have too little in common</td><td>San Diego</td><td></td></tr>
+	<tr><td><a href="https://wg21.link/LWG3154">3154</a></td><td><tt>Common</tt> and <tt>CommonReference</tt> have a common defect</td><td>San Diego</td><td></td></tr>
+
+<!-- 	<tr><td></td><td></td><td></td><td></td></tr> -->
+  </table>
+
+  <p>Last Updated: 28-Nov-2018</p>
+</div>
+</body>
+</html>

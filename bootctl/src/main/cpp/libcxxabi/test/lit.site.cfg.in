@@ -1,0 +1,29 @@
+@AUTO_GEN_COMMENT@
+config.cxx_under_test           = "@LIBCXXABI_COMPILER@"
+config.project_obj_root         = "@CMAKE_BINARY_DIR@"
+config.libcxxabi_src_root       = "@LIBCXXABI_SOURCE_DIR@"
+config.libcxxabi_obj_root       = "@LIBCXXABI_BINARY_DIR@"
+config.abi_library_path         = "@LIBCXXABI_LIBRARY_DIR@"
+config.libcxx_src_root          = "@LIBCXXABI_LIBCXX_PATH@"
+config.cxx_headers              = "@LIBCXXABI_LIBCXX_INCLUDES@"
+config.libunwind_headers        = "@LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL@"
+config.cxx_library_root         = "@LIBCXXABI_LIBCXX_LIBRARY_PATH@"
+config.llvm_unwinder            = "@LIBCXXABI_USE_LLVM_UNWINDER@"
+config.enable_threads           = "@LIBCXXABI_ENABLE_THREADS@"
+config.use_sanitizer            = "@LLVM_USE_SANITIZER@"
+config.sanitizer_library        = "@LIBCXXABI_SANITIZER_LIBRARY@"
+config.enable_32bit             = "@LIBCXXABI_BUILD_32_BITS@"
+config.target_info              = "@LIBCXXABI_TARGET_INFO@"
+config.executor                 = "@LIBCXXABI_EXECUTOR@"
+config.libcxxabi_shared         = "@LIBCXXABI_ENABLE_SHARED@"
+config.enable_shared            = "@LIBCXX_ENABLE_SHARED@"
+config.enable_exceptions        = "@LIBCXXABI_ENABLE_EXCEPTIONS@"
+config.host_triple              = "@LLVM_HOST_TRIPLE@"
+config.target_triple            = "@TARGET_TRIPLE@"
+config.use_target               = len("@LIBCXXABI_TARGET_TRIPLE@") > 0
+config.sysroot                  = "@LIBCXXABI_SYSROOT@"
+config.gcc_toolchain            = "@LIBCXXABI_GCC_TOOLCHAIN@"
+config.cxx_ext_threads          = "@LIBCXXABI_BUILD_EXTERNAL_THREAD_LIBRARY@"
+
+# Let the main config do the real work.
+lit_config.load_config(config, "@LIBCXXABI_SOURCE_DIR@/test/lit.cfg")

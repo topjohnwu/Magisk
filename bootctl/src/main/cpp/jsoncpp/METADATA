@@ -1,0 +1,15 @@
+name: "jsoncpp"
+description: "JsonCpp is a C++ library that allows manipulating JSON values, including serialization and deserialization to and from strings."
+third_party {
+  url {
+    type: ARCHIVE
+    value: "https://github.com/open-source-parsers/jsoncpp/archive/1.9.4.tar.gz"
+  }
+  version: "1.9.4"
+  license_type: NOTICE
+  last_upgrade_date {
+    year: 2021
+    month: 2
+    day: 24
+  }
+}

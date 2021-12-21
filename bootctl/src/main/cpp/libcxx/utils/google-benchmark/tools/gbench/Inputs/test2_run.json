@@ -1,0 +1,81 @@
+{
+  "context": {
+    "date": "2016-08-02 17:44:46",
+    "num_cpus": 4,
+    "mhz_per_cpu": 4228,
+    "cpu_scaling_enabled": false,
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_Hi",
+      "iterations": 1234,
+      "real_time": 42,
+      "cpu_time": 24,
+      "time_unit": "ms"
+    },
+    {
+      "name": "BM_Zero",
+      "iterations": 1000,
+      "real_time": 10,
+      "cpu_time": 10,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_Zero/4",
+      "iterations": 4000,
+      "real_time": 40,
+      "cpu_time": 40,
+      "time_unit": "ns"
+    },
+    {
+      "name": "Prefix/BM_Zero",
+      "iterations": 2000,
+      "real_time": 20,
+      "cpu_time": 20,
+      "time_unit": "ns"
+    },
+    {
+      "name": "Prefix/BM_Zero/3",
+      "iterations": 3000,
+      "real_time": 30,
+      "cpu_time": 30,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_One",
+      "iterations": 5000,
+      "real_time": 5,
+      "cpu_time": 5,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_One/4",
+      "iterations": 2000,
+      "real_time": 20,
+      "cpu_time": 20,
+      "time_unit": "ns"
+    },
+    {
+      "name": "Prefix/BM_One",
+      "iterations": 1000,
+      "real_time": 10,
+      "cpu_time": 10,
+      "time_unit": "ns"
+    },
+    {
+      "name": "Prefix/BM_One/3",
+      "iterations": 1500,
+      "real_time": 15,
+      "cpu_time": 15,
+      "time_unit": "ns"
+    },
+    {
+      "name": "BM_Bye",
+      "iterations": 5321,
+      "real_time": 11,
+      "cpu_time": 63,
+      "time_unit": "ns"
+    }
+  ]
+}

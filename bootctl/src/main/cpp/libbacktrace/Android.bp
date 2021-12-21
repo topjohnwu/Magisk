@@ -1,0 +1,258 @@
+//
+// Copyright (C) 2014 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_defaults {
+    name: "libbacktrace_common",
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
+}
+
+libbacktrace_sources = [
+    "Backtrace.cpp",
+    "BacktraceCurrent.cpp",
+    "BacktracePtrace.cpp",
+    "ThreadEntry.cpp",
+    "UnwindStack.cpp",
+    "UnwindStackMap.cpp",
+]
+
+cc_library_headers {
+    name: "libbacktrace_headers",
+    vendor_available: true,
+    product_available: true,
+    host_supported: true,
+    recovery_available: true,
+    vendor_ramdisk_available: true,
+    native_bridge_supported: true,
+    export_include_dirs: ["include"],
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    target: {
+        linux_glibc: {
+            enabled: true,
+        },
+        linux_bionic: {
+            enabled: true,
+        },
+    },
+    min_sdk_version: "apex_inherit",
+}
+
+cc_defaults {
+    name: "libbacktrace_defaults",
+    defaults: ["libbacktrace_common"],
+
+    cflags: [
+        "-Wexit-time-destructors",
+    ],
+
+    srcs: [
+        "BacktraceMap.cpp",
+    ],
+
+    export_include_dirs: ["include"],
+
+    target: {
+        darwin: {
+            enabled: true,
+            shared_libs: [
+                "libbase",
+            ],
+        },
+        linux: {
+            srcs: libbacktrace_sources,
+
+            shared_libs: [
+                "libbase",
+                "liblog",
+            ],
+
+            static_libs: [
+                "libprocinfo",
+            ],
+        },
+        android: {
+            static_libs: ["libasync_safe"],
+            static: {
+                whole_static_libs: ["libasync_safe"],
+            },
+        },
+    },
+}
+
+cc_library {
+    name: "libbacktrace",
+    vendor_available: true,
+    product_available: true,
+    // TODO(b/153609531): remove when no longer needed.
+    native_bridge_supported: true,
+    recovery_available: true,
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    min_sdk_version: "apex_inherit",
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+        private: true,
+    },
+    host_supported: true,
+    defaults: ["libbacktrace_defaults"],
+
+    target: {
+        linux: {
+            shared_libs: [
+                "libunwindstack",
+            ],
+        },
+        vendor: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+        },
+        product: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+        },
+        recovery: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+        },
+        native_bridge: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+        },
+    },
+}
+
+// Static library without DEX support to avoid dependencies on the ART APEX.
+cc_library_static {
+    name: "libbacktrace_no_dex",
+    visibility: [
+        "//system/core/debuggerd",
+        "//system/core/init",
+    ],
+    defaults: ["libbacktrace_defaults"],
+    cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+    target: {
+        linux: {
+            static_libs: [
+                "libunwindstack_no_dex",
+            ],
+        },
+    },
+}
+
+cc_test_library {
+    name: "libbacktrace_test",
+    defaults: ["libbacktrace_common"],
+    host_supported: true,
+    strip: {
+        none: true,
+    },
+    cflags: ["-O0"],
+    srcs: ["backtrace_testlib.cpp"],
+
+    shared_libs: [
+        "libunwindstack",
+    ],
+
+    target: {
+        linux_glibc: {
+            // This forces the creation of eh_frame with unwind information
+            // for host.
+            cflags: [
+                "-fcxx-exceptions"
+            ],
+        },
+    },
+}
+
+//-------------------------------------------------------------------------
+// The backtrace_test executable.
+//-------------------------------------------------------------------------
+cc_test {
+    name: "backtrace_test",
+    isolated: true,
+    defaults: ["libbacktrace_common"],
+    host_supported: true,
+    test_options: {
+        unit_test: true,
+    },
+    srcs: [
+        "backtrace_test.cpp",
+    ],
+
+    cflags: [
+        "-fno-builtin",
+        "-O0",
+        "-g",
+    ],
+
+    shared_libs: [
+        "libbacktrace",
+        "libbase",
+        "liblog",
+        "libunwindstack",
+    ],
+
+    group_static_libs: true,
+
+    target: {
+        android: {
+            // So that the dlopen can find the libbacktrace_test.so.
+            ldflags: [
+                "-Wl,--rpath,${ORIGIN}",
+            ],
+        },
+    },
+
+    test_suites: ["device-tests"],
+    data: [
+        ":libbacktrace_test",
+        "testdata/arm/*",
+        "testdata/arm64/*",
+        "testdata/x86/*",
+        "testdata/x86_64/*",
+    ],
+}
+
+cc_benchmark {
+    name: "backtrace_benchmarks",
+    defaults: ["libbacktrace_common"],
+
+    srcs: [
+        "backtrace_benchmarks.cpp",
+        "backtrace_read_benchmarks.cpp",
+    ],
+
+    shared_libs: [
+        "libbacktrace",
+        "libbase",
+        "libunwindstack",
+    ],
+}

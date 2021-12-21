@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hidl.token@1.0;
+
+/**
+ * This facilitates converting hidl interfaces into something that
+ * are more easily transferrable to other processes.
+ */
+interface ITokenManager {
+
+    /**
+     * Register an interface. The server must keep a strong reference
+     * to the interface until the token is destroyed by calling unregister.
+     *
+     * Must return empty token on failure.
+     *
+     * @param store Interface which can later be fetched with the returned token.
+     * @return token Opaque value which may be used as inputs to other functions.
+     */
+    createToken(interface store) generates (vec<uint8_t>token);
+
+    /**
+     * Destory a token and the strong reference to the associated interface.
+     *
+     * @param token Token received from createToken
+     * @return success Whether or not the token was successfully unregistered.
+     */
+    unregister(vec<uint8_t> token) generates (bool success);
+
+    /**
+     * Fetch an interface from a provided token.
+     *
+     * @param token Token received from createToken
+     * @return store Interface registered with createToken and the corresponding
+     *               token or nullptr.
+     */
+    get(vec<uint8_t> token) generates (interface store);
+};

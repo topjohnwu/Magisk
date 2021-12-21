@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2020 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<configuration description="Runs FMQ on-device integration tests.">
+    <option name="test-suite-tag" value="apct" />
+    <option name="test-suite-tag" value="apct-native" />
+
+    <target_preparer class="com.android.tradefed.targetprep.RootTargetPreparer"/>
+
+    <target_preparer class="com.android.tradefed.targetprep.PushFilePreparer">
+      <!-- We would like to abort, but currently there is not a simple way to specify installation of both bitnesses of targets. -->
+      <option name="abort-on-push-failure" value="false"/>
+
+      <option name="push" value="fmq_test_client32->/data/nativetest/fmq_test_client/fmq_test_client" />
+      <option name="push" value="fmq_test_client64->/data/nativetest64/fmq_test_client/fmq_test_client" />
+
+      <option name="push" value="android.hardware.tests.msgq@1.0-service-test32->/data/nativetest/android.hardware.tests.msgq@1.0-service-test/android.hardware.tests.msgq@1.0-service-test" />
+      <option name="push" value="android.hardware.tests.msgq@1.0-service-test64->/data/nativetest64/android.hardware.tests.msgq@1.0-service-test/android.hardware.tests.msgq@1.0-service-test" />
+
+      <option name="cleanup" value="true" />
+    </target_preparer>
+
+    <test class="com.android.tradefed.testtype.python.PythonBinaryHostTest" >
+        <option name="par-file-name" value="fmq_test" />
+        <option name="test-timeout" value="2m" />
+    </test>
+</configuration>
+

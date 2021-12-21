@@ -1,0 +1,7 @@
+{
+  "presubmit": [
+    {
+      "name": "libbase_test"
+    }
+  ]
+}

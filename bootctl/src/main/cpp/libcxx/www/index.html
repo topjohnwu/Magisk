@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>"libc++" C++ Standard Library</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://libcxxabi.llvm.org/">libc++abi</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/libcxx-dev">libcxx-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/libcxx-commits">libcxx-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>"libc++" C++ Standard Library</h1>
+  <!--*********************************************************************-->
+
+  <p>libc++ is an implementation of the C++ standard library, targeting
+     C++11, C++14 and above.</p>
+
+  <p>All of the code in libc++ is <a
+     href="https://llvm.org/docs/DeveloperPolicy.html#license">dual licensed</a>
+     under the MIT license and the UIUC License (a BSD-like license).</p>
+
+  <!--=====================================================================-->
+  <h2>New Documentation Coming Soon!</h2>
+  <!--=====================================================================-->
+
+  <p> Looking for documentation on how to use, build and test libc++? If so
+      checkout the new libc++ documentation.</p>
+
+  <p><a href="https://libcxx.llvm.org/docs/">
+      Click here for the new libc++ documentation.</a></p>
+
+  <!--=====================================================================-->
+  <h2 id="goals">Features and Goals</h2>
+  <!--=====================================================================-->
+
+    <ul>
+        <li>Correctness as defined by the C++11 standard.</li>
+        <li>Fast execution.</li>
+        <li>Minimal memory use.</li>
+        <li>Fast compile times.</li>
+        <li>ABI compatibility with gcc's libstdc++ for some low-level features
+            such as exception objects, rtti and memory allocation.</li>
+        <li>Extensive unit tests.</li>
+    </ul>
+
+  <!--=====================================================================-->
+  <h2 id="why">Why a new C++ Standard Library for C++11?</h2>
+  <!--=====================================================================-->
+
+  <p>After its initial introduction, many people have asked "why start a new
+     library instead of contributing to an existing library?" (like Apache's
+     libstdcxx, GNU's libstdc++, STLport, etc).  There are many contributing
+     reasons, but some of the major ones are:</p>
+
+  <ul>
+  <li><p>From years of experience (including having implemented the standard
+      library before), we've learned many things about implementing
+      the standard containers which require ABI breakage and fundamental changes
+      to how they are implemented.  For example, it is generally accepted that
+      building std::string using the "short string optimization" instead of
+      using Copy On Write (COW) is a superior approach for multicore
+      machines (particularly in C++11, which has rvalue references).  Breaking
+      ABI compatibility with old versions of the library was
+      determined to be critical to achieving the performance goals of
+      libc++.</p></li>
+
+  <li><p>Mainline libstdc++ has switched to GPL3, a license which the developers
+      of libc++ cannot use.  libstdc++ 4.2 (the last GPL2 version) could be
+      independently extended to support C++11, but this would be a fork of the
+      codebase (which is often seen as worse for a project than starting a new
+      independent one).  Another problem with libstdc++ is that it is tightly
+       integrated with G++ development, tending to be tied fairly closely to the
+       matching version of G++.</p>
+    </li>
+
+  <li><p>STLport and the Apache libstdcxx library are two other popular
+      candidates, but both lack C++11 support.  Our experience (and the
+      experience of libstdc++ developers) is that adding support for C++11 (in
+      particular rvalue references and move-only types) requires changes to
+      almost every class and function, essentially amounting to a rewrite.
+      Faced with a rewrite, we decided to start from scratch and evaluate every
+      design decision from first principles based on experience.</p>
+
+      <p>Further, both projects are apparently abandoned: STLport 5.2.1 was
+      released in Oct'08, and STDCXX 4.2.1 in May'08.</p>
+
+    </ul>
+
+  <!--=====================================================================-->
+  <h2 id="requirements">Platform Support</h2>
+  <!--=====================================================================-->
+
+  <p>
+    libc++ is known to work on the following platforms, using g++ and
+    clang. Note that functionality provided by &lt;atomic&gt; is only functional with
+    clang.
+  </p>
+
+  <ul>
+    <li>Mac OS X i386</li>
+    <li>Mac OS X x86_64</li>
+    <li>FreeBSD 10+ i386</li>
+    <li>FreeBSD 10+ x86_64</li>
+    <li>FreeBSD 10+ ARM</li>
+    <li>Linux i386</li>
+    <li>Linux x86_64</li>
+  </ul>
+
+  <!--=====================================================================-->
+  <h2 id="dir-structure">Current Status</h2>
+  <!--=====================================================================-->
+
+   <p>libc++ is a 100% complete C++11 implementation on Apple's OS X. </p>
+   <p>LLVM and Clang can self host in C++ and C++11 mode with libc++ on Linux.</p>
+   <p>libc++ is also a 100% complete C++14 implementation. A list of new features and
+      changes for C++14 can be found <a href="cxx1y_status.html">here</a>.</p>
+   <p>libc++'s C++17 implementation is not yet complete. A list of features and changes
+      for C++17 can be found <a href="cxx1z_status.html">here</a>.</p>
+   <p>A list of features and changes for the next C++ standard, known here as
+      "C++2a" (probably to be C++20) can be found <a href="cxx2a_status.html">here</a>.</p>
+   <p>Implementation of the post-C++14 Technical Specifications is in progress. A list of features
+      and the current status of these features can be found <a href="ts1z_status.html">here</a>.</p>
+   <p>As features get moved from the Technical Specifications into the main standard, we
+      will (after a period for migration) remove them from the TS implementation. This
+      process is detailed <a href="TS_deprecation.html">here</a>.</p>
+
+   <!--======================================================================-->
+   <h2 id="buildbots">Build Bots</h2>
+   <!--======================================================================-->
+   <p>The latest libc++ build results can be found at the following locations.</p>
+   <ul>
+      <li><a href="http://lab.llvm.org:8011/console">
+        Buildbot libc++ builders
+      </a></li>
+      <li><a href="http://lab.llvm.org:8080/green/view/Libcxx/">
+        Jenkins libc++ builders
+      </a></li>
+    </ul>
+
+  <!--=====================================================================-->
+  <h2>Get it and get involved!</h2>
+  <!--=====================================================================-->
+
+  <p>First please review our
+     <a href="https://llvm.org/docs/DeveloperPolicy.html">Developer's Policy</a>.
+
+    The documentation for building and using libc++ can be found below.
+    <ul>
+      <li><a href="https://libcxx.llvm.org/docs/UsingLibcxx.html">
+        <b>Using libc++</b></a>
+          Documentation on using the library in your programs</li>
+      <li><a href="https://libcxx.llvm.org/docs/BuildingLibcxx.html">
+        <b>Building libc++</b></a>
+          Documentation on building the library using CMake</li>
+      <li><a href="https://libcxx.llvm.org/docs/TestingLibcxx.html">
+        <b>Testing libc++</b></a>
+          Documentation for developers wishing to test the library</li>
+    </ul>
+
+  <!--=====================================================================-->
+  <h3>Notes and Known Issues</h3>
+  <!--=====================================================================-->
+
+  <p>
+    <ul>
+      <li>
+        Building libc++ with <code>-fno-rtti</code> is not supported. However
+        linking against it with <code>-fno-rtti</code> is supported.
+      </li>
+      <li>
+        On OS X v10.8 and older the CMake option
+        <code>-DLIBCXX_LIBCPPABI_VERSION=""</code> must be used during
+        configuration.
+      </li>
+    </ul>
+  </p>
+
+  <p>Send discussions to the
+    <a href="https://lists.llvm.org/mailman/listinfo/libcxx-dev">libc++ mailing list</a>.</p>
+
+  <!--=====================================================================-->
+  <h2>Bug reports and patches</h2>
+  <!--=====================================================================-->
+
+  <p>
+  If you think you've found a bug in libc++, please report it using
+  the <a href="https://bugs.llvm.org/">LLVM Bugzilla</a>. If you're not sure, you
+  can post a message to the <a href="https://lists.llvm.org/mailman/listinfo/libcxx-dev">libcxx-dev</a>
+  mailing list or on IRC.
+  </p>
+
+  <p>
+  If you want to contribute a patch to libc++, the best place for that is
+  <a href="https://llvm.org/docs/Phabricator.html">Phabricator</a>. Please
+  add libcxx-commits as a subscriber.
+  </p>
+
+  <!--=====================================================================-->
+  <h2>Design Documents</h2>
+  <!--=====================================================================-->
+
+<ul>
+<li><a href="atomic_design.html"><tt>&lt;atomic&gt;</tt></a></li>
+<li><a href="type_traits_design.html"><tt>&lt;type_traits&gt;</tt></a></li>
+<li><a href="https://cplusplusmusings.wordpress.com/2012/07/05/clang-and-standard-libraries-on-mac-os-x/">Excellent notes by Marshall Clow</a></li>
+</ul>
+
+</div>
+</body>
+</html>

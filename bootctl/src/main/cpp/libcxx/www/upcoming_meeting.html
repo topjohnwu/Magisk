@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>libc++ Upcoming Meeting Status</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>libc++ Upcoming Meeting Status</h1>
+  <!--*********************************************************************-->
+
+  <p>This is a temporary page; please check the c++2a status <a href="cxx2a_status.html">here</a></p>
+  <p>This page shows the status of the papers and issues that are expected to be adopted in the next WG21 Meeting.</p>
+
+  <p>The groups that have contributed papers:
+  <ul>
+    <li>LWG - Library working group</li>
+    <li>CWG - Core Language Working group</li>
+    <li>SG1 - Study group #1 (Concurrency working group)</li>
+  </ul>
+  </p>
+
+  <h3>Paper Status</h3>
+	<table border="1">
+	<tr><th>Paper #</th><th>Group</th><th>Paper Name</th><th>Meeting</th><th>Status</th></tr>
+	<tr><td><a href="https://wg21.link/P0487R0">P0487R0</a></td><td>LWG</td><td>Fixing operator&gt;&gt; (basic_istream&amp;, CharT*) (LWG 2499)</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="https://wg21.link/P0602R3">P0602R3</a></td><td>LWG</td><td>variant and optional should propagate copy/move triviality</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="https://wg21.link/P0655R0">P0655R0</a></td><td>LWG</td><td>visit&lt;R&gt;: Explicit Return Type for visit</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="https://wg21.link/P0972R0">P0972R0</a></td><td>LWG</td><td>&lt;chrono&gt; zero(), min(), and max() should be noexcept</td><td>San Diego</td><td>See <a href="https://reviews.llvm.org/D53828">D53828</a></td></tr>
+	<tr><td><a href="https://wg21.link/P1004R0">P1004R0</a></td><td>LWG</td><td>Making std::vector constexpr</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="https://wg21.link/P1006R0">P1006R0</a></td><td>LWG</td><td>Constexpr in std::pointer_traits</td><td>San Diego</td><td>See <a href="https://reviews.llvm.org/D53867">D53867</a></td></tr>
+	<tr><td><a href="https://wg21.link/P1032R0">P1032R0</a></td><td>LWG</td><td>Misc constexpr bits</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="http://wiki.edg.com/pub/LWGBatavia2018/LibraryWorkingGroup/D1148R0a.pdf">D1148</a></td><td>LWG</td><td>Cleaning up Clause 20</td><td>San Diego</td><td><i> </i></td></tr>
+	<tr><td><a href="http://wiki.edg.com/pub/LWGBatavia2018/LibraryWorkingGroup/D1163R0V2.pdf">D1163</a></td><td>LWG</td><td>Explicitly Implicifying explicit Constructors</td><td>San Diego</td><td><i> </i></td></tr>
+	</table>
+
+
+  <h3>Library Working group Issues Status</h3>
+  <table id="issues" border="1">
+	<tr><th>Issue #</th><th>Issue Name</th><th>Meeting</th><th>Status</th></tr>
+
+<tr><td><a href="https://wg21.link/LWG2183">2183</a></td><td>Muddled allocator requirements for <tt>match_results</tt> constructors</td><td>San Diego</td><td>Complete</td></tr>
+<tr><td><a href="https://wg21.link/LWG2184">2184</a></td><td>Muddled allocator requirements for <tt>match_results</tt> assignments</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2412">2412</a></td><td><tt>promise::set_value()</tt> and <tt>promise::get_future()</tt> should not race</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2682">2682</a></td><td><code>filesystem::copy()</code> won't create a symlink to a directory</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2697">2697</a></td><td>[concurr.ts] Behavior of <tt>future/shared_future</tt> unwrapping constructor when given an invalid <tt>future</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2936">2936</a></td><td>Path comparison is defined in terms of the generic format</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2943">2943</a></td><td>Problematic specification of the wide version of <tt>basic_filebuf::open</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2960">2960</a></td><td>[fund.ts.v3] <tt>nonesuch</tt> is insufficiently useless</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG2995">2995</a></td><td><tt>basic_stringbuf</tt> default constructor forbids it from using SSO capacity</td><td>San Diego</td><td><i>We know how to do this</i></td></tr>
+<tr><td><a href="https://wg21.link/LWG2996">2996</a></td><td>Missing rvalue overloads for <tt>shared_ptr</tt> operations</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3008">3008</a></td><td><tt>make_shared</tt> (sub)object destruction semantics are not specified</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3025">3025</a></td><td>Map-like container deduction guides should use <tt>pair&lt;Key, T&gt;</tt>, not <tt>pair&lt;const Key, T&gt;</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3031">3031</a></td><td>Algorithms and predicates with non-const reference arguments</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3037">3037</a></td><td><tt>polymorphic_allocator</tt> and incomplete types</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3038">3038</a></td><td><tt>polymorphic_allocator::allocate</tt> should not allow integer overflow to create vulnerabilities</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3054">3054</a></td><td><tt>uninitialized_copy</tt> appears to not be able to meet its exception-safety guarantee</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3065">3065</a></td><td>LWG 2989 missed that all <tt>path</tt>'s other operators should be hidden friends as well</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3096">3096</a></td><td><tt>path::lexically_relative</tt> is confused by trailing slashes</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3116">3116</a></td><td><tt><i>OUTERMOST_ALLOC_TRAITS</i></tt> needs <tt>remove_reference_t</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3122">3122</a></td><td><tt>__cpp_lib_chrono_udls</tt> was accidentally dropped</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3127">3127</a></td><td><tt>basic_osyncstream::rdbuf</tt> needs a <tt>const_cast</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3128">3128</a></td><td><tt>strstream::rdbuf</tt> needs a <tt>const_cast</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3129">3129</a></td><td><tt>regex_token_iterator</tt> constructor uses wrong pointer arithmetic</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3130">3130</a></td><td>&sect;[input.output] needs many <tt>addressof</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3131">3131</a></td><td><tt>addressof</tt> all the things</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3132">3132</a></td><td>Library needs to ban macros named <tt>expects</tt> or <tt>ensures</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3134">3134</a></td><td>[fund.ts.v3] LFTSv3 contains extraneous [meta] variable templates that should have been deleted by P09961</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3137">3137</a></td><td>Header for <tt>__cpp_lib_to_chars</tt></td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3145">3145</a></td><td><tt>file_clock</tt> breaks ABI for C++17 implementations</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3147">3147</a></td><td>Definitions of "likely" and "unlikely" are likely to cause problems</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3148">3148</a></td><td><tt>&lt;concepts&gt;</tt> should be freestanding</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3153">3153</a></td><td><tt>Common</tt> and <tt>common_type</tt> have too little in common</td><td>San Diego</td><td></td></tr>
+<tr><td><a href="https://wg21.link/LWG3154">3154</a></td><td><tt>Common</tt> and <tt>CommonReference</tt> have a common defect</td><td>San Diego</td><td></td></tr>
+
+</table>
+
+<h3>Issues to "Review"</h3>
+<table border="1">
+<tr><th>Issue #</th><th>Issue Name</th><th>Meeting</th><th>Status</th></tr>
+</table>
+
+
+<h3>Comments about the issues</h3>
+<ul>
+<li>2183 - We're missing tests for match_results (copy ctor, move ctor). I committed them in r344988.</li>
+<li>2184 - We're missing tests for match_results (copy assign, move assing). I wrote them. Unfortunately, the move-assign test fails.</li>
+<li>2412 - </li>
+<li>2682 - Eric? </li>
+<li>2697 - </li>
+<li>2936 - </li>
+<li>2943 - Eric? I suspect that this is no change for us.</li>
+<li>2960 - </li>
+<li>2995 - We used to do this. Reverting r320604 and r321124 will get us back there.</li>
+<li>2996 - </li>
+<li>3008 - </li>
+<li>3025 - </li>
+<li>3031 - Marshall says: I don't think we have to do anything for this issue. Maybe some tests; maybe a static_assert.</li>
+<li>3037 - Marshall says: We don't have std::polymorphic_allocator yet.</li>
+<li>3038 - Marshall says: We don't have std::polymorphic_allocator yet.</li>
+<li>3054 - Marshall says: We already do this; may need to update some tests.</li>
+<li>3065 - </li>
+<li>3096 - Eric? </li>
+<li>3116 - </li>
+<li>3122 - Marshall says I have updated the comments in &lt;version&gt; and in the tests.</li>
+<li>3127 - Marshall says: We don't have basic_osyncstream yet.</li>
+<li>3128 - </li>
+<li>3129 - Marshall says: This is an easy change; I think this is more wording cleanup than anything. I will prepare a patch</li>
+<li>3130 - </li>
+<li>3131 - Only changes 11 & 12 affect libc++. </li>
+<li>3132 - Marshall says: I don't think we have to do anything for this issue</li>
+<li>3134 - Marshall says: I don't think we have to do anything for this issue</li>
+<li>3137 - Marshall says I have updated the comments in &lt;version&gt; and in the tests.</li>
+<li>3145 - Eric? </li>
+<li>3147 - Marshall - I don't think we have to do anything for this issue</li>
+<li>3148 - </li>
+<li>3153 - </li>
+<li>3154 - </li>
+</ul>
+
+<p>Last Updated: 29-Oct-2018</p>
+</div>
+</body>
+</html>

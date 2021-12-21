@@ -1,0 +1,239 @@
+// Copyright (C) 2016 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package {
+    default_applicable_licenses: ["system_libhidl_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_libhidl_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "libhidl-defaults",
+    cflags: [
+        "-Wall",
+        "-Wdocumentation", // since some users use this
+        "-Werror",
+        "-Wextra-semi",
+    ],
+}
+
+phony {
+    name: "libhidl",
+    required: [
+        "libhidlbase",
+    ],
+}
+
+cc_library_headers {
+    name: "libhidl_gtest_helper",
+    export_include_dirs: ["gtest_helper"],
+}
+
+cc_test {
+    name: "libhidl_test",
+    host_supported: true,
+    defaults: ["libhidl-defaults"],
+    gtest: false,
+    srcs: ["test_main.cpp"],
+    test_suites: ["device-tests"],
+
+    shared_libs: [
+        "android.hidl.memory@1.0",
+        "libbase",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+        "libcutils",
+    ],
+    static_libs: [
+        "libgtest",
+        "libgmock",
+    ],
+
+    cflags: [
+        "-O0",
+        "-g",
+    ],
+}
+
+cc_library {
+    name: "libhidlbase",
+    defaults: ["libhidlbase-combined-impl"],
+    host_supported: true,
+    // TODO(b/153609531): remove when no longer needed.
+    native_bridge_supported: true,
+    recovery_available: true,
+    vendor_available: true,
+    product_available: true,
+    apex_available: [
+        // TODO(b/137948090): not fully supported in APEX for certain usecases
+        // - large dependency sizes
+        // - VINTF manifest cannot be read from APEX
+        // - no testing story/infra for deprecation schedule
+        "//apex_available:platform",
+        "com.android.neuralnetworks",
+        "test_com.android.neuralnetworks",
+        "com.android.bluetooth.updatable",
+        "com.android.media",
+        "com.android.media.swcodec",
+        "com.android.tethering",
+    ],
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
+    whole_static_libs: [
+        "libhwbinder-impl-internal",
+    ],
+    min_sdk_version: "29",
+}
+
+// Only libhwbinder_benchmark needs to have pgo enabled. When all places
+// support having PGO selectively enabled, all places can use libhwbinder.
+//
+// http://b/77320844
+cc_library {
+    name: "libhidlbase_pgo",
+    defaults: [
+        "libhidlbase-combined-impl",
+        "hwbinder_benchmark_pgo",
+    ],
+    whole_static_libs: [
+        "libhwbinder_pgo-impl-internal",
+    ],
+
+    visibility: ["//system/libhwbinder:__subpackages__"],
+}
+
+// WARNING: deprecated
+// This library is no longer required, and dependencies should be taken on libhidlbase instead.
+// This is automatically removed by bpfix. Once there are no makefiles, fixes can be automatically applied, and this can be removed.
+cc_library {
+    name: "libhidltransport",
+    vendor_available: true,
+
+    visibility: [
+        ":__subpackages__",
+        "//hardware:__subpackages__",
+        "//test/sts:__subpackages__",
+        "//vendor:__subpackages__",
+    ],
+}
+
+cc_defaults {
+    name: "libhidlbase-combined-impl",
+
+    defaults: [
+        "hidl-module-defaults",
+        "libhidl-defaults",
+        "libhwbinder-impl-shared-libs",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libutils",
+        "libcutils",
+    ],
+    export_shared_lib_headers: [
+        "libcutils", // for native_handle.h
+        "libutils",
+    ],
+    static_libs: [
+        "libhwbinder-impl-internal",
+    ],
+
+    target: {
+        android: {
+            shared_libs: [
+                "libvndksupport",
+            ],
+        },
+        recovery: {
+            exclude_shared_libs: [
+                "libvndksupport",
+            ],
+        },
+    },
+
+    export_include_dirs: [
+        "base/include",
+        "transport/include",
+    ],
+
+    header_libs: [
+        "libfmq-base",
+    ],
+    export_header_lib_headers: [
+        "libfmq-base",
+    ],
+
+    generated_sources: [
+        "android.hidl.manager@1.0_genc++",
+        "android.hidl.manager@1.1_genc++",
+        "android.hidl.manager@1.2_genc++",
+        "android.hidl.base@1.0_genc++",
+    ],
+    generated_headers: [
+        "android.hidl.manager@1.0_genc++_headers",
+        "android.hidl.manager@1.1_genc++_headers",
+        "android.hidl.manager@1.2_genc++_headers",
+        "android.hidl.base@1.0_genc++_headers",
+    ],
+    export_generated_headers: [
+        "android.hidl.manager@1.0_genc++_headers",
+        "android.hidl.manager@1.1_genc++_headers",
+        "android.hidl.manager@1.2_genc++_headers",
+        "android.hidl.base@1.0_genc++_headers",
+    ],
+
+    srcs: [
+        "base/HidlInternal.cpp",
+        "base/HidlSupport.cpp",
+        "base/Status.cpp",
+        "base/TaskRunner.cpp",
+        "transport/HidlBinderSupport.cpp",
+        "transport/HidlLazyUtils.cpp",
+        "transport/HidlPassthroughSupport.cpp",
+        "transport/HidlTransportSupport.cpp",
+        "transport/HidlTransportUtils.cpp",
+        "transport/LegacySupport.cpp",
+        "transport/ServiceManagement.cpp",
+        "transport/Static.cpp",
+    ],
+
+    product_variables: {
+        debuggable: {
+            cflags: ["-DLIBHIDL_TARGET_DEBUGGABLE"],
+        },
+        enforce_vintf_manifest: {
+            cflags: ["-DENFORCE_VINTF_MANIFEST"],
+        },
+    },
+
+    sanitize: {
+        misc_undefined: ["integer"],
+    },
+}

@@ -1,0 +1,199 @@
+sudo: required
+dist: trusty
+language: cpp
+
+env:
+  global:
+    - /usr/local/bin:$PATH
+
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          packages:
+            - lcov
+      env: COMPILER=g++ C_COMPILER=gcc BUILD_TYPE=Coverage
+    - compiler: gcc
+      env: COMPILER=g++ C_COMPILER=gcc BUILD_TYPE=Debug
+    - compiler: gcc
+      env: COMPILER=g++ C_COMPILER=gcc BUILD_TYPE=Release
+    - compiler: gcc
+      addons:
+        apt:
+          packages:
+            - g++-multilib
+      env: COMPILER=g++ C_COMPILER=gcc BUILD_TYPE=Debug BUILD_32_BITS=ON
+    - compiler: gcc
+      addons:
+        apt:
+          packages:
+            - g++-multilib
+      env: COMPILER=g++ C_COMPILER=gcc BUILD_TYPE=Release BUILD_32_BITS=ON
+    - compiler: gcc
+      env:
+        - INSTALL_GCC6_FROM_PPA=1
+        - COMPILER=g++-6 C_COMPILER=gcc-6  BUILD_TYPE=Debug
+        - ENABLE_SANITIZER=1
+        - EXTRA_FLAGS="-fno-omit-frame-pointer -g -O2 -fsanitize=undefined,address -fuse-ld=gold"
+    - compiler: clang
+      env: COMPILER=clang++ C_COMPILER=clang BUILD_TYPE=Debug
+    - compiler: clang
+      env: COMPILER=clang++ C_COMPILER=clang BUILD_TYPE=Release
+    # Clang w/ libc++
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            clang-3.8
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Debug
+        - LIBCXX_BUILD=1
+        - EXTRA_FLAGS="-stdlib=libc++"
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            clang-3.8
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Release
+        - LIBCXX_BUILD=1
+        - EXTRA_FLAGS="-stdlib=libc++"
+    # Clang w/ 32bit libc++
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.8
+            - g++-multilib
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Debug
+        - LIBCXX_BUILD=1
+        - BUILD_32_BITS=ON
+        - EXTRA_FLAGS="-stdlib=libc++ -m32"
+    # Clang w/ 32bit libc++
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.8
+            - g++-multilib
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Release
+        - LIBCXX_BUILD=1
+        - BUILD_32_BITS=ON
+        - EXTRA_FLAGS="-stdlib=libc++ -m32"
+    # Clang w/ libc++, ASAN, UBSAN
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            clang-3.8
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Debug
+        - LIBCXX_BUILD=1 LIBCXX_SANITIZER="Undefined;Address"
+        - ENABLE_SANITIZER=1
+        - EXTRA_FLAGS="-stdlib=libc++ -g -O2 -fno-omit-frame-pointer -fsanitize=undefined,address -fno-sanitize-recover=all"
+        - UBSAN_OPTIONS=print_stacktrace=1
+    # Clang w/ libc++ and MSAN
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            clang-3.8
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=Debug
+        - LIBCXX_BUILD=1 LIBCXX_SANITIZER=MemoryWithOrigins
+        - ENABLE_SANITIZER=1
+        - EXTRA_FLAGS="-stdlib=libc++ -g -O2 -fno-omit-frame-pointer -fsanitize=memory -fsanitize-memory-track-origins"
+    # Clang w/ libc++ and MSAN
+    - compiler: clang
+      addons:
+        apt:
+          packages:
+            clang-3.8
+      env:
+        - COMPILER=clang++-3.8 C_COMPILER=clang-3.8 BUILD_TYPE=RelWithDebInfo
+        - LIBCXX_BUILD=1 LIBCXX_SANITIZER=Thread
+        - ENABLE_SANITIZER=1
+        - EXTRA_FLAGS="-stdlib=libc++ -g -O2 -fno-omit-frame-pointer -fsanitize=thread -fno-sanitize-recover=all"
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env:
+        - COMPILER=clang++ BUILD_TYPE=Debug
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env:
+        - COMPILER=clang++ BUILD_TYPE=Release
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env:
+        - COMPILER=clang++ BUILD_TYPE=Release BUILD_32_BITS=ON
+    - os: osx
+      osx_image: xcode8.3
+      compiler: gcc
+      env:
+        - COMPILER=g++-7 C_COMPILER=gcc-7  BUILD_TYPE=Debug
+
+before_script:
+  - if [ -n "${LIBCXX_BUILD}" ]; then
+      source .travis-libcxx-setup.sh;
+    fi
+  - if [ -n "${ENABLE_SANITIZER}" ]; then
+      export EXTRA_OPTIONS="-DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF";
+    else
+      export EXTRA_OPTIONS="";
+    fi
+  - mkdir -p build && cd build
+
+before_install:
+  - if [ -z "$BUILD_32_BITS" ]; then
+      export BUILD_32_BITS=OFF && echo disabling 32 bit build;
+    fi
+  - if [ -n "${INSTALL_GCC6_FROM_PPA}" ]; then
+      sudo add-apt-repository -y "ppa:ubuntu-toolchain-r/test";
+      sudo apt-get update --option Acquire::Retries=100 --option Acquire::http::Timeout="60";
+    fi
+
+install:
+  - if [ -n "${INSTALL_GCC6_FROM_PPA}" ]; then
+      travis_wait sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-6;
+    fi
+  - if [ "${TRAVIS_OS_NAME}" == "linux" -a "${BUILD_32_BITS}" == "OFF" ]; then
+      travis_wait sudo -E apt-get -y --no-install-suggests --no-install-recommends install llvm-3.9-tools;
+      sudo cp /usr/lib/llvm-3.9/bin/FileCheck /usr/local/bin/;
+    fi
+  - if [ "${BUILD_TYPE}" == "Coverage" -a "${TRAVIS_OS_NAME}" == "linux" ]; then
+      PATH=~/.local/bin:${PATH};
+      pip install --user --upgrade pip;
+      travis_wait pip install --user cpp-coveralls;
+    fi
+  - if [ "${C_COMPILER}" == "gcc-7" -a "${TRAVIS_OS_NAME}" == "osx" ]; then
+      rm -f /usr/local/include/c++;
+      brew update;
+      travis_wait brew install gcc@7;
+    fi
+  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+      sudo apt-get update -qq;
+      sudo apt-get install -qq unzip;
+      wget https://github.com/bazelbuild/bazel/releases/download/0.10.1/bazel-0.10.1-installer-linux-x86_64.sh --output-document bazel-installer.sh;
+      travis_wait sudo bash bazel-installer.sh;
+    fi
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+      curl -L -o bazel-installer.sh https://github.com/bazelbuild/bazel/releases/download/0.10.1/bazel-0.10.1-installer-darwin-x86_64.sh;
+      travis_wait sudo bash bazel-installer.sh;
+    fi
+
+script:
+  - cmake -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_FLAGS="${EXTRA_FLAGS}" -DBENCHMARK_DOWNLOAD_DEPENDENCIES=ON -DBENCHMARK_BUILD_32_BITS=${BUILD_32_BITS} ${EXTRA_OPTIONS} ..
+  - make
+  - ctest -C ${BUILD_TYPE} --output-on-failure
+  - bazel test -c dbg --define google_benchmark.have_regex=posix --announce_rc --verbose_failures --test_output=errors --keep_going //test/...
+
+after_success:
+  - if [ "${BUILD_TYPE}" == "Coverage" -a "${TRAVIS_OS_NAME}" == "linux" ]; then
+      coveralls --include src --include include --gcov-options '\-lp' --root .. --build-root .;
+    fi

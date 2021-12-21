@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>libc++ Fundamentals TS Status</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>Post-C++14 TS Implementation Status</h1>
+  <!--*********************************************************************-->
+
+  <p>In November 2014, the C++ standard committee approved the draft for the next version of the C++ standard, known as "C++1z" (probably to be C++17)</p>
+  <p>In addition, there are several "Technical Specifications", that consist of new features that are proposed, but not yet accepted for C++1z.</p>
+  <p>This page shows the status of libc++; the status of clang's support of the language features is <a href="https://clang.llvm.org/cxx_status.html">here</a>.</p>
+
+  <h3>Technical Specifications</h3>
+  <table id="TS" border="1">
+	<tr><th>Paper Number</th><th>Paper Title</th><th>TS</th></tr>
+
+	<tr><td><a href="https://wg21.link/n4023">4023</a></td><td>C++ Extensions for Library Fundamentals</td><td>Library Fundamentals 1</td></tr>
+	<tr><td><a href="https://wg21.link/n3940">3940</a></td><td>Technical Specification - File System</td><td>File System</td></tr>
+	<tr><td></td><td></td><td></td></tr>
+
+	<tr><td><a href="https://wg21.link/n4273">4273</a></td><td>Uniform Container Erasure.</td><td>Library Fundamentals 2</td></tr>
+	<tr><td><a href="https://wg21.link/n4061">4061</a></td><td>Greatest Common Divisor and Least Common Multiple.</td><td>Library Fundamentals 2</td></tr>
+	<tr><td><a href="https://wg21.link/n4257">4257</a></td><td>Delimited iterators.</td><td>Library Fundamentals 2</td></tr>
+	<tr><td><a href="https://wg21.link/n4282">4282</a></td><td>The World's Dumbest Smart Pointer.</td><td>Library Fundamentals 2</td></tr>
+	<tr><td></td><td></td><td></td></tr>
+
+  </table>
+
+  <h3>Features in Library Fundamentals 1</h3>
+  <table id="Features" border="1">
+	<tr><th>Feature Name</th><th>Status</th></tr>
+	<tr><td>Uses-allocator construction</td><td>Not started</td></tr>
+	<tr><td>Changes to std::shared_ptr and weak_ptr</td><td>Not started</td></tr>
+	<tr><td>Additions to std::function</td><td>Not started</td></tr>
+	<tr><td>Additions to std::promise</td><td>Not started</td></tr>
+	<tr><td>Additions to std::packaged_task</td><td>Not started</td></tr>
+  <tr><td></td><td></td></tr>
+	<tr><td>Class erased_type</td><td>Complete</td></tr>
+	<tr><td>Calling a function with a tuple of arguments</td><td>Complete</td></tr>
+	<tr><td>Type traits (_v)</td><td>Complete</td></tr>
+	<tr><td>Other type transformations</td><td>Not started</td></tr>
+	<tr><td>Compile-time Rational Arithmetic</td><td>Implementation in progress</td></tr>
+	<tr><td>Time Utilities</td><td>Complete</td></tr>
+	<tr><td>System Error Support</td><td>Complete</td></tr>
+  <tr><td></td><td></td></tr>
+      <tr><td>Class memory_resource</td><td>Complete</td></tr>
+      <tr><td>Class template polymorphic_allocator</td><td>Complete</td></tr>
+      <tr><td>Template alias resource_adaptor</td><td>Complete</td></tr>
+      <tr><td>Global memory resources</td><td>Complete</td></tr>
+      <tr><td>Pool resource classes</td><td>Implementation in progress</td></tr>
+      <tr><td>Class monotonic_buffer_resource</td><td>Implementation in progress</td></tr>
+      <tr><td>Alias templates using polymorphic memory resource</td><td>Complete</td></tr>
+  <tr><td></td><td></td></tr>
+	<tr><td>Searchers</td><td>Complete</td></tr>
+	<tr><td>Optional Objects</td><td>Initial implementation complete</td></tr>
+	<tr><td>class any</td><td>Complete</td></tr>
+	<tr><td>string_view</td><td>Complete</td></tr>
+	<tr><td>memory</td><td>Implementation in progress</td></tr>
+	<tr><td>Algorithms library</td><td>Complete</td></tr>
+
+  </table>
+
+  <h3>Features in Library Fundamentals 2</h3>
+  <table id="Features" border="1">
+	<tr><th>Feature Name</th><th>Status</th></tr>
+<!--  <tr><td></td><td></td></tr> -->
+
+  </table>
+
+  <h3>Features in Filesystem</h3>
+  <table id="Features" border="1">
+	<tr><th>Feature Name</th><th>Status</th><th>First released version</th></tr>
+	<tr><td>All features</td><td>Complete</td><td>3.9</td></tr>
+
+  </table>
+
+  <p>Last Updated: 17-June-2016</p>
+</div>
+</body>
+</html>

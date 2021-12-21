@@ -1,0 +1,37 @@
+# Makefile for Sphinx documentation
+#
+# FIXME: This hack is only in place to allow the libcxx.llvm.org/docs builder
+# to work with libcxx. This should be removed when that builder supports
+# out-of-tree builds.
+
+# You can set these variables from the command line.
+SPHINXOPTS    = -n -W -v
+SPHINXBUILD   = sphinx-build
+PAPER         =
+BUILDDIR      = _build
+
+# Internal variables.
+PAPEROPT_a4     = -D latex_paper_size=a4
+PAPEROPT_letter = -D latex_paper_size=letter
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+# the i18n builder cannot share the environment and doctrees with the others
+I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+
+.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext default
+
+default: html
+
+help:
+	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  html       to make standalone HTML files"
+
+clean:
+	-rm -rf $(BUILDDIR)/*
+
+html:
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo
+	@# FIXME: Remove this `cp` once HTML->Sphinx transition is completed.
+	@# Kind of a hack, but HTML-formatted docs are on the way out anyway.
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+

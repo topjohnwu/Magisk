@@ -1,0 +1,309 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>&lt;atomic&gt; design</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>&lt;atomic&gt; design</h1>
+  <!--*********************************************************************-->
+
+<p>
+The compiler supplies all of the intrinsics as described below.  This list of
+intrinsics roughly parallels the requirements of the C and C++ atomics
+proposals.  The C and C++ library implementations simply drop through to these
+intrinsics.  Anything the platform does not support in hardware, the compiler
+arranges for a (compiler-rt) library call to be made which will do the job with
+a mutex, and in this case ignoring the memory ordering parameter (effectively
+implementing <tt>memory_order_seq_cst</tt>).
+</p>
+
+<p>
+Ultimate efficiency is preferred over run time error checking.  Undefined
+behavior is acceptable when the inputs do not conform as defined below.
+</p>
+
+<blockquote><pre>
+<font color="#C80000">// In every intrinsic signature below, type* atomic_obj may be a pointer to a</font>
+<font color="#C80000">//    volatile-qualified type.</font>
+<font color="#C80000">// Memory ordering values map to the following meanings:</font>
+<font color="#C80000">//   memory_order_relaxed == 0</font>
+<font color="#C80000">//   memory_order_consume == 1</font>
+<font color="#C80000">//   memory_order_acquire == 2</font>
+<font color="#C80000">//   memory_order_release == 3</font>
+<font color="#C80000">//   memory_order_acq_rel == 4</font>
+<font color="#C80000">//   memory_order_seq_cst == 5</font>
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// type represents a "type argument"</font>
+bool __atomic_is_lock_free(type);
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// Behavior is defined for mem_ord = 0, 1, 2, 5</font>
+type __atomic_load(const type* atomic_obj, int mem_ord);
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// Behavior is defined for mem_ord = 0, 3, 5</font>
+void __atomic_store(type* atomic_obj, type desired, int mem_ord);
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_exchange(type* atomic_obj, type desired, int mem_ord);
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// Behavior is defined for mem_success = [0 ... 5],</font>
+<font color="#C80000">//   mem_failure &lt;= mem_success</font>
+<font color="#C80000">//   mem_failure != 3</font>
+<font color="#C80000">//   mem_failure != 4</font>
+bool __atomic_compare_exchange_strong(type* atomic_obj,
+                                      type* expected, type desired,
+                                      int mem_success, int mem_failure);
+
+<font color="#C80000">// type must be trivially copyable</font>
+<font color="#C80000">// Behavior is defined for mem_success = [0 ... 5],</font>
+<font color="#C80000">//   mem_failure &lt;= mem_success</font>
+<font color="#C80000">//   mem_failure != 3</font>
+<font color="#C80000">//   mem_failure != 4</font>
+bool __atomic_compare_exchange_weak(type* atomic_obj,
+                                    type* expected, type desired,
+                                    int mem_success, int mem_failure);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_fetch_add(type* atomic_obj, type operand, int mem_ord);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_fetch_sub(type* atomic_obj, type operand, int mem_ord);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_fetch_and(type* atomic_obj, type operand, int mem_ord);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_fetch_or(type* atomic_obj, type operand, int mem_ord);
+
+<font color="#C80000">// type is one of: char, signed char, unsigned char, short, unsigned short, int,</font>
+<font color="#C80000">//      unsigned int, long, unsigned long, long long, unsigned long long,</font>
+<font color="#C80000">//      char16_t, char32_t, wchar_t</font>
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+type __atomic_fetch_xor(type* atomic_obj, type operand, int mem_ord);
+
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+void* __atomic_fetch_add(void** atomic_obj, ptrdiff_t operand, int mem_ord);
+void* __atomic_fetch_sub(void** atomic_obj, ptrdiff_t operand, int mem_ord);
+
+<font color="#C80000">// Behavior is defined for mem_ord = [0 ... 5]</font>
+void __atomic_thread_fence(int mem_ord);
+void __atomic_signal_fence(int mem_ord);
+</pre></blockquote>
+
+<p>
+If desired the intrinsics taking a single <tt>mem_ord</tt> parameter can default
+this argument to 5.
+</p>
+
+<p>
+If desired the intrinsics taking two ordering parameters can default
+<tt>mem_success</tt> to 5, and <tt>mem_failure</tt> to
+<tt>translate_memory_order(mem_success)</tt> where
+<tt>translate_memory_order(mem_success)</tt> is defined as:
+</p>
+
+<blockquote><pre>
+int
+translate_memory_order(int o)
+{
+    switch (o)
+    {
+    case 4:
+        return 2;
+    case 3:
+        return 0;
+    }
+    return o;
+}
+</pre></blockquote>
+
+<p>
+Below are representative C++ implementations of all of the operations.  Their
+purpose is to document the desired semantics of each operation, assuming
+<tt>memory_order_seq_cst</tt>.  This is essentially the code that will be called
+if the front end calls out to compiler-rt.
+</p>
+
+<blockquote><pre>
+template &lt;class T&gt;
+T
+__atomic_load(T const volatile* obj)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    return *obj;
+}
+
+template &lt;class T&gt;
+void
+__atomic_store(T volatile* obj, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    *obj = desr;
+}
+
+template &lt;class T&gt;
+T
+__atomic_exchange(T volatile* obj, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj = desr;
+    return r;
+}
+
+template &lt;class T&gt;
+bool
+__atomic_compare_exchange_strong(T volatile* obj, T* exp, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    if (std::memcmp(const_cast&lt;T*&gt;(obj), exp, sizeof(T)) == 0) <font color="#C80000">// if (*obj == *exp)</font>
+    {
+        std::memcpy(const_cast&lt;T*&gt;(obj), &amp;desr, sizeof(T)); <font color="#C80000">// *obj = desr;</font>
+        return true;
+    }
+    std::memcpy(exp, const_cast&lt;T*&gt;(obj), sizeof(T)); <font color="#C80000">// *exp = *obj;</font>
+    return false;
+}
+
+<font color="#C80000">// May spuriously return false (even if *obj == *exp)</font>
+template &lt;class T&gt;
+bool
+__atomic_compare_exchange_weak(T volatile* obj, T* exp, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    if (std::memcmp(const_cast&lt;T*&gt;(obj), exp, sizeof(T)) == 0) <font color="#C80000">// if (*obj == *exp)</font>
+    {
+        std::memcpy(const_cast&lt;T*&gt;(obj), &amp;desr, sizeof(T)); <font color="#C80000">// *obj = desr;</font>
+        return true;
+    }
+    std::memcpy(exp, const_cast&lt;T*&gt;(obj), sizeof(T)); <font color="#C80000">// *exp = *obj;</font>
+    return false;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_add(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj += operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_sub(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj -= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_and(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj &amp;= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_or(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj |= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_xor(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj ^= operand;
+    return r;
+}
+
+void*
+__atomic_fetch_add(void* volatile* obj, ptrdiff_t operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    void* r = *obj;
+    (char*&amp;)(*obj) += operand;
+    return r;
+}
+
+void*
+__atomic_fetch_sub(void* volatile* obj, ptrdiff_t operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    void* r = *obj;
+    (char*&amp;)(*obj) -= operand;
+    return r;
+}
+
+void __atomic_thread_fence()
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+}
+
+void __atomic_signal_fence()
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+}
+</pre></blockquote>
+
+
+</div>
+</body>
+</html>

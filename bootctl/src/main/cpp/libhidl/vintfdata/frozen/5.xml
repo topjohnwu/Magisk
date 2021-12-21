@@ -1,0 +1,110 @@
+<compatibility-matrix version="3.0" type="device">
+    <!--
+         cameraserver is installed for all phones and tablets, but not
+         auto or TV.
+    -->
+    <hal format="hidl" optional="true">
+        <name>android.frameworks.cameraservice.service</name>
+        <version>2.1</version>
+        <interface>
+            <name>ICameraService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.frameworks.displayservice</name>
+        <version>1.0</version>
+        <interface>
+            <name>IDisplayService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.frameworks.schedulerservice</name>
+        <version>1.0</version>
+        <interface>
+            <name>ISchedulingPolicyService</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.frameworks.sensorservice</name>
+        <version>1.0</version>
+        <interface>
+            <name>ISensorManager</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.frameworks.stats</name>
+        <version>1.0</version>
+        <interface>
+            <name>IStats</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.hardware.media.c2</name>
+        <version>1.1</version>
+        <interface>
+            <name>IComponentStore</name>
+            <instance>software</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.hidl.allocator</name>
+        <version>1.0</version>
+        <interface>
+            <name>IAllocator</name>
+            <instance>ashmem</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.hidl.manager</name>
+        <version>1.2</version>
+        <interface>
+            <name>IServiceManager</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.hidl.memory</name>
+        <version>1.0</version>
+        <interface>
+            <name>IMapper</name>
+            <instance>ashmem</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.hidl.token</name>
+        <version>1.0</version>
+        <interface>
+            <name>ITokenManager</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.system.net.netd</name>
+        <version>1.1</version>
+        <interface>
+            <name>INetd</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.system.suspend</name>
+        <version>1.0</version>
+        <interface>
+            <name>ISystemSuspend</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <hal format="hidl" optional="false">
+        <name>android.system.wifi.keystore</name>
+        <version>1.0</version>
+        <interface>
+            <name>IKeystore</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

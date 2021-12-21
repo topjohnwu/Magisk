@@ -1,0 +1,8 @@
+LIBVNDKSUPPORT {
+  global:
+    android_is_in_vendor_process; # llndk apex
+    android_load_sphal_library; # llndk apex
+    android_unload_sphal_library; # llndk apex
+  local:
+    *;
+};

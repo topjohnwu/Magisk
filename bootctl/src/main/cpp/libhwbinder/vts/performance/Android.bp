@@ -1,0 +1,100 @@
+//
+// Copyright (C) 2017 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    // http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // the below license kinds from "system_libhwbinder_license":
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["system_libhwbinder_license"],
+}
+
+cc_defaults {
+    name: "libhwbinder_test_defaults",
+    defaults: ["hwbinder_benchmark_pgo",],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libutils",
+        "libcutils",
+        "libvndksupport",
+    ],
+
+    static_libs: [
+        "android.hardware.tests.libhwbinder@1.0",
+        "libhidlbase_pgo",
+    ],
+
+    // Allow dlsym'ing self for statically linked passthrough implementations
+    ldflags: ["-rdynamic"],
+
+    // impls should never be static, these are used only for testing purposes
+    // and test portability since this test pairs with specific hal
+    // implementations
+    whole_static_libs: [
+        "android.hardware.tests.libhwbinder@1.0-impl.test",
+    ],
+
+    require_root: true,
+}
+
+cc_benchmark {
+    name: "libhwbinder_benchmark",
+    defaults: ["libhwbinder_test_defaults"],
+    srcs: ["Benchmark.cpp"],
+}
+
+// build for benchmark test based on binder.
+cc_benchmark {
+    name: "libbinder_benchmark",
+
+    srcs: ["Benchmark_binder.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: [
+        "libbinder",
+        "libutils",
+    ],
+    static_libs: [
+        "android.hardware.tests.libbinder",
+    ],
+    require_root: true,
+}
+
+// build for throughput benchmark test for hwbinder.
+cc_test {
+    name: "hwbinderThroughputTest",
+    defaults: ["libhwbinder_test_defaults"],
+    srcs: ["Benchmark_throughput.cpp"],
+}
+
+// build for latency benchmark test for hwbinder.
+cc_test {
+    name: "libhwbinder_latency",
+    defaults: ["libhwbinder_test_defaults"],
+
+    srcs: [
+        "Latency.cpp",
+        "PerfTest.cpp",
+    ],
+}

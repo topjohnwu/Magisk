@@ -1,0 +1,177 @@
+//
+// Copyright (C) 2014 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["external_libcxxabi_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+//
+// large-scale-change included anything that looked like it might be a license
+// text as a license_text. e.g. LICENSE, NOTICE, COPYING etc.
+//
+// Please consider removing redundant or irrelevant files from 'license_text:'.
+// See: http://go/android-license-faq
+license {
+    name: "external_libcxxabi_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-BSD",
+        "SPDX-license-identifier-MIT",
+        "SPDX-license-identifier-NCSA",
+    ],
+    license_text: [
+        "LICENSE.TXT",
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "libc++abi_defaults",
+    vendor_available: true,
+    product_available: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    native_bridge_supported: true,
+    include_dirs: ["external/libcxx/include"],
+    local_include_dirs: ["include"],
+    export_include_dirs: ["include"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    cppflags: [
+        "-std=c++14",
+        "-fexceptions",
+        "-Wextra",
+        "-Wno-unused-function",
+        "-Wno-implicit-fallthrough",
+        // src/cxa_demangle.cpp:2591 -Wimplicit-fallthrough
+    ],
+    sanitize: {
+        never: true,
+    },
+    stl: "none",
+    rtti: true,
+}
+
+cc_library_static {
+    name: "libc++demangle",
+    defaults: ["libc++abi_defaults"],
+    host_supported: false,
+    srcs: ["src/cxa_demangle.cpp"],
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    min_sdk_version: "apex_inherit",
+}
+
+cc_library_static {
+    name: "libc++abi",
+    defaults: ["libc++abi_defaults"],
+    host_supported: true,
+    srcs: [
+        "src/abort_message.cpp",
+        "src/cxa_aux_runtime.cpp",
+        "src/cxa_default_handlers.cpp",
+        "src/cxa_demangle.cpp",
+        "src/cxa_exception.cpp",
+        "src/cxa_exception_storage.cpp",
+        "src/cxa_guard.cpp",
+        "src/cxa_handlers.cpp",
+        "src/cxa_personality.cpp",
+        "src/cxa_thread_atexit.cpp",
+        "src/cxa_unexpected.cpp",
+        "src/cxa_vector.cpp",
+        "src/cxa_virtual.cpp",
+        "src/fallback_malloc.cpp",
+        "src/private_typeinfo.cpp",
+        "src/stdlib_exception.cpp",
+        "src/stdlib_new_delete.cpp",
+        "src/stdlib_stdexcept.cpp",
+        "src/stdlib_typeinfo.cpp",
+    ],
+    cppflags: ["-DLIBCXXABI_USE_LLVM_UNWINDER=1"],
+    target: {
+        android: {
+            cppflags: ["-DHAVE___CXA_THREAD_ATEXIT_IMPL"],
+            // Packaged in libc++demangle for Android to reduce bloat.
+            exclude_srcs: ["src/cxa_demangle.cpp"],
+        },
+        darwin: {
+            // libcxxabi really doesn't like the non-LLVM assembler on Darwin
+            asflags: ["-integrated-as"],
+            cflags: [
+                "-integrated-as",
+                "-D_LIBCPP_DISABLE_AVAILABILITY",
+            ],
+            cppflags: ["-integrated-as"],
+        },
+        linux_bionic: {
+            cppflags: ["-DHAVE___CXA_THREAD_ATEXIT_IMPL"],
+            enabled: true,
+        },
+        windows: {
+            enabled: true,
+            cppflags: [
+                "-D_LIBCPP_HAS_THREAD_API_WIN32",
+                "-D_LIBCXXABI_BUILDING_LIBRARY",
+                "-D_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS",
+                "-D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS",
+            ],
+            exclude_srcs: [
+                "src/cxa_thread_atexit.cpp",
+
+                // Building stdlib_new_delete.cpp in libcxxabi causes
+                // multiple-definition errors against definitions in
+                // libcxx/src/new.cpp on Windows.  This works on Linux and
+                // Android where the functions have 'weak' linkage and are
+                // discarded by the linker.
+                "src/stdlib_new_delete.cpp",
+            ],
+        },
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    min_sdk_version: "apex_inherit",
+}
+
+cc_fuzz {
+    name: "cxa_demangle_fuzzer",
+    host_supported: true,
+    local_include_dirs: ["include"],
+
+    srcs: [
+        "fuzz/cxa_demangle_fuzzer.cpp",
+        "src/cxa_demangle.cpp",
+    ],
+}

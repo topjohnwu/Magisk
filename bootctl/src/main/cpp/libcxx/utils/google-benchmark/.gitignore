@@ -1,0 +1,58 @@
+*.a
+*.so
+*.so.?*
+*.dll
+*.exe
+*.dylib
+*.cmake
+!/cmake/*.cmake
+!/test/AssemblyTests.cmake
+*~
+*.pyc
+__pycache__
+
+# lcov
+*.lcov
+/lcov
+
+# cmake files.
+/Testing
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# makefiles.
+Makefile
+
+# in-source build.
+bin/
+lib/
+/test/*_test
+
+# exuberant ctags.
+tags
+
+# YouCompleteMe configuration.
+.ycm_extra_conf.pyc
+
+# ninja generated files.
+.ninja_deps
+.ninja_log
+build.ninja
+install_manifest.txt
+rules.ninja
+
+# bazel output symlinks.
+bazel-*
+
+# out-of-source build top-level folders.
+build/
+_build/
+build*/
+
+# in-source dependencies
+/googletest/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+CMakeSettings.json

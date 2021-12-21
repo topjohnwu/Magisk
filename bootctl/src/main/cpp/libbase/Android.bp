@@ -1,0 +1,278 @@
+//
+// Copyright (C) 2015 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["system_libbase_license"],
+}
+
+license {
+    name: "system_libbase_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+        "SPDX-license-identifier-BSD",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "libbase_cflags_defaults",
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    target: {
+        android: {
+            cflags: [
+                "-D_FILE_OFFSET_BITS=64",
+            ],
+        },
+    },
+}
+
+cc_library_headers {
+    name: "libbase_headers",
+    vendor_available: true,
+    product_available: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    host_supported: true,
+    native_bridge_supported: true,
+    export_include_dirs: ["include"],
+
+    target: {
+        linux_bionic: {
+            enabled: true,
+        },
+        windows: {
+            enabled: true,
+        },
+    },
+    apex_available: [
+        "//apex_available:anyapex",
+        "//apex_available:platform",
+    ],
+    min_sdk_version: "29",
+}
+
+cc_defaults {
+    name: "libbase_defaults",
+    defaults: ["libbase_cflags_defaults"],
+    srcs: [
+        "abi_compatibility.cpp",
+        "chrono_utils.cpp",
+        "cmsg.cpp",
+        "file.cpp",
+        "logging.cpp",
+        "mapped_file.cpp",
+        "parsebool.cpp",
+        "parsenetaddress.cpp",
+        "process.cpp",
+        "properties.cpp",
+        "stringprintf.cpp",
+        "strings.cpp",
+        "threads.cpp",
+        "test_utils.cpp",
+    ],
+
+    cppflags: ["-Wexit-time-destructors"],
+    shared_libs: ["liblog"],
+    target: {
+        android: {
+            sanitize: {
+                misc_undefined: ["integer"],
+            },
+
+        },
+        linux: {
+            srcs: [
+                "errors_unix.cpp",
+            ],
+        },
+        darwin: {
+            srcs: [
+                "errors_unix.cpp",
+            ],
+        },
+        linux_bionic: {
+            enabled: true,
+        },
+        windows: {
+            srcs: [
+                "errors_windows.cpp",
+                "utf8.cpp",
+            ],
+            exclude_srcs: [
+                "cmsg.cpp",
+            ],
+            enabled: true,
+        },
+    },
+    min_sdk_version: "29",
+}
+
+cc_library {
+    name: "libbase",
+    defaults: ["libbase_defaults"],
+    vendor_available: true,
+    product_available: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    host_supported: true,
+    native_bridge_supported: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
+    header_libs: [
+        "libbase_headers",
+    ],
+    export_header_lib_headers: ["libbase_headers"],
+    static_libs: ["fmtlib"],
+    whole_static_libs: ["fmtlib"],
+    export_static_lib_headers: ["fmtlib"],
+    apex_available: [
+        "//apex_available:anyapex",
+        "//apex_available:platform",
+    ],
+}
+
+cc_library_static {
+    name: "libbase_ndk",
+    defaults: ["libbase_defaults"],
+    sdk_version: "current",
+    stl: "c++_static",
+    export_include_dirs: ["include"],
+    static_libs: ["fmtlib_ndk"],
+    whole_static_libs: ["fmtlib_ndk"],
+    export_static_lib_headers: ["fmtlib_ndk"],
+}
+
+// Tests
+// ------------------------------------------------------------------------------
+cc_test {
+    name: "libbase_test",
+    defaults: ["libbase_cflags_defaults"],
+    host_supported: true,
+    require_root: true,
+    srcs: [
+        "cmsg_test.cpp",
+        "endian_test.cpp",
+        "errors_test.cpp",
+        "expected_test.cpp",
+        "file_test.cpp",
+        "function_ref_test.cpp",
+        "logging_splitters_test.cpp",
+        "logging_test.cpp",
+        "macros_test.cpp",
+        "mapped_file_test.cpp",
+        "no_destructor_test.cpp",
+        "parsedouble_test.cpp",
+        "parsebool_test.cpp",
+        "parseint_test.cpp",
+        "parsenetaddress_test.cpp",
+        "process_test.cpp",
+        "properties_test.cpp",
+        "result_test.cpp",
+        "scopeguard_test.cpp",
+        "stringprintf_test.cpp",
+        "strings_test.cpp",
+        "test_main.cpp",
+        "test_utils_test.cpp",
+    ],
+    target: {
+        android: {
+            sanitize: {
+                misc_undefined: ["integer"],
+            },
+        },
+        linux: {
+            srcs: ["chrono_utils_test.cpp"],
+        },
+        windows: {
+            srcs: ["utf8_test.cpp"],
+            cflags: ["-Wno-unused-parameter"],
+            enabled: true,
+        },
+    },
+    local_include_dirs: ["."],
+    shared_libs: ["libbase"],
+    compile_multilib: "both",
+    multilib: {
+        lib32: {
+            suffix: "32",
+        },
+        lib64: {
+            suffix: "64",
+        },
+    },
+    test_suites: ["device-tests"],
+}
+
+cc_test {
+    name: "libbase_tidy_test",
+    defaults: ["libbase_cflags_defaults"],
+    host_supported: true,
+
+    tidy: true,
+    tidy_checks_as_errors: ["bugprone-use-after-move"],
+
+    srcs: [
+        "tidy/unique_fd_test.cpp",
+        "tidy/unique_fd_test2.cpp",
+    ],
+
+    shared_libs: ["libbase"],
+    test_suites: ["device_tests"],
+}
+
+cc_benchmark {
+    name: "libbase_benchmark",
+    defaults: ["libbase_cflags_defaults"],
+
+    srcs: ["format_benchmark.cpp"],
+    shared_libs: ["libbase"],
+
+    compile_multilib: "both",
+    multilib: {
+        lib32: {
+            suffix: "32",
+        },
+        lib64: {
+            suffix: "64",
+        },
+    },
+}
+
+cc_fuzz {
+    name: "libbase_parsenetaddress_fuzzer",
+    shared_libs: ["libbase"],
+    host_supported: true,
+    srcs: ["parsenetaddress_fuzzer.cpp"],
+    dictionary: "parsenetaddress_fuzzer.dict",
+
+    fuzz_config: {
+        cc: [
+            "android-bionic@google.com",
+        ],
+        componentid: 128577
+    }
+}

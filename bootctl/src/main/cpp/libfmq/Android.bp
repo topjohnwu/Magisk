@@ -1,0 +1,78 @@
+// Copyright (C) 2016 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_library {
+    name: "libfmq",
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "libcutils",
+        "libutils",
+    ],
+    export_shared_lib_headers: [
+        "libcutils",
+        "libutils",
+    ],
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.neuralnetworks",
+        "test_com.android.neuralnetworks",
+    ],
+    export_include_dirs: ["include"],
+    local_include_dirs: ["include"],
+    header_libs: [
+        "libfmq-base",
+    ],
+    export_header_lib_headers: [
+        "libfmq-base",
+    ],
+    srcs: [
+        "EventFlag.cpp",
+        "FmqInternal.cpp",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    vendor_available: true,
+    product_available: true,
+    // TODO(b/153609531): remove when no longer needed.
+    native_bridge_supported: true,
+    vndk: {
+        enabled: true,
+    },
+    double_loadable: true,
+    min_sdk_version: "29",
+    host_supported: true,
+}
+
+// Header only lib to share type between HIDL and AIDL MQDescriptor
+cc_library_headers {
+    name: "libfmq-base",
+    host_supported: true,
+    vendor_available: true,
+    product_available: true,
+    native_bridge_supported: true,
+    recovery_available: true,
+    apex_available: [
+        "//apex_available:anyapex",
+        "//apex_available:platform",
+    ],
+    export_include_dirs: ["base"],
+    min_sdk_version: "29",
+}

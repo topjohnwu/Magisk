@@ -1,0 +1,141 @@
+/*
+ * Copyright (C) 2016 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package android.hidl.base@1.0;
+
+/*
+ * The ancestor for all interfaces.
+ *
+ * All HAL files will have this interface implicitly imported. If an interface
+ * does not explicitly extend from another interface, it will implicitly extend
+ * from IBase. (This is like java.lang.Object in Java.)
+ *
+ * Methods defined here are shared by all interfaces (this is like
+ * java.lang.Object.notify(), for example.) However, the behavior of these
+ * functions cannot be overridden (with the exception of the "debug" method).
+ */
+interface IBase {
+
+    /*
+     * Provides way to determine if interface is running without requesting
+     * any functionality.
+     */
+    ping();
+
+    /*
+     * Provides run-time type information for this object.
+     * For example, for the following interface definition:
+     *     package android.hardware.foo@1.0;
+     *     interface IParent {};
+     *     interface IChild extends IParent {};
+     * Calling interfaceChain on an IChild object must yield the following:
+     *     ["android.hardware.foo@1.0::IChild",
+     *      "android.hardware.foo@1.0::IParent"
+     *      "android.hidl.base@1.0::IBase"]
+     *
+     * @return descriptors a vector of descriptors of the run-time type of the
+     *         object.
+     */
+    interfaceChain() generates (vec<string> descriptors);
+
+    /*
+     * Provides run-time type information for this object.
+     * For example, for the following interface definition:
+     *     package android.hardware.foo@1.0;
+     *     interface IParent {};
+     *     interface IChild extends IParent {};
+     * Calling interfaceDescriptor on an IChild object must yield
+     *     "android.hardware.foo@1.0::IChild"
+     *
+     * @return descriptor a descriptor of the run-time type of the
+     *         object (the first element of the vector returned by
+     *         interfaceChain())
+     */
+    interfaceDescriptor() generates (string descriptor);
+
+    /*
+     * This method notifies the interface that one or more system properties
+     * have changed. The default implementation calls
+     * (C++)  report_sysprop_change() in libcutils or
+     * (Java) android.os.SystemProperties.reportSyspropChanged,
+     * which in turn calls a set of registered callbacks (eg to update trace
+     * tags).
+     */
+    oneway notifySyspropsChanged();
+
+    /*
+     * Registers a death recipient, to be called when the process hosting this
+     * interface dies.
+     *
+     * @param recipient a hidl_death_recipient callback object
+     * @param cookie a cookie that must be returned with the callback
+     * @return success whether the death recipient was registered successfully.
+     */
+    linkToDeath(death_recipient recipient, uint64_t cookie) generates (bool success);
+
+    /*
+     * Unregisters the registered death recipient. If this service was registered
+     * multiple times with the same exact death recipient, this unlinks the most
+     * recently registered one.
+     *
+     * @param recipient a previously registered hidl_death_recipient callback
+     * @return success whether the death recipient was unregistered successfully.
+     */
+    unlinkToDeath(death_recipient recipient) generates (bool success);
+
+    /*
+     * This method trigger the interface to enable/disable instrumentation based
+     * on system property hal.instrumentation.enable.
+     */
+    oneway setHALInstrumentation();
+
+    /*
+     * Get debug information on references on this interface.
+     * @return info debugging information. See comments of DebugInfo.
+     */
+    getDebugInfo() generates (DebugInfo info);
+
+    /*
+     * Emit diagnostic information to the given file.
+     *
+     * Optionally overriden.
+     *
+     * @param fd      File descriptor to dump data to.
+     *                Must only be used for the duration of this call.
+     * @param options Arguments for debugging.
+     *                Must support empty for default debug information.
+     */
+    debug(handle fd, vec<string> options);
+
+    /*
+     * Returns hashes of the source HAL files that define the interfaces of the
+     * runtime type information on the object.
+     * For example, for the following interface definition:
+     *     package android.hardware.foo@1.0;
+     *     interface IParent {};
+     *     interface IChild extends IParent {};
+     * Calling interfaceChain on an IChild object must yield the following:
+     *     [(hash of IChild.hal),
+     *      (hash of IParent.hal)
+     *      (hash of IBase.hal)].
+     *
+     * SHA-256 is used as the hashing algorithm. Each hash has 32 bytes
+     * according to SHA-256 standard.
+     *
+     * @return hashchain a vector of SHA-1 digests
+     */
+    getHashChain() generates (vec<uint8_t[32]> hashchain);
+};

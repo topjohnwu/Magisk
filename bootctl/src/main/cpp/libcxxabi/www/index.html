@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>"libc++abi" C++ Standard Library Support</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="http://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++abi Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://libcxx.llvm.org/">libc++</a>
+    <a href="http://lists.llvm.org/mailman/listinfo/libcxx-dev">libcxx-dev</a>
+    <a href="http://lists.llvm.org/mailman/listinfo/libcxx-commits">libcxx-commits</a>
+    <a href="http://llvm.org/bugs/">Bug Reports</a>
+    <a href="http://llvm.org/svn/llvm-project/libcxxabi/trunk/">Browse SVN</a>
+    <a href="http://llvm.org/viewvc/llvm-project/libcxxabi/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>"libc++abi" C++ Standard Library Support</h1>
+  <!--*********************************************************************-->
+
+  <p>libc++abi is a new implementation of low level support for a standard
+     C++ library.</p>
+
+  <p>All of the code in libc++abi is <a
+     href="http://llvm.org/docs/DeveloperPolicy.html#license">dual licensed</a>
+     under the MIT license and the UIUC License (a BSD-like license).</p>
+
+  <!--=====================================================================-->
+  <h2 id="goals">Features and Goals</h2>
+  <!--=====================================================================-->
+
+    <ul>
+        <li>Correctness as defined by the C++11 standard.</li>
+        <li>Provide a portable sublayer to ease the porting of <a href="http://libcxx.llvm.org/">libc++</a></li>
+        <li>On Mac OS X, be ABI compatible with the existing low-level support.</li>
+    </ul>
+
+  <!--=====================================================================-->
+  <h2 id="requirements">Platform Support</h2>
+  <!--=====================================================================-->
+
+   <p>libc++abi is known to work on the following platforms, using clang.</p>
+
+    <ul>
+    <li>Darwin</li>
+    </ul>
+
+  <!--=====================================================================-->
+  <h2 id="dir-structure">Current Status</h2>
+  <!--=====================================================================-->
+
+   <p>libc++abi is complete.  <a href="spec.html">Here</a> is a
+   list of functionality.</p>
+
+  <!--=====================================================================-->
+  <h2>Get it and get involved!</h2>
+  <!--=====================================================================-->
+
+  <p>To check out the code, use:</p>
+
+  <ul>
+  <li><code>svn co http://llvm.org/svn/llvm-project/libcxxabi/trunk libcxxabi</code></li>
+  </ul>
+
+  <p>To build:</p>
+  <ul>
+  <li>Check out libcxxabi into <code>llvm/projects</code></li>
+  <li><code>cd llvm</code></li>
+  <li><code>mkdir build &amp;&amp; cd build</code></li>
+  <li><code>cmake .. # on linux you may need to prefix with CC=clang CXX=clang++</code></li>
+  <li><code>make</code></li>
+  </ul>
+
+  <p>To do a standalone build:</p>
+  <ul>
+  <li>
+    Check out the <a href="http://libcxx.llvm.org">libcxx source</a> tree.
+  </li>
+  <li><code>cd libcxxabi</code></li>
+  <li><code>mkdir build &amp;&amp; cd build</code></li>
+  <li><code>cmake -DLIBCXXABI_LIBCXX_PATH=path/to/libcxx .. # on
+    linux you may need -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++</code></li>
+  <li><code>make</code></li>
+  </ul>
+  <p> By default CMake uses <code>llvm-config</code> to locate the required
+      LLVM sources. If CMake cannot find <code>llvm-config</code> then you must
+      configure CMake using either of the following options.
+  </p>
+  <ul>
+  <li><code>-DLLVM_CONFIG_PATH=path/to/llvm-config</code></li>
+  <li><code>-DLLVM_PATH=path/to/llvm-source-root</code></li>
+  </ul>
+
+  </p>
+
+  <p>To run the tests:</p>
+  <ul>
+  <li><code>make check-cxxabi</code></li>
+  </ul>
+  <p>Note: in a standalone build, the system's libc++ will be used for tests. If
+  the system's libc++ was statically linked against libc++abi (or linked against
+  a different ABI library), this may interfere with test results.</p>
+
+  <p>Send discussions to the
+  (<a href="http://lists.llvm.org/mailman/listinfo/libcxx-dev">libcxx-dev mailing list</a>).</p>
+
+  <!--=====================================================================-->
+  <h2>Frequently asked questions</h2>
+  <!--=====================================================================-->
+
+  <p>Q: Why are the destructors for the standard exception classes defined in libc++abi?
+     They're just empty, can't they be defined inline?</p>
+  <p>A: The destructors for them live in libc++abi because they are "key" functions.
+     The Itanium ABI describes a "key" function as the first virtual declared.
+     And wherever the key function is defined, that is where the <code>type_info</code> gets defined.
+     And in libc++ types are the same type if and only if they have the same <code>type_info</code>
+     (as in there must be only one type info per type in the entire application).
+     And on OS X, libstdc++ and libc++ share these exception types.
+     So to be able to throw in one dylib and catch in another (a <code>std::exception</code> for example), 
+     there must be only one <code>std::exception type_info</code> in the entire app.
+     That typeinfo gets laid down beside <code>~exception()</code> in libc++abi (for both libstdc++ and libc++).</p>
+     <p>--Howard Hinnant</p>
+
+</div>
+</body>
+</html>

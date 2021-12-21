@@ -1,0 +1,99 @@
+#! /bin/sh
+#
+# Set the $TRIPLE environment variable to your system's triple before
+# running this script.  If you set $CXX, that will be used to compile
+# the library.  Otherwise we'll use clang++.
+
+set -e
+
+if [ `basename $(pwd)` != "lib" ]
+then
+	echo "current directory must be lib"
+	exit 1
+fi
+
+if [ -z "$CXX" ]
+then
+	CXX=clang++
+fi
+
+if [ -z "$CC" ]
+then
+    CC=clang
+fi
+
+if [ -z $RC_ProjectSourceVersion ]
+then
+  RC_ProjectSourceVersion=1
+fi
+
+EXTRA_FLAGS="-std=c++11 -stdlib=libc++ -fstrict-aliasing -Wstrict-aliasing=2 \
+             -Wsign-conversion -Wshadow -Wconversion -Wunused-variable \
+             -Wmissing-field-initializers -Wchar-subscripts -Wmismatched-tags \
+             -Wmissing-braces -Wshorten-64-to-32 -Wsign-compare \
+             -Wstrict-aliasing=2 -Wstrict-overflow=4 -Wunused-parameter \
+             -Wnewline-eof"
+
+case $TRIPLE in
+  *-apple-*)
+    if [ -z $RC_XBS ]
+    then
+      RC_CFLAGS="-arch i386 -arch x86_64"
+    fi
+    SOEXT=dylib
+    if [ -n "$SDKROOT" ]
+    then
+        EXTRA_FLAGS+="-isysroot ${SDKROOT}"
+        CXX=`xcrun -sdk "${SDKROOT}"  -find clang++`
+        CC=`xcrun -sdk "${SDKROOT}"  -find clang`
+    fi
+    LDSHARED_FLAGS="-o libc++abi.dylib \
+        -dynamiclib -nodefaultlibs  \
+        -current_version ${RC_ProjectSourceVersion} \
+        -compatibility_version 1 \
+        -install_name /usr/lib/libc++abi.dylib \
+        -lSystem"
+	if [ -f "${SDKROOT}/usr/local/lib/libCrashReporterClient.a" ]
+	then
+		LDSHARED_FLAGS+=" -lCrashReporterClient"
+	fi
+    ;;
+  *-*-mingw*)
+    # FIXME: removing libgcc and libsupc++ dependencies means porting libcxxrt and LLVM/compiler-rt
+    SOEXT=dll
+    LDSHARED_FLAGS="-o libc++abi.dll \
+        -shared -nodefaultlibs -Wl,--export-all-symbols -Wl,--allow-multiple-definition -Wl,--out-implib,libc++abi.dll.a \
+        -lsupc++ -lpthread -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcr100 -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmoldname -lmingwex -lmsvcrt"
+	;;
+  *)
+    RC_CFLAGS="-fPIC"
+    SOEXT=so
+    LDSHARED_FLAGS="-o libc++abi.so.1.0 \
+        -shared -nodefaultlibs -Wl,-soname,libc++abi.so.1 \
+        -lpthread -lrt -lc -lstdc++"
+    ;;
+esac
+
+if [ -z $RC_XBS ]
+then
+    rm -f libc++abi.1.$SOEXT*
+fi
+
+set -x
+
+for FILE in ../src/*.cpp; do
+	$CXX -c -g -O3 $RC_CFLAGS $EXTRA_FLAGS -I../include $OPTIONS $FILE
+done
+case $TRIPLE in
+  *-*-mingw*)
+  for FILE in ../src/support/win32/*.cpp; do
+    $CXX -c -g -Os $RC_CFLAGS $EXTRA_FLAGS -I../include $OPTIONS $FILE
+  done
+  ;;
+esac
+$CC *.o $RC_CFLAGS $LDSHARED_FLAGS $EXTRA_FLAGS
+
+if [ -z $RC_XBS ]
+then
+    rm *.o
+fi

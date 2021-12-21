@@ -1,0 +1,270 @@
+//
+// libdl
+//
+package {
+    default_applicable_licenses: ["bionic_libdl_license"],
+}
+
+license {
+    name: "bionic_libdl_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_library_static {
+    name: "libdl_static",
+    defaults: ["linux_bionic_supported"],
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    native_bridge_supported: true,
+
+    srcs: [
+        "libdl.cpp",
+        "libdl_cfi.cpp",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wunused",
+        "-Werror",
+    ],
+
+    // For private/CFIShadow.h.
+    include_dirs: ["bionic/libc"],
+
+    stl: "none",
+    system_shared_libs: [],
+    header_libs: ["libc_headers"],
+    export_header_lib_headers: ["libc_headers"],
+
+    sanitize: {
+        never: true,
+    },
+}
+
+cc_library {
+    name: "libdl",
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    native_bridge_supported: true,
+    static_ndk_lib: true,
+
+    defaults: ["linux_bionic_supported"],
+
+    // NOTE: --exclude-libs=libgcc.a makes sure that any symbols libdl.so pulls from
+    // libgcc.a are made static to libdl.so.  This in turn ensures that libraries that
+    // a) pull symbols from libgcc.a and b) depend on libdl.so will not rely on libdl.so
+    // to provide those symbols, but will instead pull them from libgcc.a.  Specifically,
+    // we use this property to make sure libc.so has its own copy of the code from
+    // libgcc.a it uses.
+    //
+    // DO NOT REMOVE --exclude-libs!
+
+    ldflags: [
+        "-Wl,--exclude-libs=libgcc.a",
+        "-Wl,--exclude-libs=libgcc_stripped.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-arm-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-aarch64-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-i686-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-x86_64-android.a",
+    ],
+
+    // for x86, exclude libgcc_eh.a for the same reasons as above
+    arch: {
+        arm: {
+            version_script: ":libdl.arm.map",
+            pack_relocations: false,
+            ldflags: ["-Wl,--hash-style=both"],
+        },
+        arm64: {
+            version_script: ":libdl.arm64.map",
+        },
+        x86: {
+            pack_relocations: false,
+            ldflags: [
+                "-Wl,--exclude-libs=libgcc_eh.a",
+                "-Wl,--hash-style=both",
+            ],
+            version_script: ":libdl.x86.map",
+        },
+        x86_64: {
+            ldflags: ["-Wl,--exclude-libs=libgcc_eh.a"],
+            version_script: ":libdl.x86_64.map",
+        },
+    },
+    shared: {
+        whole_static_libs: ["libdl_static"],
+    },
+    static: {
+        srcs: ["libdl_static.cpp"],
+    },
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wunused",
+        "-Werror",
+    ],
+    stl: "none",
+
+    nocrt: true,
+    system_shared_libs: [],
+    header_libs: ["libc_headers"],
+
+    // Opt out of native_coverage when opting out of system_shared_libs
+    native_coverage: false,
+
+    // This is placeholder library the actual implementation is (currently)
+    // provided by the linker.
+    shared_libs: ["ld-android"],
+
+    sanitize: {
+        never: true,
+    },
+
+    stubs: {
+        symbol_file: "libdl.map.txt",
+        versions: [
+            "29",
+            "current",
+        ],
+    },
+    llndk: {
+        symbol_file: "libdl.map.txt",
+    },
+
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.runtime",
+    ],
+
+    lto: {
+        never: true,
+    },
+}
+
+cc_library {
+    name: "libdl_android",
+
+    defaults: ["linux_bionic_supported"],
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    native_bridge_supported: true,
+
+    // NOTE: --exclude-libs=libgcc.a makes sure that any symbols libdl.so pulls from
+    // libgcc.a are made static to libdl.so.  This in turn ensures that libraries that
+    // a) pull symbols from libgcc.a and b) depend on libdl.so will not rely on libdl.so
+    // to provide those symbols, but will instead pull them from libgcc.a.  Specifically,
+    // we use this property to make sure libc.so has its own copy of the code from
+    // libgcc.a it uses.
+    //
+    // DO NOT REMOVE --exclude-libs!
+
+    ldflags: [
+        "-Wl,--exclude-libs=libgcc.a",
+        "-Wl,--exclude-libs=libgcc_stripped.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-arm-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-aarch64-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-i686-android.a",
+        "-Wl,--exclude-libs=libclang_rt.builtins-x86_64-android.a",
+    ],
+
+    // for x86, exclude libgcc_eh.a for the same reasons as above
+    arch: {
+        x86: {
+            ldflags: [
+                "-Wl,--exclude-libs=libgcc_eh.a",
+            ],
+        },
+        x86_64: {
+            ldflags: ["-Wl,--exclude-libs=libgcc_eh.a"],
+        },
+    },
+
+    srcs: [ "libdl_android.cpp" ],
+    version_script: "libdl_android.map.txt",
+
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wunused",
+        "-Werror",
+    ],
+
+    stl: "none",
+
+    nocrt: true,
+    system_shared_libs: [],
+    header_libs: ["libc_headers"],
+
+    // Opt out of native_coverage when opting out of system_shared_libs
+    native_coverage: false,
+
+    // This is placeholder library the actual implementation is (currently)
+    // provided by the linker.
+    shared_libs: ["ld-android"],
+
+    sanitize: {
+        never: true,
+    },
+
+    stubs: {
+        symbol_file: "libdl_android.map.txt",
+        versions: ["current"],
+    },
+
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.runtime",
+    ],
+
+    lto: {
+        never: true,
+    },
+}
+
+ndk_library {
+    name: "libdl",
+    symbol_file: "libdl.map.txt",
+    first_version: "9",
+}
+
+genrule {
+    name: "libdl.arm.map",
+    out: ["libdl.arm.map"],
+    srcs: ["libdl.map.txt"],
+    tool_files: [":bionic-generate-version-script"],
+    cmd: "$(location :bionic-generate-version-script) arm $(in) $(out)",
+}
+
+genrule {
+    name: "libdl.arm64.map",
+    out: ["libdl.arm64.map"],
+    srcs: ["libdl.map.txt"],
+    tool_files: [":bionic-generate-version-script"],
+    cmd: "$(location :bionic-generate-version-script) arm64 $(in) $(out)",
+}
+
+genrule {
+    name: "libdl.x86.map",
+    out: ["libdl.x86.map"],
+    srcs: ["libdl.map.txt"],
+    tool_files: [":bionic-generate-version-script"],
+    cmd: "$(location :bionic-generate-version-script) x86 $(in) $(out)",
+}
+
+genrule {
+    name: "libdl.x86_64.map",
+    out: ["libdl.x86_64.map"],
+    srcs: ["libdl.map.txt"],
+    tool_files: [":bionic-generate-version-script"],
+    cmd: "$(location :bionic-generate-version-script) x86_64 $(in) $(out)",
+}

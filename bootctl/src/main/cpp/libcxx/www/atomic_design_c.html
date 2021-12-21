@@ -1,0 +1,458 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>&lt;atomic&gt; design</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+  <!--*********************************************************************-->
+  <h1>&lt;atomic&gt; design</h1>
+  <!--*********************************************************************-->
+
+<p>
+The <tt>&lt;atomic&gt;</tt> header is one of the most closely coupled headers to
+the compiler.  Ideally when you invoke any function from
+<tt>&lt;atomic&gt;</tt>, it should result in highly optimized assembly being
+inserted directly into your application ...  assembly that is not otherwise
+representable by higher level C or C++ expressions.  The design of the libc++
+<tt>&lt;atomic&gt;</tt> header started with this goal in mind.  A secondary, but
+still very important goal is that the compiler should have to do minimal work to
+facilitate the implementation of <tt>&lt;atomic&gt;</tt>.  Without this second
+goal, then practically speaking, the libc++ <tt>&lt;atomic&gt;</tt> header would
+be doomed to be a barely supported, second class citizen on almost every
+platform.
+</p>
+
+<p>Goals:</p>
+
+<blockquote><ul>
+<li>Optimal code generation for atomic operations</li>
+<li>Minimal effort for the compiler to achieve goal 1 on any given platform</li>
+<li>Conformance to the C++0X draft standard</li>
+</ul></blockquote>
+
+<p>
+The purpose of this document is to inform compiler writers what they need to do
+to enable a high performance libc++ <tt>&lt;atomic&gt;</tt> with minimal effort.
+</p>
+
+<h2>The minimal work that must be done for a conforming <tt>&lt;atomic&gt;</tt></h2>
+
+<p>
+The only "atomic" operations that must actually be lock free in
+<tt>&lt;atomic&gt;</tt> are represented by the following compiler intrinsics:
+</p>
+
+<blockquote><pre>
+__atomic_flag__
+__atomic_exchange_seq_cst(__atomic_flag__ volatile* obj, __atomic_flag__ desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    __atomic_flag__ result = *obj;
+    *obj = desr;
+    return result;
+}
+
+void
+__atomic_store_seq_cst(__atomic_flag__ volatile* obj, __atomic_flag__ desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    *obj = desr;
+}
+</pre></blockquote>
+
+<p>
+Where:
+</p>
+
+<blockquote><ul>
+<li>
+If <tt>__has_feature(__atomic_flag)</tt> evaluates to 1 in the preprocessor then
+the compiler must define <tt>__atomic_flag__</tt> (e.g. as a typedef to
+<tt>int</tt>).
+</li>
+<li>
+If <tt>__has_feature(__atomic_flag)</tt> evaluates to 0 in the preprocessor then
+the library defines <tt>__atomic_flag__</tt> as a typedef to <tt>bool</tt>.
+</li>
+<li>
+<p>
+To communicate that the above intrinsics are available, the compiler must
+arrange for <tt>__has_feature</tt> to return 1 when fed the intrinsic name
+appended with an '_' and the mangled type name of <tt>__atomic_flag__</tt>.
+</p>
+<p>
+For example if <tt>__atomic_flag__</tt> is <tt>unsigned int</tt>:
+</p>
+<blockquote><pre>
+__has_feature(__atomic_flag) == 1
+__has_feature(__atomic_exchange_seq_cst_j) == 1
+__has_feature(__atomic_store_seq_cst_j) == 1
+
+typedef unsigned int __atomic_flag__;
+
+unsigned int __atomic_exchange_seq_cst(unsigned int volatile*, unsigned int)
+{
+   // ...
+}
+
+void __atomic_store_seq_cst(unsigned int volatile*, unsigned int)
+{
+   // ...
+}
+</pre></blockquote>
+</li>
+</ul></blockquote>
+
+<p>
+That's it!  Compiler writers do the above and you've got a fully conforming
+(though sub-par performance) <tt>&lt;atomic&gt;</tt> header!
+</p>
+
+<h2>Recommended work for a higher performance <tt>&lt;atomic&gt;</tt></h2>
+
+<p>
+It would be good if the above intrinsics worked with all integral types plus
+<tt>void*</tt>.  Because this may not be possible to do in a lock-free manner for
+all integral types on all platforms, a compiler must communicate each type that
+an intrinsic works with.  For example if <tt>__atomic_exchange_seq_cst</tt> works
+for all types except for <tt>long long</tt> and <tt>unsigned long long</tt>
+then:
+</p>
+
+<blockquote><pre>
+__has_feature(__atomic_exchange_seq_cst_b) == 1  // bool
+__has_feature(__atomic_exchange_seq_cst_c) == 1  // char
+__has_feature(__atomic_exchange_seq_cst_a) == 1  // signed char
+__has_feature(__atomic_exchange_seq_cst_h) == 1  // unsigned char
+__has_feature(__atomic_exchange_seq_cst_Ds) == 1 // char16_t
+__has_feature(__atomic_exchange_seq_cst_Di) == 1 // char32_t
+__has_feature(__atomic_exchange_seq_cst_w) == 1  // wchar_t
+__has_feature(__atomic_exchange_seq_cst_s) == 1  // short
+__has_feature(__atomic_exchange_seq_cst_t) == 1  // unsigned short
+__has_feature(__atomic_exchange_seq_cst_i) == 1  // int
+__has_feature(__atomic_exchange_seq_cst_j) == 1  // unsigned int
+__has_feature(__atomic_exchange_seq_cst_l) == 1  // long
+__has_feature(__atomic_exchange_seq_cst_m) == 1  // unsigned long
+__has_feature(__atomic_exchange_seq_cst_Pv) == 1 // void*
+</pre></blockquote>
+
+<p>
+Note that only the <tt>__has_feature</tt> flag is decorated with the argument
+type.  The name of the compiler intrinsic is not decorated, but instead works
+like a C++ overloaded function.
+</p>
+
+<p>
+Additionally there are other intrinsics besides
+<tt>__atomic_exchange_seq_cst</tt> and <tt>__atomic_store_seq_cst</tt>.  They
+are optional.  But if the compiler can generate faster code than provided by the
+library, then clients will benefit from the compiler writer's expertise and
+knowledge of the targeted platform.
+</p>
+
+<p>
+Below is the complete list of <i>sequentially consistent</i> intrinsics, and
+their library implementations.  Template syntax is used to indicate the desired
+overloading for integral and void* types.  The template does not represent a
+requirement that the intrinsic operate on <em>any</em> type!
+</p>
+
+<blockquote><pre>
+T is one of:  bool, char, signed char, unsigned char, short, unsigned short,
+              int, unsigned int, long, unsigned long,
+              long long, unsigned long long, char16_t, char32_t, wchar_t, void*
+
+template &lt;class T&gt;
+T
+__atomic_load_seq_cst(T const volatile* obj)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    return *obj;
+}
+
+template &lt;class T&gt;
+void
+__atomic_store_seq_cst(T volatile* obj, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    *obj = desr;
+}
+
+template &lt;class T&gt;
+T
+__atomic_exchange_seq_cst(T volatile* obj, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj = desr;
+    return r;
+}
+
+template &lt;class T&gt;
+bool
+__atomic_compare_exchange_strong_seq_cst_seq_cst(T volatile* obj, T* exp, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    if (std::memcmp(const_cast&lt;T*&gt;(obj), exp, sizeof(T)) == 0)
+    {
+        std::memcpy(const_cast&lt;T*&gt;(obj), &amp;desr, sizeof(T));
+        return true;
+    }
+    std::memcpy(exp, const_cast&lt;T*&gt;(obj), sizeof(T));
+    return false;
+}
+
+template &lt;class T&gt;
+bool
+__atomic_compare_exchange_weak_seq_cst_seq_cst(T volatile* obj, T* exp, T desr)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    if (std::memcmp(const_cast&lt;T*&gt;(obj), exp, sizeof(T)) == 0)
+    {
+        std::memcpy(const_cast&lt;T*&gt;(obj), &amp;desr, sizeof(T));
+        return true;
+    }
+    std::memcpy(exp, const_cast&lt;T*&gt;(obj), sizeof(T));
+    return false;
+}
+
+T is one of:  char, signed char, unsigned char, short, unsigned short,
+              int, unsigned int, long, unsigned long,
+              long long, unsigned long long, char16_t, char32_t, wchar_t
+
+template &lt;class T&gt;
+T
+__atomic_fetch_add_seq_cst(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj += operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_sub_seq_cst(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj -= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_and_seq_cst(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj &amp;= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_or_seq_cst(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj |= operand;
+    return r;
+}
+
+template &lt;class T&gt;
+T
+__atomic_fetch_xor_seq_cst(T volatile* obj, T operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    T r = *obj;
+    *obj ^= operand;
+    return r;
+}
+
+void*
+__atomic_fetch_add_seq_cst(void* volatile* obj, ptrdiff_t operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    void* r = *obj;
+    (char*&amp;)(*obj) += operand;
+    return r;
+}
+
+void*
+__atomic_fetch_sub_seq_cst(void* volatile* obj, ptrdiff_t operand)
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+    void* r = *obj;
+    (char*&amp;)(*obj) -= operand;
+    return r;
+}
+
+void __atomic_thread_fence_seq_cst()
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+}
+
+void __atomic_signal_fence_seq_cst()
+{
+    unique_lock&lt;mutex&gt; _(some_mutex);
+}
+</pre></blockquote>
+
+<p>
+One should consult the (currently draft)
+<a href="https://wg21.link/n3126">C++ standard</a>
+for the details of the definitions for these operations.  For example
+<tt>__atomic_compare_exchange_weak_seq_cst_seq_cst</tt> is allowed to fail
+spuriously while <tt>__atomic_compare_exchange_strong_seq_cst_seq_cst</tt> is
+not.
+</p>
+
+<p>
+If on your platform the lock-free definition of
+<tt>__atomic_compare_exchange_weak_seq_cst_seq_cst</tt> would be the same as
+<tt>__atomic_compare_exchange_strong_seq_cst_seq_cst</tt>, you may omit the
+<tt>__atomic_compare_exchange_weak_seq_cst_seq_cst</tt> intrinsic without a
+performance cost.  The library will prefer your implementation of
+<tt>__atomic_compare_exchange_strong_seq_cst_seq_cst</tt> over its own
+definition for implementing
+<tt>__atomic_compare_exchange_weak_seq_cst_seq_cst</tt>.  That is, the library
+will arrange for <tt>__atomic_compare_exchange_weak_seq_cst_seq_cst</tt> to call
+<tt>__atomic_compare_exchange_strong_seq_cst_seq_cst</tt> if you supply an
+intrinsic for the strong version but not the weak.
+</p>
+
+<h2>Taking advantage of weaker memory synchronization</h2>
+
+<p>
+So far all of the intrinsics presented require a <em>sequentially
+consistent</em> memory ordering.  That is, no loads or stores can move across
+the operation (just as if the library had locked that internal mutex).  But
+<tt>&lt;atomic&gt;</tt> supports weaker memory ordering operations.  In all,
+there are six memory orderings (listed here from strongest to weakest):
+</p>
+
+<blockquote><pre>
+memory_order_seq_cst
+memory_order_acq_rel
+memory_order_release
+memory_order_acquire
+memory_order_consume
+memory_order_relaxed
+</pre></blockquote>
+
+<p>
+(See the
+<a href="https://wg21.link/n3126">C++ standard</a>
+for the detailed definitions of each of these orderings).
+</p>
+
+<p>
+On some platforms, the compiler vendor can offer some or even all of the above
+intrinsics at one or more weaker levels of memory synchronization.  This might
+lead for example to not issuing an <tt>mfence</tt> instruction on the x86.
+</p>
+
+<p>
+If the compiler does not offer any given operation, at any given memory ordering
+level, the library will automatically attempt to call the next highest memory
+ordering operation.  This continues up to <tt>seq_cst</tt>, and if that doesn't
+exist, then the library takes over and does the job with a <tt>mutex</tt>.  This
+is a compile-time search &amp; selection operation.  At run time, the
+application will only see the few inlined assembly instructions for the selected
+intrinsic.
+</p>
+
+<p>
+Each intrinsic is appended with the 7-letter name of the memory ordering it
+addresses.  For example a <tt>load</tt> with <tt>relaxed</tt> ordering is
+defined by:
+</p>
+
+<blockquote><pre>
+T __atomic_load_relaxed(const volatile T* obj);
+</pre></blockquote>
+
+<p>
+And announced with:
+</p>
+
+<blockquote><pre>
+__has_feature(__atomic_load_relaxed_b) == 1  // bool
+__has_feature(__atomic_load_relaxed_c) == 1  // char
+__has_feature(__atomic_load_relaxed_a) == 1  // signed char
+...
+</pre></blockquote>
+
+<p>
+The <tt>__atomic_compare_exchange_strong(weak)</tt> intrinsics are parameterized
+on two memory orderings.  The first ordering applies when the operation returns
+<tt>true</tt> and the second ordering applies when the operation returns
+<tt>false</tt>.
+</p>
+
+<p>
+Not every memory ordering is appropriate for every operation.  <tt>exchange</tt>
+and the <tt>fetch_<i>op</i></tt> operations support all 6.  But <tt>load</tt>
+only supports <tt>relaxed</tt>, <tt>consume</tt>, <tt>acquire</tt> and <tt>seq_cst</tt>.
+<tt>store</tt>
+only supports <tt>relaxed</tt>, <tt>release</tt>, and <tt>seq_cst</tt>.  The
+<tt>compare_exchange</tt> operations support the following 16 combinations out
+of the possible 36:
+</p>
+
+<blockquote><pre>
+relaxed_relaxed
+consume_relaxed
+consume_consume
+acquire_relaxed
+acquire_consume
+acquire_acquire
+release_relaxed
+release_consume
+release_acquire
+acq_rel_relaxed
+acq_rel_consume
+acq_rel_acquire
+seq_cst_relaxed
+seq_cst_consume
+seq_cst_acquire
+seq_cst_seq_cst
+</pre></blockquote>
+
+<p>
+Again, the compiler supplies intrinsics only for the strongest orderings where
+it can make a difference.  The library takes care of calling the weakest
+supplied intrinsic that is as strong or stronger than the customer asked for.
+</p>
+
+</div>
+</body>
+</html>

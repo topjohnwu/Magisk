@@ -1,0 +1,19 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_library_static {
+    name: "android.fmq.test-impl",
+    shared_libs: [
+        "libbase",
+        "libbinder_ndk",
+        "libfmq",
+    ],
+    static_libs: [
+        "android.fmq.test-ndk_platform",
+    ],
+    export_include_dirs: ["."],
+    srcs: [
+        "TestAidlMsgQ.cpp",
+    ],
+}

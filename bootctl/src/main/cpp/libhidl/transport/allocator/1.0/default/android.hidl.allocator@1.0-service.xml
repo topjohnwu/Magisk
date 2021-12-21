@@ -1,0 +1,11 @@
+<manifest version="1.0" type="framework">
+    <hal>
+        <name>android.hidl.allocator</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>IAllocator</name>
+            <instance>ashmem</instance>
+        </interface>
+    </hal>
+</manifest>

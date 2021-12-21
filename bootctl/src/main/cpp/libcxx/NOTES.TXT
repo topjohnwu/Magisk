@@ -1,0 +1,29 @@
+//===---------------------------------------------------------------------===//
+// Notes relating to various libc++ tasks
+//===---------------------------------------------------------------------===//
+
+This file contains notes about various libc++ tasks and processes.
+
+//===---------------------------------------------------------------------===//
+// Post-Release TODO
+//===---------------------------------------------------------------------===//
+
+These notes contain a list of things that must be done after branching for
+an LLVM release.
+
+1. Update _LIBCPP_VERSION in `__config`
+2. Update the __libcpp_version file.
+3. Update the version number in `docs/conf.py`
+4. Create ABI lists for the previous release under `lib/abi`
+
+//===---------------------------------------------------------------------===//
+// Adding a new header TODO
+//===---------------------------------------------------------------------===//
+
+These notes contain a list of things that must be done upon adding a new header
+to libc++.
+
+1. Add a test under `test/libcxx` that the header defines `_LIBCPP_VERSION`.
+2. Update `test/libcxx/double_include.sh.cpp` to include the new header.
+3. Create a submodule in `include/module.modulemap` for the new header.
+4. Update the include/CMakeLists.txt file to include the new header.

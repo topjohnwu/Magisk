@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+          "http://www.w3.org/TR/html4/strict.dtd">
+<!-- Material used from: HTML 4.01 specs: http://www.w3.org/TR/html401/ -->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>libc++ Technical Specification Status</title>
+  <link type="text/css" rel="stylesheet" href="menu.css">
+  <link type="text/css" rel="stylesheet" href="content.css">
+</head>
+
+<body>
+<div id="menu">
+  <div>
+    <a href="https://llvm.org/">LLVM Home</a>
+  </div>
+
+  <div class="submenu">
+    <label>libc++ Info</label>
+    <a href="/index.html">About</a>
+  </div>
+
+  <div class="submenu">
+    <label>Quick Links</label>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-dev">cfe-dev</a>
+    <a href="https://lists.llvm.org/mailman/listinfo/cfe-commits">cfe-commits</a>
+    <a href="https://bugs.llvm.org/">Bug Reports</a>
+    <a href="https://llvm.org/svn/llvm-project/libcxx/trunk/">Browse SVN</a>
+    <a href="https://llvm.org/viewvc/llvm-project/libcxx/trunk/">Browse ViewVC</a>
+  </div>
+</div>
+
+<div id="content">
+<p>The "end game" of a Technical Specification (TS) is to have the features in there added to a future version of the C++ standard. When this happens, the TS can be retired. Sometimes, only part of at TS is added to the standard, and the rest of the features may be incorporated into the next version of the TS.</p>
+
+<p>Adoption leaves library implementors with two implementations of a feature, one in namespace <tt>std</tt>, and the other in namespace <tt>std::experimental</tt>. The first one will continue to evolve (via issues and papers), while the other will not. Gradually they will diverge. It's not good for users to have two (subtly) different implementations of the same functionality in the same library.</p>
+
+<p>As features are adopted into the main standard, we will implement them in namespace <tt>std</tt>, and then remove the versions in <tt>std::experimental</tt>. The removal will not happen immediately, because that would be unhelpful for users - giving them no chance to update their code.</p>
+
+<p>The rule of thumb that libc++ will follow is: <b>one year</b>. <br/>One year after we ship an implementation of a feature in <tt>std</tt>, we will remove it from <tt>std::experimental</tt>.</p>
+
+<p>A specific example: The first release of clang/libc++ that officially supported C++17 was 5.0. For the 7.0 release (one year after 5.0), we will remove the features that were adopted into C++17 from the TSes, <i>and</i> that were present in namespace <tt>std</tt> in the 5.0 release.</p>
+
+<h2>Library Fundamentals TS <a href="https://wg21.link/N4480">V1</a> and <a href="https://wg21.link/N4617">V2</a></h2>
+
+<p>Most (but not all) of the features of the LFTS were accepted into C++17.</p>
+
+<table id="LFTS" border="1">
+<tr><th>Section</th><th>Feature</th><th>shipped in<br/><tt>std</tt></th><th>To be removed from<br/><tt>std::experimental</tt></th><th>Notes</th></tr>
+<tr><td>2.1</td><td>uses_allocator construction</td><td><center>5.0</center></td><td><center>7.0</center></td><td></td></tr>
+<tr><td>3.1.2</td><td><tt>erased_type</tt></td><td></td><td><center>n/a</center></td><td><i>Not part of C++17</i></td></tr>
+<tr><td>3.2.1</td><td><tt>tuple_size_v</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.2.2</td><td><tt>apply</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.3.1</td><td>All of the '_v' traits in &lt;type_traits&gt;</td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.3.2</td><td><tt>invocation_type</tt> and <tt>raw_invocation_type</tt></td><td></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>3.3.3</td><td>Logical operator traits</td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.3.3</td><td>Detection Idiom</td><td><center>5.0</center></td><td></td><td><I>Only partially in C++17</I></td></tr>
+<tr><td>3.4.1</td><td>All of the '_v' traits in &lt;ratio&gt;</td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.5.1</td><td>All of the '_v' traits in &lt;chrono&gt;</td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.6.1</td><td>All of the '_v' traits in &lt;system_error&gt;</td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>3.7</td><td><tt>propagate_const</tt></td><td></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>4.2</td><td>Enhancements to <tt>function</tt></td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>4.3</td><td>searchers</td><td><center>7.0</center></td><td><center>9.0</center></td><td></td></tr>
+<tr><td>5</td><td><tt>optional</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>6</td><td><tt>any</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>7</td><td><tt>string_view</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>8.2.1</td><td><tt>shared_ptr</tt> enhancements</td><td><center>Not yet</center></td><td><center>Never added</center></td><td></td></tr>
+<tr><td>8.2.2</td><td><tt>weak_ptr</tt> enhancements</td><td><center>Not yet</center></td><td><center>Never added</center></td><td></td></tr>
+<tr><td>8.5</td><td><tt>memory_resource</tt></td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.6</td><td><tt>polymorphic_allocator</tt></td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.7</td><td><tt>resource_adaptor</tt></tt></td><td><center></center></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>8.8</td><td>Access to program-wide <tt>memory_resource</tt> objects</td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.9</td><td>Pool resource classes</td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.10</td><td><tt>monotonic_buffer_resource</tt></td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.11</td><td>Alias templates using polymorphic memory resources</td><td><center>Not yet</center></td><td></td><td></td></tr>
+<tr><td>8.12</td><td>Non-owning pointers</td><td></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>11.2</td><td><tt>promise</tt></td><td></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>11.3</td><td><tt>packaged_task</tt></td><td></td><td><center>n/a</center></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>12.2</td><td><tt>search</tt></td><td><center>7.0</center></td><td><center>9.0</center></td><td><I></I></td></tr>
+<tr><td>12.3</td><td><tt>sample</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>12.4</td><td><tt>shuffle</tt></td><td></td><td></td><td><I>Not part of C++17</I></td></tr>
+<tr><td>13.1</td><td><tt>gcd</tt> and <tt>lcm</tt></td><td><center>5.0</center></td><td><center>7.0</center></td><td><i>Removed</i></td></tr>
+<tr><td>13.2</td><td>Random number generation</td><td></td><td><td><I>Not part of C++17</I></td></tr>
+<tr><td>14</td><td>Reflection Library</td><td></td><td><td><I>Not part of C++17</I></td></tr>
+</table>
+
+<h2><a href="https://wg21.link/N4100">FileSystem TS</a></h2>
+<p>The FileSystem TS was accepted (in toto) for C++17.</p>
+<p>The FileSystem TS implementation is still (as of v6.0) in namespace <tt>std::experimental</tt>.</p>
+
+<h2>Parallelism TS <a href="https://wg21.link/N4507">V1</a> and <a href="https://wg21.link/N4706">V2</a></h2>
+<p>Some (most) of the Parallelism TS was accepted for C++17.</p>
+<p>We have not yet shipped an implementation of the Parallelism TS.</p>
+
+<h2><a href="https://wg21.link/N4680">Coroutines TS</a></h2>
+<p>The Coroutines TS is not yet part of a shipping standard.</p>
+<p>We are shipping (as of v5.0) an implementation of the Coroutines TS in namespace <tt>std::experimental</tt>.</p>
+
+<h2><a href="https://wg21.link/N4656">Networking TS</a></h2>
+<p>The Networking TS is not yet part of a shipping standard.</p>
+<p>We have not yet shipped an implementation of the Networking TS.</p>
+
+<h2><a href="https://wg21.link/N4685">Ranges TS</a></h2>
+<p>The Ranges TS is not yet part of a shipping standard.</p>
+<p>We have not yet shipped an implementation of the Ranges TS.</p>
+
+<h2><a href="https://wg21.link/N4641">Concepts TS</a></h2>
+<p>The Concepts TS is not yet part of a shipping standard, but it has been adopted into the C++20 working draft.</p>
+<p>We have not yet shipped an implementation of the Concepts TS.</p>
+
+<h2><a href="https://wg21.link/P0159">Concurrency TS</a></h2>
+<!-- The Concurrency TS was adopted in Kona (2015). -->
+<p>None of the Concurrency TS was accepted for C++17.</p>
+<p>We have not yet shipped an implementation of the Concurrency TS.</p>
+
+<!--
+><table id="Concurrency" border="1">
+<tr><th>Section</th><th>Feature</th><th>shipped in <tt>std</tt></th><th>To be removed from <tt>std::experimental</tt></th><th>Notes</th></tr>
+<tr><td>2.3</td><td>class template <tt>future</tt></td><td></td><td><td></td></tr>
+<tr><td>2.4</td><td>class template <tt>shared_future</tt></td><td></td><td><td></td></tr>
+<tr><td>2.5</td><td>class template <tt>promise</tt></td><td></td><td><td><center><I>Only using <tt>future</tt></I></center></td></tr>
+<tr><td>2.6</td><td>class template <tt>packaged_task</tt></td><td></td><td><td><center><I>Only using <tt>future</tt></I></center></td></tr>
+<tr><td>2.7</td><td>function template <tt>when_all</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>2.8</td><td>class template <tt>when_any_result</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>2.9</td><td>function template <tt>when_any</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>2.10</td><td>function template <tt>make_ready_future</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>2.11</td><td>function template <tt>make_exeptional_future</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>3</td><td><tt>latches</tt> and <tt>barriers</tt></td><td></td><td><td><center><I>Not part of C++17</I></center></td></tr>
+<tr><td>4</td><td>Atomic Smart Pointers</td><td></td><td><td><center><I>Adopted for C++20</I></center></td></tr>
+-->
+</table>
+
+
+  <hr/>
+  <p>Last Updated: 8-Feb-2018</p>
+</div>
+</body>
+</html>

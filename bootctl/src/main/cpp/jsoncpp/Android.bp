@@ -1,0 +1,96 @@
+package {
+    default_applicable_licenses: ["external_jsoncpp_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+// See: http://go/android-license-faq
+license {
+    name: "external_jsoncpp_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-MIT",
+        "legacy_unencumbered",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+cc_defaults {
+    name: "libjsoncpp_defaults",
+
+    srcs: [
+        "src/lib_json/json_reader.cpp",
+        "src/lib_json/json_value.cpp",
+        "src/lib_json/json_writer.cpp",
+    ],
+
+    local_include_dirs: [
+        "src/lib_json",
+    ],
+
+    include_build_directory: false,
+
+    export_include_dirs: ["include"],
+
+    cflags: [
+        "-DJSON_USE_EXCEPTION=0",
+        "-DJSONCPP_NO_LOCALE_SUPPORT",
+        "-Wall",
+        "-Werror",
+        "-Wno-implicit-fallthrough",
+        // src/lib_json/json_reader.cpp:210  has -Wno-implicit-fallthrough
+    ],
+
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+}
+
+cc_library {
+    name: "libjsoncpp",
+    defaults: ["libjsoncpp_defaults"],
+    vendor_available: true,
+    product_available: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
+    host_supported: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    native_bridge_supported: true,
+    min_sdk_version: "29",
+}
+
+cc_library_static {
+    name: "libjsoncpp_ndk",
+    defaults: ["libjsoncpp_defaults"],
+    sdk_version: "9",
+    stl: "libc++_static",
+}
+
+cc_library_headers {
+    name: "libjsoncpp_headers",
+    export_include_dirs: ["include"],
+    host_supported: true,
+}

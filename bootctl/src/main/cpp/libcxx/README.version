@@ -1,0 +1,4 @@
+URL: http://llvm.org/git/libcxx.git
+Version: ba865ff66b36f99a1dc5d9e31af3d8943f94e349
+BugComponent: 117395
+Owners: danalbert, srhines, android-llvm

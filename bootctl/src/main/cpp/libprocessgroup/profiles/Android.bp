@@ -1,0 +1,153 @@
+// Copyright (C) 2019 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+prebuilt_etc {
+    name: "cgroups.json",
+    src: "cgroups.json",
+    required: [
+        "cgroups_28.json",
+        "cgroups_29.json",
+        "cgroups_30.json",
+    ],
+}
+
+prebuilt_etc {
+    name: "cgroups.recovery.json",
+    filename: "cgroups.json",
+    recovery: true,
+    src: "cgroups.recovery.json",
+}
+
+prebuilt_etc {
+    name: "cgroups_28.json",
+    src: "cgroups_28.json",
+    sub_dir: "task_profiles",
+}
+
+prebuilt_etc {
+    name: "cgroups_29.json",
+    src: "cgroups_29.json",
+    sub_dir: "task_profiles",
+}
+
+prebuilt_etc {
+    name: "cgroups_30.json",
+    src: "cgroups_30.json",
+    sub_dir: "task_profiles",
+}
+
+prebuilt_etc {
+    name: "task_profiles.json",
+    src: "task_profiles.json",
+    required: [
+        "task_profiles_28.json",
+        "task_profiles_29.json",
+        "task_profiles_30.json",
+    ],
+}
+
+prebuilt_etc {
+    name: "task_profiles_28.json",
+    src: "task_profiles_28.json",
+    sub_dir: "task_profiles",
+}
+
+prebuilt_etc {
+    name: "task_profiles_29.json",
+    src: "task_profiles_29.json",
+    sub_dir: "task_profiles",
+}
+
+prebuilt_etc {
+    name: "task_profiles_30.json",
+    src: "task_profiles_30.json",
+    sub_dir: "task_profiles",
+}
+
+cc_defaults {
+    name: "libprocessgroup_test_defaults",
+    cflags: [
+        "-Wall",
+        "-Werror",
+
+        // Needed for headers from libprotobuf.
+        "-Wno-unused-parameter",
+    ],
+}
+
+cc_library_static {
+    name: "libprocessgroup_proto",
+    host_supported: true,
+    defaults: ["libprocessgroup_test_defaults"],
+    srcs: [
+        "cgroups.proto",
+        "task_profiles.proto",
+    ],
+    proto: {
+        type: "full",
+        export_proto_headers: true,
+    },
+}
+
+cc_test_host {
+    name: "libprocessgroup_proto_test",
+    defaults: ["libprocessgroup_test_defaults"],
+    srcs: [
+        "test.cpp",
+    ],
+    static_libs: [
+        "libbase",
+        "libgmock",
+        "liblog",
+        "libjsoncpp",
+        "libjsonpbverify",
+        "libjsonpbparse",
+        "libprocessgroup_proto",
+    ],
+    shared_libs: [
+        "libprotobuf-cpp-full",
+    ],
+    data: [
+        "cgroups.json",
+        "cgroups.recovery.json",
+        "task_profiles.json",
+    ],
+}
+
+cc_test {
+    name: "vts_processgroup_validate_test",
+    defaults: ["libprocessgroup_test_defaults"],
+    srcs: [
+        "test_vendor.cpp",
+    ],
+    static_libs: [
+        "libbase",
+        "libgmock",
+        "liblog",
+        "libjsoncpp",
+        "libjsonpbverify",
+        "libjsonpbparse",
+        "libprocessgroup_proto",
+    ],
+    shared_libs: [
+        "libprotobuf-cpp-full",
+    ],
+    test_suites: [
+        "vts",
+    ],
+}

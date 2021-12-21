@@ -1,0 +1,10 @@
+{
+  "presubmit": [
+    {
+      "name": "fmq_unit_tests"
+    },
+    {
+      "name": "fmq_test"
+    }
+  ]
+}
