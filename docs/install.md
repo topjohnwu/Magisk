@@ -14,7 +14,7 @@ Before you start:
 
 ---
 
-Download the [latest Magisk APK](https://github.com/topjohnwu/Magisk/releases) from the official releases on GitHub and install it on your device using `adb`. The app displays important information about your device that is required to determine the correct install process. In the app's home screen, you should see this:
+Download the [latest Magisk APK](https://github.com/topjohnwu/Magisk/releases) from the official releases on GitHub and install it on your device. The app displays important information about your device that is required to determine the correct install process. In the app's home screen, you should see this:
 
 <p align="center"><img src="images/device_info.png" width="500"/></p>
 
