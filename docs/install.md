@@ -39,23 +39,37 @@ Follow the steps below:
 
 ## Patching Images
 
-If your device has boot ramdisk, you need a copy of the `boot.img`<br>
-If your device does **NOT** have boot ramdisk, you need a copy of the `recovery.img`.
+1. **Obtain the correct image file.**
+    
+    Does the Magisk app report that your device has ramdisk in the boot partition (`Ramdisk = Yes`)?
+   - **Yes.** You need a copy of the `boot.img` image file.
+   - **No.** You need a copy of the `recovery.img` image file.
 
-You should be able to extract the file you need from official firmware packages or your custom ROM zip (if using one). If you are still having trouble, go to [XDA-Developers](https://forum.xda-developers.com/) and look for resources, guides, discussions, or ask for help in your device's forum.
+   You should be able to extract the file you need from official firmware packages or your custom ROM zip (if you are using one).
+   If you are still having trouble, go to [XDA-Developers](https://forum.xda-developers.com/) and look for resources, guides, discussions,
+   or ask for help in your device's forum.
 
-- Copy the boot/recovery image to your device
-- Press the **Install** button in the Magisk card
-- If you are patching a recovery image, make sure **"Recovery Mode"** is checked in options.<br>In most cases it should already be automatically checked.
-- Choose **"Select and Patch a File"** in method, and select the stock boot/recovery image
-- The Magisk app will patch the image to `[Internal Storage]/Download/magisk_patched_[random_strings].img`.
-- Copy the patched image to your PC with ADB:<br>
-`adb pull /sdcard/Download/magisk_patched_[random_strings].img`
-- Flash the patched boot/recovery image to your device.<br>
-For most devices, reboot into fastboot mode and flash with command:<br>
-`fastboot flash boot /path/to/magisk_patched.img` or <br>
-`fastboot flash recovery /path/to/magisk_patched.img` if flashing a recovery image
-- Reboot and voila!
+2. **Copy the image file from your computer to your device.**
+   
+   `$> adb push boot-or-recovery.img /sdcard/Download/`
+
+3. **Use the Magisk app to patch the image file.**
+   - In the Magisk app, press the blue `Install` button in the top right corner of the grey Magisk card.
+   - Choose the `Select and Patch a File` option.
+   - If you are patching a recovery image, make sure `Recovery Mode` is checked in options. In most cases, it should already be automatically checked.
+   - Navigate to the image file copied onto the device.
+   - Click `Let's go!` and wait while the Magisk app patches the stock image file.
+   - The patched image file will be written to `[Internal Storage]/Download/magisk_patched_[random_strings].img`
+
+5. **Copy the patched image file from your device to your computer.**
+   
+   `$> adb pull /sdcard/Download/magisk_patched_[random_strings].img`
+
+6. **Flash the patched image to your device.** For most devices, reboot into fastboot mode and flash with one of the following commands:
+   - `$> fastboot flash boot /path/to/magisk_patched.img`
+   - `$> fastboot flash recovery /path/to/magisk_patched.img`
+
+7. **Reboot and voila! Done.**
 
 ## Uninstallation
 
