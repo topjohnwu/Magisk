@@ -1,6 +1,8 @@
 # Installation
 
-If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
+This tutorial is only for the initial installation of Magisk.
+
+If you already have Magisk installed, it is **strongly recommended** that you upgrade directly via the Magisk app using its "Direct Install" method.
 
 ## Getting Started
 
@@ -12,22 +14,28 @@ Before you start:
 
 ---
 
-Download the [latest Magisk APK](https://github.com/topjohnwu/Magisk/releases) and install it on your device using `adb`. We use the app to gather some information about your device. In the home screen, you should see this:
+Download the [latest Magisk APK](https://github.com/topjohnwu/Magisk/releases) from the official releases on GitHub and install it on your device using `adb`. The app displays important information about your device that is required to determine the correct install process. In the app's home screen, you should see this:
 
 <p align="center"><img src="images/device_info.png" width="500"/></p>
 
-Pay special attention to the **Ramdisk** info. The result of this info determines whether your device has ramdisk in the boot partition.
+Follow the steps below:
 
-> *(Unfortunately, there are exceptions as some devices' bootloader accepts ramdisk even if it shouldn't. In this case, you will have to follow the instructions as if your device's boot partition does include ramdisk. There is no way to detect this, so the only way to know for sure is to actually try. Fortunately, as far as we know, only some Xiaomi devices are known to have this property, so most people can simply ignore this piece of information.)*
+1. **Does the Magisk app report that your device has ramdisk in the boot partition (`Ramdisk = Yes`)?**
+   - **Yes.** Continue to next question.
+   - **No.** Read the [Magisk in Recovery](#magisk-in-recovery) section before installing. The information in that section is VERY important!
+2. **Are you using a Huawei device?**
+   - **Yes.** Huawei devices are not supported. Sorry.
+   - **No.** Continue to next question.
+4. **Are you using a Samsung device _and_ the Magisk app reports `SAR = Yes`?**
+   - **Yes.** Please read the section on [Samsung (System-as-root)](#samsung-system-as-root).
+   - **No.** Continue to [Patching Images](#patching-images) section.
 
-**If your device does not have boot ramdisk, read the [Magisk in Recovery](#magisk-in-recovery) section before installing. The information in that section is VERY important!**
-
-If you are using a Samsung device and the **SAR** result is **Yes**, please check [its own section](#samsung-system-as-root).
-
-Otherwise, continue to [Patching Images](#patching-images).
-
-(P.S.1: If your device has boot ramdisk, you can also install Magisk with a [custom recovery](#custom-recovery), **but it is not recommended**)<br>
-(P.S.2: Huawei devices are not supported, and the instructions are removed from this page.)
+> Note: *Unfortunately, there are cases where the bootloader of some devices (primarily Xiaomi devices) accepts ramdisk even if it should not.
+> There is no automated way to detect this scenario, so the only way to know for sure is to try. Follow the instructions outlined above
+> and assume that your your device's boot partition does, in fact, include ramdisk. Fortunately, as far as we know, this issue is limited to
+> some Xiaomi devices, so most people can simply ignore this notification.*
+ 
+> Note: If your device does have ramdisk in the boot partition, you _can_ also install Magisk with a [custom recovery](#custom-recovery), **but it is not recommended**.
 
 ## Patching Images
 
