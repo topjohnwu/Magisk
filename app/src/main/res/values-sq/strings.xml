@@ -220,7 +220,7 @@
     <string name="failure">Dështoi!</string>
     <string name="hide_app_title">Fshehja e aplikacionit Magisk…</string>
     <string name="open_link_failed_toast">Nuk u gjet asnjë aplikacion për të hapur lidhjen</string>
-    <string name="complete_uninstall">Çinstalimi përfundoi</string>
+    <string name="complete_uninstall">Çinstalimi i plotë</string>
     <string name="restore_img">Rivendosni imazhet</string>
     <string name="restore_img_msg">Duke rivendosur…</string>
     <string name="restore_done">Rivendosja u krye!</string>
