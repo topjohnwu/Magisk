@@ -6,6 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.databinding.DataBindingUtil
@@ -41,6 +44,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         AppCompatDelegate.setDefaultNightMode(theme)
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
 
@@ -54,12 +58,10 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
             .use { it.getDrawable(0) }
             .also { window.setBackgroundDrawable(it) }
 
-        window?.decorView?.let {
-            it.systemUiVisibility = (it.systemUiVisibility
-                    or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
-        }
+        window.decorView.windowInsetsController?.hide(WindowInsets.Type.statusBars())
+        window.decorView.windowInsetsController?.hide(WindowInsets.Type.navigationBars())
+        window.decorView.windowInsetsController?.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        window.setDecorFitsSystemWindows(false)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             window?.decorView?.post {
