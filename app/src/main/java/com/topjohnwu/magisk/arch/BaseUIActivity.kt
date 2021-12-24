@@ -66,7 +66,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             window?.decorView?.post {
                 // If navigation bar is short enough (gesture navigation enabled), make it transparent
-                if (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0 < Resources.getSystem().displayMetrics.density * 40) {
+                if (window.decorView.rootWindowInsets?.isVisible(WindowInsets.Type.navigationBars()) == false) {
                     window.navigationBarColor = Color.TRANSPARENT
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         window.navigationBarDividerColor = Color.TRANSPARENT
