@@ -39,7 +39,6 @@ object Info {
     var noDataExec = false
 
     @JvmField var hasGMS = true
-    @JvmField val isPixel = Build.BRAND == "google"
     val isSamsung = Build.MANUFACTURER.equals("samsung", ignoreCase = true)
     @JvmField val isEmulator =
         getProperty("ro.kernel.qemu", "0") == "1" ||
