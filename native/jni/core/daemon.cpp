@@ -305,6 +305,7 @@ static void daemon_entry() {
     // Escape from cgroup
     int pid = getpid();
     switch_cgroup("/acct", pid);
+    switch_cgroup("/dev/memcg/apps", pid);
     switch_cgroup("/dev/cg2_bpf", pid);
     switch_cgroup("/sys/fs/cgroup", pid);
 
