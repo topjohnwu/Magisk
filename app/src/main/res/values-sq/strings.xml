@@ -13,7 +13,7 @@
     <string name="denylist">Lista e mohimit</string>
 
     <!--Home-->
-    <string name="no_connection">Asnjë lidhje nuk ofrohet</string>
+    <string name="no_connection">Nuk ka lidhje interneti</string>
     <string name="app_changelog">Ndryshimet</string>
     <string name="loading">Po ngarkohet…</string>
     <string name="update">Përditëso</string>
@@ -22,10 +22,10 @@
     <string name="home_package">Paketa</string>
     <string name="home_app_title">App</string>
 
-    <string name="home_notice_content">Shkarkoni Magisk VETEM nga faqja zyrtare e GitHub.  Skedarët nga burime të panjohura mund të jenë me qëllim të keq! </string>
+    <string name="home_notice_content">Shkarkoni Magisk VETEM nga faqja zyrtare e GitHub. Skedarët nga burime të panjohura mund të jenë me qëllim të keq! </string>
     <string name="home_support_title">Na mbështetni</string>
     <string name="home_item_source">Burimi</string>
-    <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur.  Sidoqoftë, mund të na tregoni se kujdeseni duke dërguar një donacion të vogël.</string>
+    <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Sidoqoftë, mund të na tregoni se kujdeseni duke dërguar një donacion të vogël.</string>
     <string name="home_installed_version">Instaluar</string>
     <string name="home_latest_version">E fundit</string>
     <string name="invalid_update_channel">Kanali i përditësimit i pavlefshëm</string>
@@ -220,7 +220,7 @@
     <string name="failure">Dështoi!</string>
     <string name="hide_app_title">Fshehja e aplikacionit Magisk…</string>
     <string name="open_link_failed_toast">Nuk u gjet asnjë aplikacion për të hapur lidhjen</string>
-    <string name="complete_uninstall">Çinstalimi përfundoi</string>
+    <string name="complete_uninstall">Çinstalimi i plotë</string>
     <string name="restore_img">Rivendosni imazhet</string>
     <string name="restore_img_msg">Duke rivendosur…</string>
     <string name="restore_done">Rivendosja u krye!</string>
