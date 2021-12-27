@@ -34,7 +34,12 @@ Otherwise, continue to [Patching Images](#patching-images).
 If your device has boot ramdisk, you need a copy of the `boot.img`<br>
 If your device does **NOT** have boot ramdisk, you need a copy of the `recovery.img`.
 
-You should be able to extract the file you need from official firmware packages or your custom ROM zip (if using one). If you are still having trouble, go to [XDA-Developers](https://forum.xda-developers.com/) and look for resources, guides, discussions, or ask for help in your device's forum.
+You should be able to extract the file you need from official firmware packages or your custom ROM zip (if using one). You can use one of the following to extract these files from a system image file (`payload.bin` inside a system image zip):
+
+* [payload-dumper-go](https://github.com/ssut/payload-dumper-go) (binary downloads here: [payload-dumper-go downloads](https://github.com/ssut/payload-dumper-go/releases/latest))
+* [python payload_dumper](https://github.com/vm03/payload_dumper) (requires working installation of python, [python dumper instructions on XDA Developers](https://forum.xda-developers.com/t/guide-how-to-extract-payload-bin-from-ota.3830962/))
+
+If you are still having trouble, go to [XDA-Developers](https://forum.xda-developers.com/) and look for resources, guides, discussions, or ask for help in your device's forum.
 
 - Copy the boot/recovery image to your device
 - Press the **Install** button in the Magisk card
