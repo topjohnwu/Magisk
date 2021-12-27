@@ -392,13 +392,7 @@ abstract class MagiskInstallImpl protected constructor(
     private fun flashBoot() = "direct_install $installDir $srcBoot".sh().isSuccess
 
     private suspend fun postOTA(): Boolean {
-        try {
-            val bootctl = File.createTempFile("bootctl", null, context.cacheDir)
-            service.fetchBootctl().byteStream().writeTo(bootctl)
-            "post_ota $bootctl".sh()
-        } catch (e: IOException) {
-            console.add("! Unable to download bootctl")
-            Timber.e(e)
+        if (!"post_ota".sh().isSuccess) {
             return false
         }
 

@@ -59,7 +59,7 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
-default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
+default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox', 'bootctl']
 support_targets = default_targets + ['magiskpolicy', 'resetprop', 'test']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
@@ -302,6 +302,22 @@ def dump_flag_header():
     write_if_diff(op.join(native_gen_path, 'flags.h'), flag_txt)
 
 
+def build_bootctl(args):
+    build_type = 'Release' if args.release else 'Debug'
+
+    proc = execv([gradlew, f'bootctl:assemble{build_type}'])
+    if proc.returncode != 0:
+        error(f'Build bootctl failed!')
+
+    build_type = build_type.lower()
+
+    for arch in archs:
+        mkdir_p(op.join('bootctl', 'out', arch))
+        source = op.join('bootctl', 'build', 'intermediates', 'cmake', build_type, 'obj', arch, 'bootctl')
+        target = op.join('bootctl', 'out', arch, 'bootctl')
+        mv(source, target)
+
+
 def build_binary(args):
     # Verify NDK install
     props = parse_props(op.join(ndk_path, 'source.properties'))
@@ -319,6 +335,11 @@ def build_binary(args):
         args.target = default_targets
 
     header('* Building binaries: ' + ' '.join(args.target))
+
+    if 'bootctl' in args.target:
+        build_bootctl(args)
+        if len(args.target) == 1:
+            return
 
     dump_flag_header()
 

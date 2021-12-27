@@ -101,6 +101,10 @@ fun Project.setupApp() {
                 include("busybox", "magiskboot", "magiskinit", "magisk")
                 rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
             }
+            from(rootProject.file("bootctl/out/arm64-v8a")) {
+                include("bootctl")
+                rename { "libbootctl.so" }
+            }
         }
         into("x86_64") {
             from(rootProject.file("native/out/x86_64")) {
@@ -109,7 +113,7 @@ fun Project.setupApp() {
             }
         }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 16)
+            if (inputs.sourceFiles.files.size != 17)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }

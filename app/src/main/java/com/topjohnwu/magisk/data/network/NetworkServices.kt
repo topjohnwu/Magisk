@@ -22,10 +22,6 @@ interface GithubPageServices {
 
 interface JSDelivrServices {
 
-    @GET("$MAGISK_FILES@{$REVISION}/bootctl")
-    @Streaming
-    suspend fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): ResponseBody
-
     @GET("$MAGISK_MAIN@{$REVISION}/scripts/module_installer.sh")
     @Streaming
     suspend fun fetchInstaller(@Path(REVISION) revision: String): ResponseBody

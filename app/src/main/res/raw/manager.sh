@@ -91,19 +91,15 @@ restore_imgs() {
 }
 
 post_ota() {
-  cd $NVBASE
-  cp -f $1 bootctl
-  rm -f $1
-  chmod 755 bootctl
+  cd $NVBASE/magisk
   ./bootctl hal-info || return
   [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
   ./bootctl set-active-boot-slot $SLOT_NUM
-  cat << EOF > post-fs-data.d/post_ota.sh
-/data/adb/bootctl mark-boot-successful
-rm -f /data/adb/bootctl
-rm -f /data/adb/post-fs-data.d/post_ota.sh
+  cat << EOF > $NVBASE/post-fs-data.d/post_ota.sh
+$NVBASE/magisk/bootctl mark-boot-successful
+rm -f $NVBASE/post-fs-data.d/post_ota.sh
 EOF
-  chmod 755 post-fs-data.d/post_ota.sh
+  chmod 755 $NVBASE/post-fs-data.d/post_ota.sh
   cd /
 }
 
