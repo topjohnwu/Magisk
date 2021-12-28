@@ -194,7 +194,23 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     val pkgNames = names.distinctBy { it.toLowerCase(Locale.ROOT) }
 
     var idx = 0
-    fun genCmpName() = "${pkgNames[idx++]}.${names.random(kRANDOM)}"
+    fun isJavaKeyword(name: String) = when (name) {
+        "do", "if", "for", "int", "new", "try" -> true
+        else -> false
+    }
+
+    fun genCmpName() : String {
+        var pkgName : String
+        do {
+            pkgName = pkgNames[idx++]
+        } while (isJavaKeyword(pkgName))
+
+        var clzName : String
+        do {
+            clzName = names.random(kRANDOM)
+        } while (isJavaKeyword(clzName))
+        return "${pkgName}.${clzName}"
+    }
 
     fun genClass(clzName: String, type: String) {
         val (pkg, name) = clzName.split('.')
