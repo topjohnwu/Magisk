@@ -27,7 +27,11 @@ void fstab_entry::to_file(FILE *fp) {
 line[val##1] = '\0'; \
 entry.val = &line[val##0];
 
-static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) {
+static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) {
+    if (!fstab_file || fstab_file[0] == '\0') {
+        LOGE("fstab file is empty");
+        return false;
+    }
     file_readline(fstab_file, [&](string_view l) -> bool {
         if (l[0] == '#' || l.length() == 1)
             return true;
@@ -51,6 +55,7 @@ static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
         fstab.emplace_back(move(entry));
         return true;
     });
+    return true;
 }
 
 #define FSR "/first_stage_ramdisk"
@@ -101,6 +106,7 @@ exit_loop:
 
     if (!fstab.empty()) {
         // Dump dt fstab to fstab file in rootfs and force init to use it instead
+        bool should_skip = false; // If there's any error in dt fstab and if so, skip loading it
 
         // All dt fstab entries should be first_stage_mount
         for (auto &entry : fstab) {
@@ -109,6 +115,10 @@ exit_loop:
                     entry.fsmgr_flags += ',';
                 entry.fsmgr_flags += "first_stage_mount";
             }
+            // If the entry contains slotselect but the current slot is empty, error occurs
+            if (config->slot[0] == '\0' && str_contains(entry.fsmgr_flags, "slotselect")) {
+                should_skip = true;
+            } // TODO: else if expected_field checks and fs_mgr_flags checks
         }
 
         if (fstab_file[0] == '\0') {
@@ -122,18 +132,18 @@ exit_loop:
             }
             sprintf(fstab_file, "fstab.%s", suffix);
         }
+        if (should_skip) {
+            // When dt fstab fails, fall back to default fstab
+            LOGI("dt fstab contains error, falling back to default fstab");
+            fstab.clear();
+            if (!read_fstab_file(fstab_file, fstab)) return;
 
-        // Patch init to force IsDtFstabCompatible() return false
-        auto init = mmap_data("/init", true);
-        init.patch({ make_pair("android,fstab", "xxx") });
-    } else {
-        if (fstab_file[0] == '\0') {
-            LOGE("Cannot find fstab");
-            return;
+        } else {
+            // Patch init to force IsDtFstabCompatible() return false
+            auto init = mmap_data("/init", true);
+            init.patch({make_pair("android,fstab", "xxx")});
         }
-        // Parse and load the fstab file
-        read_fstab_file(fstab_file, fstab);
-    }
+    } else if (!read_fstab_file(fstab_file, fstab)) return;
 
     // Append oppo's custom fstab
     if (access("oplus.fstab", F_OK) == 0) {
