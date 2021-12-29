@@ -19,7 +19,7 @@ import java.io.File
 
 
 fun createOkHttpClient(context: Context): OkHttpClient {
-    val appCache = Cache(File(context.cacheDir, "okhttp"), 10 * 1024 * 1024)
+    val appCache = Cache(File(context.cacheDir, "okhttp"), 10 * 1024 * 1024L)
     val builder = OkHttpClient.Builder().cache(appCache)
 
     if (BuildConfig.DEBUG) {
