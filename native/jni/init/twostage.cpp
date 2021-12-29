@@ -63,9 +63,9 @@ static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
 extern uint32_t patch_verity(void *buf, uint32_t size);
 
 void FirstStageInit::prepare() {
-    if (config->dsu) {
+    if (is_dsu()) {
         rename(backup_init(), "/init");
-        LOGI("Skip loading Magisk because of DSU");
+        LOGI("Skip loading Magisk because of DSU\n");
         return;
     }
 

@@ -204,16 +204,14 @@ bool is_dsu() {
         PLOGE("Failed to mount /metadata");
         return false;
     } else {
-        run_finally finally([] {
-            xumount2("/metadata", MNT_DETACH);
-        });
+        run_finally f([]{ xumount2("/metadata", MNT_DETACH); });
         constexpr auto dsu_status = "/metadata/gsi/dsu/install_status";
         if (xaccess(dsu_status, F_OK) == 0) {
-            char buf[PATH_MAX] = {0};
-            auto f = xopen_file(dsu_status, "r");
-            fgets(buf, sizeof(buf), f.get());
-            std::string_view status = buf;
-            if (status == "ok" || status == "0") return true;
+            char status[PATH_MAX] = {0};
+            auto fp = xopen_file(dsu_status, "r");
+            fgets(status, sizeof(status), fp.get());
+            if (status == "ok"sv || status == "0"sv)
+                return true;
         }
     }
     return false;

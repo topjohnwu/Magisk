@@ -6,7 +6,6 @@ struct BootConfig {
     bool skip_initramfs;
     bool force_normal_boot;
     bool rootwait;
-    bool dsu;
     char slot[3];
     char dt_dir[64];
     char fstab_suffix[32];

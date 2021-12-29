@@ -193,7 +193,6 @@ void BootConfig::print() {
     LOGD("fstab_suffix=[%s]\n", fstab_suffix);
     LOGD("hardware=[%s]\n", hardware);
     LOGD("hardware.platform=[%s]\n", hardware_plat);
-    LOGD("dsu=[%d]\n", dsu);
 }
 
 #define read_dt(name, key)                                          \
@@ -219,8 +218,6 @@ void load_kernel_info(BootConfig *config) {
 
     // Log to kernel
     setup_klog();
-
-    config->dsu = is_dsu();
 
     config->set(parse_cmdline(full_read("/proc/cmdline")));
     LOGD("Kernel cmdline info:\n");
