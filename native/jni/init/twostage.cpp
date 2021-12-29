@@ -196,8 +196,15 @@ exit_loop:
         auto fp = xopen_file(fstab_file, "we");
         for (auto &entry : fstab) {
             // Redirect system mnt_point so init won't switch root in first stage init
-            if (entry.mnt_point == "/system")
+            if (entry.mnt_point == "/system") {
                 entry.mnt_point = "/system_root";
+
+                // Make a symlink from /magisk -> /system_root/system
+                xsymlink("/system_root/system", "/magisk");
+                // and redirect skip_mount.cfg
+                auto init = mmap_data("/init", true);
+                init.patch({ make_pair("/system/system_ext/etc/init/config/skip_mount.cfg", "/magisk/system_ext/etc/init/config/skip_mount.cfg") });
+            }
 
             // Force remove AVB for 2SI since it may bootloop some devices
             auto len = patch_verity(entry.fsmgr_flags.data(), entry.fsmgr_flags.length());
