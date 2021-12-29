@@ -184,6 +184,8 @@ fun Project.setupStub() {
         val apkTmp = File("${apk}.tmp")
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
+            inputs.property("versionCode", Config.versionCode)
+            outputs.file(manifest)
             doLast {
                 val xml = genStubManifest(templateDir, outSrcDir)
                 manifest.parentFile.mkdirs()
@@ -192,10 +194,12 @@ fun Project.setupStub() {
                 }
             }
         }
-        mergeResourcesProvider.get().dependsOn(genManifestTask)
+        tasks.getByPath(":stub:process${variantCapped}MainManifest").dependsOn(genManifestTask)
 
         val genSrcTask = tasks.register("generate${variantCapped}ObfuscatedSources") {
             dependsOn(":stub:process${variantCapped}Resources")
+            inputs.file(apk)
+            outputs.file(apk)
             doLast {
                 exec {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
