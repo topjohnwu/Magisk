@@ -52,7 +52,7 @@ static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
         set_info(mnt_flags)
         set_info(fsmgr_flags)
 
-        fstab.emplace_back(move(entry));
+        fstab.emplace_back(std::move(entry));
         return true;
     });
     return true;
@@ -61,6 +61,53 @@ static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
 #define FSR "/first_stage_ramdisk"
 
 extern uint32_t patch_verity(void *buf, uint32_t size);
+
+static void append_oplus(vector<fstab_entry> &fstab) {
+    LOGD("Found fstab file: oplus.fstab\n");
+    map<string, string> bind_map;
+    vector<fstab_entry> entry_list;
+
+    {
+        // Make sure no duplicate mnt_point exists
+        set<string_view> mount_points;
+
+        // Add main fstab entry mnt_points
+        for (auto &entry: fstab) {
+            mount_points.emplace(entry.mnt_point);
+        }
+
+        vector<fstab_entry> oplus_fstab;
+        read_fstab_file("oplus.fstab", oplus_fstab);
+
+        for (auto &entry : oplus_fstab) {
+            if (mount_points.count(entry.mnt_point))
+                continue;
+            if (str_contains(entry.mnt_flags, "bind")) {
+                bind_map.emplace(std::move(entry.dev), std::move(entry.mnt_point));
+            } else {
+                mount_points.emplace(entry.mnt_point);
+                entry_list.emplace_back(std::move(entry));
+            }
+        }
+    }
+
+    for (auto &entry : entry_list) {
+        // Mount before switch root, fix img path
+        if (str_starts(entry.dev, "loop@/system/"))
+            entry.dev.insert(5, "/system_root");
+
+        // change bind mount entries to dev mount since some users reported bind is not working
+        // in this case, we drop the original mount point and leave only the one from bind entry
+        // because some users reported keeping the original mount point causes bootloop
+        if (auto it = bind_map.find(entry.mnt_point); it != bind_map.end()) {
+            entry.mnt_point = it->second;
+        }
+
+        fstab.push_back(std::move(entry));
+    }
+
+    unlink("oplus.fstab");
+}
 
 void FirstStageInit::prepare() {
     if (is_dsu()) {
@@ -91,11 +138,11 @@ void FirstStageInit::prepare() {
     fstab_file[0] = '\0';
 
     // Find existing fstab file
-    for (const char *suffix : {config->fstab_suffix, config->hardware, config->hardware_plat }) {
+    for (const char *suffix : { config->fstab_suffix, config->hardware, config->hardware_plat }) {
         if (suffix[0] == '\0')
             continue;
         for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "system/etc/fstab", "fstab" }) {
-            sprintf(fstab_file, "%s.%s", prefix, suffix);
+            snprintf(fstab_file, sizeof(fstab_file), "%s.%s", prefix, suffix);
             if (access(fstab_file, F_OK) != 0) {
                 fstab_file[0] = '\0';
             } else {
@@ -112,7 +159,9 @@ exit_loop:
 
     if (!fstab.empty()) {
         // Dump dt fstab to fstab file in rootfs and force init to use it instead
-        bool should_skip = false; // If there's any error in dt fstab and if so, skip loading it
+
+        // If there's any error in dt fstab, skip loading it
+        bool skip = false;
 
         // All dt fstab entries should be first_stage_mount
         for (auto &entry : fstab) {
@@ -123,79 +172,47 @@ exit_loop:
             }
             // If the entry contains slotselect but the current slot is empty, error occurs
             if (config->slot[0] == '\0' && str_contains(entry.fsmgr_flags, "slotselect")) {
-                should_skip = true;
+                skip = true;
+                break;
             } // TODO: else if expected_field checks and fs_mgr_flags checks
         }
 
         if (fstab_file[0] == '\0') {
-            const char *suffix =
-                    config->fstab_suffix[0] ? config->fstab_suffix :
-                    (config->hardware[0] ? config->hardware :
-                     (config->hardware_plat[0] ? config->hardware_plat : nullptr));
+            const char *suffix = [&]() -> const char * {
+                if (config->fstab_suffix[0])
+                    return config->fstab_suffix;
+                if (config->hardware[0])
+                    return config->hardware;
+                if (config->hardware_plat[0])
+                    return config->hardware_plat;
+                return nullptr;
+            }();
+
             if (suffix == nullptr) {
                 LOGE("Cannot determine fstab suffix!\n");
                 return;
             }
-            sprintf(fstab_file, "fstab.%s", suffix);
+            snprintf(fstab_file, sizeof(fstab_file), "fstab.%s", suffix);
         }
-        if (should_skip) {
-            // When dt fstab fails, fall back to default fstab
-            LOGI("dt fstab contains error, falling back to default fstab");
-            fstab.clear();
-            if (!read_fstab_file(fstab_file, fstab)) return;
 
+        if (skip) {
+            // When dt fstab fails, fall back to default fstab
+            LOGI("dt fstab contains error, fall back to default fstab\n");
+            fstab.clear();
+            if (!read_fstab_file(fstab_file, fstab))
+                return;
         } else {
             // Patch init to force IsDtFstabCompatible() return false
             auto init = mmap_data("/init", true);
             init.patch({make_pair("android,fstab", "xxx")});
         }
-    } else if (!read_fstab_file(fstab_file, fstab)) return;
+    } else if (!read_fstab_file(fstab_file, fstab)) {
+        return;
+    }
 
     // Append oppo's custom fstab
-    if (access("oplus.fstab", F_OK) == 0) {
-        LOGD("Found fstab file: %s\n", "oplus.fstab");
-        set<string> main_mount_point;
-        map<string, string> bind_map;
-        map<string, fstab_entry> entry_map;
-
-        // used to avoid duplication
-        for (auto &entry: fstab) {
-            main_mount_point.emplace(entry.mnt_point);
-        }
-
-        {
-            vector<fstab_entry> oplus_fstab;
-            read_fstab_file("oplus.fstab", oplus_fstab);
-
-            for (auto &entry : oplus_fstab) {
-                // skip duplicated entry between the main file and the oplus one
-                if (main_mount_point.count(entry.mnt_point)) continue;
-                if (entry.mnt_flags.find("bind") != string::npos) {
-                    bind_map.emplace(std::move(entry.dev), std::move(entry.mnt_point));
-                } else {
-                    // skip duplicated entry in the same file
-                    entry_map.insert_or_assign(decltype(entry.mnt_point){entry.mnt_point}, std::move(entry));
-                }
-            }
-        }
-
-        for (auto &[_, entry] : entry_map) {
-            // Mount before switch root, fix img path
-            if (str_starts(entry.dev, "loop@/system/"))
-                entry.dev.insert(5, "/system_root");
-
-            // change bind mount entries to dev mount since some users reported bind is not working
-            // in this case, we drop the original mount point and leave only the one from bind entry
-            // because some users reported keeping the original mount point causes bootloop
-            if (auto got = bind_map.find(entry.mnt_point); got != bind_map.end()) {
-                entry.mnt_point = got->second;
-            }
-
-            fstab.push_back(move(entry));
-        }
-
-        unlink("oplus.fstab");
-    }
+    if (access("oplus.fstab", F_OK) == 0)
+        append_oplus(fstab);
 
     {
         LOGD("Write fstab file: %s\n", fstab_file);
