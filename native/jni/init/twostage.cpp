@@ -29,7 +29,7 @@ entry.val = &line[val##0];
 
 static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) {
     if (!fstab_file || fstab_file[0] == '\0') {
-        LOGE("fstab file is empty");
+        LOGE("fstab file is empty\n");
         return false;
     }
     file_readline(fstab_file, [&](string_view l) -> bool {
@@ -140,7 +140,7 @@ exit_loop:
         }
         if (should_skip) {
             // When dt fstab fails, fall back to default fstab
-            LOGI("dt fstab contains error, falling back to default fstab");
+            LOGI("dt fstab contains error, falling back to default fstab\n");
             fstab.clear();
             if (!read_fstab_file(fstab_file, fstab)) return;
 
