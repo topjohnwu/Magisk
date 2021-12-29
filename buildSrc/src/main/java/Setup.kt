@@ -195,7 +195,11 @@ fun Project.setupStub() {
         mergeResourcesProvider.get().dependsOn(genManifestTask)
 
         val genSrcTask = tasks.register("generate${variantCapped}ObfuscatedSources") {
-            dependsOn(":stub:process${variantCapped}Resources")
+            val dep = tasks.getByPath(":stub:process${variantCapped}Resources")
+            dependsOn(dep)
+            onlyIf {
+                dep.didWork
+            }
             doLast {
                 exec {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
