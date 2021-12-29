@@ -38,6 +38,7 @@ extern std::vector<std::string> mount_list;
 
 bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(BootConfig *config);
+bool is_dsu();
 bool check_two_stage();
 void setup_klog();
 const char *backup_init();
