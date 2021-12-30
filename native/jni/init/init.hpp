@@ -28,7 +28,6 @@ struct fstab_entry {
     fstab_entry(fstab_entry &&) = default;
     fstab_entry &operator=(const fstab_entry&) = delete;
     fstab_entry &operator=(fstab_entry&&) = default;
-    void to_file(FILE *fp);
 };
 
 #define INIT_SOCKET "MAGISKINIT"
@@ -38,7 +37,6 @@ extern std::vector<std::string> mount_list;
 
 bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(BootConfig *config);
-bool is_dsu();
 bool check_two_stage();
 void setup_klog();
 const char *backup_init();
@@ -92,7 +90,6 @@ public:
 class FirstStageInit : public BaseInit {
 private:
     void prepare();
-    void get_default_fstab(char *buf, size_t len);
 public:
     FirstStageInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {
         LOGD("%s\n", __FUNCTION__);
