@@ -39,7 +39,7 @@ bool zygisk_enabled = false;
 }
 
 #define mount_mirror(part, flag) \
-else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && lstat(me->mnt_dir, &st) == 0) \
+else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && me->mnt_type != "overlay"sv && lstat(me->mnt_dir, &st) == 0) \
     do_mount_mirror(part, flag)
 
 #define link_mirror(part) \
@@ -50,7 +50,7 @@ if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
 }
 
 #define link_orig_dir(dir, part) \
-else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv) { \
+else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv && me->mnt_type != "overlay"sv) { \
     SETMIR(buf1, part); \
     rmdir(buf1); \
     xsymlink(dir, buf1); \
