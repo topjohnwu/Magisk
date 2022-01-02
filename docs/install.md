@@ -126,4 +126,4 @@ It is very difficult to accurately detect the device's information in custom rec
 - Flash the zip just like any other ordinary flashable zip.
 - Reboot and check whether the Magisk app is installed. If it isn't installed automatically, manually install the APK.
 
-> Warning: the `sepolicy.rule` file of modules may be stored in the `cache` partition. DO NOT MANUALLY WIPE THE `CACHE` PARTITION.
+> Warning: the `sepolicy.rule` file of modules may be stored in the `cache` partition. DO NOT MANUALLY WIPE THE `CACHE` PARTITION. 
