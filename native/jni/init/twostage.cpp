@@ -109,6 +109,41 @@ static void append_oplus(vector<fstab_entry> &fstab) {
     unlink("oplus.fstab");
 }
 
+void FirstStageInit::get_default_fstab(char *buf, size_t len) {
+    buf[0] = '\0';
+
+    // Find existing fstab file
+    for (const char *suffix : { config->fstab_suffix, config->hardware, config->hardware_plat }) {
+        if (suffix[0] == '\0')
+            continue;
+        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "system/etc/fstab", "fstab" }) {
+            snprintf(buf, len, "%s.%s", prefix, suffix);
+            if (access(buf, F_OK) == 0) {
+                LOGD("Found fstab file: %s\n", buf);
+                return;
+            }
+        }
+    }
+
+    buf[0] = '\0';
+
+    // No existing fstab file is found, create a valid path
+    const char *suffix = [&]() -> const char * {
+        if (config->fstab_suffix[0])
+            return config->fstab_suffix;
+        if (config->hardware[0])
+            return config->hardware;
+        if (config->hardware_plat[0])
+            return config->hardware_plat;
+        return nullptr;
+    }();
+    if (suffix == nullptr) {
+        LOGE("Cannot determine fstab suffix!\n");
+        return;
+    }
+    snprintf(buf, len, "fstab.%s", suffix);
+}
+
 void FirstStageInit::prepare() {
     if (is_dsu()) {
         rename(backup_init(), "/init");
@@ -135,23 +170,11 @@ void FirstStageInit::prepare() {
     }
 
     char fstab_file[128];
-    fstab_file[0] = '\0';
+    get_default_fstab(fstab_file, sizeof(fstab_file));
 
-    // Find existing fstab file
-    for (const char *suffix : { config->fstab_suffix, config->hardware, config->hardware_plat }) {
-        if (suffix[0] == '\0')
-            continue;
-        for (const char *prefix: { "odm/etc/fstab", "vendor/etc/fstab", "system/etc/fstab", "fstab" }) {
-            snprintf(fstab_file, sizeof(fstab_file), "%s.%s", prefix, suffix);
-            if (access(fstab_file, F_OK) != 0) {
-                fstab_file[0] = '\0';
-            } else {
-                LOGD("Found fstab file: %s\n", fstab_file);
-                goto exit_loop;
-            }
-        }
-    }
-exit_loop:
+    // Empty fstab file path is an error
+    if (fstab_file[0] == '\0')
+        return;
 
     // Try to load dt fstab
     vector<fstab_entry> fstab;
@@ -175,24 +198,6 @@ exit_loop:
                 skip = true;
                 break;
             } // TODO: else if expected_field checks and fs_mgr_flags checks
-        }
-
-        if (fstab_file[0] == '\0') {
-            const char *suffix = [&]() -> const char * {
-                if (config->fstab_suffix[0])
-                    return config->fstab_suffix;
-                if (config->hardware[0])
-                    return config->hardware;
-                if (config->hardware_plat[0])
-                    return config->hardware_plat;
-                return nullptr;
-            }();
-
-            if (suffix == nullptr) {
-                LOGE("Cannot determine fstab suffix!\n");
-                return;
-            }
-            snprintf(fstab_file, sizeof(fstab_file), "fstab.%s", suffix);
         }
 
         if (skip) {

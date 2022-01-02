@@ -92,6 +92,7 @@ public:
 class FirstStageInit : public BaseInit {
 private:
     void prepare();
+    void get_default_fstab(char *buf, size_t len);
 public:
     FirstStageInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {
         LOGD("%s\n", __FUNCTION__);
