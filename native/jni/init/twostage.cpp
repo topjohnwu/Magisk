@@ -27,11 +27,7 @@ void fstab_entry::to_file(FILE *fp) {
 line[val##1] = '\0'; \
 entry.val = &line[val##0];
 
-static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) {
-    if (!fstab_file || fstab_file[0] == '\0') {
-        LOGE("fstab file is empty");
-        return false;
-    }
+static void read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) {
     file_readline(fstab_file, [&](string_view l) -> bool {
         if (l[0] == '#' || l.length() == 1)
             return true;
@@ -55,7 +51,6 @@ static bool read_fstab_file(const char *fstab_file, vector<fstab_entry> &fstab) 
         fstab.emplace_back(std::move(entry));
         return true;
     });
-    return true;
 }
 
 #define FSR "/first_stage_ramdisk"
@@ -204,15 +199,14 @@ void FirstStageInit::prepare() {
             // When dt fstab fails, fall back to default fstab
             LOGI("dt fstab contains error, fall back to default fstab\n");
             fstab.clear();
-            if (!read_fstab_file(fstab_file, fstab))
-                return;
+            read_fstab_file(fstab_file, fstab);
         } else {
             // Patch init to force IsDtFstabCompatible() return false
             auto init = mmap_data("/init", true);
             init.patch({make_pair("android,fstab", "xxx")});
         }
-    } else if (!read_fstab_file(fstab_file, fstab)) {
-        return;
+    } else {
+        read_fstab_file(fstab_file, fstab);
     }
 
     // Append oppo's custom fstab
