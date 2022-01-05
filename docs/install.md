@@ -4,7 +4,7 @@ This tutorial is only for the initial installation of Magisk.
 
 If you already have Magisk installed, it is **strongly recommended** that you upgrade directly via the Magisk app using its "Direct Install" method.
 
-## Getting Started
+## Start
 
 Before you start:
 
