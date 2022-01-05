@@ -7,7 +7,7 @@ setupCommon()
 android {
     externalNativeBuild {
         ndkBuild {
-            path("jni/Android.mk")
+            //path("jni/Android.mk")
         }
     }
 

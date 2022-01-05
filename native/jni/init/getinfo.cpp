@@ -220,6 +220,9 @@ void load_kernel_info(BootConfig *config) {
     setup_klog();
 
     config->set(parse_cmdline(full_read("/proc/cmdline")));
+    if (strcmp(config->hardware, "exynos850") == 0) {
+    	config->skip_initramfs = false;
+    }
     LOGD("Kernel cmdline info:\n");
     config->print();
 
