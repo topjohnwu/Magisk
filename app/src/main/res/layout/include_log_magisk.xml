@@ -34,7 +34,7 @@
                     android:textAppearance="@style/AppearanceFoundation.Caption"
                     android:textSize="10sp"
                     android:paddingTop="@dimen/internal_action_bar_size"
-                    android:paddingBottom="120dp"
+                    android:paddingBottom="128dp"
                     app:layout_fitsSystemWindowsInsets="top|bottom"
                     tools:text="@tools:sample/lorem/random" />
 

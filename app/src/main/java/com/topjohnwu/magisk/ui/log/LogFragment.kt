@@ -20,6 +20,7 @@ class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()
+    override val snackbarAnchorView get() = binding.logFilterToggle
 
     private var actionSave: MenuItem? = null
     private var isMagiskLogVisible

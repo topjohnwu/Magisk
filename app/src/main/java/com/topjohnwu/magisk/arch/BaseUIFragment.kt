@@ -22,6 +22,7 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
 
     override val viewRoot: View get() = binding.root
     private val navigation get() = activity.navigation
+    open val snackbarAnchorView: View? get() = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
