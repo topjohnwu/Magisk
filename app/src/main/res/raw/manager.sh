@@ -94,6 +94,11 @@ post_ota() {
   cd $NVBASE
   cp -f $1 bootctl
   rm -f $1
+  if [ -f "/system/lib64/android.hardware.boot@1.2.so" ]; then
+    sed -i 's/android.hardware.boot@1.0.so/android.hardware.boot@1.2.so/' bootctl
+  elif [ -f "/system/lib64/android.hardware.boot@1.1.so" ]; then
+    sed -i 's/android.hardware.boot@1.0.so/android.hardware.boot@1.1.so/' bootctl
+  fi
   chmod 755 bootctl
   ./bootctl hal-info || return
   [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
