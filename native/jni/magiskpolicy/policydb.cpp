@@ -107,6 +107,20 @@ sepolicy *sepolicy::compile_split() {
     FILE *f;
     int policy_ver;
     const char *cil_file;
+#if MAGISK_DEBUG
+    cil_set_log_level(CIL_INFO);
+#endif
+    cil_set_log_handler(+[](int lvl, char* msg) {
+        if (lvl == CIL_ERR) {
+            LOGE("cil: %s", msg);
+        } else if (lvl == CIL_WARN) {
+            LOGW("cil: %s", msg);
+        } else if (lvl == CIL_INFO) {
+            LOGI("cil: %s", msg);
+        } else {
+            LOGD("cil: %s", msg);
+        }
+    });
 
     cil_db_init(&db);
     run_finally fin([db_ptr = &db]{ cil_db_destroy(db_ptr); });
@@ -114,7 +128,7 @@ sepolicy *sepolicy::compile_split() {
     cil_set_multiple_decls(db, 1);
     cil_set_disable_neverallow(db, 1);
     cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
-    cil_set_attrs_expand_generated(db, 0);
+    cil_set_attrs_expand_generated(db, 1);
 
     f = xfopen(SELINUX_VERSION, "re");
     fscanf(f, "%d", &policy_ver);

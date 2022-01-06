@@ -100,6 +100,11 @@ bool MagiskInit::patch_sepolicy(const char *file) {
     if (patch_init)
         sepol = sepolicy::from_split();
 
+    if (!sepol) {
+        LOGE("Cannot load split cil\n");
+        return false;
+    }
+
     sepol->magisk_rules();
 
     // Custom rules
