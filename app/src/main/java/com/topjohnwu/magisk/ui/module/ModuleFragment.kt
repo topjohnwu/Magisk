@@ -22,6 +22,14 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
 
     override val layoutRes = R.layout.fragment_module_md2
     override val viewModel by viewModel<ModuleViewModel>()
+    override val snackbarAnchorView: View
+        get() {
+            return if (isFilterVisible) {
+                binding.moduleFilterInclude.moduleFilterTitleSearch
+            } else {
+                binding.moduleFilterToggle
+            }
+        }
 
     private val listeners = hashSetOf<EndlessRecyclerScrollListener>()
 

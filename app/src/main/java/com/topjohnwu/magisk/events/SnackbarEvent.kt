@@ -30,13 +30,14 @@ class SnackbarEvent constructor(
 
     private fun snackbar(
         view: View,
+        anchor: View?,
         message: String,
         length: Int,
         builder: Snackbar.() -> Unit
-    ) = Snackbar.make(view, message, length).apply(builder).show()
+    ) = Snackbar.make(view, message, length).setAnchorView(anchor).apply(builder).show()
 
     override fun invoke(activity: BaseUIActivity<*, *>) {
-        snackbar(activity.snackbarView,
+        snackbar(activity.snackbarView, activity.snackbarAnchorView,
             msg.getText(activity.resources).toString(),
             length, builder)
     }

@@ -35,6 +35,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
 
     open val navHostId: Int = 0
     open val snackbarView get() = binding.root
+    open val snackbarAnchorView: View? get() = null
 
     init {
         val theme = Config.darkTheme
