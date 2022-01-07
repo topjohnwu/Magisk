@@ -324,11 +324,7 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Fix up binaries
         srcBoot.delete()
-        if (shell.isRoot) {
-            "fix_env $installDir".sh()
-        } else {
-            "cp_readlink $installDir".sh()
-        }
+        "cp_readlink $installDir".sh()
 
         return true
     }
