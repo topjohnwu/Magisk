@@ -83,9 +83,6 @@ class ShellInit : Shell.Initializer() {
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
 
-        // Pre-fetch env
-        Info.env
-
         return true
     }
 }
