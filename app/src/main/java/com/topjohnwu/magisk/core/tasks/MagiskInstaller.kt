@@ -362,6 +362,7 @@ abstract class MagiskInstallImpl protected constructor(
             "KEEPFORCEENCRYPT=${Config.keepEnc} " +
             "KEEPVERITY=${Config.keepVerity} " +
             "RECOVERYMODE=${Config.recovery} " +
+            "FORCENORMALMODE=${Info.ramdisk} " +
             "sh boot_patch.sh $srcBoot")
 
         if (!cmds.sh().isSuccess)

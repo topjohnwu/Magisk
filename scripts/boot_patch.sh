@@ -101,7 +101,7 @@ case $? in
     ;;
 esac
 
-[ -f recovery_dtbo ] && RECOVERYMODE=true
+[ "$FORCENORMALMODE" != "true" ] && [ -f recovery_dtbo ] && RECOVERYMODE=true
 
 ###################
 # Ramdisk Restores
