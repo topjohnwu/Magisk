@@ -4,9 +4,11 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
+import org.gradle.kotlin.dsl.named
 import java.io.*
 import java.util.*
 import java.util.zip.Deflater
@@ -238,5 +240,8 @@ fun Project.setupStub() {
         if (name == "optimizeReleaseResources") {
             doLast { apk.copyTo(optRes, true) }
         }
+    }
+    tasks.named<Delete>("clean") {
+        delete.addAll(listOf("src/debug/AndroidManifest.xml", "src/release/AndroidManifest.xml"))
     }
 }
