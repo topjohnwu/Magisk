@@ -147,8 +147,8 @@ template <class ...Args>
 void exec_command_async(Args &&...args) {
     const char *argv[] = {args..., nullptr};
     exec_t exec {
-        .argv = argv,
-        .fork = fork_dont_care
+        .fork = fork_dont_care,
+        .argv = argv
     };
     exec_command(exec);
 }

@@ -1,0 +1,15 @@
+/* this link script is used to fix static variables constructor and deconstructor when using lld
+ * details can be found: https://github.com/android/ndk/issues/1461
+ */
+SECTIONS {
+  .init_array : {
+    *(SORT_BY_INIT_PRIORITY(.init_array.*))
+    *(EXCLUDE_FILE(*crtend_android.o) .init_array)
+  }
+} INSERT AFTER .fini_array;
+SECTIONS {
+  .fini_array : {
+    *(SORT_BY_INIT_PRIORITY(.fini_array.*))
+    *(EXCLUDE_FILE(*crtend_android.o) .fini_array)
+  }
+} INSERT BEFORE .init_array;
