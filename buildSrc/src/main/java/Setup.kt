@@ -185,7 +185,7 @@ fun Project.setupStub() {
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
             inputs.property("versionCode", Config.versionCode)
-            outputs.file(manifest)
+            outputs.files(manifest, outSrcDir)
             doLast {
                 val xml = genStubManifest(templateDir, outSrcDir)
                 manifest.parentFile.mkdirs()

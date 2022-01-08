@@ -261,6 +261,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
 
 fun genEncryptedResources(res: InputStream, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
+    mainPkgDir.mkdirs()
 
     // Generate iv and key
     val iv = ByteArray(16)
