@@ -384,21 +384,21 @@ bool prop_area::prune_node(prop_bt * const node) {
   bool is_leaf = true;
   if (atomic_load_explicit(&node->children, memory_order_relaxed) != 0) {
     if (prune_node(to_prop_bt(&node->children))) {
-      atomic_store_explicit(&node->children, 0, memory_order_release);
+      atomic_store_explicit(&node->children, 0u, memory_order_release);
     } else {
       is_leaf = false;
     }
   }
   if (atomic_load_explicit(&node->left, memory_order_relaxed) != 0) {
     if (prune_node(to_prop_bt(&node->left))) {
-      atomic_store_explicit(&node->left, 0, memory_order_release);
+      atomic_store_explicit(&node->left, 0u, memory_order_release);
     } else {
       is_leaf = false;
     }
   }
   if (atomic_load_explicit(&node->right, memory_order_relaxed) != 0) {
     if (prune_node(to_prop_bt(&node->right))) {
-      atomic_store_explicit(&node->right, 0, memory_order_release);
+      atomic_store_explicit(&node->right, 0u, memory_order_release);
     } else {
       is_leaf = false;
     }
@@ -425,7 +425,7 @@ bool prop_area::rm(const char *name, bool trim_node) {
   }
 
   // De-reference the existing property ASAP
-  atomic_store_explicit(&node->prop, 0, memory_order_release);
+  atomic_store_explicit(&node->prop, 0u, memory_order_release);
 
   if (info) {
     // Wipe out the old info
