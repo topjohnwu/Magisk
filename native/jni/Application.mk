@@ -1,6 +1,6 @@
 APP_ABI          := armeabi-v7a arm64-v8a x86 x86_64
-APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
-APP_LDFLAGS      := -flto
+APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto=thin
+APP_LDFLAGS      := -fuse-ld=lld -flto=thin -Wl,--thinlto-cache-policy,cache_size_bytes=500m -Wl,--thinlto-cache-dir=build/.lto-cache
 APP_CPPFLAGS     := -std=c++17
 APP_STL          := none
 APP_PLATFORM     := android-21

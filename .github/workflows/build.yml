@@ -62,6 +62,7 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/.ccache
+            ${{ github.workspace }}/native/build/.lto-cache
             ~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-build-cache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-cache-
