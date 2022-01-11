@@ -9,8 +9,6 @@
 
         <import type="com.topjohnwu.magisk.core.Config" />
 
-        <import type="android.os.Build" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.install.InstallViewModel" />
@@ -36,7 +34,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"
-                gone="@{viewModel.skipOptions || Info.isEmulator}"
+                gone="@{viewModel.skipOptions}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/l1"
@@ -112,7 +110,7 @@
 
                         <CheckBox
                             style="@style/WidgetFoundation.Checkbox"
-                            goneUnless="@{!Info.vbmeta &amp;&amp; Build.VERSION.SDK_INT >= 30}"
+                            gone="@{viewModel.hideVbmeta}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="@={Config.patchVbmeta}"
