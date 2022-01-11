@@ -101,8 +101,6 @@ case $? in
     ;;
 esac
 
-[ -f recovery_dtbo ] && RECOVERYMODE=true
-
 ###################
 # Ramdisk Restores
 ###################
