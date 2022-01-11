@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
-import android.os.Build
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -27,11 +26,12 @@ class InstallViewModel(
 ) : BaseViewModel() {
 
     val isRooted = Shell.rootAccess()
-    val skipOptions = Info.ramdisk && !Info.isFDE && Info.isSAR && !(!Info.vbmeta && Build.VERSION.SDK_INT >= 30)
+    val hideVbmeta = Info.vbmeta || Info.isSamsung || Info.isAB
+    val skipOptions = Info.isEmulator || (Info.isSAR && !Info.isFDE && hideVbmeta && Info.ramdisk)
     val noSecondSlot = !isRooted || Info.isPixel || Info.isVirtualAB || !Info.isAB || Info.isEmulator
 
     @get:Bindable
-    var step = if (Info.isEmulator || skipOptions) 1 else 0
+    var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
     var _method = -1
