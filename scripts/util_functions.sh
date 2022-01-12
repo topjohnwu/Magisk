@@ -377,8 +377,10 @@ umount_apex() {
   unset BOOTCLASSPATH
 }
 
+# After calling this method, the following variables will be set:
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
+# ISENCRYPTED, VBMETAEXIST
 get_flags() {
-  # override variables
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
@@ -403,12 +405,15 @@ get_flags() {
       KEEPFORCEENCRYPT=false
     fi
   fi
+  VBMETAEXIST=false
+  local VBMETAIMG=$(find_block vbmeta vbmeta_a)
+  [ -n "$VBMETAIMG" ] && VBMETAEXIST=true
   if [ -z $PATCHVBMETAFLAG ]; then
-    if [ -e /dev/block/by-name/vbmeta_a ] || [ -e /dev/block/by-name/vbmeta ]; then
+    if $VBMETAEXIST; then
       PATCHVBMETAFLAG=false
     else
       PATCHVBMETAFLAG=true
-      ui_print "- Not found vbmeta partition, patch vbmetaflag"
+      ui_print "- Cannot find vbmeta partition, patch vbmeta in boot image"
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
