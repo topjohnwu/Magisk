@@ -171,6 +171,8 @@
     <string name="no_biometric">התקן לא נתמך או הגדרות ביומטריות אינן מאופשרות</string>
     <string name="settings_customization">התאמה אישית</string>
     <string name="setting_add_shortcut_summary">הוסף קיצור דרך יפה במסך הבית למקרה שקשה לזהות את השם ואת הסמל לאחר הסתרת היישום</string>
+    <string name="settings_doh_title">DNS על HTTPS</string>
+    <string name="settings_doh_description">עקיפת DNS מורעל במדינות מסוימות</string>
     <string name="multiuser_mode">מצב מרובה משתמשים</string>
     <string name="settings_owner_only">בעל ההתקן בלבד</string>
     <string name="settings_owner_manage">אחראי ניהול ההתקן</string>

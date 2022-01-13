@@ -176,6 +176,8 @@
     <string name="no_biometric">지원되지 않는 기기이거나 등록된 생체 정보가 없습니다.</string>
     <string name="settings_customization">커스터마이즈</string>
     <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">일부 국가에 존재하는 DNS 포이즈닝을 해결합니다.</string>
 
     <string name="multiuser_mode">다중 사용자 모드</string>
     <string name="settings_owner_only">기기 소유자만</string>

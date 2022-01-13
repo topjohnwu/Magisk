@@ -173,6 +173,8 @@
     <string name="no_biometric">Ustøttet enhet, eller mangel på biometrisk oppsett</string>
     <string name="settings_customization">Tilpasning</string>
     <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Unngåelse av DNS-forgiftelse i noen land</string>
 
     <string name="multiuser_mode">Multibrukermodus</string>
     <string name="settings_owner_only">Kun for enhetseier</string>

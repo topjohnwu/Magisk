@@ -52,7 +52,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
         // Manager
         list.addAll(listOf(
             AppSettings,
-            UpdateChannel, UpdateChannelUrl, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
         if (Info.env.isActive) {
             if (Const.USER_ID == 0) {

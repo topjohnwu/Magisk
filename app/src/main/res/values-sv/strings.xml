@@ -172,6 +172,8 @@
     <string name="no_biometric">Denna enhet stöds ej eller så är inte biometrisk autentisering aktiverad</string>
     <string name="settings_customization">Anpassning</string>
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
+    <string name="settings_doh_title">DNS över HTTPS</string>
+    <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
 
     <string name="multiuser_mode">Multiuser-läge</string>
     <string name="settings_owner_only">Endast enhetsägare</string>

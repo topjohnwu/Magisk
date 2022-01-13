@@ -167,6 +167,8 @@
     <string name="no_biometric">Perangkat tidak mendukung atau setelan biometrik tidak diaktifkan</string>
     <string name="settings_customization">Personalisasi</string>
     <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik pada layar utama seandainya nama dan ikon sulit untuk dikenali setelah menyembunyikan aplikasi</string>
+    <string name="settings_doh_title">DNS melalui HTTPS</string>
+    <string name="settings_doh_description">Solusi untuk DNS poisoning di beberapa negara</string>
 
     <string name="multiuser_mode">Mode multi pengguna</string>
     <string name="settings_owner_only">Pemilik perangkat saja</string>

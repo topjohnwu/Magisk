@@ -173,6 +173,8 @@
     <string name="no_biometric">Desteklenmeyen cihaz veya biyometrik ayar etkinleştirilmemiş</string>
     <string name="settings_customization">Özelleştirme</string>
     <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra ismini ve simgesini tanımakta zorlanırsanız ana ekrana güzel bir kısayol ekleyebilirsiniz</string>
+    <string name="settings_doh_title">HTTPS üzerinden DNS</string>
+    <string name="settings_doh_description">Bazı ülkelerdeki DNS zehirlenmesini çözmeye çalışır</string>
 
     <string name="multiuser_mode">Çoklu Kullanıcı Modu</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>

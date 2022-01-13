@@ -172,6 +172,8 @@
     <string name="no_biometric">Nepodporované zařízení nebo není biometrické ověření povolené</string>
     <string name="settings_customization">Přizpůsobit</string>
     <string name="setting_add_shortcut_summary">Přidejte odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
+    <string name="settings_doh_title">DNS nebo HTTPS</string>
+    <string name="settings_doh_description">Řešení pro opravy DNS v některých zemích.</string>
 
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Vlastník zařízení</string>

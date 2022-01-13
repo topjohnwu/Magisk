@@ -163,6 +163,8 @@
     <string name="no_biometric">Не падтрымліваецца прыладай альбо не ўключана ў наладах</string>
     <string name="settings_customization">Персаналізацыя</string>
     <string name="setting_add_shortcut_summary">Дадаць на хатні экран прыгожы цэтлік на той выпадак, калі пасля хавання праграмы будзе цяжка разглядзець значок і назву</string>
+    <string name="settings_doh_title">DNS паверх HTTPS</string>
+    <string name="settings_doh_description">Абыходны шлях для DNS у некаторых краінах</string>
     <string name="multiuser_mode">Шматкарыстальніцкі рэжым</string>
     <string name="settings_owner_only">Толькі ўладальнік</string>
     <string name="settings_owner_manage">Кіраванне ўладальнікам</string>

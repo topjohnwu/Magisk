@@ -180,6 +180,8 @@
     <string name="no_biometric">Пристрій не підтримується, або не налаштовано біометрику</string>
     <string name="settings_customization">Оформлення</string>
     <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
+    <string name="settings_doh_title">DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Відключити DoH (при нестабільному підключенні)</string>
 
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>

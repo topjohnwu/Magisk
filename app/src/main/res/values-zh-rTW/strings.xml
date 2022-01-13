@@ -180,6 +180,8 @@
     <string name="no_biometric">不支援的裝置或是未啟用生物特徵設定</string>
     <string name="settings_customization">客製化</string>
     <string name="setting_add_shortcut_summary">在隱藏應用程式後，名稱和圖示難以辨識的情況下，新增一個精緻的捷徑到首頁</string>
+    <string name="settings_doh_title">安全化的域名解析（DoH）</string>
+    <string name="settings_doh_description">解決某些地區的 DNS 汙染問題</string>
 
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>

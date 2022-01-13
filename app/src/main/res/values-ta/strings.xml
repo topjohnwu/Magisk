@@ -173,6 +173,8 @@
     <string name="no_biometric">ஆதரிக்கப்படாத சாதனம் அல்லது பயோமெட்ரிக் அமைப்புகள் எதுவும் செயல்படுத்தப்படவில்லை</string>
     <string name="settings_customization">தனிப்பயனாக்கம்</string>
     <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
+    <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>
+    <string name="settings_doh_description">சில நாடுகளில் டி.என்.எஸ் பணிபுரியும்</string>
 
     <string name="multiuser_mode">மல்டியூசர் பயன்முறை</string>
     <string name="settings_owner_only">சாதன உரிமையாளர் மட்டுமே</string>

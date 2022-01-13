@@ -182,6 +182,8 @@
     <string name="no_biometric">设备不支持或未配置生物识别功能</string>
     <string name="settings_customization">个性化</string>
     <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
+    <string name="settings_doh_title">安全 DNS（DoH）</string>
+    <string name="settings_doh_description">解决某些地区的 DNS 污染问题</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>

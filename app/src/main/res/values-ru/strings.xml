@@ -182,6 +182,8 @@
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
+    <string name="settings_doh_title">Отключение DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Отключает DoH (используйте при проблемах с подключением к сети)</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только администратор</string>

@@ -162,6 +162,8 @@
     <string name="no_biometric">Nepodržani uređaj ili nije omogućena biometrijska provjera autentičnosti</string>
     <string name="settings_customization">Prilagodba</string>
     <string name="setting_add_shortcut_summary">Dodajte lijepi prečac na početni zaslon u slučaju da je naziv i ikonu teško prepoznati nakon skrivanja aplikacije</string>
+    <string name="settings_doh_title">DNS preko HTTPS-a</string>
+    <string name="settings_doh_description">Zaobilazno trovanje DNS-om u nekim zemljama</string>
 
     <string name="multiuser_mode">Višekorisnički način rada</string>
     <string name="settings_owner_only">Samo vlasnik uređaja</string>

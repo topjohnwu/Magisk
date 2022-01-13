@@ -174,6 +174,8 @@
     <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o aplicativo</string>
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Solução alternativa para envenenamento de DNS em alguns países</string>
 
     <string name="multiuser_mode">Modo multiusuário</string>
     <string name="settings_owner_only">Somente proprietário do dispositivo</string>
