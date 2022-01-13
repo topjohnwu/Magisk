@@ -20,9 +20,6 @@ object Const {
     const val TMPDIR = "/dev/tmp"
     const val MAGISK_LOG = "/cache/magisk.log"
 
-    // Versions
-    const val BOOTCTL_REVISION = "22.0"
-
     // Misc
     val USER_ID = Process.myUid() / 100000
     val APP_IS_CANARY get() = Version.isCanary(BuildConfig.VERSION_CODE)

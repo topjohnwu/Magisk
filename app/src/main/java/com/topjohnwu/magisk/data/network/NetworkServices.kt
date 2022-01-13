@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.data.network
 
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.BranchInfo
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import okhttp3.ResponseBody
@@ -11,7 +10,6 @@ private const val BRANCH = "branch"
 private const val REPO = "repo"
 private const val FILE = "file"
 
-const val MAGISK_FILES = "topjohnwu/magisk-files"
 const val MAGISK_MAIN = "topjohnwu/Magisk"
 
 interface GithubPageServices {
@@ -21,10 +19,6 @@ interface GithubPageServices {
 }
 
 interface JSDelivrServices {
-
-    @GET("$MAGISK_FILES@{$REVISION}/bootctl")
-    @Streaming
-    suspend fun fetchBootctl(@Path(REVISION) revision: String = Const.BOOTCTL_REVISION): ResponseBody
 
     @GET("$MAGISK_MAIN@{$REVISION}/scripts/module_installer.sh")
     @Streaming

@@ -1,0 +1,32 @@
+# How to build the bootctl bundled within the Magisk app:
+#
+# 1. Checkout and sync the AOSP tree:
+#    https://source.android.com/setup/build/downloading
+# 2. Build for arm64:
+#    lunch aosp_arm64-eng
+# 3. Apply patches:
+#    cd system/extras; patch -p1 < bootctl.patch
+# 4. Build the executable:
+#    m bootctl
+
+diff --git a/bootctl/Android.bp b/bootctl/Android.bp
+index f63871cf..8a551bbe 100644
+--- a/bootctl/Android.bp
++++ b/bootctl/Android.bp
+@@ -26,11 +26,15 @@ cc_binary {
+         "-Werror",
+     ],
+
+-    shared_libs: [
++    static_libs: [
+         "android.hardware.boot@1.0",
+         "android.hardware.boot@1.1",
+         "android.hardware.boot@1.2",
++    ],
++    shared_libs: [
+         "libhidlbase",
+         "libutils",
++        "libcutils",
++        "liblog",
+     ],
+ }

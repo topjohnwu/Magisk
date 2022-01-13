@@ -59,7 +59,6 @@ class NetworkService(
     }
 
     // Fetch files
-    suspend fun fetchBootctl() = wrap { jsd.fetchBootctl() }
     suspend fun fetchInstaller() = wrap {
         val sha = fetchMainVersion()
         jsd.fetchInstaller(sha)
