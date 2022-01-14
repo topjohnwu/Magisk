@@ -294,16 +294,26 @@ bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
     table->module->ver = module;
 
     // Fill in API accordingly with module API version
-    table->v1.hookJniNativeMethods = &hookJniNativeMethods;
-    table->v1.pltHookRegister = [](const char *path, const char *symbol, void *n, void **o) {
-        xhook_register(path, symbol, n, o);
-    };
-    table->v1.pltHookExclude = [](const char *path, const char *symbol) {
-        xhook_ignore(path, symbol);
-    };
-    table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
-    table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
-    table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+    switch (ver) {
+    case 2:
+        table->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        [[fallthrough]];
+    case 1:
+        table->v1.hookJniNativeMethods = &hookJniNativeMethods;
+        table->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
+            xhook_register(p, s, n, o);
+        };
+        table->v1.pltHookExclude = [](const char *p, const char *s) {
+            xhook_ignore(p, s);
+        };
+        table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
+        table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+        table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+        break;
+    default:
+        // Unknown version number
+        return false;
+    }
 
     return true;
 }
@@ -314,6 +324,18 @@ int ZygiskModule::connectCompanion() const {
         write_int(fd, ZYGISK_CONNECT_COMPANION);
         write_int(fd, id);
         return fd;
+    }
+    return -1;
+}
+
+int ZygiskModule::getModuleDir() const {
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_GET_MODDIR);
+        write_int(fd, id);
+        int dfd = recv_fd(fd);
+        close(fd);
+        return dfd;
     }
     return -1;
 }

@@ -541,15 +541,7 @@ static void inject_magisk_bins(root_node *system) {
         delete bin->extract(init_applet[i]);
 }
 
-struct module_info {
-    string name;
-    int z32 = -1;
-#if defined(__LP64__)
-    int z64 = -1;
-#endif
-};
-
-static vector<module_info> *modules;
+vector<module_info> *module_list;
 int app_process_32 = -1;
 int app_process_64 = -1;
 
@@ -577,8 +569,8 @@ void magic_mount() {
 
     char buf[4096];
     LOGI("* Loading modules\n");
-    if (modules) {
-        for (const auto &m : *modules) {
+    if (module_list) {
+        for (const auto &m : *module_list) {
             const char *module = m.name.data();
             char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
 
@@ -732,7 +724,7 @@ static void collect_modules(bool open_zygisk) {
             }
         }
         info.name = entry->d_name;
-        modules->push_back(info);
+        module_list->push_back(info);
     });
     if (open_zygisk && zygisk_enabled) {
         bool use_memfd = true;
@@ -752,7 +744,7 @@ static void collect_modules(bool open_zygisk) {
             }
             return fd;
         };
-        std::for_each(modules->begin(), modules->end(), [&](module_info &info) {
+        std::for_each(module_list->begin(), module_list->end(), [&](module_info &info) {
             info.z32 = convert_to_memfd(info.z32);
 #if defined(__LP64__)
             info.z64 = convert_to_memfd(info.z64);
@@ -762,13 +754,13 @@ static void collect_modules(bool open_zygisk) {
 }
 
 void handle_modules() {
-    default_new(modules);
+    default_new(module_list);
     prepare_modules();
     collect_modules(false);
     exec_module_scripts("post-fs-data");
 
     // Recollect modules (module scripts could remove itself)
-    modules->clear();
+    module_list->clear();
     collect_modules(true);
 }
 
@@ -789,24 +781,7 @@ void remove_modules() {
 
 void exec_module_scripts(const char *stage) {
     vector<string_view> module_names;
-    std::transform(modules->begin(), modules->end(), std::back_inserter(module_names),
+    std::transform(module_list->begin(), module_list->end(), std::back_inserter(module_names),
         [](const module_info &info) -> string_view { return info.name; });
     exec_module_scripts(stage, module_names);
-}
-
-vector<int> zygisk_module_fds(bool is_64_bit) {
-    vector<int> fds;
-    // All fds passed to send_fds have to be valid file descriptors.
-    // To workaround this issue, send over STDOUT_FILENO as an indicator of an
-    // invalid fd as it will always be /dev/null in magiskd
-    if (is_64_bit) {
-#if defined(__LP64__)
-        std::transform(modules->begin(), modules->end(), std::back_inserter(fds),
-            [](const module_info &info) { return info.z64 < 0 ? STDOUT_FILENO : info.z64; });
-#endif
-    } else {
-        std::transform(modules->begin(), modules->end(), std::back_inserter(fds),
-            [](const module_info &info) { return info.z32 < 0 ? STDOUT_FILENO : info.z32; });
-    }
-    return fds;
 }

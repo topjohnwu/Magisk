@@ -42,9 +42,18 @@ enum : int {
     DAEMON_LAST
 };
 
+struct module_info {
+    std::string name;
+    int z32 = -1;
+#if defined(__LP64__)
+    int z64 = -1;
+#endif
+};
+
 extern bool zygisk_enabled;
 extern int app_process_32;
 extern int app_process_64;
+extern std::vector<module_info> *module_list;
 
 int connect_daemon(bool create = false);
 
@@ -69,7 +78,6 @@ void boot_complete(int client);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
-std::vector<int> zygisk_module_fds(bool is_64_bit);
 
 // Denylist
 void initialize_denylist();

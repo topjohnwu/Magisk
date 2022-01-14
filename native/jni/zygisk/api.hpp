@@ -9,7 +9,7 @@
 
 #include <jni.h>
 
-#define ZYGISK_API_VERSION 1
+#define ZYGISK_API_VERSION 2
 
 /*
 
@@ -173,6 +173,16 @@ struct Api {
     // module's companion request handler. Returns -1 if the connection attempt failed.
     int connectCompanion();
 
+    // Get the file descriptor of the root folder of the current module.
+    //
+    // This API only works in the pre[XXX]Specialize functions.
+    // Accessing the directory returned is only possible in the pre[XXX]Specialize functions
+    // or in the root companion process (assuming that you sent the fd over the socket).
+    // Both restrictions are due to SELinux and UID.
+    //
+    // Returns -1 if errors occurred.
+    int getModuleDir();
+
     // Set various options for your module.
     // Please note that this function accepts one single option at a time.
     // Check zygisk::Option for the full list of options available.
@@ -261,6 +271,7 @@ struct api_table {
     // Zygisk functions
     int  (*connectCompanion)(void * /* _this */);
     void (*setOption)(void * /* _this */, Option);
+    int  (*getModuleDir)(void * /* _this */);
 };
 
 template <class T>
@@ -277,6 +288,9 @@ void entry_impl(api_table *table, JNIEnv *env) {
 
 inline int Api::connectCompanion() {
     return impl->connectCompanion ? impl->connectCompanion(impl->_this) : -1;
+}
+inline int Api::getModuleDir() {
+    return impl->getModuleDir ? impl->getModuleDir(impl->_this) : -1;
 }
 inline void Api::setOption(Option opt) {
     if (impl->setOption) impl->setOption(impl->_this, opt);

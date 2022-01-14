@@ -81,6 +81,9 @@ struct ApiTable {
         int (*connectCompanion)(ZygiskModule *);
         void (*setOption)(ZygiskModule *, zygisk::Option);
     } v1;
+    struct {
+        int (*getModuleDir)(ZygiskModule *);
+    } v2;
 
     ApiTable(ZygiskModule *m);
 };
@@ -100,6 +103,7 @@ struct ZygiskModule {
     }
 
     int connectCompanion() const;
+    int getModuleDir() const;
     void setOption(zygisk::Option opt);
     void doUnload() const { if (unload) dlclose(handle); }
 

@@ -185,6 +185,23 @@ std::vector<int> remote_get_info(int uid, const char *process, AppInfo *info) {
 
 // The following code runs in magiskd
 
+static vector<int> get_module_fds(bool is_64_bit) {
+    vector<int> fds;
+    // All fds passed to send_fds have to be valid file descriptors.
+    // To workaround this issue, send over STDOUT_FILENO as an indicator of an
+    // invalid fd as it will always be /dev/null in magiskd
+    if (is_64_bit) {
+#if defined(__LP64__)
+        std::transform(module_list->begin(), module_list->end(), std::back_inserter(fds),
+            [](const module_info &info) { return info.z64 < 0 ? STDOUT_FILENO : info.z64; });
+#endif
+    } else {
+        std::transform(module_list->begin(), module_list->end(), std::back_inserter(fds),
+            [](const module_info &info) { return info.z32 < 0 ? STDOUT_FILENO : info.z32; });
+    }
+    return fds;
+}
+
 static bool get_exe(int pid, char *buf, size_t sz) {
     snprintf(buf, sz, "/proc/%d/exe", pid);
     return xreadlink(buf, buf, sz) > 0;
@@ -221,7 +238,7 @@ static void connect_companion(int client, bool is_64_bit) {
             exit(-1);
         }
         close(fds[1]);
-        vector<int> module_fds = zygisk_module_fds(is_64_bit);
+        vector<int> module_fds = get_module_fds(is_64_bit);
         send_fds(zygiskd_socket, module_fds.data(), module_fds.size());
         // Wait for ack
         if (read_int(zygiskd_socket) != 0) {
@@ -342,7 +359,7 @@ static void get_process_info(int client, const sock_cred *cred) {
     if (!info.on_denylist) {
         char buf[256];
         get_exe(cred->pid, buf, sizeof(buf));
-        vector<int> fds = zygisk_module_fds(str_ends(buf, "64"));
+        vector<int> fds = get_module_fds(str_ends(buf, "64"));
         send_fds(client, fds.data(), fds.size());
     }
 }
@@ -355,6 +372,15 @@ static void send_log_pipe(int fd) {
     } else {
         write_int(fd, 1);
     }
+}
+
+static void get_moddir(int client) {
+    int id = read_int(client);
+    char buf[4096];
+    snprintf(buf, sizeof(buf), MODULEROOT "/%s", module_list->operator[](id).name.data());
+    int dfd = xopen(buf, O_RDONLY | O_CLOEXEC);
+    send_fd(client, dfd);
+    close(dfd);
 }
 
 void zygisk_handler(int client, const sock_cred *cred) {
@@ -376,6 +402,9 @@ void zygisk_handler(int client, const sock_cred *cred) {
     case ZYGISK_CONNECT_COMPANION:
         get_exe(cred->pid, buf, sizeof(buf));
         connect_companion(client, str_ends(buf, "64"));
+        break;
+    case ZYGISK_GET_MODDIR:
+        get_moddir(client);
         break;
     }
     close(client);
