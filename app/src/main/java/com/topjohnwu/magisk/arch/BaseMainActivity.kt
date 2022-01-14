@@ -43,7 +43,7 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
 
         if (!isRunningAsStub) {
             val splashScreen = installSplashScreen()
-            splashScreen.setKeepVisibleCondition { doPreload }
+            splashScreen.setKeepOnScreenCondition { doPreload }
         }
 
         if (doPreload) {
