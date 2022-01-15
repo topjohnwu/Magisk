@@ -26,7 +26,7 @@ class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
 
     private fun checkTitle(text: TextView, icon: ImageView) {
         text.post {
-            if (text.layout.getEllipsisCount(0) != 0) {
+            if (text.layout?.getEllipsisCount(0) != 0) {
                 with (icon) {
                     layoutParams.width = 0
                     layoutParams.height = 0
