@@ -15,5 +15,8 @@ case $OS in
     unzip -j ccache-*-windows-64.zip '*/ccache.exe'
     ;;
 esac
+echo "ccache starting"
+date
 mkdir ./.ccache
 ./ccache -o compiler_check='%compiler% -dumpmachine; %compiler% -dumpversion'
+date
