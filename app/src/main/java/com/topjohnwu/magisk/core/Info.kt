@@ -30,7 +30,6 @@ object Info {
     @JvmStatic val env by lazy { loadState() }
     @JvmField var isSAR = false
     var isAB = false
-    val isVirtualAB = getProperty("ro.virtual_ab.enabled", "false") == "true"
     @JvmField val isZygiskEnabled = System.getenv("ZYGISK_ENABLED") == "1"
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
