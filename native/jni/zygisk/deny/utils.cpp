@@ -23,9 +23,9 @@ static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 atomic<bool> denylist_enabled = false;
 
+#define do_kill (zygisk_enabled && denylist_enabled)
+
 static void rebuild_map() {
-    if (!zygisk_enabled)
-        return;
     app_id_proc_map->clear();
     string data_path(APP_DATA_DIR);
     size_t len = data_path.length();
@@ -148,14 +148,71 @@ static bool validate(const char *pkg, const char *proc) {
 static void add_hide_set(const char *pkg, const char *proc) {
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
     deny_set->emplace(pkg, proc);
-    if (!zygisk_enabled)
+    if (!do_kill)
         return;
-    if (strcmp(pkg, ISOLATED_MAGIC) == 0) {
+    if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&str_starts>(proc, true);
     } else {
         kill_process(proc);
     }
+}
+
+static void clear_data() {
+    delete deny_set;
+    delete app_id_proc_map;
+    deny_set = nullptr;
+    app_id_proc_map = nullptr;
+    unregister_poll(inotify_fd, true);
+    inotify_fd = -1;
+}
+
+static void inotify_handler(pollfd *pfd) {
+    union {
+        inotify_event event;
+        char buf[512];
+    } u{};
+    read(pfd->fd, u.buf, sizeof(u.buf));
+    if (u.event.name == "packages.xml"sv) {
+        cached_manager_app_id = -1;
+        exec_task([] {
+            mutex_guard lock(data_lock);
+            rebuild_map();
+        });
+    }
+}
+
+static bool ensure_data() {
+    if (app_id_proc_map)
+        return true;
+
+    LOGI("denylist: initializing internal data structures\n");
+
+    default_new(deny_set);
+    char *err = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
+        add_hide_set(row["package_name"].data(), row["process"].data());
+        return true;
+    });
+    db_err_cmd(err, goto error);
+
+    default_new(app_id_proc_map);
+    rebuild_map();
+
+    inotify_fd = xinotify_init1(IN_CLOEXEC);
+    if (inotify_fd < 0) {
+        goto error;
+    } else {
+        // Monitor packages.xml
+        inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
+        pollfd inotify_pfd = { inotify_fd, POLLIN, 0 };
+        register_poll(&inotify_pfd, inotify_handler);
+    }
+
+    return true;
+
+error:
+    clear_data();
+    return false;
 }
 
 static int add_list(const char *pkg, const char *proc) {
@@ -167,6 +224,9 @@ static int add_list(const char *pkg, const char *proc) {
 
     {
         mutex_guard lock(data_lock);
+        if (!ensure_data())
+            return DAEMON_ERROR;
+
         for (const auto &hide : *deny_set)
             if (hide.first == pkg && hide.second == proc)
                 return DENYLIST_ITEM_EXIST;
@@ -191,8 +251,11 @@ int add_list(int client) {
 
 static int rm_list(const char *pkg, const char *proc) {
     {
-        bool remove = false;
         mutex_guard lock(data_lock);
+        if (!ensure_data())
+            return DAEMON_ERROR;
+
+        bool remove = false;
         for (auto it = deny_set->begin(); it != deny_set->end();) {
             if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
                 remove = true;
@@ -224,36 +287,15 @@ int rm_list(int client) {
     return rm_list(pkg.data(), proc.data());
 }
 
-static bool str_ends_safe(string_view s, string_view ss) {
-    // Never kill webview zygote
-    if (s == "webview_zygote")
-        return false;
-    return str_ends(s, ss);
-}
-
-static bool init_list() {
-    LOGD("denylist: initialize\n");
-
-    char *err = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
-        add_hide_set(row["package_name"].data(), row["process"].data());
-        return true;
-    });
-    db_err_cmd(err, return false);
-
-    // If Android Q+, also kill blastula pool and all app zygotes
-    if (SDK_INT >= 29 && zygisk_enabled) {
-        kill_process("usap32", true);
-        kill_process("usap64", true);
-        kill_process<&str_ends_safe>("_zygote", true);
-    }
-
-    return true;
-}
-
 void ls_list(int client) {
-    write_int(client, DAEMON_SUCCESS);
     {
         mutex_guard lock(data_lock);
+        if (!ensure_data()) {
+            write_int(client, DAEMON_ERROR);
+            return;
+        }
+
+        write_int(client, DAEMON_SUCCESS);
         for (const auto &hide : *deny_set) {
             write_int(client, hide.first.size() + hide.second.size() + 1);
             xwrite(client, hide.first.data(), hide.first.size());
@@ -265,27 +307,19 @@ void ls_list(int client) {
     close(client);
 }
 
+static bool str_ends_safe(string_view s, string_view ss) {
+    // Never kill webview zygote
+    if (s == "webview_zygote")
+        return false;
+    return str_ends(s, ss);
+}
+
 static void update_deny_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
             DB_SETTING_KEYS[DENYLIST_CONFIG], denylist_enabled.load());
     char *err = db_exec(sql);
     db_err(err);
-}
-
-static void inotify_handler(pollfd *pfd) {
-    union {
-        inotify_event event;
-        char buf[512];
-    } u{};
-    read(pfd->fd, u.buf, sizeof(u.buf));
-    if (u.event.name == "packages.xml"sv) {
-        cached_manager_app_id = -1;
-        exec_task([] {
-            mutex_guard lock(data_lock);
-            rebuild_map();
-        });
-    }
 }
 
 int enable_deny() {
@@ -304,26 +338,18 @@ int enable_deny() {
 
         LOGI("* Enable DenyList\n");
 
-        default_new(deny_set);
-        if (!init_list()) {
-            delete deny_set;
-            deny_set = nullptr;
+        denylist_enabled = true;
+
+        if (!ensure_data()) {
+            denylist_enabled = false;
             return DAEMON_ERROR;
         }
 
-        denylist_enabled = true;
-
-        if (zygisk_enabled) {
-            default_new(app_id_proc_map);
-            rebuild_map();
-
-            inotify_fd = xinotify_init1(IN_CLOEXEC);
-            if (inotify_fd >= 0) {
-                // Monitor packages.xml
-                inotify_add_watch(inotify_fd, "/data/system", IN_CLOSE_WRITE);
-                pollfd inotify_pfd = { inotify_fd, POLLIN, 0 };
-                register_poll(&inotify_pfd, inotify_handler);
-            }
+        // On Android Q+, also kill blastula pool and all app zygotes
+        if (SDK_INT >= 29 && zygisk_enabled) {
+            kill_process("usap32", true);
+            kill_process("usap64", true);
+            kill_process<&str_ends_safe>("_zygote", true);
         }
     }
 
@@ -337,12 +363,7 @@ int disable_deny() {
         LOGI("* Disable DenyList\n");
 
         mutex_guard lock(data_lock);
-        delete app_id_proc_map;
-        delete deny_set;
-        app_id_proc_map = nullptr;
-        deny_set = nullptr;
-        unregister_poll(inotify_fd, true);
-        inotify_fd = -1;
+        clear_data();
     }
     update_deny_config();
     return DAEMON_SUCCESS;
@@ -359,6 +380,8 @@ void initialize_denylist() {
 
 bool is_deny_target(int uid, string_view process) {
     mutex_guard lock(data_lock);
+    if (!ensure_data())
+        return false;
 
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {

@@ -46,6 +46,9 @@ void register_poll(const pollfd *pfd, poll_callback callback) {
 }
 
 void unregister_poll(int fd, bool auto_close) {
+    if (fd < 0)
+        return;
+
     if (gettid() == getpid()) {
         // On main thread, directly modify
         poll_map->erase(fd);

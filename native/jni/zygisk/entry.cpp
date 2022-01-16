@@ -312,8 +312,7 @@ static void magiskd_passthrough(int client) {
     send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 }
 
-int cached_manager_app_id = -1;
-static time_t last_modified = 0;
+atomic<int> cached_manager_app_id = -1;
 
 static void get_process_info(int client, const sock_cred *cred) {
     AppInfo info{};
@@ -323,24 +322,11 @@ static void get_process_info(int client, const sock_cred *cred) {
     // This function is called on every single zygote process specialization,
     // so performance is critical. get_manager_app_id() is expensive as it goes
     // through a SQLite query and potentially multiple filesystem stats, so we
-    // really want to cache the app ID value. Check the last modify timestamp of
-    // packages.xml and only re-fetch the manager app ID if something changed since
-    // we last checked. Granularity in seconds is good enough.
-    // If denylist is enabled, inotify will invalidate the app ID cache for us.
-    // In this case, we can skip the timestamp check all together.
+    // really want to cache the app ID value. inotify will invalidate the app ID
+    // cache for us.
 
     if (uid != 1000) {
         int manager_app_id = cached_manager_app_id;
-
-        // Denylist not enabled, check packages.xml timestamp
-        if (!denylist_enabled && manager_app_id > 0) {
-            struct stat st{};
-            stat("/data/system/packages.xml", &st);
-            if (st.st_atim.tv_sec > last_modified) {
-                manager_app_id = -1;
-                last_modified = st.st_atim.tv_sec;
-            }
-        }
 
         if (manager_app_id < 0) {
             manager_app_id = get_manager_app_id();

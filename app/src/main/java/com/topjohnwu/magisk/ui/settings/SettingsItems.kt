@@ -277,7 +277,6 @@ object DenyList : BaseSettingsItem.Toggle() {
                 if (result.isSuccess) Config.denyList = it
                 else field = !it
             }
-            DenyListConfig.isEnabled = it
         }
 
     override fun refresh() {

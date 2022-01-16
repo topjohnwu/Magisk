@@ -35,17 +35,6 @@ void denylist_handler(int client, const sock_cred *cred) {
     int res = DAEMON_ERROR;
 
     switch (req) {
-    case ADD_LIST:
-    case RM_LIST:
-    case LS_LIST:
-        if (!denylist_enabled) {
-            write_int(client, DENY_NOT_ENFORCED);
-            close(client);
-            return;
-        }
-    }
-
-    switch (req) {
     case ENFORCE_DENY:
         res = enable_deny();
         break;
