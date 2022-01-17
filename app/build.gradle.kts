@@ -74,6 +74,9 @@ dependencies {
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0")
+    implementation("dev.rikka.rikkax.insets:insets:1.1.1")
+    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"

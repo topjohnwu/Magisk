@@ -14,9 +14,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.arch.inflater.LayoutInflaterFactory
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
+import rikka.insets.WindowInsetsHelper
+import rikka.layoutinflater.view.LayoutInflaterFactory
 
 abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     BaseActivity(), BaseUIComponent<VM> {
@@ -44,6 +45,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
+            .addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
 
         super.onCreate(savedInstanceState)
 
