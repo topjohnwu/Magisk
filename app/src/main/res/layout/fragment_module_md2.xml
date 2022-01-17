@@ -17,21 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--
-        The list is reverted to use LinearLayoutManager only. The issue of random crashes lies in
-        the way StaggeredGridLayoutManager invalidates view in LazySpanLookup. Since we're adding
-        items in between full-span items the array is not yet invalidated and consecutively crashes
-        due to index of -end- being out of bounds of the current array.
-
-        If you'd like to use StaggeredGridLayoutManager, do so without adding single span items in
-        between of full-span items.
-        https://issuetracker.google.com/issues/37034096
-        -->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
             adapter="@{viewModel.adapter}"
-            gone="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            gone="@{viewModel.loading}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"
             android:layout_width="match_parent"
@@ -39,46 +28,13 @@
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingTop="@dimen/internal_action_bar_size"
-            android:paddingBottom="56dp"
+            android:paddingBottom="@dimen/internal_action_bar_size"
             app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_module_md2" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/module_filter_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginStart="@dimen/l1"
-            android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="72dp"
-            app:backgroundTint="?colorSurfaceSurfaceVariant"
-            app:layout_fitsSystemWindowsInsets="bottom"
-            app:srcCompat="@drawable/ic_search_md2"
-            app:tint="?colorPrimary"
-            tools:layout_marginBottom="64dp" />
-
-        <com.google.android.material.circularreveal.cardview.CircularRevealCardView
-            android:id="@+id/module_filter"
-            style="@style/WidgetFoundation.Card"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            android:visibility="invisible"
-            app:cardBackgroundColor="?colorSurface"
-            app:cardCornerRadius="0dp">
-
-            <include
-                android:id="@+id/module_filter_include"
-                layout="@layout/include_module_filter"
-                viewModel="@{viewModel}"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
-
         <LinearLayout
-            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            goneUnless="@{viewModel.loading}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -97,28 +53,6 @@
                 android:layout_marginTop="@dimen/l1" />
 
         </LinearLayout>
-
-        <FrameLayout
-            goneUnless="@{viewModel.remoteLoading}"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_gravity="bottom">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                tools:ignore="UselessParent">
-
-                <ProgressBar
-                    style="@style/WidgetFoundation.ProgressBar.Indeterminate"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center" />
-
-            </FrameLayout>
-
-        </FrameLayout>
 
     </FrameLayout>
 

@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.data.network
 
 import com.topjohnwu.magisk.core.model.BranchInfo
+import com.topjohnwu.magisk.core.model.ModuleJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import okhttp3.ResponseBody
 import retrofit2.http.*
@@ -36,6 +37,9 @@ interface RawServices {
 
     @GET
     suspend fun fetchString(@Url url: String): String
+
+    @GET
+    suspend fun fetchModuleJson(@Url url: String): ModuleJson
 
 }
 

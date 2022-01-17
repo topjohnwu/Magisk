@@ -28,11 +28,9 @@ data class StubJson(
 
 @JsonClass(generateAdapter = true)
 data class ModuleJson(
-    val id: String,
-    val last_update: Long,
-    val prop_url: String,
-    val zip_url: String,
-    val notes_url: String
+    val version: String,
+    val versionCode: Int,
+    val zipUrl: String,
 )
 
 @JsonClass(generateAdapter = true)

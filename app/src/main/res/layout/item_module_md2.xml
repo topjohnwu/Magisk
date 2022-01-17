@@ -98,7 +98,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintStart_toEndOf="@+id/module_info"
+                    app:layout_constraintStart_toEndOf="@+id/module_update"
                     app:layout_constraintTop_toTopOf="@+id/module_title" />
 
                 <TextView
@@ -111,6 +111,7 @@
                     android:layout_marginTop="@dimen/l1"
                     android:layout_marginEnd="@dimen/l1"
                     android:duplicateParentState="true"
+                    android:maxLines="5"
                     android:text="@{item.item.description}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
                     android:textColor="?android:textColorSecondary"
@@ -126,30 +127,34 @@
                     android:background="?colorSurfaceSurfaceVariant"
                     app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
-                <ImageView
-                    android:id="@+id/module_info"
-                    style="@style/WidgetFoundation.Icon"
-                    gone="@{item.online == null}"
+                <Button
+                    android:id="@+id/module_update"
+                    style="@style/WidgetFoundation.Button.Text"
+                    gone="@{item.item.updateJson.length == 0}"
                     android:layout_width="wrap_content"
-                    android:alpha=".5"
+                    android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:enabled="@{item.updateReady}"
                     android:focusable="true"
-                    android:onClick="@{() -> viewModel.infoPressed(item)}"
-                    android:paddingEnd="@dimen/l_50"
+                    android:onClick="@{() -> viewModel.downloadPressed(item.item.updateInfo)}"
+                    android:text="@string/update"
+                    android:textAllCaps="false"
+                    app:icon="@drawable/ic_update_md2"
+                    app:iconGravity="textEnd"
                     app:layout_constraintBottom_toBottomOf="@+id/module_remove"
                     app:layout_constraintEnd_toStartOf="@+id/module_remove"
                     app:layout_constraintTop_toTopOf="@+id/module_remove"
-                    app:srcCompat="@drawable/ic_info" />
+                    app:srcCompat="@drawable/ic_download_md2" />
 
                 <Button
                     android:id="@+id/module_remove"
-                    style="@style/WidgetFoundation.Button.Text"
+                    style="@style/WidgetFoundation.Button.Text.Secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:enabled="@{!item.updated}"
                     android:focusable="true"
-                    android:onClick="@{() -> item.delete(viewModel)}"
+                    android:onClick="@{() -> item.delete()}"
                     android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
                     android:textAllCaps="false"
                     app:icon="@{item.removed ? @drawable/ic_restart : @drawable/ic_delete_md2}"
@@ -165,7 +170,7 @@
                     android:layout_height="wrap_content"
                     app:barrierDirection="start"
                     app:referencedIds="@{viewModel.bottomBarBarrierIds}"
-                    tools:constraint_referenced_ids="module_info,module_remove" />
+                    tools:constraint_referenced_ids="module_update,module_remove" />
 
                 <TextView
                     android:id="@+id/module_suspend_text"
