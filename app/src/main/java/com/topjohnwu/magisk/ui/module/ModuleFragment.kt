@@ -1,48 +1,20 @@
 package com.topjohnwu.magisk.ui.module
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
-import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.di.viewModel
-import com.topjohnwu.magisk.ktx.*
-import com.topjohnwu.magisk.ui.MainActivity
-import com.topjohnwu.magisk.utils.EndlessRecyclerScrollListener
-import com.topjohnwu.magisk.utils.MotionRevealHelper
+import rikka.recyclerview.addEdgeSpacing
+import rikka.recyclerview.addInvalidateItemDecorationsObserver
+import rikka.recyclerview.addItemSpacing
+import rikka.recyclerview.fixEdgeEffect
 
-class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>(),
-    ReselectionTarget {
+class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_module_md2
     override val viewModel by viewModel<ModuleViewModel>()
-    override val snackbarAnchorView: View
-        get() {
-            return if (isFilterVisible) {
-                binding.moduleFilterInclude.moduleFilterTitleSearch
-            } else {
-                binding.moduleFilterToggle
-            }
-        }
-
-    private val listeners = hashSetOf<EndlessRecyclerScrollListener>()
-
-    private var isFilterVisible
-        get() = binding.moduleFilter.isVisible
-        set(value) {
-            if (!value) hideKeyboard()
-            MotionRevealHelper.withViews(binding.moduleFilter, binding.moduleFilterToggle, value)
-            with(activity as MainActivity) {
-                requestNavigationHidden(value)
-                setDisplayHomeAsUpEnabled(value)
-            }
-        }
 
     override fun onStart() {
         super.onStart()
@@ -53,91 +25,13 @@ class ModuleFragment : BaseUIFragment<ModuleViewModel, FragmentModuleMd2Binding>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.moduleFilterToggle.setOnClickListener {
-            isFilterVisible = true
-        }
-        binding.moduleFilterInclude.moduleFilterDone.setOnClickListener {
-            isFilterVisible = false
-        }
-        binding.moduleFilterInclude.moduleFilterList.addOnScrollListener(object :
-            RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
-            }
-        })
-
-        val resource = requireContext().resources
-        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
-        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
         binding.moduleList.apply {
-            addVerticalPadding(
-                l_50,
-                l1 + l_50 + resource.getDimensionPixelSize(R.dimen.internal_action_bar_size)
-            )
-            addSimpleItemDecoration(
-                left = l1,
-                top = l_50,
-                right = l1,
-                bottom = l_50,
-            )
+            addEdgeSpacing(top = R.dimen.l_50, bottom = R.dimen.l1)
+            addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
             fixEdgeEffect()
-            post {
-                addInvalidateItemDecorationsObserver()
-            }
-        }
-
-        binding.moduleFilterInclude.moduleFilterList.apply {
-            addVerticalPadding(
-                l_50,
-                l_50
-            )
-            addSimpleItemDecoration(
-                left = l1,
-                top = l_50,
-                right = l1,
-                bottom = l_50,
-            )
-            fixEdgeEffect()
+            post { addInvalidateItemDecorationsObserver() }
         }
     }
-
-    override fun onDestroyView() {
-        listeners.forEach {
-            binding.moduleList.removeOnScrollListener(it)
-            binding.moduleFilterInclude.moduleFilterList.removeOnScrollListener(it)
-        }
-        super.onDestroyView()
-    }
-
-    override fun onBackPressed(): Boolean {
-        if (isFilterVisible) {
-            isFilterVisible = false
-            return true
-        }
-        return super.onBackPressed()
-    }
-
-    // ---
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_module_md2, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_refresh -> viewModel.forceRefresh()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    // ---
-
-    override fun onReselected() {
-        binding.moduleList.scrollToPosition(10)
-        binding.moduleList.also { it.post { it.smoothScrollToPosition(0) } }
-    }
-
-    // ---
 
     override fun onPreBind(binding: FragmentModuleMd2Binding) = Unit
 

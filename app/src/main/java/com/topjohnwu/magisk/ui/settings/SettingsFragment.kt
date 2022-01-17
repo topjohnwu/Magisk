@@ -6,10 +6,9 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIFragment
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
 import com.topjohnwu.magisk.di.viewModel
-import com.topjohnwu.magisk.ktx.addSimpleItemDecoration
-import com.topjohnwu.magisk.ktx.addVerticalPadding
-import com.topjohnwu.magisk.ktx.fixEdgeEffect
-import com.topjohnwu.magisk.ktx.setOnViewReadyListener
+import rikka.recyclerview.addEdgeSpacing
+import rikka.recyclerview.addItemSpacing
+import rikka.recyclerview.fixEdgeEffect
 
 class SettingsFragment : BaseUIFragment<SettingsViewModel, FragmentSettingsMd2Binding>() {
 
@@ -24,24 +23,11 @@ class SettingsFragment : BaseUIFragment<SettingsViewModel, FragmentSettingsMd2Bi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.settingsList.setOnViewReadyListener {
-            binding.settingsList.scrollToPosition(0)
+        binding.settingsList.apply {
+            addEdgeSpacing(bottom = R.dimen.l1)
+            addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
+            fixEdgeEffect()
         }
-
-        val resource = requireContext().resources
-        val l_50 = resource.getDimensionPixelSize(R.dimen.l_50)
-        val l1 = resource.getDimensionPixelSize(R.dimen.l1)
-        binding.settingsList.addVerticalPadding(
-            0,
-            l1
-        )
-        binding.settingsList.addSimpleItemDecoration(
-            left = l1,
-            top = l_50,
-            right = l1,
-            bottom = l_50,
-        )
-        binding.settingsList.fixEdgeEffect()
     }
 
     override fun onResume() {
