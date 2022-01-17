@@ -18,6 +18,7 @@
         style="@style/WidgetFoundation.Button.Outlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/l_50"
         android:onClick="@{() -> viewModel.installPressed()}"
         android:text="@string/module_action_install_external"
         android:textAllCaps="false"

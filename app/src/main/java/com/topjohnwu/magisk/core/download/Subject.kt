@@ -43,7 +43,7 @@ sealed class Subject : Parcelable {
         val action: Action,
         override val notifyId: Int = Notifications.nextId()
     ) : Subject() {
-        override val url: String get() = module.zip_url
+        override val url: String get() = module.zipUrl
         override val title: String get() = module.downloadFilename
 
         @IgnoredOnParcel
