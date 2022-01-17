@@ -47,4 +47,8 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="ConcealableView">
+        <attr name="state_hidden" format="boolean" />
+    </declare-styleable>
+
 </resources>

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
@@ -97,10 +98,8 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
 
         getScreen(section)?.navigate()
 
-        if (savedInstanceState != null) {
-            if (!isRootFragment) {
-                requestNavigationHidden()
-            }
+        if (!isRootFragment) {
+            requestNavigationHidden(requiresAnimation = savedInstanceState == null)
         }
     }
 
@@ -120,45 +119,13 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    internal fun requestNavigationHidden(hide: Boolean = true) {
+    internal fun requestNavigationHidden(hide: Boolean = true, requiresAnimation: Boolean = true) {
         val bottomView = binding.mainNavigation
-
-        // A copy of HideBottomViewOnScrollBehavior's animation
-
-        fun animateTranslationY(
-            view: View, targetY: Int, duration: Long, interpolator: TimeInterpolator
-        ) {
-            view.tag = view
-                .animate()
-                .translationY(targetY.toFloat())
-                .setInterpolator(interpolator)
-                .setDuration(duration)
-                .setListener(
-                    object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            view.tag = null
-                        }
-                    })
-        }
-
-        (bottomView.tag as? Animator)?.cancel()
-        bottomView.clearAnimation()
-
-        if (hide) {
-            animateTranslationY(
-                bottomView,
-                bottomView.measuredHeight,
-                175L,
-                FastOutLinearInInterpolator()
-            )
+        if (requiresAnimation) {
+            bottomView.isVisible = true
+            bottomView.isHidden = hide
         } else {
-            animateTranslationY(
-                bottomView,
-                0,
-                225L,
-                LinearOutSlowInInterpolator()
-            )
+            bottomView.isGone = hide
         }
     }
 
