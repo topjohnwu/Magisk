@@ -16,7 +16,6 @@
         android:fontFamily="monospace"
         android:text="@{item.item}"
         android:textAppearance="@style/AppearanceFoundation.Caption"
-        android:textSize="10sp"
         tools:text="@tools:sample/lorem/random" />
 
 </layout>

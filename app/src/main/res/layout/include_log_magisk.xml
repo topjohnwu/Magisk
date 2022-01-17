@@ -30,11 +30,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    precomputedText="@{viewModel.consoleText}"
-                    android:textAppearance="@style/AppearanceFoundation.Caption"
-                    android:textSize="10sp"
                     android:paddingTop="@dimen/internal_action_bar_size"
                     android:paddingBottom="128dp"
+                    android:text="@{viewModel.consoleText}"
+                    android:textAppearance="@style/AppearanceFoundation.Caption"
                     app:layout_fitsSystemWindowsInsets="top|bottom"
                     tools:text="@tools:sample/lorem/random" />
 
