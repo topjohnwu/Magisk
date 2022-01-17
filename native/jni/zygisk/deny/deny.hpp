@@ -22,6 +22,8 @@ bool is_deny_target(int uid, std::string_view process);
 
 void revert_unmount();
 
+void enter_clean_ns();
+
 extern std::atomic<bool> denylist_enforced;
 extern std::atomic<int> cached_manager_app_id;
 

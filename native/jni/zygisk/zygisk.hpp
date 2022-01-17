@@ -13,6 +13,7 @@ enum : int {
     ZYGISK_GET_LOG_PIPE,
     ZYGISK_CONNECT_COMPANION,
     ZYGISK_GET_MODDIR,
+    ZYGISK_GET_CLEAN_NS,
 };
 
 #if defined(__LP64__)

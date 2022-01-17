@@ -2,6 +2,7 @@
 
 #include <magisk.hpp>
 #include <utils.hpp>
+#include "../zygisk.hpp"
 
 #include "deny.hpp"
 
@@ -38,4 +39,16 @@ void revert_unmount() {
 
     for (auto &s : reversed(targets))
         lazy_unmount(s.data());
+}
+
+void enter_clean_ns() {
+    if (int fd = connect_daemon(); fd >= 0) {
+        write_int(fd, ZYGISK_REQUEST);
+        write_int(fd, ZYGISK_GET_CLEAN_NS);
+        auto clean_ns = recv_fd(fd);
+        LOGD("denylist: set to clean ns %d\n", clean_ns);
+        if (clean_ns > 0) xsetns(clean_ns, CLONE_NEWNS);
+        close(fd);
+        close(clean_ns);
+    }
 }

@@ -379,6 +379,28 @@ static void get_moddir(int client) {
     close(dfd);
 }
 
+static int get_clean_ns(pid_t pid) {
+    int pipe_fd[2];
+    pipe(pipe_fd);
+    if (int child = xfork(); !child) {
+        switch_mnt_ns(pid);
+        xunshare(CLONE_NEWNS);
+        revert_unmount();
+        write_int(pipe_fd[1], 0);
+        read_int(pipe_fd[0]);
+        exit(0);
+    } else {
+        read_int(pipe_fd[0]);
+        char buf[PATH_MAX];
+        snprintf(buf, PATH_MAX, "/proc/%d/ns/mnt", child);
+        auto clean_ns = open(buf, O_RDONLY);
+        write_int(pipe_fd[1], 0);
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+        return clean_ns;
+    }
+}
+
 void zygisk_handler(int client, const sock_cred *cred) {
     int code = read_int(client);
     char buf[256];
@@ -402,6 +424,17 @@ void zygisk_handler(int client, const sock_cred *cred) {
     case ZYGISK_GET_MODDIR:
         get_moddir(client);
         break;
+    case ZYGISK_GET_CLEAN_NS:
+        get_exe(cred->pid, buf, sizeof(buf));
+        int clean_ns;
+        if (str_ends(buf, "64")) {
+            static int clean_ns64 = get_clean_ns(cred->pid);
+            clean_ns = clean_ns64;
+        } else {
+            static int clean_ns32 = get_clean_ns(cred->pid);
+            clean_ns = clean_ns32;
+        }
+        send_fd(client, clean_ns);
     }
     close(client);
 }

@@ -31,6 +31,7 @@ enum {
     APP_SPECIALIZE,
     SERVER_SPECIALIZE,
     CAN_DLCLOSE,
+    SKIP_CLEAN_NS,
     FLAG_MAX
 };
 
@@ -156,6 +157,7 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->state[DO_UNMOUNT]) {
+            g_ctx->state[SKIP_CLEAN_NS] = true;
             revert_unmount();
         } else {
             umount2("/system/bin/app_process64", MNT_DETACH);
@@ -163,6 +165,13 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
         }
     }
     return res;
+}
+
+DCL_HOOK_FUNC(int, setresuid, uid_t __ruid, uid_t __euid, uid_t __suid) {
+    if (g_ctx && g_ctx->state[DO_UNMOUNT] && !g_ctx->state[SKIP_CLEAN_NS]) {
+        enter_clean_ns();
+    }
+    return old_setresuid(__ruid, __euid, __suid);
 }
 
 // A place to clean things up before zygote evaluates fd table
@@ -452,7 +461,6 @@ void HookContext::nativeSpecializeAppProcess_pre() {
 
     auto module_fds = remote_get_info(args->uid, process, &flags);
     if ((flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
-        // TODO: Handle MOUNT_EXTERNAL_NONE on older platforms
         ZLOGI("[%s] is on the denylist\n", process);
         state[DO_UNMOUNT] = true;
     } else {
@@ -581,6 +589,7 @@ void hook_functions() {
     XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
     XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
     XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
+    XHOOK_REGISTER(ANDROID_RUNTIME, setresuid);
     XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
     hook_refresh();
 
