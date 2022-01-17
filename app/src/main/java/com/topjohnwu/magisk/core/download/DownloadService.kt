@@ -10,7 +10,9 @@ import android.os.Build
 import android.os.IBinder
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.intent
@@ -19,6 +21,8 @@ import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.copyAndClose
 import com.topjohnwu.magisk.ktx.synchronized
+import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Notifications.mgr
 import kotlinx.coroutines.*
@@ -71,7 +75,16 @@ class DownloadService : BaseService() {
                 }
                 if (ForegroundTracker.hasForeground) {
                     remove(subject.notifyId)
-                    subject.pendingIntent(this@DownloadService).send()
+                    if (subject !is Subject.Manager && ForegroundTracker.foreground is MainActivity) {
+                        val activity = ForegroundTracker.foreground as MainActivity
+                        withContext(Dispatchers.Main) {
+                            activity.navigation?.navigate(
+                                MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, subject.file)
+                            )
+                        }
+                    } else {
+                        subject.pendingIntent(this@DownloadService).send()
+                    }
                 } else {
                     notifyFinish(subject)
                 }
