@@ -13,7 +13,5 @@
 
     <dimen name="r1">8dp</dimen>
 
-    <!--l1 + fab size-->
-
     <dimen name="internal_action_bar_size">56dp</dimen>
 </resources>

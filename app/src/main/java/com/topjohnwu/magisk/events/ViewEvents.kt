@@ -10,21 +10,8 @@ import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.events.dialog.MarkDownDialog
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
-
-class OpenReadmeEvent(private val item: OnlineModule) : MarkDownDialog() {
-    override suspend fun getMarkdownText() = item.notes()
-    override fun build(dialog: MagiskDialog) {
-        super.build(dialog)
-        dialog.applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-            titleRes = android.R.string.cancel
-        }.cancellable(true)
-    }
-}
 
 class PermissionEvent(
     private val permission: String,

@@ -20,7 +20,6 @@ import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.ReselectionTarget
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.di.viewModel
@@ -81,9 +80,6 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
         binding.mainNavigation.setOnItemSelectedListener {
             getScreen(it.itemId)?.navigate()
             true
-        }
-        binding.mainNavigation.setOnItemReselectedListener {
-            (currentFragment as? ReselectionTarget)?.onReselected()
         }
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()

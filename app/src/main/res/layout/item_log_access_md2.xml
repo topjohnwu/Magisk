@@ -66,7 +66,6 @@
                 android:layout_height="wrap_content"
                 android:text="@{item.date}"
                 android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                android:textSize="10sp"
                 app:layout_constraintBottom_toTopOf="@+id/log_app_details"
                 app:layout_constraintTop_toBottomOf="@+id/log_app_name"
                 tools:text="06:00 PM, 10 Oct 2019" />
@@ -77,7 +76,6 @@
                 android:layout_height="wrap_content"
                 android:text="@{String.format(`%s  %s`, @string/pid(item.item.fromPid), @string/target_uid(item.item.toUid))}"
                 android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/log_command"
                 app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +89,6 @@
                 android:fontFamily="monospace"
                 android:text="@{item.item.command}"
                 android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/log_app_details"
                 app:layout_constraintTop_toTopOf="@+id/log_app_details"

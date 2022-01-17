@@ -5,7 +5,6 @@ import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.Queryable
 import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.di.AppContext
@@ -15,29 +14,25 @@ import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*
-import kotlin.collections.ArrayList
 
-@FlowPreview
-class DenyListViewModel : BaseViewModel(), Queryable {
-
-    override val queryDelay = 0L
+class DenyListViewModel : BaseViewModel() {
 
     var isShowSystem = false
         set(value) {
             field = value
-            submitQuery()
+            query()
         }
 
     var isShowOS = false
         set(value) {
             field = value
-            submitQuery()
+            query()
         }
 
     var query = ""
         set(value) {
             field = value
-            submitQuery()
+            query()
         }
 
     val items = filterableListOf<DenyListRvItem>()
@@ -71,10 +66,10 @@ class DenyListViewModel : BaseViewModel(), Queryable {
             apps to items.calculateDiff(apps)
         }
         items.update(apps, diff)
-        submitQuery()
+        query()
     }
 
-    override fun query() {
+    fun query() {
         items.filter {
             fun filterSystem() = isShowSystem || !it.info.isSystemApp()
 
