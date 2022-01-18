@@ -10,8 +10,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Непостојећи Канал Ажурирања</string>
-    <string name="safetynet_api_error">СигурнаМрежа АПИ Грешка</string>
-    <string name="safetynet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Задржи форсирану енкрипцију</string>
@@ -24,7 +22,6 @@
     <string name="no_info_provided">(Без информација)</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Ажурирање доступно</string>
     <string name="home_installed_version">Инсталирано</string>
 
     <!--Log Fragment-->
@@ -42,7 +39,6 @@
     <string name="reboot">Рестартуј</string>
     <string name="magisk_update_title">Нови Адбејт Магиска Доступан!</string>
     <string name="release_notes">Белешке обљављивања</string>
-    <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
@@ -50,7 +46,6 @@
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
-    <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="download_file_error">Грешка при преузимању фајла</string>
 
     <!--Settings Activity -->

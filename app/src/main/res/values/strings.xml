@@ -9,7 +9,6 @@
     <string name="install">Install</string>
     <string name="section_home">Home</string>
     <string name="section_theme">Themes</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
-    <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
@@ -91,20 +89,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API Error</string>
-    <string name="safetynet_res_invalid">The response is invalid</string>
-    <string name="safetynet_attest_success">Success!</string>
-    <string name="safetynet_attest_failure">Attestation failed!</string>
-    <string name="safetynet_attest_loading">Just a sec…</string>
-    <string name="safetynet_attest_restart">Try again</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
-    <string name="hide_scroll_up">Scroll up</string>
-    <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
 
     <!--Module-->
@@ -115,14 +104,10 @@
     <string name="reboot_download">Reboot to Download</string>
     <string name="reboot_edl">Reboot to EDL</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">Updates</string>
-    <string name="module_section_pending_action">Update all</string>
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
-    <string name="update_available">Update Available</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
     <string name="sorting_order">Sorting Order</string>
     <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
     <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
@@ -217,7 +202,6 @@
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
     <string name="release_notes">Release notes</string>
-    <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>
     <string name="failure">Failed!</string>
@@ -228,8 +212,6 @@
     <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
-    <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk is FOSS and doesn\'t include code for Google\'s proprietary SafetyNet API.\n\nDo you want to download a proprietary extension for SafetyNet checks?</string>
     <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. Do you want to proceed and reboot?</string>

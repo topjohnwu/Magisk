@@ -9,7 +9,6 @@
     <string name="install">Instalovat</string>
     <string name="section_home">Domů</string>
     <string name="section_theme">Téma</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Žádné připojení</string>
@@ -29,7 +28,6 @@
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
     <string name="uninstall_magisk_msg">Všechny moduly budou zakázány/odstraněny!\nROOT bude odstraněn!\nPokud jsou data dešifrována, můžou být zašifrována!</string>
-    <string name="home_check_safetynet">Zkontrolovat SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ponechat Force Encryption</string>
@@ -88,20 +86,11 @@
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cílové UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">Chyba SafetyNet API</string>
-    <string name="safetynet_res_invalid">Odpověď je neplatná</string>
-    <string name="safetynet_attest_success">Úspěšné!</string>
-    <string name="safetynet_attest_failure">Chyba ověření!</string>
-    <string name="safetynet_attest_loading">Čekejte…</string>
-    <string name="safetynet_attest_restart">Zkusit znovu</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">Zobrazit systémové aplikace</string>
     <string name="show_os_app">Zobrazit OS aplikace</string>
     <string name="hide_filter_hint">Filtrovat podle názvu</string>
-    <string name="hide_scroll_up">Posunout nahoru</string>
-    <string name="hide_filters">Filtry</string>
     <string name="hide_search">Vyhledávání</string>
 
     <!--Module-->
@@ -112,14 +101,10 @@
     <string name="reboot_download">Restartovat do Download</string>
     <string name="reboot_edl">Restartovat do EDL</string>
     <string name="module_version_author">%1$s od %2$s</string>
-    <string name="module_section_pending">Aktualizace</string>
-    <string name="module_section_pending_action">Aktualizovat vše</string>
     <string name="module_state_remove">Odstranit</string>
     <string name="module_state_restore">Obnovit</string>
     <string name="module_action_install_external">Instalace z úložiště</string>
-    <string name="update_available">Dostupná aktualizace</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
     <string name="sorting_order">Seřadit</string>
 
     <!--Settings-->
@@ -206,7 +191,6 @@
     <string name="download">Stáhnout</string>
     <string name="reboot">Restartovat</string>
     <string name="release_notes">Poznámky k vydání</string>
-    <string name="repo_cache_cleared">Mezipaměť smazána</string>
     <string name="flashing">Instalování…</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Selhalo!</string>
@@ -216,7 +200,6 @@
     <string name="restore_img_msg">Obnovování…</string>
     <string name="restore_done">Obnovení bylo provedeno!</string>
     <string name="restore_fail">Výchozí záloha neexistuje!</string>
-    <string name="proprietary_title">Stáhnout kód</string>
     <string name="setup_fail">Nastavení selhalo</string>
     <string name="env_fix_title">Vyžaduje se další nastavení</string>
     <string name="setup_msg">Nastavení je spuštěno…</string>

@@ -10,8 +10,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Etibarsız Yeniləmə Kanalı</string>
-    <string name="safetynet_api_error">SafetyNet API Xətası</string>
-    <string name="safetynet_res_invalid">Cavab etibarsızdır.</string>
     <string name="keep_force_encryption">Şifrələməyə məcbur etməni qoru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'i qoru</string>
     <string name="uninstall_magisk_title">Magisk\'i Sil</string>
@@ -26,7 +24,6 @@
     <string name="reboot_edl">EDL\'ə yenidən başlat</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Yeniləmə Var</string>
     <string name="home_installed_version">Yüklənib</string>
     <string name="sorting_order">Nizamlama Qaydası</string>
 
@@ -51,7 +48,6 @@
     <string name="download">Yüklə</string>
     <string name="reboot">Yenidən Başlat</string>
     <string name="release_notes">Yeniliklər</string>
-    <string name="repo_cache_cleared">Repo keşi silindi</string>
     <string name="manager_download_install">Yükləyib quraşdırmaq üçün toxun.</string>
     <string name="flashing">Qurulur</string>
     <string name="open_link_failed_toast">Keçid açmağa heçbir tətbiq tapılmadı.</string>
@@ -64,7 +60,6 @@
     <string name="restore_img_msg">Geri qaytarılır…</string>
     <string name="restore_done">Geri qaytarma bitdi!</string>
     <string name="restore_fail">Stock nüsxə mövcud deyil!</string>
-    <string name="proprietary_title">Özəl kodu yükləyin</string>
     <string name="setup_fail">Quraşdırma alınmadı.</string>
     <string name="env_fix_title">Əlavə Quraşdırma Lazımdır</string>
     <string name="setup_title">Əlavə quraşdırma</string>
@@ -143,7 +138,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hədəf UID: %1$d</string>
 
-    <!-- MagiskHide -->
+    <!--DenyList-->
     <string name="show_system_app">Sistem tətbiqlərini göstər</string>
 
 </resources>

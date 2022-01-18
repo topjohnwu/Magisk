@@ -9,7 +9,6 @@
     <string name="install">इंस्टॉल</string>
     <string name="section_home">होम</string>
     <string name="section_theme">थीम</string>
-    <string name="safetynet">सेफ्टीनेट</string>
 
     <!--Home-->
     <string name="no_connection">कोई कनेक्शन उपलब्ध नहीं है</string>
@@ -28,7 +27,6 @@
     <string name="invalid_update_channel">अमान्य अपडेट चैनल</string>
     <string name="uninstall_magisk_title">मैजिस्क को अनइंस्टॉल करें</string>
     <string name="uninstall_magisk_msg">सभी मॉड्यूल्स को निष्क्रिय/हटा दिया जाएगा!\n रूट को हटा दिया जाएगा!\n आपका डेटा संभावित रूप से एन्क्रिप्ट किया गया है यदि पहले से नहीं है!</string>
-    <string name="home_check_safetynet">सेफ्टीनेट की जाँच करें</string>
 
     <!--Install-->
     <string name="keep_force_encryption">फ़ोर्स एन्क्रिप्शन को संरक्षित रखें</string>
@@ -86,20 +84,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">लक्षित UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">सेफ्टीनेट एपीआई त्रुटि</string>
-    <string name="safetynet_res_invalid">प्रतिक्रिया अमान्य है</string>
-    <string name="safetynet_attest_success">सफलता!</string>
-    <string name="safetynet_attest_failure">सत्यापन विफल!</string>
-    <string name="safetynet_attest_loading">सिर्फ एक सेकंड…</string>
-    <string name="safetynet_attest_restart">पुनः प्रयास करें</string>
 
-    <!-- MagiskHide -->
+    <!--DenyList-->
     <string name="show_system_app">सिस्टम ऐप्स दिखाएं</string>
     <string name="show_os_app">OS एप्लिकेशन दिखाएं</string>
     <string name="hide_filter_hint">नाम से फ़िल्टर करें</string>
-    <string name="hide_scroll_up">ऊपर स्क्रॉल करें</string>
-    <string name="hide_filters">फिल्टर</string>
     <string name="hide_search">खोजें</string>
 
     <!--Module -->
@@ -110,14 +99,10 @@
     <string name="reboot_download">डाउनलोड मोड रिबूट</string>
     <string name="reboot_edl">EDL रिबूट</string>
     <string name="module_version_author"> %2$s के द्वारा %1$s</string>
-    <string name="module_section_pending">अपडेट्स</string>
-    <string name="module_section_pending_action">सभी अपडेट करें</string>
     <string name="module_state_remove">हटाएँ</string>
     <string name="module_state_restore">रिस्टोर करें</string>
     <string name="module_action_install_external">स्टोरेज से इनस्टॉल करें</string>
-    <string name="update_available">अपडेट उपलब्ध</string>
     <string name="module_installed">इंस्टॉल्ड</string>
-    <string name="module_section_online">ऑनलाइन</string>
     <string name="sorting_order">क्रमबद्ध तरीका</string>
 
     <!--Settings -->
@@ -198,7 +183,6 @@
     <string name="download">डाउनलोड</string>
     <string name="reboot">रीबूट</string>
     <string name="release_notes">रिलीज नोट्स</string>
-    <string name="repo_cache_cleared">रेपो कैश साफ़ किया</string>
     <string name="flashing">फ़्लैश हो रहा है...</string>
     <string name="done">सफल हुआ!</string>
     <string name="failure">असफल हुआ !</string>
@@ -208,7 +192,6 @@
     <string name="restore_img_msg">रिस्टोर हो रहा है...</string>
     <string name="restore_done">रिस्टोर सफल हुआ!</string>
     <string name="restore_fail">स्टॉक बैकअप मौजूद नहीं है!</string>
-    <string name="proprietary_title">मालिकाना कोड डाउनलोड करें</string>
     <string name="setup_fail">सेटअप असफल हुआ</string>
     <string name="env_fix_title">अतिरिक्त सेटअप की ज़रूरत है</string>
     <string name="setup_msg">वातावरण सेटअप चल रहा है...</string>

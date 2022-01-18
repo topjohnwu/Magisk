@@ -9,7 +9,6 @@
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
     <string name="section_theme">Темы</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
     <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будет недоступен!\nБудет активировано шифрование (если отключалось раннее)!</string>
-    <string name="home_check_safetynet">Проверка SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
@@ -90,20 +88,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Целевой UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">Ошибка SafetyNet API</string>
-    <string name="safetynet_res_invalid">Некорректный ответ</string>
-    <string name="safetynet_attest_success">Пройден!</string>
-    <string name="safetynet_attest_failure">Не пройден!</string>
-    <string name="safetynet_attest_loading">Подождите…</string>
-    <string name="safetynet_attest_restart">Повторить</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">Системные приложения</string>
     <string name="show_os_app">Встроенные приложения</string>
     <string name="hide_filter_hint">Введите имя</string>
-    <string name="hide_scroll_up">Вверх</string>
-    <string name="hide_filters">Сортировка</string>
     <string name="hide_search">Поиск</string>
 
     <!--Module-->
@@ -114,14 +103,10 @@
     <string name="reboot_download">Перезагрузка в Download</string>
     <string name="reboot_edl">Перезагрузка в EDL</string>
     <string name="module_version_author">%1$s от %2$s</string>
-    <string name="module_section_pending">Обновления</string>
-    <string name="module_section_pending_action">Обновить всё</string>
     <string name="module_state_remove">Удалить</string>
     <string name="module_state_restore">Восстановить</string>
     <string name="module_action_install_external">Установить из хранилища</string>
-    <string name="update_available">Доступно обновление</string>
     <string name="module_installed">Установлены</string>
-    <string name="module_section_online">Репозиторий</string>
     <string name="sorting_order">Сортировка</string>
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
@@ -216,7 +201,6 @@
     <string name="download">Скачать</string>
     <string name="reboot">Перезагрузка</string>
     <string name="release_notes">О версии</string>
-    <string name="repo_cache_cleared">Кэш репозитория модулей очищен</string>
     <string name="flashing">Установка…</string>
     <string name="done">Завершено!</string>
     <string name="failure">Ошибка!</string>
@@ -227,8 +211,6 @@
     <string name="restore_img_msg">Восстановление…</string>
     <string name="restore_done">Восстановление завершено!</string>
     <string name="restore_fail">Резервная копия отсутствует!</string>
-    <string name="proprietary_title">Загрузка расширения SafetyNet</string>
-    <string name="proprietary_notice">Magisk — проект с открытым исходным кодом и не содержит проприетарный код SafetyNet API от Google.\n\nХотите загрузить проприетарное расширение для проверки статуса SafetyNet?</string>
     <string name="setup_fail">Ошибка установки</string>
     <string name="env_fix_title">Требуется расширенная установка</string>
     <string name="env_fix_msg">Требуется расширенная установка Magisk для корректной работы. Продолжить и выполнить перезагрузку?</string>

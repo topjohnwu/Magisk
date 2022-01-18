@@ -9,8 +9,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за актуализации</string>
-    <string name="safetynet_api_error">Грешка в SafetyNet ППИ</string>
-    <string name="safetynet_res_invalid">Невалиден отговор</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
@@ -26,7 +24,6 @@
     <string name="reboot_download">Рестартиране в даунлоуд режима</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">Налице е актуализация.</string>
     <string name="home_installed_version">Инсталирани</string>
     <string name="sorting_order">Сортиране</string>
 
@@ -45,7 +42,6 @@
     <string name="reboot">Рестартиране</string>
     <string name="magisk_update_title">Достъпно е издание на Magisk.</string>
     <string name="release_notes">Бележки</string>
-    <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
@@ -59,7 +55,6 @@
     <string name="restore_img_msg">Възстановяване…</string>
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
-    <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна.</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
     <string name="setup_title">Допълнително надстройване</string>

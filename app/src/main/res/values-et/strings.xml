@@ -9,7 +9,6 @@
     <string name="install">Installi</string>
     <string name="section_home">Kodu</string>
     <string name="section_theme">Teemad</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Ühendus puudub</string>
@@ -28,7 +27,6 @@
     <string name="invalid_update_channel">Sobimatu uuenduste kanal</string>
     <string name="uninstall_magisk_title">Eemalda Magisk</string>
     <string name="uninstall_magisk_msg">Kõik moodulid keelatakse/eemaldatakse!\nJuurkasutaja eemaldatakse!\nSinu andmeid võidakse krüpteerida, kui need juba ei ole krüpteeritud!</string>
-    <string name="home_check_safetynet">Kontrolli SafetyNeti</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
@@ -86,19 +84,10 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Siht-UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNeti API viga</string>
-    <string name="safetynet_res_invalid">Vastus on sobimatu</string>
-    <string name="safetynet_attest_success">Edukas!</string>
-    <string name="safetynet_attest_failure">Atesteerimine ebaõnnestus!</string>
-    <string name="safetynet_attest_loading">Oota üks hetk…</string>
-    <string name="safetynet_attest_restart">Proovi uuesti</string>
 
-    <!-- MagiskHide -->
+    <!--DenyList-->
     <string name="show_system_app">Kuva süsteemirakendused</string>
     <string name="hide_filter_hint">Filtreeri nime järgi</string>
-    <string name="hide_scroll_up">Keri üles</string>
-    <string name="hide_filters">Filtrid</string>
     <string name="hide_search">Otsing</string>
 
     <!--Module -->
@@ -108,14 +97,10 @@
     <string name="reboot_download">Taaskäivita allalaadimisrežiimi</string>
     <string name="reboot_edl">Taaskäivita EDLi</string>
     <string name="module_version_author">%1$s autorilt %2$s</string>
-    <string name="module_section_pending">Uuendused</string>
-    <string name="module_section_pending_action">Uuenda kõik</string>
     <string name="module_state_remove">Eemalda</string>
     <string name="module_state_restore">Taasta</string>
     <string name="module_action_install_external">Installi sisemälust</string>
-    <string name="update_available">Uuendus saadaval</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Võrgus</string>
     <string name="sorting_order">Sorteerimisjärjekord</string>
 
     <!--Settings -->
@@ -196,7 +181,6 @@
     <string name="download">Allalaadimine</string>
     <string name="reboot">Taaskäivita</string>
     <string name="release_notes">Väljalaskemärkmed</string>
-    <string name="repo_cache_cleared">Hoidla vahemälu tühjendatud</string>
     <string name="flashing">Välgutamine…</string>
     <string name="done">Valmis!</string>
     <string name="failure">Ebaõnnestus</string>
@@ -206,7 +190,6 @@
     <string name="restore_img_msg">Taastamine…</string>
     <string name="restore_done">Taastamine valmis!</string>
     <string name="restore_fail">Originaalne varundus puudub!</string>
-    <string name="proprietary_title">Laadi alla suletud koodi</string>
     <string name="setup_fail">Seadistus ebaõnnnestus</string>
     <string name="env_fix_title">Vajab lisaseadistust</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>

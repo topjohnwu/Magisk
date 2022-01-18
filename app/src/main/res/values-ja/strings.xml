@@ -9,7 +9,6 @@
     <string name="install">インストール</string>
     <string name="section_home">ホーム</string>
     <string name="section_theme">テーマ</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">インターネット接続なし</string>
@@ -30,7 +29,6 @@
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
     <string name="uninstall_magisk_title">Magisk のアンインストール</string>
     <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。\nアンインストール後は root が無効化され、ストレージが暗号化されていない場合、暗号化される場合があります。</string>
-    <string name="home_check_safetynet">SafetyNet のチェック</string>
 
     <!--Install-->
     <string name="keep_force_encryption">暗号化を維持する</string>
@@ -89,20 +87,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ターゲット UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API エラー</string>
-    <string name="safetynet_res_invalid">応答が不正です</string>
-    <string name="safetynet_attest_success">成功!</string>
-    <string name="safetynet_attest_failure">認証失敗!</string>
-    <string name="safetynet_attest_loading">お待ちください…</string>
-    <string name="safetynet_attest_restart">やり直す</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">システムアプリを表示</string>
     <string name="show_os_app">OS アプリを表示</string>
     <string name="hide_filter_hint">名前で絞り込み</string>
-    <string name="hide_scroll_up">上へ</string>
-    <string name="hide_filters">絞り込み</string>
     <string name="hide_search">検索</string>
 
     <!--Module-->
@@ -113,14 +102,10 @@
     <string name="reboot_download">Download へ再起動</string>
     <string name="reboot_edl">EDL へ再起動</string>
     <string name="module_version_author">%1$s 開発者：%2$s</string>
-    <string name="module_section_pending">更新</string>
-    <string name="module_section_pending_action">すべて更新</string>
     <string name="module_state_remove">削除</string>
     <string name="module_state_restore">復元</string>
     <string name="module_action_install_external">ストレージからインストール</string>
-    <string name="update_available">更新あり</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">未インストール</string>
     <string name="sorting_order">並び順</string>
 
     <!--Settings-->
@@ -207,7 +192,6 @@
     <string name="download">ダウンロード</string>
     <string name="reboot">再起動</string>
     <string name="release_notes">更新履歴</string>
-    <string name="repo_cache_cleared">リポジトリのキャッシュを消去しました</string>
     <string name="flashing">書き込み中…</string>
     <string name="done">完了！</string>
     <string name="failure">失敗！</string>
@@ -218,8 +202,6 @@
     <string name="restore_img_msg">リストア中…</string>
     <string name="restore_done">リストア完了！</string>
     <string name="restore_fail">Stock のバックアップがありません！</string>
-    <string name="proprietary_title">プロプライエタリコードのダウンロード</string>
-    <string name="proprietary_notice">Magisk は FOSSであり、Google のプロプライエタリな SafetyNet API のコードは含まれていません。\n\nSafetyNet チェック用の拡張機能をダウンロードしますか？</string>
     <string name="setup_fail">セットアップに失敗しました</string>
     <string name="env_fix_title">追加のセットアップが必要です</string>
     <string name="env_fix_msg">Magisk を正常に動作させるために追加のセットアップが必要です。今すぐ再起動しますか？</string>

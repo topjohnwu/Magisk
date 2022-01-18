@@ -9,7 +9,6 @@
     <string name="install">Cài đặt</string>
     <string name="section_home">Home</string>
     <string name="section_theme">Chủ đề</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
     <string name="uninstall_magisk_title">Gỡ cài đặt Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả các mô-đun sẽ bị tắt hoặc bị xóa!\nRoot sẽ bị gỡ bỏ\nDữ liệu của bạn có thể bị mã hóa lại nếu nó không mã hóa!</string>
-    <string name="home_check_safetynet">Kiểm tra SafetyNet</string>
 
     <!--Settings-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hóa</string>
@@ -90,20 +88,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID mục tiêu: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">Lỗi API SafetyNet</string>
-    <string name="safetynet_res_invalid">Câu trả lời không hợp lệ</string>
-    <string name="safetynet_attest_success">Thành công!</string>
-    <string name="safetynet_attest_failure">Chứng thực không thành công!</string>
-    <string name="safetynet_attest_loading">Đợi một chút…</string>
-    <string name="safetynet_attest_restart">Thử lại</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">Hiển thị các ứng dụng hệ thống</string>
     <string name="show_os_app">Hiển thị các ứng dụng hệ điều hành</string>
     <string name="hide_filter_hint">Lọc theo tên</string>
-    <string name="hide_scroll_up">Cuộn lên</string>
-    <string name="hide_filters">Bộ lọc</string>
     <string name="hide_search">Tìm kiếm</string>
 
     <!--Module-->
@@ -114,14 +103,10 @@
     <string name="reboot_download">Khởi động lại vào Download</string>
     <string name="reboot_edl">Khởi động lại vào EDL</string>
     <string name="module_version_author">%1$s x %2$s</string>
-    <string name="module_section_pending">Cập nhật</string>
-    <string name="module_section_pending_action">Cập nhật tất cả</string>
     <string name="module_state_remove">Loại bỏ</string>
     <string name="module_state_restore">Khôi phục</string>
     <string name="module_action_install_external">Cài đặt từ bộ nhớ</string>
-    <string name="update_available">Cập nhật có sẵn</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Trực tuyến</string>
     <string name="sorting_order">Sắp xếp thứ tự</string>
     <string name="suspend_text_riru">Mô-đun bị vô hiệu hóa vì %1$s được bật</string>
     <string name="suspend_text_zygisk">Mô-đun bị vô hiệu hóa vì %1$s không được bật</string>
@@ -214,7 +199,6 @@
     <string name="download">Tải xuống</string>
     <string name="reboot">Khởi động lại</string>
     <string name="release_notes">Ghi chú bản phát hành</string>
-    <string name="repo_cache_cleared">Đã xóa bộ nhớ cache của Repo</string>
     <string name="flashing">Đang cài…</string>
     <string name="done">Xong!</string>
     <string name="failure">Thất bại!</string>
@@ -225,8 +209,6 @@
     <string name="restore_img_msg">Đang khôi phục…</string>
     <string name="restore_done">Đã khôi phục xong!</string>
     <string name="restore_fail">Bản gốc không tồn tại!</string>
-    <string name="proprietary_title">Tải xuống mã độc quyền</string>
-    <string name="proprietary_notice">Magisk là FOSS và không bao gồm mã API SafetyNet độc quyền của Google.\n\nBạn có muốn tải xuống tiện ích mở rộng độc quyền để kiểm tra SafetyNet không?</string>
     <string name="setup_fail">Thiết lập không thành công</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Bạn có muốn tiếp tục và khởi động lại không?</string>

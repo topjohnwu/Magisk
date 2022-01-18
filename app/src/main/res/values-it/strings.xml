@@ -9,7 +9,6 @@
     <string name="install">Installa</string>
     <string name="section_home">Home</string>
     <string name="section_theme">Temi</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">Lista di blocco</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">Canale di aggiornamento non valido</string>
     <string name="uninstall_magisk_title">Disinstalla Magisk</string>
     <string name="uninstall_magisk_msg">Tutti i moduli verranno disabilitati/rimossi!\nIl root verrà rimosso e i tuoi dati potrebbero essere criptati, nel caso non lo siano già.</string>
-    <string name="home_check_safetynet">Controlla SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
@@ -90,20 +88,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">Errore nelle API SafetyNet</string>
-    <string name="safetynet_res_invalid">La risposta non è valida</string>
-    <string name="safetynet_attest_success">Attestazione riuscita!</string>
-    <string name="safetynet_attest_failure">Attestazione fallita!</string>
-    <string name="safetynet_attest_loading">Solo un secondo…</string>
-    <string name="safetynet_attest_restart">Prova di nuovo</string>
 
-    <!-- MagiskHide -->
+    <!--DenyList-->
     <string name="show_system_app">Mostra app di sistema</string>
     <string name="show_os_app">Mostra app del sistema operativo</string>
     <string name="hide_filter_hint">Filtra per nome</string>
-    <string name="hide_scroll_up">Scorri verso l\'alto</string>
-    <string name="hide_filters">Filtri</string>
     <string name="hide_search">Cerca</string>
 
     <!--Module Fragment-->
@@ -114,14 +103,10 @@
     <string name="reboot_download">Riavvia in modalità download</string>
     <string name="reboot_edl">Riavvia in modalità EDL</string>
     <string name="module_version_author">%1$s di %2$s</string>
-    <string name="module_section_pending">Aggiornamenti</string>
-    <string name="module_section_pending_action">Aggiorna tutto</string>
     <string name="module_state_remove">Rimuovi</string>
     <string name="module_state_restore">Ripristina</string>
     <string name="module_action_install_external">Installa dal dispositivo</string>
-    <string name="update_available">Aggiornamento disponibile</string>										 
     <string name="module_installed">Installato</string>
-    <string name="module_section_online">Online</string>
     <string name="sorting_order">Ordina per</string>
 
     <!--Settings -->
@@ -214,7 +199,6 @@
     <string name="download">Download</string>
     <string name="reboot">Riavvia</string>
     <string name="release_notes">Note di rilascio</string>
-    <string name="repo_cache_cleared">La cache dei repository è stata svuotata</string>
     <string name="flashing">Flash in corso…</string>
     <string name="done">Completato!</string>
     <string name="failure">Fallito</string>
@@ -225,8 +209,6 @@
     <string name="restore_img_msg">Ripristino…</string>
     <string name="restore_done">Ripristino completato!</string>
     <string name="restore_fail">Non esiste un backup dell\'immagine di boot originale!</string>
-    <string name="proprietary_title">Scarica codice proprietario</string>
-    <string name="proprietary_notice">Magisk è un software libero e open source e non contiene codice proprietario per utilizzare le API SafetyNet di Google.\n\nVuoi scaricare un\'estensione proprietaria per controllare lo stato di SafetyNet?</string>			 
     <string name="setup_fail">Configurazione fallita</string>
     <string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
     <string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Vuoi procedere e riavviare il dispositivo?</string>

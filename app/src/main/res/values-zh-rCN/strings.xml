@@ -9,7 +9,6 @@
     <string name="install">安装</string>
     <string name="section_home">主页</string>
     <string name="section_theme">主题</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">排除列表</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">无效的更新通道</string>
     <string name="uninstall_magisk_title">卸载 Magisk</string>
     <string name="uninstall_magisk_msg">所有模块将被停用或删除！超级用户权限丢失！\n如果设备尚未加密，用户数据可能被自动加密。</string>
-    <string name="home_check_safetynet">测试 SafetyNet 证明</string>
 
     <!--Install-->
     <string name="keep_force_encryption">保持强制加密</string>
@@ -91,20 +89,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API 错误</string>
-    <string name="safetynet_res_invalid">无效响应</string>
-    <string name="safetynet_attest_success">通过证明</string>
-    <string name="safetynet_attest_failure">未通过证明</string>
-    <string name="safetynet_attest_loading">稍候片刻</string>
-    <string name="safetynet_attest_restart">重试</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">显示系统应用</string>
     <string name="show_os_app">显示操作系统</string>
     <string name="hide_filter_hint">按名称过滤</string>
-    <string name="hide_scroll_up">返回顶部</string>
-    <string name="hide_filters">过滤</string>
     <string name="hide_search">搜索</string>
 
     <!--Module-->
@@ -115,14 +104,10 @@
     <string name="reboot_download">重启到 Download</string>
     <string name="reboot_edl">重启到 EDL</string>
     <string name="module_version_author">%1$s，作者 %2$s</string>
-    <string name="module_section_pending">更新</string>
-    <string name="module_section_pending_action">全部更新</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">还原</string>
     <string name="module_action_install_external">从本地安装</string>
-    <string name="update_available">可更新</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">在线</string>
     <string name="sorting_order">排序方式</string>
     <string name="suspend_text_riru">%1$s 已启用，此模块暂停加载</string>
     <string name="suspend_text_zygisk">%1$s 未启用，此模块暂停加载</string>
@@ -217,7 +202,6 @@
     <string name="download">下载</string>
     <string name="reboot">重启</string>
     <string name="release_notes">发布说明</string>
-    <string name="repo_cache_cleared">仓库缓存已清除</string>
     <string name="flashing">正在刷入</string>
     <string name="done">完成！</string>
     <string name="failure">失败</string>
@@ -228,8 +212,6 @@
     <string name="restore_img_msg">正在还原</string>
     <string name="restore_done">已还原</string>
     <string name="restore_fail">原厂 Boot 映像的备份不存在</string>
-    <string name="proprietary_title">下载专有代码</string>
-    <string name="proprietary_notice">Magisk 是自由软件，不包含 Google 专有的 SafetyNet API 代码。是否允许下载一个专有扩展用于 SafetyNet 检查？</string>
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要修复运行环境</string>
     <string name="env_fix_msg">需要一些额外的安装才能使 Magisk 正常工作。完成后自动重启，是否继续？</string>

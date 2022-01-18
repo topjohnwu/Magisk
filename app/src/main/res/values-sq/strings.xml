@@ -9,7 +9,6 @@
     <string name="install">Instalo</string>
     <string name="section_home">Shtëpi</string>
     <string name="section_theme">Tema</string>
-    <string name="safetynet">Rrjeti i Sigurisë</string>
     <string name="denylist">Lista e mohimit</string>
 
     <!--Home-->
@@ -31,7 +30,6 @@
     <string name="invalid_update_channel">Kanali i përditësimit i pavlefshëm</string>
     <string name="uninstall_magisk_title">Çinstalo Magisk</string>
     <string name="uninstall_magisk_msg">Të gjitha modulet do të çaktivizohen/hiqen!\nRrënja do të hiqet!\nTë dhënat tuaja potencialisht të koduara nëse jo tashmë!</string>
-    <string name="home_check_safetynet">Kontrolloni rrjetin e sigurisë</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Ruaj kriptimin me forcë</string>
@@ -91,20 +89,11 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-    <!--SafetyNet-->
-    <string name="safetynet_api_error">Gabim API te rrjeti i sigurisë</string>
-    <string name="safetynet_res_invalid">Përgjigja është e pavlefshme</string>
-    <string name="safetynet_attest_success">Me sukses!</string>
-    <string name="safetynet_attest_failure">Vërtetimi dështoi!</string>
-    <string name="safetynet_attest_loading">Vetëm një sekondë…</string>
-    <string name="safetynet_attest_restart">Provo përsëri</string>
 
-    <!--MagiskHide-->
+    <!--DenyList-->
     <string name="show_system_app">Shfaq aplikacionet e sistemit</string>
     <string name="show_os_app">Shfaq aplikacionet e sistemit operativ</string>
     <string name="hide_filter_hint">Kërko sipas emrit</string>
-    <string name="hide_scroll_up">Lëviz lart</string>
-    <string name="hide_filters">Filtrat</string>
     <string name="hide_search">Kërko</string>
 
     <!--Module-->
@@ -115,14 +104,10 @@
     <string name="reboot_download">Rinis te Download</string>
     <string name="reboot_edl">Rinis te EDL</string>
     <string name="module_version_author">%1$s nga %2$s</string>
-    <string name="module_section_pending">Përditësimet</string>
-    <string name="module_section_pending_action">Përditëso të gjitha</string>
     <string name="module_state_remove">Hiqe</string>
     <string name="module_state_restore">Rikëthe</string>
     <string name="module_action_install_external">Instaloni nga ruajtja</string>
-    <string name="update_available">Përditësimi në dispozicion</string>
     <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Në linjë</string>
     <string name="sorting_order">Renditje me Porosi</string>
     <string name="suspend_text_riru">Moduli u pezullua sepse %1$s është aktivizuar</string>
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
@@ -215,7 +200,6 @@
     <string name="download">Shkarko</string>
     <string name="reboot">Rinis</string>
     <string name="release_notes">Shënimet e lëshimit</string>
-    <string name="repo_cache_cleared">Repo cache u pastrua</string>
     <string name="flashing">Duke flashuar…</string>
     <string name="done">U krye!</string>
     <string name="failure">Dështoi!</string>
@@ -226,8 +210,6 @@
     <string name="restore_img_msg">Duke rivendosur…</string>
     <string name="restore_done">Rivendosja u krye!</string>
     <string name="restore_fail">Rezervimi i aksioneve nuk ekziston!</string>
-    <string name="proprietary_title">Shkarkoni Kodin e Pronësisë</string>
-    <string name="proprietary_notice">Magisk është FOSS dhe nuk përfshin kodin për API-në në pronësi te rrjetit i sigurisë Google.\n\nDëshironi të shkarkoni një shtesë të pronarit për kontrollet e rrjetit të sigurisë?</string>
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim shtesë</string>
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet.  Dëshironi të vazhdoni dhe rindizni?</string>
