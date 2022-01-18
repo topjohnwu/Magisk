@@ -36,12 +36,13 @@
     <!--Install-->
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
     <string name="keep_dm_verity">Не отключать AVB 2.0/dm-verity</string>
-    <string name="recovery_mode">Режим установки в recovery</string>
+    <string name="patch_vbmeta">Патчить vbmeta в boot образе</string>
+    <string name="recovery_mode">Установка в recovery образ</string>
     <string name="install_options_title">Опции</string>
     <string name="install_method_title">Способ</string>
     <string name="install_next">Далее</string>
     <string name="install_start">Установить</string>
-    <string name="manager_download_install">Нажмите, чтобы загрузить и установить</string>
+    <string name="manager_download_install">Нажмите для установки</string>
     <string name="direct_install">Автоматическая установка (рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции Magisk после OTA!\nПродолжить?</string>
@@ -182,12 +183,12 @@
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
-    <string name="settings_doh_title">Отключение DNS поверх HTTPS</string>
-    <string name="settings_doh_description">Отключает DoH (используйте при проблемах с подключением к сети)</string>
+    <string name="settings_doh_title">DNS поверх HTTPS</string>
+    <string name="settings_doh_description">Активировать DoH (используйте при проблемах с подключением к сети)</string>
 
     <string name="multiuser_mode">Многопользовательский режим</string>
     <string name="settings_owner_only">Только администратор</string>
-    <string name="settings_owner_manage">Регулировка администратором</string>
+    <string name="settings_owner_manage">Управление администратором</string>
     <string name="settings_user_independent">Правила пользователей</string>
     <string name="owner_only_summary">Только администратору доступен Root-доступ</string>
     <string name="owner_manage_summary">Администратор управляет Root-доступом пользователей и обрабатывает запросы</string>
@@ -238,8 +239,8 @@
     <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее!</string>
     <string name="unsupport_general_title">Неподдерживаемые условия</string>
     <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
-    <string name="unsupport_other_su_msg">Обнаружена неподдерживаемая \"su\" команда. Пожалуйста, удалите сторонние Root-права.</string>
-    <string name="unsupport_external_storage_msg">Приложение установлено на внешнем хранилище. Пожалуйста, переместите его во внутреннее хранилище.</string>
+    <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите сторонние Root-права.</string>
+    <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
     <string name="unsupport_nonroot_stub_msg">Приложение не может продолжать работу в скрытом режиме, так как Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
