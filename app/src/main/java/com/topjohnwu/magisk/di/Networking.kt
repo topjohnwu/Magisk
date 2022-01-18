@@ -63,6 +63,12 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         })
     }
 
+    builder.addInterceptor { chain ->
+        val request = chain.request().newBuilder()
+        request.header("User-Agent", "Magisk ${BuildConfig.VERSION_CODE}")
+        chain.proceed(request.build())
+    }
+
     if (!ProviderInstaller.install(context)) {
         Info.hasGMS = false
     }
