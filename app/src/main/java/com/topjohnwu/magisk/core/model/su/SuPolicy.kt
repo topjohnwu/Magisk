@@ -25,16 +25,20 @@ data class SuPolicy(
         const val ALLOW = 2
     }
 
-}
+    fun toLog(toUid: Int, fromPid: Int, command: String) = SuLog(
+        uid, toUid, fromPid, packageName, appName,
+        command, policy == ALLOW, System.currentTimeMillis()
+    )
 
-fun SuPolicy.toMap() = mapOf(
-    "uid" to uid,
-    "package_name" to packageName,
-    "policy" to policy,
-    "until" to until,
-    "logging" to logging,
-    "notification" to notification
-)
+    fun toMap() = mapOf(
+        "uid" to uid,
+        "package_name" to packageName,
+        "policy" to policy,
+        "until" to until,
+        "logging" to logging,
+        "notification" to notification
+    )
+}
 
 @Throws(PackageManager.NameNotFoundException::class)
 fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
@@ -67,6 +71,16 @@ fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): SuPolicy {
         packageName = pkg,
         appName = info.getLabel(pm),
         icon = info.loadIcon(pm),
+        policy = policy
+    )
+}
+
+fun Int.toUidPolicy(pm: PackageManager, policy: Int): SuPolicy {
+    return SuPolicy(
+        uid = this,
+        packageName = "[UID] $this",
+        appName = "[UID] $this",
+        icon = pm.defaultActivityIcon,
         policy = policy
     )
 }

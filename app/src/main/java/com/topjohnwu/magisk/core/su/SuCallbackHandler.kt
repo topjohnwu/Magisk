@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.model.su.toLog
 import com.topjohnwu.magisk.core.model.su.toPolicy
+import com.topjohnwu.magisk.core.model.su.toUidPolicy
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.GlobalScope
@@ -58,7 +58,11 @@ object SuCallbackHandler {
         val notify = data.getBoolean("notify", true)
         val allow = data["policy"].toInt() ?: return
 
-        val policy = runCatching { fromUid.toPolicy(pm, allow) }.getOrElse { return }
+        val policy = runCatching {
+            fromUid.toPolicy(pm, allow)
+        }.getOrElse {
+            fromUid.toUidPolicy(pm, allow)
+        }
 
         if (notify)
             notify(context, policy)
