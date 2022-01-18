@@ -19,7 +19,7 @@ class Provider : ContentProvider() {
     }
 
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
-        SuCallbackHandler(context!!, method, extras)
+        SuCallbackHandler.run(context!!, method, extras)
         return Bundle.EMPTY
     }
 

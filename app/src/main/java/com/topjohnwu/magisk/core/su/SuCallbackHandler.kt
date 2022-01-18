@@ -1,24 +1,17 @@
 package com.topjohnwu.magisk.core.su
 
 import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.widget.Toast
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toLog
 import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.di.ServiceLocator
-import com.topjohnwu.magisk.ktx.startActivity
-import com.topjohnwu.magisk.ktx.startActivityWithRoot
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.utils.Utils
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -28,9 +21,8 @@ object SuCallbackHandler {
     const val REQUEST = "request"
     const val LOG = "log"
     const val NOTIFY = "notify"
-    const val TEST = "test"
 
-    operator fun invoke(context: Context, action: String?, data: Bundle?) {
+    fun run(context: Context, action: String?, data: Bundle?) {
         data ?: return
 
         // Debug messages
@@ -44,16 +36,8 @@ object SuCallbackHandler {
         }
 
         when (action) {
-            REQUEST -> handleRequest(context, data)
             LOG -> handleLogging(context, data)
             NOTIFY -> handleNotify(context, data)
-            TEST -> {
-                val mode = data.getInt("mode", 2)
-                Shell.su(
-                    "magisk --connect-mode $mode",
-                    "magisk --use-broadcast"
-                ).submit()
-            }
         }
     }
 
@@ -61,20 +45,6 @@ object SuCallbackHandler {
         return when (this) {
             is Number -> this.toInt()
             else -> null
-        }
-    }
-
-    private fun handleRequest(context: Context, data: Bundle) {
-        val intent = context.intent<SuRequestActivity>()
-            .setAction(REQUEST)
-            .putExtras(data)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-        if (Build.VERSION.SDK_INT >= 29) {
-            // Android Q does not allow starting activity from background
-            intent.startActivityWithRoot()
-        } else {
-            intent.startActivity(context)
         }
     }
 

@@ -37,26 +37,16 @@ open class SuRequestActivity : BaseUIActivity<SuRequestViewModel, ActivityReques
         setTheme(Theme.selected.themeRes)
         super.onCreate(savedInstanceState)
 
-        fun showRequest() {
-            viewModel.handleRequest(intent)
-        }
-
-        fun runHandler(action: String?) {
-            SuCallbackHandler(this, action, intent.extras)
-            finish()
-        }
-
         if (intent.action == Intent.ACTION_VIEW) {
             val action = intent.getStringExtra("action")
             if (action == REQUEST) {
-                showRequest()
+                viewModel.handleRequest(intent)
             } else {
-                runHandler(action)
+                SuCallbackHandler.run(this, action, intent.extras)
+                finish()
             }
-        } else if (intent.action == REQUEST) {
-            showRequest()
         } else {
-            runHandler(intent.action)
+            finish()
         }
     }
 
