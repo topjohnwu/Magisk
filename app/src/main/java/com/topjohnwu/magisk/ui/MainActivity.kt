@@ -1,8 +1,5 @@
 package com.topjohnwu.magisk.ui
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.TimeInterpolator
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
@@ -13,8 +10,6 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R

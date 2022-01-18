@@ -32,7 +32,8 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.coroutineScope
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.widget.IndeterminateCheckBox
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @BindingAdapter("gone")
