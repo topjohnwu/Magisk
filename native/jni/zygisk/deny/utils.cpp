@@ -21,9 +21,9 @@ static int inotify_fd = -1;
 // Locks the variables above
 static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
-atomic<bool> denylist_enabled = false;
+atomic<bool> denylist_enforced = false;
 
-#define do_kill (zygisk_enabled && denylist_enabled)
+#define do_kill (zygisk_enabled && denylist_enforced)
 
 static void rebuild_map() {
     app_id_proc_map->clear();
@@ -317,13 +317,13 @@ static bool str_ends_safe(string_view s, string_view ss) {
 static void update_deny_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-            DB_SETTING_KEYS[DENYLIST_CONFIG], denylist_enabled.load());
+        DB_SETTING_KEYS[DENYLIST_CONFIG], denylist_enforced.load());
     char *err = db_exec(sql);
     db_err(err);
 }
 
 int enable_deny() {
-    if (denylist_enabled) {
+    if (denylist_enforced) {
         return DAEMON_SUCCESS;
     } else {
         mutex_guard lock(data_lock);
@@ -338,10 +338,10 @@ int enable_deny() {
 
         LOGI("* Enable DenyList\n");
 
-        denylist_enabled = true;
+        denylist_enforced = true;
 
         if (!ensure_data()) {
-            denylist_enabled = false;
+            denylist_enforced = false;
             return DAEMON_ERROR;
         }
 
@@ -358,8 +358,8 @@ int enable_deny() {
 }
 
 int disable_deny() {
-    if (denylist_enabled) {
-        denylist_enabled = false;
+    if (denylist_enforced) {
+        denylist_enforced = false;
         LOGI("* Disable DenyList\n");
 
         mutex_guard lock(data_lock);
@@ -370,7 +370,7 @@ int disable_deny() {
 }
 
 void initialize_denylist() {
-    if (!denylist_enabled) {
+    if (!denylist_enforced) {
         db_settings dbs;
         get_db_settings(dbs, DENYLIST_CONFIG);
         if (dbs[DENYLIST_CONFIG])

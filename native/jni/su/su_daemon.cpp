@@ -64,12 +64,79 @@ static void database_check(const shared_ptr<su_info> &info) {
             break;
     }
 
-    if (uid > 0)
-        get_uid_policy(info->access, uid);
+    su_access &su = info->access;
+
+    if (uid > 0) {
+        char query[256], *err;
+        sprintf(query,
+            "SELECT policy, logging, notification FROM policies "
+            "WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
+        err = db_exec(query, [&](db_row &row) -> bool {
+            su.policy = (policy_t) parse_int(row["policy"]);
+            su.log = parse_int(row["logging"]);
+            su.notify = parse_int(row["notification"]);
+            LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n",
+                 su.policy, su.log, su.notify);
+            return true;
+        });
+        db_err_cmd(err, return);
+    }
 
     // We need to check our manager
-    if (info->access.log || info->access.notify)
+    if (su.log || su.notify)
         get_manager(to_user_id(uid), &info->mgr_pkg, &info->mgr_st);
+}
+
+bool uid_granted_root(int uid) {
+    if (uid == UID_ROOT)
+        return true;
+
+    db_settings cfg;
+    get_db_settings(cfg);
+
+    // Check user root access settings
+    switch (cfg[ROOT_ACCESS]) {
+    case ROOT_ACCESS_DISABLED:
+        return false;
+    case ROOT_ACCESS_APPS_ONLY:
+        if (uid == UID_SHELL)
+            return false;
+        break;
+    case ROOT_ACCESS_ADB_ONLY:
+        if (uid != UID_SHELL)
+            return false;
+        break;
+    case ROOT_ACCESS_APPS_AND_ADB:
+        break;
+    }
+
+    // Check multiuser settings
+    switch (cfg[SU_MULTIUSER_MODE]) {
+    case MULTIUSER_MODE_OWNER_ONLY:
+        if (to_user_id(uid) != 0)
+            return false;
+        break;
+    case MULTIUSER_MODE_OWNER_MANAGED:
+        uid = to_app_id(uid);
+        break;
+    case MULTIUSER_MODE_USER:
+    default:
+        break;
+    }
+
+    bool granted = false;
+
+    char query[256], *err;
+    snprintf(query, sizeof(query),
+        "SELECT policy FROM policies WHERE uid=%d AND (until=0 OR until>%li)",
+        uid, time(nullptr));
+    err = db_exec(query, [&](db_row &row) -> bool {
+        granted = parse_int(row["policy"]) == ALLOW;
+        return true;
+    });
+    db_err_cmd(err, return false);
+
+    return granted;
 }
 
 static shared_ptr<su_info> get_su_info(unsigned uid) {

@@ -52,6 +52,17 @@ struct ServerSpecializeArgsImpl {
             effective_capabilities(effective_capabilities) {}
 };
 
+enum : uint32_t {
+    PROCESS_GRANTED_ROOT = zygisk::StateFlag::PROCESS_GRANTED_ROOT,
+    PROCESS_ON_DENYLIST = zygisk::StateFlag::PROCESS_ON_DENYLIST,
+
+    DENYLIST_ENFORCING = (1u << 30),
+    PROCESS_IS_MAGISK_APP = (1u << 31),
+
+    UNMOUNT_MASK = (PROCESS_ON_DENYLIST | DENYLIST_ENFORCING),
+    PRIVATE_MASK = (0x3u << 30)
+};
+
 template<typename T>
 struct force_cast_wrapper {
     template<typename U>
@@ -80,10 +91,11 @@ struct ApiTable {
 
         int (*connectCompanion)(ZygiskModule *);
         void (*setOption)(ZygiskModule *, zygisk::Option);
-    } v1;
+    } v1{};
     struct {
         int (*getModuleDir)(ZygiskModule *);
-    } v2;
+        uint32_t (*getFlags)(ZygiskModule *);
+    } v2{};
 
     ApiTable(ZygiskModule *m);
 };
@@ -105,6 +117,7 @@ struct ZygiskModule {
     int connectCompanion() const;
     int getModuleDir() const;
     void setOption(zygisk::Option opt);
+    static uint32_t getFlags();
     void doUnload() const { if (unload) dlclose(handle); }
 
     ZygiskModule(int id, void *handle, void *entry);

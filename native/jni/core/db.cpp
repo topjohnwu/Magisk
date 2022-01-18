@@ -11,9 +11,12 @@
 
 using namespace std;
 
-typedef struct sqlite3 sqlite3;
+struct sqlite3;
 
 static sqlite3 *mDB = nullptr;
+
+#define DBLOGV(...)
+//#define DBLOGV(...) LOGD("magiskdb: " __VA_ARGS__)
 
 // SQLite APIs
 
@@ -294,7 +297,7 @@ int get_db_settings(db_settings &cfg, int key) {
     char *err;
     auto settings_cb = [&](db_row &row) -> bool {
         cfg[row["key"]] = parse_int(row["value"]);
-        LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
+        DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
         return true;
     };
     if (key >= 0) {
@@ -312,7 +315,7 @@ int get_db_strings(db_strings &str, int key) {
     char *err;
     auto string_cb = [&](db_row &row) -> bool {
         str[row["key"]] = row["value"];
-        LOGD("magiskdb: query %s=[%s]\n", row["key"].data(), row["value"].data());
+        DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
         return true;
     };
     if (key >= 0) {
@@ -322,21 +325,6 @@ int get_db_strings(db_strings &str, int key) {
     } else {
         err = db_exec("SELECT * FROM strings", string_cb);
     }
-    db_err_cmd(err, return 1);
-    return 0;
-}
-
-int get_uid_policy(su_access &su, int uid) {
-    char query[256], *err;
-    sprintf(query, "SELECT policy, logging, notification FROM policies "
-            "WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
-    err = db_exec(query, [&](db_row &row) -> bool {
-        su.policy = (policy_t) parse_int(row["policy"]);
-        su.log = parse_int(row["logging"]);
-        su.notify = parse_int(row["notification"]);
-        LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n", su.policy, su.log, su.notify);
-        return true;
-    });
     db_err_cmd(err, return 1);
     return 0;
 }

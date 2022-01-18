@@ -138,18 +138,23 @@ enum Option : int {
     // Setting this option only makes sense in preAppSpecialize.
     // The actual unmounting happens during app process specialization.
     //
-    // Processes added to Magisk's denylist will have all Magisk and its modules' files unmounted
-    // from its mount namespace. In addition, all Zygisk code will be unloaded from memory, which
-    // also implies that no Zygisk modules (including yours) are loaded.
-    //
-    // However, if for any reason your module still wants the unmount part of the denylist
-    // operation to be enabled EVEN IF THE PROCESS IS NOT ON THE DENYLIST, set this option.
+    // Set this option to force all Magisk and modules' files to be unmounted from the
+    // mount namespace of the process, regardless of the denylist enforcement status.
     FORCE_DENYLIST_UNMOUNT = 0,
 
     // When this option is set, your module's library will be dlclose-ed after post[XXX]Specialize.
-    // Be aware that after dlclose-ing your module, all of your code will be unmapped.
-    // YOU SHOULD NOT ENABLE THIS OPTION AFTER HOOKING ANY FUNCTION IN THE PROCESS.
+    // Be aware that after dlclose-ing your module, all of your code will be unmapped from memory.
+    // YOU MUST NOT ENABLE THIS OPTION AFTER HOOKING ANY FUNCTIONS IN THE PROCESS.
     DLCLOSE_MODULE_LIBRARY = 1,
+};
+
+// Bit masks of the return value of Api::getFlags()
+enum StateFlag : uint32_t {
+    // The user has granted root access to the current process
+    PROCESS_GRANTED_ROOT = (1u << 0),
+
+    // The current process was added on the denylist
+    PROCESS_ON_DENYLIST = (1u << 1),
 };
 
 // All API functions will stop working after post[XXX]Specialize as Zygisk will be unloaded
@@ -187,6 +192,10 @@ struct Api {
     // Please note that this function accepts one single option at a time.
     // Check zygisk::Option for the full list of options available.
     void setOption(Option opt);
+
+    // Get information about the current process.
+    // Returns bitwise-or'd zygisk::StateFlag values.
+    uint32_t getFlags();
 
     // Hook JNI native methods for a class
     //
@@ -272,6 +281,7 @@ struct api_table {
     int  (*connectCompanion)(void * /* _this */);
     void (*setOption)(void * /* _this */, Option);
     int  (*getModuleDir)(void * /* _this */);
+    uint32_t (*getFlags)(void * /* _this */);
 };
 
 template <class T>
@@ -294,6 +304,9 @@ inline int Api::getModuleDir() {
 }
 inline void Api::setOption(Option opt) {
     if (impl->setOption) impl->setOption(impl->_this, opt);
+}
+inline uint32_t Api::getFlags() {
+    return impl->getFlags ? impl->getFlags(impl->_this) : 0;
 }
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     if (impl->hookJniNativeMethods) impl->hookJniNativeMethods(env, className, methods, numMethods);
