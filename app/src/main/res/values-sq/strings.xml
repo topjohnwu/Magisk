@@ -38,6 +38,7 @@
     <string name="keep_dm_verity">Ruaj AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Recovery Mode</string>
     <string name="install_options_title">Opsionet</string>
+    <string name="patch_vbmeta">Arno vbmeta në imazhin e nisjes</string>
     <string name="install_method_title">Metoda</string>
     <string name="install_next">Tjetër</string>
     <string name="install_start">Shkojme</string>
@@ -184,7 +185,6 @@
     <string name="setting_add_shortcut_summary">Shtoni një shkurtore mjaft të mirë në ekranin fillestar në rast se emri dhe ikona janë të vështira për tu njohur pasi keni fshehur aplikacionin</string>
     <string name="settings_doh_title">DNS mbi HTTPS</string>
     <string name="settings_doh_description">Helmimi i paqartë nga DNS në disa kombe</string>
-
     <string name="multiuser_mode">Mënyra Multi-përdoruesit</string>
     <string name="settings_owner_only">Vetëm pronari i paisjes</string>
     <string name="settings_owner_manage">Pronari i paisjes që e manaxhon</string>
@@ -192,7 +192,6 @@
     <string name="owner_only_summary">Vetëm pronari ka akses në rrënjë</string>
     <string name="owner_manage_summary">Vetëm pronari mund të menaxhojë aksesin në rrënjë dhe të marrë kërkesat</string>
     <string name="user_indepenent_summary">Çdo përdorues ka rregullat e veta të veçanta rrënjësore</string>
-
     <string name="mount_namespace_mode">Mënyra e Montimit të Hapësirës Emërore</string>
     <string name="settings_ns_global">Hapësira globale e emrave</string>
     <string name="settings_ns_requester">Trashëgoni hapësirën e emrave</string>
