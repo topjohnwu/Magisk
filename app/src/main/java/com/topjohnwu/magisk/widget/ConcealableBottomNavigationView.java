@@ -7,10 +7,10 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.customview.view.AbsSavedState;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -101,12 +101,12 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
         }
     }
 
-    static class SavedState extends View.BaseSavedState {
+    static class SavedState extends AbsSavedState {
 
         public boolean isHidden;
 
         public SavedState(Parcel source) {
-            super(source);
+            super(source, ConcealableBottomNavigationView.class.getClassLoader());
             isHidden = source.readByte() != 0;
         }
 
@@ -120,7 +120,7 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
             out.writeByte(isHidden ? (byte) 1 : (byte) 0);
         }
 
-        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+        public static final Creator<SavedState> CREATOR = new Creator<>() {
 
             @Override
             public SavedState createFromParcel(Parcel source) {
