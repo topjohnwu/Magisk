@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.model.module
 
+import com.squareup.moshi.JsonDataException
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.superuser.Shell
@@ -120,6 +121,8 @@ data class LocalModule(
                 return true
             }
         } catch (e: IOException) {
+            Timber.w(e)
+        } catch (e: JsonDataException) {
             Timber.w(e)
         }
         return false
