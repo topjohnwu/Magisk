@@ -180,6 +180,8 @@ void BootConfig::set(const kv_pairs &kv) {
             strlcpy(hardware_plat, value.data(), sizeof(hardware_plat));
         } else if (key == "androidboot.fstab_suffix") {
             strlcpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
+        } else if (key == "qemu") {
+            emulator = true;
         }
     }
 }
@@ -193,6 +195,7 @@ void BootConfig::print() {
     LOGD("fstab_suffix=[%s]\n", fstab_suffix);
     LOGD("hardware=[%s]\n", hardware);
     LOGD("hardware.platform=[%s]\n", hardware_plat);
+    LOGD("emulator=[%d]\n", emulator);
 }
 
 #define read_dt(name, key)                                          \
@@ -230,7 +233,7 @@ void load_kernel_info(BootConfig *config) {
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
             LOGD("Running in recovery mode, waiting for key...\n");
-            config->skip_initramfs = !check_key_combo();
+            config->skip_initramfs = config->emulator || !check_key_combo();
             return false;
         }
         return true;

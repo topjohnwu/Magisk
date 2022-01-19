@@ -234,6 +234,10 @@ void SARBase::patch_rootdir() {
             make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
             make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
          });
+        if (avd_hack) {
+            // Force disable early mount on original init
+            init.patch({ make_pair("android,fstab", "xxx") });
+        }
         xmkdir(ROOTOVL, 0);
         int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
         xwrite(dest, init.buf, init.sz);

@@ -6,6 +6,7 @@ struct BootConfig {
     bool skip_initramfs;
     bool force_normal_boot;
     bool rootwait;
+    bool emulator;
     char slot[3];
     char dt_dir[64];
     char fstab_suffix[32];
@@ -65,6 +66,10 @@ protected:
     mmap_data self;
     mmap_data magisk_config;
     std::string custom_rules_dir;
+
+    // When this boolean is set, this means we are currently
+    // running magiskinit on legacy SAR AVD emulator
+    bool avd_hack = false;
 
     void mount_with_dt();
     bool patch_sepolicy(const char *file);

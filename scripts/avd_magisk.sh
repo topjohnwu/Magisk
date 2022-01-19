@@ -6,14 +6,17 @@
 # Support emulator ABI: x86_64 and arm64
 # Support API level: 23 - 31 (21 and 22 images do not have SELinux)
 #
+# With an emulator booted and accessible via ADB, usage:
+# ./build.py emulator
+#
 # This script will stop zygote, simulate the Magisk start up process
 # that would've happened before zygote was started, and finally
 # restart zygote. This is useful for setting up the emulator for
 # developing Magisk, testing modules, and developing root apps using
 # the official Android emulator (AVD) instead of a real device.
 #
-# This only covers the "core" features of Magisk. Testing magiskinit
-# and magiskboot require additional setups that are not covered here.
+# This only covers the "core" features of Magisk. For testing
+# magiskinit, please checkout avd_init.sh.
 #
 #####################################################################
 
