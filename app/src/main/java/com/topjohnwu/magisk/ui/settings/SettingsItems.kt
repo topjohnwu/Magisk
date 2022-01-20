@@ -283,9 +283,6 @@ object DenyList : BaseSettingsItem.Toggle() {
 object DenyListConfig : BaseSettingsItem.Blank() {
     override val title = R.string.settings_denylist_config_title.asText()
     override val description = R.string.settings_denylist_config_summary.asText()
-    override fun refresh() {
-        isEnabled = Zygisk.value
-    }
 }
 
 // --- Superuser
