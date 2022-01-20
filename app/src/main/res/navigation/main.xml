@@ -150,7 +150,6 @@
         app:enterAnim="@anim/fragment_enter"
         app:exitAnim="@anim/fragment_exit"
         app:popEnterAnim="@anim/fragment_enter_pop"
-        app:popExitAnim="@anim/fragment_exit_pop"
-        app:popUpTo="@id/homeFragment" />
+        app:popExitAnim="@anim/fragment_exit_pop" />
 
 </navigation>
