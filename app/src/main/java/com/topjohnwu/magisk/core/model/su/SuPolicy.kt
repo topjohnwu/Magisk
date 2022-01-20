@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.INTERACTIVE
 import com.topjohnwu.magisk.ktx.getLabel
 
 data class SuPolicy(
-    var uid: Int,
+    val uid: Int,
     val packageName: String,
     val appName: String,
     val icon: Drawable,
@@ -27,8 +27,7 @@ data class SuPolicy(
 
     fun toLog(toUid: Int, fromPid: Int, command: String) = SuLog(
         uid, toUid, fromPid, packageName, appName,
-        command, policy == ALLOW, System.currentTimeMillis()
-    )
+        command, policy == ALLOW)
 
     fun toMap() = mapOf(
         "uid" to uid,

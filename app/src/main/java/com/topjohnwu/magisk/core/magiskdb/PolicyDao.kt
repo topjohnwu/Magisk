@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core.magiskdb
 
-import android.content.pm.PackageManager
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toPolicy
@@ -54,13 +53,9 @@ class PolicyDao : BaseDao() {
 
     private fun Map<String, String>.toPolicyOrNull(): SuPolicy? {
         return runCatching { toPolicy(AppContext.packageManager) }.getOrElse {
-            Timber.e(it)
-            if (it is PackageManager.NameNotFoundException) {
-                val uid = getOrElse("uid") { null } ?: return null
-                GlobalScope.launch {
-                    delete(uid.toInt())
-                }
-            }
+            Timber.w(it)
+            val uid = getOrElse("uid") { return null }
+            GlobalScope.launch { delete(uid.toInt()) }
             null
         }
     }
