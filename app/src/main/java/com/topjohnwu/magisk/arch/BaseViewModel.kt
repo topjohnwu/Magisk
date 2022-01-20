@@ -98,8 +98,8 @@ abstract class BaseViewModel(
         _viewEvents.postValue(this)
     }
 
-    fun NavDirections.navigate() {
-        _viewEvents.postValue(NavigationEvent(this))
+    fun NavDirections.navigate(pop: Boolean = false) {
+        _viewEvents.postValue(NavigationEvent(this, pop))
     }
 
 }
