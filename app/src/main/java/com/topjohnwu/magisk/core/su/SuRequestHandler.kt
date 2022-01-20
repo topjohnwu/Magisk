@@ -4,11 +4,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toPolicy
 import com.topjohnwu.magisk.ktx.now
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -35,8 +35,10 @@ class SuRequestHandler(
             return false
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (policy.packageName == BuildConfig.APPLICATION_ID)
+        if (policy.packageName == BuildConfig.APPLICATION_ID) {
+            Shell.su("(pm uninstall ${BuildConfig.APPLICATION_ID})& >/dev/null 2>&1").exec()
             return false
+        }
 
         when (Config.suAutoResponse) {
             Config.Value.SU_AUTO_DENY -> {
@@ -87,7 +89,6 @@ class SuRequestHandler(
 
         policy.policy = action
         policy.until = until
-        policy.uid = policy.uid % 100000 + Const.USER_ID * 100000
 
         GlobalScope.launch(Dispatchers.IO) {
             try {
