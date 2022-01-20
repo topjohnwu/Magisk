@@ -445,8 +445,9 @@ def setup_ndk(args):
 
 
 def setup_avd(args):
-    build_binary(args)
-    build_app(args)
+    if not args.skip:
+        build_binary(args)
+        build_app(args)
 
     header('* Setting up emulator')
 
@@ -462,8 +463,9 @@ def setup_avd(args):
 
 
 def patch_avd_ramdisk(args):
-    build_binary(args)
-    build_app(args)
+    if not args.skip:
+        build_binary(args)
+        build_app(args)
 
     header('* Patching emulator ramdisk.img')
 
@@ -536,11 +538,15 @@ stub_parser.set_defaults(func=build_stub)
 
 avd_parser = subparsers.add_parser(
     'emulator', help='setup AVD for development')
+avd_parser.add_argument('-s', '--skip', action='store_true',
+    help='skip building binaries and the app')
 avd_parser.set_defaults(func=setup_avd)
 
 avd_patch_parser = subparsers.add_parser(
     'avd_patch', help='patch AVD ramdisk.img')
 avd_patch_parser.add_argument('ramdisk', help='path to ramdisk.img')
+avd_patch_parser.add_argument('-s', '--skip', action='store_true',
+    help='skip building binaries and the app')
 avd_patch_parser.set_defaults(func=patch_avd_ramdisk)
 
 clean_parser = subparsers.add_parser('clean', help='cleanup')
