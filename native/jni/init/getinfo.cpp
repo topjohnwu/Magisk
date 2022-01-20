@@ -204,7 +204,6 @@ if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
         data.pop_back();                                            \
-        LOGD(name "=[%s]\n", data.data());                          \
         strlcpy(config->key, data.data(), sizeof(config->key));     \
     }                                                               \
 }
@@ -223,12 +222,7 @@ void load_kernel_info(BootConfig *config) {
     setup_klog();
 
     config->set(parse_cmdline(full_read("/proc/cmdline")));
-    LOGD("Kernel cmdline info:\n");
-    config->print();
-
     config->set(parse_bootconfig(full_read("/proc/bootconfig")));
-    LOGD("Boot config info:\n");
-    config->print();
 
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
@@ -242,11 +236,13 @@ void load_kernel_info(BootConfig *config) {
     if (config->dt_dir[0] == '\0')
         strlcpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
 
-    LOGD("Device tree:\n");
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)
     read_dt("hardware", hardware)
     read_dt("hardware.platform", hardware_plat)
+
+    LOGD("Device config:\n");
+    config->print();
 }
 
 bool check_two_stage() {
