@@ -14,6 +14,10 @@
 # After patching ramdisk.img, close the emulator, then select
 # "Cold Boot Now" in AVD Manager to force a full reboot.
 #
+# P.S. If running against the API 28 image, modify init.hpp and set
+# ENABLE_AVD_HACK to 1 to enable special hacks designed specifically
+# for this use case.
+#
 #####################################################################
 # AVD Init Configurations:
 #
@@ -38,6 +42,8 @@ if [ -z "$FIRST_STAGE" ]; then
   # Re-exec script with busybox
   exec ./busybox sh $0
 fi
+
+pm install -r $(pwd)/app-debug.apk
 
 # Extract files from APK
 unzip -oj app-debug.apk 'assets/util_functions.sh'

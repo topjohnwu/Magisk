@@ -2,6 +2,11 @@
 
 using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 
+// For API 28 AVD, it uses legacy SAR setup that requires
+// special hacks in magiskinit to work properly. We do not
+// necessarily want this enabled in production builds.
+#define ENABLE_AVD_HACK 0
+
 struct BootConfig {
     bool skip_initramfs;
     bool force_normal_boot;
@@ -67,9 +72,14 @@ protected:
     mmap_data magisk_config;
     std::string custom_rules_dir;
 
+#if ENABLE_AVD_HACK
     // When this boolean is set, this means we are currently
     // running magiskinit on legacy SAR AVD emulator
     bool avd_hack = false;
+#else
+    // Make it const so compiler can optimize hacks out of the code
+    static const bool avd_hack = false;
+#endif
 
     void mount_with_dt();
     bool patch_sepolicy(const char *file);

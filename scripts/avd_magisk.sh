@@ -16,7 +16,7 @@
 # the official Android emulator (AVD) instead of a real device.
 #
 # This only covers the "core" features of Magisk. For testing
-# magiskinit, please checkout avd_init.sh.
+# magiskinit, please checkout avd_patch.sh.
 #
 #####################################################################
 

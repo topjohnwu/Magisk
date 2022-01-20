@@ -158,19 +158,21 @@ void MagiskInit::mount_with_dt() {
     for (const auto &entry : fstab) {
         if (is_lnk(entry.mnt_point.data()))
             continue;
-        // When we force AVD to disable SystemAsRoot, it will always add system
-        // to dt fstab, which we actually have already mounted as root
-        if (avd_hack && entry.mnt_point == "/system")
+        if (avd_hack && entry.mnt_point == "/system") {
+            // When we force AVD to disable SystemAsRoot, it will always add system
+            // to dt fstab. We actually already mounted it as root, so skip this one.
             continue;
+        }
         // Derive partname from dev
         sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
         setup_block(true);
         xmkdir(entry.mnt_point.data(), 0755);
         xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
-        // When avd_hack is true, do not add any early mount partitions to mount_list
-        // as we will actually forcefully disable original init's early mount
-        if (!avd_hack)
+        if (!avd_hack) {
+            // When avd_hack is true, do not add any early mount partitions to mount_list
+            // as we will actually forcefully disable original init's early mount
             mount_list.push_back(entry.mnt_point);
+        }
     }
 }
 
@@ -379,7 +381,9 @@ void SARInit::early_mount() {
         xmkdir("/dev", 0755);
         xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
         mount_list.emplace_back("/dev");
+#if ENABLE_AVD_HACK
         avd_hack = config->emulator;
+#endif
         mount_with_dt();
     }
 }
