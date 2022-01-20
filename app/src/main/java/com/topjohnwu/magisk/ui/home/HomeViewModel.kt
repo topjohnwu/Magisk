@@ -80,7 +80,9 @@ class HomeViewModel(
         it.bindExtra(BR.viewModel, this)
     }
 
-    private var checkedEnv = false
+    companion object {
+        private var checkedEnv = false
+    }
 
     override fun refresh() = viewModelScope.launch {
         state = State.LOADING
