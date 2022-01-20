@@ -54,7 +54,7 @@ unzip -oj app-debug.apk 'assets/util_functions.sh'
 
 api_level_arch_detect
 
-unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/busybox.so"
+unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
@@ -119,7 +119,8 @@ fi
 
 # Magisk stuff
 mkdir -p $MAGISKBIN 2>/dev/null
-unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' -d $MAGISKBIN
+unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' \
+-x 'assets/bootctl' -x 'assets/main.jar' -d $MAGISKBIN
 mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
