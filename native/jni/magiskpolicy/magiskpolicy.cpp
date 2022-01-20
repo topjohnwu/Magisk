@@ -4,30 +4,29 @@
 
 #include "sepolicy.hpp"
 
-using namespace std::literals;
+using namespace std;
 
 [[noreturn]] static void usage(char *arg0) {
     fprintf(stderr,
-R"EOF(MagiskPolicy - Sepolicy Patch Tool
+R"EOF(MagiskPolicy - SELinux Policy Patch Tool
 
 Usage: %s [--options...] [policy statements...]
 
 Options:
    --help            show help message for policy statements
-   --load FILE       load policies from FILE
+   --load FILE       load monolithic sepolicy from FILE
    --load-split      load from precompiled sepolicy or compile
-                     split policies
+                     split cil policies
    --compile-split   compile split cil policies
-   --save FILE       save policies to FILE
-   --live            directly apply sepolicy live
-   --magisk          inject built-in rules for a minimal
-                     Magisk selinux environment
+   --save FILE       dump monolithic sepolicy to FILE
+   --live            immediately load sepolicy into the kernel
+   --magisk          apply built-in Magisk sepolicy rules
    --apply FILE      apply rules from FILE, read and parsed
                      line by line as policy statements
-                     (multiple --apply allows)
+                     (multiple --apply are allowed)
 
-If neither --load or --compile-split is specified, it will load
-from current live policies (/sys/fs/selinux/policy)
+If neither --load, --load-split, nor --compile-split is specified,
+it will load from current live policies (/sys/fs/selinux/policy)
 
 )EOF", arg0);
     exit(1);
@@ -36,7 +35,7 @@ from current live policies (/sys/fs/selinux/policy)
 int magiskpolicy_main(int argc, char *argv[]) {
     cmdline_logging();
     const char *out_file = nullptr;
-    std::vector<std::string_view> rule_files;
+    vector<string_view> rule_files;
     sepolicy *sepol = nullptr;
     bool magisk = false;
     bool live = false;
