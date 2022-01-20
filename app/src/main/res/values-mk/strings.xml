@@ -10,8 +10,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за ажурирања</string>
-    <string name="safetynet_api_error">Грешка со SafetyNet API</string>
-    <string name="safetynet_res_invalid">Одговорот е невалиден.</string>
     <string name="keep_force_encryption">Задржи ја присилната енкрипција</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
     <string name="uninstall_magisk_title">Деинсталирај го Magisk</string>
@@ -27,7 +25,6 @@
     <!--Repo Fragment-->
     <string name="update_available">Достапно е ажурирање</string>
     <string name="home_installed_version">Инсталирано</string>
-    <string name="sorting_order">Начин на подредување</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Зачувај записник</string>
@@ -60,7 +57,6 @@
     <string name="download">Преземи</string>
     <string name="reboot">Рестартирај</string>
     <string name="release_notes">Белешки за изданието</string>
-    <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
 
     <string name="flashing">Применувам</string>
     <string name="open_link_failed_toast">Не е пронајдена апликација за отворање на врската.</string>
@@ -69,7 +65,6 @@
     <string name="restore_img_msg">Враќање…</string>
     <string name="restore_done">Враќањето заврши!</string>
     <string name="restore_fail">Не постои оригинална резервна копија!</string>
-    <string name="proprietary_title">Превземи патентиран код</string>
     <string name="setup_fail">Поставувањето е неуспешно.</string>
     <string name="env_fix_title">Потребни е дополнително поставување</string>
     <string name="setup_msg">Надградба на работната околина…</string>

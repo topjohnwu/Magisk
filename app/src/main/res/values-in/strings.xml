@@ -5,11 +5,9 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Log</string>
     <string name="settings">Setelan</string>
-    <string name="refresh">Perbarui data lokal</string>
     <string name="install">Instal</string>
     <string name="section_home">Beranda</string>
     <string name="section_theme">Tema</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Koneksi tidak tersedia</string>
@@ -28,7 +26,6 @@
     <string name="invalid_update_channel">Kanal update tidak valid</string>
     <string name="uninstall_magisk_title">Uninstal Magisk</string>
     <string name="uninstall_magisk_msg">Semua modul akan dinonaktifkan/dihapus!\nRoot akan dihapus!\nData Anda berpotensi terenkripsi jika belum!</string>
-    <string name="home_check_safetynet">Pemeriksaan SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
@@ -88,19 +85,11 @@
     <string name="target_uid">Target UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Kesalahan API SafetyNet</string>
-    <string name="safetynet_res_invalid">Respons tidak valid</string>
-    <string name="safetynet_attest_success">Berhasil!</string>
-    <string name="safetynet_attest_failure">Pengesahan gagal!</string>
-    <string name="safetynet_attest_loading">Tunggu sebentar…</string>
-    <string name="safetynet_attest_restart">Coba lagi</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
     <string name="show_os_app">Tampilkan aplikasi OS</string>
     <string name="hide_filter_hint">Filter menurut nama</string>
-    <string name="hide_scroll_up">Gulir ke atas</string>
-    <string name="hide_filters">Filter</string>
     <string name="hide_search">Telusuri</string>
 
     <!--Module-->
@@ -111,15 +100,10 @@
     <string name="reboot_download">Nyalakan ke mode Download</string>
     <string name="reboot_edl">Nyalakan ke mode EDL</string>
     <string name="module_version_author">%1$s oleh %2$s</string>
-    <string name="module_section_pending">Update</string>
-    <string name="module_section_pending_action">Update semua</string>
     <string name="module_state_remove">Hapus</string>
     <string name="module_state_restore">Pulihkan</string>
     <string name="module_action_install_external">Instal dari penyimpanan</string>
     <string name="update_available">Update tersedia</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
-    <string name="sorting_order">Urutan sortir</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode tema</string>
@@ -201,7 +185,6 @@
     <string name="download">Download</string>
     <string name="reboot">Nyalakan ulang</string>
     <string name="release_notes">Catatan rilis</string>
-    <string name="repo_cache_cleared">Cache repo dihapus</string>
     <string name="flashing">Memasang…</string>
     <string name="done">Selesai!</string>
     <string name="failure">Gagal!</string>
@@ -211,7 +194,6 @@
     <string name="restore_img_msg">Memulihkan…</string>
     <string name="restore_done">Pemulihan selesai!</string>
     <string name="restore_fail">Cadangan stock tidak ada!</string>
-    <string name="proprietary_title">Download kode proprieter</string>
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Perlu penyiapan tambahan</string>
     <string name="setup_msg">Memproses penyiapan lingkungan…</string>

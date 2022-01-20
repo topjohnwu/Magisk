@@ -6,11 +6,9 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Zapisnik događaja</string>
     <string name="settings">Postavke</string>
-    <string name="refresh">Osvježite lokalne podatke</string>
     <string name="install">Instaliranje</string>
     <string name="section_home">Početna</string>
     <string name="section_theme">Teme</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Nema dostupne veze</string>
@@ -29,7 +27,6 @@
     <string name="invalid_update_channel">Nevažeći kanal ažuriranja</string>
     <string name="uninstall_magisk_title">Deinstaliraj Magisk</string>
     <string name="uninstall_magisk_msg">Svi će moduli biti onemogućeni/uklonjeni!\nRoot će biti uklonjen!\nVaši su podaci potencijalno šifrirani, ako već nisu!</string>
-    <string name="home_check_safetynet">Provjeri SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Zadrži prisilno šifirannje</string>
@@ -88,18 +85,10 @@
     <string name="target_uid">Ciljani UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API greška</string>
-    <string name="safetynet_res_invalid">Odgovor je nevažeći</string>
-    <string name="safetynet_attest_success">Uspjeh!</string>
-    <string name="safetynet_attest_failure">Provjera nije uspjela!</string>
-    <string name="safetynet_attest_loading">Samo trenutak…</string>
-    <string name="safetynet_attest_restart">Pokušajte ponovo</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Prikaži sistemske aplikacije</string>
     <string name="hide_filter_hint">Filtriraj prema nazivu</string>
-    <string name="hide_scroll_up">Pomicanje gore</string>
-    <string name="hide_filters">Filteri</string>
     <string name="hide_search">Traži</string>
 
     <!--Module -->
@@ -109,14 +98,10 @@
     <string name="reboot_download">Ponovo pokreni u Download</string>
     <string name="reboot_edl">Ponovo pokreni u EDL</string>
     <string name="module_version_author">%1$s od %2$s</string>
-    <string name="module_section_pending">Ažuriranja</string>
-    <string name="module_section_pending_action">Ažuriraj sve</string>
     <string name="module_state_remove">Ukloni</string>
     <string name="module_state_restore">Vrati</string>
     <string name="module_action_install_external">Instaliraj iz pohrane</string>
     <string name="update_available">Ažuriranje dostupno</string>
-    <string name="module_section_online">Online</string>
-    <string name="sorting_order">Redoslijed sortiranja</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Teme</string>
@@ -196,7 +181,6 @@
     <string name="download">Preuzmi</string>
     <string name="reboot">Ponovno pokreni</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>
-    <string name="repo_cache_cleared">Predmemorija repozitorija izbrisana</string>
     <string name="flashing">Apliciranje…</string>
     <string name="done">Dovršeno!</string>
     <string name="failure">Nije uspjelo</string>
@@ -206,7 +190,6 @@
     <string name="restore_img_msg">Vraćanje…</string>
     <string name="restore_done">Vraćanje je dovršeno!</string>
     <string name="restore_fail">Izvorna Sig. kopija ne postoji!</string>
-    <string name="proprietary_title">Preuzmite vlasnički kod</string>
     <string name="setup_fail">Postavljanje nije uspjelo</string>
     <string name="env_fix_title">Zahtijeva dodatno postavljanje</string>
     <string name="setup_msg">Postavljanje okruženja za pokretanje…</string>

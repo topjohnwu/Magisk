@@ -5,11 +5,9 @@
     <string name="superuser">Super‑utilisateur</string>
     <string name="logs">Journaux</string>
     <string name="settings">Paramètres</string>
-    <string name="refresh">Actualiser les données locales</string>
     <string name="install">Installer</string>
     <string name="section_home">Accueil</string>
     <string name="section_theme">Thèmes</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">Liste Refus</string>
 
     <!--Home-->
@@ -31,7 +29,6 @@
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
-    <string name="home_check_safetynet">Vérifier SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
@@ -91,19 +88,11 @@
     <string name="target_uid">UID cible : %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Erreur de l’API SafetyNet</string>
-    <string name="safetynet_res_invalid">La réponse est incorrecte</string>
-    <string name="safetynet_attest_success">Attestation accordée !</string>
-    <string name="safetynet_attest_failure">Attestation refusée !</string>
-    <string name="safetynet_attest_loading">Une petite seconde…</string>
-    <string name="safetynet_attest_restart">Réessayer</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Afficher les applications système</string>
     <string name="show_os_app">Afficher les applications intégrées au système</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
-    <string name="hide_scroll_up">Faire défiler vers le haut</string>
-    <string name="hide_filters">Filtres</string>
     <string name="hide_search">Rechercher</string>
 
     <!--Module -->
@@ -114,15 +103,10 @@
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
     <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
     <string name="module_version_author">%1$s, par %2$s</string>
-    <string name="module_section_pending">Mises à jour</string>
-    <string name="module_section_pending_action">Tout mettre à jour</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restaurer</string>
     <string name="module_action_install_external">Installer depuis le stockage</string>
     <string name="update_available">Mise à jour disponible</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">En ligne</string>
-    <string name="sorting_order">Ordre de tri</string>
     <string name="suspend_text_riru">Module suspendu car %1$s est actif</string>
     <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
 
@@ -216,7 +200,6 @@
     <string name="download">Télécharger</string>
     <string name="reboot">Redémarrer</string>
     <string name="release_notes">Notes de version</string>
-    <string name="repo_cache_cleared">Cache de dépôt effacé</string>
     <string name="flashing">Écriture en mémoire Flash…</string>
     <string name="done">Terminé !</string>
     <string name="failure">Erreur</string>
@@ -227,8 +210,6 @@
     <string name="restore_img_msg">Restauration…</string>
     <string name="restore_done">Restauration effectuée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
-    <string name="proprietary_title">Téléchargement de code propriétaire</string>
-    <string name="proprietary_notice">L’application Magisk est un logiciel libre et ne contient pas le code propriétaire de l’API SafetyNet de Google. Souhaitez‑vous télécharger une extension permettant d’effectuer les contrôles SafetyNet ?</string>
     <string name="setup_fail">Échec de l’installation</string>
     <string name="env_fix_title">Installation supplémentaire requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez‑vous effectuer cette installation maintenant puis redémarrer ?</string>

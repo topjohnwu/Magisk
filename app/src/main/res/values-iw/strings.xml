@@ -5,11 +5,9 @@
     <string name="superuser">משתמש על</string>
     <string name="logs">יומני רישום</string>
     <string name="settings">הגדרות</string>
-    <string name="refresh">רענון נתונים מקומיים</string>
     <string name="install">התקנה</string>
     <string name="section_home">בית</string>
     <string name="section_theme">עיצוב</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">אין חיבור זמין</string>
@@ -29,7 +27,6 @@
     <string name="invalid_update_channel">ערוץ עדכון לא חוקי</string>
     <string name="uninstall_magisk_title">הסרת Magisk</string>
     <string name="uninstall_magisk_msg">כל המודולים יושבתו/יוסרו!\nגישת שורש תושבת!\nהנתונים שלך עשויים להיות מוצפנים אם לא הוצפנו כבר!</string>
-    <string name="home_check_safetynet">בדיקת SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">שמירה על הצפנה בכח</string>
@@ -88,19 +85,11 @@
     <string name="target_uid">יעד UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet שגיאת API</string>
-    <string name="safetynet_res_invalid">תגובה אינה חוקית</string>
-    <string name="safetynet_attest_success">הצליח!</string>
-    <string name="safetynet_attest_failure">האישור נכשל!</string>
-    <string name="safetynet_attest_loading">רק רגע…</string>
-    <string name="safetynet_attest_restart">נסה שנית</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">הצגת יישומי מערכת</string>
     <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>
     <string name="hide_filter_hint">סינון לפי שם</string>
-    <string name="hide_scroll_up">גלול למעלה</string>
-    <string name="hide_filters">מסננים</string>
     <string name="hide_search">חיפוש</string>
 
     <!--Module-->
@@ -111,15 +100,10 @@
     <string name="reboot_download">אתחול מצב הורדה</string>
     <string name="reboot_edl">אתחול למצב EDL</string>
     <string name="module_version_author">%1$s מאת %2$s</string>
-    <string name="module_section_pending">עדכונים</string>
-    <string name="module_section_pending_action">עדכון הכל</string>
     <string name="module_state_remove">הסר</string>
     <string name="module_state_restore">שחזר</string>
     <string name="module_action_install_external">התקן מהאחסון</string>
     <string name="update_available">עדכונים זמינים</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">מקוון</string>
-    <string name="sorting_order">סדר מיון</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">מצב עיצוב</string>
@@ -203,7 +187,6 @@
     <string name="download">הורדה</string>
     <string name="reboot">הפעלה מחדש</string>
     <string name="release_notes">הערות שחרור</string>
-    <string name="repo_cache_cleared">מטמון ריפו נוקה</string>
     <string name="flashing">צורב…</string>
     <string name="done">בוצע!</string>
     <string name="failure">נכשל</string>
@@ -214,9 +197,7 @@
     <string name="restore_img_msg">משחזר…</string>
     <string name="restore_done">השיחזור בוצע!</string>
     <string name="restore_fail">גיבוי מקורי אינו קיים!</string>
-    <string name="proprietary_title">הורד קוד קנייני</string>
-    <string name="proprietary_notice">Magisk היא תוכנה חינמית בעל קוד מקוד פתוח ומשום כך היא אינה כוללם את ה-API של SafetyNet הקניינית של גוגל.\n\nהאם ברצונך להוריד את הקוד הקנייני של SafetyNet בכדי לבדוק?</string>
-	<string name="setup_fail">ההתקנה כשלה</string>
+    <string name="setup_fail">ההתקנה כשלה</string>
     <string name="env_fix_title">דורש התקנה נוספת</string>
     <string name="env_fix_msg">המכשיר שלך זקוק להתקנה נוספת כדי ש-Magisk יפעל כראוי. האם ברצונך להמשיך ולהפעיל מחדש?</string>
 	<string name="setup_msg">הגדרת סביבת ריצה…</string>

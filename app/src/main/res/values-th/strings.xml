@@ -9,8 +9,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">ช่องทางการอัพเดตไม่ถูกต้อง</string>
-    <string name="safetynet_api_error">SafetyNet API เกิดข้อผิดพลาด</string>
-    <string name="safetynet_res_invalid">คำตอบรับไม่ถูกต้อง</string>
     <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
     <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
     <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
@@ -26,7 +24,6 @@
     <!--Repo Fragment-->
     <string name="update_available">มีการอัพเดต</string>
     <string name="home_installed_version">ติดตั้งแล้ว</string>
-    <string name="sorting_order">การเรียง</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">เก็บบันทึก</string>
@@ -49,7 +46,6 @@
     <string name="download">ดาวน์โหลด</string>
     <string name="reboot">รีบู๊ต</string>
     <string name="release_notes">-้อมูลเพิ่มเติม</string>
-    <string name="repo_cache_cleared">แคช Repo ถูกล้างแล้ว</string>
     <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
     <string name="flashing">กำลังแฟลช</string>
     <string name="open_link_failed_toast">ไม่พบแอปพลิเคชันสำหรับเปิดลิ้งค์</string>
@@ -61,7 +57,6 @@
     <string name="restore_img_msg">กำลังกู้คืน…</string>
     <string name="restore_done">การกู้คืนสำเร็จ!</string>
     <string name="restore_fail">ไม่มีไฟล์แบ็คอัพ!</string>
-    <string name="proprietary_title">Download Proprietary Code</string>
     <string name="setup_fail">การตั้งค่าล้มเหลว</string>
     <string name="env_fix_title">ต้องมีการตั้งค่าเพิ่มเติม</string>
     <string name="setup_title">การตั้งค่าเพิ่มเติม</string>

@@ -5,11 +5,9 @@
     <string name="superuser">Суперкористувач</string>
     <string name="logs">Журнали</string>
     <string name="settings">Налаштування</string>
-    <string name="refresh">Оновити список</string>
     <string name="install">Встановлення</string>
     <string name="section_home">Домашня</string>
     <string name="section_theme">Теми</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -31,7 +29,6 @@
     <string name="invalid_update_channel">Невірний канал оновлення</string>
     <string name="uninstall_magisk_title">Видалити Magisk</string>
     <string name="uninstall_magisk_msg">Ця дія призведе до вимкнення/видалення всіх модулів! Рут буде повністю видалено!\nВаші дані можуть зашифруватися, якщо вони не зашифровані!\nВпевнені, що бажаєте продовжити?</string>
-    <string name="home_check_safetynet">Тест SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Залишити примусове шифрування</string>
@@ -91,19 +88,11 @@
     <string name="target_uid">Цільовий UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Помилка SafetyNet API</string>
-    <string name="safetynet_res_invalid">Невірна відповідь</string>
-    <string name="safetynet_attest_success">Успішно!</string>
-    <string name="safetynet_attest_failure">Перевірку не пройдено!</string>
-    <string name="safetynet_attest_loading">Секунду…</string>
-    <string name="safetynet_attest_restart">Спробувати знову</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Показувати системні застосунки</string>
     <string name="show_os_app">Показувати вбудовані застосунки</string>
     <string name="hide_filter_hint">Фільтрувати за назвою</string>
-    <string name="hide_scroll_up">Прогорнути вгору</string>
-    <string name="hide_filters">Фільтри</string>
     <string name="hide_search">Пошук</string>
 
     <!--Module-->
@@ -114,15 +103,10 @@
     <string name="reboot_download">Перезавантажити в Download</string>
     <string name="reboot_edl">Перезавантажити в EDL</string>
     <string name="module_version_author">%1$s, розробник %2$s</string>
-    <string name="module_section_pending">Оновлення</string>
-    <string name="module_section_pending_action">Оновити всі</string>
     <string name="module_state_remove">Видалити</string>
     <string name="module_state_restore">Відновити</string>
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="update_available">Доступне оновлення</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Онлайн</string>
-    <string name="sorting_order">Порядок сортування</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Режим теми</string>
@@ -214,7 +198,6 @@
     <string name="download">Завантажити</string>
     <string name="reboot">Перезавантажити</string>
     <string name="release_notes">Особливості версії</string>
-    <string name="repo_cache_cleared">Кеш репозиторію очищено</string>
     <string name="flashing">Прошивання…</string>
     <string name="done">Готово!</string>
     <string name="failure">Не вдалося!</string>
@@ -225,8 +208,6 @@
     <string name="restore_img_msg">Відновлення…</string>
     <string name="restore_done">Відновлення завершено!</string>
     <string name="restore_fail">Немає оригінальної резервної копії!</string>
-    <string name="proprietary_title">Завантажити пропрієтарний код</string>
-    <string name="proprietary_notice">Magisk — це безкоштовний застосунок з відкритим вихідним кодом, тому він не містить пропрієтарний код Google для перевірки SafetyNet.\n\nБажаєте завантажити розширення SafetyNet API?</string>
     <string name="setup_fail">Не вдалося налаштувати</string>
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для вашого пристрою необхідне додаткове налаштування, щоб Magisk працював як слід. Бажаєте виконати налаштування та перезавантажити пристрій?</string>

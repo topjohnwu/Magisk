@@ -5,11 +5,9 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logboek</string>
     <string name="settings">Instellingen</string>
-    <string name="refresh">Lokale gegevens verversen</string>
     <string name="install">Installeren</string>
     <string name="section_home">Overzicht</string>
     <string name="section_theme">Thema\'s</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Geen internetverbinding</string>
@@ -28,7 +26,6 @@
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd!\nRoot wordt verwijderd!\nJe gegevens worden, als ze dat nog niet waren, mogelijk versleuteld!</string>
-    <string name="home_check_safetynet">SafetyNet controleren</string>
 
 
     <!--Install-->
@@ -88,18 +85,10 @@
     <string name="target_uid">Doel-uid: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API-fout</string>
-    <string name="safetynet_res_invalid">Ongeldig antwoord</string>
-    <string name="safetynet_attest_success">Gelukt!</string>
-    <string name="safetynet_attest_failure">Verklaring mislukt!</string>
-    <string name="safetynet_attest_loading">Even geduld…</string>
-    <string name="safetynet_attest_restart">Opnieuw proberen</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
-    <string name="hide_scroll_up">Omhoog scrollen</string>
-    <string name="hide_filters">Filters</string>
     <string name="hide_search">Zoeken</string>
 
     <!--Module Fragment-->
@@ -109,14 +98,10 @@
     <string name="reboot_download">Downloadmodus starten</string>
     <string name="reboot_edl">EDL starten</string>
     <string name="module_version_author">%1$s van %2$s</string>
-    <string name="module_section_pending">Updates</string>
-    <string name="module_section_pending_action">Alles updaten</string>
     <string name="module_state_remove">Verwijderen</string>
     <string name="module_state_restore">Herstellen</string>
     <string name="module_action_install_external">Gedownloade module installeren</string>
     <string name="update_available">Update beschikbaar</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="sorting_order">Sorteervolgorde</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Thema</string>
@@ -192,7 +177,6 @@
     <string name="download">Downloaden</string>
     <string name="reboot">Herstarten</string>
     <string name="release_notes">Wijzigingslog</string>
-    <string name="repo_cache_cleared">De pakketbroncache is gewist</string>
     <string name="flashing">Bezig met flashen…</string>
     <string name="done">Voltooid!</string>
     <string name="failure">Mislukt</string>
@@ -202,7 +186,6 @@
     <string name="restore_img_msg">Bezig met herstellen…</string>
     <string name="restore_done">Herstellen voltooid!</string>
     <string name="restore_fail">Er is geen back-up beschikbaar.</string>
-    <string name="proprietary_title">SafetyNet-code downloaden</string>
     <string name="setup_fail">Installatie mislukt</string>
     <string name="env_fix_title">Installatie nog niet afgerond</string>
     <string name="setup_msg">Bezig met toepassen van omgevingsinstellingen…</string>

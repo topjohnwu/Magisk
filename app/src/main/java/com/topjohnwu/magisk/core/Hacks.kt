@@ -61,9 +61,11 @@ val shouldKeepResources = listOf(
     R.string.release_notes,
     R.string.invalid_update_channel,
     R.string.update_available,
-    R.string.safetynet_api_error,
     R.drawable.ic_device,
-    R.drawable.ic_hide_select_md2,
     R.drawable.ic_more,
-    R.drawable.ic_magisk_delete
+    R.drawable.ic_magisk_delete,
+    R.drawable.ic_refresh_data_md2,
+    R.drawable.ic_order_date,
+    R.drawable.ic_order_name,
+    R.array.allow_timeout,
 )

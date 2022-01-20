@@ -5,11 +5,9 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
-    <string name="refresh">Odśwież dane lokalne</string>
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
@@ -30,7 +28,6 @@
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane mogą zostać potencjalnie zaszyfrowane, jeśli jeszcze nie są!</string>
-    <string name="home_check_safetynet">Sprawdź SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
@@ -90,19 +87,11 @@
     <string name="target_uid">Docelowy UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Błąd API SafetyNet</string>
-    <string name="safetynet_res_invalid">Odpowiedź jest nieprawidłowa</string>
-    <string name="safetynet_attest_success">Sukces!</string>
-    <string name="safetynet_attest_failure">Zaświadczenie nieprawidłowe!</string>
-    <string name="safetynet_attest_loading">Jeszcze chwila…</string>
-    <string name="safetynet_attest_restart">Spróbuj ponownie</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
     <string name="show_os_app">Pokaż aplikacje OS</string>
     <string name="hide_filter_hint">Filtruj według nazwy</string>
-    <string name="hide_scroll_up">Przewiń do góry</string>
-    <string name="hide_filters">Filtry</string>
     <string name="hide_search">Szukaj</string>
 
     <!--Module -->
@@ -113,15 +102,10 @@
     <string name="reboot_download">Reboot do trybu Download</string>
     <string name="reboot_edl">Reboot do trybu EDL</string>
     <string name="module_version_author">%1$s od %2$s</string>
-    <string name="module_section_pending">Aktualizacje</string>
-    <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
     <string name="module_state_remove">Usuń</string>
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="update_available">Dostępna aktualizacja</string>
-    <string name="module_installed">Zainstalowane</string>
-    <string name="module_section_online">Aktywne</string>
-    <string name="sorting_order">Kolejność sortowania</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -207,7 +191,6 @@
     <string name="download">Pobierz</string>
     <string name="reboot">Reboot</string>
     <string name="release_notes">Lista zmian</string>
-    <string name="repo_cache_cleared">Wyczyszczono pamięć podręczną repozytoriów</string>
     <string name="flashing">Flashowanie…</string>
     <string name="done">Gotowe!</string>
     <string name="failure">Błąd</string>
@@ -218,8 +201,6 @@
     <string name="restore_img_msg">Przywracanie…</string>
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Kopia zapasowa nie istnieje!</string>
-    <string name="proprietary_title">Pobierz kod własnościowy</string>
-    <string name="proprietary_notice">Magisk jest programem FOSS i nie zawiera kodu własnościowego Google SafetyNet API.\n\nCzy chcesz pobrać własnościowe rozszerzenie dla sprawdzenia SafetyNet?</string>
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga dodatkowej konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie wymaga dodatkowej konfiguracji aby Magisk działał właściwie. Czy chcesz kontynuować i uruchomić ponownie?</string>

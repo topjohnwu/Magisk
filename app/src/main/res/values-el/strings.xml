@@ -5,11 +5,9 @@
     <string name="superuser">Υπερχρήστης</string>
     <string name="logs">Αρχείο Καταγραφής</string>
     <string name="settings">Ρυθμίσεις</string>
-    <string name="refresh">Ανανέωση τοπικών δεδομένων</string>
     <string name="install">Εγκατάσταση</string>
     <string name="section_home">Αρχική</string>
     <string name="section_theme">Θέματα</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Δεν υπάρχει διαθέσιμη σύνδεση</string>
@@ -30,7 +28,6 @@
     <string name="invalid_update_channel">Λανθασμένο κανάλι ενημέρωσης</string>
     <string name="uninstall_magisk_title">Απεγκατάσταση Magisk</string>
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα!</string>
-    <string name="home_check_safetynet">Έλεγχος SafetyNet</string>
 
     <!--Install-->
 	<string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
@@ -89,19 +86,11 @@
     <string name="target_uid">UID Στόχος: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Σφάλμα του SafetyNet API</string>
-    <string name="safetynet_res_invalid">Η απόκριση είναι άκυρη</string>
-    <string name="safetynet_attest_success">Η πιστοποίηση ήταν επιτυχής!</string>
-    <string name="safetynet_attest_failure">Η πιστοποίηση απέτυχε!</string>
-    <string name="safetynet_attest_loading">Μισό λεπτό…</string>
-    <string name="safetynet_attest_restart">Προσπάθησε ξανά</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Εμφάνιση εφαρμογών συστήματος</string>
     <string name="show_os_app">Εμφάνιση εφαρμογών OS</string>
     <string name="hide_filter_hint">Φιλτράρισμα</string>
-    <string name="hide_scroll_up">Μετακίνηση</string>
-    <string name="hide_filters">Φίλτρα</string>
     <string name="hide_search">Αναζήτηση</string>
 
     <!--Module-->
@@ -112,15 +101,10 @@
     <string name="reboot_download">Επανεκκίνηση για λήψη</string>
     <string name="reboot_edl">Επανεκκίνηση σε EDL</string>
     <string name="module_version_author">%1$s από %2$s</string>
-    <string name="module_section_pending">Ενημερώσεις</string>
-    <string name="module_section_pending_action">Ενημέρωση όλων</string>
     <string name="module_state_remove">Αφαίρεση</string>
     <string name="module_state_restore">Επαναφορά</string>
     <string name="module_action_install_external">Εγκατάσταση από χώρο αποθήκευσης</string>
     <string name="update_available">Διαθέσιμη Ενημέρωση</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
-    <string name="sorting_order">Ταξινόμηση κατά</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Λειτουργία θέματος</string>
@@ -206,7 +190,6 @@
     <string name="download">Λήψη</string>
     <string name="reboot">Επανεκκίνηση</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>
-    <string name="repo_cache_cleared">Πραγματοποιήθηκε εκκαθάριση της προσωρινής μνήμης του Repository</string>
     <string name="flashing">Προγραμματισμός σε εξέλιξη</string>
     <string name="done">Ολοκληρώθηκε</string>
     <string name="failure">Αποτυχία</string>
@@ -217,8 +200,6 @@
     <string name="restore_img_msg">Επαναφορά…</string>
     <string name="restore_done">Η επαναφορά πραγματοποιήθηκε</string>
     <string name="restore_fail">Δεν υπάρχει αντίγραφο ασφαλείας!</string>
-    <string name="proprietary_title">Λήψη Ιδιόκτητου Κώδικα</string>
-    <string name="proprietary_notice">Το Magisk είναι FOSS και δεν περιλαμβάνει κώδικα για το ιδιόκτητο SafetyNet API της Google.\n\nΘέλετε να κατεβάσετε μια ιδιόκτητη επέκταση για ελέγχους SafetyNet;</string>
     <string name="setup_fail">Η εγκατάσταση απέτυχε</string>
     <string name="env_fix_title">Απαιτείται πρόσθετη εγκατάσταση</string>
     <string name="env_fix_msg">Η συσκευή σας χρειάζεται πρόσθετη ρύθμιση για να λειτουργεί σωστά το Magisk. Θέλετε να συνεχίσετε και να επανεκκινήσετε;</string>

@@ -5,11 +5,9 @@
     <string name="superuser">کاربر روت</string>
     <string name="logs">لاگ ها</string>
     <string name="settings">تنظیمات</string>
-    <string name="refresh">بروز کردن داده های محلی</string>
     <string name="install">نصب</string>
     <string name="section_home">خانه</string>
     <string name="section_theme">تم ها</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">هیچ اتصالی وجود ندارد</string>
@@ -28,7 +26,6 @@
     <string name="invalid_update_channel">کانال بروزرسانی نامعتبر است</string>
     <string name="uninstall_magisk_title">حذف Magisk</string>
     <string name="uninstall_magisk_msg">همه ماژول ها غیرفعال/حذف می شوند!\nروت حذف می شود!\nداده های شما اگر از قبل رمزگذارری نشده بودند رمز نگاری میشوند!</string>
-    <string name="home_check_safetynet">چک کردن SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">حفظ رمزگذاری اجباری</string>
@@ -84,18 +81,10 @@
     <string name="logs_cleared">لاگ با موفقیت پاک شد.</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API خطای</string>
-    <string name="safetynet_res_invalid">پاسخ نامعتبر است</string>
-    <string name="safetynet_attest_success">با موفقیت انجام شد!</string>
-    <string name="safetynet_attest_failure">گواهی نا معتبر بود!</string>
-    <string name="safetynet_attest_loading">فقط یک ثانیه…</string>
-    <string name="safetynet_attest_restart">تلاش دوباره</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">نشان دادن برنامه های سیستمی</string>
     <string name="hide_filter_hint">فیلتر کردن با نام</string>
-    <string name="hide_scroll_up">رفتن به بالا</string>
-    <string name="hide_filters">فیلتر ها</string>
     <string name="hide_search">سرچ کردن</string>
 
     <!--Module -->
@@ -105,15 +94,10 @@
     <string name="reboot_download">راه اندازی مججد برای دانلود کردن</string>
     <string name="reboot_edl">راه اندازی مججد برای رفتن به EDL</string>
     <string name="module_version_author">%1$s با %2$s</string>
-    <string name="module_section_pending">بروزرسانی ها</string>
-    <string name="module_section_pending_action">بروز رسانی کردن همه</string>
     <string name="module_state_remove">حذف کردن</string>
     <string name="module_state_restore">بازگرداندن</string>
     <string name="module_action_install_external">نصب از حافظه</string>
     <string name="update_available">بروزرسانی در دسترس است</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">آنلاین</string>
-    <string name="sorting_order">ترتیب</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">حالت تم</string>
@@ -191,7 +175,6 @@
     <string name="download">انلود کردن</string>
     <string name="reboot">راه اندازی مجدد</string>
     <string name="release_notes">نکته های نسخه</string>
-    <string name="repo_cache_cleared">حافظه پنهان ریپوسیتوری حذف شد</string>
     <string name="flashing">ر حال فلش کردن…</string>
     <string name="done">تمام!</string>
     <string name="failure">ناموفق</string>
@@ -201,7 +184,6 @@
     <string name="restore_img_msg">درحال بازیابی…</string>
     <string name="restore_done">بازیابی انجام شد!</string>
     <string name="restore_fail">نسخه پشتیبان استک موجود نیست!</string>
-    <string name="proprietary_title">دانلود کد اختصاصی</string>
     <string name="setup_fail">نصب انجام نشد</string>
     <string name="env_fix_title">به تنظیمات اضافی نیاز دارد</string>
     <string name="setup_msg">راه اندازی محیط نصب…</string>

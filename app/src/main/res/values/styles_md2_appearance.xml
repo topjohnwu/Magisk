@@ -10,17 +10,6 @@
         <item name="android:textColor">?colorSecondary</item>
     </style>
 
-    <style name="AppearanceFoundation.Large.Variant">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-    </style>
-
-    <style name="AppearanceFoundation.Display.OnPrimary" parent="TextAppearance.AppCompat.Display1">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
-
-    <style name="AppearanceFoundation.Display.OnPrimary.Variant">
-        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
-    </style>
     <!--endregion-->
 
     <!--region Title-->
@@ -29,17 +18,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="AppearanceFoundation.Title.Variant">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-    </style>
-
     <style name="AppearanceFoundation.Title.OnPrimary">
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
-    <style name="AppearanceFoundation.Title.OnPrimary.Variant">
-        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
-    </style>
     <!--endregion-->
 
     <!--region Body-->
@@ -47,25 +29,6 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="AppearanceFoundation.Body.Variant">
-        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
-    </style>
-
-    <style name="AppearanceFoundation.Body.Primary">
-        <item name="android:textColor">?attr/colorPrimary</item>
-    </style>
-
-    <style name="AppearanceFoundation.Body.Secondary">
-        <item name="android:textColor">?attr/colorSecondary</item>
-    </style>
-
-    <style name="AppearanceFoundation.Body.OnPrimary">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
-
-    <style name="AppearanceFoundation.Body.OnPrimary.Variant">
-        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
-    </style>
     <!--endregion-->
 
     <!--region Caption-->
@@ -81,17 +44,10 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
-    <style name="AppearanceFoundation.Caption.Secondary">
-        <item name="android:textColor">?attr/colorSecondary</item>
-    </style>
-
     <style name="AppearanceFoundation.Caption.OnPrimary">
         <item name="android:textColor">?attr/colorOnPrimary</item>
     </style>
 
-    <style name="AppearanceFoundation.Caption.OnPrimary.Variant">
-        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
-    </style>
     <!--endregion-->
 
     <!--region Tiny-->
@@ -108,13 +64,6 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="AppearanceFoundation.Tiny.OnPrimary">
-        <item name="android:textColor">?attr/colorOnPrimary</item>
-    </style>
-
-    <style name="AppearanceFoundation.Tiny.OnPrimary.Variant">
-        <item name="android:textColor">?attr/colorOnPrimaryVariant</item>
-    </style>
     <!--endregion-->
 
 </resources>
