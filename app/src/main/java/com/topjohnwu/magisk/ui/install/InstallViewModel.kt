@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.ui.install
 
 import android.net.Uri
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -12,10 +14,12 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -55,23 +59,23 @@ class InstallViewModel(
         set(value) = set(value, field, { field = it }, BR.data)
 
     @get:Bindable
-    var notes = ""
+    var notes: Spanned = SpannableStringBuilder()
         set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md").run {
-                    notes = when {
-                        exists() -> readText()
-                        Const.Url.CHANGELOG_URL.isEmpty() -> ""
-                        else -> {
-                            val text = svc.fetchString(Const.Url.CHANGELOG_URL)
-                            writeText(text)
-                            text
-                        }
+                val file = File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md")
+                val text = when {
+                    file.exists() -> file.readText()
+                    Const.Url.CHANGELOG_URL.isEmpty() -> ""
+                    else -> {
+                        val str = svc.fetchString(Const.Url.CHANGELOG_URL)
+                        file.writeText(str)
+                        str
                     }
                 }
+                notes = ServiceLocator.markwon.toMarkdown(text)
             } catch (e: IOException) {
                 Timber.e(e)
             }

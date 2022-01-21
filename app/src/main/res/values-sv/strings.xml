@@ -186,8 +186,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
-    <string name="repo_install_title">Installera %1$s</string>
-    <string name="repo_install_msg">Vill du installera %1$s nu?</string>
+    <string name="repo_install_title">Installera %1$s %2$s(%3$s)</string>
     <string name="download">Ladda ned</string>
     <string name="reboot">Omstart</string>
     <string name="release_notes">Utgivningsanmärkningar</string>

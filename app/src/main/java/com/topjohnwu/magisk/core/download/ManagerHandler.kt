@@ -1,14 +1,18 @@
 package com.topjohnwu.magisk.core.download
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
+import androidx.core.content.getSystemService
 import androidx.core.net.toFile
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ktx.copyAndClose
-import com.topjohnwu.magisk.ktx.relaunchApp
 import com.topjohnwu.magisk.ktx.writeTo
 import java.io.File
 import java.io.InputStream
@@ -55,9 +59,17 @@ suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStr
             apk.delete()
             patched.renameTo(apk)
         } else {
-            // Simply relaunch the app
+            val intent = packageManager.getLaunchIntentForPackage(packageName)
+            intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            //noinspection InlinedApi
+            val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            val pending = PendingIntent.getActivity(this, id, intent, flag)
+            if (ForegroundTracker.hasForeground) {
+                val alarm = getSystemService<AlarmManager>()
+                alarm!!.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, pending)
+            }
             stopSelf()
-            relaunchApp(this)
+            Runtime.getRuntime().exit(0)
         }
     } else {
         write(subject.file.outputStream())

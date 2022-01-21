@@ -1,16 +1,17 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.ProviderInstaller
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.ktx.precomputedText
-import com.topjohnwu.magisk.utils.MarkwonImagePlugin
+import com.topjohnwu.magisk.core.utils.currentLocale
 import io.noties.markwon.Markwon
-import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.utils.NoCopySpannableFactory
 import okhttp3.Cache
+import okhttp3.ConnectionSpec
 import okhttp3.Dns
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -46,7 +47,8 @@ private class DnsResolver(client: OkHttpClient) : Dns {
         if (Config.doh) {
             try {
                 return doh.lookup(hostname)
-            } catch (e: UnknownHostException) {}
+            } catch (e: UnknownHostException) {
+            }
         }
         return Dns.SYSTEM.lookup(hostname)
     }
@@ -61,11 +63,16 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         builder.addInterceptor(HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         })
+    } else {
+        builder.connectionSpecs(listOf(ConnectionSpec.RESTRICTED_TLS))
     }
+
+    builder.dns(DnsResolver(builder.build()))
 
     builder.addInterceptor { chain ->
         val request = chain.request().newBuilder()
-        request.header("User-Agent", "Magisk ${BuildConfig.VERSION_CODE}")
+        request.header("User-Agent", "Magisk/${BuildConfig.VERSION_CODE}")
+        request.header("Accept-Language", currentLocale.toLanguageTag())
         chain.proceed(request.build())
     }
 
@@ -73,7 +80,6 @@ fun createOkHttpClient(context: Context): OkHttpClient {
         Info.hasGMS = false
     }
 
-    builder.dns(DnsResolver(builder.build()))
     return builder.build()
 }
 
@@ -96,13 +102,17 @@ inline fun <reified T> createApiService(retrofitBuilder: Retrofit.Builder, baseU
         .create(T::class.java)
 }
 
-fun createMarkwon(context: Context, okHttpClient: OkHttpClient): Markwon {
+fun createMarkwon(context: Context): Markwon {
     return Markwon.builder(context)
-        .textSetter { textView, spanned, _, onComplete ->
-            textView.tag = onComplete
-            textView.precomputedText = spanned
+        .textSetter { textView, spanned, bufferType, onComplete ->
+            textView.apply {
+                post {
+                    movementMethod = LinkMovementMethod.getInstance()
+                    setSpannableFactory(NoCopySpannableFactory.getInstance())
+                    setText(spanned, bufferType)
+                    onComplete.run()
+                }
+            }
         }
-        .usePlugin(HtmlPlugin.create())
-        .usePlugin(MarkwonImagePlugin(okHttpClient))
         .build()
 }

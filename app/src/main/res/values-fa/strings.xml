@@ -171,7 +171,6 @@
     <string name="yes">بله</string>
     <string name="no">نه</string>
     <string name="repo_install_title">نصب کرد %1$s</string>
-    <string name="repo_install_msg">آیا می خواهید %1$s نصب شود؟</string>
     <string name="download">انلود کردن</string>
     <string name="reboot">راه اندازی مجدد</string>
     <string name="release_notes">نکته های نسخه</string>

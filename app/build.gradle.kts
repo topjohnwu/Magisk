@@ -78,17 +78,12 @@ dependencies {
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0")
     implementation("dev.rikka.rikkax.insets:insets:1.1.1")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
+    implementation("io.noties.markwon:core:4.6.2")
 
     val vBAdapt = "4.0.0"
     val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
-
-    val vMarkwon = "4.6.2"
-    implementation("io.noties.markwon:core:${vMarkwon}")
-    implementation("io.noties.markwon:html:${vMarkwon}")
-    implementation("io.noties.markwon:image:${vMarkwon}")
-    implementation("com.caverock:androidsvg:1.4")
 
     val vLibsu = "3.2.1"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")

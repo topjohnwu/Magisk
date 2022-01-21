@@ -31,6 +31,7 @@ data class ModuleJson(
     val version: String,
     val versionCode: Int,
     val zipUrl: String,
+    val changelog: String,
 )
 
 @JsonClass(generateAdapter = true)
