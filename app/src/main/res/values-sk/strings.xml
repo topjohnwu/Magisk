@@ -108,7 +108,8 @@
     <string name="module_action_install_external">Inštalácia z úložiska</string>
     <string name="update_available">Dostupná aktualizácia</string>
     <string name="suspend_text_riru">Modul bol pozastavený, lebo %1$s je povolené</string>
-    <string name="suspend_text_zygisk">Modul bol pozastavený, lebo  %1$s nie je povolené</string>
+    <string name="suspend_text_zygisk">Modul bol pozastavený, lebo %1$s nie je povolené</string>
+    <string name="zygisk_module_unloaded">Modul Zygisk sa nenačítal z dôvodu nekompatibility</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -228,5 +229,6 @@
     <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznateľnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>
     <string name="reboot_apply_change">Reštartovať počítač, aby sa použili zmeny</string>
+    <string name="restore_app_confirmation">Týmto obnovíte skrytú aplikáciu späť na pôvodnú aplikáciu. Naozaj to chcete urobiť?</string>
 
 </resources>
