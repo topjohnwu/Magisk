@@ -450,14 +450,16 @@ void HookContext::nativeSpecializeAppProcess_pre() {
         ZLOGV("pre  specialize [%s]\n", process);
     }
 
-    auto module_fds = remote_get_info(args->uid, process, &flags);
+    vector<int> module_fds;
+    int fd = remote_get_info(args->uid, process, &flags, module_fds);
     if ((flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
-        // TODO: Handle MOUNT_EXTERNAL_NONE on older platforms
         ZLOGI("[%s] is on the denylist\n", process);
         state[DO_UNMOUNT] = true;
-    } else {
+    } else if (fd >= 0) {
         run_modules_pre(module_fds);
+        write_int(fd, 0);
     }
+    close(fd);
 
     close_fds();
     android_logging();
@@ -486,7 +488,29 @@ void HookContext::nativeForkSystemServer_pre() {
     state[SERVER_SPECIALIZE] = true;
     if (pid == 0) {
         ZLOGV("pre  forkSystemServer\n");
-        run_modules_pre(remote_get_info(1000, "system_server", &flags));
+        vector<int> module_fds;
+        int fd = remote_get_info(1000, "system_server", &flags, module_fds);
+        if (fd >= 0) {
+            if (module_fds.empty()) {
+                write_int(fd, 0);
+            } else {
+                run_modules_pre(module_fds);
+
+                // Send the bitset of module status back to magiskd from system_server
+                dynamic_bitset bits;
+                // Pre-allocate enough bits
+                bits[module_fds.size() - 1] = false;
+                for (const auto &m : modules) {
+                    bits[m.getId()] = true;
+                }
+                write_int(fd, bits.slots());
+                for (int i = 0; i < bits.slots(); ++i) {
+                    unsigned long l = bits.to_ulong(i);
+                    xwrite(fd, &l, sizeof(l));
+                }
+            }
+            close(fd);
+        }
         close_fds();
         android_logging();
     }

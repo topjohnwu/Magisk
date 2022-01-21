@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <string_view>
+#include <bitset>
 
 #define UID_ROOT   0
 #define UID_SHELL  2000
@@ -77,6 +78,24 @@ public:
     stateless_allocator(const stateless_allocator<U, Impl>&) {}
     bool operator==(const stateless_allocator&) { return true; }
     bool operator!=(const stateless_allocator&) { return false; }
+};
+
+class dynamic_bitset {
+private:
+    using long_bits = std::bitset<sizeof(unsigned long)>;
+    std::vector<long_bits> bits;
+public:
+    constexpr static int slot_size = sizeof(unsigned long);
+    long_bits::reference operator[] (size_t pos) {
+        size_t slot = pos / slot_size;
+        size_t index = pos % slot_size;
+        if (bits.size() <= slot) {
+            bits.resize(slot + 1);
+        }
+        return bits[slot][index];
+    }
+    size_t slots() const { return bits.size(); }
+    unsigned long to_ulong(size_t slot) const { return bits[slot].to_ulong(); }
 };
 
 int parse_int(std::string_view s);

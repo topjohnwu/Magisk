@@ -715,6 +715,7 @@ static void collect_modules(bool open_zygisk) {
 #else
 #error Unsupported ABI
 #endif
+                unlinkat(modfd, "zygisk/unloaded", 0);
             }
         } else {
             // Ignore zygisk modules when zygisk is not enabled

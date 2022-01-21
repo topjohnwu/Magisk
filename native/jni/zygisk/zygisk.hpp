@@ -41,5 +41,5 @@ extern void *self_handle;
 
 void unload_first_stage();
 void hook_functions();
-std::vector<int> remote_get_info(int uid, const char *process, uint32_t *flags);
+int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 int remote_request_unmount();

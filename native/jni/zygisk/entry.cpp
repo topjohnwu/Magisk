@@ -167,8 +167,7 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     return ret;
 }
 
-std::vector<int> remote_get_info(int uid, const char *process, uint32_t *flags) {
-    vector<int> fds;
+int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &fds) {
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
         write_int(fd, ZYGISK_GET_INFO);
@@ -179,9 +178,9 @@ std::vector<int> remote_get_info(int uid, const char *process, uint32_t *flags) 
         if ((*flags & UNMOUNT_MASK) != UNMOUNT_MASK) {
             fds = recv_fds(fd);
         }
-        close(fd);
+        return fd;
     }
-    return fds;
+    return -1;
 }
 
 // The following code runs in magiskd
@@ -357,6 +356,27 @@ static void get_process_info(int client, const sock_cred *cred) {
         get_exe(cred->pid, buf, sizeof(buf));
         vector<int> fds = get_module_fds(str_ends(buf, "64"));
         send_fds(client, fds.data(), fds.size());
+    }
+
+    // The following will only happen for system_server
+    int slots = read_int(client);
+    int id = 0;
+    for (int i = 0; i < slots; ++i) {
+        unsigned long l = 0;
+        xxread(client, &l, sizeof(l));
+        bitset<sizeof(unsigned long)> bits(l);
+        for (int j = 0; id < module_list->size(); ++j, ++id) {
+            if (!bits[j]) {
+                // Either not a zygisk module, or incompatible
+                char buf[4096];
+                snprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
+                    module_list->operator[](id).name.data());
+                if (int dirfd = open(buf, O_RDONLY | O_CLOEXEC); dirfd >= 0) {
+                    close(xopenat(dirfd, "unloaded", O_CREAT | O_RDONLY, 0644));
+                    close(dirfd);
+                }
+            }
+        }
     }
 }
 
