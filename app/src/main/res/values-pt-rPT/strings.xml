@@ -32,8 +32,7 @@
     <string name="app_changelog">Lista de alterações da aplicação</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Instalar %1$s</string>
-    <string name="repo_install_msg">Deseja instalar%1$s agora?</string>
+    <string name="repo_install_title">Instalar %1$s %2$s(%3$s)</string>
     <string name="download">Transferir</string>
     <string name="reboot">Reiniciar</string>
     <string name="magisk_update_title">Nova atualização do Magisk disponível!</string>

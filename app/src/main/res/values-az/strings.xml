@@ -44,7 +44,6 @@
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">%1$s faylını yüklə</string>
-    <string name="repo_install_msg">%1$s faylını indi yükləmək istəyirsiniz?</string>
     <string name="download">Yüklə</string>
     <string name="reboot">Yenidən Başlat</string>
     <string name="release_notes">Yeniliklər</string>

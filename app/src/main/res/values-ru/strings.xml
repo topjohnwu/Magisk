@@ -196,8 +196,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="repo_install_title">Установка %1$s</string>
-    <string name="repo_install_msg">Установить %1$s ?</string>
+    <string name="repo_install_title">Установка %1$s %2$s(%3$s)</string>
     <string name="download">Скачать</string>
     <string name="reboot">Перезагрузка</string>
     <string name="release_notes">О версии</string>

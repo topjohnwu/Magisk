@@ -186,8 +186,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">ஆம்</string>
     <string name="no">இல்லை</string>
-    <string name="repo_install_title">நிறுவு %1$s</string>
-    <string name="repo_install_msg">நீங்கள் இப்போது %1$s ஐ நிறுவ விரும்புகிறீர்களா??</string>
+    <string name="repo_install_title">நிறுவு %1$s %2$s(%3$s)</string>
     <string name="download">பதிவிறக்கம்</string>
     <string name="reboot">மறுதொடக்கம்</string>
     <string name="release_notes">வெளியீட்டு குறிப்புகள்</string>

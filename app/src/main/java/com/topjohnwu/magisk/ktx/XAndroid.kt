@@ -299,53 +299,6 @@ val View.activity: Activity get() {
     }
 }
 
-var View.coroutineScope: CoroutineScope
-    get() = getTag(R.id.coroutineScope) as? CoroutineScope
-        ?: (activity as? BaseActivity)?.lifecycleScope
-        ?: GlobalScope
-    set(value) = setTag(R.id.coroutineScope, value)
-
-@set:BindingAdapter("precomputedText")
-var TextView.precomputedText: CharSequence
-    get() = text
-    set(value) {
-        val callback = tag as? Runnable
-
-        coroutineScope.launch(Dispatchers.IO) {
-            if (SDK_INT >= 29) {
-                // Internally PrecomputedTextCompat will use platform API on API 29+
-                // Due to some stupid crap OEM (Samsung) implementation, this can actually
-                // crash our app. Directly use platform APIs with some workarounds
-                val pre = PrecomputedText.create(value, textMetricsParams)
-                post {
-                    try {
-                        text = pre
-                    } catch (e: IllegalArgumentException) {
-                        // Override to computed params to workaround crashes
-                        textMetricsParams = pre.params
-                        text = pre
-                    }
-                    isGone = false
-                    callback?.run()
-                }
-            } else {
-                val tv = this@precomputedText
-                val params = TextViewCompat.getTextMetricsParams(tv)
-                val pre = PrecomputedTextCompat.create(value, params)
-                post {
-                    TextViewCompat.setPrecomputedText(tv, pre)
-                    isGone = false
-                    callback?.run()
-                }
-            }
-        }
-    }
-
-fun Int.dpInPx(): Int {
-    val scale = AppContext.resources.displayMetrics.density
-    return (this * scale + 0.5).toInt()
-}
-
 @SuppressLint("PrivateApi")
 fun getProperty(key: String, def: String): String {
     runCatching {

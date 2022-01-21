@@ -1,16 +1,24 @@
 package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class ModuleInstallDialog(private val item: OnlineModule) : DialogEvent() {
+class ModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {
+
+    private val svc get() = ServiceLocator.networkService
+
+    override suspend fun getMarkdownText(): String {
+        val str = svc.fetchString(item.changelog)
+        return if (str.length > 1000) str.substring(0, 1000) else str
+    }
 
     override fun build(dialog: MagiskDialog) {
+        super.build(dialog)
         dialog.apply {
 
             fun download(install: Boolean) {
@@ -19,21 +27,21 @@ class ModuleInstallDialog(private val item: OnlineModule) : DialogEvent() {
                 DownloadService.start(context, subject)
             }
 
-            setTitle(context.getString(R.string.repo_install_title, item.name))
-            setMessage(context.getString(R.string.repo_install_msg, item.downloadFilename))
+            val title = context.getString(R.string.repo_install_title,
+                item.name, item.version, item.versionCode)
+
+            setTitle(title)
             setCancelable(true)
             setButton(MagiskDialog.ButtonType.NEGATIVE) {
                 text = R.string.download
-                icon = R.drawable.ic_download_md2
                 onClick { download(false) }
             }
-
-            if (Info.env.isActive) {
-                setButton(MagiskDialog.ButtonType.POSITIVE) {
-                    text = R.string.install
-                    icon = R.drawable.ic_install
-                    onClick { download(true) }
-                }
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = R.string.install
+                onClick { download(true) }
+            }
+            setButton(MagiskDialog.ButtonType.NEUTRAL) {
+                text = android.R.string.cancel
             }
         }
     }

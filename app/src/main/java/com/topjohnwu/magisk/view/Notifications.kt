@@ -26,12 +26,11 @@ object Notifications {
 
     fun setup(context: Context) {
         if (SDK_INT >= 26) {
-            var channel = NotificationChannel(UPDATE_NOTIFICATION_CHANNEL,
-                    context.getString(R.string.update_channel), NotificationManager.IMPORTANCE_DEFAULT)
-            mgr.createNotificationChannel(channel)
-            channel = NotificationChannel(PROGRESS_NOTIFICATION_CHANNEL,
-                    context.getString(R.string.progress_channel), NotificationManager.IMPORTANCE_LOW)
-            mgr.createNotificationChannel(channel)
+            val channel = NotificationChannel(UPDATE_NOTIFICATION_CHANNEL,
+                context.getString(R.string.update_channel), NotificationManager.IMPORTANCE_DEFAULT)
+            val channel2 = NotificationChannel(PROGRESS_NOTIFICATION_CHANNEL,
+                context.getString(R.string.progress_channel), NotificationManager.IMPORTANCE_LOW)
+            mgr.createNotificationChannels(listOf(channel, channel2))
         }
     }
 

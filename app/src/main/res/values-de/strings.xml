@@ -194,7 +194,6 @@
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
     <string name="repo_install_title">%1$s installieren</string>
-    <string name="repo_install_msg">Möchten Sie %1$s jetzt installieren?</string>
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
     <string name="release_notes">Anmerkungen zur Veröffentlichung</string>

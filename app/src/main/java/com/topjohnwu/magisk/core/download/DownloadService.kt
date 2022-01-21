@@ -14,20 +14,19 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ForegroundTracker
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.intent
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.di.ServiceLocator
-import com.topjohnwu.magisk.ktx.copyAndClose
 import com.topjohnwu.magisk.ktx.synchronized
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Notifications.mgr
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
-import java.util.*
-import kotlin.collections.HashMap
 
 class DownloadService : BaseService() {
 
@@ -67,11 +66,11 @@ class DownloadService : BaseService() {
                 val stream = service.fetchFile(subject.url).toProgressStream(subject)
                 when (subject) {
                     is Subject.Manager -> handleAPK(subject, stream)
-                    else -> stream.copyAndClose(subject.file.outputStream())
+                    else -> stream.toModule(subject.file, service.fetchInstaller().byteStream())
                 }
                 if (ForegroundTracker.hasForeground) {
                     remove(subject.notifyId)
-                    subject.pendingIntent(this@DownloadService).send()
+                    subject.pendingIntent(this@DownloadService)?.send()
                 } else {
                     notifyFinish(subject)
                 }

@@ -195,8 +195,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Áno</string>
     <string name="no">Nie</string>
-    <string name="repo_install_title">Nainštalovať %1$s</string>
-    <string name="repo_install_msg">Chcete teraz nainštalovať %1$s?</string>
+    <string name="repo_install_title">Nainštalovať %1$s %2$s(%3$s)</string>
     <string name="download">Stiahnuť</string>
     <string name="reboot">Reštartovať</string>
     <string name="release_notes">Poznámky k vydaniu</string>

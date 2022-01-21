@@ -36,8 +36,7 @@
     <string name="app_changelog">Списък с промени</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Инсталиране на %1$s</string>
-    <string name="repo_install_msg">Желаете ли да инсталирате %1$s сега?</string>
+    <string name="repo_install_title">Инсталиране на %1$s %2$s(%3$s)</string>
     <string name="download">Изтегляне</string>
     <string name="reboot">Рестартиране</string>
     <string name="magisk_update_title">Достъпно е издание на Magisk.</string>

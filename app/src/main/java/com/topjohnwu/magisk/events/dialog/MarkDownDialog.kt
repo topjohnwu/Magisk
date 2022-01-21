@@ -10,9 +10,8 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlin.coroutines.cancellation.CancellationException
+import java.io.IOException
 
 abstract class MarkDownDialog : DialogEvent() {
 
@@ -23,17 +22,13 @@ abstract class MarkDownDialog : DialogEvent() {
         with(dialog) {
             val view = LayoutInflater.from(context).inflate(R.layout.markdown_window_md2, null)
             setView(view)
-            (ownerActivity as BaseActivity).lifecycleScope.launch {
-                val tv = view.findViewById<TextView>(R.id.md_txt)
-                withContext(Dispatchers.IO) {
-                    try {
-                        ServiceLocator.markwon.setMarkdown(tv, getMarkdownText())
-                    } catch (e: Exception) {
-                        if (e is CancellationException)
-                            throw e
-                        Timber.e(e)
-                        tv.post { tv.setText(R.string.download_file_error) }
-                    }
+            val tv = view.findViewById<TextView>(R.id.md_txt)
+            (ownerActivity as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    ServiceLocator.markwon.setMarkdown(tv, getMarkdownText())
+                } catch (e: IOException) {
+                    Timber.e(e)
+                    tv.post { tv.setText(R.string.download_file_error) }
                 }
             }
         }

@@ -35,7 +35,7 @@ sealed class Subject : Parcelable {
     abstract val title: String
     abstract val notifyId: Int
 
-    abstract fun pendingIntent(context: Context): PendingIntent
+    abstract fun pendingIntent(context: Context): PendingIntent?
 
     @Parcelize
     class Module(
@@ -53,7 +53,7 @@ sealed class Subject : Parcelable {
 
         override fun pendingIntent(context: Context) = when (action) {
             Action.Flash -> FlashFragment.installIntent(context, file)
-            else -> Intent().toPending(context)
+            else -> null
         }
     }
 

@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
+import android.text.Spanned
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -29,11 +30,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.di.ServiceLocator
-import com.topjohnwu.magisk.ktx.coroutineScope
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.widget.IndeterminateCheckBox
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @BindingAdapter("gone")
@@ -57,10 +55,8 @@ fun setInvisibleUnless(view: View, invisibleUnless: Boolean) {
 }
 
 @BindingAdapter("markdownText")
-fun setMarkdownText(tv: TextView, text: CharSequence) {
-    tv.coroutineScope.launch(Dispatchers.IO) {
-        ServiceLocator.markwon.setMarkdown(tv, text.toString())
-    }
+fun setMarkdownText(tv: TextView, markdown: Spanned) {
+    ServiceLocator.markwon.setParsedMarkdown(tv, markdown)
 }
 
 @BindingAdapter("onNavigationClick")

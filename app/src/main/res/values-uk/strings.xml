@@ -193,8 +193,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Так</string>
     <string name="no">Ні</string>
-    <string name="repo_install_title">Встановити %1$s</string>
-    <string name="repo_install_msg">Бажаєте встановити %1$s?</string>
+    <string name="repo_install_title">Встановити %1$s %2$s(%3$s)</string>
     <string name="download">Завантажити</string>
     <string name="reboot">Перезавантажити</string>
     <string name="release_notes">Особливості версії</string>

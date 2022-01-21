@@ -39,7 +39,7 @@ object ServiceLocator {
     // Networking
     val okhttp by lazy { createOkHttpClient(context) }
     val retrofit by lazy { createRetrofit(okhttp) }
-    val markwon by lazy { createMarkwon(context, okhttp) }
+    val markwon by lazy { createMarkwon(context) }
     val networkService by lazy {
         NetworkService(
             createApiService(retrofit, Const.Url.GITHUB_PAGE_URL),

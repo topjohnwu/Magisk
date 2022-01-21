@@ -187,7 +187,6 @@
     <string name="yes">対応</string>
     <string name="no">非対応</string>
     <string name="repo_install_title">%1$s をインストール</string>
-    <string name="repo_install_msg">%1$s をインストールしますか？</string>
     <string name="download">ダウンロード</string>
     <string name="reboot">再起動</string>
     <string name="release_notes">更新履歴</string>

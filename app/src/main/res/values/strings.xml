@@ -197,8 +197,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="repo_install_title">Install %1$s</string>
-    <string name="repo_install_msg">Do you want to install %1$s now?</string>
+    <string name="repo_install_title">Install %1$s %2$s(%3$s)</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
     <string name="release_notes">Release notes</string>

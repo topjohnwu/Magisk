@@ -176,8 +176,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Da</string>
     <string name="no">Ne</string>
-    <string name="repo_install_title">Instaliraj %1$s</string>
-    <string name="repo_install_msg">Da li želite instalirati %1$s sada?</string>
+    <string name="repo_install_title">Instaliraj %1$s %2$s(%3$s)</string>
     <string name="download">Preuzmi</string>
     <string name="reboot">Ponovno pokreni</string>
     <string name="release_notes">Bilješke o izdavanju aplikacije</string>

@@ -174,7 +174,6 @@
     <string name="yes">نعم</string>
     <string name="no">لا</string>
     <string name="repo_install_title">تثبيت %1$s</string>
-    <string name="repo_install_msg">هل تريد تثبيت %1$s ?</string>
     <string name="download">تنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="release_notes">معلومات الأصدار الجديد</string>
