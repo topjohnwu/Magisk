@@ -54,11 +54,17 @@ class LocalModuleRvItem(
         }
 
     @get:Bindable
-    var updateReady: Boolean
-        get() = item.updateInfo != null && !isRemoved && isEnabled
-        set(_) = notifyPropertyChanged(BR.updateReady)
+    val showUpdate get() = item.updateInfo != null
+
+    @get:Bindable
+    val updateReady get() = item.outdated && !isRemoved && isEnabled
 
     val isUpdated = item.updated
+
+    fun fetchedUpdateInfo() {
+        notifyPropertyChanged(BR.showUpdate)
+        notifyPropertyChanged(BR.updateReady)
+    }
 
     fun delete() {
         isRemoved = !isRemoved

@@ -130,7 +130,7 @@
                 <Button
                     android:id="@+id/module_update"
                     style="@style/WidgetFoundation.Button.Text"
-                    gone="@{item.item.updateJson.length == 0}"
+                    goneUnless="@{item.showUpdate}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"

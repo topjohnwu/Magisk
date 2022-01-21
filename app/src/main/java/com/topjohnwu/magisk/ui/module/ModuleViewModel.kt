@@ -59,7 +59,8 @@ class ModuleViewModel : BaseViewModel() {
     private suspend fun loadUpdateInfo() {
         withContext(Dispatchers.IO) {
             itemsInstalled.forEach {
-                it.updateReady = it.item.load()
+                if (it.item.fetch())
+                    it.fetchedUpdateInfo()
             }
         }
     }

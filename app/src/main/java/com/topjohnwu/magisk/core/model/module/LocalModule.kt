@@ -14,15 +14,18 @@ import java.util.*
 data class LocalModule(
     private val path: String,
 ) : Module() {
+    private val svc get() = ServiceLocator.networkService
+
     override var id: String = ""
     override var name: String = ""
     override var version: String = ""
     override var versionCode: Int = -1
     var author: String = ""
     var description: String = ""
-    var updateJson: String = ""
     var updateInfo: OnlineModule? = null
+    var outdated = false
 
+    private var updateUrl: String = ""
     private val removeFile = SuFile(path, "remove")
     private val disableFile = SuFile(path, "disable")
     private val updateFile = SuFile(path, "update")
@@ -93,7 +96,7 @@ data class LocalModule(
                 "versionCode" -> versionCode = value.toInt()
                 "author" -> author = value
                 "description" -> description = value
-                "updateJson" -> updateJson = value
+                "updateJson" -> updateUrl = value
             }
         }
     }
@@ -113,20 +116,21 @@ data class LocalModule(
         }
     }
 
-    suspend fun load():Boolean {
-        if (updateJson.isEmpty()) return false
+    suspend fun fetch(): Boolean {
+        if (updateUrl.isEmpty())
+            return false
 
         try {
-            val json = ServiceLocator.networkService.fetchModuleJson(updateJson)
-            if (json.versionCode > versionCode) {
-                updateInfo = OnlineModule(this, json)
-                return true
-            }
+            val json = svc.fetchModuleJson(updateUrl)
+            updateInfo = OnlineModule(this, json)
+            outdated = json.versionCode > versionCode
+            return true
         } catch (e: IOException) {
             Timber.w(e)
         } catch (e: JsonDataException) {
             Timber.w(e)
         }
+
         return false
     }
 
