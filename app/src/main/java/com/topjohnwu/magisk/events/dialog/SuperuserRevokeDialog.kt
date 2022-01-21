@@ -10,15 +10,17 @@ class SuperuserRevokeDialog(
     private val callbacks = Builder().apply(builder)
 
     override fun build(dialog: MagiskDialog) {
-        dialog.applyTitle(R.string.su_revoke_title)
-            .applyMessage(R.string.su_revoke_msg, callbacks.appName)
-            .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = android.R.string.ok
+        dialog.apply {
+            setTitle(R.string.su_revoke_title)
+            setMessage(R.string.su_revoke_msg, callbacks.appName)
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = android.R.string.ok
                 onClick { callbacks.listenerOnSuccess() }
             }
-            .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = android.R.string.cancel
+            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                text = android.R.string.cancel
             }
+        }
     }
 
     inner class Builder internal constructor() {

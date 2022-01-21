@@ -13,16 +13,19 @@ import kotlinx.coroutines.launch
 class EnvFixDialog(private val vm: HomeViewModel) : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
-        dialog.applyTitle(R.string.env_fix_title)
-            .applyMessage(R.string.env_fix_msg)
-            .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = android.R.string.ok
-                preventDismiss = true
+        dialog.apply {
+            setTitle(R.string.env_fix_title)
+            setMessage(R.string.env_fix_msg)
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = android.R.string.ok
+                doNotDismiss = true
                 onClick {
-                    dialog.applyTitle(R.string.setup_title)
-                        .applyMessage(R.string.setup_msg)
-                        .resetButtons()
-                        .cancellable(false)
+                    dialog.apply {
+                        setTitle(R.string.setup_title)
+                        setMessage(R.string.setup_msg)
+                        resetButtons()
+                        setCancelable(false)
+                    }
                     (dialog.ownerActivity as BaseActivity).lifecycleScope.launch {
                         MagiskInstaller.FixEnv {
                             dialog.dismiss()
@@ -30,14 +33,15 @@ class EnvFixDialog(private val vm: HomeViewModel) : DialogEvent() {
                     }
                 }
             }
-            .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = android.R.string.cancel
+            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                text = android.R.string.cancel
             }
+        }
 
         if (Info.env.versionCode != BuildConfig.VERSION_CODE ||
             Info.env.versionString != BuildConfig.VERSION_NAME) {
-            dialog.applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = android.R.string.ok
+            dialog.setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = android.R.string.ok
                 onClick {
                     vm.onMagiskPressed()
                     dialog.dismiss()

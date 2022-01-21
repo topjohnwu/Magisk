@@ -110,25 +110,25 @@ sealed class BaseSettingsItem : ObservableRvItem() {
         protected abstract val inputResult: String?
 
         override fun onPressed(view: View) {
-            MagiskDialog(view.context)
-                .applyTitle(title.getText(view.resources))
-                .applyView(getView(view.context))
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = android.R.string.ok
+            MagiskDialog(view.context).apply {
+                setTitle(title.getText(view.resources))
+                setView(getView(view.context))
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = android.R.string.ok
                     onClick {
                         inputResult?.let { result ->
-                            preventDismiss = false
+                            doNotDismiss = false
                             value = result
                             it.dismiss()
                             return@onClick
                         }
-                        preventDismiss = true
+                        doNotDismiss = true
                     }
                 }
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = android.R.string.cancel
+                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    text = android.R.string.cancel
                 }
-                .reveal()
+            }.show()
         }
 
         abstract fun getView(context: Context): View
@@ -151,15 +151,15 @@ sealed class BaseSettingsItem : ObservableRvItem() {
             runCatching { getStringArray(id) }.getOrDefault(emptyArray())
 
         override fun onPressed(view: View) {
-            MagiskDialog(view.context)
-                .applyTitle(title.getText(view.resources))
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = android.R.string.cancel
+            MagiskDialog(view.context).apply {
+                setTitle(title.getText(view.resources))
+                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    text = android.R.string.cancel
                 }
-                .applyAdapter(entries(view.resources)) {
+                setListItems(entries(view.resources)) {
                     value = it
                 }
-                .reveal()
+            }.show()
         }
 
     }

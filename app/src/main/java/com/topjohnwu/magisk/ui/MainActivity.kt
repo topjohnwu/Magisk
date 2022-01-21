@@ -146,42 +146,42 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
 
     private fun showUnsupportedMessage() {
         if (Info.env.isUnsupported) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_magisk_title)
-                .applyMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(false)
-                .reveal()
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_magisk_title)
+                setMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
+                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setCancelable(false)
+            }.show()
         }
 
         if (!Info.isEmulator && Info.env.isActive && System.getenv("PATH")
                 ?.split(':')
                 ?.filterNot { File("$it/magisk").exists() }
                 ?.any { File("$it/su").exists() } == true) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_general_title)
-                .applyMessage(R.string.unsupport_other_su_msg)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(false)
-                .reveal()
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_general_title)
+                setMessage(R.string.unsupport_other_su_msg)
+                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setCancelable(false)
+            }.show()
         }
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_general_title)
-                .applyMessage(R.string.unsupport_system_app_msg)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(false)
-                .reveal()
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_general_title)
+                setMessage(R.string.unsupport_system_app_msg)
+                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setCancelable(false)
+            }.show()
         }
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_general_title)
-                .applyMessage(R.string.unsupport_external_storage_msg)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) { titleRes = android.R.string.ok }
-                .cancellable(false)
-                .reveal()
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_general_title)
+                setMessage(R.string.unsupport_external_storage_msg)
+                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setCancelable(false)
+            }.show()
         }
     }
 
@@ -190,18 +190,20 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
             ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
             // Ask and show dialog
             Config.askedHome = true
-            MagiskDialog(this)
-                .applyTitle(R.string.add_shortcut_title)
-                .applyMessage(R.string.add_shortcut_msg)
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = android.R.string.cancel
-                }.applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = android.R.string.ok
+            MagiskDialog(this).apply {
+                setTitle(R.string.add_shortcut_title)
+                setMessage(R.string.add_shortcut_msg)
+                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    text = android.R.string.cancel
+                }
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = android.R.string.ok
                     onClick {
                         Shortcuts.addHomeIcon(this@MainActivity)
                     }
-                }.cancellable(true)
-                .reveal()
+                }
+                setCancelable(true)
+            }.show()
         }
     }
 }

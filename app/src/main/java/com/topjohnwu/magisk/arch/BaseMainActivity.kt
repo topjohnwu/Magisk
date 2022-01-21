@@ -75,15 +75,16 @@ abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
 
     private fun showInvalidStateMessage() {
         runOnUiThread {
-            MagiskDialog(this)
-                .applyTitle(R.string.unsupport_nonroot_stub_title)
-                .applyMessage(R.string.unsupport_nonroot_stub_msg)
-                .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = R.string.install
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_nonroot_stub_title)
+                setMessage(R.string.unsupport_nonroot_stub_msg)
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = R.string.install
                     onClick { HideAPK.restore(this@BaseMainActivity) }
                 }
-                .cancellable(false)
-                .reveal()
+                setCancelable(false)
+                show()
+            }
         }
     }
 

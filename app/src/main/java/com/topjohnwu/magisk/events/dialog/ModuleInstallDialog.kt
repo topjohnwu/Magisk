@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.view.MagiskDialog
 class ModuleInstallDialog(private val item: OnlineModule) : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
-        with(dialog) {
+        dialog.apply {
 
             fun download(install: Boolean) {
                 val action = if (install) Action.Flash else Action.Download
@@ -19,24 +19,22 @@ class ModuleInstallDialog(private val item: OnlineModule) : DialogEvent() {
                 DownloadService.start(context, subject)
             }
 
-            applyTitle(context.getString(R.string.repo_install_title, item.name))
-                .applyMessage(context.getString(R.string.repo_install_msg, item.downloadFilename))
-                .cancellable(true)
-                .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                    titleRes = R.string.download
-                    icon = R.drawable.ic_download_md2
-                    onClick { download(false) }
-                }
+            setTitle(context.getString(R.string.repo_install_title, item.name))
+            setMessage(context.getString(R.string.repo_install_msg, item.downloadFilename))
+            setCancelable(true)
+            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                text = R.string.download
+                icon = R.drawable.ic_download_md2
+                onClick { download(false) }
+            }
 
             if (Info.env.isActive) {
-                applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                    titleRes = R.string.install
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = R.string.install
                     icon = R.drawable.ic_install
                     onClick { download(true) }
                 }
             }
-
-            reveal()
         }
     }
 

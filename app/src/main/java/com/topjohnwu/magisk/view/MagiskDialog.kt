@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.Bindable
 import androidx.databinding.PropertyChangeRegistry
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
@@ -23,8 +22,11 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.*
+import com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener
 import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
 import me.tatarka.bindingcollectionadapter2.ItemBinding
+
+typealias DialogButtonClickListener = (DialogInterface) -> Unit
 
 class MagiskDialog(
     context: Context, theme: Int = 0
@@ -37,6 +39,82 @@ class MagiskDialog(
     init {
         binding.setVariable(BR.data, data)
         setCancelable(true)
+    }
+
+    inner class Data : ObservableHost {
+        override var callbacks: PropertyChangeRegistry? = null
+
+        @get:Bindable
+        var icon: Drawable? = null
+            set(value) = set(value, field, { field = it }, BR.icon)
+
+        @get:Bindable
+        var title: CharSequence = ""
+            set(value) = set(value, field, { field = it }, BR.title)
+
+        @get:Bindable
+        var message: CharSequence = ""
+            set(value) = set(value, field, { field = it }, BR.message)
+
+        val buttonPositive = ButtonViewModel()
+        val buttonNeutral = ButtonViewModel()
+        val buttonNegative = ButtonViewModel()
+    }
+
+    enum class ButtonType {
+        POSITIVE, NEUTRAL, NEGATIVE
+    }
+
+    interface Button {
+        var icon: Int
+        var text: Any
+        var isEnabled: Boolean
+        var doNotDismiss: Boolean
+
+        fun onClick(listener: DialogButtonClickListener)
+    }
+
+    inner class ButtonViewModel : Button, ObservableHost {
+        override var callbacks: PropertyChangeRegistry? = null
+
+        @get:Bindable
+        override var icon = 0
+            set(value) = set(value, field, { field = it }, BR.icon, BR.gone)
+
+        @get:Bindable
+        var message: String = ""
+            set(value) = set(value, field, { field = it }, BR.message, BR.gone)
+
+        override var text: Any
+            get() = message
+            set(value) {
+                message = when (value) {
+                    is Int -> context.getText(value)
+                    else -> value
+                }.toString()
+            }
+
+        @get:Bindable
+        val gone get() = icon == 0 && message.isEmpty()
+
+        @get:Bindable
+        override var isEnabled = true
+            set(value) = set(value, field, { field = it }, BR.enabled)
+
+        override var doNotDismiss = false
+
+        private var onClickAction: DialogButtonClickListener = {}
+
+        override fun onClick(listener: DialogButtonClickListener) {
+            onClickAction = listener
+        }
+
+        fun clicked() {
+            onClickAction(this@MagiskDialog)
+            if (!doNotDismiss) {
+                dismiss()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,129 +136,29 @@ class MagiskDialog(
         }
     }
 
-    inner class Data : ObservableHost {
-        override var callbacks: PropertyChangeRegistry? = null
+    override fun setTitle(@StringRes titleId: Int) { data.title = context.getString(titleId) }
 
-        @get:Bindable
-        var icon: Drawable? = null
-            set(value) = set(value, field, { field = it }, BR.icon)
+    override fun setTitle(title: CharSequence?) { data.title = title ?: "" }
 
-        @get:Bindable
-        var title: CharSequence = ""
-            set(value) = set(value, field, { field = it }, BR.title)
-
-        @get:Bindable
-        var message: CharSequence = ""
-            set(value) = set(value, field, { field = it }, BR.message)
-
-        val buttonPositive = Button()
-        val buttonNeutral = Button()
-        val buttonNegative = Button()
-        val buttonIDGAF = Button()
+    fun setMessage(@StringRes msgId: Int, vararg args: Any) {
+        data.message = context.getString(msgId, *args)
     }
 
-    enum class ButtonType {
-        POSITIVE, NEUTRAL, NEGATIVE, IDGAF
+    fun setMessage(message: CharSequence) { data.message = message }
+
+    fun setIcon(@DrawableRes drawableRes: Int) {
+        data.icon = AppCompatResources.getDrawable(context, drawableRes)
     }
 
-    inner class Button : ObservableHost {
-        override var callbacks: PropertyChangeRegistry? = null
+    fun setIcon(drawable: Drawable) { data.icon = drawable }
 
-        @get:Bindable
-        var icon = 0
-            set(value) = set(value, field, { field = it }, BR.icon)
-
-        @get:Bindable
-        var title: CharSequence = ""
-            set(value) = set(value, field, { field = it }, BR.title)
-
-        @get:Bindable
-        var isEnabled = true
-            set(value) = set(value, field, { field = it }, BR.enabled)
-
-        var onClickAction: OnDialogButtonClickListener = {}
-        var preventDismiss = false
-
-        fun clicked() {
-            //we might not want the click to dismiss the button to begin with
-            var prevention = preventDismiss
-
-            onClickAction(this@MagiskDialog)
-
-            //in case we don't want the dialog to close after clicking the button
-            //ie. the input is incorrect ...
-            //otherwise we disregard the request, bcs it just might reset the button in the new
-            //instance
-            if (preventDismiss) {
-                prevention = preventDismiss
-            }
-
-            if (!prevention) {
-                dismiss()
-            }
-        }
-    }
-
-    inner class ButtonBuilder(private val button: Button) {
-        var icon: Int
-            get() = button.icon
-            set(value) {
-                button.icon = value
-            }
-        var title: CharSequence
-            get() = button.title
-            set(value) {
-                button.title = value
-            }
-        var titleRes: Int
-            get() = 0
-            set(value) {
-                button.title = context.getString(value)
-            }
-        var isEnabled: Boolean
-            get() = button.isEnabled
-            set(value) {
-                button.isEnabled = value
-            }
-        var preventDismiss: Boolean
-            get() = button.preventDismiss
-            set(value) {
-                button.preventDismiss = value
-            }
-
-        fun onClick(listener: OnDialogButtonClickListener) {
-            button.onClickAction = listener
-        }
-    }
-
-    fun applyTitle(@StringRes stringRes: Int) =
-        apply { data.title = context.getString(stringRes) }
-
-    fun applyTitle(title: CharSequence) =
-        apply { data.title = title }
-
-    fun applyMessage(@StringRes stringRes: Int, vararg args: Any) =
-        apply { data.message = context.getString(stringRes, *args) }
-
-    fun applyMessage(message: CharSequence) =
-        apply { data.message = message }
-
-    fun applyIcon(@DrawableRes drawableRes: Int) =
-        apply {
-            data.icon = AppCompatResources.getDrawable(context, drawableRes)
-        }
-
-    fun applyIcon(drawable: Drawable) =
-        apply { data.icon = drawable }
-
-    fun applyButton(buttonType: ButtonType, builder: ButtonBuilder.() -> Unit) = apply {
+    fun setButton(buttonType: ButtonType, builder: Button.() -> Unit) {
         val button = when (buttonType) {
             ButtonType.POSITIVE -> data.buttonPositive
             ButtonType.NEUTRAL -> data.buttonNeutral
             ButtonType.NEGATIVE -> data.buttonNegative
-            ButtonType.IDGAF -> data.buttonIDGAF
         }
-        ButtonBuilder(button).apply(builder)
+        button.apply(builder)
     }
 
     class DialogItem(
@@ -190,43 +168,32 @@ class MagiskDialog(
         override val layoutRes = R.layout.item_list_single_line
     }
 
-    interface ActualOnDialogClickListener {
+    fun interface DialogClickListener {
         fun onClick(position: Int)
     }
 
-    fun applyAdapter(
+    fun setListItems(
         list: Array<out CharSequence>,
-        listener: OnDialogClickListener
-    ) = applyView(
+        listener: DialogClickListener
+    ) = setView(
         RecyclerView(context).also {
             it.isNestedScrollingEnabled = false
             it.layoutManager = LinearLayoutManager(context)
 
-            val actualListener = object : ActualOnDialogClickListener {
-                override fun onClick(position: Int) {
-                    listener(position)
-                    dismiss()
-                }
-            }
             val items = list.mapIndexed { i, cs -> DialogItem(cs, i) }
-            val binding = itemBindingOf<DialogItem> { it.bindExtra(BR.listener, actualListener) }
-                .let { ItemBinding.of(it) }
+            val binding = itemBindingOf<DialogItem> { item ->
+                item.bindExtra(BR.listener, DialogClickListener { pos ->
+                    listener.onClick(pos)
+                    dismiss()
+                })
+            }.let { b -> ItemBinding.of(b) }
 
             BindingRecyclerViewAdapters.setAdapter(it, binding, items, null, null, null, null)
         }
     )
 
-    fun cancellable(isCancellable: Boolean) = apply {
-        setCancelable(isCancellable)
-    }
-
-    fun <Binding : ViewDataBinding> applyView(
-        binding: Binding,
-        body: Binding.() -> Unit = {}
-    ) = applyView(binding.root).also { binding.apply(body) }
-
-    fun applyView(view: View) = apply {
-        resetView()
+    fun setView(view: View) {
+        binding.dialogBaseContainer.removeAllViews()
         binding.dialogBaseContainer.addView(
             view,
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -234,57 +201,24 @@ class MagiskDialog(
         )
     }
 
-    fun onCancel(callback: OnDialogButtonClickListener) =
-        apply { setOnCancelListener(callback) }
-
-    fun onDismiss(callback: OnDialogButtonClickListener) =
-        apply { setOnDismissListener(callback) }
-
-    fun onShow(callback: OnDialogButtonClickListener) =
-        apply { setOnShowListener(callback) }
-
-    fun reveal() = apply { super.show() }
-
-    // ---
-
-    fun resetView() = apply {
-        binding.dialogBaseContainer.removeAllViews()
-    }
-
-    fun resetTitle() = applyTitle("")
-    fun resetMessage() = applyMessage("")
-    fun resetIcon() = apply { data.icon = null }
-
-    fun resetButtons() = apply {
+    fun resetButtons() {
         ButtonType.values().forEach {
-            applyButton(it) {
-                title = ""
+            setButton(it) {
+                text = ""
                 icon = 0
                 isEnabled = true
-                preventDismiss = false
+                doNotDismiss = false
                 onClick {}
             }
         }
     }
 
-    fun reset() = resetTitle()
-        .resetMessage()
-        .resetView()
-        .resetIcon()
-        .resetButtons()
+    // Prevent calling setContentView
 
-    //region Deprecated Members
-    @Deprecated("Use applyTitle instead", ReplaceWith("applyTitle"))
-    override fun setTitle(title: CharSequence?) = Unit
-
-    @Deprecated("Use applyTitle instead", ReplaceWith("applyTitle"))
-    override fun setTitle(titleId: Int) = Unit
-
-    @Deprecated("Use reveal()", ReplaceWith("reveal()"))
-    override fun show() {
-    }
-    //endregion
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(layoutResID: Int) {}
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(view: View) {}
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(view: View, params: ViewGroup.LayoutParams?) {}
 }
-
-typealias OnDialogButtonClickListener = (DialogInterface) -> Unit
-typealias OnDialogClickListener = (position: Int) -> Unit

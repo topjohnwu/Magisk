@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.events.dialog
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseUIActivity
@@ -12,22 +13,24 @@ import com.topjohnwu.superuser.Shell
 class UninstallDialog : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
-        dialog.applyTitle(R.string.uninstall_magisk_title)
-            .applyMessage(R.string.uninstall_magisk_msg)
-            .applyButton(MagiskDialog.ButtonType.POSITIVE) {
-                titleRes = R.string.restore_img
-                onClick { restore() }
+        dialog.apply {
+            setTitle(R.string.uninstall_magisk_title)
+            setMessage(R.string.uninstall_magisk_msg)
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = R.string.restore_img
+                onClick { restore(dialog.context) }
             }
-            .applyButton(MagiskDialog.ButtonType.NEGATIVE) {
-                titleRes = R.string.complete_uninstall
-                onClick { completeUninstall() }
+            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                text = R.string.complete_uninstall
+                onClick { completeUninstall(dialog) }
             }
+        }
     }
 
     @Suppress("DEPRECATION")
-    private fun restore() {
-        val dialog = ProgressDialog(dialog.context).apply {
-            setMessage(dialog.context.getString(R.string.restore_img_msg))
+    private fun restore(context: Context) {
+        val dialog = ProgressDialog(context).apply {
+            setMessage(context.getString(R.string.restore_img_msg))
             show()
         }
 
@@ -41,9 +44,9 @@ class UninstallDialog : DialogEvent() {
         }
     }
 
-    private fun completeUninstall() {
-        (dialog.ownerActivity as? BaseUIActivity<*, *>)
-                ?.navigation?.navigate(FlashFragment.uninstall())
+    private fun completeUninstall(dialog: MagiskDialog) {
+        (dialog.ownerActivity as BaseUIActivity<*, *>)
+            .navigation?.navigate(FlashFragment.uninstall())
     }
 
 }
