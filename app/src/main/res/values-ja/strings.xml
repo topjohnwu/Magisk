@@ -8,6 +8,7 @@
     <string name="install">インストール</string>
     <string name="section_home">ホーム</string>
     <string name="section_theme">テーマ</string>
+    <string name="denylist">DenyList</string>
 
     <!--Home-->
     <string name="no_connection">インターネット接続なし</string>
@@ -106,6 +107,9 @@
     <string name="module_state_restore">復元</string>
     <string name="module_action_install_external">ストレージからインストール</string>
     <string name="update_available">更新あり</string>
+    <string name="suspend_text_riru">モジュールは %1$s が有効化されているため休止しました</string>
+    <string name="suspend_text_zygisk">モジュールは %1$s が有効化されていないため休止しました</string>
+    <string name="zygisk_module_unloaded">互換性がないため Zygisk モジュールは読み込まれませんでした</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">テーマ</string>
@@ -128,6 +132,12 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタム URL を入力</string>
+    <string name="settings_zygisk_summary">Magisk の一部を zygote デーモン上で実行する</string>
+    <string name="settings_denylist_title">DenyList を適用</string>
+    <string name="settings_denylist_summary">DenyList 内のプロセスは Magisk の変更がすべて戻されます</string>
+    <string name="settings_denylist_error">この機能を使用するには %1$s が有効化されている必要があります</string>
+    <string name="settings_denylist_config_title">DenyList を構成</string>
+    <string name="settings_denylist_config_summary">DenyList に含まれるプロセスを選択</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
@@ -212,5 +222,6 @@
     <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
     <string name="add_shortcut_msg">アプリを隠すと、アプリ名やアイコンが判別しにくいことがあります。分かりやすいようホーム画面にショートカットを追加しますか？</string>
     <string name="app_not_found">このアクションを扱えるアプリがありません</string>
+    <string name="reboot_apply_change">再起動して変更を適用</string>
 
 </resources>
