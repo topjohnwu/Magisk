@@ -76,6 +76,9 @@ class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
             getScreen(it.itemId)?.navigate()
             true
         }
+        binding.mainNavigation.setOnItemReselectedListener {
+            // https://issuetracker.google.com/issues/124538620
+        }
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
             findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
