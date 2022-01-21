@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.databinding.DiffRvItem
 import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
 import com.topjohnwu.magisk.databinding.RvContainer
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
 
 object InstallModule : DiffRvItem<InstallModule>() {
@@ -20,6 +21,25 @@ class LocalModuleRvItem(
 ) : ObservableDiffRvItem<LocalModuleRvItem>(), RvContainer<LocalModule> {
 
     override val layoutRes = R.layout.item_module_md2
+
+    val showNotice: Boolean
+    val noticeText: TextHolder
+
+    init {
+        val isZygisk = item.isZygisk
+        val isRiru = item.isRiru
+        val zygiskUnloaded = isZygisk && item.zygiskUnloaded
+
+        showNotice = zygiskUnloaded ||
+            (Info.isZygiskEnabled && isRiru) ||
+            (!Info.isZygiskEnabled && isZygisk)
+        noticeText =
+            when {
+                zygiskUnloaded -> R.string.zygisk_module_unloaded.asText()
+                isRiru -> R.string.suspend_text_riru.asText(R.string.zygisk.asText())
+                else -> R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
+            }
+    }
 
     @get:Bindable
     var isEnabled = item.enable
@@ -38,14 +58,7 @@ class LocalModuleRvItem(
         get() = item.updateInfo != null && !isRemoved && isEnabled
         set(_) = notifyPropertyChanged(BR.updateReady)
 
-    val isSuspended =
-        (Info.isZygiskEnabled && item.isRiru) || (!Info.isZygiskEnabled && item.isZygisk)
-
-    val suspendText =
-        if (item.isRiru) R.string.suspend_text_riru.asText(R.string.zygisk.asText())
-        else R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
-
-    val isUpdated get() = item.updated
+    val isUpdated = item.updated
 
     fun delete() {
         isRemoved = !isRemoved

@@ -25,7 +25,7 @@
 
         <com.google.android.material.card.MaterialCardView
             style="@style/WidgetFoundation.Card"
-            isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.suspended}"
+            isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:nextFocusRight="@id/module_indicator"
@@ -173,14 +173,14 @@
                     tools:constraint_referenced_ids="module_update,module_remove" />
 
                 <TextView
-                    android:id="@+id/module_suspend_text"
-                    goneUnless="@{item.suspended}"
+                    android:id="@+id/module_notice_text"
+                    goneUnless="@{item.showNotice}"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/l1"
                     android:layout_marginEnd="@dimen/l_50"
                     android:fontFamily="sans-serif-medium"
-                    android:text="@{item.suspendText}"
+                    android:text="@{item.noticeText}"
                     android:textAppearance="@style/AppearanceFoundation.Caption.Primary"
                     android:textColor="?colorError"
                     app:layout_constraintBottom_toBottomOf="@+id/module_remove"

@@ -29,10 +29,12 @@ data class LocalModule(
     private val ruleFile = SuFile(path, "sepolicy.rule")
     private val riruFolder = SuFile(path, "riru")
     private val zygiskFolder = SuFile(path, "zygisk")
+    private val unloaded = SuFile(zygiskFolder, "unloaded")
 
     val updated: Boolean get() = updateFile.exists()
     val isRiru: Boolean get() = (id == "riru-core") || riruFolder.exists()
     val isZygisk: Boolean get() = zygiskFolder.exists()
+    val zygiskUnloaded: Boolean get() = unloaded.exists()
 
     var enable: Boolean
         get() = !disableFile.exists()
