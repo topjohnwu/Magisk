@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
+import com.topjohnwu.magisk.events.dialog.RestoreAppDialog
 import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
@@ -104,7 +105,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
             is DenyListConfig ->
                 SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             is SystemlessHosts -> createHosts()
-            is Restore -> HideAPK.restore(view.activity)
+            is Restore -> RestoreAppDialog().publish()
             is AddShortcut -> AddHomeIconEvent().publish()
             else -> callback()
         }
