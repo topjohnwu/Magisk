@@ -13,14 +13,12 @@ import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.ktx.startAnimations
 
-abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
-    Fragment(), BaseUIComponent<VM> {
+abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHolder {
 
-    val activity get() = requireActivity() as BaseUIActivity<*, *>
+    val activity get() = requireActivity() as NavigationActivity<*>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 
-    override val viewRoot: View get() = binding.root
     private val navigation get() = activity.navigation
     open val snackbarAnchorView: View? get() = null
 
@@ -64,7 +62,7 @@ abstract class BaseUIFragment<VM : BaseViewModel, Binding : ViewDataBinding> :
         super.onViewCreated(view, savedInstanceState)
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
-                this@BaseUIFragment.onPreBind(binding)
+                this@BaseFragment.onPreBind(binding)
                 return true
             }
         })

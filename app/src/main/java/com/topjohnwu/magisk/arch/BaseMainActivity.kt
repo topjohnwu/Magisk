@@ -21,8 +21,7 @@ import com.topjohnwu.superuser.Shell
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-abstract class BaseMainActivity<VM : BaseViewModel, Binding : ViewDataBinding>
-    : BaseUIActivity<VM, Binding>() {
+abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
 
     companion object {
         private var doPreload = true

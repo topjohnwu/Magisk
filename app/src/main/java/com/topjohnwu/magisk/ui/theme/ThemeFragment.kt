@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentThemeMd2Binding
 import com.topjohnwu.magisk.databinding.ItemThemeBindingImpl
 import com.topjohnwu.magisk.di.viewModel
 
-class ThemeFragment : BaseUIFragment<ThemeViewModel, FragmentThemeMd2Binding>() {
+class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_theme_md2
     override val viewModel by viewModel<ThemeViewModel>()

@@ -7,7 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.MainActivity
@@ -16,7 +16,7 @@ import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
 
-class LogFragment : BaseUIFragment<LogViewModel, FragmentLogMd2Binding>() {
+class LogFragment : BaseFragment<FragmentLogMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()

@@ -3,14 +3,14 @@ package com.topjohnwu.magisk.ui.superuser
 import android.os.Bundle
 import android.view.View
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
 
-class SuperuserFragment : BaseUIFragment<SuperuserViewModel, FragmentSuperuserMd2Binding>() {
+class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_superuser_md2
     override val viewModel by viewModel<SuperuserViewModel>()

@@ -1,12 +1,10 @@
 package com.topjohnwu.magisk.arch
 
-import android.view.View
 import androidx.lifecycle.LifecycleOwner
 
-interface BaseUIComponent<VM : BaseViewModel> : LifecycleOwner {
+interface ViewModelHolder : LifecycleOwner {
 
-    val viewRoot: View
-    val viewModel: VM
+    val viewModel: BaseViewModel
 
     fun startObserveEvents() {
         viewModel.viewEvents.observe(this) {

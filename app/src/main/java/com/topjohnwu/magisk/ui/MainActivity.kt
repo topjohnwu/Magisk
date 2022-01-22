@@ -27,7 +27,7 @@ import java.io.File
 
 class MainViewModel : BaseViewModel()
 
-class MainActivity : BaseMainActivity<MainViewModel, ActivityMainMd2Binding>() {
+class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()

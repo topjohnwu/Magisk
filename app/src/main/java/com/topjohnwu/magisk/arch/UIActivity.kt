@@ -4,37 +4,22 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import androidx.navigation.NavController
-import androidx.navigation.NavDirections
-import androidx.navigation.fragment.NavHostFragment
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
 
-abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
-    BaseActivity(), BaseUIComponent<VM> {
+abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModelHolder {
 
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 
-    private val navHostFragment by lazy {
-        supportFragmentManager.findFragmentById(navHostId) as? NavHostFragment
-    }
-    private val topFragment get() = navHostFragment?.childFragmentManager?.fragments?.getOrNull(0)
-    protected val currentFragment get() = topFragment as? BaseUIFragment<*, *>
-
-    override val viewRoot: View get() = binding.root
-    open val navigation: NavController? get() = navHostFragment?.navController
-
-    open val navHostId: Int = 0
     open val snackbarView get() = binding.root
     open val snackbarAnchorView: View? get() = null
 
@@ -89,7 +74,7 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
     }
 
     fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
-        viewRoot.rootView.accessibilityDelegate = delegate
+        binding.root.rootView.accessibilityDelegate = delegate
     }
 
     override fun onResume() {
@@ -97,23 +82,9 @@ abstract class BaseUIActivity<VM : BaseViewModel, Binding : ViewDataBinding> :
         viewModel.requestRefresh()
     }
 
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
-    }
-
     override fun onEventDispatched(event: ViewEvent) = when (event) {
         is ContextExecutor -> event(this)
         is ActivityExecutor -> event(this)
         else -> Unit
-    }
-
-    override fun onBackPressed() {
-        if (navigation == null || currentFragment?.onBackPressed()?.not() == true) {
-            super.onBackPressed()
-        }
-    }
-
-    fun NavDirections.navigate() {
-        navigation?.navigate(this)
     }
 }

@@ -5,14 +5,14 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.events.RebootEvent
 import com.topjohnwu.superuser.Shell
 
-class HomeFragment : BaseUIFragment<HomeViewModel, FragmentHomeMd2Binding>() {
+class HomeFragment : BaseFragment<FragmentHomeMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_home_md2
     override val viewModel by viewModel<HomeViewModel>()

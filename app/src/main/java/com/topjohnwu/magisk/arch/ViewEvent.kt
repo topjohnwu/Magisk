@@ -18,9 +18,9 @@ interface ContextExecutor {
 }
 
 interface ActivityExecutor {
-    operator fun invoke(activity: BaseUIActivity<*, *>)
+    operator fun invoke(activity: UIActivity<*>)
 }
 
 interface FragmentExecutor {
-    operator fun invoke(fragment: BaseUIFragment<*, *>)
+    operator fun invoke(fragment: BaseFragment<*>)
 }

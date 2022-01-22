@@ -18,32 +18,32 @@ class PermissionEvent(
     private val callback: (Boolean) -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
-    override fun invoke(activity: BaseUIActivity<*, *>) =
+    override fun invoke(activity: UIActivity<*>) =
         activity.withPermission(permission, callback)
 }
 
 class BackPressEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         activity.onBackPressed()
     }
 }
 
 class DieEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         activity.finish()
     }
 }
 
 class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
     : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         activity.setContentView()
         activity.setAccessibilityDelegate(delegate)
     }
 }
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         activity.recreate()
     }
 }
@@ -51,7 +51,7 @@ class RecreateEvent : ViewEvent(), ActivityExecutor {
 class MagiskInstallFileEvent(
     private val callback: (Uri) -> Unit
 ) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         try {
             activity.getContent("*/*", callback)
             Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
@@ -65,8 +65,8 @@ class NavigationEvent(
     private val directions: NavDirections,
     private val pop: Boolean
 ) : ViewEvent(), ActivityExecutor {
-    override fun invoke(activity: BaseUIActivity<*, *>) {
-        (activity as? BaseUIActivity<*, *>)?.apply {
+    override fun invoke(activity: UIActivity<*>) {
+        (activity as? NavigationActivity<*>)?.apply {
             if (pop) navigation?.popBackStack()
             directions.navigate()
         }
@@ -80,7 +80,7 @@ class AddHomeIconEvent : ViewEvent(), ContextExecutor {
 }
 
 class SelectModuleEvent : ViewEvent(), FragmentExecutor {
-    override fun invoke(fragment: BaseUIFragment<*, *>) {
+    override fun invoke(fragment: BaseFragment<*>) {
         try {
             fragment.apply {
                 activity.getContent("application/zip") {

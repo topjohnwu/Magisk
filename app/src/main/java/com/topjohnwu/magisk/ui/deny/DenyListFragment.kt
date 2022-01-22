@@ -9,7 +9,7 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseUIFragment
+import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.hideKeyboard
@@ -17,7 +17,7 @@ import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
 
-class DenyListFragment : BaseUIFragment<DenyListViewModel, FragmentDenyMd2Binding>() {
+class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_deny_md2
     override val viewModel by viewModel<DenyListViewModel>()

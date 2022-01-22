@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.arch.ActivityExecutor
-import com.topjohnwu.magisk.arch.BaseUIActivity
+import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 
@@ -16,7 +16,7 @@ class BiometricEvent(
         builder(Builder())
     }
 
-    override fun invoke(activity: BaseUIActivity<*, *>) {
+    override fun invoke(activity: UIActivity<*>) {
         BiometricHelper.authenticate(
             activity,
             onError = listenerOnFailure,
