@@ -26,10 +26,10 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 
-class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
+class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
 
     val adapter = adapterOf<BaseSettingsItem>()
-    val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.callback, this) }
+    val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.handler, this) }
     val items = createItems()
 
     init {
@@ -96,27 +96,25 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Callback {
         return list
     }
 
-    override fun onItemPressed(view: View, item: BaseSettingsItem, callback: () -> Unit) {
+    override fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit) {
         when (item) {
-            is DownloadPath -> withExternalRW(callback)
-            is Biometrics -> authenticate(callback)
-            is Theme ->
-                SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
-            is DenyListConfig ->
-                SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
-            is SystemlessHosts -> createHosts()
-            is Restore -> RestoreAppDialog().publish()
-            is AddShortcut -> AddHomeIconEvent().publish()
-            else -> callback()
+            DownloadPath -> withExternalRW(andThen)
+            Biometrics -> authenticate(andThen)
+            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+            DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
+            SystemlessHosts -> createHosts()
+            Restore -> RestoreAppDialog().publish()
+            AddShortcut -> AddHomeIconEvent().publish()
+            else -> andThen()
         }
     }
 
-    override fun onItemChanged(view: View, item: BaseSettingsItem) {
+    override fun onItemAction(view: View, item: BaseSettingsItem) {
         when (item) {
-            is Language -> RecreateEvent().publish()
-            is UpdateChannel -> openUrlIfNecessary(view)
+            Language -> RecreateEvent().publish()
+            UpdateChannel -> openUrlIfNecessary(view)
             is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
-            is Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
+            Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
     }
