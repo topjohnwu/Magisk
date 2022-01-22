@@ -110,6 +110,7 @@
     <string name="update_available">Përditësimi në dispozicion</string>
     <string name="suspend_text_riru">Moduli u pezullua sepse %1$s është aktivizuar</string>
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
+    <string name="zygisk_module_unloaded">Moduli Zygisk nuk është ngarkuar për shkak të papajtueshmërisë</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
@@ -226,4 +227,5 @@
     <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për tu njohur.  Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
     <string name="reboot_apply_change">Rinisni për të aplikuar ndryshimet</string>
+    <string name="restore_app_confirmation">Kjo do të rivendosë aplikacionin e fshehur në aplikacionin origjinal. A dëshironi vërtet ta bëni këtë?</string>
 </resources>
