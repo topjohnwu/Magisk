@@ -75,6 +75,13 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             tools:node="remove" />
 
+        <!-- We don't need emoji compat -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="remove" />
+
     </application>
 
 </manifest>

@@ -48,6 +48,7 @@ android {
             excludes += "/okhttp3/**"
             excludes += "/*.txt"
             excludes += "/*.bin"
+            excludes += "/*.json"
         }
         jniLibs {
             keepDebugSymbols += "**/*.so"
