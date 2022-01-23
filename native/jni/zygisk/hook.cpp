@@ -457,8 +457,8 @@ void HookContext::nativeSpecializeAppProcess_pre() {
         state[DO_UNMOUNT] = true;
     } else if (fd >= 0) {
         run_modules_pre(module_fds);
-        write_int(fd, 0);
     }
+    write_int(fd, 0);
     close(fd);
 
     close_fds();
