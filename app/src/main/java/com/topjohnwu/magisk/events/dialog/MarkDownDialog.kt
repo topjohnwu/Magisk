@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.IOException
 
@@ -23,12 +24,13 @@ abstract class MarkDownDialog : DialogEvent() {
             val view = LayoutInflater.from(context).inflate(R.layout.markdown_window_md2, null)
             setView(view)
             val tv = view.findViewById<TextView>(R.id.md_txt)
-            (ownerActivity as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            (ownerActivity as BaseActivity).lifecycleScope.launch {
                 try {
-                    ServiceLocator.markwon.setMarkdown(tv, getMarkdownText())
+                    val text = withContext(Dispatchers.IO) { getMarkdownText() }
+                    ServiceLocator.markwon.setMarkdown(tv, text)
                 } catch (e: IOException) {
                     Timber.e(e)
-                    tv.post { tv.setText(R.string.download_file_error) }
+                    tv.setText(R.string.download_file_error)
                 }
             }
         }
