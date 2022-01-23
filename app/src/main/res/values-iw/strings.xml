@@ -182,7 +182,6 @@
     <!--Toasts, Dialogs-->
     <string name="yes">כן</string>
     <string name="no">לא</string>
-    <string name="repo_install_title">התקן %1$s</string>
     <string name="download">הורדה</string>
     <string name="reboot">הפעלה מחדש</string>
     <string name="release_notes">הערות שחרור</string>

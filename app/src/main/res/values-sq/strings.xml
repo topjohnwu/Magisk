@@ -194,7 +194,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
     <string name="no">Jo</string>
-    <string name="repo_install_title">Instalo %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Instalo %1$s %2$s(%3$d)</string>
     <string name="download">Shkarko</string>
     <string name="reboot">Rinis</string>
     <string name="release_notes">Shënimet e lëshimit</string>

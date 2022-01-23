@@ -186,7 +186,6 @@
     <!--Toasts, Dialogs-->
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
-    <string name="repo_install_title">%1$s-ის ინსტალაცია</string>
     <string name="download">გადმოწერა</string>
     <string name="reboot">გადატვირთვა</string>
     <string name="release_notes">რელიზის შენიშვნები</string>

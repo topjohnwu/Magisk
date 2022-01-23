@@ -52,7 +52,7 @@
     <string name="reboot_delay_toast">Рестартирање за 5 секунди…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Инсталирај %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Инсталирај %1$s %2$s(%3$d)</string>
     <string name="download">Преземи</string>
     <string name="reboot">Рестартирај</string>
     <string name="release_notes">Белешки за изданието</string>

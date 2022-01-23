@@ -186,7 +186,6 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Evet</string>
     <string name="no">Hayır</string>
-    <string name="repo_install_title">%1$s yükle</string>
     <string name="download">İndir</string>
     <string name="reboot">Yeniden Başlat</string>
     <string name="release_notes">Sürüm notları</string>

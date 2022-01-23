@@ -41,7 +41,7 @@
     <string name="magisk_update_title">มีการอัพเดต Magisk!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">ติดตั้ง %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">ติดตั้ง %1$s %2$s(%3$d)</string>
     <string name="download">ดาวน์โหลด</string>
     <string name="reboot">รีบู๊ต</string>
     <string name="release_notes">-้อมูลเพิ่มเติม</string>

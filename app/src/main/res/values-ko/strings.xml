@@ -190,7 +190,6 @@
     <!--Toasts, Dialogs-->
     <string name="yes">예</string>
     <string name="no">아니오</string>
-    <string name="repo_install_title">%1$s 설치</string>
     <string name="download">다운로드</string>
     <string name="reboot">다시 시작</string>
     <string name="release_notes">릴리즈 노트</string>

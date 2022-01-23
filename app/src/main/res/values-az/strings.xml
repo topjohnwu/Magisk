@@ -43,7 +43,6 @@
     <string name="magisk_update_title">Magisk Yeniləməsi Var!</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">%1$s faylını yüklə</string>
     <string name="download">Yüklə</string>
     <string name="reboot">Yenidən Başlat</string>
     <string name="release_notes">Yeniliklər</string>

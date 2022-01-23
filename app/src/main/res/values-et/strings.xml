@@ -175,7 +175,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Jah</string>
     <string name="no">Ei</string>
-    <string name="repo_install_title">Installi %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Installi %1$s %2$s(%3$d)</string>
     <string name="download">Allalaadimine</string>
     <string name="reboot">Taaskäivita</string>
     <string name="release_notes">Väljalaskemärkmed</string>

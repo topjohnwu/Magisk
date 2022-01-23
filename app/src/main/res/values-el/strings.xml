@@ -185,7 +185,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ναι</string>
     <string name="no">Όχι</string>
-    <string name="repo_install_title">Εγκατάσταση %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Εγκατάσταση %1$s %2$s(%3$d)</string>
     <string name="download">Λήψη</string>
     <string name="reboot">Επανεκκίνηση</string>
     <string name="release_notes">Σημειώσεις έκδοσης</string>

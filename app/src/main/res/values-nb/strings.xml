@@ -186,7 +186,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
-    <string name="repo_install_title">Installer %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Installer %1$s %2$s(%3$d)</string>
     <string name="download">Last ned</string>
     <string name="reboot">Omstart</string>
     <string name="release_notes">Utgivelsesnotater</string>

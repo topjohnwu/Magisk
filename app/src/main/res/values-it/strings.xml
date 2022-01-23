@@ -193,7 +193,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Sì</string>
     <string name="no">No</string>
-    <string name="repo_install_title">Installazione di %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Installazione di %1$s %2$s(%3$d)</string>
     <string name="download">Download</string>
     <string name="reboot">Riavvia</string>
     <string name="release_notes">Note di rilascio</string>

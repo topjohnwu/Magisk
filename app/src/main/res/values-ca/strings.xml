@@ -186,7 +186,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Sí</string>
     <string name="no">No</string>
-    <string name="repo_install_title">Instal·lar %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">Instal·lar %1$s %2$s(%3$d)</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
     <string name="release_notes">Notes de llançament</string>

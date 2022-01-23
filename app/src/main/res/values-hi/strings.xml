@@ -177,7 +177,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">हाँ</string>
     <string name="no">नहीं</string>
-    <string name="repo_install_title">इंस्टॉल %1$s %2$s(%3$s)</string>
+    <string name="repo_install_title">इंस्टॉल %1$s %2$s(%3$d)</string>
     <string name="download">डाउनलोड</string>
     <string name="reboot">रीबूट</string>
     <string name="release_notes">रिलीज नोट्स</string>
