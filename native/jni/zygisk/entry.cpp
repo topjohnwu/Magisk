@@ -167,6 +167,11 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     return ret;
 }
 
+static inline bool should_load_modules(int flags) {
+    return (flags & UNMOUNT_MASK) != UNMOUNT_MASK &&
+           (flags & PROCESS_IS_MAGISK_APP) != PROCESS_IS_MAGISK_APP;
+}
+
 int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &fds) {
     if (int fd = connect_daemon(); fd >= 0) {
         write_int(fd, ZYGISK_REQUEST);
@@ -175,7 +180,7 @@ int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &
         write_int(fd, uid);
         write_string(fd, process);
         xxread(fd, flags, sizeof(*flags));
-        if ((*flags & UNMOUNT_MASK) != UNMOUNT_MASK) {
+        if (should_load_modules(*flags)) {
             fds = recv_fds(fd);
         }
         return fd;
@@ -351,7 +356,7 @@ static void get_process_info(int client, const sock_cred *cred) {
 
     xwrite(client, &flags, sizeof(flags));
 
-    if ((flags & UNMOUNT_MASK) != UNMOUNT_MASK) {
+    if (should_load_modules(flags)) {
         char buf[256];
         get_exe(cred->pid, buf, sizeof(buf));
         vector<int> fds = get_module_fds(str_ends(buf, "64"));
