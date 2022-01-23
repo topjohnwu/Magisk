@@ -47,8 +47,7 @@ private class DnsResolver(client: OkHttpClient) : Dns {
         if (Config.doh) {
             try {
                 return doh.lookup(hostname)
-            } catch (e: UnknownHostException) {
-            }
+            } catch (e: UnknownHostException) {}
         }
         return Dns.SYSTEM.lookup(hostname)
     }
@@ -64,7 +63,7 @@ fun createOkHttpClient(context: Context): OkHttpClient {
             level = HttpLoggingInterceptor.Level.BASIC
         })
     } else {
-        builder.connectionSpecs(listOf(ConnectionSpec.RESTRICTED_TLS))
+        builder.connectionSpecs(listOf(ConnectionSpec.MODERN_TLS))
     }
 
     builder.dns(DnsResolver(builder.build()))
