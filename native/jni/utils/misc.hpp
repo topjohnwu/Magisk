@@ -81,21 +81,23 @@ public:
 };
 
 class dynamic_bitset {
-private:
-    using long_bits = std::bitset<sizeof(unsigned long)>;
-    std::vector<long_bits> bits;
 public:
-    constexpr static int slot_size = sizeof(unsigned long);
-    long_bits::reference operator[] (size_t pos) {
+    using slot_type = unsigned long;
+    constexpr static int slot_size = sizeof(slot_type) * 8;
+    using slot_bits = std::bitset<slot_size>;
+
+    slot_bits::reference operator[] (size_t pos) {
         size_t slot = pos / slot_size;
         size_t index = pos % slot_size;
-        if (bits.size() <= slot) {
-            bits.resize(slot + 1);
+        if (slot_list.size() <= slot) {
+            slot_list.resize(slot + 1);
         }
-        return bits[slot][index];
+        return slot_list[slot][index];
     }
-    size_t slots() const { return bits.size(); }
-    unsigned long to_ulong(size_t slot) const { return bits[slot].to_ulong(); }
+    size_t slots() const { return slot_list.size(); }
+    slot_type get_slot(size_t slot) const { return slot_list[slot].to_ulong(); }
+private:
+    std::vector<slot_bits> slot_list;
 };
 
 int parse_int(std::string_view s);

@@ -362,9 +362,9 @@ static void get_process_info(int client, const sock_cred *cred) {
     int slots = read_int(client);
     int id = 0;
     for (int i = 0; i < slots; ++i) {
-        unsigned long l = 0;
+        dynamic_bitset::slot_type l = 0;
         xxread(client, &l, sizeof(l));
-        bitset<sizeof(unsigned long)> bits(l);
+        dynamic_bitset::slot_bits bits(l);
         for (int j = 0; id < module_list->size(); ++j, ++id) {
             if (!bits[j]) {
                 // Either not a zygisk module, or incompatible

@@ -505,7 +505,7 @@ void HookContext::nativeForkSystemServer_pre() {
                 }
                 write_int(fd, bits.slots());
                 for (int i = 0; i < bits.slots(); ++i) {
-                    unsigned long l = bits.to_ulong(i);
+                    auto l = bits.get_slot(i);
                     xwrite(fd, &l, sizeof(l));
                 }
             }
