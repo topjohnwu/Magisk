@@ -1,15 +1,12 @@
 package com.topjohnwu.magisk.di
 
 import android.content.Context
-import android.text.method.LinkMovementMethod
 import com.squareup.moshi.Moshi
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.ProviderInstaller
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.currentLocale
-import io.noties.markwon.Markwon
-import io.noties.markwon.utils.NoCopySpannableFactory
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
 import okhttp3.Dns
@@ -99,19 +96,4 @@ inline fun <reified T> createApiService(retrofitBuilder: Retrofit.Builder, baseU
         .baseUrl(baseUrl)
         .build()
         .create(T::class.java)
-}
-
-fun createMarkwon(context: Context): Markwon {
-    return Markwon.builder(context)
-        .textSetter { textView, spanned, bufferType, onComplete ->
-            textView.apply {
-                post {
-                    movementMethod = LinkMovementMethod.getInstance()
-                    setSpannableFactory(NoCopySpannableFactory.getInstance())
-                    setText(spanned, bufferType)
-                    onComplete.run()
-                }
-            }
-        }
-        .build()
 }

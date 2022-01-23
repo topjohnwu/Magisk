@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.di
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -19,6 +20,8 @@ import com.topjohnwu.magisk.ui.install.InstallViewModel
 import com.topjohnwu.magisk.ui.log.LogViewModel
 import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
 import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
+import io.noties.markwon.Markwon
+import io.noties.markwon.utils.NoCopySpannableFactory
 
 val AppContext: Context inline get() = ServiceLocator.context
 
@@ -73,3 +76,13 @@ private fun createSuLogDatabase(context: Context) =
     Room.databaseBuilder(context, SuLogDatabase::class.java, "sulogs.db")
         .fallbackToDestructiveMigration()
         .build()
+
+private fun createMarkwon(context: Context) =
+    Markwon.builder(context).textSetter { textView, spanned, bufferType, onComplete ->
+        textView.apply {
+            movementMethod = LinkMovementMethod.getInstance()
+            setSpannableFactory(NoCopySpannableFactory.getInstance())
+            setText(spanned, bufferType)
+            onComplete.run()
+        }
+    }.build()
