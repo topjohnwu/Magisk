@@ -110,7 +110,7 @@
     <string name="update_available">Доступно обновление</string>
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
-    <string name="zygisk_module_unloaded">Модуль Zygisk не запущен по причине несовместимости</string>
+    <string name="zygisk_module_unloaded">Модуль Zygisk не запущен из-за несовместимости</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
