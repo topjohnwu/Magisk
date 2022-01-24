@@ -54,7 +54,7 @@ public class DownloadActivity extends Activity {
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         // Only download and dynamic load full APK if hidden
-        dynLoad = getPackageName().equals(BuildConfig.APPLICATION_ID);
+        dynLoad = !getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         // Inject resources
         loadResources();
