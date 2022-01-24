@@ -20,7 +20,7 @@
     <string name="home_package">Имя пакета</string>
     <string name="home_app_title">Приложение</string>
 
-    <string name="home_notice_content">Скачивайте Magisk ТОЛЬКО из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
+    <string name="home_notice_content">Скачивайте Magisk только из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
@@ -51,7 +51,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
-    <string name="touch_filtered_warning">Одно из приложений отображается поверх окна Magisk, выдача прав недоступна</string>
+    <string name="touch_filtered_warning">Одно из приложений отображается поверх окна Magisk, выдача Root-прав недоступна</string>
     <string name="deny">Запретить</string>
     <string name="prompt">Запросить</string>
     <string name="grant">Разрешить</string>
@@ -110,7 +110,7 @@
     <string name="update_available">Доступно обновление</string>
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
-    <string name="zygisk_module_unloaded">Модуль Zygisk не загружен по причине несовместимости</string>
+    <string name="zygisk_module_unloaded">Модуль Zygisk не запущен по причине несовместимости</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
@@ -217,12 +217,12 @@
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
-    <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, словно Magisk не установлен вообще, пожалуйста, обновите Magisk как можно скорее.</string>
+    <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, словно Magisk не установлен, пожалуйста, обновите Magisk как можно скорее.</string>
     <string name="unsupport_general_title">Неподдерживаемые условия</string>
     <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
     <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите стороннего провайдера Root-прав и/или переустановите Magisk.</string>
     <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
-    <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше продолжать работу, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
+    <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
     <string name="add_shortcut_title">Добавление ярлыка</string>
