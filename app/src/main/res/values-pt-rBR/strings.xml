@@ -103,6 +103,7 @@
     <string name="home_installed_version">Instalado</string>
     <string name="suspend_text_riru">Módulo suspenso porque %1$s está ativo</string>
     <string name="suspend_text_zygisk">Módulo suspenso porque %1$s não está ativo</string>
+    <string name="zygisk_module_unloaded">Modulo Zygisk não carregado devido a incompatibilidade</string>
 
 
     <!--Settings -->
