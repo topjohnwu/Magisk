@@ -33,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Erzwungene Verschlüsselung beibehalten</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity beibehalten</string>
+    <string name="patch_vbmeta">vbmeta im Boot-Image patchen</string>
     <string name="recovery_mode">Recovery Modus</string>
     <string name="install_options_title">Optionen</string>
     <string name="install_method_title">Methode</string>
@@ -89,13 +90,13 @@
 
     <!--SafetyNet-->
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">System-Apps anzeigen</string>
     <string name="show_os_app">OS-Apps anzeigen</string>
     <string name="hide_filter_hint">Nach Namen filtern</string>
     <string name="hide_search">Suche</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(Keine Informationen verfügbar)</string>
     <string name="reboot_userspace">Sanfter Neustart</string>
     <string name="reboot_recovery">Neustart zum Recovery</string>
@@ -107,8 +108,11 @@
     <string name="module_state_restore">Wiederherstellen</string>
     <string name="module_action_install_external">Aus dem Speicher installieren</string>
     <string name="update_available">Update verfügbar</string>
+    <string name="suspend_text_riru">Modul ausgesetzt, weil %1$s aktiviert ist</string>
+    <string name="suspend_text_zygisk">Modul ausgesetzt, weil %1$s nicht aktiviert ist</string>
+    <string name="zygisk_module_unloaded">Zygisk-Modul aufgrund von Inkompatibilität nicht geladen</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Themen-Modus</string>
     <string name="settings_dark_mode_message">Modus auswählen, der am besten zu Ihrem Stil passt!</string>
     <string name="settings_dark_mode_light">Immer hell</string>
@@ -118,7 +122,7 @@
     <string name="settings_download_path_message">Dateien werden in %1$s gespeichert</string>
     <string name="settings_hide_app_title">Magisk-App verstecken</string>
     <string name="settings_hide_app_summary">Proxy-App mit zufälliger Paket-ID und benutzerdefiniertem App-Label installieren</string>
-   <string name="settings_restore_app_title">Magisk-App wiederherstellen</string>
+    <string name="settings_restore_app_title">Magisk-App wiederherstellen</string>
     <string name="settings_restore_app_summary">App wieder einblenden und original APK wiederherstellen</string>
     <string name="language">Sprache</string>
     <string name="system_default">Systemstandard</string>
@@ -193,13 +197,14 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
+    <string name="repo_install_title">%1$s installieren %2$s(%3$d)</string>
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
     <string name="release_notes">Anmerkungen zur Veröffentlichung</string>
     <string name="flashing">Flashen…</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-   <string name="hide_app_title">Magisk-App verstecken…</string>
+    <string name="hide_app_title">Magisk-App verstecken…</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
@@ -224,5 +229,6 @@
     <string name="add_shortcut_msg">Nachdem Sie diese App verstecken, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten Sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
     <string name="reboot_apply_change">Neustart zum Änderungen übernehmen</string>
+    <string name="restore_app_confirmation">Dadurch wird die versteckte App wieder zur ursprünglichen App. Wollen Sie das wirklich tun?</string>
 
 </resources>
