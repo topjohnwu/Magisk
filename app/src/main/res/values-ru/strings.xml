@@ -15,12 +15,12 @@
     <string name="app_changelog">Изменения</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Обновить</string>
-    <string name="not_available">N/A</string>
+    <string name="not_available">Н/Д</string>
     <string name="hide">Скрыть</string>
     <string name="home_package">Имя пакета</string>
     <string name="home_app_title">Приложение</string>
 
-    <string name="home_notice_content">Загружайте Magisk только из официального репозитория GitHub. Файлы из других источников могут содержать вредоносный код!</string>
+    <string name="home_notice_content">Скачивайте Magisk только из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
@@ -28,7 +28,7 @@
     <string name="home_latest_version">Доступен</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
-    <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будет недоступен!\nБудет активировано шифрование (если отключалось раннее)!</string>
+    <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будет недоступен!\nБудет активировано шифрование хранилища (если отключалось ранее)!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
@@ -41,7 +41,7 @@
     <string name="install_start">Установить</string>
     <string name="manager_download_install">Нажмите для установки</string>
     <string name="direct_install">Автоматическая установка (рекомендуется)</string>
-    <string name="install_inactive_slot">Установка во второй слот (OTA)</string>
+    <string name="install_inactive_slot">Установка во второй слот (после OTA-обновления)</string>
     <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции Magisk после OTA!\nПродолжить?</string>
     <string name="setup_title">Расширенная установка</string>
     <string name="select_patch_file">Пропатчить boot образ</string>
@@ -51,7 +51,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Запрос прав суперпользователя</string>
-    <string name="touch_filtered_warning">Обнаружены наложения экрана, обработка запроса недоступна</string>
+    <string name="touch_filtered_warning">Одно из приложений отображается поверх окна Magisk, выдача Root-прав недоступна</string>
     <string name="deny">Запретить</string>
     <string name="prompt">Запросить</string>
     <string name="grant">Разрешить</string>
@@ -70,7 +70,7 @@
     <string name="su_snack_notif_off">Уведомления для %1$s отключены</string>
     <string name="su_snack_log_on">Логирование для %1$s включено</string>
     <string name="su_snack_log_off">Логирование для %1$s отключено</string>
-    <string name="su_revoke_title">Сброс настроек</string>
+    <string name="su_revoke_title">Сброс настроек прав</string>
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
     <string name="toast">Всплывающие уведомления</string>
     <string name="none">Ничего</string>
@@ -110,17 +110,18 @@
     <string name="update_available">Доступно обновление</string>
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
+    <string name="zygisk_module_unloaded">Модуль Zygisk не запущен из-за несовместимости</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
     <string name="settings_dark_mode_message">Настройте оформление под себя!</string>
     <string name="settings_dark_mode_light">Всегда светлый</string>
-    <string name="settings_dark_mode_system">Системный</string>
+    <string name="settings_dark_mode_system">Как в системе</string>
     <string name="settings_dark_mode_dark">Всегда тёмный</string>
     <string name="settings_download_path_title">Папка для загрузок</string>
     <string name="settings_download_path_message">Файлы будут загружаться в %1$s</string>
     <string name="settings_hide_app_title">Скрытие приложения Magisk</string>
-    <string name="settings_hide_app_summary">Пересобрать приложение Magisk со случайным названием и именем пакета</string>
+    <string name="settings_hide_app_summary">Пересобрать приложение Magisk с другим названием и случайным именем пакета</string>
     <string name="settings_restore_app_title">Восстановление приложения Magisk</string>
     <string name="settings_restore_app_summary">Восстановить приложение Magisk к исходному состоянию</string>
     <string name="language">Язык</string>
@@ -134,8 +135,8 @@
     <string name="settings_update_custom_msg">Укажите ссылку</string>
     <string name="settings_zygisk_summary">Запускать компоненты Magisk в zygote процессе</string>
     <string name="settings_denylist_title">Активировать DenyList</string>
-    <string name="settings_denylist_summary">Все изменения внесённые Magisk-ом будут скрыты для процессов, отмеченных в DenyList</string>
-    <string name="settings_denylist_error">Для применения функции необходимо запустить %1$s</string>
+    <string name="settings_denylist_summary">Все изменения, внесённые Magisk-ом, будут скрыты от процессов, отмеченных в DenyList</string>
+    <string name="settings_denylist_error">Для работы функции необходимо запустить %1$s</string>
     <string name="settings_denylist_config_title">Настройка DenyList</string>
     <string name="settings_denylist_config_summary">Отметьте процессы для скрытия в DenyList</string>
     <string name="settings_hosts_title">Внесистемный hosts файл</string>
@@ -160,13 +161,13 @@
     <string name="superuser_notification">Уведомления суперпользователя</string>
     <string name="settings_su_reauth_title">Повторная аутентификация</string>
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
-    <string name="settings_su_tapjack_title">Защита от перехвата ввода</string>
+    <string name="settings_su_tapjack_title">Защита от перехвата нажатий</string>
     <string name="settings_su_tapjack_summary">Окно запроса прав суперпользователя будет неактивно пока активированы наложения экрана</string>
     <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
-    <string name="settings_su_biometric_summary">Использовать биометрическую аутентификацию для запросов прав суперпользователя</string>
+    <string name="settings_su_biometric_summary">Принимать запросы прав суперпользователя только после биометрической аутентификации</string>
     <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
-    <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после скрытия</string>
+    <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после его скрытия</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>
     <string name="settings_doh_description">Активировать DoH (используйте при проблемах с подключением к сети)</string>
 
@@ -216,17 +217,18 @@
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
-    <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, как будто Magisk не установлен, пожалуйста, обновите Magisk как можно быстрее!</string>
+    <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, словно Magisk не установлен, пожалуйста, обновите Magisk как можно скорее.</string>
     <string name="unsupport_general_title">Неподдерживаемые условия</string>
     <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
-    <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите сторонние Root-права.</string>
+    <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите стороннего провайдера Root-прав и/или переустановите Magisk.</string>
     <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
-    <string name="unsupport_nonroot_stub_msg">Приложение не может продолжать работу в скрытом режиме, так как Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
+    <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
-    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу!</string>
-    <string name="add_shortcut_title">Создание ярлыка</string>
-    <string name="add_shortcut_msg">После скрытия приложения Magisk его имя и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
+    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
+    <string name="add_shortcut_title">Добавление ярлыка</string>
+    <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
     <string name="reboot_apply_change">Перезагрузить для применения изменений</string>
+    <string name="restore_app_confirmation">Это действие восстановит пересобранное для скрытия приложение к исходному состоянию. Вы действительно хотите продолжить?</string>
 
 </resources>
