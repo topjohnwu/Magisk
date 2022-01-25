@@ -133,6 +133,8 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
     <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
+    <string name="settings_hosts_title">Systemless Hosts</string>
+    <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_zygisk_summary">Corre les parts de Magisk en la Zygote</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Els processos en la llista de denegació tindran totes les modificación de Magisk revertides</string>
