@@ -62,6 +62,7 @@ object Language : BaseSettingsItem.Selector() {
                 entryValues = values
                 val selectedLocale = currentLocale.getDisplayName(currentLocale)
                 value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
+                notifyPropertyChanged(BR.description)
             }
         }
     }
