@@ -9,7 +9,7 @@ using namespace std;
 
 [[noreturn]] static void usage() {
     fprintf(stderr,
-R"EOF("DenyList Config CLI
+R"EOF(DenyList Config CLI
 
 Usage: magisk --denylist [action [arguments...] ]
 Actions:
@@ -21,6 +21,7 @@ Actions:
    ls              Print the current denylist
    exec CMDs...    Execute commands in isolated mount
                    namespace and do all unmounts
+
 )EOF");
     exit(1);
 }

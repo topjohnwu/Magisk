@@ -39,7 +39,7 @@ static void usage(int status) {
     "  -v, --version                 display version number and exit\n"
     "  -V                            display version code and exit\n"
     "  -mm, -M,\n"
-    "  --mount-master                force run in the global mount namespace\n");
+    "  --mount-master                force run in the global mount namespace\n\n");
     exit(status);
 }
 
