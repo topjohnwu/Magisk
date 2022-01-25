@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.core.utils.RootRegistry
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -19,7 +18,6 @@ import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
 
@@ -52,9 +50,6 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
                     return@getShell
                 }
                 preLoad()
-                if (it.isRoot) {
-                    RootRegistry.Connection.await(2, TimeUnit.SECONDS)
-                }
                 runOnUiThread {
                     doPreload = false
                     if (isRunningAsStub) {
