@@ -35,7 +35,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   │   ├── ...
 │   │   └── ...
 │   │
-│   ├── zygisk              <--- This folder contains the native libraries to load in zygote
+│   ├── zygisk              <--- This folder contains the module's Zygisk native libraries
 │   │   ├── arm64-v8a.so
 │   │   ├── armeabi-v7a.so
 │   │   ├── x86.so
@@ -114,6 +114,18 @@ Please read the [Boot Scripts](#boot-scripts) section to understand the differen
 In all scripts of your module, please use `MODDIR=${0%/*}` to get your module's base directory path; do **NOT** hardcode your module path in scripts.
 If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `1`.
 
+#### The `system` folder
+
+All files you want Magisk to replace/inject for you should be placed in this folder. This folder will be recursively merged into the real `/system`; that is: existing files in the real `/system` will be replaced by the one in modules' `system`, and new files in modules' `system` will be added to the real `/system`.
+
+There is one trick you can use: if you place an empty file named `.replace` in any of the folders, instead of merging its contents, that folder will directly replace the one in the real system. This can be very handy in some cases, for example swapping out an entire system app.
+
+If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
+
+#### Zygisk
+
+Zygisk is a feature in Magisk that allows advanced module developers to run code directly in every Android applications' processes before they are specialized and start running. For more details about the Zygisk API and building a Zygisk module, please checkout the [Zygisk Module Sample](https://github.com/topjohnwu/zygisk-module-sample) project.
+
 #### system.prop
 
 This file follows the same format as `build.prop`. Each line comprises of `[key]=[value]`.
@@ -123,10 +135,6 @@ This file follows the same format as `build.prop`. Each line comprises of `[key]
 If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk's daemon will make sure this file is copied to somewhere `magiskinit` can read pre-init to ensure these rules are injected properly.
 
 Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
-
-#### The `system` folder
-
-All files you want Magisk to replace/inject for you should be placed in this folder. Please read through the [Magic Mount](details.md#magic-mount) section to understand how Magisk mount your files.
 
 ## Magisk Module Installer
 
@@ -220,16 +228,6 @@ The list above will result in the following files being created: `$MODPATH/syste
 - When your module is downloaded with the Magisk app, `update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to ensure all installer uses up-to-date scripts. **DO NOT** try to add any custom logic in `update-binary` as it is pointless.
 - Due to historical reasons, **DO NOT** add a file named `install.sh` in your module installer. That specific file was previously used and will be treated differently.
 - **DO NOT** call `exit` at the end of `customize.sh`. The module installer would want to do finalizations.
-
-## Module Tricks
-
-#### Remove Files
-
-How to remove a file systemless-ly? To actually make the file _disappear_ is complicated (possible, not worth the effort). Replacing it with a dummy file should be good enough! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
-
-#### Remove Folders
-
-Same as mentioned above, actually making the folder _disappear_ is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers is to add the folder you want to remove into the `REPLACE` list within `customize.sh`. If your module doesn't provide a corresponding folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.
 
 ## Boot Scripts
 

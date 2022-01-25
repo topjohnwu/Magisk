@@ -54,7 +54,7 @@ Some binaries and files should be stored on non-volatile storages in `/data`. In
 - It is an existing folder on modern Android, so it cannot be used as an indication of the existence of Magisk.
 - The permission of the folder is by default `700`, owner as `root`, so non-root processes are unable to enter, read, write the folder in any possible way.
 - The folder is labeled with secontext `u:object_r:adb_data_file:s0`, and very few processes have the permission to do any interaction with that secontext.
-- The folder is located in *Device encrypted storage*, so it is accessible as soon as data is properly mounted in FBE (File-Based Encryption) devices.
+- The folder is located in _Device encrypted storage_, so it is accessible as soon as data is properly mounted in FBE (File-Based Encryption) devices.
 
 ```
 SECURE_DIR=/data/adb
@@ -113,16 +113,6 @@ Usually, system properties are designed to only be updated by `init` and read-on
 
 - `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes does not go through `property_service`. The default set property behavior of `resetprop` matches `setprop`, which **WILL** trigger events (implemented by first deleting the property then set it via `property_service`). There is a flag `-n` to disable it if you need this special behavior.
 - persist properties (props that starts with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove it from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will be read from **BOTH** `prop_area` and persistent storage.
-
-## Magic Mount
-
-The details of the actual implementation and algorithm of Magic Mount is omitted here, please directly dive into the source code if interested (`core/module.cpp`).
-
-Even though the mounting logic is very complicated, the final result of Magic Mount is actually pretty simple. For each module, the folder `$MODPATH/system` will be recursively merged into the real `/system`; that is: existing files in the real system will be replaced by the one in modules' system, and new files in modules' system will be added to the real system.
-
-There is one additional trick you can use: if you place an empty file named `.replace` in any of the folders in a module's system, instead of merging the contents, that folder will directly replace the one in the real system. This will be very handy in some cases, for example swapping out a system app.
-
-If you want to replace files in `/vendor` or `/product`, please place them under `$MODPATH/system/vendor` or `$MODPATH/system/product`. Magisk will transparently handle both cases, whether vendor or product is a separate partition or not.
 
 ## SELinux Policies
 
