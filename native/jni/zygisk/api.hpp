@@ -62,7 +62,7 @@ public:
     // This function is called when the module is loaded into the target process.
     // A Zygisk API handle will be sent as an argument; call utility functions or interface
     // with Zygisk through this handle.
-    virtual void onLoad(Api *api, JNIEnv *env) {}
+    virtual void onLoad([[maybe_unused]] Api *api, [[maybe_unused]] JNIEnv *env) {}
 
     // This function is called before the app process is specialized.
     // At this point, the process just got forked from zygote, but no app specific specialization
@@ -76,20 +76,20 @@ public:
     // If you need to run some operations as superuser, you can call Api::connectCompanion() to
     // get a socket to do IPC calls with a root companion process.
     // See Api::connectCompanion() for more info.
-    virtual void preAppSpecialize(AppSpecializeArgs *args) {}
+    virtual void preAppSpecialize([[maybe_unused]] AppSpecializeArgs *args) {}
 
     // This function is called after the app process is specialized.
     // At this point, the process has all sandbox restrictions enabled for this application.
     // This means that this function runs as the same privilege of the app's own code.
-    virtual void postAppSpecialize(const AppSpecializeArgs *args) {}
+    virtual void postAppSpecialize([[maybe_unused]] const AppSpecializeArgs *args) {}
 
     // This function is called before the system server process is specialized.
     // See preAppSpecialize(args) for more info.
-    virtual void preServerSpecialize(ServerSpecializeArgs *args) {}
+    virtual void preServerSpecialize([[maybe_unused]] ServerSpecializeArgs *args) {}
 
     // This function is called after the system server process is specialized.
     // At this point, the process runs with the privilege of system_server.
-    virtual void postServerSpecialize(const ServerSpecializeArgs *args) {}
+    virtual void postServerSpecialize([[maybe_unused]] const ServerSpecializeArgs *args) {}
 };
 
 struct AppSpecializeArgs {
