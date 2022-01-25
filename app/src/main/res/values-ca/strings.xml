@@ -8,7 +8,8 @@
     <string name="install">Instal·lar</string>
     <string name="section_home">Inici</string>
     <string name="section_theme">Temes</string>
-
+    <string name="denylist">Llista de denegació</string>
+	
     <!--Home-->
     <string name="no_connection">Connexió no disponible</string>
     <string name="app_changelog">Registre de canvis</string>
@@ -32,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Modifiqueu vbmeta en l'imatge d'inici</string>
     <string name="recovery_mode">Mode de Recuperació</string>
     <string name="install_options_title">Opcions</string>
     <string name="install_method_title">Mètode</string>
@@ -106,6 +108,9 @@
     <string name="module_state_restore">Recuperar</string>
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="update_available">Actualització Disponible</string>
+    <string name="suspend_text_riru">Mòdul suspendat perque %1$s hi esta habilitat</string>
+    <string name="suspend_text_zygisk">Mòdul suspendat perque %1$s no hi esta habilitat</string>
+    <string name="zygisk_module_unloaded">Mòdul Zygisk no carregat debut a algunes incompatibilitats</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode del tema</string>
@@ -128,8 +133,14 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Canal personalitzat</string>
     <string name="settings_update_custom_msg">Inserta un URL personalitzada</string>
-    <string name="settings_hosts_title">Systemless Hosts</string>
-    <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
+    <string name="settings_zygisk_summary">Corre les parts de Magisk en la Zygote</string>
+    <string name="settings_denylist_title">Enforce DenyList</string>
+    <string name="settings_denylist_summary">Els processos en la llista de denegació tindran totes les modificación de Magisk revertides</string>
+    <string name="settings_denylist_error">Aquesta característica nessecita %1$s per a ser activada</string>
+    <string name="settings_denylist_config_title">Configurar llista de denegació</string>
+    <string name="settings_denylist_config_summary">Selecciona els processos per a ser inclosos en la llista de denegació</string>
+    <string name="settings_hosts_title">Systemless hosts</string>
+    <string name="settings_hosts_summary">Systemless hosts suport per a aplicacións que bloquejan comercials</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_hint">Nou nom</string>
     <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
@@ -207,9 +218,17 @@
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
     <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
+    <string name="unsupport_general_title">Stat Anormaal</string>
+    <string name="unsupport_system_app_msg">Córrer aquesta app com aplicació del sistema no esta soportat. Sius plau, torni a l'app d'usuari.</string>
+    <string name="unsupport_other_su_msg">Un binario \"su\" que no és de Magisk ha sigut detectat. Sius play borri altres solucións root o/i reinstal·li Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk esta instal·lat en l'emmagatzematge extern. Sius play mogui l'app a l'emmagatzematge intern.</string>
+    <string name="unsupport_nonroot_stub_msg">L'aplicació oculta de Magisk no pot funcionar perquè l'accés root s-ha perdut. Sius plau retorni a l'APK original.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
     <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
     <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
     <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
+    <string name="reboot_apply_change">Reboot to apply changes</string>
+    <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
 
 </resources>

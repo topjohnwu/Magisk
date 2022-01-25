@@ -33,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
+	<string name="patch_vbmeta">Parchear vbmeta en la imagen de arranque</string>
     <string name="recovery_mode">Modo recovery</string>
     <string name="install_options_title">Opciones</string>
     <string name="install_method_title">Método</string>
@@ -109,6 +110,7 @@
     <string name="update_available">Actualización disponible</string>
     <string name="suspend_text_riru">Módulo suspendido porque %1$s está habilitado</string>
     <string name="suspend_text_zygisk">Módulo suspendido porque %1$s no está habilitado</string>
+	<string name="zygisk_module_unloaded">Módulo de Zygisk deshabilitado debido a la incompatibilidad</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Elegir modo</string>
@@ -216,10 +218,17 @@
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_msg">Esta versión de la app no soporta versiones de Magisk inferiores a la %1$s.\n\nLa aplicación se comportará como si no tuvieses Magisk instalado, por favor actualiza Magisk tan pronto como sea posible.</string>
-    <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
+    <string name="unsupport_general_title">Estado Anormal</string>
+    <string name="unsupport_system_app_msg">Correr esta app como una app del sistema no está soportado. Por favor regrese a una app de usuario.</string>
+    <string name="unsupport_other_su_msg">Un binario \"su\" no propietario de Magisk fue encontrado. Por favor remueva cualquier solución root y/o reinstale Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk está instalado en el almacenamiento externo. Por favor muévalo al almacenamiento interno.</string>
+    <string name="unsupport_nonroot_stub_msg">La aplicación oculta de Magisk no puede seguir funcionando porque el acceso raíz fue perdido. Por favor restaura el APK original</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+	<string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
     <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
     <string name="add_shortcut_msg">Tras esconder la app, su nombre e icono pueden resultar difíciles de reconocer. ¿Quieres añadir un acceso directo más bonito a la pantalla principal?</string>
     <string name="app_not_found">No se ha encontrado ninguna app para manejar esta acción</string>
     <string name="reboot_apply_change">Reiniciar para aplicar cambios</string>
+	<string name="restore_app_confirmation">Esto restaurara la aplicación oculta de nuevo a la app original. ¿Realmente quieres hacer esto?</string>
 
 </resources>
