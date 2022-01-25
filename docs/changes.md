@@ -1,5 +1,34 @@
 # Magisk Changelog
 
+### v24.0
+
+- [General] MagiskHide is removed from Magisk
+- [General] Support 64-bit only systems
+- [General] Support Android 12
+- [General] Update BusyBox to 1.34.1
+- [Zygisk] Introduce new feature: Zygisk
+- [Zygisk] Introduce DenyList feature to revert Magisk features in user selected processes
+- [MagiskBoot] Support patching 32-bit kernel zImages
+- [MagiskBoot] Support boot image header v4
+- [MagiskBoot] Support patching out `skip_initramfs` from dtb bootargs
+- [MagiskBoot] Add new env variable `PATCHVBMETAFLAG` to configure whether vbmeta flags should be patched
+- [MagiskInit] Support loading fstab from `/system/etc` (required for Pixel 6)
+- [MagiskInit] Support `/proc/bootconfig` for loading boot configurations
+- [MagiskInit] Better support for some Meizu devices
+- [MagiskInit] Better support for some OnePlus/Oppo/Realme devices
+- [MagiskInit] Support `init.real` on some Sony devices
+- [MagiskInit] Skip loading Magisk when detecting DSU
+- [MagiskPolicy] Load `*_compat_cil_file` from system_ext
+- [MagiskSU] Use isolated devpts if the kernel supports it
+- [MagiskSU] Fix root shell if isolated mount namespace is set
+- [resetprop] Deleted properties are now wiped from memory instead of just unlinking
+- [App] Build a single APK for all ABIs
+- [App] Switch to use standard bottom navigation bar
+- [App] Downloading modules from the centralized Magisk-Modules-Repo is removed
+- [App] Support user configuration of boot image vbmeta patching
+- [App] Restore the ability to install Magisk on the other slot on some A/B devices
+- [App] Allow modules to specify an update URL for in-app update + install
+
 ### v23.0
 
 - [App] Update snet extension. This fixes SafetyNet API errors.
@@ -115,6 +144,7 @@
 - [Scripts] Support Lineage Recovery for Android 10+
 
 ### v20.3
+
 - [MagiskBoot] Fix `lz4_legacy` decompression
 
 ### v20.2
@@ -174,8 +204,8 @@
 - [General] Fix bootloops on some devices with tmpfs mounting to /data
 - [MagiskInit] Add Kirin hi6250 support
 - [MagiskSU] Stop claiming device focus for su logging/notify if feasible.
-This fix issues with users locking Magisk Manager with app lock, and prevent
-video apps get messed up when an app is requesting root in the background.
+  This fix issues with users locking Magisk Manager with app lock, and prevent
+  video apps get messed up when an app is requesting root in the background.
 
 ### v19.1
 
@@ -183,7 +213,7 @@ video apps get messed up when an app is requesting root in the background.
 - [General] Support Android Q Beta 2
 - [MagiskInit] New sbin overlay setup process for better compatibility
 - [MagiskInit] Allow long pressing volume up to boot to recovery in recovery mode
-- [MagicMount] Use proper system\_root mirror
+- [MagicMount] Use proper system_root mirror
 - [MagicMount] Use self created device nodes for mirrors
 - [MagicMount] Do not allow adding new files/folders in partition root folder (e.g. /system or /vendor)
 
@@ -256,7 +286,7 @@ video apps get messed up when an app is requesting root in the background.
 - [General] Bring back install to inactive slot for OTAs on A/B devices
 - [Script] Remove system based root in addon.d
 - [Script] Add proper addon.d-v2 for preserving Magisk on custom ROMs on A/B devices
-- [Script] Enable KEEPVERITY when the device is using system\_root\_image
+- [Script] Enable KEEPVERITY when the device is using system_root_image
 - [Script] Add hexpatch to remove Samsung defex in new Oreo kernels
 - [Daemon] Support non ext4 filesystems for mirrors (system/vendor)
 - [MagiskSU] Make pts sockets always run in dev_pts secontext, providing all terminal emulator root shell the same power as adb shells
@@ -303,7 +333,7 @@ video apps get messed up when an app is requesting root in the background.
 - [MagiskInit] Remove `magiskinit_daemon`, the actual magisk daemon (magiskd) shall handle everything itself
 - [Daemon] Remove post-fs stage as it is very limited and also will not work on A/B devices; replaced with simple mount in post-fs-data, which will run ASAP even before the daemon is started
 - [General] Remove all 64-bit binaries as there is no point in using them; all binaries are now 32-bit only.
-Some weirdly implemented root apps might break (e.g. Tasker, already reported to the developer), but it is not my fault :)
+  Some weirdly implemented root apps might break (e.g. Tasker, already reported to the developer), but it is not my fault :)
 - [resetprop] Add Protobuf encode/decode to support manipulating persist properties on Android P
 - [MagiskHide] Include app sub-services as hiding targets. This might significantly increase the amount of apps that could be properly hidden
 
@@ -376,11 +406,11 @@ Some weirdly implemented root apps might break (e.g. Tasker, already reported to
 - [Daemon] Rewrite logcat monitor to be more efficient
 - [Daemon] Fix a bug where logcat monitor may spawn infinite logcat processes
 - [MagiskSU] Update su to work the same as proper Linux implementation:
-Initialize window size; all environment variables will be migrated (except HOME, SHELL, USER, LOGNAME, these will be set accordingly),
-"--preserve-environment" option will preserve all variables, including those four exceptions.
-Check the Linux su manpage for more info
+  Initialize window size; all environment variables will be migrated (except HOME, SHELL, USER, LOGNAME, these will be set accordingly),
+  "--preserve-environment" option will preserve all variables, including those four exceptions.
+  Check the Linux su manpage for more info
 - [MagiskBoot] Massive refactor, rewrite all cpio operations and CLI
-- [MagiskInit][MagiskBoot] Support ramdisk high compression mode
+- [MagiskInit][magiskboot] Support ramdisk high compression mode
 
 ### v14.5 (1456)
 
@@ -498,15 +528,15 @@ Check the Linux su manpage for more info
 
 - [General] Move most binaries into magisk.img (Samsung cannot run su daemon in /data)
 - [General] Move sepolicy live patch to `late_start` service
-This shall fix the long boot times, especially on Samsung devices
+  This shall fix the long boot times, especially on Samsung devices
 - [General] Add Samsung RKP hexpatch back, should now work on Samsung stock kernels
 - [General] Fix installation with SuperSU
 - [MagiskHide] Support other logcat `am_proc_start` patterns
 - [MagiskHide] Change /sys/fs/selinux/enforce(policy) permissions if required
-Samsung devices cannot switch selinux states, if running on permissive custom kernel, the users will stuck at permissive
-If this scenario is detected, change permissions to hide the permissive state, leads to SafetyNet passes
+  Samsung devices cannot switch selinux states, if running on permissive custom kernel, the users will stuck at permissive
+  If this scenario is detected, change permissions to hide the permissive state, leads to SafetyNet passes
 - [MagiskHide] Add built in prop rules to fake KNOX status
-Samsung apps requiring KNOX status to be 0x0 should now work (Samsung Pay not tested)
+  Samsung apps requiring KNOX status to be 0x0 should now work (Samsung Pay not tested)
 - [MagiskHide] Remove all ro.build props, since they cause more issues than they benefit...
 - [MagiskBoot] Add lz4 legacy format support (most linux kernel using lz4 for compression is using this)
 - [MagiskBoot] Fix MTK kernels with MTK headers
@@ -531,27 +561,27 @@ Samsung apps requiring KNOX status to be 0x0 should now work (Samsung Pay not te
 ### v11.0
 
 - [Magic Mount] Support replacing symlinks.
-Symlinks cannot be a target of a bind mounted, so they are treated the same as new files
+  Symlinks cannot be a target of a bind mounted, so they are treated the same as new files
 - [Magic Mount] Fix the issue when file/folder name contains spaces
 - [BusyBox] Updated to v1.26.2. Should fix the black screen issues of FlashFire
 - [resetprop] Support reading prop files that contains spaces in prop values
 - [MagiskSU] Adapt communication to Magisk Manager; stripped out unused data transfer
 - [MagiskSU] Implement SuperUser access option (Disable, APP only, ADB Only, APP & ADB)
-phh Superuser app has this option but the feature isn't implemented within the su binary
+  phh Superuser app has this option but the feature isn't implemented within the su binary
 - [MagiskSU] Fixed all issues with su -c "commands" (run commands with root)
-This feature is supposed to only allow one single option, but apparently adb shell su -c "command" doesn't work this way, and plenty of root apps don't follow the rule. The su binary will now consider everything after -c as a part of the command.
+  This feature is supposed to only allow one single option, but apparently adb shell su -c "command" doesn't work this way, and plenty of root apps don't follow the rule. The su binary will now consider everything after -c as a part of the command.
 - [MagiskSU] Removed legacy context hack for TiBack, what it currently does is slowing down the invocation
 - [MagiskSU] Preserve the current working directory after invoking su
-Previously phh superuser will change the path to /data/data after obtaining root shell. It will now stay in the same directory where you called su
+  Previously phh superuser will change the path to /data/data after obtaining root shell. It will now stay in the same directory where you called su
 - [MagiskSU] Daemon now also runs in u:r:su:s0 context
 - [MagiskSU] Removed an unnecessary fork, reduce running processes and speed up the invocation
 - [MagiskSU] Add -cn option to the binary
-Not sure if this is still relevant, and also not sure if implemented correctly, but hey it's here
+  Not sure if this is still relevant, and also not sure if implemented correctly, but hey it's here
 - [sepolicy-inject] Complete re-write the command-line options, now nearly matches supolicy syntax
 - [sepolicy-inject] Support all matching mode for nearly every action (makes pseudo enforced possible)
 - [sepolicy-inject] Fixed an ancient bug that allocated memory isn't reset
 - [uninstaller] Now works as a independent script that can be executed at boot
-Fully support recovery with no /data access, Magisk uninstallation with Magisk Manager
+  Fully support recovery with no /data access, Magisk uninstallation with Magisk Manager
 - [Addition] Busybox, MagiskHide, hosts settings can now be applied instantly; no reboots required
 - [Addition] Add post-fs-data.d and service.d
 - [Addition] Add option to disable Magisk (MagiskSU will still be started)
@@ -646,4 +676,5 @@ Fully support recovery with no /data access, Magisk uninstallation with Magisk M
 - Removed Magisk Manager in Magisk patch, it is now included in Magisk phh's superuser only
 
 ### v1
+
 - Initial release

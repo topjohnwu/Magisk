@@ -1,7 +1,8 @@
 # Developer Guides
 
 ## BusyBox
-Magisk ships with a feature complete BusyBox binary (including full SELinux support). The executable is located at `/data/adb/magisk/busybox`. Magisk's BusyBox supports runtime toggle-able "ASH Standalone Shell Mode". What this standalone mode means is that when running in the `ash` shell of BusyBox, every single command will directly use the applet within BusyBox, regardless of what is set as `PATH`. For example, commands like `ls`, `rm`, `chmod` will **NOT** use what is in `PATH` (in the case of Android by default it will be `/system/bin/ls`, `/system/bin/rm`, and `/system/bin/chmod` respectively), but will instead directly call internal BusyBox applets. This makes sure that scripts always run in a predictable environment and always have the full suite of commands no matter which Android version it is running on. To force a command *not* to use BusyBox, you have to call the executable with full paths.
+
+Magisk ships with a feature complete BusyBox binary (including full SELinux support). The executable is located at `/data/adb/magisk/busybox`. Magisk's BusyBox supports runtime toggle-able "ASH Standalone Shell Mode". What this standalone mode means is that when running in the `ash` shell of BusyBox, every single command will directly use the applet within BusyBox, regardless of what is set as `PATH`. For example, commands like `ls`, `rm`, `chmod` will **NOT** use what is in `PATH` (in the case of Android by default it will be `/system/bin/ls`, `/system/bin/rm`, and `/system/bin/chmod` respectively), but will instead directly call internal BusyBox applets. This makes sure that scripts always run in a predictable environment and always have the full suite of commands no matter which Android version it is running on. To force a command _not_ to use BusyBox, you have to call the executable with full paths.
 
 Every single shell script running in the context of Magisk will be executed in BusyBox's `ash` shell with standalone mode enabled. For what is relevant to 3rd party developers, this includes all boot scripts and module installation scripts.
 
@@ -12,8 +13,8 @@ For those who want to use this "Standalone Mode" feature outside of Magisk, ther
 
 To make sure all subsequent `sh` shell executed also runs in standalone mode, option 1 is the preferred method (and this is what Magisk and the Magisk app internally use) as environment variables are inherited down to child processes.
 
-
 ## Magisk Modules
+
 A Magisk module is a folder placed in `/data/adb/modules` with the structure below:
 
 ```
@@ -25,47 +26,53 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   │
 │   │      *** Module Identity ***
 │   │
-│   ├── module.prop         <--- This file stores the metadata of the module
+│   ├── module.prop         <--- This file stores the metadata of the module
 │   │
 │   │      *** Main Contents ***
 │   │
-│   ├── system              <--- This folder will be mounted if skip_mount does not exist
-│   │   ├── ...
-│   │   ├── ...
-│   │   └── ...
+│   ├── system              <--- This folder will be mounted if skip_mount does not exist
+│   │   ├── ...
+│   │   ├── ...
+│   │   └── ...
+│   │
+│   ├── zygisk              <--- This folder contains the native libraries to load in zygote
+│   │   ├── arm64-v8a.so
+│   │   ├── armeabi-v7a.so
+│   │   ├── x86.so
+│   │   ├── x86_64.so
+│   │   └── unloaded        <--- If exists, the native libraries are incompatible
 │   │
 │   │      *** Status Flags ***
 │   │
-│   ├── skip_mount          <--- If exists, Magisk will NOT mount your system folder
-│   ├── disable             <--- If exists, the module will be disabled
-│   ├── remove              <--- If exists, the module will be removed next reboot
+│   ├── skip_mount          <--- If exists, Magisk will NOT mount your system folder
+│   ├── disable             <--- If exists, the module will be disabled
+│   ├── remove              <--- If exists, the module will be removed next reboot
 │   │
 │   │      *** Optional Files ***
 │   │
-│   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
-│   ├── service.sh          <--- This script will be executed in late_start service
+│   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
+│   ├── service.sh          <--- This script will be executed in late_start service
 |   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
-│   ├── system.prop         <--- Properties in this file will be loaded as system properties by resetprop
-│   ├── sepolicy.rule       <--- Additional custom sepolicy rules
-│   │
+│   ├── system.prop         <--- Properties in this file will be loaded as system properties by resetprop
+│   ├── sepolicy.rule       <--- Additional custom sepolicy rules
+│   │
 │   │      *** Auto Generated, DO NOT MANUALLY CREATE OR MODIFY ***
-│   │
-│   ├── vendor              <--- A symlink to $MODID/system/vendor
-│   ├── product             <--- A symlink to $MODID/system/product
-│   ├── system_ext          <--- A symlink to $MODID/system/system_ext
+│   │
+│   ├── vendor              <--- A symlink to $MODID/system/vendor
+│   ├── product             <--- A symlink to $MODID/system/product
+│   ├── system_ext          <--- A symlink to $MODID/system/system_ext
 │   │
 │   │      *** Any additional files / folders are allowed ***
 │   │
-│   ├── ...
-│   └── ...
+│   ├── ...
+│   └── ...
 |
 ├── another_module
-│   ├── .
-│   └── .
+│   ├── .
+│   └── .
 ├── .
 ├── .
 ```
-
 
 #### module.prop
 
@@ -78,28 +85,47 @@ version=<string>
 versionCode=<int>
 author=<string>
 description=<string>
+updateJson=<url> (optional)
 ```
+
 - `id` has to match this regular expression: `^[a-zA-Z][a-zA-Z0-9._-]+$`<br>
-ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_module`, ✗ `-a-module`<br>
-This is the **unique identifier** of your module. You should not change it once published.
+  ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_module`, ✗ `-a-module`<br>
+  This is the **unique identifier** of your module. You should not change it once published.
 - `versionCode` has to be an **integer**. This is used to compare versions
 - Others that weren't mentioned above can be any **single line** string.
 - Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or `Macintosh (CR)` one.
+- `updateJson` should point to a URL that downloads a JSON to provide info so the Magisk app can update the module.
+
+Update JSON format:
+
+```
+{
+    "version": string,
+    "versionCode": int,
+    "zipUrl": url,
+    "changelog": url
+}
+```
 
 #### Shell scripts (`*.sh`)
+
 Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script.
 
 In all scripts of your module, please use `MODDIR=${0%/*}` to get your module's base directory path; do **NOT** hardcode your module path in scripts.
+If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `1`.
 
 #### system.prop
+
 This file follows the same format as `build.prop`. Each line comprises of `[key]=[value]`.
 
 #### sepolicy.rule
+
 If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk's daemon will make sure this file is copied to somewhere `magiskinit` can read pre-init to ensure these rules are injected properly.
 
 Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
 
 #### The `system` folder
+
 All files you want Magisk to replace/inject for you should be placed in this folder. Please read through the [Magic Mount](details.md#magic-mount) section to understand how Magisk mount your files.
 
 ## Magisk Module Installer
@@ -115,11 +141,11 @@ By default, `update-binary` will check/setup the environment, load utility funct
 module.zip
 │
 ├── META-INF
-│   └── com
-│       └── google
-│           └── android
-│               ├── update-binary      <--- The module_installer.sh you downloaded
-│               └── updater-script     <--- Should only contain the string "#MAGISK"
+│   └── com
+│       └── google
+│           └── android
+│               ├── update-binary      <--- The module_installer.sh you downloaded
+│               └── updater-script     <--- Should only contain the string "#MAGISK"
 │
 ├── customize.sh                       <--- (Optional, more details later)
 │                                           This script will be sourced by update-binary
@@ -130,7 +156,7 @@ module.zip
 
 #### Customization
 
-If you need to customize the module installation process, optionally you can create a new script in the installer called `customize.sh`. This script will be *sourced* (not executed!) by `update-binary` after all files are extracted and default permissions and secontext are applied. This is very useful if your module includes different files based on ABI, or you need to set special permissions/secontext for some of your files (e.g. files in `/system/bin`).
+If you need to customize the module installation process, optionally you can create a new script in the installer called `customize.sh`. This script will be _sourced_ (not executed!) by `update-binary` after all files are extracted and default permissions and secontext are applied. This is very useful if your module includes different files based on ABI, or you need to set special permissions/secontext for some of your files (e.g. files in `/system/bin`).
 
 If you need even more customization and prefer to do everything on your own, declare `SKIPUNZIP=1` in `customize.sh` to skip the extraction and applying default permissions/secontext steps. Be aware that by doing so, your `customize.sh` will then be responsible to install everything by itself.
 
@@ -139,6 +165,7 @@ If you need even more customization and prefer to do everything on your own, dec
 This script will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled. The following variables and shell functions are available for convenience:
 
 ##### Variables
+
 - `MAGISK_VER` (string): the version string of current installed Magisk (e.g. `v20.0`)
 - `MAGISK_VER_CODE` (int): the version code of current installed Magisk (e.g. `20000`)
 - `BOOTMODE` (bool): `true` if the module is being installed in the Magisk app
@@ -176,6 +203,7 @@ set_perm_recursive <directory> <owner> <group> <dirpermission> <filepermission> 
 ```
 
 ##### Easy Replace
+
 You can declare a list of folders you want to directly replace in the variable name `REPLACE`. The module installer script will pickup this variable and create `.replace` files for you. An example declaration:
 
 ```
@@ -184,6 +212,7 @@ REPLACE="
 /system/app/Bloatware
 "
 ```
+
 The list above will result in the following files being created: `$MODPATH/system/app/YouTube/.replace` and `$MODPATH/system/app/Bloatware/.replace`
 
 #### Notes
@@ -192,49 +221,41 @@ The list above will result in the following files being created: `$MODPATH/syste
 - Due to historical reasons, **DO NOT** add a file named `install.sh` in your module installer. That specific file was previously used and will be treated differently.
 - **DO NOT** call `exit` at the end of `customize.sh`. The module installer would want to do finalizations.
 
-## Submit Modules
-
-You can submit a module to **Magisk-Module-Repo** so users can download your module directly in the Magisk app.
-
-- Follow the instructions in the previous section to create a valid installer for your module.
-- Create `README.md` (filename should be exactly the same) containing all info for your module. If you are not familiar with the Markdown syntax, the [Markdown Cheat Sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) will be handy.
-- Create a repository with your personal GitHub account, and upload your module installer to the repo
-- Create a request for submission via this link: [submission](https://github.com/Magisk-Modules-Repo/submission)
-
 ## Module Tricks
 
 #### Remove Files
-How to remove a file systemless-ly? To actually make the file *disappear* is complicated (possible, not worth the effort). Replacing it with a dummy file should be good enough! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
+
+How to remove a file systemless-ly? To actually make the file _disappear_ is complicated (possible, not worth the effort). Replacing it with a dummy file should be good enough! Create an empty file with the same name and place it in the same path within a module, it shall replace your target file with a dummy file.
 
 #### Remove Folders
-Same as mentioned above, actually making the folder *disappear* is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers is to add the folder you want to remove into the `REPLACE` list within `customize.sh`. If your module doesn't provide a corresponding folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.
 
+Same as mentioned above, actually making the folder _disappear_ is not worth the effort. Replacing it with an empty folder should be good enough! A handy trick for module developers is to add the folder you want to remove into the `REPLACE` list within `customize.sh`. If your module doesn't provide a corresponding folder, it will create an empty folder, and automatically add `.replace` into the empty folder so the dummy folder will properly replace the one in `/system`.
 
 ## Boot Scripts
 
 In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
 
 - post-fs-data mode
-    - This stage is BLOCKING. The boot process is paused before execution is done, or 10 seconds have passed.
-    - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
-    - This stage happens before Zygote is started, which pretty much means everything in Android
-    - **Run scripts in this mode only if necessary!**
+  - This stage is BLOCKING. The boot process is paused before execution is done, or 10 seconds have passed.
+  - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
+  - This stage happens before Zygote is started, which pretty much means everything in Android
+  - **Run scripts in this mode only if necessary!**
 - late_start service mode
-    - This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.
-    - **This is the recommended stage to run most scripts!**
+  - This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.
+  - **This is the recommended stage to run most scripts!**
 
 In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
 
 - General Scripts
-    - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
-    - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
-    - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
-    - Modules should **NOT** add general scripts since it violates encapsulation
+  - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
+  - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
+  - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
+  - Modules should **NOT** add general scripts since it violates encapsulation
 - Module Scripts
-    - Placed in the folder of the module
-    - Only executed if the module is enabled
-    - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
-    - Modules require boot scripts should **ONLY** use module scripts instead of general scripts
+  - Placed in the folder of the module
+  - Only executed if the module is enabled
+  - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
+  - Modules require boot scripts should **ONLY** use module scripts instead of general scripts
 
 These scripts will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled.
 
@@ -258,16 +279,16 @@ Here is an example of how to setup `overlay.d` with custom `*.rc` script:
 ramdisk
 │
 ├── overlay.d
-│   ├── sbin
+│   ├── sbin
 │   │   ├── libfoo.ko      <--- These 2 files will be copied
-│   │   └── myscript.sh    <--- to Magisk's tmpfs directory
-│   ├── custom.rc          <--- This file will be injected into init.rc
-│   ├── res
-│   │   └── random.png     <--- This file will replace /res/random.png
-│   └── new_file           <--- This file will be ignored because
+│   │   └── myscript.sh    <--- to Magisk's tmpfs directory
+│   ├── custom.rc          <--- This file will be injected into init.rc
+│   ├── res
+│   │   └── random.png     <--- This file will replace /res/random.png
+│   └── new_file           <--- This file will be ignored because
 │                               /new_file does not exist
 ├── res
-│   └── random.png         <--- This file will be replaced by
+│   └── random.png         <--- This file will be replaced by
 │                               /overlay.d/res/random.png
 ├── ...
 ├── ...  /* The rest of initramfs files */
