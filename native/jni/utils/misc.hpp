@@ -94,8 +94,15 @@ public:
         }
         return slot_list[slot][index];
     }
+    bool operator[] (size_t pos) const {
+        size_t slot = pos / slot_size;
+        size_t index = pos % slot_size;
+        return slot_list.size() > slot && slot_list[slot][index];
+    }
     size_t slots() const { return slot_list.size(); }
-    slot_type get_slot(size_t slot) const { return slot_list[slot].to_ulong(); }
+    slot_type get_slot(size_t slot) const {
+        return slot_list.size() > slot ? slot_list[slot].to_ulong() : 0ul;
+    }
 private:
     std::vector<slot_bits> slot_list;
 };

@@ -498,11 +498,8 @@ void HookContext::nativeForkSystemServer_pre() {
 
                 // Send the bitset of module status back to magiskd from system_server
                 dynamic_bitset bits;
-                // Pre-allocate enough bits
-                bits[module_fds.size() - 1] = false;
-                for (const auto &m : modules) {
+                for (const auto &m : modules)
                     bits[m.getId()] = true;
-                }
                 write_int(fd, bits.slots());
                 for (int i = 0; i < bits.slots(); ++i) {
                     auto l = bits.get_slot(i);
