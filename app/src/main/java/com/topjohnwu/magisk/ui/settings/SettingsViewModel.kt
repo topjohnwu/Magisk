@@ -67,7 +67,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
                 Magisk,
                 SystemlessHosts
             ))
-            if (Const.Version.isCanary()) {
+            if (Const.Version.atLeast_24_0()) {
                 list.addAll(listOf(Zygisk, DenyList, DenyListConfig))
             }
         }
