@@ -117,6 +117,7 @@
     <string name="settings_dark_mode_message">¡Seleccione el modo que mejor se adapte a su estilo!</string>
     <string name="settings_dark_mode_light">Claro</string>
     <string name="settings_dark_mode_system">Seguir al sistema</string>
+    <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
     <string name="settings_dark_mode_dark">Oscuro</string>
     <string name="settings_download_path_title">Ruta de Descarga</string>
     <string name="settings_download_path_message">Los archivos se guardarán en %1$s</string>
