@@ -1,6 +1,6 @@
 <resources>
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Moduli</string>
     <string name="superuser">Accesso root</string>
     <string name="logs">Registro eventi</string>
@@ -107,6 +107,9 @@
     <string name="module_state_restore">Ripristina</string>
     <string name="module_action_install_external">Installa dal dispositivo</string>
     <string name="update_available">Aggiornamento disponibile</string>
+    <string name="suspend_text_riru">Modulo sospeso perché %1$s è abilitato</string>
+    <string name="suspend_text_zygisk">Modulo sospeso perché %1$s non è abilitato</string>
+    <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>																					  
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Impostazioni tema</string>
@@ -225,5 +228,6 @@
     <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
     <string name="reboot_apply_change">Riavvia per applicare le modifiche</string>
+    <string name="restore_app_confirmation">L\'app nascosta verrà sostituita con la versione originale. Sei sicuro di voler continuare?</string>
 
 </resources>
