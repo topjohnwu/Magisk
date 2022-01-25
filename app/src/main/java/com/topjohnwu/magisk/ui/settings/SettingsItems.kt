@@ -204,7 +204,7 @@ object Magisk : BaseSettingsItem.Section() {
 }
 
 object Zygisk : BaseSettingsItem.Toggle() {
-    override val title = R.string.zygisk.asText()
+    override val title = R.string.zygisk_beta.asText()
     override val description get() =
         if (mismatch) R.string.reboot_apply_change.asText()
         else R.string.settings_zygisk_summary.asText()
