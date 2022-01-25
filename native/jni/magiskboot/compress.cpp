@@ -111,8 +111,9 @@ public:
         zo{}, out(nullptr), outsize(0), crc(crc32_z(0L, Z_NULL, 0)), in_total(0), bp(0) {
         ZopfliInitOptions(&zo);
 
-        // 5 iterations is reasonable for large files
-        zo.numiterations = 5;
+        // This config is already better than gzip -9
+        zo.numiterations = 1;
+        zo.blocksplitting = 0;
 
         ZOPFLI_APPEND_DATA(31, &out, &outsize);  /* ID1 */
         ZOPFLI_APPEND_DATA(139, &out, &outsize); /* ID2 */
