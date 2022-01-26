@@ -230,6 +230,6 @@
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
     <string name="app_not_found">Aucune application n’a été trouvée pour gérer cette action</string>
     <string name="reboot_apply_change">Redémarrer pour appliquer les changements</string>
-    <string name="restore_app_confirmation">Cela restaurera l’application cachée en application originale. Vous voulez vraiment faire ça ?/string>
+    <string name="restore_app_confirmation">Cela restaurera l’application cachée en application originale. Vous voulez vraiment faire ça ?</string>
 
 </resources>
