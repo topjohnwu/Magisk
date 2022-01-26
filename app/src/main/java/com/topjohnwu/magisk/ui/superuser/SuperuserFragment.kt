@@ -17,7 +17,7 @@ class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        activity.title = resources.getString(R.string.superuser)
+        activity?.title = resources.getString(R.string.superuser)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
