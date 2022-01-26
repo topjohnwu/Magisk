@@ -92,9 +92,9 @@ updateJson=<url> (optional)
   ex: ✓ `a_module`, ✓ `a.module`, ✓ `module-101`, ✗ `a module`, ✗ `1_module`, ✗ `-a-module`<br>
   This is the **unique identifier** of your module. You should not change it once published.
 - `versionCode` has to be an **integer**. This is used to compare versions
-- Others that weren't mentioned above can be any **single line** string.
-- Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or `Macintosh (CR)` one.
 - `updateJson` should point to a URL that downloads a JSON to provide info so the Magisk app can update the module.
+- Others that weren't mentioned above can be any **single line** string.
+- Make sure to use the `UNIX (LF)` line break type and not the `Windows (CR+LF)` or `Macintosh (CR)`.
 
 Update JSON format:
 
@@ -116,15 +116,15 @@ If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `
 
 #### The `system` folder
 
-All files you want Magisk to replace/inject for you should be placed in this folder. This folder will be recursively merged into the real `/system`; that is: existing files in the real `/system` will be replaced by the one in modules' `system`, and new files in modules' `system` will be added to the real `/system`.
+All files you want to replace/inject should be placed in this folder. This folder will be recursively merged into the real `/system`; that is: existing files in the real `/system` will be replaced by the one in the module's `system`, and new files in the module's `system` will be added to the real `/system`.
 
-There is one trick you can use: if you place an empty file named `.replace` in any of the folders, instead of merging its contents, that folder will directly replace the one in the real system. This can be very handy in some cases, for example swapping out an entire system app.
+If you place a file named `.replace` in any of the folders, instead of merging its contents, that folder will directly replace the one in the real system. This can be very handy for swapping out an entire folder.
 
 If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
 
 #### Zygisk
 
-Zygisk is a feature in Magisk that allows advanced module developers to run code directly in every Android applications' processes before they are specialized and start running. For more details about the Zygisk API and building a Zygisk module, please checkout the [Zygisk Module Sample](https://github.com/topjohnwu/zygisk-module-sample) project.
+Zygisk is a feature of Magisk that allows advanced module developers to run code directly in every Android applications' processes before they are specialized and running. For more details about the Zygisk API and building a Zygisk module, please checkout the [Zygisk Module Sample](https://github.com/topjohnwu/zygisk-module-sample) project.
 
 #### system.prop
 
@@ -132,18 +132,16 @@ This file follows the same format as `build.prop`. Each line comprises of `[key]
 
 #### sepolicy.rule
 
-If your module requires some additional sepolicy patches, please add those rules into this file. The module installer script and Magisk's daemon will make sure this file is copied to somewhere `magiskinit` can read pre-init to ensure these rules are injected properly.
-
-Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
+If your module requires some additional sepolicy patches, please add those rules into this file. Each line in this file will be treated as a policy statement. For more details about how a policy statement is formatted, please check [magiskpolicy](tools.md#magiskpolicy)'s documentation.
 
 ## Magisk Module Installer
 
-A Magisk Module Installer is a Magisk Module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. An installer has the same file structure as a Magisk module (please check the previous section for more info). The simplest Magisk Module Installer is just a Magisk Module packed in a zip file, with addition to the following files:
+A Magisk module installer is a Magisk module packaged in a zip file that can be flashed in the Magisk app or custom recoveries such as TWRP. The simplest Magisk module installer is just a Magisk module packed as a zip file, in addition to the following files:
 
 - `update-binary`: Download the latest [module_installer.sh](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) and rename/copy that script as `update-binary`
 - `updater-script`: This file should only contain the string `#MAGISK`
 
-By default, `update-binary` will check/setup the environment, load utility functions, extract the module installer zip to where your module will be installed, and finally do some trivial tasks and cleanups, which should cover most simple modules' needs.
+The module installer script will setup the environment, extract the module files from the zip file to the correct location, then finalizes the installation process, which should be good enough for most simple Magisk modules.
 
 ```
 module.zip
@@ -164,13 +162,11 @@ module.zip
 
 #### Customization
 
-If you need to customize the module installation process, optionally you can create a new script in the installer called `customize.sh`. This script will be _sourced_ (not executed!) by `update-binary` after all files are extracted and default permissions and secontext are applied. This is very useful if your module includes different files based on ABI, or you need to set special permissions/secontext for some of your files (e.g. files in `/system/bin`).
+If you need to customize the module installation process, optionally you can create a script in the installer named `customize.sh`. This script will be _sourced_ (not executed!) by the module installer script after all files are extracted and default permissions and secontext are applied. This is very useful if your module require additional setup based on the device ABI, or you need to set special permissions/secontext for some of your module files.
 
-If you need even more customization and prefer to do everything on your own, declare `SKIPUNZIP=1` in `customize.sh` to skip the extraction and applying default permissions/secontext steps. Be aware that by doing so, your `customize.sh` will then be responsible to install everything by itself.
+If you would like to fully control and customize the installation process, declare `SKIPUNZIP=1` in `customize.sh` to skip all default installation steps. By doing so, your `customize.sh` will be responsible to install everything by itself.
 
-#### `customize.sh` Environment
-
-This script will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled. The following variables and shell functions are available for convenience:
+The `customize.sh` script runs in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled. The following variables and functions are available:
 
 ##### Variables
 
@@ -210,9 +206,7 @@ set_perm_recursive <directory> <owner> <group> <dirpermission> <filepermission> 
        set_perm dir owner group dirpermission context
 ```
 
-##### Easy Replace
-
-You can declare a list of folders you want to directly replace in the variable name `REPLACE`. The module installer script will pickup this variable and create `.replace` files for you. An example declaration:
+For convenience, you can also declare a list of folders you want to replace in the variable name `REPLACE`. The module installer script will create the `.replace` file into the folders listed in `REPLACE`. For example:
 
 ```
 REPLACE="
@@ -221,13 +215,13 @@ REPLACE="
 "
 ```
 
-The list above will result in the following files being created: `$MODPATH/system/app/YouTube/.replace` and `$MODPATH/system/app/Bloatware/.replace`
+The list above will result in the following files being created: `$MODPATH/system/app/YouTube/.replace` and `$MODPATH/system/app/Bloatware/.replace`.
 
 #### Notes
 
-- When your module is downloaded with the Magisk app, `update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh) to ensure all installer uses up-to-date scripts. **DO NOT** try to add any custom logic in `update-binary` as it is pointless.
-- Due to historical reasons, **DO NOT** add a file named `install.sh` in your module installer. That specific file was previously used and will be treated differently.
-- **DO NOT** call `exit` at the end of `customize.sh`. The module installer would want to do finalizations.
+- When your module is downloaded with the Magisk app, `update-binary` will be **forcefully** replaced with the latest [`module_installer.sh`](https://github.com/topjohnwu/Magisk/blob/master/scripts/module_installer.sh). **DO NOT** try to add any custom logic in `update-binary`.
+- Due to historical reasons, **DO NOT** add a file named `install.sh` in your module installer zip.
+- **DO NOT** call `exit` at the end of `customize.sh`. The module installer script has to perform some cleanups before exiting.
 
 ## Boot Scripts
 
@@ -238,25 +232,24 @@ In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and *
   - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
   - This stage happens before Zygote is started, which pretty much means everything in Android
   - **WARNING:** using `setprop` will deadlock the boot process! Please use `resetprop -n <prop_name> <prop_value>` instead.
-  - **Run scripts in this mode only if necessary!**
+  - **Only run scripts in this mode if necessary.**
 - late_start service mode
-  - This stage is NON-BLOCKING. Your script runs in parallel along with the booting process.
-  - **This is the recommended stage to run most scripts!**
+  - This stage is NON-BLOCKING. Your script runs in parallel with the rest of the booting process.
+  - **This is the recommended stage to run most scripts.**
 
 In Magisk, there are also 2 kinds of scripts: **general scripts** and **module scripts**.
 
 - General Scripts
   - Placed in `/data/adb/post-fs-data.d` or `/data/adb/service.d`
-  - Only executed if the script is executable (execution permissions, `chmod +x script.sh`)
+  - Only executed if the script is set as executable (`chmod +x script.sh`)
   - Scripts in `post-fs-data.d` runs in post-fs-data mode, and scripts in `service.d` runs in late_start service mode.
-  - Modules should **NOT** add general scripts since it violates encapsulation
+  - Modules should **NOT** add general scripts during installation
 - Module Scripts
-  - Placed in the folder of the module
+  - Placed in the module's own folder
   - Only executed if the module is enabled
   - `post-fs-data.sh` runs in post-fs-data mode, and `service.sh` runs in late_start service mode.
-  - Modules require boot scripts should **ONLY** use module scripts instead of general scripts
 
-These scripts will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled.
+All boot scripts will run in Magisk's BusyBox `ash` shell with "Standalone Mode" enabled.
 
 ## Root Directory Overlay System
 
@@ -268,11 +261,11 @@ Overlay files shall be placed in the `overlay.d` folder in boot image ramdisk, a
 2. Existing files can be replaced by files located at the same relative path
 3. Files that correspond to a non-existing file will be ignored
 
-In order to have additional files that you want to reference in your custom `*.rc` scripts, add them in `overlay.d/sbin`. The 3 rules above does not apply to everything in this specific folder, as they will directly be copied to Magisk's internal `tmpfs` directory (which used to always be located at `/sbin`).
+To add additional files which you can refer to in your custom `*.rc` scripts, add them into `overlay.d/sbin`. The 3 rules above do not apply to anything in this folder; instead, they will be directly copied to Magisk's internal `tmpfs` directory (which used to always be `/sbin`).
 
-Due to changes in Android 11, the `/sbin` folder is no longer guaranteed to exist. In that case, Magisk randomly generates the `tmpfs` folder. Every occurrence of the pattern `${MAGISKTMP}` in your `*.rc` scripts will be replaced with the Magisk `tmpfs` folder when `magiskinit` injects it into `init.rc`. This also works on pre Android 11 devices as `${MAGISKTMP}` will simply be replaced with `/sbin` in this case, so the best practice is to **NEVER** hardcode `/sbin` in your `*.rc` scripts when referencing additional files.
+Starting from Android 11, the `/sbin` folder may no longer exists, and in that scenario, Magisk randomly generates a different `tmpfs` folder each boot. Every occurrence of the pattern `${MAGISKTMP}` in your `*.rc` scripts will be replaced with the Magisk `tmpfs` folder when `magiskinit` injects it into `init.rc`. On pre Android 11 devices, `${MAGISKTMP}` will simply be replaced with `/sbin`, so **NEVER** hardcode `/sbin` in the `*.rc` scripts when referencing these additional files.
 
-Here is an example of how to setup `overlay.d` with custom `*.rc` script:
+Here is an example of how to setup `overlay.d` with a custom `*.rc` script:
 
 ```
 ramdisk
@@ -280,7 +273,7 @@ ramdisk
 ├── overlay.d
 │   ├── sbin
 │   │   ├── libfoo.ko      <--- These 2 files will be copied
-│   │   └── myscript.sh    <--- to Magisk's tmpfs directory
+│   │   └── myscript.sh    <--- into Magisk's tmpfs directory
 │   ├── custom.rc          <--- This file will be injected into init.rc
 │   ├── res
 │   │   └── random.png     <--- This file will replace /res/random.png
