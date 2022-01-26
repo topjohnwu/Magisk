@@ -108,8 +108,8 @@
     <string name="module_state_restore">Recuperar</string>
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="update_available">Actualització Disponible</string>
-    <string name="suspend_text_riru">Mòdul suspendat perque %1$s hi esta habilitat</string>
-    <string name="suspend_text_zygisk">Mòdul suspendat perque %1$s no hi esta habilitat</string>
+    <string name="suspend_text_riru">Mòdul suspès perque %1$s hi esta habilitat</string>
+    <string name="suspend_text_zygisk">Mòdul suspès perque %1$s no hi esta habilitat</string>
     <string name="zygisk_module_unloaded">Mòdul Zygisk no carregat debut a algunes incompatibilitats</string>
 
     <!--Settings-->
@@ -137,12 +137,12 @@
     <string name="settings_hosts_summary">Suport per aplicacions tipus Adblock fora de la partició del sistema</string>
     <string name="settings_zygisk_summary">Corre les parts de Magisk en la Zygote</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
-    <string name="settings_denylist_summary">Els processos en la llista de denegació tindran totes les modificación de Magisk revertides</string>
-    <string name="settings_denylist_error">Aquesta característica nessecita %1$s per a ser activada</string>
+    <string name="settings_denylist_summary">Els processos en la llista de denegació tindran totes les modificacións de Magisk revertides</string>
+    <string name="settings_denylist_error">Aquesta característica necessita %1$s per a ser activada</string>
     <string name="settings_denylist_config_title">Configurar llista de denegació</string>
     <string name="settings_denylist_config_summary">Selecciona els processos per a ser inclosos en la llista de denegació</string>
     <string name="settings_hosts_title">Systemless hosts</string>
-    <string name="settings_hosts_summary">Systemless hosts suport per a aplicacións que bloquejan comercials</string>
+    <string name="settings_hosts_summary">Systemless hosts support per a aplicacións que bloquejan comercials</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_hint">Nou nom</string>
     <string name="settings_app_name_helper">Es refarà l\'aplicació amb aquest nom</string>
@@ -220,17 +220,17 @@
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
     <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
-    <string name="unsupport_general_title">Stat Anormaal</string>
-    <string name="unsupport_system_app_msg">Córrer aquesta app com aplicació del sistema no esta soportat. Sius plau, torni a l'app d'usuari.</string>
-    <string name="unsupport_other_su_msg">Un binario \"su\" que no és de Magisk ha sigut detectat. Sius play borri altres solucións root o/i reinstal·li Magisk.</string>
-    <string name="unsupport_external_storage_msg">Magisk esta instal·lat en l'emmagatzematge extern. Sius play mogui l'app a l'emmagatzematge intern.</string>
-    <string name="unsupport_nonroot_stub_msg">L'aplicació oculta de Magisk no pot funcionar perquè l'accés root s-ha perdut. Sius plau retorni a l'APK original.</string>
+    <string name="unsupport_general_title">Estat Anormal</string>
+    <string name="unsupport_system_app_msg">Córrer aquesta app com aplicació del sistema no està suportat. Sis plau, torni a l'app d'usuari.</string>
+    <string name="unsupport_other_su_msg">Un binari \"su\" que no és de Magisk ha sigut detectat. Sis plau esborri altres solucions root o/i reinstal·li Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk està instal·lat en l'emmagatzematge extern. Sis plau mogui l'app a l'emmagatzematge intern.</string>
+    <string name="unsupport_nonroot_stub_msg">L'aplicació oculta de Magisk no pot funcionar perquè l'accés root s-ha perdut. Sis plau torni a l'APK original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
     <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
     <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
     <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
-    <string name="reboot_apply_change">Reboot to apply changes</string>
-    <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
+    <string name="reboot_apply_change">Reinici per a aplicar els canvis</string>
+    <string name="restore_app_confirmation">Això restaurarà l'app oculta de volta l'original. Realment vols fer això?</string>
 
 </resources>
