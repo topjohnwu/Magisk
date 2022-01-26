@@ -34,7 +34,7 @@ Next, we need to know whether your device has a separate `vbmeta` partition.
 - If you find `vbmeta`, `vbmeta_a`, or `vbmeta_b`, then yes, your device **has** a separate `vbmeta` partition
 - Otherwise, your device **does not** have a separate `vbmeta` partition.
 
-Quick recap, at this point, you should know and prepare:
+Quick recap, at this point, you should know and prepared:
 
 1. Whether your device has boot ramdisk
 2. Whether your device has a separate `vbmeta` partition
@@ -89,7 +89,7 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
 
 ### Unlocking Bootloader
 
-Unlocking the bootloader on modern Samsung devices have some caveats. The newly introduced `VaultKeeper` service will make the bootloader reject any unofficial partitions in some cirumstances.
+Unlocking the bootloader on modern Samsung devices have some caveats. The newly introduced `VaultKeeper` service will make the bootloader reject any unofficial partitions in some circumstances.
 
 - Allow bootloader unlocking in **Developer options → OEM unlocking**
 - Reboot to download mode: power off your device and press the download mode key combo for your device
@@ -117,7 +117,7 @@ Unlocking the bootloader on modern Samsung devices have some caveats. The newly 
 
 ### Upgrading the OS
 
-Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the Odin flashing step: do NOT use the `CSC` tar, but the `HOME_CSC` tar instead as we are performing an upgrade, not the initial install**.
+Once you have rooted your Samsung device, you can no longer upgrade your Android OS through OTA. To upgrade your device's OS, you have to manually download the new firmware zip file and go through the same `AP` patching process written in the previous section. **The only difference here is in the Odin flashing step: do NOT use the `CSC` tar, but instead use the `HOME_CSC` tar as we are performing an upgrade, not the initial install**.
 
 ### Important Notes
 
