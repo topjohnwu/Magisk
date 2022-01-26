@@ -28,6 +28,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public Activity instantiateActivity(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (loader == null) loader = cl;
         if (receiver != null)
             return receiver.instantiateActivity(loader, className, intent);
         return create(className);
@@ -36,6 +37,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public BroadcastReceiver instantiateReceiver(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (loader == null) loader = cl;
         if (receiver != null)
             return receiver.instantiateReceiver(loader, className, intent);
         return create(className);
@@ -44,6 +46,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public Service instantiateService(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (loader == null) loader = cl;
         if (receiver != null)
             return receiver.instantiateService(loader, className, intent);
         return create(className);
@@ -52,6 +55,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     @Override
     public ContentProvider instantiateProvider(ClassLoader cl, String className)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if (loader == null) loader = cl;
         if (receiver != null)
             return receiver.instantiateProvider(loader, className);
         return create(className);
