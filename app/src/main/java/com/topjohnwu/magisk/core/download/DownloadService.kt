@@ -76,7 +76,7 @@ class DownloadService : BaseService() {
                 }
                 if (!hasNotifications)
                     stopSelf()
-            } catch (e: IOException) {
+            } catch (e: Throwable) {
                 Timber.e(e)
                 notifyFail(subject)
             }
