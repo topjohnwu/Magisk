@@ -41,5 +41,8 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
     } catch (e: IOException) {
         e.printStackTrace()
         throw e
+    } catch (e: Throwable) {
+        e.printStackTrace()
+        throw IOException(e)
     }
 }
