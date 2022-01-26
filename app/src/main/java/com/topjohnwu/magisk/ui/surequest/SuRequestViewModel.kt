@@ -73,7 +73,7 @@ class SuRequestViewModel(
     val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
     private val handler = SuRequestHandler(AppContext.packageManager, policyDB)
-    private lateinit var timer: CountDownTimer
+    private var timer: CountDownTimer? = null
 
     fun grantPressed() {
         cancelTimer()
@@ -121,7 +121,7 @@ class SuRequestViewModel(
     }
 
     private fun respond(action: Int) {
-        timer.cancel()
+        timer?.cancel()
 
         val pos = selectedItemPosition
         timeoutPrefs.edit().putInt(handler.policy.packageName, pos).apply()
@@ -132,7 +132,7 @@ class SuRequestViewModel(
     }
 
     private fun cancelTimer() {
-        timer.cancel()
+        timer?.cancel()
         denyText.seconds = 0
     }
 
