@@ -33,7 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Păstrează criptarea forțată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
-	<string name="patch_vbmeta">Patchați vbmeta în imaginea de pornire</string>
+    <string name="patch_vbmeta">Patchuiţi vbmeta în imaginea de pornire</string>
     <string name="recovery_mode">Mod de recuperare</string>
     <string name="install_options_title">Opțiuni</string>
     <string name="install_method_title">Metodă</string>
@@ -108,8 +108,8 @@
     <string name="module_state_restore">Restaurează</string>
     <string name="module_action_install_external">Instalează din spațiul de stocare</string>
     <string name="update_available">Actualizare disponibilă</string>
-	<string name="suspend_text_riru">Modul suspendat pentru că %1$s este activat</string>
-    <string name="suspend_text_zygisk">Modul suspendat pentru că %1$s nu este activat</string>
+	<string name="suspend_text_riru">Modul suspendat deoarece %1$s este activat</string>
+    <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
     <string name="zygisk_module_unloaded">Modul Zygisk nu încarcăt din cauza unei incompatibilități</string>
 
     <!--Settings-->
@@ -228,7 +228,7 @@
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
     <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
-	<string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
-	<string name="restore_app_confirmation">O să restaureze aplicația ocultă înapoi la cea originală. Sigur vreți să continuați?</string>
+    <string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
+    <string name="restore_app_confirmation">Aplicaţia ascunsă va fi readusă la varianta iniţială. Sigur vreți să continuați?</string>
 
 </resources>
