@@ -103,9 +103,11 @@ class FlashViewModel : BaseViewModel() {
             val name = "magisk_install_log_%s.log".format(now.toTime(timeFormatStandard))
             val file = MediaStoreUtils.getFile(name, true)
             file.uri.outputStream().bufferedWriter().use { writer ->
-                logItems.forEach {
-                    writer.write(it)
-                    writer.newLine()
+                synchronized(logItems) {
+                    logItems.forEach {
+                        writer.write(it)
+                        writer.newLine()
+                    }
                 }
             }
             SnackbarEvent(file.toString()).publish()
