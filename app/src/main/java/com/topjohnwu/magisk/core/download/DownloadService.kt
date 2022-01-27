@@ -25,7 +25,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import timber.log.Timber
-import java.io.IOException
 import java.io.InputStream
 
 class DownloadService : BaseService() {
@@ -77,7 +76,7 @@ class DownloadService : BaseService() {
                 }
                 if (!hasNotifications)
                     stopSelf()
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Timber.e(e)
                 notifyFail(subject)
             }
