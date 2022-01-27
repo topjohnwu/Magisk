@@ -64,7 +64,7 @@ open class App() : Application() {
         }
 
         base.resources.patch()
-        app.registerActivityLifecycleCallbacks(ForegroundTracker)
+        app.registerActivityLifecycleCallbacks(ActivityTracker)
     }
 
     override fun onCreate() {
@@ -86,7 +86,7 @@ open class App() : Application() {
 }
 
 @SuppressLint("StaticFieldLeak")
-object ForegroundTracker : Application.ActivityLifecycleCallbacks {
+object ActivityTracker : Application.ActivityLifecycleCallbacks {
 
     @Volatile
     var foreground: Activity? = null

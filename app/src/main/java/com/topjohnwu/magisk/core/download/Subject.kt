@@ -34,8 +34,9 @@ sealed class Subject : Parcelable {
     abstract val file: Uri
     abstract val title: String
     abstract val notifyId: Int
+    open val autoStart: Boolean get() = true
 
-    abstract fun pendingIntent(context: Context): PendingIntent?
+    abstract fun pendingIntent(context: Context): PendingIntent
 
     @Parcelize
     class Module(
@@ -45,16 +46,15 @@ sealed class Subject : Parcelable {
     ) : Subject() {
         override val url: String get() = module.zipUrl
         override val title: String get() = module.downloadFilename
+        override val autoStart: Boolean get() = action == Action.Flash
 
         @IgnoredOnParcel
         override val file by lazy {
             MediaStoreUtils.getFile(title).uri
         }
 
-        override fun pendingIntent(context: Context) = when (action) {
-            Action.Flash -> FlashFragment.installIntent(context, file)
-            else -> null
-        }
+        override fun pendingIntent(context: Context) =
+            FlashFragment.installIntent(context, file)
     }
 
     @Parcelize

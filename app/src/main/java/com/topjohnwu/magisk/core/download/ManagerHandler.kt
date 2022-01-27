@@ -7,7 +7,7 @@ import androidx.core.content.getSystemService
 import androidx.core.net.toFile
 import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.ForegroundTracker
+import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
@@ -64,7 +64,7 @@ suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStr
             //noinspection InlinedApi
             val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             val pending = PendingIntent.getActivity(this, id, intent, flag)
-            if (ForegroundTracker.hasForeground) {
+            if (ActivityTracker.hasForeground) {
                 val alarm = getSystemService<AlarmManager>()
                 alarm!!.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, pending)
             }

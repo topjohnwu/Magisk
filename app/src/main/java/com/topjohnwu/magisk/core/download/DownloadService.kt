@@ -11,7 +11,7 @@ import android.os.IBinder
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.ForegroundTracker
+import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
@@ -68,9 +68,10 @@ class DownloadService : BaseService() {
                     is Subject.Manager -> handleAPK(subject, stream)
                     else -> stream.toModule(subject.file, service.fetchInstaller().byteStream())
                 }
-                if (ForegroundTracker.hasForeground) {
+                val activity = ActivityTracker.foreground
+                if (activity != null && subject.autoStart) {
                     remove(subject.notifyId)
-                    subject.pendingIntent(this@DownloadService)?.send()
+                    subject.pendingIntent(activity).send()
                 } else {
                     notifyFinish(subject)
                 }
