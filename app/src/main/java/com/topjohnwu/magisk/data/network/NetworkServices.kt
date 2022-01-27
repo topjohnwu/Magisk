@@ -6,24 +6,14 @@ import com.topjohnwu.magisk.core.model.UpdateInfo
 import okhttp3.ResponseBody
 import retrofit2.http.*
 
-private const val REVISION = "revision"
 private const val BRANCH = "branch"
 private const val REPO = "repo"
 private const val FILE = "file"
-
-const val MAGISK_MAIN = "topjohnwu/Magisk"
 
 interface GithubPageServices {
 
     @GET("{$FILE}")
     suspend fun fetchUpdateJSON(@Path(FILE) file: String): UpdateInfo
-}
-
-interface JSDelivrServices {
-
-    @GET("$MAGISK_MAIN@{$REVISION}/scripts/module_installer.sh")
-    @Streaming
-    suspend fun fetchInstaller(@Path(REVISION) revision: String): ResponseBody
 }
 
 interface RawServices {

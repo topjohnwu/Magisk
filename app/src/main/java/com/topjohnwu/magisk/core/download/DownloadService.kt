@@ -66,7 +66,7 @@ class DownloadService : BaseService() {
                 val stream = service.fetchFile(subject.url).toProgressStream(subject)
                 when (subject) {
                     is Subject.Manager -> handleAPK(subject, stream)
-                    else -> stream.toModule(subject.file, service.fetchInstaller().byteStream())
+                    is Subject.Module -> stream.toModule(subject.file, assets.open("module_installer.sh"))
                 }
                 val activity = ActivityTracker.foreground
                 if (activity != null && subject.autoStart) {
