@@ -15,11 +15,11 @@ import com.topjohnwu.magisk.ktx.startAnimations
 
 abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHolder {
 
-    val activity get() = requireActivity() as NavigationActivity<*>
+    val activity get() = getActivity() as? NavigationActivity<*>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 
-    private val navigation get() = activity.navigation
+    private val navigation get() = activity?.navigation
     open val snackbarAnchorView: View? get() = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,12 +41,12 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onStart() {
         super.onStart()
-        activity.supportActionBar?.subtitle = null
+        activity?.supportActionBar?.subtitle = null
     }
 
     override fun onEventDispatched(event: ViewEvent) = when(event) {
         is ContextExecutor -> event(requireContext())
-        is ActivityExecutor -> event(activity)
+        is ActivityExecutor -> activity?.let { event(it) } ?: Unit
         is FragmentExecutor -> event(this)
         else -> Unit
     }

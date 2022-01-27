@@ -31,10 +31,10 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     override fun onStart() {
         super.onStart()
         setHasOptionsMenu(true)
-        activity.setTitle(R.string.flash_screen_title)
+        activity?.setTitle(R.string.flash_screen_title)
 
         viewModel.subtitle.observe(this) {
-            activity.supportActionBar?.setSubtitle(it)
+            activity?.supportActionBar?.setSubtitle(it)
         }
     }
 
@@ -49,15 +49,15 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        defaultOrientation = activity.requestedOrientation
-        activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+        defaultOrientation = activity?.requestedOrientation ?: -1
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
         viewModel.startFlashing()
     }
 
     @SuppressLint("WrongConstant")
     override fun onDestroyView() {
         if (defaultOrientation != -1) {
-            activity.requestedOrientation = defaultOrientation
+            activity?.requestedOrientation = defaultOrientation
         }
         super.onDestroyView()
     }

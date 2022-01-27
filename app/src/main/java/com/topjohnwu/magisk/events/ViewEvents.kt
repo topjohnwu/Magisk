@@ -83,7 +83,7 @@ class SelectModuleEvent : ViewEvent(), FragmentExecutor {
     override fun invoke(fragment: BaseFragment<*>) {
         try {
             fragment.apply {
-                activity.getContent("application/zip") {
+                activity?.getContent("application/zip") {
                     MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, it).navigate()
                 }
             }

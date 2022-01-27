@@ -19,7 +19,7 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        activity.title = resources.getString(R.string.section_home)
+        activity?.title = resources.getString(R.string.section_home)
         setHasOptionsMenu(true)
         DownloadService.observeProgress(this, viewModel::onProgressUpdate)
     }
@@ -64,7 +64,7 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>() {
         when (item.itemId) {
             R.id.action_settings ->
                 HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
-            R.id.action_reboot -> RebootEvent.inflateMenu(activity).show()
+            R.id.action_reboot -> activity?.let { RebootEvent.inflateMenu(it).show() }
             else -> return super.onOptionsItemSelected(item)
         }
         return true

@@ -61,7 +61,7 @@ class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
     override fun onStart() {
         super.onStart()
 
-        activity.title = getString(R.string.section_theme)
+        activity?.title = getString(R.string.section_theme)
     }
 
 }

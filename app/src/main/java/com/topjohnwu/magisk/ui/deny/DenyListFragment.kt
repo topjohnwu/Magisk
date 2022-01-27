@@ -26,7 +26,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        activity.setTitle(R.string.denylist)
+        activity?.setTitle(R.string.denylist)
         setHasOptionsMenu(true)
     }
 
