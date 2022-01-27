@@ -15,7 +15,7 @@ import com.topjohnwu.magisk.ktx.startAnimations
 
 abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHolder {
 
-    val activity get() = runCatching { requireActivity() }.getOrNull() as NavigationActivity<*>?
+    val activity get() = val activity get() = getActivity() as? NavigationActivity<*>
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
 
