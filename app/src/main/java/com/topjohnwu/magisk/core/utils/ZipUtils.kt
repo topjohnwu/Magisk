@@ -38,11 +38,7 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
             }
             SuFileOutputStream.open(dest).use { out -> zin.copyTo(out) }
         }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        throw e
-    } catch (e: Throwable) {
-        e.printStackTrace()
+    } catch (e: IllegalArgumentException) {
         throw IOException(e)
     }
 }
