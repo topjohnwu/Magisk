@@ -121,15 +121,15 @@ class MagiskDialog(
         super.onCreate(savedInstanceState)
         super.setContentView(binding.root)
 
-        val default = MaterialColors.getColor(context, R.attr.colorSurface, javaClass.canonicalName)
+        val default = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurface, javaClass.canonicalName)
         val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, default)
-        val materialShapeDrawable = MaterialShapeDrawable(context, null, R.attr.alertDialogStyle, R.style.MaterialAlertDialog_MaterialComponents)
+        val materialShapeDrawable = MaterialShapeDrawable(context, null, androidx.appcompat.R.attr.alertDialogStyle, com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents)
         materialShapeDrawable.initializeElevationOverlay(context)
         materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)
         materialShapeDrawable.elevation = context.resources.getDimension(R.dimen.margin_generic)
         materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l_50))
 
-        val inset = context.resources.getDimensionPixelSize(R.dimen.appcompat_dialog_background_inset)
+        val inset = context.resources.getDimensionPixelSize(com.google.android.material.R.dimen.appcompat_dialog_background_inset)
         window?.apply {
             setBackgroundDrawable(InsetDrawable(materialShapeDrawable, inset, inset, inset, inset))
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

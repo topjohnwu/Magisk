@@ -29,11 +29,11 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
     }
 
     public ConcealableBottomNavigationView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, R.attr.bottomNavigationStyle);
+        this(context, attrs, com.google.android.material.R.attr.bottomNavigationStyle);
     }
 
     public ConcealableBottomNavigationView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, R.style.Widget_Design_BottomNavigationView);
+        this(context, attrs, defStyleAttr, com.google.android.material.R.style.Widget_Design_BottomNavigationView);
     }
 
     public ConcealableBottomNavigationView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {

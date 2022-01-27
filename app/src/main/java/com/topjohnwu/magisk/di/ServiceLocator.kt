@@ -54,14 +54,14 @@ object ServiceLocator {
 
     object VMFactory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel?> create(clz: Class<T>): T {
-            return when (clz) {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return when (modelClass) {
                 HomeViewModel::class.java -> HomeViewModel(networkService)
                 LogViewModel::class.java -> LogViewModel(logRepo)
                 SuperuserViewModel::class.java -> SuperuserViewModel(policyDB)
                 InstallViewModel::class.java -> InstallViewModel(networkService)
                 SuRequestViewModel::class.java -> SuRequestViewModel(policyDB, timeoutPrefs)
-                else -> clz.newInstance()
+                else -> modelClass.newInstance()
             } as T
         }
     }
@@ -69,7 +69,7 @@ object ServiceLocator {
 
 inline fun <reified VM : ViewModel> ViewModelStoreOwner.viewModel() =
     lazy(LazyThreadSafetyMode.NONE) {
-        ViewModelProvider(this, ServiceLocator.VMFactory).get(VM::class.java)
+        ViewModelProvider(this, ServiceLocator.VMFactory)[VM::class.java]
     }
 
 private fun createSuLogDatabase(context: Context) =

@@ -29,7 +29,7 @@ fun Project.setupCommon() {
     androidBase {
         compileSdkVersion(31)
         buildToolsVersion = "31.0.0"
-        ndkPath = "${System.getenv("ANDROID_SDK_ROOT")}/ndk/magisk"
+        ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
             minSdk = 21
