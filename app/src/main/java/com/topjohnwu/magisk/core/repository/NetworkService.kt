@@ -40,7 +40,7 @@ class NetworkService(
     private suspend fun fetchBetaUpdate() = pages.fetchUpdateJSON("beta.json")
     private suspend fun fetchCanaryUpdate() = pages.fetchUpdateJSON("canary.json")
     private suspend fun fetchDebugUpdate() = pages.fetchUpdateJSON("debug.json")
-    private suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
+    private suspend fun fetchCustomUpdate(url: String) = pages.fetchUpdateJSON(url)
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
