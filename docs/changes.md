@@ -1,5 +1,9 @@
 # Magisk Changelog
 
+### v24.1
+
+- [App] Stability improvements
+
 ### v24.0
 
 - [General] MagiskHide is removed from Magisk
