@@ -141,7 +141,6 @@
     <string name="settings_denylist_error">Aquesta característica necessita %1$s per a ser activada</string>
     <string name="settings_denylist_config_title">Configurar llista de denegació</string>
     <string name="settings_denylist_config_summary">Selecciona els processos per a ser inclosos en la llista de denegació</string>
-    <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support per a aplicacións que bloquejan comercials</string>
     <string name="settings_hosts_toast">Agregat el mòdul Systemless Hosts</string>
     <string name="settings_app_name_hint">Nou nom</string>
