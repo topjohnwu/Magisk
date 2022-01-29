@@ -332,26 +332,24 @@ static void get_process_info(int client, const sock_cred *cred) {
     // really want to cache the app ID value. inotify will invalidate the app ID
     // cache for us.
 
-    if (uid != 1000) {
-        int manager_app_id = cached_manager_app_id;
+    int manager_app_id = cached_manager_app_id;
 
-        if (manager_app_id < 0) {
-            manager_app_id = get_manager_app_id();
-            cached_manager_app_id = manager_app_id;
-        }
+    if (manager_app_id < 0) {
+        manager_app_id = get_manager_app_id();
+        cached_manager_app_id = manager_app_id;
+    }
 
-        if (to_app_id(uid) == manager_app_id) {
-            flags |= PROCESS_IS_MAGISK_APP;
-        }
-        if (denylist_enforced) {
-            flags |= DENYLIST_ENFORCING;
-        }
-        if (is_deny_target(uid, process)) {
-            flags |= PROCESS_ON_DENYLIST;
-        }
-        if (uid_granted_root(uid)) {
-            flags |= PROCESS_GRANTED_ROOT;
-        }
+    if (to_app_id(uid) == manager_app_id) {
+        flags |= PROCESS_IS_MAGISK_APP;
+    }
+    if (denylist_enforced) {
+        flags |= DENYLIST_ENFORCING;
+    }
+    if (is_deny_target(uid, process)) {
+        flags |= PROCESS_ON_DENYLIST;
+    }
+    if (uid_granted_root(uid)) {
+        flags |= PROCESS_GRANTED_ROOT;
     }
 
     xwrite(client, &flags, sizeof(flags));
