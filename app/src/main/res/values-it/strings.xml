@@ -33,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Correggi vbmeta nell'immagine di boot</string>
     <string name="recovery_mode">Modalità recovery</string>
     <string name="install_options_title">Opzioni</string>
     <string name="install_method_title">Metodo</string>
