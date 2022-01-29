@@ -131,8 +131,8 @@
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Custom Channel</string>
-    <string name="settings_update_custom_msg">Insert a custom URL</string>
+    <string name="settings_update_custom">Custom</string>
+    <string name="settings_update_custom_msg">Insert a custom channel URL</string>
     <string name="settings_zygisk_summary">Run parts of Magisk in the zygote daemon</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
