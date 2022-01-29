@@ -33,7 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
     <string name="keep_dm_verity">Mantenir AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Modifiqueu vbmeta en l'imatge d'inici</string>
+    <string name="patch_vbmeta">Modifiqueu vbmeta en l\'imatge d\'inici</string>
     <string name="recovery_mode">Mode de Recuperació</string>
     <string name="install_options_title">Opcions</string>
     <string name="install_method_title">Mètode</string>
@@ -219,16 +219,16 @@
     <string name="unsupport_magisk_title">Versió de Magisk incompatible</string>
     <string name="unsupport_magisk_msg">Aquesta versió de Magisk Manager no suporta versions de Magisk més petites que la %1$s.\n\nL\'aplicació es comportarà com si Magisk no estigués instal·lat, si us plau actualitzi Magisk com més aviat millor.</string>
     <string name="unsupport_general_title">Estat Anormal</string>
-    <string name="unsupport_system_app_msg">Córrer aquesta app com aplicació del sistema no està suportat. Sis plau, torni a l'app d'usuari.</string>
+    <string name="unsupport_system_app_msg">Córrer aquesta app com aplicació del sistema no està suportat. Sis plau, torni a l\'app d'usuari.</string>
     <string name="unsupport_other_su_msg">Un binari \"su\" que no és de Magisk ha sigut detectat. Sis plau esborri altres solucions root o/i reinstal·li Magisk.</string>
-    <string name="unsupport_external_storage_msg">Magisk està instal·lat en l'emmagatzematge extern. Sis plau mogui l'app a l'emmagatzematge intern.</string>
-    <string name="unsupport_nonroot_stub_msg">L'aplicació oculta de Magisk no pot funcionar perquè l'accés root s-ha perdut. Sis plau torni a l'APK original.</string>
+    <string name="unsupport_external_storage_msg">Magisk està instal·lat en l\'emmagatzematge extern. Sis plau mogui l\'app a l\'emmagatzematge intern.</string>
+    <string name="unsupport_nonroot_stub_msg">L\'aplicació oculta de Magisk no pot funcionar perquè l\'accés root s-ha perdut. Sis plau torni a l\'APK original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Ha de donar permís d\'emmagatzematge per activar aquesta funcionalitat</string>
     <string name="add_shortcut_title">Afegeix una drecera a la pantalla d\'inici</string>
     <string name="add_shortcut_msg">Després d\'amagar Magisk Manager, el seu nom i icona poden ser difícils de reconèixer. Vols afegir una bonica drecera a la teva pantalla d\'inici?</string>
     <string name="app_not_found">No s\'ha trobat una aplicació per emprar aquesta acció</string>
     <string name="reboot_apply_change">Reinici per a aplicar els canvis</string>
-    <string name="restore_app_confirmation">Això restaurarà l'app oculta de volta l'original. Realment vols fer això?</string>
+    <string name="restore_app_confirmation">Això restaurarà l\'app oculta de volta l\'original. Realment vols fer això?</string>
 
 </resources>
