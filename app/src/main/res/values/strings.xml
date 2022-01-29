@@ -91,8 +91,8 @@
     <!--SafetyNet-->
 
     <!--MagiskHide-->
-    <string name="show_system_app">Show system apps</string>
-    <string name="show_os_app">Show device-specific apps</string>
+    <string name="show_system_app">Show updatable system apps</string>
+    <string name="show_os_app">Show fixed system apps</string>
     <string name="hide_filter_hint">Filter by name</string>
     <string name="hide_search">Search</string>
 
