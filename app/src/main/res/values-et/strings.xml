@@ -91,8 +91,8 @@
     <!--SafetyNet-->
 
     <!--MagiskHide-->
-    <string name="show_system_app">Kuva süsteemirakendused</string>
-    <string name="show_os_app">Kuva seadmepõhised rakendused</string>
+    <string name="show_system_app">Kuva uuendatavad süsteemirakendused</string>
+    <string name="show_os_app">Kuva fikseeritud süsteemirakendused</string>
     <string name="hide_filter_hint">Filtreeri nime järgi</string>
     <string name="hide_search">Otsing</string>
 
