@@ -133,7 +133,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kanal me porosi</string>
     <string name="settings_update_custom_msg">Fut një URL të personalizuar</string>
-    <string name="settings_zygisk_summary">Drejtoni pjesë të Magisk në demonin zigotë</string>
+    <string name="settings_zygisk_summary">Drejtoni pjesë të Magisk në demonin zygote</string>
     <string name="settings_denylist_title">Zbato Listën e Mohimit</string>
     <string name="settings_denylist_summary">Proceset në listën e mohimit do të kenë të gjitha modifikimet e Magisk</string>
     <string name="settings_denylist_error">Ky funksion kërkon %1$s për tu aktivizuar</string>
