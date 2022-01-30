@@ -191,7 +191,6 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/src/context.c \
     selinux/libsepol/src/context_record.c \
     selinux/libsepol/src/debug.c \
-    selinux/libsepol/src/deprecated_funcs.c \
     selinux/libsepol/src/ebitmap.c \
     selinux/libsepol/src/expand.c \
     selinux/libsepol/src/handle.c \
@@ -217,9 +216,9 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/src/policydb.c \
     selinux/libsepol/src/policydb_convert.c \
     selinux/libsepol/src/policydb_public.c \
+    selinux/libsepol/src/policydb_validate.c \
     selinux/libsepol/src/port_record.c \
     selinux/libsepol/src/ports.c \
-    selinux/libsepol/src/roles.c \
     selinux/libsepol/src/services.c \
     selinux/libsepol/src/sidtab.c \
     selinux/libsepol/src/symtab.c \
@@ -246,7 +245,9 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/cil/src/cil_strpool.c \
     selinux/libsepol/cil/src/cil_symtab.c \
     selinux/libsepol/cil/src/cil_tree.c \
-    selinux/libsepol/cil/src/cil_verify.c
+    selinux/libsepol/cil/src/cil_verify.c \
+    selinux/libsepol/cil/src/cil_write_ast.c
+
 LOCAL_CFLAGS := -Dgetline=__getline -Wno-implicit-function-declaration
 include $(BUILD_STATIC_LIBRARY)
 

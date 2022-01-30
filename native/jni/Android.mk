@@ -43,10 +43,9 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
-include $(CLEAR_VARS)
-
 ifdef B_INIT
 
+include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := libsepol libxz libutils
 

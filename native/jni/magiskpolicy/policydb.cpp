@@ -110,7 +110,7 @@ sepolicy *sepolicy::compile_split() {
 #if MAGISK_DEBUG
     cil_set_log_level(CIL_INFO);
 #endif
-    cil_set_log_handler(+[](int lvl, char* msg) {
+    cil_set_log_handler(+[](int lvl, const char *msg) {
         if (lvl == CIL_ERR) {
             LOGE("cil: %s", msg);
         } else if (lvl == CIL_WARN) {
