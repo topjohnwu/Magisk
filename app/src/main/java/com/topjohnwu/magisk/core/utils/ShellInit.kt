@@ -42,7 +42,7 @@ class ShellInit : Shell.Initializer() {
             if (shell.isRoot) {
                 add("export MAGISKTMP=\$(magisk --path)/.magisk")
                 // Test if we can properly execute stuff in /data
-                Info.noDataExec = !shell.newJob().add("$localBB true").exec().isSuccess
+                Info.noDataExec = !shell.newJob().add("$localBB sh -c \"$localBB true\"").exec().isSuccess
             }
 
             if (Info.noDataExec) {
