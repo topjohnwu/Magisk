@@ -405,7 +405,7 @@ def cleanup(args):
 def setup_ndk(args):
     os_name = platform.system().lower()
     ndk_ver = config['ndkVersion']
-    url = f'https://dl.google.com/android/repository/android-ndk-r{ndk_ver}-{os_name}-x86_64.zip'
+    url = f'https://dl.google.com/android/repository/android-ndk-r{ndk_ver}-{os_name}.zip'
     ndk_zip = url.split('/')[-1]
 
     header(f'* Downloading {ndk_zip}')
@@ -417,7 +417,7 @@ def setup_ndk(args):
     with zipfile.ZipFile(ndk_zip, 'r') as zf:
         for info in zf.infolist():
             vprint(f'Extracting {info.filename}')
-            if info.external_attr == 2716663808:  # symlink
+            if info.external_attr >> 28 == 0xA:  # symlink
                 src = zf.read(info).decode("utf-8")
                 dest = op.join(ndk_root, info.filename)
                 os.symlink(src, dest)
