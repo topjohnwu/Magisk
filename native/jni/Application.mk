@@ -11,12 +11,6 @@ ifndef B_SHARED
 # Fix static variables' ctor/dtor when using LTO
 # See: https://github.com/android/ndk/issues/1461
 APP_LDFLAGS      += -T jni/lto_fix.lds
-ifneq ($(TARGET_ARCH),arm64)
-ifneq ($(TARGET_ARCH),x86_64)
-# Disable fortify on static 32-bit targets
-APP_CFLAGS       += -D_FORTIFY_SOURCE=0 -Wno-macro-redefined
-endif
-endif
 endif
 
 # Busybox should use stock libc.a
