@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "logging.hpp"
+#include <logging.hpp>
 
 #undef _FORTIFY_SOURCE
 
