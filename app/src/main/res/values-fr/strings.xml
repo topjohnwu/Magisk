@@ -112,7 +112,6 @@
     <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
     <string name="zygisk_module_unloaded">Module Zygisk non chargé en raison d’une incompatibilité</string>
 
-
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
     <string name="settings_dark_mode_message">Choisissez le mode qui correspond le mieux à votre style !</string>
