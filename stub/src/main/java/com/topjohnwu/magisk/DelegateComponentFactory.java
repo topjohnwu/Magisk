@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.os.Process;
 
 @SuppressLint("NewApi")
 public class DelegateComponentFactory extends AppComponentFactory {
@@ -21,6 +22,10 @@ public class DelegateComponentFactory extends AppComponentFactory {
 
     @Override
     public ClassLoader instantiateClassLoader(ClassLoader cl, ApplicationInfo info) {
+        if (Process.myUid() == 0) {
+            // Do not do anything in root process
+            return cl;
+        }
         DynLoad.loadApk(info);
         return new DelegateClassLoader();
     }
