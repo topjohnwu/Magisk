@@ -2,10 +2,7 @@ package com.topjohnwu.magisk;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.res.Configuration;
-
-import java.lang.reflect.Method;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
@@ -17,14 +14,7 @@ public class DelegateApplication extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-
-        receiver = DynLoad.setup(this);
-        if (receiver != null) try {
-            // Call attachBaseContext without ContextImpl to show it is being wrapped
-            Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
-            m.setAccessible(true);
-            m.invoke(receiver, this);
-        } catch (Exception ignored) { /* Impossible */ }
+        receiver = DynLoad.createAndSetupApp(this);
     }
 
     @Override

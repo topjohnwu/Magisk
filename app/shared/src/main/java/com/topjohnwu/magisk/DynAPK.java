@@ -3,6 +3,7 @@ package com.topjohnwu.magisk;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 
 import java.io.File;
@@ -16,24 +17,35 @@ public class DynAPK {
     private static File dynDir;
     private static Method addAssetPath;
 
-    private static File getDynDir(Context c) {
+    private static File getDynDir(ApplicationInfo info) {
         if (dynDir == null) {
+            final String dataDir;
             if (SDK_INT >= 24) {
-                // Use protected context to allow directBootAware
-                c = c.createDeviceProtectedStorageContext();
+                // Use device protected path to allow directBootAware
+                dataDir = info.deviceProtectedDataDir;
+            } else {
+                dataDir = info.dataDir;
             }
-            dynDir = new File(c.getFilesDir().getParent(), "dyn");
-            dynDir.mkdir();
+            dynDir = new File(dataDir, "dyn");
+            dynDir.mkdirs();
         }
         return dynDir;
     }
 
     public static File current(Context c) {
-        return new File(getDynDir(c), "current.apk");
+        return new File(getDynDir(c.getApplicationInfo()), "current.apk");
+    }
+
+    public static File current(ApplicationInfo info) {
+        return new File(getDynDir(info), "current.apk");
     }
 
     public static File update(Context c) {
-        return new File(getDynDir(c), "update.apk");
+        return new File(getDynDir(c.getApplicationInfo()), "update.apk");
+    }
+
+    public static File update(ApplicationInfo info) {
+        return new File(getDynDir(info), "update.apk");
     }
 
     public static void addAssetPath(AssetManager asset, String path) {

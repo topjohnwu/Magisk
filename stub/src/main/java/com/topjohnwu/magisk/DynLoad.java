@@ -2,7 +2,6 @@ package com.topjohnwu.magisk;
 
 import android.app.AppComponentFactory;
 import android.app.Application;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
@@ -10,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 
 import com.topjohnwu.magisk.utils.APKInstall;
@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
@@ -27,23 +28,52 @@ import io.michaelrocks.paranoid.Obfuscate;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DynLoad {
 
+    // The current active classloader
+    static ClassLoader loader = new RedirectClassLoader();
     static Object componentFactory;
     static final DynAPK.Data apkData = createApkData();
 
-    // Dynamically load APK, inject ClassLoader into ContextImpl, then
-    // create the actual Application instance from the loaded APK
-    static Application inject(Context context) {
-        File apk = DynAPK.current(context);
-        File update = DynAPK.update(context);
+    private static boolean loadedApk = false;
+
+    static void attachContext(Object o, Context context) {
+        if (!(o instanceof ContextWrapper))
+            return;
+        try {
+            Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
+            m.setAccessible(true);
+            m.invoke(o, context);
+        } catch (Exception ignored) { /* Impossible */ }
+    }
+
+    // Dynamically load APK from internal or external storage
+    static void loadAPK(ApplicationInfo info) {
+        if (loadedApk)
+            return;
+        loadedApk = true;
+
+        File apk = DynAPK.current(info);
+        File update = DynAPK.update(info);
 
         if (update.exists()) {
             // Rename from update
             update.renameTo(apk);
         }
 
-        if (BuildConfig.DEBUG) {
-            // Copy from external for easier development
-            File external = new File(context.getExternalFilesDir(null), "magisk.apk");
+        // Copy from external for easier development
+        if (BuildConfig.DEBUG) copy_from_ext: {
+            final File dir;
+            try {
+                var dirs = (File[]) Environment.class
+                        .getMethod("buildExternalStorageAppFilesDirs", String.class)
+                        .invoke(null, info.packageName);
+                if (dirs == null)
+                    break copy_from_ext;
+                dir = dirs[0];
+            } catch (ReflectiveOperationException e) {
+                Log.e(DynLoad.class.getSimpleName(), "", e);
+                break copy_from_ext;
+            }
+            File external = new File(dir, "magisk.apk");
             if (external.exists()) {
                 try {
                     var in = new FileInputStream(external);
@@ -60,19 +90,33 @@ public class DynLoad {
             }
         }
 
-        if (!apk.exists() && !context.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-            // Copy from previous app
+        if (apk.exists()) {
+           loader = new InjectedClassLoader(apk);
+        }
+    }
+
+    // Dynamically load APK, inject ClassLoader into ContextImpl, then
+    // create the non-stub Application instance from the loaded APK
+    static Application createApp(Context context) {
+        File apk = DynAPK.current(context);
+        loadAPK(context.getApplicationInfo());
+
+        // Trigger folder creation
+        context.getExternalFilesDir(null);
+
+        // If no APK to load, attempt to copy from previous app
+        if (!isDynLoader() && !context.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
             Uri uri = new Uri.Builder().scheme("content")
                     .authority("com.topjohnwu.magisk.provider")
                     .encodedPath("apk_file").build();
-            ContentResolver resolver = context.getContentResolver();
             try {
-                InputStream src = resolver.openInputStream(uri);
+                InputStream src = context.getContentResolver().openInputStream(uri);
                 if (src != null) {
                     var out = new FileOutputStream(apk);
                     try (src; out) {
                         APKInstall.transfer(src, out);
                     }
+                    loader = new InjectedClassLoader(apk);
                 }
             } catch (IOException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
@@ -80,12 +124,11 @@ public class DynLoad {
             }
         }
 
-        if (apk.exists()) {
-            ClassLoader cl = new InjectedClassLoader(apk);
+        if (isDynLoader()) {
             PackageManager pm = context.getPackageManager();
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
             try {
-                return createApp(context, cl, pkgInfo.applicationInfo);
+                return newApp(pkgInfo.applicationInfo);
             } catch (ReflectiveOperationException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
                 apk.delete();
@@ -95,65 +138,63 @@ public class DynLoad {
         return null;
     }
 
-    // Inject and create Application, or setup redirections for the current app
-    static Application setup(Context context) {
-        Application app = inject(context);
+    // Stub app setup entry
+    static Application createAndSetupApp(Application context) {
+        // On API >= 29, AppComponentFactory will replace the ClassLoader
+        if (Build.VERSION.SDK_INT < 29)
+            replaceClassLoader(context);
+
+        Application app = createApp(context);
         if (app != null) {
-            return app;
+            // Send real application to attachBaseContext
+            attachContext(app, context);
         }
-
-        ClassLoader cl = new RedirectClassLoader();
-        try {
-            setClassLoader(context, cl);
-            if (Build.VERSION.SDK_INT >= 28) {
-                ((DelegateComponentFactory) componentFactory).loader = cl;
-            }
-        } catch (Exception e) {
-            Log.e(DynLoad.class.getSimpleName(), "", e);
-        }
-
-        return null;
+        return app;
     }
 
-    private static Application createApp(Context context, ClassLoader cl, ApplicationInfo info)
-            throws ReflectiveOperationException {
+    private static boolean isDynLoader() {
+        return loader instanceof InjectedClassLoader;
+    }
+
+    private static Application newApp(ApplicationInfo info) throws ReflectiveOperationException {
         // Create the receiver Application
-        Object app = cl.loadClass(info.className)
+        var app = (Application) loader.loadClass(info.className)
                 .getConstructor(Object.class)
                 .newInstance(apkData.getObject());
 
         // Create the receiver component factory
         if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
-            Object factory = cl.loadClass(info.appComponentFactory).newInstance();
-            DelegateComponentFactory delegate = (DelegateComponentFactory) componentFactory;
-            delegate.loader = cl;
+            Object factory = loader.loadClass(info.appComponentFactory).newInstance();
+            var delegate = (DelegateComponentFactory) componentFactory;
             delegate.receiver = (AppComponentFactory) factory;
         }
 
-        setClassLoader(context, cl);
-
-        return (Application) app;
+        return app;
     }
 
     // Replace LoadedApk mClassLoader
-    private static void setClassLoader(Context context, ClassLoader cl)
-            throws NoSuchFieldException, IllegalAccessException {
+    private static void replaceClassLoader(Context context) {
         // Get ContextImpl
         while (context instanceof ContextWrapper) {
             context = ((ContextWrapper) context).getBaseContext();
         }
 
-        Field mInfo = context.getClass().getDeclaredField("mPackageInfo");
-        mInfo.setAccessible(true);
-        Object loadedApk = mInfo.get(context);
-        assert loadedApk != null;
-        Field mcl = loadedApk.getClass().getDeclaredField("mClassLoader");
-        mcl.setAccessible(true);
-        mcl.set(loadedApk, cl);
+        try {
+            Field mInfo = context.getClass().getDeclaredField("mPackageInfo");
+            mInfo.setAccessible(true);
+            Object loadedApk = mInfo.get(context);
+            Field mcl = loadedApk.getClass().getDeclaredField("mClassLoader");
+            mcl.setAccessible(true);
+            mcl.set(loadedApk, new DelegateClassLoader());
+        } catch (Exception e) {
+            // Actually impossible as this method is only called on API < 29,
+            // and API 21 - 28 do not restrict access to these methods/fields.
+            Log.e(DynLoad.class.getSimpleName(), "", e);
+        }
     }
 
     private static DynAPK.Data createApkData() {
-        DynAPK.Data data = new DynAPK.Data();
+        var data = new DynAPK.Data();
         data.setVersion(BuildConfig.STUB_VERSION);
         data.setClassToComponent(Mapping.inverseMap);
         data.setRootService(DelegateRootService.class);

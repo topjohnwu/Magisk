@@ -5,7 +5,6 @@ import android.content.ContextWrapper;
 import android.util.Log;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
@@ -18,7 +17,7 @@ public class DelegateRootService extends ContextWrapper {
 
     @Override
     protected void attachBaseContext(Context base) {
-        if (DynLoad.inject(base) == null)
+        if (DynLoad.createApp(base) == null)
             return;
 
         // Create the actual RootService and call its attachBaseContext
@@ -26,9 +25,7 @@ public class DelegateRootService extends ContextWrapper {
             Constructor<?> ctor = DynLoad.apkData.getRootService().getConstructor(Object.class);
             ctor.setAccessible(true);
             Object service = ctor.newInstance(this);
-            Method m = ContextWrapper.class.getDeclaredMethod("attachBaseContext", Context.class);
-            m.setAccessible(true);
-            m.invoke(service, base);
+            DynLoad.attachContext(service, base);
         } catch (Exception e) {
             Log.e(DelegateRootService.class.getSimpleName(), "", e);
         }

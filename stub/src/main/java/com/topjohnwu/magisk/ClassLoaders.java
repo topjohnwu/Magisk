@@ -30,3 +30,15 @@ class RedirectClassLoader extends ClassLoader {
         return clz == null ? super.loadClass(name, resolve) : clz;
     }
 }
+
+class DelegateClassLoader extends ClassLoader {
+
+    DelegateClassLoader() {
+        super(null);
+    }
+
+    @Override
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        return DynLoad.loader.loadClass(name);
+    }
+}

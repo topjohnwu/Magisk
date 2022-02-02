@@ -118,8 +118,7 @@ public class DownloadActivity extends Activity {
         File apk = dynLoad ? DynAPK.current(this) : new File(getCacheDir(), "manager.apk");
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
-                DynLoad.setup(this);
-                runOnUiThread(onSuccess);
+                // TODO
             } else {
                 var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
                 APKInstall.installapk(this, file);
