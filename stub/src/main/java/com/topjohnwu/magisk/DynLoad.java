@@ -95,16 +95,15 @@ public class DynLoad {
         }
     }
 
-    // Dynamically load APK, inject ClassLoader into ContextImpl, then
-    // create the non-stub Application instance from the loaded APK
+    // Dynamically load APK and create the Application instance from the loaded APK
     static Application createApp(Context context) {
-        File apk = StubApk.current(context);
-        loadApk(context.getApplicationInfo());
-
         // Trigger folder creation
         context.getExternalFilesDir(null);
 
-        // If no APK to load, attempt to copy from previous app
+        File apk = StubApk.current(context);
+        loadApk(context.getApplicationInfo());
+
+        // If no APK is loaded, attempt to copy from previous app
         if (!isDynLoader() && !context.getPackageName().equals(APPLICATION_ID)) {
             try {
                 var info = context.getPackageManager().getApplicationInfo(APPLICATION_ID, 0);
@@ -185,7 +184,7 @@ public class DynLoad {
             mcl.set(loadedApk, new DelegateClassLoader());
         } catch (Exception e) {
             // Actually impossible as this method is only called on API < 29,
-            // and API 21 - 28 do not restrict access to these methods/fields.
+            // and API 21 - 28 do not restrict access to these fields.
             Log.e(DynLoad.class.getSimpleName(), "", e);
         }
     }
