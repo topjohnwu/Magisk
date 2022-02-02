@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk;
 
+import static com.topjohnwu.magisk.BuildConfig.APPLICATION_ID;
+
 import android.app.AppComponentFactory;
 import android.app.Application;
 import android.content.Context;
@@ -7,7 +9,6 @@ import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -105,19 +105,16 @@ public class DynLoad {
         context.getExternalFilesDir(null);
 
         // If no APK to load, attempt to copy from previous app
-        if (!isDynLoader() && !context.getPackageName().equals(BuildConfig.APPLICATION_ID)) {
-            Uri uri = new Uri.Builder().scheme("content")
-                    .authority("com.topjohnwu.magisk.provider")
-                    .encodedPath("apk_file").build();
+        if (!isDynLoader() && !context.getPackageName().equals(APPLICATION_ID)) {
             try {
-                InputStream src = context.getContentResolver().openInputStream(uri);
-                if (src != null) {
-                    var out = new FileOutputStream(apk);
-                    try (src; out) {
-                        APKInstall.transfer(src, out);
-                    }
-                    loader = new InjectedClassLoader(apk);
+                var info = context.getPackageManager().getApplicationInfo(APPLICATION_ID, 0);
+                var src = new FileInputStream(info.sourceDir);
+                var out = new FileOutputStream(apk);
+                try (src; out) {
+                    APKInstall.transfer(src, out);
                 }
+                loader = new InjectedClassLoader(apk);
+            } catch (PackageManager.NameNotFoundException ignored) {
             } catch (IOException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
                 apk.delete();
