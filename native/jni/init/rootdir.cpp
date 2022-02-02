@@ -31,6 +31,12 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
             fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
             return true;
         }
+        // Samsung's persist.sys.zygote.early will start zygotes before actual post-fs-data phase
+        if (str_starts(line, "on property:persist.sys.zygote.early=")) {
+            LOGD("Invalidate persist.sys.zygote.early\n");
+            fprintf(rc, "on property:persist.sys.zygote.early.xxxxx=true\n");
+            return true;
+        }
         // Else just write the line
         fprintf(rc, "%s", line.data());
         return true;
