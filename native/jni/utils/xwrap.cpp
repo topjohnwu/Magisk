@@ -452,6 +452,7 @@ void *xmmap(void *addr, size_t length, int prot, int flags,
     void *ret = mmap(addr, length, prot, flags, fd, offset);
     if (ret == MAP_FAILED) {
         PLOGE("mmap");
+        return nullptr;
     }
     return ret;
 }
