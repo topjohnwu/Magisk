@@ -5,7 +5,6 @@ import static android.R.string.ok;
 import static android.R.string.yes;
 import static com.topjohnwu.magisk.R.string.dling;
 import static com.topjohnwu.magisk.R.string.no_internet_msg;
-import static com.topjohnwu.magisk.R.string.relaunch_app;
 import static com.topjohnwu.magisk.R.string.upgrade_msg;
 
 import android.app.Activity;
@@ -17,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.widget.Toast;
 
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.Request;
@@ -111,14 +109,14 @@ public class DownloadActivity extends Activity {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
         Runnable onSuccess = () -> {
             dialog.dismiss();
-            Toast.makeText(themed, relaunch_app, Toast.LENGTH_LONG).show();
+            PhoenixActivity.rebirth(this, InjectedClassLoader.PHOENIX);
             finish();
         };
         // Download and upgrade the app
         File apk = dynLoad ? StubApk.current(this) : new File(getCacheDir(), "manager.apk");
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
-                // TODO
+                runOnUiThread(onSuccess);
             } else {
                 var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
                 APKInstall.installapk(this, file);

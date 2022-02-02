@@ -1,13 +1,9 @@
 package com.topjohnwu.magisk.core.download
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Intent
-import androidx.core.content.getSystemService
 import androidx.core.net.toFile
+import com.topjohnwu.magisk.PhoenixActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
@@ -59,17 +55,8 @@ suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStr
             apk.delete()
             patched.renameTo(apk)
         } else {
-            val intent = packageManager.getLaunchIntentForPackage(packageName)
-            intent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            //noinspection InlinedApi
-            val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            val pending = PendingIntent.getActivity(this, id, intent, flag)
-            if (ActivityTracker.hasForeground) {
-                val alarm = getSystemService<AlarmManager>()
-                alarm!!.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, pending)
-            }
-            stopSelf()
-            Runtime.getRuntime().exit(0)
+            val clz = Info.stub!!.classToComponent["PHOENIX"]!!
+            PhoenixActivity.rebirth(this, clz)
         }
     } else {
         write(subject.file.outputStream())

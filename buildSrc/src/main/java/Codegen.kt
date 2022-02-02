@@ -77,7 +77,8 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     class Component(
         val real: String,
         val stub: String,
-        val xml: String
+        val xml: String,
+        val genClass: Boolean = false
     )
 
     outDir.deleteRecursively()
@@ -92,13 +93,26 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(Component(
         "androidx.core.app.CoreComponentFactory",
         "DelegateComponentFactory",
-        ""
+        "",
+        true
     ))
 
     cmpList.add(Component(
         "com.topjohnwu.magisk.core.App",
         "DelegateApplication",
-        ""
+        "",
+        true
+    ))
+
+    cmpList.add(Component(
+        "PHOENIX",
+        "PhoenixActivity",
+        """
+        |<activity
+        |    android:name="%s"
+        |    android:process=":%s"
+        |    android:exported="false" />""".ind(2),
+        true
     ))
 
     cmpList.add(Component(
@@ -236,12 +250,12 @@ fun genStubManifest(srcDir: File, outDir: File): String {
                 maps.append("|internalMap.put(\"$name\", com.topjohnwu.magisk.${gen.stub}.class);".ind(2))
                 maps.append('\n')
             }
-            if (gen.stub.startsWith("Delegate")) {
+            if (gen.genClass) {
                 genClass(name, gen.stub)
             }
         }
         if (gen.xml.isNotEmpty()) {
-            cmps.add(gen.xml.format(name))
+            cmps.add(gen.xml.format(name, names.random(kRANDOM)))
         }
     }
 
