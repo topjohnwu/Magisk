@@ -2,7 +2,7 @@ package com.topjohnwu.magisk.core
 
 import android.os.Build
 import androidx.databinding.ObservableBoolean
-import com.topjohnwu.magisk.DynAPK
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.data.repository.NetworkService
@@ -16,7 +16,7 @@ val isRunningAsStub get() = Info.stub != null
 
 object Info {
 
-    var stub: DynAPK.Data? = null
+    var stub: StubApk.Data? = null
 
     val EMPTY_REMOTE = UpdateInfo()
     var remote = EMPTY_REMOTE

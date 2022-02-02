@@ -31,7 +31,7 @@ public class DynLoad {
     // The current active classloader
     static ClassLoader loader = new RedirectClassLoader();
     static Object componentFactory;
-    static final DynAPK.Data apkData = createApkData();
+    static final StubApk.Data apkData = createApkData();
 
     private static boolean loadedApk = false;
 
@@ -46,13 +46,13 @@ public class DynLoad {
     }
 
     // Dynamically load APK from internal or external storage
-    static void loadAPK(ApplicationInfo info) {
+    static void loadApk(ApplicationInfo info) {
         if (loadedApk)
             return;
         loadedApk = true;
 
-        File apk = DynAPK.current(info);
-        File update = DynAPK.update(info);
+        File apk = StubApk.current(info);
+        File update = StubApk.update(info);
 
         if (update.exists()) {
             // Rename from update
@@ -98,8 +98,8 @@ public class DynLoad {
     // Dynamically load APK, inject ClassLoader into ContextImpl, then
     // create the non-stub Application instance from the loaded APK
     static Application createApp(Context context) {
-        File apk = DynAPK.current(context);
-        loadAPK(context.getApplicationInfo());
+        File apk = StubApk.current(context);
+        loadApk(context.getApplicationInfo());
 
         // Trigger folder creation
         context.getExternalFilesDir(null);
@@ -193,8 +193,8 @@ public class DynLoad {
         }
     }
 
-    private static DynAPK.Data createApkData() {
-        var data = new DynAPK.Data();
+    private static StubApk.Data createApkData() {
+        var data = new StubApk.Data();
         data.setVersion(BuildConfig.STUB_VERSION);
         data.setClassToComponent(Mapping.inverseMap);
         data.setRootService(DelegateRootService.class);

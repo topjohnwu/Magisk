@@ -6,7 +6,7 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import com.topjohnwu.magisk.DynAPK
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.superuser.Shell
@@ -19,7 +19,7 @@ import kotlin.system.exitProcess
 open class App() : Application() {
 
     constructor(o: Any) : this() {
-        val data = DynAPK.Data(o)
+        val data = StubApk.Data(o)
         // Add the root service name mapping
         data.classToComponent[RootRegistry::class.java.name] = data.rootService.name
         // Send back the actual root service class
@@ -58,7 +58,7 @@ open class App() : Application() {
 
         refreshLocale()
         AppApkPath = if (isRunningAsStub) {
-            DynAPK.current(base).path
+            StubApk.current(base).path
         } else {
             base.packageResourcePath
         }

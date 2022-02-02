@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.core.utils
 
 import android.content.Context
-import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -29,7 +29,7 @@ class ShellInit : Shell.Initializer() {
             if (isRunningAsStub) {
                 if (!shell.isRoot)
                     return true
-                val jar = JarFile(DynAPK.current(context))
+                val jar = JarFile(StubApk.current(context))
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
                 localBB.delete()

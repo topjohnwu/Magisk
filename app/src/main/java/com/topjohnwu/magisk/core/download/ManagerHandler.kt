@@ -5,8 +5,8 @@ import android.app.PendingIntent
 import android.content.Intent
 import androidx.core.content.getSystemService
 import androidx.core.net.toFile
-import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
@@ -45,7 +45,7 @@ suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStr
     if (isRunningAsStub) {
         val apk = subject.file.toFile()
         val id = subject.notifyId
-        write(DynAPK.update(this).outputStream())
+        write(StubApk.update(this).outputStream())
         if (Info.stub!!.version < subject.stub.versionCode) {
             // Also upgrade stub
             update(id) {

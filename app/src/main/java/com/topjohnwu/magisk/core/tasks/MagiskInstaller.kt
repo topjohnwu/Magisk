@@ -6,8 +6,8 @@ import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
@@ -93,7 +93,7 @@ abstract class MagiskInstallImpl protected constructor(
         try {
             // Extract binaries
             if (isRunningAsStub) {
-                val zf = ZipFile(DynAPK.current(context))
+                val zf = ZipFile(StubApk.current(context))
 
                 // Also extract magisk32 on non 64-bit only 64-bit devices
                 val is32lib = Const.CPU_ABI_32?.let {

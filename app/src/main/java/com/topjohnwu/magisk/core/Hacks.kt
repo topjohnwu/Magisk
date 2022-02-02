@@ -11,14 +11,14 @@ import android.content.res.AssetManager
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.DisplayMetrics
-import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.utils.syncLocale
 import com.topjohnwu.magisk.di.AppContext
 
 lateinit var AppApkPath: String
 
-fun AssetManager.addAssetPath(path: String) = DynAPK.addAssetPath(this, path)
+fun AssetManager.addAssetPath(path: String) = StubApk.addAssetPath(this, path)
 
 fun Context.wrap(): Context = if (this is PatchedContext) this else PatchedContext(this)
 

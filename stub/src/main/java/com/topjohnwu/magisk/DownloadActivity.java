@@ -115,7 +115,7 @@ public class DownloadActivity extends Activity {
             finish();
         };
         // Download and upgrade the app
-        File apk = dynLoad ? DynAPK.current(this) : new File(getCacheDir(), "manager.apk");
+        File apk = dynLoad ? StubApk.current(this) : new File(getCacheDir(), "manager.apk");
         request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
             if (dynLoad) {
                 // TODO
@@ -140,7 +140,7 @@ public class DownloadActivity extends Activity {
             try (is; out) {
                 APKInstall.transfer(is, out);
             }
-            DynAPK.addAssetPath(getResources().getAssets(), apk.getPath());
+            StubApk.addAssetPath(getResources().getAssets(), apk.getPath());
         } catch (Exception ignored) {
         }
     }

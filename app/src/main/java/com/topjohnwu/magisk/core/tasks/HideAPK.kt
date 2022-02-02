@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
-import com.topjohnwu.magisk.DynAPK
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -156,7 +156,7 @@ object HideAPK {
             setCancelable(false)
             show()
         }
-        val apk = DynAPK.current(activity)
+        val apk = StubApk.current(activity)
         val receiver = APKInstall.register(activity, APPLICATION_ID) {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()

@@ -21,7 +21,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
 
     @Override
     public ClassLoader instantiateClassLoader(ClassLoader cl, ApplicationInfo info) {
-        DynLoad.loadAPK(info);
+        DynLoad.loadApk(info);
         return new DelegateClassLoader();
     }
 

@@ -13,7 +13,7 @@ import java.util.Map;
 import io.michaelrocks.paranoid.Obfuscate;
 
 @Obfuscate
-public class DynAPK {
+public class StubApk {
     private static File dynDir;
     private static Method addAssetPath;
 
