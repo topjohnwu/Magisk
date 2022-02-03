@@ -7,7 +7,7 @@
 #include <daemon.hpp>
 #include <magisk.hpp>
 #include <db.hpp>
-
+#include <android/dlext.h>
 #include "zygisk.hpp"
 #include "module.hpp"
 #include "deny/deny.hpp"
@@ -25,15 +25,6 @@ static void zygisk_logging() {
     log_cb.w = zlog(WARN);
     log_cb.e = zlog(ERROR);
     log_cb.ex = nop_ex;
-}
-
-static char *first_stage_path = nullptr;
-void unload_first_stage() {
-    if (first_stage_path) {
-        unmap_all(first_stage_path);
-        free(first_stage_path);
-        first_stage_path = nullptr;
-    }
 }
 
 // Make sure /proc/self/environ is sanitized
@@ -61,20 +52,28 @@ static void zygisk_cleanup_wait() {
     }
 }
 
-#define SECOND_STAGE_PTR "ZYGISK_PTR"
-
-static void second_stage_entry(void *handle, const char *tmp, char *path) {
-    self_handle = handle;
-    MAGISKTMP = tmp;
-    unsetenv(INJECT_ENV_2);
-    unsetenv(SECOND_STAGE_PTR);
-
+static void second_stage_entry() {
     zygisk_logging();
     ZLOGD("inject 2nd stage\n");
-    hook_functions();
 
-    // First stage will be unloaded before the first fork
-    first_stage_path = path;
+    MAGISKTMP = getenv(MAGISKTMP_ENV);
+    int fd = atoi(getenv(MAGISKFD_ENV));
+    std::string fd_path = "/proc/self/fd/" + to_string(fd);
+    char path[PATH_MAX] = {0};
+    xreadlink(fd_path.data(), path, PATH_MAX);
+    struct stat s{};
+    xfstat(fd, &s);
+    android_dlextinfo info{
+            .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+            .library_fd = fd,
+    };
+    self_handle = android_dlopen_ext(path, RTLD_LAZY, &info);
+    dlclose(self_handle);
+    close(fd);
+    unsetenv(MAGISKTMP_ENV);
+    unsetenv(MAGISKFD_ENV);
+    sanitize_environ();
+    hook_functions();
 }
 
 static void first_stage_entry() {
@@ -82,50 +81,50 @@ static void first_stage_entry() {
     ZLOGD("inject 1st stage\n");
 
     char *ld = getenv("LD_PRELOAD");
-    char tmp[128];
-    strlcpy(tmp, getenv("MAGISKTMP"), sizeof(tmp));
-    char *path;
+    char path[PATH_MAX];
     if (char *c = strrchr(ld, ':')) {
         *c = '\0';
         setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
-        path = strdup(c + 1);
+        strcpy(path, c + 1);
     } else {
         unsetenv("LD_PRELOAD");
-        path = strdup(ld);
+        strcpy(path, ld);
     }
-    unsetenv(INJECT_ENV_1);
-    unsetenv("MAGISKTMP");
-    sanitize_environ();
 
-    char *num = strrchr(path, '.') - 1;
+    int fd = xopen(path, O_RDONLY | O_CLOEXEC);
+    // use fd here instead of path to make sure inode is the same as 2nd stage
+    setenv(MAGISKFD_ENV, to_string(fd).data(), 1);
+    struct stat s{};
+    xfstat(fd, &s);
 
-    // Update path to 2nd stage lib
-    *num = '2';
+    android_dlextinfo info{
+            .flags = ANDROID_DLEXT_FORCE_LOAD | ANDROID_DLEXT_USE_LIBRARY_FD,
+            .library_fd = fd,
+    };
+    auto[addr, size] = find_map_range(path, s.st_ino);
+    if (addr && size) {
+        info.flags |= ANDROID_DLEXT_RESERVED_ADDRESS;
+        info.reserved_addr = addr;
+        // we dont actually allocate this space
+        // since we are loading the same inode, make it sufficient larger
+        // two page_size's: one for the beginning and one for the ending
+        info.reserved_size = size + 2 * 4096;
+    }
 
-    // Load second stage
     setenv(INJECT_ENV_2, "1", 1);
-    void *handle = dlopen(path, RTLD_LAZY);
-    remap_all(path);
-
-    // Revert path to 1st stage lib
-    *num = '1';
-
-    // Run second stage entry
-    char *env = getenv(SECOND_STAGE_PTR);
-    decltype(&second_stage_entry) second_stage;
-    sscanf(env, "%p", &second_stage);
-    second_stage(handle, tmp, path);
+    // Force dlopen myself to make myself dlclosable
+    // After this call, all global variables are reset
+    android_dlopen_ext(path, RTLD_LAZY, &info);
 }
 
-__attribute__((constructor))
+[[gnu::constructor]] [[maybe_unused]]
 static void zygisk_init() {
-    if (getenv(INJECT_ENV_2)) {
-        // Return function pointer to first stage
-        char buf[128];
-        snprintf(buf, sizeof(buf), "%p", &second_stage_entry);
-        setenv(SECOND_STAGE_PTR, buf, 1);
-    } else if (getenv(INJECT_ENV_1)) {
+    if (getenv(INJECT_ENV_1)) {
+        unsetenv(INJECT_ENV_1);
         first_stage_entry();
+    } else if (getenv(INJECT_ENV_2)) {
+        unsetenv(INJECT_ENV_2);
+        second_stage_entry();
     }
 }
 
@@ -167,7 +166,7 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     return ret;
 }
 
-static inline bool should_load_modules(int flags) {
+static inline bool should_load_modules(uint32_t flags) {
     return (flags & UNMOUNT_MASK) != UNMOUNT_MASK &&
            (flags & PROCESS_IS_MAGISK_APP) != PROCESS_IS_MAGISK_APP;
 }
@@ -304,10 +303,6 @@ static void setup_files(int client, const sock_cred *cred) {
 
     write_int(client, 0);
     send_fd(client, is_64_bit ? app_process_64 : app_process_32);
-
-    string path = MAGISKTMP + "/" ZYGISKBIN "/zygisk." + basename(buf);
-    cp_afc(buf, (path + ".1.so").data());
-    cp_afc(buf, (path + ".2.so").data());
     write_string(client, MAGISKTMP);
 }
 

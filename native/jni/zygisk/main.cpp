@@ -1,6 +1,7 @@
 #include <sys/mount.h>
 #include <dlfcn.h>
 
+#include <android/dlext.h>
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <socket.hpp>
@@ -70,26 +71,22 @@ int app_process_main(int argc, char *argv[]) {
                 break;
 
             string tmp = read_string(socket);
-#if defined(__LP64__)
-            string lib = tmp + "/" ZYGISKBIN "/zygisk.app_process64.1.so";
-#else
-            string lib = tmp + "/" ZYGISKBIN "/zygisk.app_process32.1.so";
-#endif
+            char exe[PATH_MAX] = {0};
+            xreadlink("/proc/self/exe", exe, PATH_MAX);
             if (char *ld = getenv("LD_PRELOAD")) {
                 char env[256];
-                sprintf(env, "%s:%s", ld, lib.data());
+                sprintf(env, "%s:%s", ld, exe);
                 setenv("LD_PRELOAD", env, 1);
             } else {
-                setenv("LD_PRELOAD", lib.data(), 1);
+                setenv("LD_PRELOAD", exe, 1);
             }
             setenv(INJECT_ENV_1, "1", 1);
-            setenv("MAGISKTMP", tmp.data(), 1);
+            setenv(MAGISKTMP_ENV, tmp.data(), 1);
 
             close(socket);
 
-            snprintf(buf, sizeof(buf), "/proc/self/fd/%d", app_proc_fd);
             fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
-            execve(buf, argv, environ);
+            syscall(__NR_execveat, app_proc_fd, "", argv, environ, AT_EMPTY_PATH);
         } while (false);
 
         close(socket);
