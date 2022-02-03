@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ktx.copyAndClose
 import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.utils.APKInstall
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
@@ -57,8 +58,10 @@ suspend fun DownloadService.handleAPK(subject: Subject.Manager, stream: InputStr
         } else {
             val clz = Info.stub!!.classToComponent["PHOENIX"]!!
             PhoenixActivity.rebirth(this, clz)
+            return
         }
-    } else {
-        write(subject.file.outputStream())
     }
+    val receiver = APKInstall.register(this, null, null)
+    write(APKInstall.openStream(this, false))
+    subject.intent = receiver.waitIntent()
 }

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
@@ -16,7 +15,6 @@ import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -36,7 +34,7 @@ sealed class Subject : Parcelable {
     abstract val notifyId: Int
     open val autoStart: Boolean get() = true
 
-    abstract fun pendingIntent(context: Context): PendingIntent
+    abstract fun pendingIntent(context: Context): PendingIntent?
 
     @Parcelize
     class Module(
@@ -71,14 +69,12 @@ sealed class Subject : Parcelable {
             cachedFile("manager.apk")
         }
 
+        @IgnoredOnParcel
+        var intent: Intent? = null
+
         val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
 
-        override fun pendingIntent(context: Context): PendingIntent {
-            val receiver = APKInstall.register(context, null, null)
-            APKInstall.installapk(context, file.toFile())
-            val intent = receiver.waitIntent() ?: Intent()
-            return intent.toPending(context)
-        }
+        override fun pendingIntent(context: Context) = intent?.toPending(context)
     }
 
     @SuppressLint("InlinedApi")

@@ -125,7 +125,7 @@ object HideAPK {
         }
         val cmd = "adb_pm_install $repack ${activity.applicationInfo.uid}"
         if (!Shell.su(cmd).exec().isSuccess) {
-            APKInstall.installapk(activity, repack)
+            APKInstall.install(activity, repack)
             receiver.waitIntent()?.let { activity.startActivity(it) }
         }
         return true
@@ -164,7 +164,7 @@ object HideAPK {
         val cmd = "adb_pm_install $apk ${activity.applicationInfo.uid}"
         Shell.su(cmd).submit(Shell.EXECUTOR) { ret ->
             if (ret.isSuccess) return@submit
-            APKInstall.installapk(activity, apk)
+            APKInstall.install(activity, apk)
             receiver.waitIntent()?.let { activity.startActivity(it) }
         }
     }

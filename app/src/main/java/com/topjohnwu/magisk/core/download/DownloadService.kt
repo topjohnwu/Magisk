@@ -70,7 +70,7 @@ class DownloadService : BaseService() {
                 val activity = ActivityTracker.foreground
                 if (activity != null && subject.autoStart) {
                     remove(subject.notifyId)
-                    subject.pendingIntent(activity).send()
+                    subject.pendingIntent(activity)?.send()
                 } else {
                     notifyFinish(subject)
                 }
@@ -117,13 +117,13 @@ class DownloadService : BaseService() {
 
     private fun notifyFinish(subject: Subject) = finalNotify(subject.notifyId) {
         broadcast(1f, subject)
-        it.setContentIntent(subject.pendingIntent(this))
-            .setContentTitle(subject.title)
+        it.setContentTitle(subject.title)
             .setContentText(getString(R.string.download_complete))
             .setSmallIcon(android.R.drawable.stat_sys_download_done)
             .setProgress(0, 0, false)
             .setOngoing(false)
             .setAutoCancel(true)
+        subject.pendingIntent(this)?.let { intent -> it.setContentIntent(intent) }
     }
 
     private fun finalNotify(id: Int, editor: (Notification.Builder) -> Unit): Int {

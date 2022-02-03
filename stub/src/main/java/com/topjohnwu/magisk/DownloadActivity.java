@@ -119,7 +119,7 @@ public class DownloadActivity extends Activity {
                 runOnUiThread(onSuccess);
             } else {
                 var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
-                APKInstall.installapk(this, file);
+                APKInstall.install(this, file);
                 Intent intent = receiver.waitIntent();
                 if (intent != null) startActivity(intent);
             }
