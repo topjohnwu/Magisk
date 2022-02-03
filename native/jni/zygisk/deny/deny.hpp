@@ -21,6 +21,7 @@ void ls_list(int client);
 bool is_deny_target(int uid, std::string_view process);
 
 void revert_unmount();
+void cleanup_preload();
 
 extern std::atomic<bool> denylist_enforced;
 extern std::atomic<int> cached_manager_app_id;

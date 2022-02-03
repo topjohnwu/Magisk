@@ -156,6 +156,7 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
         if (g_ctx->state[DO_UNMOUNT]) {
+            cleanup_preload();
             revert_unmount();
         } else {
             umount2("/system/bin/app_process64", MNT_DETACH);
