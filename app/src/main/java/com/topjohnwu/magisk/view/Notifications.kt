@@ -48,7 +48,7 @@ object Notifications {
     }
 
     fun managerUpdate(context: Context) {
-        val intent = DownloadService.getPendingIntent(context, Subject.Manager())
+        val intent = DownloadService.getPendingIntent(context, Subject.App())
 
         val builder = updateBuilder(context)
             .setContentTitle(context.getString(R.string.magisk_update_title))

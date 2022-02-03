@@ -56,7 +56,7 @@ sealed class Subject : Parcelable {
     }
 
     @Parcelize
-    class Manager(
+    class App(
         private val json: MagiskJson = Info.remote.magisk,
         val stub: StubJson = Info.remote.stub,
         override val notifyId: Int = Notifications.nextId()

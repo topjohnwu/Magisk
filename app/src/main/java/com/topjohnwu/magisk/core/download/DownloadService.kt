@@ -1,53 +1,47 @@
 package com.topjohnwu.magisk.core.download
 
 import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.PendingIntent
 import android.app.PendingIntent.*
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
-import android.os.IBinder
+import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
+import com.topjohnwu.magisk.PhoenixActivity
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
-import com.topjohnwu.magisk.core.base.BaseService
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.intent
-import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.di.ServiceLocator
-import com.topjohnwu.magisk.ktx.synchronized
-import com.topjohnwu.magisk.view.Notifications
-import com.topjohnwu.magisk.view.Notifications.mgr
+import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
+import com.topjohnwu.magisk.ktx.copyAndClose
+import com.topjohnwu.magisk.ktx.forEach
+import com.topjohnwu.magisk.ktx.withStreams
+import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.utils.APKInstall
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import okhttp3.ResponseBody
 import timber.log.Timber
+import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 
-class DownloadService : BaseService() {
+class DownloadService : NotificationService() {
 
-    private val hasNotifications get() = notifications.isNotEmpty()
-    private val notifications = HashMap<Int, Notification.Builder>().synchronized()
     private val job = Job()
 
-    val service get() = ServiceLocator.networkService
-
-    // -- Service overrides
-
-    override fun onBind(intent: Intent?): IBinder? = null
-
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        intent.getParcelableExtra<Subject>(SUBJECT_KEY)?.let { doDownload(it) }
+        intent.getParcelableExtra<Subject>(SUBJECT_KEY)?.let { download(it) }
         return START_NOT_STICKY
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        notifications.forEach { mgr.cancel(it.key) }
-        notifications.clear()
     }
 
     override fun onDestroy() {
@@ -55,17 +49,15 @@ class DownloadService : BaseService() {
         job.cancel()
     }
 
-    // -- Download logic
-
-    private fun doDownload(subject: Subject) {
+    private fun download(subject: Subject) {
         update(subject.notifyId)
         val coroutineScope = CoroutineScope(job + Dispatchers.IO)
         coroutineScope.launch {
             try {
                 val stream = service.fetchFile(subject.url).toProgressStream(subject)
                 when (subject) {
-                    is Subject.Manager -> handleAPK(subject, stream)
-                    is Subject.Module -> stream.toModule(subject.file, assets.open("module_installer.sh"))
+                    is Subject.App -> handleApp(stream, subject)
+                    is Subject.Module -> handleModule(stream, subject.file)
                 }
                 val activity = ActivityTracker.foreground
                 if (activity != null && subject.autoStart) {
@@ -83,87 +75,87 @@ class DownloadService : BaseService() {
         }
     }
 
-    private fun ResponseBody.toProgressStream(subject: Subject): InputStream {
-        val max = contentLength()
-        val total = max.toFloat() / 1048576
-        val id = subject.notifyId
+    private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
+        fun write(output: OutputStream) {
+            val external = subject.externalFile.outputStream()
+            stream.copyAndClose(TeeOutputStream(external, output))
+        }
 
-        update(id) { it.setContentTitle(subject.title) }
+        if (isRunningAsStub) {
+            val apk = subject.file.toFile()
+            val id = subject.notifyId
+            write(StubApk.update(this).outputStream())
+            if (Info.stub!!.version < subject.stub.versionCode) {
+                // Also upgrade stub
+                update(id) {
+                    it.setProgress(0, 0, true)
+                        .setContentTitle(getString(R.string.hide_app_title))
+                        .setContentText("")
+                }
+                service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
+                val patched = File(apk.parent, "patched.apk")
+                HideAPK.patch(this, apk, patched, packageName, applicationInfo.nonLocalizedLabel)
+                apk.delete()
+                patched.renameTo(apk)
+            } else {
+                val clz = Info.stub!!.classToComponent["PHOENIX"]!!
+                PhoenixActivity.rebirth(this, clz)
+                return
+            }
+        }
+        val receiver = APKInstall.register(this, null, null)
+        write(APKInstall.openStream(this, false))
+        subject.intent = receiver.waitIntent()
+    }
 
-        return ProgressInputStream(byteStream()) {
-            val progress = it.toFloat() / 1048576
-            update(id) { notification ->
-                if (max > 0) {
-                    broadcast(progress / total, subject)
-                    notification
-                        .setProgress(max.toInt(), it.toInt(), false)
-                        .setContentText("%.2f / %.2f MB".format(progress, total))
-                } else {
-                    broadcast(-1f, subject)
-                    notification.setContentText("%.2f MB / ??".format(progress))
+    private fun handleModule(src: InputStream, file: Uri) {
+        val input = ZipInputStream(src.buffered())
+        val output = ZipOutputStream(file.outputStream().buffered())
+
+        withStreams(input, output) { zin, zout ->
+            zout.putNextEntry(ZipEntry("META-INF/"))
+            zout.putNextEntry(ZipEntry("META-INF/com/"))
+            zout.putNextEntry(ZipEntry("META-INF/com/google/"))
+            zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
+            zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
+            assets.open("module_installer.sh").copyTo(zout)
+
+            zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
+            zout.write("#MAGISK\n".toByteArray())
+
+            zin.forEach { entry ->
+                val path = entry.name
+                if (path.isNotEmpty() && !path.startsWith("META-INF")) {
+                    zout.putNextEntry(ZipEntry(path))
+                    if (!entry.isDirectory) {
+                        zin.copyTo(zout)
+                    }
                 }
             }
         }
     }
 
-    // --- Notification management
-
-    private fun notifyFail(subject: Subject) = finalNotify(subject.notifyId) {
-        broadcast(-2f, subject)
-        it.setContentText(getString(R.string.download_file_error))
-            .setSmallIcon(android.R.drawable.stat_notify_error)
-            .setOngoing(false)
-    }
-
-    private fun notifyFinish(subject: Subject) = finalNotify(subject.notifyId) {
-        broadcast(1f, subject)
-        it.setContentTitle(subject.title)
-            .setContentText(getString(R.string.download_complete))
-            .setSmallIcon(android.R.drawable.stat_sys_download_done)
-            .setProgress(0, 0, false)
-            .setOngoing(false)
-            .setAutoCancel(true)
-        subject.pendingIntent(this)?.let { intent -> it.setContentIntent(intent) }
-    }
-
-    private fun finalNotify(id: Int, editor: (Notification.Builder) -> Unit): Int {
-        val notification = remove(id)?.also(editor) ?: return -1
-        val newId = Notifications.nextId()
-        mgr.notify(newId, notification.build())
-        return newId
-    }
-
-    private fun create() = Notifications.progress(this, "")
-
-    fun update(id: Int, editor: (Notification.Builder) -> Unit = {}) {
-        val wasEmpty = !hasNotifications
-        val notification = notifications.getOrPut(id, ::create).also(editor)
-        if (wasEmpty)
-            updateForeground()
-        else
-            mgr.notify(id, notification.build())
-    }
-
-    private fun remove(id: Int): Notification.Builder? {
-        val n = notifications.remove(id)?.also { updateForeground() }
-        mgr.cancel(id)
-        return n
-    }
-
-    private fun updateForeground() {
-        if (hasNotifications) {
-            val (id, notification) = notifications.entries.first()
-            startForeground(id, notification.build())
-        } else {
-            stopForeground(false)
+    private class TeeOutputStream(
+        private val o1: OutputStream,
+        private val o2: OutputStream
+    ) : OutputStream() {
+        override fun write(b: Int) {
+            o1.write(b)
+            o2.write(b)
+        }
+        override fun write(b: ByteArray?, off: Int, len: Int) {
+            o1.write(b, off, len)
+            o2.write(b, off, len)
+        }
+        override fun close() {
+            o1.close()
+            o2.close()
         }
     }
 
     companion object {
-        private const val SUBJECT_KEY = "download_subject"
+        private const val SUBJECT_KEY = "subject"
         private const val REQUEST_CODE = 1
-
-        private val progressBroadcast = MutableLiveData<Pair<Float, Subject>?>()
 
         fun observeProgress(owner: LifecycleOwner, callback: (Float, Subject) -> Unit) {
             progressBroadcast.value = null
@@ -171,10 +163,6 @@ class DownloadService : BaseService() {
                 val (progress, subject) = it ?: return@observe
                 callback(progress, subject)
             }
-        }
-
-        private fun broadcast(progress: Float, subject: Subject) {
-            progressBroadcast.postValue(progress to subject)
         }
 
         private fun intent(context: Context, subject: Subject) =
@@ -200,5 +188,4 @@ class DownloadService : BaseService() {
             }
         }
     }
-
 }

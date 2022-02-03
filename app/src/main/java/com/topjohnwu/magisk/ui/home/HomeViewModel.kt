@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.core.download.Subject.Manager
+import com.topjohnwu.magisk.core.download.Subject.App
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
@@ -112,7 +112,7 @@ class HomeViewModel(
     }.publish()
 
     fun onProgressUpdate(progress: Float, subject: Subject) {
-        if (subject is Manager)
+        if (subject is App)
             stateManagerProgress = progress.times(100f).roundToInt()
     }
 
