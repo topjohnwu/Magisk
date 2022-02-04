@@ -53,7 +53,7 @@ class MagiskInstallFileEvent(
 ) : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
         try {
-            activity.getContent("*/*", callback)
+            activity.getContent("application/*", callback)
             Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
         } catch (e: ActivityNotFoundException) {
             Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
