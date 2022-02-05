@@ -354,7 +354,7 @@ void parse_prop_file(const char *file, const function<bool(string_view, string_v
 
 // Original source: https://android.googlesource.com/platform/bionic/+/master/libc/bionic/mntent.cpp
 // License: AOSP, full copyright notice please check original source
-struct mntent *compat_getmntent_r(FILE *fp, struct mntent *e, char *buf, int buf_len) {
+static struct mntent *compat_getmntent_r(FILE *fp, struct mntent *e, char *buf, int buf_len) {
     memset(e, 0, sizeof(*e));
     while (fgets(buf, buf_len, fp) != nullptr) {
         // Entries look like "proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0".
