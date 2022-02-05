@@ -352,12 +352,39 @@ void parse_prop_file(const char *file, const function<bool(string_view, string_v
     });
 }
 
+// Original source: https://android.googlesource.com/platform/bionic/+/master/libc/bionic/mntent.cpp
+// License: AOSP, full copyright notice please check original source
+static struct mntent *compat_getmntent_r(FILE *fp, struct mntent *e, char *buf, int buf_len) {
+    memset(e, 0, sizeof(*e));
+    while (fgets(buf, buf_len, fp) != nullptr) {
+        // Entries look like "proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0".
+        // That is: mnt_fsname mnt_dir mnt_type mnt_opts 0 0.
+        int fsname0, fsname1, dir0, dir1, type0, type1, opts0, opts1;
+        if (sscanf(buf, " %n%*s%n %n%*s%n %n%*s%n %n%*s%n %d %d",
+                   &fsname0, &fsname1, &dir0, &dir1, &type0, &type1, &opts0, &opts1,
+                   &e->mnt_freq, &e->mnt_passno) == 2) {
+            e->mnt_fsname = &buf[fsname0];
+            buf[fsname1] = '\0';
+            e->mnt_dir = &buf[dir0];
+            buf[dir1] = '\0';
+            e->mnt_type = &buf[type0];
+            buf[type1] = '\0';
+            e->mnt_opts = &buf[opts0];
+            buf[opts1] = '\0';
+            return e;
+        }
+    }
+    return nullptr;
+}
+
 void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
     auto fp = sFILE(setmntent(file, "re"), endmntent);
     if (fp) {
         mntent mentry{};
         char buf[4096];
-        while (getmntent_r(fp.get(), &mentry, buf, sizeof(buf))) {
+        // getmntent_r from system's libc.so is broken on old platform
+        // use the compat one instead
+        while (compat_getmntent_r(fp.get(), &mentry, buf, sizeof(buf))) {
             if (!fn(&mentry))
                 break;
         }

@@ -25,6 +25,7 @@ bool zygisk_enabled = false;
  *********/
 
 #define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
+#define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
 #define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
@@ -38,9 +39,12 @@ bool zygisk_enabled = false;
     LOGI("mount: %s\n", buf1); \
 }
 
-#define mount_mirror(part, flag) \
-else if (MNT_DIR_IS("/" #part) && me->mnt_type != "tmpfs"sv && me->mnt_type != "overlay"sv && lstat(me->mnt_dir, &st) == 0) \
-    do_mount_mirror(part, flag)
+#define mount_mirror(part, flag)    \
+if (MNT_DIR_IS("/" #part) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay") && \
+    lstat(me->mnt_dir, &st) == 0) { \
+    do_mount_mirror(part, flag);    \
+    break;                          \
+}
 
 #define link_mirror(part) \
 SETMIR(buf1, part); \
@@ -50,11 +54,12 @@ if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
 }
 
 #define link_orig_dir(dir, part) \
-else if (MNT_DIR_IS(dir) && me->mnt_type != "tmpfs"sv && me->mnt_type != "overlay"sv) { \
-    SETMIR(buf1, part); \
-    rmdir(buf1); \
-    xsymlink(dir, buf1); \
-    LOGI("link: %s\n", buf1); \
+if (MNT_DIR_IS(dir) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay")) { \
+    SETMIR(buf1, part);          \
+    rmdir(buf1);                 \
+    xsymlink(dir, buf1);         \
+    LOGI("link: %s\n", buf1);    \
+    break;                       \
 }
 
 #define link_orig(part) link_orig_dir("/" #part, part)
@@ -66,20 +71,22 @@ static void mount_mirrors() {
     LOGI("* Mounting mirrors\n");
 
     parse_mnt("/proc/mounts", [&](mntent *me) {
-        struct stat st;
-        if (0) {}
-        mount_mirror(system, MS_RDONLY)
-        mount_mirror(vendor, MS_RDONLY)
-        mount_mirror(product, MS_RDONLY)
-        mount_mirror(system_ext, MS_RDONLY)
-        mount_mirror(data, 0)
-        link_orig(cache)
-        link_orig(metadata)
-        link_orig(persist)
-        link_orig_dir("/mnt/vendor/persist", persist)
-        else if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
-            xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-        }
+        struct stat st{};
+        do {
+            mount_mirror(system, MS_RDONLY)
+            mount_mirror(vendor, MS_RDONLY)
+            mount_mirror(product, MS_RDONLY)
+            mount_mirror(system_ext, MS_RDONLY)
+            mount_mirror(data, 0)
+            link_orig(cache)
+            link_orig(metadata)
+            link_orig(persist)
+            link_orig_dir("/mnt/vendor/persist", persist)
+            if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
+                xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
+                break;
+            }
+        } while (false);
         return true;
     });
     SETMIR(buf1, system);
