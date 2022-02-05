@@ -87,6 +87,10 @@ int app_process_main(int argc, char *argv[]) {
 
             fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
             syscall(__NR_execveat, app_proc_fd, "", argv, environ, AT_EMPTY_PATH);
+            if (errno == ENOSYS) {
+                snprintf(buf, sizeof(buf), "/proc/self/fd/%d", app_proc_fd);
+                execve(buf, argv, environ);
+            }
         } while (false);
 
         close(socket);
