@@ -2,12 +2,13 @@
 #include <dlfcn.h>
 #include <sys/prctl.h>
 #include <android/log.h>
+#include <android/dlext.h>
 
 #include <utils.hpp>
 #include <daemon.hpp>
 #include <magisk.hpp>
 #include <db.hpp>
-#include <android/dlext.h>
+
 #include "zygisk.hpp"
 #include "module.hpp"
 #include "deny/deny.hpp"
@@ -34,7 +35,7 @@ static void sanitize_environ() {
 
     for (int i = 0; environ[i]; ++i) {
         // Copy all env onto the original stack
-        int len = strlen(environ[i]);
+        size_t len = strlen(environ[i]);
         memmove(cur, environ[i], len + 1);
         environ[i] = cur;
         cur += len + 1;
@@ -43,7 +44,7 @@ static void sanitize_environ() {
     prctl(PR_SET_MM, PR_SET_MM_ENV_END, cur, 0, 0);
 }
 
-__attribute__((destructor))
+[[gnu::destructor]] [[maybe_unused]]
 static void zygisk_cleanup_wait() {
     if (self_handle) {
         // Wait 10us to make sure none of our code is executing
@@ -56,16 +57,15 @@ static void second_stage_entry() {
     zygisk_logging();
     ZLOGD("inject 2nd stage\n");
 
+    char path[PATH_MAX];
     MAGISKTMP = getenv(MAGISKTMP_ENV);
-    int fd = atoi(getenv(MAGISKFD_ENV));
-    std::string fd_path = "/proc/self/fd/" + to_string(fd);
-    char path[PATH_MAX] = {0};
-    xreadlink(fd_path.data(), path, PATH_MAX);
-    struct stat s{};
-    xfstat(fd, &s);
-    android_dlextinfo info{
-            .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
-            .library_fd = fd,
+    int fd = parse_int(getenv(MAGISKFD_ENV));
+
+    snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
+    xreadlink(path, path, PATH_MAX);
+    android_dlextinfo info {
+        .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+        .library_fd = fd,
     };
     self_handle = android_dlopen_ext(path, RTLD_LAZY, &info);
     dlclose(self_handle);
@@ -80,40 +80,46 @@ static void first_stage_entry() {
     android_logging();
     ZLOGD("inject 1st stage\n");
 
-    char *ld = getenv("LD_PRELOAD");
     char path[PATH_MAX];
+    char buf[256];
+    char *ld = getenv("LD_PRELOAD");
     if (char *c = strrchr(ld, ':')) {
         *c = '\0';
+        strlcpy(path, c + 1, sizeof(path));
         setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
-        strcpy(path, c + 1);
     } else {
         unsetenv("LD_PRELOAD");
-        strcpy(path, ld);
+        strlcpy(path, ld, sizeof(path));
     }
 
+    // Force the linker to load the library on top of ourselves, so we do not
+    // need to unmap the 1st stage library that was loaded with LD_PRELOAD.
+
     int fd = xopen(path, O_RDONLY | O_CLOEXEC);
-    // use fd here instead of path to make sure inode is the same as 2nd stage
-    setenv(MAGISKFD_ENV, to_string(fd).data(), 1);
+    // Use fd here instead of path to make sure inode is the same as 2nd stage
+    snprintf(buf, sizeof(buf), "%d", fd);
+    setenv(MAGISKFD_ENV, buf, 1);
     struct stat s{};
     xfstat(fd, &s);
 
-    android_dlextinfo info{
-            .flags = ANDROID_DLEXT_FORCE_LOAD | ANDROID_DLEXT_USE_LIBRARY_FD,
-            .library_fd = fd,
+    android_dlextinfo info {
+        .flags = ANDROID_DLEXT_FORCE_LOAD | ANDROID_DLEXT_USE_LIBRARY_FD,
+        .library_fd = fd,
     };
-    auto[addr, size] = find_map_range(path, s.st_ino);
+    auto [addr, size] = find_map_range(path, s.st_ino);
     if (addr && size) {
         info.flags |= ANDROID_DLEXT_RESERVED_ADDRESS;
         info.reserved_addr = addr;
-        // we dont actually allocate this space
-        // since we are loading the same inode, make it sufficient larger
-        // two page_size's: one for the beginning and one for the ending
+        // The existing address is guaranteed to fit, as 1st stage and 2nd stage
+        // are exactly the same ELF (same inode). However, the linker could over
+        // estimate the required size and refuse to dlopen. Add 2 more page_sizes
+        // (one at the beginning and one at the end) as a safety measure.
         info.reserved_size = size + 2 * 4096;
     }
 
     setenv(INJECT_ENV_2, "1", 1);
-    // Force dlopen myself to make myself dlclosable
-    // After this call, all global variables are reset
+    // Force dlopen ourselves to make ourselves dlclose-able.
+    // After this call, all global variables will be reset.
     android_dlopen_ext(path, RTLD_LAZY, &info);
 }
 

@@ -27,7 +27,8 @@ enum : int {
 #define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
 #endif
 
-std::tuple<void*, size_t> find_map_range(const char *name, unsigned long inode);
+// Find the memory address + size of the pages matching name + inode
+std::pair<void*, size_t> find_map_range(const char *name, unsigned long inode);
 
 // Unmap all pages matching the name
 void unmap_all(const char *name);

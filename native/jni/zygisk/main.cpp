@@ -1,7 +1,7 @@
 #include <sys/mount.h>
+#include <android/dlext.h>
 #include <dlfcn.h>
 
-#include <android/dlext.h>
 #include <magisk.hpp>
 #include <utils.hpp>
 #include <socket.hpp>
@@ -14,7 +14,7 @@ using namespace std;
 // Entrypoint for app_process overlay
 int app_process_main(int argc, char *argv[]) {
     android_logging();
-    char buf[256];
+    char buf[PATH_MAX];
 
     bool zygote = false;
     if (auto fp = open_file("/proc/self/attr/current", "r")) {
@@ -52,9 +52,8 @@ int app_process_main(int argc, char *argv[]) {
             return 1;
         close(fds[0]);
 
-        snprintf(buf, sizeof(buf), "/proc/self/fd/%d", app_proc_fd);
         fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
-        execve(buf, argv, environ);
+        fexecve(app_proc_fd, argv, environ);
         return 1;
     }
 
@@ -71,14 +70,14 @@ int app_process_main(int argc, char *argv[]) {
                 break;
 
             string tmp = read_string(socket);
-            char exe[PATH_MAX] = {0};
-            xreadlink("/proc/self/exe", exe, PATH_MAX);
+            xreadlink("/proc/self/exe", buf, sizeof(buf));
             if (char *ld = getenv("LD_PRELOAD")) {
-                char env[256];
-                sprintf(env, "%s:%s", ld, exe);
-                setenv("LD_PRELOAD", env, 1);
+                string env = ld;
+                env += ':';
+                env += buf;
+                setenv("LD_PRELOAD", env.data(), 1);
             } else {
-                setenv("LD_PRELOAD", exe, 1);
+                setenv("LD_PRELOAD", buf, 1);
             }
             setenv(INJECT_ENV_1, "1", 1);
             setenv(MAGISKTMP_ENV, tmp.data(), 1);
@@ -86,11 +85,7 @@ int app_process_main(int argc, char *argv[]) {
             close(socket);
 
             fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
-            syscall(__NR_execveat, app_proc_fd, "", argv, environ, AT_EMPTY_PATH);
-            if (errno == ENOSYS) {
-                snprintf(buf, sizeof(buf), "/proc/self/fd/%d", app_proc_fd);
-                execve(buf, argv, environ);
-            }
+            fexecve(app_proc_fd, argv, environ);
         } while (false);
 
         close(socket);

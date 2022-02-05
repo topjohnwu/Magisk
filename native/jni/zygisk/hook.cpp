@@ -1,8 +1,9 @@
 #include <android/dlext.h>
-#include <dlfcn.h>
 #include <sys/mount.h>
-#include <xhook.h>
+#include <dlfcn.h>
 #include <bitset>
+
+#include <xhook.h>
 
 #include <utils.hpp>
 #include <flags.h>
@@ -367,8 +368,8 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
 
     for (int i = 0; i < fds.size(); ++i) {
         android_dlextinfo info {
-                .flags = ANDROID_DLEXT_FORCE_LOAD | ANDROID_DLEXT_USE_LIBRARY_FD,
-                .library_fd = fds[i],
+            .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+            .library_fd = fds[i],
         };
         if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
             if (void *e = dlsym(h, "zygisk_module_entry")) {
