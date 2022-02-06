@@ -228,7 +228,7 @@
     <string name="add_shortcut_title">新增捷徑到首頁</string>
     <string name="add_shortcut_msg">在隱藏 Magisk 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
     <string name="app_not_found">沒有可以處理這個操作的應用程式</string>
-    <string name="reboot_apply_change">重新啟動裝置以套用設變更</string>
+    <string name="reboot_apply_change">重新啟動裝置以套用設定變更</string>
     <string name="restore_app_confirmation">這將會還原隱藏的應用程式回到原本的應用程式。請問您確定要執行？</string>
 
 </resources>
