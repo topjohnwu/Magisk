@@ -204,8 +204,12 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     names.addAll(c3.subList(0, 10))
     names.shuffle(RANDOM)
 
-    // Distinct by lower case to support case insensitive file systems
-    val pkgNames = names.distinctBy { it.toLowerCase(Locale.ROOT) }
+    val pkgNames = names.subList(0, 50)
+        // Distinct by lower case to support case insensitive file systems
+        .distinctBy { it.toLowerCase(Locale.ROOT) }
+        // Old Android does not support capitalized package names
+        // Check Android 7.0.0 PackageParser#buildClassName
+        .map { it.decapitalize(Locale.ROOT) }
 
     var idx = 0
     fun isJavaKeyword(name: String) = when (name) {
