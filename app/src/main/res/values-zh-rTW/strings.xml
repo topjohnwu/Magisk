@@ -33,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保持 AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">修補 vbmeta 到開機映像檔</string>
     <string name="recovery_mode">安裝至 Recovery</string>
     <string name="install_options_title">選項</string>
     <string name="install_method_title">安裝方式</string>
@@ -107,6 +108,9 @@
     <string name="module_state_restore">還原</string>
     <string name="module_action_install_external">從本機安裝</string>
     <string name="update_available">有可用的更新</string>
+    <string name="suspend_text_riru">此模組因 %1$s 已啟用而暫停運作</string>
+    <string name="suspend_text_zygisk">此模組因 %1$s 未啟用而暫停運作</string>
+    <string name="zygisk_module_unloaded">此 Zygisk 模組因未相容而不載入</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">主題模式</string>
@@ -224,6 +228,7 @@
     <string name="add_shortcut_title">新增捷徑到首頁</string>
     <string name="add_shortcut_msg">在隱藏 Magisk 之後，其名稱與圖示將難以辨識。您想要新增一個精緻的捷徑到桌面嗎？</string>
     <string name="app_not_found">沒有可以處理這個操作的應用程式</string>
-<string name="reboot_apply_change">重新啟動裝置以套用設變更</string>
+    <string name="reboot_apply_change">重新啟動裝置以套用設定變更</string>
+    <string name="restore_app_confirmation">這將會還原隱藏的應用程式回到原本的應用程式。請問您確定要執行？</string>
 
 </resources>
