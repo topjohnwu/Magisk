@@ -4,8 +4,10 @@
 #include <jni.h>
 #include <vector>
 
-#define INJECT_ENV_1 "MAGISK_INJ_1"
-#define INJECT_ENV_2 "MAGISK_INJ_2"
+#define INJECT_ENV_1   "MAGISK_INJ_1"
+#define INJECT_ENV_2   "MAGISK_INJ_2"
+#define MAGISKFD_ENV   "MAGISKFD"
+#define MAGISKTMP_ENV  "MAGISKTMP"
 
 enum : int {
     ZYGISK_SETUP,
@@ -25,6 +27,9 @@ enum : int {
 #define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
 #endif
 
+// Find the memory address + size of the pages matching name + inode
+std::pair<void*, size_t> find_map_range(const char *name, unsigned long inode);
+
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 
@@ -39,7 +44,6 @@ uintptr_t get_function_addr(int pid, const char *lib, uintptr_t off);
 
 extern void *self_handle;
 
-void unload_first_stage();
 void hook_functions();
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 int remote_request_unmount();

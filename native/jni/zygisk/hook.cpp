@@ -1,7 +1,9 @@
-#include <dlfcn.h>
+#include <android/dlext.h>
 #include <sys/mount.h>
-#include <xhook.h>
+#include <dlfcn.h>
 #include <bitset>
+
+#include <xhook.h>
 
 #include <utils.hpp>
 #include <flags.h>
@@ -147,7 +149,6 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
 // Skip actual fork and return cached result if applicable
 // Also unload first stage zygisk if necessary
 DCL_HOOK_FUNC(int, fork) {
-    unload_first_stage();
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
 
@@ -360,15 +361,17 @@ uint32_t ZygiskModule::getFlags() {
 }
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
-    char buf[256];
 
     // Since we directly use the pointer to elements in the vector, in order to prevent dangling
     // pointers, the vector has to be pre-allocated to ensure reallocation does not occur
     modules.reserve(fds.size());
 
     for (int i = 0; i < fds.size(); ++i) {
-        snprintf(buf, sizeof(buf), "/proc/self/fd/%d", fds[i]);
-        if (void *h = dlopen(buf, RTLD_LAZY)) {
+        android_dlextinfo info {
+            .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+            .library_fd = fds[i],
+        };
+        if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
             if (void *e = dlsym(h, "zygisk_module_entry")) {
                 modules.emplace_back(i, h, e);
             }
