@@ -9,12 +9,6 @@
 
 using namespace std;
 
-enum {
-    NAMED_ACTIVITY,
-    PKG_ACTIVITY,
-    CONTENT_PROVIDER
-};
-
 #define CALL_PROVIDER \
 exe, "/system/bin", "com.android.commands.content.Content", \
 "call", "--uri", target, "--user", user, "--method", action
@@ -27,11 +21,13 @@ exe, "/system/bin", "com.android.commands.am.Am", \
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
 #define get_user(info) \
-(info->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
-? info->uid / 100000 : 0)
+((info)->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
+? to_user_id((info)->uid) : 0)
 
 #define get_cmd(to) \
-(to.command.empty() ? (to.shell.empty() ? DEFAULT_SHELL : to.shell.data()) : to.command.data())
+((to).command.empty() ? \
+((to).shell.empty() ? DEFAULT_SHELL : (to).shell.data()) : \
+(to).command.data())
 
 class Extra {
     const char *key;
@@ -45,47 +41,55 @@ class Extra {
         bool bool_val;
         const char *str_val;
     };
-    char buf[32];
+    string str;
 public:
     Extra(const char *k, int v): key(k), type(INT), int_val(v) {}
     Extra(const char *k, bool v): key(k), type(BOOL), bool_val(v) {}
     Extra(const char *k, const char *v): key(k), type(STRING), str_val(v) {}
 
     void add_intent(vector<const char *> &vec) {
+        char buf[32];
         const char *val;
         switch (type) {
-            case INT:
-                vec.push_back("--ei");
-                sprintf(buf, "%d", int_val);
-                val = buf;
-                break;
-            case BOOL:
-                vec.push_back("--ez");
-                val = bool_val ? "true" : "false";
-                break;
-            case STRING:
-                vec.push_back("--es");
-                val = str_val;
-                break;
+        case INT:
+            vec.push_back("--ei");
+            snprintf(buf, sizeof(buf), "%d", int_val);
+            str = buf;
+            val = str.data();
+            break;
+        case BOOL:
+            vec.push_back("--ez");
+            val = bool_val ? "true" : "false";
+            break;
+        case STRING:
+            vec.push_back("--es");
+            val = str_val;
+            break;
         }
         vec.push_back(key);
         vec.push_back(val);
     }
 
     void add_bind(vector<const char *> &vec) {
+        char buf[32];
+        str = key;
         switch (type) {
-            case INT:
-                sprintf(buf, "%s:i:%d", key, int_val);
-                break;
-            case BOOL:
-                sprintf(buf, "%s:b:%s", key, bool_val ? "true" : "false");
-                break;
-            case STRING:
-                sprintf(buf, "%s:s:%s", key, str_val);
-                break;
+        case INT:
+            str += ":i:";
+            snprintf(buf, sizeof(buf), "%d", int_val);
+            str += buf;
+            break;
+        case BOOL:
+            str += ":b:";
+            str += bool_val ? "true" : "false";
+            break;
+        case STRING:
+            str += ":s:";
+            str += str_val;
+            break;
         }
         vec.push_back("--extra");
-        vec.push_back(buf);
+        vec.push_back(str.data());
     }
 };
 
@@ -100,7 +104,7 @@ static bool check_no_error(int fd) {
 }
 
 static void exec_cmd(const char *action, vector<Extra> &data,
-                     const shared_ptr<su_info> &info, int mode = CONTENT_PROVIDER) {
+                     const shared_ptr<su_info> &info, bool provider = true) {
     char exe[128];
     char target[128];
     char user[4];
@@ -117,8 +121,8 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     }
 
     // First try content provider call method
-    if (mode >= CONTENT_PROVIDER) {
-        sprintf(target, "content://%s.provider", info->mgr_pkg.data());
+    if (provider) {
+        snprintf(target, sizeof(target), "content://%s.provider", info->mgr_pkg.data());
         vector<const char *> args{ CALL_PROVIDER };
         for (auto &e : data) {
             e.add_bind(args);
@@ -147,17 +151,15 @@ static void exec_cmd(const char *action, vector<Extra> &data,
         .argv = args.data()
     };
 
-    if (mode >= PKG_ACTIVITY) {
-        // Then try start activity without component name
-        strcpy(target, info->mgr_pkg.data());
-        exec_command_sync(exec);
-        if (check_no_error(exec.fd))
-            return;
-    }
+    // Then try start activity without package name
+    strlcpy(target, info->mgr_pkg.data(), sizeof(target));
+    exec_command_sync(exec);
+    if (check_no_error(exec.fd))
+        return;
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    sprintf(target, "%s/.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
+    snprintf(target, sizeof(target), "%s/.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);
@@ -205,7 +207,7 @@ int app_request(const shared_ptr<su_info> &info) {
     extras.reserve(2);
     extras.emplace_back("fifo", fifo);
     extras.emplace_back("uid", info->uid);
-    exec_cmd("request", extras, info, PKG_ACTIVITY);
+    exec_cmd("request", extras, info, false);
 
     // Wait for data input for at most 70 seconds
     int fd = xopen(fifo, O_RDONLY | O_CLOEXEC);
