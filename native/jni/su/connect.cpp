@@ -20,10 +20,6 @@ exe, "/system/bin", "com.android.commands.am.Am", \
 
 // 0x18000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|FLAG_INCLUDE_STOPPED_PACKAGES
 
-#define get_user(info) \
-((info)->cfg[SU_MULTIUSER_MODE] == MULTIUSER_MODE_USER \
-? to_user_id((info)->uid) : 0)
-
 #define get_cmd(to) \
 ((to).command.empty() ? \
 ((to).shell.empty() ? DEFAULT_SHELL : (to).shell.data()) : \
@@ -108,7 +104,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     char exe[128];
     char target[128];
     char user[4];
-    snprintf(user, sizeof(user), "%d", get_user(info));
+    snprintf(user, sizeof(user), "%d", to_user_id(info->eval_uid));
 
     if (zygisk_enabled) {
 #if defined(__LP64__)
@@ -206,7 +202,7 @@ int app_request(const shared_ptr<su_info> &info) {
     vector<Extra> extras;
     extras.reserve(2);
     extras.emplace_back("fifo", fifo);
-    extras.emplace_back("uid", info->uid);
+    extras.emplace_back("uid", info->eval_uid);
     exec_cmd("request", extras, info, false);
 
     // Wait for data input for at most 70 seconds

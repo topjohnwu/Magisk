@@ -19,9 +19,9 @@ using namespace std;
 static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
-su_info::su_info(unsigned uid) :
-        uid(uid), access(DEFAULT_SU_ACCESS), mgr_st({}),
-        timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
+su_info::su_info(int uid) :
+uid(uid), eval_uid(-1), access(DEFAULT_SU_ACCESS), mgr_st{},
+timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
     pthread_mutex_destroy(&_lock);
@@ -44,47 +44,45 @@ void su_info::refresh() {
     timestamp = ts.tv_sec * 1000L + ts.tv_nsec / 1000000L;
 }
 
-static void database_check(const shared_ptr<su_info> &info) {
-    int uid = info->uid;
-    get_db_settings(info->cfg);
+void su_info::check_db() {
+    eval_uid = uid;
+    get_db_settings(cfg);
 
     // Check multiuser settings
-    switch (info->cfg[SU_MULTIUSER_MODE]) {
-        case MULTIUSER_MODE_OWNER_ONLY:
-            if (to_user_id(uid) != 0) {
-                uid = -1;
-                info->access = NO_SU_ACCESS;
-            }
-            break;
-        case MULTIUSER_MODE_OWNER_MANAGED:
-            uid = to_app_id(uid);
-            break;
-        case MULTIUSER_MODE_USER:
-        default:
-            break;
+    switch (cfg[SU_MULTIUSER_MODE]) {
+    case MULTIUSER_MODE_OWNER_ONLY:
+        if (to_user_id(uid) != 0) {
+            eval_uid = -1;
+            access = NO_SU_ACCESS;
+        }
+        break;
+    case MULTIUSER_MODE_OWNER_MANAGED:
+        eval_uid = to_app_id(uid);
+        break;
+    case MULTIUSER_MODE_USER:
+    default:
+        break;
     }
 
-    su_access &su = info->access;
-
-    if (uid > 0) {
+    if (eval_uid > 0) {
         char query[256], *err;
-        sprintf(query,
+        snprintf(query, sizeof(query),
             "SELECT policy, logging, notification FROM policies "
-            "WHERE uid=%d AND (until=0 OR until>%li)", uid, time(nullptr));
+            "WHERE uid=%d AND (until=0 OR until>%li)", eval_uid, time(nullptr));
         err = db_exec(query, [&](db_row &row) -> bool {
-            su.policy = (policy_t) parse_int(row["policy"]);
-            su.log = parse_int(row["logging"]);
-            su.notify = parse_int(row["notification"]);
+            access.policy = (policy_t) parse_int(row["policy"]);
+            access.log = parse_int(row["logging"]);
+            access.notify = parse_int(row["notification"]);
             LOGD("magiskdb: query policy=[%d] log=[%d] notify=[%d]\n",
-                 su.policy, su.log, su.notify);
+                 access.policy, access.log, access.notify);
             return true;
         });
         db_err_cmd(err, return);
     }
 
     // We need to check our manager
-    if (su.log || su.notify)
-        get_manager(to_user_id(uid), &info->mgr_pkg, &info->mgr_st);
+    if (access.log || access.notify)
+        get_manager(to_user_id(eval_uid), &mgr_pkg, &mgr_st);
 }
 
 bool uid_granted_root(int uid) {
@@ -156,7 +154,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
     if (info->access.policy == QUERY) {
         // Not cached, get data from database
-        database_check(info);
+        info->check_db();
 
         // If it's root or the manager, allow it silently
         if (info->uid == UID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_st.st_uid)) {
