@@ -30,6 +30,7 @@
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
             android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
             android:exported="false"
             tools:ignore="AppLinkUrlError">
             <intent-filter>
