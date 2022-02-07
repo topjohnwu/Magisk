@@ -80,13 +80,18 @@ public:
     bool operator!=(const stateless_allocator&) { return false; }
 };
 
-class dynamic_bitset {
+class dynamic_bitset_impl {
 public:
     using slot_type = unsigned long;
     constexpr static int slot_size = sizeof(slot_type) * 8;
     using slot_bits = std::bitset<slot_size>;
 
-    slot_bits::reference operator[] (size_t pos) {
+    size_t slots() const { return slot_list.size(); }
+    slot_type get_slot(size_t slot) const {
+        return slot_list.size() > slot ? slot_list[slot].to_ulong() : 0ul;
+    }
+protected:
+    slot_bits::reference get(size_t pos) {
         size_t slot = pos / slot_size;
         size_t index = pos % slot_size;
         if (slot_list.size() <= slot) {
@@ -94,17 +99,23 @@ public:
         }
         return slot_list[slot][index];
     }
-    bool operator[] (size_t pos) const {
+    bool get(size_t pos) const {
         size_t slot = pos / slot_size;
         size_t index = pos % slot_size;
         return slot_list.size() > slot && slot_list[slot][index];
     }
-    size_t slots() const { return slot_list.size(); }
-    slot_type get_slot(size_t slot) const {
-        return slot_list.size() > slot ? slot_list[slot].to_ulong() : 0ul;
-    }
 private:
     std::vector<slot_bits> slot_list;
+};
+
+struct dynamic_bitset : public dynamic_bitset_impl {
+    slot_bits::reference operator[] (size_t pos) { return get(pos); }
+    bool operator[] (size_t pos) const { return get(pos); }
+};
+
+struct StringCmp {
+    using is_transparent = void;
+    bool operator()(std::string_view a, std::string_view b) const { return a < b; }
 };
 
 int parse_int(std::string_view s);

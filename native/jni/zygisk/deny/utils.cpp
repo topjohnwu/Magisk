@@ -14,8 +14,13 @@
 
 using namespace std;
 
-static set<pair<string, string>> *deny_set;             /* set of <pkg, process> pair */
-static map<int, vector<string_view>> *app_id_proc_map;  /* app ID -> list of process */
+// Package name -> list of process names
+using str_set = set<string, StringCmp>;
+static map<string, str_set, StringCmp> *deny_map_;
+#define deny_map (*deny_map_)
+
+// app ID -> list of process name
+static map<int, vector<string_view>> *app_id_proc_map;
 static int inotify_fd = -1;
 
 // Locks the variables above
@@ -40,29 +45,28 @@ static void rebuild_map() {
         return;
     }
 
-    string_view prev_pkg;
-    struct stat st;
-    for (const auto &target : *deny_set) {
-        if (target.first == ISOLATED_MAGIC) {
-            // Isolated process
-            (*app_id_proc_map)[-1].emplace_back(target.second);
-        } else if (prev_pkg == target.first) {
-            // Optimize the case when it's the same package as previous iteration
-            (*app_id_proc_map)[to_app_id(st.st_uid)].emplace_back(target.second);
-        } else {
+    for (const auto &[pkg, procs] : deny_map) {
+        int app_id = -1;
+        if (pkg != ISOLATED_MAGIC) {
             // Traverse the filesystem to find app ID
             for (const auto &user_id : users) {
                 data_path.resize(len);
                 data_path += '/';
                 data_path += user_id;
                 data_path += '/';
-                data_path += target.first;
-                if (stat(data_path.data(), &st) == 0) {
-                    prev_pkg = target.first;
-                    (*app_id_proc_map)[to_app_id(st.st_uid)].emplace_back(target.second);
+                data_path += pkg;
+                struct stat st{};
+                if (stat(data_path.data(), &st) != 0) {
+                    app_id = to_app_id(st.st_uid);
                     break;
                 }
             }
+            if (app_id < 0)
+                continue;
+        }
+
+        for (const auto &proc : procs) {
+            (*app_id_proc_map)[app_id].emplace_back(proc);
         }
     }
 }
@@ -145,23 +149,26 @@ static bool validate(const char *pkg, const char *proc) {
     return pkg_valid && proc_valid;
 }
 
-static void add_hide_set(const char *pkg, const char *proc) {
+static bool add_hide_set(const char *pkg, const char *proc) {
+    auto p = deny_map[pkg].emplace(proc);
+    if (!p.second)
+        return false;
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
-    deny_set->emplace(pkg, proc);
     if (!do_kill)
-        return;
+        return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&str_starts>(proc, true);
     } else {
         kill_process(proc);
     }
+    return true;
 }
 
 static void clear_data() {
-    delete deny_set;
+    delete deny_map_;
     delete app_id_proc_map;
-    deny_set = nullptr;
+    deny_map_ = nullptr;
     app_id_proc_map = nullptr;
     unregister_poll(inotify_fd, true);
     inotify_fd = -1;
@@ -188,7 +195,7 @@ static bool ensure_data() {
 
     LOGI("denylist: initializing internal data structures\n");
 
-    default_new(deny_set);
+    default_new(deny_map_);
     char *err = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
         add_hide_set(row["package_name"].data(), row["process"].data());
         return true;
@@ -226,11 +233,8 @@ static int add_list(const char *pkg, const char *proc) {
         mutex_guard lock(data_lock);
         if (!ensure_data())
             return DAEMON_ERROR;
-
-        for (const auto &hide : *deny_set)
-            if (hide.first == pkg && hide.second == proc)
-                return DENYLIST_ITEM_EXIST;
-        add_hide_set(pkg, proc);
+        if (!add_hide_set(pkg, proc))
+            return DENYLIST_ITEM_EXIST;
         rebuild_map();
     }
 
@@ -256,13 +260,19 @@ static int rm_list(const char *pkg, const char *proc) {
             return DAEMON_ERROR;
 
         bool remove = false;
-        for (auto it = deny_set->begin(); it != deny_set->end();) {
-            if (it->first == pkg && (proc[0] == '\0' || it->second == proc)) {
+
+        if (proc[0] == '\0') {
+            if (deny_map.erase(pkg) != 0) {
                 remove = true;
-                LOGI("denylist rm: [%s/%s]\n", it->first.data(), it->second.data());
-                it = deny_set->erase(it);
-            } else {
-                ++it;
+                LOGI("denylist rm: [%s]\n", pkg);
+            }
+        } else {
+            auto it = deny_map.find(pkg);
+            if (it != deny_map.end()) {
+                if (it->second.erase(proc) != 0) {
+                    remove = true;
+                    LOGI("denylist rm: [%s/%s]\n", pkg, proc);
+                }
             }
         }
         if (!remove)
@@ -296,11 +306,14 @@ void ls_list(int client) {
         }
 
         write_int(client, DAEMON_SUCCESS);
-        for (const auto &hide : *deny_set) {
-            write_int(client, hide.first.size() + hide.second.size() + 1);
-            xwrite(client, hide.first.data(), hide.first.size());
-            xwrite(client, "|", 1);
-            xwrite(client, hide.second.data(), hide.second.size());
+
+        for (const auto &[pkg, procs] : deny_map) {
+            for (const auto &proc : procs) {
+                write_int(client, pkg.size() + proc.size() + 1);
+                xwrite(client, pkg.data(), pkg.size());
+                xwrite(client, "|", 1);
+                xwrite(client, proc.data(), proc.size());
+            }
         }
     }
     write_int(client, 0);

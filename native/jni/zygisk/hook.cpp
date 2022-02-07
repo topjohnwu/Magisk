@@ -69,11 +69,6 @@ struct HookContext {
 
 #undef DCL_PRE_POST
 
-struct StringCmp {
-    using is_transparent = void;
-    bool operator()(string_view a, string_view b) const { return a < b; }
-};
-
 // Global variables
 vector<tuple<const char *, const char *, void **>> *xhook_list;
 map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
