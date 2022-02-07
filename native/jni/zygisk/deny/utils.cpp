@@ -81,7 +81,7 @@ static void rescan_apps() {
 static void update_pkg_uid(const string &pkg, bool remove) {
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
-        return false;
+        return;
     dirent *entry;
     struct stat st{};
     char buf[PATH_MAX] = {0};
