@@ -68,8 +68,8 @@ static void rescan_apps() {
                     continue;
                 }
                 app_ids_seen[app_id] = true;
-                if (pkg_to_procs.contains(entry->d_name)) {
-                    app_id_to_pkgs[app_id].insert(entry->d_name);
+                if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
+                    app_id_to_pkgs[app_id].insert(it->first);
                 }
             }
         } else {
@@ -78,7 +78,7 @@ static void rescan_apps() {
     }
 }
 
-static bool update_pkg_uid(const string &pkg, bool remove) {
+static void update_pkg_uid(const string &pkg, bool remove) {
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
         return false;
@@ -101,10 +101,9 @@ static bool update_pkg_uid(const string &pkg, bool remove) {
                 app_id_to_pkgs[app_id].insert(pkg);
                 app_ids_seen[app_id] = true;
             }
-            return true;
+            break;
         }
     }
-    return false;
 }
 
 // Leave /proc fd opened as we're going to read from it repeatedly
@@ -245,9 +244,7 @@ static int add_list(const char *pkg, const char *proc) {
         auto p = add_hide_set(pkg, proc);
         if (!p.second)
             return DENYLIST_ITEM_EXIST;
-        if (!update_pkg_uid(*p.first, false)) {
-            return DAEMON_ERROR;
-        }
+        update_pkg_uid(*p.first, false);
     }
 
     // Add to database
