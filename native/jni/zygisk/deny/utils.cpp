@@ -29,15 +29,15 @@ struct app_id_bitset : public dynamic_bitset_impl {
 // If package name == ISOLATED_MAGIC, or app ID == -1, it means isolated service
 
 // List of all discovered app IDs
-static app_id_bitset *app_ids_seen_;
+static unique_ptr<app_id_bitset> app_ids_seen_;
 #define app_ids_seen (*app_ids_seen_)
 
 // Package name -> list of process names
-static map<string, set<string, StringCmp>, StringCmp> *pkg_to_procs_;
+static unique_ptr<map<string, set<string, StringCmp>, StringCmp>> pkg_to_procs_;
 #define pkg_to_procs (*pkg_to_procs_)
 
 // app ID -> list of pkg names (string_view points to a pkg_to_procs key)
-static map<int, set<string_view>> *app_id_to_pkgs_;
+static unique_ptr<map<int, set<string_view>>> app_id_to_pkgs_;
 #define app_id_to_pkgs (*app_id_to_pkgs_)
 
 // Locks the data structures above
@@ -68,42 +68,27 @@ static void rescan_apps() {
                     continue;
                 }
                 app_ids_seen[app_id] = true;
-                if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
-                    app_id_to_pkgs[app_id].insert(it->first);
+                if (pkg_to_procs.contains(entry->d_name)) {
+                    app_id_to_pkgs[app_id].insert(entry->d_name);
                 }
             }
         } else {
             close(dfd);
         }
     }
-    if (auto it = pkg_to_procs.find(ISOLATED_MAGIC); it != pkg_to_procs.end()) {
-        app_id_to_pkgs[-1].insert(it->first);
-    }
 }
 
-static void update_pkg_uid(const string &pkg, bool remove) {
-    string data_path(APP_DATA_DIR);
-    size_t len = data_path.length();
-
-    // Collect all user IDs
-    vector<string> users;
-    if (auto dir = open_dir(APP_DATA_DIR)) {
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            users.emplace_back(entry->d_name);
-        }
-    } else {
-        return;
-    }
-
-    // Find package data folder to get its app ID
-    for (const auto &user_id : users) {
-        data_path.resize(len);
-        data_path += '/';
-        data_path += user_id;
-        data_path += '/';
-        data_path += pkg;
-        struct stat st{};
-        if (stat(data_path.data(), &st) != 0) {
+static bool update_pkg_uid(const string &pkg, bool remove) {
+    auto data_dir = xopen_dir(APP_DATA_DIR);
+    if (!data_dir)
+        return false;
+    dirent *entry;
+    struct stat st{};
+    char buf[PATH_MAX] = {0};
+    // For each user
+    while ((entry = xreaddir(data_dir.get()))) {
+        snprintf(buf, PATH_MAX, "%s/%s", entry->d_name, pkg.data());
+        if (fstatat(dirfd(data_dir.get()), buf, &st, 0) == 0) {
             int app_id = to_app_id(st.st_uid);
             if (remove) {
                 if (auto it = app_id_to_pkgs.find(app_id); it != app_id_to_pkgs.end()) {
@@ -114,10 +99,12 @@ static void update_pkg_uid(const string &pkg, bool remove) {
                 }
             } else {
                 app_id_to_pkgs[app_id].insert(pkg);
+                app_ids_seen[app_id] = true;
             }
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 // Leave /proc fd opened as we're going to read from it repeatedly
@@ -215,12 +202,9 @@ static auto add_hide_set(const char *pkg, const char *proc) {
 }
 
 static void clear_data() {
-    delete app_ids_seen_;
-    delete pkg_to_procs_;
-    delete app_id_to_pkgs_;
-    app_ids_seen_ = nullptr;
-    pkg_to_procs_ = nullptr;
-    app_id_to_pkgs_ = nullptr;
+    app_ids_seen_.reset(nullptr);
+    pkg_to_procs_.reset(nullptr);
+    app_id_to_pkgs_.reset(nullptr);
 }
 
 static bool ensure_data() {
@@ -234,7 +218,7 @@ static bool ensure_data() {
         add_hide_set(row["package_name"].data(), row["process"].data());
         return true;
     });
-    db_err_cmd(err, goto error);
+    db_err_cmd(err, goto error)
 
     default_new(app_ids_seen_);
     default_new(app_id_to_pkgs_);
@@ -261,7 +245,9 @@ static int add_list(const char *pkg, const char *proc) {
         auto p = add_hide_set(pkg, proc);
         if (!p.second)
             return DENYLIST_ITEM_EXIST;
-        update_pkg_uid(*p.first, false);
+        if (!update_pkg_uid(*p.first, false)) {
+            return DAEMON_ERROR;
+        }
     }
 
     // Add to database
@@ -269,7 +255,7 @@ static int add_list(const char *pkg, const char *proc) {
     snprintf(sql, sizeof(sql),
             "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
-    db_err_cmd(err, return DAEMON_ERROR);
+    db_err_cmd(err, return DAEMON_ERROR)
     return DAEMON_SUCCESS;
 }
 
@@ -315,7 +301,7 @@ static int rm_list(const char *pkg, const char *proc) {
         snprintf(sql, sizeof(sql),
                 "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
-    db_err_cmd(err, return DAEMON_ERROR);
+    db_err_cmd(err, return DAEMON_ERROR)
     return DAEMON_SUCCESS;
 }
 
@@ -423,17 +409,13 @@ bool is_deny_target(int uid, string_view process) {
 
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {
-        // Isolated processes
-        auto it = app_id_to_pkgs.find(-1);
-        if (it == app_id_to_pkgs.end())
-            return false;
-
-        for (const auto &pkg : it->second) {
-            for (const auto &s : pkg_to_procs.find(pkg)->second) {
+        if (auto it = pkg_to_procs.find(ISOLATED_MAGIC); it != pkg_to_procs.end()) {
+            for (const auto &s : it->second) {
                 if (str_starts(process, s))
                     return true;
             }
         }
+        return false;
     } else {
         if (!app_ids_seen[app_id]) {
             // Found new app ID

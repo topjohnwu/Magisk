@@ -65,6 +65,9 @@ reversed_container<T> reversed(T &base) {
 template<class T>
 static inline void default_new(T *&p) { p = new T(); }
 
+template<class T>
+static inline void default_new(std::unique_ptr<T> &p) { p.reset(new T()); }
+
 template<typename T, typename Impl>
 class stateless_allocator {
 public:
