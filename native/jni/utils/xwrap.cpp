@@ -288,6 +288,14 @@ int xfstat(int fd, struct stat *buf) {
     return ret;
 }
 
+int xfstatat(int dirfd, const char *pathname, struct stat *buf, int flags) {
+    int ret = fstatat(dirfd, pathname, buf, flags);
+    if (ret < 0) {
+        PLOGE("fstatat %s", pathname);
+    }
+    return ret;
+}
+
 int xdup(int fd) {
     int ret = dup(fd);
     if (ret < 0) {
