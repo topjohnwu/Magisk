@@ -103,7 +103,7 @@ static void update_pkg_uid(const string &pkg, bool remove) {
         data_path += '/';
         data_path += pkg;
         struct stat st{};
-        if (stat(data_path.data(), &st) != 0) {
+        if (stat(data_path.data(), &st) == 0) {
             int app_id = to_app_id(st.st_uid);
             if (remove) {
                 if (auto it = app_id_to_pkgs.find(app_id); it != app_id_to_pkgs.end()) {
