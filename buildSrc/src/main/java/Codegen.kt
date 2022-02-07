@@ -171,6 +171,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |    android:directBootAware="true"
         |    android:excludeFromRecents="true"
         |    android:exported="false"
+        |    android:taskAffinity=""
         |    tools:ignore="AppLinkUrlError">
         |    <intent-filter>
         |        <action android:name="android.intent.action.VIEW"/>
