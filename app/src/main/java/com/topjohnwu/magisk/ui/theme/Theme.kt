@@ -37,7 +37,7 @@ enum class Theme(
         themeRes = R.style.ThemeFoundationMD2_Salamence
     ),
     Fraxure(
-        themeName = "Fraxure (Legacy)",
+        themeName = "Fraxure",
         themeRes = R.style.ThemeFoundationMD2_Fraxure
     );
 

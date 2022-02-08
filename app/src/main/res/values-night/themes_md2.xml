@@ -24,6 +24,8 @@
     </style>
 
     <style name="ThemeFoundationMD2.Amoled" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorSurfaceVariant">#0A0A0A</item>
+        <item name="colorSurfaceSurfaceVariant">#000</item>
         <item name="colorSurface">#000</item>
         <item name="colorOnPrimary">#FFF</item>
         <item name="colorOnSecondary">#FFF</item>

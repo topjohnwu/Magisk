@@ -63,6 +63,8 @@
     </style>
 
     <style name="ThemeFoundationMD2.Amoled" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorSurfaceVariant">#F8F8F8</item>
+        <item name="colorSurfaceSurfaceVariant">#FFF</item>
         <item name="colorSurface">#FFF</item>
         <item name="colorOnPrimary">#FFF</item>
         <item name="colorOnSecondary">#FFF</item>
@@ -121,9 +123,9 @@
 
     <style name="ThemeFoundationMD2.Fraxure" parent="ThemeFoundationMD2.Amoled">
         <item name="colorPrimary">#009688</item>
-        <item name="colorPrimaryVariant">#8000796B</item>
-        <item name="colorSecondary">?colorError</item>
-        <item name="colorSecondaryVariant">#806D1111</item>
+        <item name="colorPrimaryVariant">#80009688</item>
+        <item name="colorSecondary">#00796B</item>
+        <item name="colorSecondaryVariant">#8000796B</item>
     </style>
 
     <!--3rd party themes-->
