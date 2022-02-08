@@ -87,7 +87,7 @@ static void update_pkg_uid(const string &pkg, bool remove) {
     char buf[PATH_MAX] = {0};
     // For each user
     while ((entry = xreaddir(data_dir.get()))) {
-        snprintf(buf, PATH_MAX, "%s/%s", entry->d_name, pkg.data());
+        snprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
         if (fstatat(dirfd(data_dir.get()), buf, &st, 0) == 0) {
             int app_id = to_app_id(st.st_uid);
             if (remove) {
