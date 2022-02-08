@@ -197,11 +197,15 @@ if [ -f kernel ]; then
   # After:  [mov w2, #-32768]
   ./magiskboot hexpatch kernel 821B8012 E2FF8F12
 
-  # Force kernel to load rootfs
-  # skip_initramfs -> want_initramfs
-  ./magiskboot hexpatch kernel \
-  736B69705F696E697472616D667300 \
-  77616E745F696E697472616D667300
+  # This patch is unneeded on pre-oreo devices
+  # and might boot loop them in some situations
+  if [ $API -ge 26 ]; then
+    # Force kernel to load rootfs
+    # skip_initramfs -> want_initramfs
+    ./magiskboot hexpatch kernel \
+    736B69705F696E697472616D667300 \
+    77616E745F696E697472616D667300
+  fi
 fi
 
 #################
