@@ -8,7 +8,7 @@ If unfortunately you do not have USB debugging enabled, reboot into Safe Mode. M
 
 ### Q: Why is X app detecting root?
 
-Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules available that specifically provide these functionalities, please search around 😉
+Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules available that specifically provide these functionalities, see [this XDA thread](https://forum.xda-developers.com/t/discussion-magisk-the-age-of-zygisk.4393877/) for more information.
 
 ### Q: After I hidden the Magisk app, the app icon is broken.
 
