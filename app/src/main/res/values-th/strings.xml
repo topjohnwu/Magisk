@@ -8,12 +8,12 @@
     <string name="install">ติดตั้ง</string>
 
     <!--Status Fragment-->
-    <string name="invalid_update_channel">ช่องทางการอัพเดตไม่ถูกต้อง</string>
+    <string name="invalid_update_channel">ช่องทางการอัปเดตไม่ถูกต้อง</string>
     <string name="keep_force_encryption">เก็บค่าบังคับการเข้ารหัส</string>
     <string name="keep_dm_verity">เก็บค่า AVB 2.0/dm-verity</string>
     <string name="uninstall_magisk_title">ถอนการติดตั้ง Magisk</string>
     <string name="uninstall_magisk_msg">โมดูลทั้งหมดจะถูกปิดการใช้งาน/ถูกลบ, สิทธิการเข้าถึง Root จะถูกลบ และข้อมูลของคุณอาจถูกเข้ารหัส</string>
-    <string name="update">อัพเดต</string>
+    <string name="update">อัปเดต</string>
 
     <!--Module Fragment-->
     <string name="no_info_provided">(ไม่มีข้อมูล)</string>
@@ -22,7 +22,7 @@
     <string name="reboot_download">รีบู๊ตไป Download</string>
 
     <!--Repo Fragment-->
-    <string name="update_available">มีการอัพเดต</string>
+    <string name="update_available">มีการอัปเดต</string>
     <string name="home_installed_version">ติดตั้งแล้ว</string>
 
     <!--Log Fragment-->
@@ -34,17 +34,17 @@
     <string name="app_changelog">สิ่งที่เพิ่มใหม่</string>
 
     <!-- System Components, Notifications -->
-    <string name="update_channel">การอัพเดต Magisk</string>
+    <string name="update_channel">การอัปเดต Magisk</string>
     <string name="progress_channel">สถานะ</string>
     <string name="download_complete">ดาวน์โหลดสำเร็จ</string>
     <string name="download_file_error">เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์</string>
-    <string name="magisk_update_title">มีการอัพเดต Magisk!</string>
+    <string name="magisk_update_title">มีการอัปเดต Magisk!</string>
 
     <!--Toasts, Dialogs-->
     <string name="repo_install_title">ติดตั้ง %1$s %2$s(%3$d)</string>
     <string name="download">ดาวน์โหลด</string>
     <string name="reboot">รีบู๊ต</string>
-    <string name="release_notes">-้อมูลเพิ่มเติม</string>
+    <string name="release_notes">ข้อมูลเพิ่มเติม</string>
     <string name="manager_download_install">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
     <string name="flashing">กำลังแฟลช</string>
     <string name="open_link_failed_toast">ไม่พบแอปพลิเคชันสำหรับเปิดลิ้งค์</string>
@@ -64,9 +64,9 @@
     <!--Settings Activity -->
     <string name="language">ภาษา</string>
     <string name="system_default">(มาตรฐานระบบ)</string>
-    <string name="settings_check_update_title">ตรวจสอบการอัพเดต</string>
-    <string name="settings_check_update_summary">ตรวจสอบการอัพเดตเป็นระยะในพื้นหลัง</string>
-    <string name="settings_update_channel_title">ช่องทางการอัพเดต</string>
+    <string name="settings_check_update_title">ตรวจสอบการอัปเดต</string>
+    <string name="settings_check_update_summary">ตรวจสอบการอัปเดตเป็นระยะในพื้นหลัง</string>
+    <string name="settings_update_channel_title">ช่องทางการอัปเดต</string>
     <string name="settings_update_stable">เสถียร</string>
     <string name="settings_update_beta">เบต้า</string>
     <string name="settings_update_custom">กำหนดเอง</string>
@@ -89,8 +89,8 @@
     <string name="auto_response">การตอบกลับ</string>
     <string name="request_timeout">เวลาการขอใช้งาน</string>
     <string name="superuser_notification">การแจ้งเตือน Superuser</string>
-    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัพเกรด</string>
-    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัพเกรด</string>
+    <string name="settings_su_reauth_title">ขอสิทธิ์ใหม่หลังจากอัปเกรด</string>
+    <string name="settings_su_reauth_summary">ขอสิทธิ์ superuser ใหม่หลังจากแอปถูกอัปเกรด</string>
 
     <string name="multiuser_mode">โหมดผู้ใช้หลายคน</string>
     <string name="settings_owner_only">เจ้าของอุปกรณ์เท่านั้น</string>
@@ -115,7 +115,7 @@
     <string name="grant">อนุญาต</string>
     <string name="su_warning">จะให้การเข้าถึงอุปกรณ์ในทุกรูปแบบ กรุณาปฏิเสธหากคุณไม่มั่นใจ!</string>
     <string name="forever">ตลอดกาล</string>
-    <string name="once">คั้งเดียว</string>
+    <string name="once">ครั้งเดียว</string>
     <string name="tenmin">10 นาที</string>
     <string name="twentymin">20 นาที</string>
     <string name="thirtymin">30 นาที</string>
