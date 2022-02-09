@@ -105,17 +105,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     ))
 
     cmpList.add(Component(
-        "PHOENIX",
-        "PhoenixActivity",
-        """
-        |<activity
-        |    android:name="%s"
-        |    android:process=":%s"
-        |    android:exported="false" />""".ind(2),
-        true
-    ))
-
-    cmpList.add(Component(
         "com.topjohnwu.magisk.core.Provider",
         "dummy.DummyProvider",
         """
@@ -138,6 +127,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |    <intent-filter>
         |        <action android:name="android.intent.action.LOCALE_CHANGED" />
         |        <action android:name="android.intent.action.UID_REMOVED" />
+        |        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
         |    </intent-filter>
         |    <intent-filter>
         |        <action android:name="android.intent.action.PACKAGE_REPLACED" />
@@ -260,7 +250,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
             }
         }
         if (gen.xml.isNotEmpty()) {
-            cmps.add(gen.xml.format(name, names.random(kRANDOM)))
+            cmps.add(gen.xml.format(name))
         }
     }
 

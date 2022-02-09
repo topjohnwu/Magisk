@@ -3,6 +3,8 @@ package com.topjohnwu.magisk.core
 import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.content.Intent
+import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ReplacedNotification
 import com.topjohnwu.magisk.core.base.BaseReceiver
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.Shortcuts
@@ -43,6 +45,11 @@ open class Receiver : BaseReceiver() {
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
                 getPkg(intent)?.let { Shell.su("magisk --denylist rm $it").submit() }
+            }
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                ReplacedNotification.show(context, context.getString(R.string.replaced_channel),
+                    context.getString(R.string.replaced_title),
+                    context.getString(R.string.replaced_text))
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
         }

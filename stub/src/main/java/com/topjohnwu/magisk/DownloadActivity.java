@@ -26,6 +26,7 @@ import org.json.JSONException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -109,21 +110,28 @@ public class DownloadActivity extends Activity {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
         Runnable onSuccess = () -> {
             dialog.dismiss();
-            PhoenixActivity.rebirth(this, InjectedClassLoader.PHOENIX);
-            finish();
+            ReplacedNotification.show(this, getString(R.string.replaced_channel),
+                    getString(R.string.replaced_title),
+                    getString(R.string.replaced_text));
+            ReplacedNotification.restartApplication(this);
         };
         // Download and upgrade the app
-        File apk = dynLoad ? StubApk.current(this) : new File(getCacheDir(), "manager.apk");
-        request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
-            if (dynLoad) {
-                runOnUiThread(onSuccess);
-            } else {
-                var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
-                APKInstall.install(this, file);
+        var request = request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (dynLoad) {
+            request.getAsFile(StubApk.current(this), file -> runOnUiThread(onSuccess));
+        } else {
+            request.getAsInputStream(input -> {
+                var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, null);
+                var out = APKInstall.openStream(this);
+                try (input; out) {
+                    if (out != null) APKInstall.transfer(input, out);
+                } catch (IOException e) {
+                    error(e);
+                }
                 Intent intent = receiver.waitIntent();
                 if (intent != null) startActivity(intent);
-            }
-        });
+            });
+        }
     }
 
     private void loadResources() {

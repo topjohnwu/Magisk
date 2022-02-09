@@ -4,4 +4,7 @@
     <string name="no_internet_msg">Please connect to the Internet! Upgrading to full Magisk is required.</string>
     <string name="dling">Downloading</string>
     <string name="relaunch_app">Please manually re-launch the app</string>
+    <string name="replaced_channel">Update Complete</string>
+    <string name="replaced_title">Magisk update is complete</string>
+    <string name="replaced_text">Tap to open app</string>
 </resources>

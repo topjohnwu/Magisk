@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
-import com.topjohnwu.magisk.PhoenixActivity
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.ReplacedNotification
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Info
@@ -98,13 +98,15 @@ class DownloadService : NotificationService() {
                 apk.delete()
                 patched.renameTo(apk)
             } else {
-                val clz = Info.stub!!.classToComponent["PHOENIX"]!!
-                PhoenixActivity.rebirth(this, clz)
+                ReplacedNotification.show(this, getString(R.string.replaced_channel),
+                    getString(R.string.replaced_title),
+                    getString(R.string.replaced_text))
+                ActivityTracker.foreground?.let { ReplacedNotification.restartApplication(it) }
                 return
             }
         }
         val receiver = APKInstall.register(this, null, null)
-        write(APKInstall.openStream(this, false))
+        write(APKInstall.openStream(this))
         subject.intent = receiver.waitIntent()
     }
 
