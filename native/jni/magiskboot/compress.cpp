@@ -476,6 +476,15 @@ protected:
                 memcpy(&block_sz, in + 4, sizeof(block_sz));
             } else {
                 memcpy(&block_sz, in, sizeof(block_sz));
+                if (block_sz > buf_sz) {
+                    if (block_sz != 0x184C2102) {
+                        LOGE("Mix lz4 format is not yet supported\n");
+                        return false;
+                    }
+                    chunk_sz = sizeof(block_sz);
+                    block_sz = 0;
+                    return true;
+                }
             }
             chunk_sz = block_sz;
             return true;

@@ -59,9 +59,9 @@ protected:
     virtual bool write_chunk(const void *buf, size_t len, bool final) = 0;
 
     size_t chunk_sz;
+    const size_t buf_sz;
 
 private:
-    size_t buf_sz;
     size_t buf_off = 0;
     uint8_t *_buf = nullptr;
 };
