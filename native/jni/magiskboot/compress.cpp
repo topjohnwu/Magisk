@@ -480,9 +480,9 @@ protected:
                 memcpy(&block_sz, in + 4, sizeof(block_sz));
             } else {
                 memcpy(&block_sz, in, sizeof(block_sz));
-                if (block_sz > buf_sz) {
+                if (block_sz > LZ4_UNCOMPRESSED) {
                     if (block_sz != 0x184C2102) {
-                        LOGE("Mix lz4 format is not yet supported\n");
+                        LOGE("Mix lz4 format (%x) is not yet supported\n", block_sz);
                         return false;
                     }
                     chunk_sz = sizeof(block_sz);
