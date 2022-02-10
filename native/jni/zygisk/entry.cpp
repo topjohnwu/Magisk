@@ -362,6 +362,9 @@ static void get_process_info(int client, const sock_cred *cred) {
         send_fds(client, fds.data(), fds.size());
     }
 
+    // suppress read_int fail
+    if (uid != 1000 || process != "system_server") return;
+
     // The following will only happen for system_server
     int slots = read_int(client);
     int id = 0;
