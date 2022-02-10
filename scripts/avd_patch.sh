@@ -57,7 +57,7 @@ for file in lib*.so; do
   mv "$file" "${file:3:${#file}-6}"
 done
 
-gzip -d ramdisk.cpio.gz
+./magiskboot decompress ramdisk.cpio.tmp ramdisk.cpio
 cp ramdisk.cpio ramdisk.cpio.orig
 
 touch config
@@ -84,4 +84,4 @@ export KEEPFORCEENCRYPT=true
 "add 000 .backup/.magisk config"
 
 rm -f ramdisk.cpio.orig config magisk*.xz
-gzip -9 ramdisk.cpio
+./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz

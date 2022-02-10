@@ -491,7 +491,7 @@ def patch_avd_ramdisk(args):
            'scripts/avd_patch.sh', '/data/local/tmp'])
     if proc.returncode != 0:
         error('adb push failed!')
-    proc = execv([adb_path, 'push', backup, '/data/local/tmp/ramdisk.cpio.gz'])
+    proc = execv([adb_path, 'push', backup, '/data/local/tmp/ramdisk.cpio.tmp'])
     if proc.returncode != 0:
         error('adb push failed!')
 
