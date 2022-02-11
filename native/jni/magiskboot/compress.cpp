@@ -454,7 +454,7 @@ private:
 class LZ4_decoder : public chunk_out_stream {
 public:
     explicit LZ4_decoder(stream_ptr &&base) :
-    	chunk_out_stream(std::move(base), LZ4_COMPRESSED, sizeof(block_sz) + 4),
+        chunk_out_stream(std::move(base), LZ4_COMPRESSED, sizeof(block_sz)),
         out_buf(new char[LZ4_UNCOMPRESSED]), block_sz(0) {}
 
     ~LZ4_decoder() override {
@@ -471,12 +471,14 @@ protected:
         auto in = reinterpret_cast<const char *>(buf);
 
         if (block_sz == 0) {
-            if (chunk_sz == sizeof(block_sz) + 4) {
-                // Skip the first 4 bytes, which is magic
-                memcpy(&block_sz, in + 4, sizeof(block_sz));
-            } else {
-                memcpy(&block_sz, in, sizeof(block_sz));
+            memcpy(&block_sz, in, sizeof(block_sz));
+            if (block_sz == 0x184C2102) {
+                // This is actually the lz4 magic, read the next 4 bytes
+                block_sz = 0;
+                chunk_sz = sizeof(block_sz);
+                return true;
             }
+            // Read the next block chunk
             chunk_sz = block_sz;
             return true;
         } else {
