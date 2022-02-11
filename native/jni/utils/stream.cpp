@@ -163,7 +163,9 @@ bool chunk_out_stream::write(const void *_in, size_t len, bool final) {
 
 void chunk_out_stream::finalize() {
     if (buf_off) {
-        write_chunk(_buf, buf_off, true);
+        if (!write_chunk(_buf, buf_off, true)) {
+            LOGE("Error in finalize, file truncated\n");
+        }
         delete[] _buf;
         _buf = nullptr;
         buf_off = 0;

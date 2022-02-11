@@ -438,7 +438,11 @@ public:
 
     ~LZ4F_encoder() override {
         size_t len = LZ4F_compressEnd(ctx, out_buf, outCapacity, nullptr);
-        bwrite(out_buf, len);
+        if (LZ4F_isError(len)) {
+            LOGE("LZ4F end of frame error: %s\n", LZ4F_getErrorName(len));
+        } else if (!bwrite(out_buf, len)) {
+            LOGE("LZ4F end of frame error: I/O error\n");
+        }
         LZ4F_freeCompressionContext(ctx);
         delete[] out_buf;
     }
