@@ -83,12 +83,14 @@ public:
             break;
         case STRING:
             str += ":s:";
-            std::string tmp = str_val;
-            if (SDK_INT >= __ANDROID_API_R__) {
+            if (SDK_INT >= 30) {
+                string tmp = str_val;
                 replace_all(tmp, "\\", "\\\\");
                 replace_all(tmp, ":", "\\:");
+                str += tmp;
+            } else {
+                str += str_val;
             }
-            str += tmp;
             break;
         }
         vec.push_back("--extra");
