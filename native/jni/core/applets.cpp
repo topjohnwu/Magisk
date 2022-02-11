@@ -21,20 +21,23 @@ static int call_applet(int argc, char *argv[]) {
             return (*applet_mains[i])(argc, argv);
         }
     }
-    if (str_starts(base, "app_process")) {
-        return app_process_main(argc, argv);
-    }
     fprintf(stderr, "%s: applet not found\n", base.data());
     return 1;
 }
 
 int main(int argc, char *argv[]) {
-    umask(0);
     enable_selinux();
     cmdline_logging();
     init_argv0(argc, argv);
 
     string_view base = basename(argv[0]);
+
+    // app_process is actually not an applet
+    if (str_starts(base, "app_process")) {
+        return app_process_main(argc, argv);
+    }
+
+    umask(0);
     if (base == "magisk" || base == "magisk32" || base == "magisk64") {
         if (argc > 1 && argv[1][0] != '-') {
             // Calling applet via magisk [applet] args
