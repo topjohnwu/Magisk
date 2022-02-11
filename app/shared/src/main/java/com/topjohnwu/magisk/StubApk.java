@@ -27,6 +27,7 @@ public class StubApk {
                 dataDir = info.dataDir;
             }
             dynDir = new File(dataDir, "dyn");
+            // noinspection ResultOfMethodCallIgnored
             dynDir.mkdirs();
         }
         return dynDir;
@@ -51,6 +52,7 @@ public class StubApk {
     public static void addAssetPath(AssetManager asset, String path) {
         try {
             if (addAssetPath == null)
+                // noinspection JavaReflectionMemberAccess
                 addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
             addAssetPath.invoke(asset, path);
         } catch (Exception ignored) {}

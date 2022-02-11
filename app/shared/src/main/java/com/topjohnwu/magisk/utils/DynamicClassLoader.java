@@ -28,6 +28,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
         try {
             // Then check boot classpath
+            assert base != null;
             return base.loadClass(name);
         } catch (ClassNotFoundException ignored) {
             try {
@@ -46,6 +47,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
     @Override
     public URL getResource(String name) {
+        assert base != null;
         URL resource = base.getResource(name);
         if (resource != null)
             return resource;
@@ -58,6 +60,7 @@ public class DynamicClassLoader extends DexClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
+        assert base != null;
         return new CompoundEnumeration<>(base.getResources(name),
                 findResources(name), getParent().getResources(name));
     }
