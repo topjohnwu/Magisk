@@ -29,6 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
@@ -70,6 +71,9 @@ class DownloadService : NotificationService() {
                     stopSelf()
             } catch (e: Exception) {
                 Timber.e(e)
+                if (isRunningAsStub) {
+                    StubApk.update(this@DownloadService).delete()
+                }
                 notifyFail(subject)
             }
         }
@@ -94,7 +98,10 @@ class DownloadService : NotificationService() {
                 }
                 service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
                 val patched = File(apk.parent, "patched.apk")
-                HideAPK.patch(this, apk, patched, packageName, applicationInfo.nonLocalizedLabel)
+                val label = applicationInfo.nonLocalizedLabel
+                if (!HideAPK.patch(this, apk, patched, packageName, label)) {
+                    throw IOException("HideAPK patch error")
+                }
                 apk.delete()
                 patched.renameTo(apk)
             } else {
