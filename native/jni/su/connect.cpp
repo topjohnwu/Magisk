@@ -7,6 +7,8 @@
 #include "su.hpp"
 #include "daemon.hpp"
 
+extern int SDK_INT;
+
 using namespace std;
 
 #define CALL_PROVIDER \
@@ -81,7 +83,14 @@ public:
             break;
         case STRING:
             str += ":s:";
-            str += str_val;
+            if (SDK_INT >= 30) {
+                string tmp = str_val;
+                replace_all(tmp, "\\", "\\\\");
+                replace_all(tmp, ":", "\\:");
+                str += tmp;
+            } else {
+                str += str_val;
+            }
             break;
         }
         vec.push_back("--extra");
