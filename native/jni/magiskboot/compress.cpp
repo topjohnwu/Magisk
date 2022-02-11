@@ -522,7 +522,7 @@ protected:
             return false;
         }
         if (bwrite(&block_sz, sizeof(block_sz)) && bwrite(out_buf, block_sz)) {
-            in_total += sizeof(block_sz) + block_sz;
+            in_total += len;
             return true;
         }
         return false;
