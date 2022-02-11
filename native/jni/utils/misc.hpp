@@ -93,6 +93,9 @@ public:
     slot_type get_slot(size_t slot) const {
         return slot_list.size() > slot ? slot_list[slot].to_ulong() : 0ul;
     }
+    void emplace_back(slot_type l) {
+        slot_list.emplace_back(l);
+    }
 protected:
     slot_bits::reference get(size_t pos) {
         size_t slot = pos / slot_size;

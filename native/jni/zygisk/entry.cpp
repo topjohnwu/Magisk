@@ -367,21 +367,21 @@ static void get_process_info(int client, const sock_cred *cred) {
 
     // Collect module status from system_server
     int slots = read_int(client);
-    int id = 0;
+    dynamic_bitset bits;
     for (int i = 0; i < slots; ++i) {
         dynamic_bitset::slot_type l = 0;
         xxread(client, &l, sizeof(l));
-        dynamic_bitset::slot_bits bits(l);
-        for (int j = 0; id < module_list->size(); ++j, ++id) {
-            if (!bits[j]) {
-                // Either not a zygisk module, or incompatible
-                char buf[4096];
-                snprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
-                    module_list->operator[](id).name.data());
-                if (int dirfd = open(buf, O_RDONLY | O_CLOEXEC); dirfd >= 0) {
-                    close(xopenat(dirfd, "unloaded", O_CREAT | O_RDONLY, 0644));
-                    close(dirfd);
-                }
+        bits.emplace_back(l);
+    }
+    for (int id = 0; id < module_list->size(); ++id) {
+        if (!as_const(bits)[id]) {
+            // Either not a zygisk module, or incompatible
+            char buf[4096];
+            snprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
+                module_list->operator[](id).name.data());
+            if (int dirfd = open(buf, O_RDONLY | O_CLOEXEC); dirfd >= 0) {
+                close(xopenat(dirfd, "unloaded", O_CREAT | O_RDONLY, 0644));
+                close(dirfd);
             }
         }
     }
