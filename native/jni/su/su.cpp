@@ -159,10 +159,7 @@ int su_client_main(int argc, char *argv[]) {
     int ptmx, fd;
 
     // Connect to client
-    fd = connect_daemon();
-
-    // Tell the daemon we are su
-    write_int(fd, SUPERUSER);
+    fd = connect_daemon(DaemonRequest::SUPERUSER);
 
     // Send su_request
     xwrite(fd, &su_req, sizeof(su_req_base));

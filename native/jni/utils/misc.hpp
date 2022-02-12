@@ -5,6 +5,8 @@
 #include <functional>
 #include <string_view>
 #include <bitset>
+#include <compare>
+#include "xwrap.hpp"
 
 #define UID_ROOT   0
 #define UID_SHELL  2000
@@ -196,4 +198,33 @@ void exec_command_async(Args &&...args) {
         .argv = argv,
     };
     exec_command(exec);
+}
+
+template <class _Tp, bool = std::is_enum_v<_Tp> >
+struct __is_scoped_enum_helper : std::false_type {};
+
+template <class _Tp>
+struct __is_scoped_enum_helper<_Tp, true>
+: public std::bool_constant<!std::is_convertible_v<_Tp, std::underlying_type_t<_Tp> > > {};
+
+template <class _Tp>
+struct is_scoped_enum
+        : public __is_scoped_enum_helper<_Tp> {};
+
+template <class _Tp>
+inline constexpr bool is_scoped_enum_v = is_scoped_enum<_Tp>::value;
+
+template<typename Enum> requires( is_scoped_enum_v<Enum> )
+constexpr inline auto operator <=> (std::underlying_type_t<Enum> a, Enum b) {
+    return a <=> static_cast<std::underlying_type_t<Enum>>(b);
+}
+
+template<typename Enum> requires( is_scoped_enum_v<Enum> )
+constexpr inline auto operator != (std::underlying_type_t<Enum> a, Enum b) {
+    return a != static_cast<std::underlying_type_t<Enum>>(b);
+}
+
+template<typename Enum> requires( is_scoped_enum_v<Enum> )
+constexpr inline auto operator == (std::underlying_type_t<Enum> a, Enum b) {
+    return a == static_cast<std::underlying_type_t<Enum>>(b);
 }

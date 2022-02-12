@@ -32,31 +32,40 @@ void denylist_handler(int client, const sock_cred *cred) {
         return;
     }
 
-    int req = read_int(client);
-    int res = DAEMON_ERROR;
+    DenyResponse res = DenyResponse::ERROR;
 
-    switch (req) {
-    case ENFORCE_DENY:
-        res = enable_deny();
-        break;
-    case DISABLE_DENY:
-        res = disable_deny();
-        break;
-    case ADD_LIST:
-        res = add_list(client);
-        break;
-    case RM_LIST:
-        res = rm_list(client);
-        break;
-    case LS_LIST:
-        ls_list(client);
-        return;
-    case DENY_STATUS:
-        res = (zygisk_enabled && denylist_enforced) ? DENY_IS_ENFORCED : DENY_NOT_ENFORCED;
-        break;
+    int code = read_int(client);
+    auto req = static_cast<DenyRequest>(code);
+
+    if (code < 0 || code >= DenyRequest::END) {
+        goto done;
     }
 
-    write_int(client, res);
+    switch (req) {
+    case DenyRequest::ENFORCE:
+        res = enable_deny();
+        break;
+    case DenyRequest::DISABLE:
+        res = disable_deny();
+        break;
+    case DenyRequest::ADD:
+        res = add_list(client);
+        break;
+    case DenyRequest::REMOVE:
+        res = rm_list(client);
+        break;
+    case DenyRequest::LIST:
+        ls_list(client);
+        return;
+    case DenyRequest::STATUS:
+        res = (zygisk_enabled && denylist_enforced) ? DenyResponse::ENFORCED
+                                                    : DenyResponse::NOT_ENFORCED;
+        break;
+    case DenyRequest::END:
+        __builtin_unreachable();
+    }
+done:
+    write_int(client, static_cast<int>(res));
     close(client);
 }
 
@@ -64,19 +73,19 @@ int denylist_cli(int argc, char **argv) {
     if (argc < 2)
         usage();
 
-    int req;
+    DenyRequest req;
     if (argv[1] == "enable"sv)
-        req = ENFORCE_DENY;
+        req = DenyRequest::ENFORCE;
     else if (argv[1] == "disable"sv)
-        req = DISABLE_DENY;
+        req = DenyRequest::DISABLE;
     else if (argv[1] == "add"sv)
-        req = ADD_LIST;
+        req = DenyRequest::ADD;
     else if (argv[1] == "rm"sv)
-        req = RM_LIST;
+        req = DenyRequest::REMOVE;
     else if (argv[1] == "ls"sv)
-        req = LS_LIST;
+        req = DenyRequest::LIST;
     else if (argv[1] == "status"sv)
-        req = DENY_STATUS;
+        req = DenyRequest::STATUS;
     else if (argv[1] == "exec"sv && argc > 2) {
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
@@ -88,56 +97,54 @@ int denylist_cli(int argc, char **argv) {
     }
 
     // Send request
-    int fd = connect_daemon();
-    write_int(fd, DENYLIST);
-    write_int(fd, req);
-    if (req == ADD_LIST || req == RM_LIST) {
+    int fd = deny_request(req);
+    if (req == DenyRequest::ADD || req == DenyRequest::REMOVE) {
         write_string(fd, argv[2]);
         write_string(fd, argv[3] ? argv[3] : "");
     }
 
     // Get response
     int code = read_int(fd);
-    switch (code) {
-    case DAEMON_SUCCESS:
-        break;
-    case DENY_NOT_ENFORCED:
+    auto res = (code < 0 || code >= DenyResponse::END) ? DenyResponse::ERROR
+                                                       : static_cast<DenyResponse>(code);
+    switch (res) {
+    case DenyResponse::NOT_ENFORCED:
         fprintf(stderr, "Denylist is not enforced\n");
         goto return_code;
-    case DENY_IS_ENFORCED:
+    case DenyResponse::ENFORCED:
         fprintf(stderr, "Denylist is enforced\n");
         goto return_code;
-    case DENYLIST_ITEM_EXIST:
+    case DenyResponse::ITEM_EXIST:
         fprintf(stderr, "Target already exists in denylist\n");
         goto return_code;
-    case DENYLIST_ITEM_NOT_EXIST:
+    case DenyResponse::ITEM_NOT_EXIST:
         fprintf(stderr, "Target does not exist in denylist\n");
         goto return_code;
-    case DENY_NO_NS:
+    case DenyResponse::NO_NS:
         fprintf(stderr, "The kernel does not support mount namespace\n");
         goto return_code;
-    case DENYLIST_INVALID_PKG:
+    case DenyResponse::INVALID_PKG:
         fprintf(stderr, "Invalid package / process name\n");
         goto return_code;
-    case ROOT_REQUIRED:
-        fprintf(stderr, "Root is required for this operation\n");
-        goto return_code;
-    case DAEMON_ERROR:
-    default:
-        fprintf(stderr, "Daemon error\n");
-        return DAEMON_ERROR;
+    case DenyResponse::ERROR:
+        fprintf(stderr, "deny: Daemon error\n");
+        return -1;
+    case DenyResponse::OK:
+        break;
+    case DenyResponse::END:
+        __builtin_unreachable();
     }
 
-    if (req == LS_LIST) {
-        string res;
+    if (req == DenyRequest::LIST) {
+        string out;
         for (;;) {
-            read_string(fd, res);
-            if (res.empty())
+            read_string(fd, out);
+            if (out.empty())
                 break;
-            printf("%s\n", res.data());
+            printf("%s\n", out.data());
         }
     }
 
 return_code:
-    return req == DENY_STATUS ? (code == DENY_IS_ENFORCED ? 0 : 1) : code != DAEMON_SUCCESS;
+    return req == DenyRequest::STATUS ? res != DenyResponse::ENFORCED : res != DenyResponse::OK;
 }

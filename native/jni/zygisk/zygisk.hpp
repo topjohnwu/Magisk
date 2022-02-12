@@ -3,18 +3,21 @@
 #include <stdint.h>
 #include <jni.h>
 #include <vector>
+#include <daemon.hpp>
 
 #define INJECT_ENV_1   "MAGISK_INJ_1"
 #define INJECT_ENV_2   "MAGISK_INJ_2"
 #define MAGISKFD_ENV   "MAGISKFD"
 #define MAGISKTMP_ENV  "MAGISKTMP"
 
-enum : int {
-    ZYGISK_SETUP,
-    ZYGISK_GET_INFO,
-    ZYGISK_GET_LOG_PIPE,
-    ZYGISK_CONNECT_COMPANION,
-    ZYGISK_GET_MODDIR,
+enum class ZygiskRequest : int {
+    SETUP,
+    GET_INFO,
+    GET_LOG_PIPE,
+    CONNECT_COMPANION,
+    GET_MODDIR,
+    PASSTHROUGH,
+    END
 };
 
 #if defined(__LP64__)
@@ -47,3 +50,10 @@ extern void *self_handle;
 void hook_functions();
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 int remote_request_unmount();
+
+
+inline int zygisk_request(ZygiskRequest req) {
+    int fd = connect_daemon(DaemonRequest::ZYGISK_REQUEST, false);
+    write_int(fd, static_cast<int>(req));
+    return fd;
+}
