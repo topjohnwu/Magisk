@@ -226,20 +226,20 @@ error:
     return false;
 }
 
-static int add_list(const char *pkg, const char *proc) {
+static DenyResponse add_list(const char *pkg, const char *proc) {
     if (proc[0] == '\0')
         proc = pkg;
 
     if (!validate(pkg, proc))
-        return DENYLIST_INVALID_PKG;
+        return DenyResponse::INVALID_PKG;
 
     {
         mutex_guard lock(data_lock);
         if (!ensure_data())
-            return DAEMON_ERROR;
+            return DenyResponse::ERROR;
         auto p = add_hide_set(pkg, proc);
         if (!p.second)
-            return DENYLIST_ITEM_EXIST;
+            return DenyResponse::ITEM_EXIST;
         update_pkg_uid(*p.first, false);
     }
 
@@ -248,21 +248,21 @@ static int add_list(const char *pkg, const char *proc) {
     snprintf(sql, sizeof(sql),
             "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
-    db_err_cmd(err, return DAEMON_ERROR)
-    return DAEMON_SUCCESS;
+    db_err_cmd(err, return DenyResponse::ERROR)
+    return DenyResponse::OK;
 }
 
-int add_list(int client) {
+DenyResponse add_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return add_list(pkg.data(), proc.data());
 }
 
-static int rm_list(const char *pkg, const char *proc) {
+static DenyResponse rm_list(const char *pkg, const char *proc) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data())
-            return DAEMON_ERROR;
+            return DenyResponse::ERROR;
 
         bool remove = false;
 
@@ -284,7 +284,7 @@ static int rm_list(const char *pkg, const char *proc) {
         }
 
         if (!remove)
-            return DENYLIST_ITEM_NOT_EXIST;
+            return DenyResponse::ITEM_NOT_EXIST;
     }
 
     char sql[4096];
@@ -294,11 +294,11 @@ static int rm_list(const char *pkg, const char *proc) {
         snprintf(sql, sizeof(sql),
                 "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
-    db_err_cmd(err, return DAEMON_ERROR)
-    return DAEMON_SUCCESS;
+    db_err_cmd(err, return DenyResponse::ERROR)
+    return DenyResponse::OK;
 }
 
-int rm_list(int client) {
+DenyResponse rm_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return rm_list(pkg.data(), proc.data());
@@ -308,11 +308,11 @@ void ls_list(int client) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data()) {
-            write_int(client, DAEMON_ERROR);
+            write_int(client, static_cast<int>(DenyResponse::ERROR));
             return;
         }
 
-        write_int(client, DAEMON_SUCCESS);
+        write_int(client,static_cast<int>(DenyResponse::OK));
 
         for (const auto &[pkg, procs] : pkg_to_procs) {
             for (const auto &proc : procs) {
@@ -342,19 +342,19 @@ static void update_deny_config() {
     db_err(err);
 }
 
-int enable_deny() {
+DenyResponse enable_deny() {
     if (denylist_enforced) {
-        return DAEMON_SUCCESS;
+        return DenyResponse::OK;
     } else {
         mutex_guard lock(data_lock);
 
         if (access("/proc/self/ns/mnt", F_OK) != 0) {
             LOGW("The kernel does not support mount namespace\n");
-            return DENY_NO_NS;
+            return DenyResponse::NO_NS;
         }
 
         if (procfp == nullptr && (procfp = opendir("/proc")) == nullptr)
-            return DAEMON_ERROR;
+            return DenyResponse::ERROR;
 
         LOGI("* Enable DenyList\n");
 
@@ -362,7 +362,7 @@ int enable_deny() {
 
         if (!ensure_data()) {
             denylist_enforced = false;
-            return DAEMON_ERROR;
+            return DenyResponse::ERROR;
         }
 
         // On Android Q+, also kill blastula pool and all app zygotes
@@ -374,16 +374,16 @@ int enable_deny() {
     }
 
     update_deny_config();
-    return DAEMON_SUCCESS;
+    return DenyResponse::OK;
 }
 
-int disable_deny() {
+DenyResponse disable_deny() {
     if (denylist_enforced) {
         denylist_enforced = false;
         LOGI("* Disable DenyList\n");
     }
     update_deny_config();
-    return DAEMON_SUCCESS;
+    return DenyResponse::OK;
 }
 
 void initialize_denylist() {

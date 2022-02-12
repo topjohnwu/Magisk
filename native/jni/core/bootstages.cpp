@@ -14,6 +14,7 @@
 #include <selinux.hpp>
 
 #include "core.hpp"
+#include "zygisk/deny/deny.hpp"
 
 using namespace std;
 

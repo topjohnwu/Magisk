@@ -240,7 +240,7 @@ void SARBase::patch_rootdir() {
             make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
             make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
          });
-        if (avd_hack) {
+        if constexpr (avd_hack) {
             // Force disable early mount on original init
             init.patch({ make_pair("android,fstab", "xxx") });
         }

@@ -10,11 +10,36 @@
 
 #define ISOLATED_MAGIC "isolated"
 
+enum class DenyRequest : int {
+    ENFORCE,
+    DISABLE,
+    ADD,
+    REMOVE,
+    LIST,
+    STATUS,
+
+    END
+};
+
+enum class DenyResponse: int {
+    OK,
+    ENFORCED,
+    NOT_ENFORCED,
+    ITEM_EXIST,
+    ITEM_NOT_EXIST,
+    INVALID_PKG,
+    NO_NS,
+    ERROR,
+
+    END
+};
+
+
 // CLI entries
-int enable_deny();
-int disable_deny();
-int add_list(int client);
-int rm_list(int client);
+DenyResponse enable_deny();
+DenyResponse disable_deny();
+DenyResponse add_list(int client);
+DenyResponse rm_list(int client);
 void ls_list(int client);
 
 // Utility functions
@@ -25,20 +50,8 @@ void revert_unmount();
 extern std::atomic<bool> denylist_enforced;
 extern std::atomic<int> cached_manager_app_id;
 
-enum : int {
-    ENFORCE_DENY,
-    DISABLE_DENY,
-    ADD_LIST,
-    RM_LIST,
-    LS_LIST,
-    DENY_STATUS,
-};
-
-enum : int {
-    DENY_IS_ENFORCED = DAEMON_LAST + 1,
-    DENY_NOT_ENFORCED,
-    DENYLIST_ITEM_EXIST,
-    DENYLIST_ITEM_NOT_EXIST,
-    DENYLIST_INVALID_PKG,
-    DENY_NO_NS,
-};
+inline int deny_request(DenyRequest req) {
+    int fd = connect_daemon(DaemonRequest::DENYLIST);
+    write_int(fd, static_cast<std::underlying_type_t<DenyRequest>>(req));
+    return fd;
+}

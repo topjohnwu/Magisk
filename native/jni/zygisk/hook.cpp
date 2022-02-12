@@ -317,9 +317,7 @@ bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
 }
 
 int ZygiskModule::connectCompanion() const {
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_CONNECT_COMPANION);
+    if (int fd = zygisk_request(ZygiskRequest::CONNECT_COMPANION); fd >= 0) {
         write_int(fd, id);
         return fd;
     }
@@ -327,9 +325,7 @@ int ZygiskModule::connectCompanion() const {
 }
 
 int ZygiskModule::getModuleDir() const {
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_GET_MODDIR);
+    if (int fd = zygisk_request(ZygiskRequest::GET_MODDIR); fd >= 0) {
         write_int(fd, id);
         int dfd = recv_fd(fd);
         close(fd);

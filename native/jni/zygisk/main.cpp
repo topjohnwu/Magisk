@@ -57,11 +57,8 @@ int app_process_main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (int socket = connect_daemon(); socket >= 0) {
+    if (int socket = zygisk_request(ZygiskRequest::SETUP); socket >= 0) {
         do {
-            write_int(socket, ZYGISK_REQUEST);
-            write_int(socket, ZYGISK_SETUP);
-
             if (read_int(socket) != 0)
                 break;
 
@@ -176,9 +173,7 @@ int zygisk_main(int argc, char *argv[]) {
         int is_64_bit = parse_int(argv[3]);
         if (fcntl(client, F_GETFD) < 0)
             return 1;
-        if (int magiskd = connect_daemon(); magiskd >= 0) {
-            write_int(magiskd, ZYGISK_PASSTHROUGH);
-            write_int(magiskd, ZYGISK_PASSTHROUGH);
+        if (int magiskd = zygisk_request(ZygiskRequest::PASSTHROUGH); magiskd >= 0) {
             write_int(magiskd, is_64_bit);
 
             if (read_int(magiskd) != 0) {

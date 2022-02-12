@@ -142,9 +142,7 @@ static int zygisk_log(int prio, const char *fmt, va_list ap) {
     if (logd_fd < 0) {
         // Change logging temporarily to prevent infinite recursion and stack overflow
         android_logging();
-        if (int fd = connect_daemon(); fd >= 0) {
-            write_int(fd, ZYGISK_REQUEST);
-            write_int(fd, ZYGISK_GET_LOG_PIPE);
+        if (int fd = zygisk_request(ZygiskRequest::GET_LOG_PIPE); fd >= 0) {
             if (read_int(fd) == 0) {
                 logd_fd = recv_fd(fd);
             }
@@ -178,10 +176,7 @@ static inline bool should_load_modules(uint32_t flags) {
 }
 
 int remote_get_info(int uid, const char *process, uint32_t *flags, vector<int> &fds) {
-    if (int fd = connect_daemon(); fd >= 0) {
-        write_int(fd, ZYGISK_REQUEST);
-        write_int(fd, ZYGISK_GET_INFO);
-
+    if (int fd = zygisk_request(ZygiskRequest::GET_INFO); fd >= 0) {
         write_int(fd, uid);
         write_string(fd, process);
         xxread(fd, flags, sizeof(*flags));
@@ -404,28 +399,39 @@ static void get_moddir(int client) {
 }
 
 void zygisk_handler(int client, const sock_cred *cred) {
+//    using enum ZYGISK_REQUEST;
     int code = read_int(client);
     char buf[256];
-    switch (code) {
-    case ZYGISK_SETUP:
+    if (code < ZygiskRequest::SETUP || code >= ZygiskRequest::END) {
+        write_int(client, -1);
+        return;
+    }
+    auto req = static_cast<ZygiskRequest>(code);
+    if (req != ZygiskRequest::PASSTHROUGH && cred->context != "u:r:zygote:s0") {
+        return;
+    }
+    switch (req) {
+    case ZygiskRequest::SETUP:
         setup_files(client, cred);
         break;
-    case ZYGISK_PASSTHROUGH:
+    case ZygiskRequest::PASSTHROUGH:
         magiskd_passthrough(client);
         break;
-    case ZYGISK_GET_INFO:
+    case ZygiskRequest::GET_INFO:
         get_process_info(client, cred);
         break;
-    case ZYGISK_GET_LOG_PIPE:
+    case ZygiskRequest::GET_LOG_PIPE:
         send_log_pipe(client);
         break;
-    case ZYGISK_CONNECT_COMPANION:
+    case ZygiskRequest::CONNECT_COMPANION:
         get_exe(cred->pid, buf, sizeof(buf));
         connect_companion(client, str_ends(buf, "64"));
         break;
-    case ZYGISK_GET_MODDIR:
+    case ZygiskRequest::GET_MODDIR:
         get_moddir(client);
         break;
+    case ZygiskRequest::END:
+        __builtin_unreachable();
     }
     close(client);
 }
