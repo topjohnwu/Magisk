@@ -7,7 +7,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Environment;
@@ -31,9 +30,16 @@ public class DynLoad {
     // The current active classloader
     static ClassLoader loader = new RedirectClassLoader();
     static Object componentFactory;
-    static final StubApk.Data apkData = createApkData();
 
     private static boolean loadedApk = false;
+
+    static StubApk.Data createApkData() {
+        var data = new StubApk.Data();
+        data.setVersion(BuildConfig.STUB_VERSION);
+        data.setClassToComponent(Mapping.inverseMap);
+        data.setRootService(DelegateRootService.class);
+        return data;
+    }
 
     static void attachContext(Object o, Context context) {
         if (!(o instanceof ContextWrapper))
@@ -95,16 +101,16 @@ public class DynLoad {
         }
     }
 
-    // Dynamically load APK and create the Application instance from the loaded APK
-    static Application createApp(Context context) {
+    // Dynamically load APK from internal, external storage, or previous app
+    static boolean loadApk(Context context) {
         // Trigger folder creation
         context.getExternalFilesDir(null);
 
-        File apk = StubApk.current(context);
         loadApk(context.getApplicationInfo());
 
         // If no APK is loaded, attempt to copy from previous app
         if (!isDynLoader() && !context.getPackageName().equals(APPLICATION_ID)) {
+            File apk = StubApk.current(context);
             try {
                 var info = context.getPackageManager().getApplicationInfo(APPLICATION_ID, 0);
                 var src = new FileInputStream(info.sourceDir);
@@ -120,52 +126,50 @@ public class DynLoad {
             }
         }
 
-        if (isDynLoader()) {
-            PackageManager pm = context.getPackageManager();
-            PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
-            try {
-                return newApp(pkgInfo.applicationInfo);
-            } catch (ReflectiveOperationException | NullPointerException e) {
-                Log.e(DynLoad.class.getSimpleName(), "", e);
-                apk.delete();
-            }
-
-        }
-        return null;
+        return isDynLoader();
     }
 
-    // Stub app setup entry
+    // Dynamically load APK and create the Application instance from the loaded APK
     static Application createAndSetupApp(Application context) {
-        // On API >= 29, AppComponentFactory will replace the ClassLoader
+        // On API >= 29, AppComponentFactory will replace the ClassLoader for us
         if (Build.VERSION.SDK_INT < 29)
             replaceClassLoader(context);
 
-        Application app = createApp(context);
-        if (app != null) {
+        if (!loadApk(context))
+            return null;
+
+        File apk = StubApk.current(context);
+        PackageManager pm = context.getPackageManager();
+        try {
+            var info = pm.getPackageArchiveInfo(apk.getPath(), 0).applicationInfo;
+
+            // Create the receiver Application
+            var data = createApkData();
+            var app = (Application) loader.loadClass(info.className)
+                    .getConstructor(Object.class)
+                    .newInstance(data.getObject());
+
+            // Create the receiver component factory
+            if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
+                Object factory = loader.loadClass(info.appComponentFactory).newInstance();
+                var delegate = (DelegateComponentFactory) componentFactory;
+                delegate.receiver = (AppComponentFactory) factory;
+            }
+
             // Send real application to attachBaseContext
             attachContext(app, context);
+
+            return app;
+        } catch (Exception e) {
+            Log.e(DynLoad.class.getSimpleName(), "", e);
+            apk.delete();
         }
-        return app;
+
+        return null;
     }
 
     private static boolean isDynLoader() {
         return loader instanceof InjectedClassLoader;
-    }
-
-    private static Application newApp(ApplicationInfo info) throws ReflectiveOperationException {
-        // Create the receiver Application
-        var app = (Application) loader.loadClass(info.className)
-                .getConstructor(Object.class)
-                .newInstance(apkData.getObject());
-
-        // Create the receiver component factory
-        if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
-            Object factory = loader.loadClass(info.appComponentFactory).newInstance();
-            var delegate = (DelegateComponentFactory) componentFactory;
-            delegate.receiver = (AppComponentFactory) factory;
-        }
-
-        return app;
     }
 
     // Replace LoadedApk mClassLoader
@@ -187,13 +191,5 @@ public class DynLoad {
             // and API 21 - 28 do not restrict access to these fields.
             Log.e(DynLoad.class.getSimpleName(), "", e);
         }
-    }
-
-    private static StubApk.Data createApkData() {
-        var data = new StubApk.Data();
-        data.setVersion(BuildConfig.STUB_VERSION);
-        data.setClassToComponent(Mapping.inverseMap);
-        data.setRootService(DelegateRootService.class);
-        return data;
     }
 }
