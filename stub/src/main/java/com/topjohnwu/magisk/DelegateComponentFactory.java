@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.ContentProvider;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.os.Process;
 
 import com.topjohnwu.magisk.dummy.DummyProvider;
 import com.topjohnwu.magisk.dummy.DummyReceiver;
@@ -26,11 +25,6 @@ public class DelegateComponentFactory extends AppComponentFactory {
 
     @Override
     public ClassLoader instantiateClassLoader(ClassLoader cl, ApplicationInfo info) {
-        if (Process.myUid() == 0) {
-            // Do not do anything in root process
-            return cl;
-        }
-        DynLoad.loadApk(info);
         return new DelegateClassLoader();
     }
 
@@ -43,7 +37,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Activity instantiateActivity(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
-            return receiver.instantiateActivity(DynLoad.loader, className, intent);
+            return receiver.instantiateActivity(DelegateClassLoader.cl, className, intent);
         return create(className, DownloadActivity.class);
     }
 
@@ -51,7 +45,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public BroadcastReceiver instantiateReceiver(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
-            return receiver.instantiateReceiver(DynLoad.loader, className, intent);
+            return receiver.instantiateReceiver(DelegateClassLoader.cl, className, intent);
         return create(className, DummyReceiver.class);
     }
 
@@ -59,7 +53,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public Service instantiateService(ClassLoader cl, String className, Intent intent)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
-            return receiver.instantiateService(DynLoad.loader, className, intent);
+            return receiver.instantiateService(DelegateClassLoader.cl, className, intent);
         return create(className, DummyService.class);
     }
 
@@ -67,7 +61,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
     public ContentProvider instantiateProvider(ClassLoader cl, String className)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
-            return receiver.instantiateProvider(DynLoad.loader, className);
+            return receiver.instantiateProvider(DelegateClassLoader.cl, className);
         return create(className, DummyProvider.class);
     }
 
@@ -75,7 +69,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws IllegalAccessException, InstantiationException {
         try {
             // noinspection unchecked
-            return (T) DynLoad.loader.loadClass(name).newInstance();
+            return (T) DelegateClassLoader.cl.loadClass(name).newInstance();
         } catch (ClassNotFoundException e) {
             return fallback.newInstance();
         }

@@ -20,7 +20,8 @@ public class DelegateRootService extends ContextWrapper {
 
     @Override
     protected void attachBaseContext(Context base) {
-        if (!DynLoad.loadApk(base))
+        ClassLoader loader = DynLoad.loadApk(base);
+        if (loader == null)
             return;
 
         try {
@@ -29,7 +30,7 @@ public class DelegateRootService extends ContextWrapper {
             File apk = StubApk.current(base);
             PackageManager pm = base.getPackageManager();
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
-            DynLoad.loader.loadClass(pkgInfo.applicationInfo.className)
+            loader.loadClass(pkgInfo.applicationInfo.className)
                     .getConstructor(Object.class)
                     .newInstance(data.getObject());
 
