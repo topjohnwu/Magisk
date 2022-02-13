@@ -76,9 +76,6 @@ fun genKeyData(keysDir: File, outSrc: File) {
 fun genStubManifest(srcDir: File, outDir: File): String {
     outDir.deleteRecursively()
 
-    val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
-    mainPkgDir.mkdirs()
-
     fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
 
     val cmpList = mutableListOf<String>()
@@ -195,7 +192,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         val clzName = genCmpName()
         val (pkg, name) = clzName.split('.')
         val pkgDir = File(outDir, pkg)
-        pkgDir.mkdir()
+        pkgDir.mkdirs()
         PrintStream(File(pkgDir, "$name.java")).use {
             it.println("package $pkg;")
             it.println("public class $name extends com.topjohnwu.magisk.$type {}")
@@ -220,6 +217,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
 
 fun genEncryptedResources(res: InputStream, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
+    mainPkgDir.mkdirs()
 
     // Generate iv and key
     val iv = ByteArray(16)

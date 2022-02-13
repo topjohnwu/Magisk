@@ -108,11 +108,11 @@ public class DynLoad {
 
         int flags = PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES
                 | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS;
+        var pm = context.getPackageManager();
 
         final PackageInfo info;
         try {
-            info = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), flags);
+            info = pm.getPackageInfo(context.getPackageName(), flags);
         } catch (PackageManager.NameNotFoundException e) {
             // Impossible
             throw new RuntimeException(e);
@@ -122,8 +122,7 @@ public class DynLoad {
 
         final var cl = loadApk(context);
         if (cl != null) try {
-            var pkgInfo = context.getPackageManager()
-                    .getPackageArchiveInfo(apk.getPath(), flags);
+            var pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), flags);
             cl.updateComponentMap(info, pkgInfo);
 
             var appInfo = pkgInfo.applicationInfo;
