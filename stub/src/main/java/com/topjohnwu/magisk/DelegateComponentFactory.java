@@ -11,6 +11,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.os.Process;
 
+import com.topjohnwu.magisk.dummy.DummyProvider;
+import com.topjohnwu.magisk.dummy.DummyReceiver;
+import com.topjohnwu.magisk.dummy.DummyService;
+
 @SuppressLint("NewApi")
 public class DelegateComponentFactory extends AppComponentFactory {
 
@@ -40,7 +44,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
             return receiver.instantiateActivity(DynLoad.loader, className, intent);
-        return create(className);
+        return create(className, DownloadActivity.class);
     }
 
     @Override
@@ -48,7 +52,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
             return receiver.instantiateReceiver(DynLoad.loader, className, intent);
-        return create(className);
+        return create(className, DummyReceiver.class);
     }
 
     @Override
@@ -56,7 +60,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
             return receiver.instantiateService(DynLoad.loader, className, intent);
-        return create(className);
+        return create(className, DummyService.class);
     }
 
     @Override
@@ -64,12 +68,17 @@ public class DelegateComponentFactory extends AppComponentFactory {
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (receiver != null)
             return receiver.instantiateProvider(DynLoad.loader, className);
-        return create(className);
+        return create(className, DummyProvider.class);
     }
 
-    private <T> T create(String name)
-            throws ClassNotFoundException, IllegalAccessException, InstantiationException{
-        return (T) DynLoad.loader.loadClass(name).newInstance();
+    private <T> T create(String name, Class<T> fallback)
+            throws IllegalAccessException, InstantiationException {
+        try {
+            // noinspection unchecked
+            return (T) DynLoad.loader.loadClass(name).newInstance();
+        } catch (ClassNotFoundException e) {
+            return fallback.newInstance();
+        }
     }
 
 }

@@ -49,6 +49,14 @@ public class DownloadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (DynLoad.isDynLoader()) {
+            // For some reason activity is created before Application.attach(),
+            // relaunch the activity using the same intent
+            finishAffinity();
+            startActivity(getIntent());
+            return;
+        }
+
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         // Only download and dynamic load full APK if hidden

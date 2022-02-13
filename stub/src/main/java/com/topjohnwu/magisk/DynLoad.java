@@ -4,14 +4,21 @@ import static com.topjohnwu.magisk.BuildConfig.APPLICATION_ID;
 
 import android.app.AppComponentFactory;
 import android.app.Application;
+import android.app.job.JobService;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
+import com.topjohnwu.magisk.dummy.DummyProvider;
+import com.topjohnwu.magisk.dummy.DummyReceiver;
+import com.topjohnwu.magisk.dummy.DummyService;
 import com.topjohnwu.magisk.utils.APKInstall;
 
 import java.io.File;
@@ -20,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
@@ -28,15 +37,20 @@ import io.michaelrocks.paranoid.Obfuscate;
 public class DynLoad {
 
     // The current active classloader
-    static ClassLoader loader = new RedirectClassLoader();
+    static ClassLoader loader = DynLoad.class.getClassLoader();
     static Object componentFactory;
+    static Map<String, String> componentMap = new HashMap<>();
 
     private static boolean loadedApk = false;
 
     static StubApk.Data createApkData() {
         var data = new StubApk.Data();
         data.setVersion(BuildConfig.STUB_VERSION);
-        data.setClassToComponent(Mapping.inverseMap);
+        Map<String, String> map = new HashMap<>();
+        for (var e : componentMap.entrySet()) {
+            map.put(e.getValue(), e.getKey());
+        }
+        data.setClassToComponent(map);
         data.setRootService(DelegateRootService.class);
         return data;
     }
@@ -135,23 +149,40 @@ public class DynLoad {
         if (Build.VERSION.SDK_INT < 29)
             replaceClassLoader(context);
 
-        if (!loadApk(context))
+        int flags = PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES
+                | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS;
+
+        final PackageInfo info;
+        try {
+            info = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), flags);
+        } catch (PackageManager.NameNotFoundException e) {
+            // Impossible
+            throw new RuntimeException(e);
+        }
+
+        if (!loadApk(context)) {
+            loader = new RedirectClassLoader(createInternalMap(info));
             return null;
+        }
 
         File apk = StubApk.current(context);
         PackageManager pm = context.getPackageManager();
         try {
-            var info = pm.getPackageArchiveInfo(apk.getPath(), 0).applicationInfo;
+            var pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), flags);
+            var appInfo = pkgInfo.applicationInfo;
+
+            updateComponentMap(info, pkgInfo);
 
             // Create the receiver Application
             var data = createApkData();
-            var app = (Application) loader.loadClass(info.className)
+            var app = (Application) loader.loadClass(appInfo.className)
                     .getConstructor(Object.class)
                     .newInstance(data.getObject());
 
             // Create the receiver component factory
             if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
-                Object factory = loader.loadClass(info.appComponentFactory).newInstance();
+                Object factory = loader.loadClass(appInfo.appComponentFactory).newInstance();
                 var delegate = (DelegateComponentFactory) componentFactory;
                 delegate.receiver = (AppComponentFactory) factory;
             }
@@ -168,7 +199,90 @@ public class DynLoad {
         return null;
     }
 
-    private static boolean isDynLoader() {
+    private static Map<String, Class<?>> createInternalMap(PackageInfo info) {
+        Map<String, Class<?>> map = new HashMap<>();
+        for (var c : info.activities) {
+            map.put(c.name, DownloadActivity.class);
+        }
+        for (var c : info.services) {
+            map.put(c.name, DummyService.class);
+        }
+        for (var c : info.providers) {
+            map.put(c.name, DummyProvider.class);
+        }
+        for (var c : info.receivers) {
+            map.put(c.name, DummyReceiver.class);
+        }
+        return map;
+    }
+
+    private static void updateComponentMap(PackageInfo from, PackageInfo to) {
+        {
+            var src = from.activities;
+            var dest = to.activities;
+
+            final ActivityInfo sa;
+            final ActivityInfo da;
+            final ActivityInfo sb;
+            final ActivityInfo db;
+            if (src[0].exported) {
+                sa = src[0];
+                sb = src[1];
+            } else {
+                sa = src[1];
+                sb = src[0];
+            }
+            if (dest[0].exported) {
+                da = dest[0];
+                db = dest[1];
+            } else {
+                da = dest[1];
+                db = dest[0];
+            }
+            componentMap.put(sa.name, da.name);
+            componentMap.put(sb.name, db.name);
+        }
+
+        {
+            var src = from.services;
+            var dest = to.services;
+
+            final ServiceInfo sa;
+            final ServiceInfo da;
+            final ServiceInfo sb;
+            final ServiceInfo db;
+            if (JobService.PERMISSION_BIND.equals(src[0].permission)) {
+                sa = src[0];
+                sb = src[1];
+            } else {
+                sa = src[1];
+                sb = src[0];
+            }
+            if (JobService.PERMISSION_BIND.equals(dest[0].permission)) {
+                da = dest[0];
+                db = dest[1];
+            } else {
+                da = dest[1];
+                db = dest[0];
+            }
+            componentMap.put(sa.name, da.name);
+            componentMap.put(sb.name, db.name);
+        }
+
+        {
+            var src = from.receivers;
+            var dest = to.receivers;
+            componentMap.put(src[0].name, dest[0].name);
+        }
+
+        {
+            var src = from.providers;
+            var dest = to.providers;
+            componentMap.put(src[0].name, dest[0].name);
+        }
+    }
+
+    static boolean isDynLoader() {
         return loader instanceof InjectedClassLoader;
     }
 
