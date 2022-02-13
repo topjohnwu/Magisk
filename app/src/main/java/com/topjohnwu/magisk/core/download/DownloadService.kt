@@ -29,6 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
@@ -84,23 +85,30 @@ class DownloadService : NotificationService() {
         if (isRunningAsStub) {
             val apk = subject.file.toFile()
             val id = subject.notifyId
-            write(StubApk.update(this).outputStream())
-            if (Info.stub!!.version < subject.stub.versionCode) {
-                // Also upgrade stub
-                update(id) {
-                    it.setProgress(0, 0, true)
-                        .setContentTitle(getString(R.string.hide_app_title))
-                        .setContentText("")
+            try {
+                write(StubApk.update(this).outputStream())
+                if (Info.stub!!.version < subject.stub.versionCode) {
+                    // Also upgrade stub
+                    update(id) {
+                        it.setProgress(0, 0, true)
+                            .setContentTitle(getString(R.string.hide_app_title))
+                            .setContentText("")
+                    }
+                    service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
+                    val patched = File(apk.parent, "patched.apk")
+                    val label = applicationInfo.nonLocalizedLabel
+                    if (!HideAPK.patch(this, apk, patched, packageName, label)) {
+                        throw IOException("HideAPK patch error")
+                    }
+                    apk.delete()
+                    patched.renameTo(apk)
+                } else {
+                    val clz = Info.stub!!.classToComponent["PHOENIX"]!!
+                    PhoenixActivity.rebirth(this, clz)
+                    return
                 }
-                service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
-                val patched = File(apk.parent, "patched.apk")
-                HideAPK.patch(this, apk, patched, packageName, applicationInfo.nonLocalizedLabel)
-                apk.delete()
-                patched.renameTo(apk)
-            } else {
-                val clz = Info.stub!!.classToComponent["PHOENIX"]!!
-                PhoenixActivity.rebirth(this, clz)
-                return
+            } catch (e: Exception) {
+                StubApk.update(this).delete()
             }
         }
         val receiver = APKInstall.register(this, null, null)

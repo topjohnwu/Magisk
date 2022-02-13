@@ -125,7 +125,7 @@ public class DynLoad {
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), 0);
             try {
                 return newApp(pkgInfo.applicationInfo);
-            } catch (ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException | NullPointerException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
                 apk.delete();
             }
