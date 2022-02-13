@@ -8,19 +8,13 @@ import java.io.File;
 // mapping when loading from platform (via LoadedApk.mClassLoader)
 class InjectedClassLoader extends ClassLoader {
 
-    private static final String PKEY = "PHOENIX";
-    static final String PHOENIX = Mapping.inverseMap.get(PKEY);
-
     InjectedClassLoader(File apk) {
         super(new DynamicClassLoader(apk));
     }
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        String n = Mapping.get(name);
-        if (n.equals(PKEY))
-            return PhoenixActivity.class;
-        return super.loadClass(n, resolve);
+        return super.loadClass(Mapping.get(name), resolve);
     }
 }
 

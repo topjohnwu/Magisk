@@ -2,7 +2,9 @@ package com.topjohnwu.magisk;
 
 import static android.os.Build.VERSION.SDK_INT;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 
@@ -54,6 +56,14 @@ public class StubApk {
                 addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
             addAssetPath.invoke(asset, path);
         } catch (Exception ignored) {}
+    }
+
+    public static void restartProcess(Activity activity) {
+        Intent intent = activity.getPackageManager()
+                .getLaunchIntentForPackage(activity.getPackageName());
+        activity.finishAffinity();
+        activity.startActivity(intent);
+        Runtime.getRuntime().exit(0);
     }
 
     public static class Data {

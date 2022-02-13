@@ -109,7 +109,7 @@ public class DownloadActivity extends Activity {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
         Runnable onSuccess = () -> {
             dialog.dismiss();
-            PhoenixActivity.rebirth(this, InjectedClassLoader.PHOENIX);
+            StubApk.restartProcess(this);
             finish();
         };
         // Download and upgrade the app

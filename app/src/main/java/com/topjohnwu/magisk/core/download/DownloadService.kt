@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
-import com.topjohnwu.magisk.PhoenixActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
@@ -103,8 +102,13 @@ class DownloadService : NotificationService() {
                     apk.delete()
                     patched.renameTo(apk)
                 } else {
-                    val clz = Info.stub!!.classToComponent["PHOENIX"]!!
-                    PhoenixActivity.rebirth(this, clz)
+                    ActivityTracker.foreground?.let {
+                        // Relaunch the process if we are foreground
+                        StubApk.restartProcess(it)
+                    } ?: run {
+                        // Or else simply kill the current process
+                        Runtime.getRuntime().exit(0)
+                    }
                     return
                 }
             } catch (e: Exception) {
