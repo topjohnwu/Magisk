@@ -75,11 +75,6 @@ class DownloadService : NotificationService() {
         }
     }
 
-    private fun APKInstall.Session.open(): OutputStream {
-        Config.showUpdateDone = true
-        return openStream(this@DownloadService)
-    }
-
     private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
         fun writeTee(output: OutputStream) {
             val uri =  MediaStoreUtils.getFile("${subject.title}.apk").uri
@@ -115,7 +110,7 @@ class DownloadService : NotificationService() {
 
                     // Install
                     val session = APKInstall.startSession(this)
-                    patched.inputStream().copyAndClose(session.open())
+                    patched.inputStream().copyAndClose(session.openStream(this))
                     subject.intent = session.waitIntent()
 
                     patched.delete()
@@ -137,7 +132,7 @@ class DownloadService : NotificationService() {
             }
         } else {
             val session = APKInstall.startSession(this)
-            writeTee(session.open())
+            writeTee(session.openStream(this))
             subject.intent = session.waitIntent()
         }
     }

@@ -51,7 +51,6 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
-        Config.showUpdateDone = false
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 

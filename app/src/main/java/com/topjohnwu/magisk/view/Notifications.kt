@@ -52,6 +52,7 @@ object Notifications {
 
     @SuppressLint("InlinedApi")
     fun updateDone(context: Context) {
+        setup(context)
         val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val pending = PendingIntent.getActivity(context, 0, selfLaunchIntent(context), flag)
         val builder = if (SDK_INT >= 26) {
