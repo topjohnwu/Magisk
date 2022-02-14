@@ -187,10 +187,13 @@
 
     <!--Notifications-->
     <string name="update_channel">Përditësimet e magisk</string>
+    <string name="updated_channel">Përditësimi përfundoi</string>
     <string name="progress_channel">Njoftimet e progresit</string>
     <string name="download_complete">Shkarkimi përfundoi</string>
     <string name="download_file_error">Gabim në shkarkimin e skedarit</string>
     <string name="magisk_update_title">Përditësimi Magisk i disponueshëm!</string>
+    <string name="updated_title">Magisk u përditësua</string>
+    <string name="updated_text">Prekni për të hapur aplikacionin</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Po</string>
@@ -223,6 +226,7 @@
     <string name="unsupport_nonroot_stub_msg">Aplikacioni nuk mund të vazhdojë të punojë në gjendjen e fshehur pasi rrënja ishte e humbur. Ju lutemi rivendoseni përsëri në APK-në origjinale.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jepni lejen e ruajtjes për të aktivizuar këtë funksion</string>
+    <string name="install_unknown_denied">Lejo "instaloni aplikacione të panjohura" për të aktivizuar këtë funksion</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin bazë</string>
     <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për tu njohur.  Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
