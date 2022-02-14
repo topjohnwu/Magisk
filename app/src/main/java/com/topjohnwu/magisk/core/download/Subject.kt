@@ -32,7 +32,8 @@ sealed class Subject : Parcelable {
     abstract val file: Uri
     abstract val title: String
     abstract val notifyId: Int
-    open val autoStart: Boolean get() = true
+    open val autoLaunch: Boolean get() = true
+    open val postDownload: (() -> Unit)? get() = null
 
     abstract fun pendingIntent(context: Context): PendingIntent?
 
@@ -44,7 +45,7 @@ sealed class Subject : Parcelable {
     ) : Subject() {
         override val url: String get() = module.zipUrl
         override val title: String get() = module.downloadFilename
-        override val autoStart: Boolean get() = action == Action.Flash
+        override val autoLaunch: Boolean get() = action == Action.Flash
 
         @IgnoredOnParcel
         override val file by lazy {
@@ -70,10 +71,10 @@ sealed class Subject : Parcelable {
         }
 
         @IgnoredOnParcel
+        override var postDownload: (() -> Unit)? = null
+
+        @IgnoredOnParcel
         var intent: Intent? = null
-
-        val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
-
         override fun pendingIntent(context: Context) = intent?.toPending(context)
     }
 

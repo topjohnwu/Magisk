@@ -13,12 +13,14 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ktx.copyAndClose
 import com.topjohnwu.magisk.ktx.forEach
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.utils.APKInstall
+import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -57,12 +59,13 @@ class DownloadService : NotificationService() {
                     is Subject.Module -> handleModule(stream, subject.file)
                 }
                 val activity = ActivityTracker.foreground
-                if (activity != null && subject.autoStart) {
+                if (activity != null && subject.autoLaunch) {
                     remove(subject.notifyId)
                     subject.pendingIntent(activity)?.send()
                 } else {
                     notifyFinish(subject)
                 }
+                subject.postDownload?.invoke()
                 if (!hasNotifications)
                     stopSelf()
             } catch (e: Exception) {
@@ -79,7 +82,8 @@ class DownloadService : NotificationService() {
 
     private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
         fun writeTee(output: OutputStream) {
-            val external = subject.externalFile.outputStream()
+            val uri =  MediaStoreUtils.getFile("${subject.title}.apk").uri
+            val external = uri.outputStream()
             stream.copyAndClose(TeeOutputStream(external, output))
         }
 
@@ -120,8 +124,9 @@ class DownloadService : NotificationService() {
                         // Relaunch the process if we are foreground
                         StubApk.restartProcess(it)
                     } ?: run {
-                        // Or else simply kill the current process
-                        Runtime.getRuntime().exit(0)
+                        // Or else kill the current process after posting notification
+                        subject.intent = Notifications.selfLaunchIntent(this)
+                        subject.postDownload = { Runtime.getRuntime().exit(0) }
                     }
                     return
                 }

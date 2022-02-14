@@ -43,13 +43,17 @@ object Notifications {
         }
     }
 
+    fun selfLaunchIntent(context: Context): Intent {
+        val pm = context.packageManager
+        val intent = pm.getLaunchIntentForPackage(context.packageName)!!
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        return intent
+    }
+
     @SuppressLint("InlinedApi")
     fun updateDone(context: Context) {
-        val pm = context.packageManager
-        val intent = pm.getLaunchIntentForPackage(context.packageName) ?: return
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        val pending = PendingIntent.getActivity(context, 0, intent, flag)
+        val pending = PendingIntent.getActivity(context, 0, selfLaunchIntent(context), flag)
         val builder = if (SDK_INT >= 26) {
             Notification.Builder(context, UPDATED_CHANNEL)
                 .setSmallIcon(context.getBitmap(R.drawable.ic_magisk_outline).toIcon())

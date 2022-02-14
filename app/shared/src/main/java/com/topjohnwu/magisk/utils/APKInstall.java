@@ -56,8 +56,11 @@ public final class APKInstall {
     }
 
     public interface Session {
+        // @WorkerThread
         OutputStream openStream(Context context) throws IOException;
+        // @WorkerThread
         void install(Context context, File apk) throws IOException;
+        // @WorkerThread @Nullable
         Intent waitIntent();
     }
 
@@ -106,11 +109,10 @@ public final class APKInstall {
             context.getApplicationContext().unregisterReceiver(this);
         }
 
-        // @WorkerThread @Nullable
         @Override
         public Intent waitIntent() {
             try {
-                //noinspection ResultOfMethodCallIgnored
+                // noinspection ResultOfMethodCallIgnored
                 latch.await(5, TimeUnit.SECONDS);
             } catch (Exception ignored) {}
             return userAction;
