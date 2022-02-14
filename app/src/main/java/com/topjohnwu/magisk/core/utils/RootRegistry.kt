@@ -12,11 +12,7 @@ import kotlin.system.exitProcess
 
 class RootRegistry(stub: Any?) : RootService() {
 
-    constructor() : this(null)
-
-    private val className: String? = stub?.javaClass?.name
-
-    init {
+    constructor() : this(null) {
         // Always log full stack trace with Timber
         Timber.plant(Timber.DebugTree())
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -24,6 +20,8 @@ class RootRegistry(stub: Any?) : RootService() {
             exitProcess(1)
         }
     }
+
+    private val className: String? = stub?.javaClass?.name
 
     override fun onBind(intent: Intent): IBinder {
         // TODO: PLACEHOLDER
