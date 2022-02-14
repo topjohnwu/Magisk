@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.utils;
 
+import static android.content.pm.PackageInstaller.EXTRA_SESSION_ID;
 import static android.content.pm.PackageInstaller.EXTRA_STATUS;
 import static android.content.pm.PackageInstaller.STATUS_FAILURE_INVALID;
 import static android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION;
@@ -98,6 +99,15 @@ public final class APKInstall {
                             onSuccess(context);
                         }
                         break;
+                    default:
+                        int id = intent.getIntExtra(EXTRA_SESSION_ID, 0);
+                        if (id > 0) {
+                            var installer = context.getPackageManager().getPackageInstaller();
+                            var info = installer.getSessionInfo(id);
+                            if (info != null) {
+                                installer.abandonSession(info.getSessionId());
+                            }
+                        }
                 }
                 latch.countDown();
             }
