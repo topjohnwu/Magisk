@@ -116,28 +116,24 @@ public class DownloadActivity extends Activity {
 
     private void dlAPK() {
         dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
-        Runnable onSuccess = () -> {
-            dialog.dismiss();
-            StubApk.restartProcess(this);
-            finish();
-        };
         // Download and upgrade the app
-        File apk = dynLoad ? StubApk.current(this) : new File(getCacheDir(), "manager.apk");
-        request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR).getAsFile(apk, file -> {
-            if (dynLoad) {
-                runOnUiThread(onSuccess);
-            } else {
+        var request = request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (dynLoad) {
+            request.getAsFile(StubApk.current(this), file -> StubApk.restartProcess(this));
+        } else {
+            request.getAsInputStream(input -> {
                 var session = APKInstall.startSession(this);
-                try {
-                    session.install(this, file);
-                    Intent intent = session.waitIntent();
-                    if (intent != null)
-                        startActivity(intent);
+                try (input; var out = session.openStream(this)) {
+                    if (out != null)
+                        APKInstall.transfer(input, out);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    error(e);
                 }
-            }
-        });
+                Intent intent = session.waitIntent();
+                if (intent != null)
+                    startActivity(intent);
+            });
+        }
     }
 
     private void loadResources() {
