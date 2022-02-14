@@ -94,6 +94,10 @@ public class Request implements Closeable {
         return exec(this::getInputStream);
     }
 
+    public void getAsInputStream(ResponseListener<InputStream> rs) {
+        submit(this::getInputStream, rs);
+    }
+
     public void getAsFile(File out, ResponseListener<File> rs) {
         submit(() -> dlFile(out), rs);
     }
