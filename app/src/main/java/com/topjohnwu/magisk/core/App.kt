@@ -9,6 +9,7 @@ import android.os.Bundle
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
@@ -94,10 +95,12 @@ object ActivityTracker : Application.ActivityLifecycleCallbacks {
     val hasForeground get() = foreground != null
 
     override fun onActivityResumed(activity: Activity) {
+        if (activity is SuRequestActivity) return
         foreground = activity
     }
 
     override fun onActivityPaused(activity: Activity) {
+        if (activity is SuRequestActivity) return
         foreground = null
     }
 
