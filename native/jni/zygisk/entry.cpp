@@ -330,24 +330,21 @@ static void get_process_info(int client, const sock_cred *cred) {
     // This function is called on every single zygote process specialization,
     // so performance is critical. get_manager_app_id() is expensive as it goes
     // through a SQLite query and potentially multiple filesystem stats, so we
-    // really want to cache the app ID value. inotify will invalidate the app ID
-    // cache for us.
+    // really want to cache its app ID value.
 
+    if (is_deny_target(uid, process)) {
+        flags |= PROCESS_ON_DENYLIST;
+    }
     int manager_app_id = cached_manager_app_id;
-
     if (manager_app_id < 0) {
         manager_app_id = get_manager_app_id();
         cached_manager_app_id = manager_app_id;
     }
-
     if (to_app_id(uid) == manager_app_id) {
         flags |= PROCESS_IS_MAGISK_APP;
     }
     if (denylist_enforced) {
         flags |= DENYLIST_ENFORCING;
-    }
-    if (is_deny_target(uid, process)) {
-        flags |= PROCESS_ON_DENYLIST;
     }
     if (uid_granted_root(uid)) {
         flags |= PROCESS_GRANTED_ROOT;

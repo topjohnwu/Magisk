@@ -14,23 +14,8 @@
 
 using namespace std;
 
-#define FIRST_APP_UID 10000
-
-struct app_id_bitset : public dynamic_bitset_impl {
-    slot_bits::reference operator[] (size_t pos) {
-        return pos < FIRST_APP_UID ? get(0) : get(pos - FIRST_APP_UID);
-    }
-    bool operator[] (size_t pos) const {
-        return pos < FIRST_APP_UID || get(pos - FIRST_APP_UID);
-    }
-};
-
 // For the following data structures:
 // If package name == ISOLATED_MAGIC, or app ID == -1, it means isolated service
-
-// List of all discovered app IDs
-static unique_ptr<app_id_bitset> app_ids_seen_;
-#define app_ids_seen (*app_ids_seen_)
 
 // Package name -> list of process names
 static unique_ptr<map<string, set<string, StringCmp>, StringCmp>> pkg_to_procs_;
@@ -47,9 +32,24 @@ atomic<bool> denylist_enforced = false;
 
 #define do_kill (zygisk_enabled && denylist_enforced)
 
+static unsigned long long pkg_xml_ino = 0;
+
 static void rescan_apps() {
+    {
+        struct stat st{};
+        stat("/data/system/packages.xml", &st);
+        if (pkg_xml_ino == st.st_ino) {
+            // Packages has not changed, do not rescan
+            return;
+        }
+        pkg_xml_ino = st.st_ino;
+    }
+
     LOGD("denylist: rescanning apps\n");
+
     app_id_to_pkgs.clear();
+    cached_manager_app_id = -1;
+
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
         return;
@@ -67,7 +67,6 @@ static void rescan_apps() {
                     // This app ID has been handled
                     continue;
                 }
-                app_ids_seen[app_id] = true;
                 if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
                     app_id_to_pkgs[app_id].insert(it->first);
                 }
@@ -99,7 +98,6 @@ static void update_pkg_uid(const string &pkg, bool remove) {
                 }
             } else {
                 app_id_to_pkgs[app_id].insert(pkg);
-                app_ids_seen[app_id] = true;
             }
             break;
         }
@@ -201,13 +199,12 @@ static auto add_hide_set(const char *pkg, const char *proc) {
 }
 
 static void clear_data() {
-    app_ids_seen_.reset(nullptr);
     pkg_to_procs_.reset(nullptr);
     app_id_to_pkgs_.reset(nullptr);
 }
 
 static bool ensure_data() {
-    if (app_ids_seen_)
+    if (pkg_to_procs_)
         return true;
 
     LOGI("denylist: initializing internal data structures\n");
@@ -219,7 +216,6 @@ static bool ensure_data() {
     });
     db_err_cmd(err, goto error)
 
-    default_new(app_ids_seen_);
     default_new(app_id_to_pkgs_);
     rescan_apps();
 
@@ -404,6 +400,8 @@ bool is_deny_target(int uid, string_view process) {
     if (!ensure_data())
         return false;
 
+    rescan_apps();
+
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {
         if (auto it = pkg_to_procs.find(ISOLATED_MAGIC); it != pkg_to_procs.end()) {
@@ -414,12 +412,6 @@ bool is_deny_target(int uid, string_view process) {
         }
         return false;
     } else {
-        if (!app_ids_seen[app_id]) {
-            // Found new app ID
-            cached_manager_app_id = -1;
-            rescan_apps();
-        }
-
         auto it = app_id_to_pkgs.find(app_id);
         if (it == app_id_to_pkgs.end())
             return false;
