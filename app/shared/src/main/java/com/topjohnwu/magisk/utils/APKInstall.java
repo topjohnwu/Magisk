@@ -10,11 +10,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInstaller.Session;
 import android.content.pm.PackageInstaller.SessionParams;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,51 +29,6 @@ import io.michaelrocks.paranoid.Obfuscate;
 @Obfuscate
 public final class APKInstall {
 
-    private static final String ACTION_SESSION_UPDATE = "ACTION_SESSION_UPDATE";
-
-    // @WorkerThread
-    public static void install(Context context, File apk) {
-        try (var src = new FileInputStream(apk);
-             var out = openStream(context)) {
-            if (out != null)
-                transfer(src, out);
-        } catch (IOException e) {
-            Log.e(APKInstall.class.getSimpleName(), "", e);
-        }
-    }
-
-    public static OutputStream openStream(Context context) {
-        //noinspection InlinedApi
-        var flag = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE;
-        var intent = new Intent(ACTION_SESSION_UPDATE).setPackage(context.getPackageName());
-        var pending = PendingIntent.getBroadcast(context, 0, intent, flag);
-
-        var installer = context.getPackageManager().getPackageInstaller();
-        var params = new SessionParams(SessionParams.MODE_FULL_INSTALL);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            params.setRequireUserAction(SessionParams.USER_ACTION_NOT_REQUIRED);
-        }
-        try {
-            Session session = installer.openSession(installer.createSession(params));
-            var out = session.openWrite(UUID.randomUUID().toString(), 0, -1);
-            return new FilterOutputStream(out) {
-                @Override
-                public void write(byte[] b, int off, int len) throws IOException {
-                    out.write(b, off, len);
-                }
-                @Override
-                public void close() throws IOException {
-                    super.close();
-                    session.commit(pending.getIntentSender());
-                    session.close();
-                }
-            };
-        } catch (IOException e) {
-            Log.e(APKInstall.class.getSimpleName(), "", e);
-        }
-        return null;
-    }
-
     public static void transfer(InputStream in, OutputStream out) throws IOException {
         int size = 8192;
         var buffer = new byte[size];
@@ -85,20 +38,36 @@ public final class APKInstall {
         }
     }
 
-    public static InstallReceiver register(Context context, String packageName, Runnable onSuccess) {
-        var receiver = new InstallReceiver(packageName, onSuccess);
-        var filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
-        filter.addDataScheme("package");
-        context.registerReceiver(receiver, filter);
-        context.registerReceiver(receiver, new IntentFilter(ACTION_SESSION_UPDATE));
+    public static Session startSession(Context context) {
+        return startSession(context, null, null);
+    }
+
+    public static Session startSession(Context context, String pkg, Runnable onSuccess) {
+        var receiver = new InstallReceiver(pkg, onSuccess);
+        context = context.getApplicationContext();
+        if (pkg != null) {
+            // If pkg is not null, look for package added event
+            var filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
+            filter.addDataScheme("package");
+            context.registerReceiver(receiver, filter);
+        }
+        context.registerReceiver(receiver, new IntentFilter(receiver.sessionId));
         return receiver;
     }
 
-    public static class InstallReceiver extends BroadcastReceiver {
+    public interface Session {
+        OutputStream openStream(Context context) throws IOException;
+        void install(Context context, File apk) throws IOException;
+        Intent waitIntent();
+    }
+
+    private static class InstallReceiver extends BroadcastReceiver implements Session {
         private final String packageName;
         private final Runnable onSuccess;
         private final CountDownLatch latch = new CountDownLatch(1);
         private Intent userAction = null;
+
+        final String sessionId = UUID.randomUUID().toString();
 
         private InstallReceiver(String packageName, Runnable onSuccess) {
             this.packageName = packageName;
@@ -113,33 +82,74 @@ public final class APKInstall {
                     return;
                 String pkg = data.getSchemeSpecificPart();
                 if (pkg.equals(packageName)) {
-                    if (onSuccess != null)
-                        onSuccess.run();
-                    context.unregisterReceiver(this);
+                    onSuccess(context);
                 }
-                return;
+            } else if (sessionId.equals(intent.getAction())) {
+                int status = intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE_INVALID);
+                switch (status) {
+                    case STATUS_PENDING_USER_ACTION:
+                        userAction = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+                        break;
+                    case STATUS_SUCCESS:
+                        if (packageName == null) {
+                            onSuccess(context);
+                        }
+                        break;
+                }
+                latch.countDown();
             }
-            int status = intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE_INVALID);
-            switch (status) {
-                case STATUS_PENDING_USER_ACTION:
-                    userAction = intent.getParcelableExtra(Intent.EXTRA_INTENT);
-                    break;
-                case STATUS_SUCCESS:
-                    if (onSuccess != null)
-                        onSuccess.run();
-                default:
-                    context.unregisterReceiver(this);
-            }
-            latch.countDown();
+        }
+
+        private void onSuccess(Context context) {
+            if (onSuccess != null)
+                onSuccess.run();
+            context.getApplicationContext().unregisterReceiver(this);
         }
 
         // @WorkerThread @Nullable
+        @Override
         public Intent waitIntent() {
             try {
                 //noinspection ResultOfMethodCallIgnored
                 latch.await(5, TimeUnit.SECONDS);
             } catch (Exception ignored) {}
             return userAction;
+        }
+
+        @Override
+        public OutputStream openStream(Context context) throws IOException {
+            // noinspection InlinedApi
+            var flag = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE;
+            var intent = new Intent(sessionId).setPackage(context.getPackageName());
+            var pending = PendingIntent.getBroadcast(context, 0, intent, flag);
+
+            var installer = context.getPackageManager().getPackageInstaller();
+            var params = new SessionParams(SessionParams.MODE_FULL_INSTALL);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                params.setRequireUserAction(SessionParams.USER_ACTION_NOT_REQUIRED);
+            }
+            var session = installer.openSession(installer.createSession(params));
+            var out = session.openWrite(sessionId, 0, -1);
+            return new FilterOutputStream(out) {
+                @Override
+                public void write(byte[] b, int off, int len) throws IOException {
+                    out.write(b, off, len);
+                }
+                @Override
+                public void close() throws IOException {
+                    super.close();
+                    session.commit(pending.getIntentSender());
+                    session.close();
+                }
+            };
+        }
+
+        @Override
+        public void install(Context context, File apk) throws IOException {
+            try (var src = new FileInputStream(apk);
+                 var out = openStream(context)) {
+                transfer(src, out);
+            }
         }
     }
 }

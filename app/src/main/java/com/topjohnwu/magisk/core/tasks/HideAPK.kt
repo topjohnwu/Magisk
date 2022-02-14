@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.core.tasks
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -20,8 +21,7 @@ import com.topjohnwu.magisk.signing.SignApk
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -108,7 +108,8 @@ object HideAPK {
             Timber.e(e)
             stub.createNewFile()
             val cmd = "\$MAGISKBIN/magiskinit -x manager ${stub.path}"
-            if (!Shell.su(cmd).exec().isSuccess) return false
+            if (!Shell.su(cmd).exec().isSuccess)
+                return false
         }
 
         // Generate a new random package name and signature
@@ -120,20 +121,22 @@ object HideAPK {
             return false
 
         // Install and auto launch app
-        val receiver = APKInstall.register(activity, pkg) {
+        val session = APKInstall.startSession(activity, pkg) {
             launchApp(activity, pkg)
         }
-        val cmd = "adb_pm_install $repack ${activity.applicationInfo.uid}"
-        if (!Shell.su(cmd).exec().isSuccess) {
-            APKInstall.install(activity, repack)
-            receiver.waitIntent()?.let { activity.startActivity(it) }
+        try {
+            session.install(activity, repack)
+        } catch (e: IOException) {
+            Timber.e(e)
+            return false
         }
+        session.waitIntent()?.let { activity.startActivity(it) }
         return true
     }
 
     @Suppress("DEPRECATION")
     suspend fun hide(activity: Activity, label: String) {
-        val dialog = android.app.ProgressDialog(activity).apply {
+        val dialog = ProgressDialog(activity).apply {
             setTitle(activity.getString(R.string.hide_app_title))
             isIndeterminate = true
             setCancelable(false)
@@ -148,24 +151,28 @@ object HideAPK {
         }
     }
 
+    @DelicateCoroutinesApi
     @Suppress("DEPRECATION")
     fun restore(activity: Activity) {
-        val dialog = android.app.ProgressDialog(activity).apply {
+        val dialog = ProgressDialog(activity).apply {
             setTitle(activity.getString(R.string.restore_img_msg))
             isIndeterminate = true
             setCancelable(false)
             show()
         }
         val apk = StubApk.current(activity)
-        val receiver = APKInstall.register(activity, APPLICATION_ID) {
+        val session = APKInstall.startSession(activity, APPLICATION_ID) {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()
         }
-        val cmd = "adb_pm_install $apk ${activity.applicationInfo.uid}"
-        Shell.su(cmd).submit(Shell.EXECUTOR) { ret ->
-            if (ret.isSuccess) return@submit
-            APKInstall.install(activity, apk)
-            receiver.waitIntent()?.let { activity.startActivity(it) }
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                session.install(activity, apk)
+            } catch (e: IOException) {
+                Timber.e(e)
+                return@launch
+            }
+            session.waitIntent()?.let { activity.startActivity(it) }
         }
     }
 }

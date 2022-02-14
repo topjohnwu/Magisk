@@ -99,6 +99,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |    <intent-filter>
         |        <action android:name="android.intent.action.LOCALE_CHANGED" />
         |        <action android:name="android.intent.action.UID_REMOVED" />
+        |        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
         |    </intent-filter>
         |    <intent-filter>
         |        <action android:name="android.intent.action.PACKAGE_REPLACED" />

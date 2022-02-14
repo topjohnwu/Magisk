@@ -72,9 +72,9 @@ class DownloadService : NotificationService() {
         }
     }
 
-    private fun openApkSession(): OutputStream {
+    private fun APKInstall.Session.open(): OutputStream {
         Config.showUpdateDone = true
-        return APKInstall.openStream(this)
+        return openStream(this@DownloadService)
     }
 
     private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
@@ -110,9 +110,9 @@ class DownloadService : NotificationService() {
                     apk.delete()
 
                     // Install
-                    val receiver = APKInstall.register(this, null, null)
-                    patched.inputStream().copyAndClose(openApkSession())
-                    subject.intent = receiver.waitIntent()
+                    val session = APKInstall.startSession(this)
+                    patched.inputStream().copyAndClose(session.open())
+                    subject.intent = session.waitIntent()
 
                     patched.delete()
                 } else {
@@ -131,9 +131,9 @@ class DownloadService : NotificationService() {
                 throw e
             }
         } else {
-            val receiver = APKInstall.register(this, null, null)
-            writeTee(openApkSession())
-            subject.intent = receiver.waitIntent()
+            val session = APKInstall.startSession(this)
+            writeTee(session.open())
+            subject.intent = session.waitIntent()
         }
     }
 

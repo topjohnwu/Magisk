@@ -26,6 +26,7 @@ import org.json.JSONException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -126,10 +127,15 @@ public class DownloadActivity extends Activity {
             if (dynLoad) {
                 runOnUiThread(onSuccess);
             } else {
-                var receiver = APKInstall.register(this, BuildConfig.APPLICATION_ID, onSuccess);
-                APKInstall.install(this, file);
-                Intent intent = receiver.waitIntent();
-                if (intent != null) startActivity(intent);
+                var session = APKInstall.startSession(this);
+                try {
+                    session.install(this, file);
+                    Intent intent = session.waitIntent();
+                    if (intent != null)
+                        startActivity(intent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
