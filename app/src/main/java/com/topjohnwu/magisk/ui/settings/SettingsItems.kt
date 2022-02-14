@@ -122,6 +122,7 @@ object Restore : BaseSettingsItem.Blank() {
                     text = android.R.string.cancel
                 }
                 setCancelable(true)
+                show()
             }
         }
     }
