@@ -123,7 +123,11 @@ class HomeViewModel(
     fun onDeletePressed() = UninstallDialog().publish()
 
     fun onManagerPressed() = when (state) {
-        State.LOADED -> withExternalRW { ManagerInstallDialog().publish() }
+        State.LOADED -> withExternalRW {
+            withInstallPermission {
+                ManagerInstallDialog().publish()
+            }
+        }
         State.LOADING -> SnackbarEvent(R.string.loading).publish()
         else -> SnackbarEvent(R.string.no_connection).publish()
     }

@@ -10,6 +10,7 @@ import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
@@ -73,6 +74,13 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
     fun setAccessibilityDelegate(delegate: View.AccessibilityDelegate?) {
         binding.root.rootView.accessibilityDelegate = delegate
     }
+
+    fun showSnackbar(
+        message: CharSequence,
+        length: Int = Snackbar.LENGTH_SHORT,
+        builder: Snackbar.() -> Unit = {}
+    ) = Snackbar.make(snackbarView, message, length)
+        .setAnchorView(snackbarAnchorView).apply(builder).show()
 
     override fun onResume() {
         super.onResume()

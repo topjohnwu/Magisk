@@ -1,32 +1,33 @@
 package com.topjohnwu.magisk.arch
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
+import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContract
+import android.widget.Toast
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.JobService
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
+import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
-import java.util.concurrent.CountDownLatch
+import kotlinx.coroutines.launch
 
 abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
 
     companion object {
         private var doPreload = true
     }
-
-    private val latch = CountDownLatch(1)
-    private val uninstallPkg = registerForActivityResult(UninstallPackage) { latch.countDown() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(Theme.selected.themeRes)
@@ -67,18 +68,28 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
 
     abstract fun showMainUI(savedInstanceState: Bundle?)
 
-    private fun showInvalidStateMessage() {
-        runOnUiThread {
-            MagiskDialog(this).apply {
-                setTitle(R.string.unsupport_nonroot_stub_title)
-                setMessage(R.string.unsupport_nonroot_stub_msg)
-                setButton(MagiskDialog.ButtonType.POSITIVE) {
-                    text = R.string.install
-                    onClick { HideAPK.restore(this@BaseMainActivity) }
+    @SuppressLint("InlinedApi")
+    private fun showInvalidStateMessage(): Unit = runOnUiThread {
+        MagiskDialog(this).apply {
+            setTitle(R.string.unsupport_nonroot_stub_title)
+            setMessage(R.string.unsupport_nonroot_stub_msg)
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = R.string.install
+                onClick {
+                    withPermission(REQUEST_INSTALL_PACKAGES) {
+                        if (!it) {
+                            Utils.toast(R.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                            showInvalidStateMessage()
+                        } else {
+                            lifecycleScope.launch {
+                                HideAPK.restore(this@BaseMainActivity)
+                            }
+                        }
+                    }
                 }
-                setCancelable(false)
-                show()
             }
+            setCancelable(false)
+            show()
         }
     }
 
@@ -107,23 +118,10 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
                 Config.suManager = ""
             pkg ?: return
             if (!Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess) {
-                uninstallPkg.launch(pkg)
-                // Wait for the uninstallation to finish
-                latch.await()
+                // Uninstall through Android API
+                uninstallAndWait(pkg)
             }
         }
     }
 
-    object UninstallPackage : ActivityResultContract<String, Boolean>() {
-
-        @Suppress("DEPRECATION")
-        override fun createIntent(context: Context, input: String): Intent {
-            val uri = Uri.Builder().scheme("package").opaquePart(input).build()
-            val intent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, uri)
-            intent.putExtra(Intent.EXTRA_RETURN_RESULT, true)
-            return intent
-        }
-
-        override fun parseResult(resultCode: Int, intent: Intent?) = resultCode == RESULT_OK
-    }
 }

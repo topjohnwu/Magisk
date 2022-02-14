@@ -25,6 +25,7 @@ import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
+import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -105,6 +106,25 @@ object Hide : BaseSettingsItem.Input() {
 object Restore : BaseSettingsItem.Blank() {
     override val title = R.string.settings_restore_app_title.asText()
     override val description = R.string.settings_restore_app_summary.asText()
+
+    override fun onPressed(view: View, handler: Handler) {
+        handler.onItemPressed(view, this) {
+            MagiskDialog(view.context).apply {
+                setTitle(R.string.settings_restore_app_title)
+                setMessage(R.string.restore_app_confirmation)
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = android.R.string.ok
+                    onClick {
+                        handler.onItemAction(view, this@Restore)
+                    }
+                }
+                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    text = android.R.string.cancel
+                }
+                setCancelable(true)
+            }
+        }
+    }
 }
 
 object AddShortcut : BaseSettingsItem.Blank() {

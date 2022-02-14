@@ -21,7 +21,8 @@ import com.topjohnwu.magisk.signing.SignApk
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -151,9 +152,8 @@ object HideAPK {
         }
     }
 
-    @DelicateCoroutinesApi
     @Suppress("DEPRECATION")
-    fun restore(activity: Activity) {
+    suspend fun restore(activity: Activity) {
         val dialog = ProgressDialog(activity).apply {
             setTitle(activity.getString(R.string.restore_img_msg))
             isIndeterminate = true
@@ -165,12 +165,12 @@ object HideAPK {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()
         }
-        GlobalScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             try {
                 session.install(activity, apk)
             } catch (e: IOException) {
                 Timber.e(e)
-                return@launch
+                return@withContext
             }
             session.waitIntent()?.let { activity.startActivity(it) }
         }

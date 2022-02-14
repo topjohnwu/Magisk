@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.arch
 
-import android.Manifest
+import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.annotation.SuppressLint
 import androidx.annotation.CallSuper
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
@@ -78,9 +80,20 @@ abstract class BaseViewModel(
     }
 
     inline fun withExternalRW(crossinline callback: () -> Unit) {
-        withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+        withPermission(WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()
+            } else {
+                callback()
+            }
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    inline fun withInstallPermission(crossinline callback: () -> Unit) {
+        withPermission(REQUEST_INSTALL_PACKAGES) {
+            if (!it) {
+                SnackbarEvent(R.string.install_unknown_denied).publish()
             } else {
                 callback()
             }

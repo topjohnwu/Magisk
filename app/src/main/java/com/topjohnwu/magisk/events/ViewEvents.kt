@@ -5,12 +5,16 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.navigation.NavDirections
+import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.Shortcuts
 
 class PermissionEvent(
@@ -67,7 +71,7 @@ class NavigationEvent(
 ) : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
         (activity as? NavigationActivity<*>)?.apply {
-            if (pop) navigation?.popBackStack()
+            if (pop) navigation.popBackStack()
             directions.navigate()
         }
     }
@@ -90,5 +94,28 @@ class SelectModuleEvent : ViewEvent(), FragmentExecutor {
         } catch (e: ActivityNotFoundException) {
             Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
         }
+    }
+}
+
+class SnackbarEvent(
+    private val msg: TextHolder,
+    private val length: Int = Snackbar.LENGTH_SHORT,
+    private val builder: Snackbar.() -> Unit = {}
+) : ViewEvent(), ActivityExecutor {
+
+    constructor(
+        @StringRes res: Int,
+        length: Int = Snackbar.LENGTH_SHORT,
+        builder: Snackbar.() -> Unit = {}
+    ) : this(res.asText(), length, builder)
+
+    constructor(
+        msg: String,
+        length: Int = Snackbar.LENGTH_SHORT,
+        builder: Snackbar.() -> Unit = {}
+    ) : this(msg.asText(), length, builder)
+
+    override fun invoke(activity: UIActivity<*>) {
+        activity.showSnackbar(msg.getText(activity.resources), length, builder)
     }
 }
