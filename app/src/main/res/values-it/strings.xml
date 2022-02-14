@@ -186,11 +186,14 @@
     <string name="isolate_summary">Ogni sessione di root avrà il suo namespace isolato</string>
 
     <!--Notifications-->
-    <string name="update_channel">Aggiornamenti Magisk</string>
+    <string name="update_channel">Aggiornamenti di Magisk</string>
     <string name="progress_channel">Notifiche di avanzamento</string>
+    <string name="updated_channel">Aggiornamento completato</string>
     <string name="download_complete">Download completato</string>
     <string name="download_file_error">Errore durante il download del file</string>
     <string name="magisk_update_title">È disponibile un aggiornamento di Magisk!</string>
+    <string name="updated_title">Magisk è stato aggiornato</string>
+    <string name="updated_text">Tocca per aprire l\'app</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Sì</string>
@@ -223,6 +226,7 @@
     <string name="unsupport_nonroot_stub_msg">Dal momento che i permessi di root sono stati persi, l\'app di Magisk nascosta non può più funzionare. Ripristina l\'APK originale.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
+    <string name="install_unknown_denied">Consenti l\'installazione di app sconosciute per abilitare questa funzionalità</string>
     <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
     <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
     <string name="app_not_found">Non è stata trovata un\'app per gestire questa azione</string>
