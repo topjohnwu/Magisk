@@ -61,7 +61,6 @@ object Config : PreferenceModel, DBConfig {
         const val BOOT_ID = "boot_id"
         const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
-        const val SHOW_UPDATE_DONE = "update_done"
     }
 
     object Value {
@@ -134,7 +133,6 @@ object Config : PreferenceModel, DBConfig {
     var suTapjack by preference(Key.SU_TAPJACK, true)
     var checkUpdate by preference(Key.CHECK_UPDATES, true)
     var doh by preference(Key.DOH, false)
-    var showUpdateDone by preference(Key.SHOW_UPDATE_DONE, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
