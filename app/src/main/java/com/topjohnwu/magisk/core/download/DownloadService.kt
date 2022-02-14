@@ -11,10 +11,7 @@ import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.ActivityTracker
-import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.intent
-import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.ktx.copyAndClose
@@ -75,32 +72,49 @@ class DownloadService : NotificationService() {
         }
     }
 
+    private fun openApkSession(): OutputStream {
+        Config.showUpdateDone = true
+        return APKInstall.openStream(this)
+    }
+
     private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
-        fun write(output: OutputStream) {
+        fun writeTee(output: OutputStream) {
             val external = subject.externalFile.outputStream()
             stream.copyAndClose(TeeOutputStream(external, output))
         }
 
         if (isRunningAsStub) {
-            val apk = subject.file.toFile()
-            val id = subject.notifyId
+            val updateApk = StubApk.update(this)
             try {
-                write(StubApk.update(this).outputStream())
+                // Download full APK to stub update path
+                writeTee(updateApk.outputStream())
+
                 if (Info.stub!!.version < subject.stub.versionCode) {
                     // Also upgrade stub
-                    update(id) {
+                    update(subject.notifyId) {
                         it.setProgress(0, 0, true)
                             .setContentTitle(getString(R.string.hide_app_title))
                             .setContentText("")
                     }
+
+                    // Download
+                    val apk = subject.file.toFile()
                     service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
+
+                    // Patch
                     val patched = File(apk.parent, "patched.apk")
                     val label = applicationInfo.nonLocalizedLabel
                     if (!HideAPK.patch(this, apk, patched, packageName, label)) {
                         throw IOException("HideAPK patch error")
                     }
                     apk.delete()
-                    patched.renameTo(apk)
+
+                    // Install
+                    val receiver = APKInstall.register(this, null, null)
+                    patched.inputStream().copyAndClose(openApkSession())
+                    subject.intent = receiver.waitIntent()
+
+                    patched.delete()
                 } else {
                     ActivityTracker.foreground?.let {
                         // Relaunch the process if we are foreground
@@ -112,12 +126,15 @@ class DownloadService : NotificationService() {
                     return
                 }
             } catch (e: Exception) {
-                StubApk.update(this).delete()
+                // If any error occurred, do not let stub load the new APK
+                updateApk.delete()
+                throw e
             }
+        } else {
+            val receiver = APKInstall.register(this, null, null)
+            writeTee(openApkSession())
+            subject.intent = receiver.waitIntent()
         }
-        val receiver = APKInstall.register(this, null, null)
-        write(APKInstall.openStream(this, false))
-        subject.intent = receiver.waitIntent()
     }
 
     private fun handleModule(src: InputStream, file: Uri) {

@@ -5,6 +5,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
 import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
@@ -45,6 +46,12 @@ open class Receiver : BaseReceiver() {
                 getPkg(intent)?.let { Shell.su("magisk --denylist rm $it").submit() }
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                if (Config.showUpdateDone) {
+                    Notifications.updateDone(context)
+                    Config.showUpdateDone = false
+                }
+            }
         }
     }
 }

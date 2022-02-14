@@ -190,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
+    <string name="updated_channel">Update Complete</string>
     <string name="download_complete">Download complete</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
+    <string name="updated_title">Magisk Updated</string>
+    <string name="updated_text">Tap to open app</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Yes</string>

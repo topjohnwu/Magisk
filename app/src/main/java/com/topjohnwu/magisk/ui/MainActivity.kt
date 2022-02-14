@@ -15,7 +15,10 @@ import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
@@ -48,10 +51,11 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
+        Config.showUpdateDone = false
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-        navigation?.addOnDestinationChangedListener { _, destination, _ ->
+        navigation.addOnDestinationChangedListener { _, destination, _ ->
             isRootFragment = when (destination.id) {
                 R.id.homeFragment,
                 R.id.modulesFragment,

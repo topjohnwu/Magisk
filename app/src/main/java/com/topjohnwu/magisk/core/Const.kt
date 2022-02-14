@@ -37,8 +37,6 @@ object Const {
 
     object ID {
         const val JOB_SERVICE_ID = 7
-        const val UPDATE_NOTIFICATION_CHANNEL = "update"
-        const val PROGRESS_NOTIFICATION_CHANNEL = "progress"
     }
 
     object Url {
