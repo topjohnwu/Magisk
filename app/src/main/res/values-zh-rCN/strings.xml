@@ -23,7 +23,7 @@
     <string name="home_notice_content">仅从官方 GitHub 页面下载 Magisk。未知来源的文件可能具有恶意行为！</string>
     <string name="home_support_title">支持开发</string>
     <string name="home_item_source">源代码</string>
-    <string name="home_support_content">Magisk 将一直保持自由且开源，向开发者捐赠以表示支持。</string>
+    <string name="home_support_content">Magisk 将一直保持免费且开源，向开发者捐赠以表示支持。</string>
     <string name="home_installed_version">当前</string>
     <string name="home_latest_version">最新</string>
     <string name="invalid_update_channel">无效的更新通道</string>
@@ -190,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">更新提示</string>
     <string name="progress_channel">下载进度</string>
+    <string name="updated_channel">更新完成</string>
     <string name="download_complete">下载完成</string>
     <string name="download_file_error">下载失败</string>
     <string name="magisk_update_title">Magisk 已发布新版本！</string>
+    <string name="updated_title">Magisk 已完成更新</string>
+    <string name="updated_text">点按即可打开应用</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">是</string>
@@ -225,6 +228,7 @@
     <string name="unsupport_nonroot_stub_msg">超级用户权限丢失，应用无法在隐藏状态下继续工作，请恢复到原始 Magisk 应用。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
+    <string name="install_unknown_denied">允许安装未知应用以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
     <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
     <string name="app_not_found">找不到可处理此操作的应用</string>
