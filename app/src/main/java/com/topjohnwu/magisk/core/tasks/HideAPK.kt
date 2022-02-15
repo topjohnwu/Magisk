@@ -33,7 +33,6 @@ object HideAPK {
 
     private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
     private const val ALPHADOTS = "$ALPHA....."
-    private const val APP_NAME = "Magisk"
     private const val ANDROID_MANIFEST = "AndroidManifest.xml"
 
     // Some arbitrary limit
@@ -69,12 +68,14 @@ object HideAPK {
         apk: File, out: File,
         pkg: String, label: CharSequence
     ): Boolean {
+        val info = context.packageManager.getPackageArchiveInfo(apk.path, 0) ?: return false
+        val name = info.applicationInfo.nonLocalizedLabel.toString()
         try {
             val jar = JarMap.open(apk, true)
             val je = jar.getJarEntry(ANDROID_MANIFEST)
             val xml = AXML(jar.getRawData(je))
 
-            if (!xml.findAndPatch(APPLICATION_ID to pkg, APP_NAME to label.toString()))
+            if (!xml.findAndPatch(APPLICATION_ID to pkg, name to label.toString()))
                 return false
 
             // Write apk changes
