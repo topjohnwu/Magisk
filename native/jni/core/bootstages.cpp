@@ -258,6 +258,85 @@ static bool check_key_combo() {
     return true;
 }
 
+#define F2FS_SYSFS_PATH "/sys/fs/f2fs"
+#define F2FS_DEF_CP_INTERVAL "60"
+#define F2FS_TUNE_CP_INTERVAL "200"
+#define F2FS_DEF_GC_THREAD_URGENT_SLEEP_TIME "500"
+#define F2FS_TUNE_GC_THREAD_URGENT_SLEEP_TIME "50"
+#define BLOCK_SYSFS_PATH "/sys/block"
+#define TUNE_DISCARD_MAX_BYTES "134217728"
+
+static inline bool tune_f2fs_target(const char *device) {
+    // Tune only SCSI (UFS), eMMC, NVMe and virtual devices
+    return !strncmp(device, "sd", 2) ||
+           !strncmp(device, "mmcblk", 6) ||
+           !strncmp(device, "nvme", 4) ||
+           !strncmp(device, "vd", 2) ||
+           !strncmp(device, "xvd", 3);
+}
+
+static void __tune_f2fs(const char *dir, const char *device, const char *node,
+                        const char *def, const char *val, bool wr_only) {
+    char path[128], buf[32];
+    int flags = F_OK | R_OK | W_OK;
+
+    sprintf(path, "%s/%s/%s", dir, device, node);
+
+    if (wr_only)
+        flags &= ~R_OK;
+    if (access(path, flags) != 0)
+        return;
+
+    int fd = xopen(path, wr_only ? O_WRONLY : O_RDWR);
+    if (fd < 0)
+        return;
+
+    if (!wr_only) {
+        ssize_t len;
+        len = xread(fd, buf, sizeof(buf));
+        if (buf[len - 1] == '\n')
+            buf[len - 1] = '\0';
+        if (strncmp(buf, def, len)) {
+            // Something else changed this node from the kernel's default.
+            // Pass.
+            LOGI("node %s unnecessary for tuning\n", node);
+            close(fd);
+            return;
+        }
+    }
+
+    xwrite(fd, val, strlen(val));
+    close(fd);
+
+    LOGI("node %s tuned to %s\n", path, val);
+}
+
+static void tune_f2fs() {
+    // Tune f2fs sysfs node
+    if (auto dir = xopen_dir(F2FS_SYSFS_PATH); dir) {
+        for (dirent *entry; (entry = readdir(dir.get()));) {
+            if (entry->d_name == "."sv || entry->d_name == ".."sv || !tune_f2fs_target(entry->d_name))
+                continue;
+
+            __tune_f2fs(F2FS_SYSFS_PATH, entry->d_name, "cp_interval",
+                F2FS_DEF_CP_INTERVAL, F2FS_TUNE_CP_INTERVAL, false);
+            __tune_f2fs(F2FS_SYSFS_PATH, entry->d_name, "gc_urgent_sleep_time",
+                F2FS_DEF_GC_THREAD_URGENT_SLEEP_TIME, F2FS_TUNE_GC_THREAD_URGENT_SLEEP_TIME, false);
+        }
+    }
+
+    // Tune block discard limit
+    if (auto dir = xopen_dir(BLOCK_SYSFS_PATH); dir) {
+        for (dirent *entry; (entry = readdir(dir.get()));) {
+            if (entry->d_name == "."sv || entry->d_name == ".."sv || !tune_f2fs_target(entry->d_name))
+                continue;
+
+            __tune_f2fs(BLOCK_SYSFS_PATH, entry->d_name, "queue/discard_max_bytes",
+                nullptr, TUNE_DISCARD_MAX_BYTES, true);
+        }
+    }
+}
+
 /***********************
  * Boot Stage Handlers *
  ***********************/
@@ -281,6 +360,8 @@ void post_fs_data(int client) {
     setup_logfile(true);
 
     LOGI("** post-fs-data mode running\n");
+
+    tune_f2fs();
 
     unlock_blocks();
     mount_mirrors();
