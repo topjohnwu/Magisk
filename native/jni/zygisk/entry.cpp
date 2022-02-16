@@ -112,9 +112,9 @@ static void first_stage_entry() {
         info.reserved_addr = addr;
         // The existing address is guaranteed to fit, as 1st stage and 2nd stage
         // are exactly the same ELF (same inode). However, the linker could over
-        // estimate the required size and refuse to dlopen. Add 2 more page_sizes
-        // (one at the beginning and one at the end) as a safety measure.
-        info.reserved_size = size + 2 * 4096;
+        // estimate the required size and refuse to dlopen. The estimated size
+        // is not accurate so size the size to unlimited.
+        info.reserved_size = -1;
     }
 
     setenv(INJECT_ENV_2, "1", 1);
