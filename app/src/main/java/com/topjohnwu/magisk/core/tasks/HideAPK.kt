@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -102,7 +103,7 @@ object HideAPK {
         activity.finish()
     }
 
-    private suspend fun patchAndHide(activity: Activity, label: String): Boolean {
+    private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
             svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
@@ -123,7 +124,7 @@ object HideAPK {
             return false
 
         // Install and auto launch app
-        val session = APKInstall.startSession(activity, pkg) {
+        val session = APKInstall.startSession(activity, pkg, onFailure) {
             launchApp(activity, pkg)
         }
         try {
@@ -132,7 +133,7 @@ object HideAPK {
             Timber.e(e)
             return false
         }
-        session.waitIntent()?.let { activity.startActivity(it) }
+        session.waitIntent()?.let { activity.startActivity(it) } ?: return false
         return true
     }
 
@@ -144,13 +145,14 @@ object HideAPK {
             setCancelable(false)
             show()
         }
-        val result = withContext(Dispatchers.IO) {
-            patchAndHide(activity, label)
-        }
-        if (!result) {
+        val onFailure = Runnable {
             dialog.dismiss()
             Utils.toast(R.string.failure, Toast.LENGTH_LONG)
         }
+        val success = withContext(Dispatchers.IO) {
+            patchAndHide(activity, label, onFailure)
+        }
+        if (!success) onFailure.run()
     }
 
     @Suppress("DEPRECATION")
@@ -161,19 +163,25 @@ object HideAPK {
             setCancelable(false)
             show()
         }
+        val onFailure = Runnable {
+            dialog.dismiss()
+            Utils.toast(R.string.failure, Toast.LENGTH_LONG)
+        }
         val apk = StubApk.current(activity)
-        val session = APKInstall.startSession(activity, APPLICATION_ID) {
+        val session = APKInstall.startSession(activity, APPLICATION_ID, onFailure) {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()
         }
-        withContext(Dispatchers.IO) {
+        val success = withContext(Dispatchers.IO) {
             try {
                 session.install(activity, apk)
             } catch (e: IOException) {
                 Timber.e(e)
-                return@withContext
+                return@withContext false
             }
-            session.waitIntent()?.let { activity.startActivity(it) }
+            session.waitIntent()?.let { activity.startActivity(it) } ?: return@withContext false
+            return@withContext true
         }
+        if (!success) onFailure.run()
     }
 }

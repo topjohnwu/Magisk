@@ -40,11 +40,12 @@ public final class APKInstall {
     }
 
     public static Session startSession(Context context) {
-        return startSession(context, null, null);
+        return startSession(context, null, null, null);
     }
 
-    public static Session startSession(Context context, String pkg, Runnable onSuccess) {
-        var receiver = new InstallReceiver(pkg, onSuccess);
+    public static Session startSession(Context context, String pkg,
+                                       Runnable onFailure, Runnable onSuccess) {
+        var receiver = new InstallReceiver(pkg, onSuccess, onFailure);
         context = context.getApplicationContext();
         if (pkg != null) {
             // If pkg is not null, look for package added event
@@ -68,14 +69,16 @@ public final class APKInstall {
     private static class InstallReceiver extends BroadcastReceiver implements Session {
         private final String packageName;
         private final Runnable onSuccess;
+        private final Runnable onFailure;
         private final CountDownLatch latch = new CountDownLatch(1);
         private Intent userAction = null;
 
         final String sessionId = UUID.randomUUID().toString();
 
-        private InstallReceiver(String packageName, Runnable onSuccess) {
+        private InstallReceiver(String packageName, Runnable onSuccess, Runnable onFailure) {
             this.packageName = packageName;
             this.onSuccess = onSuccess;
+            this.onFailure = onFailure;
         }
 
         @Override
@@ -108,6 +111,10 @@ public final class APKInstall {
                                 installer.abandonSession(info.getSessionId());
                             }
                         }
+                        if (onFailure != null) {
+                            onFailure.run();
+                        }
+                        context.getApplicationContext().unregisterReceiver(this);
                 }
                 latch.countDown();
             }
