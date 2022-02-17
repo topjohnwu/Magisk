@@ -35,17 +35,21 @@ int fork_no_orphan() {
 
 int gen_rand_str(char *buf, int len, bool varlen) {
     constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static std::mt19937 gen([]{
-        if (access("/dev/urandom", F_OK) != 0)
-            mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
-        int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-        unsigned seed;
-        xxread(fd, &seed, sizeof(seed));
+    static mt19937 gen([]{
+        mt19937::result_type seed;
+        if (syscall(__NR_getrandom, &seed, sizeof(seed), 0) < 0) {
+            // This can happen if device is running a too low Linux version
+            if (access("/dev/urandom", F_OK) != 0)
+                mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
+            int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+            xxread(fd, &seed, sizeof(seed));
+            close(fd);
+        }
         return seed;
     }());
-    std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
+    uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
     if (varlen) {
-        std::uniform_int_distribution<int> len_dist(len / 2, len);
+        uniform_int_distribution<int> len_dist(len / 2, len);
         len = len_dist(gen);
     }
     for (int i = 0; i < len - 1; ++i)
