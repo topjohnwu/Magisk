@@ -215,10 +215,10 @@ int app_request(const shared_ptr<su_info> &info) {
     exec_cmd("request", extras, info, false);
 
     // Wait for data input for at most 70 seconds
-    int fd = xopen(fifo, O_RDONLY | O_CLOEXEC);
+    int fd = xopen(fifo, O_RDONLY | O_CLOEXEC | O_NONBLOCK);
     struct pollfd pfd = {
         .fd = fd,
-        .events = POLL_IN
+        .events = POLLIN
     };
     if (xpoll(&pfd, 1, 70 * 1000) <= 0) {
         close(fd);
