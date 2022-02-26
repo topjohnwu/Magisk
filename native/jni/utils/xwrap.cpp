@@ -393,6 +393,11 @@ int xmount(const char *source, const char *target,
     const char *filesystemtype, unsigned long mountflags,
     const void *data) {
     int ret = mount(source, target, filesystemtype, mountflags, data);
+    if (ret < 0 && errno == EBUSY && (mountflags & MS_RDONLY) != 0) {
+        // This may happen when source is used to mount read-write partitions
+        LOGW("source %s cannot be mounted as read-only, fallback to read-write\n", source);
+        ret = mount(source, target, filesystemtype, mountflags & ~MS_RDONLY, data);
+    }
     if (ret < 0) {
         PLOGE("mount %s->%s", source, target);
     }
