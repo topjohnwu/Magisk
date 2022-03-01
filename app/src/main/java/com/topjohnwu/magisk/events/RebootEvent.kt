@@ -20,7 +20,7 @@ object RebootEvent {
             R.id.action_reboot_bootloader -> systemReboot("bootloader")
             R.id.action_reboot_download -> systemReboot("download")
             R.id.action_reboot_edl -> systemReboot("edl")
-            R.id.action_reboot_recovery -> Shell.su("/system/bin/reboot recovery").submit()
+            R.id.action_reboot_recovery -> Shell.cmd("/system/bin/reboot recovery").submit()
             else -> Unit
         }
         return true

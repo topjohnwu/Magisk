@@ -111,13 +111,13 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
             runCatching {
                 // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
                 packageManager.getApplicationInfo(APPLICATION_ID, 0)
-                Shell.su("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
+                Shell.cmd("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
             }
         } else {
             if (Config.suManager.isNotEmpty())
                 Config.suManager = ""
             pkg ?: return
-            if (!Shell.su("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess) {
+            if (!Shell.cmd("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess) {
                 // Uninstall through Android API
                 uninstallAndWait(pkg)
             }

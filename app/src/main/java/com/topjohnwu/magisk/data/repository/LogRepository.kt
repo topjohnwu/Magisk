@@ -29,9 +29,9 @@ class LogRepository(
             }
         }
         if (Info.env.isActive) {
-            Shell.su("cat ${Const.MAGISK_LOG} || logcat -d -s Magisk").to(list).await()
+            Shell.cmd("cat ${Const.MAGISK_LOG} || logcat -d -s Magisk").to(list).await()
         } else {
-            Shell.sh("logcat -d").to(list).await()
+            Shell.cmd("logcat -d").to(list).await()
         }
         return list.buf.toString()
     }
@@ -39,7 +39,7 @@ class LogRepository(
     suspend fun clearLogs() = logDao.deleteAll()
 
     fun clearMagiskLogs(cb: (Shell.Result) -> Unit) =
-        Shell.su("echo -n > ${Const.MAGISK_LOG}").submit(cb)
+        Shell.cmd("echo -n > ${Const.MAGISK_LOG}").submit(cb)
 
     suspend fun insert(log: SuLog) = logDao.insert(log)
 

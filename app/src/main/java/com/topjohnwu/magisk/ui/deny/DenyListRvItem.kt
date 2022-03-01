@@ -103,7 +103,7 @@ class ProcessRvItem(
         set(value) = set(value, process.isEnabled, { process.isEnabled = it }, BR.enabled) {
             val arg = if (it) "add" else "rm"
             val (name, pkg) = process
-            Shell.su("magisk --denylist $arg $pkg \'$name\'").submit()
+            Shell.cmd("magisk --denylist $arg $pkg \'$name\'").submit()
         }
 
     fun toggle() {

@@ -8,14 +8,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 fun reboot(reason: String = if (Config.recovery) "recovery" else "") {
-    Shell.su("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
+    Shell.cmd("/system/bin/svc power reboot $reason || /system/bin/reboot $reason").submit()
 }
 
 fun relaunchApp(context: Context) {
     val intent = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return
     val args = mutableListOf("am", "start", "--user", Const.USER_ID.toString())
     val cmd = intent.toCommand(args).joinToString(separator = " ")
-    Shell.su("run_delay 1 \"$cmd\"").exec()
+    Shell.cmd("run_delay 1 \"$cmd\"").exec()
     Runtime.getRuntime().exit(0)
 }
 

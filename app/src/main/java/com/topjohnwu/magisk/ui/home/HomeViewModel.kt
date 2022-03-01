@@ -144,7 +144,7 @@ class HomeViewModel(
     private suspend fun ensureEnv() {
         if (MagiskState.NOT_INSTALLED == stateMagisk || checkedEnv) return
         val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
-        if (!Shell.su(cmd).await().isSuccess) {
+        if (!Shell.cmd(cmd).await().isSuccess) {
             EnvFixDialog(this).publish()
         }
         checkedEnv = true

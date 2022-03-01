@@ -34,7 +34,7 @@ class UninstallDialog : DialogEvent() {
             show()
         }
 
-        Shell.su("restore_imgs").submit { result ->
+        Shell.cmd("restore_imgs").submit { result ->
             dialog.dismiss()
             if (result.isSuccess) {
                 Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT)

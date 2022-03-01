@@ -110,7 +110,7 @@ object HideAPK {
             Timber.e(e)
             stub.createNewFile()
             val cmd = "\$MAGISKBIN/magiskinit -x manager ${stub.path}"
-            if (!Shell.su(cmd).exec().isSuccess)
+            if (!Shell.cmd(cmd).exec().isSuccess)
                 return false
         }
 

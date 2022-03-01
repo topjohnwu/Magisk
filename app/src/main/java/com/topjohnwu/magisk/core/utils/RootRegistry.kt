@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ipc.RootService
 import timber.log.Timber
 import java.util.concurrent.CountDownLatch
@@ -48,6 +49,6 @@ class RootRegistry(stub: Any?) : RootService() {
     }
 
     companion object {
-        var bindTask: Runnable? = null
+        var bindTask: Shell.Task? = null
     }
 }

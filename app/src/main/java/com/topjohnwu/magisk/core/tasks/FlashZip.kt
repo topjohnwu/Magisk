@@ -63,7 +63,7 @@ open class FlashZip(
 
         console.add("- Installing ${mUri.displayName}")
 
-        return Shell.su("sh $installDir/update-binary dummy 1 \'$zipFile\'")
+        return Shell.cmd("sh $installDir/update-binary dummy 1 \'$zipFile\'")
             .to(console, logs).exec().isSuccess
     }
 
@@ -79,7 +79,7 @@ open class FlashZip(
             Timber.e(e)
             false
         } finally {
-            Shell.su("cd /", "rm -rf $installDir ${Const.TMPDIR}").submit()
+            Shell.cmd("cd /", "rm -rf $installDir ${Const.TMPDIR}").submit()
         }
     }
 }

@@ -452,7 +452,7 @@ abstract class MagiskInstaller(
         if (success) {
             console.add("- All done!")
         } else {
-            Shell.sh("rm -rf $installDir").submit()
+            Shell.cmd("rm -rf $installDir").submit()
             console.add("! Installation failed")
         }
         return success
@@ -497,7 +497,7 @@ abstract class MagiskInstaller(
             val success = super.exec()
             if (success) {
                 UiThreadHandler.handler.postDelayed(3000) {
-                    Shell.su("pm uninstall ${context.packageName}").exec()
+                    Shell.cmd("pm uninstall ${context.packageName}").exec()
                 }
             }
             return success

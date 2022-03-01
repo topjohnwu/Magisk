@@ -18,7 +18,7 @@ class Query(private val _query: String) {
 
     suspend inline fun <R : Any> query(crossinline mapper: (Map<String, String>) -> R?): List<R> =
         withContext(Dispatchers.Default) {
-            Shell.su(query).await().out.map { line ->
+            Shell.cmd(query).await().out.map { line ->
                 async {
                     line.split("\\|".toRegex())
                         .map { it.split("=", limit = 2) }
@@ -32,7 +32,7 @@ class Query(private val _query: String) {
 
     suspend inline fun query() = query { it }
 
-    suspend inline fun commit() = Shell.su(query).to(null).await()
+    suspend inline fun commit() = Shell.cmd(query).to(null).await()
 }
 
 class Delete : Query.Builder {

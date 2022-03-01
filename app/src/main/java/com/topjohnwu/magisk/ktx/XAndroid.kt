@@ -84,7 +84,7 @@ fun Intent.startActivity(context: Context) = context.startActivity(this)
 fun Intent.startActivityWithRoot() {
     val args = mutableListOf("am", "start", "--user", Const.USER_ID.toString())
     val cmd = toCommand(args).joinToString(" ")
-    Shell.su(cmd).submit()
+    Shell.cmd(cmd).submit()
 }
 
 fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<String> {

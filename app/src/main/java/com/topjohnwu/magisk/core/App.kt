@@ -70,7 +70,7 @@ open class App() : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        RootRegistry.bindTask = RootService.createBindTask(
+        RootRegistry.bindTask = RootService.bindOrTask(
             intent<RootRegistry>(),
             UiThreadHandler.executor,
             RootRegistry.Connection
@@ -91,8 +91,6 @@ object ActivityTracker : Application.ActivityLifecycleCallbacks {
 
     @Volatile
     var foreground: Activity? = null
-
-    val hasForeground get() = foreground != null
 
     override fun onActivityResumed(activity: Activity) {
         if (activity is SuRequestActivity) return
