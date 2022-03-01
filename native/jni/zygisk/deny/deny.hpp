@@ -10,7 +10,8 @@
 
 #define ISOLATED_MAGIC "isolated"
 
-enum class DenyRequest : int {
+namespace DenyRequest {
+enum : int {
     ENFORCE,
     DISABLE,
     ADD,
@@ -20,8 +21,10 @@ enum class DenyRequest : int {
 
     END
 };
+}
 
-enum class DenyResponse: int {
+namespace DenyResponse {
+enum : int {
     OK,
     ENFORCED,
     NOT_ENFORCED,
@@ -33,13 +36,13 @@ enum class DenyResponse: int {
 
     END
 };
-
+}
 
 // CLI entries
-DenyResponse enable_deny();
-DenyResponse disable_deny();
-DenyResponse add_list(int client);
-DenyResponse rm_list(int client);
+int enable_deny();
+int disable_deny();
+int add_list(int client);
+int rm_list(int client);
 void ls_list(int client);
 
 // Utility functions
@@ -49,9 +52,3 @@ void revert_unmount();
 
 extern std::atomic<bool> denylist_enforced;
 extern std::atomic<int> cached_manager_app_id;
-
-inline int deny_request(DenyRequest req) {
-    int fd = connect_daemon(DaemonRequest::DENYLIST);
-    write_int(fd, static_cast<std::underlying_type_t<DenyRequest>>(req));
-    return fd;
-}
