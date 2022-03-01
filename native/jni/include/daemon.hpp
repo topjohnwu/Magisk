@@ -28,6 +28,7 @@ enum : int {
     SQLITE_CMD,
     REMOVE_MODULES,
     ZYGISK,
+    ZYGISK_PASSTHROUGH,
     END,
 };
 }
@@ -38,7 +39,7 @@ enum : int {
     ERROR = -1,
     OK = 0,
     ROOT_REQUIRED,
-    INVALID_REQUEST,
+    ACCESS_DENIED,
     END
 };
 }

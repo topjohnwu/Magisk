@@ -35,10 +35,6 @@ void denylist_handler(int client, const sock_cred *cred) {
     int req = read_int(client);
     int res = DenyResponse::ERROR;
 
-    if (req < 0 || req >= DenyRequest::END) {
-        goto done;
-    }
-
     switch (req) {
     case DenyRequest::ENFORCE:
         res = enable_deny();
@@ -60,9 +56,9 @@ void denylist_handler(int client, const sock_cred *cred) {
                 ? DenyResponse::ENFORCED : DenyResponse::NOT_ENFORCED;
         break;
     default:
-        __builtin_unreachable();
+        // Unknown request code
+        break;
     }
-done:
     write_int(client, res);
     close(client);
 }

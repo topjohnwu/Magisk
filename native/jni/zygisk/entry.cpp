@@ -401,13 +401,6 @@ static void get_moddir(int client) {
 void zygisk_handler(int client, const sock_cred *cred) {
     int code = read_int(client);
     char buf[256];
-    if (code < ZygiskRequest::SETUP || code >= ZygiskRequest::END) {
-        write_int(client, -1);
-        return;
-    }
-    if (code != ZygiskRequest::PASSTHROUGH && cred->context != "u:r:zygote:s0") {
-        return;
-    }
     switch (code) {
     case ZygiskRequest::SETUP:
         setup_files(client, cred);
@@ -429,7 +422,8 @@ void zygisk_handler(int client, const sock_cred *cred) {
         get_moddir(client);
         break;
     default:
-        __builtin_unreachable();
+        // Unknown code
+        break;
     }
     close(client);
 }
