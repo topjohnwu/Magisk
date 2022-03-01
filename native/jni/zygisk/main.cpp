@@ -173,7 +173,8 @@ int zygisk_main(int argc, char *argv[]) {
         int is_64_bit = parse_int(argv[3]);
         if (fcntl(client, F_GETFD) < 0)
             return 1;
-        if (int magiskd = zygisk_request(ZygiskRequest::PASSTHROUGH); magiskd >= 0) {
+        if (int magiskd = connect_daemon(MainRequest::ZYGISK_PASSTHROUGH); magiskd >= 0) {
+            write_int(magiskd, ZygiskRequest::PASSTHROUGH);
             write_int(magiskd, is_64_bit);
 
             if (read_int(magiskd) != 0) {

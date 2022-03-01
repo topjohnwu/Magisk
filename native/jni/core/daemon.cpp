@@ -160,6 +160,7 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         reboot();
         break;
     case MainRequest::ZYGISK:
+    case MainRequest::ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
         break;
     default:
@@ -208,18 +209,24 @@ static void handle_request(pollfd *pfd) {
     bool is_zygote;
     int code;
 
-    if (!get_client_cred(client, &cred))
+    if (!get_client_cred(client, &cred)) {
+        // Client died
         goto done;
+    }
     is_root = cred.uid == UID_ROOT;
     is_zygote = cred.context == "u:r:zygote:s0";
 
-    if (!is_root && !is_zygote && !is_client(cred.pid))
+    if (!is_root && !is_zygote && !is_client(cred.pid)) {
+        // Unsupported client state
+        write_int(client, MainResponse::ACCESS_DENIED);
         goto done;
+    }
 
     code = read_int(client);
-
-    if (code < 0 || code >= MainRequest::END || code == MainRequest::_SYNC_BARRIER_)
+    if (code < 0 || code >= MainRequest::END || code == MainRequest::_SYNC_BARRIER_) {
+        // Unknown request code
         goto done;
+    }
 
     // Check client permissions
     switch (code) {
@@ -237,7 +244,14 @@ static void handle_request(pollfd *pfd) {
         break;
     case MainRequest::REMOVE_MODULES:
         if (!is_root && cred.uid != UID_SHELL) {
-            write_int(client, MainResponse::ROOT_REQUIRED);
+            write_int(client, MainResponse::ACCESS_DENIED);
+            goto done;
+        }
+        break;
+    case MainRequest::ZYGISK:
+        if (!is_zygote) {
+            // Invalid client context
+            write_int(client, MainResponse::ACCESS_DENIED);
             goto done;
         }
         break;
@@ -252,7 +266,7 @@ static void handle_request(pollfd *pfd) {
         goto done;
     }
 
-    // Handle complex requests in another thread
+    // Handle async requests in another thread
     exec_task([=] { handle_request_async(client, code, cred); });
     return;
 
@@ -422,8 +436,8 @@ int connect_daemon(int req, bool create) {
     case MainResponse::ROOT_REQUIRED:
         LOGE("Root is required for this operation\n");
         exit(-1);
-    case MainResponse::INVALID_REQUEST:
-        LOGE("Invalid request\n");
+    case MainResponse::ACCESS_DENIED:
+        LOGE("Access denied\n");
         exit(-1);
     default:
         __builtin_unreachable();
