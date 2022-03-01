@@ -32,12 +32,10 @@ void denylist_handler(int client, const sock_cred *cred) {
         return;
     }
 
-    DenyResponse res = DenyResponse::ERROR;
+    int req = read_int(client);
+    int res = DenyResponse::ERROR;
 
-    int code = read_int(client);
-    auto req = static_cast<DenyRequest>(code);
-
-    if (code < 0 || code >= DenyRequest::END) {
+    if (req < 0 || req >= DenyRequest::END) {
         goto done;
     }
 
@@ -58,14 +56,14 @@ void denylist_handler(int client, const sock_cred *cred) {
         ls_list(client);
         return;
     case DenyRequest::STATUS:
-        res = (zygisk_enabled && denylist_enforced) ? DenyResponse::ENFORCED
-                                                    : DenyResponse::NOT_ENFORCED;
+        res = (zygisk_enabled && denylist_enforced)
+                ? DenyResponse::ENFORCED : DenyResponse::NOT_ENFORCED;
         break;
-    case DenyRequest::END:
+    default:
         __builtin_unreachable();
     }
 done:
-    write_int(client, static_cast<int>(res));
+    write_int(client, res);
     close(client);
 }
 
@@ -73,7 +71,7 @@ int denylist_cli(int argc, char **argv) {
     if (argc < 2)
         usage();
 
-    DenyRequest req;
+    int req;
     if (argv[1] == "enable"sv)
         req = DenyRequest::ENFORCE;
     else if (argv[1] == "disable"sv)
@@ -97,16 +95,17 @@ int denylist_cli(int argc, char **argv) {
     }
 
     // Send request
-    int fd = deny_request(req);
+    int fd = connect_daemon(MainRequest::DENYLIST);
+    write_int(fd, req);
     if (req == DenyRequest::ADD || req == DenyRequest::REMOVE) {
         write_string(fd, argv[2]);
         write_string(fd, argv[3] ? argv[3] : "");
     }
 
     // Get response
-    int code = read_int(fd);
-    auto res = (code < 0 || code >= DenyResponse::END) ? DenyResponse::ERROR
-                                                       : static_cast<DenyResponse>(code);
+    int res = read_int(fd);
+    if (res < 0 || res >= DenyResponse::END)
+        res = DenyResponse::ERROR;
     switch (res) {
     case DenyResponse::NOT_ENFORCED:
         fprintf(stderr, "Denylist is not enforced\n");
@@ -131,7 +130,7 @@ int denylist_cli(int argc, char **argv) {
         return -1;
     case DenyResponse::OK:
         break;
-    case DenyResponse::END:
+    default:
         __builtin_unreachable();
     }
 

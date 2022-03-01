@@ -10,7 +10,8 @@
 #define MAGISKFD_ENV   "MAGISKFD"
 #define MAGISKTMP_ENV  "MAGISKTMP"
 
-enum class ZygiskRequest : int {
+namespace ZygiskRequest {
+enum : int {
     SETUP,
     GET_INFO,
     GET_LOG_PIPE,
@@ -19,6 +20,7 @@ enum class ZygiskRequest : int {
     PASSTHROUGH,
     END
 };
+}
 
 #if defined(__LP64__)
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
@@ -51,9 +53,8 @@ void hook_functions();
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 int remote_request_unmount();
 
-
-inline int zygisk_request(ZygiskRequest req) {
-    int fd = connect_daemon(DaemonRequest::ZYGISK_REQUEST, false);
-    write_int(fd, static_cast<int>(req));
+inline int zygisk_request(int req) {
+    int fd = connect_daemon(MainRequest::ZYGISK);
+    write_int(fd, req);
     return fd;
 }

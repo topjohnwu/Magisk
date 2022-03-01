@@ -14,7 +14,6 @@
 #include <selinux.hpp>
 
 #include "core.hpp"
-#include "zygisk/deny/deny.hpp"
 
 using namespace std;
 
@@ -264,6 +263,7 @@ static bool check_key_combo() {
  ***********************/
 
 static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
+extern int disable_deny();
 
 void post_fs_data(int client) {
     // ack

@@ -226,7 +226,7 @@ error:
     return false;
 }
 
-static DenyResponse add_list(const char *pkg, const char *proc) {
+static int add_list(const char *pkg, const char *proc) {
     if (proc[0] == '\0')
         proc = pkg;
 
@@ -252,13 +252,13 @@ static DenyResponse add_list(const char *pkg, const char *proc) {
     return DenyResponse::OK;
 }
 
-DenyResponse add_list(int client) {
+int add_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return add_list(pkg.data(), proc.data());
 }
 
-static DenyResponse rm_list(const char *pkg, const char *proc) {
+static int rm_list(const char *pkg, const char *proc) {
     {
         mutex_guard lock(data_lock);
         if (!ensure_data())
@@ -298,7 +298,7 @@ static DenyResponse rm_list(const char *pkg, const char *proc) {
     return DenyResponse::OK;
 }
 
-DenyResponse rm_list(int client) {
+int rm_list(int client) {
     string pkg = read_string(client);
     string proc = read_string(client);
     return rm_list(pkg.data(), proc.data());
@@ -342,7 +342,7 @@ static void update_deny_config() {
     db_err(err);
 }
 
-DenyResponse enable_deny() {
+int enable_deny() {
     if (denylist_enforced) {
         return DenyResponse::OK;
     } else {
@@ -377,7 +377,7 @@ DenyResponse enable_deny() {
     return DenyResponse::OK;
 }
 
-DenyResponse disable_deny() {
+int disable_deny() {
     if (denylist_enforced) {
         denylist_enforced = false;
         LOGI("* Disable DenyList\n");

@@ -10,7 +10,8 @@
 #include <socket.hpp>
 
 // Daemon command codes
-enum class DaemonRequest: int {
+namespace MainRequest {
+enum : int {
     START_DAEMON,
     CHECK_VERSION,
     CHECK_VERSION_CODE,
@@ -26,18 +27,21 @@ enum class DaemonRequest: int {
     DENYLIST,
     SQLITE_CMD,
     REMOVE_MODULES,
-    ZYGISK_REQUEST,
+    ZYGISK,
     END,
 };
+}
 
 // Return codes for daemon
-enum class DaemonResponse: int {
+namespace MainResponse {
+enum : int {
     ERROR = -1,
     OK = 0,
     ROOT_REQUIRED,
     INVALID_REQUEST,
     END
 };
+}
 
 struct module_info {
     std::string name;
@@ -52,7 +56,7 @@ extern int app_process_32;
 extern int app_process_64;
 extern std::vector<module_info> *module_list;
 
-int connect_daemon(DaemonRequest req, bool create = false);
+int connect_daemon(int req, bool create = false);
 
 // Poll control
 using poll_callback = void(*)(pollfd*);
