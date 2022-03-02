@@ -8,6 +8,7 @@
     <string name="install">설치</string>
     <string name="section_home">홈</string>
     <string name="section_theme">테마</string>
+    <string name="denylist">거부목록</string>
 
     <!--Home-->
     <string name="no_connection">사용 가능한 연결 없음</string>
@@ -32,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">강제 암호화 유지</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity 유지</string>
+    <string name="patch_vbmeta">부트 이미지에 vbmeta 패치</string>
     <string name="recovery_mode">리커버리 모드</string>
     <string name="install_options_title">옵션</string>
     <string name="install_method_title">설치 방법</string>
@@ -79,7 +81,7 @@
 
     <!--Logs-->
     <string name="log_data_none">로그가 없습니다. SU 권한을 필요로 하는 앱을 사용하십시오.</string>
-    <string name="log_data_magisk_none">로그가 없습니다.</string>
+    <string name="log_data_magisk_none">Magisk 로그가 없습니다.</string>
     <string name="menuSaveLog">로그 저장</string>
     <string name="menuClearLog">지금 로그 삭제</string>
     <string name="logs_cleared">로그 삭제 완료.</string>
@@ -106,6 +108,9 @@
     <string name="module_state_restore">복구</string>
     <string name="module_action_install_external">저장소에서 설치</string>
     <string name="update_available">업데이트 가능</string>
+    <string name="suspend_text_riru">%1$s 가 활성화 되어있기 때문에 모듈이 중단되었습니다</string>
+    <string name="suspend_text_zygisk">%1$s 가 비활성화 되어있기 때문에 모듈이 중단되었습니다</string>
+    <string name="zygisk_module_unloaded">호환성 문제로 인해 Zygisk 모듈이 로드되지 않았습니다.</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">테마 선택</string>
@@ -130,6 +135,8 @@
     <string name="settings_update_custom_msg">사용자 지정 URL 입력</string>
     <string name="settings_zygisk_summary">zygote 데몬에서 Magisk 부분 실행</string>
     <string name="settings_denylist_title">DenyList 적용</string>
+    <string name="settings_denylist_summary">DenyList의 프로세스는 Magisk의 모든 수정사항을 되돌립니다</string>
+    <string name="settings_denylist_error">이 기능을 사용하려면 %1$s 활성화가 필요합니다</string>
     <string name="settings_denylist_config_title">DenyList 구성</string>
     <string name="settings_denylist_config_summary">denylist에 포함할 프로세스를 선택합니다.</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -175,7 +182,7 @@
     <string name="mount_namespace_mode">이름공간 마운트 모드</string>
     <string name="settings_ns_global">전역 이름공간</string>
     <string name="settings_ns_requester">이름공간 상속</string>
-    <string name="settings_ns_isolate">이름공간 고립</string>
+    <string name="settings_ns_isolate">격리된 이름공간</string>
     <string name="global_summary">모든 루트 세션이 전역 마운트 이름공간을 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 이름공간을 상속합니다.</string>
     <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 이름공간을 사용합니다.</string>
@@ -183,19 +190,23 @@
     <!--Notifications-->
     <string name="update_channel">Magisk 업데이트</string>
     <string name="progress_channel">진행 상황</string>
+    <string name="updated_channel">업데이트 완료</string>
     <string name="download_complete">다운로드 완료</string>
     <string name="download_file_error">파일 다운로드 오류</string>
     <string name="magisk_update_title">새 버전의 Magisk를 사용할 수 있습니다!</string>
+    <string name="updated_title">업데이트 된 Magisk</string>
+    <string name="updated_text">터치하여 앱 열기</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">예</string>
     <string name="no">아니오</string>
+    <string name="repo_install_title">%1$s %2$s(%3$d) 설치</string>
     <string name="download">다운로드</string>
     <string name="reboot">다시 시작</string>
     <string name="release_notes">릴리즈 노트</string>
     <string name="flashing">플래싱 중…</string>
     <string name="done">완료!</string>
-    <string name="failure">실패</string>
+    <string name="failure">실패!</string>
     <string name="hide_app_title">Magisk 앱 숨기는 중…</string>
     <string name="open_link_failed_toast">링크를 열 수 있는 앱이 없습니다.</string>
     <string name="complete_uninstall">완전히 제거</string>
@@ -209,10 +220,19 @@
     <string name="setup_msg">환경 설정 진행 중…</string>
     <string name="authenticate">인증</string>
     <string name="unsupport_magisk_title">지원되지 않는 Magisk 버전</string>
+    <string name="unsupport_magisk_msg">이 버전의 앱은 %1$s 미만의 Magisk 버전을 지원하지 않습니다.\n\n해당앱은 Magisk가 설치되지 않은것처럼 동작할것입니다. 가능한 빨리 Magisk 를 업데이트 하세요.</string>
+    <string name="unsupport_general_title">비정상적인 상태</string>
+    <string name="unsupport_system_app_msg">해당 앱을 시스템 앱으로 실행하는 것은 지원하지 않습니다. 앱을 일반사용자 앱으로 실행해 주세요.</string>
+    <string name="unsupport_other_su_msg">Magisk 로 부터 설치되지 않은 \"su\" 바이너리가 감지되었습니다. 다른 루팅 솔루션을 제거하거나, Magisk 를 다시 설치해주세요.</string>
+    <string name="unsupport_external_storage_msg">Magisk 가 외부 저장소에 설치되어 있습니다. Magisk 를 내부 저장소에 설치 해주세요.</string>
+    <string name="unsupport_nonroot_stub_msg">숨겨진 Magisk 앱은 루팅이 풀려 더이상 동작하지 않습니다. 원본 APK 를 복원하거나 재설치 해주세요.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">해당 기능을 사용하려면 저장소 권한을 허용해 주십시오.</string>
+    <string name="install_unknown_denied">이 기능을 활성화 하려면 "알수 없는 앱 설치"를 허용해주세요.</string>
     <string name="add_shortcut_title">홈 화면에 바로가기 추가</string>
     <string name="add_shortcut_msg">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="app_not_found">해당 작업을 처리할 어플리케이션이 없습니다.</string>
     <string name="reboot_apply_change">변경 사항을 적용하려면 재부팅하세요.</string>
+    <string name="restore_app_confirmation">정말로 실행하시겠습니까? 숨겨진 앱이 원본 앱으로 복원됩니다.</string>
 
 </resources>
