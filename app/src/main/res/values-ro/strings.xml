@@ -23,16 +23,17 @@
     <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
     <string name="home_item_source">Sursă</string>
-    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă trimițând o mică donație.</string>
+    <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă făcând o donație.</string>
     <string name="home_installed_version">Versiune instalată</string>
     <string name="home_latest_version">Ultima versiune</string>
     <string name="invalid_update_channel">Canal de actualizare nevalid</string>
     <string name="uninstall_magisk_title">Dezinstalează Magisk</string>
-    <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nPotențial ți se vor cripta datele dacă nu sunt criptate deja!</string>
+    <string name="uninstall_magisk_msg">Toate modulele vor fi dezactivate/eliminate!\nRootul va fi eliminat!\nOrice spațiu de stocare intern necriptat prin folosirea Magisk va fi recriptat!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Păstrează criptarea forțată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Patchuiește vbmeta în imaginea de boot</string>
     <string name="recovery_mode">Mod de recuperare</string>
     <string name="install_options_title">Opțiuni</string>
     <string name="install_method_title">Metodă</string>
@@ -70,16 +71,16 @@
     <string name="su_snack_log_on">Jurnalizarea pentru %1$s a fost activată</string>
     <string name="su_snack_log_off">Jurnalizarea pentru %1$s a fost dezactivată</string>
     <string name="su_revoke_title">Revoci?</string>
-    <string name="su_revoke_msg">Confirmi revocarea drepturilor pentru %1$s?</string>
+    <string name="su_revoke_msg">Confirmă revocarea drepturilor de superutilizator pentru %1$s</string>
     <string name="toast">Mesaj</string>
     <string name="none">Niciuna</string>
 
     <string name="superuser_toggle_notification">Notificări</string>
     <string name="superuser_toggle_revoke">Revocă</string>
-    <string name="superuser_policy_none">Nicio aplicație nu a cerut încă permisiuni de superutilizator.</string>
+    <string name="superuser_policy_none">Nicio aplicație nu a cerut încă permisiunea de superutilizator.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile cu acces de superutilizator</string>
+    <string name="log_data_none">Nu există jurnale, încearcă să folosești ceva mai mult aplicațiile care folosesc root</string>
     <string name="log_data_magisk_none">Jurnalele Magisk sunt goale, asta-i ciudat</string>
     <string name="menuSaveLog">Salvează jurnalul</string>
     <string name="menuClearLog">Golește jurnalul acum</string>
@@ -107,6 +108,9 @@
     <string name="module_state_restore">Restaurează</string>
     <string name="module_action_install_external">Instalează din spațiul de stocare</string>
     <string name="update_available">Actualizare disponibilă</string>
+    <string name="suspend_text_riru">Modul suspendat deoarece %1$s este activat</string>
+    <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
+    <string name="zygisk_module_unloaded">Modulul Zygisk nu a fost încărcat din cauza incompatibilității</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mod pentru temă</string>
@@ -119,7 +123,7 @@
     <string name="settings_hide_app_title">Ascunde aplicația Magisk</string>
     <string name="settings_hide_app_summary">Instalează o aplicație proxy cu ID aleatoriu pentru pachet și etichetă personalizată pentru aplicație</string>
     <string name="settings_restore_app_title">Restaurează aplicația Magisk</string>
-    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaureaz-o înapoi în APK-ul original</string>
+    <string name="settings_restore_app_summary">Dezvăluie aplicația și restaurează APK-ul original</string>
     <string name="language">Limbă</string>
     <string name="system_default">(Implicită a sistemului)</string>
     <string name="settings_check_update_title">Caută actualizări</string>
@@ -127,8 +131,8 @@
     <string name="settings_update_channel_title">Canal de actualizare</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Canal personalizat</string>
-    <string name="settings_update_custom_msg">Inserează un URL personalizat</string>
+    <string name="settings_update_custom">Personalizat</string>
+    <string name="settings_update_custom_msg">Inserează un URL pentru canal personalizat</string>
     <string name="settings_zygisk_summary">Rulează părți ale Magisk în daemonul zygote</string>
     <string name="settings_denylist_title">Impune lista de refuzări</string>
     <string name="settings_denylist_summary">Procesele din lista de refuzări vor avea toate modificările Magisk anulate</string>
@@ -136,7 +140,7 @@
     <string name="settings_denylist_config_title">Configurează lista de refuzări</string>
     <string name="settings_denylist_config_summary">Selectează procesele care vor fi incluse în lista de refuzări</string>
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
-    <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor adblock</string>
+    <string name="settings_hosts_summary">Suport pentru fișierul hosts în afara partiției system, în cazul aplicațiilor care blochează reclame</string>
     <string name="settings_hosts_toast">Modulul pentru fișierul hosts în afara partiției system, adăugat</string>
     <string name="settings_app_name_hint">Nume nou</string>
     <string name="settings_app_name_helper">Aplicația va fi reîmpachetată cu acest nume</string>
@@ -156,10 +160,10 @@
     <string name="request_timeout">Expirare pentru cerere</string>
     <string name="superuser_notification">Notificare de superutilizator</string>
     <string name="settings_su_reauth_title">Reautentificare după actualizare</string>
-    <string name="settings_su_reauth_summary">Reautentifică permisiunile pentru superutilizator după o actualizare a aplicației</string>
-    <string name="settings_su_tapjack_title">Activează protecția față de tapjacking</string>
-    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea drepturilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
-    <string name="settings_su_biometric_title">Activează autentificarea biometrică</string>
+    <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
+    <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
+    <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
+    <string name="settings_su_biometric_title">Autentificare biometrică</string>
     <string name="settings_su_biometric_summary">Folosește autentificarea biometrică pentru a permite cereri de superutilizator</string>
     <string name="no_biometric">Dispozitiv nesuportat sau nu sunt activate setări biometrice</string>
     <string name="settings_customization">Personalizare</string>
@@ -186,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Actualizări Magisk</string>
     <string name="progress_channel">Notificări de progres</string>
+    <string name="updated_channel">Actualizare finalizată</string>
     <string name="download_complete">Descărcare finalizată</string>
     <string name="download_file_error">Eroare la descărcarea fișierului</string>
     <string name="magisk_update_title">Actualizare Magisk disponibilă!</string>
+    <string name="updated_title">Magisk actualizat</string>
+    <string name="updated_text">Atinge pentru a deschide aplicația</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Da</string>
@@ -213,17 +220,19 @@
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
-    <string name="unsupport_magisk_msg">Această versiune a aplicației nu suportă versiunea Magisk mai mică de %1$s.\n\nAplicația se va comporta ca și cum Magisk nu este instalat, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
+    <string name="unsupport_magisk_msg">Această versiune a aplicației nu suportă versiunile Magisk mai mici de %1$s.\n\nAplicația se va comporta ca și cum Magisk nu este instalat, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
     <string name="unsupport_general_title">Stare anormală</string>
     <string name="unsupport_system_app_msg">Rularea acestei aplicații ca aplicație de sistem nu este suportată. Te rugăm să readuci aplicația într-o aplicație de utilizator.</string>
-    <string name="unsupport_other_su_msg">Este detectată o comandă „su” care nu aparține Magisk. Te rugăm să elimini cealaltă aplicație su nesuportată.</string>
+    <string name="unsupport_other_su_msg">A fost detectat un binar „su” care nu provine de la Magisk. Te rugăm să elimini orice soluție root concurentă și/sau să reinstalezi Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk este instalat în spațiul de stocare extern. Te rugăm să muți aplicația în spațiul de stocare intern.</string>
-    <string name="unsupport_nonroot_stub_msg">Aplicația nu poate continua să funcționeze în starea ascunsă, deoarece rootul a fost pierdut. Te rugăm să o restaurezi înapoi în APK-ul original.</string>
+    <string name="unsupport_nonroot_stub_msg">Aplicația Magisk ascunsă nu poate continua să funcționeze deoarece rootul a fost pierdut. Te rugăm să restaurezi APK-ul original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
+    <string name="install_unknown_denied">Permite „instalarea de aplicații necunoscute” pentru a activa această funcționalitate</string>
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
     <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>
     <string name="app_not_found">Nu s-a găsit nicio aplicație care să gestioneze această acțiune</string>
-	<string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
+    <string name="reboot_apply_change">Repornește pentru a aplica modificările</string>
+    <string name="restore_app_confirmation">Acest lucru va restaura aplicația ascunsă în aplicația originală. Sigur vrei să faci asta?</string>
 
 </resources>
