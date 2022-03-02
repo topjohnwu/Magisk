@@ -189,15 +189,25 @@ string &replace_all(string &str, string_view from, string_view to) {
     return str;
 }
 
-vector<string> split(const string& s, const string& delimiters) {
-    vector<string> result;
+template <class T>
+static auto split_impl(T s, T delims) {
+    vector<std::decay_t<T>> result;
     size_t base = 0;
     size_t found;
     while (true) {
-        found = s.find_first_of(delimiters, base);
+        found = s.find_first_of(delims, base);
         result.push_back(s.substr(base, found - base));
-        if (found == string::npos) break;
+        if (found == string::npos)
+            break;
         base = found + 1;
     }
     return result;
+}
+
+vector<string> split(const string &s, const string &delims) {
+    return split_impl<const string&>(s, delims);
+}
+
+vector<string_view> split_ro(string_view s, string_view delims) {
+    return split_impl<string_view>(s, delims);
 }
