@@ -190,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Обновление Magisk</string>
     <string name="progress_channel">Уведомления о прогрессе</string>
+    <string name="updated_channel">Обновление завершено</string>
     <string name="download_complete">Загрузка завершена</string>
     <string name="download_file_error">Ошибка загрузки файла</string>
     <string name="magisk_update_title">Доступно обновление Magisk!</string>
+    <string name="updated_title">Magisk обновлён</string>
+    <string name="updated_text">Нажмите, чтобы открыть</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Да</string>
@@ -224,7 +227,8 @@
     <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
     <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
-    <string name="external_rw_permission_denied">Пожалуйста, предоставьте доступ к хранилищу</string>
+    <string name="external_rw_permission_denied">Предоставьте разрешение на доступ к хранилищу</string>
+    <string name="install_unknown_denied">Предоставьте разрешение на "Установку из неизвестных источников"</string>
     <string name="add_shortcut_title">Добавление ярлыка</string>
     <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
