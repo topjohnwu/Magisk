@@ -78,7 +78,7 @@
     <string name="superuser_policy_none">Nenhum app solicitou permissão de Superusuário ainda.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Não há tem registros. Tente usar os apps permitidos para Superusuário.</string>
+    <string name="log_data_none">Não há registros. Tente usar os apps permitidos para Superusuário.</string>
     <string name="log_data_magisk_none">Os Registro de atividade do Magisk estão vazios, isso é estranho.</string>
     <string name="menuSaveLog">Salvar Registro</string>
     <string name="menuClearLog">Limpar Registro agora</string>
