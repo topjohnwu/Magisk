@@ -4,11 +4,39 @@
 
 namespace {
 
-using module_abi_v1 = zygisk::internal::module_abi;
 struct HookContext;
 struct ZygiskModule;
 
-struct AppSpecializeArgsImpl {
+struct AppSpecializeArgs_v3 {
+    jint &uid;
+    jint &gid;
+    jintArray &gids;
+    jint &runtime_flags;
+    jobjectArray &rlimits;
+    jint &mount_external;
+    jstring &se_info;
+    jstring &nice_name;
+    jstring &instruction_set;
+    jstring &app_data_dir;
+
+    jintArray *fds_to_ignore = nullptr;
+    jboolean *is_child_zygote = nullptr;
+    jboolean *is_top_app = nullptr;
+    jobjectArray *pkg_data_info_list = nullptr;
+    jobjectArray *whitelisted_data_info_list = nullptr;
+    jboolean *mount_data_dirs = nullptr;
+    jboolean *mount_storage_dirs = nullptr;
+
+    AppSpecializeArgs_v3(
+            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
+            jobjectArray &rlimits, jint &mount_external, jstring &se_info, jstring &nice_name,
+            jstring &instruction_set, jstring &app_data_dir) :
+            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags), rlimits(rlimits),
+            mount_external(mount_external), se_info(se_info), nice_name(nice_name),
+            instruction_set(instruction_set), app_data_dir(app_data_dir) {}
+};
+
+struct AppSpecializeArgs_v1 {
     jint &uid;
     jint &gid;
     jintArray &gids;
@@ -19,24 +47,35 @@ struct AppSpecializeArgsImpl {
     jstring &instruction_set;
     jstring &app_data_dir;
 
-    /* Optional */
-    jboolean *is_child_zygote = nullptr;
-    jboolean *is_top_app = nullptr;
-    jobjectArray *pkg_data_info_list = nullptr;
-    jobjectArray *whitelisted_data_info_list = nullptr;
-    jboolean *mount_data_dirs = nullptr;
-    jboolean *mount_storage_dirs = nullptr;
+    jboolean *const is_child_zygote;
+    jboolean *const is_top_app;
+    jobjectArray *const pkg_data_info_list;
+    jobjectArray *const whitelisted_data_info_list;
+    jboolean *const mount_data_dirs;
+    jboolean *const mount_storage_dirs;
 
-    AppSpecializeArgsImpl(
-            jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
-            jint &mount_external, jstring &se_info, jstring &nice_name,
-            jstring &instruction_set, jstring &app_data_dir) :
-            uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
-            mount_external(mount_external), se_info(se_info), nice_name(nice_name),
-            instruction_set(instruction_set), app_data_dir(app_data_dir) {}
+    AppSpecializeArgs_v1(const AppSpecializeArgs_v3 *v3) :
+            uid(v3->uid), gid(v3->gid), gids(v3->gids), runtime_flags(v3->runtime_flags),
+            mount_external(v3->mount_external), se_info(v3->se_info), nice_name(v3->nice_name),
+            instruction_set(v3->instruction_set), app_data_dir(v3->app_data_dir),
+            is_child_zygote(v3->is_child_zygote), is_top_app(v3->is_top_app),
+            pkg_data_info_list(v3->pkg_data_info_list),
+            whitelisted_data_info_list(v3->whitelisted_data_info_list),
+            mount_data_dirs(v3->mount_data_dirs), mount_storage_dirs(v3->mount_storage_dirs) {}
 };
 
-struct ServerSpecializeArgsImpl {
+struct module_abi_raw {
+    long api_version;
+    void *_this;
+    void (*preAppSpecialize)(void *, void *);
+    void (*postAppSpecialize)(void *, const void *);
+    void (*preServerSpecialize)(void *, void *);
+    void (*postServerSpecialize)(void *, const void *);
+};
+
+using module_abi_v1 = module_abi_raw;
+
+struct ServerSpecializeArgs_v1 {
     jint &uid;
     jint &gid;
     jintArray &gids;
@@ -44,7 +83,7 @@ struct ServerSpecializeArgsImpl {
     jlong &permitted_capabilities;
     jlong &effective_capabilities;
 
-    ServerSpecializeArgsImpl(
+    ServerSpecializeArgs_v1(
             jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
             jlong &permitted_capabilities, jlong &effective_capabilities) :
             uid(uid), gid(gid), gids(gids), runtime_flags(runtime_flags),
@@ -62,21 +101,6 @@ enum : uint32_t {
     UNMOUNT_MASK = (PROCESS_ON_DENYLIST | DENYLIST_ENFORCING),
     PRIVATE_MASK = (0x3u << 30)
 };
-
-template<typename T>
-struct force_cast_wrapper {
-    template<typename U>
-    operator U() const { return reinterpret_cast<U>(mX); }
-    force_cast_wrapper(T &&x) : mX(std::forward<T>(x)) {}
-    force_cast_wrapper &operator=(const force_cast_wrapper &) = delete;
-private:
-    T &&mX;
-};
-
-template<typename R>
-force_cast_wrapper<R> force_cast(R &&x) {
-    return force_cast_wrapper<R>(std::forward<R>(x));
-}
 
 struct ApiTable {
     // These first 2 entries are permanent
@@ -100,18 +124,32 @@ struct ApiTable {
     ApiTable(ZygiskModule *m);
 };
 
+#define call_app(method)            \
+switch (*ver) {                     \
+case 1:                             \
+case 2: {                           \
+    AppSpecializeArgs_v1 a(args);   \
+    v1->method(v1->_this, &a);      \
+    break;                          \
+}                                   \
+case 3:                             \
+    v1->method(v1->_this, args);    \
+    break;                          \
+}
+
 struct ZygiskModule {
-    void preAppSpecialize(AppSpecializeArgsImpl *args) const {
-        v1->preAppSpecialize(v1->_this, force_cast(args));
+
+    void preAppSpecialize(AppSpecializeArgs_v3 *args) const {
+        call_app(preAppSpecialize)
     }
-    void postAppSpecialize(const AppSpecializeArgsImpl *args) const {
-        v1->postAppSpecialize(v1->_this, force_cast(args));
+    void postAppSpecialize(const AppSpecializeArgs_v3 *args) const {
+        call_app(postAppSpecialize)
     }
-    void preServerSpecialize(ServerSpecializeArgsImpl *args) const {
-        v1->preServerSpecialize(v1->_this, force_cast(args));
+    void preServerSpecialize(ServerSpecializeArgs_v1 *args) const {
+        v1->preServerSpecialize(v1->_this, args);
     }
-    void postServerSpecialize(const ServerSpecializeArgsImpl *args) const {
-        v1->postServerSpecialize(v1->_this, force_cast(args));
+    void postServerSpecialize(const ServerSpecializeArgs_v1 *args) const {
+        v1->postServerSpecialize(v1->_this, args);
     }
 
     int connectCompanion() const;
