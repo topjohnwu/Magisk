@@ -6,7 +6,7 @@
     <string name="logs">Nhật ký</string>
     <string name="settings">Cài đặt</string>
     <string name="install">Cài đặt</string>
-    <string name="section_home">Home</string>
+    <string name="section_home">Trang chủ</string>
     <string name="section_theme">Chủ đề</string>
     <string name="denylist">DenyList</string>
 
@@ -23,16 +23,17 @@
     <string name="home_notice_content">Chỉ nên tải Magisk từ trang GitHub chính thức. Tải tệp từ các nguồn không rõ có thể gây hại!</string>
     <string name="home_support_title">Hỗ trợ chúng tôi</string>
     <string name="home_item_source">Nguồn</string>
-    <string name="home_support_content">Magisk, và sẽ luôn luôn là, miễn phí và mã nguồn mở. Tuy nhiên, bạn có thể cho chúng tôi thấy rằng bạn quan tâm bằng cách gửi một khoản đóng góp nhỏ.</string>
+    <string name="home_support_content">Magisk sẽ, và luôn luôn là, miễn phí và mã nguồn mở. Tuy nhiên, bạn có thể cho chúng tôi thấy rằng bạn quan tâm bằng cách gửi một khoản đóng góp nhỏ.</string>
     <string name="home_installed_version">Cài đặt</string>
     <string name="home_latest_version">Mới nhất</string>
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
     <string name="uninstall_magisk_title">Gỡ cài đặt Magisk</string>
     <string name="uninstall_magisk_msg">Tất cả các mô-đun sẽ bị tắt hoặc bị xóa!\nRoot sẽ bị gỡ bỏ\nDữ liệu của bạn có thể bị mã hóa lại nếu nó không mã hóa!</string>
 
-    <!--Settings-->
+    <!--Install-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hóa</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
+     <string name="patch_vbmeta">Vá vbmeta trong boot image</string>
     <string name="recovery_mode">Chế độ Recovery</string>
     <string name="install_options_title">Tùy chọn</string>
     <string name="install_method_title">Phương pháp</string>
@@ -41,7 +42,7 @@
     <string name="manager_download_install">Nhấn để tải xuống và cài đặt</string>
     <string name="direct_install">Cài đặt trực tiếp (Khuyến nghị)</string>
     <string name="install_inactive_slot">Cài đặt vào vùng không hoạt động (Sau OTA)</string>
-    <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ BẮT BUỘC khởi động vào vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tùy chọn này sau khi hoàn tất OTA.\nTiếp tục chứ?</string>
+    <string name="install_inactive_slot_msg">Thiết bị của bạn sẽ bị BUỘC khởi động vào vị trí không hoạt động hiện tại sau khi khởi động lại!\nChỉ sử dụng tùy chọn này sau khi hoàn tất OTA.\nTiếp tục chứ?</string>
     <string name="setup_title">Thiết lập bổ sung</string>
     <string name="select_patch_file">Chọn và vá tệp</string>
     <string name="patch_file_msg">Chọn đĩa ảnh (*.img) hoặc tệp tarfile ODIN (*.tar)</string>
@@ -50,7 +51,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Yêu cầu Superuser</string>
-    <string name="touch_filtered_warning">Vì một ứng dụng đang che phủ yêu cầu Superuser, Magisk không thể xác minh đó là phản hồi của bạn</string>
+    <string name="touch_filtered_warning">Vì một ứng dụng đang che phủ yêu cầu Superuser, Magisk không thể xác minh phản hồi của bạn</string>
     <string name="deny">Từ chối</string>
     <string name="prompt">Nhắc nhở</string>
     <string name="grant">Cấp phép</string>
@@ -79,7 +80,7 @@
     <string name="superuser_policy_none">Chưa có ứng dụng nào yêu cầu Superuser.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Nhật ký của bạn đang trống, hãy thử sử dụng các ứng dụng hỗ trợ SU của bạn nhiều hơn</string>
+    <string name="log_data_none">Nhật ký của bạn đang trống, hãy thử sử dụng các ứng dụng root của bạn nhiều hơn</string>
     <string name="log_data_magisk_none">Nhật ký Magisk trống, điều đó thật kỳ lạ</string>
     <string name="menuSaveLog">Lưu nhật ký</string>
     <string name="menuClearLog">Xóa nhật ký ngay bây giờ</string>
@@ -102,14 +103,15 @@
     <string name="reboot_bootloader">Khởi động lại vào Bootloader</string>
     <string name="reboot_download">Khởi động lại vào Download</string>
     <string name="reboot_edl">Khởi động lại vào EDL</string>
-    <string name="module_version_author">%1$s x %2$s</string>
-    <string name="module_state_remove">Loại bỏ</string>
+    <string name="module_version_author">%1$s bởi %2$s</string>
+    <string name="module_state_remove">Gỡ bỏ</string>
     <string name="module_state_restore">Khôi phục</string>
     <string name="module_action_install_external">Cài đặt từ bộ nhớ</string>
     <string name="update_available">Cập nhật có sẵn</string>
     <string name="suspend_text_riru">Mô-đun bị vô hiệu hóa vì %1$s được bật</string>
     <string name="suspend_text_zygisk">Mô-đun bị vô hiệu hóa vì %1$s không được bật</string>
-
+    <string name="zygisk_module_unloaded">Không tải mô-đun Zygisk vì không tương thích</string>
+    
     <!--Settings-->
     <string name="settings_dark_mode_title">Chế độ chủ đề</string>
     <string name="settings_dark_mode_message">Chọn chế độ phù hợp nhất với phong cách của bạn!</string>
@@ -159,13 +161,15 @@
     <string name="superuser_notification">Thông báo của Superuser</string>
     <string name="settings_su_reauth_title">Xác thực lại sau khi nâng cấp</string>
     <string name="settings_su_reauth_summary">Xác thực lại quyền Superuser sau khi nâng cấp ứng dụng</string>
-    <string name="settings_su_tapjack_title">Kích hoạt tính năng bảo vệ bằng Tapjacking</string>
+    <string name="settings_su_tapjack_title">Bảo vệ khỏi Tapjacking</string>
     <string name="settings_su_tapjack_summary">Hộp thoại nhắc Superuser sẽ không trả lời đầu vào khi bị che khuất bởi bất kỳ cửa sổ hoặc lớp phủ nào khác</string>
     <string name="settings_su_biometric_title">Bật xác thực sinh trắc học</string>
     <string name="settings_su_biometric_summary">Sử dụng xác thực sinh trắc học để xác nhận yêu cầu Superuser</string>
     <string name="no_biometric">Thiết bị của bạn không được hỗ trợ hoặc không có phương pháp xác thực sinh trắc học nào được kích hoạt</string>
     <string name="settings_customization">Tùy biến</string>
     <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó nhận ra tên và biểu tượng sau khi ẩn ứng dụng</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
     <string name="multiuser_mode">Chế độ đa người dùng</string>
     <string name="settings_owner_only">Chỉ chủ sở hữu thiết bị</string>
@@ -186,9 +190,12 @@
     <!--Thông báo-->
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="progress_channel">Thông báo tiến độ</string>
+    <string name="updated_channel">Cập nhật hoàn tất</string>
     <string name="download_complete">Tải về hoàn tất</string>
     <string name="download_file_error">Lỗi khi tải xuống tệp</string>
     <string name="magisk_update_title">Cập nhật Magisk có sẵn!</string>
+    <string name="updated_title">Đã cập nhật Magisk</string>
+    <string name="updated_text">Chạm để mở ứng dụng</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Đồng ý</string>
@@ -203,10 +210,10 @@
     <string name="hide_app_title">Đang ẩn ứng dụng Magisk…</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết</string>
     <string name="complete_uninstall">Hoàn thành Gỡ cài đặt</string>
-    <string name="restore_img">Khôi phục đĩa ảnh boot</string>
+    <string name="restore_img">Khôi phục đĩa ảnh boot (image)</string>
     <string name="restore_img_msg">Đang khôi phục…</string>
     <string name="restore_done">Đã khôi phục xong!</string>
-    <string name="restore_fail">Bản gốc không tồn tại!</string>
+    <string name="restore_fail">Bản sao lưu gốc không tồn tại!</string>
     <string name="setup_fail">Thiết lập không thành công</string>
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Bạn có muốn tiếp tục và khởi động lại không?</string>
@@ -216,14 +223,16 @@
     <string name="unsupport_magisk_msg">Phiên bản hiện tại của ứng dụng không hỗ trợ phiên bản Magisk thấp hơn %1$s.\n\nỨng dụng sẽ hoạt động như thể Magisk chưa được cài đặt. Vui lòng nâng cấp lên phiên bản mới nhất.</string>
     <string name="unsupport_general_title">Trạng thái bất thường</string>
     <string name="unsupport_system_app_msg">Không hỗ trợ chạy ứng dụng này dưới dạng ứng dụng hệ thống. Vui lòng hoàn nguyên ứng dụng về ứng dụng người dùng.</string>
-    <string name="unsupport_other_su_msg">Một lệnh \"su\" không thuộc về Magisk được phát hiện. Vui lòng loại bỏ su không được hỗ trợ khác.</string>
+    <string name="unsupport_other_su_msg">Một lệnh \"su\" không thuộc về Magisk được phát hiện. Vui lòng gỡ bỏ bất kì phương pháp root khác và/hoặc cài đặt lại Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk được cài đặt vào bộ nhớ ngoài. Vui lòng chuyển ứng dụng vào bộ nhớ trong.</string>
     <string name="unsupport_nonroot_stub_msg">Ứng dụng không thể tiếp tục hoạt động ở trạng thái ẩn vì mất quyền root. Vui lòng khôi phục nó trở lại APK ban đầu.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Cấp quyền lưu trữ để bật chức năng này</string>
+    <string name="install_unknown_denied">Cho phép "cài đặt ứng dụng không rõ nguồn gốc" để bật chức năng này</string>
     <string name="add_shortcut_title">Thêm lối tắt vào màn hình chính</string>
     <string name="add_shortcut_msg">Sau khi ẩn ứng dụng này, tên và biểu tượng của nó có thể trở nên khó nhận ra. Bạn có muốn thêm một phím tắt đẹp vào màn hình chính không?</string>
     <string name="app_not_found">Không tìm thấy ứng dụng nào để xử lý hành động này</string>
     <string name="reboot_apply_change">Khởi động lại để áp dụng các thay đổi</string>
+    <string name="restore_app_confirmation">Điều này sẽ khôi phục ứng dụng ẩn về nguyên bản. Bạn chắc chắn muốn làm điều này chứ?</string>
 
 </resources>

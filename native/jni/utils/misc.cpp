@@ -35,21 +35,17 @@ int fork_no_orphan() {
 
 int gen_rand_str(char *buf, int len, bool varlen) {
     constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static mt19937 gen([]{
-        mt19937::result_type seed;
-        if (syscall(__NR_getrandom, &seed, sizeof(seed), 0) < 0) {
-            // This can happen if device is running a too low Linux version
-            if (access("/dev/urandom", F_OK) != 0)
-                mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
-            int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-            xxread(fd, &seed, sizeof(seed));
-            close(fd);
-        }
+    static std::mt19937 gen([]{
+        if (access("/dev/urandom", F_OK) != 0)
+            mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
+        int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+        unsigned seed;
+        xxread(fd, &seed, sizeof(seed));
         return seed;
     }());
-    uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
+    std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
     if (varlen) {
-        uniform_int_distribution<int> len_dist(len / 2, len);
+        std::uniform_int_distribution<int> len_dist(len / 2, len);
         len = len_dist(gen);
     }
     for (int i = 0; i < len - 1; ++i)
@@ -189,15 +185,25 @@ string &replace_all(string &str, string_view from, string_view to) {
     return str;
 }
 
-vector<string> split(const string& s, const string& delimiters) {
-    vector<string> result;
+template <class T>
+static auto split_impl(T s, T delims) {
+    vector<std::decay_t<T>> result;
     size_t base = 0;
     size_t found;
     while (true) {
-        found = s.find_first_of(delimiters, base);
+        found = s.find_first_of(delims, base);
         result.push_back(s.substr(base, found - base));
-        if (found == string::npos) break;
+        if (found == string::npos)
+            break;
         base = found + 1;
     }
     return result;
+}
+
+vector<string> split(const string &s, const string &delims) {
+    return split_impl<const string&>(s, delims);
+}
+
+vector<string_view> split_ro(string_view s, string_view delims) {
+    return split_impl<string_view>(s, delims);
 }

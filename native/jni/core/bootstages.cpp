@@ -29,21 +29,31 @@ bool zygisk_enabled = false;
 #define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
 #define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
-#define do_mount_mirror(part, flag) {\
-    SETMIR(buf1, part); \
-    SETBLK(buf2, part); \
-    unlink(buf2); \
+#define do_mount_mirror(part) {     \
+    SETMIR(buf1, part);             \
+    SETBLK(buf2, part);             \
+    unlink(buf2);                   \
     mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-    xmkdir(buf1, 0755); \
-    xmount(buf2, buf1, me->mnt_type, flag, nullptr); \
-    LOGI("mount: %s\n", buf1); \
+    xmkdir(buf1, 0755);             \
+    int flags = 0;                  \
+    auto opts = split_ro(me->mnt_opts, ",");\
+    for (string_view s : opts) {    \
+        if (s == "ro") {            \
+            flags |= MS_RDONLY;     \
+            break;                  \
+        }                           \
+    }                               \
+    xmount(buf2, buf1, me->mnt_type, flags, nullptr); \
+    LOGI("mount: %s\n", buf1);      \
 }
 
-#define mount_mirror(part, flag)    \
-if (MNT_DIR_IS("/" #part) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay") && \
-    lstat(me->mnt_dir, &st) == 0) { \
-    do_mount_mirror(part, flag);    \
-    break;                          \
+#define mount_mirror(part) \
+if (MNT_DIR_IS("/" #part)  \
+    && !MNT_TYPE_IS("tmpfs") \
+    && !MNT_TYPE_IS("overlay") \
+    && lstat(me->mnt_dir, &st) == 0) { \
+    do_mount_mirror(part); \
+    break;                 \
 }
 
 #define link_mirror(part) \
@@ -73,11 +83,11 @@ static void mount_mirrors() {
     parse_mnt("/proc/mounts", [&](mntent *me) {
         struct stat st{};
         do {
-            mount_mirror(system, MS_RDONLY)
-            mount_mirror(vendor, MS_RDONLY)
-            mount_mirror(product, MS_RDONLY)
-            mount_mirror(system_ext, MS_RDONLY)
-            mount_mirror(data, 0)
+            mount_mirror(system)
+            mount_mirror(vendor)
+            mount_mirror(product)
+            mount_mirror(system_ext)
+            mount_mirror(data)
             link_orig(cache)
             link_orig(metadata)
             link_orig(persist)
@@ -96,7 +106,7 @@ static void mount_mirrors() {
         parse_mnt("/proc/mounts", [&](mntent *me) {
             struct stat st;
             if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
-                do_mount_mirror(system_root, MS_RDONLY)
+                do_mount_mirror(system_root)
                 return false;
             }
             return true;

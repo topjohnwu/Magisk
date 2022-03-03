@@ -33,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
     <string name="keep_dm_verity">Ponechať AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Zaplátať vbmeta v boot image</string>
     <string name="recovery_mode">Režim Recovery</string>
     <string name="install_options_title">Možnosti</string>
     <string name="install_method_title">Metóda</string>
@@ -189,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Aktualizácie Magisku</string>
     <string name="progress_channel">Upozornenia o priebehu</string>
+    <string name="updated_channel">Aktualizácia dokončená</string>
     <string name="download_complete">Sťahovanie ukončené</string>
     <string name="download_file_error">Chyba sťahovania súboru</string>
     <string name="magisk_update_title">Je dostupná aktualizácia Magisku!</string>
+    <string name="updated_title">Magisk aktualizovaný</string>
+    <string name="updated_text">Ťuknutím otvoríte apku</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Áno</string>
@@ -224,6 +228,7 @@
     <string name="unsupport_nonroot_stub_msg">Skrytá aplikácia Magisk nemôže pokračovať v práci, lebo root sa stratil. Prosím, obnovte ju z pôvodného súboru APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="install_unknown_denied">Povoľte "inštaláciu neznámych aplikácii" na povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
     <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznateľnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
     <string name="app_not_found">Nenašla sa žiadna aplikácia, ktorá dokáže spracovať túto akciu</string>

@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -100,20 +99,16 @@ class DownloadService : NotificationService() {
                     val apk = subject.file.toFile()
                     service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
 
-                    // Patch
-                    val patched = File(apk.parent, "patched.apk")
-                    val label = applicationInfo.nonLocalizedLabel
-                    if (!HideAPK.patch(this, apk, patched, packageName, label)) {
-                        throw IOException("HideAPK patch error")
+                    // Patch and install
+                    val session = APKInstall.startSession(this)
+                    session.openStream(this).use {
+                        val label = applicationInfo.nonLocalizedLabel
+                        if (!HideAPK.patch(this, apk, it, packageName, label)) {
+                            throw IOException("HideAPK patch error")
+                        }
                     }
                     apk.delete()
-
-                    // Install
-                    val session = APKInstall.startSession(this)
-                    patched.inputStream().copyAndClose(session.openStream(this))
                     subject.intent = session.waitIntent()
-
-                    patched.delete()
                 } else {
                     ActivityTracker.foreground?.let {
                         // Relaunch the process if we are foreground
