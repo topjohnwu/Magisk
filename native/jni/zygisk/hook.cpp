@@ -394,15 +394,17 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
 
     // Add all ignored fd onto whitelist
     if (state[APP_SPECIALIZE] && args->fds_to_ignore) {
-        int len = env->GetArrayLength(*args->fds_to_ignore);
-        int *arr = env->GetIntArrayElements(*args->fds_to_ignore, nullptr);
-        for (int i = 0; i < len; ++i) {
-            int fd = arr[i];
-            if (fd >= 0 && fd < 1024) {
-                open_fds[fd] = true;
+        if (jintArray fdsToIgnore = *args->fds_to_ignore) {
+            int len = env->GetArrayLength(fdsToIgnore);
+            int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
+            for (int i = 0; i < len; ++i) {
+                int fd = arr[i];
+                if (fd >= 0 && fd < 1024) {
+                    open_fds[fd] = true;
+                }
             }
+            env->ReleaseIntArrayElements(fdsToIgnore, arr, JNI_ABORT);
         }
-        env->ReleaseIntArrayElements(*args->fds_to_ignore, arr, 0);
     }
 
     // Close all unrecorded fds
