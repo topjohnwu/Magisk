@@ -112,7 +112,6 @@
     <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
     <string name="zygisk_module_unloaded">Module Zygisk non chargé en raison d’une incompatibilité</string>
 
-
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
     <string name="settings_dark_mode_message">Choisissez le mode qui correspond le mieux à votre style !</string>
@@ -191,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Mises à jour de Magisk</string>
     <string name="progress_channel">Notifications de progression</string>
+    <string name="updated_channel">Mise à jour Terminée</string>
     <string name="download_complete">Téléchargement terminé</string>
     <string name="download_file_error">Erreur lors du téléchargement du fichier</string>
     <string name="magisk_update_title">Une mise à jour de Magisk est disponible !</string>
+    <string name="updated_title">Magisk Mis à jour</string>
+    <string name="updated_text">Appuyer pour ouvrir l’application</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Oui</string>
@@ -226,6 +228,7 @@
     <string name="unsupport_nonroot_stub_msg">Cette application ne peut continuer à fonctionner en étant masquée car l’accès en tant que super‑utilisateur a été perdu. Merci de restaurer l’APK originel.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
+    <string name="install_unknown_denied">Autoriser "installation d’applications inconnues" pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>
     <string name="app_not_found">Aucune application n’a été trouvée pour gérer cette action</string>

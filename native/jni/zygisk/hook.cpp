@@ -43,8 +43,8 @@ void name##_post();
 struct HookContext {
     JNIEnv *env;
     union {
-        AppSpecializeArgsImpl *args;
-        ServerSpecializeArgsImpl *server_args;
+        AppSpecializeArgs_v3 *args;
+        ServerSpecializeArgs_v1 *server_args;
         void *raw_args;
     };
     const char *process;
@@ -292,10 +292,11 @@ bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
 
     // Fill in API accordingly with module API version
     switch (ver) {
+    case 3:
     case 2:
         table->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
         table->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
-        [[fallthrough]];
+        // fallthrough
     case 1:
         table->v1.hookJniNativeMethods = &hookJniNativeMethods;
         table->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
@@ -388,6 +389,21 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
             m.preAppSpecialize(args);
         } else if (state[SERVER_SPECIALIZE]) {
             m.preServerSpecialize(server_args);
+        }
+    }
+
+    // Add all ignored fd onto whitelist
+    if (state[APP_SPECIALIZE] && args->fds_to_ignore) {
+        if (jintArray fdsToIgnore = *args->fds_to_ignore) {
+            int len = env->GetArrayLength(fdsToIgnore);
+            int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
+            for (int i = 0; i < len; ++i) {
+                int fd = arr[i];
+                if (fd >= 0 && fd < 1024) {
+                    open_fds[fd] = true;
+                }
+            }
+            env->ReleaseIntArrayElements(fdsToIgnore, arr, JNI_ABORT);
         }
     }
 

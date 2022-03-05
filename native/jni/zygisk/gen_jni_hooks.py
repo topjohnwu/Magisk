@@ -87,7 +87,7 @@ class ForkAndSpec(JNIHook):
         return 'nativeForkAndSpecialize'
 
     def init_args(self):
-        return 'AppSpecializeArgsImpl args(uid, gid, gids, runtime_flags, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
+        return 'AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
 
     def body(self):
         decl = ''
@@ -118,7 +118,7 @@ class ForkServer(ForkAndSpec):
         return 'nativeForkSystemServer'
 
     def init_args(self):
-        return 'ServerSpecializeArgsImpl args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
+        return 'ServerSpecializeArgs_v1 args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);'
 
 # Common args
 uid = Argument('uid', jint)
@@ -134,7 +134,7 @@ instruction_set = Argument('instruction_set', jstring)
 app_data_dir = Argument('app_data_dir', jstring)
 
 # o
-fds_to_ignore = Argument('fds_to_ignore', jintArray)
+fds_to_ignore = Argument('fds_to_ignore', jintArray, True)
 
 # p
 is_child_zygote = Argument('is_child_zygote', jboolean, True)

@@ -106,12 +106,15 @@ public class DynLoad {
         if (Build.VERSION.SDK_INT < 29)
             replaceClassLoader(context);
 
+        // noinspection InlinedApi
         int flags = PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES
-                | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS;
+                | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS
+                | PackageManager.MATCH_DIRECT_BOOT_AWARE | PackageManager.MATCH_DIRECT_BOOT_UNAWARE;
         var pm = context.getPackageManager();
 
         final PackageInfo info;
         try {
+            // noinspection WrongConstant
             info = pm.getPackageInfo(context.getPackageName(), flags);
         } catch (PackageManager.NameNotFoundException e) {
             // Impossible
@@ -122,6 +125,7 @@ public class DynLoad {
 
         final var cl = loadApk(context);
         if (cl != null) try {
+            // noinspection WrongConstant
             var pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), flags);
             cl.updateComponentMap(info, pkgInfo);
 
@@ -162,7 +166,6 @@ public class DynLoad {
     }
 
     // Replace LoadedApk mClassLoader
-    @SuppressWarnings("ConstantConditions")
     private static void replaceClassLoader(Context context) {
         // Get ContextImpl
         while (context instanceof ContextWrapper) {
@@ -173,6 +176,7 @@ public class DynLoad {
             Field mInfo = context.getClass().getDeclaredField("mPackageInfo");
             mInfo.setAccessible(true);
             Object loadedApk = mInfo.get(context);
+            assert loadedApk != null;
             Field mcl = loadedApk.getClass().getDeclaredField("mClassLoader");
             mcl.setAccessible(true);
             mcl.set(loadedApk, new DelegateClassLoader());
