@@ -3,36 +3,36 @@ description: Create a report to help us improve
 body:
   - type: markdown
     attributes:
-    value:  |
-      ## READ BEFORE OPENING ISSUES
-      All bug reports require you to **USE CANARY BUILDS**. Please include the version name and version code in the bug report.
-      **DO NOT** open issues regarding root detection.
-      **DO NOT** ask for instructions.
-      **DO NOT** report issues if you have any modules installed.
-      Without following the rules above, your issue will be closed without explanation.
+      value:  |
+        ## READ BEFORE OPENING ISSUES
+        All bug reports require you to **USE CANARY BUILDS**. Please include the version name and version code in the bug report.
+        **DO NOT** open issues regarding root detection.
+        **DO NOT** ask for instructions.
+        **DO NOT** report issues if you have any modules installed.
+        Without following the rules above, your issue will be closed without explanation.
   - type: checkboxes
     id: preliminary_checklist
     attributes:
-    label: Preliminary checklist
-    options:
-      - label: "I have read the [README](https://github.com/topjohnwu/Magisk/blob/master/README.MD)."
-        required: true
-      - label: "I have searched the existing issues for my problem. This is a new ticket, NOT a duplicate or related to another open issue."
-        required: true
-      - label: "I have updated Magisk Canary to the latest version. The bug is reproducible on this latest version."
-        required: true
+      label: Preliminary checklist
+      options:
+        - label: "I have read the [README](https://github.com/topjohnwu/Magisk/blob/master/README.MD)."
+          required: true
+        - label: "I have searched the existing issues for my problem. This is a new ticket, NOT a duplicate or related to another open issue."
+          required: true
+        - label: "I have updated Magisk Canary to the latest version. The bug is reproducible on this latest version."
+          required: true
   - type: dropdown
     id: device_architecture
     attributes:
-    label: Device architecture
-    multiple: false
-    options:
-      - arm
-      - arm64
-      - arm64-v8a
-      - armeabi-v7a
-      - x86
-      - x64
+      label: Device architecture
+      multiple: false
+      options:
+        - arm
+        - arm64
+        - arm64-v8a
+        - armeabi-v7a
+        - x86
+        - x64
     validations:
       required: true
   - type: input
