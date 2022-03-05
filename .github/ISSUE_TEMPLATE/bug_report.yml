@@ -1,15 +1,15 @@
 name: "Bug report"
 description: Create a report to help us improve
 body:
-	- type: markdown
-		attributes:
-		value:	|
-			## READ BEFORE OPENING ISSUES
-			All bug reports require you to **USE CANARY BUILDS**. Please include the version name and version code in the bug report.
-			**DO NOT** open issues regarding root detection.
-			**DO NOT** ask for instructions.
-			**DO NOT** report issues if you have any modules installed.
-			Without following the rules above, your issue will be closed without explanation.
+  - type: markdown
+    attributes:
+    value:	|
+      ## READ BEFORE OPENING ISSUES
+      All bug reports require you to **USE CANARY BUILDS**. Please include the version name and version code in the bug report.
+      **DO NOT** open issues regarding root detection.
+      **DO NOT** ask for instructions.
+      **DO NOT** report issues if you have any modules installed.
+      Without following the rules above, your issue will be closed without explanation.
 	- type: checkboxes
 	  id: preliminary_checklist
 	  attributes:
