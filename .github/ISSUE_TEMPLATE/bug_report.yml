@@ -33,65 +33,67 @@ body:
       - armeabi-v7a
       - x86
       - x64
-		validations:
-			required: true
-	- type: input
-	  id: device_model
-	  attributes:
-	  	label: Device model
-		description: What is your device model? This can usually be found in your device's settings in the "About" section. Also do mention if you're using a Custom ROM.
-		placeholder: (e.g. `Nokia 6.1 Plus (DRG_Sprout)`, or `SM-G960UZKABST`, etc.)
-	validations:
-		required: true
-	- type: dropdown
-	  id: android_version
-	  attributes:
-	  	label: Android version
-		description: What version of Android are you runing currently?
-		options:
-			- 13 (Developer Preview)
-			- 12
-			- 11
-			- 10
-			- 9
-			- 8.1
-			- 8.0
-			- 7.1
-			- 7.0
-			- 6
-			- 5.1
-			- 5.0
-			- 4.4
-			- 4.3
-			- 4.2
-			- 4.1
-		validations:
-			required: true
-	- type: input
-	  id: magisk_version_name
-	  attributes:
- 		label: Magisk Version Name
-		description: What is the version of Magisk that you're currently running?
-		placeholder: (e.g. `7cfce9f`, or `f822ca5`, etc.)
-	  validations:
-		required: true
-	- type: input
-	  id: magisk_version_code
-	  attributes:
-	  	label: Magisk Version Code
-		description: What is the version code of the Magisk that you're currently running?
-		placeholder: (e.g. `23001`, or `24201`, etc.)
-	- type: textarea
-	  id: bug_logs
-	  attributes: 
-	  	label: Is this bug a Crash, Bootloop, or any other issues related to Magisk?
-		description:	|
-			If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT ROOT**.
-			If you experience issues during installation, in recovery, upload the recovery logs, or in Magisk, upload the install logs. Please also upload the `boot.img` or `recovery.img` that you are using for patching.
-			If you experience a crash of Magisk app, dump the full `logcat` **when the crash happens**.
-			If you experience other issues related to Magisk, upload `magisk.log`, and preferably also include a boot `logcat` (start dumping `logcat` when the device boots up)
-			If neither of them, then type `No`.
-		placeholder: |
+    validations:
+      required: true
+  - type: input
+    id: device_model
+    attributes:
+      label: Device model
+      description: What is your device model? This can usually be found in your device's settings in the "About" section. Also do mention if you're using a Custom ROM.
+      placeholder: (e.g. `Nokia 6.1 Plus (DRG_Sprout)`, or `SM-G960UZKABST`, etc.)
+    validations:
+      required: true
+  - type: dropdown
+    id: android_version
+    attributes:
+      label: Android version
+      description: What version of Android are you runing currently?
+      options:
+        - 13 (Developer Preview)
+	- 12
+	- 11
+	- 10
+	- 9
+	- 8.1
+	- 8.0
+	- 7.1
+	- 7.0
+	- 6
+	- 5.1
+	- 5.0
+	- 4.4
+	- 4.3
+	- 4.2
+	- 4.1
+    validations:
+      required: true
+  - type: input
+    id: magisk_version_name
+    attributes:
+      label: Magisk Version Name
+      description: What is the version of Magisk that you're currently running?
+      placeholder: (e.g. `7cfce9f`, or `f822ca5`, etc.)
+    validations:
+      required: true
+  - type: input
+    id: magisk_version_code
+    attributes:
+      label: Magisk Version Code
+      description: What is the version code of the Magisk that you're currently running?
+      placeholder: (e.g. `23001`, or `24201`, etc.)
+    validations:
+      required: true
+  - type: textarea
+    id: bug_logs
+    attributes: 
+      label: Is this bug a Crash, Bootloop, or any other issues related to Magisk?
+      description:  |
+        If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT ROOT**.
+        If you experience issues during installation, in recovery, upload the recovery logs, or in Magisk, upload the install logs. Please also upload the `boot.img` or `recovery.img` that you are using for patching.
+	If you experience a crash of Magisk app, dump the full `logcat` **when the crash happens**.
+	If you experience other issues related to Magisk, upload `magisk.log`, and preferably also include a boot `logcat` (start dumping `logcat` when the device boots up)
+	If neither of them, then type `No`.
+placeholder: |
 			Drag the `kernel_logs / recovery_logs / install_logs/ boot.img / logcat` here to attach it or paste the logcat dump here.
 		validations:
 			required: true
