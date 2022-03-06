@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.AnyDiffRvItem
-import com.topjohnwu.magisk.databinding.adapterOf
 import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.events.SnackbarEvent
@@ -33,7 +32,6 @@ class SuperuserViewModel(
     private val itemsPolicies = diffListOf<PolicyRvItem>()
     private val itemsHelpers = ObservableArrayList<TextItem>()
 
-    val adapter = adapterOf<AnyDiffRvItem>()
     val items = MergeObservableList<AnyDiffRvItem>()
         .insertList(itemsHelpers)
         .insertList(itemsPolicies)

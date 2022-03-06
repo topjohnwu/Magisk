@@ -19,7 +19,6 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
-            adapter="@{viewModel.adapter}"
             gone="@{viewModel.loading}"
             itemBinding="@{viewModel.itemBinding}"
             items="@{viewModel.items}"

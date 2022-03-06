@@ -8,7 +8,6 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.databinding.RvItem
-import com.topjohnwu.magisk.databinding.adapterOf
 import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.events.SelectModuleEvent
@@ -26,7 +25,6 @@ class ModuleViewModel : BaseViewModel() {
 
     private val itemsInstalled = diffListOf<LocalModuleRvItem>()
 
-    val adapter = adapterOf<RvItem>()
     val items = MergeObservableList<RvItem>()
     val itemBinding = itemBindingOf<RvItem> {
         it.bindExtra(BR.viewModel, this)

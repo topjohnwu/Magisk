@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.databinding.AnyDiffRvItem
 import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
+import com.topjohnwu.magisk.databinding.adapterOf
 import com.topjohnwu.magisk.di.viewModel
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
@@ -24,6 +26,7 @@ class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.superuserList.apply {
+            adapter = adapterOf<AnyDiffRvItem>()
             addEdgeSpacing(top = R.dimen.l_50, bottom = R.dimen.l1)
             addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
             fixEdgeEffect()
