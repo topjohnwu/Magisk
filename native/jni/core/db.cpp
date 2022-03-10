@@ -144,9 +144,9 @@ static char *open_and_init_db(sqlite3 *&db) {
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
     if (ret)
         return strdup(sqlite3_errmsg(db));
-    int ver;
+    int ver = 0;
     bool upgrade = false;
-    char *err;
+    char *err = nullptr;
     sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
     err_ret(err);
     if (ver > DB_VERSION) {
@@ -250,7 +250,7 @@ static char *open_and_init_db(sqlite3 *&db) {
 }
 
 char *db_exec(const char *sql) {
-    char *err;
+    char *err = nullptr;
     if (mDB == nullptr) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
@@ -276,7 +276,7 @@ static int sqlite_db_row_callback(void *cb, int col_num, char **data, char **col
 }
 
 char *db_exec(const char *sql, const db_row_cb &fn) {
-    char *err;
+    char *err = nullptr;
     if (mDB == nullptr) {
         err = open_and_init_db(mDB);
         db_err_cmd(err,
@@ -294,7 +294,7 @@ char *db_exec(const char *sql, const db_row_cb &fn) {
 }
 
 int get_db_settings(db_settings &cfg, int key) {
-    char *err;
+    char *err = nullptr;
     auto settings_cb = [&](db_row &row) -> bool {
         cfg[row["key"]] = parse_int(row["value"]);
         DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
@@ -312,7 +312,7 @@ int get_db_settings(db_settings &cfg, int key) {
 }
 
 int get_db_strings(db_strings &str, int key) {
-    char *err;
+    char *err = nullptr;
     auto string_cb = [&](db_row &row) -> bool {
         str[row["key"]] = row["value"];
         DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
