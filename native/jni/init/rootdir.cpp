@@ -240,7 +240,7 @@ void SARBase::patch_rootdir() {
             make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
             make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
          });
-        if constexpr (avd_hack) {
+        if (avd_hack) {
             // Force disable early mount on original init
             init.patch({ make_pair("android,fstab", "xxx") });
         }
@@ -276,23 +276,9 @@ void SARBase::patch_rootdir() {
     // sepolicy
     patch_sepolicy(sepol);
 
-    // Restore backup files
-    struct sockaddr_un sun;
-    int sockfd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (connect(sockfd, (struct sockaddr*) &sun, setup_sockaddr(&sun, INIT_SOCKET)) == 0) {
-        LOGD("ACK init daemon to write backup files\n");
-        // Let daemon know where tmp_dir is
-        write_string(sockfd, tmp_dir);
-        // Wait for daemon to finish restoring files
-        read_int(sockfd);
-    } else {
-        LOGD("Restore backup files locally\n");
-        restore_folder(ROOTOVL, overlays);
-        overlays.clear();
-    }
-    close(sockfd);
-
     // Handle overlay.d
+    restore_folder(ROOTOVL, overlays);
+    overlays.clear();
     load_overlay_rc(ROOTOVL);
     if (access(ROOTOVL "/sbin", F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir

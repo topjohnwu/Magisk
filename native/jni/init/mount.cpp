@@ -205,27 +205,6 @@ static void switch_root(const string &path) {
     frm_rf(root);
 }
 
-bool is_dsu() {
-    strcpy(blk_info.partname, "metadata");
-    xmkdir("/metadata", 0755);
-    if (setup_block(true) < 0 ||
-        xmount(blk_info.block_dev, "/metadata", "ext4", MS_RDONLY, nullptr)) {
-        PLOGE("Failed to mount /metadata");
-        return false;
-    } else {
-        run_finally f([]{ xumount2("/metadata", MNT_DETACH); });
-        constexpr auto dsu_status = "/metadata/gsi/dsu/install_status";
-        if (xaccess(dsu_status, F_OK) == 0) {
-            char status[PATH_MAX] = {0};
-            auto fp = xopen_file(dsu_status, "r");
-            fgets(status, sizeof(status), fp.get());
-            if (status == "ok"sv || status == "0"sv)
-                return true;
-        }
-    }
-    return false;
-}
-
 void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
     char path[128];
     xrealpath(dev_base, blk_info.block_dev);
@@ -327,10 +306,14 @@ void RootFSInit::early_mount() {
 void SARBase::backup_files() {
     if (access("/overlay.d", F_OK) == 0)
         backup_folder("/overlay.d", overlays);
+    else if (access("/data/overlay.d", F_OK) == 0)
+        backup_folder("/data/overlay.d", overlays);
 
     self = mmap_data("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
         magisk_config = mmap_data("/.backup/.magisk");
+    else if (access("/data/.backup/.magisk", R_OK) == 0)
+        magisk_config = mmap_data("/data/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
@@ -367,13 +350,13 @@ mount_root:
         xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
 }
 
-void SARInit::early_mount() {
+bool SARInit::early_mount() {
     backup_files();
     mount_system_root();
     switch_root("/system_root");
 
     // Use the apex folder to determine whether 2SI (Android 10+)
-    is_two_stage = access("/apex", F_OK) == 0;
+    bool is_two_stage = access("/apex", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
     if (!is_two_stage) {
@@ -386,26 +369,8 @@ void SARInit::early_mount() {
 #endif
         mount_with_dt();
     }
-}
 
-bool SecondStageInit::prepare() {
-    backup_files();
-
-    umount2("/init", MNT_DETACH);
-    umount2("/proc/self/exe", MNT_DETACH);
-
-    // some weird devices, like meizu, embrace two stage init but still have legacy rootfs behaviour
-    bool legacy = false;
-    if (access("/system_root", F_OK) == 0) {
-        if (access("/system_root/proc", F_OK) == 0) {
-            switch_root("/system_root");
-        } else {
-            xmount("/system_root", "/system", nullptr, MS_MOVE, nullptr);
-            rmdir("/system_root");
-            legacy = true;
-        }
-    }
-    return legacy;
+    return is_two_stage;
 }
 
 void BaseInit::exec_init() {

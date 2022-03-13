@@ -63,13 +63,11 @@ LOCAL_SRC_FILES := \
     init/rootdir.cpp \
     init/getinfo.cpp \
     init/twostage.cpp \
-    core/socket.cpp \
     magiskpolicy/sepolicy.cpp \
     magiskpolicy/magiskpolicy.cpp \
     magiskpolicy/rules.cpp \
     magiskpolicy/policydb.cpp \
-    magiskpolicy/statement.cpp \
-    magiskboot/pattern.cpp
+    magiskpolicy/statement.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
