@@ -210,16 +210,25 @@ bool cpio::mv(const char *from, const char *to) {
 void cpio::load_cpio(const char *buf, size_t sz) {
     size_t pos = 0;
     while (pos < sz) {
-        auto header = reinterpret_cast<const cpio_newc_header *>(buf + pos);
+        auto hdr = reinterpret_cast<const cpio_newc_header *>(buf + pos);
+        if (memcmp(hdr->magic, "070701", 6) != 0)
+            LOGE("bad cpio header\n");
         pos += sizeof(cpio_newc_header);
         string_view name(buf + pos);
-        pos += x8u(header->namesize);
+        pos += x8u(hdr->namesize);
         pos_align(pos);
         if (name == "." || name == "..")
             continue;
-        if (name == "TRAILER!!!")
-            break;
-        auto entry = new cpio_entry(header);
+        if (name == "TRAILER!!!") {
+            // Android support multiple CPIO being concatenated
+            // Search for the next cpio header
+            auto next = static_cast<const char *>(memmem(buf + pos, sz - pos, "070701", 6));
+            if (next == nullptr)
+                break;
+            pos = next - buf;
+            continue;
+        }
+        auto entry = new cpio_entry(hdr);
         entry->data = xmalloc(entry->filesize);
         memcpy(entry->data, buf + pos, entry->filesize);
         pos += entry->filesize;
