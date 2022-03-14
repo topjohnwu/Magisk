@@ -56,7 +56,7 @@ static int dump_manager(const char *path, mode_t mode) {
 
 class RecoveryInit : public BaseInit {
 public:
-    RecoveryInit(char *argv[], BootConfig *cmd) : BaseInit(argv, cmd) {}
+    using BaseInit::BaseInit;
     void start() override {
         LOGD("Ramdisk is recovery, abort\n");
         rename(backup_init(), "/init");
@@ -144,14 +144,13 @@ int main(int argc, char *argv[]) {
     BootConfig config{};
 
     if (argc > 1 && argv[1] == "selinux_setup"sv) {
-        setup_klog();
         init = new SecondStageInit(argv);
     } else {
         // This will also mount /sys and /proc
         load_kernel_info(&config);
 
         if (config.skip_initramfs)
-            init = new SARInit(argv, &config);
+            init = new LegacySARInit(argv, &config);
         else if (config.force_normal_boot)
             init = new FirstStageInit(argv, &config);
         else if (access("/sbin/recovery", F_OK) == 0 || access("/system/bin/recovery", F_OK) == 0)

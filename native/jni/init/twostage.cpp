@@ -30,7 +30,7 @@ void FirstStageInit::prepare() {
     cp_afc("overlay.d", "/data/overlay.d");
 }
 
-void SARInit::first_stage_prep() {
+void LegacySARInit::first_stage_prep() {
     xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
 
     // Patch init binary
@@ -57,7 +57,7 @@ void SARInit::first_stage_prep() {
     xmkdir("/data/overlay.d", 0);
     restore_folder("/data/overlay.d", overlays);
     int cfg = xopen("/data/.backup/config", O_WRONLY | O_CREAT, 0);
-    xwrite(cfg, magisk_config.buf, magisk_config.sz);
+    xwrite(cfg, magisk_cfg.buf, magisk_cfg.sz);
     close(cfg);
 }
 

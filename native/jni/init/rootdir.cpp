@@ -202,7 +202,7 @@ static void patch_socket_name(const char *path) {
 #define MONOPOLICY  "/sepolicy"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
-void SARBase::patch_rootdir() {
+void SARBase::patch_ro_root() {
     string tmp_dir;
     const char *sepol;
 
@@ -327,7 +327,7 @@ void SARBase::patch_rootdir() {
 #define TMP_MNTDIR "/dev/mnt"
 #define TMP_RULESDIR "/.backup/.sepolicy.rules"
 
-void RootFSBase::patch_rootfs() {
+void MagiskInit::patch_rw_root() {
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");
@@ -378,7 +378,7 @@ void MagiskProxy::start() {
 
     // Backup stuffs before removing them
     self = mmap_data("/sbin/magisk");
-    magisk_config = mmap_data("/.backup/.magisk");
+    magisk_cfg = mmap_data("/.backup/.magisk");
     auto magisk = mmap_data("/sbin/magisk32.xz");
     auto magisk64 = mmap_data("/sbin/magisk64.xz");
     char custom_rules_dir[64];

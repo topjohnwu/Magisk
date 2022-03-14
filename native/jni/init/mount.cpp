@@ -311,9 +311,9 @@ void SARBase::backup_files() {
 
     self = mmap_data("/proc/self/exe");
     if (access("/.backup/.magisk", R_OK) == 0)
-        magisk_config = mmap_data("/.backup/.magisk");
+        magisk_cfg = mmap_data("/.backup/.magisk");
     else if (access("/data/.backup/.magisk", R_OK) == 0)
-        magisk_config = mmap_data("/data/.backup/.magisk");
+        magisk_cfg = mmap_data("/data/.backup/.magisk");
 }
 
 void SARBase::mount_system_root() {
@@ -350,7 +350,7 @@ mount_root:
         xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
 }
 
-bool SARInit::early_mount() {
+bool LegacySARInit::early_mount() {
     backup_files();
     mount_system_root();
     switch_root("/system_root");
@@ -394,7 +394,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
 
     int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
-    xwrite(fd, magisk_config.buf, magisk_config.sz);
+    xwrite(fd, magisk_cfg.buf, magisk_cfg.sz);
     close(fd);
     fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
     xwrite(fd, self.buf, self.sz);
