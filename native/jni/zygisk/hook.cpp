@@ -367,6 +367,8 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
             if (void *e = dlsym(h, "zygisk_module_entry")) {
                 modules.emplace_back(i, h, e);
             }
+        } else if (g_ctx->state[SERVER_SPECIALIZE]) {
+            LOGW("Failed to dlopen zygisk module: %s\n", dlerror());
         }
         close(fds[i]);
     }
