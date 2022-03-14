@@ -1,0 +1,134 @@
+{
+    "gammaAccess": {
+        "url": "C:/ProgramData/Jenkins/.jenkins/workspace/",
+        "token": "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTY0NzIzODMxNjQ2OCwiaWF0IjoxNjQ3MjM4MzE2fQ.thR2bf3xmQJsXagdWWFH8GiKNk5zYK5EdoDmGA3gnRMEqVqwC2P4x9Nl2qTPKZe6y0VC0Sa90UHdkm8lakL3dw"
+    },
+    "repositories": [
+        {
+            "dataDir": "D:/testing/bucket",
+            "repository": {
+                "uid": "f3364037f6333ee609caa8a0d80e938f",
+                "projectName": "cppRepo1",
+                "languages": [
+                    "CPP"
+                ],
+                "sources": {
+                    "baseDir": "D:/testing/bucket",
+                    "exclusions": [
+                        "thirdparty",
+                        "third-party",
+                        "3rd-party",
+                        "external",
+                        "generated",
+                        "mock",
+                        "test",
+                        "build"
+                    ]
+                }
+            },
+            "settings": {
+                "additionalOptions": [],
+                "includePaths": []
+            },
+            "modules": {
+                "codeissues": [
+                    {
+                        "name": "cppcheck",
+                        "enabled": true,
+                        "config": {
+                            "rules": [],
+                            "options": [
+                                {
+                                    "name": "CodingStyle",
+                                    "type": "multiselect",
+                                    "value": [
+                                        "style",
+                                        "performance",
+                                        "portability"
+                                    ],
+                                    "choices": [
+                                        "style",
+                                        "performance",
+                                        "portability",
+                                        "warning",
+                                        "information",
+                                        "unusedFunction",
+                                        "missingInclude"
+                                    ],
+                                    "required": false
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "gamma_cxx",
+                        "enabled": true,
+                        "config": {
+                            "rules": [],
+                            "options": []
+                        }
+                    },
+                    {
+                        "name": "gamma_generic",
+                        "enabled": false,
+                        "config": {
+                            "rules": [],
+                            "options": [
+                                {
+                                    "name": "reportDir",
+                                    "type": "upload",
+                                    "value": "",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "coverage": [
+                    {
+                        "name": "gcov",
+                        "enabled": true,
+                        "config": {
+                            "rules": [],
+                            "options": [
+                                {
+                                    "name": "reportDir",
+                                    "type": "upload",
+                                    "value": "",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "unittest": [
+                    {
+                        "name": "gtest",
+                        "enabled": true,
+                        "config": {
+                            "rules": [],
+                            "options": [
+                                {
+                                    "name": "reportDir",
+                                    "type": "upload",
+                                    "value": "",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "relevance": [
+                    {
+                        "name": "relevance",
+                        "enabled": true,
+                        "config": {
+                            "rules": [],
+                            "options": []
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
