@@ -124,6 +124,9 @@ void sepolicy::magisk_rules() {
     // Let everyone access tmpfs files (for SAR sbin overlay)
     allow(ALL, "tmpfs", "file", ALL);
 
+    // Allow magiskinit daemon to handle mock selinuxfs
+    allow("kernel", "tmpfs", "fifo_file", "write");
+
     // For relabelling files
     allow("rootfs", "labeledfs", "filesystem", "associate");
     allow(SEPOL_FILE_TYPE, "pipefs", "filesystem", "associate");

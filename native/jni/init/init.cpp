@@ -109,7 +109,6 @@ static int test_main(int argc, char *argv[]) {
 #endif // ENABLE_TEST
 
 static int magisk_proxy_main(int argc, char *argv[]) {
-    setup_klog();
     auto init = make_unique<MagiskProxy>(argv);
     init->start();
     return 1;

@@ -79,6 +79,27 @@ static void load_cil(struct cil_db *db, const char *file) {
     LOGD("cil_add [%s]\n", file);
 }
 
+sepolicy *sepolicy::from_data(char *data, size_t len) {
+    LOGD("Load policy from data\n");
+
+    policy_file_t pf;
+    policy_file_init(&pf);
+    pf.data = data;
+    pf.len = len;
+    pf.type = PF_USE_MEMORY;
+
+    auto db = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+    if (policydb_init(db) || policydb_read(db, &pf, 0)) {
+        LOGE("Fail to load policy from data\n");
+        free(db);
+        return nullptr;
+    }
+
+    auto sepol = new sepolicy();
+    sepol->db = db;
+    return sepol;
+}
+
 sepolicy *sepolicy::from_file(const char *file) {
     LOGD("Load policy from: %s\n", file);
 

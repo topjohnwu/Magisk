@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <selinux.hpp>
+#include <string>
 
 #define ALL nullptr
 
@@ -9,10 +10,11 @@ struct policydb;
 
 class sepolicy {
 public:
-    typedef const char * c_str;
+    using c_str = const char *;
     ~sepolicy();
 
     // Public static factory functions
+    static sepolicy *from_data(char *data, size_t len);
     static sepolicy *from_file(c_str file);
     static sepolicy *from_split();
     static sepolicy *compile_split();
@@ -20,6 +22,7 @@ public:
     // External APIs
     bool to_file(c_str file);
     void parse_statement(c_str stmt);
+    void load_rules(const std::string &rules);
     void load_rule_file(c_str file);
 
     // Operation on types

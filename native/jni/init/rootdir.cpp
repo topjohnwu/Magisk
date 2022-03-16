@@ -4,7 +4,7 @@
 #include <magisk.hpp>
 #include <magiskpolicy.hpp>
 #include <utils.hpp>
-#include <socket.hpp>
+#include <stream.hpp>
 
 #include "init.hpp"
 #include "magiskrc.inc"
@@ -139,6 +139,94 @@ bool MagiskInit::patch_sepolicy(const char *file) {
     return patch_init;
 }
 
+#define MOCK_LOAD      SELINUXMOCK "/load"
+#define MOCK_ENFORCE   SELINUXMOCK "/enforce"
+#define REAL_SELINUXFS SELINUXMOCK "/fs"
+
+void MagiskInit::hijack_sepolicy() {
+    // Read all custom rules into memory
+    string rules;
+    if (!custom_rules_dir.empty()) {
+        if (auto dir = xopen_dir(custom_rules_dir.data())) {
+            for (dirent *entry; (entry = xreaddir(dir.get()));) {
+                auto rule_file = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
+                if (xaccess(rule_file.data(), R_OK) == 0) {
+                    LOGD("Load custom sepolicy patch: [%s]\n", rule_file.data());
+                    full_read(rule_file.data(), rules);
+                    rules += '\n';
+                }
+            }
+        }
+    }
+
+    // Hijack the "load" and "enforce" node in selinuxfs to manipulate
+    // the actual sepolicy being loaded into the kernel
+
+    // We need to preserve sysfs and selinuxfs after re-exec
+    mount_list.erase(std::remove_if(
+            mount_list.begin(), mount_list.end(),
+            [](const string &s) { return s == "/sys"; }), mount_list.end());
+
+    if (access(SELINUX_ENFORCE, F_OK) != 0) {
+        // selinuxfs needs to be mounted
+        xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+    }
+
+    LOGD("Hijack [" SELINUX_LOAD "] and [" SELINUX_ENFORCE "]\n");
+
+    xmkdir(SELINUXMOCK, 0);
+    mkfifo(MOCK_LOAD, 0600);
+    mkfifo(MOCK_ENFORCE, 0644);
+    xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
+    xmount(MOCK_ENFORCE, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+
+    // Create a new process waiting for original init to load sepolicy into our fifo
+    if (xfork()) {
+        // In parent, return and continue boot process
+        return;
+    }
+
+    // Read full sepolicy
+    int fd = xopen(MOCK_LOAD, O_RDONLY);
+    string policy = fd_full_read(fd);
+    close(fd);
+    auto sepol = unique_ptr<sepolicy>(sepolicy::from_data(policy.data(), policy.length()));
+
+    sepol->magisk_rules();
+    sepol->load_rules(rules);
+
+    // Mount selinuxfs to another path
+    xmkdir(REAL_SELINUXFS, 0755);
+    xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
+
+    // This open will block until the actual init calls security_getenforce
+    fd = xopen(MOCK_ENFORCE, O_WRONLY);
+
+    // Cleanup the hijacks
+    umount2("/init", MNT_DETACH);
+    xumount2(SELINUX_LOAD, MNT_DETACH);
+    xumount2(SELINUX_ENFORCE, MNT_DETACH);
+
+    // Load patched policy
+    sepol->to_file(REAL_SELINUXFS "/load");
+
+    // Write to mock "enforce" ONLY after sepolicy is loaded. We need to make sure
+    // the actual init process is blocked until sepolicy is loaded, or else
+    // restorecon will fail and re-exec won't change context, causing boot failure.
+    // We (ab)use the fact that security_getenforce reads the "enforce" file, and
+    // because it has been replaced with our FIFO file, init will block until we
+    // write something into the pipe, effectively hijacking its control flow.
+
+    xwrite(fd, "0", 1);
+    close(fd);
+
+    // At this point, the actual init process will be unblocked
+    // and continue on with restorecon + re-exec.
+
+    // Terminate process
+    exit(0);
+}
+
 static void recreate_sbin(const char *mirror, bool use_bind_mount) {
     auto dp = xopen_dir(mirror);
     int src = dirfd(dp.get());
@@ -199,22 +287,18 @@ static void patch_socket_name(const char *path) {
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
-#define MONOPOLICY  "/sepolicy"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void SARBase::patch_ro_root() {
     string tmp_dir;
-    const char *sepol;
 
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
-        sepol = "/sbin/.se";
     } else {
         char buf[8];
         gen_rand_str(buf, sizeof(buf));
         tmp_dir = "/dev/"s + buf;
         xmkdir(tmp_dir.data(), 0);
-        sepol = "/dev/.se";
     }
 
     setup_tmp(tmp_dir.data());
@@ -231,50 +315,20 @@ void SARBase::patch_ro_root() {
     if (tmp_dir == "/sbin")
         recreate_sbin(ROOTMIR "/sbin", true);
 
-    // Patch init
-    int patch_count;
-    {
+    xmkdir(ROOTOVL, 0);
+
+    // Handle avd hack
+    if (avd_hack) {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
         auto init = mmap_data("/init");
-        patch_count = init.patch({
-            make_pair(SPLIT_PLAT_CIL, "xxx"), /* Force loading monolithic sepolicy */
-            make_pair(MONOPOLICY, sepol)      /* Redirect /sepolicy to custom path */
-         });
-        if (avd_hack) {
-            // Force disable early mount on original init
-            init.patch({ make_pair("android,fstab", "xxx") });
-        }
-        xmkdir(ROOTOVL, 0);
+        // Force disable early mount on original init
+        init.patch({ make_pair("android,fstab", "xxx") });
         int dest = xopen(ROOTOVL "/init", O_CREAT | O_WRONLY | O_CLOEXEC, 0);
         xwrite(dest, init.buf, init.sz);
         fclone_attr(src, dest);
         close(src);
         close(dest);
     }
-
-    if (patch_count != 2) {
-        // init is dynamically linked, need to patch libselinux
-        const char *path = "/system/lib64/libselinux.so";
-        if (access(path, F_OK) != 0) {
-            path = "/system/lib/libselinux.so";
-            if (access(path, F_OK) != 0)
-                path = nullptr;
-        }
-        if (path) {
-            char ovl[128];
-            sprintf(ovl, ROOTOVL "%s", path);
-            auto lib = mmap_data(path);
-            lib.patch({ make_pair(MONOPOLICY, sepol) });
-            xmkdirs(dirname(ovl), 0755);
-            int dest = xopen(ovl, O_CREAT | O_WRONLY | O_CLOEXEC, 0);
-            xwrite(dest, lib.buf, lib.sz);
-            close(dest);
-            clone_attr(path, ovl);
-        }
-    }
-
-    // sepolicy
-    patch_sepolicy(sepol);
 
     // Handle overlay.d
     restore_folder(ROOTOVL, overlays);
@@ -320,6 +374,8 @@ void SARBase::patch_ro_root() {
     int dest = xopen(ROOTMNT, O_WRONLY | O_CREAT, 0);
     write(dest, magic_mount_list.data(), magic_mount_list.length());
     close(dest);
+
+    hijack_sepolicy();
 
     chdir("/");
 }

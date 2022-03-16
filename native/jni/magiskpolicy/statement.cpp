@@ -313,7 +313,38 @@ void sepolicy::parse_statement(const char *stmt) {
 }
 
 void sepolicy::load_rule_file(const char *file) {
-    file_readline(true, file, [=](string_view line) -> bool {
+    file_readline(true, file, [&](string_view line) -> bool {
+        if (line.empty() || line[0] == '#')
+            return true;
+        parse_statement(line.data());
+        return true;
+    });
+}
+
+void sepolicy::load_rules(const string &rules) {
+    struct cookie {
+        const string &s;
+        size_t pos;
+    };
+    cookie c{rules, 0};
+    FILE *fp = funopen(&c, /* read */ [](void *v, char *buf, int sz) -> int {
+        auto c = reinterpret_cast<cookie*>(v);
+        if (c->pos == c->s.length())
+            return 0;
+        size_t end = std::min(c->pos + sz, c->s.length());
+        int len = end - c->pos;
+        memcpy(buf, c->s.data() + c->pos, len);
+        c->pos = end;
+        return len;
+    }, /* write */ [](auto, auto, auto) -> int {
+        return 0;
+    }, /* seek */ [](auto, auto, auto) -> fpos_t {
+        return 0;
+    }, /* close */ [](auto) -> int {
+        return 0;
+    });
+
+    file_readline(true, fp, [&](string_view line) -> bool {
         if (line.empty() || line[0] == '#')
             return true;
         parse_statement(line.data());

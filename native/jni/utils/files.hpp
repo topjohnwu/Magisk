@@ -77,10 +77,19 @@ void fclone_attr(int src, int dest);
 void clone_attr(const char *src, const char *dest);
 void fd_full_read(int fd, void **buf, size_t *size);
 void full_read(const char *filename, void **buf, size_t *size);
+void fd_full_read(int fd, std::string &str);
+void full_read(const char *filename, std::string &str);
 std::string fd_full_read(int fd);
 std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
-void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn);
+void file_readline(bool trim, FILE *fp, const std::function<bool(std::string_view)> &fn);
+static inline void file_readline(
+        bool trim, const char *file, const std::function<bool(std::string_view)> &fn) {
+    FILE *fp = xfopen(file, "re");
+    if (fp == nullptr)
+        return;
+    file_readline(trim, fp, fn);
+}
 static inline void file_readline(const char *file,
         const std::function<bool(std::string_view)> &fn) {
     file_readline(false, file, fn);

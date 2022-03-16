@@ -72,6 +72,7 @@ static kv_pairs parse_bootconfig(string_view str) {
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
 
 static bool check_key_combo() {
+    LOGD("Running in recovery mode, waiting for key...\n");
     uint8_t bitmask[(KEY_MAX + 1) / 8];
     vector<int> events;
     constexpr const char *name = "/event";
@@ -226,7 +227,6 @@ void load_kernel_info(BootConfig *config) {
 
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
         if (key == "RECOVERYMODE" && value == "true") {
-            LOGD("Running in recovery mode, waiting for key...\n");
             config->skip_initramfs = config->emulator || !check_key_combo();
             return false;
         }

@@ -104,7 +104,7 @@ if (access(#val, F_OK) == 0) {\
     entry.val = rtrim(full_read(#val)); \
 }
 
-void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
+static void read_dt_fstab(BootConfig *config, vector<fstab_entry> &fstab) {
     if (access(config->dt_dir, F_OK) != 0)
         return;
 
@@ -152,13 +152,28 @@ void BaseInit::read_dt_fstab(vector<fstab_entry> &fstab) {
     }
 }
 
-void MagiskInit::mount_with_dt() {
+static void mount_with_dt(BootConfig *config) {
     vector<fstab_entry> fstab;
-    read_dt_fstab(fstab);
+    read_dt_fstab(config, fstab);
     for (const auto &entry : fstab) {
         if (is_lnk(entry.mnt_point.data()))
             continue;
-        if (avd_hack && entry.mnt_point == "/system") {
+        // Derive partname from dev
+        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
+        setup_block(true);
+        xmkdir(entry.mnt_point.data(), 0755);
+        xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
+        mount_list.push_back(entry.mnt_point);
+    }
+}
+
+static void avd_hack_mount(BootConfig *config) {
+    vector<fstab_entry> fstab;
+    read_dt_fstab(config, fstab);
+    for (const auto &entry : fstab) {
+        if (is_lnk(entry.mnt_point.data()))
+            continue;
+        if (entry.mnt_point == "/system") {
             // When we force AVD to disable SystemAsRoot, it will always add system
             // to dt fstab. We actually already mounted it as root, so skip this one.
             continue;
@@ -168,11 +183,8 @@ void MagiskInit::mount_with_dt() {
         setup_block(true);
         xmkdir(entry.mnt_point.data(), 0755);
         xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
-        if (!avd_hack) {
-            // When avd_hack is true, do not add any early mount partitions to mount_list
-            // as we will actually forcefully disable original init's early mount
-            mount_list.push_back(entry.mnt_point);
-        }
+        // Do not add any early mount partitions to mount_list as we will
+        // actually forcefully disable original init's early mount.
     }
 }
 
@@ -300,7 +312,7 @@ void RootFSInit::early_mount() {
     LOGD("Restoring /init\n");
     rename(backup_init(), "/init");
 
-    mount_with_dt();
+    mount_with_dt(config);
 }
 
 void SARBase::backup_files() {
@@ -316,8 +328,10 @@ void SARBase::backup_files() {
         magisk_cfg = mmap_data("/data/.backup/.magisk");
 }
 
-void SARBase::mount_system_root() {
-    LOGD("Early mount system_root\n");
+bool LegacySARInit::mount_system_root() {
+    backup_files();
+
+    LOGD("Mounting system_root\n");
     strcpy(blk_info.block_dev, "/dev/root");
 
     do {
@@ -344,31 +358,36 @@ void SARBase::mount_system_root() {
     // We don't really know what to do at this point...
     LOGE("Cannot find root partition, abort\n");
     exit(1);
+
 mount_root:
     xmkdir("/system_root", 0755);
-    if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr))
-        xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr);
-}
 
-bool LegacySARInit::early_mount() {
-    backup_files();
-    mount_system_root();
+    if (xmount("/dev/root", "/system_root", "ext4", MS_RDONLY, nullptr)) {
+        if (xmount("/dev/root", "/system_root", "erofs", MS_RDONLY, nullptr)) {
+            // We don't really know what to do at this point...
+            LOGE("Cannot mount root partition, abort\n");
+            exit(1);
+        }
+    }
+
     switch_root("/system_root");
 
     // Use the apex folder to determine whether 2SI (Android 10+)
     bool is_two_stage = access("/apex", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
-    if (!is_two_stage) {
-        // Make dev writable
-        xmkdir("/dev", 0755);
-        xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-        mount_list.emplace_back("/dev");
 #if ENABLE_AVD_HACK
-        avd_hack = config->emulator;
-#endif
-        mount_with_dt();
+    if (!is_two_stage) {
+        if (config->emulator) {
+            avd_hack = true;
+            // Make dev writable
+            xmkdir("/dev", 0755);
+            xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+            mount_list.emplace_back("/dev");
+            avd_hack_mount(config);
+        }
     }
+#endif
 
     return is_two_stage;
 }
