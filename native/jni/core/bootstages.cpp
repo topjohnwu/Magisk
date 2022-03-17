@@ -372,8 +372,8 @@ void boot_complete(int client) {
 
     if (!get_manager()) {
         // Install stub
-        auto init = MAGISKTMP + "/magiskinit";
-        exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
-        install_apk("/data/magisk.apk");
+        auto apk = MAGISKTMP + "/stub.apk";
+        cp_afc(apk.data(), "/data/stub.apk");
+        install_apk("/data/stub.apk");
     }
 }

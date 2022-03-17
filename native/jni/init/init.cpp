@@ -35,7 +35,7 @@ bool unxz(int fd, const uint8_t *buf, size_t size) {
     return true;
 }
 
-static int dump_manager(const char *path, mode_t mode) {
+int dump_manager(const char *path, mode_t mode) {
     int fd = xopen(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
     if (fd < 0)
         return 1;

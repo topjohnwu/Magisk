@@ -233,6 +233,8 @@ void SARBase::patch_ro_root() {
         } else {
             xsymlink("./magisk32", "magisk");
         }
+
+        dump_manager("stub.apk", 0644);
     }
 
     if (access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) {
@@ -307,6 +309,8 @@ void MagiskInit::patch_rw_root() {
         } else {
             xsymlink("./magisk32", "magisk");
         }
+
+        dump_manager("stub.apk", 0644);
     }
 
     if (!treble && access("/sepolicy", F_OK) == 0) {
