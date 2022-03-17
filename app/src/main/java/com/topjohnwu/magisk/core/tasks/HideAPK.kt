@@ -82,7 +82,7 @@ object HideAPK {
 
                 // Write apk changes
                 jar.getOutputStream(je).use { it.write(xml.bytes) }
-                val keys = Keygen(context)
+                val keys = Keygen()
                 SignApk.sign(keys.cert, keys.key, jar, out)
                 return true
             }
@@ -104,6 +104,7 @@ object HideAPK {
         activity.finish()
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
@@ -130,7 +131,7 @@ object HideAPK {
         }
 
         val cmd = "adb_pm_install $repack ${activity.applicationInfo.uid}"
-        if (Shell.su(cmd).exec().isSuccess) return true
+        if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
             session.install(activity, repack)
@@ -178,7 +179,7 @@ object HideAPK {
             dialog.dismiss()
         }
         val cmd = "adb_pm_install $apk ${activity.applicationInfo.uid}"
-        if (Shell.su(cmd).await().isSuccess) return
+        if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {
                 session.install(activity, apk)
