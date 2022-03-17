@@ -5,7 +5,7 @@ using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 // For API 28 AVD, it uses legacy SAR setup that requires
 // special hacks in magiskinit to work properly. We do not
 // necessarily want this enabled in production builds.
-#define ENABLE_AVD_HACK 1
+#define ENABLE_AVD_HACK 0
 
 struct BootConfig {
     bool skip_initramfs;
@@ -20,20 +20,6 @@ struct BootConfig {
 
     void set(const kv_pairs &);
     void print();
-};
-
-struct fstab_entry {
-    std::string dev;
-    std::string mnt_point;
-    std::string type;
-    std::string mnt_flags;
-    std::string fsmgr_flags;
-
-    fstab_entry() = default;
-    fstab_entry(const fstab_entry &) = delete;
-    fstab_entry(fstab_entry &&) = default;
-    fstab_entry &operator=(const fstab_entry&) = delete;
-    fstab_entry &operator=(fstab_entry&&) = default;
 };
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
@@ -64,6 +50,8 @@ public:
 };
 
 class MagiskInit : public BaseInit {
+private:
+    void mount_rules_dir();
 protected:
     mmap_data self;
     mmap_data magisk_cfg;
@@ -81,7 +69,6 @@ protected:
     void patch_sepolicy(const char *file);
     void hijack_sepolicy();
     void setup_tmp(const char *path);
-    void mount_rules_dir(const char *dev_base, const char *mnt_base);
     void patch_rw_root();
 public:
     using BaseInit::BaseInit;

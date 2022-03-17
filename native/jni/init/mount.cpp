@@ -60,11 +60,9 @@ static struct {
     char block_dev[64];
 } blk_info;
 
-static int64_t setup_block(bool write_block) {
+static int64_t setup_block() {
     if (dev_list.empty())
         collect_devices();
-    xmkdir("/dev", 0755);
-    xmkdir("/dev/block", 0755);
 
     for (int tries = 0; tries < 3; ++tries) {
         for (auto &dev : dev_list) {
@@ -75,9 +73,6 @@ static int64_t setup_block(bool write_block) {
             else
                 continue;
 
-            if (write_block) {
-                sprintf(blk_info.block_dev, "/dev/block/%s", dev.devname);
-            }
             dev_t rdev = makedev(dev.major, dev.minor);
             xmknod(blk_info.block_dev, S_IFBLK | 0600, rdev);
             return rdev;
@@ -90,87 +85,6 @@ static int64_t setup_block(bool write_block) {
 
     // The requested partname does not exist
     return -1;
-}
-
-static bool is_lnk(const char *name) {
-    struct stat st{};
-    if (lstat(name, &st))
-        return false;
-    return S_ISLNK(st.st_mode);
-}
-
-#define read_info(val) \
-if (access(#val, F_OK) == 0) {\
-    entry.val = rtrim(full_read(#val)); \
-}
-
-static void read_dt_fstab(BootConfig *config, vector<fstab_entry> &fstab) {
-    if (access(config->dt_dir, F_OK) != 0)
-        return;
-
-    char cwd[128];
-    getcwd(cwd, sizeof(cwd));
-    chdir(config->dt_dir);
-    run_finally cd([&]{ chdir(cwd); });
-
-    if (access("fstab", F_OK) != 0)
-        return;
-    chdir("fstab");
-
-    // Make sure dt fstab is enabled
-    if (access("status", F_OK) == 0) {
-        auto status = rtrim(full_read("status"));
-        if (status != "okay" && status != "ok")
-            return;
-    }
-
-    auto dir = xopen_dir(".");
-    for (dirent *dp; (dp = xreaddir(dir.get()));) {
-        if (dp->d_type != DT_DIR)
-            continue;
-        chdir(dp->d_name);
-        run_finally f([]{ chdir(".."); });
-
-        if (access("status", F_OK) == 0) {
-            auto status = rtrim(full_read("status"));
-            if (status != "okay" && status != "ok")
-                continue;
-        }
-
-        fstab_entry entry;
-
-        read_info(dev);
-        read_info(mnt_point) else {
-            entry.mnt_point = "/";
-            entry.mnt_point += dp->d_name;
-        }
-        read_info(type);
-        read_info(mnt_flags);
-        read_info(fsmgr_flags);
-
-        fstab.emplace_back(std::move(entry));
-    }
-}
-
-static void avd_hack_mount(BootConfig *config) {
-    vector<fstab_entry> fstab;
-    read_dt_fstab(config, fstab);
-    for (const auto &entry : fstab) {
-        if (is_lnk(entry.mnt_point.data()))
-            continue;
-        if (entry.mnt_point == "/system") {
-            // When we force AVD to disable SystemAsRoot, it will always add system
-            // to dt fstab. We actually already mounted it as root, so skip this one.
-            continue;
-        }
-        // Derive partname from dev
-        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
-        setup_block(true);
-        xmkdir(entry.mnt_point.data(), 0755);
-        xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
-        // Do not add any early mount partitions to mount_list as we will
-        // actually forcefully disable original init's early mount.
-    }
 }
 
 static void switch_root(const string &path) {
@@ -202,10 +116,10 @@ static void switch_root(const string &path) {
     frm_rf(root);
 }
 
-void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
+void MagiskInit::mount_rules_dir() {
     char path[128];
-    xrealpath(dev_base, blk_info.block_dev);
-    xrealpath(mnt_base, path);
+    xrealpath(BLOCKDIR, blk_info.block_dev);
+    xrealpath(MIRRDIR, path);
     char *b = blk_info.block_dev + strlen(blk_info.block_dev);
     char *p = path + strlen(path);
 
@@ -221,10 +135,10 @@ void MagiskInit::mount_rules_dir(const char *dev_base, const char *mnt_base) {
     strcpy(blk_info.partname, "userdata");
     strcpy(b, "/data");
     strcpy(p, "/data");
-    if (setup_block(false) < 0) {
+    if (setup_block() < 0) {
         // Try NVIDIA naming scheme
         strcpy(blk_info.partname, "UDA");
-        if (setup_block(false) < 0)
+        if (setup_block() < 0)
             goto cache;
     }
     // WARNING: DO NOT ATTEMPT TO MOUNT F2FS AS IT MAY CRASH THE KERNEL
@@ -255,10 +169,10 @@ cache:
     strcpy(blk_info.partname, "cache");
     strcpy(b, "/cache");
     strcpy(p, "/cache");
-    if (setup_block(false) < 0) {
+    if (setup_block() < 0) {
         // Try NVIDIA naming scheme
         strcpy(blk_info.partname, "CAC");
-        if (setup_block(false) < 0)
+        if (setup_block() < 0)
             goto metadata;
     }
     if (!do_mount("ext4"))
@@ -271,7 +185,7 @@ metadata:
     strcpy(blk_info.partname, "metadata");
     strcpy(b, "/metadata");
     strcpy(p, "/metadata");
-    if (setup_block(false) < 0 || !do_mount("ext4"))
+    if (setup_block() < 0 || !do_mount("ext4"))
         goto persist;
     custom_rules_dir = path + "/magisk"s;
     goto success;
@@ -281,7 +195,7 @@ persist:
     strcpy(blk_info.partname, "persist");
     strcpy(b, "/persist");
     strcpy(p, "/persist");
-    if (setup_block(false) < 0 || !do_mount("ext4"))
+    if (setup_block() < 0 || !do_mount("ext4"))
         return;
     custom_rules_dir = path + "/magisk"s;
 
@@ -321,18 +235,18 @@ bool LegacySARInit::mount_system_root() {
     do {
         // Try legacy SAR dm-verity
         strcpy(blk_info.partname, "vroot");
-        auto dev = setup_block(false);
+        auto dev = setup_block();
         if (dev >= 0)
             goto mount_root;
 
         // Try NVIDIA naming scheme
         strcpy(blk_info.partname, "APP");
-        dev = setup_block(false);
+        dev = setup_block();
         if (dev >= 0)
             goto mount_root;
 
         sprintf(blk_info.partname, "system%s", config->slot);
-        dev = setup_block(false);
+        dev = setup_block();
         if (dev >= 0)
             goto mount_root;
 
@@ -368,7 +282,13 @@ mount_root:
             xmkdir("/dev", 0755);
             xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
             mount_list.emplace_back("/dev");
-            avd_hack_mount(config);
+
+            // These values are hardcoded for API 28 AVD
+            xmkdir("/dev/block", 0755);
+            strcpy(blk_info.block_dev, "/dev/block/vde1");
+            strcpy(blk_info.partname, "vendor");
+            setup_block();
+            xmount(blk_info.block_dev, "/vendor", "ext4", MS_RDONLY, nullptr);
         }
     }
 #endif
@@ -395,6 +315,8 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(INTLROOT, 0755);
     xmkdir(MIRRDIR, 0);
     xmkdir(BLOCKDIR, 0);
+
+    mount_rules_dir();
 
     int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
     xwrite(fd, magisk_cfg.buf, magisk_cfg.sz);

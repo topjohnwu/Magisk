@@ -306,8 +306,6 @@ void SARBase::patch_ro_root() {
     setup_tmp(tmp_dir.data());
     chdir(tmp_dir.data());
 
-    mount_rules_dir(BLOCKDIR, MIRRDIR);
-
     // Mount system_root mirror
     xmkdir(ROOTMIR, 0755);
     xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
@@ -405,8 +403,6 @@ void MagiskInit::patch_rw_root() {
     xmkdir(PRE_TMPDIR, 0);
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
-
-    mount_rules_dir(BLOCKDIR, MIRRDIR);
 
     {
         // Extract magisk
