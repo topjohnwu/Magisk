@@ -65,7 +65,6 @@ LOCAL_SRC_FILES := \
     init/twostage.cpp \
     init/selinux.cpp \
     magiskpolicy/sepolicy.cpp \
-    magiskpolicy/magiskpolicy.cpp \
     magiskpolicy/rules.cpp \
     magiskpolicy/policydb.cpp \
     magiskpolicy/statement.cpp
@@ -114,14 +113,12 @@ LOCAL_STATIC_LIBRARIES := \
     libsepol
 
 LOCAL_SRC_FILES := \
-    core/applet_stub.cpp \
+    magiskpolicy/main.cpp \
     magiskpolicy/sepolicy.cpp \
-    magiskpolicy/magiskpolicy.cpp \
     magiskpolicy/rules.cpp \
     magiskpolicy/policydb.cpp \
     magiskpolicy/statement.cpp
 
-LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
 include $(BUILD_EXECUTABLE)
 
 endif
