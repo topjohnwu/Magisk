@@ -15,11 +15,11 @@ object RebootEvent {
 
     private fun reboot(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_reboot_normal -> systemReboot()
-            R.id.action_reboot_userspace -> systemReboot("userspace")
-            R.id.action_reboot_bootloader -> systemReboot("bootloader")
-            R.id.action_reboot_download -> systemReboot("download")
-            R.id.action_reboot_edl -> systemReboot("edl")
+            R.id.action_reboot_normal -> Shell.cmd("/system/bin/reboot").submit()
+            R.id.action_reboot_userspace -> Shell.cmd("/system/bin/reboot userspace").submit()
+            R.id.action_reboot_bootloader -> Shell.cmd("/system/bin/reboot bootloader").submit()
+            R.id.action_reboot_download -> Shell.cmd("/system/bin/reboot download").submit()
+            R.id.action_reboot_edl -> Shell.cmd("/system/bin/reboot edl").submit()
             R.id.action_reboot_recovery -> Shell.cmd("/system/bin/reboot recovery").submit()
             else -> Unit
         }
