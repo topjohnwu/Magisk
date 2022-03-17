@@ -333,9 +333,6 @@ def build_binary(args):
     if flag:
         run_ndk_build(flag + ' B_SHARED=1')
 
-    if 'magisk' in args.target:
-        clean_elf()
-
     if 'magiskinit' in args.target:
         dump_bin_header()
         flag += ' B_INIT=1'
@@ -354,6 +351,8 @@ def build_binary(args):
 
     if 'busybox' in args.target:
         run_ndk_build('B_BB=1')
+
+    clean_elf()
 
 
 def build_apk(args, module):
