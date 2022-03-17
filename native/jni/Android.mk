@@ -110,7 +110,7 @@ ifdef B_POLICY
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskpolicy
 LOCAL_STATIC_LIBRARIES := \
-    libutilx \
+    libutils \
     libsepol
 
 LOCAL_SRC_FILES := \
@@ -122,7 +122,6 @@ LOCAL_SRC_FILES := \
     magiskpolicy/statement.cpp
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=magiskpolicy_main
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif

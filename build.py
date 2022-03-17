@@ -59,8 +59,8 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
-default_targets = ['magisk', 'magiskinit', 'magiskboot', 'busybox']
-support_targets = default_targets + ['magiskpolicy', 'resetprop', 'test']
+default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox']
+support_targets = default_targets + ['resetprop', 'test']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
 ndk_root = op.join(sdk_path, 'ndk')
@@ -199,8 +199,8 @@ def clean_elf():
             execv(['g++', '-std=c++11', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp',
                    '-o', elf_cleaner])
     args = [elf_cleaner]
-    args.extend(op.join('native', 'out', arch, 'magisk')
-                for arch in archs)
+    args.extend(op.join('native', 'out', arch, bin)
+                for arch in archs for bin in ['magisk', 'magiskpolicy'])
     execv(args)
 
 
@@ -327,13 +327,14 @@ def build_binary(args):
     if 'magisk' in args.target:
         flag += ' B_MAGISK=1'
 
+    if 'magiskpolicy' in args.target:
+        flag += ' B_POLICY=1'
+
     if 'test' in args.target:
         flag += ' B_TEST=1'
 
     if flag:
         run_ndk_build(flag + ' B_SHARED=1')
-
-    if 'magisk' in args.target:
         clean_elf()
 
     flag = ''
@@ -341,9 +342,6 @@ def build_binary(args):
     if 'magiskinit' in args.target:
         dump_bin_header()
         flag += ' B_INIT=1'
-
-    if 'magiskpolicy' in args.target:
-        flag += ' B_POLICY=1'
 
     if 'resetprop' in args.target:
         flag += ' B_PROP=1'

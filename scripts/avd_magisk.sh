@@ -69,7 +69,6 @@ if [ -d /dev/avd-magisk ]; then
 fi
 
 # SELinux stuffs
-ln -sf ./magiskinit magiskpolicy
 if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
   ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
 elif [ -f /sepolicy ]; then
@@ -125,19 +124,20 @@ mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
 
-for file in magisk32 magisk64 magiskinit; do
+for file in magisk32 magisk64 magiskpolicy; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file
 done
 cp -af ./magiskboot $MAGISKBIN/magiskboot
+cp -af ./magiskinit $MAGISKBIN/magiskinit
 cp -af ./busybox $MAGISKBIN/busybox
 
 ln -s ./magisk64 $MAGISKTMP/magisk
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
-ln -s ./magiskinit $MAGISKTMP/magiskpolicy
+ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block

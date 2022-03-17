@@ -167,6 +167,11 @@ static bool magisk_env() {
     cp_afc(DATABIN "/busybox", buf);
     exec_command_async(buf, "--install", "-s", dirname(buf));
 
+    if (access(DATABIN "/magiskpolicy", X_OK) == 0) {
+        sprintf(buf, "%s/magiskpolicy", MAGISKTMP.data());
+        cp_afc(DATABIN "/magiskpolicy", buf);
+    }
+
     return true;
 }
 

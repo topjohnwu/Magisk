@@ -513,11 +513,9 @@ public:
                 xsymlink("./magisk", dest.data());
             }
         } else {
-            for (int i = 0; init_applet[i]; ++i) {
-                string dest = dir_name + "/" + init_applet[i];
-                VLOGD("create", "./magiskinit", dest.data());
-                xsymlink("./magiskinit", dest.data());
-            }
+            string dest = dir_name + "/supolicy";
+            VLOGD("create", "./magiskpolicy", dest.data());
+            xsymlink("./magiskpolicy", dest.data());
         }
         create_and_mount(MAGISKTMP + "/" + name());
     }
@@ -532,13 +530,12 @@ static void inject_magisk_bins(root_node *system) {
 
     // Insert binaries
     bin->insert(new magisk_node("magisk"));
-    bin->insert(new magisk_node("magiskinit"));
+    bin->insert(new magisk_node("magiskpolicy"));
 
     // Also delete all applets to make sure no modules can override it
     for (int i = 0; applet_names[i]; ++i)
         delete bin->extract(applet_names[i]);
-    for (int i = 0; init_applet[i]; ++i)
-        delete bin->extract(init_applet[i]);
+    delete bin->extract("supolicy");
 }
 
 vector<module_info> *module_list;

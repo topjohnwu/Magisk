@@ -300,17 +300,11 @@ void MagiskInit::setup_tmp(const char *path) {
     int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
     xwrite(fd, magisk_cfg.buf, magisk_cfg.sz);
     close(fd);
-    fd = xopen("magiskinit", O_WRONLY | O_CREAT, 0755);
-    xwrite(fd, self.buf, self.sz);
-    close(fd);
-
-    // The magisk binary will be handled later
 
     // Create applet symlinks
     for (int i = 0; applet_names[i]; ++i)
         xsymlink("./magisk", applet_names[i]);
-    xsymlink("./magiskinit", "magiskpolicy");
-    xsymlink("./magiskinit", "supolicy");
+    xsymlink("./magiskpolicy", "supolicy");
 
     chdir("/");
 }
