@@ -82,34 +82,9 @@ static void load_overlay_rc(const char *overlay) {
     }
 }
 
-bool MagiskInit::patch_sepolicy(const char *file) {
-    bool patch_init = false;
-    sepolicy *sepol = nullptr;
-
-    if (access(SPLIT_PLAT_CIL, R_OK) == 0) {
-        LOGD("sepol: split policy\n");
-        patch_init = true;
-    } else if (access("/sepolicy", R_OK) == 0) {
-        LOGD("sepol: monolithic policy\n");
-        sepol = sepolicy::from_file("/sepolicy");
-    } else {
-        LOGD("sepol: no selinux\n");
-        return false;
-    }
-
-    if (access(SELINUX_VERSION, F_OK) != 0) {
-        // Mount selinuxfs to communicate with kernel
-        xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
-        mount_list.emplace_back(SELINUX_MNT);
-    }
-
-    if (patch_init)
-        sepol = sepolicy::from_split();
-
-    if (!sepol) {
-        LOGE("Cannot load split cil\n");
-        return false;
-    }
+void MagiskInit::patch_sepolicy(const char *file) {
+    LOGD("Patching monolithic policy\n");
+    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file("/sepolicy"));
 
     sepol->magisk_rules();
 
@@ -128,19 +103,17 @@ bool MagiskInit::patch_sepolicy(const char *file) {
 
     LOGD("Dumping sepolicy to: [%s]\n", file);
     sepol->to_file(file);
-    delete sepol;
 
     // Remove OnePlus stupid debug sepolicy and use our own
     if (access("/sepolicy_debug", F_OK) == 0) {
         unlink("/sepolicy_debug");
         link("/sepolicy", "/sepolicy_debug");
     }
-
-    return patch_init;
 }
 
 #define MOCK_LOAD      SELINUXMOCK "/load"
 #define MOCK_ENFORCE   SELINUXMOCK "/enforce"
+#define MOCK_COMPAT    SELINUXMOCK "/compatible"
 #define REAL_SELINUXFS SELINUXMOCK "/fs"
 
 void MagiskInit::hijack_sepolicy() {
@@ -161,29 +134,58 @@ void MagiskInit::hijack_sepolicy() {
 
     // Hijack the "load" and "enforce" node in selinuxfs to manipulate
     // the actual sepolicy being loaded into the kernel
+    xmkdir(SELINUXMOCK, 0);
+    auto hijack = [] {
+        LOGD("Hijack [" SELINUX_LOAD "] and [" SELINUX_ENFORCE "]\n");
+        mkfifo(MOCK_LOAD, 0600);
+        mkfifo(MOCK_ENFORCE, 0644);
+        xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
+        xmount(MOCK_ENFORCE, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+    };
 
-    // We need to preserve sysfs and selinuxfs after re-exec
-    mount_list.erase(std::remove_if(
-            mount_list.begin(), mount_list.end(),
-            [](const string &s) { return s == "/sys"; }), mount_list.end());
-
+    string dt_compat;
     if (access(SELINUX_ENFORCE, F_OK) != 0) {
-        // selinuxfs needs to be mounted
-        xmount("selinuxfs", SELINUX_MNT, "selinuxfs", 0, nullptr);
+        // selinuxfs not mounted yet. Hijack the dt fstab nodes first
+        // and let the original init mount selinuxfs for us
+        // This only happens on Android 8.0 - 9.0
+
+        // Preserve sysfs and procfs for hijacking
+        mount_list.erase(std::remove_if(
+                mount_list.begin(), mount_list.end(),
+                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
+
+        // Remount procfs with proper options
+        xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
+
+        char buf[4096];
+        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
+        dt_compat = full_read(buf);
+
+        LOGD("Hijack [%s]\n", buf);
+        mkfifo(MOCK_COMPAT, 0444);
+        xmount(MOCK_COMPAT, buf, nullptr, MS_BIND, nullptr);
+    } else {
+        hijack();
     }
 
-    LOGD("Hijack [" SELINUX_LOAD "] and [" SELINUX_ENFORCE "]\n");
-
-    xmkdir(SELINUXMOCK, 0);
-    mkfifo(MOCK_LOAD, 0600);
-    mkfifo(MOCK_ENFORCE, 0644);
-    xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
-    xmount(MOCK_ENFORCE, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
-
-    // Create a new process waiting for original init to load sepolicy into our fifo
+    // Create a new process waiting for init operations
     if (xfork()) {
         // In parent, return and continue boot process
         return;
+    }
+
+    if (!dt_compat.empty()) {
+        // This open will block until init calls DoFirstStageMount
+        // The only purpose here is actually to wait for init to mount selinuxfs for us
+        int fd = xopen(MOCK_COMPAT, O_WRONLY);
+
+        char buf[4096];
+        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
+        xumount2(buf, MNT_DETACH);
+
+        hijack();
+        xwrite(fd, dt_compat.data(), dt_compat.size());
+        close(fd);
     }
 
     // Read full sepolicy
@@ -199,7 +201,7 @@ void MagiskInit::hijack_sepolicy() {
     xmkdir(REAL_SELINUXFS, 0755);
     xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
 
-    // This open will block until the actual init calls security_getenforce
+    // This open will block until init calls security_getenforce
     fd = xopen(MOCK_ENFORCE, O_WRONLY);
 
     // Cleanup the hijacks
@@ -220,7 +222,7 @@ void MagiskInit::hijack_sepolicy() {
     xwrite(fd, "0", 1);
     close(fd);
 
-    // At this point, the actual init process will be unblocked
+    // At this point, the init process will be unblocked
     // and continue on with restorecon + re-exec.
 
     // Terminate process
@@ -380,8 +382,7 @@ void SARBase::patch_ro_root() {
     chdir("/");
 }
 
-#define TMP_MNTDIR "/dev/mnt"
-#define TMP_RULESDIR "/.backup/.sepolicy.rules"
+#define PRE_TMPDIR "/magisk-tmp"
 
 void MagiskInit::patch_rw_root() {
     // Create hardlink mirror of /sbin to /root
@@ -389,38 +390,52 @@ void MagiskInit::patch_rw_root() {
     clone_attr("/sbin", "/root");
     link_path("/sbin", "/root");
 
-    // Handle custom sepolicy rules
-    xmkdir(TMP_MNTDIR, 0755);
-    xmkdir("/dev/block", 0755);
-    mount_rules_dir("/dev/block", TMP_MNTDIR);
-    // Preserve custom rule path
-    if (!custom_rules_dir.empty()) {
-        string rules_dir = "./" + custom_rules_dir.substr(sizeof(TMP_MNTDIR));
-        xsymlink(rules_dir.data(), TMP_RULESDIR);
-    }
-
-    if (patch_sepolicy("/sepolicy")) {
-        if (access("/system/bin/init", F_OK) == 0) {
-            auto init = mmap_data("/system/bin/init");
-            init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
-            int dest = xopen("/init", O_TRUNC | O_WRONLY | O_CLOEXEC, 0);
-            xwrite(dest, init.buf, init.sz);
-            close(dest);
-        } else {
-            auto init = mmap_data("/init", true);
-            init.patch({ make_pair(SPLIT_PLAT_CIL, "xxx") });
-        }
-    }
-
     // Handle overlays
     if (access("/overlay.d", F_OK) == 0) {
         LOGD("Merge overlay.d\n");
         load_overlay_rc("/overlay.d");
         mv_path("/overlay.d", "/");
     }
+    rm_rf("/.backup");
 
+    // Patch init.rc
     patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
     rename("/init.p.rc", "/init.rc");
+
+    xmkdir(PRE_TMPDIR, 0);
+    setup_tmp(PRE_TMPDIR);
+    chdir(PRE_TMPDIR);
+
+    mount_rules_dir(BLOCKDIR, MIRRDIR);
+
+    {
+        // Extract magisk
+        auto magisk = mmap_data("/sbin/magisk32.xz");
+        unlink("/sbin/magisk32.xz");
+        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
+        unxz(fd, magisk.buf, magisk.sz);
+        close(fd);
+        patch_socket_name("magisk32");
+        if (access("/sbin/magisk64.xz", F_OK) == 0) {
+            magisk = mmap_data("/sbin/magisk64.xz");
+            unlink("/sbin/magisk64.xz");
+            fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
+            unxz(fd, magisk.buf, magisk.sz);
+            close(fd);
+            patch_socket_name("magisk64");
+            xsymlink("./magisk64", "magisk");
+        } else {
+            xsymlink("./magisk32", "magisk");
+        }
+    }
+
+    if (access("/sepolicy", F_OK) == 0) {
+        patch_sepolicy("/sepolicy");
+    } else {
+        hijack_sepolicy();
+    }
+
+    chdir("/");
 
     // Dump magiskinit as magisk
     int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
@@ -428,48 +443,26 @@ void MagiskInit::patch_rw_root() {
     close(fd);
 }
 
-void MagiskProxy::start() {
+int magisk_proxy_main(int argc, char *argv[]) {
+    setup_klog();
+    LOGD("%s\n", __FUNCTION__);
+
     // Mount rootfs as rw to do post-init rootfs patches
     xmount(nullptr, "/", nullptr, MS_REMOUNT, nullptr);
 
-    // Backup stuffs before removing them
-    self = mmap_data("/sbin/magisk");
-    magisk_cfg = mmap_data("/.backup/.magisk");
-    auto magisk = mmap_data("/sbin/magisk32.xz");
-    auto magisk64 = mmap_data("/sbin/magisk64.xz");
-    char custom_rules_dir[64];
-    custom_rules_dir[0] = '\0';
-    xreadlink(TMP_RULESDIR, custom_rules_dir, sizeof(custom_rules_dir));
-
     unlink("/sbin/magisk");
-    unlink("/sbin/magisk32.xz");
-    unlink("/sbin/magisk64.xz");
-    rm_rf("/.backup");
 
-    setup_tmp("/sbin");
-
-    // Extract magisk
-    int fd = xopen("/sbin/magisk32", O_WRONLY | O_CREAT, 0755);
-    unxz(fd, magisk.buf, magisk.sz);
-    close(fd);
-    patch_socket_name("/sbin/magisk32");
-    if (magisk64.sz) {
-        fd = xopen("/sbin/magisk64", O_WRONLY | O_CREAT, 0755);
-        unxz(fd, magisk64.buf, magisk64.sz);
-        close(fd);
-        patch_socket_name("/sbin/magisk64");
-        xsymlink("./magisk64", "/sbin/magisk");
-    } else {
-        xsymlink("./magisk32", "/sbin/magisk");
-    }
+    // Move tmpfs to /sbin
+    // For some reason MS_MOVE won't work, as a workaround bind mount then unmount
+    xmount(PRE_TMPDIR, "/sbin", nullptr, MS_BIND | MS_REC, nullptr);
+    xumount2(PRE_TMPDIR, MNT_DETACH);
+    rmdir(PRE_TMPDIR);
 
     // Create symlinks pointing back to /root
     recreate_sbin("/root", false);
 
-    if (custom_rules_dir[0])
-        xsymlink(custom_rules_dir, "/sbin/" RULESDIR);
-
     // Tell magiskd to remount rootfs
     setenv("REMOUNT_ROOT", "1", 1);
     execv("/sbin/magisk", argv);
+    return 1;
 }

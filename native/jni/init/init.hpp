@@ -40,6 +40,7 @@ struct fstab_entry {
 
 extern std::vector<std::string> mount_list;
 
+int magisk_proxy_main(int argc, char *argv[]);
 bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(BootConfig *config);
 bool check_two_stage();
@@ -77,7 +78,7 @@ protected:
     static constexpr bool avd_hack = false;
 #endif
 
-    bool patch_sepolicy(const char *file);
+    void patch_sepolicy(const char *file);
     void hijack_sepolicy();
     void setup_tmp(const char *path);
     void mount_rules_dir(const char *dev_base, const char *mnt_base);
@@ -158,23 +159,14 @@ public:
 
 class RootFSInit : public MagiskInit {
 private:
-    void early_mount();
+    void prepare();
 public:
     RootFSInit(char *argv[], BootConfig *config) : MagiskInit(argv, config) {
         LOGD("%s\n", __FUNCTION__);
     }
     void start() override {
-        early_mount();
+        prepare();
         patch_rw_root();
         exec_init();
     }
-};
-
-class MagiskProxy : public MagiskInit {
-public:
-    explicit MagiskProxy(char *argv[]) : MagiskInit(argv) {
-        setup_klog();
-        LOGD("%s\n", __FUNCTION__);
-    }
-    void start() override;
 };

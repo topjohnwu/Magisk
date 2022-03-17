@@ -152,21 +152,6 @@ static void read_dt_fstab(BootConfig *config, vector<fstab_entry> &fstab) {
     }
 }
 
-static void mount_with_dt(BootConfig *config) {
-    vector<fstab_entry> fstab;
-    read_dt_fstab(config, fstab);
-    for (const auto &entry : fstab) {
-        if (is_lnk(entry.mnt_point.data()))
-            continue;
-        // Derive partname from dev
-        sprintf(blk_info.partname, "%s%s", basename(entry.dev.data()), config->slot);
-        setup_block(true);
-        xmkdir(entry.mnt_point.data(), 0755);
-        xmount(blk_info.block_dev, entry.mnt_point.data(), entry.type.data(), MS_RDONLY, nullptr);
-        mount_list.push_back(entry.mnt_point);
-    }
-}
-
 static void avd_hack_mount(BootConfig *config) {
     vector<fstab_entry> fstab;
     read_dt_fstab(config, fstab);
@@ -306,13 +291,12 @@ success:
     xsymlink(custom_rules_dir.data(), path);
 }
 
-void RootFSInit::early_mount() {
+void RootFSInit::prepare() {
     self = mmap_data("/init");
+    magisk_cfg = mmap_data("/.backup/.magisk");
 
     LOGD("Restoring /init\n");
     rename(backup_init(), "/init");
-
-    mount_with_dt(config);
 }
 
 void SARBase::backup_files() {
