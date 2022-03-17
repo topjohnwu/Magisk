@@ -336,6 +336,8 @@ def build_binary(args):
     if 'magisk' in args.target:
         clean_elf()
 
+    flag = ''
+
     if 'magiskinit' in args.target:
         dump_bin_header()
         flag += ' B_INIT=1'
