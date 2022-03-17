@@ -77,7 +77,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0")
-    implementation("dev.rikka.rikkax.insets:insets:1.1.1")
+    implementation("dev.rikka.rikkax.insets:insets:1.2.0")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
     implementation("io.noties.markwon:core:4.6.2")
 
@@ -110,7 +110,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.5.0-alpha01"
+    val vNav = "2.5.0-alpha03"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
