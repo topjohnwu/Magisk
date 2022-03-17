@@ -131,7 +131,7 @@ static bool magisk_env() {
     // Alternative binaries paths
     const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
     for (auto alt : alt_bin) {
-        struct stat st;
+        struct stat st{};
         if (lstat(alt, &st) == 0) {
             if (S_ISLNK(st.st_mode)) {
                 unlink(alt);
@@ -143,15 +143,7 @@ static bool magisk_env() {
             break;
         }
     }
-
-    // Remove stuffs
     rm_rf("/cache/data_adb");
-    rm_rf("/data/adb/modules/.core");
-    unlink("/data/adb/magisk.img");
-    unlink("/data/adb/magisk_merge.img");
-    unlink("/data/magisk.img");
-    unlink("/data/magisk_merge.img");
-    unlink("/data/magisk_debug.log");
 
     // Directories in /data/adb
     xmkdir(DATABIN, 0755);
@@ -379,17 +371,9 @@ void boot_complete(int client) {
         xmkdir(SECURE_DIR, 0700);
 
     if (!get_manager()) {
-        if (access(MANAGERAPK, F_OK) == 0) {
-            // Only try to install APK when no manager is installed
-            // Magisk Manager should be upgraded by itself, not through recovery installs
-            rename(MANAGERAPK, "/data/magisk.apk");
-            install_apk("/data/magisk.apk");
-        } else {
-            // Install stub
-            auto init = MAGISKTMP + "/magiskinit";
-            exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
-            install_apk("/data/magisk.apk");
-        }
+        // Install stub
+        auto init = MAGISKTMP + "/magiskinit";
+        exec_command_sync(init.data(), "-x", "manager", "/data/magisk.apk");
+        install_apk("/data/magisk.apk");
     }
-    unlink(MANAGERAPK);
 }
