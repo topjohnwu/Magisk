@@ -63,6 +63,7 @@ LOCAL_SRC_FILES := \
     init/rootdir.cpp \
     init/getinfo.cpp \
     init/twostage.cpp \
+    init/selinux.cpp \
     magiskpolicy/sepolicy.cpp \
     magiskpolicy/magiskpolicy.cpp \
     magiskpolicy/rules.cpp \

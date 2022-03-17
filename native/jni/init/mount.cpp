@@ -205,27 +205,6 @@ success:
     xsymlink(custom_rules_dir.data(), path);
 }
 
-void RootFSInit::prepare() {
-    self = mmap_data("/init");
-    magisk_cfg = mmap_data("/.backup/.magisk");
-
-    LOGD("Restoring /init\n");
-    rename(backup_init(), "/init");
-}
-
-void SARBase::backup_files() {
-    if (access("/overlay.d", F_OK) == 0)
-        backup_folder("/overlay.d", overlays);
-    else if (access("/data/overlay.d", F_OK) == 0)
-        backup_folder("/data/overlay.d", overlays);
-
-    self = mmap_data("/proc/self/exe");
-    if (access("/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/.backup/.magisk");
-    else if (access("/data/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/data/.backup/.magisk");
-}
-
 bool LegacySARInit::mount_system_root() {
     backup_files();
 
