@@ -198,3 +198,8 @@ void exec_command_async(Args &&...args) {
     };
     exec_command(exec);
 }
+
+template<typename T, size_t N>
+inline constexpr auto array_size(T (&a)[N]) {
+    return N;
+}

@@ -37,12 +37,35 @@ void MagiskInit::patch_sepolicy(const char *file) {
     }
 }
 
-#define MOCK_LOAD      SELINUXMOCK "/load"
-#define MOCK_ENFORCE   SELINUXMOCK "/enforce"
-#define MOCK_COMPAT    SELINUXMOCK "/compatible"
-#define REAL_SELINUXFS SELINUXMOCK "/fs"
+#define MOCK_LOAD         SELINUXMOCK "/load"
+#define MOCK_FILE_CONTEXT SELINUXMOCK "/plat_file_contexts"
+#define MOCK_COMPAT       SELINUXMOCK "/compatible"
+#define REAL_SELINUXFS    SELINUXMOCK "/fs"
+
+static constexpr const char *file_contexts[] = {
+        "/system/etc/selinux/plat_file_contexts",
+        "/plat_file_contexts",
+        "/dev/selinux/apex_file_contexts",
+        "/system_ext/etc/selinux/system_ext_file_contexts",
+        "/system_ext_file_contexts",
+        "/product/etc/selinux/product_file_contexts",
+        "/product_file_contexts",
+        "/vendor/etc/selinux/vendor_file_contexts",
+        "/vendor_file_contexts",
+        "/odm/etc/selinux/odm_file_contexts",
+        "/odm_file_contexts",
+};
 
 void MagiskInit::hijack_sepolicy() {
+    const char *file_context_path = nullptr;
+    for (size_t i = 0; i < array_size(file_contexts); ++i) {
+        if (access(file_contexts[i], F_OK) == 0) {
+            // should we check fcontext_is_binary?
+            file_context_path = file_contexts[i];
+            break;
+        }
+    }
+    auto file_context = full_read(file_context_path);
     // Read all custom rules into memory
     string rules;
     if (!custom_rules_dir.empty()) {
@@ -54,6 +77,12 @@ void MagiskInit::hijack_sepolicy() {
                     full_read(rule_file.data(), rules);
                     rules += '\n';
                 }
+                auto context_file = custom_rules_dir + "/" + entry->d_name + "/file_contexts";
+                if (xaccess(context_file.data(), R_OK) == 0) {
+                    LOGD("Load custom file_contexts patch: [%s]\n", context_file.data());
+                    full_read(context_file.data(), file_context);
+                    file_context += '\n';
+                }
             }
         }
     }
@@ -61,12 +90,12 @@ void MagiskInit::hijack_sepolicy() {
     // Hijack the "load" and "enforce" node in selinuxfs to manipulate
     // the actual sepolicy being loaded into the kernel
     xmkdir(SELINUXMOCK, 0);
-    auto hijack = [] {
-        LOGD("Hijack [" SELINUX_LOAD "] and [" SELINUX_ENFORCE "]\n");
+    auto hijack = [file_context_path] {
+        LOGD("Hijack [" SELINUX_LOAD "] and [%s]\n", file_context_path);
         mkfifo(MOCK_LOAD, 0600);
-        mkfifo(MOCK_ENFORCE, 0644);
+        mkfifo(MOCK_FILE_CONTEXT, 0600);
         xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
-        xmount(MOCK_ENFORCE, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+        xmount(MOCK_FILE_CONTEXT, file_context_path, nullptr, MS_BIND, nullptr);
     };
 
     string dt_compat;
@@ -127,13 +156,13 @@ void MagiskInit::hijack_sepolicy() {
     xmkdir(REAL_SELINUXFS, 0755);
     xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
 
-    // This open will block until init calls security_getenforce
-    fd = xopen(MOCK_ENFORCE, O_WRONLY);
+    // This open will block until init calls resetcon
+    fd = xopen(MOCK_FILE_CONTEXT, O_WRONLY);
 
     // Cleanup the hijacks
     umount2("/init", MNT_DETACH);
     xumount2(SELINUX_LOAD, MNT_DETACH);
-    xumount2(SELINUX_ENFORCE, MNT_DETACH);
+    xumount2(file_context_path, MNT_DETACH);
 
     // Load patched policy
     sepol->to_file(REAL_SELINUXFS "/load");
@@ -145,7 +174,7 @@ void MagiskInit::hijack_sepolicy() {
     // because it has been replaced with our FIFO file, init will block until we
     // write something into the pipe, effectively hijacking its control flow.
 
-    xwrite(fd, "0", 1);
+    xwrite(fd, file_context.data(), file_context.size());
     close(fd);
 
     // At this point, the init process will be unblocked
