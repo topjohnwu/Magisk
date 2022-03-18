@@ -235,7 +235,7 @@ void SARBase::patch_ro_root() {
         }
     }
 
-    if (access("/sepolicy", F_OK) == 0) {
+    if (access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) {
         patch_sepolicy(ROOTOVL "/sepolicy");
     } else {
         hijack_sepolicy();
