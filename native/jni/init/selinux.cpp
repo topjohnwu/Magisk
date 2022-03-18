@@ -37,36 +37,53 @@ void MagiskInit::patch_sepolicy(const char *file) {
     }
 }
 
-#define MOCK_LOAD      SELINUXMOCK "/load"
-#define MOCK_ENFORCE   SELINUXMOCK "/enforce"
 #define MOCK_COMPAT    SELINUXMOCK "/compatible"
+#define MOCK_LOAD      SELINUXMOCK "/load"
+#define MOCK_BLOCKING  SELINUXMOCK "/blocking"
 #define REAL_SELINUXFS SELINUXMOCK "/fs"
 
 void MagiskInit::hijack_sepolicy() {
-    // Read all custom rules into memory
-    string rules;
-    if (!custom_rules_dir.empty()) {
-        if (auto dir = xopen_dir(custom_rules_dir.data())) {
-            for (dirent *entry; (entry = xreaddir(dir.get()));) {
-                auto rule_file = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
-                if (xaccess(rule_file.data(), R_OK) == 0) {
-                    LOGD("Load custom sepolicy patch: [%s]\n", rule_file.data());
-                    full_read(rule_file.data(), rules);
-                    rules += '\n';
-                }
-            }
+    const char *blocking_target;
+    string actual_content;
+
+    xmkdir(SELINUXMOCK, 0);
+
+    if (access("/system/etc/selinux/apex", F_OK) == 0) {
+        // On devices with apex sepolicy, it runs restorecon before enforcing SELinux.
+        // To block control flow before that happens, we will have to hijack the
+        // plat_file_contexts file to achieve that.
+
+        if (access("/system/etc/selinux/plat_file_contexts", F_OK) == 0) {
+            blocking_target = "/system/etc/selinux/plat_file_contexts";
+        } else if (access("/plat_file_contexts", F_OK) == 0) {
+            blocking_target = "/plat_file_contexts";
+        } else {
+            // Error, should never happen
+            LOGE("! Cannot find plat_file_contexts\n");
+            return;
         }
+        actual_content = full_read(blocking_target);
+
+        LOGD("Hijack [%s]\n", blocking_target);
+        mkfifo(MOCK_BLOCKING, 0644);
+        xmount(MOCK_BLOCKING, blocking_target, nullptr, MS_BIND, nullptr);
+    } else {
+        // We block using the "enforce" node
+        blocking_target = SELINUX_ENFORCE;
+        actual_content = "0";
     }
 
     // Hijack the "load" and "enforce" node in selinuxfs to manipulate
     // the actual sepolicy being loaded into the kernel
-    xmkdir(SELINUXMOCK, 0);
-    auto hijack = [] {
-        LOGD("Hijack [" SELINUX_LOAD "] and [" SELINUX_ENFORCE "]\n");
+    auto hijack = [&] {
+        LOGD("Hijack [" SELINUX_LOAD "]\n");
         mkfifo(MOCK_LOAD, 0600);
-        mkfifo(MOCK_ENFORCE, 0644);
         xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
-        xmount(MOCK_ENFORCE, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+        if (strcmp(blocking_target, SELINUX_ENFORCE) == 0) {
+            LOGD("Hijack [" SELINUX_ENFORCE "]\n");
+            mkfifo(MOCK_BLOCKING, 0644);
+            xmount(MOCK_BLOCKING, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
+        }
     };
 
     string dt_compat;
@@ -94,6 +111,21 @@ void MagiskInit::hijack_sepolicy() {
         hijack();
     }
 
+    // Read all custom rules into memory
+    string rules;
+    if (!custom_rules_dir.empty()) {
+        if (auto dir = xopen_dir(custom_rules_dir.data())) {
+            for (dirent *entry; (entry = xreaddir(dir.get()));) {
+                auto rule_file = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
+                if (xaccess(rule_file.data(), R_OK) == 0) {
+                    LOGD("Load custom sepolicy patch: [%s]\n", rule_file.data());
+                    full_read(rule_file.data(), rules);
+                    rules += '\n';
+                }
+            }
+        }
+    }
+
     // Create a new process waiting for init operations
     if (xfork()) {
         // In parent, return and continue boot process
@@ -110,6 +142,7 @@ void MagiskInit::hijack_sepolicy() {
         xumount2(buf, MNT_DETACH);
 
         hijack();
+
         xwrite(fd, dt_compat.data(), dt_compat.size());
         close(fd);
     }
@@ -123,29 +156,27 @@ void MagiskInit::hijack_sepolicy() {
     sepol->magisk_rules();
     sepol->load_rules(rules);
 
-    // Mount selinuxfs to another path
-    xmkdir(REAL_SELINUXFS, 0755);
-    xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
-
-    // This open will block until init calls security_getenforce
-    fd = xopen(MOCK_ENFORCE, O_WRONLY);
+    // This open will block until init calls security_getenforce or selinux_android_restorecon
+    fd = xopen(MOCK_BLOCKING, O_WRONLY);
 
     // Cleanup the hijacks
     umount2("/init", MNT_DETACH);
     xumount2(SELINUX_LOAD, MNT_DETACH);
-    xumount2(SELINUX_ENFORCE, MNT_DETACH);
+    xumount2(blocking_target, MNT_DETACH);
 
     // Load patched policy
+    xmkdir(REAL_SELINUXFS, 0755);
+    xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
     sepol->to_file(REAL_SELINUXFS "/load");
 
-    // Write to mock "enforce" ONLY after sepolicy is loaded. We need to make sure
+    // Write to mock blocking target ONLY after sepolicy is loaded. We need to make sure
     // the actual init process is blocked until sepolicy is loaded, or else
     // restorecon will fail and re-exec won't change context, causing boot failure.
-    // We (ab)use the fact that security_getenforce reads the "enforce" file, and
+    // We (ab)use the fact that init reads from our blocking target, and
     // because it has been replaced with our FIFO file, init will block until we
     // write something into the pipe, effectively hijacking its control flow.
 
-    xwrite(fd, "0", 1);
+    xwrite(fd, actual_content.data(), actual_content.length());
     close(fd);
 
     // At this point, the init process will be unblocked
