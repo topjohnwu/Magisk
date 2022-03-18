@@ -249,6 +249,11 @@ mount_root:
 
     switch_root("/system_root");
 
+    // Make dev writable
+    xmkdir("/dev", 0755);
+    xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
+    mount_list.emplace_back("/dev");
+
     // Use the apex folder to determine whether 2SI (Android 10+)
     bool is_two_stage = access("/apex", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
@@ -257,11 +262,6 @@ mount_root:
     if (!is_two_stage) {
         if (config->emulator) {
             avd_hack = true;
-            // Make dev writable
-            xmkdir("/dev", 0755);
-            xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
-            mount_list.emplace_back("/dev");
-
             // These values are hardcoded for API 28 AVD
             xmkdir("/dev/block", 0755);
             strcpy(blk_info.block_dev, "/dev/block/vde1");
