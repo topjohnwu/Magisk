@@ -61,9 +61,6 @@ protected:
     // When this boolean is set, this means we are currently
     // running magiskinit on legacy SAR AVD emulator
     bool avd_hack = false;
-#else
-    // Make it constexpr so compiler can optimize hacks out of the code
-    static constexpr bool avd_hack = false;
 #endif
 
     void patch_sepolicy(const char *file);

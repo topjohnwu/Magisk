@@ -181,6 +181,7 @@ void SARBase::patch_ro_root() {
 
     xmkdir(ROOTOVL, 0);
 
+#if ENABLE_AVD_HACK
     // Handle avd hack
     if (avd_hack) {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
@@ -193,6 +194,7 @@ void SARBase::patch_ro_root() {
         close(src);
         close(dest);
     }
+#endif
 
     // Handle overlay.d
     restore_folder(ROOTOVL, overlays);
@@ -233,13 +235,17 @@ void SARBase::patch_ro_root() {
         }
     }
 
+    if (access("/sepolicy", F_OK) == 0) {
+        patch_sepolicy(ROOTOVL "/sepolicy");
+    } else {
+        hijack_sepolicy();
+    }
+
     // Mount rootdir
     magic_mount(ROOTOVL);
     int dest = xopen(ROOTMNT, O_WRONLY | O_CREAT, 0);
     write(dest, magic_mount_list.data(), magic_mount_list.length());
     close(dest);
-
-    hijack_sepolicy();
 
     chdir("/");
 }
