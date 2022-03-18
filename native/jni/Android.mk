@@ -119,6 +119,7 @@ LOCAL_SRC_FILES := \
     magiskpolicy/policydb.cpp \
     magiskpolicy/statement.cpp
 
+LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
