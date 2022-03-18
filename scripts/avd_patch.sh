@@ -43,8 +43,6 @@ if [ -z "$FIRST_STAGE" ]; then
   exec ./busybox sh $0
 fi
 
-pm install -r $(pwd)/app-debug.apk
-
 # Extract files from APK
 unzip -oj app-debug.apk 'assets/util_functions.sh'
 . ./util_functions.sh
