@@ -70,7 +70,6 @@ void MagiskInit::hijack_sepolicy() {
     } else {
         // We block using the "enforce" node
         blocking_target = SELINUX_ENFORCE;
-        actual_content = "0";
     }
 
     // Hijack the "load" and "enforce" node in selinuxfs to manipulate
@@ -168,6 +167,10 @@ void MagiskInit::hijack_sepolicy() {
     xmkdir(REAL_SELINUXFS, 0755);
     xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
     sepol->to_file(REAL_SELINUXFS "/load");
+
+    if (strcmp(blocking_target, SELINUX_ENFORCE) == 0) {
+        actual_content = full_read(SELINUX_ENFORCE);
+    }
 
     // Write to mock blocking target ONLY after sepolicy is loaded. We need to make sure
     // the actual init process is blocked until sepolicy is loaded, or else
