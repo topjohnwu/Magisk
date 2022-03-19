@@ -319,9 +319,9 @@ dir_node::iterator dir_node::insert(iterator it, uint8_t type, const Func &fn, b
             else
                 it = children.emplace_hint(--it, node->_name, node);
         } else {
-            if (get_same && it->second->node_type == type)
-                return it;
-            return children.end();
+            if (get_same && it->second->node_type != type)
+                return children.end();
+            return it;
         }
     } else {
         node = fn(node);
@@ -436,10 +436,14 @@ bool dir_node::collect_files(const char *module, int dfd) {
         }
 
         if (entry->d_type == DT_DIR) {
-            // Need check cause emplace could fail due to previous module dir replace
-            if (auto dn = emplace_or_get<inter_node>(entry->d_name, entry->d_name, module);
-                dn && !dn->collect_files(module, dirfd(dir.get()))) {
-                // Upgrade node to module due to '.replace'
+            dir_node *dn;
+            if (auto it = children.find(entry->d_name); it == children.end()) {
+                dn = emplace<inter_node>(entry->d_name, entry->d_name, module);
+            } else {
+                dn = iterator_to_node<dir_node>(upgrade<tmpfs_node>(it));
+                dn->set_exist(true);
+            }
+            if (dn && !dn->collect_files(module, dirfd(dir.get()))) {
                 upgrade<module_node>(dn->name(), module);
             }
         } else {
@@ -484,8 +488,11 @@ void tmpfs_node::mount() {
         return;
     string src = mirror_path();
     const string &dest = node_path();
-    file_attr a;
-    getattr(src.data(), &a);
+    file_attr a{};
+    if (access(src.data(), F_OK) == 0)
+        getattr(src.data(), &a);
+    else
+        getattr(parent()->node_path().data(), &a);
     mkdir(dest.data(), 0);
     if (!isa<tmpfs_node>(parent())) {
         // We don't need another layer of tmpfs if parent is skel
