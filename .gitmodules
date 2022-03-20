@@ -25,9 +25,6 @@
 [submodule "pcre"]
 	path = native/jni/external/pcre
 	url = https://android.googlesource.com/platform/external/pcre
-[submodule "xhook"]
-	path = native/jni/external/xhook
-	url = https://github.com/iqiyi/xHook.git
 [submodule "libcxx"]
 	path = native/jni/external/libcxx
 	url = https://github.com/topjohnwu/libcxx.git
