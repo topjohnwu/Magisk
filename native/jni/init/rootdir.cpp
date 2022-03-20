@@ -278,6 +278,12 @@ void MagiskInit::patch_rw_root() {
     patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
     rename("/init.p.rc", "/init.rc");
 
+    bool treble;
+    {
+        auto init = mmap_data("/init");
+        treble = init.contains(SPLIT_PLAT_CIL);
+    }
+
     xmkdir(PRE_TMPDIR, 0);
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
@@ -303,7 +309,7 @@ void MagiskInit::patch_rw_root() {
         }
     }
 
-    if (access("/sepolicy", F_OK) == 0) {
+    if (!treble && access("/sepolicy", F_OK) == 0) {
         patch_sepolicy("/sepolicy");
     } else {
         hijack_sepolicy();
