@@ -198,7 +198,7 @@
     <string name="updated_text">Chạm để mở ứng dụng</string>
 
     <!--Toasts, Dialogs-->
-    <string name="yes">Đồng ý</string>
+    <string name="yes">Có</string>
     <string name="no">Không</string>
     <string name="repo_install_title">Cài đặt %1$s %2$s(%3$d)</string>
     <string name="download">Tải xuống</string>
@@ -210,7 +210,7 @@
     <string name="hide_app_title">Đang ẩn ứng dụng Magisk…</string>
     <string name="open_link_failed_toast">Không tìm thấy ứng dụng nào để mở liên kết</string>
     <string name="complete_uninstall">Hoàn thành Gỡ cài đặt</string>
-    <string name="restore_img">Khôi phục đĩa ảnh boot (image)</string>
+    <string name="restore_img">Khôi phục đĩa ảnh boot (boot image)</string>
     <string name="restore_img_msg">Đang khôi phục…</string>
     <string name="restore_done">Đã khôi phục xong!</string>
     <string name="restore_fail">Bản sao lưu gốc không tồn tại!</string>
