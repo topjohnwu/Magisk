@@ -56,6 +56,8 @@ public:
     bool is_reg() { return file_type() == DT_REG; }
     uint8_t type() { return node_type; }
     const string &name() { return _name; }
+
+    // Don't call the following two functions before prepare
     const string &node_path();
     string mirror_path() { return mirror_dir + node_path(); }
 
@@ -95,7 +97,7 @@ private:
 
     dir_node *_parent = nullptr;
 
-    // Cache
+    // Cache, it should only be used within prepare
     string _node_path;
 };
 
@@ -247,6 +249,7 @@ private:
     const char *module;
 };
 
+// Don't create the following two nodes before prepare
 class mirror_node : public node_entry {
 public:
     explicit mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
@@ -370,7 +373,7 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
     } else {
         // It is actually possible that mirror does not exist (nested mount points)
         // Set self to non exist so this node will be ignored at mount
-        set_exist(false);
+        // Keep it the same as `node`
         return;
     }
 
@@ -402,16 +405,21 @@ bool dir_node::prepare() {
         if (should_be_tmpfs(it->second)) {
             if (node_type > type_id<tmpfs_node>()) {
                 // Upgrade will fail, remove the unsupported child node
+                LOGW("Unable to add: %s, skipped\n", it->second->node_path().data());
                 delete it->second;
                 it = children.erase(it);
                 continue;
             }
             // Tell parent to upgrade self to tmpfs
             to_tmpfs = true;
-            // If child is inter_node, upgrade to module
-            if (auto nit = upgrade<module_node, inter_node>(it); nit != children.end()) {
-                it = nit;
-                goto next_node;
+            // If child is inter_node and it does not (need to) exist, upgrade to module
+            if (auto dn = dyn_cast<inter_node>(it->second); dn) {
+                if (!dn->exist()) {
+                    if (auto nit = upgrade<module_node, inter_node>(it); nit != children.end()) {
+                        it = nit;
+                        goto next_node;
+                    }
+                }
             }
         }
         if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->is_dir() && !dn->prepare()) {
@@ -440,8 +448,10 @@ bool dir_node::collect_files(const char *module, int dfd) {
             if (auto it = children.find(entry->d_name); it == children.end()) {
                 dn = emplace<inter_node>(entry->d_name, entry->d_name, module);
             } else {
-                dn = iterator_to_node<dir_node>(upgrade<tmpfs_node>(it));
-                dn->set_exist(true);
+                dn = dyn_cast<inter_node>(it->second);
+                // it has been accessed by at least two modules, it must be guarantee to exist
+                // set it so that it won't be upgrade to module_node but tmpfs_node
+                if (dn) dn->set_exist(true);
             }
             if (dn && !dn->collect_files(module, dirfd(dir.get()))) {
                 upgrade<module_node>(dn->name(), module);
@@ -618,7 +628,6 @@ void magic_mount() {
                 }
             }
         }
-
         root->prepare();
         root->mount();
     }
