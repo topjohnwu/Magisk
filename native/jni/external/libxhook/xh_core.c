@@ -70,14 +70,20 @@ typedef TAILQ_HEAD(xh_core_ignore_info_queue, xh_core_ignore_info,) xh_core_igno
 //required info from /proc/self/maps
 typedef struct xh_core_map_info
 {
-    char      *pathname;
-    uintptr_t  base_addr;
-    xh_elf_t   elf;
+    char           *pathname;
+    unsigned long  inode;
+    uintptr_t      base_addr;
+    xh_elf_t       elf;
     RB_ENTRY(xh_core_map_info) link;
 } xh_core_map_info_t;
 static __inline__ int xh_core_map_info_cmp(xh_core_map_info_t *a, xh_core_map_info_t *b)
 {
-    return strcmp(a->pathname, b->pathname);
+    int path_cmp = strcmp(a->pathname, b->pathname);
+    if (path_cmp == 0) {
+        return a->inode - b->inode;
+    } else {
+        return path_cmp;
+    }
 }
 typedef RB_HEAD(xh_core_map_info_tree, xh_core_map_info) xh_core_map_info_tree_t;
 RB_GENERATE_STATIC(xh_core_map_info_tree, xh_core_map_info, link, xh_core_map_info_cmp)
@@ -295,7 +301,7 @@ static void xh_core_hook(xh_core_map_info_t *mi)
         }
         else
         {
-            XH_LOG_WARN("catch SIGSEGV when init or hook: %s", mi->pathname);
+            XH_LOG_WARN("catch SIGSEGV when init or hook: %s %lu", mi->pathname, mi->inode);
         }
         xh_core_sigsegv_flag = 0;
     }
@@ -308,6 +314,7 @@ static void xh_core_refresh_impl()
     uintptr_t                base_addr;
     char                     perm[5];
     unsigned long            offset;
+    unsigned long            inode;
     int                      pathname_pos;
     char                    *pathname;
     size_t                   pathname_len;
@@ -326,7 +333,7 @@ static void xh_core_refresh_impl()
 
     while(fgets(line, sizeof(line), fp))
     {
-        if(sscanf(line, "%"PRIxPTR"-%*lx %4s %lx %*x:%*x %*d%n", &base_addr, perm, &offset, &pathname_pos) != 3) continue;
+        if(sscanf(line, "%"PRIxPTR"-%*lx %4s %lx %*x:%*x %lu %n", &base_addr, perm, &offset, &inode, &pathname_pos) != 4) continue;
 
         //check permission
         if(perm[0] != 'r') continue;
@@ -384,9 +391,10 @@ static void xh_core_refresh_impl()
         //check elf header format
         //We are trying to do ELF header checking as late as possible.
         if(0 != xh_core_check_elf_header(base_addr, pathname)) continue;
-        
+
         //check existed map item
         mi_key.pathname = pathname;
+        mi_key.inode = inode;
         if(NULL != (mi = RB_FIND(xh_core_map_info_tree, &xh_core_map_info, &mi_key)))
         {
             //exist
@@ -420,15 +428,14 @@ static void xh_core_refresh_impl()
                 free(mi);
                 continue;
             }
+            mi->inode = inode;
             mi->base_addr = base_addr;
 
             //repeated?
             //We only keep the first one, that is the real base address
             if(NULL != RB_INSERT(xh_core_map_info_tree, &map_info_refreshed, mi))
             {
-#if XH_CORE_DEBUG
-                XH_LOG_DEBUG("repeated map info when create: %s", line);
-#endif
+                XH_LOG_WARN("repeated map info when create: %s", line);
                 free(mi->pathname);
                 free(mi);
                 continue;
