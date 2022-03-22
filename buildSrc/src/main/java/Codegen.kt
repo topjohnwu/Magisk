@@ -3,6 +3,7 @@ import java.io.File
 import java.io.InputStream
 import java.io.PrintStream
 import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
@@ -58,16 +59,15 @@ private fun PrintStream.byteField(name: String, bytes: ByteArray) {
     println("}")
 }
 
-fun genKeyData(keysDir: File, outSrc: File) {
+fun genKeyData(keysDir: File, outSrc: File, certificate: X509Certificate) {
     outSrc.parentFile.mkdirs()
     PrintStream(outSrc).use {
         it.println("package com.topjohnwu.magisk.signing;")
         it.println("public final class KeyData {")
 
-        it.byteField("testCert", File(keysDir, "testkey.x509.pem").readBytes())
-        it.byteField("testKey", File(keysDir, "testkey.pk8").readBytes())
         it.byteField("verityCert", File(keysDir, "verity.x509.pem").readBytes())
         it.byteField("verityKey", File(keysDir, "verity.pk8").readBytes())
+        it.byteField("signCert", certificate.encoded)
 
         it.println("}")
     }

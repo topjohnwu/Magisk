@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.signing;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -21,6 +23,7 @@ import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -226,6 +229,64 @@ public abstract class ApkSignerV2 {
             centralDir,
             eocd,
         };
+    }
+
+    public static byte[] getCertificate(String path) throws IOException {
+        try (var apk = new RandomAccessFile(path, "r")) {
+            var buffer = ByteBuffer.allocate(0x10);
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+            apk.seek(apk.length() - 0x6);
+            apk.readFully(buffer.array(), 0x0, 0x6);
+            int offset = buffer.getInt();
+            if (buffer.getShort() != 0) {
+                return null;
+            }
+
+            apk.seek(offset - 0x10);
+            apk.readFully(buffer.array(), 0x0, 0x10);
+
+            if (!Arrays.equals(buffer.array(), APK_SIGNING_BLOCK_MAGIC)) {
+                return null;
+            }
+
+            // Read and compare size fields
+            apk.seek(offset - 0x18);
+            apk.readFully(buffer.array(), 0x0, 0x8);
+            buffer.rewind();
+            int size = (int) buffer.getLong();
+
+            var block = ByteBuffer.allocate(size + 0x8);
+            block.order(ByteOrder.LITTLE_ENDIAN);
+            apk.seek(offset - block.capacity());
+            apk.readFully(block.array(), 0x0, block.capacity());
+
+            if (size != block.getLong()) {
+                return null;
+            }
+
+            int length = 0;
+            while (block.remaining() > 24) {
+                size = (int) block.getLong();
+                if (block.getInt() == APK_SIGNATURE_SCHEME_V2_BLOCK_ID) {
+                    // signer-sequence length, signer length, signed data length
+                    block.position(block.position() + 12);
+                    size = block.getInt(); // digests-sequence length
+
+                    // digests, certificates length
+                    block.position(block.position() + size + 0x4);
+
+                    length = block.getInt(); // certificate length
+                    break;
+                } else {
+                    block.position(block.position() + size - 0x4);
+                }
+            }
+
+            var certificate = new byte[length];
+            block.get(certificate);
+            return certificate;
+        }
     }
 
     private static Map<Integer, byte[]> computeContentDigests(

@@ -15,18 +15,18 @@ import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
+import com.topjohnwu.magisk.signing.ApkSignerV2
+import com.topjohnwu.magisk.signing.KeyData
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import java.io.File
+import java.util.*
 
 class MainViewModel : BaseViewModel()
 
@@ -185,6 +185,15 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
             MagiskDialog(this).apply {
                 setTitle(R.string.unsupport_general_title)
                 setMessage(R.string.unsupport_external_storage_msg)
+                setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
+                setCancelable(false)
+            }.show()
+        }
+
+        if (!Arrays.equals(ApkSignerV2.getCertificate(AppApkPath), KeyData.signCert())) {
+            MagiskDialog(this).apply {
+                setTitle(R.string.unsupport_general_title)
+                setMessage(R.string.home_notice_content)
                 setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()

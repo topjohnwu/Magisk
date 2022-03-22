@@ -10,6 +10,8 @@ import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
 import java.io.*
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 import java.util.*
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
@@ -79,6 +81,17 @@ private fun Project.setupAppCommon() {
             includeInApk = false
         }
     }
+}
+
+fun getCertificate(storeType: String?, storeFile: File, storePassword: String,
+                   keyPassword: String, keyAlias: String): X509Certificate {
+    val keyStore = KeyStore.getInstance(storeType ?: KeyStore.getDefaultType())
+    val fis = FileInputStream(storeFile)
+    keyStore.load(fis, storePassword.toCharArray())
+    fis.close()
+    val keyPasswordArray = keyPassword.toCharArray()
+    val entry = keyStore.getEntry(keyAlias, KeyStore.PasswordProtection(keyPasswordArray))
+    return (entry as KeyStore.PrivateKeyEntry).certificate as X509Certificate
 }
 
 fun Project.setupApp() {
@@ -166,7 +179,13 @@ fun Project.setupApp() {
             inputs.dir(keysDir)
             outputs.file(outSrc)
             doLast {
-                genKeyData(keysDir, outSrc)
+                val certificate = getCertificate(
+                    signingConfig.storeType,
+                    signingConfig.storeFile!!,
+                    signingConfig.storePassword!!,
+                    signingConfig.keyPassword!!,
+                    signingConfig.keyAlias!!)
+                genKeyData(keysDir, outSrc, certificate)
             }
         }
         registerJavaGeneratingTask(genSrcTask, outSrcDir)
