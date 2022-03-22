@@ -13,7 +13,8 @@ LOCAL_STATIC_LIBRARIES := \
     libnanopb \
     libsystemproperties \
     libphmap \
-    libxhook
+    libxhook \
+    libmincrypt
 
 LOCAL_SRC_FILES := \
     core/applets.cpp \

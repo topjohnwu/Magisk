@@ -128,6 +128,9 @@ class Keygen(context: Context) : CertKeyProvider {
         }
         Config.keyStoreRaw = bytes.toString("UTF-8")
 
+        val digest = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
+        Config.certDigest = digest.joinToString("") { "%02x".format(it) }
+
         return ks
     }
 }

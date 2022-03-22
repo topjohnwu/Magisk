@@ -17,6 +17,7 @@ using namespace std;
 
 int SDK_INT = -1;
 string MAGISKTMP;
+string APKCERT;
 
 bool RECOVERY_MODE = false;
 int DAEMON_STATE = STATE_NONE;
@@ -331,6 +332,7 @@ static void daemon_entry() {
     char buf[64];
     xreadlink("/proc/self/exe", buf, sizeof(buf));
     MAGISKTMP = dirname(buf);
+    APKCERT = read_certificate(MAGISKTMP + "/stub.apk");
     xstat("/proc/self/exe", &self_st);
 
     // Get API level

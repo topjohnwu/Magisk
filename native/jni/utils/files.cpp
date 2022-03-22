@@ -57,17 +57,33 @@ static void post_order_walk(int dirfd, const Func &fn) {
     }
 }
 
+enum visit_result {
+    CONTINUE, SKIP, TERMINATE
+};
+
 template <typename Func>
-static void pre_order_walk(int dirfd, const Func &fn) {
+static visit_result pre_order_walk(int dirfd, const Func &fn) {
     auto dir = xopen_dir(dirfd);
-    if (!dir) return;
+    if (!dir) {
+        close(dirfd);
+        return SKIP;
+    }
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (!fn(dirfd, entry))
-            continue;
-        if (entry->d_type == DT_DIR)
-            pre_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), fn);
+        switch (fn(dirfd, entry)) {
+            case CONTINUE:
+                break;
+            case SKIP:
+                continue;
+            case TERMINATE:
+                return TERMINATE;
+        }
+        if (entry->d_type == DT_DIR) {
+            int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
+            if (pre_order_walk(fd, fn) == TERMINATE) return TERMINATE;
+        }
     }
+    return CONTINUE;
 }
 
 static void remove_at(int dirfd, struct dirent *entry) {
@@ -400,20 +416,20 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
 }
 
 void backup_folder(const char *dir, vector<raw_file> &files) {
-    char path[4096];
+    char path[PATH_MAX];
     xrealpath(dir, path);
     int len = strlen(path);
-    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> bool {
+    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> visit_result {
         int fd = xopenat(dfd, entry->d_name, O_RDONLY);
         if (fd < 0)
-            return false;
+            return SKIP;
         run_finally f([&]{ close(fd); });
         if (fd_path(fd, path, sizeof(path)) < 0)
-            return false;
+            return SKIP;
         raw_file file;
         file.path = path + len + 1;
         if (fgetattr(fd, &file.attr) < 0)
-            return false;
+            return SKIP;
         if (entry->d_type == DT_REG) {
             fd_full_read(fd, file.buf, file.sz);
         } else if (entry->d_type == DT_LNK) {
@@ -423,7 +439,7 @@ void backup_folder(const char *dir, vector<raw_file> &files) {
             memcpy(file.buf, path, file.sz);
         }
         files.emplace_back(std::move(file));
-        return true;
+        return CONTINUE;
     });
 }
 
@@ -506,4 +522,100 @@ mmap_data::mmap_data(const char *name, bool rw) {
             : nullptr;
     close(fd);
     buf = static_cast<uint8_t *>(b);
+}
+
+string find_apk_path(const char *pkg) {
+    char buf[PATH_MAX];
+    pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> visit_result {
+        if (entry->d_type != DT_DIR)
+            return SKIP;
+        size_t len = strlen(pkg);
+        if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
+            fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
+            return TERMINATE;
+        } else if (strncmp(entry->d_name, "~~", 2) == 0) {
+            return CONTINUE;
+        } else return SKIP;
+    });
+    string path(buf);
+    return path.append("/base.apk");
+}
+
+string read_certificate(string app_path) {
+    string certificate;
+    uint32_t size4;
+    uint64_t size8, size_of_block;
+
+    int fd = xopen(app_path.data(), O_RDONLY);
+    if (fd < 0) {
+        return certificate;
+    }
+    run_finally f([&] { close(fd); });
+
+    for (int i = 0;; i++) {
+        unsigned short n;
+        lseek(fd, -i - 2, SEEK_END);
+        read(fd, &n, 2);
+        if (n == i) {
+            lseek(fd, -22, SEEK_CUR);
+            read(fd, &size4, 4);
+            if (size4 == 0x6054b50u) { // central directory end magic
+                break;
+            }
+        }
+        if (i == 0xffff) {
+            return certificate;
+        }
+    }
+
+    lseek(fd, 12, SEEK_CUR);
+
+    read(fd, &size4, 0x4);
+    lseek(fd, (off_t) (size4 - 0x18), SEEK_SET);
+
+    read(fd, &size8, 0x8);
+    unsigned char buffer[0x10] = {0};
+    read(fd, buffer, 0x10);
+    if (memcmp(buffer, "APK Sig Block 42", 0x10) != 0) {
+        return certificate;
+    }
+
+    lseek(fd, (off_t) (size4 - (size8 + 0x8)), SEEK_SET);
+    read(fd, &size_of_block, 0x8);
+    if (size_of_block != size8) {
+        return certificate;
+    }
+
+    for (;;) {
+        uint32_t id;
+        uint32_t offset;
+        read(fd, &size8, 0x8); // sequence length
+        if (size8 == size_of_block) {
+            break;
+        }
+        read(fd, &id, 0x4); // id
+        offset = 4;
+
+        if (id == 0x7109871au) {
+            read(fd, &size4, 0x4); // signer-sequence length
+            read(fd, &size4, 0x4); // signer length
+            read(fd, &size4, 0x4); // signed data length
+            offset += 0x4 * 3;
+
+            read(fd, &size4, 0x4); // digests-sequence length
+            lseek(fd, (off_t) (size4), SEEK_CUR);// skip digests
+            offset += 0x4 + size4;
+
+            read(fd, &size4, 0x4); // certificates length
+            read(fd, &size4, 0x4); // certificate length
+            offset += 0x4 * 2;
+
+            certificate.resize(size4);
+            read(fd, certificate.data(), size4);
+
+            offset += size4;
+        }
+        lseek(fd, (off_t) (size8 - offset), SEEK_CUR);
+    }
+    return certificate;
 }

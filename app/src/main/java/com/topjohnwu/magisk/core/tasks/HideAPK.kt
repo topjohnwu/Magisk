@@ -120,6 +120,7 @@ object HideAPK {
         val repack = File(activity.cacheDir, "patched.apk")
         val pkg = genPackageName()
         Config.keyStoreRaw = ""
+        Config.certDigest = ""
 
         if (!patch(activity, stub, FileOutputStream(repack), pkg, label))
             return false
