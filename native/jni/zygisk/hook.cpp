@@ -359,6 +359,11 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
     modules.reserve(fds.size());
 
     for (int i = 0; i < fds.size(); ++i) {
+        struct stat s{};
+        if (fstat(fds[i], &s) != 0 || !S_ISREG(s.st_mode)) {
+            close(fds[i]);
+            continue;
+        }
         android_dlextinfo info {
             .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
             .library_fd = fds[i],
