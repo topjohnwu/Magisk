@@ -114,14 +114,17 @@ static void zygiskd(int socket) {
         vector<int> module_fds = recv_fds(socket);
         for (int fd : module_fds) {
             comp_entry entry = nullptr;
-            android_dlextinfo info {
-                    .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
-                    .library_fd = fd,
-            };
-            if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
-                *(void **) &entry = dlsym(h, "zygisk_companion_entry");
-            } else {
-                LOGW("Failed to dlopen zygisk module: %s\n", dlerror());
+            struct stat s{};
+            if (fstat(fd, &s) == 0 && S_ISREG(s.st_mode)) {
+                android_dlextinfo info {
+                        .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+                        .library_fd = fd,
+                };
+                if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
+                    *(void **) &entry = dlsym(h, "zygisk_companion_entry");
+                } else {
+                    LOGW("Failed to dlopen zygisk module: %s\n", dlerror());
+                }
             }
             modules.push_back(entry);
             close(fd);
