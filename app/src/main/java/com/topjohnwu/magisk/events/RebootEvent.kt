@@ -8,7 +8,6 @@ import android.widget.PopupMenu
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.superuser.Shell
 import com.topjohnwu.magisk.ktx.reboot as systemReboot
 
 object RebootEvent {
@@ -20,7 +19,7 @@ object RebootEvent {
             R.id.action_reboot_bootloader -> systemReboot("bootloader")
             R.id.action_reboot_download -> systemReboot("download")
             R.id.action_reboot_edl -> systemReboot("edl")
-            R.id.action_reboot_recovery -> Shell.cmd("/system/bin/reboot recovery").submit()
+            R.id.action_reboot_recovery -> systemReboot("recovery")
             else -> Unit
         }
         return true
