@@ -7,11 +7,8 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.toPolicy
-import com.topjohnwu.magisk.ktx.now
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.Closeable
@@ -54,10 +51,9 @@ class SuRequestHandler(
         return true
     }
 
-    @Throws(IOException::class)
     override fun close() {
         if (::output.isInitialized)
-            output.close()
+            runCatching { output.close() }
     }
 
     private class SuRequestError : IOException()
@@ -73,7 +69,7 @@ class SuRequestHandler(
             when (e) {
                 is IOException, is PackageManager.NameNotFoundException -> {
                     Timber.e(e)
-                    runCatching { close() }
+                    close()
                     false
                 }
                 else -> throw e  // Unexpected error
@@ -81,23 +77,24 @@ class SuRequestHandler(
         }
     }
 
-    fun respond(action: Int, time: Int) {
+    suspend fun respond(action: Int, time: Int) {
         val until = if (time > 0)
-            TimeUnit.MILLISECONDS.toSeconds(now) + TimeUnit.MINUTES.toSeconds(time.toLong())
+            TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) +
+                TimeUnit.MINUTES.toSeconds(time.toLong())
         else
             time.toLong()
 
         policy.policy = action
         policy.until = until
 
-        GlobalScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             try {
                 output.writeInt(policy.policy)
                 output.flush()
             } catch (e: IOException) {
                 Timber.e(e)
             } finally {
-                runCatching { close() }
+                close()
                 if (until >= 0)
                     policyDB.update(policy)
             }
