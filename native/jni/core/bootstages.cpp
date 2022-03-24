@@ -319,11 +319,16 @@ void post_fs_data(int client) {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
+    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo() || access("/cache/disable_magisk", F_OK) == 0 || access("/persist/disable_magisk", F_OK) == 0 || access("/data/unencrypted/disable_magisk", F_OK) == 0 || access("/metadata/disable_magisk", F_OK) == 0 || access("/mnt/vendor/persist/disable_magisk", F_OK) == 0) {
         safe_mode = true;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
         disable_deny();
+        rm_rf("/cache/disable_magisk");
+        rm_rf("/metadata/disable_magisk");
+        rm_rf("/persist/disable_magisk");
+        rm_rf("/data/unencrypted/disable_magisk");
+        rm_rf("/mnt/vendor/persist/disable_magisk");  
     } else {
         exec_common_scripts("post-fs-data");
         db_settings dbs;
