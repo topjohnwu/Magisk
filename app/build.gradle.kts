@@ -86,7 +86,7 @@ dependencies {
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vLibsu = "4.0.2"
+    val vLibsu = "4.0.3"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:io:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:service:${vLibsu}")

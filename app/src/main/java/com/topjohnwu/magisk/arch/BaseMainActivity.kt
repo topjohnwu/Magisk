@@ -14,6 +14,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.utils.Utils
@@ -104,6 +105,9 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
 
         // Pre-fetch network services
         ServiceLocator.networkService
+
+        // Wait for root service
+        RootUtils.Connection.await()
     }
 
     private fun handleRepackage(pkg: String?) {

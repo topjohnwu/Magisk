@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.utils.*
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
@@ -22,9 +23,9 @@ open class App() : Application() {
     constructor(o: Any) : this() {
         val data = StubApk.Data(o)
         // Add the root service name mapping
-        data.classToComponent[RootRegistry::class.java.name] = data.rootService.name
+        data.classToComponent[RootUtils::class.java.name] = data.rootService.name
         // Send back the actual root service class
-        data.rootService = RootRegistry::class.java
+        data.rootService = RootUtils::class.java
         Info.stub = data
     }
 
@@ -38,43 +39,40 @@ open class App() : Application() {
     }
 
     override fun attachBaseContext(context: Context) {
-        Shell.setDefaultBuilder(Shell.Builder.create()
-            .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(ShellInit::class.java)
-            .setTimeout(2))
-        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
-
         // Get the actual ContextImpl
         val app: Application
         val base: Context
         if (context is Application) {
             app = context
             base = context.baseContext
+            AppApkPath = StubApk.current(base).path
         } else {
             app = this
             base = context
+            AppApkPath = base.packageResourcePath
         }
         super.attachBaseContext(base)
         ServiceLocator.context = base
-
-        refreshLocale()
-        AppApkPath = if (isRunningAsStub) {
-            StubApk.current(base).path
-        } else {
-            base.packageResourcePath
-        }
-
-        base.resources.patch()
         app.registerActivityLifecycleCallbacks(ActivityTracker)
     }
 
     override fun onCreate() {
         super.onCreate()
-        RootRegistry.bindTask = RootService.bindOrTask(
-            intent<RootRegistry>(),
+        Shell.setDefaultBuilder(Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .setInitializers(ShellInit::class.java)
+            .setTimeout(2))
+        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
+        RootUtils.bindTask = RootService.bindOrTask(
+            intent<RootUtils>(),
             UiThreadHandler.executor,
-            RootRegistry.Connection
+            RootUtils.Connection
         )
+        // Pre-heat the shell ASAP
+        Shell.getShell(null) {}
+
+        refreshLocale()
+        AppContext.resources.patch()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

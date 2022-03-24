@@ -19,8 +19,8 @@ import java.util.jar.JarFile
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
         if (shell.isRoot) {
-            RootRegistry.bindTask?.let { shell.execTask(it) }
-            RootRegistry.bindTask = null
+            RootUtils.bindTask?.let { shell.execTask(it) }
+            RootUtils.bindTask = null
         }
         shell.newJob().apply {
             add("export ASH_STANDALONE=1")
