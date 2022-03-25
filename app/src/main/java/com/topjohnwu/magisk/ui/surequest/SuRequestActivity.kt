@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
+import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
@@ -14,6 +15,9 @@ import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
 import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.theme.Theme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 open class SuRequestActivity : UIActivity<ActivityRequestBinding>() {
 
@@ -40,8 +44,12 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>() {
             if (action == REQUEST) {
                 viewModel.handleRequest(intent)
             } else {
-                SuCallbackHandler.run(this, action, intent.extras)
-                finish()
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        SuCallbackHandler.run(this@SuRequestActivity, action, intent.extras)
+                    }
+                    finish()
+                }
             }
         } else {
             finish()

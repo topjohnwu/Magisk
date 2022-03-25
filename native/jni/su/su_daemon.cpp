@@ -193,20 +193,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
             info->access = NO_SU_ACCESS;
             return info;
         }
-    } else {
-        return info;
     }
-
-    // If still not determined, ask manager
-    int fd = app_request(info);
-    if (fd < 0) {
-        info->access.policy = DENY;
-    } else {
-        int ret = read_int_be(fd);
-        info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
-        close(fd);
-    }
-
     return info;
 }
 
@@ -236,6 +223,18 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     xxread(client, &ctx.req, sizeof(su_req_base));
     read_string(client, ctx.req.shell);
     read_string(client, ctx.req.command);
+
+    // If still not determined, ask manager
+    if (ctx.info->access.policy == QUERY) {
+        int fd = app_request(ctx);
+        if (fd < 0) {
+            ctx.info->access.policy = DENY;
+        } else {
+            int ret = read_int_be(fd);
+            ctx.info->access.policy = ret < 0 ? DENY : static_cast<policy_t>(ret);
+            close(fd);
+        }
+    }
 
     if (ctx.info->access.log)
         app_log(ctx);

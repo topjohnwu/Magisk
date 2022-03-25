@@ -1,22 +1,20 @@
-@file:SuppressLint("InlinedApi")
-
 package com.topjohnwu.magisk.core.model.su
 
-import android.annotation.SuppressLint
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.INTERACTIVE
 import com.topjohnwu.magisk.ktx.getLabel
+import com.topjohnwu.magisk.ktx.getPackageInfo
 
-data class SuPolicy(
+class SuPolicy(
     val uid: Int,
     val packageName: String,
     val appName: String,
     val icon: Drawable,
     var policy: Int = INTERACTIVE,
     var until: Long = -1L,
-    val logging: Boolean = true,
-    val notification: Boolean = true
+    var logging: Boolean = true,
+    var notification: Boolean = true
 ) {
 
     companion object {
@@ -24,10 +22,6 @@ data class SuPolicy(
         const val DENY = 1
         const val ALLOW = 2
     }
-
-    fun toLog(toUid: Int, fromPid: Int, command: String) = SuLog(
-        uid, toUid, fromPid, packageName, appName,
-        command, policy == ALLOW)
 
     fun toMap() = mapOf(
         "uid" to uid,
@@ -39,47 +33,43 @@ data class SuPolicy(
     )
 }
 
-@Throws(PackageManager.NameNotFoundException::class)
-fun Map<String, String>.toPolicy(pm: PackageManager): SuPolicy {
-    val uid = get("uid")?.toIntOrNull() ?: -1
-    val packageName = get("package_name").orEmpty()
-    val info = pm.getApplicationInfo(packageName, PackageManager.MATCH_UNINSTALLED_PACKAGES)
-
-    if (info.uid != uid)
-        throw PackageManager.NameNotFoundException()
-
+fun PackageManager.createPolicy(info: PackageInfo): SuPolicy {
+    val appInfo = info.applicationInfo
+    val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
     return SuPolicy(
-        uid = uid,
-        packageName = packageName,
-        appName = info.getLabel(pm),
-        icon = info.loadIcon(pm),
-        policy = get("policy")?.toIntOrNull() ?: INTERACTIVE,
-        until = get("until")?.toLongOrNull() ?: -1L,
-        logging = get("logging")?.toIntOrNull() != 0,
-        notification = get("notification")?.toIntOrNull() != 0
+        uid = appInfo.uid,
+        packageName = getNameForUid(appInfo.uid)!!,
+        appName = "$prefix${appInfo.getLabel(this)}",
+        icon = appInfo.loadIcon(this),
     )
 }
 
 @Throws(PackageManager.NameNotFoundException::class)
-fun Int.toPolicy(pm: PackageManager, policy: Int = INTERACTIVE): SuPolicy {
-    val pkg = pm.getPackagesForUid(this)?.firstOrNull()
-        ?: throw PackageManager.NameNotFoundException()
-    val info = pm.getApplicationInfo(pkg, PackageManager.MATCH_UNINSTALLED_PACKAGES)
-    return SuPolicy(
-        uid = info.uid,
-        packageName = pkg,
-        appName = info.getLabel(pm),
-        icon = info.loadIcon(pm),
-        policy = policy
-    )
+fun PackageManager.createPolicy(uid: Int): SuPolicy {
+    val info = getPackageInfo(uid, -1)
+    return if (info == null) {
+        // We can assert getNameForUid does not return null because
+        // getPackageInfo will already throw if UID does not exist
+        val name = getNameForUid(uid)!!
+        SuPolicy(
+            uid = uid,
+            packageName = name,
+            appName = "[SharedUID] $name",
+            icon = defaultActivityIcon,
+        )
+    } else {
+        createPolicy(info)
+    }
 }
 
-fun Int.toUidPolicy(pm: PackageManager, policy: Int): SuPolicy {
-    return SuPolicy(
-        uid = this,
-        packageName = "[UID] $this",
-        appName = "[UID] $this",
-        icon = pm.defaultActivityIcon,
-        policy = policy
-    )
+@Throws(PackageManager.NameNotFoundException::class)
+fun PackageManager.createPolicy(map: Map<String, String>): SuPolicy {
+    val uid = map["uid"]?.toIntOrNull() ?: throw IllegalArgumentException()
+    val policy = createPolicy(uid)
+
+    map["policy"]?.toInt()?.let { policy.policy = it }
+    map["until"]?.toLong()?.let { policy.until = it }
+    map["logging"]?.toInt()?.let { policy.logging = it != 0 }
+    map["notification"]?.toInt()?.let { policy.notification = it != 0 }
+    return policy
 }

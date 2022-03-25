@@ -7,12 +7,12 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.model.su.toPolicy
-import com.topjohnwu.magisk.core.model.su.toUidPolicy
+import com.topjohnwu.magisk.core.model.su.createSuLog
 import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.ktx.getLabel
+import com.topjohnwu.magisk.ktx.getPackageInfo
 import com.topjohnwu.magisk.utils.Utils
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 object SuCallbackHandler {
@@ -53,59 +53,47 @@ object SuCallbackHandler {
     private fun handleLogging(context: Context, data: Bundle) {
         val fromUid = data.getIntComp("from.uid", -1)
         val notify = data.getBoolean("notify", true)
-        val allow = data.getIntComp("policy", SuPolicy.ALLOW)
+        val policy = data.getIntComp("policy", SuPolicy.ALLOW)
+        val toUid = data.getIntComp("to.uid", -1)
+        val pid = data.getIntComp("pid", -1)
+        val command = data.getString("command", "")
 
         val pm = context.packageManager
 
-        val policy = runCatching {
-            fromUid.toPolicy(pm, allow)
-        }.getOrElse {
-            GlobalScope.launch { ServiceLocator.policyDB.delete(fromUid) }
-            fromUid.toUidPolicy(pm, allow)
-        }
+        val log = runCatching {
+            pm.getPackageInfo(fromUid, pid)?.let {
+                pm.createSuLog(it, toUid, pid, command, policy)
+            }
+        }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy)
 
         if (notify)
-            notify(context, policy)
+            notify(context, log.action, log.appName)
 
-        val toUid = data.getIntComp("to.uid", -1)
-        val pid = data.getIntComp("pid", -1)
-
-        val command = data.getString("command", "")
-        val log = policy.toLog(
-            toUid = toUid,
-            fromPid = pid,
-            command = command
-        )
-
-        GlobalScope.launch {
-            ServiceLocator.logRepo.insert(log)
-        }
+        runBlocking { ServiceLocator.logRepo.insert(log) }
     }
 
     private fun handleNotify(context: Context, data: Bundle) {
-        val fromUid = data.getIntComp("from.uid", -1)
-        val allow = data.getIntComp("policy", SuPolicy.ALLOW)
+        val uid = data.getIntComp("from.uid", -1)
+        val pid = data.getIntComp("pid", -1)
+        val policy = data.getIntComp("policy", SuPolicy.ALLOW)
 
         val pm = context.packageManager
 
+        val appName = runCatching {
+            pm.getPackageInfo(uid, pid)?.applicationInfo?.getLabel(pm)
+        }.getOrNull() ?: "[UID] $uid"
 
-        val policy = runCatching {
-            fromUid.toPolicy(pm, allow)
-        }.getOrElse {
-            GlobalScope.launch { ServiceLocator.policyDB.delete(fromUid) }
-            fromUid.toUidPolicy(pm, allow)
-        }
-        notify(context, policy)
+        notify(context, policy == SuPolicy.ALLOW, appName)
     }
 
-    private fun notify(context: Context, policy: SuPolicy) {
+    private fun notify(context: Context, granted: Boolean, appName: String) {
         if (Config.suNotification == Config.Value.NOTIFICATION_TOAST) {
-            val resId = if (policy.policy == SuPolicy.ALLOW)
+            val resId = if (granted)
                 R.string.su_allow_toast
             else
                 R.string.su_deny_toast
 
-            Utils.toast(context.getString(resId, policy.appName), Toast.LENGTH_SHORT)
+            Utils.toast(context.getString(resId, appName), Toast.LENGTH_SHORT)
         }
     }
 }

@@ -191,6 +191,7 @@ void app_notify(const su_context &ctx) {
         vector<Extra> extras;
         extras.reserve(2);
         extras.emplace_back("from.uid", ctx.info->uid);
+        extras.emplace_back("pid", ctx.pid);
         extras.emplace_back("policy", ctx.info->access.policy);
 
         exec_cmd("notify", extras, ctx.info);
@@ -198,21 +199,22 @@ void app_notify(const su_context &ctx) {
     }
 }
 
-int app_request(const shared_ptr<su_info> &info) {
+int app_request(const su_context &ctx) {
     // Create FIFO
     char fifo[64];
     strcpy(fifo, "/dev/socket/");
     gen_rand_str(fifo + 12, 32, true);
     mkfifo(fifo, 0600);
-    chown(fifo, info->mgr_st.st_uid, info->mgr_st.st_gid);
+    chown(fifo, ctx.info->mgr_st.st_uid, ctx.info->mgr_st.st_gid);
     setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
     // Send request
     vector<Extra> extras;
     extras.reserve(2);
     extras.emplace_back("fifo", fifo);
-    extras.emplace_back("uid", info->eval_uid);
-    exec_cmd("request", extras, info, false);
+    extras.emplace_back("uid", ctx.info->eval_uid);
+    extras.emplace_back("pid", ctx.pid);
+    exec_cmd("request", extras, ctx.info, false);
 
     // Wait for data input for at most 70 seconds
     int fd = xopen(fifo, O_RDONLY | O_CLOEXEC | O_NONBLOCK);

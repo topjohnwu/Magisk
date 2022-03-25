@@ -1,22 +1,20 @@
 package com.topjohnwu.magisk.core.magiskdb
 
-class StringDao : BaseDao() {
+class StringDao : MagiskDB() {
 
-    override val table = Table.STRINGS
+    suspend fun delete(key: String) {
+        val query = "DELETE FROM ${Table.STRINGS} WHERE key == \"$key\""
+        exec(query)
+    }
 
-    suspend fun delete(key: String) = buildQuery<Delete> {
-        condition { equals("key", key) }
-    }.commit()
+    suspend fun put(key: String, value: String) {
+        val kv = mapOf("key" to key, "value" to value)
+        val query = "REPLACE INTO ${Table.STRINGS} ${kv.toQuery()}"
+        exec(query)
+    }
 
-    suspend fun put(key: String, value: String) = buildQuery<Replace> {
-        values("key" to key, "value" to value)
-    }.commit()
-
-    suspend fun fetch(key: String, default: String = "") = buildQuery<Select> {
-        fields("value")
-        condition { equals("key", key) }
-    }.query {
-        it["value"]
-    }.firstOrNull() ?: default
-
+    suspend fun fetch(key: String, default: String = ""): String {
+        val query = "SELECT value FROM ${Table.STRINGS} WHERE key == \"$key\" LIMIT = 1"
+        return exec(query) { it["value"] }.firstOrNull() ?: default
+    }
 }

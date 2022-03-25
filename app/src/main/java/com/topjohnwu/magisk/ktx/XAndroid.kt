@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.*
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -19,40 +19,26 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
-import android.text.PrecomputedText
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
-import androidx.annotation.ColorRes
-import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.core.net.toUri
-import androidx.core.text.PrecomputedTextCompat
-import androidx.core.view.isGone
-import androidx.core.widget.TextViewCompat
-import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.DynamicClassLoader
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.Array
+import kotlin.String
 import java.lang.reflect.Array as JArray
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
@@ -78,8 +64,6 @@ val Context.deviceProtectedContext: Context get() =
     if (SDK_INT >= 24) {
         createDeviceProtectedStorageContext()
     } else { this }
-
-fun Intent.startActivity(context: Context) = context.startActivity(this)
 
 fun Intent.startActivityWithRoot() {
     val args = mutableListOf("am", "start", "--user", Const.USER_ID.toString())
@@ -185,8 +169,6 @@ fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<S
     return args
 }
 
-fun Intent.chooser(title: String = "Pick an app") = Intent.createChooser(this, title)
-
 fun Context.cachedFile(name: String) = File(cacheDir, name)
 
 fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
@@ -208,34 +190,6 @@ fun ApplicationInfo.getLabel(pm: PackageManager): String {
 
     return loadLabel(pm).toString()
 }
-
-fun Intent.exists(packageManager: PackageManager) = resolveActivity(packageManager) != null
-
-fun Context.colorCompat(@ColorRes id: Int) = try {
-    ContextCompat.getColor(this, id)
-} catch (e: Resources.NotFoundException) {
-    null
-}
-
-fun Context.colorStateListCompat(@ColorRes id: Int) = try {
-    ContextCompat.getColorStateList(this, id)
-} catch (e: Resources.NotFoundException) {
-    null
-}
-
-fun Context.drawableCompat(@DrawableRes id: Int) = AppCompatResources.getDrawable(this, id)
-/**
- * Pass [start] and [end] dimensions, function will return left and right
- * with respect to RTL layout direction
- */
-fun Context.startEndToLeftRight(start: Int, end: Int): Pair<Int, Int> {
-    if (resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
-        return end to start
-    }
-    return start to end
-}
-
-fun Context.openUrl(url: String) = Utils.openLink(this, url.toUri())
 
 inline fun <reified T> T.createClassLoader(apk: File) =
     DynamicClassLoader(apk, T::class.java.classLoader)
@@ -307,4 +261,21 @@ fun getProperty(key: String, def: String): String {
         return get.invoke(clazz, key, def) as String
     }
     return def
+}
+
+@SuppressLint("InlinedApi")
+@Throws(PackageManager.NameNotFoundException::class)
+fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
+    val flag = PackageManager.MATCH_UNINSTALLED_PACKAGES
+    val pkgs = getPackagesForUid(uid) ?: throw PackageManager.NameNotFoundException()
+    return if (pkgs.size > 1) {
+        if (pid <= 0)
+            return null
+        // Try to find package name from PID
+        val proc = RootUtils.obj?.getAppProcess(pid) ?: return null
+        val pkg = proc.pkgList[0]
+        getPackageInfo(pkg, flag)
+    } else {
+        getPackageInfo(pkgs[0], flag)
+    }
 }

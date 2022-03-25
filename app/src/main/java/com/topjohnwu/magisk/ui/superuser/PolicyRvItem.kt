@@ -20,34 +20,28 @@ class PolicyRvItem(
     var isExpanded = false
         set(value) = set(value, field, { field = it }, BR.expanded)
 
-    // This property hosts the policy state
-    var policyState = item.policy == SuPolicy.ALLOW
-        set(value) = set(value, field, { field = it }, BR.enabled)
-
     // This property binds with the UI state
     @get:Bindable
     var isEnabled
-        get() = policyState
-        set(value) = set(value, policyState, { viewModel.togglePolicy(this, it) }, BR.enabled)
-
-    @get:Bindable
-    var shouldNotify = item.notification
-        set(value) = set(value, field, { field = it }, BR.shouldNotify) {
-            viewModel.updatePolicy(updatedPolicy, isLogging = false)
+        get() = item.policy == SuPolicy.ALLOW
+        set(value) {
+            if (value != isEnabled)
+                viewModel.togglePolicy(this, value)
         }
 
     @get:Bindable
-    var shouldLog = item.logging
-        set(value) = set(value, field, { field = it }, BR.shouldLog) {
-            viewModel.updatePolicy(updatedPolicy, isLogging = true)
+    var shouldNotify
+        get() = item.notification
+        set(value) = set(value, shouldNotify, { item.notification = it }, BR.shouldNotify) {
+            viewModel.updatePolicy(item, isLogging = false)
         }
 
-    private val updatedPolicy
-        get() = item.copy(
-            policy = if (policyState) SuPolicy.ALLOW else SuPolicy.DENY,
-            notification = shouldNotify,
-            logging = shouldLog
-        )
+    @get:Bindable
+    var shouldLog
+        get() = item.logging
+        set(value) = set(value, shouldLog, { item.logging = it }, BR.shouldLog) {
+            viewModel.updatePolicy(item, isLogging = true)
+        }
 
     fun toggleExpand() {
         isExpanded = !isExpanded

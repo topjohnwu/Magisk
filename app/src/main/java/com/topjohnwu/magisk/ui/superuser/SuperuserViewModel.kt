@@ -47,12 +47,12 @@ class SuperuserViewModel(
             return@launch
         }
         state = State.LOADING
-        val (policies, diff) = withContext(Dispatchers.Default) {
+        val (policies, diff) = withContext(Dispatchers.IO) {
             db.deleteOutdated()
-            val policies = db.fetchAll {
+            val policies = db.fetchAll().map {
                 PolicyRvItem(it, it.icon, this@SuperuserViewModel)
             }.sortedWith(compareBy(
-                { it.item.appName.toLowerCase(currentLocale) },
+                { it.item.appName.lowercase(currentLocale) },
                 { it.item.packageName }
             ))
             policies to itemsPolicies.calculateDiff(policies)
@@ -107,14 +107,13 @@ class SuperuserViewModel(
 
     fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
         fun updateState() {
-            item.policyState = enable
-
             val policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
-            val app = item.item.copy(policy = policy)
+            item.item.policy = policy
+            item.notifyPropertyChanged(BR.enabled)
 
             viewModelScope.launch {
-                db.update(app)
-                val res = if (app.policy == SuPolicy.ALLOW) R.string.su_snack_grant
+                db.update(item.item)
+                val res = if (item.item.policy == SuPolicy.ALLOW) R.string.su_snack_grant
                 else R.string.su_snack_deny
                 SnackbarEvent(res.asText(item.item.appName)).publish()
             }
