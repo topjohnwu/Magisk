@@ -1,5 +1,8 @@
 package com.topjohnwu.magisk.ui.superuser
 
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -12,9 +15,11 @@ import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.AnyDiffRvItem
 import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
+import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.TextItem
@@ -41,6 +46,7 @@ class SuperuserViewModel(
 
     // ---
 
+    @SuppressLint("InlinedApi")
     override fun refresh() = viewModelScope.launch {
         if (!Utils.showSuperUser()) {
             state = State.LOADING_FAILED
@@ -49,11 +55,28 @@ class SuperuserViewModel(
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.IO) {
             db.deleteOutdated()
-            val policies = db.fetchAll().map {
-                PolicyRvItem(it, it.icon, this@SuperuserViewModel)
-            }.sortedWith(compareBy(
-                { it.item.appName.lowercase(currentLocale) },
-                { it.item.packageName }
+            val policies = ArrayList<PolicyRvItem>()
+            val pm = AppContext.packageManager
+            for (policy in db.fetchAll()) {
+                val pkgs = pm.getPackagesForUid(policy.uid) ?: continue
+                policies.addAll(pkgs.mapNotNull { pkg ->
+                    try {
+                        val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES)
+                        PolicyRvItem(
+                            this@SuperuserViewModel, policy,
+                            info.packageName,
+                            info.sharedUserId != null,
+                            info.applicationInfo.loadIcon(pm),
+                            info.applicationInfo.getLabel(pm)
+                        )
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        null
+                    }
+                })
+            }
+            policies.sortWith(compareBy(
+                { it.appName.lowercase(currentLocale) },
+                { it.packageName }
             ))
             policies to itemsPolicies.calculateDiff(policies)
         }
@@ -82,40 +105,56 @@ class SuperuserViewModel(
             }.publish()
         } else {
             SuperuserRevokeDialog {
-                appName = item.item.appName
+                appName = item.title
                 onSuccess { updateState() }
             }.publish()
         }
     }
 
-    //---
-
-    fun updatePolicy(policy: SuPolicy, isLogging: Boolean) = viewModelScope.launch {
-        db.update(policy)
-        val res = when {
-            isLogging -> when {
-                policy.logging -> R.string.su_snack_log_on
+    fun updateNotify(item: PolicyRvItem) {
+        viewModelScope.launch {
+            db.update(item.item)
+            val res = when {
+                item.item.logging -> R.string.su_snack_log_on
                 else -> R.string.su_snack_log_off
             }
-            else -> when {
-                policy.notification -> R.string.su_snack_notif_on
+            itemsPolicies.forEach {
+                if (it.item.uid == item.item.uid) {
+                    it.notifyPropertyChanged(BR.shouldNotify)
+                }
+            }
+            SnackbarEvent(res.asText(item.appName)).publish()
+        }
+    }
+
+    fun updateLogging(item: PolicyRvItem) {
+        viewModelScope.launch {
+            db.update(item.item)
+            val res = when {
+                item.item.notification -> R.string.su_snack_notif_on
                 else -> R.string.su_snack_notif_off
             }
+            itemsPolicies.forEach {
+                if (it.item.uid == item.item.uid) {
+                    it.notifyPropertyChanged(BR.shouldLog)
+                }
+            }
+            SnackbarEvent(res.asText(item.appName)).publish()
         }
-        SnackbarEvent(res.asText(policy.appName)).publish()
     }
 
     fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
         fun updateState() {
-            val policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
-            item.item.policy = policy
-            item.notifyPropertyChanged(BR.enabled)
-
             viewModelScope.launch {
+                val res = if (enable) R.string.su_snack_grant else R.string.su_snack_deny
+                item.item.policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
                 db.update(item.item)
-                val res = if (item.item.policy == SuPolicy.ALLOW) R.string.su_snack_grant
-                else R.string.su_snack_deny
-                SnackbarEvent(res.asText(item.item.appName)).publish()
+                itemsPolicies.forEach {
+                    if (it.item.uid == item.item.uid) {
+                        it.notifyPropertyChanged(BR.enabled)
+                    }
+                }
+                SnackbarEvent(res.asText(item.appName)).publish()
             }
         }
 

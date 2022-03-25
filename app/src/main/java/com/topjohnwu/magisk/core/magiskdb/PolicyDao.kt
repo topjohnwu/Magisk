@@ -2,9 +2,7 @@ package com.topjohnwu.magisk.core.magiskdb
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.model.su.createPolicy
 import com.topjohnwu.magisk.di.AppContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class PolicyDao : MagiskDB() {
@@ -23,28 +21,31 @@ class PolicyDao : MagiskDB() {
 
     suspend fun fetch(uid: Int): SuPolicy? {
         val query = "SELECT * FROM ${Table.POLICY} WHERE uid == $uid LIMIT = 1"
-        return exec(query) { it.toPolicyOrNull() }.firstOrNull()
+        return exec(query, ::toPolicy).firstOrNull()
     }
 
     suspend fun update(policy: SuPolicy) {
-        val query = "REPLACE INTO ${Table.POLICY} ${policy.toMap().toQuery()}"
+        val map = policy.toMap()
+        // Put in package_name for old database
+        map["package_name"] = AppContext.packageManager.getNameForUid(policy.uid)!!
+        val query = "REPLACE INTO ${Table.POLICY} ${map.toQuery()}"
         exec(query)
     }
 
     suspend fun fetchAll(): List<SuPolicy> {
         val query = "SELECT * FROM ${Table.POLICY} WHERE uid/100000 == ${Const.USER_ID}"
-        return exec(query) { it.toPolicyOrNull() }.filterNotNull()
+        return exec(query, ::toPolicy).filterNotNull()
     }
 
-    private suspend fun Map<String, String>.toPolicyOrNull(): SuPolicy? {
-        try {
-            return AppContext.packageManager.createPolicy(this)
-        } catch (e: Exception) {
-            Timber.w(e)
-            val uid = get("uid") ?: return null
-            delete(uid.toInt())
-            return null
-        }
+    private fun toPolicy(map: Map<String, String>): SuPolicy? {
+        val uid = map["uid"]?.toInt() ?: return null
+        val policy = SuPolicy(uid)
+
+        map["policy"]?.toInt()?.let { policy.policy = it }
+        map["until"]?.toLong()?.let { policy.until = it }
+        map["logging"]?.toInt()?.let { policy.logging = it != 0 }
+        map["notification"]?.toInt()?.let { policy.notification = it != 0 }
+        return policy
     }
 
 }

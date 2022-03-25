@@ -21,7 +21,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
@@ -31,6 +30,7 @@ import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
+import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.launch
@@ -100,17 +100,21 @@ class SuRequestViewModel(
     fun handleRequest(intent: Intent) {
         viewModelScope.launch {
             if (handler.start(intent))
-                showDialog(handler.policy)
+                showDialog()
             else
                 DieEvent().publish()
         }
     }
 
-    private fun showDialog(policy: SuPolicy) {
-        icon = policy.icon
-        title = policy.appName
-        packageName = policy.packageName
-        selectedItemPosition = timeoutPrefs.getInt(policy.packageName, 0)
+    private fun showDialog() {
+        val pm = handler.pm
+        val info = handler.pkgInfo
+        val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
+
+        icon = info.applicationInfo.loadIcon(pm)
+        title = "$prefix${info.applicationInfo.getLabel(pm)}"
+        packageName = info.packageName
+        selectedItemPosition = timeoutPrefs.getInt(packageName, 0)
 
         // Set timer
         val millis = SECONDS.toMillis(Config.suDefaultTimeout.toLong())
@@ -124,7 +128,7 @@ class SuRequestViewModel(
         timer?.cancel()
 
         val pos = selectedItemPosition
-        timeoutPrefs.edit().putInt(handler.policy.packageName, pos).apply()
+        timeoutPrefs.edit().putInt(handler.pkgInfo.packageName, pos).apply()
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])

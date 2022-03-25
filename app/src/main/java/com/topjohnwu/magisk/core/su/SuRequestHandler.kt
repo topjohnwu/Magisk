@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.core.su
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.model.su.createPolicy
 import com.topjohnwu.magisk.ktx.getPackageInfo
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -19,12 +19,14 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class SuRequestHandler(
-    private val pm: PackageManager,
+    val pm: PackageManager,
     private val policyDB: PolicyDao
 ) : Closeable {
 
     private lateinit var output: DataOutputStream
     lateinit var policy: SuPolicy
+        private set
+    lateinit var pkgInfo: PackageInfo
         private set
 
     // Return true to indicate undetermined policy, require user interaction
@@ -33,7 +35,7 @@ class SuRequestHandler(
             return false
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (policy.packageName == BuildConfig.APPLICATION_ID) {
+        if (pkgInfo.packageName == BuildConfig.APPLICATION_ID) {
             Shell.cmd("(pm uninstall ${BuildConfig.APPLICATION_ID})& >/dev/null 2>&1").exec()
             return false
         }
@@ -64,9 +66,9 @@ class SuRequestHandler(
             val fifo = intent.getStringExtra("fifo") ?: throw SuRequestError()
             val uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
             val pid = intent.getIntExtra("pid", -1)
-            val info = pm.getPackageInfo(uid, pid) ?: throw SuRequestError()
+            pkgInfo = pm.getPackageInfo(uid, pid) ?: throw SuRequestError()
             output = DataOutputStream(FileOutputStream(fifo).buffered())
-            policy = pm.createPolicy(info)
+            policy = SuPolicy(uid)
             true
         } catch (e: Exception) {
             when (e) {
