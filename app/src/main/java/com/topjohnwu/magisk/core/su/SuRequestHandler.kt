@@ -36,7 +36,7 @@ class SuRequestHandler(
 
         // Never allow com.topjohnwu.magisk (could be malware)
         if (pkgInfo.packageName == BuildConfig.APPLICATION_ID) {
-            Shell.cmd("(pm uninstall ${BuildConfig.APPLICATION_ID})& >/dev/null 2>&1").exec()
+            Shell.cmd("(pm uninstall ${BuildConfig.APPLICATION_ID} >/dev/null 2>&1)&").exec()
             return false
         }
 

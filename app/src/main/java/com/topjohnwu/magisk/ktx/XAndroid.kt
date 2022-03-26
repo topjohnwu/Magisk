@@ -19,6 +19,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
+import android.os.Process
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -272,7 +273,13 @@ fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
         if (pid <= 0)
             return null
         // Try to find package name from PID
-        val proc = RootUtils.obj?.getAppProcess(pid) ?: return null
+        val proc = RootUtils.obj?.getAppProcess(pid)
+            ?: return if (uid == Process.SHELL_UID) {
+                // It is possible that some apps installed are sharing UID with shell.
+                // We will not be able to find a package from the active process list,
+                // because the client is forked from ADB shell, not any app process.
+                getPackageInfo("com.android.shell", flag)
+            } else null
         val pkg = proc.pkgList[0]
         getPackageInfo(pkg, flag)
     } else {
