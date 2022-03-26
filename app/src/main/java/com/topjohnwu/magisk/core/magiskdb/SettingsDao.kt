@@ -14,7 +14,7 @@ class SettingsDao : MagiskDB() {
     }
 
     suspend fun fetch(key: String, default: Int = -1): Int {
-        val query = "SELECT value FROM ${Table.SETTINGS} WHERE key == \"$key\" LIMIT = 1"
+        val query = "SELECT value FROM ${Table.SETTINGS} WHERE key == \"$key\" LIMIT 1"
         return exec(query) { it["value"]?.toInt() }.firstOrNull() ?: default
     }
 }

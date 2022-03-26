@@ -14,7 +14,7 @@ class StringDao : MagiskDB() {
     }
 
     suspend fun fetch(key: String, default: String = ""): String {
-        val query = "SELECT value FROM ${Table.STRINGS} WHERE key == \"$key\" LIMIT = 1"
+        val query = "SELECT value FROM ${Table.STRINGS} WHERE key == \"$key\" LIMIT 1"
         return exec(query) { it["value"] }.firstOrNull() ?: default
     }
 }
