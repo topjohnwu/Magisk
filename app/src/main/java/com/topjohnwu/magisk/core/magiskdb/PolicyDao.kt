@@ -26,8 +26,10 @@ class PolicyDao : MagiskDB() {
 
     suspend fun update(policy: SuPolicy) {
         val map = policy.toMap()
-        // Put in package_name for old database
-        map["package_name"] = AppContext.packageManager.getNameForUid(policy.uid)!!
+        if (!Const.Version.isCanary()) {
+            // Put in package_name for old database
+            map["package_name"] = AppContext.packageManager.getNameForUid(policy.uid)!!
+        }
         val query = "REPLACE INTO ${Table.POLICY} ${map.toQuery()}"
         exec(query)
     }

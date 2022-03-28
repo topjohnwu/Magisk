@@ -7,7 +7,7 @@
 #include <socket.hpp>
 #include <utils.hpp>
 
-#define DB_VERSION 11
+#define DB_VERSION 12
 
 using namespace std;
 
@@ -158,8 +158,8 @@ static char *open_and_init_db(sqlite3 *&db) {
     auto create_policy = [&] {
         sqlite3_exec(db,
                 "CREATE TABLE IF NOT EXISTS policies "
-                "(uid INT, package_name TEXT, policy INT, until INT, "
-                "logging INT, notification INT, PRIMARY KEY(uid))",
+                "(uid INT, policy INT, until INT, logging INT, "
+                "notification INT, PRIMARY KEY(uid))",
                 nullptr, nullptr, &err);
     };
     auto create_settings = [&] {
@@ -185,11 +185,12 @@ static char *open_and_init_db(sqlite3 *&db) {
     //
     // 0 - 6: DB stored in app private data. There are no longer any code in the project to
     //        migrate these data, so no need to take any of these versions into consideration.
-    // 7 : create table 'hidelist' (process TEXT, PRIMARY KEY(process))
-    // 8 : add new column (package_name TEXT) to table 'hidelist'
-    // 9 : rebuild table 'hidelist' to update primary key (PRIMARY KEY(package_name, process))
-    // 10: remove table 'logs'
-    // 11: remove table 'hidelist' and create table 'denylist' (same data structure)
+    // 7 : create table `hidelist` (process TEXT, PRIMARY KEY(process))
+    // 8 : add new column (package_name TEXT) to table `hidelist`
+    // 9 : rebuild table `hidelist` to change primary key (PRIMARY KEY(package_name, process))
+    // 10: remove table `logs`
+    // 11: remove table `hidelist` and create table `denylist` (same data structure)
+    // 12: rebuild table `policies` to drop column `package_name`
 
     if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
         create_policy();
@@ -249,6 +250,22 @@ static char *open_and_init_db(sqlite3 *&db) {
         create_denylist();
         err_ret(err);
         ver = 11;
+        upgrade = true;
+    }
+    if (ver == 11) {
+        sqlite3_exec(db,
+                "BEGIN TRANSACTION;"
+                "ALTER TABLE policies RENAME TO policies_tmp;"
+                "CREATE TABLE IF NOT EXISTS policies "
+                "(uid INT, policy INT, until INT, logging INT, "
+                "notification INT, PRIMARY KEY(uid));"
+                "INSERT INTO policies "
+                "SELECT uid, policy, until, logging, notification FROM policies_tmp;"
+                "DROP TABLE policies_tmp;"
+                "COMMIT;",
+                nullptr, nullptr, &err);
+        err_ret(err);
+        ver = 12;
         upgrade = true;
     }
 
