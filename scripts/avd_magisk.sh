@@ -60,6 +60,8 @@ for file in lib*.so; do
   mv "$file" "${file:3:${#file}-6}"
 done
 
+cp magiskinit magiskpolicy
+
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
 stop
