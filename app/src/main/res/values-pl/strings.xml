@@ -8,7 +8,8 @@
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
-
+    <string name="denylist">Lista odmów</string>
+    
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
     <string name="app_changelog">Dziennik zmian</string>
@@ -32,6 +33,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
     <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację rozruchu)</string>
+    <string name="patch_vbmeta">Załataj vbmeta w obrazie rozruchowym</string>
     <string name="recovery_mode">Tryb Recovery</string>
     <string name="install_options_title">Opcje</string>
     <string name="install_method_title">Metoda</string>
@@ -106,6 +108,9 @@
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="update_available">Dostępna aktualizacja</string>
+    <string name="suspend_text_riru">Moduł uśpiony ponieważ %1$s jest włączony</string>
+    <string name="suspend_text_zygisk">Moduł uśpiony ponieważ %1$s jest wyłączony</string>
+    <string name="zygisk_module_unloaded">Moduł Zygisk nie załadowany ze względu na niekompatybilność</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -128,6 +133,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny kanał</string>
     <string name="settings_update_custom_msg">Wprowadź adres URL własnego kanału</string>
+    <string name="settings_zygisk_summary">Uruchom cześć Magiska w zygocie Demona</string>
+    <string name="settings_denylist_title">Wymuś Listę Odmów</string>
+    <string name="settings_denylist_summary">Procesy z Listy Odmów będą miały wszystkie modyfikacje Magisk cofnięte</string>
+    <string name="settings_denylist_error">Ta funkcja wymaga aby %1$s było włączone</string>
+    <string name="settings_denylist_config_title">Ustaw Listę Odmów</string>
+    <string name="settings_denylist_config_summary">Wybierz proces który ma zostać zawarty w Liście Odmów</string>
     <string name="settings_hosts_title">Hosty Systemless</string>
     <string name="settings_hosts_summary">Wsparcie hostów Systemless dla aplikacji typu Adblock</string>
     <string name="settings_hosts_toast">Dodano moduł hostów Systemless</string>
@@ -179,9 +190,12 @@
     <!--Notifications-->
     <string name="update_channel">Aktualizacja Magisk</string>
     <string name="progress_channel">Powiadomienia o postępach</string>
+    <string name="updated_channel">Aktualizacja zakończona</string>
     <string name="download_complete">Pobieranie zakończone</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="magisk_update_title">Aktualizacja Magisk dostępna!</string>
+    <string name="updated_title">Magisk zaktualizowany</string>
+    <string name="updated_text">Naciśnij aby otworzyć applikację</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Tak</string>
@@ -214,8 +228,11 @@
     <string name="unsupport_nonroot_stub_msg">Ta aplikacja nie może dłużej działać w trybie ukrycia jako że root został utracony. Proszę przywrócić ją do oryginalnego stanu.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcję.</string>
+    <string name="install_unknown_denied">Zezwól na "Instaluj z nieznanych źródeł" by włączyć tą funkcję</string>
     <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
     <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
+    <string name="reboot_apply_change">Uruchom ponownie by zastosować zmiany</string>
+    <string name="restore_app_confirmation">To przywróci ukrytą aplikację z powrotem do orginalnej aplikacji. Czy na pewno chcesz to zrobić?</string>
 
 </resources>
