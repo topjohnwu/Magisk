@@ -1,8 +1,7 @@
 #include <utils.hpp>
 #include <vector>
-#include <magiskpolicy.hpp>
 
-#include "sepolicy.hpp"
+#include "policy.hpp"
 
 using namespace std;
 

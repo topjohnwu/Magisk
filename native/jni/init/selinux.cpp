@@ -1,7 +1,7 @@
 #include <sys/mount.h>
 
 #include <magisk.hpp>
-#include <magiskpolicy.hpp>
+#include <sepolicy.hpp>
 #include <utils.hpp>
 
 #include "init.hpp"

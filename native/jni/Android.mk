@@ -54,7 +54,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := \
     libutilx \
-    libsepol \
+    libpolicy \
     libxz
 
 LOCAL_SRC_FILES := \
@@ -63,11 +63,7 @@ LOCAL_SRC_FILES := \
     init/rootdir.cpp \
     init/getinfo.cpp \
     init/twostage.cpp \
-    init/selinux.cpp \
-    magiskpolicy/sepolicy.cpp \
-    magiskpolicy/rules.cpp \
-    magiskpolicy/policydb.cpp \
-    magiskpolicy/statement.cpp
+    init/selinux.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
@@ -110,14 +106,9 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskpolicy
 LOCAL_STATIC_LIBRARIES := \
     libutils \
-    libsepol
+    libpolicy
 
-LOCAL_SRC_FILES := \
-    magiskpolicy/main.cpp \
-    magiskpolicy/sepolicy.cpp \
-    magiskpolicy/rules.cpp \
-    magiskpolicy/policydb.cpp \
-    magiskpolicy/statement.cpp
+LOCAL_SRC_FILES := magiskpolicy/main.cpp
 
 include $(BUILD_EXECUTABLE)
 
@@ -158,14 +149,30 @@ include $(BUILD_EXECUTABLE)
 endif
 endif
 
+########################
+# Libraries
+########################
+
+include $(CLEAR_VARS)
+LOCAL_MODULE:= libpolicy
+LOCAL_STATIC_LIBRARIES := \
+    libutils \
+    libsepol
+LOCAL_C_INCLUDES := jni/magiskpolicy jni/magiskpolicy/include
+LOCAL_EXPORT_C_INCLUDES := jni/magiskpolicy/include
+LOCAL_SRC_FILES := \
+    magiskpolicy/api.cpp \
+    magiskpolicy/sepolicy.cpp \
+    magiskpolicy/rules.cpp \
+    magiskpolicy/policydb.cpp \
+    magiskpolicy/statement.cpp
+include $(BUILD_STATIC_LIBRARY)
+
+include jni/utils/Android.mk
+include jni/external/Android.mk
+
 ifdef B_BB
 
 include jni/external/busybox/Android.mk
 
 endif
-
-########################
-# Libraries
-########################
-include jni/utils/Android.mk
-include jni/external/Android.mk

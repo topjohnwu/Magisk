@@ -2,10 +2,9 @@
 #include <vector>
 #include <string>
 
-#include <magiskpolicy.hpp>
 #include <utils.hpp>
 
-#include "sepolicy.hpp"
+#include "policy.hpp"
 
 using namespace std;
 

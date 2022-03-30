@@ -6,12 +6,8 @@
 
 #define ALL nullptr
 
-struct policydb;
-
-class sepolicy {
-public:
+struct sepolicy {
     using c_str = const char *;
-    ~sepolicy();
 
     // Public static factory functions
     static sepolicy *from_data(char *data, size_t len);
@@ -59,5 +55,6 @@ public:
     bool create(c_str name) { return type(name, "domain"); }
 
 protected:
-    policydb *db;
+    // Prevent anyone from accidentally creating an instance
+    sepolicy() = default;
 };

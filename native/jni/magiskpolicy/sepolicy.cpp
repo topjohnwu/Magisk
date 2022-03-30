@@ -1,22 +1,6 @@
-#include <sepol/policydb/policydb.h>
-
-#include <magiskpolicy.hpp>
 #include <utils.hpp>
 
-#include "sepolicy.hpp"
-
-#if 0
-// Print out all rules going through public API for debugging
-template <typename ...Args>
-static void dprint(const char *action, Args ...args) {
-    std::string s(action);
-    for (int i = 0; i < sizeof...(args); ++i) s += " %s";
-    s += "\n";
-    LOGD(s.data(), (args ? args : "*")...);
-}
-#else
-#define dprint(...)
-#endif
+#include "policy.hpp"
 
 // Invert is adding rules for auditdeny; in other cases, invert is removing rules
 #define strip_av(effect, invert) ((effect == AVTAB_AUDITDENY) == !invert)
@@ -106,16 +90,15 @@ static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
     return 0;
 }
 
-void sepol_impl::check_avtab_node(avtab_ptr_t node) {
-    bool redundant;
-    if (node->key.specified == AVTAB_AUDITDENY)
-        redundant = node->datum.data == ~0U;
-    else if (node->key.specified & AVTAB_XPERMS)
-        redundant = node->datum.xperms == nullptr;
-    else
-        redundant = node->datum.data == 0U;
-    if (redundant)
-        avtab_remove_node(&db->te_avtab, node);
+static bool is_redundant(avtab_ptr_t node) {
+    switch (node->key.specified) {
+    case AVTAB_AUDITDENY:
+        return node->datum.data == ~0U;
+    case AVTAB_XPERMS:
+        return node->datum.xperms == nullptr;
+    default:
+        return node->datum.data == 0U;
+    }
 }
 
 avtab_ptr_t sepol_impl::get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms) {
@@ -199,7 +182,9 @@ void sepol_impl::add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *c
             else
                 node->datum.data = ~0U;
         }
-        check_avtab_node(node);
+
+        if (is_redundant(node))
+            avtab_remove_node(&db->te_avtab, node);
     }
 }
 
@@ -621,93 +606,4 @@ void sepol_impl::strip_dontaudit() {
         if (node->key.specified == AVTAB_AUDITDENY || node->key.specified == AVTAB_XPERMS_DONTAUDIT)
             avtab_remove_node(&db->te_avtab, node);
     });
-}
-
-bool sepolicy::allow(const char *s, const char *t, const char *c, const char *p) {
-    dprint(__FUNCTION__, s, t, c, p);
-    return impl->add_rule(s, t, c, p, AVTAB_ALLOWED, false);
-}
-
-bool sepolicy::deny(const char *s, const char *t, const char *c, const char *p) {
-    dprint(__FUNCTION__, s, t, c, p);
-    return impl->add_rule(s, t, c, p, AVTAB_ALLOWED, true);
-}
-
-bool sepolicy::auditallow(const char *s, const char *t, const char *c, const char *p) {
-    dprint(__FUNCTION__, s, t, c, p);
-    return impl->add_rule(s, t, c, p, AVTAB_AUDITALLOW, false);
-}
-
-bool sepolicy::dontaudit(const char *s, const char *t, const char *c, const char *p) {
-    dprint(__FUNCTION__, s, t, c, p);
-    return impl->add_rule(s, t, c, p, AVTAB_AUDITDENY, true);
-}
-
-bool sepolicy::allowxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_ALLOWED, false);
-}
-
-bool sepolicy::auditallowxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_AUDITALLOW, false);
-}
-
-bool sepolicy::dontauditxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_DONTAUDIT, false);
-}
-
-bool sepolicy::type_change(const char *s, const char *t, const char *c, const char *d) {
-    dprint(__FUNCTION__, s, t, c, d);
-    return impl->add_type_rule(s, t, c, d, AVTAB_CHANGE);
-}
-
-bool sepolicy::type_member(const char *s, const char *t, const char *c, const char *d) {
-    dprint(__FUNCTION__, s, t, c, d);
-    return impl->add_type_rule(s, t, c, d, AVTAB_MEMBER);
-}
-
-bool sepolicy::type_transition(const char *s, const char *t, const char *c, const char *d, const char *o) {
-    if (o) {
-        dprint(__FUNCTION__, s, t, c, d, o);
-        return impl->add_filename_trans(s, t, c, d, o);
-    } else {
-        dprint(__FUNCTION__, s, t, c, d);
-        return impl->add_type_rule(s, t, c, d, AVTAB_TRANSITION);
-    }
-}
-
-bool sepolicy::permissive(const char *s) {
-    dprint(__FUNCTION__, s);
-    return impl->set_type_state(s, true);
-}
-
-bool sepolicy::enforce(const char *s) {
-    dprint(__FUNCTION__, s);
-    return impl->set_type_state(s, false);
-}
-
-bool sepolicy::type(const char *name, const char *attr) {
-    dprint(__FUNCTION__, name, attr);
-    return impl->add_type(name, TYPE_TYPE) && impl->add_typeattribute(name, attr);
-}
-
-bool sepolicy::attribute(const char *name) {
-    dprint(__FUNCTION__, name);
-    return impl->add_type(name, TYPE_ATTRIB);
-}
-
-bool sepolicy::typeattribute(const char *type, const char *attr) {
-    dprint(__FUNCTION__, type, attr);
-    return impl->add_typeattribute(type, attr);
-}
-
-bool sepolicy::genfscon(const char *fs_name, const char *path, const char *ctx) {
-    dprint(__FUNCTION__, fs_name, path, ctx);
-    return impl->add_genfscon(fs_name, path, ctx);
-}
-
-bool sepolicy::exists(const char *source) {
-    return hashtab_search(db->p_types.table, source) != nullptr;
 }

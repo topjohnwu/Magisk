@@ -1,11 +1,11 @@
 #pragma once
 
-#include <sepol/policydb/policydb.h>
-#include <magiskpolicy.hpp>
+// libse internal APIs, do not use directly
 
-// Internal APIs, do not use directly
+#include <sepol/policydb/policydb.h>
+#include <sepolicy.hpp>
+
 struct sepol_impl : public sepolicy {
-    void check_avtab_node(avtab_ptr_t node);
     avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
     bool add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert);
     void add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool invert);
@@ -20,8 +20,13 @@ struct sepol_impl : public sepolicy {
     void add_typeattribute(type_datum_t *type, type_datum_t *attr);
     bool add_typeattribute(const char *type, const char *attr);
     void strip_dontaudit();
+
+    sepol_impl(policydb *db) : db(db) {}
+    ~sepol_impl();
+
+    policydb *db;
 };
 
-#define impl static_cast<sepol_impl *>(this)
+#define impl reinterpret_cast<sepol_impl *>(this)
 
 void statement_help();
