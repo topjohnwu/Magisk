@@ -413,7 +413,7 @@ get_flags() {
       PATCHVBMETAFLAG=false
     else
       PATCHVBMETAFLAG=true
-      ui_print "- Cannot find vbmeta partition, patch vbmeta in boot image"
+      ui_print "- vbmeta partition not exist, patch vbmeta in boot image"
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
