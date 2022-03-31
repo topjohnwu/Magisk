@@ -12,7 +12,7 @@ Magisk will mount a `tmpfs` directory to store some temporary data. For devices 
 # Binaries like magisk, magiskinit, and all symlinks to
 # applets are directly stored in this path. This means when
 # this is /sbin, these binaries will be directly in PATH.
-MAGISKPATH=$(magisk --path)
+MAGISKBASE=$(magisk --path)
 
 # Magisk internal stuffs
 MAGISKTMP=$MAGISKBASE/.magisk
