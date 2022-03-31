@@ -111,7 +111,7 @@ class SuperuserViewModel(
         }
     }
 
-    fun updateNotify(item: PolicyRvItem) {
+    fun updateLogging(item: PolicyRvItem) {
         viewModelScope.launch {
             db.update(item.item)
             val res = when {
@@ -127,7 +127,7 @@ class SuperuserViewModel(
         }
     }
 
-    fun updateLogging(item: PolicyRvItem) {
+    fun updateNotify(item: PolicyRvItem) {
         viewModelScope.launch {
             db.update(item.item)
             val res = when {
