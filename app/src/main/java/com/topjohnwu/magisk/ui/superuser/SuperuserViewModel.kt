@@ -115,8 +115,8 @@ class SuperuserViewModel(
         viewModelScope.launch {
             db.update(item.item)
             val res = when {
-                item.item.logging -> R.string.su_snack_log_on
-                else -> R.string.su_snack_log_off
+                item.item.notification -> R.string.su_snack_notif_on
+                else -> R.string.su_snack_notif_off
             }
             itemsPolicies.forEach {
                 if (it.item.uid == item.item.uid) {
@@ -131,8 +131,8 @@ class SuperuserViewModel(
         viewModelScope.launch {
             db.update(item.item)
             val res = when {
-                item.item.notification -> R.string.su_snack_notif_on
-                else -> R.string.su_snack_notif_off
+                item.item.logging -> R.string.su_snack_log_on
+                else -> R.string.su_snack_log_off
             }
             itemsPolicies.forEach {
                 if (it.item.uid == item.item.uid) {
