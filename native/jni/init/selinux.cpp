@@ -42,7 +42,7 @@ void MagiskInit::patch_sepolicy(const char *file) {
 #define MOCK_BLOCKING  SELINUXMOCK "/blocking"
 #define REAL_SELINUXFS SELINUXMOCK "/fs"
 
-void MagiskInit::hijack_sepolicy() {
+bool MagiskInit::hijack_sepolicy() {
     const char *blocking_target;
     string actual_content;
 
@@ -60,7 +60,7 @@ void MagiskInit::hijack_sepolicy() {
         } else {
             // Error, should never happen
             LOGE("! Cannot find plat_file_contexts\n");
-            return;
+            return false;
         }
         actual_content = full_read(blocking_target);
 
@@ -91,11 +91,6 @@ void MagiskInit::hijack_sepolicy() {
         // and let the original init mount selinuxfs for us
         // This only happens on Android 8.0 - 9.0
 
-        // Preserve sysfs and procfs for hijacking
-        mount_list.erase(std::remove_if(
-                mount_list.begin(), mount_list.end(),
-                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
-
         // Remount procfs with proper options
         xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
 
@@ -103,7 +98,18 @@ void MagiskInit::hijack_sepolicy() {
         snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
         dt_compat = full_read(buf);
 
+        if (dt_compat.empty()) {
+            // Device does not do early mount and apparently use monolithic policy
+            return false;
+        }
+
         LOGD("Hijack [%s]\n", buf);
+
+        // Preserve sysfs and procfs for hijacking
+        mount_list.erase(std::remove_if(
+                mount_list.begin(), mount_list.end(),
+                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
+
         mkfifo(MOCK_COMPAT, 0444);
         xmount(MOCK_COMPAT, buf, nullptr, MS_BIND, nullptr);
     } else {
@@ -128,7 +134,7 @@ void MagiskInit::hijack_sepolicy() {
     // Create a new process waiting for init operations
     if (xfork()) {
         // In parent, return and continue boot process
-        return;
+        return true;
     }
 
     if (!dt_compat.empty()) {
