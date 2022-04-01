@@ -64,7 +64,7 @@ protected:
 #endif
 
     void patch_sepolicy(const char *file);
-    void hijack_sepolicy();
+    bool hijack_sepolicy();
     void setup_tmp(const char *path);
     void patch_rw_root();
 public:

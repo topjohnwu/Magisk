@@ -235,10 +235,8 @@ void SARBase::patch_ro_root() {
         }
     }
 
-    if (access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) {
+    if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
         patch_sepolicy(ROOTOVL "/sepolicy");
-    } else {
-        hijack_sepolicy();
     }
 
     // Mount rootdir
@@ -309,10 +307,8 @@ void MagiskInit::patch_rw_root() {
         }
     }
 
-    if (!treble && access("/sepolicy", F_OK) == 0) {
+    if ((!treble && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
         patch_sepolicy("/sepolicy");
-    } else {
-        hijack_sepolicy();
     }
 
     chdir("/");
