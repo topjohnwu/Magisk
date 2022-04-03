@@ -21,5 +21,5 @@ int read_int_be(int fd);
 void write_int(int fd, int val);
 void write_int_be(int fd, int val);
 std::string read_string(int fd);
-void read_string(int fd, std::string &str);
+bool read_string(int fd, std::string &str);
 void write_string(int fd, std::string_view str);
