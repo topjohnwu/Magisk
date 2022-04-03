@@ -158,11 +158,13 @@ void write_int_be(int fd, int val) {
     xwrite(fd, &nl, sizeof(nl));
 }
 
-void read_string(int fd, std::string &str) {
+bool read_string(int fd, std::string &str) {
     int len = read_int(fd);
     str.clear();
+    if (len < 0)
+        return false;
     str.resize(len);
-    xxread(fd, str.data(), len);
+    return xxread(fd, str.data(), len) == len;
 }
 
 string read_string(int fd) {

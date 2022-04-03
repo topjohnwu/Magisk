@@ -86,7 +86,7 @@ int pts_open(char *slave_name, size_t slave_name_size) {
         goto error;
 
     // Get the slave name
-    if (ptsname_r(fdm, slave_name, slave_name_size-1))
+    if (ptsname_r(fdm, slave_name, slave_name_size - 1))
         goto error;
 
     slave_name[slave_name_size - 1] = '\0';
