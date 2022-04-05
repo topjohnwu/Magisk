@@ -110,6 +110,11 @@ uint32_t __system_property_serial(const prop_info* pi) {
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
+void __system_property_get_context(const char* prop, const char** context) {
+  system_properties.GetPropContext(prop, context);
+}
+
+__BIONIC_WEAK_FOR_NATIVE_BRIDGE
 uint32_t __system_property_wait_any(uint32_t old_serial) {
   return system_properties.WaitAny(old_serial);
 }

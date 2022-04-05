@@ -75,6 +75,9 @@ class SystemProperties {
   const prop_info* FindNth(unsigned n);
   int Foreach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie);
 
+  // Added by resetprop
+  void GetPropContext(const char* prop, const char** context);
+
  private:
   // We don't want to use new or malloc in properties (b/31659220), and we don't want to waste a
   // full page by using mmap(), so we set aside enough space to create any context of the three

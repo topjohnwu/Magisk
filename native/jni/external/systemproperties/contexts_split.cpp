@@ -327,14 +327,10 @@ bool ContextsSplit::Initialize(bool writable, const char* filename, bool* fsetxa
 }
 
 prop_area* ContextsSplit::GetPropAreaForName(const char* name) {
-  auto entry = ListFind(prefixes_, [name](PrefixNode* l) {
-    return l->prefix[0] == '*' || !strncmp(l->prefix, name, l->prefix_len);
-  });
-  if (!entry) {
+  // resetprop: pull out context node finding to GetContextNodeForName()
+  auto cnode = GetContextNodeForName(name);
+  if (!cnode)
     return nullptr;
-  }
-
-  auto cnode = entry->context;
   if (!cnode->pa()) {
     // We explicitly do not check no_access_ in this case because unlike the
     // case of foreach(), we want to generate an selinux audit for each
@@ -360,4 +356,24 @@ void ContextsSplit::FreeAndUnmap() {
   ListFree(&prefixes_);
   ListFree(&contexts_);
   prop_area::unmap_prop_area(&serial_prop_area_);
+}
+
+// resetprop added
+void ContextsSplit::GetContextForName(const char* name, const char** context) {
+  auto cnode = GetContextNodeForName(name);
+  if (cnode) {
+    if (context) *context = cnode->context();
+  } else {
+    if (context) *context = nullptr;
+  }
+}
+
+ContextListNode* ContextsSplit::GetContextNodeForName(const char* name) {
+  auto entry = ListFind(prefixes_, [name](PrefixNode* l) {
+      return l->prefix[0] == '*' || !strncmp(l->prefix, name, l->prefix_len);
+  });
+  if (!entry) {
+    return nullptr;
+  }
+  return entry->context;
 }

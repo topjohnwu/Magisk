@@ -399,3 +399,12 @@ int SystemProperties::Foreach(void (*propfn)(const prop_info* pi, void* cookie),
 
   return 0;
 }
+
+// resetprop added
+void SystemProperties::GetPropContext(const char* prop, const char** context) {
+  if (!initialized_) {
+    if (context) *context = nullptr;
+    return;
+  }
+  contexts_->GetContextForName(prop, context);
+}

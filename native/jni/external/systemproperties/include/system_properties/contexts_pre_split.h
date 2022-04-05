@@ -64,6 +64,11 @@ class ContextsPreSplit : public Contexts {
     prop_area::unmap_prop_area(&pre_split_prop_area_);
   }
 
+  // resetprop added
+  virtual void GetContextForName(const char* name, const char** context) override {
+    if (context) *context = nullptr;
+  }
+
  private:
   prop_area* pre_split_prop_area_ = nullptr;
 };

@@ -42,4 +42,7 @@ class Contexts {
   virtual void ForEach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) = 0;
   virtual void ResetAccess() = 0;
   virtual void FreeAndUnmap() = 0;
+
+  // resetprop added
+  virtual void GetContextForName(const char* name, const char** context) = 0;
 };

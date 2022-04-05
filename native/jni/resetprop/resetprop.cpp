@@ -65,6 +65,8 @@ Flags:
            (this flag only affects setprop)
    -p      read/write props from/to persistent storage
            (this flag only affects getprop and delprop)
+   -Z      show property contexts instead of values
+           (this flag only affects getprop)
 
 )EOF", arg0);
     exit(1);
@@ -119,8 +121,11 @@ struct sysprop_stub {
     virtual int setprop(const char *name, const char *value, bool trigger) { return 1; }
     virtual string getprop(const char *name, bool persist) { return string(); }
     virtual void getprops(void (*callback)(const char *, const char *, void *),
-            void *cookie, bool persist) {}
+            void *cookie, bool persist, bool context) {}
     virtual int delprop(const char *name, bool persist) { return 1; }
+    virtual void get_prop_context(const char* prop, const char** context) {
+        *context = nullptr;
+    }
 };
 
 struct sysprop : public sysprop_stub {
@@ -153,7 +158,7 @@ struct sysprop : public sysprop_stub {
         return val;
     }
 
-    void getprops(void (*callback)(const char*, const char*, void*), void *cookie, bool) override {
+    void getprops(void (*callback)(const char*, const char*, void*), void *cookie, bool, bool) override {
         prop_list list;
         prop_collector collector(list);
         system_property_foreach(read_prop, &collector);
@@ -212,14 +217,20 @@ struct resetprop : public sysprop {
     }
 
     void getprops(void (*callback)(const char *, const char *, void *),
-            void *cookie, bool persist) override {
+            void *cookie, bool persist, bool context) override {
         prop_list list;
         prop_collector collector(list);
         system_property_foreach(read_prop, &collector);
         if (persist)
             persist_getprops(&collector);
-        for (auto &[key, val] : list)
-            callback(key.data(), val.data(), cookie);
+        for (auto &[key, val] : list) {
+            const char* v;
+            if (context)
+                ::get_prop_context(key.data(), &v);
+            else
+                v = val.data();
+            callback(key.data(), v, cookie);
+        }
     }
 
     // Not an error when something is deleted
@@ -234,6 +245,10 @@ struct resetprop : public sysprop {
                 ret = 0;
         }
         return ret;
+    }
+
+    void get_prop_context(const char* prop, const char** context) override {
+        __system_property_get_context(prop, context);
     }
 };
 
@@ -265,18 +280,18 @@ static sysprop_stub *get_impl() {
  * Implementation of top-level APIs
  ***********************************/
 
-static void print_props(bool persist) {
+static void print_props(bool persist, bool context) {
     getprops([](const char *name, const char *value, auto) {
         printf("[%s]: [%s]\n", name, value);
-    }, nullptr, persist);
+    }, nullptr, persist, context);
 }
 
 string getprop(const char *name, bool persist) {
     return get_impl()->getprop(name, persist);
 }
 
-void getprops(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {
-    get_impl()->getprops(callback, cookie, persist);
+void getprops(void (*callback)(const char *, const char *, void *), void *cookie, bool persist, bool context) {
+    get_impl()->getprops(callback, cookie, persist, context);
 }
 
 int setprop(const char *name, const char *value, bool prop_svc) {
@@ -296,11 +311,16 @@ void load_prop_file(const char *filename, bool prop_svc) {
     });
 }
 
+void get_prop_context(const char* prop, const char** context) {
+    get_impl()->get_prop_context(prop, context);
+}
+
 int resetprop_main(int argc, char *argv[]) {
     log_cb.d = [](auto fmt, auto ap) -> int { return verbose ? vfprintf(stderr, fmt, ap) : 0; };
 
     bool prop_svc = true;
     bool persist = false;
+    bool show_ctx = false;
     char *argv0 = argv[0];
 
     --argc;
@@ -328,6 +348,9 @@ int resetprop_main(int argc, char *argv[]) {
             case 'n':
                 prop_svc = false;
                 continue;
+            case 'Z':
+                show_ctx = true;
+                continue;
             case '\0':
                 break;
             case 'h':
@@ -342,9 +365,17 @@ int resetprop_main(int argc, char *argv[]) {
 
     switch (argc) {
     case 0:
-        print_props(persist);
+        print_props(persist, show_ctx);
         return 0;
     case 1: {
+        if (show_ctx) {
+            const char* context;
+            get_prop_context(argv[0], &context);
+            if (!context)
+                return 1;
+            printf("%s\n", context);
+            return 0;
+        }
         string prop = getprop(argv[0], persist);
         if (prop.empty())
             return 1;

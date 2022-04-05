@@ -47,6 +47,10 @@ class ContextsSerialized : public Contexts {
   virtual void ResetAccess() override;
   virtual void FreeAndUnmap() override;
 
+  // resetprop added
+  virtual void GetContextForName(const char* name, const char** context) override;
+  ContextNode* GetContextNodeForName(const char* name);
+
  private:
   bool InitializeContextNodes();
   bool InitializeProperties();

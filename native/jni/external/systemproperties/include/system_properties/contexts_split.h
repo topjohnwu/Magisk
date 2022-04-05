@@ -47,6 +47,10 @@ class ContextsSplit : public Contexts {
   virtual void ResetAccess() override;
   virtual void FreeAndUnmap() override;
 
+  // resetprop added
+  virtual void GetContextForName(const char* name, const char** context) override;
+  ContextListNode* GetContextNodeForName(const char* name);
+
  private:
   bool MapSerialPropertyArea(bool access_rw, bool* fsetxattr_failed);
   bool InitializePropertiesFromFile(const char* filename);

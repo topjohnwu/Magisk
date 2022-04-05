@@ -128,6 +128,11 @@ int __system_property_update(prop_info* __pi, const char* __value, unsigned int 
 */
 uint32_t __system_property_serial(const prop_info* __pi);
 
+/* Get property of a property.
+** Added by resetprop.
+*/
+void __system_property_get_context(const char* prop, const char** context);
+
 /* Initialize the system properties area in read only mode.
  * Should be done by all processes that need to read system
  * properties.

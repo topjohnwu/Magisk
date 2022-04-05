@@ -127,14 +127,10 @@ bool ContextsSerialized::Initialize(bool writable, const char* filename, bool* f
 }
 
 prop_area* ContextsSerialized::GetPropAreaForName(const char* name) {
-  uint32_t index;
-  property_info_area_file_->GetPropertyInfoIndexes(name, &index, nullptr);
-  if (index == ~0u || index >= num_context_nodes_) {
-    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Could not find context for property \"%s\"",
-                          name);
+  // resetprop: pull out context node finding to GetContextNodeForName()
+  auto* context_node = GetContextNodeForName(name);
+  if (!context_node)
     return nullptr;
-  }
-  auto* context_node = &context_nodes_[index];
   if (!context_node->pa()) {
     // We explicitly do not check no_access_ in this case because unlike the
     // case of foreach(), we want to generate an selinux audit for each
@@ -169,4 +165,25 @@ void ContextsSerialized::FreeAndUnmap() {
   }
   prop_area::unmap_prop_area(&serial_prop_area_);
   serial_prop_area_ = nullptr;
+}
+
+// resetprop added
+void ContextsSerialized::GetContextForName(const char* name, const char** context) {
+  auto* context_node = GetContextNodeForName(name);
+  if (context_node) {
+    if (context) *context = context_node->context();
+  } else {
+    if (context) *context = nullptr;
+  }
+}
+
+ContextNode* ContextsSerialized::GetContextNodeForName(const char* name) {
+  uint32_t index;
+  property_info_area_file_->GetPropertyInfoIndexes(name, &index, nullptr);
+  if (index == ~0u || index >= num_context_nodes_) {
+    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Could not find context for property \"%s\"",
+                          name);
+    return nullptr;
+  }
+  return &context_nodes_[index];
 }
