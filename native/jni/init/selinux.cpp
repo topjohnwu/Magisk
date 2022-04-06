@@ -92,8 +92,8 @@ bool MagiskInit::hijack_sepolicy() {
         return true;
     }
 
-    // block until blocking file opened as read only
-    // we have selinuxfs now and init has opened a tmp policy file
+    // Block until blocking file opened as read only
+    // selinuxfs has been mounted now
     int fd = xopen(MOCK_BLOCKING, O_WRONLY);
     umount2("/init", MNT_DETACH);
     xumount2(blocking_file, MNT_DETACH);
@@ -102,7 +102,8 @@ bool MagiskInit::hijack_sepolicy() {
     if (pre_compiled) {
         policy_path = MOCK_BLOCKING;
     } else {
-        // fnd the tmp policy file by searching init's open files
+        // init has opened a tmp policy file
+        // Find it by searching init's open files
         {
             auto dir = open_dir("/proc/1/fd");
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
@@ -115,40 +116,40 @@ bool MagiskInit::hijack_sepolicy() {
             }
         }
 
-        // hijack policy file to let secilc write the compiled policy for us
+        // Hijack the tmp file to let secilc write the compiled policy to us
         hijack(MOCK_POLICY, policy_path.data());
 
-        // hijack null file to block secilc until we finish our sepolicy patching and write to the
-        // real tmp policy file
+        // Hijack null file to block secilc until we finish our sepolicy patching and write to the
+        // original tmp policy file
         hijack(MOCK_NULL, SELINUX_NULL);
 
         write(fd, actual_content.data(), actual_content.size());
         close(fd);
         {
-            // block until secilc open as write only
+            // Block until secilc opens it as write only
             fd = xopen(MOCK_POLICY, O_RDONLY);
             xumount2(policy_path.data(), MNT_DETACH);
 
-            // read the compiled policy
+            // Read the compiled policy
             fd_full_read(fd, actual_content);
             close(fd);
         }
     }
-    // path the compiled policy
+    // Patch the compiled policy
     auto sepol = std::unique_ptr<sepolicy>(
             sepolicy::from_data(actual_content.data(), actual_content.length()));
     sepol->magisk_rules();
     sepol->load_rules(rules);
-    // save to the original tmp policy file
+    // Save to the right destination
     sepol->to_file(policy_path.data());
     if (!pre_compiled) {
-        // block seclic until we finish patching policy
+        // Unlock seclic when we finish patching policy
         fd = xopen(MOCK_NULL, O_RDONLY);
         xumount2(SELINUX_NULL, MNT_DETACH);
-        // read all dummy content
+        // Read all dummy content
         fd_full_read(fd, actual_content);
     }
     close(fd);
-    // gracefully exit
+    // All done, exit gracefully
     exit(0);
 }
