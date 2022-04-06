@@ -50,7 +50,7 @@ inline void hijack(const char* src, const char* dest) {
 bool MagiskInit::hijack_sepolicy() {
     xmkdir(SELINUXMOCK, 0);
 
-    std::string actual_content;
+    std::string buffer;
     const char *blocking_file;
     bool pre_compiled = false;
     if (sepolicy::check_precompiled(ODM_PRE_COMPILED)) {
@@ -61,11 +61,11 @@ bool MagiskInit::hijack_sepolicy() {
         pre_compiled = true;
     } else {
         blocking_file = SPLIT_PLAT_VER;
-        file_readline(SPLIT_PLAT_VER, [&actual_content](auto line) {
-            actual_content = line;
+        file_readline(SPLIT_PLAT_VER, [&buffer](auto line) {
+            buffer = line;
             return false;
         });
-        if (actual_content.empty()) return false;
+        if (buffer.empty()) return false;
     }
     // this will be open read only right after creating policy tmp file if not pre-compiled
     // Mock it to block init, get policy tmp file and mock it or patch the pre-compiled policy
@@ -101,6 +101,8 @@ bool MagiskInit::hijack_sepolicy() {
     std::string policy_path;
     if (pre_compiled) {
         policy_path = MOCK_BLOCKING;
+        buffer.clear();
+        full_read(blocking_file, buffer);
     } else {
         // init has opened a tmp policy file
         // Find it by searching init's open files
@@ -123,21 +125,22 @@ bool MagiskInit::hijack_sepolicy() {
         // original tmp policy file
         hijack(MOCK_NULL, SELINUX_NULL);
 
-        write(fd, actual_content.data(), actual_content.size());
+        write(fd, buffer.data(), buffer.size());
         close(fd);
         {
             // Block until secilc opens it as write only
             fd = xopen(MOCK_POLICY, O_RDONLY);
             xumount2(policy_path.data(), MNT_DETACH);
 
+            buffer.clear();
             // Read the compiled policy
-            fd_full_read(fd, actual_content);
+            fd_full_read(fd, buffer);
             close(fd);
         }
     }
     // Patch the compiled policy
     auto sepol = std::unique_ptr<sepolicy>(
-            sepolicy::from_data(actual_content.data(), actual_content.length()));
+            sepolicy::from_data(buffer.data(), buffer.length()));
     sepol->magisk_rules();
     sepol->load_rules(rules);
     // Save to the right destination
@@ -147,9 +150,10 @@ bool MagiskInit::hijack_sepolicy() {
         fd = xopen(MOCK_NULL, O_RDONLY);
         xumount2(SELINUX_NULL, MNT_DETACH);
         // Read all dummy content
-        fd_full_read(fd, actual_content);
+        fd_full_read(fd, buffer);
     }
     close(fd);
+    LOGD("sepolicy patch finished\n");
     // All done, exit gracefully
     exit(0);
 }
