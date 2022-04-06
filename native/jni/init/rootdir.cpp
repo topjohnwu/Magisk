@@ -235,8 +235,11 @@ void SARBase::patch_ro_root() {
         }
     }
 
-    if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
-        patch_sepolicy(ROOTOVL "/sepolicy");
+    // Oculus Go will use a special sepolicy if unlocked
+    if (access("/sepolicy.unlocked", F_OK) == 0) {
+        patch_sepolicy("/sepolicy.unlocked", ROOTOVL "/sepolicy.unlocked");
+    } else if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
+        patch_sepolicy("/sepolicy", ROOTOVL "/sepolicy");
     }
 
     // Mount rootdir
@@ -308,7 +311,7 @@ void MagiskInit::patch_rw_root() {
     }
 
     if ((!treble && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
-        patch_sepolicy("/sepolicy");
+        patch_sepolicy("/sepolicy", "/sepolicy");
     }
 
     chdir("/");

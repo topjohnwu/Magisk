@@ -63,7 +63,7 @@ protected:
     bool avd_hack = false;
 #endif
 
-    void patch_sepolicy(const char *file);
+    void patch_sepolicy(const char *in, const char *out);
     bool hijack_sepolicy();
     void setup_tmp(const char *path);
     void patch_rw_root();

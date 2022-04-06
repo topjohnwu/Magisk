@@ -8,9 +8,9 @@
 
 using namespace std;
 
-void MagiskInit::patch_sepolicy(const char *file) {
+void MagiskInit::patch_sepolicy(const char *in, const char *out) {
     LOGD("Patching monolithic policy\n");
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file("/sepolicy"));
+    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(in));
 
     sepol->magisk_rules();
 
@@ -27,8 +27,8 @@ void MagiskInit::patch_sepolicy(const char *file) {
         }
     }
 
-    LOGD("Dumping sepolicy to: [%s]\n", file);
-    sepol->to_file(file);
+    LOGD("Dumping sepolicy to: [%s]\n", out);
+    sepol->to_file(out);
 
     // Remove OnePlus stupid debug sepolicy and use our own
     if (access("/sepolicy_debug", F_OK) == 0) {
