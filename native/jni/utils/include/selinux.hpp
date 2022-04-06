@@ -7,6 +7,7 @@
 #define SELINUX_LOAD        SELINUX_MNT "/load"
 #define SELINUX_CONTEXT     SELINUX_MNT "/context"
 #define SELINUX_VERSION     SELINUX_MNT "/policyvers"
+#define SELINUX_NULL        SELINUX_MNT "/null"
 
 // sepolicy paths
 #define PLAT_POLICY_DIR     "/system/etc/selinux/"
@@ -15,6 +16,7 @@
 #define ODM_POLICY_DIR      "/odm/etc/selinux/"
 #define SYSEXT_POLICY_DIR   "/system_ext/etc/selinux/"
 #define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
+#define SPLIT_PLAT_VER      VEND_POLICY_DIR "plat_sepolicy_vers.txt"
 
 // Unconstrained domain the daemon and root processes run in
 #define SEPOL_PROC_DOMAIN   "magisk"

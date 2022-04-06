@@ -37,84 +37,26 @@ void MagiskInit::patch_sepolicy(const char *file) {
     }
 }
 
-#define MOCK_COMPAT    SELINUXMOCK "/compatible"
-#define MOCK_LOAD      SELINUXMOCK "/load"
-#define MOCK_BLOCKING  SELINUXMOCK "/blocking"
-#define REAL_SELINUXFS SELINUXMOCK "/fs"
+#define MOCK_POLICY    SELINUXMOCK "/sepolicy"
+#define MOCK_PLAT_VER  SELINUXMOCK "/plat_sepolicy_vers.txt"
+#define MOCK_NULL      SELINUXMOCK "/null"
 
 bool MagiskInit::hijack_sepolicy() {
-    const char *blocking_target;
-    string actual_content;
-
     xmkdir(SELINUXMOCK, 0);
 
-    if (access("/system/etc/selinux/apex", F_OK) == 0) {
-        // On devices with apex sepolicy, it runs restorecon before enforcing SELinux.
-        // To block control flow before that happens, we will have to hijack the
-        // plat_file_contexts file to achieve that.
+    std::string vend_plat_vers;
+    file_readline(SPLIT_PLAT_VER, [&vend_plat_vers] (auto line){
+        vend_plat_vers = line;
+        return false;
+    });
 
-        if (access("/system/etc/selinux/plat_file_contexts", F_OK) == 0) {
-            blocking_target = "/system/etc/selinux/plat_file_contexts";
-        } else if (access("/plat_file_contexts", F_OK) == 0) {
-            blocking_target = "/plat_file_contexts";
-        } else {
-            // Error, should never happen
-            LOGE("! Cannot find plat_file_contexts\n");
-            return false;
-        }
-        actual_content = full_read(blocking_target);
+    if (vend_plat_vers.empty()) return false;
 
-        LOGD("Hijack [%s]\n", blocking_target);
-        mkfifo(MOCK_BLOCKING, 0644);
-        xmount(MOCK_BLOCKING, blocking_target, nullptr, MS_BIND, nullptr);
-    } else {
-        // We block using the "enforce" node
-        blocking_target = SELINUX_ENFORCE;
-    }
-
-    // Hijack the "load" and "enforce" node in selinuxfs to manipulate
-    // the actual sepolicy being loaded into the kernel
-    auto hijack = [&] {
-        LOGD("Hijack [" SELINUX_LOAD "]\n");
-        mkfifo(MOCK_LOAD, 0600);
-        xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
-        if (strcmp(blocking_target, SELINUX_ENFORCE) == 0) {
-            LOGD("Hijack [" SELINUX_ENFORCE "]\n");
-            mkfifo(MOCK_BLOCKING, 0644);
-            xmount(MOCK_BLOCKING, SELINUX_ENFORCE, nullptr, MS_BIND, nullptr);
-        }
-    };
-
-    string dt_compat;
-    if (access(SELINUX_ENFORCE, F_OK) != 0) {
-        // selinuxfs not mounted yet. Hijack the dt fstab nodes first
-        // and let the original init mount selinuxfs for us
-        // This only happens on Android 8.0 - 9.0
-
-        // Remount procfs with proper options
-        xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-
-        char buf[4096];
-        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
-        dt_compat = full_read(buf);
-
-        if (dt_compat.empty()) {
-            // Device does not do early mount and apparently use monolithic policy
-            return false;
-        }
-
-        LOGD("Hijack [%s]\n", buf);
-
-        // Preserve sysfs and procfs for hijacking
-        mount_list.erase(std::remove_if(
-                mount_list.begin(), mount_list.end(),
-                [](const string &s) { return s == "/proc" || s == "/sys"; }), mount_list.end());
-
-        mkfifo(MOCK_COMPAT, 0444);
-        xmount(MOCK_COMPAT, buf, nullptr, MS_BIND, nullptr);
-    } else {
-        hijack();
-    }
+    // SPLIT_PLAT_VER will be open read only right after creating policy tmp file
+    // Mock it to block init, get policy tmp file and mock it
+    LOGD("Hijack [%s]\n", SPLIT_PLAT_VER);
+    mkfifo(MOCK_PLAT_VER, 0644);
+    xmount(MOCK_PLAT_VER, SPLIT_PLAT_VER, nullptr, MS_BIND, nullptr);
 
     // Read all custom rules into memory
     string rules;
@@ -137,60 +79,63 @@ bool MagiskInit::hijack_sepolicy() {
         return true;
     }
 
-    if (!dt_compat.empty()) {
-        // This open will block until init calls DoFirstStageMount
-        // The only purpose here is actually to wait for init to mount selinuxfs for us
-        int fd = xopen(MOCK_COMPAT, O_WRONLY);
-
-        char buf[4096];
-        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
-        xumount2(buf, MNT_DETACH);
-
-        hijack();
-
-        xwrite(fd, dt_compat.data(), dt_compat.size());
-        close(fd);
-    }
-
-    // Read full sepolicy
-    int fd = xopen(MOCK_LOAD, O_RDONLY);
-    string policy = fd_full_read(fd);
-    close(fd);
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_data(policy.data(), policy.length()));
-
-    sepol->magisk_rules();
-    sepol->load_rules(rules);
-
-    // This open will block until init calls security_getenforce or selinux_android_restorecon
-    fd = xopen(MOCK_BLOCKING, O_WRONLY);
-
-    // Cleanup the hijacks
+    // block until SPLIT_PLAT_VER opened as read only
+    // we have selinuxfs now and init has opened a tmp policy file
+    int fd = xopen(MOCK_PLAT_VER, O_WRONLY);
     umount2("/init", MNT_DETACH);
-    xumount2(SELINUX_LOAD, MNT_DETACH);
-    xumount2(blocking_target, MNT_DETACH);
+    xumount2(SPLIT_PLAT_VER, MNT_DETACH);
 
-    // Load patched policy
-    xmkdir(REAL_SELINUXFS, 0755);
-    xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
-    sepol->to_file(REAL_SELINUXFS "/load");
-
-    if (strcmp(blocking_target, SELINUX_ENFORCE) == 0) {
-        actual_content = full_read(SELINUX_ENFORCE);
+    // fnd the tmp policy file by searching init's open files
+    std::string policy_path;
+    {
+        auto dir = open_dir("/proc/1/fd");
+        for (dirent *entry; (entry = xreaddir(dir.get()));) {
+            char buf[PATH_MAX];
+            if (readlinkat(dirfd(dir.get()), entry->d_name, buf, sizeof(buf)) < 0) continue;
+            if (auto path = std::string_view(buf); path.starts_with("/dev/sepolicy.")) {
+                policy_path = path;
+            }
+        }
     }
 
-    // Write to mock blocking target ONLY after sepolicy is loaded. We need to make sure
-    // the actual init process is blocked until sepolicy is loaded, or else
-    // restorecon will fail and re-exec won't change context, causing boot failure.
-    // We (ab)use the fact that init reads from our blocking target, and
-    // because it has been replaced with our FIFO file, init will block until we
-    // write something into the pipe, effectively hijacking its control flow.
+    // hijack policy file to let secilc write the compiled policy for us
+    LOGD("Hijack [%s]\n", policy_path.data());
+    mkfifo(MOCK_POLICY, 0644);
+    xmount(MOCK_POLICY, policy_path.data(), nullptr, MS_BIND, nullptr);
 
-    xwrite(fd, actual_content.data(), actual_content.length());
-    close(fd);
+    // hijack null file to block secilc until we finish our sepolicy patching and write to the
+    // real tmp policy file
+    LOGD("Hijack [%s]\n", SELINUX_NULL);
+    mkfifo(MOCK_NULL, 0644);
+    xmount(MOCK_NULL, SELINUX_NULL, nullptr, MS_BIND, nullptr);
 
-    // At this point, the init process will be unblocked
-    // and continue on with restorecon + re-exec.
+    write(fd, vend_plat_vers.data(), vend_plat_vers.size());
+    {
+        // block until secilc open as write only
+        fd = xopen(MOCK_POLICY, O_RDONLY);
+        xumount2(policy_path.data(), MNT_DETACH);
 
-    // Terminate process
+        std::string policy;
+        // read the compiled policy
+        fd_full_read(fd, policy);
+
+        // path the compiled policy
+        auto sepol = unique_ptr<sepolicy>(sepolicy::from_data(policy.data(), policy.length()));
+        sepol->magisk_rules();
+        sepol->load_rules(rules);
+        // save to the original tmp policy file
+        sepol->to_file(policy_path.data());
+    }
+
+    {
+        std::string dummy;
+        // block seclic until we finish patching policy
+        fd = xopen(MOCK_NULL, O_RDONLY);
+        xumount2(SELINUX_NULL, MNT_DETACH);
+        // read all dummy content
+        fd_full_read(fd, dummy);
+    }
+
+    // gracefully exit
     exit(0);
 }
