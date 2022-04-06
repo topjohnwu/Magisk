@@ -32,10 +32,14 @@ static bool cmp_sha256(const char *a, const char *b) {
     return memcmp(id_a, id_b, SHALEN) == 0;
 }
 
-static bool check_precompiled(const char *precompiled) {
+bool sepolicy::check_precompiled(const char *precompiled) {
     bool ok = false;
     const char *actual_sha;
     char compiled_sha[128];
+
+    if (access(precompiled, R_OK) != 0) {
+        return false;
+    }
 
     actual_sha = PLAT_POLICY_DIR "plat_and_mapping_sepolicy.cil.sha256";
     if (access(actual_sha, R_OK) == 0) {
@@ -218,12 +222,10 @@ sepolicy *sepolicy::compile_split() {
 }
 
 sepolicy *sepolicy::from_split() {
-    const char *odm_pre = ODM_POLICY_DIR "precompiled_sepolicy";
-    const char *vend_pre = VEND_POLICY_DIR "precompiled_sepolicy";
-    if (access(odm_pre, R_OK) == 0 && check_precompiled(odm_pre))
-        return sepolicy::from_file(odm_pre);
-    else if (access(vend_pre, R_OK) == 0 && check_precompiled(vend_pre))
-        return sepolicy::from_file(vend_pre);
+    if (check_precompiled(ODM_PRE_COMPILED))
+        return sepolicy::from_file(ODM_PRE_COMPILED);
+    else if (check_precompiled(VEND_PRE_COMPILED))
+        return sepolicy::from_file(VEND_PRE_COMPILED);
     else
         return sepolicy::compile_split();
 }

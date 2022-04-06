@@ -17,6 +17,8 @@
 #define SYSEXT_POLICY_DIR   "/system_ext/etc/selinux/"
 #define SPLIT_PLAT_CIL      PLAT_POLICY_DIR "plat_sepolicy.cil"
 #define SPLIT_PLAT_VER      VEND_POLICY_DIR "plat_sepolicy_vers.txt"
+#define ODM_PRE_COMPILED    ODM_POLICY_DIR "precompiled_sepolicy"
+#define VEND_PRE_COMPILED   VEND_POLICY_DIR "precompiled_sepolicy"
 
 // Unconstrained domain the daemon and root processes run in
 #define SEPOL_PROC_DOMAIN   "magisk"

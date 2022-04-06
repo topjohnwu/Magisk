@@ -38,25 +38,38 @@ void MagiskInit::patch_sepolicy(const char *file) {
 }
 
 #define MOCK_POLICY    SELINUXMOCK "/sepolicy"
-#define MOCK_PLAT_VER  SELINUXMOCK "/plat_sepolicy_vers.txt"
+#define MOCK_BLOCKING  SELINUXMOCK "/blocking"
 #define MOCK_NULL      SELINUXMOCK "/null"
+
+inline void hijack(const char* src, const char* dest) {
+    LOGD("Hijack [%s]\n", dest);
+    mkfifo(src, 0644);
+    xmount(src, dest, nullptr, MS_BIND, nullptr);
+}
 
 bool MagiskInit::hijack_sepolicy() {
     xmkdir(SELINUXMOCK, 0);
 
-    std::string vend_plat_vers;
-    file_readline(SPLIT_PLAT_VER, [&vend_plat_vers] (auto line){
-        vend_plat_vers = line;
-        return false;
-    });
-
-    if (vend_plat_vers.empty()) return false;
-
-    // SPLIT_PLAT_VER will be open read only right after creating policy tmp file
-    // Mock it to block init, get policy tmp file and mock it
-    LOGD("Hijack [%s]\n", SPLIT_PLAT_VER);
-    mkfifo(MOCK_PLAT_VER, 0644);
-    xmount(MOCK_PLAT_VER, SPLIT_PLAT_VER, nullptr, MS_BIND, nullptr);
+    std::string actual_content;
+    const char *blocking_file;
+    bool pre_compiled = false;
+    if (sepolicy::check_precompiled(ODM_PRE_COMPILED)) {
+        blocking_file = ODM_PRE_COMPILED;
+        pre_compiled = true;
+    } else if (sepolicy::check_precompiled(VEND_PRE_COMPILED)) {
+        blocking_file = VEND_PRE_COMPILED;
+        pre_compiled = true;
+    } else {
+        blocking_file = SPLIT_PLAT_VER;
+        file_readline(SPLIT_PLAT_VER, [&actual_content](auto line) {
+            actual_content = line;
+            return false;
+        });
+        if (actual_content.empty()) return false;
+    }
+    // this will be open read only right after creating policy tmp file if not pre-compiled
+    // Mock it to block init, get policy tmp file and mock it or patch the pre-compiled policy
+    hijack(MOCK_BLOCKING, blocking_file);
 
     // Read all custom rules into memory
     string rules;
@@ -79,63 +92,63 @@ bool MagiskInit::hijack_sepolicy() {
         return true;
     }
 
-    // block until SPLIT_PLAT_VER opened as read only
+    // block until blocking file opened as read only
     // we have selinuxfs now and init has opened a tmp policy file
-    int fd = xopen(MOCK_PLAT_VER, O_WRONLY);
+    int fd = xopen(MOCK_BLOCKING, O_WRONLY);
     umount2("/init", MNT_DETACH);
-    xumount2(SPLIT_PLAT_VER, MNT_DETACH);
+    xumount2(blocking_file, MNT_DETACH);
 
-    // fnd the tmp policy file by searching init's open files
     std::string policy_path;
-    {
-        auto dir = open_dir("/proc/1/fd");
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            char buf[PATH_MAX];
-            if (readlinkat(dirfd(dir.get()), entry->d_name, buf, sizeof(buf)) < 0) continue;
-            if (auto path = std::string_view(buf); path.starts_with("/dev/sepolicy.")) {
-                policy_path = path;
+    if (pre_compiled) {
+        policy_path = MOCK_BLOCKING;
+    } else {
+        // fnd the tmp policy file by searching init's open files
+        {
+            auto dir = open_dir("/proc/1/fd");
+            for (dirent *entry; (entry = xreaddir(dir.get()));) {
+                char buf[PATH_MAX];
+                if (readlinkat(dirfd(dir.get()), entry->d_name, buf, sizeof(buf)) < 0) continue;
+                if (auto path = std::string_view(buf); path.starts_with("/dev/sepolicy.")) {
+                    policy_path = path;
+                    break;
+                }
             }
         }
+
+        // hijack policy file to let secilc write the compiled policy for us
+        hijack(MOCK_POLICY, policy_path.data());
+
+        // hijack null file to block secilc until we finish our sepolicy patching and write to the
+        // real tmp policy file
+        hijack(MOCK_NULL, SELINUX_NULL);
+
+        write(fd, actual_content.data(), actual_content.size());
+        close(fd);
+        {
+            // block until secilc open as write only
+            fd = xopen(MOCK_POLICY, O_RDONLY);
+            xumount2(policy_path.data(), MNT_DETACH);
+
+            // read the compiled policy
+            fd_full_read(fd, actual_content);
+            close(fd);
+        }
     }
-
-    // hijack policy file to let secilc write the compiled policy for us
-    LOGD("Hijack [%s]\n", policy_path.data());
-    mkfifo(MOCK_POLICY, 0644);
-    xmount(MOCK_POLICY, policy_path.data(), nullptr, MS_BIND, nullptr);
-
-    // hijack null file to block secilc until we finish our sepolicy patching and write to the
-    // real tmp policy file
-    LOGD("Hijack [%s]\n", SELINUX_NULL);
-    mkfifo(MOCK_NULL, 0644);
-    xmount(MOCK_NULL, SELINUX_NULL, nullptr, MS_BIND, nullptr);
-
-    write(fd, vend_plat_vers.data(), vend_plat_vers.size());
-    {
-        // block until secilc open as write only
-        fd = xopen(MOCK_POLICY, O_RDONLY);
-        xumount2(policy_path.data(), MNT_DETACH);
-
-        std::string policy;
-        // read the compiled policy
-        fd_full_read(fd, policy);
-
-        // path the compiled policy
-        auto sepol = unique_ptr<sepolicy>(sepolicy::from_data(policy.data(), policy.length()));
-        sepol->magisk_rules();
-        sepol->load_rules(rules);
-        // save to the original tmp policy file
-        sepol->to_file(policy_path.data());
-    }
-
-    {
-        std::string dummy;
+    // path the compiled policy
+    auto sepol = std::unique_ptr<sepolicy>(
+            sepolicy::from_data(actual_content.data(), actual_content.length()));
+    sepol->magisk_rules();
+    sepol->load_rules(rules);
+    // save to the original tmp policy file
+    sepol->to_file(policy_path.data());
+    if (!pre_compiled) {
         // block seclic until we finish patching policy
         fd = xopen(MOCK_NULL, O_RDONLY);
         xumount2(SELINUX_NULL, MNT_DETACH);
         // read all dummy content
-        fd_full_read(fd, dummy);
+        fd_full_read(fd, actual_content);
     }
-
+    close(fd);
     // gracefully exit
     exit(0);
 }

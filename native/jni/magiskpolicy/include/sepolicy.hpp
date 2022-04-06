@@ -54,6 +54,8 @@ struct sepolicy {
     // Deprecate
     bool create(c_str name) { return type(name, "domain"); }
 
+    static bool check_precompiled(const char *precompiled);
+
 protected:
     // Prevent anyone from accidentally creating an instance
     sepolicy() = default;
