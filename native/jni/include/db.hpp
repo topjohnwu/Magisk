@@ -84,11 +84,12 @@ protected:
  * DB Strings *
  **************/
 
-constexpr const char *DB_STRING_KEYS[] = { "requester" };
+constexpr const char *DB_STRING_KEYS[] = { "requester", "cert_digest" };
 
 // Strings keys indices
 enum {
-    SU_MANAGER = 0
+    SU_MANAGER = 0,
+    CERT_DIGEST
 };
 
 class db_strings : public db_dict<std::string, std::size(DB_STRING_KEYS)> {

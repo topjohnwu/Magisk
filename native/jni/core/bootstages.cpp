@@ -20,6 +20,7 @@ using namespace std;
 static bool safe_mode = false;
 static int stub_fd = -1;
 bool zygisk_enabled = false;
+string APKCERT;
 
 /*********
  * Setup *
@@ -124,6 +125,7 @@ static bool magisk_env() {
     LOGI("* Initializing Magisk environment\n");
 
     string stub_path = MAGISKTMP + "/stub.apk";
+    APKCERT = read_certificate(stub_path);
     stub_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
     unlink(stub_path.data());
 
