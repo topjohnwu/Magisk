@@ -184,7 +184,7 @@ def load_config(args):
 def collect_binary():
     for arch in archs:
         mkdir_p(op.join('native', 'out', arch))
-        for bin in support_targets:
+        for bin in support_targets + ['libpreload.so']:
             source = op.join('native', 'libs', arch, bin)
             target = op.join('native', 'out', arch, bin)
             mv(source, target)
@@ -284,6 +284,11 @@ def dump_bin_header():
     with open(stub, 'rb') as src:
         text = binary_dump(src, 'manager_xz')
         write_if_diff(op.join(native_gen_path, 'binaries.h'), text)
+    for arch in archs:
+        preload = op.join('native', 'out', arch, 'libpreload.so')
+        with open(preload, 'rb') as src:
+            text = binary_dump(src, 'preload_xz')
+            write_if_diff(op.join(native_gen_path, f'{arch}_binaries.h'), text)
 
 
 def dump_flag_header():
@@ -322,6 +327,8 @@ def build_binary(args):
 
     dump_flag_header()
 
+    # Build shared executables
+
     flag = ''
 
     if 'magisk' in args.target:
@@ -333,9 +340,14 @@ def build_binary(args):
     if 'test' in args.target:
         flag += ' B_TEST=1'
 
+    if 'magiskinit' in args.target:
+        flag += ' B_PRELOAD=1'
+
     if flag:
         run_ndk_build(flag + ' B_SHARED=1')
         clean_elf()
+
+    # Then build static executables
 
     flag = ''
 

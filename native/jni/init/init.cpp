@@ -8,6 +8,18 @@
 #include <utils.hpp>
 #include <binaries.h>
 
+#if defined(__arm__)
+#include <armeabi-v7a_binaries.h>
+#elif defined(__aarch64__)
+#include <arm64-v8a_binaries.h>
+#elif defined(__i386__)
+#include <x86_binaries.h>
+#elif defined(__x86_64__)
+#include <x86_64_binaries.h>
+#else
+#error Unsupported ABI
+#endif
+
 #include "init.hpp"
 
 using namespace std;
@@ -35,14 +47,22 @@ bool unxz(int fd, const uint8_t *buf, size_t size) {
     return true;
 }
 
-int dump_manager(const char *path, mode_t mode) {
+static int dump_bin(const uint8_t *buf, size_t sz, const char *path, mode_t mode) {
     int fd = xopen(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
     if (fd < 0)
         return 1;
-    if (!unxz(fd, manager_xz, sizeof(manager_xz)))
+    if (!unxz(fd, buf, sz))
         return 1;
     close(fd);
     return 0;
+}
+
+int dump_manager(const char *path, mode_t mode) {
+    return dump_bin(manager_xz, sizeof(manager_xz), path, mode);
+}
+
+int dump_preload(const char *path, mode_t mode) {
+    return dump_bin(preload_xz, sizeof(preload_xz), path, mode);
 }
 
 class RecoveryInit : public BaseInit {

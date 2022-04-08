@@ -48,6 +48,15 @@ include $(BUILD_EXECUTABLE)
 
 endif
 
+ifdef B_PRELOAD
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := preload
+LOCAL_SRC_FILES := init/preload.c
+include $(BUILD_SHARED_LIBRARY)
+
+endif
+
 ifdef B_INIT
 
 include $(CLEAR_VARS)
