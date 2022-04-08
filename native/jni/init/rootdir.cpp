@@ -131,14 +131,6 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
     }
 }
 
-static void patch_socket_name(const char *path) {
-    static char rstr[16] = { 0 };
-    if (rstr[0] == '\0')
-        gen_rand_str(rstr, sizeof(rstr));
-    auto bin = mmap_data(path, true);
-    bin.patch({ make_pair(MAIN_SOCKET, rstr) });
-}
-
 void SARBase::backup_files() {
     if (access("/overlay.d", F_OK) == 0)
         backup_folder("/overlay.d", overlays);
@@ -150,6 +142,39 @@ void SARBase::backup_files() {
         magisk_cfg = mmap_data("/.backup/.magisk");
     else if (access("/data/.backup/.magisk", R_OK) == 0)
         magisk_cfg = mmap_data("/data/.backup/.magisk");
+}
+
+static void patch_socket_name(const char *path) {
+    static char rstr[16] = { 0 };
+    if (rstr[0] == '\0')
+        gen_rand_str(rstr, sizeof(rstr));
+    auto bin = mmap_data(path, true);
+    bin.patch({ make_pair(MAIN_SOCKET, rstr) });
+}
+
+static void extract_files(bool sbin) {
+    const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
+    const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
+
+    auto magisk = mmap_data(m32);
+    unlink(m32);
+    int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
+    unxz(fd, magisk.buf, magisk.sz);
+    close(fd);
+    patch_socket_name("magisk32");
+    if (access(m64, F_OK) == 0) {
+        magisk = mmap_data(m64);
+        unlink(m64);
+        fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
+        unxz(fd, magisk.buf, magisk.sz);
+        close(fd);
+        patch_socket_name("magisk64");
+        xsymlink("./magisk64", "magisk");
+    } else {
+        xsymlink("./magisk32", "magisk");
+    }
+
+    dump_manager("stub.apk", 0);
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
@@ -215,27 +240,7 @@ void SARBase::patch_ro_root() {
     }
 
     // Extract magisk
-    {
-        auto magisk = mmap_data("magisk32.xz");
-        unlink("magisk32.xz");
-        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
-        unxz(fd, magisk.buf, magisk.sz);
-        close(fd);
-        patch_socket_name("magisk32");
-        if (access("magisk64.xz", F_OK) == 0) {
-            magisk = mmap_data("magisk64.xz");
-            unlink("magisk64.xz");
-            fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
-            unxz(fd, magisk.buf, magisk.sz);
-            close(fd);
-            patch_socket_name("magisk64");
-            xsymlink("./magisk64", "magisk");
-        } else {
-            xsymlink("./magisk32", "magisk");
-        }
-
-        dump_manager("stub.apk", 0644);
-    }
+    extract_files(false);
 
     if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
         patch_sepolicy(ROOTOVL "/sepolicy");
@@ -288,28 +293,8 @@ void MagiskInit::patch_rw_root() {
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
 
-    {
-        // Extract magisk
-        auto magisk = mmap_data("/sbin/magisk32.xz");
-        unlink("/sbin/magisk32.xz");
-        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
-        unxz(fd, magisk.buf, magisk.sz);
-        close(fd);
-        patch_socket_name("magisk32");
-        if (access("/sbin/magisk64.xz", F_OK) == 0) {
-            magisk = mmap_data("/sbin/magisk64.xz");
-            unlink("/sbin/magisk64.xz");
-            fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
-            unxz(fd, magisk.buf, magisk.sz);
-            close(fd);
-            patch_socket_name("magisk64");
-            xsymlink("./magisk64", "magisk");
-        } else {
-            xsymlink("./magisk32", "magisk");
-        }
-
-        dump_manager("stub.apk", 0644);
-    }
+    // Extract magisk
+    extract_files(true);
 
     if ((!treble && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
         patch_sepolicy("/sepolicy");
