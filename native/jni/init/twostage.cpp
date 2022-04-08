@@ -68,6 +68,9 @@ bool SecondStageInit::prepare() {
     umount2("/proc/self/exe", MNT_DETACH);
     umount2("/data", MNT_DETACH);
 
+    // Make sure init dmesg logs won't get messed up
+    argv[0] = (char *) INIT_PATH;
+
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
     // Check if root and system are on the same filesystem
     struct stat root{}, system{};
