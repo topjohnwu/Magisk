@@ -1,6 +1,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
+#include <magisk.hpp>
 #include <utils.hpp>
 
 #include "deny.hpp"
@@ -83,6 +84,9 @@ int denylist_cli(int argc, char **argv) {
     else if (argv[1] == "exec"sv && argc > 2) {
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
+        int fd = connect_daemon(MainRequest::GET_PATH);
+        MAGISKTMP = read_string(fd);
+        close(fd);
         revert_unmount();
         execvp(argv[2], argv + 2);
         exit(1);
