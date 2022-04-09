@@ -354,7 +354,9 @@ void late_start(int client) {
         return;
 
     exec_common_scripts("service");
-    exec_module_scripts("service");
+    if (module_list) {
+        exec_module_scripts("service");
+    }
 }
 
 void boot_complete(int client) {
