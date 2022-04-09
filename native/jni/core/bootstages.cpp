@@ -375,15 +375,18 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    if (stub_fd > 0 && !get_manager()) {
-        // Install stub
-        struct stat st{};
-        fstat(stub_fd, &st);
-        int dfd = xopen("/data/stub.apk", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
-        xsendfile(dfd, stub_fd, nullptr, st.st_size);
+    if (stub_fd > 0) {
+        if (!get_manager()) {
+            // Install stub
+            struct stat st{};
+            fstat(stub_fd, &st);
+            char apk[] = "/data/stub.apk";
+            int dfd = xopen(apk, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
+            xsendfile(dfd, stub_fd, nullptr, st.st_size);
+            close(dfd);
+            install_apk(apk);
+        }
         close(stub_fd);
-        close(dfd);
         stub_fd = -1;
-        install_apk("/data/stub.apk");
     }
 }
