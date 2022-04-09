@@ -200,7 +200,7 @@ static vector<int> get_module_fds(bool is_64_bit) {
         std::transform(module_list->begin(), module_list->end(), std::back_inserter(fds),
             [](const module_info &info) { return info.z64 < 0 ? STDOUT_FILENO : info.z64; });
 #endif
-    } else {
+    } else if (module_list) {
         std::transform(module_list->begin(), module_list->end(), std::back_inserter(fds),
             [](const module_info &info) { return info.z32 < 0 ? STDOUT_FILENO : info.z32; });
     }
@@ -365,7 +365,7 @@ static void get_process_info(int client, const sock_cred *cred) {
         xxread(client, &l, sizeof(l));
         bits.emplace_back(l);
     }
-    for (int id = 0; id < module_list->size(); ++id) {
+    for (int id = 0; module_list && id < module_list->size(); ++id) {
         if (!as_const(bits)[id]) {
             // Either not a zygisk module, or incompatible
             char buf[4096];
