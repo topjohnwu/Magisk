@@ -12,8 +12,7 @@ import subprocess
 import sys
 import textwrap
 import urllib.request
-import zipfile
-from distutils.dir_util import copy_tree
+import tarfile
 
 
 def error(str):
@@ -309,9 +308,11 @@ def dump_flag_header():
 
 def build_binary(args):
     # Verify NDK install
-    props = parse_props(op.join(ndk_path, 'source.properties'))
-    if props['Pkg.Revision'] != config['fullNdkVersion']:
-        error('Incorrect NDK. Please install/upgrade NDK with "build.py ndk"')
+    try:
+        with open(op.join(ndk_path, 'ONDK_VERSION'), 'r') as ondk_ver:
+            assert ondk_ver.read().strip(' \t\r\n') == config['ondkVersion']
+    except:
+        error('Unmatched NDK. Please install/upgrade NDK with "build.py ndk"')
 
     if 'target' not in vars(args):
         vars(args)['target'] = []
@@ -416,30 +417,17 @@ def cleanup(args):
 
 def setup_ndk(args):
     os_name = platform.system().lower()
-    ndk_ver = config['ndkVersion']
-    url = f'https://dl.google.com/android/repository/android-ndk-r{ndk_ver}-{os_name}.zip'
-    ndk_zip = url.split('/')[-1]
+    ndk_ver = config['ondkVersion']
+    url = f'https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.gz'
+    ndk_archive = url.split('/')[-1]
 
-    header(f'* Downloading {ndk_zip}')
-    with urllib.request.urlopen(url) as response, open(ndk_zip, 'wb') as out_file:
-        shutil.copyfileobj(response, out_file)
+    header(f'* Downloading and extracting {ndk_archive}')
+    with urllib.request.urlopen(url) as response:
+        with tarfile.open(mode='r|gz', fileobj=response) as tar:
+            tar.extractall(ndk_root)
 
-    header('* Extracting NDK zip')
     rm_rf(ndk_path)
-    with zipfile.ZipFile(ndk_zip, 'r') as zf:
-        for info in zf.infolist():
-            vprint(f'Extracting {info.filename}')
-            if info.external_attr >> 28 == 0xA:  # symlink
-                src = zf.read(info).decode("utf-8")
-                dest = op.join(ndk_root, info.filename)
-                os.symlink(src, dest)
-                continue
-            extracted_path = zf.extract(info, ndk_root)
-            if info.create_system == 3:  # ZIP_UNIX_SYSTEM = 3
-                unix_attributes = info.external_attr >> 16
-            if unix_attributes:
-                os.chmod(extracted_path, unix_attributes)
-    mv(op.join(ndk_root, f'android-ndk-r{ndk_ver}'), ndk_path)
+    mv(op.join(ndk_root, f'ondk-{ndk_ver}'), ndk_path)
 
     header('* Patching static libs')
     for target in ['aarch64-linux-android', 'arm-linux-androideabi',
@@ -452,8 +440,7 @@ def setup_ndk(args):
             continue
         src_dir = op.join('tools', 'ndk-bins', '21', arch)
         rm(op.join(src_dir, '.DS_Store'))
-        for path in copy_tree(src_dir, lib_dir):
-            vprint(f'Replaced {path}')
+        shutil.copytree(src_dir, lib_dir, copy_function=cp, dirs_exist_ok=True)
 
 
 def setup_avd(args):
