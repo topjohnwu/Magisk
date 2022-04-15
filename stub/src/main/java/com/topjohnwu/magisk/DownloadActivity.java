@@ -66,6 +66,8 @@ public class DownloadActivity extends Activity {
         // Inject resources
         loadResources();
 
+        ProviderInstaller.install(this);
+
         if (Networking.checkNetworkStatus(this)) {
             if (apkLink == null) {
                 fetchCanary();
