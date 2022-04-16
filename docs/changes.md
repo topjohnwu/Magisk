@@ -3,7 +3,8 @@
 ### v24.3
 
 - [General] Stop using `getrandom` syscall
-- [Zygisk] Update API to v3, adding new fields to `AppSpecializeArgs`
+- [Zygisk
+] Update API to v3, adding new fields to `AppSpecializeArgs`
 - [App] Improve app repackaging installation workflow
 
 ### v24.2
@@ -34,7 +35,8 @@
 - [General] Support Android 12
 - [General] Support devices that do not support 32-bit and only runs 64-bit code
 - [General] Update BusyBox to 1.34.1
-- [Zygisk] Introduce new feature: Zygisk
+- [Zygi
+sk] Introduce new feature: Zygisk
 - [Zygisk] Introduce DenyList feature to revert Magisk features in user selected processes
 - [MagiskBoot] Support patching 32-bit kernel zImages
 - [MagiskBoot] Support boot image header v4
