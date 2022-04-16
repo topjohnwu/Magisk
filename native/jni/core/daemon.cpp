@@ -362,14 +362,6 @@ static void daemon_entry() {
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 
-    // SELinux mock cleanups
-    string selinux_mock = MAGISKTMP + "/" SELINUXMOCK;
-    string fs = selinux_mock + "/fs";
-    if (access(fs.data(), F_OK) == 0) {
-        umount2(fs.data(), MNT_DETACH);
-    }
-    rm_rf(selinux_mock.data());
-
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
     parse_prop_file(config.data(), [](auto key, auto val) -> bool {

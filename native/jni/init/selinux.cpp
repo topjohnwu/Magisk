@@ -40,7 +40,6 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
 #define MOCK_COMPAT    SELINUXMOCK "/compatible"
 #define MOCK_LOAD      SELINUXMOCK "/load"
 #define MOCK_ENFORCE   SELINUXMOCK "/enforce"
-#define REAL_SELINUXFS SELINUXMOCK "/fs"
 
 bool MagiskInit::hijack_sepolicy() {
     xmkdir(SELINUXMOCK, 0);
@@ -58,7 +57,7 @@ bool MagiskInit::hijack_sepolicy() {
     // the actual sepolicy being loaded into the kernel
     auto hijack = [&] {
         LOGD("Hijack [" SELINUX_LOAD "]\n");
-        mkfifo(MOCK_LOAD, 0600);
+        close(xopen(MOCK_LOAD, O_CREAT | O_RDONLY, 0600));
         xmount(MOCK_LOAD, SELINUX_LOAD, nullptr, MS_BIND, nullptr);
         LOGD("Hijack [" SELINUX_ENFORCE "]\n");
         mkfifo(MOCK_ENFORCE, 0644);
@@ -131,28 +130,21 @@ bool MagiskInit::hijack_sepolicy() {
         close(fd);
     }
 
-    // Read full sepolicy
-    int fd = xopen(MOCK_LOAD, O_RDONLY);
-    string policy = fd_full_read(fd);
-    close(fd);
-    auto sepol = unique_ptr<sepolicy>(sepolicy::from_data(policy.data(), policy.length()));
-
-    sepol->magisk_rules();
-    sepol->load_rules(rules);
-
     // This open will block until init calls security_getenforce
-    fd = xopen(MOCK_ENFORCE, O_WRONLY);
+    int fd = xopen(MOCK_ENFORCE, O_WRONLY);
 
     // Cleanup the hijacks
     umount2("/init", MNT_DETACH);
     xumount2(SELINUX_LOAD, MNT_DETACH);
     xumount2(SELINUX_ENFORCE, MNT_DETACH);
 
-    // Load patched policy
-    xmkdir(REAL_SELINUXFS, 0755);
-    xmount("selinuxfs", REAL_SELINUXFS, "selinuxfs", 0, nullptr);
-    sepol->to_file(REAL_SELINUXFS "/load");
-    string enforce = full_read(SELINUX_ENFORCE);
+    // Load and patch policy
+    auto sepol = unique_ptr<sepolicy>(sepolicy::from_file(MOCK_LOAD));
+    sepol->magisk_rules();
+    sepol->load_rules(rules);
+
+    // Load patched policy into kernel
+    sepol->to_file(SELINUX_LOAD);
 
     // Write to the enforce node ONLY after sepolicy is loaded. We need to make sure
     // the actual init process is blocked until sepolicy is loaded, or else
@@ -161,6 +153,7 @@ bool MagiskInit::hijack_sepolicy() {
     // it has been replaced with our FIFO file, init will block until we
     // write something into the pipe, effectively hijacking its control flow.
 
+    string enforce = full_read(SELINUX_ENFORCE);
     xwrite(fd, enforce.data(), enforce.length());
     close(fd);
 
