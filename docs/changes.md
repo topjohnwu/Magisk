@@ -1,4 +1,4 @@
-# Magisk Changelog
+https://github.com/topjohnwu/Magisk/issues/5728#issue-1202934132# Magisk Changelog
 
 ### v24.3
 
