@@ -12,7 +12,7 @@ Some highlight features:
 - **MagiskSU**: Provide root access for applications
 - **Magisk Modules**: Modify read-only partitions by installing modules
 - **MagiskBoot**: The most complete tool for unpacking and repacking Android boot images
-- **Zygisk**: Run code in every Android applications' processes
+- **Zygisk**: Run code in every Android application's processes
 
 ## Downloads
 
