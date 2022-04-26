@@ -73,7 +73,8 @@ class SuRequestViewModel(
     val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
     private val handler = SuRequestHandler(AppContext.packageManager, policyDB)
-    private var timer: CountDownTimer? = null
+    private lateinit var timer: CountDownTimer
+    private var initialized = false
 
     fun grantPressed() {
         cancelTimer()
@@ -122,10 +123,16 @@ class SuRequestViewModel(
 
         // Actually show the UI
         ShowUIEvent(if (Config.suTapjack) EmptyAccessibilityDelegate else null).publish()
+        initialized = true
     }
 
     private fun respond(action: Int) {
-        timer?.cancel()
+        if (!initialized) {
+            // ignore the response until showDialog done
+            return
+        }
+
+        timer.cancel()
 
         val pos = selectedItemPosition
         timeoutPrefs.edit().putInt(handler.pkgInfo.packageName, pos).apply()
@@ -138,7 +145,7 @@ class SuRequestViewModel(
     }
 
     private fun cancelTimer() {
-        timer?.cancel()
+        timer.cancel()
         denyText.seconds = 0
     }
 
