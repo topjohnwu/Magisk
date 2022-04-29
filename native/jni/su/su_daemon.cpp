@@ -220,7 +220,9 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     };
 
     // Read su_request
-    if (xxread(client, &ctx.req, sizeof(su_req_base)) < 0 || !read_string(client, ctx.req.shell) || !read_string(client, ctx.req.command)) {
+    if (xxread(client, &ctx.req, sizeof(su_req_base)) < 0
+        || !read_string(client, ctx.req.shell)
+        || !read_string(client, ctx.req.command)) {
         LOGW("su: remote process probably died, abort\n");
         ctx.info.reset();
         write_int(client, DENY);

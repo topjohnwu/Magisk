@@ -283,10 +283,7 @@ static void switch_cgroup(const char *cgroup, int pid) {
     if (fd == -1)
         return;
     snprintf(buf, sizeof(buf), "%d\n", pid);
-    if (xwrite(fd, buf, strlen(buf)) == -1) {
-        close(fd);
-        return;
-    }
+    xwrite(fd, buf, strlen(buf));
     close(fd);
 }
 
