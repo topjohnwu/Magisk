@@ -651,9 +651,9 @@ copy_sepolicy_rules() {
   fi
 
   if [ -d ${RULESDIR%/magisk} ]; then
-    ui_print "- Sepolicy rules dir is ${RULESDIR%/magisk}"
+    echo "RULESDIR=$RULESDIR" >&2
   else
-    ui_print "- Sepolicy rules dir ${RULESDIR%/magisk} not found"
+    ui_print "- Unable to find sepolicy rules dir ${RULESDIR%/magisk}"
     return 1
   fi
 
