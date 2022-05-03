@@ -46,7 +46,7 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
         }
 
         if (doPreload) {
-            Shell.getShell(null) {
+            Shell.getShell(Shell.EXECUTOR) {
                 if (isRunningAsStub && !it.isRoot) {
                     showInvalidStateMessage()
                     return@getShell

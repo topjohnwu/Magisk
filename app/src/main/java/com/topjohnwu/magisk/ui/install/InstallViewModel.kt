@@ -18,7 +18,6 @@ import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.events.MagiskInstallFileEvent
 import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -29,7 +28,7 @@ class InstallViewModel(
     svc: NetworkService
 ) : BaseViewModel() {
 
-    val isRooted = Shell.rootAccess()
+    val isRooted get() = Info.isRooted
     val hideVbmeta = Info.vbmeta || Info.isSamsung || Info.isAB
     val skipOptions = Info.isEmulator || (Info.isSAR && !Info.isFDE && hideVbmeta && Info.ramdisk)
     val noSecondSlot = !isRooted || !Info.isAB || Info.isEmulator

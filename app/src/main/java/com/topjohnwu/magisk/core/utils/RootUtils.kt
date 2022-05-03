@@ -9,6 +9,7 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.ipc.RootService
+import com.topjohnwu.superuser.nio.FileSystemManager
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
@@ -33,6 +34,7 @@ class RootUtils(stub: Any?) : RootService() {
     override fun onBind(intent: Intent): IBinder {
         return object : IRootUtils.Stub() {
             override fun getAppProcess(pid: Int) = safe(null) { getAppProcessImpl(pid) }
+            override fun getFileSystem(): IBinder = FileSystemManager.getService()
         }
     }
 
@@ -68,7 +70,10 @@ class RootUtils(stub: Any?) : RootService() {
 
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             Timber.d("onServiceConnected")
-            obj = IRootUtils.Stub.asInterface(service)
+            IRootUtils.Stub.asInterface(service).let {
+                obj = it
+                fs = FileSystemManager.getRemote(it.fileSystem)
+            }
             releaseShared(1)
         }
 
@@ -101,6 +106,8 @@ class RootUtils(stub: Any?) : RootService() {
 
     companion object {
         var bindTask: Shell.Task? = null
+        var fs = FileSystemManager.getLocal()
+            private set
         var obj: IRootUtils? = null
             get() {
                 Connection.await()

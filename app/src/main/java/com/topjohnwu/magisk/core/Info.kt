@@ -8,7 +8,6 @@ import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.data.repository.NetworkService
 import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getProperty
-import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
 
@@ -36,6 +35,7 @@ object Info {
     @JvmField var vbmeta = false
     var crypto = ""
     var noDataExec = false
+    var isRooted = false
 
     @JvmField var hasGMS = true
     val isSamsung = Build.MANUFACTURER.equals("samsung", ignoreCase = true)
@@ -62,7 +62,7 @@ object Info {
     ) {
         val versionCode = when {
             code < Const.Version.MIN_VERCODE -> -1
-            else -> if (Shell.rootAccess()) code else -1
+            else -> if (isRooted) code else -1
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = versionCode >= 0

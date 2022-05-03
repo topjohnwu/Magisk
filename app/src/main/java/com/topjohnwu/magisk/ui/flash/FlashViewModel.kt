@@ -21,14 +21,13 @@ import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.superuser.CallbackList
-import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FlashViewModel : BaseViewModel() {
 
     @get:Bindable
-    var showReboot = Shell.rootAccess()
+    var showReboot = Info.isRooted
         set(value) = set(value, field, { field = it }, BR.showReboot)
 
     private val _subtitle = MutableLiveData(R.string.flashing)

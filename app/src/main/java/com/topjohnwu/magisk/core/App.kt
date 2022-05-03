@@ -8,7 +8,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.utils.*
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
@@ -54,13 +53,11 @@ open class App() : Application() {
         super.attachBaseContext(base)
         ServiceLocator.context = base
         app.registerActivityLifecycleCallbacks(ActivityTracker)
-    }
 
-    override fun onCreate() {
-        super.onCreate()
         Shell.setDefaultBuilder(Shell.Builder.create()
             .setFlags(Shell.FLAG_MOUNT_MASTER)
             .setInitializers(ShellInit::class.java)
+            .setContext(base)
             .setTimeout(2))
         Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
         RootUtils.bindTask = RootService.bindOrTask(
@@ -72,7 +69,7 @@ open class App() : Application() {
         Shell.getShell(null) {}
 
         refreshLocale()
-        AppContext.resources.patch()
+        resources.patch()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
