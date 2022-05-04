@@ -76,7 +76,7 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
 - **(Recovery Key Combo) → (Splash screen) → (Long press volume up) → (Recovery Mode)**
 
 (Note: You **CANNOT** use custom recoveries to install or upgrade Magisk in this case!!)
-(Note: In Android version 11 and above, you have to have your phone conncted to a computer to start into recovery, and therefore also to start into Magsik!)
+(Note: Newer versions of Android (reportedly version 11 and above), do not allow to boot into Recovery mode the known way. To do so, you have to have your phone connected to a computer **and** hold the recovery button combination to start into recovery, (and therefore now to start into Magisk)!)
 
 ## Samsung (System-as-root)
 
