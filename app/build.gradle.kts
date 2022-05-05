@@ -86,7 +86,7 @@ dependencies {
     implementation("${bindingAdapter}:${vBAdapt}")
     implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
 
-    val vLibsu = "5.0.0"
+    val vLibsu = "5.0.1"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:service:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:nio:${vLibsu}")
@@ -105,12 +105,12 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.4.1"
+    val vRoom = "2.4.2"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.5.0-alpha01"
+    val vNav = "2.5.0-beta01"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
@@ -123,6 +123,6 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.4.1")
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.core:core-splashscreen:1.0.0-beta01")
+    implementation("androidx.core:core-splashscreen:1.0.0-beta02")
     implementation("com.google.android.material:material:1.5.0")
 }
