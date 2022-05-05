@@ -1,9 +1,12 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
@@ -29,6 +32,13 @@ class ModuleViewModel : BaseViewModel() {
     val itemBinding = itemBindingOf<RvItem> {
         it.bindExtra(BR.viewModel, this)
     }
+
+    var waitingForFile = false
+    val selectFileCallback : (Uri) -> Unit = {
+        waitingForFile = false;
+        MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, it).navigate()
+    }
+        get() { waitingForFile = true; return field }
 
     init {
         if (Info.env.isActive) {
@@ -70,6 +80,6 @@ class ModuleViewModel : BaseViewModel() {
             SnackbarEvent(R.string.no_connection).publish()
         }
 
-    fun installPressed() = withExternalRW { SelectModuleEvent().publish() }
+    fun installPressed() = withExternalRW { SelectModuleEvent(selectFileCallback).publish() }
 
 }

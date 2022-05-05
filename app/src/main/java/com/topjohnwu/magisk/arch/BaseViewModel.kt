@@ -43,7 +43,7 @@ abstract class BaseViewModel(
     val isConnected get() = Info.isConnected
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
 
-    var state= initialState
+    var state = initialState
         set(value) = set(value, field, { field = it }, BR.loading, BR.loaded, BR.loadFailed)
 
     private val _viewEvents = MutableLiveData<ViewEvent>()

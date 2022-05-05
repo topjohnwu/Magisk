@@ -100,4 +100,8 @@ abstract class BaseActivity : AppCompatActivity() {
         startActivity(Intent(intent).setFlags(0))
         finish()
     }
+
+    fun updateContentCallback(callback: (Uri) -> Unit) {
+        contentCallback = callback
+    }
 }

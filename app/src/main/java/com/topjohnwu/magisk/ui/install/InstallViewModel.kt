@@ -38,6 +38,11 @@ class InstallViewModel(
     var step = if (skipOptions) 1 else 0
         set(value) = set(value, field, { field = it }, BR.step)
 
+    var waitingForFile = false
+
+    val selectFileCallback : (Uri) -> Unit = { uri -> data = uri }
+        get() { waitingForFile = true; return field }
+
     var _method = -1
 
     @get:Bindable
@@ -46,7 +51,7 @@ class InstallViewModel(
         set(value) = set(value, _method, { _method = it }, BR.method) {
             when (it) {
                 R.id.method_patch -> {
-                    MagiskInstallFileEvent { uri -> data = uri }.publish()
+                    MagiskInstallFileEvent(selectFileCallback).publish()
                 }
                 R.id.method_inactive_slot -> {
                     SecondSlotWarningDialog().publish()
@@ -56,7 +61,7 @@ class InstallViewModel(
 
     @get:Bindable
     var data: Uri? = null
-        set(value) = set(value, field, { field = it }, BR.data)
+        set(value) = set(value, field, { field = it; waitingForFile = false }, BR.data)
 
     @get:Bindable
     var notes: Spanned = SpannableStringBuilder()

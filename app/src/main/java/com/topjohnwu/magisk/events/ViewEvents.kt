@@ -83,13 +83,11 @@ class AddHomeIconEvent : ViewEvent(), ContextExecutor {
     }
 }
 
-class SelectModuleEvent : ViewEvent(), FragmentExecutor {
+class SelectModuleEvent(val callback: (Uri) -> Unit) : ViewEvent(), FragmentExecutor {
     override fun invoke(fragment: BaseFragment<*>) {
         try {
             fragment.apply {
-                activity?.getContent("application/zip") {
-                    MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, it).navigate()
-                }
+                activity?.getContent("application/zip", callback)
             }
         } catch (e: ActivityNotFoundException) {
             Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
