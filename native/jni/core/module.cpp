@@ -583,34 +583,32 @@ void magic_mount() {
 
     char buf[4096];
     LOGI("* Loading modules\n");
-    if (module_list) {
-        for (const auto &m : *module_list) {
-            const char *module = m.name.data();
-            char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
+    for (const auto &m : *module_list) {
+        const char *module = m.name.data();
+        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
 
-            // Read props
-            strcpy(b, "system.prop");
-            if (access(buf, F_OK) == 0) {
-                LOGI("%s: loading [system.prop]\n", module);
-                load_prop_file(buf, false);
-            }
-
-            // Check whether skip mounting
-            strcpy(b, "skip_mount");
-            if (access(buf, F_OK) == 0)
-                continue;
-
-            // Double check whether the system folder exists
-            strcpy(b, "system");
-            if (access(buf, F_OK) != 0)
-                continue;
-
-            LOGI("%s: loading mount files\n", module);
-            b[-1] = '\0';
-            int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
-            system->collect_files(module, fd);
-            close(fd);
+        // Read props
+        strcpy(b, "system.prop");
+        if (access(buf, F_OK) == 0) {
+            LOGI("%s: loading [system.prop]\n", module);
+            load_prop_file(buf, false);
         }
+
+        // Check whether skip mounting
+        strcpy(b, "skip_mount");
+        if (access(buf, F_OK) == 0)
+            continue;
+
+        // Double check whether the system folder exists
+        strcpy(b, "system");
+        if (access(buf, F_OK) != 0)
+            continue;
+
+        LOGI("%s: loading mount files\n", module);
+        b[-1] = '\0';
+        int fd = xopen(buf, O_RDONLY | O_CLOEXEC);
+        system->collect_files(module, fd);
+        close(fd);
     }
     if (MAGISKTMP != "/sbin") {
         // Need to inject our binaries into /system/bin
@@ -768,7 +766,6 @@ static void collect_modules(bool open_zygisk) {
 }
 
 void handle_modules() {
-    default_new(module_list);
     prepare_modules();
     collect_modules(false);
     exec_module_scripts("post-fs-data");
