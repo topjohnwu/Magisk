@@ -625,7 +625,7 @@ run_migrations() {
 
 copy_sepolicy_rules() {
   # mount required partitions in recovery
-  if [ $BOOTMODE == false ]; then
+  if [ "$BOOTMODE" != true ]; then
     mount /persist
     mount /metadata
   fi
