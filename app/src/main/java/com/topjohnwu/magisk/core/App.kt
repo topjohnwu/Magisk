@@ -6,7 +6,9 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.Telemetry
 import com.topjohnwu.magisk.core.utils.*
 import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
@@ -15,7 +17,6 @@ import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
-import kotlin.system.exitProcess
 
 open class App() : Application() {
 
@@ -30,11 +31,19 @@ open class App() : Application() {
 
     init {
         // Always log full stack trace with Timber
-        Timber.plant(Timber.DebugTree())
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            Timber.e(e)
-            exitProcess(1)
-        }
+        Timber.plant(object : Timber.DebugTree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                super.log(priority, tag, message, t)
+                val properties = HashMap<String, String>()
+                properties.putAll(Info.constInfo)
+                if (t != null) {
+                    Telemetry.trackError(t, properties)
+                } else if (priority >= Log.WARN) {
+                    properties["message"] = message
+                    Telemetry.trackError(RuntimeException(), properties)
+                }
+            }
+        })
     }
 
     override fun attachBaseContext(context: Context) {
@@ -72,6 +81,12 @@ open class App() : Application() {
         resources.patch()
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        Telemetry.start(this, Info.constInfo.toString(), "constInfo")
+        Telemetry.trackEvent("App onCreate", Info.constInfo)
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         if (resources.configuration.diff(newConfig) != 0) {
             resources.setConfig(newConfig)
@@ -98,8 +113,13 @@ object ActivityTracker : Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}
-    override fun onActivityStarted(activity: Activity) {}
-    override fun onActivityStopped(activity: Activity) {}
+    override fun onActivityStarted(activity: Activity) {
+        Telemetry.trackEvent("${activity.javaClass.simpleName} Started",
+            Config.prefs.all.mapValues { it.value.toString() })
+    }
+    override fun onActivityStopped(activity: Activity) {
+        Telemetry.trackEvent("${activity.javaClass.simpleName} Stopped", Config.allDbSettings)
+    }
     override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
     override fun onActivityDestroyed(activity: Activity) {}
 }

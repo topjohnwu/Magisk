@@ -153,6 +153,17 @@ object Config : PreferenceModel, DBConfig {
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
+    val allDbSettings
+        get() = HashMap<String, String>().apply {
+            put("rootMode", rootMode.toString())
+            put("suMntNamespaceMode", suMntNamespaceMode.toString())
+            put("suMultiuserMode", suMultiuserMode.toString())
+            put("suBiometric", suBiometric.toString())
+            put("zygisk", zygisk.toString())
+            put("denyList", denyList.toString())
+            put("hasGMS", Info.hasGMS.toString())
+        }
+
     private const val SU_FINGERPRINT = "su_fingerprint"
 
     fun load(pkg: String?) {

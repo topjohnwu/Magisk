@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core
 
 import android.os.Build
 import androidx.databinding.ObservableBoolean
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
@@ -10,6 +11,7 @@ import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
+import java.util.*
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -48,6 +50,25 @@ object Info {
             NetworkObserver.observe(AppContext) {
                 UiThreadHandler.run { field.set(it) }
             }
+        }
+    }
+
+    val constInfo by lazy {
+        HashMap<String, String>().apply {
+            put("root", isRooted.toString())
+            put("stub", isRunningAsStub.toString())
+            put("runningVer", env.versionString)
+            put("runningVerCode", env.versionCode.toString())
+            put("appVer", BuildConfig.VERSION_NAME)
+            put("appVerCode", BuildConfig.VERSION_CODE.toString())
+            put("zygisk", isZygiskEnabled.toString())
+            put("isSAR", isSAR.toString())
+            put("isAB", isAB.toString())
+            put("crypto", crypto)
+            put("ramdisk", ramdisk.toString())
+            put("noDataExec", noDataExec.toString())
+            put("isEmulator", isEmulator.toString())
+            put("supportedABIs", Arrays.toString(Build.SUPPORTED_ABIS))
         }
     }
 

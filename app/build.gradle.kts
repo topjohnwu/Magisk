@@ -114,6 +114,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
+    val vAppCenter = "4.4.3"
+    debugImplementation("com.microsoft.appcenter:appcenter-analytics:${vAppCenter}")
+    debugImplementation("com.microsoft.appcenter:appcenter-crashes:${vAppCenter}")
+
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
