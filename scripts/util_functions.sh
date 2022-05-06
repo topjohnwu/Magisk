@@ -624,6 +624,12 @@ run_migrations() {
 }
 
 copy_sepolicy_rules() {
+  # mount required partitions in recovery
+  if [ $BOOTMODE == false ]; then
+    mount /persist
+    mount /metadata
+  fi
+
   # Remove all existing rule folders
   rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
