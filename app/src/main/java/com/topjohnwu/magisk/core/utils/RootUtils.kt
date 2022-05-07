@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.core.content.getSystemService
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.ipc.RootService
@@ -105,7 +106,7 @@ class RootUtils(stub: Any?) : RootService() {
 
         fun await() {
             // We cannot await on the main thread
-            if (!ShellUtils.onMainThread())
+            if (Info.isRooted && !ShellUtils.onMainThread())
                 acquireSharedInterruptibly(1)
         }
     }
