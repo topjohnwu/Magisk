@@ -22,7 +22,11 @@ class RootUtils(stub: Any?) : RootService() {
     private lateinit var am: ActivityManager
 
     constructor() : this(null) {
-        Timber.plant(Timber.DebugTree())
+        Timber.plant(object : Timber.DebugTree() {
+            override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                super.log(priority, "Magisk", message, t)
+            }
+        })
     }
 
     override fun onCreate() {
