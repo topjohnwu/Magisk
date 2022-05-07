@@ -55,11 +55,16 @@ class SuperuserViewModel(
         state = State.LOADING
         val (policies, diff) = withContext(Dispatchers.IO) {
             db.deleteOutdated()
+            db.delete(AppContext.applicationInfo.uid)
             val policies = ArrayList<PolicyRvItem>()
             val pm = AppContext.packageManager
             for (policy in db.fetchAll()) {
-                val pkgs = pm.getPackagesForUid(policy.uid) ?: continue
-                policies.addAll(pkgs.mapNotNull { pkg ->
+                val pkgs = pm.getPackagesForUid(policy.uid)
+                if (pkgs == null) {
+                    db.delete(policy.uid)
+                    continue
+                }
+                val map = pkgs.mapNotNull { pkg ->
                     try {
                         val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES)
                         PolicyRvItem(
@@ -72,7 +77,12 @@ class SuperuserViewModel(
                     } catch (e: PackageManager.NameNotFoundException) {
                         null
                     }
-                })
+                }
+                if (map.isEmpty()) {
+                    db.delete(policy.uid)
+                    continue
+                }
+                policies.addAll(map)
             }
             policies.sortWith(compareBy(
                 { it.appName.lowercase(currentLocale) },
