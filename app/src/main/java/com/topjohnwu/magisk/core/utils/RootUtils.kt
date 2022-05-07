@@ -12,6 +12,7 @@ import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.FileSystemManager
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 class RootUtils(stub: Any?) : RootService() {
@@ -55,9 +56,14 @@ class RootUtils(stub: Any?) : RootService() {
             if (proc != null)
                 return proc
             // Find PPID
-            File("/proc/$pid/status").useLines {
-                val s = it.find { line -> line.startsWith("PPid:") }
-                pid = s?.substring(5)?.trim()?.toInt() ?: -1
+            try {
+                File("/proc/$pid/status").useLines {
+                    val line = it.find { l -> l.startsWith("PPid:") } ?: return null
+                    pid = line.substring(5).trim().toInt()
+                }
+            } catch (e: IOException) {
+                // The process died unexpectedly
+                return null
             }
         }
         return null

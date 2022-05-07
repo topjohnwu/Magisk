@@ -66,7 +66,11 @@ class SuRequestHandler(
             val fifo = intent.getStringExtra("fifo") ?: throw SuRequestError()
             val uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
             val pid = intent.getIntExtra("pid", -1)
-            pkgInfo = pm.getPackageInfo(uid, pid) ?: throw SuRequestError()
+            pkgInfo = pm.getPackageInfo(uid, pid) ?: PackageInfo().apply {
+                val name = pm.getNameForUid(uid) ?: throw SuRequestError()
+                // We only fill in sharedUserId and leave other fields uninitialized
+                sharedUserId = name.split(":")[0]
+            }
             output = DataOutputStream(FileOutputStream(fifo).buffered())
             policy = SuPolicy(uid)
             true

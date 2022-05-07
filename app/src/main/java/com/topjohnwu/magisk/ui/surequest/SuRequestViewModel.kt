@@ -110,11 +110,21 @@ class SuRequestViewModel(
     private fun showDialog() {
         val pm = handler.pm
         val info = handler.pkgInfo
-        val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
+        val app = info.applicationInfo
 
-        icon = info.applicationInfo.loadIcon(pm)
-        title = "$prefix${info.applicationInfo.getLabel(pm)}"
-        packageName = info.packageName
+        if (app == null) {
+            // The request is not coming from an app process, and the UID is a
+            // shared UID. We have no way to know where this request comes from.
+            icon = pm.defaultActivityIcon
+            title = "[SharedUID] ${info.sharedUserId}"
+            packageName = info.sharedUserId
+        } else {
+            val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
+            icon = app.loadIcon(pm)
+            title = "$prefix${app.getLabel(pm)}"
+            packageName = info.packageName
+        }
+
         selectedItemPosition = timeoutPrefs.getInt(packageName, 0)
 
         // Set timer
@@ -135,7 +145,7 @@ class SuRequestViewModel(
         timer.cancel()
 
         val pos = selectedItemPosition
-        timeoutPrefs.edit().putInt(handler.pkgInfo.packageName, pos).apply()
+        timeoutPrefs.edit().putInt(packageName, pos).apply()
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])
