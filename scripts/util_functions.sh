@@ -624,12 +624,6 @@ run_migrations() {
 }
 
 copy_sepolicy_rules() {
-  # mount required partitions in recovery
-  if [ "$BOOTMODE" != true ]; then
-    mount /persist
-    mount /metadata
-  fi
-
   # Remove all existing rule folders
   rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
@@ -725,6 +719,12 @@ install_module() {
   cd $TMPDIR
 
   setup_flashable
+  if ! $BOOTMODE; then
+  # Mounting things in recovery (best effort)
+    mount_name metadata /metadata
+    mount_name "cache cac" /cache
+    mount_name persist /persist
+  fi
   mount_partitions
   api_level_arch_detect
 
