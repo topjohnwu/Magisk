@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.system.Os
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.superuser.Shell
@@ -13,7 +14,6 @@ import com.topjohnwu.superuser.ipc.RootService
 import com.topjohnwu.superuser.nio.FileSystemManager
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.locks.AbstractQueuedSynchronizer
 
 class RootUtils(stub: Any?) : RootService() {
@@ -44,6 +44,7 @@ class RootUtils(stub: Any?) : RootService() {
         return try {
             block()
         } catch (e: Throwable) {
+            // The process died unexpectedly
             Timber.e(e)
             default
         }
@@ -56,15 +57,19 @@ class RootUtils(stub: Any?) : RootService() {
             val proc = procList.find { it.pid == pid }
             if (proc != null)
                 return proc
+
+            // Stop find when root process
+            if (Os.stat("/proc/$pid").st_uid == 0) {
+                val info = ActivityManager.RunningAppProcessInfo()
+                info.uid = 0
+                info.pid = pid
+                return info
+            }
+
             // Find PPID
-            try {
-                File("/proc/$pid/status").useLines {
-                    val line = it.find { l -> l.startsWith("PPid:") } ?: return null
-                    pid = line.substring(5).trim().toInt()
-                }
-            } catch (e: IOException) {
-                // The process died unexpectedly
-                return null
+            File("/proc/$pid/status").useLines {
+                val line = it.find { l -> l.startsWith("PPid:") } ?: return null
+                pid = line.substring(5).trim().toInt()
             }
         }
         return null
