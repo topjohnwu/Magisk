@@ -269,20 +269,27 @@ fun getProperty(key: String, def: String): String {
 fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
     val flag = PackageManager.MATCH_UNINSTALLED_PACKAGES
     val pkgs = getPackagesForUid(uid) ?: throw PackageManager.NameNotFoundException()
-    return if (pkgs.size > 1) {
-        if (pid <= 0)
+    if (pkgs.size > 1) {
+        if (pid <= 0) {
             return null
+        }
         // Try to find package name from PID
         val proc = RootUtils.obj?.getAppProcess(pid)
-            ?: return if (uid == Process.SHELL_UID) {
+        if (proc == null) {
+            if (uid == Process.SHELL_UID) {
                 // It is possible that some apps installed are sharing UID with shell.
                 // We will not be able to find a package from the active process list,
                 // because the client is forked from ADB shell, not any app process.
-                getPackageInfo("com.android.shell", flag)
-            } else null
-        val pkg = proc.pkgList[0]
-        getPackageInfo(pkg, flag)
-    } else {
-        getPackageInfo(pkgs[0], flag)
+                return getPackageInfo("com.android.shell", flag)
+            }
+        } else if (uid == proc.uid) {
+            return getPackageInfo(proc.pkgList[0], flag)
+        }
+
+        return null
     }
+    if (pkgs.size == 1) {
+        return getPackageInfo(pkgs[0], flag)
+    }
+    throw PackageManager.NameNotFoundException()
 }
