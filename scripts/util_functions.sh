@@ -296,10 +296,10 @@ mount_partitions() {
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
 
-  # Mounting things in recovery (best effort)
+  # Mount sepolicy rules dir locations in recovery (best effort)
   if ! $BOOTMODE; then
-    mount_name metadata /metadata
     mount_name "cache cac" /cache
+    mount_name metadata /metadata
     mount_name persist /persist
   fi
 }
