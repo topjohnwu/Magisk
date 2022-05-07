@@ -40,12 +40,6 @@ is_mounted /data || mount /data || abort "! Unable to mount /data, please uninst
 mount_partitions
 check_data
 $DATA_DE || abort "! Cannot access /data, please uninstall with the Magisk app"
-if ! $BOOTMODE; then
-  # Mounting stuffs in recovery (best effort)
-  mount_name metadata /metadata
-  mount_name "cache cac" /cache
-  mount_name persist /persist
-fi
 get_flags
 find_boot_image
 
