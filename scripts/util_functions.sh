@@ -295,6 +295,13 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
+
+  # Mounting things in recovery (best effort)
+  if ! $BOOTMODE; then
+    mount_name metadata /metadata
+    mount_name "cache cac" /cache
+    mount_name persist /persist
+  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -719,12 +726,6 @@ install_module() {
   cd $TMPDIR
 
   setup_flashable
-  if ! $BOOTMODE; then
-  # Mounting things in recovery (best effort)
-    mount_name metadata /metadata
-    mount_name "cache cac" /cache
-    mount_name persist /persist
-  fi
   mount_partitions
   api_level_arch_detect
 
