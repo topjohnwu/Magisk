@@ -1,22 +1,26 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.events.SelectModuleEvent
+import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.parcelize.Parcelize
 import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class ModuleViewModel : BaseViewModel() {
@@ -29,6 +33,8 @@ class ModuleViewModel : BaseViewModel() {
     val itemBinding = itemBindingOf<RvItem> {
         it.bindExtra(BR.viewModel, this)
     }
+
+    val data get() = uri
 
     init {
         if (Info.env.isActive) {
@@ -70,6 +76,18 @@ class ModuleViewModel : BaseViewModel() {
             SnackbarEvent(R.string.no_connection).publish()
         }
 
-    fun installPressed() = withExternalRW { SelectModuleEvent().publish() }
+    fun installPressed() = withExternalRW {
+        GetContentEvent("application/zip", UriCallback()).publish()
+    }
 
+    @Parcelize
+    class UriCallback : ContentResultCallback {
+        override fun onActivityResult(result: Uri) {
+            uri.value = result
+        }
+    }
+
+    companion object {
+        private val uri = MutableLiveData<Uri?>()
+    }
 }

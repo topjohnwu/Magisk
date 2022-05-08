@@ -53,7 +53,8 @@ class FlashViewModel : BaseViewModel() {
         viewModelScope.launch {
             val result = when (action) {
                 Const.Value.FLASH_ZIP -> {
-                    FlashZip(uri!!, outItems, logItems).exec()
+                    uri ?: return@launch
+                    FlashZip(uri, outItems, logItems).exec()
                 }
                 Const.Value.UNINSTALL -> {
                     showReboot = false

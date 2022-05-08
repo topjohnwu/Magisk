@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.arch
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
+import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
@@ -57,6 +58,9 @@ abstract class BaseViewModel(
     init {
         isConnected.addOnPropertyChangedCallback(refreshCallback)
     }
+
+    open fun onSaveState(state: Bundle) {}
+    open fun onRestoreState(state: Bundle) {}
 
     /** This should probably never be called manually, it's called manually via delegate. */
     @Synchronized
