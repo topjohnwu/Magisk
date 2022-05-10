@@ -60,10 +60,7 @@ class RootUtils(stub: Any?) : RootService() {
 
             // Stop find when root process
             if (Os.stat("/proc/$pid").st_uid == 0) {
-                val info = ActivityManager.RunningAppProcessInfo()
-                info.uid = 0
-                info.pid = pid
-                return info
+                return null
             }
 
             // Find PPID
