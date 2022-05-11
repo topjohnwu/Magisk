@@ -152,7 +152,6 @@ void exec_module_scripts(const char *stage, const vector<string_view> &modules) 
 
 constexpr char install_script[] = R"EOF(
 APK=%s
-log -t Magisk "apk_uninstall: $(pm uninstall %s 2>&1)"
 log -t Magisk "apk_install: $APK"
 log -t Magisk "apk_install: $(pm install -r $APK 2>&1)"
 rm -f $APK
@@ -164,7 +163,7 @@ void install_apk(const char *apk) {
         .fork = fork_no_orphan
     };
     char cmds[sizeof(install_script) + 4096];
-    sprintf(cmds, install_script, apk, JAVA_PACKAGE_NAME);
+    sprintf(cmds, install_script, apk);
     exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 

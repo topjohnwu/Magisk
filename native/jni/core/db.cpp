@@ -6,7 +6,6 @@
 #include <db.hpp>
 #include <socket.hpp>
 #include <utils.hpp>
-#include <mincrypt/sha256.h>
 
 #define DB_VERSION 12
 
@@ -360,89 +359,43 @@ int get_db_strings(db_strings &str, int key) {
     return 0;
 }
 
-static bool is_stub_trusted(const char *pkg, const char *trust_hash) {
-    // TODO: Remove when next stable released
-    if (trust_hash[0] == 0) {
-        LOGW("su: skip check stub.apk signature\n");
-        return true;
-    }
-
-    string cert = read_certificate(find_apk_path(pkg));
-    if (cert.empty())
-        return false;
-    uint8_t hash[SHA256_DIGEST_SIZE];
-    SHA256_hash(cert.data(), cert.length(), hash);
-    char hash_hex[SHA256_DIGEST_SIZE * 2 + 1];
-    char *ptr = &hash_hex[0];
-    for (uint8_t i: hash) {
-        ptr += sprintf(ptr, "%02x", i);
-    }
-    return strcmp(trust_hash, hash_hex) == 0;
-}
-
 bool get_manager(int user_id, std::string *pkg, struct stat *st) {
     db_strings str;
     get_db_strings(str, SU_MANAGER);
-    get_db_strings(str, CERT_DIGEST);
     char app_path[128];
-
-    if (APKCERT.empty())
-        LOGW("su: skip check app signature\n");
 
     if (!str[SU_MANAGER].empty()) {
         // App is repackaged
         sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, user_id, str[SU_MANAGER].data());
         if (stat(app_path, st) == 0) {
-            if (is_stub_trusted(str[SU_MANAGER].data(), str[CERT_DIGEST].data())) {
-                strcpy(app_path, "/dyn/current.apk");
-                if (!APKCERT.empty() && access(app_path, F_OK) == 0) {
-                    if (read_certificate(app_path) == APKCERT) {
-                        if (pkg)
-                            pkg->swap(str[SU_MANAGER]);
-                        return true;
-                    } else {
-                        LOGW("su: current.apk signature mismatch\n");
-                    }
-                } else {
-                    if (pkg)
-                        pkg->swap(str[SU_MANAGER]);
-                    return true;
-                }
-            } else {
-                LOGW("su: stub.apk signature mismatch\n");
-            }
+            if (pkg)
+                pkg->swap(str[SU_MANAGER]);
+            return true;
         }
     }
 
     // Check the official package name
     sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, user_id);
     if (stat(app_path, st) == 0) {
-        string cert = read_certificate(find_apk_path(JAVA_PACKAGE_NAME));
-        if (APKCERT.empty())
-            cert.clear();
-        if (cert == APKCERT) {
-            if (pkg)
-                *pkg = JAVA_PACKAGE_NAME;
-            return true;
-        } else {
-            LOGW("su: app signature mismatch\n");
-        }
+        if (pkg)
+            *pkg = JAVA_PACKAGE_NAME;
+        return true;
+    } else {
+        LOGE("su: cannot find manager\n");
+        memset(st, 0, sizeof(*st));
+        if (pkg)
+            pkg->clear();
+        return false;
     }
-
-    LOGE("su: cannot find trusted app\n");
-    memset(st, 0, sizeof(*st));
-    if (pkg)
-        pkg->clear();
-    return false;
 }
 
 bool get_manager(string *pkg) {
-    struct stat st{};
+    struct stat st;
     return get_manager(0, pkg, &st);
 }
 
 int get_manager_app_id() {
-    struct stat st{};
+    struct stat st;
     if (get_manager(0, nullptr, &st))
         return to_app_id(st.st_uid);
     return -1;

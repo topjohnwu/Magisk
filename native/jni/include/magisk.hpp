@@ -35,7 +35,6 @@ constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 
 extern int SDK_INT;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
-extern std::string APKCERT;
 
 // Multi-call entrypoints
 int magisk_main(int argc, char *argv[]);
