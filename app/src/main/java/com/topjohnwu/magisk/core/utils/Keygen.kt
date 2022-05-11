@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.KeyPairGenerator
 import java.security.KeyStore
-import java.security.MessageDigest
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
 import java.util.*
@@ -73,9 +72,6 @@ class Keygen : CertKeyProvider {
             ks.store(it, PASSWORD)
         }
         Config.keyStoreRaw = bytes.toString("UTF-8")
-
-        val digest = MessageDigest.getInstance("SHA-256").digest(cert.encoded)
-        Config.certDigest = digest.joinToString("") { "%02x".format(it) }
 
         return ks
     }
