@@ -2,7 +2,7 @@
 #include <sys/sysmacros.h>
 #include <libgen.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 #include <magisk.hpp>
 

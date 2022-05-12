@@ -10,7 +10,7 @@
 #include <zopfli/util.h>
 #include <zopfli/deflate.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "magiskboot.hpp"
 #include "compress.hpp"

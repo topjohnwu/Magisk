@@ -15,7 +15,7 @@
 
 #include <magisk.hpp>
 #include <daemon.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <flags.h>
 
 #include "su.hpp"

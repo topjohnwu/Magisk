@@ -2,7 +2,7 @@
 #include <android/log.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <stream.hpp>
 

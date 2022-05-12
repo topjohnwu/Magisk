@@ -7,7 +7,7 @@
 
 #include <daemon.hpp>
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 #include <db.hpp>
 

@@ -3,7 +3,7 @@
 #include <sys/wait.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 #include <daemon.hpp>
 

@@ -1,9 +1,9 @@
 // This file implements all missing symbols that should exist in normal API 21
 // libc.a but missing in our extremely lean libc.a replacements.
 
-#include <cstdlib>
-#include <cstring>
-#include <cerrno>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <mntent.h>
 #include <unistd.h>
 #include <fcntl.h>

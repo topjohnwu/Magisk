@@ -4,7 +4,7 @@
 #include <sys/mount.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
 #include <db.hpp>

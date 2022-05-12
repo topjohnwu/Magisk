@@ -4,14 +4,14 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <logging.hpp>
-
 #undef _FORTIFY_SOURCE
+
+extern int __vloge(const char* fmt, va_list ap);
 
 static inline __noreturn __printflike(1, 2) void __fortify_fatal(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    log_cb.e(fmt, args);
+    __vloge(fmt, args);
     va_end(args);
     abort();
 }

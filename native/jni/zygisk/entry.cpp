@@ -4,7 +4,7 @@
 #include <android/log.h>
 #include <android/dlext.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <magisk.hpp>
 #include <db.hpp>

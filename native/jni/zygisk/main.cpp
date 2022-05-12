@@ -3,7 +3,7 @@
 #include <dlfcn.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <socket.hpp>
 #include <daemon.hpp>
 

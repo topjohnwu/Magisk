@@ -2,7 +2,7 @@
 #include <libgen.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "init.hpp"
 #include "magiskrc.inc"

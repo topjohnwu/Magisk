@@ -1,6 +1,6 @@
 #include <sys/mman.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "magiskboot.hpp"
 

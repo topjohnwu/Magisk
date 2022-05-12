@@ -9,7 +9,7 @@ ifdef B_MAGISK
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk
 LOCAL_STATIC_LIBRARIES := \
-    libutils \
+    libbase \
     libnanopb \
     libsystemproperties \
     libphmap \
@@ -23,6 +23,7 @@ LOCAL_SRC_FILES := \
     core/bootstages.cpp \
     core/socket.cpp \
     core/db.cpp \
+    core/cert.cpp \
     core/scripting.cpp \
     core/restorecon.cpp \
     core/module.cpp \
@@ -33,7 +34,6 @@ LOCAL_SRC_FILES := \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
-    su/cert.cpp \
     su/su_daemon.cpp \
     zygisk/entry.cpp \
     zygisk/main.cpp \
@@ -64,7 +64,8 @@ ifdef B_INIT
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := \
-    libutilx \
+    libbase \
+    libcompat \
     libpolicy \
     libxz
 
@@ -86,7 +87,8 @@ ifdef B_BOOT
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := \
-    libutilx \
+    libbase \
+    libcompat \
     libmincrypt \
     liblzma \
     liblz4 \
@@ -96,15 +98,15 @@ LOCAL_STATIC_LIBRARIES := \
     libzopfli
 
 LOCAL_SRC_FILES := \
-    magiskboot/main.cpp \
-    magiskboot/bootimg.cpp \
-    magiskboot/hexpatch.cpp \
-    magiskboot/compress.cpp \
-    magiskboot/format.cpp \
-    magiskboot/dtb.cpp \
-    magiskboot/ramdisk.cpp \
-    magiskboot/pattern.cpp \
-    magiskboot/cpio.cpp
+    boot/main.cpp \
+    boot/bootimg.cpp \
+    boot/hexpatch.cpp \
+    boot/compress.cpp \
+    boot/format.cpp \
+    boot/dtb.cpp \
+    boot/ramdisk.cpp \
+    boot/pattern.cpp \
+    boot/cpio.cpp
 
 LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
@@ -116,10 +118,11 @@ ifdef B_POLICY
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskpolicy
 LOCAL_STATIC_LIBRARIES := \
-    libutils \
+    libbase \
+    libbase \
     libpolicy
 
-LOCAL_SRC_FILES := magiskpolicy/main.cpp
+LOCAL_SRC_FILES := sepolicy/main.cpp
 
 include $(BUILD_EXECUTABLE)
 
@@ -130,7 +133,8 @@ ifdef B_PROP
 include $(CLEAR_VARS)
 LOCAL_MODULE := resetprop
 LOCAL_STATIC_LIBRARIES := \
-    libutilx \
+    libbase \
+    libcompat \
     libnanopb \
     libsystemproperties
 
@@ -151,7 +155,7 @@ ifneq (,$(wildcard jni/test.cpp))
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
 LOCAL_STATIC_LIBRARIES := \
-    libutils \
+    libbase \
     libphmap
 
 LOCAL_SRC_FILES := test.cpp
@@ -167,19 +171,19 @@ endif
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libpolicy
 LOCAL_STATIC_LIBRARIES := \
-    libutils \
+    libbase \
     libsepol
-LOCAL_C_INCLUDES := jni/magiskpolicy jni/magiskpolicy/include
-LOCAL_EXPORT_C_INCLUDES := jni/magiskpolicy/include
+LOCAL_C_INCLUDES := jni/sepolicy/include
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
-    magiskpolicy/api.cpp \
-    magiskpolicy/sepolicy.cpp \
-    magiskpolicy/rules.cpp \
-    magiskpolicy/policydb.cpp \
-    magiskpolicy/statement.cpp
+    sepolicy/api.cpp \
+    sepolicy/sepolicy.cpp \
+    sepolicy/rules.cpp \
+    sepolicy/policydb.cpp \
+    sepolicy/statement.cpp
 include $(BUILD_STATIC_LIBRARY)
 
-include jni/utils/Android.mk
+include jni/base/Android.mk
 include jni/external/Android.mk
 
 ifdef B_BB

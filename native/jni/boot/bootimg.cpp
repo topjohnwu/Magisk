@@ -4,7 +4,7 @@
 #include <libfdt.h>
 #include <mincrypt/sha.h>
 #include <mincrypt/sha256.h>
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "bootimg.hpp"
 #include "magiskboot.hpp"

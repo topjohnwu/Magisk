@@ -5,7 +5,7 @@
 #include <magisk.hpp>
 #include <db.hpp>
 #include <socket.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 #define DB_VERSION 12
 

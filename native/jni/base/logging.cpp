@@ -55,3 +55,8 @@ void LOGD(const char *fmt, ...) {}
 void LOGI(const char *fmt, ...) { LOG_BODY(i) }
 void LOGW(const char *fmt, ...) { LOG_BODY(w) }
 void LOGE(const char *fmt, ...) { LOG_BODY(e); log_cb.ex(EXIT_FAILURE); }
+
+// Export raw symbol to fortify compat
+extern "C" int __vloge(const char* fmt, va_list ap) {
+    return log_cb.e(fmt, ap);
+}

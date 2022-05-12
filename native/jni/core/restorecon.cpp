@@ -2,7 +2,7 @@
 
 #include <magisk.hpp>
 #include <selinux.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 using namespace std;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-// libse internal APIs, do not use directly
+// Internal APIs, do not use directly
 
 #include <sepol/policydb/policydb.h>
 #include <sepolicy.hpp>

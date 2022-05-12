@@ -3,7 +3,7 @@
 #include <map>
 #include <libfdt.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "magiskboot.hpp"
 #include "dtb.hpp"

@@ -8,7 +8,7 @@
 
 #include <magisk.hpp>
 #include <db.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <resetprop.hpp>
 #include <selinux.hpp>

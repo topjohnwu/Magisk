@@ -5,7 +5,7 @@
 
 #include <cil/cil.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <stream.hpp>
 
 #include "policy.hpp"
