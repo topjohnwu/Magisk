@@ -62,6 +62,7 @@ void magisk_cpio::patch() {
 #define MAGISK_PATCHED    (1 << 0)
 #define UNSUPPORTED_CPIO  (1 << 1)
 #define SONY_INIT         (1 << 2)
+#define UNKNOWN_CPIO      (1 << 3)
 
 int magisk_cpio::test() {
     int ret = 0;
@@ -223,8 +224,8 @@ int cpio_commands(int argc, char *argv[]) {
     --argc;
 
     magisk_cpio cpio;
-    if (access(incpio, R_OK) == 0)
-        cpio.load_cpio(incpio);
+    if (access(incpio, R_OK) == 0 && !cpio.load_cpio(incpio))
+        exit(UNKNOWN_CPIO);
 
     int cmdc;
     char *cmdv[6];

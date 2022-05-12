@@ -30,7 +30,7 @@ public:
     };
     using entry_map = std::map<std::string, std::unique_ptr<cpio_entry>, StringCmp>;
 
-    void load_cpio(const char *file);
+    bool load_cpio(const char *file);
     void dump(const char *file);
     void rm(const char *name, bool r = false);
     void extract();
@@ -51,5 +51,5 @@ protected:
 private:
     void dump(FILE *out);
     void insert(std::string_view name, cpio_entry *e);
-    void load_cpio(const char *buf, size_t sz);
+    bool load_cpio(const char *buf, size_t sz);
 };

@@ -114,7 +114,7 @@ else
   # Stock A only system-as-root
   STATUS=0
 fi
-case $((STATUS & 3)) in
+case $((STATUS & 11)) in
   0 )  # Stock boot
     ui_print "- Stock boot image detected"
     SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
@@ -132,6 +132,9 @@ case $((STATUS & 3)) in
   2 )  # Unsupported
     ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore back to stock boot image"
+    ;;
+  8 )  # Unknown format
+    abort "! Unsupported/Unknown ramdisk cpio format"
     ;;
 esac
 

@@ -150,10 +150,10 @@ void cpio::dump(FILE *out) {
     fclose(out);
 }
 
-void cpio::load_cpio(const char *file) {
+bool cpio::load_cpio(const char *file) {
     fprintf(stderr, "Loading cpio: [%s]\n", file);
     auto m = mmap_data(file);
-    load_cpio(reinterpret_cast<char *>(m.buf), m.sz);
+    return load_cpio(reinterpret_cast<char *>(m.buf), m.sz);
 }
 
 void cpio::insert(string_view name, cpio_entry *e) {
@@ -207,12 +207,15 @@ bool cpio::mv(const char *from, const char *to) {
 
 #define pos_align(p) p = align_to(p, 4)
 
-void cpio::load_cpio(const char *buf, size_t sz) {
+bool cpio::load_cpio(const char *buf, size_t sz) {
     size_t pos = 0;
     while (pos < sz) {
         auto hdr = reinterpret_cast<const cpio_newc_header *>(buf + pos);
-        if (memcmp(hdr->magic, "070701", 6) != 0)
-            LOGE("bad cpio header\n");
+        if (memcmp(hdr->magic, "070701", 6) != 0) {
+            // Do not use LOGE() here as it will immediately exit with EXIT_FAILURE
+            LOGW("bad cpio header\n");
+            return false;
+        }
         pos += sizeof(cpio_newc_header);
         string_view name(buf + pos);
         pos += x8u(hdr->namesize);
@@ -235,4 +238,5 @@ void cpio::load_cpio(const char *buf, size_t sz) {
         insert(name, entry);
         pos_align(pos);
     }
+    return true;
 }
