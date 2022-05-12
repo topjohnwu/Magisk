@@ -17,7 +17,15 @@ void FirstStageInit::prepare() {
     cp_afc("/init" /* magiskinit */, REDIR_PATH);
 
     unlink("/init");
-    xrename(backup_init(), "/init");
+    const char *orig_init = backup_init();
+    if (access(orig_init, F_OK) == 0) {
+        xrename(orig_init, "/init");
+    } else {
+        // If the backup init is missing, this means that the boot ramdisk
+        // was created from scratch, and the real init is in a separate CPIO,
+        // which is guaranteed to be placed at /system/bin/init.
+        xsymlink(INIT_PATH, "/init");
+    }
 
     {
         auto init = mmap_data("/init", true);

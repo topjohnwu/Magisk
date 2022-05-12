@@ -111,7 +111,7 @@ if [ -e ramdisk.cpio ]; then
   ./magiskboot cpio ramdisk.cpio test
   STATUS=$?
 else
-  # Stock A only system-as-root
+  # Stock A only legacy SAR, or some Android 13 GKIs
   STATUS=0
 fi
 case $((STATUS & 3)) in
