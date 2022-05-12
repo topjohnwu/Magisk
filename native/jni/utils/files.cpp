@@ -1,10 +1,7 @@
 #include <sys/sendfile.h>
 #include <linux/fs.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
-#include <string.h>
 #include <libgen.h>
 
 #include <utils.hpp>
@@ -57,12 +54,12 @@ static void post_order_walk(int dirfd, const Func &fn) {
     }
 }
 
-enum visit_result {
-    CONTINUE, SKIP, TERMINATE
+enum walk_result {
+    CONTINUE, SKIP, ABORT
 };
 
 template <typename Func>
-static visit_result pre_order_walk(int dirfd, const Func &fn) {
+static walk_result pre_order_walk(int dirfd, const Func &fn) {
     auto dir = xopen_dir(dirfd);
     if (!dir) {
         close(dirfd);
@@ -71,16 +68,17 @@ static visit_result pre_order_walk(int dirfd, const Func &fn) {
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         switch (fn(dirfd, entry)) {
-            case CONTINUE:
-                break;
-            case SKIP:
-                continue;
-            case TERMINATE:
-                return TERMINATE;
+        case CONTINUE:
+            break;
+        case SKIP:
+            continue;
+        case ABORT:
+            return ABORT;
         }
         if (entry->d_type == DT_DIR) {
             int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-            if (pre_order_walk(fd, fn) == TERMINATE) return TERMINATE;
+            if (pre_order_walk(fd, fn) == ABORT)
+                return ABORT;
         }
     }
     return CONTINUE;
@@ -419,7 +417,7 @@ void backup_folder(const char *dir, vector<raw_file> &files) {
     char path[PATH_MAX];
     xrealpath(dir, path);
     int len = strlen(path);
-    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> visit_result {
+    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         int fd = xopenat(dfd, entry->d_name, O_RDONLY);
         if (fd < 0)
             return SKIP;
@@ -526,96 +524,17 @@ mmap_data::mmap_data(const char *name, bool rw) {
 
 string find_apk_path(const char *pkg) {
     char buf[PATH_MAX];
-    pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> visit_result {
+    pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         if (entry->d_type != DT_DIR)
             return SKIP;
         size_t len = strlen(pkg);
         if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
             fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
-            return TERMINATE;
+            return ABORT;
         } else if (strncmp(entry->d_name, "~~", 2) == 0) {
             return CONTINUE;
         } else return SKIP;
     });
     string path(buf);
     return path.append("/base.apk");
-}
-
-string read_certificate(string app_path) {
-    string certificate;
-    uint32_t size4;
-    uint64_t size8, size_of_block;
-
-    int fd = xopen(app_path.data(), O_RDONLY);
-    if (fd < 0) {
-        return certificate;
-    }
-    run_finally f([&] { close(fd); });
-
-    for (int i = 0;; i++) {
-        unsigned short n;
-        lseek(fd, -i - 2, SEEK_END);
-        read(fd, &n, 2);
-        if (n == i) {
-            lseek(fd, -22, SEEK_CUR);
-            read(fd, &size4, 4);
-            if (size4 == 0x6054b50u) { // central directory end magic
-                break;
-            }
-        }
-        if (i == 0xffff) {
-            return certificate;
-        }
-    }
-
-    lseek(fd, 12, SEEK_CUR);
-
-    read(fd, &size4, 0x4);
-    lseek(fd, (off_t) (size4 - 0x18), SEEK_SET);
-
-    read(fd, &size8, 0x8);
-    unsigned char buffer[0x10] = {0};
-    read(fd, buffer, 0x10);
-    if (memcmp(buffer, "APK Sig Block 42", 0x10) != 0) {
-        return certificate;
-    }
-
-    lseek(fd, (off_t) (size4 - (size8 + 0x8)), SEEK_SET);
-    read(fd, &size_of_block, 0x8);
-    if (size_of_block != size8) {
-        return certificate;
-    }
-
-    for (;;) {
-        uint32_t id;
-        uint32_t offset;
-        read(fd, &size8, 0x8); // sequence length
-        if (size8 == size_of_block) {
-            break;
-        }
-        read(fd, &id, 0x4); // id
-        offset = 4;
-
-        if (id == 0x7109871au) {
-            read(fd, &size4, 0x4); // signer-sequence length
-            read(fd, &size4, 0x4); // signer length
-            read(fd, &size4, 0x4); // signed data length
-            offset += 0x4 * 3;
-
-            read(fd, &size4, 0x4); // digests-sequence length
-            lseek(fd, (off_t) (size4), SEEK_CUR);// skip digests
-            offset += 0x4 + size4;
-
-            read(fd, &size4, 0x4); // certificates length
-            read(fd, &size4, 0x4); // certificate length
-            offset += 0x4 * 2;
-
-            certificate.resize(size4);
-            read(fd, certificate.data(), size4);
-
-            offset += size4;
-        }
-        lseek(fd, (off_t) (size8 - offset), SEEK_CUR);
-    }
-    return certificate;
 }

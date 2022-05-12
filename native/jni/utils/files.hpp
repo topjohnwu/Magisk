@@ -101,9 +101,7 @@ void clone_dir(int src, int dest);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 void backup_folder(const char *dir, std::vector<raw_file> &files);
 void restore_folder(const char *dir, std::vector<raw_file> &files);
-
 std::string find_apk_path(const char *pkg);
-std::string read_certificate(std::string app_path);
 
 template <typename T>
 void full_read(const char *filename, T &buf, size_t &size) {
