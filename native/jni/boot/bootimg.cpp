@@ -423,16 +423,16 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             flags[LG_BUMP_FLAG] = true;
         }
 
-        // Find AVB structures
-        void *meta = memmem(tail, tail_size, AVB_MAGIC, AVB_MAGIC_LEN);
-        if (meta) {
-            // Double check if footer exists
-            void *footer = tail + tail_size - sizeof(AvbFooter);
-            if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
+        // Find AVB footer
+        void *footer = tail + tail_size - sizeof(AvbFooter);
+        if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
+            avb_footer = reinterpret_cast<AvbFooter*>(footer);
+            // Double check if meta header exists
+            void *meta = hdr_addr + __builtin_bswap64(avb_footer->vbmeta_offset);
+            if (BUFFER_MATCH(meta, AVB_MAGIC)) {
                 fprintf(stderr, "VBMETA\n");
                 flags[AVB_FLAG] = true;
-                avb_meta = reinterpret_cast<AvbVBMetaImageHeader*>(meta);
-                avb_footer = reinterpret_cast<AvbFooter*>(footer);
+                vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(meta);
             }
         }
     }
@@ -466,9 +466,11 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 
     // Dump kernel
     if (!skip_decomp && COMPRESSED(boot.k_fmt)) {
-        int fd = creat(KERNEL_FILE, 0644);
-        decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
-        close(fd);
+        if (boot.hdr->kernel_size() != 0) {
+            int fd = creat(KERNEL_FILE, 0644);
+            decompress(boot.k_fmt, fd, boot.kernel, boot.hdr->kernel_size());
+            close(fd);
+        }
     } else {
         dump(boot.kernel, boot.hdr->kernel_size(), KERNEL_FILE);
     }
@@ -478,9 +480,11 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 
     // Dump ramdisk
     if (!skip_decomp && COMPRESSED(boot.r_fmt)) {
-        int fd = creat(RAMDISK_FILE, 0644);
-        decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
-        close(fd);
+        if (boot.hdr->ramdisk_size() != 0) {
+            int fd = creat(RAMDISK_FILE, 0644);
+            decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
+            close(fd);
+        }
     } else {
         dump(boot.ramdisk, boot.hdr->ramdisk_size(), RAMDISK_FILE);
     }
@@ -490,9 +494,11 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 
     // Dump extra
     if (!skip_decomp && COMPRESSED(boot.e_fmt)) {
-        int fd = creat(EXTRA_FILE, 0644);
-        decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
-        close(fd);
+        if (boot.hdr->extra_size() != 0) {
+            int fd = creat(EXTRA_FILE, 0644);
+            decompress(boot.e_fmt, fd, boot.extra, boot.hdr->extra_size());
+            close(fd);
+        }
     } else {
         dump(boot.extra, boot.hdr->extra_size(), EXTRA_FILE);
     }
@@ -682,7 +688,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         file_align_with(4096);
         off.vbmeta = lseek(fd, 0, SEEK_CUR);
         uint64_t vbmeta_size = __builtin_bswap64(boot.avb_footer->vbmeta_size);
-        xwrite(fd, boot.avb_meta, vbmeta_size);
+        xwrite(fd, boot.vbmeta, vbmeta_size);
     }
 
     // Pad image to original size if not chromeos (as it requires post processing)

@@ -608,7 +608,7 @@ struct boot_img {
 
     // AVB structs
     AvbFooter *avb_footer;
-    AvbVBMetaImageHeader *avb_meta;
+    AvbVBMetaImageHeader *vbmeta;
 
     // Pointers to blocks defined in header
     uint8_t *hdr_addr;
