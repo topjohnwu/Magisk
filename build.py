@@ -275,8 +275,8 @@ def write_if_diff(file_name, text):
             f.write(text)
 
 
-def dump_bin_header():
-    stub = op.join(config['outdir'], 'stub-release.apk')
+def dump_bin_header(args):
+    stub = op.join(config['outdir'], f'stub-{"release" if args.release else "debug"}.apk')
     if not op.exists(stub):
         error('Build stub APK before building "magiskinit"')
     mkdir_p(native_gen_path)
@@ -353,7 +353,7 @@ def build_binary(args):
     flag = ''
 
     if 'magiskinit' in args.target:
-        dump_bin_header()
+        dump_bin_header(args)
         flag += ' B_INIT=1'
 
     if 'resetprop' in args.target:
@@ -370,7 +370,7 @@ def build_binary(args):
 
 
 def build_apk(args, module):
-    build_type = 'Release' if args.release or module == 'stub' else 'Debug'
+    build_type = 'Release' if args.release else 'Debug'
 
     proc = execv([gradlew, f'{module}:assemble{build_type}',
                   '-PconfigPath=' + op.abspath(args.config)])

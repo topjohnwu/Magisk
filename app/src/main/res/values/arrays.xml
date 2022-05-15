@@ -65,6 +65,7 @@
         <item>@string/settings_update_beta</item>
         <item>@string/settings_update_custom</item>
         <item>Canary</item>
+        <item>Debug</item>
     </string-array>
 
 </resources>

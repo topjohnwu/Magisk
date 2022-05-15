@@ -4,6 +4,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Config.Value.BETA_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CANARY_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.CUSTOM_CHANNEL
+import com.topjohnwu.magisk.core.Config.Value.DEBUG_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
@@ -24,12 +25,12 @@ class NetworkService(
             DEFAULT_CHANNEL, STABLE_CHANNEL -> fetchStableUpdate()
             BETA_CHANNEL -> fetchBetaUpdate()
             CANARY_CHANNEL -> fetchCanaryUpdate()
+            DEBUG_CHANNEL -> fetchDebugUpdate()
             CUSTOM_CHANNEL -> fetchCustomUpdate(Config.customChannelUrl)
             else -> throw IllegalArgumentException()
         }
         if (info.magisk.versionCode < Info.env.versionCode &&
-            Config.updateChannel == DEFAULT_CHANNEL
-        ) {
+            Config.updateChannel == DEFAULT_CHANNEL) {
             Config.updateChannel = BETA_CHANNEL
             info = fetchBetaUpdate()
         }
@@ -40,6 +41,7 @@ class NetworkService(
     private suspend fun fetchStableUpdate() = pages.fetchUpdateJSON("stable.json")
     private suspend fun fetchBetaUpdate() = pages.fetchUpdateJSON("beta.json")
     private suspend fun fetchCanaryUpdate() = pages.fetchUpdateJSON("canary.json")
+    private suspend fun fetchDebugUpdate() = pages.fetchUpdateJSON("debug.json")
     private suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
 
     private inline fun <T> safe(factory: () -> T): T? {

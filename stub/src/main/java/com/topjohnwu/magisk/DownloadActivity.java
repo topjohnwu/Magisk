@@ -40,7 +40,9 @@ import io.michaelrocks.paranoid.Obfuscate;
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
-    private static final String CANARY_URL = "https://topjohnwu.github.io/magisk-files/canary.json";
+    private static final String JSON_URL = BuildConfig.DEBUG ?
+            "https://topjohnwu.github.io/magisk-files/debug.json" :
+            "https://topjohnwu.github.io/magisk-files/canary.json";
 
     private String apkLink = BuildConfig.APK_URL;
     private Context themed;
@@ -105,7 +107,7 @@ public class DownloadActivity extends Activity {
 
     private void fetchCanary() {
         dialog = ProgressDialog.show(themed, "", "", true);
-        request(CANARY_URL).getAsJSONObject(json -> {
+        request(JSON_URL).getAsJSONObject(json -> {
             dialog.dismiss();
             try {
                 apkLink = json.getJSONObject("magisk").getString("link");

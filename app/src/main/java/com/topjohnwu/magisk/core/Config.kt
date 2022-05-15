@@ -70,6 +70,7 @@ object Config : PreferenceModel, DBConfig {
         const val BETA_CHANNEL = 1
         const val CUSTOM_CHANNEL = 2
         const val CANARY_CHANNEL = 3
+        const val DEBUG_CHANNEL = 4
 
         // root access mode
         const val ROOT_ACCESS_DISABLED = 0
@@ -106,6 +107,8 @@ object Config : PreferenceModel, DBConfig {
 
     private val defaultChannel =
         if (BuildConfig.DEBUG)
+            Value.DEBUG_CHANNEL
+        else if (Const.APP_IS_CANARY)
             Value.CANARY_CHANNEL
         else
             Value.DEFAULT_CHANNEL
