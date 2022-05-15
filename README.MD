@@ -20,7 +20,8 @@ Some highlight features:
 
 [![](https://img.shields.io/badge/Magisk-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
 [![](https://img.shields.io/badge/Magisk%20Beta-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-release.apk)
+[![](https://img.shields.io/badge/Magisk-Debug-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -30,7 +31,7 @@ Some highlight features:
 
 ## Bug Reports
 
-**Only bug reports from Canary builds will be accepted.**
+**Only bug reports from Debug builds will be accepted.**
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
