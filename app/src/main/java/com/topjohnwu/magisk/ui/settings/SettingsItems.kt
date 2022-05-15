@@ -167,7 +167,7 @@ object UpdateChannel : BaseSettingsItem.Selector() {
     override val entryRes = R.array.update_channel
     override fun entries(res: Resources): Array<String> {
         return super.entries(res).let {
-            if (!BuildConfig.DEBUG)
+            if (!Const.APP_IS_CANARY && !BuildConfig.DEBUG)
                 it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
             else it
         }
