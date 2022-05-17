@@ -172,10 +172,11 @@ object Config : PreferenceModel, DBConfig {
                 suBiometric = true
             remove(SU_FINGERPRINT)
             prefs.getString(Key.UPDATE_CHANNEL, null).also {
-                if (it == null)
+                if (it == null ||
+                    it.toInt() > Value.DEBUG_CHANNEL ||
+                    it.toInt() < Value.DEFAULT_CHANNEL) {
                     putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-                else if (it.toInt() > Value.CANARY_CHANNEL)
-                    putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
+                }
             }
         }
     }
