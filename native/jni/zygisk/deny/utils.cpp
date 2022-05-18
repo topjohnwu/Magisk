@@ -53,10 +53,6 @@ static void rescan_apps() {
                 struct stat st{};
                 xfstatat(dfd, entry->d_name, &st, 0);
                 int app_id = to_app_id(st.st_uid);
-                if (app_id_to_pkgs.contains(app_id)) {
-                    // This app ID has been handled
-                    continue;
-                }
                 if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
                     app_id_to_pkgs[app_id].insert(it->first);
                 }
