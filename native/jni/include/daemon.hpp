@@ -9,6 +9,10 @@
 
 #include <socket.hpp>
 
+#define AID_APP_START 10000
+#define AID_APP_END 19999
+#define AID_USER_OFFSET 100000
+
 // Daemon command codes
 namespace MainRequest {
 enum : int {
@@ -80,6 +84,11 @@ void boot_complete(int client);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
+
+// Package
+bool need_pkg_refresh();
+std::vector<bool> get_app_no_list();
+int get_manager(int user_id = 0, std::string *pkg = nullptr);
 
 // Denylist
 void initialize_denylist();

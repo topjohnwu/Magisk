@@ -20,7 +20,7 @@ static pthread_mutex_t cache_lock = PTHREAD_MUTEX_INITIALIZER;
 static shared_ptr<su_info> cached;
 
 su_info::su_info(int uid) :
-uid(uid), eval_uid(-1), access(DEFAULT_SU_ACCESS), mgr_st{},
+uid(uid), eval_uid(-1), access(DEFAULT_SU_ACCESS), mgr_uid(-1),
 timestamp(0), _lock(PTHREAD_MUTEX_INITIALIZER) {}
 
 su_info::~su_info() {
@@ -82,7 +82,7 @@ void su_info::check_db() {
 
     // We need to check our manager
     if (access.log || access.notify)
-        get_manager(to_user_id(eval_uid), &mgr_pkg, &mgr_st);
+        mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg);
 }
 
 bool uid_granted_root(int uid) {
@@ -137,6 +137,32 @@ bool uid_granted_root(int uid) {
     return granted;
 }
 
+static void prune_su_access() {
+    vector<bool> app_no_list = get_app_no_list();
+    vector<int> rm_uids;
+    char query[256], *err;
+    strlcpy(query, "SELECT uid FROM policies", sizeof(query));
+    err = db_exec(query, [&](db_row &row) -> bool {
+        int uid = parse_int(row["uid"]);
+        int app_id = to_app_id(uid);
+        if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
+            int app_no = app_id - AID_APP_START;
+            if (app_no >= app_no_list.size() || !app_no_list[app_no]) {
+                // The app_id is no longer installed
+                rm_uids.push_back(uid);
+            }
+        }
+        return true;
+    });
+    db_err_cmd(err, return);
+
+    for (int uid : rm_uids) {
+        snprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
+        // Don't care about errors
+        db_exec(query);
+    }
+}
+
 static shared_ptr<su_info> get_su_info(unsigned uid) {
     LOGD("su: request from uid=[%d]\n", uid);
 
@@ -144,6 +170,10 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
     {
         mutex_guard lock(cache_lock);
+        if (need_pkg_refresh()) {
+            cached.reset();
+            prune_su_access();
+        }
         if (!cached || cached->uid != uid || !cached->is_fresh())
             cached = make_shared<su_info>(uid);
         cached->refresh();
@@ -157,7 +187,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         info->check_db();
 
         // If it's root or the manager, allow it silently
-        if (info->uid == UID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_st.st_uid)) {
+        if (info->uid == UID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
             info->access = SILENT_SU_ACCESS;
             return info;
         }
@@ -189,7 +219,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
             return info;
 
         // If still not determined, check if manager exists
-        if (info->mgr_pkg.empty()) {
+        if (info->mgr_uid < 0) {
             info->access = NO_SU_ACCESS;
             return info;
         }

@@ -23,6 +23,7 @@ LOCAL_SRC_FILES := \
     core/bootstages.cpp \
     core/socket.cpp \
     core/db.cpp \
+    core/package.cpp \
     core/cert.cpp \
     core/scripting.cpp \
     core/restorecon.cpp \

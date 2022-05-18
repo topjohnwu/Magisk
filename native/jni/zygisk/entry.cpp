@@ -7,7 +7,6 @@
 #include <base.hpp>
 #include <daemon.hpp>
 #include <magisk.hpp>
-#include <db.hpp>
 
 #include "zygisk.hpp"
 #include "module.hpp"
@@ -313,8 +312,6 @@ static void magiskd_passthrough(int client) {
     send_fd(client, is_64_bit ? app_process_64 : app_process_32);
 }
 
-atomic<int> cached_manager_app_id = -1;
-
 extern bool uid_granted_root(int uid);
 static void get_process_info(int client, const sock_cred *cred) {
     int uid = read_int(client);
@@ -322,19 +319,10 @@ static void get_process_info(int client, const sock_cred *cred) {
 
     uint32_t flags = 0;
 
-    // This function is called on every single zygote process specialization,
-    // so performance is critical. get_manager_app_id() is expensive as it goes
-    // through a SQLite query and potentially multiple filesystem stats, so we
-    // really want to cache its app ID value.
-
     if (is_deny_target(uid, process)) {
         flags |= PROCESS_ON_DENYLIST;
     }
-    int manager_app_id = cached_manager_app_id;
-    if (manager_app_id < 0) {
-        manager_app_id = get_manager_app_id();
-        cached_manager_app_id = manager_app_id;
-    }
+    int manager_app_id = get_manager();
     if (to_app_id(uid) == manager_app_id) {
         flags |= PROCESS_IS_MAGISK_APP;
     }

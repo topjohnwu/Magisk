@@ -23,7 +23,7 @@ public:
     db_settings cfg;
     su_access access;
     std::string mgr_pkg;
-    struct stat mgr_st;
+    int mgr_uid;
     void check_db();
 
     // These should be guarded with global cache lock

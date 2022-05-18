@@ -32,23 +32,13 @@ atomic<bool> denylist_enforced = false;
 
 #define do_kill (zygisk_enabled && denylist_enforced)
 
-static unsigned long long pkg_xml_ino = 0;
-
 static void rescan_apps() {
-    {
-        struct stat st{};
-        stat("/data/system/packages.xml", &st);
-        if (pkg_xml_ino == st.st_ino) {
-            // Packages has not changed, do not rescan
-            return;
-        }
-        pkg_xml_ino = st.st_ino;
-    }
+    if (!need_pkg_refresh())
+        return;
 
     LOGD("denylist: rescanning apps\n");
 
     app_id_to_pkgs.clear();
-    cached_manager_app_id = -1;
 
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)

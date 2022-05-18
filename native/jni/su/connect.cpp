@@ -205,7 +205,7 @@ int app_request(const su_context &ctx) {
     strcpy(fifo, "/dev/socket/");
     gen_rand_str(fifo + 12, 32, true);
     mkfifo(fifo, 0600);
-    chown(fifo, ctx.info->mgr_st.st_uid, ctx.info->mgr_st.st_gid);
+    chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
     setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
     // Send request

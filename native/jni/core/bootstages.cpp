@@ -128,7 +128,7 @@ static bool magisk_env() {
     unlink(stub_path.data());
 
     string pkg;
-    get_manager(&pkg);
+    get_manager(0, &pkg);
 
     sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
@@ -376,7 +376,7 @@ void boot_complete(int client) {
         xmkdir(SECURE_DIR, 0700);
 
     if (stub_fd > 0) {
-        if (!get_manager()) {
+        if (get_manager() < 0) {
             // Install stub
             struct stat st{};
             fstat(stub_fd, &st);
