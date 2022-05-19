@@ -359,6 +359,14 @@ int get_db_strings(db_strings &str, int key) {
     return 0;
 }
 
+void rm_db_strings(int key) {
+    char *err;
+    char query[128];
+    snprintf(query, sizeof(query), "DELETE FROM strings WHERE key == '%s'", DB_STRING_KEYS[key]);
+    err = db_exec(query);
+    db_err_cmd(err, return);
+}
+
 void exec_sql(int client) {
     run_finally f([=]{ close(client); });
     string sql = read_string(client);

@@ -62,7 +62,7 @@ vector<bool> get_app_no_list() {
     return list;
 }
 
-int get_manager(int user_id, std::string *pkg) {
+int get_manager(int user_id, string *pkg) {
     mutex_guard g(pkg_lock);
 
     char app_path[128];
@@ -73,42 +73,103 @@ int get_manager(int user_id, std::string *pkg) {
     int app_id = mgr_app_id;
     if (app_id > 0) {
         // Just need to check whether the app is installed in the user
-        snprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, mgr_pkg->data());
+        const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
+        snprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
         if (access(app_path, F_OK) == 0) {
-            if (pkg) *pkg = *mgr_pkg;
+            if (pkg) *pkg = name;
             return user_id * AID_USER_OFFSET + app_id;
         } else {
             goto not_found;
         }
     } else {
+        // Here, we want to actually find the manager app and cache the results.
+        // This means that we check all users, not just the requested user.
+        // We also do a validation on whether the repackaged APK is still installed.
+
         db_strings str;
         get_db_strings(str, SU_MANAGER);
 
-        if (!str[SU_MANAGER].empty()) {
-            // App is repackaged
-            snprintf(app_path, sizeof(app_path),
-                     "%s/%d/%s", APP_DATA_DIR, user_id, str[SU_MANAGER].data());
-            if (stat(app_path, &st) == 0) {
-                mgr_pkg->swap(str[SU_MANAGER]);
+        vector<int> users;
+        bool collected = false;
+
+        auto collect_users = [&] {
+            if (collected)
+                return;
+            collected = true;
+            auto data_dir = xopen_dir(APP_DATA_DIR);
+            if (!data_dir)
+                return;
+            dirent *entry;
+            while ((entry = xreaddir(data_dir.get()))) {
+                // Only collect users not requested as we've already checked it
+                if (int u = parse_int(entry->d_name); u >= 0 && u != user_id)
+                    users.push_back(parse_int(entry->d_name));
             }
-        } else {
-            // Check the original package name
-            snprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, user_id);
+        };
+
+        if (!str[SU_MANAGER].empty()) {
+            // Check the repackaged package name
+
+            auto check_pkg = [&](int u) -> bool {
+                snprintf(app_path, sizeof(app_path),
+                         "%s/%d/%s", APP_DATA_DIR, u, str[SU_MANAGER].data());
+                if (stat(app_path, &st) == 0) {
+                    mgr_pkg->swap(str[SU_MANAGER]);
+                    mgr_app_id = to_app_id(st.st_uid);
+                    return true;
+                }
+                return false;
+            };
+
+            if (check_pkg(user_id)) {
+                if (pkg) *pkg = *mgr_pkg;
+                return st.st_uid;
+            }
+            collect_users();
+            for (int u : users) {
+                if (check_pkg(u)) {
+                    // Found repackaged app, but not installed in the requested user
+                    goto not_found;
+                }
+            }
+
+            // Repackaged app not found, remove package from db
+            rm_db_strings(SU_MANAGER);
+
+            // Fallthrough
+        }
+
+        // Check the original package name
+
+        auto check_pkg = [&](int u) -> bool {
+            snprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
-                *mgr_pkg = JAVA_PACKAGE_NAME;
-            } else {
+                mgr_pkg->clear();
+                mgr_app_id = to_app_id(st.st_uid);
+                return true;
+            }
+            return false;
+        };
+
+        if (check_pkg(user_id)) {
+            if (pkg) *pkg = JAVA_PACKAGE_NAME;
+            return st.st_uid;
+        }
+        collect_users();
+        for (int u : users) {
+            if (check_pkg(u)) {
+                // Found app, but not installed in the requested user
                 goto not_found;
             }
         }
+
+        // No manager app is found, clear all cached value
+        mgr_app_id = -1;
+        mgr_pkg->clear();
     }
 
-    mgr_app_id = to_app_id(st.st_uid);
-    if (pkg) *pkg = *mgr_pkg;
-    return st.st_uid;
-
 not_found:
-    LOGE("su: cannot find manager\n");
-    if (pkg)
-        pkg->clear();
+    LOGE("su: cannot find manager for user=[%d]\n", user_id);
+    if (pkg) pkg->clear();
     return -1;
 }
