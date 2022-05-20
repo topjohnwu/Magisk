@@ -12,6 +12,7 @@ import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.Closeable
 import java.io.DataOutputStream
 import java.io.FileOutputStream
 import java.io.IOException
@@ -20,10 +21,11 @@ import java.util.concurrent.TimeUnit
 class SuRequestHandler(
     val pm: PackageManager,
     private val policyDB: PolicyDao
-) {
+) : Closeable {
 
     private lateinit var output: DataOutputStream
-    private lateinit var policy: SuPolicy
+    lateinit var policy: SuPolicy
+        private set
     lateinit var pkgInfo: PackageInfo
         private set
 
@@ -52,36 +54,35 @@ class SuRequestHandler(
         return true
     }
 
-    private fun close() {
+    override fun close() {
         if (::output.isInitialized)
             runCatching { output.close() }
     }
 
+    private class SuRequestError : IOException()
+
     private suspend fun init(intent: Intent) = withContext(Dispatchers.IO) {
         try {
-            val fifo = intent.getStringExtra("fifo") ?: throw IOException("fifo == null")
-            output = DataOutputStream(FileOutputStream(fifo))
-            val uid = intent.getIntExtra("uid", -1)
-            if (uid <= 0) {
-                throw IOException("uid == $uid")
-            }
-            policy = SuPolicy(uid)
+            val fifo = intent.getStringExtra("fifo") ?: throw SuRequestError()
+            val uid = intent.getIntExtra("uid", -1).also { if (it < 0) throw SuRequestError() }
             val pid = intent.getIntExtra("pid", -1)
-            try {
-                pkgInfo = pm.getPackageInfo(uid, pid) ?: PackageInfo().apply {
-                    val name = pm.getNameForUid(uid) ?: throw PackageManager.NameNotFoundException()
-                    // We only fill in sharedUserId and leave other fields uninitialized
-                    sharedUserId = name.split(":")[0]
-                }
-                return@withContext true
-            } catch (e: PackageManager.NameNotFoundException) {
-                respond(SuPolicy.DENY, -1)
-                return@withContext false
+            pkgInfo = pm.getPackageInfo(uid, pid) ?: PackageInfo().apply {
+                val name = pm.getNameForUid(uid) ?: throw SuRequestError()
+                // We only fill in sharedUserId and leave other fields uninitialized
+                sharedUserId = name.split(":")[0]
             }
-        } catch (e: IOException) {
-            Timber.e(e)
-            close()
-            return@withContext false
+            output = DataOutputStream(FileOutputStream(fifo).buffered())
+            policy = SuPolicy(uid)
+            true
+        } catch (e: Exception) {
+            when (e) {
+                is IOException, is PackageManager.NameNotFoundException -> {
+                    Timber.e(e)
+                    close()
+                    false
+                }
+                else -> throw e  // Unexpected error
+            }
         }
     }
 
