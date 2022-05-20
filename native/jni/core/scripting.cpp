@@ -163,7 +163,22 @@ void install_apk(const char *apk) {
         .fork = fork_no_orphan
     };
     char cmds[sizeof(install_script) + 4096];
-    sprintf(cmds, install_script, apk);
+    snprintf(cmds, sizeof(cmds), install_script, apk);
+    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+}
+
+constexpr char uninstall_script[] = R"EOF(
+PKG=%s
+log -t Magisk "apk_uninstall: $PKG"
+log -t Magisk "apk_uninstall: $(pm uninstall $PKG 2>&1)"
+)EOF";
+
+void uninstall_pkg(const char *pkg) {
+    exec_t exec {
+        .fork = fork_no_orphan
+    };
+    char cmds[sizeof(uninstall_script) + 256];
+    snprintf(cmds, sizeof(cmds), uninstall_script, pkg);
     exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 

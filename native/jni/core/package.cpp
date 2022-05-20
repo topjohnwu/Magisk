@@ -2,6 +2,7 @@
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <db.hpp>
+#include <flags.h>
 
 #include "core.hpp"
 
@@ -18,7 +19,9 @@ static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
 static int mgr_app_id = -1;
 static string *mgr_pkg;
+static string *mgr_cert;
 static int stub_apk_fd = -1;
+static const string *default_cert;
 
 bool need_pkg_refresh() {
     struct stat st{};
@@ -70,6 +73,8 @@ void preserve_stub_apk() {
     string stub_path = MAGISKTMP + "/stub.apk";
     stub_apk_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
     unlink(stub_path.data());
+    default_cert = new string(read_certificate(stub_apk_fd));
+    lseek(stub_apk_fd, 0, SEEK_SET);
 }
 
 static void install_stub() {
@@ -92,6 +97,8 @@ int get_manager(int user_id, string *pkg, bool install) {
     struct stat st{};
     if (mgr_pkg == nullptr)
         default_new(mgr_pkg);
+    if (mgr_cert == nullptr)
+        default_new(mgr_cert);
 
     if (skip_check.test_and_set()) {
         if (mgr_app_id < 0) {
@@ -109,7 +116,7 @@ int get_manager(int user_id, string *pkg, bool install) {
     } else {
         // Here, we want to actually find the manager app and cache the results.
         // This means that we check all users, not just the requested user.
-        // We also do a validation on whether the repackaged APK is still installed.
+        // Certificates are also verified to prevent manipulation.
 
         db_strings str;
         get_db_strings(str, SU_MANAGER);
@@ -135,12 +142,32 @@ int get_manager(int user_id, string *pkg, bool install) {
         if (!str[SU_MANAGER].empty()) {
             // Check the repackaged package name
 
+            bool invalid = false;
             auto check_pkg = [&](int u) -> bool {
                 snprintf(app_path, sizeof(app_path),
                          "%s/%d/%s", APP_DATA_DIR, u, str[SU_MANAGER].data());
                 if (stat(app_path, &st) == 0) {
+                    int app_id = to_app_id(st.st_uid);
+
+                    string apk = find_apk_path(str[SU_MANAGER].data());
+                    int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+                    string cert = read_certificate(fd);
+                    close(fd);
+
+                    // Verify validity
+                    if (str[SU_MANAGER] == *mgr_pkg) {
+                        if (app_id != mgr_app_id || cert != *mgr_cert) {
+                            // app ID or cert should never change
+                            LOGE("pkg: repackaged APK signature invalid: %s\n", apk.data());
+                            uninstall_pkg(mgr_pkg->data());
+                            invalid = true;
+                            return false;
+                        }
+                    }
+
                     mgr_pkg->swap(str[SU_MANAGER]);
-                    mgr_app_id = to_app_id(st.st_uid);
+                    mgr_app_id = app_id;
+                    mgr_cert->swap(cert);
                     return true;
                 }
                 return false;
@@ -150,11 +177,15 @@ int get_manager(int user_id, string *pkg, bool install) {
                 if (pkg) *pkg = *mgr_pkg;
                 return st.st_uid;
             }
-            collect_users();
-            for (int u : users) {
-                if (check_pkg(u)) {
-                    // Found repackaged app, but not installed in the requested user
-                    goto not_found;
+            if (!invalid) {
+                collect_users();
+                for (int u : users) {
+                    if (check_pkg(u)) {
+                        // Found repackaged app, but not installed in the requested user
+                        goto not_found;
+                    }
+                    if (invalid)
+                        break;
                 }
             }
 
@@ -166,10 +197,28 @@ int get_manager(int user_id, string *pkg, bool install) {
 
         // Check the original package name
 
+        bool invalid = false;
         auto check_pkg = [&](int u) -> bool {
             snprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
+                string apk = find_apk_path(JAVA_PACKAGE_NAME);
+                int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+                string cert = read_certificate(fd);
+                close(fd);
+
+                if (default_cert && cert != *default_cert) {
+                    // Found APK with invalid signature, force replace with stub
+                    LOGE("pkg: APK signature mismatch: %s\n", apk.data());
+#if !MAGISK_DEBUG
+                    uninstall_pkg(JAVA_PACKAGE_NAME);
+                    invalid = true;
+                    install = true;
+                    return false;
+#endif
+                }
+
                 mgr_pkg->clear();
+                mgr_cert->clear();
                 mgr_app_id = to_app_id(st.st_uid);
                 return true;
             }
@@ -180,23 +229,28 @@ int get_manager(int user_id, string *pkg, bool install) {
             if (pkg) *pkg = JAVA_PACKAGE_NAME;
             return st.st_uid;
         }
-        collect_users();
-        for (int u : users) {
-            if (check_pkg(u)) {
-                // Found app, but not installed in the requested user
-                goto not_found;
+        if (!invalid) {
+            collect_users();
+            for (int u : users) {
+                if (check_pkg(u)) {
+                    // Found app, but not installed in the requested user
+                    goto not_found;
+                }
+                if (invalid)
+                    break;
             }
         }
-
-        // No manager app is found, clear all cached value
-        mgr_app_id = -1;
-        mgr_pkg->clear();
-        if (install)
-            install_stub();
     }
 
+    // No manager app is found, clear all cached value
+    mgr_app_id = -1;
+    mgr_pkg->clear();
+    mgr_cert->clear();
+    if (install)
+        install_stub();
+
 not_found:
-    LOGE("su: cannot find manager for user=[%d]\n", user_id);
+    LOGW("pkg: cannot find manager for user=[%d]\n", user_id);
     if (pkg) pkg->clear();
     return -1;
 }
