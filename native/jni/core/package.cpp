@@ -3,6 +3,8 @@
 #include <daemon.hpp>
 #include <db.hpp>
 
+#include "core.hpp"
+
 using namespace std;
 
 // These functions will be called on every single zygote process specialization and su request,
@@ -10,11 +12,13 @@ using namespace std;
 // or simply skipped unless necessary.
 
 static atomic<ino_t> pkg_xml_ino = 0;
+static atomic_flag skip_check;
 
-// pkg_lock protects mgr_app_id and mgr_pkg
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
+// pkg_lock protects all following variables
 static int mgr_app_id = -1;
 static string *mgr_pkg;
+static int stub_apk_fd = -1;
 
 bool need_pkg_refresh() {
     struct stat st{};
@@ -24,8 +28,7 @@ bool need_pkg_refresh() {
         // Packages have not changed
         return false;
     } else {
-        mutex_guard g(pkg_lock);
-        mgr_app_id = -1;
+        skip_check.clear();
         return true;
     }
 }
@@ -62,7 +65,27 @@ vector<bool> get_app_no_list() {
     return list;
 }
 
-int get_manager(int user_id, string *pkg) {
+void preserve_stub_apk() {
+    mutex_guard g(pkg_lock);
+    string stub_path = MAGISKTMP + "/stub.apk";
+    stub_apk_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
+    unlink(stub_path.data());
+}
+
+static void install_stub() {
+    if (stub_apk_fd < 0)
+        return;
+    struct stat st{};
+    fstat(stub_apk_fd, &st);
+    char apk[] = "/data/stub.apk";
+    int dfd = xopen(apk, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
+    xsendfile(dfd, stub_apk_fd, nullptr, st.st_size);
+    lseek(stub_apk_fd, 0, SEEK_SET);
+    close(dfd);
+    install_apk(apk);
+}
+
+int get_manager(int user_id, string *pkg, bool install) {
     mutex_guard g(pkg_lock);
 
     char app_path[128];
@@ -70,14 +93,16 @@ int get_manager(int user_id, string *pkg) {
     if (mgr_pkg == nullptr)
         default_new(mgr_pkg);
 
-    int app_id = mgr_app_id;
-    if (app_id > 0) {
+    if (skip_check.test_and_set()) {
+        if (mgr_app_id < 0) {
+            goto not_found;
+        }
         // Just need to check whether the app is installed in the user
         const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
         snprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
         if (access(app_path, F_OK) == 0) {
             if (pkg) *pkg = name;
-            return user_id * AID_USER_OFFSET + app_id;
+            return user_id * AID_USER_OFFSET + mgr_app_id;
         } else {
             goto not_found;
         }
@@ -166,6 +191,8 @@ int get_manager(int user_id, string *pkg) {
         // No manager app is found, clear all cached value
         mgr_app_id = -1;
         mgr_pkg->clear();
+        if (install)
+            install_stub();
     }
 
 not_found:

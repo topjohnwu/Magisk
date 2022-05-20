@@ -139,6 +139,8 @@ ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
+./magiskinit -x manager $MAGISKTMP/stub.apk
+
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block
 touch $MAGISKTMP/.magisk/config

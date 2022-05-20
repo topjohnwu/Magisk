@@ -445,8 +445,8 @@ def setup_ndk(args):
 
 def setup_avd(args):
     if not args.skip:
-        build_binary(args)
-        build_app(args)
+        args.release = False
+        build_all(args)
 
     header('* Setting up emulator')
 
@@ -463,8 +463,8 @@ def setup_avd(args):
 
 def patch_avd_ramdisk(args):
     if not args.skip:
-        build_binary(args)
-        build_app(args)
+        args.release = False
+        build_all(args)
 
     header('* Patching emulator ramdisk.img')
 

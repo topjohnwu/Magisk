@@ -18,7 +18,6 @@
 using namespace std;
 
 static bool safe_mode = false;
-static int stub_fd = -1;
 bool zygisk_enabled = false;
 
 /*********
@@ -123,10 +122,7 @@ static bool magisk_env() {
 
     LOGI("* Initializing Magisk environment\n");
 
-    string stub_path = MAGISKTMP + "/stub.apk";
-    stub_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
-    unlink(stub_path.data());
-
+    preserve_stub_apk();
     string pkg;
     get_manager(0, &pkg);
 
@@ -375,18 +371,6 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    if (stub_fd > 0) {
-        if (get_manager() < 0) {
-            // Install stub
-            struct stat st{};
-            fstat(stub_fd, &st);
-            char apk[] = "/data/stub.apk";
-            int dfd = xopen(apk, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
-            xsendfile(dfd, stub_fd, nullptr, st.st_size);
-            close(dfd);
-            install_apk(apk);
-        }
-        close(stub_fd);
-        stub_fd = -1;
-    }
+    // Ensure manager exists
+    get_manager(0, nullptr, true);
 }

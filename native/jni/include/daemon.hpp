@@ -86,9 +86,10 @@ void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
 
 // Package
+void preserve_stub_apk();
 bool need_pkg_refresh();
 std::vector<bool> get_app_no_list();
-int get_manager(int user_id = 0, std::string *pkg = nullptr);
+int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
 
 // Denylist
 void initialize_denylist();
