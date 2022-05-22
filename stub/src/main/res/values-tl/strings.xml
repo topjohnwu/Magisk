@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Mag-upgrade sa buong Magisk upang matapos ang setup. I-download at i-install?</string>
+    <string name="no_internet_msg">Mangyaring kumonekta sa Internet! Kailangang mag-upgrade sa buong Magisk.</string>
+    <string name="dling">Nagda-download</string>
+    <string name="relaunch_app">Mangyaring buksan muli ang app</string>
+</resources>
