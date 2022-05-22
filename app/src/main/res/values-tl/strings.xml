@@ -183,18 +183,13 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Oo</string>
     <string name="no">Hindi</string>
-    <string name="repo_install_title">Install %1$s %2$s(%3$d)</string>
     <string name="download">I-download</string>
-    <string name="reboot">Reboot</string>
-    <string name="release_notes">Release notes</string>
-    <string name="flashing">Flashing…</string>
+    <string name="flashing">Fina-flash…</string>
     <string name="done">Tapos na!</string>
     <string name="failure">Pumalpak!</string>
     <string name="hide_app_title">Itinatago ang Magisk app…</string>
     <string name="open_link_failed_toast">Walang app na nakita para buksan ang link</string>
     <string name="complete_uninstall">Kumpletong Uninstall</string>
-    <string name="restore_img">Restore Images</string>
-    <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Natapos ang restoration!</string>
     <string name="restore_fail">Walang stock backup!</string>
     <string name="setup_fail">Pumalpak ang setup</string>
