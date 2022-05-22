@@ -1,0 +1,221 @@
+<resources>
+
+    <!--Sections-->
+    <string name="modules">Mga modyul</string>
+    <string name="superuser">Superuser</string>
+    <string name="logs">Mga log</string>
+    <string name="settings">Mga setting</string>
+    <string name="section_theme">Mga tema</string>
+    <string name="denylist">TanggiListahan</string>
+
+    <!--Home-->
+    <string name="no_connection">Walang available na koneksyon</string>
+    <string name="app_changelog">Listahan ng mga pagbabago</string>
+    <string name="loading">Ikinakarga…</string>
+    <string name="update">Mag-Update</string>
+    <string name="hide">Itago</string>
+
+    <string name="home_notice_content">Sa opisyal na pahina lamang sa GitHub i-download ang Magisk. Maaaring mapanganib ang mga file mula sa ibang mapagkukunan!</string>
+    <string name="home_support_title">Tulungan Kami</string>
+    <string name="home_support_content">Open source ang Magisk. Gayunpaman, maaari mo kaming tulungan sa pamamagitan ng pagbibigay ng donasyon.</string>
+    <string name="home_installed_version">Naka-install</string>
+    <string name="home_latest_version">Pinakabago</string>
+    <string name="invalid_update_channel">Maling Update Channel</string>
+    <string name="uninstall_magisk_title">I-uninstall ang Magisk</string>
+    <string name="uninstall_magisk_msg">Madi-disable/matatanggal ang lahat ng iyong modyul!\nMawawala ang root!\nMare-reencrypt ang internal storage na na-unencrypt sa pamamagitan ng Magisk!</string>
+
+    <!--Install-->
+    <string name="keep_force_encryption">Panatilihin ang sapilitang pag-encrypt</string>
+    <string name="keep_dm_verity">Panatilihin ang AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Tapalan ang vbmeta sa boot image</string>
+    <string name="install_options_title">Mga opsyon</string>
+    <string name="install_method_title">Paraan</string>
+    <string name="install_next">Susunod</string>
+    <string name="install_start">Tara na</string>
+    <string name="manager_download_install">Pindutin para i-download at i-install</string>
+    <string name="direct_install">Direktang Install (Pinakamainam)</string>
+    <string name="install_inactive_slot">I-install sa Inactive Slot (Pagkatapos ng OTA)</string>
+    <string name="install_inactive_slot_msg">Mapipilitan kang mag-boot sa susunod sa kasalukuyang inactive slot!\nGamitin lang ito pagkatapos ng OTA.\nTumuloy?</string>
+    <string name="setup_title">Karagdagang Setup</string>
+    <string name="select_patch_file">Piliin at Tapalan ang File</string>
+    <string name="patch_file_msg">Pumili ng raw image (*.img) o ODIN tarfile (*.tar)</string>
+    <string name="reboot_delay_toast">Magre-reboot sa 5 segundo…</string>
+
+    <!--Superuser-->
+    <string name="su_request_title">Hiling para sa Superuser</string>
+    <string name="touch_filtered_warning">Hindi maberipika ng Magisk ang hiling para sa Superuser dahil may app na humaharang dito</string>
+    <string name="deny">Tanggihan</string>
+    <string name="prompt">Tanungin</string>
+    <string name="grant">Payagan</string>
+    <string name="su_warning">Nagbibigay ng full access sa iyong device.\Tanggihan kung hindi ka sigurado!</string>
+    <string name="forever">Magpakailanman</string>
+    <string name="once">Isang beses lang</string>
+    <string name="tenmin">10 min</string>
+    <string name="twentymin">20 min</string>
+    <string name="thirtymin">30 min</string>
+    <string name="sixtymin">60 min</string>
+    <string name="su_allow_toast">Binigyan ng kapangyarihan ng Superuser ang %1$s</string>
+    <string name="su_deny_toast">Hindi binigyan ng kapangyarihan sa Superuser ang %1$s</string>
+    <string name="su_snack_grant">Nabigyan ng kapangyarihan ng Superuser ang %1$s</string>
+    <string name="su_snack_deny">Hindi nabigyan ng kapangyarihan sa Superuser ang %1$s</string>
+    <string name="su_snack_notif_on">Naka-enable ang notifications ng %1$s</string>
+    <string name="su_snack_notif_off">Naka-disable ang notifications ng %1$s</string>
+    <string name="su_snack_log_on">Na-enable ang logs ng %1$s</string>
+    <string name="su_snack_log_off">Na-disable ang notifications ng %1$s</string>
+    <string name="su_revoke_title">Tanggihan?</string>
+    <string name="su_revoke_msg">Kumpirmahin para matanggal ang mga kakayahan bilang Superuser ng %1$s</string>
+    <string name="toast">Toast</string>
+    <string name="none">Wala</string>
+
+    <string name="superuser_toggle_notification">Mga notipikasyon</string>
+    <string name="superuser_toggle_revoke">Tanggihan</string>
+    <string name="superuser_policy_none">Wala pang app na humiling ng kapangyarihan ng Superuser.</string>
+
+    <!--Logs-->
+    <string name="log_data_none">Wala kang logs, wala ka rin bang jowa? Yan po kasi ang assessment ko.</string>
+    <string name="log_data_magisk_none">Walang logs ang Magisk</string>
+    <string name="menuSaveLog">I-save ang log</string>
+    <string name="menuClearLog">Burahin ang log</string>
+    <string name="logs_cleared">Matagumpay na nabura ang logs</string>
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
+
+    <!--SafetyNet-->
+
+    <!--MagiskHide-->
+    <string name="show_system_app">Ipakita ang mga system app</string>
+    <string name="show_os_app">Ipakita ang mga OS app</string>
+    <string name="hide_filter_hint">I-filter sa pangalan</string>
+    <string name="hide_search">Maghanap</string>
+
+    <!--Module-->
+    <string name="no_info_provided">(Walang ibinigay na info)</string>
+    <string name="reboot_userspace">Soft reboot</string>
+    <string name="reboot_recovery">Mag-reboot tungong Recovery</string>
+    <string name="reboot_bootloader">Mag-reboot tungong Bootloader</string>
+    <string name="reboot_download">Mag-reboot tungong Download</string>
+    <string name="reboot_edl">Mag-reboot tungong EDL</string>
+    <string name="module_version_author">%1$s ni/ng %2$s</string>
+    <string name="module_state_remove">Tanggalin</string>
+    <string name="module_state_restore">Ibalik</string>
+    <string name="module_action_install_external">Mag-install mula sa storage</string>
+    <string name="update_available">May available na update</string>
+    <string name="suspend_text_riru">Nakasuspinde ang modyul sapagkat naka-enable ang %1$s</string>
+    <string name="suspend_text_zygisk">Nakasuspinde ang modyul sapagkat hindi naka-enable ang %1$s</string>
+    <string name="zygisk_module_unloaded">Hindi na-load ang Zygisk module dahil sa incompatibility</string>
+
+    <!--Settings-->
+    <string name="settings_dark_mode_title">Mode ng Tema</string>
+    <string name="settings_dark_mode_message">Piliin ang mode na pinakagusto mo!</string>
+    <string name="settings_dark_mode_light">Palaging Maliwanag</string>
+    <string name="settings_dark_mode_system">Sundin ang System</string>
+    <string name="settings_dark_mode_dark">Palaging Madilim</string>
+    <string name="settings_download_path_message">Ise-save ang file sa %1$s</string>
+    <string name="settings_hide_app_title">Itago ang Magisk app</string>
+    <string name="settings_hide_app_summary">Mag-install ng proxy app na may random package ID at custom app label</string>
+    <string name="settings_restore_app_title">Ibalik ang Magisk app</string>
+    <string name="settings_restore_app_summary">Ibalik ang Magisk at gamitin ang orihinal na APK</string>
+    <string name="language">Wika</string>
+    <string name="system_default">(Default ng System)</string>
+    <string name="settings_check_update_title">Tumingin ng mga Update</string>
+    <string name="settings_check_update_summary">Paminsan-minsang tumingin ng mga update sa background</string>
+    <string name="settings_update_channel_title">Update Channel</string>
+    <string name="settings_update_custom_msg">Maglagay ng custom channel URL</string>
+    <string name="settings_zygisk_summary">Patakbuhin ang ilang parte ng Magisk sa zygote daemon</string>
+    <string name="settings_denylist_title">Ipatupad ang TanggiListahan</string>
+    <string name="settings_denylist_summary">Hindi eepekto ang mga kustomisasyon ng Magisk sa mga prosesong nasa TanggiListahan</string>
+    <string name="settings_denylist_error">Kailangang naka-enable ang %1$s para sa feature na ito</string>
+    <string name="settings_denylist_config_title">I-configure ang TanggiListahan</string>
+    <string name="settings_denylist_config_summary">Piliin ang mga prosesong isasama sa TanggiListahan</string>
+    <string name="settings_hosts_summary">Systemless hosts support para sa app na humaharang sa ads</string>
+    <string name="settings_hosts_toast">Naidagdag ang systemless hosts module</string>
+    <string name="settings_app_name_hint">Bagong pangalan</string>
+    <string name="settings_app_name_helper">Mare-repackage ang app gamit ang pangalang ito</string>
+    <string name="settings_app_name_error">Maling format</string>
+    <string name="settings_su_app_adb">Mga app at ADB</string>
+    <string name="settings_su_app">Mga app lang</string>
+    <string name="settings_su_adb">ADB lang</string>
+    <string name="settings_su_disable">Naka-disable</string>
+    <string name="settings_su_request_10">10 segundo</string>
+    <string name="settings_su_request_15">15 segundo</string>
+    <string name="settings_su_request_20">20 segundo</string>
+    <string name="settings_su_request_30">30 segundo</string>
+    <string name="settings_su_request_45">45 segundo</string>
+    <string name="settings_su_request_60">60 segundo</string>
+    <string name="superuser_access">Superuser Access</string>
+    <string name="auto_response">Awtomatikong Tugon</string>
+    <string name="request_timeout">Request Timeout</string>
+    <string name="superuser_notification">Superuser Notification</string>
+    <string name="settings_su_reauth_title">Reauthenticate pagkatapos ng upgrade</string>
+    <string name="settings_su_reauth_summary">Humingi muli ng Superuser permission pagkatapos mag-upgrade ng mga app</string>
+    <string name="settings_su_tapjack_title">Proteksyon sa Tapjacking</string>
+    <string name="settings_su_tapjack_summary">Hindi tatanggap ng input ang Superuser prompt dialog habang may app na nakapatong rito</string>
+    <string name="settings_su_biometric_summary">Gumamit ng biometric authentication sa Superuser requests</string>
+    <string name="no_biometric">Unsupported device o walang biometric settings na naka-enable</string>
+    <string name="settings_customization">Kustomisasyon</string>
+    <string name="setting_add_shortcut_summary">Magdagdag ng shortcut sa home screen</string>
+    <string name="settings_doh_title">DNS sa HTTPS</string>
+    <string name="settings_doh_description">Iwasan ang DNS poisoning sa ilang lugar</string>
+
+    <string name="settings_owner_only">May-ari lang ng Device</string>
+    <string name="settings_owner_manage">Pinamamahalaan ng May-ari ng Device</string>
+    <string name="owner_only_summary">Ang may-ari lang ang may root access</string>
+    <string name="owner_manage_summary">Ang may-ari lang ang makakapamahala ng root access at makatanggap ng mga prompt ng kahilingan</string>
+    <string name="user_indepenent_summary">Ang bawat user ay may hiwalay na patakaran sa root</string>
+
+    <string name="settings_ns_global">Pandaigdigang Namespace</string>
+    <string name="settings_ns_requester">Manahin ang Namespace</string>
+    <string name="settings_ns_isolate">Hiwalay na Namespace</string>
+    <string name="global_summary">Gagamitin ng lahat ng root session ang pandaigdigang mount namespace</string>
+    <string name="requester_summary">Mamanahin ng mga root session ang namespace ng nag-request sa kanila</string>
+    <string name="isolate_summary">May nakahiwalay na namespace ang bawat root session</string>
+
+    <!--Notifications-->
+    <string name="update_channel">Mga update ng Magisk</string>
+    <string name="progress_channel">Mga notipikasyon sa Progress</string>
+    <string name="updated_channel">Tapos na ang Pag-update</string>
+    <string name="download_complete">Tapos na ang Pag-download</string>
+    <string name="download_file_error">Error sa pag-download ng file</string>
+    <string name="magisk_update_title">May available na update para sa Magisk!</string>
+    <string name="updated_title">Na-update ang Magisk</string>
+    <string name="updated_text">Pindutin para buksan ang app</string>
+
+    <!--Toasts, Dialogs-->
+    <string name="yes">Oo</string>
+    <string name="no">Hindi</string>
+    <string name="repo_install_title">Install %1$s %2$s(%3$d)</string>
+    <string name="download">I-download</string>
+    <string name="reboot">Reboot</string>
+    <string name="release_notes">Release notes</string>
+    <string name="flashing">Flashing…</string>
+    <string name="done">Tapos na!</string>
+    <string name="failure">Pumalpak!</string>
+    <string name="hide_app_title">Itinatago ang Magisk app…</string>
+    <string name="open_link_failed_toast">Walang app na nakita para buksan ang link</string>
+    <string name="complete_uninstall">Kumpletong Uninstall</string>
+    <string name="restore_img">Restore Images</string>
+    <string name="restore_img_msg">Restoring…</string>
+    <string name="restore_done">Natapos ang restoration!</string>
+    <string name="restore_fail">Walang stock backup!</string>
+    <string name="setup_fail">Pumalpak ang setup</string>
+    <string name="env_fix_title">Kailangan ng Karagdagang Setup</string>
+    <string name="env_fix_msg">Kailangan mo ng karagdagang setup upang gumana nang maayos ang Magisk. Gusto mo bang tumuloy at mag-reboot?</string>
+    <string name="setup_msg">Ipinapaandar ang environment setup…</string>
+    <string name="authenticate">Authenticate</string>
+    <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
+    <string name="unsupport_magisk_msg">Hindi suportado ng app na ito ang mga bersyon ng Magisk na mas mababa sa %1$s.\n\nMag-upgrade na hangga't maaari.</string>
+    <string name="unsupport_general_title">Abnormal na Estado</string>
+    <string name="unsupport_system_app_msg">Hindi pwedeng patakbuhin ang app na ito bilang system app. Paki-revert ito sa user app.</string>
+    <string name="unsupport_other_su_msg">May nakitang \"su\" binary na hindi mula sa Magisk. Pakitanggal ang iba pang mga root solution at/o i-reinstall ang Magisk</string>
+    <string name="unsupport_external_storage_msg">Naka-install ang Magisk sa external storage. Pakilipat ito sa internal storage.</string>
+    <string name="unsupport_nonroot_stub_msg">Hindi gumagana ang nakatagong Magisk app dahil nawala ang root. Pakibalik ang orihinal na APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Pakibigyan ng pahintulot sa storage ang app para gumana ito</string>
+    <string name="install_unknown_denied">I-enable ang "I-install ang mga di-kilalang app" para rito</string>
+    <string name="add_shortcut_title">Magdagdag ng shortcut sa home screen</string>
+    <string name="add_shortcut_msg">Nais mo bang magdagdag ng shortcut sa home screen?</string>
+    <string name="app_not_found">Walang app na nakita upang asikasuhin ang aksyong ito</string>
+    <string name="reboot_apply_change">Mag-reboot upang malapat ang mga pagbabago</string>
+    <string name="restore_app_confirmation">Babalik ang nakatagong app sa orihinal na app. Sigurado ka ba?</string>
+
+</resources>
