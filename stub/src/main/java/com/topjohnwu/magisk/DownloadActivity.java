@@ -59,7 +59,7 @@ public class DownloadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (DelegateClassLoader.cl instanceof AppClassLoader) {
+        if (DynLoad.activeClassLoader instanceof AppClassLoader) {
             // For some reason activity is created before Application.attach(),
             // relaunch the activity using the same intent
             finishAffinity();
