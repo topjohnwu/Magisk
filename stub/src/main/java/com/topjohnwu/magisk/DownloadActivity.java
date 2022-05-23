@@ -12,8 +12,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.loader.ResourcesLoader;
+import android.content.res.loader.ResourcesProvider;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.system.Os;
+import android.system.OsConstants;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
@@ -27,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -66,7 +73,9 @@ public class DownloadActivity extends Activity {
         dynLoad = !getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         // Inject resources
-        loadResources();
+        try {
+            loadResources();
+        } catch (Exception ignored) {}
 
         ProviderInstaller.install(this);
 
@@ -140,21 +149,35 @@ public class DownloadActivity extends Activity {
         }
     }
 
-    private void loadResources() {
-        File apk = new File(getCacheDir(), "res.apk");
-        try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
-            IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
-            cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
-            var out = new FileOutputStream(apk);
-            try (is; out) {
-                APKInstall.transfer(is, out);
-            }
-            StubApk.addAssetPath(getResources().getAssets(), apk.getPath());
-        } catch (Exception ignored) {
+    private void decryptResources(OutputStream out) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
+        IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
+        cipher.init(Cipher.DECRYPT_MODE, key, iv);
+        var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
+        try (is; out) {
+            APKInstall.transfer(is, out);
         }
     }
 
+    private void loadResources() throws Exception {
+        if (Build.VERSION.SDK_INT >= 30) {
+            var fd = Os.memfd_create("res.apk", 0);
+            try {
+                decryptResources(new FileOutputStream(fd));
+                Os.lseek(fd, 0, OsConstants.SEEK_SET);
+                try (var pfd = ParcelFileDescriptor.dup(fd)) {
+                    var loader = new ResourcesLoader();
+                    loader.addProvider(ResourcesProvider.loadFromApk(pfd));
+                    getResources().addLoaders(loader);
+                }
+            } finally {
+                Os.close(fd);
+            }
+        } else {
+            File apk = new File(getCacheDir(), "res.apk");
+            decryptResources(new FileOutputStream(apk));
+            StubApk.addAssetPath(getResources(), apk.getPath());
+        }
+    }
 }

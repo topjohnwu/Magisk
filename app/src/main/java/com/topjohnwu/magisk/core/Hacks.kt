@@ -18,7 +18,7 @@ import com.topjohnwu.magisk.di.AppContext
 
 lateinit var AppApkPath: String
 
-fun AssetManager.addAssetPath(path: String) = StubApk.addAssetPath(this, path)
+fun Resources.addAssetPath(path: String) = StubApk.addAssetPath(this, path)
 
 fun Context.wrap(): Context = if (this is PatchedContext) this else PatchedContext(this)
 
@@ -32,17 +32,18 @@ private class PatchedContext(base: Context) : ContextWrapper(base) {
 fun Resources.patch(): Resources {
     syncLocale()
     if (isRunningAsStub)
-        assets.addAssetPath(AppApkPath)
+        addAssetPath(AppApkPath)
     return this
 }
 
 fun createNewResources(): Resources {
     val asset = AssetManager::class.java.newInstance()
-    asset.addAssetPath(AppApkPath)
     val config = Configuration(AppContext.resources.configuration)
     val metrics = DisplayMetrics()
     metrics.setTo(AppContext.resources.displayMetrics)
-    return Resources(asset, metrics, config)
+    val res = Resources(asset, metrics, config)
+    res.addAssetPath(AppApkPath)
+    return res
 }
 
 fun Class<*>.cmp(pkg: String) =
