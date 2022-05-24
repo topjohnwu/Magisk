@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define ENFORCE_SIGNATURE (!MAGISK_DEBUG)
+
 // These functions will be called on every single zygote process specialization and su request,
 // so performance is absolutely critical. Most operations should either have its result cached
 // or simply skipped unless necessary.
@@ -100,6 +102,24 @@ int get_manager(int user_id, string *pkg, bool install) {
     if (mgr_cert == nullptr)
         default_new(mgr_cert);
 
+    auto check_dyn = [&](int u) -> bool {
+        snprintf(app_path, sizeof(app_path),
+            "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, u, mgr_pkg->data());
+        int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
+        if (dyn < 0)
+            return false;
+        bool mismatch = default_cert && read_certificate(dyn) != *default_cert;
+        close(dyn);
+        if (mismatch) {
+            LOGE("pkg: dyn APK signature mismatch: %s\n", app_path);
+#if ENFORCE_SIGNATURE
+            clear_pkg(mgr_pkg->data(), u);
+            return false;
+#endif
+        }
+        return true;
+    };
+
     if (skip_check.test_and_set()) {
         if (mgr_app_id < 0) {
             goto not_found;
@@ -108,6 +128,9 @@ int get_manager(int user_id, string *pkg, bool install) {
         const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
         snprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
         if (access(app_path, F_OK) == 0) {
+            // Always check dyn signature for repackaged app
+            if (!mgr_pkg->empty() && !check_dyn(user_id))
+                goto not_found;
             if (pkg) *pkg = name;
             return user_id * AID_USER_OFFSET + mgr_app_id;
         } else {
@@ -161,6 +184,7 @@ int get_manager(int user_id, string *pkg, bool install) {
                             LOGE("pkg: repackaged APK signature invalid: %s\n", apk.data());
                             uninstall_pkg(mgr_pkg->data());
                             invalid = true;
+                            install = true;
                             return false;
                         }
                     }
@@ -174,6 +198,8 @@ int get_manager(int user_id, string *pkg, bool install) {
             };
 
             if (check_pkg(user_id)) {
+                if (!check_dyn(user_id))
+                    goto not_found;
                 if (pkg) *pkg = *mgr_pkg;
                 return st.st_uid;
             }
@@ -209,7 +235,7 @@ int get_manager(int user_id, string *pkg, bool install) {
                 if (default_cert && cert != *default_cert) {
                     // Found APK with invalid signature, force replace with stub
                     LOGE("pkg: APK signature mismatch: %s\n", apk.data());
-#if !MAGISK_DEBUG
+#if ENFORCE_SIGNATURE
                     uninstall_pkg(JAVA_PACKAGE_NAME);
                     invalid = true;
                     install = true;

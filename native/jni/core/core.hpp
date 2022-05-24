@@ -35,4 +35,5 @@ void exec_common_scripts(const char *stage);
 void exec_module_scripts(const char *stage, const std::vector<std::string_view> &modules);
 void install_apk(const char *apk);
 void uninstall_pkg(const char *pkg);
+void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
