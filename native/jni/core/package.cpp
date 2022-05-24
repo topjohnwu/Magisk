@@ -103,6 +103,7 @@ int get_manager(int user_id, string *pkg, bool install) {
         default_new(mgr_cert);
 
     auto check_dyn = [&](int u) -> bool {
+#if ENFORCE_SIGNATURE
         snprintf(app_path, sizeof(app_path),
             "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, u, mgr_pkg->data());
         int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
@@ -112,11 +113,10 @@ int get_manager(int user_id, string *pkg, bool install) {
         close(dyn);
         if (mismatch) {
             LOGE("pkg: dyn APK signature mismatch: %s\n", app_path);
-#if ENFORCE_SIGNATURE
             clear_pkg(mgr_pkg->data(), u);
             return false;
-#endif
         }
+#endif
         return true;
     };
 
@@ -227,22 +227,20 @@ int get_manager(int user_id, string *pkg, bool install) {
         auto check_pkg = [&](int u) -> bool {
             snprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
+#if ENFORCE_SIGNATURE
                 string apk = find_apk_path(JAVA_PACKAGE_NAME);
                 int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
                 string cert = read_certificate(fd);
                 close(fd);
-
                 if (default_cert && cert != *default_cert) {
                     // Found APK with invalid signature, force replace with stub
                     LOGE("pkg: APK signature mismatch: %s\n", apk.data());
-#if ENFORCE_SIGNATURE
                     uninstall_pkg(JAVA_PACKAGE_NAME);
                     invalid = true;
                     install = true;
                     return false;
-#endif
                 }
-
+#endif
                 mgr_pkg->clear();
                 mgr_cert->clear();
                 mgr_app_id = to_app_id(st.st_uid);
