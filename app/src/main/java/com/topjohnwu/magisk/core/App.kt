@@ -7,8 +7,8 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.*
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler

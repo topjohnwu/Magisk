@@ -1,8 +1,8 @@
-package com.topjohnwu.magisk.data.repository
+package com.topjohnwu.magisk.core.repository
 
-import com.topjohnwu.magisk.core.magiskdb.SettingsDao
-import com.topjohnwu.magisk.core.magiskdb.StringDao
-import kotlinx.coroutines.GlobalScope
+import com.topjohnwu.magisk.core.data.magiskdb.SettingsDao
+import com.topjohnwu.magisk.core.data.magiskdb.StringDao
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.properties.ReadWriteProperty
@@ -11,26 +11,27 @@ import kotlin.reflect.KProperty
 interface DBConfig {
     val settingsDB: SettingsDao
     val stringDB: StringDao
+    val coroutineScope: CoroutineScope
 
     fun dbSettings(
         name: String,
         default: Int
-    ) = DBSettingsValue(name, default)
+    ) = IntDBProperty(name, default)
 
     fun dbSettings(
         name: String,
         default: Boolean
-    ) = DBBoolSettings(name, default)
+    ) = BoolDBProperty(name, default)
 
     fun dbStrings(
         name: String,
         default: String,
         sync: Boolean = false
-    ) = DBStringsValue(name, default, sync)
+    ) = StringDBProperty(name, default, sync)
 
 }
 
-class DBSettingsValue(
+class IntDBProperty(
     private val name: String,
     private val default: Int
 ) : ReadWriteProperty<DBConfig, Int> {
@@ -48,18 +49,18 @@ class DBSettingsValue(
         synchronized(this) {
             this.value = value
         }
-        GlobalScope.launch {
+        thisRef.coroutineScope.launch {
             thisRef.settingsDB.put(name, value)
         }
     }
 }
 
-open class DBBoolSettings(
+open class BoolDBProperty(
     name: String,
     default: Boolean
 ) : ReadWriteProperty<DBConfig, Boolean> {
 
-    val base = DBSettingsValue(name, if (default) 1 else 0)
+    val base = IntDBProperty(name, if (default) 1 else 0)
 
     override fun getValue(thisRef: DBConfig, property: KProperty<*>): Boolean =
         base.getValue(thisRef, property) != 0
@@ -68,10 +69,10 @@ open class DBBoolSettings(
         base.setValue(thisRef, property, if (value) 1 else 0)
 }
 
-class DBBoolSettingsNoWrite(
+class BoolDBPropertyNoWrite(
     name: String,
     default: Boolean
-) : DBBoolSettings(name, default) {
+) : BoolDBProperty(name, default) {
     override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) {
         synchronized(base) {
             base.value = if (value) 1 else 0
@@ -79,7 +80,7 @@ class DBBoolSettingsNoWrite(
     }
 }
 
-class DBStringsValue(
+class StringDBProperty(
     private val name: String,
     private val default: String,
     private val sync: Boolean
@@ -106,7 +107,7 @@ class DBStringsValue(
                     thisRef.stringDB.delete(name)
                 }
             } else {
-                GlobalScope.launch {
+                thisRef.coroutineScope.launch {
                     thisRef.stringDB.delete(name)
                 }
             }
@@ -116,7 +117,7 @@ class DBStringsValue(
                     thisRef.stringDB.put(name, value)
                 }
             } else {
-                GlobalScope.launch {
+                thisRef.coroutineScope.launch {
                     thisRef.stringDB.put(name, value)
                 }
             }

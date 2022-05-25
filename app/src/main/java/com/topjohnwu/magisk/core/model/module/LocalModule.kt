@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.core.model.module
 
 import com.squareup.moshi.JsonDataException
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.di
+package com.topjohnwu.magisk.core.di
 
 import android.content.Context
 import com.squareup.moshi.Moshi

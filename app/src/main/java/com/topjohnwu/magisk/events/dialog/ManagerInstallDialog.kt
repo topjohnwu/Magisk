@@ -2,10 +2,10 @@ package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.di.AppContext
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 import java.io.File
 

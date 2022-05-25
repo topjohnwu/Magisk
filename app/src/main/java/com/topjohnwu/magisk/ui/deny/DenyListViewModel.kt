@@ -5,15 +5,18 @@ import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.toCollection
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DenyListViewModel : BaseViewModel() {
 

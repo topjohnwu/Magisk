@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContextWrapper
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell

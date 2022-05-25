@@ -10,8 +10,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.core.di.viewModel
 import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing

@@ -11,11 +11,11 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.databinding.adapterOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.SnackbarEvent

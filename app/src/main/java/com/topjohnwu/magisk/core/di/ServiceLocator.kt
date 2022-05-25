@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.di
+package com.topjohnwu.magisk.core.di
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.room.Room
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.magiskdb.PolicyDao
-import com.topjohnwu.magisk.core.magiskdb.SettingsDao
-import com.topjohnwu.magisk.core.magiskdb.StringDao
-import com.topjohnwu.magisk.data.database.SuLogDatabase
-import com.topjohnwu.magisk.data.repository.LogRepository
-import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.core.data.SuLogDatabase
+import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.data.magiskdb.SettingsDao
+import com.topjohnwu.magisk.core.data.magiskdb.StringDao
+import com.topjohnwu.magisk.core.repository.LogRepository
+import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.install.InstallViewModel

@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder.LITTLE_ENDIAN
 import java.nio.charset.Charset
-import java.util.*
 
 class AXML(b: ByteArray) {
 

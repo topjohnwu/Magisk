@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.core.magiskdb
+package com.topjohnwu.magisk.core.data.magiskdb
 
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.superuser.Shell

@@ -3,10 +3,10 @@ package com.topjohnwu.magisk.core
 import android.os.Build
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler

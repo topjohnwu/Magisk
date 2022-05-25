@@ -6,21 +6,23 @@ import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.repository.BoolDBPropertyNoWrite
+import com.topjohnwu.magisk.core.repository.DBConfig
+import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.refreshLocale
-import com.topjohnwu.magisk.data.preference.PreferenceModel
-import com.topjohnwu.magisk.data.repository.DBBoolSettingsNoWrite
-import com.topjohnwu.magisk.data.repository.DBConfig
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
+import kotlinx.coroutines.GlobalScope
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
 import java.io.InputStream
 
-object Config : PreferenceModel, DBConfig {
+object Config : PreferenceConfig, DBConfig {
 
     override val stringDB get() = ServiceLocator.stringDB
     override val settingsDB get() = ServiceLocator.settingsDB
     override val context get() = ServiceLocator.deContext
+    override val coroutineScope get() = GlobalScope
 
     @get:SuppressLint("ApplySharedPref")
     val prefsFile: File get() {
@@ -152,7 +154,7 @@ object Config : PreferenceModel, DBConfig {
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var zygisk by dbSettings(Key.ZYGISK, false)
-    var denyList by DBBoolSettingsNoWrite(Key.DENYLIST, false)
+    var denyList by BoolDBPropertyNoWrite(Key.DENYLIST, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 

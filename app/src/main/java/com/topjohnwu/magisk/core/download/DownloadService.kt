@@ -11,7 +11,10 @@ import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.ActivityTracker
+import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.intent
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream

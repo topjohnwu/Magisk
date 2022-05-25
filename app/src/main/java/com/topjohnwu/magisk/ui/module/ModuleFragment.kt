@@ -6,10 +6,10 @@ import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.di.viewModel
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.adapterOf
-import com.topjohnwu.magisk.di.viewModel
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addInvalidateItemDecorationsObserver
 import rikka.recyclerview.addItemSpacing

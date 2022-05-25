@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.ktx.getPackageInfo
 import com.topjohnwu.superuser.Shell

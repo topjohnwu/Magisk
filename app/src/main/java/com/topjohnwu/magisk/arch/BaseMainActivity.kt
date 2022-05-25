@@ -12,10 +12,10 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog

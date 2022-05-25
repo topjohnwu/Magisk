@@ -7,9 +7,9 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.data.repository.LogRepository
 import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set

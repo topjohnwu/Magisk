@@ -1,9 +1,9 @@
-package com.topjohnwu.magisk.data.repository
+package com.topjohnwu.magisk.core.repository
 
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.data.SuLogDao
 import com.topjohnwu.magisk.core.model.su.SuLog
-import com.topjohnwu.magisk.data.database.SuLogDao
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.superuser.Shell
 

@@ -18,9 +18,9 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.viewModel
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.Utils

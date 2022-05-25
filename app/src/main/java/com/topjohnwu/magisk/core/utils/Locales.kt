@@ -8,11 +8,10 @@ import android.content.res.Resources
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.createNewResources
-import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.core.di.AppContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
 
 var currentLocale: Locale = Locale.getDefault()
 

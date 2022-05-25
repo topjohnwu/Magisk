@@ -6,9 +6,9 @@ import android.widget.Toast
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.createSuLog
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.ktx.getPackageInfo
 import com.topjohnwu.magisk.utils.Utils

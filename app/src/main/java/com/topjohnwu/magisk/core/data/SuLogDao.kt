@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.data.database
+package com.topjohnwu.magisk.core.data
 
 import androidx.room.*
 import com.topjohnwu.magisk.core.model.su.SuLog

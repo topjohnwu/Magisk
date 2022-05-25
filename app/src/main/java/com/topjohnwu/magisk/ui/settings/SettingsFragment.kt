@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.core.di.viewModel
 import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.data.network
+package com.topjohnwu.magisk.core.data
 
 import com.topjohnwu.magisk.core.model.BranchInfo
 import com.topjohnwu.magisk.core.model.ModuleJson

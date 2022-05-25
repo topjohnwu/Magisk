@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.App
-import com.topjohnwu.magisk.data.repository.NetworkService
+import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent

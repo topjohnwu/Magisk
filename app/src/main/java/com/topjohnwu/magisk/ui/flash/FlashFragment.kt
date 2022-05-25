@@ -12,8 +12,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
+import com.topjohnwu.magisk.core.di.viewModel
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.MainActivity
 
 class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
