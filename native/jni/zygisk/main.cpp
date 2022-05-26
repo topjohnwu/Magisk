@@ -45,8 +45,11 @@ int app_process_main(int argc, char *argv[]) {
         }
 
         close(fds[1]);
-        if (read_int(fds[0]) != 0)
+        if (read_int(fds[0]) != 0) {
+            fprintf(stderr, "Failed to connect magisk daemon, "
+                            "try umount %s or reboot.\n", argv[0]);
             return 1;
+        }
         int app_proc_fd = recv_fd(fds[0]);
         if (app_proc_fd < 0)
             return 1;
