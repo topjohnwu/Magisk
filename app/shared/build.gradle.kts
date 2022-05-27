@@ -6,9 +6,6 @@ setupCommon()
 
 android {
     namespace = "com.topjohnwu.shared"
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
 }
 
 dependencies {

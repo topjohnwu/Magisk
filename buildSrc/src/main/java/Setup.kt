@@ -1,3 +1,4 @@
+
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.apache.tools.ant.filters.FixCrLfFilter
@@ -9,6 +10,7 @@ import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.*
 import java.util.*
 import java.util.zip.Deflater
@@ -21,6 +23,11 @@ private fun Project.androidBase(configure: Action<BaseExtension>) =
 
 private fun Project.android(configure: Action<BaseAppModuleExtension>) =
     extensions.configure("android", configure)
+
+private fun Project.kotlinOptions(configure: Action<KotlinJvmOptions>) =
+    extensions.findByName("kotlinOptions")?.let {
+        configure.execute(it as KotlinJvmOptions)
+    }
 
 private val Project.android: BaseAppModuleExtension
     get() = extensions.getByName("android") as BaseAppModuleExtension
@@ -40,6 +47,9 @@ fun Project.setupCommon() {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
 }
 

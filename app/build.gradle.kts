@@ -56,10 +56,6 @@ android {
             keepDebugSymbols += "**/*.so"
         }
     }
-
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
 
 setupApp()
