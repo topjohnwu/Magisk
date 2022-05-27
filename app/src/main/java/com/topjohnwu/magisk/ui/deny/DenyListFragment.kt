@@ -10,7 +10,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.core.di.viewModel
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
 import com.topjohnwu.magisk.ktx.hideKeyboard
 import rikka.recyclerview.addEdgeSpacing
@@ -35,7 +35,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
 
         binding.appList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState != RecyclerView.SCROLL_STATE_IDLE) hideKeyboard()
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) activity?.hideKeyboard()
             }
         })
 

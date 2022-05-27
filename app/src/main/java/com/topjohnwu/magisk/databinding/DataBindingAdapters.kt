@@ -30,6 +30,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.widget.IndeterminateCheckBox
 import kotlin.math.roundToInt
@@ -288,4 +289,9 @@ fun TextView.setTextColorAttr(attr: Int) {
     val tv = TypedValue()
     context.theme.resolveAttribute(attr, tv, true)
     setTextColor(tv.data)
+}
+
+@BindingAdapter("android:text")
+fun TextView.setText(text: TextHolder) {
+    this.text = text.getText(context.resources)
 }

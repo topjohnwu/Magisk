@@ -1,11 +1,15 @@
 package com.topjohnwu.magisk.ktx
 
 import androidx.collection.SparseArrayCompat
-import timber.log.Timber
+import com.topjohnwu.magisk.core.utils.currentLocale
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Field
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.zip.ZipEntry
@@ -45,8 +49,27 @@ fun <T> MutableSet<T>.synchronized(): MutableSet<T> = Collections.synchronizedSe
 
 fun <K, V> MutableMap<K, V>.synchronized(): MutableMap<K, V> = Collections.synchronizedMap(this)
 
-fun SimpleDateFormat.parseOrNull(date: String) =
-    runCatching { parse(date) }.onFailure { Timber.e(it) }.getOrNull()
-
 fun Class<*>.reflectField(name: String): Field =
     getDeclaredField(name).apply { isAccessible = true }
+
+inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R): Flow<R> {
+    return flatMapMerge { value ->
+        flow { emit(transform(value)) }
+    }
+}
+
+fun Long.toTime(format: DateFormat) = format.format(this).orEmpty()
+
+val timeFormatStandard by lazy {
+    SimpleDateFormat(
+        "yyyy-MM-dd'T'HH:mm:ss",
+        currentLocale
+    )
+}
+val timeDateFormat: DateFormat by lazy {
+    DateFormat.getDateTimeInstance(
+        DateFormat.DEFAULT,
+        DateFormat.DEFAULT,
+        currentLocale
+    )
+}

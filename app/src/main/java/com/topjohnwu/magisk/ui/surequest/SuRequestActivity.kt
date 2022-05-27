@@ -10,7 +10,7 @@ import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
-import com.topjohnwu.magisk.core.di.viewModel
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding

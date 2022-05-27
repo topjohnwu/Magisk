@@ -3,9 +3,6 @@ package com.topjohnwu.magisk.core.di
 import android.annotation.SuppressLint
 import android.content.Context
 import android.text.method.LinkMovementMethod
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.room.Room
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.data.SuLogDatabase
@@ -15,11 +12,6 @@ import com.topjohnwu.magisk.core.data.magiskdb.StringDao
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.ktx.deviceProtectedContext
-import com.topjohnwu.magisk.ui.home.HomeViewModel
-import com.topjohnwu.magisk.ui.install.InstallViewModel
-import com.topjohnwu.magisk.ui.log.LogViewModel
-import com.topjohnwu.magisk.ui.superuser.SuperuserViewModel
-import com.topjohnwu.magisk.ui.surequest.SuRequestViewModel
 import io.noties.markwon.Markwon
 import io.noties.markwon.utils.NoCopySpannableFactory
 
@@ -50,26 +42,7 @@ object ServiceLocator {
             createApiService(retrofit, Const.Url.GITHUB_API_URL)
         )
     }
-
-    object VMFactory : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return when (modelClass) {
-                HomeViewModel::class.java -> HomeViewModel(networkService)
-                LogViewModel::class.java -> LogViewModel(logRepo)
-                SuperuserViewModel::class.java -> SuperuserViewModel(policyDB)
-                InstallViewModel::class.java -> InstallViewModel(networkService)
-                SuRequestViewModel::class.java -> SuRequestViewModel(policyDB, timeoutPrefs)
-                else -> modelClass.newInstance()
-            } as T
-        }
-    }
 }
-
-inline fun <reified VM : ViewModel> ViewModelStoreOwner.viewModel() =
-    lazy(LazyThreadSafetyMode.NONE) {
-        ViewModelProvider(this, ServiceLocator.VMFactory)[VM::class.java]
-    }
 
 private fun createSuLogDatabase(context: Context) =
     Room.databaseBuilder(context, SuLogDatabase::class.java, "sulogs.db")

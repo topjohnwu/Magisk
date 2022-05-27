@@ -8,7 +8,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
-import com.topjohnwu.magisk.core.di.viewModel
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.MotionRevealHelper

@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.now
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
@@ -59,7 +58,8 @@ class LogViewModel(
 
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
+            val filename = "magisk_log_%s.log".format(
+                System.currentTimeMillis().toTime(timeFormatStandard))
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---Detected Device Info---\n\n")
