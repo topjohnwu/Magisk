@@ -81,21 +81,20 @@ int magisk_main(int argc, char *argv[]) {
         cp_afc(argv[2], argv[3]);
         return 0;
     } else if (argv[1] == "--daemon"sv) {
-        int fd = connect_daemon(MainRequest::START_DAEMON, true);
-        close(fd);
+        close(connect_daemon(MainRequest::START_DAEMON, true));
         return 0;
     } else if (argv[1] == "--stop"sv) {
         int fd = connect_daemon(MainRequest::STOP_DAEMON);
         return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
-        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::POST_FS_DATA, true));
+        return 0;
     } else if (argv[1] == "--service"sv) {
-        int fd = connect_daemon(MainRequest::LATE_START, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::LATE_START, true));
+        return 0;
     } else if (argv[1] == "--boot-complete"sv) {
-        int fd = connect_daemon(MainRequest::BOOT_COMPLETE, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::BOOT_COMPLETE));
+        return 0;
     } else if (argv[1] == "--denylist"sv) {
         return denylist_cli(argc - 1, argv + 1);
     } else if (argc >= 3 && argv[1] == "--sqlite"sv) {

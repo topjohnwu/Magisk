@@ -51,12 +51,11 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     rc_list.clear();
 
     // Inject Magisk rc scripts
-    char pfd_svc[16], ls_svc[16], bc_svc[16];
+    char pfd_svc[16], ls_svc[16];
     gen_rand_str(pfd_svc, sizeof(pfd_svc));
     gen_rand_str(ls_svc, sizeof(ls_svc));
-    gen_rand_str(bc_svc, sizeof(bc_svc));
-    LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc, bc_svc);
+    LOGD("Inject magisk services: [%s] [%s]\n", pfd_svc, ls_svc);
+    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc);
 
     fclose(rc);
     clone_attr(src, dest);

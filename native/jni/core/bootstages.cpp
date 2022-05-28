@@ -274,8 +274,6 @@ static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 extern int disable_deny();
 
 void post_fs_data(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);
@@ -336,8 +334,6 @@ unblock_init:
 }
 
 void late_start(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);
@@ -354,8 +350,6 @@ void late_start(int client) {
 }
 
 void boot_complete(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);

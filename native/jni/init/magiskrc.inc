@@ -29,12 +29,6 @@ constexpr char MAGISK_RC[] =
 "\n"
 
 "on property:sys.boot_completed=1\n"
-"    start %4$s\n"
-"\n"
-
-"service %4$s %1$s/magisk --boot-complete\n"
-"    user root\n"
-"    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
-"    oneshot\n"
+"    exec %1$s/magisk --boot-complete\n"
 "\n"
 ;
