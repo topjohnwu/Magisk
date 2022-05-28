@@ -78,7 +78,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
     }
 
     fun NavDirections.navigate() {
-        navigation?.navigate(this)
+        navigation?.currentDestination?.getAction(actionId)?.let { navigation!!.navigate(this) }
     }
 
 }
