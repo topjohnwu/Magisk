@@ -36,8 +36,6 @@ class HomeViewModel(
 
     val magiskTitleBarrierIds =
         intArrayOf(R.id.home_magisk_icon, R.id.home_magisk_title, R.id.home_magisk_button)
-    val magiskDetailBarrierIds =
-        intArrayOf(R.id.home_magisk_installed_version, R.id.home_device_details_ramdisk)
     val appTitleBarrierIds =
         intArrayOf(R.id.home_manager_icon, R.id.home_manager_title, R.id.home_manager_button)
 
@@ -70,7 +68,8 @@ class HomeViewModel(
 
     val managerInstalledVersion
         get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
-            Info.stub?.let { " (${it.version})" }.orEmpty()
+            Info.stub?.let { " (${it.version})" }.orEmpty() +
+            if (BuildConfig.DEBUG) " (D)" else ""
 
     @get:Bindable
     var stateManagerProgress = 0
