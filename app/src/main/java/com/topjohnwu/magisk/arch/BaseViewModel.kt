@@ -4,9 +4,7 @@ import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.annotation.CallSuper
 import androidx.databinding.Bindable
-import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.databinding.ObservableHost
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.BackPressEvent
@@ -41,7 +38,6 @@ abstract class BaseViewModel(
     @get:Bindable
     val loadFailed get() = state == State.LOADING_FAILED
 
-    val isConnected get() = Info.isConnected
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
 
     var state= initialState
@@ -49,15 +45,6 @@ abstract class BaseViewModel(
 
     private val _viewEvents = MutableLiveData<ViewEvent>()
     private var runningJob: Job? = null
-    private val refreshCallback = object : Observable.OnPropertyChangedCallback() {
-        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-            requestRefresh()
-        }
-    }
-
-    init {
-        isConnected.addOnPropertyChangedCallback(refreshCallback)
-    }
 
     open fun onSaveState(state: Bundle) {}
     open fun onRestoreState(state: Bundle) {}
@@ -72,12 +59,6 @@ abstract class BaseViewModel(
     }
 
     protected open fun refresh(): Job? = null
-
-    @CallSuper
-    override fun onCleared() {
-        isConnected.removeOnPropertyChangedCallback(refreshCallback)
-        super.onCleared()
-    }
 
     fun withPermission(permission: String, callback: (Boolean) -> Unit) {
         PermissionEvent(permission, callback).publish()

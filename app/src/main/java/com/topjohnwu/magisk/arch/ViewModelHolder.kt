@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.ui.install.InstallViewModel
@@ -15,9 +16,12 @@ interface ViewModelHolder : LifecycleOwner, ViewModelStoreOwner {
 
     val viewModel: BaseViewModel
 
-    fun startObserveEvents() {
+    fun startObserveLiveData() {
         viewModel.viewEvents.observe(this) {
             onEventDispatched(it)
+        }
+        Info.isConnected.observe(this) {
+            viewModel.requestRefresh()
         }
     }
 

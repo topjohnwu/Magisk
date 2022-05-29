@@ -1,7 +1,8 @@
 package com.topjohnwu.magisk.core
 
 import android.os.Build
-import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.UpdateInfo
@@ -43,10 +44,10 @@ object Info {
         getProperty("ro.kernel.qemu", "0") == "1" ||
             getProperty("ro.boot.qemu", "0") == "1"
 
-    val isConnected by lazy {
-        ObservableBoolean(false).also { field ->
+    val isConnected: LiveData<Boolean> by lazy {
+        MutableLiveData(false).also { field ->
             NetworkObserver.observe(AppContext) {
-                UiThreadHandler.run { field.set(it) }
+                UiThreadHandler.run { field.value = it }
             }
         }
     }

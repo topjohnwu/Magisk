@@ -24,7 +24,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startObserveEvents()
+        startObserveLiveData()
     }
 
     override fun onCreateView(

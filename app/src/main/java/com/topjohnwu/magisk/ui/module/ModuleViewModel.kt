@@ -70,7 +70,7 @@ class ModuleViewModel : BaseViewModel() {
     }
 
     fun downloadPressed(item: OnlineModule?) =
-        if (item != null && isConnected.get()) {
+        if (item != null && Info.isConnected.value == true) {
             withExternalRW { ModuleInstallDialog(item).publish() }
         } else {
             SnackbarEvent(R.string.no_connection).publish()

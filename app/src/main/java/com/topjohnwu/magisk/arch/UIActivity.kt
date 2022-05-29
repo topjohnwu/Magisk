@@ -36,7 +36,7 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
 
         super.onCreate(savedInstanceState)
 
-        startObserveEvents()
+        startObserveLiveData()
 
         // We need to set the window background explicitly since for whatever reason it's not
         // propagated upstream
