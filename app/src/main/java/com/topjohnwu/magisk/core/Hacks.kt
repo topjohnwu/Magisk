@@ -30,9 +30,9 @@ private class PatchedContext(base: Context) : ContextWrapper(base) {
 }
 
 fun Resources.patch(): Resources {
-    syncLocale()
     if (isRunningAsStub)
         addAssetPath(AppApkPath)
+    syncLocale()
     return this
 }
 
