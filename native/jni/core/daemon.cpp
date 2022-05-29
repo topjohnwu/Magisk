@@ -416,6 +416,14 @@ int connect_daemon(int req, bool create) {
             return -1;
         }
 
+        char buf[64];
+        xreadlink("/proc/self/exe", buf, sizeof(buf));
+        if (str_starts(buf, "/system/bin/")) {
+            LOGE("Start daemon on /dev or /sbin\n");
+            close(fd);
+            return -1;
+        }
+
         if (fork_dont_care() == 0) {
             close(fd);
             daemon_entry();
