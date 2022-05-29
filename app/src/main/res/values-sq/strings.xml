@@ -111,6 +111,7 @@
     <string name="suspend_text_riru">Moduli u pezullua sepse %1$s është aktivizuar</string>
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
     <string name="zygisk_module_unloaded">Moduli Zygisk nuk është ngarkuar për shkak të papajtueshmërisë</string>
+    <string name="module_empty">Ska module të instaluar</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
