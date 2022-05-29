@@ -31,4 +31,12 @@ constexpr char MAGISK_RC[] =
 "on property:sys.boot_completed=1\n"
 "    exec %1$s/magisk --boot-complete\n"
 "\n"
+
+"on property:init.svc.zygote=restarting\n"
+"    exec %1$s/magisk --zygote-restart\n"
+"\n"
+
+"on property:init.svc.zygote=stopped\n"
+"    exec %1$s/magisk --zygote-restart\n"
+"\n"
 ;

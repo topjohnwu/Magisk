@@ -14,7 +14,7 @@ using namespace std;
 // so performance is absolutely critical. Most operations should either have its result cached
 // or simply skipped unless necessary.
 
-static atomic<ino_t> pkg_xml_ino = 0;
+atomic<ino_t> pkg_xml_ino = 0;
 static atomic_flag skip_check;
 
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;

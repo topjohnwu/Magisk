@@ -356,7 +356,7 @@ void boot_complete(int client) {
     DAEMON_STATE = STATE_BOOT_COMPLETE;
     setup_logfile(false);
 
-    LOGI("** boot_complete triggered\n");
+    LOGI("** boot-complete triggered\n");
 
     if (safe_mode)
         return;
@@ -366,5 +366,14 @@ void boot_complete(int client) {
         xmkdir(SECURE_DIR, 0700);
 
     // Ensure manager exists
+    need_pkg_refresh();
     get_manager(0, nullptr, true);
+}
+
+void zygote_restart(int client) {
+    close(client);
+
+    LOGI("** zygote restarted\n");
+    pkg_xml_ino = 0;
+    prune_su_access();
 }

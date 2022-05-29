@@ -137,7 +137,7 @@ bool uid_granted_root(int uid) {
     return granted;
 }
 
-static void prune_su_access() {
+void prune_su_access() {
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
     char query[256], *err;

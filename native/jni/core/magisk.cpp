@@ -29,9 +29,8 @@ Options:
 Advanced Options (Internal APIs):
    --daemon                  manually start magisk daemon
    --stop                    remove all magisk changes and stop daemon
-   --[init trigger]          start service for init trigger
-                             Supported init triggers:
-                             post-fs-data, service, boot-complete
+   --[init trigger]          callback on init triggers. Valid triggers:
+                             post-fs-data, service, boot-complete, zygote-restart
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
    --restorecon              restore selinux context on Magisk files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
@@ -94,6 +93,9 @@ int magisk_main(int argc, char *argv[]) {
         return 0;
     } else if (argv[1] == "--boot-complete"sv) {
         close(connect_daemon(MainRequest::BOOT_COMPLETE));
+        return 0;
+    } else if (argv[1] == "--zygote-restart"sv) {
+        close(connect_daemon(MainRequest::ZYGOTE_RESTART));
         return 0;
     } else if (argv[1] == "--denylist"sv) {
         return denylist_cli(argc - 1, argv + 1);

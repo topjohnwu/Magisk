@@ -150,6 +150,9 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::BOOT_COMPLETE:
         boot_complete(client);
         break;
+    case MainRequest::ZYGOTE_RESTART:
+        zygote_restart(client);
+        break;
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
         break;
@@ -233,6 +236,7 @@ static void handle_request(pollfd *pfd) {
     case MainRequest::POST_FS_DATA:
     case MainRequest::LATE_START:
     case MainRequest::BOOT_COMPLETE:
+    case MainRequest::ZYGOTE_RESTART:
     case MainRequest::SQLITE_CMD:
     case MainRequest::GET_PATH:
     case MainRequest::DENYLIST:

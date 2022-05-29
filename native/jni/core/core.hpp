@@ -5,6 +5,7 @@
 
 extern bool RECOVERY_MODE;
 extern int DAEMON_STATE;
+extern std::atomic<ino_t> pkg_xml_ino;
 
 // Daemon state
 enum : int {

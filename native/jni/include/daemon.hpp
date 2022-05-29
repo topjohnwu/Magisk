@@ -28,6 +28,7 @@ enum : int {
     POST_FS_DATA,
     LATE_START,
     BOOT_COMPLETE,
+    ZYGOTE_RESTART,
     DENYLIST,
     SQLITE_CMD,
     REMOVE_MODULES,
@@ -81,6 +82,7 @@ void android_logging();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+void zygote_restart(int client);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
@@ -90,6 +92,7 @@ void preserve_stub_apk();
 bool need_pkg_refresh();
 std::vector<bool> get_app_no_list();
 int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
+void prune_su_access();
 
 // Denylist
 void initialize_denylist();
