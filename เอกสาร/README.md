@@ -6,7 +6,6 @@
 - [Magisk Changelog](changes.md)
 
 The following sections are for developers
-
 - [Developer Guides](guides.md)
 - [Magisk Tools](tools.md)
 - [Internal Details](details.md)
