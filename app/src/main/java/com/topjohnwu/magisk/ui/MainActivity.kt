@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
@@ -84,7 +85,7 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
         }
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
-            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
+            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive && LocalModule.loaded()
         }
 
         val section =

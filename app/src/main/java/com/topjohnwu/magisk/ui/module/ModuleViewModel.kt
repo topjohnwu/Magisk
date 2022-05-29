@@ -37,7 +37,7 @@ class ModuleViewModel : BaseViewModel() {
     val data get() = uri
 
     init {
-        if (Info.env.isActive) {
+        if (Info.env.isActive && LocalModule.loaded()) {
             items.insertItem(InstallModule)
                 .insertList(itemsInstalled)
         }
