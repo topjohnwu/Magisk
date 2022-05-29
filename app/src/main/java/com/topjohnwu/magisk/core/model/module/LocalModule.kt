@@ -138,6 +138,8 @@ data class LocalModule(
 
         private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
 
+        fun loaded() = RootUtils.fs.getFile(Const.MAGISK_PATH).exists()
+
         suspend fun installed() = withContext(Dispatchers.IO) {
             RootUtils.fs.getFile(Const.MAGISK_PATH)
                 .listFiles()

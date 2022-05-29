@@ -111,6 +111,7 @@
     <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
     <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
     <string name="zygisk_module_unloaded">Zygisk module not loaded due to incompatibility</string>
+    <string name="module_empty">No module</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
