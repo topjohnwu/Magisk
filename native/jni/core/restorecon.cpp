@@ -76,13 +76,6 @@ void restorecon() {
 }
 
 void restore_tmpcon() {
-    if (MAGISKTMP == "/system/bin") {
-        // Running with emulator.sh
-        if (SDK_INT >= 26)
-            lsetfilecon("/system/bin/magisk", EXEC_CON);
-        return;
-    }
-
     if (MAGISKTMP == "/sbin")
         setfilecon(MAGISKTMP.data(), ROOT_CON);
     else
