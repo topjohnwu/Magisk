@@ -15,7 +15,7 @@ using namespace std;
 // or simply skipped unless necessary.
 
 atomic<ino_t> pkg_xml_ino = 0;
-static atomic_flag skip_check;
+static atomic_flag skip_mgr_check;
 
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
@@ -25,16 +25,12 @@ static string *mgr_cert;
 static int stub_apk_fd = -1;
 static const string *default_cert;
 
-bool need_pkg_refresh() {
+void check_pkg_refresh() {
     struct stat st{};
-    stat("/data/system/packages.xml", &st);
-    ino_t ino = pkg_xml_ino.exchange(st.st_ino);
-    if (ino == st.st_ino) {
-        // Packages have not changed
-        return false;
-    } else {
-        skip_check.clear();
-        return true;
+    if (stat("/data/system/packages.xml", &st) == 0 &&
+        pkg_xml_ino.exchange(st.st_ino) != st.st_ino) {
+        skip_mgr_check.clear();
+        skip_pkg_rescan.clear();
     }
 }
 
@@ -120,7 +116,7 @@ int get_manager(int user_id, string *pkg, bool install) {
         return true;
     };
 
-    if (skip_check.test_and_set()) {
+    if (skip_mgr_check.test_and_set()) {
         if (mgr_app_id < 0) {
             goto not_found;
         }

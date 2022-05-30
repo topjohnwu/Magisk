@@ -14,6 +14,8 @@
 
 using namespace std;
 
+atomic_flag skip_pkg_rescan;
+
 // For the following data structures:
 // If package name == ISOLATED_MAGIC, or app ID == -1, it means isolated service
 
@@ -33,9 +35,6 @@ atomic<bool> denylist_enforced = false;
 #define do_kill (zygisk_enabled && denylist_enforced)
 
 static void rescan_apps() {
-    if (!need_pkg_refresh())
-        return;
-
     LOGD("denylist: rescanning apps\n");
 
     app_id_to_pkgs.clear();
@@ -386,7 +385,8 @@ bool is_deny_target(int uid, string_view process) {
     if (!ensure_data())
         return false;
 
-    rescan_apps();
+    if (!skip_pkg_rescan.test_and_set())
+        rescan_apps();
 
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {

@@ -89,11 +89,14 @@ void zygisk_handler(int client, const sock_cred *cred);
 
 // Package
 void preserve_stub_apk();
-bool need_pkg_refresh();
+void check_pkg_refresh();
 std::vector<bool> get_app_no_list();
+// Call check_pkg_refresh() before calling get_manager(...)
+// to make sure the package state is invalidated!
 int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
 void prune_su_access();
 
 // Denylist
+extern std::atomic_flag skip_pkg_rescan;
 void initialize_denylist();
 int denylist_cli(int argc, char **argv);

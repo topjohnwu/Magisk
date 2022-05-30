@@ -366,7 +366,7 @@ void boot_complete(int client) {
         xmkdir(SECURE_DIR, 0700);
 
     // Ensure manager exists
-    need_pkg_refresh();
+    check_pkg_refresh();
     get_manager(0, nullptr, true);
 }
 

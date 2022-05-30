@@ -81,8 +81,10 @@ void su_info::check_db() {
     }
 
     // We need to check our manager
-    if (access.log || access.notify)
+    if (access.log || access.notify) {
+        check_pkg_refresh();
         mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg, true);
+    }
 }
 
 bool uid_granted_root(int uid) {
@@ -138,6 +140,7 @@ bool uid_granted_root(int uid) {
 }
 
 void prune_su_access() {
+    cached.reset();
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
     char query[256], *err;
@@ -170,10 +173,6 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
 
     {
         mutex_guard lock(cache_lock);
-        if (need_pkg_refresh()) {
-            cached.reset();
-            prune_su_access();
-        }
         if (!cached || cached->uid != uid || !cached->is_fresh())
             cached = make_shared<su_info>(uid);
         cached->refresh();
