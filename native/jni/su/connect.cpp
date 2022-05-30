@@ -217,7 +217,8 @@ int app_request(const su_context &ctx) {
     exec_cmd("request", extras, ctx.info, false);
 
     // Wait for data input for at most 70 seconds
-    int fd = xopen(fifo, O_RDONLY | O_CLOEXEC | O_NONBLOCK);
+    // Open with O_RDWR to prevent FIFO open block
+    int fd = xopen(fifo, O_RDWR | O_CLOEXEC);
     struct pollfd pfd = {
         .fd = fd,
         .events = POLLIN
