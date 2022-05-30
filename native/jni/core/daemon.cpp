@@ -174,7 +174,11 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
 static void handle_request_sync(int client, int code) {
     switch (code) {
     case MainRequest::CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
+#if MAGISK_DEBUG
+        write_string(client, MAGISK_VERSION ":MAGISK:D");
+#else
+        write_string(client, MAGISK_VERSION ":MAGISK:R");
+#endif
         break;
     case MainRequest::CHECK_VERSION_CODE:
         write_int(client, MAGISK_VER_CODE);

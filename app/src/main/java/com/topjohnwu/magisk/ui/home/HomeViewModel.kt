@@ -57,7 +57,7 @@ class HomeViewModel(
     val magiskInstalledVersion
         get() = Info.env.run {
             if (isActive)
-                "$versionString ($versionCode)".asText()
+                ("$versionString ($versionCode)" + if (isDebug) " (D)" else "").asText()
             else
                 R.string.not_available.asText()
         }
@@ -93,8 +93,10 @@ class HomeViewModel(
                 else -> MagiskState.UP_TO_DATE
             }
 
+            val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             managerRemoteVersion =
-                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asText()
+                ("${magisk.version} (${magisk.versionCode}) (${stub.versionCode})" +
+                    if (isDebug) " (D)" else "").asText()
         } ?: run {
             state = State.LOADING_FAILED
             managerRemoteVersion = R.string.not_available.asText()

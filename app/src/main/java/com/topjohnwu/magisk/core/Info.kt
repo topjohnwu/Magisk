@@ -52,13 +52,17 @@ object Info {
         }
     }
 
-    private fun loadState() = Env(
-        fastCmd("magisk -v").split(":".toRegex())[0],
-        runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
-    )
+    private fun loadState(): Env {
+        val v = fastCmd("magisk -v").split(":".toRegex())
+        return Env(
+            v[0], v.size >= 3 && v[2] == "D",
+            runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
+        )
+    }
 
     class Env(
         val versionString: String = "",
+        val isDebug: Boolean = false,
         code: Int = -1
     ) {
         val versionCode = when {
