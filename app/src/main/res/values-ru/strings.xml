@@ -111,6 +111,7 @@
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
     <string name="zygisk_module_unloaded">Модуль Zygisk не запущен из-за несовместимости</string>
+    <string name="module_empty">Модули не установлены</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
