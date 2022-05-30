@@ -13,14 +13,14 @@ class PolicyRvItem(
     private val viewModel: SuperuserViewModel,
     override val item: SuPolicy,
     val packageName: String,
-    private val isSharedUid: Boolean,
+    isSharedUid: Boolean,
     val icon: Drawable,
     val appName: String
 ) : ObservableDiffRvItem<PolicyRvItem>(), RvContainer<SuPolicy> {
 
     override val layoutRes = R.layout.item_policy_md2
 
-    val title get() = if (isSharedUid) "[SharedUID] $appName" else appName
+    val title = if (isSharedUid) "[SharedUID] $appName" else appName
 
     private inline fun <reified T> setImpl(new: T, old: T, setter: (T) -> Unit) {
         if (old != new) {
