@@ -15,7 +15,7 @@
     <string name="app_changelog">Changelog</string>
     <string name="loading">Đang tải…</string>
     <string name="update">Cập nhật</string>
-    <string name="not_available">N/A</string>
+    <string name="not_available">Không có sẵn</string>
     <string name="hide">Ẩn</string>
     <string name="home_package">Gói</string>
     <string name="home_app_title">Ứng dụng</string>
@@ -28,7 +28,7 @@
     <string name="home_latest_version">Mới nhất</string>
     <string name="invalid_update_channel">Kênh cập nhật không hợp lệ</string>
     <string name="uninstall_magisk_title">Gỡ cài đặt Magisk</string>
-    <string name="uninstall_magisk_msg">Tất cả các mô-đun sẽ bị tắt hoặc bị xóa!\nRoot sẽ bị gỡ bỏ\nDữ liệu của bạn có thể bị mã hóa lại nếu nó không mã hóa!</string>
+    <string name="uninstall_magisk_msg">Tất cả các mô-đun sẽ bị tắt hoặc bị xóa!\nRoot sẽ bị gỡ bỏ\nPhân vùng data đã tắt mã hóa thông qua Magisk sẽ bị mã hóa lại!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hóa</string>
@@ -110,8 +110,10 @@
     <string name="update_available">Cập nhật có sẵn</string>
     <string name="suspend_text_riru">Mô-đun bị vô hiệu hóa vì %1$s được bật</string>
     <string name="suspend_text_zygisk">Mô-đun bị vô hiệu hóa vì %1$s không được bật</string>
-    <string name="zygisk_module_unloaded">Không tải mô-đun Zygisk vì không tương thích</string>
-    
+    <string name="zygisk_module_unloaded">Không thể tải mô-đun Zygisk vì không tương thích</string>
+    <string name="module_empty">Chưa có mô-đun nào được cài đặt!</string>
+
+
     <!--Settings-->
     <string name="settings_dark_mode_title">Chế độ chủ đề</string>
     <string name="settings_dark_mode_message">Chọn chế độ phù hợp nhất với phong cách của bạn!</string>
@@ -135,9 +137,9 @@
     <string name="settings_update_custom_msg">Chèn một URL tùy chỉnh</string>
     <string name="settings_zygisk_summary">Khởi chạy các thành phần của Magisk trong tiến trình nền zygote</string>
     <string name="settings_denylist_title">Thực thi DenyList</string>
-    <string name="settings_denylist_summary">Các quy trình trong DenyList sẽ có tất cả các sửa đổi Magisk được hoàn nguyên</string>
+    <string name="settings_denylist_summary">Các quy trình trong DenyList sẽ hoàn nguyên mọi sửa đổi bởi Magisk</string>
     <string name="settings_denylist_error">Tính năng này yêu cầu %1$s được bật</string>
-    <string name="settings_denylist_config_title">Định cấu hình DenyList</string>
+    <string name="settings_denylist_config_title">Cấu hình DenyList</string>
     <string name="settings_denylist_config_summary">Chọn các quy trình được đưa vào DenyList</string>
     <string name="settings_hosts_title">Systemlest hosts</string>
     <string name="settings_hosts_summary">Hỗ trợ systemless hosts cho các ứng dụng chặn quảng cáo</string>
