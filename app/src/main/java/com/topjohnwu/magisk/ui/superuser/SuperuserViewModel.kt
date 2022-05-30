@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.superuser
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
+import android.os.Process
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -59,7 +60,9 @@ class SuperuserViewModel(
             val policies = ArrayList<PolicyRvItem>()
             val pm = AppContext.packageManager
             for (policy in db.fetchAll()) {
-                val pkgs = pm.getPackagesForUid(policy.uid)
+                val pkgs =
+                    if (policy.uid == Process.SYSTEM_UID) arrayOf("android")
+                    else pm.getPackagesForUid(policy.uid)
                 if (pkgs == null) {
                     db.delete(policy.uid)
                     continue
