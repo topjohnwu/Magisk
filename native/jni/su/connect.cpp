@@ -5,7 +5,6 @@
 #include <selinux.hpp>
 
 #include "su.hpp"
-#include "daemon.hpp"
 
 extern int SDK_INT;
 

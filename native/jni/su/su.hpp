@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <db.hpp>
+#include <daemon.hpp>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -41,7 +42,7 @@ private:
 };
 
 struct su_req_base {
-    int uid = UID_ROOT;
+    int uid = AID_ROOT;
     bool login = false;
     bool keepenv = false;
     bool mount_master = false;

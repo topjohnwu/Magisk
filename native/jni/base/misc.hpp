@@ -6,15 +6,9 @@
 #include <string_view>
 #include <bitset>
 
-#define UID_ROOT   0
-#define UID_SHELL  2000
-
 #define DISALLOW_COPY_AND_MOVE(clazz) \
 clazz(const clazz &) = delete; \
 clazz(clazz &&) = delete;
-
-#define to_app_id(uid)  (uid % 100000)
-#define to_user_id(uid) (uid / 100000)
 
 class mutex_guard {
     DISALLOW_COPY_AND_MOVE(mutex_guard)

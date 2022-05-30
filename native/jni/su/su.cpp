@@ -14,7 +14,6 @@
 #include <sys/stat.h>
 
 #include <magisk.hpp>
-#include <daemon.hpp>
 #include <base.hpp>
 #include <flags.h>
 

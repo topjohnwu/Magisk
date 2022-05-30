@@ -220,7 +220,7 @@ static void handle_request(pollfd *pfd) {
         // Client died
         goto done;
     }
-    is_root = cred.uid == UID_ROOT;
+    is_root = cred.uid == AID_ROOT;
     is_zygote = cred.context == "u:r:zygote:s0";
 
     if (!is_root && !is_zygote && !is_client(cred.pid)) {
@@ -251,7 +251,7 @@ static void handle_request(pollfd *pfd) {
         }
         break;
     case MainRequest::REMOVE_MODULES:
-        if (!is_root && cred.uid != UID_SHELL) {
+        if (!is_root && cred.uid != AID_SHELL) {
             write_int(client, MainResponse::ACCESS_DENIED);
             goto done;
         }
@@ -414,7 +414,7 @@ int connect_daemon(int req, bool create) {
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (connect(fd, (sockaddr *) &sun, len)) {
-        if (!create || getuid() != UID_ROOT) {
+        if (!create || getuid() != AID_ROOT) {
             LOGE("No daemon is currently running!\n");
             close(fd);
             return -1;

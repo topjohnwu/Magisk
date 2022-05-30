@@ -9,9 +9,14 @@
 
 #include <socket.hpp>
 
+#define AID_ROOT   0
+#define AID_SHELL  2000
 #define AID_APP_START 10000
 #define AID_APP_END 19999
 #define AID_USER_OFFSET 100000
+
+#define to_app_id(uid)  (uid % AID_USER_OFFSET)
+#define to_user_id(uid) (uid / AID_USER_OFFSET)
 
 // Daemon command codes
 namespace MainRequest {

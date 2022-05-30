@@ -5,11 +5,9 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <daemon.hpp>
 #include <magisk.hpp>
 #include <base.hpp>
 #include <selinux.hpp>
-#include <db.hpp>
 
 #include "su.hpp"
 #include "pts.hpp"
@@ -88,7 +86,7 @@ void su_info::check_db() {
 }
 
 bool uid_granted_root(int uid) {
-    if (uid == UID_ROOT)
+    if (uid == AID_ROOT)
         return true;
 
     db_settings cfg;
@@ -99,11 +97,11 @@ bool uid_granted_root(int uid) {
     case ROOT_ACCESS_DISABLED:
         return false;
     case ROOT_ACCESS_APPS_ONLY:
-        if (uid == UID_SHELL)
+        if (uid == AID_SHELL)
             return false;
         break;
     case ROOT_ACCESS_ADB_ONLY:
-        if (uid != UID_SHELL)
+        if (uid != AID_SHELL)
             return false;
         break;
     case ROOT_ACCESS_APPS_AND_ADB:
@@ -186,7 +184,7 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
         info->check_db();
 
         // If it's root or the manager, allow it silently
-        if (info->uid == UID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
+        if (info->uid == AID_ROOT || to_app_id(info->uid) == to_app_id(info->mgr_uid)) {
             info->access = SILENT_SU_ACCESS;
             return info;
         }
@@ -198,13 +196,13 @@ static shared_ptr<su_info> get_su_info(unsigned uid) {
                 info->access = NO_SU_ACCESS;
                 break;
             case ROOT_ACCESS_ADB_ONLY:
-                if (info->uid != UID_SHELL) {
+                if (info->uid != AID_SHELL) {
                     LOGW("Root access limited to ADB only!\n");
                     info->access = NO_SU_ACCESS;
                 }
                 break;
             case ROOT_ACCESS_APPS_ONLY:
-                if (info->uid == UID_SHELL) {
+                if (info->uid == AID_SHELL) {
                     LOGW("Root access is disabled for ADB!\n");
                     info->access = NO_SU_ACCESS;
                 }
