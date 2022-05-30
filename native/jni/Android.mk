@@ -78,7 +78,6 @@ LOCAL_SRC_FILES := \
     init/twostage.cpp \
     init/selinux.cpp
 
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -109,7 +108,6 @@ LOCAL_SRC_FILES := \
     boot/pattern.cpp \
     boot/cpio.cpp
 
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -145,7 +143,6 @@ LOCAL_SRC_FILES := \
     resetprop/resetprop.cpp \
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
-LOCAL_LDFLAGS := -static
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -170,7 +167,7 @@ endif
 ########################
 
 include $(CLEAR_VARS)
-LOCAL_MODULE:= libpolicy
+LOCAL_MODULE := libpolicy
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libsepol

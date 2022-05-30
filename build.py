@@ -328,8 +328,6 @@ def build_binary(args):
 
     dump_flag_header()
 
-    # Build shared executables
-
     flag = ''
 
     if 'magisk' in args.target:
@@ -344,18 +342,6 @@ def build_binary(args):
     if 'magiskinit' in args.target:
         flag += ' B_PRELOAD=1'
 
-    if flag:
-        run_ndk_build(flag + ' B_SHARED=1')
-        clean_elf()
-
-    # Then build static executables
-
-    flag = ''
-
-    if 'magiskinit' in args.target:
-        dump_bin_header(args)
-        flag += ' B_INIT=1'
-
     if 'resetprop' in args.target:
         flag += ' B_PROP=1'
 
@@ -364,6 +350,13 @@ def build_binary(args):
 
     if flag:
         run_ndk_build(flag)
+        clean_elf()
+
+    # magiskinit and busybox has to be built separately
+
+    if 'magiskinit' in args.target:
+        dump_bin_header(args)
+        run_ndk_build('B_INIT=1')
 
     if 'busybox' in args.target:
         run_ndk_build('B_BB=1')
