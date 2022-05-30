@@ -137,7 +137,7 @@
     <string name="settings_update_custom_msg">Chèn một URL tùy chỉnh</string>
     <string name="settings_zygisk_summary">Khởi chạy các thành phần của Magisk trong tiến trình nền zygote</string>
     <string name="settings_denylist_title">Thực thi DenyList</string>
-    <string name="settings_denylist_summary">Các quy trình trong DenyList sẽ hoàn nguyên mọi sửa đổi bởi Magisk</string>
+    <string name="settings_denylist_summary">Các tiến trình trong DenyList sẽ bị hoàn nguyên mọi sửa đổi bởi Magisk</string>
     <string name="settings_denylist_error">Tính năng này yêu cầu %1$s được bật</string>
     <string name="settings_denylist_config_title">Cấu hình DenyList</string>
     <string name="settings_denylist_config_summary">Chọn các quy trình được đưa vào DenyList</string>
