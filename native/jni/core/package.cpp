@@ -28,8 +28,8 @@ static const string *default_cert;
 bool need_pkg_refresh() {
     struct stat st{};
     stat("/data/system/packages.xml", &st);
-    ino_t ino = st.st_ino;
-    if (pkg_xml_ino.compare_exchange_strong(ino, st.st_ino)) {
+    ino_t ino = pkg_xml_ino.exchange(st.st_ino);
+    if (ino == st.st_ino) {
         // Packages have not changed
         return false;
     } else {
