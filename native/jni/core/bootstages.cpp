@@ -291,6 +291,7 @@ void post_fs_data(int client) {
 
     unlock_blocks();
     mount_mirrors();
+    prune_su_access();
 
     if (access(SECURE_DIR, F_OK) != 0) {
         if (SDK_INT < 24) {
