@@ -147,6 +147,7 @@
                     android:enabled="@{viewModel.grantEnabled}"
                     android:text="@string/grant" />
 
+                <requestFocus />
             </LinearLayout>
 
         </LinearLayout>
