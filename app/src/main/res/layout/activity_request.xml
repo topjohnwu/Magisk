@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="java.util.Arrays"/>
+        <import type="java.util.Arrays" />
 
         <variable
             name="viewModel"
@@ -101,9 +101,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:enabled="@{viewModel.grantEnabled}"
-                app:items="@{Arrays.asList(@stringArray/allow_timeout)}"
+                android:selection="@={viewModel.selectedItemPosition}"
                 app:itemBinding="@{viewModel.itemBinding}"
-                android:selection="@={viewModel.selectedItemPosition}" />
+                app:items="@{Arrays.asList(@stringArray/allow_timeout)}" />
 
             <TextView
                 android:id="@+id/warning"
@@ -133,6 +133,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:onClick="@{() -> viewModel.denyPressed()}"
                     android:text="@{viewModel.denyText}"
                     android:textColor="?colorOnSurfaceVariant"
@@ -145,9 +147,13 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="@{() -> viewModel.grantPressed()}"
+                    android:clickable="true"
                     android:enabled="@{viewModel.grantEnabled}"
+                    android:focusable="true"
+                    android:onClick="@{() -> viewModel.grantPressed()}"
                     android:text="@string/grant" />
+
+                <requestFocus />
 
             </LinearLayout>
 

@@ -36,18 +36,19 @@
             android:layout_height="0dp"
             android:layout_marginBottom="2dp"
             android:alpha=".3"
-            app:tint="?colorSecondary"
-            app:srcCompat="@drawable/bg_line_bottom_rounded"
             app:layout_constraintBottom_toTopOf="@+id/track_bullet"
             app:layout_constraintEnd_toEndOf="@+id/track_bullet"
             app:layout_constraintStart_toStartOf="@+id/track_bullet"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/bg_line_bottom_rounded"
+            app:tint="?colorSecondary" />
 
         <ImageView
             android:id="@+id/track_bullet"
             style="@style/WidgetFoundation.Image.Small"
             isSelected="@{isSelected}"
             srcCompat="@{bullet}"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,12 +63,12 @@
             android:layout_height="0dp"
             android:layout_marginTop="2dp"
             android:alpha=".3"
-            app:tint="?colorSecondary"
-            app:srcCompat="@drawable/bg_line_top_rounded"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/track_bullet"
             app:layout_constraintStart_toStartOf="@+id/track_bullet"
-            app:layout_constraintTop_toBottomOf="@+id/track_bullet" />
+            app:layout_constraintTop_toBottomOf="@+id/track_bullet"
+            app:srcCompat="@drawable/bg_line_top_rounded"
+            app:tint="?colorSecondary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
