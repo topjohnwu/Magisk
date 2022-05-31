@@ -54,10 +54,8 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             AppSettings,
             UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
-        if (Info.env.isActive) {
-            if (Const.USER_ID == 0) {
-                if (hidden) list.add(Restore) else list.add(Hide)
-            }
+        if (Build.VERSION.SDK_INT >= 22 && Info.env.isActive && Const.USER_ID == 0) {
+            if (hidden) list.add(Restore) else list.add(Hide)
         }
 
         // Magisk
