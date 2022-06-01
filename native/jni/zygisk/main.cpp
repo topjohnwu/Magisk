@@ -78,14 +78,13 @@ int app_process_main(int argc, char *argv[]) {
                 break;
 
             string tmp = read_string(socket);
-            xreadlink("/proc/self/exe", buf, sizeof(buf));
             if (char *ld = getenv("LD_PRELOAD")) {
                 string env = ld;
                 env += ':';
-                env += buf;
+                env += HIJACK_BIN;
                 setenv("LD_PRELOAD", env.data(), 1);
             } else {
-                setenv("LD_PRELOAD", buf, 1);
+                setenv("LD_PRELOAD", HIJACK_BIN, 1);
             }
             setenv(INJECT_ENV_1, "1", 1);
             setenv(MAGISKTMP_ENV, tmp.data(), 1);
