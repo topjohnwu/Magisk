@@ -30,6 +30,7 @@ object Const {
 
         fun atLeast_21_2() = Info.env.versionCode >= 21200 || isCanary()
         fun atLeast_24_0() = Info.env.versionCode >= 24000 || isCanary()
+        fun atLeast_25_0() = Info.env.versionCode >= 25000 || isCanary()
         fun isCanary() = isCanary(Info.env.versionCode)
 
         fun isCanary(ver: Int) = ver > 0 && ver % 100 != 0
