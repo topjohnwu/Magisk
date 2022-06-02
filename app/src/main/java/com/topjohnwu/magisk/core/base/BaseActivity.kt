@@ -18,10 +18,9 @@ import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.patch
 import com.topjohnwu.magisk.core.utils.RequestInstall
 import com.topjohnwu.magisk.core.utils.UninstallPackage
-import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.utils.Utils
 import java.util.concurrent.CountDownLatch
@@ -56,14 +55,12 @@ abstract class BaseActivity : AppCompatActivity() {
         uninstallLatch.countDown()
     }
 
-    override fun applyOverrideConfiguration(config: Configuration?) {
-        // Force applying our preferred local
-        config?.setLocale(currentLocale)
-        super.applyOverrideConfiguration(config)
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.patch())
     }
 
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base.wrap())
+    override fun createConfigurationContext(config: Configuration): Context {
+        return super.createConfigurationContext(config).patch()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
