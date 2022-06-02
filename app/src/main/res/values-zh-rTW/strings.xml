@@ -22,7 +22,7 @@
 
     <string name="home_notice_content">請從官方的 Github 網頁下載 Magisk。從未知來源下載的檔案可能懷有惡意！</string>
     <string name="home_support_title">支持開發</string>
-    <string name="home_follow_title">追蹤我們</string>
+    <string name="home_follow_title">關注我們</string>
     <string name="home_item_source">原始碼</string>
     <string name="home_support_content">Magisk 無論現在和未來永遠是免費且開源。但您可以透過發送小額的抖內來彰顯您對我們的支持。</string>
     <string name="home_installed_version">已安裝</string>
