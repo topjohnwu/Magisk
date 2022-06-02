@@ -1,9 +1,8 @@
-<a href="https://github.com/topjohnwu/Magisk/#gh-dark-mode-only">
-  <img src="docs/images/logo-light.png">
-</a>
-
-<a href="https://github.com/topjohnwu/Magisk/#gh-light-mode-only">
-  <img src="docs/images/logo-dark.png">
+<a href="https://github.com/topjohnwu/Magisk/">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flame-0/Magisk/master/docs/images/logo-light.png">
+    <img alt="Magisk" src="https://raw.githubusercontent.com/flame-0/Magisk/master/docs/images/logo-dark.png">
+  </picture>
 </a>
 
 [![Downloads](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
