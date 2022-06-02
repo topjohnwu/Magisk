@@ -35,6 +35,11 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
     override val navHostId: Int = R.id.main_nav_host
+    override val snackbarView: View
+        get() {
+            val fragmentOverride = currentFragment?.snackbarView
+            return fragmentOverride ?: super.snackbarView
+        }
     override val snackbarAnchorView: View?
         get() {
             val fragmentAnchor = currentFragment?.snackbarAnchorView
