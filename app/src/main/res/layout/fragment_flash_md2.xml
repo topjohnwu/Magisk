@@ -54,6 +54,12 @@
             app:icon="@drawable/ic_restart"
             app:iconTint="?colorOnPrimary" />
 
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/snackbar_container"
+            app:fitsSystemWindowsInsets="top|bottom"/>
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>
