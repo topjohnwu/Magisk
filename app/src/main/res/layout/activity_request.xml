@@ -131,8 +131,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:onClick="@{() -> viewModel.denyPressed()}"
                     android:text="@{viewModel.denyText}"
                     android:textColor="?colorOnSurfaceVariant"
@@ -145,9 +143,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:clickable="true"
                     android:enabled="@{viewModel.grantEnabled}"
-                    android:focusable="true"
                     android:onClick="@{() -> viewModel.grantPressed()}"
                     android:text="@string/grant" />
 
