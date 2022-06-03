@@ -24,13 +24,13 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/module"
             style="@style/WidgetFoundation.Card"
             isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
-            android:id="@+id/module"
-            android:clickable="true"
-            android:focusable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
             android:nextFocusRight="@id/module_indicator"
             android:onClick="@{() -> item.setEnabled(!item.enabled)}"
             app:cardBackgroundColor="@color/color_card_background_color_selector"
