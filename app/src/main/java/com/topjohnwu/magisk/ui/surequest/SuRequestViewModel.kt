@@ -34,7 +34,6 @@ import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.launch
-import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
@@ -69,8 +68,6 @@ class SuRequestViewModel(
         }
         false
     }
-
-    val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
     private val handler = SuRequestHandler(AppContext.packageManager, policyDB)
     private lateinit var timer: CountDownTimer

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
@@ -23,7 +24,6 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import me.tatarka.bindingcollectionadapter2.BR
 import kotlin.math.roundToInt
 
 enum class MagiskState {
