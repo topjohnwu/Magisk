@@ -125,9 +125,7 @@ using db_row_cb = std::function<bool(db_row&)>;
 
 int get_db_settings(db_settings &cfg, int key = -1);
 int get_db_strings(db_strings &str, int key = -1);
-bool get_manager(int user_id, std::string *pkg, struct stat *st);
-bool get_manager(std::string *pkg = nullptr);
-int get_manager_app_id();
+void rm_db_strings(int key);
 void exec_sql(int client);
 char *db_exec(const char *sql);
 char *db_exec(const char *sql, const db_row_cb &fn);

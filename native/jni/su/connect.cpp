@@ -1,11 +1,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 
 #include "su.hpp"
-#include "daemon.hpp"
 
 extern int SDK_INT;
 
@@ -164,7 +163,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    snprintf(target, sizeof(target), "%s/.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
+    snprintf(target, sizeof(target), "%s/com.topjohnwu.magisk.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);
@@ -189,7 +188,7 @@ void app_log(const su_context &ctx) {
 void app_notify(const su_context &ctx) {
     if (fork_dont_care() == 0) {
         vector<Extra> extras;
-        extras.reserve(2);
+        extras.reserve(3);
         extras.emplace_back("from.uid", ctx.info->uid);
         extras.emplace_back("pid", ctx.pid);
         extras.emplace_back("policy", ctx.info->access.policy);
@@ -205,19 +204,20 @@ int app_request(const su_context &ctx) {
     strcpy(fifo, "/dev/socket/");
     gen_rand_str(fifo + 12, 32, true);
     mkfifo(fifo, 0600);
-    chown(fifo, ctx.info->mgr_st.st_uid, ctx.info->mgr_st.st_gid);
+    chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
     setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
 
     // Send request
     vector<Extra> extras;
-    extras.reserve(2);
+    extras.reserve(3);
     extras.emplace_back("fifo", fifo);
     extras.emplace_back("uid", ctx.info->eval_uid);
     extras.emplace_back("pid", ctx.pid);
     exec_cmd("request", extras, ctx.info, false);
 
     // Wait for data input for at most 70 seconds
-    int fd = xopen(fifo, O_RDONLY | O_CLOEXEC | O_NONBLOCK);
+    // Open with O_RDWR to prevent FIFO open block
+    int fd = xopen(fifo, O_RDWR | O_CLOEXEC);
     struct pollfd pfd = {
         .fd = fd,
         .events = POLLIN

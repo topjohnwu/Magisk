@@ -3,7 +3,7 @@
 #include <sys/wait.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 #include <daemon.hpp>
 
@@ -152,8 +152,8 @@ void exec_module_scripts(const char *stage, const vector<string_view> &modules) 
 
 constexpr char install_script[] = R"EOF(
 APK=%s
-log -t Magisk "apk_install: $APK"
-log -t Magisk "apk_install: $(pm install -r $APK 2>&1)"
+log -t Magisk "pm_install: $APK"
+log -t Magisk "pm_install: $(pm install -r $APK 2>&1)"
 rm -f $APK
 )EOF";
 
@@ -163,7 +163,38 @@ void install_apk(const char *apk) {
         .fork = fork_no_orphan
     };
     char cmds[sizeof(install_script) + 4096];
-    sprintf(cmds, install_script, apk);
+    snprintf(cmds, sizeof(cmds), install_script, apk);
+    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+}
+
+constexpr char uninstall_script[] = R"EOF(
+PKG=%s
+log -t Magisk "pm_uninstall: $PKG"
+log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
+)EOF";
+
+void uninstall_pkg(const char *pkg) {
+    exec_t exec {
+        .fork = fork_no_orphan
+    };
+    char cmds[sizeof(uninstall_script) + 256];
+    snprintf(cmds, sizeof(cmds), uninstall_script, pkg);
+    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+}
+
+constexpr char clear_script[] = R"EOF(
+PKG=%s
+USER=%d
+log -t Magisk "pm_clear: $PKG (user=$USER)"
+log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
+)EOF";
+
+void clear_pkg(const char *pkg, int user_id) {
+    exec_t exec {
+        .fork = fork_no_orphan
+    };
+    char cmds[sizeof(clear_script) + 288];
+    snprintf(cmds, sizeof(cmds), clear_script, pkg, user_id);
     exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
 }
 

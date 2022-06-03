@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.widget.Pre23CardViewBackgroundColorFixLayoutInflaterListener
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
 
@@ -33,10 +34,15 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
             .addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
+            .apply {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    this.addOnViewCreatedListener(Pre23CardViewBackgroundColorFixLayoutInflaterListener.getInstance())
+                }
+            }
 
         super.onCreate(savedInstanceState)
 
-        startObserveEvents()
+        startObserveLiveData()
 
         // We need to set the window background explicitly since for whatever reason it's not
         // propagated upstream

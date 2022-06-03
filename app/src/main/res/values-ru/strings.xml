@@ -111,6 +111,7 @@
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
     <string name="zygisk_module_unloaded">Модуль Zygisk не запущен из-за несовместимости</string>
+    <string name="module_empty">Модули не установлены</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
@@ -177,7 +178,7 @@
     <string name="settings_user_independent">Правила пользователей</string>
     <string name="owner_only_summary">Только администратору доступен Root-доступ</string>
     <string name="owner_manage_summary">Администратор управляет Root-доступом пользователей и обрабатывает запросы</string>
-    <string name="user_indepenent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
+    <string name="user_independent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
 
     <string name="mount_namespace_mode">Настройка пространств имён</string>
     <string name="settings_ns_global">Общее пространство имён</string>

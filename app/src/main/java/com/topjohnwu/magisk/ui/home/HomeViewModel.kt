@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
+import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.*
@@ -11,8 +12,8 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.App
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.databinding.itemBindingOf
+import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.EnvFixDialog
@@ -23,7 +24,6 @@ import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import me.tatarka.bindingcollectionadapter2.BR
 import kotlin.math.roundToInt
 
 enum class MagiskState {
@@ -36,8 +36,6 @@ class HomeViewModel(
 
     val magiskTitleBarrierIds =
         intArrayOf(R.id.home_magisk_icon, R.id.home_magisk_title, R.id.home_magisk_button)
-    val magiskDetailBarrierIds =
-        intArrayOf(R.id.home_magisk_installed_version, R.id.home_device_details_ramdisk)
     val appTitleBarrierIds =
         intArrayOf(R.id.home_manager_icon, R.id.home_manager_title, R.id.home_manager_button)
 
@@ -59,7 +57,7 @@ class HomeViewModel(
     val magiskInstalledVersion
         get() = Info.env.run {
             if (isActive)
-                "$versionString ($versionCode)".asText()
+                ("$versionString ($versionCode)" + if (isDebug) " (D)" else "").asText()
             else
                 R.string.not_available.asText()
         }
@@ -70,14 +68,15 @@ class HomeViewModel(
 
     val managerInstalledVersion
         get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
-            Info.stub?.let { " (${it.version})" }.orEmpty()
+            Info.stub?.let { " (${it.version})" }.orEmpty() +
+            if (BuildConfig.DEBUG) " (D)" else ""
 
     @get:Bindable
     var stateManagerProgress = 0
         set(value) = set(value, field, { field = it }, BR.stateManagerProgress)
 
-    val itemBinding = itemBindingOf<IconLink> {
-        it.bindExtra(BR.viewModel, this)
+    val extraBindings = bindExtra {
+        it.put(BR.viewModel, this)
     }
 
     companion object {
@@ -94,8 +93,10 @@ class HomeViewModel(
                 else -> MagiskState.UP_TO_DATE
             }
 
+            val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             managerRemoteVersion =
-                "${magisk.version} (${magisk.versionCode}) (${stub.versionCode})".asText()
+                ("${magisk.version} (${magisk.versionCode}) (${stub.versionCode})" +
+                    if (isDebug) " (D)" else "").asText()
         } ?: run {
             state = State.LOADING_FAILED
             managerRemoteVersion = R.string.not_available.asText()

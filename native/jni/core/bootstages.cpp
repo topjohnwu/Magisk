@@ -8,7 +8,7 @@
 
 #include <magisk.hpp>
 #include <db.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <resetprop.hpp>
 #include <selinux.hpp>
@@ -18,7 +18,6 @@
 using namespace std;
 
 static bool safe_mode = false;
-static int stub_fd = -1;
 bool zygisk_enabled = false;
 
 /*********
@@ -123,12 +122,9 @@ static bool magisk_env() {
 
     LOGI("* Initializing Magisk environment\n");
 
-    string stub_path = MAGISKTMP + "/stub.apk";
-    stub_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
-    unlink(stub_path.data());
-
+    preserve_stub_apk();
     string pkg;
-    get_manager(&pkg);
+    get_manager(0, &pkg);
 
     sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
@@ -278,8 +274,6 @@ static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 extern int disable_deny();
 
 void post_fs_data(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);
@@ -297,6 +291,7 @@ void post_fs_data(int client) {
 
     unlock_blocks();
     mount_mirrors();
+    prune_su_access();
 
     if (access(SECURE_DIR, F_OK) != 0) {
         if (SDK_INT < 24) {
@@ -340,8 +335,6 @@ unblock_init:
 }
 
 void late_start(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);
@@ -358,15 +351,13 @@ void late_start(int client) {
 }
 
 void boot_complete(int client) {
-    // ack
-    write_int(client, 0);
     close(client);
 
     mutex_guard lock(stage_lock);
     DAEMON_STATE = STATE_BOOT_COMPLETE;
     setup_logfile(false);
 
-    LOGI("** boot_complete triggered\n");
+    LOGI("** boot-complete triggered\n");
 
     if (safe_mode)
         return;
@@ -375,18 +366,15 @@ void boot_complete(int client) {
     if (access(SECURE_DIR, F_OK) != 0)
         xmkdir(SECURE_DIR, 0700);
 
-    if (stub_fd > 0) {
-        if (!get_manager()) {
-            // Install stub
-            struct stat st{};
-            fstat(stub_fd, &st);
-            char apk[] = "/data/stub.apk";
-            int dfd = xopen(apk, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
-            xsendfile(dfd, stub_fd, nullptr, st.st_size);
-            close(dfd);
-            install_apk(apk);
-        }
-        close(stub_fd);
-        stub_fd = -1;
-    }
+    // Ensure manager exists
+    check_pkg_refresh();
+    get_manager(0, nullptr, true);
+}
+
+void zygote_restart(int client) {
+    close(client);
+
+    LOGI("** zygote restarted\n");
+    pkg_xml_ino = 0;
+    prune_su_access();
 }

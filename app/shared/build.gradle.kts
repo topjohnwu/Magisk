@@ -5,9 +5,7 @@ plugins {
 setupCommon()
 
 android {
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
+    namespace = "com.topjohnwu.shared"
 }
 
 dependencies {

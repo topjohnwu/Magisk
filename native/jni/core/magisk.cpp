@@ -1,7 +1,7 @@
 #include <sys/mount.h>
 #include <libgen.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
@@ -29,9 +29,8 @@ Options:
 Advanced Options (Internal APIs):
    --daemon                  manually start magisk daemon
    --stop                    remove all magisk changes and stop daemon
-   --[init trigger]          start service for init trigger
-                             Supported init triggers:
-                             post-fs-data, service, boot-complete
+   --[init trigger]          callback on init triggers. Valid triggers:
+                             post-fs-data, service, boot-complete, zygote-restart
    --unlock-blocks           set BLKROSET flag to OFF for all block devices
    --restorecon              restore selinux context on Magisk files
    --clone-attr SRC DEST     clone permission, owner, and selinux context
@@ -53,7 +52,11 @@ int magisk_main(int argc, char *argv[]) {
     if (argc < 2)
         usage();
     if (argv[1] == "-c"sv) {
-        printf(MAGISK_VERSION ":MAGISK (" str(MAGISK_VER_CODE) ")\n");
+#if MAGISK_DEBUG
+        printf(MAGISK_VERSION ":MAGISK:D (" str(MAGISK_VER_CODE) ")\n");
+#else
+        printf(MAGISK_VERSION ":MAGISK:R (" str(MAGISK_VER_CODE) ")\n");
+#endif
         return 0;
     } else if (argv[1] == "-v"sv) {
         int fd = connect_daemon(MainRequest::CHECK_VERSION);
@@ -81,21 +84,23 @@ int magisk_main(int argc, char *argv[]) {
         cp_afc(argv[2], argv[3]);
         return 0;
     } else if (argv[1] == "--daemon"sv) {
-        int fd = connect_daemon(MainRequest::START_DAEMON, true);
-        close(fd);
+        close(connect_daemon(MainRequest::START_DAEMON, true));
         return 0;
     } else if (argv[1] == "--stop"sv) {
         int fd = connect_daemon(MainRequest::STOP_DAEMON);
         return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
-        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::POST_FS_DATA, true));
+        return 0;
     } else if (argv[1] == "--service"sv) {
-        int fd = connect_daemon(MainRequest::LATE_START, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::LATE_START, true));
+        return 0;
     } else if (argv[1] == "--boot-complete"sv) {
-        int fd = connect_daemon(MainRequest::BOOT_COMPLETE, true);
-        return read_int(fd);
+        close(connect_daemon(MainRequest::BOOT_COMPLETE));
+        return 0;
+    } else if (argv[1] == "--zygote-restart"sv) {
+        close(connect_daemon(MainRequest::ZYGOTE_RESTART));
+        return 0;
     } else if (argv[1] == "--denylist"sv) {
         return denylist_cli(argc - 1, argv + 1);
     } else if (argc >= 3 && argv[1] == "--sqlite"sv) {

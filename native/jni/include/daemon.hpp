@@ -9,6 +9,15 @@
 
 #include <socket.hpp>
 
+#define AID_ROOT   0
+#define AID_SHELL  2000
+#define AID_APP_START 10000
+#define AID_APP_END 19999
+#define AID_USER_OFFSET 100000
+
+#define to_app_id(uid)  (uid % AID_USER_OFFSET)
+#define to_user_id(uid) (uid / AID_USER_OFFSET)
+
 // Daemon command codes
 namespace MainRequest {
 enum : int {
@@ -24,6 +33,7 @@ enum : int {
     POST_FS_DATA,
     LATE_START,
     BOOT_COMPLETE,
+    ZYGOTE_RESTART,
     DENYLIST,
     SQLITE_CMD,
     REMOVE_MODULES,
@@ -77,10 +87,21 @@ void android_logging();
 void post_fs_data(int client);
 void late_start(int client);
 void boot_complete(int client);
+void zygote_restart(int client);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
 
+// Package
+void preserve_stub_apk();
+void check_pkg_refresh();
+std::vector<bool> get_app_no_list();
+// Call check_pkg_refresh() before calling get_manager(...)
+// to make sure the package state is invalidated!
+int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
+void prune_su_access();
+
 // Denylist
+extern std::atomic_flag skip_pkg_rescan;
 void initialize_denylist();
 int denylist_cli(int argc, char **argv);

@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.core.di.AppContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException

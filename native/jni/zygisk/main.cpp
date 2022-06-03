@@ -3,9 +3,10 @@
 #include <dlfcn.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <socket.hpp>
 #include <daemon.hpp>
+#include <selinux.hpp>
 
 #include "zygisk.hpp"
 
@@ -17,7 +18,14 @@ int app_process_main(int argc, char *argv[]) {
     char buf[PATH_MAX];
 
     bool zygote = false;
-    if (auto fp = open_file("/proc/self/attr/current", "r")) {
+    if (!selinux_enabled()) {
+        for (int i = 0; i < argc; ++i) {
+            if (argv[i] == "--zygote"sv) {
+                zygote = true;
+                break;
+            }
+        }
+    } else if (auto fp = open_file("/proc/self/attr/current", "r")) {
         fscanf(fp.get(), "%s", buf);
         zygote = (buf == "u:r:zygote:s0"sv);
     }
@@ -45,8 +53,11 @@ int app_process_main(int argc, char *argv[]) {
         }
 
         close(fds[1]);
-        if (read_int(fds[0]) != 0)
+        if (read_int(fds[0]) != 0) {
+            fprintf(stderr, "Failed to connect magisk daemon, "
+                            "try umount %s or reboot.\n", argv[0]);
             return 1;
+        }
         int app_proc_fd = recv_fd(fds[0]);
         if (app_proc_fd < 0)
             return 1;
@@ -67,14 +78,13 @@ int app_process_main(int argc, char *argv[]) {
                 break;
 
             string tmp = read_string(socket);
-            xreadlink("/proc/self/exe", buf, sizeof(buf));
             if (char *ld = getenv("LD_PRELOAD")) {
                 string env = ld;
                 env += ':';
-                env += buf;
+                env += HIJACK_BIN;
                 setenv("LD_PRELOAD", env.data(), 1);
             } else {
-                setenv("LD_PRELOAD", buf, 1);
+                setenv("LD_PRELOAD", HIJACK_BIN, 1);
             }
             setenv(INJECT_ENV_1, "1", 1);
             setenv(MAGISKTMP_ENV, tmp.data(), 1);

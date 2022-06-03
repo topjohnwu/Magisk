@@ -6,7 +6,6 @@ import androidx.databinding.ObservableList
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * @param callback    The callback that controls the behavior of the DiffObservableList.

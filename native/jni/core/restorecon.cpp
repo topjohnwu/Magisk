@@ -2,7 +2,7 @@
 
 #include <magisk.hpp>
 #include <selinux.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 using namespace std;
 
@@ -66,6 +66,8 @@ static void restore_magiskcon(int dirfd) {
 }
 
 void restorecon() {
+    if (!selinux_enabled())
+        return;
     int fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
     if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
         lsetfilecon(SECURE_DIR, ADB_CON);
@@ -76,13 +78,8 @@ void restorecon() {
 }
 
 void restore_tmpcon() {
-    if (MAGISKTMP == "/system/bin") {
-        // Running with emulator.sh
-        if (SDK_INT >= 26)
-            lsetfilecon("/system/bin/magisk", EXEC_CON);
+    if (!selinux_enabled())
         return;
-    }
-
     if (MAGISKTMP == "/sbin")
         setfilecon(MAGISKTMP.data(), ROOT_CON);
     else

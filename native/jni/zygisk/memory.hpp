@@ -3,7 +3,7 @@
 #include <map>
 #include <parallel_hashmap/phmap.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 namespace jni_hook {
 

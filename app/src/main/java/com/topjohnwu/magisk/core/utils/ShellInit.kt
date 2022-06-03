@@ -19,6 +19,7 @@ import java.util.jar.JarFile
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
         if (shell.isRoot) {
+            Info.isRooted = true
             RootUtils.bindTask?.let { shell.execTask(it) }
             RootUtils.bindTask = null
         }

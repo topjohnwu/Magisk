@@ -23,8 +23,6 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.*
 import com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener
-import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
-import me.tatarka.bindingcollectionadapter2.ItemBinding
 
 typealias DialogButtonClickListener = (DialogInterface) -> Unit
 
@@ -181,14 +179,13 @@ class MagiskDialog(
             it.layoutManager = LinearLayoutManager(context)
 
             val items = list.mapIndexed { i, cs -> DialogItem(cs, i) }
-            val binding = itemBindingOf<DialogItem> { item ->
-                item.bindExtra(BR.listener, DialogClickListener { pos ->
+            val extraBindings = bindExtra { sa ->
+                sa.put(BR.listener, DialogClickListener { pos ->
                     listener.onClick(pos)
                     dismiss()
                 })
-            }.let { b -> ItemBinding.of(b) }
-
-            BindingRecyclerViewAdapters.setAdapter(it, binding, items, null, null, null, null)
+            }
+            it.setAdapter(items, extraBindings)
         }
     )
 

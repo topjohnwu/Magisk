@@ -4,7 +4,7 @@
 #include <sys/mount.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
 #include <db.hpp>
@@ -150,6 +150,9 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::BOOT_COMPLETE:
         boot_complete(client);
         break;
+    case MainRequest::ZYGOTE_RESTART:
+        zygote_restart(client);
+        break;
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
         break;
@@ -171,7 +174,11 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
 static void handle_request_sync(int client, int code) {
     switch (code) {
     case MainRequest::CHECK_VERSION:
-        write_string(client, MAGISK_VERSION ":MAGISK");
+#if MAGISK_DEBUG
+        write_string(client, MAGISK_VERSION ":MAGISK:D");
+#else
+        write_string(client, MAGISK_VERSION ":MAGISK:R");
+#endif
         break;
     case MainRequest::CHECK_VERSION_CODE:
         write_int(client, MAGISK_VER_CODE);
@@ -213,7 +220,7 @@ static void handle_request(pollfd *pfd) {
         // Client died
         goto done;
     }
-    is_root = cred.uid == UID_ROOT;
+    is_root = cred.uid == AID_ROOT;
     is_zygote = cred.context == "u:r:zygote:s0";
 
     if (!is_root && !is_zygote && !is_client(cred.pid)) {
@@ -233,6 +240,7 @@ static void handle_request(pollfd *pfd) {
     case MainRequest::POST_FS_DATA:
     case MainRequest::LATE_START:
     case MainRequest::BOOT_COMPLETE:
+    case MainRequest::ZYGOTE_RESTART:
     case MainRequest::SQLITE_CMD:
     case MainRequest::GET_PATH:
     case MainRequest::DENYLIST:
@@ -243,13 +251,13 @@ static void handle_request(pollfd *pfd) {
         }
         break;
     case MainRequest::REMOVE_MODULES:
-        if (!is_root && cred.uid != UID_SHELL) {
+        if (!is_root && cred.uid != AID_SHELL) {
             write_int(client, MainResponse::ACCESS_DENIED);
             goto done;
         }
         break;
     case MainRequest::ZYGISK:
-        if (!is_zygote) {
+        if (!is_zygote && selinux_enabled()) {
             // Invalid client context
             write_int(client, MainResponse::ACCESS_DENIED);
             goto done;
@@ -283,10 +291,7 @@ static void switch_cgroup(const char *cgroup, int pid) {
     if (fd == -1)
         return;
     snprintf(buf, sizeof(buf), "%d\n", pid);
-    if (xwrite(fd, buf, strlen(buf)) == -1) {
-        close(fd);
-        return;
-    }
+    xwrite(fd, buf, strlen(buf));
     close(fd);
 }
 
@@ -362,14 +367,6 @@ static void daemon_entry() {
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 
-    // SELinux mock cleanups
-    string selinux_mock = MAGISKTMP + "/" SELINUXMOCK;
-    string fs = selinux_mock + "/fs";
-    if (access(fs.data(), F_OK) == 0) {
-        umount2(fs.data(), MNT_DETACH);
-    }
-    rm_rf(selinux_mock.data());
-
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
     parse_prop_file(config.data(), [](auto key, auto val) -> bool {
@@ -402,6 +399,7 @@ static void daemon_entry() {
 
     default_new(poll_map);
     default_new(poll_fds);
+    default_new(module_list);
 
     // Register handler for main socket
     pollfd main_socket_pfd = { fd, POLLIN, 0 };
@@ -416,8 +414,16 @@ int connect_daemon(int req, bool create) {
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
     if (connect(fd, (sockaddr *) &sun, len)) {
-        if (!create || getuid() != UID_ROOT) {
+        if (!create || getuid() != AID_ROOT) {
             LOGE("No daemon is currently running!\n");
+            close(fd);
+            return -1;
+        }
+
+        char buf[64];
+        xreadlink("/proc/self/exe", buf, sizeof(buf));
+        if (str_starts(buf, "/system/bin/")) {
+            LOGE("Start daemon on /dev or /sbin\n");
             close(fd);
             return -1;
         }

@@ -25,7 +25,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startObserveEvents()
+        startObserveLiveData()
     }
 
     override fun onCreateView(
@@ -37,7 +37,12 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
             it.setVariable(BR.viewModel, viewModel)
             it.lifecycleOwner = viewLifecycleOwner
         }
+        savedInstanceState?.let { viewModel.onRestoreState(it) }
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.onSaveState(outState)
     }
 
     override fun onStart() {
@@ -79,7 +84,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
     }
 
     fun NavDirections.navigate() {
-        navigation?.navigate(this)
+        navigation?.currentDestination?.getAction(actionId)?.let { navigation!!.navigate(this) }
     }
 
 }

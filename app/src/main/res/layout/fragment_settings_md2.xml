@@ -18,9 +18,8 @@
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            adapter="@{viewModel.adapter}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
             android:id="@+id/settings_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -1,14 +1,17 @@
+
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.*
 import java.util.*
 import java.util.zip.Deflater
@@ -22,23 +25,32 @@ private fun Project.androidBase(configure: Action<BaseExtension>) =
 private fun Project.android(configure: Action<BaseAppModuleExtension>) =
     extensions.configure("android", configure)
 
+private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
+    (this as ExtensionAware).extensions.findByName("kotlinOptions")?.let {
+        configure.execute(it as KotlinJvmOptions)
+    }
+
 private val Project.android: BaseAppModuleExtension
     get() = extensions.getByName("android") as BaseAppModuleExtension
 
 fun Project.setupCommon() {
     androidBase {
-        compileSdkVersion(31)
-        buildToolsVersion = "31.0.0"
+        compileSdkVersion(32)
+        buildToolsVersion = "32.0.0"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
             minSdk = 21
-            targetSdk = 31
+            targetSdk = 32
         }
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
+        }
+
+        kotlinOptions {
+            jvmTarget = "11"
         }
     }
 }

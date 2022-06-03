@@ -2,9 +2,9 @@ package com.topjohnwu.magisk.core.model.module
 
 import com.squareup.moshi.JsonDataException
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.io.SuFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -26,13 +26,12 @@ data class LocalModule(
     var outdated = false
 
     private var updateUrl: String = ""
-    private val removeFile = SuFile(path, "remove")
-    private val disableFile = SuFile(path, "disable")
-    private val updateFile = SuFile(path, "update")
-    private val ruleFile = SuFile(path, "sepolicy.rule")
-    private val riruFolder = SuFile(path, "riru")
-    private val zygiskFolder = SuFile(path, "zygisk")
-    private val unloaded = SuFile(zygiskFolder, "unloaded")
+    private val removeFile = RootUtils.fs.getFile(path, "remove")
+    private val disableFile = RootUtils.fs.getFile(path, "disable")
+    private val updateFile = RootUtils.fs.getFile(path, "update")
+    private val riruFolder = RootUtils.fs.getFile(path, "riru")
+    private val zygiskFolder = RootUtils.fs.getFile(path, "zygisk")
+    private val unloaded = RootUtils.fs.getFile(zygiskFolder, "unloaded")
 
     val updated: Boolean get() = updateFile.exists()
     val isRiru: Boolean get() = (id == "riru-core") || riruFolder.exists()
@@ -42,19 +41,12 @@ data class LocalModule(
     var enable: Boolean
         get() = !disableFile.exists()
         set(enable) {
-            val dir = "$PERSIST/$id"
             if (enable) {
                 disableFile.delete()
-                if (Const.Version.atLeast_21_2())
-                    Shell.cmd("copy_sepolicy_rules").submit()
-                else
-                    Shell.cmd("mkdir -p $dir", "cp -af $ruleFile $dir").submit()
+                Shell.cmd("copy_sepolicy_rules").submit()
             } else {
                 !disableFile.createNewFile()
-                if (Const.Version.atLeast_21_2())
-                    Shell.cmd("copy_sepolicy_rules").submit()
-                else
-                    Shell.cmd("rm -rf $dir").submit()
+                Shell.cmd("copy_sepolicy_rules").submit()
             }
         }
 
@@ -64,16 +56,10 @@ data class LocalModule(
             if (remove) {
                 if (updateFile.exists()) return
                 removeFile.createNewFile()
-                if (Const.Version.atLeast_21_2())
-                    Shell.cmd("copy_sepolicy_rules").submit()
-                else
-                    Shell.cmd("rm -rf $PERSIST/$id").submit()
+                Shell.cmd("copy_sepolicy_rules").submit()
             } else {
                 removeFile.delete()
-                if (Const.Version.atLeast_21_2())
-                    Shell.cmd("copy_sepolicy_rules").submit()
-                else
-                    Shell.cmd("cp -af $ruleFile $PERSIST/$id").submit()
+                Shell.cmd("copy_sepolicy_rules").submit()
             }
         }
 
@@ -138,8 +124,10 @@ data class LocalModule(
 
         private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
 
+        fun loaded() = RootUtils.fs.getFile(Const.MAGISK_PATH).exists()
+
         suspend fun installed() = withContext(Dispatchers.IO) {
-            SuFile(Const.MAGISK_PATH)
+            RootUtils.fs.getFile(Const.MAGISK_PATH)
                 .listFiles()
                 .orEmpty()
                 .filter { !it.isFile }

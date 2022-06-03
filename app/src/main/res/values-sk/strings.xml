@@ -111,6 +111,7 @@
     <string name="suspend_text_riru">Modul bol pozastavený, lebo %1$s je povolené</string>
     <string name="suspend_text_zygisk">Modul bol pozastavený, lebo %1$s nie je povolené</string>
     <string name="zygisk_module_unloaded">Modul Zygisk sa nenačítal z dôvodu nekompatibility</string>
+    <string name="module_empty">Nie je nainštalovaný žiadny modul</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motívu</string>
@@ -177,7 +178,7 @@
     <string name="settings_user_independent">Nezávisí od používateľa</string>
     <string name="owner_only_summary">Root prístup má iba majiteľ zariadenia</string>
     <string name="owner_manage_summary">Iba majiteľ zariadenia môže spravovať prístup root a prijímať žiadosti</string>
-    <string name="user_indepenent_summary">Každý používateľ má vlastné pravidlá pre root</string>
+    <string name="user_independent_summary">Každý používateľ má vlastné pravidlá pre root</string>
 
     <string name="mount_namespace_mode">Režim Mount namespace</string>
     <string name="settings_ns_global">Globálny namespace</string>

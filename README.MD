@@ -20,7 +20,8 @@ Some highlight features:
 
 [![](https://img.shields.io/badge/Magisk-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
 [![](https://img.shields.io/badge/Magisk%20Beta-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-release.apk)
+[![](https://img.shields.io/badge/Magisk-Debug-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -30,7 +31,7 @@ Some highlight features:
 
 ## Bug Reports
 
-**Only bug reports from Canary builds will be accepted.**
+**Only bug reports from Debug builds will be accepted.**
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
@@ -52,7 +53,13 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
   For each action, use `-h` to access help (e.g. `./build.py all -h`)
 - To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native (C++/C) sources.
 - Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
-- To sign APKs and zips with your own private keys, set signing configs in `config.prop`. For more info, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
+
+## Signing and Distribution
+
+- The certificate of the key used to sign the final Magisk APK product is also directly embedded into some executables. In release builds, Magisk's root daemon will enforce this certificate check and reject and forcefully uninstall any non-matching Magisk apps to protect users from malicious and unverified Magisk APKs.
+- To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to bypass the signature check.
+- To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
+- Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
 
 ## Translation Contributions
 

@@ -6,7 +6,7 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -2,7 +2,7 @@
 #include <endian.h>
 
 #include <socket.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 using namespace std;
 
@@ -27,7 +27,7 @@ bool get_client_cred(int fd, sock_cred *cred) {
     char buf[4096];
     len = sizeof(buf);
     if (getsockopt(fd, SOL_SOCKET, SO_PEERSEC, buf, &len) != 0)
-        return false;
+        len = 0;
     buf[len] = '\0';
     cred->context = buf;
     return true;

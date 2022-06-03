@@ -5,7 +5,7 @@
 #include <magisk.hpp>
 #include <db.hpp>
 #include <socket.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 #define DB_VERSION 12
 
@@ -359,46 +359,12 @@ int get_db_strings(db_strings &str, int key) {
     return 0;
 }
 
-bool get_manager(int user_id, std::string *pkg, struct stat *st) {
-    db_strings str;
-    get_db_strings(str, SU_MANAGER);
-    char app_path[128];
-
-    if (!str[SU_MANAGER].empty()) {
-        // App is repackaged
-        sprintf(app_path, "%s/%d/%s", APP_DATA_DIR, user_id, str[SU_MANAGER].data());
-        if (stat(app_path, st) == 0) {
-            if (pkg)
-                pkg->swap(str[SU_MANAGER]);
-            return true;
-        }
-    }
-
-    // Check the official package name
-    sprintf(app_path, "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, user_id);
-    if (stat(app_path, st) == 0) {
-        if (pkg)
-            *pkg = JAVA_PACKAGE_NAME;
-        return true;
-    } else {
-        LOGE("su: cannot find manager\n");
-        memset(st, 0, sizeof(*st));
-        if (pkg)
-            pkg->clear();
-        return false;
-    }
-}
-
-bool get_manager(string *pkg) {
-    struct stat st;
-    return get_manager(0, pkg, &st);
-}
-
-int get_manager_app_id() {
-    struct stat st;
-    if (get_manager(0, nullptr, &st))
-        return to_app_id(st.st_uid);
-    return -1;
+void rm_db_strings(int key) {
+    char *err;
+    char query[128];
+    snprintf(query, sizeof(query), "DELETE FROM strings WHERE key == '%s'", DB_STRING_KEYS[key]);
+    err = db_exec(query);
+    db_err_cmd(err, return);
 }
 
 void exec_sql(int client) {

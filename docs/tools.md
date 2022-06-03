@@ -1,6 +1,6 @@
 # Magisk Tools
 
-Magisk comes with a huge collections of tools for installation, daemons, and utilities for developers. This documentation covers the 3 binaries and all included applets. The binaries and applets are shown below:
+Magisk comes with a huge collections of tools for installation, daemons, and utilities for developers. This documentation covers the 4 binaries and all included applets. The binaries and applets are shown below:
 
 ```
 magiskboot                 /* binary */
@@ -11,8 +11,6 @@ magisk                     /* binary */
 resetprop -> magisk
 su -> magisk
 ```
-
-Note: The Magisk zip you download only contains `magiskboot`, `magiskinit`, and `magiskinit64`. The binary `magisk` is compressed and embedded into `magiskinit(64)`. Push `magiskinit(64)` to your device and run `./magiskinit(64) -x magisk <path>` to extract `magisk` out of the binary.
 
 ### magiskboot
 

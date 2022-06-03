@@ -2,12 +2,11 @@ package com.topjohnwu.magisk.core.download
 
 import android.app.Notification
 import android.content.Intent
-import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseService
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.synchronized
 import com.topjohnwu.magisk.view.Notifications
 import okhttp3.ResponseBody
@@ -19,8 +18,6 @@ open class NotificationService : BaseService() {
     protected val hasNotifications get() = notifications.isNotEmpty()
 
     protected val service get() = ServiceLocator.networkService
-
-    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)

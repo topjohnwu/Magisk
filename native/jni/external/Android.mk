@@ -248,7 +248,7 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/cil/src/cil_verify.c \
     selinux/libsepol/cil/src/cil_write_ast.c
 
-LOCAL_CFLAGS := -Dgetline=__getline -Wno-implicit-function-declaration
+LOCAL_CFLAGS := -Wno-unused-but-set-variable
 include $(BUILD_STATIC_LIBRARY)
 
 # libselinux.a
@@ -260,7 +260,7 @@ LOCAL_EXPORT_C_INCLUDES := $(LIBSELINUX)
 LOCAL_STATIC_LIBRARIES := libpcre2
 LOCAL_CFLAGS := \
     -Wno-implicit-function-declaration -Wno-int-conversion -Wno-unused-function \
-    -Wno-macro-redefined -D_GNU_SOURCE -DUSE_PCRE2 \
+    -Wno-macro-redefined -Wno-unused-but-set-variable -D_GNU_SOURCE -DUSE_PCRE2 \
     -DNO_PERSISTENTLY_STORED_PATTERNS -DDISABLE_SETRANS -DDISABLE_BOOL \
     -DNO_MEDIA_BACKEND -DNO_X_BACKEND -DNO_DB_BACKEND -DNO_ANDROID_BACKEND \
     -Dfgets_unlocked=fgets -D'__fsetlocking(...)='

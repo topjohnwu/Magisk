@@ -1,23 +1,27 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.events.SelectModuleEvent
+import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
+import kotlinx.parcelize.Parcelize
 
 class ModuleViewModel : BaseViewModel() {
 
@@ -26,12 +30,14 @@ class ModuleViewModel : BaseViewModel() {
     private val itemsInstalled = diffListOf<LocalModuleRvItem>()
 
     val items = MergeObservableList<RvItem>()
-    val itemBinding = itemBindingOf<RvItem> {
-        it.bindExtra(BR.viewModel, this)
+    val extraBindings = bindExtra {
+        it.put(BR.viewModel, this)
     }
 
+    val data get() = uri
+
     init {
-        if (Info.env.isActive) {
+        if (Info.env.isActive && LocalModule.loaded()) {
             items.insertItem(InstallModule)
                 .insertList(itemsInstalled)
         }
@@ -64,12 +70,24 @@ class ModuleViewModel : BaseViewModel() {
     }
 
     fun downloadPressed(item: OnlineModule?) =
-        if (item != null && isConnected.get()) {
+        if (item != null && Info.isConnected.value == true) {
             withExternalRW { ModuleInstallDialog(item).publish() }
         } else {
             SnackbarEvent(R.string.no_connection).publish()
         }
 
-    fun installPressed() = withExternalRW { SelectModuleEvent().publish() }
+    fun installPressed() = withExternalRW {
+        GetContentEvent("application/zip", UriCallback()).publish()
+    }
 
+    @Parcelize
+    class UriCallback : ContentResultCallback {
+        override fun onActivityResult(result: Uri) {
+            uri.value = result
+        }
+    }
+
+    companion object {
+        private val uri = MutableLiveData<Uri?>()
+    }
 }

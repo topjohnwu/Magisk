@@ -9,10 +9,11 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
@@ -22,9 +23,8 @@ import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.NOPList
 import com.topjohnwu.superuser.internal.UiThreadHandler
-import com.topjohnwu.superuser.io.SuFile
-import com.topjohnwu.superuser.io.SuFileInputStream
-import com.topjohnwu.superuser.io.SuFileOutputStream
+import com.topjohnwu.superuser.nio.ExtendedFile
+import com.topjohnwu.superuser.nio.FileSystemManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.jpountz.lz4.LZ4FrameInputStream
@@ -45,13 +45,16 @@ abstract class MagiskInstallImpl protected constructor(
     private val logs: MutableList<String> = NOPList.getInstance()
 ) {
 
-    protected var installDir = File("xxx")
-    private lateinit var srcBoot: File
+    protected lateinit var installDir: ExtendedFile
+    private lateinit var srcBoot: ExtendedFile
 
     private val shell = Shell.getShell()
     private val service get() = ServiceLocator.networkService
     protected val context get() = ServiceLocator.deContext
     private val useRootDir = shell.isRoot && Info.noDataExec
+
+    private val rootFS get() = RootUtils.fs
+    private val localFS get() = FileSystemManager.getLocal()
 
     private fun findImage(): Boolean {
         val bootPath = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
@@ -59,7 +62,7 @@ abstract class MagiskInstallImpl protected constructor(
             console.add("! Unable to detect target image")
             return false
         }
-        srcBoot = SuFile(bootPath)
+        srcBoot = rootFS.getFile(bootPath)
         console.add("- Target image: $bootPath")
         return true
     }
@@ -77,7 +80,7 @@ abstract class MagiskInstallImpl protected constructor(
             console.add("! Unable to detect target image")
             return false
         }
-        srcBoot = SuFile(bootPath)
+        srcBoot = rootFS.getFile(bootPath)
         console.add("- Target image: $bootPath")
         return true
     }
@@ -86,7 +89,7 @@ abstract class MagiskInstallImpl protected constructor(
         console.add("- Device platform: ${Const.CPU_ABI}")
         console.add("- Installing: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
-        installDir = File(context.filesDir.parent, "install")
+        installDir = localFS.getFile(context.filesDir.parent, "install")
         installDir.deleteRecursively()
         installDir.mkdirs()
 
@@ -146,7 +149,7 @@ abstract class MagiskInstallImpl protected constructor(
 
         if (useRootDir) {
             // Move everything to tmpfs to workaround Samsung bullshit
-            SuFile(Const.TMPDIR).also {
+            rootFS.getFile(Const.TMPDIR).also {
                 arrayOf(
                     "rm -rf $it",
                     "mkdir -p $it",
@@ -158,14 +161,6 @@ abstract class MagiskInstallImpl protected constructor(
         }
 
         return true
-    }
-
-    // Optimization for SuFile I/O streams to skip an internal trial and error
-    private fun installDirFile(name: String): File {
-        return if (useRootDir)
-            SuFile(installDir, name)
-        else
-            File(installDir, name)
     }
 
     private fun InputStream.cleanPump(out: OutputStream) = withStreams(this, out) { src, _ ->
@@ -198,8 +193,8 @@ abstract class MagiskInstallImpl protected constructor(
                     val name = entry.name.replace(".lz4", "")
                     console.add("-- Extracting: $name")
 
-                    val extract = installDirFile(name)
-                    decompressedStream().cleanPump(SuFileOutputStream.open(extract))
+                    val extract = installDir.getChildFile(name)
+                    decompressedStream().cleanPump(extract.newOutputStream())
                 } else if (entry.name.contains("vbmeta.img")) {
                     val rawData = decompressedStream().readBytes()
                     // Valid vbmeta.img should be at least 256 bytes
@@ -219,8 +214,8 @@ abstract class MagiskInstallImpl protected constructor(
                 }
             }
         }
-        val boot = installDirFile("boot.img")
-        val recovery = installDirFile("recovery.img")
+        val boot = installDir.getChildFile("boot.img")
+        val recovery = installDir.getChildFile("recovery.img")
         if (Config.recovery && recovery.exists() && boot.exists()) {
             // Install to recovery
             srcBoot = recovery
@@ -234,7 +229,7 @@ abstract class MagiskInstallImpl protected constructor(
                 "./magiskboot cleanup",
                 "rm -f new-boot.img",
                 "cd /").sh()
-            SuFileInputStream.open(boot).use {
+            boot.newInputStream().use {
                 tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
                 it.copyTo(tarOut)
             }
@@ -280,9 +275,9 @@ abstract class MagiskInstallImpl protected constructor(
                     processTar(src, outFile!!.uri.outputStream())
                 } else {
                     // raw image
-                    srcBoot = installDirFile("boot.img")
+                    srcBoot = installDir.getChildFile("boot.img")
                     console.add("- Copying image to cache")
-                    src.cleanPump(SuFileOutputStream.open(srcBoot))
+                    src.cleanPump(srcBoot.newOutputStream())
                     outFile = MediaStoreUtils.getFile("$filename.img", true)
                     outFile!!.uri.outputStream()
                 }
@@ -302,12 +297,12 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Output file
         try {
-            val newBoot = installDirFile("new-boot.img")
+            val newBoot = installDir.getChildFile("new-boot.img")
             if (outStream is TarOutputStream) {
                 val name = if (srcBoot.path.contains("recovery")) "recovery.img" else "boot.img"
                 outStream.putNextEntry(newTarEntry(name, newBoot.length()))
             }
-            SuFileInputStream.open(newBoot).cleanPump(outStream)
+            newBoot.newInputStream().cleanPump(outStream)
             newBoot.delete()
 
             console.add("")
@@ -331,9 +326,9 @@ abstract class MagiskInstallImpl protected constructor(
 
     private fun patchBoot(): Boolean {
         var isSigned = false
-        if (srcBoot.let { it !is SuFile || !it.isCharacter }) {
+        if (!srcBoot.isCharacter) {
             try {
-                SuFileInputStream.open(srcBoot).use {
+                srcBoot.newInputStream().use {
                     if (SignBoot.verifySignature(it, null)) {
                         isSigned = true
                         console.add("- Boot image is signed with AVB 1.0")
@@ -346,7 +341,7 @@ abstract class MagiskInstallImpl protected constructor(
             }
         }
 
-        val newBoot = installDirFile("new-boot.img")
+        val newBoot = installDir.getChildFile("new-boot.img")
         if (!useRootDir) {
             // Create output files before hand
             newBoot.createNewFile()
@@ -370,7 +365,7 @@ abstract class MagiskInstallImpl protected constructor(
             console.add("- Signing boot image with verity keys")
             val signed = File.createTempFile("signed", ".img", context.cacheDir)
             try {
-                val src = SuFileInputStream.open(newBoot).buffered()
+                val src = newBoot.newInputStream().buffered()
                 val out = signed.outputStream().buffered()
                 withStreams(src, out) { _, _ ->
                     SignBoot.doSignature(null, null, src, out, "/boot")
@@ -410,11 +405,11 @@ abstract class MagiskInstallImpl protected constructor(
     private fun String.fsh() = ShellUtils.fastCmd(shell, this)
     private fun Array<String>.fsh() = ShellUtils.fastCmd(shell, *this)
 
-    protected fun doPatchFile(patchFile: Uri) = extractFiles() && handleFile(patchFile)
+    protected fun patchFile(file: Uri) = extractFiles() && handleFile(file)
 
     protected fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
 
-    protected suspend fun secondSlot() =
+    protected fun secondSlot() =
         findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
 
     protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
@@ -463,7 +458,7 @@ abstract class MagiskInstaller(
         console: MutableList<String>,
         logs: MutableList<String>
     ) : MagiskInstaller(console, logs) {
-        override suspend fun operations() = doPatchFile(uri)
+        override suspend fun operations() = patchFile(uri)
     }
 
     class SecondSlot(

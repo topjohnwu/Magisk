@@ -1,11 +1,11 @@
 package com.topjohnwu.magisk.events.dialog
 
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.Action
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 
 class ModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {

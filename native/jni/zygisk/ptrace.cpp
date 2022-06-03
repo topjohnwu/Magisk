@@ -22,7 +22,7 @@
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "zygisk.hpp"
 #include "ptrace.hpp"

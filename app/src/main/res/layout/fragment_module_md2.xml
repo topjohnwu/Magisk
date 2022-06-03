@@ -20,8 +20,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
             gone="@{viewModel.loading}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -33,7 +33,6 @@
             tools:listitem="@layout/item_module_md2" />
 
         <LinearLayout
-            goneUnless="@{viewModel.loading}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -41,6 +40,7 @@
             android:orientation="vertical">
 
             <TextView
+                goneUnless="@{viewModel.loading}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/loading"
@@ -49,8 +49,16 @@
 
             <ProgressBar
                 style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+                goneUnless="@{viewModel.loading}"
                 android:layout_marginTop="@dimen/l1" />
 
+            <TextView
+                gone="@{viewModel.loading || viewModel.items.size() != 1 }"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/module_empty"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </FrameLayout>

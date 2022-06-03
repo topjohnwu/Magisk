@@ -72,7 +72,7 @@
                             gone="@{viewModel.step != 0}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:onClick="@{() -> viewModel.step(1)}"
+                            android:onClick="@{() -> viewModel.setStep(1)}"
                             android:text="@string/install_next" />
 
                     </LinearLayout>

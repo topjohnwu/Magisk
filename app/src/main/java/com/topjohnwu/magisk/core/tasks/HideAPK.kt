@@ -11,9 +11,9 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Provider
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.signing.JarMap

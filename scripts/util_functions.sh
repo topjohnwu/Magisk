@@ -295,6 +295,13 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
+
+  # Mount sepolicy rules dir locations in recovery (best effort)
+  if ! $BOOTMODE; then
+    mount_name "cache cac" /cache
+    mount_name metadata /metadata
+    mount_name persist /persist
+  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -651,9 +658,9 @@ copy_sepolicy_rules() {
   fi
 
   if [ -d ${RULESDIR%/magisk} ]; then
-    ui_print "- Sepolicy rules dir is ${RULESDIR%/magisk}"
+    echo "RULESDIR=$RULESDIR" >&2
   else
-    ui_print "- Sepolicy rules dir ${RULESDIR%/magisk} not found"
+    ui_print "- Unable to find sepolicy rules dir ${RULESDIR%/magisk}"
     return 1
   fi
 
@@ -810,7 +817,7 @@ install_module() {
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
   $MODPATH/README.md $MODPATH/.git*
-  rmdir -p $MODPATH
+  rmdir -p $MODPATH 2>/dev/null
 
   cd /
   $BOOTMODE || recovery_cleanup
@@ -832,7 +839,7 @@ NVBASE=/data/adb
 TMPDIR=/dev/tmp
 
 # Bootsigner related stuff
-BOOTSIGNERCLASS=com.topjohnwu.signing.SignBoot
+BOOTSIGNERCLASS=com.topjohnwu.magisk.signing.SignBoot
 BOOTSIGNER='/system/bin/dalvikvm -Xnoimage-dex2oat -cp $APK $BOOTSIGNERCLASS'
 BOOTSIGNED=false
 

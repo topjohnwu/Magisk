@@ -5,7 +5,7 @@
 
 #include <xz.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <binaries.h>
 
 #if defined(__arm__)

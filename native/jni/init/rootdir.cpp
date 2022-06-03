@@ -2,7 +2,7 @@
 #include <libgen.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "init.hpp"
 #include "magiskrc.inc"
@@ -29,7 +29,7 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
             fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
             return true;
         }
-        // Samsung's persist.sys.zygote.early will start zygotes before actual post-fs-data phase
+        // Samsung's persist.sys.zygote.early will cause Zygote to start before post-fs-data
         if (str_starts(line, "on property:persist.sys.zygote.early=")) {
             LOGD("Invalidate persist.sys.zygote.early\n");
             fprintf(rc, "on property:persist.sys.zygote.early.xxxxx=true\n");
@@ -51,12 +51,11 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     rc_list.clear();
 
     // Inject Magisk rc scripts
-    char pfd_svc[16], ls_svc[16], bc_svc[16];
+    char pfd_svc[16], ls_svc[16];
     gen_rand_str(pfd_svc, sizeof(pfd_svc));
     gen_rand_str(ls_svc, sizeof(ls_svc));
-    gen_rand_str(bc_svc, sizeof(bc_svc));
-    LOGD("Inject magisk services: [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc);
-    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc, bc_svc);
+    LOGD("Inject magisk services: [%s] [%s]\n", pfd_svc, ls_svc);
+    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc);
 
     fclose(rc);
     clone_attr(src, dest);

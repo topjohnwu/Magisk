@@ -1,14 +1,20 @@
 package com.topjohnwu.magisk;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.ParcelFileDescriptor.MODE_READ_ONLY;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.content.res.loader.ResourcesLoader;
+import android.content.res.loader.ResourcesProvider;
+import android.os.ParcelFileDescriptor;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -50,12 +56,21 @@ public class StubApk {
         return new File(getDynDir(info), "update.apk");
     }
 
-    public static void addAssetPath(AssetManager asset, String path) {
-        try {
-            if (addAssetPath == null)
-                addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
-            addAssetPath.invoke(asset, path);
-        } catch (Exception ignored) {}
+    public static void addAssetPath(Resources res, String path) {
+        if (SDK_INT >= 30) {
+            try (var fd = ParcelFileDescriptor.open(new File(path), MODE_READ_ONLY)) {
+                var loader = new ResourcesLoader();
+                loader.addProvider(ResourcesProvider.loadFromApk(fd));
+                res.addLoaders(loader);
+            } catch (IOException ignored) {}
+        } else {
+            AssetManager asset = res.getAssets();
+            try {
+                if (addAssetPath == null)
+                    addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
+                addAssetPath.invoke(asset, path);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static void restartProcess(Activity activity) {

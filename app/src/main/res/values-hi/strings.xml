@@ -157,7 +157,7 @@
     <string name="settings_user_independent"> स्वत्रंत उपयोगकर्ता</string>
     <string name="owner_only_summary">केवल मालिक के पास ही रूट की पहुँच है</string>
     <string name="owner_manage_summary">केवल मालिक रूट एक्सेस का प्रबंधन कर सकते हैं और अनुरोध संकेत प्राप्त कर सकते हैं</string>
-    <string name="user_indepenent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है</string>
+    <string name="user_independent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है</string>
 
     <string name="mount_namespace_mode">माउंट नेमस्पेस मोड</string>
     <string name="settings_ns_global">ग्लोबल नेमस्पेस</string>
