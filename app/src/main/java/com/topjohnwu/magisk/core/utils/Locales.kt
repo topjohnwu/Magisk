@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.createNewResources
 import com.topjohnwu.magisk.core.di.AppContext
@@ -27,6 +28,11 @@ withContext(Dispatchers.Default) {
     // Create a completely new resource to prevent cross talk over active configs
     val res = createNewResources()
 
+    fun changeLocale(locale: Locale) {
+        res.configuration.setLocale(locale)
+        res.updateConfiguration(res.configuration, res.displayMetrics)
+    }
+
     val locales = ArrayList<String>().apply {
         // Add default locale
         add("en")
@@ -40,13 +46,13 @@ withContext(Dispatchers.Default) {
     }.map {
         Locale.forLanguageTag(it)
     }.distinctBy {
-        res.setLocale(it)
+        changeLocale(it)
         res.getString(compareId)
     }.sortedWith { a, b ->
         a.getDisplayName(a).compareTo(b.getDisplayName(b), true)
     }
 
-    res.setLocale(defaultLocale)
+    changeLocale(defaultLocale)
     val defName = res.getString(R.string.system_default)
 
     val names = ArrayList<String>(locales.size + 1)
@@ -70,11 +76,6 @@ fun Resources.setConfig(config: Configuration) {
 
 fun Resources.syncLocale() = setConfig(configuration)
 
-fun Resources.setLocale(locale: Locale) {
-    configuration.setLocale(locale)
-    updateConfiguration(configuration, displayMetrics)
-}
-
 fun refreshLocale() {
     val localeConfig = Config.locale
     currentLocale = when {
@@ -83,4 +84,5 @@ fun refreshLocale() {
     }
     Locale.setDefault(currentLocale)
     AppContext.resources.syncLocale()
+    ActivityTracker.foreground?.recreate()
 }

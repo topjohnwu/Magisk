@@ -179,7 +179,7 @@
     <string name="settings_user_independent">Người dùng độc lập</string>
     <string name="owner_only_summary">Chỉ chủ sở hữu mới có quyền truy cập root</string>
     <string name="owner_manage_summary">Chỉ chủ sở hữu mới có thể quản lý quyền truy cập root và nhận lời nhắc yêu cầu</string>
-    <string name="user_indepenent_summary">Mỗi người dùng có các quy tắc root riêng biệt của riêng mình</string>
+    <string name="user_independent_summary">Mỗi người dùng có các quy tắc root riêng biệt của riêng mình</string>
 
     <string name="mount_namespace_mode">Chế độ cho Mount namespace</string>
     <string name="settings_ns_global">Không gian tên chung</string>

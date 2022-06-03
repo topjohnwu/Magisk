@@ -173,7 +173,7 @@
     <string name="settings_user_independent">Independente do usuário</string>
     <string name="owner_only_summary">Somente o proprietário tem acesso ao SuperUsuário</string>
     <string name="owner_manage_summary">Somente o proprietário pode gerenciar o acesso do SuperUsuário e receber pedidos de solicitação</string>
-    <string name="user_indepenent_summary">Cada usuário tem suas próprias regras de root separadas</string>
+    <string name="user_independent_summary">Cada usuário tem suas próprias regras de root separadas</string>
     <string name="mount_namespace_mode">Ativar Modo Namespace</string>
     <string name="settings_ns_global">Namespace global</string>
     <string name="settings_ns_requester">Herdar Namespace</string>

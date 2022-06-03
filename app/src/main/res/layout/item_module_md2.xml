@@ -151,7 +151,7 @@
 
                 <Button
                     android:id="@+id/module_remove"
-                    style="@style/WidgetFoundation.Button.Text.Secondary"
+                    style="@style/WidgetFoundation.Button.Text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
@@ -160,6 +160,7 @@
                     android:onClick="@{() -> item.delete()}"
                     android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
                     android:textAllCaps="false"
+                    android:theme="@style/ThemeOverlay.Button.Text.Secondary"
                     app:icon="@{item.removed ? @drawable/ic_restart : @drawable/ic_delete_md2}"
                     app:iconGravity="textEnd"
                     app:layout_constraintEnd_toEndOf="parent"

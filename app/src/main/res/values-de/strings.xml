@@ -177,7 +177,7 @@
     <string name="settings_user_independent">Benutzerunabhängig</string>
     <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
     <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffsanfragen</string>
-    <string name="user_indepenent_summary">Jeder Nutzer hat seine eigenen Root-Regeln</string>
+    <string name="user_independent_summary">Jeder Nutzer hat seine eigenen Root-Regeln</string>
 
     <string name="mount_namespace_mode">Mount Namespace Modus</string>
     <string name="settings_ns_global">Globaler Namespace</string>

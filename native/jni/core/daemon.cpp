@@ -257,7 +257,7 @@ static void handle_request(pollfd *pfd) {
         }
         break;
     case MainRequest::ZYGISK:
-        if (!is_zygote) {
+        if (!is_zygote && selinux_enabled()) {
             // Invalid client context
             write_int(client, MainResponse::ACCESS_DENIED);
             goto done;

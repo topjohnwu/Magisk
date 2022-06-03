@@ -165,7 +165,7 @@
     <string name="settings_user_independent">Användaroberoende</string>
     <string name="owner_only_summary">Endast ägare har root-åtkomst</string>
     <string name="owner_manage_summary">Endast ägare kan hantera root-åtkomst och ta emot bägärda förfrågningar</string>
-    <string name="user_indepenent_summary">Varje användare har sina egna separata root-regler</string>
+    <string name="user_independent_summary">Varje användare har sina egna separata root-regler</string>
 
     <string name="mount_namespace_mode">Montera namnrymdsläge</string>
     <string name="settings_ns_global">Global namnrymd</string>

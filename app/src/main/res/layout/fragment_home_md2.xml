@@ -11,6 +11,8 @@
 
         <import type="com.topjohnwu.magisk.ui.home.DeveloperItem" />
 
+        <import type="com.topjohnwu.magisk.ui.home.IconLink" />
+
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
@@ -131,14 +133,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_margin="@dimen/l1"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
                 android:focusable="false">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="@dimen/l1">
+                    android:paddingTop="@dimen/l1"
+                    android:paddingBottom="@dimen/l1">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -157,8 +162,58 @@
                         android:text="@string/home_support_content"
                         android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingTop="@dimen/l_50" >
+
+                        <include
+                            item="@{IconLink.Patreon.INSTANCE}"
+                            layout="@layout/item_icon_link"
+                            viewModel="@{viewModel}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                        <include
+                            item="@{IconLink.PayPal.Project.INSTANCE}"
+                            layout="@layout/item_icon_link"
+                            viewModel="@{viewModel}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/WidgetFoundation.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/l1"
+                android:focusable="false">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/l1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        android:layout_marginEnd="@dimen/l1"
+                        android:text="@string/home_follow_title"
+                        android:textAppearance="@style/AppearanceFoundation.Title" />
+
                     <include
-                        item="@{DeveloperItem.Main.INSTANCE}"
+                        item="@{DeveloperItem.John.INSTANCE}"
                         layout="@layout/item_developer"
                         viewModel="@{viewModel}"
                         android:layout_width="wrap_content"
@@ -166,7 +221,23 @@
                         android:layout_marginTop="@dimen/l_50" />
 
                     <include
-                        item="@{DeveloperItem.App.INSTANCE}"
+                        item="@{DeveloperItem.Vvb.INSTANCE}"
+                        layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50" />
+
+                    <include
+                        item="@{DeveloperItem.YU.INSTANCE}"
+                        layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50" />
+
+                    <include
+                        item="@{DeveloperItem.Rikka.INSTANCE}"
                         layout="@layout/item_developer"
                         viewModel="@{viewModel}"
                         android:layout_width="wrap_content"

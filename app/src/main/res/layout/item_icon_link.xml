@@ -18,10 +18,10 @@
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackgroundBorderless"
+        android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
-        android:minWidth="60dp"
+        android:minWidth="48dp"
         android:onClick="@{() -> viewModel.onLinkPressed(item.link)}"
         android:padding="@dimen/l_50"
         tools:layout_gravity="center">

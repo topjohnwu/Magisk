@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core.download
 
 import android.app.Notification
 import android.content.Intent
-import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseService
@@ -19,8 +18,6 @@ open class NotificationService : BaseService() {
     protected val hasNotifications get() = notifications.isNotEmpty()
 
     protected val service get() = ServiceLocator.networkService
-
-    override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)

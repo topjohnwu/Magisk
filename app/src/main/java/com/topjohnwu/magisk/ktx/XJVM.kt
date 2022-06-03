@@ -60,9 +60,10 @@ inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R)
 
 fun Long.toTime(format: DateFormat) = format.format(this).orEmpty()
 
+// Some devices don't allow filenames containing ":"
 val timeFormatStandard by lazy {
     SimpleDateFormat(
-        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH.mm.ss",
         currentLocale
     )
 }

@@ -37,9 +37,10 @@ object Customization : BaseSettingsItem.Section() {
 }
 
 object Language : BaseSettingsItem.Selector() {
-    override var value = -1
+    override var value
+        get() = index
         set(value) {
-            field = value
+            index = value
             Config.locale = entryValues[value]
         }
 
@@ -47,6 +48,7 @@ object Language : BaseSettingsItem.Selector() {
 
     private var entries = emptyArray<String>()
     private var entryValues = emptyArray<String>()
+    private var index = -1
 
     override fun entries(res: Resources) = entries
     override fun descriptions(res: Resources) = entries
@@ -62,7 +64,7 @@ object Language : BaseSettingsItem.Selector() {
                 entries = names
                 entryValues = values
                 val selectedLocale = currentLocale.getDisplayName(currentLocale)
-                value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
+                index = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
                 notifyPropertyChanged(BR.description)
             }
         }
@@ -225,7 +227,7 @@ object Magisk : BaseSettingsItem.Section() {
 }
 
 object Zygisk : BaseSettingsItem.Toggle() {
-    override val title = R.string.zygisk_beta.asText()
+    override val title = R.string.zygisk.asText()
     override val description get() =
         if (mismatch) R.string.reboot_apply_change.asText()
         else R.string.settings_zygisk_summary.asText()

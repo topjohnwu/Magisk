@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Ne téléchargez Magisk qu’uniquement depuis la page GitHub officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
     <string name="home_support_title">Soutenez‑nous</string>
+    <string name="home_follow_title">Suivez-nous</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
     <string name="home_installed_version">Installé</string>
@@ -178,7 +179,7 @@
     <string name="settings_user_independent">Indépendant de l’utilisateur</string>
     <string name="owner_only_summary">Seul le propriétaire possède un accès super‑utilisateur.</string>
     <string name="owner_manage_summary">Seul le propriétaire peut gérer l’accès super‑utilisateur et recevoir les demandes d’accès.</string>
-    <string name="user_indepenent_summary">Chaque utilisateur a ses propres règles d’accès super‑utilisateur distinctes.</string>
+    <string name="user_independent_summary">Chaque utilisateur a ses propres règles d’accès super‑utilisateur distinctes.</string>
 
     <string name="mount_namespace_mode">Mode d’espace de noms du montage</string>
     <string name="settings_ns_global">Espace de noms global</string>
