@@ -696,7 +696,7 @@
 ### v2
 
 - Fix verity patch. It should now work on all devices (might fix some of the unable-to-boot issues)
-- All scripts will now run in selinux permissive mode for maximum compatibility (this will **NOT** turn your device to permissive)
+- All scripts will now run in selinux permissive mode for maximum compatibility (this will be turn your device to permissive)
 - Add Nougat Developer Preview 5 support
 - Add systemless host support for AdBlock Apps (enabled by default)
 - Add support for new root disable method
