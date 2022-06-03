@@ -95,8 +95,8 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 goneUnless="@{item.isExpanded}"
-                itemBinding="@{viewModel.itemInternalBinding}"
-                items="@{item.processes}"
+                app:items="@{item.processes}"
+                app:extraBindings="@{viewModel.extraBindings}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?colorSurfaceVariant"

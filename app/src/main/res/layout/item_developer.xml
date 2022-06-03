@@ -32,9 +32,9 @@
             tools:text="\@topjohnwu" />
 
         <androidx.recyclerview.widget.RecyclerView
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{item.items}"
-            nestedScrollingEnabled="@{false}"
+            app:items="@{item.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
+            app:nestedScrollingEnabled="@{false}"
             android:overScrollMode="never"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -20,8 +20,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/module_list"
             gone="@{viewModel.loading}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

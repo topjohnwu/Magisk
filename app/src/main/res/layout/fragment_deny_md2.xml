@@ -17,9 +17,6 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/app_list"
-            invisibleUnless="@{viewModel.loaded}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -27,6 +24,9 @@
             android:paddingTop="@dimen/internal_action_bar_size"
             app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:invisibleUnless="@{viewModel.loaded}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
             tools:listitem="@layout/item_hide_md2"
             tools:paddingTop="40dp" />
 
