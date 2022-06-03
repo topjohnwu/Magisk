@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Magisk sťahujte IBA z oficiálnej stránky na GitHubé. Súbory z neznámych zdrojov môžu byť škodlivé!</string>
     <string name="home_support_title">Podporte nás</string>
+    <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude slobodný a s otvoreným kódom. Môžete nám však dať najavo, že vám na nás záleží, tým, že nám prispejete.</string>
     <string name="home_installed_version">Nainštalované</string>
