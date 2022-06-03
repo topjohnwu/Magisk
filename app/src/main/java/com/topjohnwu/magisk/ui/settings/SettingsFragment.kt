@@ -14,6 +14,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_settings_md2
     override val viewModel by viewModel<SettingsViewModel>()
+    override val snackbarView: View get() = binding.snackbarContainer
 
     override fun onStart() {
         super.onStart()
