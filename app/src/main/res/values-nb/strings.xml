@@ -166,7 +166,7 @@
     <string name="settings_user_independent">Brukeruavhengig</string>
     <string name="owner_only_summary">Rot-tilgang kun for eier</string>
     <string name="owner_manage_summary">Kun eier kan håndtere rot-tilgang og motta forespørsler</string>
-    <string name="user_indepenent_summary">Hver bruker har egne rot-regler</string>
+    <string name="user_independent_summary">Hver bruker har egne rot-regler</string>
 
     <string name="mount_namespace_mode">Modus for montering av navnerom</string>
     <string name="settings_ns_global">Omspennede navnerom</string>

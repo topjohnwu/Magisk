@@ -105,7 +105,7 @@
     <string name="settings_user_independent">Независно од корисникот</string>
     <string name="owner_only_summary">Само сопственикот има рут пристап.</string>
     <string name="owner_manage_summary">Само сопственикот може да управува со рут пристапот и да ги прима барања за рут пристап.</string>
-    <string name="user_indepenent_summary">Секој корисник има сопствени рут правила.</string>
+    <string name="user_independent_summary">Секој корисник има сопствени рут правила.</string>
 
     <string name="mount_namespace_mode">Поставете го режимот на именски простор</string>
     <string name="settings_ns_global">Глобален именски простор</string>

@@ -166,7 +166,7 @@
     <string name="settings_user_independent">பயனர்-சுதந்திரம்</string>
     <string name="owner_only_summary">உரிமையாளருக்கு மட்டுமே ரூட் அணுகல் உள்ளது</string>
     <string name="owner_manage_summary">உரிமையாளர் மட்டுமே ரூட் அணுகலை நிர்வகிக்க முடியும்</string>
-    <string name="user_indepenent_summary">ஒவ்வொரு பயனருக்கும் அவரவர் / அவளுக்கு தனித்தனி ரூட் விதிகள் உள்ளன</string>
+    <string name="user_independent_summary">ஒவ்வொரு பயனருக்கும் அவரவர் / அவளுக்கு தனித்தனி ரூட் விதிகள் உள்ளன</string>
 
     <string name="mount_namespace_mode">நேம்ஸ்பேஸ் பயன்முறையை சேர்</string>
     <string name="settings_ns_global">உலகளாவிய பெயர்வெளி</string>

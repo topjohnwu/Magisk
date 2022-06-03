@@ -179,7 +179,7 @@
     <string name="settings_user_independent">User-Independent</string>
     <string name="owner_only_summary">Only owner has root access</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
-    <string name="user_indepenent_summary">Each user has their own separate root rules</string>
+    <string name="user_independent_summary">Each user has their own separate root rules</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>

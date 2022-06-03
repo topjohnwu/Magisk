@@ -178,7 +178,7 @@
     <string name="settings_user_independent">Nezávisí od používateľa</string>
     <string name="owner_only_summary">Root prístup má iba majiteľ zariadenia</string>
     <string name="owner_manage_summary">Iba majiteľ zariadenia môže spravovať prístup root a prijímať žiadosti</string>
-    <string name="user_indepenent_summary">Každý používateľ má vlastné pravidlá pre root</string>
+    <string name="user_independent_summary">Každý používateľ má vlastné pravidlá pre root</string>
 
     <string name="mount_namespace_mode">Režim Mount namespace</string>
     <string name="settings_ns_global">Globálny namespace</string>

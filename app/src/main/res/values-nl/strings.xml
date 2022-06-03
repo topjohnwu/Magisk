@@ -152,7 +152,7 @@
     <string name="settings_user_independent">Gebruikeronafhankelijk</string>
     <string name="owner_only_summary">Alleen de apparaateigenaar heeft roottoegang</string>
     <string name="owner_manage_summary">Alleen de eigenaar kan roottoegang goedkeuren en verzoeken ontvangen</string>
-    <string name="user_indepenent_summary">Elke gebruiker heeft zijn/haar eigen rootregels</string>
+    <string name="user_independent_summary">Elke gebruiker heeft zijn/haar eigen rootregels</string>
 
     <string name="mount_namespace_mode">Naamruimtemodus aankoppelen</string>
     <string name="settings_ns_global">Globale naamruimte</string>

@@ -179,7 +179,7 @@
     <string name="settings_user_independent">使用者獨立管理</string>
     <string name="owner_only_summary">僅限裝置擁有者可使用 Root 權限</string>
     <string name="owner_manage_summary">僅限裝置擁有者可管理及接收 Root 權限的要求提示</string>
-    <string name="user_indepenent_summary">每個使用者皆擁有獨立的 Root 權限規則</string>
+    <string name="user_independent_summary">每個使用者皆擁有獨立的 Root 權限規則</string>
 
     <string name="mount_namespace_mode">掛接命名空間模式</string>
     <string name="settings_ns_global">全域命名空間</string>

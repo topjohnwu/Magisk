@@ -157,7 +157,7 @@
     <string name="settings_user_independent">ਸੁਤੰਤਰ ਉਪਭੋਗਤਾ</string>
     <string name="owner_only_summary">ਸਿਰਫ ਮਾਲਕ ਕੋਲ ਰੂਟ ਐਕਸੈਸ ਹੈ</string>
     <string name="owner_manage_summary">ਸਿਰਫ ਮਾਲਕ ਰੂਟ ਐਕਸੈਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰ ਸਕਦੇ ਹਨ ਅਤੇ ਬੇਨਤੀ ਸਿਗਨਲ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੇ ਹਨ</string>
-    <string name="user_indepenent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
+    <string name="user_independent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
 
     <string name="mount_namespace_mode">ਮਾਉਂਟ ਨੇਮਸਪੇਸ ਮੋਡ</string>
     <string name="settings_ns_global">ਗਲੋਬਲ ਨੇਮਸਪੇਸ</string>

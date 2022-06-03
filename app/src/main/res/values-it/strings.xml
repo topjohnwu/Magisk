@@ -108,7 +108,7 @@
     <string name="update_available">Aggiornamento disponibile</string>
     <string name="suspend_text_riru">Modulo sospeso perché %1$s è abilitato</string>
     <string name="suspend_text_zygisk">Modulo sospeso perché %1$s non è abilitato</string>
-    <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>																					  
+    <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Impostazioni tema</string>
@@ -175,7 +175,7 @@
     <string name="settings_user_independent">Indipendente dall\'utente</string>
     <string name="owner_only_summary">Solo il proprietario possiede i permessi di root</string>
     <string name="owner_manage_summary">Solo il proprietario può gestire l\'accesso root e ricevere le richieste dalle app</string>
-    <string name="user_indepenent_summary">Ogni utente ha le proprie regole di root indipendenti</string>
+    <string name="user_independent_summary">Ogni utente ha le proprie regole di root indipendenti</string>
 
     <string name="mount_namespace_mode">Modalità mount namespace</string>
     <string name="settings_ns_global">Namespace globale</string>
