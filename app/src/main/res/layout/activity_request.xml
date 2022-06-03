@@ -99,9 +99,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:enabled="@{viewModel.grantEnabled}"
+                android:selection="@={viewModel.selectedItemPosition}"
                 app:items="@{@stringArray/allow_timeout}"
-                app:layout="@{@layout/item_spinner}"
-                android:selection="@={viewModel.selectedItemPosition}" />
+                app:layout="@{@layout/item_spinner}" />
 
             <TextView
                 android:id="@+id/warning"
@@ -143,8 +143,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="@{() -> viewModel.grantPressed()}"
                     android:enabled="@{viewModel.grantEnabled}"
+                    android:onClick="@{() -> viewModel.grantPressed()}"
                     android:text="@string/grant" />
 
                 <requestFocus />
