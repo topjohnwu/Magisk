@@ -5,6 +5,7 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
@@ -24,8 +25,8 @@ private fun Project.androidBase(configure: Action<BaseExtension>) =
 private fun Project.android(configure: Action<BaseAppModuleExtension>) =
     extensions.configure("android", configure)
 
-private fun Project.kotlinOptions(configure: Action<KotlinJvmOptions>) =
-    extensions.findByName("kotlinOptions")?.let {
+private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
+    (this as ExtensionAware).extensions.findByName("kotlinOptions")?.let {
         configure.execute(it as KotlinJvmOptions)
     }
 
@@ -47,9 +48,10 @@ fun Project.setupCommon() {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
-    }
-    kotlinOptions {
-        jvmTarget = "11"
+
+        kotlinOptions {
+            jvmTarget = "11"
+        }
     }
 }
 

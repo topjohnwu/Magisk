@@ -5,8 +5,11 @@
 
     <data>
 
+<<<<<<< dpad-support-api25
         <import type="java.util.Arrays" />
 
+=======
+>>>>>>> master
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.surequest.SuRequestViewModel" />
@@ -101,9 +104,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:enabled="@{viewModel.grantEnabled}"
+<<<<<<< dpad-support-api25
                 android:selection="@={viewModel.selectedItemPosition}"
                 app:itemBinding="@{viewModel.itemBinding}"
                 app:items="@{Arrays.asList(@stringArray/allow_timeout)}" />
+=======
+                app:items="@{@stringArray/allow_timeout}"
+                app:layout="@{@layout/item_spinner}"
+                android:selection="@={viewModel.selectedItemPosition}" />
+>>>>>>> master
 
             <TextView
                 android:id="@+id/warning"
@@ -154,7 +163,10 @@
                     android:text="@string/grant" />
 
                 <requestFocus />
+<<<<<<< dpad-support-api25
 
+=======
+>>>>>>> master
             </LinearLayout>
 
         </LinearLayout>

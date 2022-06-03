@@ -8,10 +8,7 @@ import android.text.Spanned
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.Toolbar
 import androidx.cardview.widget.CardView
@@ -294,4 +291,9 @@ fun TextView.setTextColorAttr(attr: Int) {
 @BindingAdapter("android:text")
 fun TextView.setText(text: TextHolder) {
     this.text = text.getText(context.resources)
+}
+
+@BindingAdapter("items", "layout")
+fun Spinner.setAdapter(items: Array<Any>, layoutRes: Int) {
+    adapter = ArrayAdapter(context, layoutRes, items)
 }

@@ -178,7 +178,7 @@
     <string name="settings_user_independent">Правила пользователей</string>
     <string name="owner_only_summary">Только администратору доступен Root-доступ</string>
     <string name="owner_manage_summary">Администратор управляет Root-доступом пользователей и обрабатывает запросы</string>
-    <string name="user_indepenent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
+    <string name="user_independent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
 
     <string name="mount_namespace_mode">Настройка пространств имён</string>
     <string name="settings_ns_global">Общее пространство имён</string>

@@ -24,9 +24,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/flash_content"
-                adapter="@{viewModel.adapter}"
-                itemBinding="@{viewModel.itemBinding}"
-                items="@{viewModel.items}"
+                app:items="@{viewModel.items}"
                 scrollToLast="@{true}"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

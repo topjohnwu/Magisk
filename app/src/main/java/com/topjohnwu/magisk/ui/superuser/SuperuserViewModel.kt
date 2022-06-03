@@ -15,8 +15,9 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.AnyDiffRvItem
+import com.topjohnwu.magisk.databinding.MergeObservableList
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
@@ -27,7 +28,6 @@ import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
     private val db: PolicyDao
@@ -35,14 +35,14 @@ class SuperuserViewModel(
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
-    private val itemsPolicies = diffListOf<PolicyRvItem>()
     private val itemsHelpers = ObservableArrayList<TextItem>()
+    private val itemsPolicies = diffListOf<PolicyRvItem>()
 
     val items = MergeObservableList<AnyDiffRvItem>()
         .insertList(itemsHelpers)
         .insertList(itemsPolicies)
-    val itemBinding = itemBindingOf<AnyDiffRvItem> {
-        it.bindExtra(BR.listener, this)
+    val extraBindings = bindExtra {
+        it.put(BR.listener, this)
     }
 
     // ---

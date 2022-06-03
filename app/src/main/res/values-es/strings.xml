@@ -175,7 +175,7 @@
     <string name="settings_user_independent">Usuario independiente</string>
     <string name="owner_only_summary">Sólo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
-    <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
+    <string name="user_independent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
 
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>

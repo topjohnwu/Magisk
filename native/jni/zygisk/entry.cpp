@@ -1,6 +1,7 @@
 #include <libgen.h>
 #include <dlfcn.h>
 #include <sys/prctl.h>
+#include <sys/mount.h>
 #include <android/log.h>
 #include <android/dlext.h>
 
@@ -52,78 +53,56 @@ static void zygisk_cleanup_wait() {
     }
 }
 
+static void *unload_first_stage(void *) {
+    // Wait 10us to make sure 1st stage is done
+    timespec ts = { .tv_sec = 0, .tv_nsec = 10000L };
+    nanosleep(&ts, nullptr);
+    unmap_all(HIJACK_BIN);
+    xumount2(HIJACK_BIN, MNT_DETACH);
+    return nullptr;
+}
+
 static void second_stage_entry() {
     zygisk_logging();
     ZLOGD("inject 2nd stage\n");
 
-    char path[PATH_MAX];
     MAGISKTMP = getenv(MAGISKTMP_ENV);
-    int fd = parse_int(getenv(MAGISKFD_ENV));
-
-    snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
-    xreadlink(path, path, PATH_MAX);
-    android_dlextinfo info {
-        .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
-        .library_fd = fd,
-    };
-    self_handle = android_dlopen_ext(path, RTLD_LAZY, &info);
+#if defined(__LP64__)
+    self_handle = dlopen("/system/bin/app_process", RTLD_NOLOAD);
+#else
+    self_handle = dlopen("/system/bin/app_process32", RTLD_NOLOAD);
+#endif
     dlclose(self_handle);
-    close(fd);
+
     unsetenv(MAGISKTMP_ENV);
-    unsetenv(MAGISKFD_ENV);
     sanitize_environ();
     hook_functions();
+    new_daemon_thread(&unload_first_stage, nullptr);
 }
 
 static void first_stage_entry() {
-    android_logging();
     ZLOGD("inject 1st stage\n");
 
-    char path[PATH_MAX];
-    char buf[256];
     char *ld = getenv("LD_PRELOAD");
     if (char *c = strrchr(ld, ':')) {
         *c = '\0';
-        strlcpy(path, c + 1, sizeof(path));
         setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
     } else {
         unsetenv("LD_PRELOAD");
-        strlcpy(path, ld, sizeof(path));
     }
 
-    // Force the linker to load the library on top of ourselves, so we do not
-    // need to unmap the 1st stage library that was loaded with LD_PRELOAD.
-
-    int fd = xopen(path, O_RDONLY | O_CLOEXEC);
-    // Use fd here instead of path to make sure inode is the same as 2nd stage
-    snprintf(buf, sizeof(buf), "%d", fd);
-    setenv(MAGISKFD_ENV, buf, 1);
-    struct stat s{};
-    xfstat(fd, &s);
-
-    android_dlextinfo info {
-        .flags = ANDROID_DLEXT_FORCE_LOAD | ANDROID_DLEXT_USE_LIBRARY_FD,
-        .library_fd = fd,
-    };
-    auto [addr, size] = find_map_range(path, s.st_ino);
-    if (addr && size) {
-        info.flags |= ANDROID_DLEXT_RESERVED_ADDRESS;
-        info.reserved_addr = addr;
-        // The existing address is guaranteed to fit, as 1st stage and 2nd stage
-        // are exactly the same ELF (same inode). However, the linker could over
-        // estimate the required size and refuse to dlopen. The estimated size
-        // is not accurate so size the size to unlimited.
-        info.reserved_size = -1;
-    }
-
+    // Load second stage
     setenv(INJECT_ENV_2, "1", 1);
-    // Force dlopen ourselves to make ourselves dlclose-able.
-    // After this call, all global variables will be reset.
-    android_dlopen_ext(path, RTLD_LAZY, &info);
+#if defined(__LP64__)
+    dlopen("/system/bin/app_process", RTLD_LAZY);
+#else
+    dlopen("/system/bin/app_process32", RTLD_LAZY);
+#endif
 }
 
 [[gnu::constructor]] [[maybe_unused]]
 static void zygisk_init() {
+    android_logging();
     if (getenv(INJECT_ENV_1)) {
         unsetenv(INJECT_ENV_1);
         first_stage_entry();
@@ -301,8 +280,23 @@ static void setup_files(int client, const sock_cred *cred) {
         }
     }
 
+    // Hijack some binary in /system/bin to host 1st stage
+    const char *hbin;
+    string mbin;
+    int app_fd;
+    if (is_64_bit) {
+        hbin = HIJACK_BIN64;
+        mbin = MAGISKTMP + "/" ZYGISKBIN "/magisk64";
+        app_fd = app_process_64;
+    } else {
+        hbin = HIJACK_BIN32;
+        mbin = MAGISKTMP + "/" ZYGISKBIN "/magisk32";
+        app_fd = app_process_32;
+    }
+    xmount(mbin.data(), hbin, nullptr, MS_BIND, nullptr);
+
     write_int(client, 0);
-    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
+    send_fd(client, app_fd);
     write_string(client, MAGISKTMP);
 }
 

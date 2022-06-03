@@ -2,10 +2,8 @@
 
 package com.topjohnwu.magisk.core
 
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.AssetManager
 import android.content.res.Configuration
@@ -20,13 +18,9 @@ lateinit var AppApkPath: String
 
 fun Resources.addAssetPath(path: String) = StubApk.addAssetPath(this, path)
 
-fun Context.wrap(): Context = if (this is PatchedContext) this else PatchedContext(this)
-
-private class PatchedContext(base: Context) : ContextWrapper(base) {
-    init { base.resources.patch() }
-    override fun getClassLoader() = javaClass.classLoader!!
-    override fun createConfigurationContext(config: Configuration) =
-        super.createConfigurationContext(config).wrap()
+fun Context.patch(): Context {
+    resources.patch()
+    return this
 }
 
 fun Resources.patch(): Resources {
@@ -48,10 +42,6 @@ fun createNewResources(): Resources {
 
 fun Class<*>.cmp(pkg: String) =
     ComponentName(pkg, Info.stub?.classToComponent?.get(name) ?: name)
-
-inline fun <reified T> Activity.redirect() = Intent(intent)
-    .setComponent(T::class.java.cmp(packageName))
-    .setFlags(0)
 
 inline fun <reified T> Context.intent() = Intent().setComponent(T::class.java.cmp(packageName))
 

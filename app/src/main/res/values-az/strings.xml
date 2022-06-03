@@ -98,7 +98,7 @@
     <string name="settings_user_independent">İstifadəçidən asılı olmayaraq</string>
     <string name="owner_only_summary">Yalnız cihaz sahibinin root icazəsi var.</string>
     <string name="owner_manage_summary">Yalnız cihaz sahibi root icazələrini redaktə edə və icazə istəkləri qəbul edə bilər.</string>
-    <string name="user_indepenent_summary">Hər istifadəçinin ayrı root qaydaları var.</string>
+    <string name="user_independent_summary">Hər istifadəçinin ayrı root qaydaları var.</string>
     <string name="mount_namespace_mode">Adlarfəzası Modunu Qoş</string>
     <string name="settings_ns_global">Qlobal Adlarfəzası</string>
     <string name="settings_ns_requester">Keçmə Adlarfəzası</string>

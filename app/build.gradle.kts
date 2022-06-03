@@ -78,12 +78,7 @@ dependencies {
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
     implementation("io.noties.markwon:core:4.6.2")
 
-    val vBAdapt = "4.0.0"
-    val bindingAdapter = "me.tatarka.bindingcollectionadapter2:bindingcollectionadapter"
-    implementation("${bindingAdapter}:${vBAdapt}")
-    implementation("${bindingAdapter}-recyclerview:${vBAdapt}")
-
-    val vLibsu = "5.0.1"
+    val vLibsu = "5.0.2"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:service:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:nio:${vLibsu}")

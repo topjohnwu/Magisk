@@ -8,8 +8,6 @@ import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
-import com.topjohnwu.magisk.databinding.RvItem
-import com.topjohnwu.magisk.databinding.adapterOf
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addInvalidateItemDecorationsObserver
 import rikka.recyclerview.addItemSpacing
@@ -34,7 +32,6 @@ class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.moduleList.apply {
-            adapter = adapterOf<RvItem>()
             addEdgeSpacing(top = R.dimen.l_50, bottom = R.dimen.l1)
             addItemSpacing(R.dimen.l1, R.dimen.l_50, R.dimen.l1)
             fixEdgeEffect()

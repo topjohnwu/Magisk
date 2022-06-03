@@ -14,9 +14,7 @@ import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.databinding.RvBindingAdapter
 import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.reboot
@@ -36,9 +34,7 @@ class FlashViewModel : BaseViewModel() {
     private val _subtitle = MutableLiveData(R.string.flashing)
     val subtitle get() = _subtitle as LiveData<Int>
 
-    val adapter = RvBindingAdapter<ConsoleItem>()
     val items = diffListOf<ConsoleItem>()
-    val itemBinding = itemBindingOf<ConsoleItem>()
     lateinit var args: FlashFragmentArgs
 
     private val logItems = mutableListOf<String>().synchronized()
