@@ -5,18 +5,19 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
-import dalvik.system.DexClassLoader;
+import dalvik.system.BaseDexClassLoader;
 
-public class DynamicClassLoader extends DexClassLoader {
+public class DynamicClassLoader extends BaseDexClassLoader {
 
     private static final ClassLoader base = Object.class.getClassLoader();
 
     public DynamicClassLoader(File apk) {
-        super(apk.getPath(), apk.getParent(), null, base);
+        this(apk, base);
     }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {
-        super(apk.getPath(), apk.getParent(), null, parent);
+        // Set optimizedDirectory to null to bypass DexFile's security checks
+        super(apk.getPath(), null, null, parent);
     }
 
     @Override
