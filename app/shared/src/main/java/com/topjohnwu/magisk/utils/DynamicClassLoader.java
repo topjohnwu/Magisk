@@ -18,8 +18,8 @@ public class DynamicClassLoader extends BaseDexClassLoader {
     }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {
-        // Set optimizedDirectory to null for RootService to bypass DexFile's security checks
-        super(apk.getPath(), Process.myUid() == 0 ? null : apk.getParentFile(), null, parent);
+        // Set optimizedDirectory to null to bypass DexFile's security checks
+        super(apk.getPath(), null, null, parent);
     }
 
     @Override
