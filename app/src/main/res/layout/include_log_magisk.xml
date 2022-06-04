@@ -24,7 +24,9 @@
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:nextFocusUp="@id/log_filter_toggle"
+                android:nextFocusDown="@id/log_filter_toggle">
 
                 <TextView
                     android:layout_width="wrap_content"
