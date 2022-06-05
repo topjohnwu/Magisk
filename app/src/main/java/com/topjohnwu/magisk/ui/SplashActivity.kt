@@ -135,13 +135,10 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                 Shell.cmd("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
             }
         } else {
-            if (Config.suManager.isNotEmpty())
+            if (!Const.Version.atLeast_25_0() && Config.suManager.isNotEmpty())
                 Config.suManager = ""
             pkg ?: return
-            if (!Shell.cmd("(pm uninstall $pkg)& >/dev/null 2>&1").exec().isSuccess) {
-                // Uninstall through Android API
-                uninstallAndWait(pkg)
-            }
+            Shell.cmd("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
         }
     }
 

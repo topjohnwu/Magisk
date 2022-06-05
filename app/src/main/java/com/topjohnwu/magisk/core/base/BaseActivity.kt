@@ -14,17 +14,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.RequestInstall
-import com.topjohnwu.magisk.core.utils.UninstallPackage
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.utils.Utils
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 interface ContentResultCallback: ActivityResultCallback<Uri>, Parcelable {
     fun onActivityLaunch() {}
@@ -48,11 +44,6 @@ abstract class BaseActivity : AppCompatActivity() {
     private val getContent = registerForActivityResult(GetContent()) {
         if (it != null) contentCallback?.onActivityResult(it)
         contentCallback = null
-    }
-
-    private var uninstallLatch = CountDownLatch(1)
-    private val uninstallPkg = registerForActivityResult(UninstallPackage()) {
-        uninstallLatch.countDown()
     }
 
     private val mReferrerField by lazy(LazyThreadSafetyMode.NONE) {
@@ -112,13 +103,6 @@ abstract class BaseActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
         }
-    }
-
-    @WorkerThread
-    fun uninstallAndWait(pkg: String) {
-        uninstallLatch = CountDownLatch(1)
-        uninstallPkg.launch(pkg)
-        uninstallLatch.await(3, TimeUnit.SECONDS)
     }
 
     override fun recreate() {
