@@ -97,10 +97,10 @@ object HideAPK {
         Config.suManager = if (pkg == APPLICATION_ID) "" else pkg
         val self = activity.packageName
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        activity.grantUriPermission(pkg, Provider.APK_URI(self), flag)
-        activity.grantUriPermission(pkg, Provider.PREFS_URI(self), flag)
+        activity.grantUriPermission(pkg, Provider.preferencesUri(self), flag)
         intent.putExtra(Const.Key.PREV_PKG, self)
-        activity.startActivity(intent)
+        intent.flags = 0
+        activity.startActivityForResult(intent, Int.MAX_VALUE)
         activity.finish()
     }
 

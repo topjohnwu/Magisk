@@ -9,6 +9,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
@@ -95,10 +96,19 @@ abstract class BaseMainActivity<Binding : ViewDataBinding> : NavigationActivity<
     }
 
     private fun preLoad() {
-        val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)
+        val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)?.let {
+            // Make sure the calling package matches (prevent DoS)
+            if (it == callingPackage)
+                it
+            else
+                null
+        }
 
         Config.load(prevPkg)
         handleRepackage(prevPkg)
+        if (prevPkg != null) {
+            StubApk.restartProcess(this)
+        }
         Notifications.setup(this)
         JobService.schedule(this)
         Shortcuts.setupDynamic(this)

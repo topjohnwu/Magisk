@@ -163,7 +163,7 @@ object Config : PreferenceConfig, DBConfig {
     fun load(pkg: String?) {
         // Only try to load prefs when fresh install and a previous package name is set
         if (pkg != null && prefs.all.isEmpty()) runCatching {
-            context.contentResolver.openInputStream(Provider.PREFS_URI(pkg))?.use {
+            context.contentResolver.openInputStream(Provider.preferencesUri(pkg))?.use {
                 prefs.edit { parsePrefs(it) }
             }
         }
