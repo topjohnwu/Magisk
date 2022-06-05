@@ -12,12 +12,12 @@ import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
 import java.util.*
-import java.util.zip.Deflater
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
+import java.util.zip.*
 
 private fun Project.androidBase(configure: Action<BaseExtension>) =
     extensions.configure("android", configure)
@@ -219,22 +219,23 @@ fun Project.setupStub() {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
 
-                val buffer = ByteArrayOutputStream(apk.length().toInt())
-                val newApk = ZipOutputStream(FileOutputStream(apk))
-                ZipFile(apkTmp).use {
-                    newApk.use { new ->
-                        new.setLevel(Deflater.BEST_COMPRESSION)
-                        new.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        it.getInputStream(it.getEntry("AndroidManifest.xml")).transferTo(new)
-                        new.closeEntry()
-                        new.finish()
+                val buffer = ByteArrayOutputStream()
+                apkTmp.inputStream().use {
+                    object : GZIPOutputStream(buffer) {
+                        init {
+                            def.setLevel(Deflater.BEST_COMPRESSION)
+                        }
+                    }.use { o ->
+                        it.transferTo(o)
                     }
-                    ZipOutputStream(buffer).use { arsc ->
-                        arsc.setLevel(Deflater.BEST_COMPRESSION)
-                        arsc.putNextEntry(ZipEntry("resources.arsc"))
-                        it.getInputStream(it.getEntry("resources.arsc")).transferTo(arsc)
-                        arsc.closeEntry()
-                        arsc.finish()
+                }
+                ZipFile(apkTmp).use { o ->
+                    ZipOutputStream(apk.outputStream()).use { n ->
+                        n.setLevel(Deflater.BEST_COMPRESSION)
+                        n.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        o.getInputStream(o.getEntry("AndroidManifest.xml")).transferTo(n)
+                        n.closeEntry()
+                        n.finish()
                     }
                 }
                 apkTmp.delete()

@@ -9,10 +9,8 @@ import dalvik.system.BaseDexClassLoader;
 
 public class DynamicClassLoader extends BaseDexClassLoader {
 
-    private static final ClassLoader base = Object.class.getClassLoader();
-
     public DynamicClassLoader(File apk) {
-        this(apk, base);
+        this(apk, getSystemClassLoader());
     }
 
     public DynamicClassLoader(File apk, ClassLoader parent) {
@@ -29,7 +27,7 @@ public class DynamicClassLoader extends BaseDexClassLoader {
 
         try {
             // Then check boot classpath
-            return base.loadClass(name);
+            return getSystemClassLoader().loadClass(name);
         } catch (ClassNotFoundException ignored) {
             try {
                 // Next try current dex
@@ -47,7 +45,7 @@ public class DynamicClassLoader extends BaseDexClassLoader {
 
     @Override
     public URL getResource(String name) {
-        URL resource = base.getResource(name);
+        URL resource = getSystemClassLoader().getResource(name);
         if (resource != null)
             return resource;
         resource = findResource(name);
@@ -59,7 +57,7 @@ public class DynamicClassLoader extends BaseDexClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        return new CompoundEnumeration<>(base.getResources(name),
+        return new CompoundEnumeration<>(getSystemClassLoader().getResources(name),
                 findResources(name), getParent().getResources(name));
     }
 }

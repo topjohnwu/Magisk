@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -95,6 +96,12 @@ public class DownloadActivity extends Activity {
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        Runtime.getRuntime().exit(0);
+    }
+
     private void error(Throwable e) {
         Log.e(getClass().getSimpleName(), "", e);
         finish();
@@ -154,7 +161,8 @@ public class DownloadActivity extends Activity {
         SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
         IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
         cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
+        var is = new GZIPInputStream(new CipherInputStream(
+                new ByteArrayInputStream(Bytes.res()), cipher));
         try (is; out) {
             APKInstall.transfer(is, out);
         }

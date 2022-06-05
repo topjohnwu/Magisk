@@ -131,7 +131,7 @@ class StubClassLoader extends ClassLoader {
 class DelegateClassLoader extends ClassLoader {
 
     DelegateClassLoader() {
-        super(null);
+        super();
     }
 
     @Override

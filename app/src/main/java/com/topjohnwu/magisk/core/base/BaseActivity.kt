@@ -5,7 +5,6 @@ import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,9 +17,9 @@ import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.patch
 import com.topjohnwu.magisk.core.utils.RequestInstall
 import com.topjohnwu.magisk.core.utils.UninstallPackage
+import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.utils.Utils
 import java.util.concurrent.CountDownLatch
@@ -56,11 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base.patch())
-    }
-
-    override fun createConfigurationContext(config: Configuration): Context {
-        return super.createConfigurationContext(config).patch()
+        super.attachBaseContext(base.wrap())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

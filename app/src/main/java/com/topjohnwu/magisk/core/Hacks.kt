@@ -4,6 +4,7 @@ package com.topjohnwu.magisk.core
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.AssetManager
 import android.content.res.Configuration
@@ -13,21 +14,32 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.utils.syncLocale
+import com.topjohnwu.magisk.ktx.unwrap
 
 lateinit var AppApkPath: String
 
 fun Resources.addAssetPath(path: String) = StubApk.addAssetPath(this, path)
-
-fun Context.patch(): Context {
-    resources.patch()
-    return this
-}
 
 fun Resources.patch(): Resources {
     if (isRunningAsStub)
         addAssetPath(AppApkPath)
     syncLocale()
     return this
+}
+
+fun Context.patch(): Context {
+    unwrap().resources.patch()
+    return this
+}
+
+// Wrapping is only necessary for ContextThemeWrapper to support configuration overrides
+fun Context.wrap(): Context {
+    patch()
+    return object : ContextWrapper(this) {
+        override fun createConfigurationContext(config: Configuration): Context {
+            return super.createConfigurationContext(config).wrap()
+        }
+    }
 }
 
 fun createNewResources(): Resources {
