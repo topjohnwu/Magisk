@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Скачивайте Magisk только из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
+    <string name="home_follow_title">Подписывайтесь</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
     <string name="home_installed_version">Установлен</string>
