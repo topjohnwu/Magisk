@@ -26,10 +26,7 @@
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:taskAffinity=""
-            tools:ignore="AppLinkUrlError">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -38,7 +35,6 @@
 
         <receiver
             android:name=".core.Receiver"
-            android:directBootAware="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
