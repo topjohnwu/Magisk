@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core.base
 
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -52,6 +53,18 @@ abstract class BaseActivity : AppCompatActivity() {
     private var uninstallLatch = CountDownLatch(1)
     private val uninstallPkg = registerForActivityResult(UninstallPackage()) {
         uninstallLatch.countDown()
+    }
+
+    private val mReferrerField by lazy(LazyThreadSafetyMode.NONE) {
+        Activity::class.java.reflectField("mReferrer")
+    }
+
+    val realCallingPackage: String? get() {
+        callingPackage?.let { return it }
+        if (Build.VERSION.SDK_INT >= 22) {
+            mReferrerField.get(this)?.let { return it as String }
+        }
+        return null
     }
 
     override fun attachBaseContext(base: Context) {

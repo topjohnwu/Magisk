@@ -99,8 +99,7 @@ object HideAPK {
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
         activity.grantUriPermission(pkg, Provider.preferencesUri(self), flag)
         intent.putExtra(Const.Key.PREV_PKG, self)
-        intent.flags = 0
-        activity.startActivityForResult(intent, Int.MAX_VALUE)
+        activity.startActivity(intent)
         activity.finish()
     }
 
