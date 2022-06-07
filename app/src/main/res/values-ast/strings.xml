@@ -42,8 +42,8 @@
     <string name="install_inactive_slot">Instalar na ralura inactiva (darréu del OTA)</string>
     <string name="install_inactive_slot_msg">¡El preséu va arrincar OBLIGATORIAMENTE na ralura inactiva darréu de reaniciar!\nUsa esta opción namás dempués d\'acabar l\'anovamientu per OTA.\n¿Quies siguir?</string>
     <string name="setup_title">Configuración adicional</string>
-    <string name="select_patch_file">Esbillar y parchiar un ficheru</string>
-    <string name="patch_file_msg">Esbilla una imaxe en bruto (*.img) o un archivu d\'ODIN (*.tar)</string>
+    <string name="select_patch_file">Seleicionar y parchiar un ficheru</string>
+    <string name="patch_file_msg">Seleiciona una imaxe en bruto (*.img) o un archivu d\'ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reaniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
     <!--Superuser-->
@@ -106,7 +106,7 @@
     <string name="module_empty">Nun hai nengún módulu instaláu</string>
     <!--Settings-->
     <string name="settings_dark_mode_title">Mou del estilu</string>
-    <string name="settings_dark_mode_message">¡Esbilla\'l mou que meyor s\'adaute al to estilu!</string>
+    <string name="settings_dark_mode_message">¡Seleiciona\'l mou que meyor s\'adaute al to estilu!</string>
     <string name="settings_dark_mode_light">Claridá</string>
     <string name="settings_dark_mode_system">L\'estilu del sistema</string>
     <string name="settings_dark_mode_dark">Escuridá</string>
@@ -130,7 +130,7 @@
     <string name="settings_denylist_summary">Los procesos de la llista d\'esclusión tienen toles modificaciones de Magisk anulaes</string>
     <string name="settings_denylist_error">Esta función rique l\'activación de: %1$s</string>
     <string name="settings_denylist_config_title">Configurar la llista d\'esclusión</string>
-    <string name="settings_denylist_config_summary">Esbilla los procesos que s\'inclúin na llista d\'esclusión</string>
+    <string name="settings_denylist_config_summary">Seleiciona los procesos que s\'inclúin na llista d\'esclusión</string>
     <string name="settings_hosts_title">Módulu «Systemless Hosts»</string>
     <string name="settings_hosts_summary">Un módulu pa les aplicaciones que bloquien anuncios</string>
     <string name="settings_hosts_toast">Amestóse\'l módulu «Systemless Hosts»</string>
