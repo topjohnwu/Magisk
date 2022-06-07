@@ -13,7 +13,7 @@
     <string name="no_connection">L\'accesu a internet nun ta disponible</string>
     <string name="app_changelog">Rexistru de cambeos</string>
     <string name="loading">Cargando…</string>
-    <string name="update">Anovamienu</string>
+    <string name="update">Anovar</string>
     <string name="not_available">N/D</string>
     <string name="hide">Anubrir</string>
     <string name="home_package">Paquete</string>
@@ -23,8 +23,8 @@
     <string name="home_follow_title">Redes sociales</string>
     <string name="home_item_source">Códigu fonte</string>
     <string name="home_support_content">Magisk ye y va ser de códigu abiertu y gratuitu. Sicasí, pues ayudanos faciendo una donación o collaborando.</string>
-    <string name="home_installed_version">V. instalada</string>
-    <string name="home_latest_version">Última v.</string>
+    <string name="home_installed_version">Versión instalada</string>
+    <string name="home_latest_version">Última versión</string>
     <string name="invalid_update_channel">La canal d\'anovamientu nun ye válida</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">¡Van quitase y desactivase tolos módulos y l\'accesu root!\nCualesquier almacenamientu internu ensin cifrar pente l\'usu de Magisk va volver cifrase.</string>
@@ -37,7 +37,7 @@
     <string name="install_method_title">Métodu</string>
     <string name="install_next">Siguiente</string>
     <string name="install_start">Siguir</string>
-    <string name="manager_download_install">Primi pa baxar ya instalar</string>
+    <string name="manager_download_install">Primi equí pa baxalu ya instalalu</string>
     <string name="direct_install">Instalación direuta (aconséyase)</string>
     <string name="install_inactive_slot">Instalar na ralura inactiva (darréu del OTA)</string>
     <string name="install_inactive_slot_msg">¡El preséu va arrincar OBLIGATORIAMENTE na ralura inactiva darréu de reaniciar!\nUsa esta opción namás dempués d\'acabar l\'anovamientu per OTA.\n¿Quies siguir?</string>
