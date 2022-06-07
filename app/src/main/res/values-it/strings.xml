@@ -22,7 +22,7 @@
 
     <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
     <string name="home_support_title">Supportaci</string>
-	<string name="home_follow_title">Seguici</string>												   
+    <string name="home_follow_title">Seguici</string>												   
     <string name="home_item_source">Codice sorgente</string>
     <string name="home_support_content">Magisk è, e sempre sarà, gratuito ed open source. Puoi comunque mostrarci il tuo apprezzamento facendo una donazione.</string>
     <string name="home_installed_version">Installata</string>
@@ -88,8 +88,6 @@
     <string name="logs_cleared">Registro eventi svuotato correttamente.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
-	
-	<!--SafetyNet-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra app di sistema</string>
@@ -112,7 +110,7 @@
     <string name="suspend_text_riru">Modulo sospeso perché %1$s è abilitato</string>
     <string name="suspend_text_zygisk">Modulo sospeso perché %1$s non è abilitato</string>
     <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>
-	<string name="module_empty">Nessun modulo installato</string>
+    <string name="module_empty">Nessun modulo installato</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Impostazioni tema</string>
