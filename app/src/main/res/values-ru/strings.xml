@@ -234,7 +234,7 @@
     <string name="add_shortcut_title">Добавление ярлыка</string>
     <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
-    <string name="reboot_apply_change">Перезагрузить для применения изменений</string>
+    <string name="reboot_apply_change">Перезагрузите устройство для применения изменений</string>
     <string name="restore_app_confirmation">Это действие восстановит пересобранное для скрытия приложение к исходному состоянию. Вы действительно хотите продолжить?</string>
 
 </resources>
