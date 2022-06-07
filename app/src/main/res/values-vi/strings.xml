@@ -130,7 +130,7 @@
     <string name="system_default">(Mặc định hệ thống)</string>
     <string name="settings_check_update_title">Kiểm tra cập nhật</string>
     <string name="settings_check_update_summary">Kiểm tra định kỳ các bản cập nhật trong nền</string>
-    <string name="settings_update_channel_title">Cập nhật kênh</string>
+    <string name="settings_update_channel_title">Kênh cập nhật</string>
     <string name="settings_update_stable">Ổn định</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Kênh tùy chỉnh</string>
