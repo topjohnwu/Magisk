@@ -723,6 +723,7 @@ is_legacy_script() {
 install_module() {
   rm -rf $TMPDIR
   mkdir -p $TMPDIR
+  chcon u:object_r:system_file:s0 $TMPDIR
   cd $TMPDIR
 
   setup_flashable
