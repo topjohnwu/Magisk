@@ -115,6 +115,14 @@ char *magisk_cpio::sha1() {
 for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1)
 
 void magisk_cpio::restore() {
+    // If the backup init is missing, this means that the boot ramdisk
+    // was created from scratch by us. Nothing needs to be restored.
+    if (exists(".backup") && !exists(".backup/init")) {
+        fprintf(stderr, "Remove all in ramdisk\n");
+        entries.clear();
+        return;
+    }
+
     if (auto it = entries.find(".backup/.rmlist"); it != entries.end()) {
         char *file;
         for_each_str(file, it->second->data, it->second->filesize) {
