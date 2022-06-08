@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui.theme
 
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.dialog.DarkThemeDialog
 import com.topjohnwu.magisk.view.TappableHeadlineItem
@@ -10,15 +11,13 @@ class ThemeViewModel : BaseViewModel(), TappableHeadlineItem.Listener {
     val themeHeadline = TappableHeadlineItem.ThemeMode
 
     override fun onItemPressed(item: TappableHeadlineItem) = when (item) {
-        is TappableHeadlineItem.ThemeMode -> darkModePressed()
-        else -> Unit
+        is TappableHeadlineItem.ThemeMode -> DarkThemeDialog().publish()
     }
 
     fun saveTheme(theme: Theme) {
-        theme.select()
-        RecreateEvent().publish()
+        if (!theme.isSelected) {
+            Config.themeOrdinal = theme.ordinal
+            RecreateEvent().publish()
+        }
     }
-
-    private fun darkModePressed() = DarkThemeDialog().publish()
-
 }

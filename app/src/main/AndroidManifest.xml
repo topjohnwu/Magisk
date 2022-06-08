@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
-
     <application
         android:name=".core.App"
         android:extractNativeLibs="true"
@@ -28,9 +26,7 @@
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
-            android:excludeFromRecents="true"
             android:exported="false"
-            android:taskAffinity=""
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -40,7 +36,6 @@
 
         <receiver
             android:name=".core.Receiver"
-            android:directBootAware="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />

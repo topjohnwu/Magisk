@@ -94,7 +94,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         """
         |<receiver
         |    android:name="%s"
-        |    android:directBootAware="true"
         |    android:exported="false">
         |    <intent-filter>
         |        <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -127,9 +126,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |<activity
         |    android:name="%s"
         |    android:directBootAware="true"
-        |    android:excludeFromRecents="true"
         |    android:exported="false"
-        |    android:taskAffinity=""
         |    tools:ignore="AppLinkUrlError">
         |    <intent-filter>
         |        <action android:name="android.intent.action.VIEW"/>

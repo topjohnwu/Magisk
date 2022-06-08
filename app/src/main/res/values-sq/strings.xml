@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Shkarkoni Magisk VETEM nga faqja zyrtare e GitHub. Skedarët nga burime të panjohura mund të jenë me qëllim të keq! </string>
     <string name="home_support_title">Na mbështetni</string>
+    <string name="home_follow_title">Na ndiqni</string>
     <string name="home_item_source">Burimi</string>
     <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Sidoqoftë, mund të na tregoni se kujdeseni duke dërguar një donacion të vogël.</string>
     <string name="home_installed_version">Instaluar</string>

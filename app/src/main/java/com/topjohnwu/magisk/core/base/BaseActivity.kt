@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core.base
 
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -13,17 +14,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.utils.RequestInstall
-import com.topjohnwu.magisk.core.utils.UninstallPackage
 import com.topjohnwu.magisk.core.wrap
 import com.topjohnwu.magisk.ktx.reflectField
 import com.topjohnwu.magisk.utils.Utils
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 interface ContentResultCallback: ActivityResultCallback<Uri>, Parcelable {
     fun onActivityLaunch() {}
@@ -49,9 +46,16 @@ abstract class BaseActivity : AppCompatActivity() {
         contentCallback = null
     }
 
-    private var uninstallLatch = CountDownLatch(1)
-    private val uninstallPkg = registerForActivityResult(UninstallPackage()) {
-        uninstallLatch.countDown()
+    private val mReferrerField by lazy(LazyThreadSafetyMode.NONE) {
+        Activity::class.java.reflectField("mReferrer")
+    }
+
+    val realCallingPackage: String? get() {
+        callingPackage?.let { return it }
+        if (Build.VERSION.SDK_INT >= 22) {
+            mReferrerField.get(this)?.let { return it as String }
+        }
+        return null
     }
 
     override fun attachBaseContext(base: Context) {
@@ -99,13 +103,6 @@ abstract class BaseActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
         }
-    }
-
-    @WorkerThread
-    fun uninstallAndWait(pkg: String) {
-        uninstallLatch = CountDownLatch(1)
-        uninstallPkg.launch(pkg)
-        uninstallLatch.await(3, TimeUnit.SECONDS)
     }
 
     override fun recreate() {
