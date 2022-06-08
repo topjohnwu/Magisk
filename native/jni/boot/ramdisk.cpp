@@ -142,15 +142,13 @@ void magisk_cpio::restore() {
 }
 
 void magisk_cpio::backup(const char *orig) {
-    if (access(orig, R_OK))
-        return;
-
     entry_map backups;
     string rm_list;
     backups.emplace(".backup", new cpio_entry(S_IFDIR));
 
     magisk_cpio o;
-    o.load_cpio(orig);
+    if (access(orig, R_OK) == 0)
+        o.load_cpio(orig);
 
     // Remove existing backups in original ramdisk
     o.rm(".backup", true);
