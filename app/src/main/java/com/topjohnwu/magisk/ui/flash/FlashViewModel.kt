@@ -34,6 +34,10 @@ class FlashViewModel : BaseViewModel() {
     private val _subtitle = MutableLiveData(R.string.flashing)
     val subtitle get() = _subtitle as LiveData<Int>
 
+    private val _flashResult = MutableLiveData<Boolean>()
+    val flashResult: LiveData<Boolean>
+        get() = _flashResult
+
     val items = diffListOf<ConsoleItem>()
     lateinit var args: FlashFragmentArgs
 
@@ -88,6 +92,7 @@ class FlashViewModel : BaseViewModel() {
             success -> _subtitle.postValue(R.string.done)
             else -> _subtitle.postValue(R.string.failure)
         }
+        _flashResult.value = success
     }
 
     fun onMenuItemClicked(item: MenuItem): Boolean {
@@ -100,7 +105,8 @@ class FlashViewModel : BaseViewModel() {
     private fun savePressed() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "magisk_install_log_%s.log".format(
-                System.currentTimeMillis().toTime(timeFormatStandard))
+                System.currentTimeMillis().toTime(timeFormatStandard)
+            )
             val file = MediaStoreUtils.getFile(name, true)
             file.uri.outputStream().bufferedWriter().use { writer ->
                 synchronized(logItems) {
