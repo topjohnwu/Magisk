@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.navigation.NavDeepLinkBuilder
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
@@ -37,6 +38,15 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
         viewModel.subtitle.observe(this) {
             activity?.supportActionBar?.setSubtitle(it)
         }
+
+        viewModel.flashResult.observe(this) { success ->
+            binding.restartBtn.apply {
+                if (success && viewModel.showReboot) {
+                    if (!this.isVisible) this.show()
+                    if (!this.isFocused) this.requestFocus()
+                }
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -66,7 +76,7 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     }
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        return when(event.keyCode) {
+        return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP,
             KeyEvent.KEYCODE_VOLUME_DOWN -> true
             else -> false
