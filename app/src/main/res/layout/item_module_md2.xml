@@ -24,6 +24,7 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/module"
             style="@style/WidgetFoundation.Card"
             isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
             android:layout_width="match_parent"
@@ -98,6 +99,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/l_50"
                     android:checked="@={item.enabled}"
+                    android:nextFocusLeft="@id/module"
                     app:layout_constraintBottom_toBottomOf="@+id/module_version_author"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1"
