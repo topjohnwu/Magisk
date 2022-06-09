@@ -53,7 +53,9 @@ void cpio::dump(const char *file) {
     dump(xfopen(file, "we"));
 }
 
-void cpio::rm(entry_map::iterator &it) {
+void cpio::rm(entry_map::iterator it) {
+    if (it == entries.end())
+        return;
     fprintf(stderr, "Remove [%s]\n", it->first.data());
     entries.erase(it);
 }
@@ -188,7 +190,7 @@ void cpio::ln(const char *target, const char *name) {
     fprintf(stderr, "Create symlink [%s] -> [%s]\n", name, target);
 }
 
-void cpio::mv(entry_map::iterator &it, const char *name) {
+void cpio::mv(entry_map::iterator it, const char *name) {
     fprintf(stderr, "Move [%s] -> [%s]\n", it->first.data(), name);
     auto e = it->second.release();
     entries.erase(it);

@@ -45,8 +45,8 @@ protected:
     entry_map entries;
 
     static void extract_entry(const entry_map::value_type &e, const char *file);
-    void rm(entry_map::iterator &it);
-    void mv(entry_map::iterator &it, const char *name);
+    void rm(entry_map::iterator it);
+    void mv(entry_map::iterator it, const char *name);
 
 private:
     void dump(FILE *out);

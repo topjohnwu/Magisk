@@ -82,11 +82,10 @@ int magisk_cpio::test() {
 }
 
 #define for_each_line(line, buf, size) \
-for (line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(line + 1, '\n') + 1)
+for (char *line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(line + 1, '\n') + 1)
 
 char *magisk_cpio::sha1() {
     char sha1[41];
-    char *line;
     for (auto &e : entries) {
         if (e.first == "init.magisk.rc" || e.first == "overlay/init.magisk.rc") {
             for_each_line(line, e.second->data, e.second->filesize) {
@@ -112,40 +111,48 @@ char *magisk_cpio::sha1() {
 }
 
 #define for_each_str(str, buf, size) \
-for (str = (char *) buf; str < (char *) buf + size; str = str += strlen(str) + 1)
+for (char *str = (char *) buf; str < (char *) buf + size; str += strlen(str) + 1)
 
 void magisk_cpio::restore() {
-    // If the backup init is missing, this means that the boot ramdisk
-    // was created from scratch by us. Nothing needs to be restored.
-    if (exists(".backup") && !exists(".backup/init")) {
+    // Collect files
+    auto bk = entries.end();
+    auto rl = entries.end();
+    auto mg = entries.end();
+    vector<entry_map::iterator> backups;
+    for (auto it = entries.begin(); it != entries.end(); ++it) {
+        if (it->first == ".backup") {
+            bk = it;
+        } else if (it->first == ".backup/.rmlist") {
+            rl = it;
+        } else if (it->first == ".backup/.magisk") {
+            mg = it;
+        } else if (str_starts(it->first, ".backup/")) {
+            backups.emplace_back(it);
+        }
+    }
+
+    // If the .backup folder is effectively empty, this means that the boot ramdisk was
+    // created from scratch by an old broken magiskboot. This is just a hacky workaround.
+    if (bk != entries.end() && mg != entries.end() && rl == entries.end() && backups.empty()) {
         fprintf(stderr, "Remove all in ramdisk\n");
         entries.clear();
         return;
     }
 
-    if (auto it = entries.find(".backup/.rmlist"); it != entries.end()) {
-        char *file;
-        for_each_str(file, it->second->data, it->second->filesize) {
+    // Remove files
+    rm(bk);
+    rm(mg);
+    if (rl != entries.end()) {
+        for_each_str(file, rl->second->data, rl->second->filesize) {
             rm(file);
         }
-        rm(it);
+        rm(rl);
     }
 
-    for (auto it = entries.begin(); it != entries.end();) {
-        auto cur = it++;
-        if (str_starts(cur->first, ".backup")) {
-            if (cur->first.length() == 7 || &cur->first[8] == ".magisk"sv) {
-                rm(cur);
-            } else {
-                mv(cur, &cur->first[8]);
-            }
-        } else if (str_starts(cur->first, "magisk") ||
-                cur->first == "overlay/init.magisk.rc" ||
-                cur->first == "sbin/magic_mask.sh" ||
-                cur->first == "init.magisk.rc") {
-            // Some known stuff we can remove
-            rm(cur);
-        }
+    // Restore files
+    for (auto it : backups) {
+        const char *name = &it->first[8];
+        mv(it, name);
     }
 }
 
