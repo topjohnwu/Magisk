@@ -9,8 +9,8 @@
 #define INJECT_ENV_2   "MAGISK_INJ_2"
 #define MAGISKTMP_ENV  "MAGISKTMP"
 
-#define HIJACK_BIN64   "/system/bin/bootanimation"
-#define HIJACK_BIN32   "/system/bin/screencap"
+#define HIJACK_BIN64   "/system/bin/appwidget"
+#define HIJACK_BIN32   "/system/bin/bu"
 
 namespace ZygiskRequest {
 enum : int {
