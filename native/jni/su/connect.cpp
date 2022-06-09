@@ -17,10 +17,11 @@ exe, "/system/bin", "com.android.commands.content.Content", \
 #define START_ACTIVITY \
 exe, "/system/bin", "com.android.commands.am.Am", \
 "start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
-"-f", "0x58000020", "--es", "action", action
+"-f", "0x58800020", "--es", "action", action
 
-// 0x58000020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|
-//              FLAG_ACTIVITY_NO_HISTORY|FLAG_INCLUDE_STOPPED_PACKAGES
+// 0x58800020 = FLAG_ACTIVITY_NEW_TASK|FLAG_ACTIVITY_MULTIPLE_TASK|
+//              FLAG_ACTIVITY_NO_HISTORY|FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS|
+//              FLAG_INCLUDE_STOPPED_PACKAGES
 
 #define get_cmd(to) \
 ((to).command.empty() ? \
