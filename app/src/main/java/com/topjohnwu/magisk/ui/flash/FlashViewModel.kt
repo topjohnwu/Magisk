@@ -32,9 +32,9 @@ class FlashViewModel : BaseViewModel() {
         FLASHING, SUCCESS, FAILED
     }
 
-    private val _flashState = MutableLiveData(State.FLASHING)
-    val flashState: LiveData<State> get() = _flashState
-    val flashing = Transformations.map(flashState) { it == State.FLASHING }
+    private val _state = MutableLiveData(State.FLASHING)
+    val state: LiveData<State> get() = _state
+    val flashing = Transformations.map(state) { it == State.FLASHING }
 
     @get:Bindable
     var showReboot = Info.isRooted
@@ -89,7 +89,7 @@ class FlashViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        _flashState.value = if (success) State.SUCCESS else State.FAILED
+        _state.value = if (success) State.SUCCESS else State.FAILED
     }
 
     fun onMenuItemClicked(item: MenuItem): Boolean {

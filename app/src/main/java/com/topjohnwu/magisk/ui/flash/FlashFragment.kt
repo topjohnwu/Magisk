@@ -35,7 +35,7 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
         setHasOptionsMenu(true)
         activity?.setTitle(R.string.flash_screen_title)
 
-        viewModel.flashState.observe(this) {
+        viewModel.state.observe(this) {
             activity?.supportActionBar?.setSubtitle(
                 when (it) {
                     FlashViewModel.State.FLASHING -> R.string.flashing

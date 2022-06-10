@@ -95,7 +95,6 @@ class InstallViewModel(
             R.id.method_inactive_slot -> FlashFragment.flash(true).navigate(true)
             else -> error("Unknown value")
         }
-        state = State.LOADING
     }
 
     override fun onSaveState(state: Bundle) {

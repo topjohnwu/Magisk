@@ -24,7 +24,7 @@
             android:paddingTop="@dimen/internal_action_bar_size"
             app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:invisibleUnless="@{viewModel.loaded}"
+            app:invisible="@{viewModel.loading}"
             app:items="@{viewModel.items}"
             app:extraBindings="@{viewModel.extraBindings}"
             tools:listitem="@layout/item_hide_md2"
@@ -49,24 +49,6 @@
             <ProgressBar
                 style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                 android:layout_marginTop="@dimen/l1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            goneUnless="@{viewModel.loadFailed}"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_available"
-                android:textAppearance="@style/AppearanceFoundation.Title"
-                android:textStyle="bold" />
 
         </LinearLayout>
 
