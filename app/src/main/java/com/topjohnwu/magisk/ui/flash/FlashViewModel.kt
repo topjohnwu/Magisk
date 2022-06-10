@@ -4,6 +4,7 @@ import android.view.MenuItem
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -27,16 +28,17 @@ import kotlinx.coroutines.launch
 
 class FlashViewModel : BaseViewModel() {
 
+    enum class State {
+        FLASHING, SUCCESS, FAILED
+    }
+
+    private val _flashState = MutableLiveData(State.FLASHING)
+    val flashState: LiveData<State> get() = _flashState
+    val flashing = Transformations.map(flashState) { it == State.FLASHING }
+
     @get:Bindable
     var showReboot = Info.isRooted
         set(value) = set(value, field, { field = it }, BR.showReboot)
-
-    private val _subtitle = MutableLiveData(R.string.flashing)
-    val subtitle get() = _subtitle as LiveData<Int>
-
-    private val _flashResult = MutableLiveData<Boolean>()
-    val flashResult: LiveData<Boolean>
-        get() = _flashResult
 
     val items = diffListOf<ConsoleItem>()
     lateinit var args: FlashFragmentArgs
@@ -87,12 +89,7 @@ class FlashViewModel : BaseViewModel() {
     }
 
     private fun onResult(success: Boolean) {
-        state = if (success) State.LOADED else State.LOADING_FAILED
-        when {
-            success -> _subtitle.postValue(R.string.done)
-            else -> _subtitle.postValue(R.string.failure)
-        }
-        _flashResult.value = success
+        _flashState.value = if (success) State.SUCCESS else State.FAILED
     }
 
     fun onMenuItemClicked(item: MenuItem): Boolean {

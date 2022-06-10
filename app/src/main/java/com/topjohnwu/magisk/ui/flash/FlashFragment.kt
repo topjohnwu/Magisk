@@ -35,13 +35,16 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
         setHasOptionsMenu(true)
         activity?.setTitle(R.string.flash_screen_title)
 
-        viewModel.subtitle.observe(this) {
-            activity?.supportActionBar?.setSubtitle(it)
-        }
-
-        viewModel.flashResult.observe(this) { success ->
-            binding.restartBtn.apply {
-                if (success && viewModel.showReboot) {
+        viewModel.flashState.observe(this) {
+            activity?.supportActionBar?.setSubtitle(
+                when (it) {
+                    FlashViewModel.State.FLASHING -> R.string.flashing
+                    FlashViewModel.State.SUCCESS -> R.string.done
+                    FlashViewModel.State.FAILED -> R.string.failure
+                }
+            )
+            if (it == FlashViewModel.State.SUCCESS && viewModel.showReboot) {
+                binding.restartBtn.apply {
                     if (!this.isVisible) this.show()
                     if (!this.isFocused) this.requestFocus()
                 }
@@ -84,7 +87,8 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     }
 
     override fun onBackPressed(): Boolean {
-        if (viewModel.loading) return true
+        if (viewModel.flashing.value == true)
+            return true
         return super.onBackPressed()
     }
 

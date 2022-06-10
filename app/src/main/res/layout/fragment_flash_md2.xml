@@ -39,14 +39,14 @@
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/restart_btn"
-            gone="@{!viewModel.loaded || !viewModel.showReboot}"
+            gone="@{viewModel.flashing || !viewModel.showReboot}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/l1"
             android:layout_marginBottom="@dimen/l1"
-            android:clickable="@{!viewModel.loaded}"
-            android:enabled="@{viewModel.loaded}"
+            android:clickable="@{!viewModel.flashing}"
+            android:enabled="@{!viewModel.flashing}"
             android:focusable="true"
             android:onClick="@{() -> viewModel.restartPressed()}"
             android:text="@string/reboot"
