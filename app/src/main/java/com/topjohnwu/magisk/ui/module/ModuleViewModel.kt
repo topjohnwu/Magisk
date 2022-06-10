@@ -52,6 +52,10 @@ class ModuleViewModel : BaseViewModel() {
         }
     }
 
+    override fun onNetworkChanged(network: Boolean) {
+        requestRefresh()
+    }
+
     private suspend fun loadInstalled() {
         val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
         val diff = withContext(Dispatchers.Default) {

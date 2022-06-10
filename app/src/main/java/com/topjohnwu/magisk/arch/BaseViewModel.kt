@@ -21,9 +21,7 @@ import com.topjohnwu.magisk.events.PermissionEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import kotlinx.coroutines.Job
 
-abstract class BaseViewModel(
-    initialState: State = State.LOADING
-) : ViewModel(), ObservableHost {
+abstract class BaseViewModel : ViewModel(), ObservableHost {
 
     override var callbacks: PropertyChangeRegistry? = null
 
@@ -40,7 +38,7 @@ abstract class BaseViewModel(
 
     val viewEvents: LiveData<ViewEvent> get() = _viewEvents
 
-    var state= initialState
+    var state = State.LOADING
         set(value) = set(value, field, { field = it }, BR.loading, BR.loaded, BR.loadFailed)
 
     private val _viewEvents = MutableLiveData<ViewEvent>()
@@ -59,6 +57,8 @@ abstract class BaseViewModel(
     }
 
     protected open fun refresh(): Job? = null
+
+    open fun onNetworkChanged(network: Boolean) {}
 
     fun withPermission(permission: String, callback: (Boolean) -> Unit) {
         PermissionEvent(permission, callback).publish()

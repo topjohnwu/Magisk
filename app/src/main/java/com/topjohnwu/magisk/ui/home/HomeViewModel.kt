@@ -104,13 +104,9 @@ class HomeViewModel(
         ensureEnv()
     }
 
-    val showTest = false
-
-    fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
-        override fun invoke(activity: UIActivity<*>) {
-            /* Entry point to trigger test events within the app */
-        }
-    }.publish()
+    override fun onNetworkChanged(network: Boolean) {
+        requestRefresh()
+    }
 
     fun onProgressUpdate(progress: Float, subject: Subject) {
         if (subject is App)
@@ -151,4 +147,10 @@ class HomeViewModel(
         checkedEnv = true
     }
 
+    val showTest = false
+    fun onTestPressed() = object : ViewEvent(), ActivityExecutor {
+        override fun invoke(activity: UIActivity<*>) {
+            /* Entry point to trigger test events within the app */
+        }
+    }.publish()
 }

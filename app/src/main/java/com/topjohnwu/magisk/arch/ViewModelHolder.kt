@@ -17,12 +17,8 @@ interface ViewModelHolder : LifecycleOwner, ViewModelStoreOwner {
     val viewModel: BaseViewModel
 
     fun startObserveLiveData() {
-        viewModel.viewEvents.observe(this) {
-            onEventDispatched(it)
-        }
-        Info.isConnected.observe(this) {
-            viewModel.requestRefresh()
-        }
+        viewModel.viewEvents.observe(this, this::onEventDispatched)
+        Info.isConnected.observe(this, viewModel::onNetworkChanged)
     }
 
     /**
