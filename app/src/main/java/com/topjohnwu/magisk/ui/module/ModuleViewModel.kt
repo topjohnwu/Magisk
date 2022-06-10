@@ -3,10 +3,9 @@ package com.topjohnwu.magisk.ui.module
 import android.net.Uri
 import androidx.databinding.Bindable
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
@@ -16,12 +15,10 @@ import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 
-class ModuleViewModel : BaseViewModel() {
+class ModuleViewModel : AsyncLoadViewModel() {
 
     val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
 
@@ -45,18 +42,14 @@ class ModuleViewModel : BaseViewModel() {
         }
     }
 
-    override fun refresh(): Job {
-        return viewModelScope.launch {
-            loading = true
-            loadInstalled()
-            loading = false
-            loadUpdateInfo()
-        }
+    override suspend fun doLoadWork() {
+        loading = true
+        loadInstalled()
+        loading = false
+        loadUpdateInfo()
     }
 
-    override fun onNetworkChanged(network: Boolean) {
-        requestRefresh()
-    }
+    override fun onNetworkChanged(network: Boolean) = startLoading()
 
     private suspend fun loadInstalled() {
         val installed = LocalModule.installed().map { LocalModuleRvItem(it) }

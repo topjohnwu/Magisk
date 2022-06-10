@@ -76,7 +76,10 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onResume() {
         super.onResume()
-        viewModel.requestRefresh()
+        viewModel.let {
+            if (it is AsyncLoadViewModel)
+                it.startLoading()
+        }
     }
 
     protected open fun onPreBind(binding: Binding) {

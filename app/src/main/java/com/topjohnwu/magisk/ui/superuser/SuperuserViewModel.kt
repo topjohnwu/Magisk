@@ -9,7 +9,7 @@ import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.su.SuPolicy
@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 
 class SuperuserViewModel(
     private val db: PolicyDao
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
@@ -48,10 +48,10 @@ class SuperuserViewModel(
         private set(value) = set(value, field, { field = it }, BR.loading)
 
     @SuppressLint("InlinedApi")
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         if (!Utils.showSuperUser()) {
             loading = false
-            return@launch
+            return
         }
         loading = true
         val (policies, diff) = withContext(Dispatchers.IO) {

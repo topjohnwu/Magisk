@@ -89,7 +89,10 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
 
     override fun onResume() {
         super.onResume()
-        viewModel.requestRefresh()
+        viewModel.let {
+            if (it is AsyncLoadViewModel)
+                it.startLoading()
+        }
     }
 
     override fun onEventDispatched(event: ViewEvent) = when (event) {

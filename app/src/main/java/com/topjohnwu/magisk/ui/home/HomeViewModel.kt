@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.ui.home
 import android.content.Context
 import androidx.core.net.toUri
 import androidx.databinding.Bindable
-import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
@@ -23,12 +22,11 @@ import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 class HomeViewModel(
     private val svc: NetworkService
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     enum class State {
         LOADING, INVALID, OUTDATED, UP_TO_DATE
@@ -83,7 +81,7 @@ class HomeViewModel(
         private var checkedEnv = false
     }
 
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         appState = State.LOADING
         Info.getRemote(svc)?.apply {
             appState = when {
@@ -101,9 +99,7 @@ class HomeViewModel(
         ensureEnv()
     }
 
-    override fun onNetworkChanged(network: Boolean) {
-        requestRefresh()
-    }
+    override fun onNetworkChanged(network: Boolean) = startLoading()
 
     fun onProgressUpdate(progress: Float, subject: Subject) {
         if (subject is App)

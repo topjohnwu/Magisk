@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -24,7 +24,7 @@ import java.io.FileInputStream
 
 class LogViewModel(
     private val repo: LogRepository
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     // --- empty view
 
@@ -43,7 +43,7 @@ class LogViewModel(
     var consoleText = " "
         set(value) = set(value, field, { field = it }, BR.consoleText)
 
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         consoleText = repo.fetchMagiskLogs()
         val (suLogs, diff) = withContext(Dispatchers.Default) {
             val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
@@ -89,12 +89,12 @@ class LogViewModel(
 
     fun clearMagiskLog() = repo.clearMagiskLogs {
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 
     fun clearLog() = viewModelScope.launch {
         repo.clearLogs()
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 }
