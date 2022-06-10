@@ -10,7 +10,6 @@ import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
-import com.topjohnwu.superuser.internal.UiThreadHandler
 
 val isRunningAsStub get() = Info.stub != null
 
@@ -47,7 +46,8 @@ object Info {
     val isConnected: LiveData<Boolean> by lazy {
         MutableLiveData(false).also { field ->
             NetworkObserver.observe(AppContext) {
-                UiThreadHandler.run { field.value = it }
+                remote = EMPTY_REMOTE
+                field.postValue(it)
             }
         }
     }

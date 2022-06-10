@@ -46,7 +46,10 @@ class NetworkService(
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {
-            factory()
+            if (Info.isConnected.value == true)
+                factory()
+            else
+                null
         } catch (e: Exception) {
             Timber.e(e)
             null
