@@ -13,7 +13,7 @@
     <string name="no_connection">L\'accesu a internet nun ta disponible</string>
     <string name="app_changelog">Rexistru de cambeos</string>
     <string name="loading">Cargando…</string>
-    <string name="update">Anovamienu</string>
+    <string name="update">Anovar</string>
     <string name="not_available">N/D</string>
     <string name="hide">Anubrir</string>
     <string name="home_package">Paquete</string>
@@ -23,8 +23,8 @@
     <string name="home_follow_title">Redes sociales</string>
     <string name="home_item_source">Códigu fonte</string>
     <string name="home_support_content">Magisk ye y va ser de códigu abiertu y gratuitu. Sicasí, pues ayudanos faciendo una donación o collaborando.</string>
-    <string name="home_installed_version">V. instalada</string>
-    <string name="home_latest_version">Última v.</string>
+    <string name="home_installed_version">Versión instalada</string>
+    <string name="home_latest_version">Última versión</string>
     <string name="invalid_update_channel">La canal d\'anovamientu nun ye válida</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">¡Van quitase y desactivase tolos módulos y l\'accesu root!\nCualesquier almacenamientu internu ensin cifrar pente l\'usu de Magisk va volver cifrase.</string>
@@ -37,13 +37,13 @@
     <string name="install_method_title">Métodu</string>
     <string name="install_next">Siguiente</string>
     <string name="install_start">Siguir</string>
-    <string name="manager_download_install">Primi pa baxar ya instalar</string>
+    <string name="manager_download_install">Primi equí pa baxalu ya instalalu</string>
     <string name="direct_install">Instalación direuta (aconséyase)</string>
     <string name="install_inactive_slot">Instalar na ralura inactiva (darréu del OTA)</string>
     <string name="install_inactive_slot_msg">¡El preséu va arrincar OBLIGATORIAMENTE na ralura inactiva darréu de reaniciar!\nUsa esta opción namás dempués d\'acabar l\'anovamientu per OTA.\n¿Quies siguir?</string>
     <string name="setup_title">Configuración adicional</string>
-    <string name="select_patch_file">Esbillar y parchiar un ficheru</string>
-    <string name="patch_file_msg">Esbilla una imaxe en bruto (*.img) o un archivu d\'ODIN (*.tar)</string>
+    <string name="select_patch_file">Seleicionar y parchiar un ficheru</string>
+    <string name="patch_file_msg">Seleiciona una imaxe en bruto (*.img) o un archivu d\'ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reaniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
     <!--Superuser-->
@@ -106,7 +106,7 @@
     <string name="module_empty">Nun hai nengún módulu instaláu</string>
     <!--Settings-->
     <string name="settings_dark_mode_title">Mou del estilu</string>
-    <string name="settings_dark_mode_message">¡Esbilla\'l mou que meyor s\'adaute al to estilu!</string>
+    <string name="settings_dark_mode_message">¡Seleiciona\'l mou que meyor s\'adaute al to estilu!</string>
     <string name="settings_dark_mode_light">Claridá</string>
     <string name="settings_dark_mode_system">L\'estilu del sistema</string>
     <string name="settings_dark_mode_dark">Escuridá</string>
@@ -130,7 +130,7 @@
     <string name="settings_denylist_summary">Los procesos de la llista d\'esclusión tienen toles modificaciones de Magisk anulaes</string>
     <string name="settings_denylist_error">Esta función rique l\'activación de: %1$s</string>
     <string name="settings_denylist_config_title">Configurar la llista d\'esclusión</string>
-    <string name="settings_denylist_config_summary">Esbilla los procesos que s\'inclúin na llista d\'esclusión</string>
+    <string name="settings_denylist_config_summary">Seleiciona los procesos que s\'inclúin na llista d\'esclusión</string>
     <string name="settings_hosts_title">Módulu «Systemless Hosts»</string>
     <string name="settings_hosts_summary">Un módulu pa les aplicaciones que bloquien anuncios</string>
     <string name="settings_hosts_toast">Amestóse\'l módulu «Systemless Hosts»</string>
