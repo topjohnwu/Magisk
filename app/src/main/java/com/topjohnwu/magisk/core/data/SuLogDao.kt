@@ -20,18 +20,18 @@ abstract class SuLogDao(private val db: SuLogDatabase) {
 
     suspend fun deleteAll() = withContext(Dispatchers.IO) { db.clearAllTables() }
 
-    suspend fun fetchAll(): MutableList<SuLog> {
+    fun fetchAll(): MutableList<SuLog> {
         deleteOutdated()
         return fetch()
     }
 
     @Query("SELECT * FROM logs ORDER BY time DESC")
-    protected abstract suspend fun fetch(): MutableList<SuLog>
+    protected abstract fun fetch(): MutableList<SuLog>
 
     @Query("DELETE FROM logs WHERE time < :timeout")
-    protected abstract suspend fun deleteOutdated(timeout: Long = twoWeeksAgo)
+    protected abstract fun deleteOutdated(timeout: Long = twoWeeksAgo)
 
     @Insert
-    abstract suspend fun insert(log: SuLog)
+    abstract fun insert(log: SuLog)
 
 }
