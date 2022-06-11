@@ -217,10 +217,11 @@ grep_prop() { return; }
 
 app_init() {
   mount_partitions
+  RAMDISKEXIST=false
+  check_boot_ramdisk && RAMDISKEXIST=true
   get_flags
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
-  check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
   check_encryption
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
