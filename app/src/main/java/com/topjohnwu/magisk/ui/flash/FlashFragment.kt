@@ -22,6 +22,8 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     override val layoutRes = R.layout.fragment_flash_md2
     override val viewModel by viewModel<FlashViewModel>()
     override val snackbarView: View get() = binding.snackbarContainer
+    override val snackbarAnchorView: View?
+        get() = if (binding.restartBtn.isShown) binding.restartBtn else super.snackbarAnchorView
 
     private var defaultOrientation = -1
 
