@@ -144,16 +144,13 @@ check_boot_ramdisk() {
   # Create boolean ISAB
   [ -z $SLOT ] && ISAB=false || ISAB=true
 
-  # If we are running as recovery mode, then we do not have ramdisk
-  [ "$RECOVERYMODE" = "true" ] && return 1
-
   # If we are A/B, then we must have ramdisk
   $ISAB && return 0
 
   # If we are using legacy SAR, but not A/B, assume we do not have ramdisk
   if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
-    # Override recovery mode to true if not set
-    [ -z $RECOVERYMODE ] && RECOVERYMODE=true
+    # Override recovery mode to true
+    RECOVERYMODE=true
     return 1
   fi
 
@@ -217,10 +214,11 @@ grep_prop() { return; }
 
 app_init() {
   mount_partitions
+  RAMDISKEXIST=false
+  check_boot_ramdisk && RAMDISKEXIST=true
   get_flags
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
-  check_boot_ramdisk && RAMDISKEXIST=true || RAMDISKEXIST=false
   check_encryption
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
