@@ -99,7 +99,8 @@ post_ota() {
   rm -f $1
   chmod 755 bootctl
   ./bootctl hal-info || return
-  [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1 || SLOT_NUM=0
+  SLOT_NUM=0
+  [ $(./bootctl get-current-slot) -eq 0 ] && SLOT_NUM=1
   ./bootctl set-active-boot-slot $SLOT_NUM
   cat << EOF > post-fs-data.d/post_ota.sh
 /data/adb/bootctl mark-boot-successful
@@ -142,7 +143,8 @@ adb_pm_install() {
 
 check_boot_ramdisk() {
   # Create boolean ISAB
-  [ -z $SLOT ] && ISAB=false || ISAB=true
+  ISAB=true
+  [ -z $SLOT ] && ISAB=false
 
   # If we are A/B, then we must have ramdisk
   $ISAB && return 0
@@ -170,7 +172,8 @@ check_encryption() {
           CRYPTOTYPE="file"
         else
           # We are either FDE or metadata encryption (which is also FBE)
-          grep -q ' /metadata ' /proc/mounts && CRYPTOTYPE="file" || CRYPTOTYPE="block"
+          CRYPTOTYPE="block"
+          grep -q ' /metadata ' /proc/mounts && CRYPTOTYPE="file"
         fi
       fi
     fi
@@ -186,12 +189,14 @@ check_encryption() {
 mount_partitions() {
   [ "$(getprop ro.build.ab_update)" = "true" ] && SLOT=$(getprop ro.boot.slot_suffix)
   # Check whether non rootfs root dir exists
-  grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_ROOT=true || SYSTEM_ROOT=false
+  SYSTEM_ROOT=false
+  grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_ROOT=true
 }
 
 get_flags() {
   KEEPVERITY=$SYSTEM_ROOT
-  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true || ISENCRYPTED=false
+  ISENCRYPTED=false
+  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   KEEPFORCEENCRYPT=$ISENCRYPTED
   # Although this most certainly won't work without root, keep it just in case
   if [ -e /dev/block/by-name/vbmeta_a ] || [ -e /dev/block/by-name/vbmeta ]; then
