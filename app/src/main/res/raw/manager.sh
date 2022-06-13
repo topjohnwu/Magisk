@@ -10,7 +10,7 @@ env_check() {
   for file in busybox magiskboot magiskinit util_functions.sh boot_patch.sh; do
     [ -f "$MAGISKBIN/$file" ] || return 1
   done
-  if [ "$2" -ge 24302 ]; then
+  if [ "$2" -ge 25000 ]; then
     [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
   fi
   grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
@@ -206,7 +206,8 @@ get_flags() {
   fi
   # Preset PATCHVBMETAFLAG to false in the non-root case
   PATCHVBMETAFLAG=false
-  # Do NOT preset RECOVERYMODE here
+  # Make sure RECOVERYMODE has value
+  [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
 run_migrations() { return; }
@@ -225,8 +226,6 @@ app_init() {
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
   check_encryption
-  # Make sure RECOVERYMODE has value
-  [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 }
 
 export BOOTMODE=true
