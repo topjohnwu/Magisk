@@ -64,7 +64,7 @@ void LegacySARInit::first_stage_prep() {
     xmkdir("/data/.backup", 0);
     xmkdir("/data/overlay.d", 0);
     restore_folder("/data/overlay.d", overlays);
-    int cfg = xopen("/data/.backup/config", O_WRONLY | O_CREAT, 0);
+    int cfg = xopen("/data/.backup/.magisk", O_WRONLY | O_CREAT, 0);
     xwrite(cfg, magisk_cfg.buf, magisk_cfg.sz);
     close(cfg);
 }
