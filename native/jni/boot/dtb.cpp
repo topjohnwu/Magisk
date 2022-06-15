@@ -93,47 +93,43 @@ static int find_fstab(const void *fdt, int node = 0) {
     return -1;
 }
 
-static void dtb_print(const char *file, bool fstab) {
-    fprintf(stderr, "Loading dtbs from [%s]\n", file);
-    auto m = mmap_data(file);
-    // Loop through all the dtbs
-    int dtb_num = 0;
-    uint8_t * const end = m.buf + m.sz;
+template<typename Func>
+static void for_each_fdt(const char *file, bool rw, Func fn) {
+    auto m = mmap_data(file, rw);
+    uint8_t *end = m.buf + m.sz;
     for (uint8_t *fdt = m.buf; fdt < end;) {
         fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
         if (fdt == nullptr)
             break;
+        fn(fdt);
+        fdt += fdt_totalsize(fdt);
+    }
+}
+
+static void dtb_print(const char *file, bool fstab) {
+    fprintf(stderr, "Loading dtbs from [%s]\n", file);
+    int dtb_num = 0;
+    for_each_fdt(file, false, [&](uint8_t *fdt) {
         if (fstab) {
-            int node = find_fstab(fdt);
-            if (node >= 0) {
-                fprintf(stderr, "Found fstab in buf.%04d\n", dtb_num);
+            if (int node = find_fstab(fdt); node >= 0) {
+                fprintf(stderr, "Found fstab in dtb.%04d\n", dtb_num);
                 print_node(fdt, node);
             }
         } else {
-            fprintf(stderr, "Printing buf.%04d\n", dtb_num);
+            fprintf(stderr, "Printing dtb.%04d\n", dtb_num);
             print_node(fdt);
         }
         ++dtb_num;
-        fdt += fdt_totalsize(fdt);
-    }
+    });
     fprintf(stderr, "\n");
 }
 
-[[maybe_unused]]
-static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file);
-
 static bool dtb_patch(const char *file) {
-    bool keep_verity = check_env("KEEPVERITY");
-
     fprintf(stderr, "Loading dtbs from [%s]\n", file);
-    auto m = mmap_data(file, true);
 
+    bool keep_verity = check_env("KEEPVERITY");
     bool patched = false;
-    uint8_t * const end = m.buf + m.sz;
-    for (uint8_t *fdt = m.buf; fdt < end;) {
-        fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
-        if (fdt == nullptr)
-            break;
+    for_each_fdt(file, true, [&](uint8_t *fdt) {
         int node;
         // Patch the chosen node for bootargs
         fdt_for_each_subnode(node, fdt, 0) {
@@ -149,18 +145,39 @@ static bool dtb_patch(const char *file) {
             }
             break;
         }
-        if (int fstab = find_fstab(fdt); fstab >= 0) {
-            fdt_for_each_subnode(node, fdt, fstab) {
-                if (!keep_verity) {
+        if (!keep_verity) {
+            if (int fstab = find_fstab(fdt); fstab >= 0) {
+                fdt_for_each_subnode(node, fdt, fstab) {
                     int len;
                     char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
                     patched |= patch_verity(value, len) != len;
                 }
             }
         }
-        fdt += fdt_totalsize(fdt);
-    }
+    });
     return patched;
+}
+
+[[noreturn]]
+static void dtb_test(const char *file) {
+    for_each_fdt(file, false, [&](uint8_t *fdt) {
+        // Find the system node in fstab
+        if (int fstab = find_fstab(fdt); fstab >= 0) {
+            int node;
+            fdt_for_each_subnode(node, fdt, fstab) {
+                if (auto name = fdt_get_name(fdt, node, nullptr); !name || name != "system"sv)
+                    continue;
+                int len;
+                if (auto value = fdt_getprop(fdt, node, "mnt_point", &len)) {
+                    // If mnt_point is set to /system_root, abort!
+                    if (strncmp(static_cast<const char *>(value), "/system_root", len) == 0) {
+                        exit(1);
+                    }
+                }
+            }
+        }
+    });
+    exit(0);
 }
 
 int dtb_commands(int argc, char *argv[]) {
@@ -175,10 +192,16 @@ int dtb_commands(int argc, char *argv[]) {
         if (!dtb_patch(dtb))
             exit(1);
         return 0;
+    } else if (argv[0] == "test"sv) {
+        dtb_test(dtb);
     } else {
         return 1;
     }
 }
+
+// The following code is unused, left here for historical purpose. Since the code is
+// extremely complicated, I won't want to rewrite this whole thing if somehow we need
+// to use it in the future...
 
 namespace {
 
@@ -187,8 +210,6 @@ struct fdt_blob {
     uint32_t offset;
     uint32_t len;
 };
-
-}
 
 static bool fdt_patch(void *fdt) {
     int fstab = find_fstab(fdt);
@@ -361,6 +382,7 @@ static bool blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
 
 #define DTB_MATCH(s) BUFFER_MATCH(dtb, s)
 
+[[maybe_unused]]
 static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
     if (DTB_MATCH(QCDT_MAGIC)) {
         auto hdr = reinterpret_cast<qcdt_hdr*>(dtb);
@@ -426,3 +448,5 @@ static bool dtb_patch_rebuild(uint8_t *dtb, size_t dtb_sz, const char *file) {
         return blob_patch(dtb, dtb_sz, file);
     }
 }
+
+} // namespace

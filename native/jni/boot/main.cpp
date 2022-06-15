@@ -91,6 +91,10 @@ Supported actions:
         Search for fstab and remove verity/avb
         Modifications are done directly to the file in-place
         Configure with env variables: KEEPVERITY
+      test
+        Test the fstab's status
+        Return values:
+        0:valid    1:error
 
   split <file>
     Split image.*-dtb into kernel + kernel_dtb
