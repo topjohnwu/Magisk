@@ -79,6 +79,8 @@ HookContext *g_ctx;
 const JNINativeInterface *old_functions;
 JNINativeInterface *new_functions;
 
+} // namespace
+
 #define HOOK_JNI(method)                                                                     \
 if (methods[i].name == #method##sv) {                                                        \
     int j = 0;                                                                               \
@@ -102,6 +104,8 @@ if (methods[i].name == #method##sv) {                                           
 #include "jni_hooks.hpp"
 
 #undef HOOK_JNI
+
+namespace {
 
 jclass gClassRef;
 jmethodID class_getName;
