@@ -20,30 +20,38 @@ Usage: %s <action> [args...]
 
 Supported actions:
   unpack [-n] [-h] <bootimg>
-    Unpack <bootimg> to, if available, kernel, kernel_dtb, ramdisk.cpio,
-    second, dtb, extra, and recovery_dtbo into current directory.
-    If '-n' is provided, it will not attempt to decompress kernel or
-    ramdisk.cpio from their original formats.
-    If '-h' is provided, it will dump header info to 'header',
-    which will be parsed when repacking.
+    Unpack <bootimg> to its individual components, each component to
+    a file with its corresponding file name in the current directory.
+    Supported components: kernel, kernel_dtb, ramdisk.cpio, second,
+    dtb, extra, and recovery_dtbo.
+    By default, each component will be automatically decompressed
+    on-the-fly before writing to the output file.
+    If '-n' is provided, all decompression operations will be skipped;
+    each component will remain untouched, dumped in its original format.
+    If '-h' is provided, the boot image header information will be
+    dumped to the file 'header', which can be used to modify header
+    configurations during repacking.
     Return values:
     0:valid    1:error    2:chromeos
 
   repack [-n] <origbootimg> [outbootimg]
-    Repack boot image components from current directory
-    to [outbootimg], or new-boot.img if not specified.
-    If '-n' is provided, it will not attempt to recompress ramdisk.cpio,
-    otherwise it will compress ramdisk.cpio and kernel with the same format
-    as in <origbootimg> if the file provided is not already compressed.
-    If env variable PATCHVBMETAFLAG is set to true, all disable flags will
-    be set in the vbmeta header.
+    Repack boot image components using files from the current directory
+    to [outbootimg], or 'new-boot.img' if not specified.
+    <origbootimg> is the original boot image used to unpack the components.
+    By default, each component will be automatically compressed using its
+    corresponding format detected in <origbootimg>. If a component file
+    in the current directory is already compressed, then no addition
+    compression will be performed for that specific component.
+    If '-n' is provided, all compression operations will be skipped.
+    If env variable PATCHVBMETAFLAG is set to true, all disable flags in
+    the boot image's vbmeta header will be set.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
-    Search <hexpattern1> in <file>, and replace with <hexpattern2>
+    Search <hexpattern1> in <file>, and replace it with <hexpattern2>
 
   cpio <incpio> [commands...]
     Do cpio commands to <incpio> (modifications are done in-place)
-    Each command is a single argument, add quotes for each command
+    Each command is a single argument, add quotes for each command.
     Supported commands:
       exists ENTRY
         Return 0 if ENTRY exists, else return 1
@@ -60,7 +68,7 @@ Supported actions:
       extract [ENTRY OUT]
         Extract ENTRY to OUT, or extract all entries to current directory
       test
-        Test the current cpio's status
+        Test the cpio's status
         Return value is 0 or bitwise or-ed of following values:
         0x1:Magisk    0x2:unsupported    0x4:Sony
       patch
@@ -73,8 +81,8 @@ Supported actions:
       sha1
         Print stock boot SHA1 if previously backed up in ramdisk
 
-  dtb <input> <action> [args...]
-    Do dtb related actions to <input>
+  dtb <file> <action> [args...]
+    Do dtb related actions to <file>
     Supported actions:
       print [-f]
         Print all contents of dtb for debugging
@@ -84,7 +92,7 @@ Supported actions:
         Modifications are done directly to the file in-place
         Configure with env variables: KEEPVERITY
 
-  split <input>
+  split <file>
     Split image.*-dtb into kernel + kernel_dtb
 
   sha1 <file>
@@ -94,8 +102,11 @@ Supported actions:
     Cleanup the current working directory
 
   compress[=format] <infile> [outfile]
-    Compress <infile> with [format] (default: gzip), optionally to [outfile]
-    <infile>/[outfile] can be '-' to be STDIN/STDOUT
+    Compress <infile> with [format] to [outfile].
+    <infile>/[outfile] can be '-' to be STDIN/STDOUT.
+    If [format] is not specified, then gzip will be used.
+    If [outfile] is not specified, then <infile> will be replaced
+    with another file suffixed with a matching file extension.
     Supported formats: )EOF", arg0);
 
     print_formats();
@@ -103,8 +114,10 @@ Supported actions:
     fprintf(stderr, R"EOF(
 
   decompress <infile> [outfile]
-    Detect format and decompress <infile>, optionally to [outfile]
-    <infile>/[outfile] can be '-' to be STDIN/STDOUT
+    Detect format and decompress <infile> to [outfile].
+    <infile>/[outfile] can be '-' to be STDIN/STDOUT.
+    If [outfile] is not specified, then <infile> will be replaced
+    with another file removing its archive format file extension.
     Supported formats: )EOF");
 
     print_formats();

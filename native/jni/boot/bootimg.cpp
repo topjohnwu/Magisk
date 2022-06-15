@@ -577,7 +577,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     }
     if (access(KERNEL_FILE, R_OK) == 0) {
         auto m = mmap_data(KERNEL_FILE);
-        if (!COMPRESSED_ANY(check_fmt(m.buf, m.sz)) && COMPRESSED(boot.k_fmt)) {
+        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf, m.sz)) && COMPRESSED(boot.k_fmt)) {
             // Always use zopfli for zImage compression
             auto fmt = (boot.flags[ZIMAGE_KERNEL] && boot.k_fmt == GZIP) ? ZOPFLI : boot.k_fmt;
             hdr->kernel_size() = compress(fmt, fd, m.buf, m.sz);
