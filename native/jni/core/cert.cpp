@@ -1,5 +1,4 @@
 #include <base.hpp>
-#include <flags.h>
 
 using namespace std;
 
@@ -96,7 +95,7 @@ struct EOCD {
  * This method extracts the first certificate of the first signer
  * within the APK v2 signature block.
  */
-string read_certificate(int fd, bool check_version) {
+string read_certificate(int fd, int version) {
     uint32_t size4;
     uint64_t size8;
 
@@ -131,13 +130,13 @@ string read_certificate(int fd, bool check_version) {
     read(fd, &central_dir_off, sizeof(central_dir_off));
 
     // Read comment
-    if (check_version) {
+    if (version >= 0) {
         uint16_t comment_sz = 0;
         read(fd, &comment_sz, sizeof(comment_sz));
         string comment;
         comment.resize(comment_sz);
         read(fd, comment.data(), comment_sz);
-        if (MAGISK_VER_CODE > parse_int(comment)) {
+        if (version > parse_int(comment)) {
             // Older version of magisk app is not supported
             return {};
         }

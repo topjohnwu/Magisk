@@ -105,7 +105,7 @@ int get_manager(int user_id, string *pkg, bool install) {
         int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
         if (dyn < 0)
             return false;
-        bool mismatch = default_cert && read_certificate(dyn, true) != *default_cert;
+        bool mismatch = default_cert && read_certificate(dyn, MAGISK_VER_CODE) != *default_cert;
         close(dyn);
         if (mismatch) {
             LOGE("pkg: dyn APK signature mismatch: %s\n", app_path);
@@ -226,7 +226,7 @@ int get_manager(int user_id, string *pkg, bool install) {
 #if ENFORCE_SIGNATURE
                 string apk = find_apk_path(JAVA_PACKAGE_NAME);
                 int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
-                string cert = read_certificate(fd, true);
+                string cert = read_certificate(fd, MAGISK_VER_CODE);
                 close(fd);
                 if (default_cert && cert != *default_cert) {
                     // Found APK with invalid signature, force replace with stub
