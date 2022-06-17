@@ -37,6 +37,7 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -420,20 +421,15 @@ abstract class MagiskInstallImpl protected constructor(
     protected abstract suspend fun operations(): Boolean
 
     open suspend fun exec(): Boolean {
-        synchronized(Companion) {
-            if (haveActiveSession)
-                return false
-            haveActiveSession = true
-        }
+        if (haveActiveSession.getAndSet(true))
+            return false
         val result = withContext(Dispatchers.IO) { operations() }
-        synchronized(Companion) {
-            haveActiveSession = false
-        }
+        haveActiveSession.set(false)
         return result
     }
 
     companion object {
-        private var haveActiveSession = false
+        private var haveActiveSession = AtomicBoolean(false)
     }
 }
 
