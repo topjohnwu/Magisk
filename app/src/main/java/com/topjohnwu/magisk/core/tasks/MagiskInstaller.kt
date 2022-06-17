@@ -58,7 +58,7 @@ abstract class MagiskInstallImpl protected constructor(
     private val localFS get() = FileSystemManager.getLocal()
 
     private fun findImage(): Boolean {
-        val bootPath = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
+        val bootPath = "RECOVERYMODE=${Config.recovery} find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
