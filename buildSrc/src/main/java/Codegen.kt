@@ -64,8 +64,6 @@ fun genKeyData(keysDir: File, outSrc: File) {
         it.println("package com.topjohnwu.magisk.signing;")
         it.println("public final class KeyData {")
 
-        it.byteField("testCert", File(keysDir, "testkey.x509.pem").readBytes())
-        it.byteField("testKey", File(keysDir, "testkey.pk8").readBytes())
         it.byteField("verityCert", File(keysDir, "verity.x509.pem").readBytes())
         it.byteField("verityKey", File(keysDir, "verity.pk8").readBytes())
 
