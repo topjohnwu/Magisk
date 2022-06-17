@@ -1,6 +1,11 @@
-
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.builder.internal.packaging.IncrementalPackager
+import com.android.builder.model.SigningConfig
+import com.android.tools.build.apkzlib.sign.SigningExtension
+import com.android.tools.build.apkzlib.sign.SigningOptions
+import com.android.tools.build.apkzlib.zfile.ZFiles
+import com.android.tools.build.apkzlib.zip.ZFileOptions
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
@@ -16,6 +21,8 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 import java.util.*
 import java.util.zip.*
 
@@ -55,6 +62,37 @@ fun Project.setupCommon() {
     }
 }
 
+private fun SigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
+    val keyStore = KeyStore.getInstance(storeType ?: KeyStore.getDefaultType())
+    storeFile!!.inputStream().use {
+        keyStore.load(it, storePassword!!.toCharArray())
+    }
+    val keyPwdArray = keyPassword!!.toCharArray()
+    val entry = keyStore.getEntry(keyAlias!!, KeyStore.PasswordProtection(keyPwdArray))
+    return entry as KeyStore.PrivateKeyEntry
+}
+
+private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eocdComment: String) {
+    val privateKey = signConfig.getPrivateKey()
+    val signingOptions = SigningOptions.builder()
+        .setMinSdkVersion(minSdk)
+        .setV1SigningEnabled(true)
+        .setV2SigningEnabled(true)
+        .setKey(privateKey.privateKey)
+        .setCertificates(privateKey.certificate as X509Certificate)
+        .setValidation(SigningOptions.Validation.ASSUME_INVALID)
+        .build()
+    val options = ZFileOptions().apply {
+        noTimestamps = true
+        autoSortFiles = true
+    }
+    ZFiles.apk(apkPath, options).use {
+        SigningExtension(signingOptions).register(it)
+        it.eocdComment = eocdComment.toByteArray()
+        it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
+    }
+}
+
 private fun Project.setupAppCommon() {
     setupCommon()
 
@@ -89,6 +127,19 @@ private fun Project.setupAppCommon() {
 
         dependenciesInfo {
             includeInApk = false
+        }
+    }
+
+    android.applicationVariants.all {
+        val projectName = project.name.toLowerCase(Locale.ROOT)
+        val variantCapped = name.capitalize(Locale.ROOT)
+        val variant = name.toLowerCase(Locale.ROOT)
+        tasks.getByPath(":$projectName:package$variantCapped").doLast {
+            val apkDir = if (properties["android.injected.invoked.from.ide"] == "true")
+                "intermediates" else "outputs"
+            val apk = File(buildDir, "${apkDir}/apk/${variant}/$projectName-${variant}.apk")
+            val comment = "${Config.versionCode}"
+            addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
     }
 }
