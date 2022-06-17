@@ -415,14 +415,12 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (realpath(path, cwd))
         chdir(cwd);
     snprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
-    char buf[4096] = { 0 };
-    int fd = xopen(path, O_RDONLY);
-    read(fd, buf, sizeof(buf));
-    close(fd);
+    auto env = full_read(path);
     clearenv();
-    for (size_t pos = 0; buf[pos];) {
-        putenv(buf + pos);
-        pos += strlen(buf + pos) + 1;
+    for (size_t pos = 0; pos < env.size(); ++pos) {
+        putenv(env.data() + pos);
+        pos = env.find_first_of('\0', pos);
+        if (pos == std::string::npos) break;
     }
     if (!ctx.req.keepenv) {
         struct passwd *pw;
