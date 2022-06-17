@@ -420,7 +420,8 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     for (size_t pos = 0; pos < env.size(); ++pos) {
         putenv(env.data() + pos);
         pos = env.find_first_of('\0', pos);
-        if (pos == std::string::npos) break;
+        if (pos == std::string::npos)
+            break;
     }
     if (!ctx.req.keepenv) {
         struct passwd *pw;
