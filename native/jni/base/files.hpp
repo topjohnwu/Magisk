@@ -39,14 +39,14 @@ protected:
     void swap(byte_data &o);
 };
 
-struct raw_file : public byte_data {
+struct raw_file {
     std::string path;
     file_attr attr;
+    std::string content;
 
     raw_file() : attr{} {}
     raw_file(const raw_file&) = delete;
-    raw_file(raw_file &&o) : path(std::move(o.path)), attr(o.attr) { swap(o); }
-    ~raw_file() { free(buf); }
+    raw_file(raw_file &&o) : path(std::move(o.path)), attr(o.attr), content(std::move(o.content)) {}
 };
 
 struct mmap_data : public byte_data {
@@ -75,11 +75,9 @@ int setattrat(int dirfd, const char *name, file_attr *a);
 int fsetattr(int fd, file_attr *a);
 void fclone_attr(int src, int dest);
 void clone_attr(const char *src, const char *dest);
-void fd_full_read(int fd, void **buf, size_t *size);
-void full_read(const char *filename, void **buf, size_t *size);
-void fd_full_read(int fd, std::string &str);
+void full_read(int fd, std::string &str);
 void full_read(const char *filename, std::string &str);
-std::string fd_full_read(int fd);
+std::string full_read(int fd);
 std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 void file_readline(bool trim, FILE *fp, const std::function<bool(std::string_view)> &fn);
@@ -102,18 +100,6 @@ void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 void backup_folder(const char *dir, std::vector<raw_file> &files);
 void restore_folder(const char *dir, std::vector<raw_file> &files);
 std::string find_apk_path(const char *pkg);
-
-template <typename T>
-void full_read(const char *filename, T &buf, size_t &size) {
-    static_assert(std::is_pointer<T>::value);
-    full_read(filename, reinterpret_cast<void**>(&buf), &size);
-}
-
-template <typename T>
-void fd_full_read(int fd, T &buf, size_t &size) {
-    static_assert(std::is_pointer<T>::value);
-    fd_full_read(fd, reinterpret_cast<void**>(&buf), &size);
-}
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
 using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;

@@ -72,7 +72,7 @@ static void load_overlay_rc(const char *overlay) {
         if (str_ends(entry->d_name, ".rc")) {
             LOGD("Found rc script [%s]\n", entry->d_name);
             int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-            rc_list.push_back(fd_full_read(rc));
+            rc_list.push_back(full_read(rc));
             close(rc);
             unlinkat(dfd, entry->d_name, 0);
         }

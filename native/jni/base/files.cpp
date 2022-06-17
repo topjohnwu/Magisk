@@ -286,26 +286,7 @@ void fclone_attr(int src, int dest) {
     fsetattr(dest, &a);
 }
 
-void fd_full_read(int fd, void **buf, size_t *size) {
-    *size = lseek(fd, 0, SEEK_END);
-    lseek(fd, 0, SEEK_SET);
-    *buf = xmalloc(*size + 1);
-    xxread(fd, *buf, *size);
-    ((char *) *buf)[*size] = '\0';
-}
-
-void full_read(const char *filename, void **buf, size_t *size) {
-    int fd = xopen(filename, O_RDONLY | O_CLOEXEC);
-    if (fd < 0) {
-        *buf = nullptr;
-        *size = 0;
-        return;
-    }
-    fd_full_read(fd, buf, size);
-    close(fd);
-}
-
-void fd_full_read(int fd, string &str) {
+void full_read(int fd, string &str) {
     char buf[4096];
     for (ssize_t len; (len = xread(fd, buf, sizeof(buf))) > 0;)
         str.insert(str.end(), buf, buf + len);
@@ -313,14 +294,14 @@ void fd_full_read(int fd, string &str) {
 
 void full_read(const char *filename, string &str) {
     if (int fd = xopen(filename, O_RDONLY | O_CLOEXEC); fd >= 0) {
-        fd_full_read(fd, str);
+        full_read(fd, str);
         close(fd);
     }
 }
 
-string fd_full_read(int fd) {
+string full_read(int fd) {
     string str;
-    fd_full_read(fd, str);
+    full_read(fd, str);
     return str;
 }
 
@@ -429,12 +410,10 @@ void backup_folder(const char *dir, vector<raw_file> &files) {
         if (fgetattr(fd, &file.attr) < 0)
             return SKIP;
         if (entry->d_type == DT_REG) {
-            fd_full_read(fd, file.buf, file.sz);
+            file.content = full_read(fd);
         } else if (entry->d_type == DT_LNK) {
             xreadlinkat(dfd, entry->d_name, path, sizeof(path));
-            file.sz = strlen(path) + 1;
-            file.buf = (uint8_t *) xmalloc(file.sz);
-            memcpy(file.buf, path, file.sz);
+            file.content = path;
         }
         files.emplace_back(std::move(file));
         return CONTINUE;
@@ -449,10 +428,10 @@ void restore_folder(const char *dir, vector<raw_file> &files) {
         if (S_ISDIR(file.attr.st.st_mode)) {
             mkdirs(path, 0);
         } else if (S_ISREG(file.attr.st.st_mode)) {
-            auto fp = xopen_file(path.data(), "we");
-            if (fp) fwrite(file.buf, 1, file.sz, fp.get());
+            if (auto fp = xopen_file(path.data(), "we"))
+                fwrite(file.content.data(), 1, file.content.size(), fp.get());
         } else if (S_ISLNK(file.attr.st.st_mode)) {
-            symlink((char *)file.buf, path.data());
+            symlink(file.content.data(), path.data());
         }
         setattr(path.data(), &file.attr);
     }
