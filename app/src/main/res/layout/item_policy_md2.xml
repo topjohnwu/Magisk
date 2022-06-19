@@ -17,10 +17,13 @@
         android:layout_gravity="center">
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/policy"
             style="@style/WidgetFoundation.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="@{item.enabled ? 1f : .5f}"
+            android:focusable="true"
+            android:nextFocusRight="@id/policy_indicator"
             android:onClick="@{() -> item.toggleExpand()}">
 
             <LinearLayout
@@ -35,10 +38,10 @@
                     <ImageView
                         android:id="@+id/policy_app_icon"
                         style="@style/WidgetFoundation.Image"
+                        srcCompat="@{item.icon}"
                         android:layout_marginStart="@dimen/l1"
                         android:layout_marginTop="@dimen/l1"
                         android:layout_marginBottom="@dimen/l1"
-                        srcCompat="@{item.icon}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -86,8 +89,9 @@
                         android:id="@+id/policy_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="@={item.enabled}"
                         android:layout_marginEnd="@dimen/l1"
+                        android:checked="@={item.enabled}"
+                        android:nextFocusLeft="@id/policy"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -96,20 +100,20 @@
 
                 <LinearLayout
                     android:id="@+id/policy_expand_container"
-                    android:orientation="horizontal"
                     gone="@{!item.isExpanded}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="?colorSurfaceVariant"
+                    android:orientation="horizontal"
                     tools:visibility="visible">
 
                     <Button
                         android:id="@+id/policy_notify"
                         style="@style/WidgetFoundation.Button.Text"
                         isSelected="@{item.shouldNotify}"
-                        android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:minHeight="24dp"
                         android:onClick="@{() -> item.toggleNotify()}"
                         android:text="@string/superuser_toggle_notification"
@@ -131,9 +135,9 @@
                         android:id="@+id/policy_log"
                         style="@style/WidgetFoundation.Button.Text"
                         isSelected="@{item.shouldLog}"
-                        android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:minHeight="24dp"
                         android:onClick="@{() -> item.toggleLog()}"
                         android:text="@string/logs"
@@ -154,9 +158,9 @@
                     <Button
                         android:id="@+id/policy_delete"
                         style="@style/WidgetFoundation.Button.Text"
-                        android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:minHeight="24dp"
                         android:onClick="@{() -> item.revoke()}"
                         android:text="@string/superuser_toggle_revoke"
