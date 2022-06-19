@@ -80,9 +80,15 @@ bool SecondStageInit::prepare() {
     argv[0] = (char *) INIT_PATH;
 
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    // Check if root and system are on the same filesystem
+    // Check if root and system are on different filesystems
     struct stat root{}, system{};
     xstat("/", &root);
     xstat("/system", &system);
-    return root.st_dev != system.st_dev;
+    if (root.st_dev != system.st_dev) {
+        // We are still on rootfs, so make sure we will execute the init of the 2nd stage
+        unlink("/init");
+        xsymlink(INIT_PATH, "/init");
+        return true;
+    }
+    return false;
 }
