@@ -1,5 +1,14 @@
 # Magisk Changelog
 
+### v25.1
+
+- [MagiskBoot] Fix ramdisk backup being incorrectly skipped
+- [MagiskBoot] Add new feature to detect unsupported dtb and abort during installation
+- [Zygisk] Change binary hijack paths
+- [App] Fix incorrect recovery mode detection and installation
+- [MagiskInit] Fix config not properly exported in legacy SAR devices
+- [General] Enforce the Magisk app to always match or be newer than `magiskd`
+
 ### v25.0
 
 - [MagiskInit] Update 2SI implementation, significantly increase device compatibility (e.g. Sony Xperia devices)
