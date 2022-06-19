@@ -126,7 +126,7 @@
     <string name="settings_hide_app_summary">安裝一個隨機套件名稱和客製化應用程式名稱的代理應用程式</string>
     <string name="settings_restore_app_title">還原 Magisk</string>
     <string name="settings_restore_app_summary">取消隱藏並還原為原始套件</string>
-	<string name="language">語言</string>
+    <string name="language">語言</string>
     <string name="system_default">（系統預設值）</string>
     <string name="settings_check_update_title">檢查更新</string>
     <string name="settings_check_update_summary">定期於背景檢查更新</string>
@@ -141,7 +141,7 @@
     <string name="settings_denylist_error">這個功能需要啟用 %1$s</string>
     <string name="settings_denylist_config_title">設定黑名單</string>
     <string name="settings_denylist_config_summary">選擇要包含在黑名單的處理程序</string>
-    <string name="settings_hosts_title">主機(HOSTS) 模組化</string>
+    <string name="settings_hosts_title">主機（hosts）模組化</string>
     <string name="settings_hosts_summary">為廣告阻擋程式提供主機模組</string>
     <string name="settings_hosts_toast">已安裝主機模組</string>
     <string name="settings_app_name_hint">新的名稱</string>
@@ -192,11 +192,11 @@
     <!--Notifications-->
     <string name="update_channel">Magisk 更新</string>
     <string name="progress_channel">進度通知</string>
-	<string name="updated_channel">更新完成</string>
+    <string name="updated_channel">更新完成</string>
     <string name="download_complete">下載完成</string>
     <string name="download_file_error">下載錯誤</string>
     <string name="magisk_update_title">Magisk 有可用的更新！</string>
-	<string name="updated_title">Magisk 已完成更新</string>
+    <string name="updated_title">Magisk 已完成更新</string>
     <string name="updated_text">點選即可開啟應用程式</string>
 
     <!--Toasts, Dialogs-->
@@ -222,17 +222,17 @@
     <string name="setup_msg">正在修復執行環境……</string>
     <string name="authenticate">驗證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
-    <string name="unsupport_magisk_msg">此 Magisk 的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
+    <string name="unsupport_magisk_msg">此應用程式的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
     <string name="unsupport_general_title">異常狀態</string>
     <string name="unsupport_system_app_msg">本應用程式不支援以系統應用程式的方式執行。請恢復為使用者應用程式。</string>
     <string name="unsupport_other_su_msg">偵測到一個不是來自 Magisk 的「su」二進位檔案。請移除其他 Root 方案。</string>
-    <string name="unsupport_external_storage_msg">Magisk 已被安裝到外部儲存空間。請移動應用程式至內部儲存空間。</string>
-    <string name="unsupport_nonroot_stub_msg">Magisk 無法在 Root 權限遺失的情況下以隱藏模式執行。請還原為原始套件。</string>
+    <string name="unsupport_external_storage_msg">應用程式已被安裝到外部儲存空間。請移動應用程式至內部儲存空間。</string>
+    <string name="unsupport_nonroot_stub_msg">應用程式無法在 Root 權限遺失的情況下以隱藏模式執行。請還原為原始套件。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">授予儲存空間存取權以啟用此功能</string>
-	<string name="install_unknown_denied">允許「安裝未知應用程式」以啟用此功能</string>
+    <string name="install_unknown_denied">允許「安裝未知應用程式」以啟用此功能</string>
     <string name="add_shortcut_title">在主螢幕中新增捷徑</string>
-    <string name="add_shortcut_msg">在隱藏 Magisk 以後，其名稱與圖示將難以辨識。請問您想要在主螢幕中新增一個精緻的捷徑嗎？</string>
+    <string name="add_shortcut_msg">在隱藏應用程式以後，其名稱與圖示將難以辨識。請問您想要在主螢幕中新增一個精緻的捷徑嗎？</string>
     <string name="app_not_found">沒有可以處理這個動作的應用程式</string>
     <string name="reboot_apply_change">重新啟動裝置以套用設定變更</string>
     <string name="restore_app_confirmation">這將會還原隱藏的應用程式至原始。請問您確定要執行？</string>
