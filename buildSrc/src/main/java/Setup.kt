@@ -21,9 +21,11 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
+import java.nio.file.Files
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.*
+import java.util.jar.JarFile
 import java.util.zip.*
 
 private fun Project.androidBase(configure: Action<BaseExtension>) =
@@ -90,6 +92,7 @@ private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eo
         SigningExtension(signingOptions).register(it)
         it.eocdComment = eocdComment.toByteArray()
         it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
+        it.get(JarFile.MANIFEST_NAME)?.delete()
     }
 }
 
@@ -133,11 +136,8 @@ private fun Project.setupAppCommon() {
     android.applicationVariants.all {
         val projectName = project.name.toLowerCase(Locale.ROOT)
         val variantCapped = name.capitalize(Locale.ROOT)
-        val variant = name.toLowerCase(Locale.ROOT)
         tasks.getByPath(":$projectName:package$variantCapped").doLast {
-            val apkDir = if (properties["android.injected.invoked.from.ide"] == "true")
-                "intermediates" else "outputs"
-            val apk = File(buildDir, "${apkDir}/apk/${variant}/$projectName-${variant}.apk")
+            val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
             val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
             addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
