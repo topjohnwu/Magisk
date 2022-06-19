@@ -14,6 +14,7 @@ int xopenat(int dirfd, const char *pathname, int flags, mode_t mode);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
+off_t xlseek(int fd, off_t offset, int whence);
 int xpipe2(int pipefd[2], int flags);
 int xsetns(int fd, int nstype);
 int xunshare(int flags);

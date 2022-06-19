@@ -81,17 +81,9 @@ std::string full_read(int fd);
 std::string full_read(const char *filename);
 void write_zero(int fd, size_t size);
 void file_readline(bool trim, FILE *fp, const std::function<bool(std::string_view)> &fn);
-static inline void file_readline(
-        bool trim, const char *file, const std::function<bool(std::string_view)> &fn) {
-    FILE *fp = xfopen(file, "re");
-    if (fp == nullptr)
-        return;
-    file_readline(trim, fp, fn);
-}
-static inline void file_readline(const char *file,
-        const std::function<bool(std::string_view)> &fn) {
-    file_readline(false, file, fn);
-}
+void file_readline(bool trim, const char *file, const std::function<bool(std::string_view)> &fn);
+void file_readline(const char *file, const std::function<bool(std::string_view)> &fn);
+void parse_prop_file(FILE *fp, const std::function<bool(std::string_view, std::string_view)> &fn);
 void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
 void frm_rf(int dirfd);

@@ -138,7 +138,7 @@ private fun Project.setupAppCommon() {
             val apkDir = if (properties["android.injected.invoked.from.ide"] == "true")
                 "intermediates" else "outputs"
             val apk = File(buildDir, "${apkDir}/apk/${variant}/$projectName-${variant}.apk")
-            val comment = "${Config.versionCode}"
+            val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
             addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
     }

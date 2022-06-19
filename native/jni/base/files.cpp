@@ -338,12 +338,19 @@ void file_readline(bool trim, FILE *fp, const function<bool(string_view)> &fn) {
         if (!fn(start))
             break;
     }
-    fclose(fp);
     free(buf);
 }
 
-void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &fn) {
-    file_readline(true, file, [&](string_view line_view) -> bool {
+void file_readline(bool trim, const char *file, const function<bool(string_view)> &fn) {
+    if (auto fp = open_file(file, "re"))
+        file_readline(trim, fp.get(), fn);
+}
+void file_readline(const char *file, const function<bool(string_view)> &fn) {
+    file_readline(false, file, fn);
+}
+
+void parse_prop_file(FILE *fp, const function<bool(string_view, string_view)> &fn) {
+    file_readline(true, fp, [&](string_view line_view) -> bool {
         char *line = (char *) line_view.data();
         if (line[0] == '#')
             return true;
@@ -353,6 +360,11 @@ void parse_prop_file(const char *file, const function<bool(string_view, string_v
         *eql = '\0';
         return fn(line, eql + 1);
     });
+}
+
+void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &fn) {
+    if (auto fp = open_file(file, "re"))
+        parse_prop_file(fp.get(), fn);
 }
 
 // Original source: https://android.googlesource.com/platform/bionic/+/master/libc/bionic/mntent.cpp

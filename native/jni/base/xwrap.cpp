@@ -111,6 +111,14 @@ ssize_t xxread(int fd, void *buf, size_t count) {
     return read_sz;
 }
 
+off_t xlseek(int fd, off_t offset, int whence) {
+    off_t ret = lseek(fd, offset, whence);
+    if (ret < 0) {
+        PLOGE("lseek");
+    }
+    return ret;
+}
+
 int xpipe2(int pipefd[2], int flags) {
     int ret = pipe2(pipefd, flags);
     if (ret < 0) {
