@@ -9,6 +9,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -98,10 +99,10 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
 
         Config.load(prevPkg)
         handleRepackage(prevPkg)
-        if (prevPkg != null && !isRunningAsStub) {
+        if (prevPkg != null) {
             runOnUiThread {
-                // Might have new configuration loaded, relaunch the activity
-                relaunch()
+                // Relaunch the process after package migration
+                StubApk.restartProcess(this)
             }
             return
         }
