@@ -270,16 +270,8 @@ fun Project.setupStub() {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
 
-                val buffer = ByteArrayOutputStream()
-                apkTmp.inputStream().use {
-                    object : GZIPOutputStream(buffer) {
-                        init {
-                            def.setLevel(Deflater.BEST_COMPRESSION)
-                        }
-                    }.use { o ->
-                        it.transferTo(o)
-                    }
-                }
+                val buffer = ByteArrayOutputStream(apk.length().toInt())
+                val def = DeflaterOutputStream(buffer, Deflater(Deflater.BEST_COMPRESSION))
                 ZipFile(apkTmp).use { o ->
                     ZipOutputStream(apk.outputStream()).use { n ->
                         n.setLevel(Deflater.BEST_COMPRESSION)
@@ -288,9 +280,12 @@ fun Project.setupStub() {
                         n.closeEntry()
                         n.finish()
                     }
+                    def.use { d ->
+                        o.getInputStream(o.getEntry("resources.arsc")).transferTo(d)
+                    }
                 }
                 apkTmp.delete()
-                genEncryptedResources(ByteArrayInputStream(buffer.toByteArray()), outSrcDir)
+                genResources(buffer, outSrcDir)
             }
         }
         registerJavaGeneratingTask(genSrcTask, outSrcDir)

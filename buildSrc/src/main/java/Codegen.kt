@@ -1,13 +1,8 @@
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.InputStream
 import java.io.PrintStream
 import java.security.SecureRandom
 import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.CipherOutputStream
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 import kotlin.random.asKotlinRandom
 
 // Set non-zero value here to fix the random seed for reproducible builds
@@ -212,34 +207,14 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     return xml.format(usedNames[0], usedNames[1], cmps.joinToString("\n\n"))
 }
 
-fun genEncryptedResources(res: InputStream, outDir: File) {
+fun genResources(res: ByteArrayOutputStream, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
     mainPkgDir.mkdirs()
-
-    // Generate iv and key
-    val iv = ByteArray(16)
-    val key = ByteArray(32)
-    RANDOM.nextBytes(iv)
-    RANDOM.nextBytes(key)
-
-    val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(iv))
-    val bos = ByteArrayOutputStream()
-
-    res.use {
-        CipherOutputStream(bos, cipher).use { os ->
-            it.transferTo(os)
-        }
-    }
 
     PrintStream(File(mainPkgDir, "Bytes.java")).use {
         it.println("package com.topjohnwu.magisk;")
         it.println("public final class Bytes {")
-
-        it.byteField("key", key)
-        it.byteField("iv", iv)
-        it.byteField("res", bos.toByteArray())
-
+        it.byteField("res", res.toByteArray())
         it.println("}")
     }
 }

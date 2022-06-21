@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
 import android.util.Log;
@@ -30,17 +31,16 @@ import com.topjohnwu.magisk.utils.APKInstall;
 import org.json.JSONException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import java.util.zip.CRC32;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import io.michaelrocks.paranoid.Obfuscate;
 
@@ -76,7 +76,9 @@ public class DownloadActivity extends Activity {
         // Inject resources
         try {
             loadResources();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            Log.e(APP_NAME, Log.getStackTraceString(e));
+        }
 
         ProviderInstaller.install(this);
 
@@ -156,19 +158,37 @@ public class DownloadActivity extends Activity {
         }
     }
 
-    private void decryptResources(OutputStream out) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
-        IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        var is = new GZIPInputStream(new CipherInputStream(
-                new ByteArrayInputStream(Bytes.res()), cipher));
-        try (is; out) {
-            APKInstall.transfer(is, out);
+    private void decryptResources(OutputStream out) throws IOException {
+        try (var zip = new ZipOutputStream(out)) {
+            var buf = new ByteArrayOutputStream();
+            var arsc = new InflaterInputStream(new ByteArrayInputStream(Bytes.res()));
+            try (arsc) {
+                APKInstall.transfer(arsc, buf);
+            }
+            var data = buf.toByteArray();
+            var crc = new CRC32();
+            crc.update(data);
+            var arscEntry = new ZipEntry("resources.arsc");
+            arscEntry.setMethod(ZipEntry.STORED);
+            arscEntry.setSize(data.length);
+            arscEntry.setCrc(crc.getValue());
+            zip.putNextEntry(arscEntry);
+            zip.write(data);
+            zip.closeEntry();
+
+            zip.putNextEntry(new ZipEntry("AndroidManifest.xml"));
+            var apk = new ZipFile(getPackageResourcePath());
+            var xml = apk.getInputStream(apk.getEntry("AndroidManifest.xml"));
+            try (apk; xml) {
+                APKInstall.transfer(xml, zip);
+            }
+            zip.closeEntry();
+
+            zip.finish();
         }
     }
 
-    private void loadResources() throws Exception {
+    private void loadResources() throws IOException, ErrnoException {
         if (Build.VERSION.SDK_INT >= 30) {
             var fd = Os.memfd_create("res.apk", 0);
             try {
