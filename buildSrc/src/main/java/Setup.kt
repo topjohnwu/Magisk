@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
-import java.nio.file.Files
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.*
@@ -270,27 +269,20 @@ fun Project.setupStub() {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
 
-                val buffer = ByteArrayOutputStream()
-                apkTmp.inputStream().use {
-                    object : GZIPOutputStream(buffer) {
-                        init {
-                            def.setLevel(Deflater.BEST_COMPRESSION)
-                        }
-                    }.use { o ->
-                        it.transferTo(o)
+                val bos = ByteArrayOutputStream()
+                ZipFile(apkTmp).use { src ->
+                    ZipOutputStream(apk.outputStream()).use {
+                        it.setLevel(Deflater.BEST_COMPRESSION)
+                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                        it.closeEntry()
                     }
-                }
-                ZipFile(apkTmp).use { o ->
-                    ZipOutputStream(apk.outputStream()).use { n ->
-                        n.setLevel(Deflater.BEST_COMPRESSION)
-                        n.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        o.getInputStream(o.getEntry("AndroidManifest.xml")).transferTo(n)
-                        n.closeEntry()
-                        n.finish()
+                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
                     }
                 }
                 apkTmp.delete()
-                genEncryptedResources(ByteArrayInputStream(buffer.toByteArray()), outSrcDir)
+                genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outSrcDir)
             }
         }
         registerJavaGeneratingTask(genSrcTask, outSrcDir)

@@ -34,7 +34,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -76,7 +79,9 @@ public class DownloadActivity extends Activity {
         // Inject resources
         try {
             loadResources();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            error(e);
+        }
 
         ProviderInstaller.install(this);
 
@@ -103,7 +108,7 @@ public class DownloadActivity extends Activity {
     }
 
     private void error(Throwable e) {
-        Log.e(getClass().getSimpleName(), "", e);
+        Log.e(getClass().getSimpleName(), Log.getStackTraceString(e));
         finish();
     }
 
@@ -157,14 +162,26 @@ public class DownloadActivity extends Activity {
     }
 
     private void decryptResources(OutputStream out) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
-        IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
-        cipher.init(Cipher.DECRYPT_MODE, key, iv);
-        var is = new GZIPInputStream(new CipherInputStream(
-                new ByteArrayInputStream(Bytes.res()), cipher));
-        try (is; out) {
-            APKInstall.transfer(is, out);
+        try (var zip = new ZipOutputStream(out)) {
+            zip.putNextEntry(new ZipEntry("resources.arsc"));
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
+            IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
+            cipher.init(Cipher.DECRYPT_MODE, key, iv);
+            var is = new InflaterInputStream(new CipherInputStream(
+                    new ByteArrayInputStream(Bytes.res()), cipher));
+            try (is) {
+                APKInstall.transfer(is, zip);
+            }
+            zip.closeEntry();
+
+            zip.putNextEntry(new ZipEntry("AndroidManifest.xml"));
+            var apk = new ZipFile(getPackageResourcePath());
+            var xml = apk.getInputStream(apk.getEntry("AndroidManifest.xml"));
+            try (apk; xml) {
+                APKInstall.transfer(xml, zip);
+            }
+            zip.closeEntry();
         }
     }
 
