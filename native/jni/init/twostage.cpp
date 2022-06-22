@@ -39,6 +39,7 @@ void FirstStageInit::prepare() {
 }
 
 void LegacySARInit::first_stage_prep() {
+    xmkdir("/data", 0755);
     xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
 
     // Patch init binary

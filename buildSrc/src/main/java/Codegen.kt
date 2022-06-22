@@ -11,7 +11,8 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.random.asKotlinRandom
 
 // Set non-zero value here to fix the random seed for reproducible builds
-const val RAND_SEED = 0
+// CI builds are always reproducible
+val RAND_SEED = if (System.getenv("CI") != null) 42 else 0
 private lateinit var RANDOM: Random
 private val kRANDOM get() = RANDOM.asKotlinRandom()
 
