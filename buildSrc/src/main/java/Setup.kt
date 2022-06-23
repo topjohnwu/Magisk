@@ -1,20 +1,31 @@
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.builder.internal.packaging.IncrementalPackager
+import com.android.builder.model.SigningConfig
+import com.android.tools.build.apkzlib.sign.SigningExtension
+import com.android.tools.build.apkzlib.sign.SigningOptions
+import com.android.tools.build.apkzlib.zfile.ZFiles
+import com.android.tools.build.apkzlib.zip.ZFileOptions
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.named
-import java.io.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.PrintStream
+import java.security.KeyStore
+import java.security.cert.X509Certificate
 import java.util.*
-import java.util.zip.Deflater
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
+import java.util.jar.JarFile
+import java.util.zip.*
 
 private fun Project.androidBase(configure: Action<BaseExtension>) =
     extensions.configure("android", configure)
@@ -22,24 +33,65 @@ private fun Project.androidBase(configure: Action<BaseExtension>) =
 private fun Project.android(configure: Action<BaseAppModuleExtension>) =
     extensions.configure("android", configure)
 
+private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
+    (this as ExtensionAware).extensions.findByName("kotlinOptions")?.let {
+        configure.execute(it as KotlinJvmOptions)
+    }
+
 private val Project.android: BaseAppModuleExtension
     get() = extensions.getByName("android") as BaseAppModuleExtension
 
 fun Project.setupCommon() {
     androidBase {
-        compileSdkVersion(31)
-        buildToolsVersion = "31.0.0"
+        compileSdkVersion(32)
+        buildToolsVersion = "32.0.0"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
             minSdk = 21
-            targetSdk = 31
+            targetSdk = 32
         }
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
             targetCompatibility = JavaVersion.VERSION_11
         }
+
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+    }
+}
+
+private fun SigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
+    val keyStore = KeyStore.getInstance(storeType ?: KeyStore.getDefaultType())
+    storeFile!!.inputStream().use {
+        keyStore.load(it, storePassword!!.toCharArray())
+    }
+    val keyPwdArray = keyPassword!!.toCharArray()
+    val entry = keyStore.getEntry(keyAlias!!, KeyStore.PasswordProtection(keyPwdArray))
+    return entry as KeyStore.PrivateKeyEntry
+}
+
+private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eocdComment: String) {
+    val privateKey = signConfig.getPrivateKey()
+    val signingOptions = SigningOptions.builder()
+        .setMinSdkVersion(minSdk)
+        .setV1SigningEnabled(true)
+        .setV2SigningEnabled(true)
+        .setKey(privateKey.privateKey)
+        .setCertificates(privateKey.certificate as X509Certificate)
+        .setValidation(SigningOptions.Validation.ASSUME_INVALID)
+        .build()
+    val options = ZFileOptions().apply {
+        noTimestamps = true
+        autoSortFiles = true
+    }
+    ZFiles.apk(apkPath, options).use {
+        SigningExtension(signingOptions).register(it)
+        it.eocdComment = eocdComment.toByteArray()
+        it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
+        it.get(JarFile.MANIFEST_NAME)?.delete()
     }
 }
 
@@ -77,6 +129,16 @@ private fun Project.setupAppCommon() {
 
         dependenciesInfo {
             includeInApk = false
+        }
+    }
+
+    android.applicationVariants.all {
+        val projectName = project.name.toLowerCase(Locale.ROOT)
+        val variantCapped = name.capitalize(Locale.ROOT)
+        tasks.getByPath(":$projectName:package$variantCapped").doLast {
+            val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
+            val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
+            addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
     }
 }
@@ -207,26 +269,20 @@ fun Project.setupStub() {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
 
-                val buffer = ByteArrayOutputStream(apk.length().toInt())
-                val newApk = ZipOutputStream(FileOutputStream(apk))
-                ZipFile(apkTmp).use {
-                    newApk.use { new ->
-                        new.setLevel(Deflater.BEST_COMPRESSION)
-                        new.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        it.getInputStream(it.getEntry("AndroidManifest.xml")).transferTo(new)
-                        new.closeEntry()
-                        new.finish()
+                val bos = ByteArrayOutputStream()
+                ZipFile(apkTmp).use { src ->
+                    ZipOutputStream(apk.outputStream()).use {
+                        it.setLevel(Deflater.BEST_COMPRESSION)
+                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                        it.closeEntry()
                     }
-                    ZipOutputStream(buffer).use { arsc ->
-                        arsc.setLevel(Deflater.BEST_COMPRESSION)
-                        arsc.putNextEntry(ZipEntry("resources.arsc"))
-                        it.getInputStream(it.getEntry("resources.arsc")).transferTo(arsc)
-                        arsc.closeEntry()
-                        arsc.finish()
+                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
                     }
                 }
                 apkTmp.delete()
-                genEncryptedResources(ByteArrayInputStream(buffer.toByteArray()), outSrcDir)
+                genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outSrcDir)
             }
         }
         registerJavaGeneratingTask(genSrcTask, outSrcDir)

@@ -156,7 +156,7 @@
     <string name="settings_user_independent">Neovisno o korisniku</string>
     <string name="owner_only_summary">Samo vlasnik ima root pristup</string>
     <string name="owner_manage_summary">Samo vlasnik može upravljati root pristupom i primati zahtjeve za root pristup</string>
-    <string name="user_indepenent_summary">Svaki korisnik ima vlastita root pravila</string>
+    <string name="user_independent_summary">Svaki korisnik ima vlastita root pravila</string>
 
     <string name="mount_namespace_mode">Postavljanje imenskog prostora</string>
     <string name="settings_ns_global">Globalni imenski prostor</string>

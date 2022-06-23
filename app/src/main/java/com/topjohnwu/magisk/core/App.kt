@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -9,14 +8,16 @@ import android.os.Bundle
 import android.util.Log
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.Telemetry
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.*
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
+import java.lang.ref.WeakReference
+import kotlin.system.exitProcess
 
 open class App() : Application() {
 
@@ -96,20 +97,21 @@ open class App() : Application() {
     }
 }
 
-@SuppressLint("StaticFieldLeak")
 object ActivityTracker : Application.ActivityLifecycleCallbacks {
 
+    val foreground: Activity? get() = ref.get()
+
     @Volatile
-    var foreground: Activity? = null
+    private var ref = WeakReference<Activity>(null)
 
     override fun onActivityResumed(activity: Activity) {
         if (activity is SuRequestActivity) return
-        foreground = activity
+        ref = WeakReference(activity)
     }
 
     override fun onActivityPaused(activity: Activity) {
         if (activity is SuRequestActivity) return
-        foreground = null
+        ref.clear()
     }
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}

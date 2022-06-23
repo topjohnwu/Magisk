@@ -177,7 +177,7 @@
     <string name="settings_user_independent">Utilizator independent</string>
     <string name="owner_only_summary">Numai proprietarul are acces la root</string>
     <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească cereri</string>
-    <string name="user_indepenent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
+    <string name="user_independent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
 
     <string name="mount_namespace_mode">Mod de montare a spațiului de nume</string>
     <string name="settings_ns_global">Spațiu de nume global</string>

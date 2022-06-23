@@ -3,19 +3,19 @@ package com.topjohnwu.magisk.ui.superuser
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
+import android.os.Process
+import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
+import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.databinding.AnyDiffRvItem
-import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.databinding.*
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
@@ -26,40 +26,48 @@ import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
 
 class SuperuserViewModel(
     private val db: PolicyDao
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
-    private val itemsPolicies = diffListOf<PolicyRvItem>()
     private val itemsHelpers = ObservableArrayList<TextItem>()
+    private val itemsPolicies = diffListOf<PolicyRvItem>()
 
     val items = MergeObservableList<AnyDiffRvItem>()
         .insertList(itemsHelpers)
         .insertList(itemsPolicies)
-    val itemBinding = itemBindingOf<AnyDiffRvItem> {
-        it.bindExtra(BR.listener, this)
+    val extraBindings = bindExtra {
+        it.put(BR.listener, this)
     }
 
-    // ---
+    @get:Bindable
+    var loading = true
+        private set(value) = set(value, field, { field = it }, BR.loading)
 
     @SuppressLint("InlinedApi")
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         if (!Utils.showSuperUser()) {
-            state = State.LOADING_FAILED
-            return@launch
+            loading = false
+            return
         }
-        state = State.LOADING
+        loading = true
         val (policies, diff) = withContext(Dispatchers.IO) {
             db.deleteOutdated()
+            db.delete(AppContext.applicationInfo.uid)
             val policies = ArrayList<PolicyRvItem>()
             val pm = AppContext.packageManager
             for (policy in db.fetchAll()) {
-                val pkgs = pm.getPackagesForUid(policy.uid) ?: continue
-                policies.addAll(pkgs.mapNotNull { pkg ->
+                val pkgs =
+                    if (policy.uid == Process.SYSTEM_UID) arrayOf("android")
+                    else pm.getPackagesForUid(policy.uid)
+                if (pkgs == null) {
+                    db.delete(policy.uid)
+                    continue
+                }
+                val map = pkgs.mapNotNull { pkg ->
                     try {
                         val info = pm.getPackageInfo(pkg, MATCH_UNINSTALLED_PACKAGES)
                         PolicyRvItem(
@@ -72,7 +80,12 @@ class SuperuserViewModel(
                     } catch (e: PackageManager.NameNotFoundException) {
                         null
                     }
-                })
+                }
+                if (map.isEmpty()) {
+                    db.delete(policy.uid)
+                    continue
+                }
+                policies.addAll(map)
             }
             policies.sortWith(compareBy(
                 { it.appName.lowercase(currentLocale) },
@@ -85,7 +98,7 @@ class SuperuserViewModel(
             itemsHelpers.clear()
         else if (itemsHelpers.isEmpty())
             itemsHelpers.add(itemNoData)
-        state = State.LOADED
+        loading = false
     }
 
     // ---

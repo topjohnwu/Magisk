@@ -2,7 +2,7 @@
 
 #include <magisk.hpp>
 #include <sepolicy.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "init.hpp"
 

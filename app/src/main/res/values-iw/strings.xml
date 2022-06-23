@@ -163,7 +163,7 @@
     <string name="settings_user_independent">משתמש עצמאי</string>
     <string name="owner_only_summary">לבעלים בלבד ישנה גישת שורש</string>
     <string name="owner_manage_summary">הבעלים בלבד יכול לנהל גישת שורש ולקבל הנחיות לבקשה</string>
-    <string name="user_indepenent_summary">לכל משתמש יש כללי שורש נפרדים משלו</string>
+    <string name="user_independent_summary">לכל משתמש יש כללי שורש נפרדים משלו</string>
     <string name="mount_namespace_mode">מצב הצבת מרחב שם</string>
     <string name="settings_ns_global">מרחב שם גלובלי</string>
     <string name="settings_ns_requester">מרחב שם מורש</string>

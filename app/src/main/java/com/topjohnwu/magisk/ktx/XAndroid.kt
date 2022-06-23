@@ -11,7 +11,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -22,12 +21,10 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Process
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.fragment.app.Fragment
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
@@ -35,7 +32,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.utils.DynamicClassLoader
 import com.topjohnwu.superuser.Shell
 import java.io.File
 import kotlin.Array
@@ -172,12 +168,6 @@ fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<S
 
 fun Context.cachedFile(name: String) = File(cacheDir, name)
 
-fun <Result> Cursor.toList(transformer: (Cursor) -> Result): List<Result> {
-    val out = mutableListOf<Result>()
-    while (moveToNext()) out.add(transformer(this))
-    return out
-}
-
 fun ApplicationInfo.getLabel(pm: PackageManager): String {
     runCatching {
         if (labelRes > 0) {
@@ -191,9 +181,6 @@ fun ApplicationInfo.getLabel(pm: PackageManager): String {
 
     return loadLabel(pm).toString()
 }
-
-inline fun <reified T> T.createClassLoader(apk: File) =
-    DynamicClassLoader(apk, T::class.java.classLoader)
 
 fun Context.unwrap(): Context {
     var context = this
@@ -216,21 +203,6 @@ fun Activity.hideKeyboard() {
         ?.hideSoftInputFromWindow(view.windowToken, 0)
     view.clearFocus()
 }
-
-fun Fragment.hideKeyboard() {
-    activity?.hideKeyboard()
-}
-
-fun View.setOnViewReadyListener(callback: () -> Unit) = addOnGlobalLayoutListener(true, callback)
-
-fun View.addOnGlobalLayoutListener(oneShot: Boolean = false, callback: () -> Unit) =
-    viewTreeObserver.addOnGlobalLayoutListener(object :
-        ViewTreeObserver.OnGlobalLayoutListener {
-        override fun onGlobalLayout() {
-            if (oneShot) viewTreeObserver.removeOnGlobalLayoutListener(this)
-            callback()
-        }
-    })
 
 fun ViewGroup.startAnimations() {
     val transition = AutoTransition()
@@ -269,20 +241,27 @@ fun getProperty(key: String, def: String): String {
 fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
     val flag = PackageManager.MATCH_UNINSTALLED_PACKAGES
     val pkgs = getPackagesForUid(uid) ?: throw PackageManager.NameNotFoundException()
-    return if (pkgs.size > 1) {
-        if (pid <= 0)
+    if (pkgs.size > 1) {
+        if (pid <= 0) {
             return null
+        }
         // Try to find package name from PID
         val proc = RootUtils.obj?.getAppProcess(pid)
-            ?: return if (uid == Process.SHELL_UID) {
+        if (proc == null) {
+            if (uid == Process.SHELL_UID) {
                 // It is possible that some apps installed are sharing UID with shell.
                 // We will not be able to find a package from the active process list,
                 // because the client is forked from ADB shell, not any app process.
-                getPackageInfo("com.android.shell", flag)
-            } else null
-        val pkg = proc.pkgList[0]
-        getPackageInfo(pkg, flag)
-    } else {
-        getPackageInfo(pkgs[0], flag)
+                return getPackageInfo("com.android.shell", flag)
+            }
+        } else if (uid == proc.uid) {
+            return getPackageInfo(proc.pkgList[0], flag)
+        }
+
+        return null
     }
+    if (pkgs.size == 1) {
+        return getPackageInfo(pkgs[0], flag)
+    }
+    throw PackageManager.NameNotFoundException()
 }

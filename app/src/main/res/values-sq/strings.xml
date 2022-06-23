@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Shkarkoni Magisk VETEM nga faqja zyrtare e GitHub. Skedarët nga burime të panjohura mund të jenë me qëllim të keq! </string>
     <string name="home_support_title">Na mbështetni</string>
+    <string name="home_follow_title">Na ndiqni</string>
     <string name="home_item_source">Burimi</string>
     <string name="home_support_content">Magisk është, dhe gjithmonë do të jetë, falas dhe me burim të hapur. Sidoqoftë, mund të na tregoni se kujdeseni duke dërguar një donacion të vogël.</string>
     <string name="home_installed_version">Instaluar</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">Moduli u pezullua sepse %1$s është aktivizuar</string>
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
     <string name="zygisk_module_unloaded">Moduli Zygisk nuk është ngarkuar për shkak të papajtueshmërisë</string>
+    <string name="module_empty">Ska module të instaluar</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
@@ -176,7 +178,7 @@
     <string name="settings_user_independent">I pavarur nga përdoruesi</string>
     <string name="owner_only_summary">Vetëm pronari ka akses në rrënjë</string>
     <string name="owner_manage_summary">Vetëm pronari mund të menaxhojë aksesin në rrënjë dhe të marrë kërkesat</string>
-    <string name="user_indepenent_summary">Çdo përdorues ka rregullat e veta të veçanta rrënjësore</string>
+    <string name="user_independent_summary">Çdo përdorues ka rregullat e veta të veçanta rrënjësore</string>
     <string name="mount_namespace_mode">Mënyra e Montimit të Hapësirës Emërore</string>
     <string name="settings_ns_global">Hapësira globale e emrave</string>
     <string name="settings_ns_requester">Trashëgoni hapësirën e emrave</string>

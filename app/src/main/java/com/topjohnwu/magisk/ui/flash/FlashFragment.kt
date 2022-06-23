@@ -6,20 +6,24 @@ import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.isVisible
 import androidx.navigation.NavDeepLinkBuilder
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.MainActivity
 
 class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_flash_md2
     override val viewModel by viewModel<FlashViewModel>()
+    override val snackbarView: View get() = binding.snackbarContainer
+    override val snackbarAnchorView: View?
+        get() = if (binding.restartBtn.isShown) binding.restartBtn else super.snackbarAnchorView
 
     private var defaultOrientation = -1
 
@@ -33,8 +37,20 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
         setHasOptionsMenu(true)
         activity?.setTitle(R.string.flash_screen_title)
 
-        viewModel.subtitle.observe(this) {
-            activity?.supportActionBar?.setSubtitle(it)
+        viewModel.state.observe(this) {
+            activity?.supportActionBar?.setSubtitle(
+                when (it) {
+                    FlashViewModel.State.FLASHING -> R.string.flashing
+                    FlashViewModel.State.SUCCESS -> R.string.done
+                    FlashViewModel.State.FAILED -> R.string.failure
+                }
+            )
+            if (it == FlashViewModel.State.SUCCESS && viewModel.showReboot) {
+                binding.restartBtn.apply {
+                    if (!this.isVisible) this.show()
+                    if (!this.isFocused) this.requestFocus()
+                }
+            }
         }
     }
 
@@ -65,7 +81,7 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     }
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        return when(event.keyCode) {
+        return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP,
             KeyEvent.KEYCODE_VOLUME_DOWN -> true
             else -> false
@@ -73,7 +89,8 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     }
 
     override fun onBackPressed(): Boolean {
-        if (viewModel.loading) return true
+        if (viewModel.flashing.value == true)
+            return true
         return super.onBackPressed()
     }
 

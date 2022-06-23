@@ -20,11 +20,12 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
     protected abstract val layoutRes: Int
 
     private val navigation get() = activity?.navigation
+    open val snackbarView: View? get() = null
     open val snackbarAnchorView: View? get() = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startObserveEvents()
+        startObserveLiveData()
     }
 
     override fun onCreateView(
@@ -36,7 +37,12 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
             it.setVariable(BR.viewModel, viewModel)
             it.lifecycleOwner = viewLifecycleOwner
         }
+        savedInstanceState?.let { viewModel.onRestoreState(it) }
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.onSaveState(outState)
     }
 
     override fun onStart() {
@@ -70,7 +76,10 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onResume() {
         super.onResume()
-        viewModel.requestRefresh()
+        viewModel.let {
+            if (it is AsyncLoadViewModel)
+                it.startLoading()
+        }
     }
 
     protected open fun onPreBind(binding: Binding) {
@@ -78,7 +87,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
     }
 
     fun NavDirections.navigate() {
-        navigation?.navigate(this)
+        navigation?.currentDestination?.getAction(actionId)?.let { navigation!!.navigate(this) }
     }
 
 }

@@ -45,7 +45,7 @@
     <string-array name="multiuser_summary">
         <item>@string/owner_only_summary</item>
         <item>@string/owner_manage_summary</item>
-        <item>@string/user_indepenent_summary</item>
+        <item>@string/user_independent_summary</item>
     </string-array>
 
     <string-array name="namespace">
@@ -65,6 +65,7 @@
         <item>@string/settings_update_beta</item>
         <item>@string/settings_update_custom</item>
         <item>Canary</item>
+        <item>Debug</item>
     </string-array>
 
 </resources>

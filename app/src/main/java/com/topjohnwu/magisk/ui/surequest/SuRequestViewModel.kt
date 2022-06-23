@@ -20,13 +20,13 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
@@ -34,7 +34,6 @@ import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.launch
-import me.tatarka.bindingcollectionadapter2.ItemBinding
 import java.util.concurrent.TimeUnit.SECONDS
 
 class SuRequestViewModel(
@@ -69,8 +68,6 @@ class SuRequestViewModel(
         }
         false
     }
-
-    val itemBinding = ItemBinding.of<String>(BR.item, R.layout.item_spinner)
 
     private val handler = SuRequestHandler(AppContext.packageManager, policyDB)
     private lateinit var timer: CountDownTimer
@@ -110,11 +107,21 @@ class SuRequestViewModel(
     private fun showDialog() {
         val pm = handler.pm
         val info = handler.pkgInfo
-        val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
+        val app = info.applicationInfo
 
-        icon = info.applicationInfo.loadIcon(pm)
-        title = "$prefix${info.applicationInfo.getLabel(pm)}"
-        packageName = info.packageName
+        if (app == null) {
+            // The request is not coming from an app process, and the UID is a
+            // shared UID. We have no way to know where this request comes from.
+            icon = pm.defaultActivityIcon
+            title = "[SharedUID] ${info.sharedUserId}"
+            packageName = info.sharedUserId
+        } else {
+            val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
+            icon = app.loadIcon(pm)
+            title = "$prefix${app.getLabel(pm)}"
+            packageName = info.packageName
+        }
+
         selectedItemPosition = timeoutPrefs.getInt(packageName, 0)
 
         // Set timer
@@ -135,7 +142,7 @@ class SuRequestViewModel(
         timer.cancel()
 
         val pos = selectedItemPosition
-        timeoutPrefs.edit().putInt(handler.pkgInfo.packageName, pos).apply()
+        timeoutPrefs.edit().putInt(packageName, pos).apply()
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])

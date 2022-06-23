@@ -13,14 +13,14 @@ import androidx.core.view.isVisible
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseMainActivity
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.Utils
@@ -30,11 +30,16 @@ import java.io.File
 
 class MainViewModel : BaseViewModel()
 
-class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
+class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
     override val navHostId: Int = R.id.main_nav_host
+    override val snackbarView: View
+        get() {
+            val fragmentOverride = currentFragment?.snackbarView
+            return fragmentOverride ?: super.snackbarView
+        }
     override val snackbarAnchorView: View?
         get() {
             val fragmentAnchor = currentFragment?.snackbarAnchorView
@@ -84,7 +89,7 @@ class MainActivity : BaseMainActivity<ActivityMainMd2Binding>() {
         }
         binding.mainNavigation.menu.apply {
             findItem(R.id.superuserFragment)?.isEnabled = Utils.showSuperUser()
-            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive
+            findItem(R.id.modulesFragment)?.isEnabled = Info.env.isActive && LocalModule.loaded()
         }
 
         val section =

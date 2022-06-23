@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Instala la versión completa de Magisk pa finar la configuración. ¿Quies facelo agora?</string>
+    <string name="no_internet_msg">¡Conéctate a internet! Tienes d\'instalar la versión completa de Magisk.</string>
+    <string name="dling">Baxando</string>
+    <string name="relaunch_app">Volvi llanzar l\'aplicación manualmente</string>
+</resources>

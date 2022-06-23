@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <db.hpp>
+#include <daemon.hpp>
 
 #define DEFAULT_SHELL "/system/bin/sh"
 
@@ -23,7 +24,7 @@ public:
     db_settings cfg;
     su_access access;
     std::string mgr_pkg;
-    struct stat mgr_st;
+    int mgr_uid;
     void check_db();
 
     // These should be guarded with global cache lock
@@ -41,7 +42,7 @@ private:
 };
 
 struct su_req_base {
-    int uid = UID_ROOT;
+    int uid = AID_ROOT;
     bool login = false;
     bool keepenv = false;
     bool mount_master = false;

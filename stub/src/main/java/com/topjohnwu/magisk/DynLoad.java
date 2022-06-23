@@ -28,6 +28,7 @@ import io.michaelrocks.paranoid.Obfuscate;
 public class DynLoad {
 
     static Object componentFactory;
+    static ClassLoader activeClassLoader = DynLoad.class.getClassLoader();
 
     static StubApk.Data createApkData() {
         var data = new StubApk.Data();
@@ -150,7 +151,7 @@ public class DynLoad {
                 delegate.receiver = (AppComponentFactory) factory;
             }
 
-            DelegateClassLoader.cl = cl;
+            activeClassLoader = cl;
 
             // Send real application to attachBaseContext
             attachContext(app, context);
@@ -161,7 +162,7 @@ public class DynLoad {
             apk.delete();
         }
 
-        DelegateClassLoader.cl = new StubClassLoader(info);
+        activeClassLoader = new StubClassLoader(info);
         return null;
     }
 

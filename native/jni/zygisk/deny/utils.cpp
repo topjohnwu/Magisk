@@ -7,12 +7,14 @@
 #include <set>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <db.hpp>
 
 #include "deny.hpp"
 
 using namespace std;
+
+atomic_flag skip_pkg_rescan;
 
 // For the following data structures:
 // If package name == ISOLATED_MAGIC, or app ID == -1, it means isolated service
@@ -32,23 +34,10 @@ atomic<bool> denylist_enforced = false;
 
 #define do_kill (zygisk_enabled && denylist_enforced)
 
-static unsigned long long pkg_xml_ino = 0;
-
 static void rescan_apps() {
-    {
-        struct stat st{};
-        stat("/data/system/packages.xml", &st);
-        if (pkg_xml_ino == st.st_ino) {
-            // Packages has not changed, do not rescan
-            return;
-        }
-        pkg_xml_ino = st.st_ino;
-    }
-
     LOGD("denylist: rescanning apps\n");
 
     app_id_to_pkgs.clear();
-    cached_manager_app_id = -1;
 
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
@@ -63,10 +52,6 @@ static void rescan_apps() {
                 struct stat st{};
                 xfstatat(dfd, entry->d_name, &st, 0);
                 int app_id = to_app_id(st.st_uid);
-                if (app_id_to_pkgs.contains(app_id)) {
-                    // This app ID has been handled
-                    continue;
-                }
                 if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
                     app_id_to_pkgs[app_id].insert(it->first);
                 }
@@ -400,7 +385,8 @@ bool is_deny_target(int uid, string_view process) {
     if (!ensure_data())
         return false;
 
-    rescan_apps();
+    if (!skip_pkg_rescan.test_and_set())
+        rescan_apps();
 
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {

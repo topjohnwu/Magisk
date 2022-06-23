@@ -155,7 +155,7 @@
     <string name="settings_user_independent">Правілы карыстальнікаў</string>
     <string name="owner_only_summary">Толькі ўладальніку даступны рэжым суперкарыстальніка</string>
     <string name="owner_manage_summary">Толькі ўладальнік кіруе доступам суперкарыстальніка і апрацоўвае запыты</string>
-    <string name="user_indepenent_summary">Кожны карыстальнік кіруе правіламі доступу суперкарыстальніка</string>
+    <string name="user_independent_summary">Кожны карыстальнік кіруе правіламі доступу суперкарыстальніка</string>
     <string name="mount_namespace_mode">Наладка прастораў назваў</string>
     <string name="settings_ns_global">Агульная прастора назваў</string>
     <string name="settings_ns_requester">Спадкаемная прастора назваў</string>

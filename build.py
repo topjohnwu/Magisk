@@ -275,8 +275,8 @@ def write_if_diff(file_name, text):
             f.write(text)
 
 
-def dump_bin_header():
-    stub = op.join(config['outdir'], 'stub-release.apk')
+def dump_bin_header(args):
+    stub = op.join(config['outdir'], f'stub-{"release" if args.release else "debug"}.apk')
     if not op.exists(stub):
         error('Build stub APK before building "magiskinit"')
     mkdir_p(native_gen_path)
@@ -328,8 +328,6 @@ def build_binary(args):
 
     dump_flag_header()
 
-    # Build shared executables
-
     flag = ''
 
     if 'magisk' in args.target:
@@ -344,18 +342,6 @@ def build_binary(args):
     if 'magiskinit' in args.target:
         flag += ' B_PRELOAD=1'
 
-    if flag:
-        run_ndk_build(flag + ' B_SHARED=1')
-        clean_elf()
-
-    # Then build static executables
-
-    flag = ''
-
-    if 'magiskinit' in args.target:
-        dump_bin_header()
-        flag += ' B_INIT=1'
-
     if 'resetprop' in args.target:
         flag += ' B_PROP=1'
 
@@ -364,13 +350,20 @@ def build_binary(args):
 
     if flag:
         run_ndk_build(flag)
+        clean_elf()
+
+    # magiskinit and busybox has to be built separately
+
+    if 'magiskinit' in args.target:
+        dump_bin_header(args)
+        run_ndk_build('B_INIT=1')
 
     if 'busybox' in args.target:
         run_ndk_build('B_BB=1')
 
 
 def build_apk(args, module):
-    build_type = 'Release' if args.release or module == 'stub' else 'Debug'
+    build_type = 'Release' if args.release else 'Debug'
 
     proc = execv([gradlew, f'{module}:assemble{build_type}',
                   '-PconfigPath=' + op.abspath(args.config)])
@@ -445,8 +438,8 @@ def setup_ndk(args):
 
 def setup_avd(args):
     if not args.skip:
-        build_binary(args)
-        build_app(args)
+        args.release = False
+        build_all(args)
 
     header('* Setting up emulator')
 
@@ -463,8 +456,8 @@ def setup_avd(args):
 
 def patch_avd_ramdisk(args):
     if not args.skip:
-        build_binary(args)
-        build_app(args)
+        args.release = False
+        build_all(args)
 
     header('* Patching emulator ramdisk.img')
 

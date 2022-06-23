@@ -69,12 +69,14 @@ if [ -d /dev/avd-magisk ]; then
 fi
 
 # SELinux stuffs
-if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
-  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
-elif [ -f /sepolicy ]; then
-  ./magiskpolicy --load /sepolicy --live --magisk 2>&1
-else
-  ./magiskpolicy --live --magisk 2>&1
+if [ -d /sys/fs/selinux ]; then
+  if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
+    ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
+  elif [ -f /sepolicy ]; then
+    ./magiskpolicy --load /sepolicy --live --magisk 2>&1
+  else
+    ./magiskpolicy --live --magisk 2>&1
+  fi
 fi
 
 MAGISKTMP=/sbin
@@ -138,6 +140,8 @@ ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
+
+./magiskinit -x manager $MAGISKTMP/stub.apk
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block

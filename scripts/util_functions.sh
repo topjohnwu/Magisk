@@ -295,6 +295,13 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
+
+  # Mount sepolicy rules dir locations in recovery (best effort)
+  if ! $BOOTMODE; then
+    mount_name "cache cac" /cache
+    mount_name metadata /metadata
+    mount_name persist /persist
+  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -716,6 +723,7 @@ is_legacy_script() {
 install_module() {
   rm -rf $TMPDIR
   mkdir -p $TMPDIR
+  chcon u:object_r:system_file:s0 $TMPDIR
   cd $TMPDIR
 
   setup_flashable

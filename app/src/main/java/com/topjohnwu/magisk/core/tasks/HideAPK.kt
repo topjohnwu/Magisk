@@ -11,9 +11,9 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Provider
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.await
 import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.signing.JarMap
@@ -97,8 +97,7 @@ object HideAPK {
         Config.suManager = if (pkg == APPLICATION_ID) "" else pkg
         val self = activity.packageName
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        activity.grantUriPermission(pkg, Provider.APK_URI(self), flag)
-        activity.grantUriPermission(pkg, Provider.PREFS_URI(self), flag)
+        activity.grantUriPermission(pkg, Provider.preferencesUri(self), flag)
         intent.putExtra(Const.Key.PREV_PKG, self)
         activity.startActivity(intent)
         activity.finish()

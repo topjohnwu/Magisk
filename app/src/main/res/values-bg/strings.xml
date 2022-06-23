@@ -97,7 +97,7 @@
     <string name="settings_user_independent">Независими потребители</string>
     <string name="owner_only_summary">Само собственикът има руут достъп.</string>
     <string name="owner_manage_summary">Само собственикът може да управлява руут достъпа и да получава запитвания за достъп.</string>
-    <string name="user_indepenent_summary">Всеки потребител има собствени правила за руут достъп.</string>
+    <string name="user_independent_summary">Всеки потребител има собствени правила за руут достъп.</string>
 
     <string name="mount_namespace_mode">Монтиране по именни пространства</string>
     <string name="settings_ns_global">Глобално</string>

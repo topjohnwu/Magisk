@@ -1,7 +1,7 @@
 #include <sys/mount.h>
 
 #include <magisk.hpp>
-#include <utils.hpp>
+#include <base.hpp>
 #include <socket.hpp>
 
 #include "init.hpp"
@@ -17,7 +17,15 @@ void FirstStageInit::prepare() {
     cp_afc("/init" /* magiskinit */, REDIR_PATH);
 
     unlink("/init");
-    xrename(backup_init(), "/init");
+    const char *orig_init = backup_init();
+    if (access(orig_init, F_OK) == 0) {
+        xrename(orig_init, "/init");
+    } else {
+        // If the backup init is missing, this means that the boot ramdisk
+        // was created from scratch, and the real init is in a separate CPIO,
+        // which is guaranteed to be placed at /system/bin/init.
+        xsymlink(INIT_PATH, "/init");
+    }
 
     {
         auto init = mmap_data("/init", true);
@@ -31,6 +39,7 @@ void FirstStageInit::prepare() {
 }
 
 void LegacySARInit::first_stage_prep() {
+    xmkdir("/data", 0755);
     xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
 
     // Patch init binary
@@ -56,7 +65,7 @@ void LegacySARInit::first_stage_prep() {
     xmkdir("/data/.backup", 0);
     xmkdir("/data/overlay.d", 0);
     restore_folder("/data/overlay.d", overlays);
-    int cfg = xopen("/data/.backup/config", O_WRONLY | O_CREAT, 0);
+    int cfg = xopen("/data/.backup/.magisk", O_WRONLY | O_CREAT, 0);
     xwrite(cfg, magisk_cfg.buf, magisk_cfg.sz);
     close(cfg);
 }
@@ -72,9 +81,15 @@ bool SecondStageInit::prepare() {
     argv[0] = (char *) INIT_PATH;
 
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    // Check if root and system are on the same filesystem
+    // Check if root and system are on different filesystems
     struct stat root{}, system{};
     xstat("/", &root);
     xstat("/system", &system);
-    return root.st_dev != system.st_dev;
+    if (root.st_dev != system.st_dev) {
+        // We are still on rootfs, so make sure we will execute the init of the 2nd stage
+        unlink("/init");
+        xsymlink(INIT_PATH, "/init");
+        return true;
+    }
+    return false;
 }

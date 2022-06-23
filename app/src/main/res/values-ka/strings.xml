@@ -166,7 +166,7 @@
     <string name="settings_user_independent">მომხმარებლისგან დამოუკიდებელი</string>
     <string name="owner_only_summary">მხოლოდ მფლობელს ჰქონდეს სუპერმომხმარებელთან წვდომა</string>
     <string name="owner_manage_summary">მხოლოდ მფლობელს ჰქონდეს ნებართვების მართვა</string>
-    <string name="user_indepenent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
+    <string name="user_independent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
 
     <string name="mount_namespace_mode">Namespace რეჟიმის დამონტაჟება</string>
     <string name="settings_ns_global">გლობალური Namespace-ი</string>

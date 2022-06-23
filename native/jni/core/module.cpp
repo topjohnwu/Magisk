@@ -2,7 +2,7 @@
 #include <map>
 #include <utility>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
@@ -563,13 +563,19 @@ int app_process_64 = -1;
 if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
     app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
     string zbin = zygisk_bin + "/app_process" #bit;                                     \
+    string dbin = zygisk_bin + "/magisk" #bit;                                          \
     string mbin = MAGISKTMP + "/magisk" #bit;                                           \
     int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
     int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
     xsendfile(out, src, nullptr, INT_MAX);                                              \
-    close(src);                                                                         \
     close(out);                                                                         \
+    out = xopen(dbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                        \
+    lseek(src, 0, SEEK_SET);                                                            \
+    xsendfile(out, src, nullptr, INT_MAX);                                              \
+    close(out);                                                                         \
+    close(src);                                                                         \
     clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
+    clone_attr("/system/bin/app_process" #bit, dbin.data());                            \
     bind_mount(zbin.data(), "/system/bin/app_process" #bit);                            \
 }
 

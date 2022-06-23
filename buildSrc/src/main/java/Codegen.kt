@@ -11,7 +11,8 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.random.asKotlinRandom
 
 // Set non-zero value here to fix the random seed for reproducible builds
-const val RAND_SEED = 0
+// CI builds are always reproducible
+val RAND_SEED = if (System.getenv("CI") != null) 42 else 0
 private lateinit var RANDOM: Random
 private val kRANDOM get() = RANDOM.asKotlinRandom()
 
@@ -64,8 +65,6 @@ fun genKeyData(keysDir: File, outSrc: File) {
         it.println("package com.topjohnwu.magisk.signing;")
         it.println("public final class KeyData {")
 
-        it.byteField("testCert", File(keysDir, "testkey.x509.pem").readBytes())
-        it.byteField("testKey", File(keysDir, "testkey.pk8").readBytes())
         it.byteField("verityCert", File(keysDir, "verity.x509.pem").readBytes())
         it.byteField("verityKey", File(keysDir, "verity.pk8").readBytes())
 
@@ -94,7 +93,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         """
         |<receiver
         |    android:name="%s"
-        |    android:directBootAware="true"
         |    android:exported="false">
         |    <intent-filter>
         |        <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -127,7 +125,6 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |<activity
         |    android:name="%s"
         |    android:directBootAware="true"
-        |    android:excludeFromRecents="true"
         |    android:exported="false"
         |    android:taskAffinity=""
         |    tools:ignore="AppLinkUrlError">

@@ -12,8 +12,14 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.loader.ResourcesLoader;
+import android.content.res.loader.ResourcesProvider;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.system.Os;
+import android.system.OsConstants;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
@@ -27,6 +33,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -40,7 +51,9 @@ import io.michaelrocks.paranoid.Obfuscate;
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
-    private static final String CANARY_URL = "https://topjohnwu.github.io/magisk-files/canary.json";
+    private static final String JSON_URL = BuildConfig.DEBUG ?
+            "https://topjohnwu.github.io/magisk-files/debug.json" :
+            "https://topjohnwu.github.io/magisk-files/canary.json";
 
     private String apkLink = BuildConfig.APK_URL;
     private Context themed;
@@ -50,7 +63,7 @@ public class DownloadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (DelegateClassLoader.cl instanceof AppClassLoader) {
+        if (DynLoad.activeClassLoader instanceof AppClassLoader) {
             // For some reason activity is created before Application.attach(),
             // relaunch the activity using the same intent
             finishAffinity();
@@ -64,7 +77,11 @@ public class DownloadActivity extends Activity {
         dynLoad = !getPackageName().equals(BuildConfig.APPLICATION_ID);
 
         // Inject resources
-        loadResources();
+        try {
+            loadResources();
+        } catch (Exception e) {
+            error(e);
+        }
 
         ProviderInstaller.install(this);
 
@@ -84,8 +101,14 @@ public class DownloadActivity extends Activity {
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        Runtime.getRuntime().exit(0);
+    }
+
     private void error(Throwable e) {
-        Log.e(getClass().getSimpleName(), "", e);
+        Log.e(getClass().getSimpleName(), Log.getStackTraceString(e));
         finish();
     }
 
@@ -105,7 +128,7 @@ public class DownloadActivity extends Activity {
 
     private void fetchCanary() {
         dialog = ProgressDialog.show(themed, "", "", true);
-        request(CANARY_URL).getAsJSONObject(json -> {
+        request(JSON_URL).getAsJSONObject(json -> {
             dialog.dismiss();
             try {
                 apkLink = json.getJSONObject("magisk").getString("link");
@@ -138,21 +161,48 @@ public class DownloadActivity extends Activity {
         }
     }
 
-    private void loadResources() {
-        File apk = new File(getCacheDir(), "res.apk");
-        try {
+    private void decryptResources(OutputStream out) throws Exception {
+        try (var zip = new ZipOutputStream(out)) {
+            zip.putNextEntry(new ZipEntry("resources.arsc"));
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKey key = new SecretKeySpec(Bytes.key(), "AES");
             IvParameterSpec iv = new IvParameterSpec(Bytes.iv());
             cipher.init(Cipher.DECRYPT_MODE, key, iv);
-            var is = new CipherInputStream(new ByteArrayInputStream(Bytes.res()), cipher);
-            var out = new FileOutputStream(apk);
-            try (is; out) {
-                APKInstall.transfer(is, out);
+            var is = new InflaterInputStream(new CipherInputStream(
+                    new ByteArrayInputStream(Bytes.res()), cipher));
+            try (is) {
+                APKInstall.transfer(is, zip);
             }
-            StubApk.addAssetPath(getResources().getAssets(), apk.getPath());
-        } catch (Exception ignored) {
+            zip.closeEntry();
+
+            zip.putNextEntry(new ZipEntry("AndroidManifest.xml"));
+            var apk = new ZipFile(getPackageResourcePath());
+            var xml = apk.getInputStream(apk.getEntry("AndroidManifest.xml"));
+            try (apk; xml) {
+                APKInstall.transfer(xml, zip);
+            }
+            zip.closeEntry();
         }
     }
 
+    private void loadResources() throws Exception {
+        if (Build.VERSION.SDK_INT >= 30) {
+            var fd = Os.memfd_create("res.apk", 0);
+            try {
+                decryptResources(new FileOutputStream(fd));
+                Os.lseek(fd, 0, OsConstants.SEEK_SET);
+                try (var pfd = ParcelFileDescriptor.dup(fd)) {
+                    var loader = new ResourcesLoader();
+                    loader.addProvider(ResourcesProvider.loadFromApk(pfd));
+                    getResources().addLoaders(loader);
+                }
+            } finally {
+                Os.close(fd);
+            }
+        } else {
+            File apk = new File(getCacheDir(), "res.apk");
+            decryptResources(new FileOutputStream(apk));
+            StubApk.addAssetPath(getResources(), apk.getPath());
+        }
+    }
 }

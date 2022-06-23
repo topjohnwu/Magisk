@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include <vector>
 
-#include <utils.hpp>
+#include <base.hpp>
 
 #include "init.hpp"
 
@@ -163,6 +163,11 @@ void setup_klog() {
 void BootConfig::set(const kv_pairs &kv) {
     for (const auto &[key, value] : kv) {
         if (key == "androidboot.slot_suffix") {
+            // Many Amlogic devices are A-only but have slot_suffix...
+            if (value == "normal") {
+                LOGW("Skip invalid androidboot.slot_suffix=[normal]\n");
+                continue;
+            }
             strlcpy(slot, value.data(), sizeof(slot));
         } else if (key == "androidboot.slot") {
             slot[0] = '_';

@@ -64,6 +64,14 @@ test_api() {
   adb shell magisk -v
   kill -INT $pid
   wait $pid
+
+  # Restore patches
+  if [ -f "${ramdisk}.bak" ]; then
+    cp "${ramdisk}.bak" "$ramdisk"
+  fi
+  if [ -f "${features}.bak" ]; then
+    cp "${features}.bak" "$features"
+  fi
 }
 
 # Build our executables

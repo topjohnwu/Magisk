@@ -9,6 +9,8 @@ paranoid {
 }
 
 android {
+    namespace = "com.topjohnwu.magisk"
+
     val canary = !Config.version.contains(".")
 
     val url = if (canary) null

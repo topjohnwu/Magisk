@@ -9,11 +9,11 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ktx.reboot
 import com.topjohnwu.magisk.ktx.withStreams
 import com.topjohnwu.magisk.ktx.writeTo
@@ -37,6 +37,7 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -57,7 +58,7 @@ abstract class MagiskInstallImpl protected constructor(
     private val localFS get() = FileSystemManager.getLocal()
 
     private fun findImage(): Boolean {
-        val bootPath = "find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
+        val bootPath = "RECOVERYMODE=${Config.recovery} find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
@@ -420,20 +421,15 @@ abstract class MagiskInstallImpl protected constructor(
     protected abstract suspend fun operations(): Boolean
 
     open suspend fun exec(): Boolean {
-        synchronized(Companion) {
-            if (haveActiveSession)
-                return false
-            haveActiveSession = true
-        }
+        if (haveActiveSession.getAndSet(true))
+            return false
         val result = withContext(Dispatchers.IO) { operations() }
-        synchronized(Companion) {
-            haveActiveSession = false
-        }
+        haveActiveSession.set(false)
         return result
     }
 
     companion object {
-        private var haveActiveSession = false
+        private var haveActiveSession = AtomicBoolean(false)
     }
 }
 

@@ -173,7 +173,7 @@
     <string name="settings_user_independent">Незалежний користувач</string>
     <string name="owner_only_summary">Тільки власник має root-доступ</string>
     <string name="owner_manage_summary">Тільки власник може керувати root-доступом і опрацьовувати запити на надання доступу</string>
-    <string name="user_indepenent_summary">Кожен користувач має власні правила root-доступу</string>
+    <string name="user_independent_summary">Кожен користувач має власні правила root-доступу</string>
 
     <string name="mount_namespace_mode">Режим монтування простору імен</string>
     <string name="settings_ns_global">Глобальний простір імен</string>

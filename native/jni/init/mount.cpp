@@ -2,7 +2,7 @@
 #include <sys/sysmacros.h>
 #include <libgen.h>
 
-#include <utils.hpp>
+#include <base.hpp>
 #include <selinux.hpp>
 #include <magisk.hpp>
 
@@ -209,6 +209,10 @@ bool LegacySARInit::mount_system_root() {
     backup_files();
 
     LOGD("Mounting system_root\n");
+
+    // there's no /dev in stub cpio
+    xmkdir("/dev", 0777);
+
     strcpy(blk_info.block_dev, "/dev/root");
 
     do {
@@ -250,7 +254,6 @@ mount_root:
     switch_root("/system_root");
 
     // Make dev writable
-    xmkdir("/dev", 0755);
     xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
     mount_list.emplace_back("/dev");
 

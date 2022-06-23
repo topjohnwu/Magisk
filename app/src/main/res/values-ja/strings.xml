@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Magisk は必ず公式 GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
     <string name="home_support_title">サポートする</string>
+    <string name="home_follow_title">フォローする</string>
     <string name="home_item_source">ソース</string>
     <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ることで、 Magisk の開発を支援できます。</string>
     <string name="home_installed_version">インストール済</string>
@@ -82,8 +83,8 @@
     <!--Logs-->
     <string name="log_data_none">ログはありません。スーパーユーザを使用するアプリをもっと使ってみてください</string>
     <string name="log_data_magisk_none">おかしなことに Magisk のログは空です</string>
-    <string name="menuSaveLog">ログの保存</string>
-    <string name="menuClearLog">ログの消去</string>
+    <string name="menuSaveLog">ログを保存</string>
+    <string name="menuClearLog">ログを消去</string>
     <string name="logs_cleared">ログを消去しました</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ターゲット UID: %1$d</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">モジュールは %1$s が有効化されているため休止しました</string>
     <string name="suspend_text_zygisk">モジュールは %1$s が有効化されていないため休止しました</string>
     <string name="zygisk_module_unloaded">互換性がないため Zygisk モジュールは読み込まれませんでした</string>
+    <string name="module_empty">モジュールをインストールしていません</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">テーマ</string>
@@ -133,12 +135,12 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタム URL を入力</string>
-    <string name="settings_zygisk_summary">Magisk の一部を zygote デーモン上で実行する</string>
+    <string name="settings_zygisk_summary">Magisk の一部を zygote デーモン上で実行します</string>
     <string name="settings_denylist_title">DenyList を適用</string>
     <string name="settings_denylist_summary">DenyList 内のプロセスは Magisk の変更がすべて戻されます</string>
     <string name="settings_denylist_error">この機能を使用するには %1$s が有効化されている必要があります</string>
     <string name="settings_denylist_config_title">DenyList を構成</string>
-    <string name="settings_denylist_config_summary">DenyList に含まれるプロセスを選択</string>
+    <string name="settings_denylist_config_summary">DenyList に含めるプロセスを選択します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">広告ブロックアプリのための Systemless hosts サポートを有効化します</string>
     <string name="settings_hosts_toast">Systemless hosts モジュールを追加しました</string>
@@ -177,7 +179,7 @@
     <string name="settings_user_independent">ユーザー毎</string>
     <string name="owner_only_summary">端末の管理者のみスーパーユーザー権限を利用できます</string>
     <string name="owner_manage_summary">端末の管理者のみがスーパーユーザー権限を管理し、要求を受け付けられます</string>
-    <string name="user_indepenent_summary">ユーザー毎にそれぞれスーパーユーザー権限を設定できます</string>
+    <string name="user_independent_summary">ユーザー毎にそれぞれスーパーユーザー権限を設定できます</string>
 
     <string name="mount_namespace_mode">名前空間のマウントモード</string>
     <string name="settings_ns_global">グローバル名前空間</string>
@@ -190,9 +192,12 @@
     <!--Notifications-->
     <string name="update_channel">Magisk の更新</string>
     <string name="progress_channel">進捗通知</string>
+    <string name="updated_channel">更新完了</string>
     <string name="download_complete">ダウンロード完了</string>
     <string name="download_file_error">ダウンロード中にエラーが発生しました</string>
     <string name="magisk_update_title">Magisk の更新があります！</string>
+    <string name="updated_title">Magisk を更新しました</string>
+    <string name="updated_text">タップでアプリを開きます</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">対応</string>
@@ -225,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">root 権限が失われたため、Magisk の隠しアプリが動作できなくなりました。元の APK を復元してください。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">この機能を有効にするにはストレージ権限を許可してください</string>
+    <string name="install_unknown_denied">この機能を有効化するには、不明なソースからのインストールを許可してください</string>
     <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
     <string name="add_shortcut_msg">アプリを隠すと、アプリ名やアイコンが判別しにくいことがあります。分かりやすいようホーム画面にショートカットを追加しますか？</string>
     <string name="app_not_found">このアクションを扱えるアプリがありません</string>

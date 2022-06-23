@@ -7,8 +7,10 @@
 
 #define INJECT_ENV_1   "MAGISK_INJ_1"
 #define INJECT_ENV_2   "MAGISK_INJ_2"
-#define MAGISKFD_ENV   "MAGISKFD"
 #define MAGISKTMP_ENV  "MAGISKTMP"
+
+#define HIJACK_BIN64   "/system/bin/appwidget"
+#define HIJACK_BIN32   "/system/bin/bu"
 
 namespace ZygiskRequest {
 enum : int {
@@ -26,10 +28,12 @@ enum : int {
 #define ZLOGD(...) LOGD("zygisk64: " __VA_ARGS__)
 #define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
 #define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
+#define HIJACK_BIN HIJACK_BIN64
 #else
 #define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
 #define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
 #define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
+#define HIJACK_BIN HIJACK_BIN32
 #endif
 
 // Find the memory address + size of the pages matching name + inode

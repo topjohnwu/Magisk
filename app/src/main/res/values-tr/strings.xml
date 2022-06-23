@@ -166,7 +166,7 @@
     <string name="settings_user_independent">Kullanıcıdan Bağımsız</string>
     <string name="owner_only_summary">Yalnızca root erişimi olan kullanıcı</string>
     <string name="owner_manage_summary">Yalnızca cihaz sahibi root erişimini yönetebilir ve izin isteklerini alabilir</string>
-    <string name="user_indepenent_summary">Her kullanıcının kendine ait root erişim kuralları olur</string>
+    <string name="user_independent_summary">Her kullanıcının kendine ait root erişim kuralları olur</string>
     <string name="mount_namespace_mode">Ad Alanı Modunu Bağla</string>
 
     <string name="settings_ns_global">Global Ad Alanı</string>

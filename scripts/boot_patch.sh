@@ -111,7 +111,7 @@ if [ -e ramdisk.cpio ]; then
   ./magiskboot cpio ramdisk.cpio test
   STATUS=$?
 else
-  # Stock A only system-as-root
+  # Stock A only legacy SAR, or some Android 13 GKIs
   STATUS=0
 fi
 case $((STATUS & 3)) in
@@ -183,7 +183,15 @@ rm -f ramdisk.cpio.orig config magisk*.xz
 #################
 
 for dt in dtb kernel_dtb extra; do
-  [ -f $dt ] && ./magiskboot dtb $dt patch && ui_print "- Patch fstab in $dt"
+  if [ -f $dt ]; then
+    if ! ./magiskboot dtb $dt test; then
+      ui_print "! Unsupported boot image $dt"
+      abort "! Please restore back to stock boot image"
+    fi
+    if ./magiskboot dtb $dt patch; then
+      ui_print "- Patch fstab in boot image $dt"
+    fi
+  fi
 done
 
 if [ -f kernel ]; then

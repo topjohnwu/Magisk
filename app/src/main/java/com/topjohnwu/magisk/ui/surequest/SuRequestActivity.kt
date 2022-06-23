@@ -10,10 +10,10 @@ import android.view.WindowManager
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,13 +24,9 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>() {
     override val layoutRes: Int = R.layout.activity_request
     override val viewModel: SuRequestViewModel by viewModel()
 
-    override fun onBackPressed() {
-        viewModel.denyPressed()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-        lockOrientation()
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.addFlags(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -62,7 +58,11 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>() {
         return theme
     }
 
-    private fun lockOrientation() {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+    override fun onBackPressed() {
+        viewModel.denyPressed()
+    }
+
+    override fun finish() {
+        super.finishAndRemoveTask()
     }
 }

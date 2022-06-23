@@ -130,15 +130,12 @@ class StubClassLoader extends ClassLoader {
 
 class DelegateClassLoader extends ClassLoader {
 
-    // The active classloader
-    static ClassLoader cl = DelegateClassLoader.class.getClassLoader();
-
     DelegateClassLoader() {
-        super(null);
+        super();
     }
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        return cl.loadClass(name);
+        return DynLoad.activeClassLoader.loadClass(name);
     }
 }

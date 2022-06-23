@@ -5,16 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.now
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
@@ -25,7 +24,7 @@ import java.io.FileInputStream
 
 class LogViewModel(
     private val repo: LogRepository
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     // --- empty view
 
@@ -35,8 +34,8 @@ class LogViewModel(
     // --- su log
 
     val items = diffListOf<LogRvItem>()
-    val itemBinding = itemBindingOf<LogRvItem> {
-        it.bindExtra(BR.viewModel, this)
+    val extraBindings = bindExtra {
+        it.put(BR.viewModel, this)
     }
 
     // --- magisk log
@@ -44,7 +43,7 @@ class LogViewModel(
     var consoleText = " "
         set(value) = set(value, field, { field = it }, BR.consoleText)
 
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         consoleText = repo.fetchMagiskLogs()
         val (suLogs, diff) = withContext(Dispatchers.Default) {
             val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
@@ -59,7 +58,8 @@ class LogViewModel(
 
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
+            val filename = "magisk_log_%s.log".format(
+                System.currentTimeMillis().toTime(timeFormatStandard))
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---Detected Device Info---\n\n")
@@ -89,12 +89,12 @@ class LogViewModel(
 
     fun clearMagiskLog() = repo.clearMagiskLogs {
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 
     fun clearLog() = viewModelScope.launch {
         repo.clearLogs()
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 }

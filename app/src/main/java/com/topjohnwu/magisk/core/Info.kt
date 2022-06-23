@@ -3,11 +3,13 @@ package com.topjohnwu.magisk.core
 import android.os.Build
 import androidx.databinding.ObservableBoolean
 import com.topjohnwu.magisk.BuildConfig
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.UpdateInfo
+import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.net.NetworkObserver
-import com.topjohnwu.magisk.data.repository.NetworkService
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -45,10 +47,11 @@ object Info {
         getProperty("ro.kernel.qemu", "0") == "1" ||
             getProperty("ro.boot.qemu", "0") == "1"
 
-    val isConnected by lazy {
-        ObservableBoolean(false).also { field ->
+    val isConnected: LiveData<Boolean> by lazy {
+        MutableLiveData(false).also { field ->
             NetworkObserver.observe(AppContext) {
-                UiThreadHandler.run { field.set(it) }
+                remote = EMPTY_REMOTE
+                field.postValue(it)
             }
         }
     }
@@ -72,13 +75,17 @@ object Info {
         }
     }
 
-    private fun loadState() = Env(
-        fastCmd("magisk -v").split(":".toRegex())[0],
-        runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
-    )
+    private fun loadState(): Env {
+        val v = fastCmd("magisk -v").split(":".toRegex())
+        return Env(
+            v[0], v.size >= 3 && v[2] == "D",
+            runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
+        )
+    }
 
     class Env(
         val versionString: String = "",
+        val isDebug: Boolean = false,
         code: Int = -1
     ) {
         val versionCode = when {

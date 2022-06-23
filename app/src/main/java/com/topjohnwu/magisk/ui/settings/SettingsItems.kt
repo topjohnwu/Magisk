@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.JobService
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -22,7 +23,6 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.di.AppContext
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -37,9 +37,10 @@ object Customization : BaseSettingsItem.Section() {
 }
 
 object Language : BaseSettingsItem.Selector() {
-    override var value = -1
+    override var value
+        get() = index
         set(value) {
-            field = value
+            index = value
             Config.locale = entryValues[value]
         }
 
@@ -47,6 +48,7 @@ object Language : BaseSettingsItem.Selector() {
 
     private var entries = emptyArray<String>()
     private var entryValues = emptyArray<String>()
+    private var index = -1
 
     override fun entries(res: Resources) = entries
     override fun descriptions(res: Resources) = entries
@@ -62,7 +64,7 @@ object Language : BaseSettingsItem.Selector() {
                 entries = names
                 entryValues = values
                 val selectedLocale = currentLocale.getDisplayName(currentLocale)
-                value = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
+                index = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
                 notifyPropertyChanged(BR.description)
             }
         }
@@ -167,7 +169,7 @@ object UpdateChannel : BaseSettingsItem.Selector() {
     override val entryRes = R.array.update_channel
     override fun entries(res: Resources): Array<String> {
         return super.entries(res).let {
-            if (!BuildConfig.DEBUG)
+            if (!Const.APP_IS_CANARY && !BuildConfig.DEBUG)
                 it.copyOfRange(0, Config.Value.CANARY_CHANNEL)
             else it
         }
@@ -225,7 +227,7 @@ object Magisk : BaseSettingsItem.Section() {
 }
 
 object Zygisk : BaseSettingsItem.Toggle() {
-    override val title = R.string.zygisk_beta.asText()
+    override val title = R.string.zygisk.asText()
     override val description get() =
         if (mismatch) R.string.reboot_apply_change.asText()
         else R.string.settings_zygisk_summary.asText()
