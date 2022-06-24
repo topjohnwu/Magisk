@@ -186,7 +186,7 @@ for dt in dtb kernel_dtb extra; do
   if [ -f $dt ]; then
     if ! ./magiskboot dtb $dt test; then
       ui_print "! Boot image $dt was patched by old (unsupported) Magisk"
-      abort "! Please restore back to stock boot image and try again"
+      abort "! Please try again with *unpatched* boot image"
     fi
     if ./magiskboot dtb $dt patch; then
       ui_print "- Patch fstab in boot image $dt"
