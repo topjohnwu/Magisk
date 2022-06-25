@@ -24,6 +24,7 @@ struct BootConfig {
 };
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
+#define INIT_PATH  "/system/bin/init"
 
 extern std::vector<std::string> mount_list;
 
@@ -33,6 +34,7 @@ void load_kernel_info(BootConfig *config);
 bool check_two_stage();
 void setup_klog();
 const char *backup_init();
+void restore_ramdisk_init();
 int dump_manager(const char *path, mode_t mode);
 int dump_preload(const char *path, mode_t mode);
 
