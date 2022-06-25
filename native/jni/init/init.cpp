@@ -57,6 +57,20 @@ static int dump_bin(const uint8_t *buf, size_t sz, const char *path, mode_t mode
     return 0;
 }
 
+void restore_ramdisk_init() {
+    unlink("/init");
+
+    const char *orig_init = backup_init();
+    if (access(orig_init, F_OK) == 0) {
+        xrename(orig_init, "/init");
+    } else {
+        // If the backup init is missing, this means that the boot ramdisk
+        // was created from scratch, and the real init is in a separate CPIO,
+        // which is guaranteed to be placed at /system/bin/init.
+        xsymlink(INIT_PATH, "/init");
+    }
+}
+
 int dump_manager(const char *path, mode_t mode) {
     return dump_bin(manager_xz, sizeof(manager_xz), path, mode);
 }
@@ -70,7 +84,7 @@ public:
     using BaseInit::BaseInit;
     void start() override {
         LOGD("Ramdisk is recovery, abort\n");
-        rename(backup_init(), "/init");
+        restore_ramdisk_init();
         rm_rf("/.backup");
         exec_init();
     }
