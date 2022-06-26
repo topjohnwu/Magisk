@@ -103,8 +103,10 @@ int get_manager(int user_id, string *pkg, bool install) {
         snprintf(app_path, sizeof(app_path),
             "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, u, mgr_pkg->data());
         int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
-        if (dyn < 0)
+        if (dyn < 0) {
+            LOGW("pkg: no dyn APK, ignore\n");
             return false;
+        }
         bool mismatch = default_cert && read_certificate(dyn, MAGISK_VER_CODE) != *default_cert;
         close(dyn);
         if (mismatch) {
@@ -270,7 +272,8 @@ int get_manager(int user_id, string *pkg, bool install) {
         install_stub();
 
 not_found:
-    LOGW("pkg: cannot find manager for user=[%d]\n", user_id);
+    const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
+    LOGW("pkg: cannot find %s for user=[%d]\n", name, user_id);
     if (pkg) pkg->clear();
     return -1;
 }
