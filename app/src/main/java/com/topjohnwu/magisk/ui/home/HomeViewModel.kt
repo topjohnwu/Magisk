@@ -94,6 +94,7 @@ class HomeViewModel(
                 ("${magisk.version} (${magisk.versionCode}) (${stub.versionCode})" +
                     if (isDebug) " (D)" else "").asText()
         } ?: run {
+            appState = State.INVALID
             managerRemoteVersion = R.string.not_available.asText()
         }
         ensureEnv()
@@ -112,7 +113,7 @@ class HomeViewModel(
 
     fun onDeletePressed() = UninstallDialog().publish()
 
-    fun onManagerPressed() = when (magiskState) {
+    fun onManagerPressed() = when (appState) {
         State.LOADING -> SnackbarEvent(R.string.loading).publish()
         State.INVALID -> SnackbarEvent(R.string.no_connection).publish()
         else -> withExternalRW {
