@@ -52,7 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザー権限の要求</string>
-    <string name="touch_filtered_warning">他のアプリがスーパーユーザー権限の要求ダイアログが隠しているため、Magisk はあなたの応答を確認できません。</string>
+    <string name="touch_filtered_warning">他のアプリがスーパーユーザー権限の要求ダイアログを隠しているため、Magisk はあなたの応答を確認できません。</string>
     <string name="deny">拒否</string>
     <string name="prompt">尋ねる</string>
     <string name="grant">許可</string>
