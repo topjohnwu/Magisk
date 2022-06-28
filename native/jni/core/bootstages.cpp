@@ -188,7 +188,7 @@ static bool check_data() {
         return false;
     auto crypto = getprop("ro.crypto.state");
     if (!crypto.empty()) {
-        if (crypto == "unencrypted") {
+        if (crypto != "encrypted") {
             // Unencrypted, we can directly access data
             return true;
         } else {
