@@ -51,7 +51,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - Run `./build.py ndk` to let the script download and install NDK for you
 - To start building, run `build.py` to see your options. \
   For each action, use `-h` to access help (e.g. `./build.py all -h`)
-- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native (C++/C) sources.
+- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native sources.
 - Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
 
 ## Signing and Distribution

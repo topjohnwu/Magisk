@@ -40,3 +40,6 @@
 [submodule "zopfli"]
 	path = native/jni/external/zopfli
 	url = https://github.com/google/zopfli.git
+[submodule "cxx-rs"]
+	path = native/jni/external/cxx-rs
+	url = https://github.com/topjohnwu/cxx.git

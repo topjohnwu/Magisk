@@ -37,10 +37,10 @@ def vprint(str):
 
 is_windows = os.name == 'nt'
 is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
+EXE_EXT = '.exe' if is_windows else ''
 
 if not is_ci and is_windows:
     import colorama
-
     colorama.init()
 
 # Environment checks
@@ -58,16 +58,20 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
+triples = ['armv7a-linux-androideabi', 'i686-linux-android', 'aarch64-linux-android', 'x86_64-linux-android']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox']
 support_targets = default_targets + ['resetprop', 'test']
+rust_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
 ndk_root = op.join(sdk_path, 'ndk')
 ndk_path = op.join(ndk_root, 'magisk')
 ndk_build = op.join(ndk_path, 'ndk-build')
+rust_bin = op.join(ndk_path, 'toolchains', 'rust', 'bin')
+cargo = op.join(rust_bin, 'cargo' + EXE_EXT)
 gradlew = op.join('.', 'gradlew' + ('.bat' if is_windows else ''))
-adb_path = op.join(sdk_path, 'platform-tools', 'adb' + ('.exe' if is_windows else ''))
-native_gen_path = op.join('native', 'out', 'generated')
+adb_path = op.join(sdk_path, 'platform-tools', 'adb' + EXE_EXT)
+native_gen_path = op.realpath(op.join('native', 'out', 'generated'))
 
 # Global vars
 config = {}
@@ -123,16 +127,17 @@ def mkdir_p(path, mode=0o755):
     os.makedirs(path, mode, exist_ok=True)
 
 
-def execv(cmd):
-    return subprocess.run(cmd, stdout=STDOUT)
+def execv(cmd, env=None):
+    return subprocess.run(cmd, stdout=STDOUT, env=env)
 
 
 def system(cmd):
     return subprocess.run(cmd, shell=True, stdout=STDOUT)
 
 
-def cmd_out(cmd):
-    return subprocess.check_output(cmd).strip().decode('utf-8')
+def cmd_out(cmd, env=None):
+    return subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env) \
+                     .stdout.strip().decode('utf-8')
 
 
 def xz(data):
@@ -180,15 +185,6 @@ def load_config(args):
     STDOUT = None if args.verbose else subprocess.DEVNULL
 
 
-def collect_binary():
-    for arch in archs:
-        mkdir_p(op.join('native', 'out', arch))
-        for bin in support_targets + ['libpreload.so']:
-            source = op.join('native', 'libs', arch, bin)
-            target = op.join('native', 'out', arch, bin)
-            mv(source, target)
-
-
 def clean_elf():
     if is_windows:
         elf_cleaner = op.join('tools', 'elf-cleaner.exe')
@@ -201,48 +197,6 @@ def clean_elf():
     args.extend(op.join('native', 'out', arch, bin)
                 for arch in archs for bin in ['magisk', 'magiskpolicy'])
     execv(args)
-
-
-def find_build_tools():
-    global build_tools
-    if build_tools:
-        return build_tools
-    build_tools_root = op.join(os.environ['ANDROID_SDK_ROOT'], 'build-tools')
-    ls = os.listdir(build_tools_root)
-    # Use the latest build tools available
-    ls.sort()
-    build_tools = op.join(build_tools_root, ls[-1])
-    return build_tools
-
-
-# Unused but keep this code
-def sign_zip(unsigned):
-    if 'keyStore' not in config:
-        return
-
-    msg = '* Signing APK'
-    apksigner = op.join(find_build_tools(), 'apksigner' + ('.bat' if is_windows else ''))
-
-    exec_args = [apksigner, 'sign',
-                 '--ks', config['keyStore'],
-                 '--ks-pass', f'pass:{config["keyStorePass"]}',
-                 '--ks-key-alias', config['keyAlias'],
-                 '--key-pass', f'pass:{config["keyPass"]}',
-                 '--v1-signer-name', 'CERT',
-                 '--v4-signing-enabled', 'false']
-
-    if unsigned.endswith('.zip'):
-        msg = '* Signing zip'
-        exec_args.extend(['--min-sdk-version', '17',
-                          '--v2-signing-enabled', 'false',
-                          '--v3-signing-enabled', 'false'])
-
-    exec_args.append(unsigned)
-
-    header(msg)
-    proc = execv(exec_args)
-    if proc.returncode != 0:
-        error('Signing failed!')
 
 
 def binary_dump(src, var_name):
@@ -261,7 +215,70 @@ def run_ndk_build(flags):
     if proc.returncode != 0:
         error('Build binary failed!')
     os.chdir('..')
-    collect_binary()
+    for arch in archs:
+        for tgt in support_targets + ['libpreload.so']:
+            source = op.join('native', 'libs', arch, tgt)
+            target = op.join('native', 'out', arch, tgt)
+            mv(source, target)
+
+
+def run_cargo_build(args):
+    os.chdir(op.join('native', 'rust'))
+    targets = set(args.target) & set(rust_targets)
+
+    env = os.environ.copy()
+    env['PATH'] = f'{rust_bin}:{env["PATH"]}'
+
+    # Install cxxbridge and generate C++ bindings
+    native_out = op.join('..', '..', 'native', 'out')
+    local_cargo_root = op.join(native_out, '.cargo')
+    mkdir_p(local_cargo_root)
+    cmds = [cargo, 'install', '--root', local_cargo_root, 'cxxbridge-cmd']
+    if not args.verbose:
+        cmds.append('-q')
+    proc = execv(cmds, env)
+    if proc.returncode != 0:
+        error('cxxbridge-cmd installation failed!')
+    cxxbridge = op.join(local_cargo_root, 'bin', 'cxxbridge' + EXE_EXT)
+    mkdir(native_gen_path)
+    for p in ['base', 'boot', 'core', 'init', 'sepolicy']:
+        text = cmd_out([cxxbridge, op.join(p, 'src', 'lib.rs')])
+        write_if_diff(op.join(native_gen_path, f'{p}-rs.cpp'), text)
+        text = cmd_out([cxxbridge, '--header', op.join(p, 'src', 'lib.rs')])
+        write_if_diff(op.join(native_gen_path, f'{p}-rs.hpp'), text)
+
+    # Start building the actual build commands
+    cmds = [cargo, 'build', '-Z', 'build-std=std,panic_abort',
+           '-Z', 'build-std-features=panic_immediate_abort']
+    for target in targets:
+        cmds.append('-p')
+        cmds.append(target)
+    rust_out = 'debug'
+    if args.release:
+        cmds.append('-r')
+        rust_out = 'release'
+    if not args.verbose:
+        cmds.append('-q')
+
+    os_name = platform.system().lower()
+    llvm_bin = op.join(ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64', 'bin')
+    env['TARGET_CC'] = op.join(llvm_bin, 'clang' + EXE_EXT)
+    env['RUSTFLAGS'] = '-Clinker-plugin-lto'
+    for (arch, triple) in zip(archs, triples):
+        env['TARGET_CFLAGS'] = f'--target={triple}21'
+        rust_triple = 'thumbv7neon-linux-androideabi' if triple.startswith('armv7') else triple
+        proc = execv([*cmds, '--target', rust_triple], env)
+        if proc.returncode != 0:
+            error('Build binary failed!')
+
+        arch_out = op.join(native_out, arch)
+        mkdir(arch_out)
+        for tgt in targets:
+            source = op.join('target', rust_triple, rust_out, f'lib{tgt}.a')
+            target = op.join(arch_out, f'lib{tgt}-rs.a')
+            mv(source, target)
+
+    os.chdir(op.join('..', '..'))
 
 
 def write_if_diff(file_name, text):
@@ -325,6 +342,8 @@ def build_binary(args):
         args.target = default_targets
 
     header('* Building binaries: ' + ' '.join(args.target))
+
+    run_cargo_build(args)
 
     dump_flag_header()
 
@@ -402,6 +421,7 @@ def cleanup(args):
         rm_rf(op.join('native', 'out'))
         rm_rf(op.join('native', 'libs'))
         rm_rf(op.join('native', 'obj'))
+        rm_rf(op.join('native', 'rust', 'target'))
 
     if 'java' in args.target:
         header('* Cleaning java')

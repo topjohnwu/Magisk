@@ -15,7 +15,8 @@ LOCAL_SRC_FILES := \
     selinux.cpp \
     logging.cpp \
     xwrap.cpp \
-    stream.cpp
+    stream.cpp \
+    ../external/cxx-rs/src/cxx.cc
 include $(BUILD_STATIC_LIBRARY)
 
 # All static executables should link with libcompat
