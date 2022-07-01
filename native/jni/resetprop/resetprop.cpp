@@ -13,8 +13,6 @@
 
 using namespace std;
 
-static bool verbose = false;
-
 #ifdef APPLET_STUB_MAIN
 #define system_property_set           __system_property_set
 #define system_property_find          __system_property_find
@@ -297,10 +295,9 @@ void load_prop_file(const char *filename, bool prop_svc) {
 }
 
 int resetprop_main(int argc, char *argv[]) {
-    log_cb.d = [](auto fmt, auto ap) -> int { return verbose ? vfprintf(stderr, fmt, ap) : 0; };
-
     bool prop_svc = true;
     bool persist = false;
+    bool verbose = false;
     char *argv0 = argv[0];
 
     --argc;
@@ -339,6 +336,9 @@ int resetprop_main(int argc, char *argv[]) {
         --argc;
         ++argv;
     }
+
+    if (!verbose)
+        log_cb.d = nop_log;
 
     switch (argc) {
     case 0:

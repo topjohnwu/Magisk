@@ -127,6 +127,7 @@ int magisk_main(int argc, char *argv[]) {
 #if 0
     /* Entry point for testing stuffs */
     else if (argv[1] == "--test"sv) {
+        rust_test_entry();
         return 0;
     }
 #endif

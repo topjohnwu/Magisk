@@ -2,41 +2,52 @@
 #include <cstdlib>
 
 #include <flags.h>
+#include <base.hpp>
 
-#include "logging.hpp"
+// Just need to include it somewhere
+#include <base-rs.cpp>
 
 using namespace std;
 
-int nop_log(const char *, va_list) { return 0; }
-
-void nop_ex(int) {}
+void nop_log(const char *, va_list) {}
 
 log_callback log_cb = {
     .d = nop_log,
     .i = nop_log,
     .w = nop_log,
     .e = nop_log,
-    .ex = nop_ex
 };
+static bool EXIT_ON_ERROR = false;
 
-void no_logging() {
-    log_cb.d = nop_log;
-    log_cb.i = nop_log;
-    log_cb.w = nop_log;
-    log_cb.e = nop_log;
-    log_cb.ex = nop_ex;
+static void fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
+    char buf[4096];
+    int len = vsnprintf(buf, sizeof(buf), fmt, ap);
+    if (len > 0 && buf[len - 1] == '\n') {
+        // It's unfortunate that all logging on the C++ side always manually include
+        // a newline at the end due to how it was originally implemented.
+        // The logging infrastructure on the rust side does NOT expect a newline
+        // at the end, so we will have to strip it out before sending it over.
+        buf[len - 1] = '\0';
+    }
+    log_with_rs(level, buf);
 }
 
-static int vprintfe(const char *fmt, va_list ap) {
-    return vfprintf(stderr, fmt, ap);
+#define rlog(prio) [](auto fmt, auto ap) { fmt_and_log_with_rs(LogLevel::prio, fmt, ap); }
+static void forward_logging_to_rs() {
+    log_cb.d = rlog(Debug);
+    log_cb.i = rlog(Info);
+    log_cb.w = rlog(Warn);
+    log_cb.e = rlog(Error);
 }
 
 void cmdline_logging() {
-    log_cb.d = vprintfe;
-    log_cb.i = vprintf;
-    log_cb.w = vprintfe;
-    log_cb.e = vprintfe;
-    log_cb.ex = exit;
+    rs::logging::cmdline_logging();
+    forward_logging_to_rs();
+}
+
+void exit_on_error(bool b) {
+    rs::logging::exit_on_error(b);
+    EXIT_ON_ERROR = b;
 }
 
 #define LOG_BODY(prio) { \
@@ -54,9 +65,9 @@ void LOGD(const char *fmt, ...) {}
 #endif
 void LOGI(const char *fmt, ...) { LOG_BODY(i) }
 void LOGW(const char *fmt, ...) { LOG_BODY(w) }
-void LOGE(const char *fmt, ...) { LOG_BODY(e); log_cb.ex(EXIT_FAILURE); }
+void LOGE(const char *fmt, ...) { LOG_BODY(e); if (EXIT_ON_ERROR) exit(EXIT_FAILURE); }
 
 // Export raw symbol to fortify compat
-extern "C" int __vloge(const char* fmt, va_list ap) {
-    return log_cb.e(fmt, ap);
+extern "C" void __vloge(const char* fmt, va_list ap) {
+    log_cb.e(fmt, ap);
 }

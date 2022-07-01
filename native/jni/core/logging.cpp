@@ -166,22 +166,22 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
     return ret;
 }
 
-#define mlog(prio) [](auto fmt, auto ap){ return magisk_log(ANDROID_LOG_##prio, fmt, ap); }
+#define mlog(prio) [](auto fmt, auto ap){ magisk_log(ANDROID_LOG_##prio, fmt, ap); }
 void magisk_logging() {
     log_cb.d = mlog(DEBUG);
     log_cb.i = mlog(INFO);
     log_cb.w = mlog(WARN);
     log_cb.e = mlog(ERROR);
-    log_cb.ex = nop_ex;
+    exit_on_error(false);
 }
 
-#define alog(prio) [](auto fmt, auto ap){ return __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
+#define alog(prio) [](auto fmt, auto ap){ __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
 void android_logging() {
     log_cb.d = alog(DEBUG);
     log_cb.i = alog(INFO);
     log_cb.w = alog(WARN);
     log_cb.e = alog(ERROR);
-    log_cb.ex = nop_ex;
+    exit_on_error(false);
 }
 
 void start_log_daemon() {

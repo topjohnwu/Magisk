@@ -4,11 +4,10 @@
 #include <cstdarg>
 
 struct log_callback {
-    int (*d)(const char* fmt, va_list ap);
-    int (*i)(const char* fmt, va_list ap);
-    int (*w)(const char* fmt, va_list ap);
-    int (*e)(const char* fmt, va_list ap);
-    void (*ex)(int code);
+    void (*d)(const char* fmt, va_list ap);
+    void (*i)(const char* fmt, va_list ap);
+    void (*w)(const char* fmt, va_list ap);
+    void (*e)(const char* fmt, va_list ap);
 };
 
 extern log_callback log_cb;
@@ -19,8 +18,7 @@ void LOGW(const char *fmt, ...) __printflike(1, 2);
 void LOGE(const char *fmt, ...) __printflike(1, 2);
 #define PLOGE(fmt, args...) LOGE(fmt " failed with %d: %s\n", ##args, errno, std::strerror(errno))
 
-int nop_log(const char *, va_list);
-void nop_ex(int);
+void nop_log(const char *, va_list);
 
-void no_logging();
 void cmdline_logging();
+void exit_on_error(bool b);

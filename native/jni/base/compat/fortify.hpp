@@ -6,7 +6,7 @@
 
 #undef _FORTIFY_SOURCE
 
-extern int __vloge(const char* fmt, va_list ap);
+extern void __vloge(const char* fmt, va_list ap);
 
 static inline __noreturn __printflike(1, 2) void __fortify_fatal(const char* fmt, ...) {
     va_list args;

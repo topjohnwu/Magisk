@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <socket.hpp>
+#include <core-rs.hpp>
 
 #define AID_ROOT   0
 #define AID_SHELL  2000

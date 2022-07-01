@@ -11,6 +11,8 @@
 #include <resetprop.hpp>
 #include <flags.h>
 
+#include <core-rs.cpp>
+
 #include "core.hpp"
 
 using namespace std;
