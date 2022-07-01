@@ -20,16 +20,16 @@
     <string name="home_package">パッケージ ID </string>
     <string name="home_app_title">アプリ</string>
 
-    <string name="home_notice_content">Magisk は必ず公式 GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
+    <string name="home_notice_content">Magisk は必ず公式の GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
     <string name="home_support_title">サポートする</string>
     <string name="home_follow_title">フォローする</string>
     <string name="home_item_source">ソース</string>
-    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ることで、 Magisk の開発を支援できます。</string>
+    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ることで､ Magisk の開発を支援することができます。</string>
     <string name="home_installed_version">インストール済</string>
     <string name="home_latest_version">最新版</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
     <string name="uninstall_magisk_title">Magisk のアンインストール</string>
-    <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。\nアンインストール後は root が無効化され、ストレージが暗号化されていない場合、暗号化される場合があります。</string>
+    <string name="uninstall_magisk_msg">すべてのモジュールが無効化/削除されます。\nアンインストール後は root が削除され､ストレージが暗号化されていない場合は暗号化される場合があります。</string>
 
     <!--Install-->
     <string name="keep_force_encryption">暗号化を維持する</string>
@@ -40,7 +40,7 @@
     <string name="install_method_title">方法</string>
     <string name="install_next">次へ</string>
     <string name="install_start">はじめる</string>
-    <string name="manager_download_install">タップでダウンロードしてインストールします</string>
+    <string name="manager_download_install">タップしてダウンロード＆インストールします</string>
     <string name="direct_install">直接インストール (推奨)</string>
     <string name="install_inactive_slot">別のスロットにインストール (OTA 後)</string>
     <string name="install_inactive_slot_msg">お使いのデバイスは再起動後に現在とは別のスロットで強制的に起動されます！\nこのオプションは OTA の完了後にのみ使用してください。\n続行しますか？</string>
@@ -52,7 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">スーパーユーザー権限の要求</string>
-    <string name="touch_filtered_warning">スーパーユーザー権限の要求ダイアログが他のアプリで隠れているため、Magisk はあなたの応答を確認できません。</string>
+    <string name="touch_filtered_warning">他のアプリがスーパーユーザー権限の要求ダイアログを隠しているため、Magisk はあなたの応答を確認できません。</string>
     <string name="deny">拒否</string>
     <string name="prompt">尋ねる</string>
     <string name="grant">許可</string>
@@ -206,7 +206,7 @@
     <string name="download">ダウンロード</string>
     <string name="reboot">再起動</string>
     <string name="release_notes">更新履歴</string>
-    <string name="flashing">書き込み中…</string>
+    <string name="flashing">書込中…</string>
     <string name="done">完了！</string>
     <string name="failure">失敗！</string>
     <string name="hide_app_title">Magisk アプリを隠しています…</string>
@@ -218,7 +218,7 @@
     <string name="restore_fail">Stock のバックアップがありません！</string>
     <string name="setup_fail">セットアップに失敗しました</string>
     <string name="env_fix_title">追加のセットアップが必要です</string>
-    <string name="env_fix_msg">Magisk を正常に動作させるために追加のセットアップが必要です。今すぐ再起動しますか？</string>
+    <string name="env_fix_msg">Magisk を正常に動作させるためには追加のセットアップが必要です。今すぐ再起動しますか？</string>
     <string name="setup_msg">追加セットアップを実行中…</string>
     <string name="authenticate">認証</string>
     <string name="unsupport_magisk_title">対応していない Magisk バージョンです</string>
@@ -227,7 +227,7 @@
     <string name="unsupport_system_app_msg">このアプリをシステムアプリとして起動することはサポートされていません。ユーザーアプリに戻してください。</string>
     <string name="unsupport_other_su_msg">Magisk 以外の \"su\" バイナリが検出されました。競合する root 権限取得ソフトを削除し、Magisk をインストールし直してください。</string>
     <string name="unsupport_external_storage_msg">Magisk が外部ストレージにインストールされています。内部ストレージに移動してください。</string>
-    <string name="unsupport_nonroot_stub_msg">root 権限が失われたため、Magisk の隠しアプリが動作できなくなりました。元の APK を復元してください。</string>
+    <string name="unsupport_nonroot_stub_msg">root 権限が失われたため､隠し Magisk アプリが動作できなくなりました。元の APK を復元してください。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">この機能を有効にするにはストレージ権限を許可してください</string>
     <string name="install_unknown_denied">この機能を有効化するには、不明なソースからのインストールを許可してください</string>
