@@ -227,7 +227,7 @@ def run_cargo_build(args):
     targets = set(args.target) & set(rust_targets)
 
     env = os.environ.copy()
-    env['PATH'] = f'{rust_bin}:{env["PATH"]}'
+    env['CARGO_BUILD_RUSTC'] = op.join(rust_bin, 'rustc' + EXE_EXT)
 
     # Install cxxbridge and generate C++ bindings
     native_out = op.join('..', '..', 'native', 'out')
