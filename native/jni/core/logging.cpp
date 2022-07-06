@@ -35,7 +35,7 @@ void setup_logfile(bool reset) {
 }
 
 // Maximum message length for pipes to transfer atomically
-#define MAX_MSG_LEN  (PIPE_BUF - sizeof(log_meta))
+#define MAX_MSG_LEN  (int) (PIPE_BUF - sizeof(log_meta))
 
 static void *logfile_writer(void *arg) {
     int pipefd = (long) arg;
@@ -124,11 +124,11 @@ static void *logfile_writer(void *arg) {
     }
 }
 
-int magisk_log(int prio, const char *fmt, va_list ap) {
-    char buf[MAX_MSG_LEN + 1];
-    int len = vsnprintf(buf, sizeof(buf), fmt, ap);
-
+void magisk_log_write(int prio, const char *msg, int len) {
     if (logd_fd >= 0) {
+        // Truncate
+        len = std::min(MAX_MSG_LEN, len);
+
         log_meta meta = {
             .prio = prio,
             .len = len,
@@ -139,7 +139,7 @@ int magisk_log(int prio, const char *fmt, va_list ap) {
         iovec iov[2];
         iov[0].iov_base = &meta;
         iov[0].iov_len = sizeof(meta);
-        iov[1].iov_base = buf;
+        iov[1].iov_base = (void *) msg;
         iov[1].iov_len = len;
 
         if (writev(logd_fd, iov, 2) < 0) {
@@ -147,40 +147,17 @@ int magisk_log(int prio, const char *fmt, va_list ap) {
             close(logd_fd.exchange(-1));
         }
     }
-    __android_log_write(prio, "Magisk", buf);
-
-    return len;
 }
 
-// Used to override external C library logging
-extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
-    char buf[4096];
-    auto len = strlcpy(buf, tag, sizeof(buf));
-    // Prevent format specifications in the tag
-    std::replace(buf, buf + len, '%', '_');
-    snprintf(buf + len, sizeof(buf) - len, ": %s", fmt);
-    va_list argv;
-    va_start(argv, fmt);
-    int ret = magisk_log(prio, buf, argv);
-    va_end(argv);
-    return ret;
-}
-
-#define mlog(prio) [](auto fmt, auto ap){ magisk_log(ANDROID_LOG_##prio, fmt, ap); }
 void magisk_logging() {
-    log_cb.d = mlog(DEBUG);
-    log_cb.i = mlog(INFO);
-    log_cb.w = mlog(WARN);
-    log_cb.e = mlog(ERROR);
+    rust::magisk_logging();
+    forward_logging_to_rs();
     exit_on_error(false);
 }
 
-#define alog(prio) [](auto fmt, auto ap){ __android_log_vprint(ANDROID_LOG_##prio, "Magisk", fmt, ap); }
 void android_logging() {
-    log_cb.d = alog(DEBUG);
-    log_cb.i = alog(INFO);
-    log_cb.w = alog(WARN);
-    log_cb.e = alog(ERROR);
+    rust::android_logging();
+    forward_logging_to_rs();
     exit_on_error(false);
 }
 

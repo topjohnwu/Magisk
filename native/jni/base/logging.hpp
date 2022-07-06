@@ -20,5 +20,6 @@ void LOGE(const char *fmt, ...) __printflike(1, 2);
 
 void nop_log(const char *, va_list);
 
+void forward_logging_to_rs();
 void cmdline_logging();
 void exit_on_error(bool b);

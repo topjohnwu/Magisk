@@ -1,4 +1,5 @@
 #include <base.hpp>
+#include <init-rs.hpp>
 
 using kv_pairs = std::vector<std::pair<std::string, std::string>>;
 

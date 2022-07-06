@@ -57,6 +57,7 @@ name = "magiskinit"
 version = "0.1.0"
 dependencies = [
  "base",
+ "cxx",
 ]
 
 [[package]]

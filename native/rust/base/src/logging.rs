@@ -23,10 +23,6 @@ pub struct Logger {
 
 pub fn nop_log(_: Arguments) {}
 
-fn println(args: Arguments) { println!("{}", args); }
-
-fn eprintln(args: Arguments) { eprintln!("{}", args); }
-
 pub fn log_with_rs(level: LogLevel, msg: &str) {
     log_impl(level, format_args!("{}", msg));
 }
@@ -36,11 +32,14 @@ pub fn exit_on_error(b: bool) {
 }
 
 pub fn cmdline_logging() {
+    fn print(args: Arguments) { print!("{}", args); }
+    fn eprint(args: Arguments) { eprint!("{}", args); }
+
     let logger = Logger {
-        d: eprintln,
-        i: println,
-        w: eprintln,
-        e: eprintln,
+        d: eprint,
+        i: print,
+        w: eprint,
+        e: eprint,
     };
     unsafe {
         LOGGER = logger;
@@ -65,23 +64,23 @@ pub fn log_impl(level: LogLevel, args: Arguments) {
 
 #[macro_export]
 macro_rules! error {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Error, format_args!($($arg)+)))
+    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!($($arg)+)))
 }
 
 #[macro_export]
 macro_rules! warn {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Warn, format_args!($($arg)+)))
+    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Warn, format_args_nl!($($arg)+)))
 }
 
 #[macro_export]
 macro_rules! info {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Info, format_args!($($arg)+)))
+    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Info, format_args_nl!($($arg)+)))
 }
 
 #[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! debug {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Debug, format_args!($($arg)+)))
+    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Debug, format_args_nl!($($arg)+)))
 }
 
 #[cfg(not(debug_assertions))]

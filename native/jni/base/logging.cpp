@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <android/log.h>
+
 #include <flags.h>
 #include <base.hpp>
 
@@ -19,21 +21,47 @@ log_callback log_cb = {
 };
 static bool EXIT_ON_ERROR = false;
 
-static void fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
+static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[4096];
-    int len = vsnprintf(buf, sizeof(buf), fmt, ap);
-    if (len > 0 && buf[len - 1] == '\n') {
-        // It's unfortunate that all logging on the C++ side always manually include
-        // a newline at the end due to how it was originally implemented.
-        // The logging infrastructure on the rust side does NOT expect a newline
-        // at the end, so we will have to strip it out before sending it over.
-        buf[len - 1] = '\0';
-    }
+    int ret = vsnprintf(buf, sizeof(buf), fmt, ap);
     log_with_rs(level, buf);
+    return ret;
+}
+
+// Used to override external C library logging
+extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
+    LogLevel level;
+    switch (prio) {
+    case ANDROID_LOG_DEBUG:
+        level = LogLevel::Debug;
+        break;
+    case ANDROID_LOG_INFO:
+        level = LogLevel::Info;
+        break;
+    case ANDROID_LOG_WARN:
+        level = LogLevel::Warn;
+        break;
+    case ANDROID_LOG_ERROR:
+        level = LogLevel::Error;
+        break;
+    default:
+        return 0;
+    }
+
+    char fmt_buf[4096];
+    auto len = strlcpy(fmt_buf, tag, sizeof(fmt_buf));
+    // Prevent format specifications in the tag
+    std::replace(fmt_buf, fmt_buf + len, '%', '_');
+    snprintf(fmt_buf + len, sizeof(fmt_buf) - len, ": %s", fmt);
+    va_list argv;
+    va_start(argv, fmt);
+    int ret = fmt_and_log_with_rs(level, fmt_buf, argv);
+    va_end(argv);
+    return ret;
 }
 
 #define rlog(prio) [](auto fmt, auto ap) { fmt_and_log_with_rs(LogLevel::prio, fmt, ap); }
-static void forward_logging_to_rs() {
+void forward_logging_to_rs() {
     log_cb.d = rlog(Debug);
     log_cb.i = rlog(Info);
     log_cb.w = rlog(Warn);
@@ -41,12 +69,13 @@ static void forward_logging_to_rs() {
 }
 
 void cmdline_logging() {
-    rs::logging::cmdline_logging();
+    rust::cmdline_logging();
     forward_logging_to_rs();
+    exit_on_error(true);
 }
 
 void exit_on_error(bool b) {
-    rs::logging::exit_on_error(b);
+    rust::exit_on_error(b);
     EXIT_ON_ERROR = b;
 }
 

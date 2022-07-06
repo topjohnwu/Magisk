@@ -1,6 +1,10 @@
+#![feature(format_args_nl)]
+
 pub use logging::*;
+pub use misc::*;
 
 mod logging;
+mod misc;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -16,7 +20,7 @@ pub mod ffi {
     }
 }
 
-#[cxx::bridge(namespace = "rs::logging")]
+#[cxx::bridge(namespace = "rust")]
 pub mod ffi2 {
     extern "Rust" {
         fn cmdline_logging();

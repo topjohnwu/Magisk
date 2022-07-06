@@ -118,10 +118,8 @@ static bool check_key_combo() {
 }
 
 static FILE *kmsg;
-static char kmsg_buf[4096];
-static void vprintk(const char *fmt, va_list ap) {
-    vsnprintf(kmsg_buf + 12, sizeof(kmsg_buf) - 12, fmt, ap);
-    fprintf(kmsg, "%s", kmsg_buf);
+extern "C" void klog_write(const char *msg, int len) {
+    fprintf(kmsg, "%.*s", len, msg);
 }
 void setup_klog() {
     // Shut down first 3 fds
@@ -149,9 +147,9 @@ void setup_klog() {
 
     kmsg = fdopen(fd, "w");
     setbuf(kmsg, nullptr);
-    log_cb.d = log_cb.i = log_cb.w = log_cb.e = vprintk;
+    rust::setup_klog();
+    forward_logging_to_rs();
     exit_on_error(false);
-    strcpy(kmsg_buf, "magiskinit: ");
 
     // Disable kmsg rate limiting
     if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {

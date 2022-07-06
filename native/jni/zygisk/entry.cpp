@@ -17,14 +17,9 @@ using namespace std;
 
 void *self_handle = nullptr;
 
-static void zygisk_log(int prio, const char *fmt, va_list ap);
-
-#define zlog(prio) [](auto fmt, auto ap){ zygisk_log(ANDROID_LOG_##prio, fmt, ap); }
 static void zygisk_logging() {
-    log_cb.d = zlog(DEBUG);
-    log_cb.i = zlog(INFO);
-    log_cb.w = zlog(WARN);
-    log_cb.e = zlog(ERROR);
+    rust::zygisk_logging();
+    forward_logging_to_rs();
     exit_on_error(false);
 }
 
@@ -114,7 +109,7 @@ static void zygisk_init() {
 
 // The following code runs in zygote/app process
 
-static void zygisk_log(int prio, const char *fmt, va_list ap) {
+extern "C" void zygisk_log_write(int prio, const char *msg, int len) {
     // If we don't have log pipe set, ask magiskd for it
     // This could happen multiple times in zygote because it was closed to prevent crashing
     if (logd_fd < 0) {
@@ -139,7 +134,7 @@ static void zygisk_log(int prio, const char *fmt, va_list ap) {
         sigaddset(&mask, SIGPIPE);
         pthread_sigmask(SIG_BLOCK, &mask, &orig_mask);
     }
-    magisk_log(prio, fmt, ap);
+    magisk_log_write(prio, msg, len);
     if (sig) {
         timespec ts{};
         sigtimedwait(&mask, nullptr, &ts);

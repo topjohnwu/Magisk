@@ -8,3 +8,4 @@ crate-type = ["staticlib"]
 
 [dependencies]
 base = { path = "../base" }
+cxx = "1.0.69"
