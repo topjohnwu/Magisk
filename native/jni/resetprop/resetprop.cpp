@@ -337,8 +337,7 @@ int resetprop_main(int argc, char *argv[]) {
         ++argv;
     }
 
-    if (!verbose)
-        log_cb.d = nop_log;
+    set_log_level_state(LogLevel::Debug, verbose);
 
     switch (argc) {
     case 0:

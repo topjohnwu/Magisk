@@ -149,18 +149,6 @@ void magisk_log_write(int prio, const char *msg, int len) {
     }
 }
 
-void magisk_logging() {
-    rust::magisk_logging();
-    forward_logging_to_rs();
-    exit_on_error(false);
-}
-
-void android_logging() {
-    rust::android_logging();
-    forward_logging_to_rs();
-    exit_on_error(false);
-}
-
 void start_log_daemon() {
     int fds[2];
     if (pipe2(fds, O_CLOEXEC) == 0) {

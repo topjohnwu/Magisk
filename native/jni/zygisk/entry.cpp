@@ -17,12 +17,6 @@ using namespace std;
 
 void *self_handle = nullptr;
 
-static void zygisk_logging() {
-    rust::zygisk_logging();
-    forward_logging_to_rs();
-    exit_on_error(false);
-}
-
 // Make sure /proc/self/environ is sanitized
 // Filter env and reset MM_ENV_END
 static void sanitize_environ() {

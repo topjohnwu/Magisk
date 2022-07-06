@@ -20,7 +20,6 @@ void unlock_blocks();
 void reboot();
 void start_log_daemon();
 void setup_logfile(bool reset);
-void magisk_logging();
 std::string read_certificate(int fd, int version = -1);
 
 // Module stuffs

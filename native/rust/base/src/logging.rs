@@ -1,64 +1,113 @@
 use std::fmt::Arguments;
+use std::io::{stderr, stdout, Write};
 use std::process::exit;
 
 use crate::ffi::LogLevel;
 
+// Ugly hack to avoid using enum
+#[allow(non_snake_case, non_upper_case_globals)]
+mod LogFlag {
+    pub const DisableError: u32 = 0x1;
+    pub const DisableWarn: u32 = 0x2;
+    pub const DisableInfo: u32 = 0x4;
+    pub const DisableDebug: u32 = 0x8;
+    pub const ExitOnError: u32 = 0x10;
+}
+
 // We don't need to care about thread safety, because all
 // logger changes will only happen on the main thread.
 pub static mut LOGGER: Logger = Logger {
-    d: nop_log,
-    i: nop_log,
-    w: nop_log,
-    e: nop_log,
+    fmt: |_, _| {},
+    write: |_, _| {},
+    flags: 0,
 };
-static mut EXIT_ON_ERROR: bool = false;
 
 #[derive(Copy, Clone)]
 pub struct Logger {
-    pub d: fn(args: Arguments),
-    pub i: fn(args: Arguments),
-    pub w: fn(args: Arguments),
-    pub e: fn(args: Arguments),
-}
-
-pub fn nop_log(_: Arguments) {}
-
-pub fn log_with_rs(level: LogLevel, msg: &str) {
-    log_impl(level, format_args!("{}", msg));
+    pub fmt: fn(level: LogLevel, args: Arguments),
+    pub write: fn(level: LogLevel, msg: &[u8]),
+    pub flags: u32,
 }
 
 pub fn exit_on_error(b: bool) {
-    unsafe { EXIT_ON_ERROR = b; }
+    unsafe {
+        if b {
+            LOGGER.flags |= LogFlag::ExitOnError;
+        } else {
+            LOGGER.flags &= !LogFlag::ExitOnError;
+        }
+    }
 }
 
-pub fn cmdline_logging() {
-    fn print(args: Arguments) { print!("{}", args); }
-    fn eprint(args: Arguments) { eprint!("{}", args); }
+impl LogLevel {
+    fn to_disable_flag(&self) -> u32 {
+        match *self {
+            LogLevel::Error => LogFlag::DisableError,
+            LogLevel::Warn => LogFlag::DisableWarn,
+            LogLevel::Info => LogFlag::DisableInfo,
+            LogLevel::Debug => LogFlag::DisableDebug,
+            _ => 0
+        }
+    }
+}
 
-    let logger = Logger {
-        d: eprint,
-        i: print,
-        w: eprint,
-        e: eprint,
-    };
+pub fn set_log_level_state(level: LogLevel, enabled: bool) {
+    let flag = level.to_disable_flag();
     unsafe {
-        LOGGER = logger;
-        EXIT_ON_ERROR = true;
+        if enabled {
+            LOGGER.flags &= !flag
+        } else {
+            LOGGER.flags |= flag
+        }
+    }
+}
+
+pub fn log_with_rs(level: LogLevel, msg: &str) {
+    let logger = unsafe { LOGGER };
+    if (logger.flags & level.to_disable_flag()) != 0 {
+        return;
+    }
+    (logger.write)(level, msg.as_bytes());
+    if level == LogLevel::Error && (logger.flags & LogFlag::ExitOnError) != 0 {
+        exit(1);
     }
 }
 
 pub fn log_impl(level: LogLevel, args: Arguments) {
     let logger = unsafe { LOGGER };
-    let aoe = unsafe { EXIT_ON_ERROR };
-    match level {
-        LogLevel::Error => {
-            (logger.e)(args);
-            if aoe { exit(1); }
+    if (logger.flags & level.to_disable_flag()) != 0 {
+        return;
+    }
+    (logger.fmt)(level, args);
+    if level == LogLevel::Error && (logger.flags & LogFlag::ExitOnError) != 0 {
+        exit(1);
+    }
+}
+
+pub fn cmdline_logging() {
+    fn print(level: LogLevel, args: Arguments) {
+        if level == LogLevel::Info {
+            print!("{}", args);
+        } else {
+            eprint!("{}", args);
         }
-        LogLevel::Warn => (logger.w)(args),
-        LogLevel::Info => (logger.i)(args),
-        LogLevel::Debug => (logger.d)(args),
-        _ => ()
+    }
+
+    fn write(level: LogLevel, msg: &[u8]) {
+        if level == LogLevel::Info {
+            stdout().write_all(msg).ok();
+        } else {
+            stderr().write_all(msg).ok();
+        }
+    }
+
+    let logger = Logger {
+        fmt: print,
+        write,
+        flags: LogFlag::ExitOnError,
+    };
+    unsafe {
+        LOGGER = logger;
     }
 }
 

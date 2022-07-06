@@ -1,15 +1,16 @@
 use std::fmt::Arguments;
 use base::*;
+use base::ffi::LogLevel;
 
 extern "C" {
     fn klog_write(msg: *const u8, len: i32);
 }
 
 pub fn setup_klog() {
-    fn klog_impl(args: Arguments) {
-        const PREFIX: &[u8; 12] = b"magiskinit: ";
-        const PFX_LEN: usize = PREFIX.len();
+    const PREFIX: &[u8; 12] = b"magiskinit: ";
+    const PFX_LEN: usize = PREFIX.len();
 
+    fn klog_fmt(_: LogLevel, args: Arguments) {
         let mut buf: [u8; 4096] = [0; 4096];
         buf[..PFX_LEN].copy_from_slice(PREFIX);
         let len = fmt_to_buf(&mut buf[PFX_LEN..], args) + PFX_LEN;
@@ -18,11 +19,16 @@ pub fn setup_klog() {
         }
     }
 
+    fn klog_write_impl(_: LogLevel, msg: &[u8]) {
+        unsafe {
+            klog_write(msg.as_ptr(), msg.len() as i32);
+        }
+    }
+
     let logger = Logger {
-        d: klog_impl,
-        i: klog_impl,
-        w: klog_impl,
-        e: klog_impl,
+        fmt: klog_fmt,
+        write: klog_write_impl,
+        flags: 0,
     };
     exit_on_error(false);
     unsafe {

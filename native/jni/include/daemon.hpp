@@ -81,7 +81,6 @@ void exec_task(std::function<void()> &&task);
 
 // Logging
 extern std::atomic<int> logd_fd;
-void android_logging();
 extern "C" void magisk_log_write(int prio, const char *msg, int len);
 
 // Daemon handlers

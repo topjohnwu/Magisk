@@ -121,6 +121,15 @@ static FILE *kmsg;
 extern "C" void klog_write(const char *msg, int len) {
     fprintf(kmsg, "%.*s", len, msg);
 }
+
+static int klog_with_rs(LogLevel level, const char *fmt, va_list ap) {
+    char buf[4096];
+    strlcpy(buf, "magiskinit: ", sizeof(buf));
+    int len = vsnprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
+    log_with_rs(level, rust::Str(buf, len));
+    return len;
+}
+
 void setup_klog() {
     // Shut down first 3 fds
     int fd;
@@ -148,8 +157,7 @@ void setup_klog() {
     kmsg = fdopen(fd, "w");
     setbuf(kmsg, nullptr);
     rust::setup_klog();
-    forward_logging_to_rs();
-    exit_on_error(false);
+    cpp_logger = klog_with_rs;
 
     // Disable kmsg rate limiting
     if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {
