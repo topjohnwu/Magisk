@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
+    <string name="home_follow_title">Folge Sie uns</string>
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
     <string name="home_installed_version">Installiert</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">Modul ausgesetzt, weil %1$s aktiviert ist</string>
     <string name="suspend_text_zygisk">Modul ausgesetzt, weil %1$s nicht aktiviert ist</string>
     <string name="zygisk_module_unloaded">Zygisk-Modul aufgrund von Inkompatibilität nicht geladen</string>
+    <string name="module_empty">Kein Modul installiert</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Themen-Modus</string>
@@ -190,9 +192,12 @@
     <!--Notifications-->
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Fortschrittsmitteilungen</string>
+    <string name="updated_channel">Update abgeschlossen</string>
     <string name="download_complete">Download abgeschlossen</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="magisk_update_title">Magisk Update verfügbar!</string>
+    <string name="updated_title">Magisk aktualisiert</string>
+    <string name="updated_text">Tippen, um die App zu öffnen</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
@@ -225,6 +230,8 @@
     <string name="unsupport_nonroot_stub_msg">App kann im versteckten Zustand nicht weiter funktionieren, da Root verloren gegangen ist. Ursprüngliche APK bitte wiederherstellen.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
+    <string name="install_unknown_denied">Unbekannte Apps installieren erlauben, um diese Funktion zu aktivieren</string>
+
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
     <string name="add_shortcut_msg">Nachdem Sie diese App verstecken, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten Sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
