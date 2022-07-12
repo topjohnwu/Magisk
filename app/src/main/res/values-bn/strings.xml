@@ -228,7 +228,7 @@
     <string name="unsupport_other_su_msg">ম্যাজিস্ক থেকে নয় একটি \"su\" বাইনারি সনাক্ত করা হয়েছে।  অনুগ্রহ করে কোনো প্রতিযোগী রুট সমাধান সরান এবং/অথবা ম্যাজিস্ক পুনরায় ইনস্টল করুন।</string>
     <string name="unsupport_external_storage_msg">ম্যাজিস্ক বহিরাগত স্টোরেজ ইনস্টল করা হয়.  অনুগ্রহ করে অ্যাপটিকে অভ্যন্তরীণ সঞ্চয়স্থানে সরান৷</string>
     <string name="unsupport_nonroot_stub_msg">লুকানো ম্যাজিস্ক অ্যাপটি কাজ চালিয়ে যেতে পারে না কারণ রুট হারিয়ে গেছে।  অনুগ্রহ করে আসল APK পুনরুদ্ধার করুন।</string>
-    <string name="unsupport_nonroot_stub_title">@স্ট্রিং/সেটিংস_অ্যাপ_শিরোনাম_পুনরুদ্ধার করুন</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">এই কার্যকারিতা সক্ষম করতে স্টোরেজ অনুমতি দিন</string>
     <string name="install_unknown_denied">এই কার্যকারিতা সক্ষম করতে "অজানা অ্যাপগুলি ইনস্টল করুন" এর অনুমতি দিন</string>
     <string name="add_shortcut_title">হোম স্ক্রিনে শর্টকাট যোগ করুন</string>
