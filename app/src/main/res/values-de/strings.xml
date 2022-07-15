@@ -22,7 +22,7 @@
 
     <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
-    <string name="home_follow_title">Folge Sie uns</string>
+    <string name="home_follow_title">Folgen Sie uns</string>
     <string name="home_item_source">Quelle</string>
     <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
     <string name="home_installed_version">Installiert</string>
