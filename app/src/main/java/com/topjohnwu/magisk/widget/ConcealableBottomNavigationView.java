@@ -54,8 +54,8 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
         toHidden.setDuration(175);
         toHidden.setInterpolator(new FastOutLinearInInterpolator());
         Animator toUnhidden = ObjectAnimator.ofFloat(this, "translationY", 0);
-        toHidden.setDuration(225);
-        toHidden.setInterpolator(new FastOutLinearInInterpolator());
+        toUnhidden.setDuration(225);
+        toUnhidden.setInterpolator(new FastOutLinearInInterpolator());
 
         StateListAnimator animator = new StateListAnimator();
 
