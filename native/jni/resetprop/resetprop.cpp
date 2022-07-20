@@ -240,7 +240,6 @@ struct resetprop : public sysprop {
 static sysprop_stub *get_impl() {
     static sysprop_stub *impl = nullptr;
     if (impl == nullptr) {
-        use_pb = access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0;
 #ifdef APPLET_STUB_MAIN
         if (__system_properties_init()) {
             LOGE("resetprop: __system_properties_init error\n");

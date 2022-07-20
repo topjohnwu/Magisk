@@ -16,8 +16,6 @@ struct prop_cb {
     }
 };
 
-extern bool use_pb;
-
 using prop_list = std::map<std::string, std::string>;
 
 struct prop_collector : prop_cb {
