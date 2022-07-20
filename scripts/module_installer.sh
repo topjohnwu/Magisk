@@ -3,6 +3,7 @@
 #################
 # Initialization
 #################
+ 
 
 umask 022
 
@@ -16,12 +17,14 @@ require_new_magisk() {
   exit 1
 }
 
+
 #########################
 # Load util_functions.sh
 #########################
 
 OUTFD=$2
 ZIPFILE=$3
+
 
 mount /data 2>/dev/null
 
