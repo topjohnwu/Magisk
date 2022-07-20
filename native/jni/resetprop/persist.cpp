@@ -75,8 +75,6 @@ PB_BIND(PersistentProperties_PersistentPropertyRecord, PersistentProperties_Pers
  * End of auto generated code
  * ***************************/
 
-bool use_pb = false;
-
 static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
     string &name = *static_cast<string *>(*arg);
     name.resize(stream->bytes_left);
@@ -154,8 +152,18 @@ static bool file_getprop(const char *name, char *value) {
     return value[0] != '\0';
 }
 
+static bool check_pb() {
+    static bool checked = false;
+    static bool use_pb = false;
+    if (!checked) {
+        checked = true;
+        use_pb = access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0;
+    }
+    return use_pb;
+}
+
 void persist_getprops(prop_cb *prop_cb) {
-    if (use_pb) {
+    if (check_pb()) {
         pb_getprop(prop_cb);
     } else {
         auto dir = open_dir(PERSISTENT_PROPERTY_DIR);
@@ -180,7 +188,7 @@ private:
 };
 
 string persist_getprop(const char *name) {
-    if (use_pb) {
+    if (check_pb()) {
         auto prop = match_prop_name(name);
         pb_getprop(&prop);
         if (prop.value[0]) {
@@ -199,7 +207,7 @@ string persist_getprop(const char *name) {
 }
 
 bool persist_deleteprop(const char *name) {
-    if (use_pb) {
+    if (check_pb()) {
         prop_list list;
         prop_collector collector(list);
         persist_getprops(&collector);
