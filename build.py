@@ -425,7 +425,7 @@ def cleanup(args):
 
     if 'java' in args.target:
         header('* Cleaning java')
-        execv([gradlew, 'clean'])
+        execv([gradlew, 'app:clean', 'app:shared:clean', 'stub:clean'])
 
 
 def setup_ndk(args):
