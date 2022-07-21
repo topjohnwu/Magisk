@@ -153,12 +153,7 @@ static bool file_getprop(const char *name, char *value) {
 }
 
 static bool check_pb() {
-    static bool checked = false;
-    static bool use_pb = false;
-    if (!checked) {
-        checked = true;
-        use_pb = access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0;
-    }
+    static bool use_pb = access(PERSISTENT_PROPERTY_DIR "/persistent_properties", R_OK) == 0;
     return use_pb;
 }
 
