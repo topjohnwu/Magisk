@@ -3,7 +3,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support emulator ABI: x86_64 and arm64
+# Support emulator ABI: ALL
 # Support API level: 23 - 31 (21 and 22 images do not have SELinux)
 #
 # With an emulator booted and accessible via ADB, usage:
@@ -135,7 +135,11 @@ cp -af ./magiskboot $MAGISKBIN/magiskboot
 cp -af ./magiskinit $MAGISKBIN/magiskinit
 cp -af ./busybox $MAGISKBIN/busybox
 
-ln -s ./magisk64 $MAGISKTMP/magisk
+if [ "$IS64BIT" = "true" ]; then
+  ln -s ./magisk64 $MAGISKTMP/magisk
+else
+  ln -s ./magisk32 $MAGISKTMP/magisk
+fi
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
