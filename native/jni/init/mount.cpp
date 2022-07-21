@@ -202,7 +202,15 @@ persist:
 success:
     // Create symlinks so we don't need to go through this logic again
     strcpy(p, "/sepolicy.rules");
-    xsymlink(custom_rules_dir.data(), path);
+    if (char *rel = strstr(custom_rules_dir.data(), MIRRDIR)) {
+        // Create symlink with relative path
+        char s[128];
+        s[0] = '.';
+        strlcpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
+        xsymlink(s, path);
+    } else {
+        xsymlink(custom_rules_dir.data(), path);
+    }
 }
 
 bool LegacySARInit::mount_system_root() {
