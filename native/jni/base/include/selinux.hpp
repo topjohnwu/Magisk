@@ -40,3 +40,4 @@ bool selinux_enabled();
 void enable_selinux();
 void restorecon();
 void restore_tmpcon();
+void restore_databincon();
