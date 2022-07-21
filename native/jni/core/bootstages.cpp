@@ -152,6 +152,8 @@ static bool magisk_env() {
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
 
+    restore_databincon();
+
     if (access(DATABIN "/busybox", X_OK))
         return false;
 

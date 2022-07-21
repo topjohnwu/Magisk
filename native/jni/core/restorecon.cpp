@@ -74,6 +74,9 @@ void restorecon() {
     close(fd);
     lsetfilecon(MODULEROOT, SYSTEM_CON);
     restore_syscon(xopen(MODULEROOT, O_RDONLY | O_CLOEXEC));
+}
+
+void restore_databincon() {
     restore_magiskcon(xopen(DATABIN, O_RDONLY | O_CLOEXEC));
 }
 
