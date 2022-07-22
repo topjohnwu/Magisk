@@ -522,6 +522,10 @@ public:
     explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
 
     void mount() override {
+        const string src = MAGISKTMP + "/" + name();
+        if (access(src.data(), F_OK))
+            return;
+
         const string &dir_name = parent()->node_path();
         if (name() == "magisk") {
             for (int i = 0; applet_names[i]; ++i) {
@@ -534,7 +538,7 @@ public:
             VLOGD("create", "./magiskpolicy", dest.data());
             xsymlink("./magiskpolicy", dest.data());
         }
-        create_and_mount(MAGISKTMP + "/" + name());
+        create_and_mount(src);
     }
 };
 
@@ -624,7 +628,7 @@ void magic_mount() {
     if (!system->is_empty()) {
         // Handle special read-only partitions
         for (const char *part : { "/vendor", "/product", "/system_ext" }) {
-            struct stat st;
+            struct stat st{};
             if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
                 if (auto old = system->extract(part + 1)) {
                     auto new_node = new root_node(old);
