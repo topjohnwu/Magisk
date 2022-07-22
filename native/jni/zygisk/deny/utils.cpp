@@ -104,27 +104,39 @@ static void crawl_procfs(const F &fn) {
     }
 }
 
-template <bool str_op(string_view, string_view)>
-static bool proc_name_match(int pid, const char *name) {
+static inline bool str_eql(string_view a, string_view b) { return a == b; }
+
+template<bool str_op(string_view, string_view) = &str_eql>
+static bool proc_name_match(int pid, string_view name) {
     char buf[4019];
     sprintf(buf, "/proc/%d/cmdline", pid);
     if (auto fp = open_file(buf, "re")) {
         fgets(buf, sizeof(buf), fp.get());
         if (str_op(buf, name)) {
-            LOGD("denylist: kill PID=[%d] (%s)\n", pid, buf);
             return true;
         }
     }
     return false;
 }
 
-static inline bool str_eql(string_view a, string_view b) { return a == b; }
+static bool proc_context_match(int pid, string_view context) {
+    char buf[PATH_MAX];
+    sprintf(buf, "/proc/%d/attr/current", pid);
+    if (auto fp = open_file(buf, "re")) {
+        fgets(buf, sizeof(buf), fp.get());
+        if (str_eql(buf, context)) {
+            return true;
+        }
+    }
+    return false;
+}
 
-template<bool str_op(string_view, string_view) = &str_eql>
+template<bool matcher(int, string_view) = &proc_name_match>
 static void kill_process(const char *name, bool multi = false) {
     crawl_procfs([=](int pid) -> bool {
-        if (proc_name_match<str_op>(pid, name)) {
+        if (matcher(pid, name)) {
             kill(pid, SIGKILL);
+            LOGD("denylist: kill PID=[%d] (%s)\n", pid, name);
             return multi;
         }
         return true;
@@ -176,7 +188,7 @@ static auto add_hide_set(const char *pkg, const char *proc) {
         return p;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
-        kill_process<&str_starts>(proc, true);
+        kill_process<&proc_name_match<str_starts>>(proc, true);
     } else {
         kill_process(proc);
     }
@@ -312,13 +324,6 @@ void ls_list(int client) {
     close(client);
 }
 
-static bool str_ends_safe(string_view s, string_view ss) {
-    // Never kill webview zygote
-    if (s == "webview_zygote")
-        return false;
-    return str_ends(s, ss);
-}
-
 static void update_deny_config() {
     char sql[64];
     sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
@@ -354,7 +359,7 @@ int enable_deny() {
         if (SDK_INT >= 29 && zygisk_enabled) {
             kill_process("usap32", true);
             kill_process("usap64", true);
-            kill_process<&str_ends_safe>("_zygote", true);
+            kill_process<&proc_context_match>("app_zygote", true);
         }
     }
 
