@@ -46,7 +46,7 @@ impl LogLevel {
             LogLevel::Warn => LogFlag::DisableWarn,
             LogLevel::Info => LogFlag::DisableInfo,
             LogLevel::Debug => LogFlag::DisableDebug,
-            _ => 0
+            _ => 0,
         }
     }
 }
@@ -135,5 +135,5 @@ macro_rules! debug {
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! debug {
-    ($($arg:tt)+) => ()
+    ($($arg:tt)+) => {};
 }
