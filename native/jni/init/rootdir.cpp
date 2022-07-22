@@ -155,16 +155,18 @@ static void extract_files(bool sbin) {
     const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
     const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
 
-    auto magisk = mmap_data(m32);
-    unlink(m32);
-    int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
-    unxz(fd, magisk.buf, magisk.sz);
-    close(fd);
-    patch_socket_name("magisk32");
+    if (access(m32, F_OK) == 0) {
+        auto magisk = mmap_data(m32);
+        unlink(m32);
+        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
+        unxz(fd, magisk.buf, magisk.sz);
+        close(fd);
+        patch_socket_name("magisk32");
+    }
     if (access(m64, F_OK) == 0) {
-        magisk = mmap_data(m64);
+        auto magisk = mmap_data(m64);
         unlink(m64);
-        fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
+        int fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
         patch_socket_name("magisk64");
