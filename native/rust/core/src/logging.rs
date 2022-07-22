@@ -1,6 +1,6 @@
-use std::fmt::Arguments;
-use base::*;
 use base::ffi::LogLevel;
+use base::*;
+use std::fmt::Arguments;
 
 #[allow(dead_code, non_camel_case_types)]
 #[repr(i32)]
@@ -28,7 +28,7 @@ fn level_to_prio(level: LogLevel) -> i32 {
         LogLevel::Warn => ALogPriority::ANDROID_LOG_WARN as i32,
         LogLevel::Info => ALogPriority::ANDROID_LOG_INFO as i32,
         LogLevel::Debug => ALogPriority::ANDROID_LOG_DEBUG as i32,
-        _ => 0
+        _ => 0,
     }
 }
 

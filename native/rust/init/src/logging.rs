@@ -1,6 +1,6 @@
-use std::fmt::Arguments;
-use base::*;
 use base::ffi::LogLevel;
+use base::*;
+use std::fmt::Arguments;
 
 extern "C" {
     fn klog_write(msg: *const u8, len: i32);
