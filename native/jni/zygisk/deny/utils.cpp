@@ -124,7 +124,7 @@ static bool proc_context_match(int pid, string_view context) {
     sprintf(buf, "/proc/%d/attr/current", pid);
     if (auto fp = open_file(buf, "re")) {
         fgets(buf, sizeof(buf), fp.get());
-        if (str_eql(buf, context)) {
+        if (str_starts(buf, context)) {
             return true;
         }
     }
@@ -359,7 +359,7 @@ int enable_deny() {
         if (SDK_INT >= 29 && zygisk_enabled) {
             kill_process("usap32", true);
             kill_process("usap64", true);
-            kill_process<&proc_context_match>("app_zygote", true);
+            kill_process<&proc_context_match>("u:r:app_zygote:s0", true);
         }
     }
 
