@@ -23,4 +23,4 @@ panic = "abort"
 strip = true
 
 [patch.crates-io]
-cxx = { path = "../jni/external/cxx-rs" }
+cxx = { path = "../src/external/cxx-rs" }

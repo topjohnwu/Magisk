@@ -211,6 +211,7 @@ def binary_dump(src, var_name):
 
 def run_ndk_build(flags):
     os.chdir('native')
+    flags = 'NDK_PROJECT_PATH=. NDK_APPLICATION_MK=src/Application.mk ' + flags
     proc = system(f'{ndk_build} {flags} -j{cpu_count}')
     if proc.returncode != 0:
         error('Build binary failed!')
@@ -223,7 +224,7 @@ def run_ndk_build(flags):
 
 
 def run_cargo_build(args):
-    os.chdir(op.join('native', 'rust'))
+    os.chdir(op.join('native', 'src'))
     targets = set(args.target) & set(rust_targets)
 
     env = os.environ.copy()
@@ -242,9 +243,9 @@ def run_cargo_build(args):
     cxxbridge = op.join(local_cargo_root, 'bin', 'cxxbridge' + EXE_EXT)
     mkdir(native_gen_path)
     for p in ['base', 'boot', 'core', 'init', 'sepolicy']:
-        text = cmd_out([cxxbridge, op.join(p, 'src', 'lib.rs')])
+        text = cmd_out([cxxbridge, op.join(p, 'lib.rs')])
         write_if_diff(op.join(native_gen_path, f'{p}-rs.cpp'), text)
-        text = cmd_out([cxxbridge, '--header', op.join(p, 'src', 'lib.rs')])
+        text = cmd_out([cxxbridge, '--header', op.join(p, 'lib.rs')])
         write_if_diff(op.join(native_gen_path, f'{p}-rs.hpp'), text)
 
     # Start building the actual build commands

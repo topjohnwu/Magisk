@@ -1,3 +1,4 @@
+APP_BUILD_SCRIPT := src/Android.mk
 APP_ABI          := armeabi-v7a arm64-v8a x86 x86_64
 APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
 APP_LDFLAGS      := -flto
@@ -10,7 +11,7 @@ APP_STRIP_MODE   := --strip-all
 # Busybox should use stock libc.a
 ifdef B_BB
 APP_PLATFORM     := android-24
-APP_LDFLAGS      += -T jni/lto_fix.lds
+APP_LDFLAGS      += -T src/lto_fix.lds
 ifeq ($(OS),Windows_NT)
 APP_SHORT_COMMANDS := true
 endif

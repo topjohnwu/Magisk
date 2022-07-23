@@ -153,7 +153,7 @@ include $(BUILD_EXECUTABLE)
 endif
 
 ifdef B_TEST
-ifneq (,$(wildcard jni/test.cpp))
+ifneq (,$(wildcard src/test.cpp))
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := test
@@ -176,7 +176,7 @@ LOCAL_MODULE := libpolicy
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libsepol
-LOCAL_C_INCLUDES := jni/sepolicy/include
+LOCAL_C_INCLUDES := src/sepolicy/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
     sepolicy/api.cpp \
@@ -186,12 +186,12 @@ LOCAL_SRC_FILES := \
     sepolicy/statement.cpp
 include $(BUILD_STATIC_LIBRARY)
 
-include jni/Android-rs.mk
-include jni/base/Android.mk
-include jni/external/Android.mk
+include src/Android-rs.mk
+include src/base/Android.mk
+include src/external/Android.mk
 
 ifdef B_BB
 
-include jni/external/busybox/Android.mk
+include src/external/busybox/Android.mk
 
 endif

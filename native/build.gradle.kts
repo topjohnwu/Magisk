@@ -9,8 +9,12 @@ android {
 
     externalNativeBuild {
         ndkBuild {
-            path("jni/Android.mk")
+            path("src/Android.mk")
         }
+    }
+
+    sourceSets.getByName("main") {
+        manifest.srcFile("src/AndroidManifest.xml")
     }
 
     defaultConfig {
