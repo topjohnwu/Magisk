@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">A telepítés befejezéséhez frissíts a teljes Magiskre. Letöltés és telepítés?</string>
+    <string name="no_internet_msg">Csatlakozz az internethez! Frissíteni kell a teljes Magiskre.</string>
+    <string name="dling">Letöltés</string>
+    <string name="relaunch_app">Kérjük manuálisan indítsd újra az alkalmazást</string>
+</resources>
