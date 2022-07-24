@@ -231,10 +231,11 @@ def run_cargo_build(args):
     env['CARGO_BUILD_RUSTC'] = op.join(rust_bin, 'rustc' + EXE_EXT)
 
     # Install cxxbridge and generate C++ bindings
-    native_out = op.join('..', '..', 'native', 'out')
+    native_out = op.join('..', 'out')
+    cxx_src = op.join('external', 'cxx-rs', 'gen', 'cmd')
     local_cargo_root = op.join(native_out, '.cargo')
     mkdir_p(local_cargo_root)
-    cmds = [cargo, 'install', '--root', local_cargo_root, 'cxxbridge-cmd']
+    cmds = [cargo, 'install', '--root', local_cargo_root, '--path', cxx_src]
     if not args.verbose:
         cmds.append('-q')
     proc = execv(cmds, env)
