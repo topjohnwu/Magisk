@@ -205,6 +205,25 @@ void magisk_cpio::backup(const char *orig) {
             string name = ".backup/" + lhs->first;
             fprintf(stderr, "[%s] -> [%s]\n", lhs->first.data(), name.data());
             auto e = lhs->second.release();
+
+            // Ensure parent directory exists in .backup
+            string full_path;
+            auto split = split_ro(lhs->first, "/");
+            // Exclude the name of the file itself
+            split.pop_back();
+            for (auto dir : split) {
+                if (!full_path.empty())
+                    full_path += "/";
+                full_path += dir;
+                string bak = ".backup/" + full_path;
+                if (backups.find(bak) == backups.end()) {
+                    // Parent directory does not exist
+                    fprintf(stderr, "Backup parent entry: [%s] -> [%s]\n",
+                            full_path.data(), bak.data());
+                    auto origin = o.entries.find(full_path);
+                    backups.emplace(bak, origin->second.release());
+                }
+            }
             backups.emplace(name, e);
         }
 
