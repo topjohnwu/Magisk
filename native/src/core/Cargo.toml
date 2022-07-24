@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 base = { path = "../base" }
-cxx = "1.0.69"
+cxx = { path = "../external/cxx-rs" }

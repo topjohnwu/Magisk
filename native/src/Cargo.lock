@@ -17,7 +17,7 @@ checksum = "2fff2a6927b3bb87f9595d67196a70493f627687a71d87a0d692242c33f58c11"
 
 [[package]]
 name = "cxx"
-version = "1.0.69"
+version = "1.0.72"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -26,11 +26,11 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.69"
+version = "1.0.72"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.69"
+version = "1.0.72"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -98,6 +98,6 @@ dependencies = [
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.1"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bd2fe26506023ed7b5e1e315add59d6f584c621d037f9368fea9cfb988f368c"
+checksum = "15c61ba63f9235225a22310255a29b806b907c9b8c964bcbd0a2c70f3f2deea7"

@@ -1,12 +1,6 @@
 [workspace]
-
-members = [
-    "base",
-    "boot",
-    "core",
-    "init",
-    "sepolicy",
-]
+exclude = ["external"]
+members = ["base", "boot", "core", "init", "sepolicy"]
 
 [profile.dev]
 opt-level = "z"
@@ -23,4 +17,4 @@ panic = "abort"
 strip = true
 
 [patch.crates-io]
-cxx = { path = "../src/external/cxx-rs" }
+cxx = { path = "external/cxx-rs" }

@@ -7,4 +7,4 @@ edition = "2021"
 path = "lib.rs"
 
 [dependencies]
-cxx = "1.0.69"
+cxx = { path = "../external/cxx-rs" }
