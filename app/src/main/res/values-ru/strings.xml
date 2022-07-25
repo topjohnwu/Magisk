@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Модули</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Суперпользователь</string>
     <string name="logs">Лог</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
