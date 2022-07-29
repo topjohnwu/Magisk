@@ -39,10 +39,8 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     private fun createItems(): List<BaseSettingsItem> {
         val context = AppContext
         val hidden = context.packageName != BuildConfig.APPLICATION_ID
-
         // Customization
         val list = mutableListOf(
-            Customization,
             Theme, Language
         )
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
@@ -96,7 +94,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
             Biometrics -> authenticate(andThen)
-            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+//            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             SystemlessHosts -> createHosts()
             Hide, Restore -> withInstallPermission(andThen)

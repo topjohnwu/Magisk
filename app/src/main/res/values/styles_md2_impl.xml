@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="WidgetFoundation.Appbar" parent="Widget.MaterialComponents.AppBarLayout.Surface" />
+    <style name="WidgetFoundation.Appbar" parent="Widget.Material3.AppBarLayout" />
 
-    <style name="WidgetFoundation.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="titleTextAppearance">@style/AppearanceFoundation.Title</item>
-        <item name="titleTextColor">?colorOnSurface</item>
-        <item name="subtitleTextAppearance">@style/AppearanceFoundation.Caption</item>
-        <item name="subtitleTextColor">?colorOnSurfaceVariant</item>
-        <item name="android:background">@android:color/transparent</item>
+    <style name="WidgetFoundation.Toolbar" parent="Widget.Material3.Toolbar.Surface">
         <item name="contentInsetStartWithNavigation">0dp</item>
-        <item name="android:layout_height">?actionBarSize</item>
-        <item name="android:theme">@style/ThemeOverlay.MaterialComponents.ActionBar</item>
+        <item name="android:layout_height">?android:actionBarSize</item>
+        <item name="android:theme">@style/ThemeOverlay.Material3.ActionBar</item>
     </style>
 
 
-    <style name="WidgetFoundation.Card" parent="Widget.MaterialComponents.CardView">
+    <style name="WidgetFoundation.Card" parent="Widget.Material3.CardView.Filled">
         <item name="android:focusable">auto</item>
-        <item name="cardBackgroundColor">?colorSurfaceVariant</item>
-        <item name="cardCornerRadius">@dimen/l_50</item>
+        <item name="cardCornerRadius">@dimen/card_corner</item>
         <item name="cardElevation">0dp</item>
         <item name="cardPreventCornerOverlap">false</item>
     </style>
 
-    <style name="WidgetFoundation.Card.Primary">
-        <item name="cardBackgroundColor">?colorPrimary</item>
-    </style>
-
     <style name="WidgetFoundation.Card.Elevated">
-        <item name="cardBackgroundColor">?colorSurfaceSurfaceVariant</item>
-        <item name="cardCornerRadius">@dimen/l_50</item>
-        <item name="cardElevation">@dimen/l_125</item>
+        <item name="cardCornerRadius">@dimen/card_corner</item>
+        <item name="cardElevation">@dimen/l1</item>
     </style>
 
+    <style name="WidgetFoundation.Switch" parent="@android:style/Widget.Material.CompoundButton.Switch">
+        <item name="track">@drawable/switch_track</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
+        <item name="showText">false</item>
+    </style>
 
-    <style name="WidgetFoundation.Button" parent="Widget.MaterialComponents.Button">
+    <style name="WidgetFoundation.Button" parent="Widget.Material3.Button">
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/product_sans_regular</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
     </style>
 
-    <style name="WidgetFoundation.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="WidgetFoundation.Button.Error">
+        <item name="backgroundTint">?colorError</item>
+        <item name="iconTint">?colorOnError</item>
+        <item name="android:textColor">?colorOnError</item>
+    </style>
+
+    <style name="WidgetFoundation.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textStyle">bold</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
@@ -48,17 +49,11 @@
         <item name="android:textColor">?colorPrimary</item>
     </style>
 
-    <style name="WidgetFoundation.Button.Outlined.Error">
-        <item name="strokeColor">@color/color_error_transient</item>
-        <item name="rippleColor">@color/color_error_transient</item>
-        <item name="android:textColor">@color/color_error_transient</item>
-        <item name="iconTint">@color/color_error_transient</item>
-    </style>
-
-    <style name="WidgetFoundation.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="WidgetFoundation.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textStyle">bold</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
+        <item name="tint">#BD1C1C</item>
     </style>
 
     <style name="WidgetFoundation.Button.Text.OnPrimary">
@@ -74,8 +69,8 @@
     </style>
 
     <style name="WidgetFoundation.Image.Big">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">55dp</item>
+        <item name="android:layout_height">55dp</item>
     </style>
 
     <style name="WidgetFoundation.Image.Small">
@@ -86,16 +81,6 @@
 
     <style name="WidgetFoundation.Icon" parent="WidgetFoundation.Image.Big">
         <item name="android:padding">@dimen/l_75</item>
-        <item name="android:background">?selectableItemBackgroundBorderless</item>
-        <item name="tint">@color/color_text_transient</item>
-    </style>
-
-    <style name="WidgetFoundation.Icon.Primary">
-        <item name="tint">@color/color_primary_transient</item>
-    </style>
-
-    <style name="WidgetFoundation.Icon.OnPrimary">
-        <item name="tint">@color/color_on_primary_transient</item>
     </style>
 
     <style name="WidgetFoundation.Checkbox" parent="Widget.AppCompat.CompoundButton.CheckBox">

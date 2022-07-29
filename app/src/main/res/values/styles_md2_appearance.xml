@@ -16,6 +16,7 @@
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/product_sans_regular</item>
     </style>
 
     <style name="AppearanceFoundation.Title.OnPrimary">
@@ -27,6 +28,7 @@
     <!--region Body-->
     <style name="AppearanceFoundation.Body" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">@font/product_sans_light</item>
     </style>
 
     <!--endregion-->
@@ -34,7 +36,9 @@
     <!--region Caption-->
     <style name="AppearanceFoundation.Caption" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="fontFamily">@font/product_sans_light</item>
     </style>
+
 
     <style name="AppearanceFoundation.Caption.Variant">
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
@@ -54,10 +58,16 @@
     <style name="AppearanceFoundation.Tiny" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">11sp</item>
+        <item name="fontFamily">@font/product_sans_light</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Bold">
         <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/product_sans_regular</item>
+    </style>
+
+    <style name="AppearanceFoundation.Tiny.Secondary">
+        <item name="android:textColor">?colorSecondary</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Variant">

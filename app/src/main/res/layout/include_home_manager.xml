@@ -15,11 +15,6 @@
 
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:focusable="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -28,30 +23,20 @@
             android:paddingTop="@dimen/l_50"
             android:paddingEnd="@dimen/l1"
             android:paddingBottom="@dimen/l_50"
-            tools:layout_gravity="center">
-
-            <ImageView
-                android:id="@+id/home_manager_icon"
-                style="@style/WidgetFoundation.Icon.Primary"
-                android:padding="@dimen/l_50"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_manager" />
+            tools:layout_gravity="center"
+            android:focusable="false">
 
             <TextView
                 android:id="@+id/home_manager_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
                 android:text="@string/home_app_title"
                 android:textAppearance="@style/AppearanceFoundation.Title"
-                android:textColor="?colorPrimary"
                 android:maxLines="1"
                 android:ellipsize="end"
-                app:layout_constraintBottom_toBottomOf="@+id/home_manager_icon"
-                app:layout_constraintEnd_toStartOf="@+id/home_manager_button"
-                app:layout_constraintStart_toEndOf="@+id/home_manager_icon"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/home_manager_button"
+                app:layout_constraintStart_toStartOf="parent"
                 tools:text="@string/home_app_title" />
 
             <FrameLayout
@@ -92,7 +77,7 @@
                 android:layout_height="wrap_content"
                 app:barrierDirection="bottom"
                 app:referencedIds="@{viewModel.appTitleBarrierIds}"
-                tools:constraint_referenced_ids="home_manager_icon,home_manager_title,home_manager_button" />
+                tools:constraint_referenced_ids="home_manager_title,home_manager_button" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -178,7 +163,5 @@
             </HorizontalScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
 
 </layout>

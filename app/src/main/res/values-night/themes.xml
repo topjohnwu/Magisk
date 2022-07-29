@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.Foundation.Dark" parent="Theme.Material3.DynamicColors.Dark">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="switchStyle">@style/WidgetFoundation.Switch</item>
+        <item name="android:fontFamily">@font/product_sans_light</item>
+    </style>
+
+    <style name="Theme.Foundation" parent="Base.Theme.Foundation.Dark" />
+
+</resources>

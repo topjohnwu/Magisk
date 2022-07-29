@@ -21,7 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="@{item.enabled ? 1f : .5f}"
-            android:onClick="@{() -> item.toggleExpand()}">
+            android:onClick="@{() -> item.toggleExpand()}"
+            android:clickable="@{item.enabled}"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -100,7 +102,6 @@
                     gone="@{!item.isExpanded}"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="?colorSurfaceVariant"
                     tools:visibility="visible">
 
                     <Button
@@ -124,8 +125,7 @@
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="@dimen/l_50"
-                        android:layout_marginBottom="@dimen/l_50"
-                        android:background="?colorSurfaceSurfaceVariant" />
+                        android:layout_marginBottom="@dimen/l_50" />
 
                     <Button
                         android:id="@+id/policy_log"
@@ -148,8 +148,7 @@
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="@dimen/l_50"
-                        android:layout_marginBottom="@dimen/l_50"
-                        android:background="?colorSurfaceSurfaceVariant" />
+                        android:layout_marginBottom="@dimen/l_50" />
 
                     <Button
                         android:id="@+id/policy_delete"

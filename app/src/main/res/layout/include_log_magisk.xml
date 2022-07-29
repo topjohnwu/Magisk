@@ -33,7 +33,8 @@
                     android:paddingTop="@dimen/internal_action_bar_size"
                     android:paddingBottom="128dp"
                     android:text="@{viewModel.consoleText}"
-                    android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:textColor="?attr/colorOnSurface"
                     app:layout_fitsSystemWindowsInsets="top|bottom"
                     tools:text="@tools:sample/lorem/random" />
 

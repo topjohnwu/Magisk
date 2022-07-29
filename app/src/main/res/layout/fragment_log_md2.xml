@@ -29,11 +29,9 @@
             android:layout_gravity="bottom|end"
             android:layout_marginStart="@dimen/l1"
             android:layout_marginEnd="@dimen/l1"
-            android:layout_marginBottom="72dp"
+            android:layout_marginBottom="60dp"
             app:layout_fitsSystemWindowsInsets="bottom"
-            app:backgroundTint="?colorSurfaceSurfaceVariant"
             app:srcCompat="@drawable/ic_folder_list"
-            app:tint="?colorPrimary"
             tools:layout_marginBottom="64dp" />
 
         <com.google.android.material.circularreveal.cardview.CircularRevealCardView

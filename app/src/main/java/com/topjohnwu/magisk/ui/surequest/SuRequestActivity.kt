@@ -14,7 +14,6 @@ import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.su.SuCallbackHandler
 import com.topjohnwu.magisk.core.su.SuCallbackHandler.REQUEST
 import com.topjohnwu.magisk.databinding.ActivityRequestBinding
-import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +31,7 @@ open class SuRequestActivity : UIActivity<ActivityRequestBinding>() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             window.setHideOverlayWindows(true)
         }
-        setTheme(Theme.selected.themeRes)
+        setTheme(R.style.Theme_Foundation)
         super.onCreate(savedInstanceState)
 
         if (intent.action == Intent.ACTION_VIEW) {

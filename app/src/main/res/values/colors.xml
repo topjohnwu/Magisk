@@ -5,4 +5,10 @@
     <color name="light">#e0e0e0</color>
     <color name="su_request_background">#e0e0e0</color>
     <color name="splash_background">@color/ic_launcher_background</color>
+    <color name="switch_state_on">@android:color/system_accent1_100</color>
+    <color name="switch_state_off">@android:color/system_accent2_100</color>
+    <color name="switch_thumb_disabled">@android:color/system_neutral2_100</color>
+    <color name="switch_thumb_off">@android:color/system_neutral2_300</color>
+    <color name="switch_track_on">@android:color/system_accent1_600</color>
+    <color name="switch_track_off">@color/color_switch_track_off</color>
 </resources>

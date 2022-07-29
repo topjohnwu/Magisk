@@ -14,15 +14,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="@dimen/l1"
-        android:paddingBottom="@dimen/l_50">
+        android:layout_marginStart="@dimen/l1"
+        android:paddingTop="@dimen/l1">
 
         <TextView
             gone="@{item.title.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{item.title}"
-            android:textAppearance="@style/AppearanceFoundation.Large.Secondary"
+            android:textAppearance="@style/AppearanceFoundation.Tiny.Secondary"
             android:textStyle="bold"
             tools:text="@tools:sample/lorem" />
 

@@ -45,19 +45,15 @@
                 android:textAllCaps="false"
                 tools:visibility="gone" />
 
-            <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card.Primary"
-                goneUnless="@{viewModel.noticeVisible}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:layout_marginBottom="@dimen/l1"
-                android:focusable="false">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    goneUnless="@{viewModel.noticeVisible}"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:layout_marginBottom="@dimen/l1"
+                    android:focusable="false">
 
                     <TextView
                         android:id="@+id/home_notice_content"
@@ -65,7 +61,6 @@
                         android:layout_height="wrap_content"
                         android:padding="@dimen/l1"
                         android:text="@string/home_notice_content"
-                        android:textAppearance="@style/AppearanceFoundation.Caption.OnPrimary"
                         app:layout_constraintEnd_toStartOf="@+id/home_notice_hide"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -78,13 +73,13 @@
                         android:onClick="@{() -> viewModel.hideNotice()}"
                         android:text="@string/hide"
                         android:textAllCaps="false"
+                        android:layout_marginEnd="10dp"
+                        android:backgroundTint="@android:color/transparent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
             <include
                 android:id="@+id/home_magisk_wrapper"
@@ -113,35 +108,30 @@
                 android:layout_height="@dimen/l1" />
 
             <Button
-                style="@style/WidgetFoundation.Button.Outlined.Error"
                 goneUnless="@{Info.env.isActive}"
+                style="@style/WidgetFoundation.Button.Error"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
+                android:layout_height="50dp"
+                android:layout_marginStart="@dimen/l2"
+                android:layout_marginEnd="@dimen/l2"
                 android:onClick="@{() -> viewModel.onDeletePressed()}"
                 android:text="@string/uninstall_magisk_title"
                 android:textAllCaps="false"
-                android:textSize="12sp"
-                app:cornerRadius="@dimen/r1"
+                android:textSize="20sp"
+                app:cornerRadius="10dp"
                 app:icon="@drawable/ic_delete_md2" />
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:focusable="false">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:paddingTop="@dimen/l1"
-                    android:paddingBottom="@dimen/l1">
+                    android:paddingBottom="@dimen/l1"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="@dimen/l1"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:layout_marginTop="@dimen/l1"
+                    android:focusable="false">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -186,21 +176,14 @@
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_margin="@dimen/l1"
-                android:focusable="false">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="@dimen/l1">
+                    android:paddingTop="@dimen/l1"
+                    android:layout_gravity="bottom"
+                    android:layout_margin="@dimen/l1"
+                    android:focusable="false">
 
                     <TextView
                         android:layout_width="match_parent"
@@ -242,9 +225,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l_50" />
 
-                </LinearLayout>
+                    <include
+                        item="@{DeveloperItem.Dng.INSTANCE}"
+                        layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50" />
 
-            </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
 
         </LinearLayout>
 

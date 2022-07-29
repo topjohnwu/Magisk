@@ -30,11 +30,11 @@ import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-// --- Customization
-
-object Customization : BaseSettingsItem.Section() {
-    override val title = R.string.settings_customization.asText()
-}
+//// --- Customization
+//
+//object Customization : BaseSettingsItem.Section() {
+//    override val title = R.string.settings_customization.asText()
+//}
 
 object Language : BaseSettingsItem.Selector() {
     override var value

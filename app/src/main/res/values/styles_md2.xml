@@ -4,7 +4,7 @@
     <style name="SplashTheme" parent="Theme.Splash" />
     <style name="StubSplashTheme" parent="Theme.Splash"/>
 
-    <style name="Foundation" parent="Theme.Foundation.Light" />
+    <style name="Foundation" parent="Theme.Foundation" />
 
     <!--region Do not remove-->
     <style name="Empty" />
@@ -13,7 +13,7 @@
 
     <!--endregion-->
 
-    <style name="Foundation.PopupMenu" parent="Widget.MaterialComponents.PopupMenu">
+    <style name="Foundation.PopupMenu" parent="Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu">
         <item name="android:itemTextAppearance">@style/AppearanceFoundation.Caption</item>
         <item name="android:textStyle">bold</item>
     </style>
