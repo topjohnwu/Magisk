@@ -237,7 +237,8 @@ static int add_list(const char *pkg, const char *proc) {
         auto p = add_hide_set(pkg, proc);
         if (!p.second)
             return DenyResponse::ITEM_EXIST;
-        update_pkg_uid(*p.first, false);
+        auto it = pkg_to_procs.find(pkg);
+        update_pkg_uid(it->first, false);
     }
 
     // Add to database
@@ -407,8 +408,15 @@ bool is_deny_target(int uid, string_view process) {
         if (it == app_id_to_pkgs.end())
             return false;
         for (const auto &pkg : it->second) {
-            if (pkg_to_procs.find(pkg)->second.count(process))
-                return true;
+            const auto &procs = pkg_to_procs.find(pkg);
+            if (procs == pkg_to_procs.end()) {
+                LOGE("is_deny_target[%d, %s]: package not found [%s]\n", app_id, process.data(), pkg.data());
+                continue;
+            } else {
+                if (procs->second.count(process)) {
+                    return true;
+                }
+            }
         }
     }
     return false;
