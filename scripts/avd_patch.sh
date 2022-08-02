@@ -3,8 +3,7 @@
 #   AVD MagiskInit Setup
 #####################################################################
 #
-# Support emulator ABI: x86_64 and arm64
-# Support API level: 23 - 31 (21 and 22 images do not have SELinux)
+# Support API level: 23 - 33 (21 and 22 images do not have SELinux)
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py avd_patch path/to/booted/avd-image/ramdisk.img
@@ -24,7 +23,7 @@
 # rootfs w/o early mount: API 23 - 25
 # rootfs with early mount: API 26 - 27
 # Legacy system-as-root: API 28
-# 2 stage init: API 29 - 31
+# 2 stage init: API 29 - 33
 #####################################################################
 
 if [ ! -f /system/build.prop ]; then
@@ -44,12 +43,12 @@ if [ -z "$FIRST_STAGE" ]; then
 fi
 
 # Extract files from APK
-unzip -oj app-debug.apk 'assets/util_functions.sh'
+unzip -oj magisk.apk 'assets/util_functions.sh'
 . ./util_functions.sh
 
 api_level_arch_detect
 
-unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
+unzip -oj magisk.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"

@@ -460,14 +460,17 @@ def setup_ndk(args):
 
 def setup_avd(args):
     if not args.skip:
-        args.release = False
         build_all(args)
 
     header('* Setting up emulator')
 
     abi = cmd_out([adb_path, 'shell', 'getprop', 'ro.product.cpu.abi'])
-    proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'out/app-debug.apk',
-           'scripts/avd_magisk.sh', '/data/local/tmp'])
+    proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'scripts/avd_magisk.sh', '/data/local/tmp'])
+    if proc.returncode != 0:
+        error('adb push failed!')
+
+    apk = 'out/app-release.apk' if args.release else 'out/app-debug.apk'
+    proc = execv([adb_path, 'push', apk, '/data/local/tmp/magisk.apk'])
     if proc.returncode != 0:
         error('adb push failed!')
 
@@ -501,10 +504,15 @@ def patch_avd_ramdisk(args):
             f.write(adv_ft)
 
     abi = cmd_out([adb_path, 'shell', 'getprop', 'ro.product.cpu.abi'])
-    proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'out/app-debug.apk',
-           'scripts/avd_patch.sh', '/data/local/tmp'])
+    proc = execv([adb_path, 'push', f'native/out/{abi}/busybox', 'scripts/avd_patch.sh', '/data/local/tmp'])
     if proc.returncode != 0:
         error('adb push failed!')
+
+    apk = 'out/app-release.apk' if args.release else 'out/app-debug.apk'
+    proc = execv([adb_path, 'push', apk, '/data/local/tmp/magisk.apk'])
+    if proc.returncode != 0:
+        error('adb push failed!')
+
     proc = execv([adb_path, 'push', backup, '/data/local/tmp/ramdisk.cpio.tmp'])
     if proc.returncode != 0:
         error('adb push failed!')
