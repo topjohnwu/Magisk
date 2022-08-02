@@ -320,7 +320,11 @@ static void get_process_info(int client, const sock_cred *cred) {
 
     if (should_load_modules(flags)) {
         char buf[256];
-        get_exe(cred->pid, buf, sizeof(buf));
+        if (!get_exe(cred->pid, buf, sizeof(buf))) {
+            LOGW("zygisk: remote process %d probably died, abort\n", cred->pid);
+            send_fd(client, -1);
+            return;
+        }
         vector<int> fds = get_module_fds(str_ends(buf, "64"));
         send_fds(client, fds.data(), fds.size());
     }
@@ -386,8 +390,11 @@ void zygisk_handler(int client, const sock_cred *cred) {
         send_log_pipe(client);
         break;
     case ZygiskRequest::CONNECT_COMPANION:
-        get_exe(cred->pid, buf, sizeof(buf));
-        connect_companion(client, str_ends(buf, "64"));
+        if (get_exe(cred->pid, buf, sizeof(buf))) {
+            connect_companion(client, str_ends(buf, "64"));
+        } else {
+            LOGW("zygisk: remote process %d probably died, abort\n", cred->pid);
+        }
         break;
     case ZygiskRequest::GET_MODDIR:
         get_moddir(client);
