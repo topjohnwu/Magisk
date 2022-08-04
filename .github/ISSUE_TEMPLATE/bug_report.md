@@ -10,9 +10,9 @@ assignees: ""
 
 ## READ BEFORE OPENING ISSUES
 
-All bug reports require you to **USE DEBUG BUILDS**. Please include the version name and version code in the bug report.
+All bug reports require you to **USE THE LATEST DEBUG BUILD**. Please include the version name and version code in the bug report.
 
-If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT MAGISK**.
+If you experience a bootloop, attach a `dmesg` (kernel logs) when the device refuse to boot. This may very likely require a custom kernel on some devices as `last_kmsg` or `pstore ramoops` are usually not enabled by default. A [bugreport](https://developer.android.com/studio/debug/bug-report) captured on the **FIRST BOOT** after bootloop may also includes it. In addition, please also upload the result of `cat /proc/mounts` when your device is working correctly **WITHOUT MAGISK**.
 
 If you experience issues during installation, in recovery, upload the recovery logs, or in Magisk, upload the install logs. Please also upload the `boot.img` or `recovery.img` that you are using for patching.
 

@@ -31,18 +31,21 @@ Some highlight features:
 
 ## Bug Reports
 
-**Only bug reports from Debug builds will be accepted.**
+**Only bug reports from the latest Debug build will be accepted.<br>
+Please follow our issue template, otherwise your issue will be automatically closed by bot.**
 
 For installation issues, upload both boot image and install logs.<br>
-For Magisk issues, upload boot logcat or dmesg.<br>
+For Magisk issues, upload boot logcat, dmesg or [bugreport](https://developer.android.com/studio/debug/bug-report).<br>
 For Magisk app crashes, record and upload the logcat when the crash occurs.
 
 ## Building and Development
 
 - Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
-- Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
+- Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git` \
+  (Windows only: BEFORE cloning, enable developer mode in Settings and run `git config --global core.symlinks true`!)
 - Install Python 3.6+ \
   (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
+- (Windows only) Install Visual Studio 2013+ with the Windows 10/11 SDK and the Visual C++ option
 - Configure to use the JDK bundled in Android Studio:
   - macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`
   - Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
