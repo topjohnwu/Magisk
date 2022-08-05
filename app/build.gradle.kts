@@ -88,7 +88,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-scalars:${vRetrofit}")
 
-    val vOkHttp = "4.9.3"
+    val vOkHttp = "4.10.0"
     implementation("com.squareup.okhttp3:okhttp:${vOkHttp}")
     implementation("com.squareup.okhttp3:logging-interceptor:${vOkHttp}")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
@@ -102,7 +102,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.5.0-rc01"
+    val vNav = "2.5.1"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
@@ -112,9 +112,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.4.2")
     implementation("androidx.preference:preference:1.2.0")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.1")
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.core:core-splashscreen:1.0.0-rc01")
+    implementation("androidx.core:core-splashscreen:1.0.0")
     implementation("com.google.android.material:material:1.6.1")
 }
