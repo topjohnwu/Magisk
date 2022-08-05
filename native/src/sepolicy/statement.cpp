@@ -227,7 +227,7 @@ static bool parse_pattern_6(const Func &fn, const char *action, char *stmt) {
     parsed_tokens arr;
     if (!tokenize_and_check<1, 0>(stmt, arr))
         return false;
-    run_fn(arr[0][1]);
+    run_fn(arr[0][0]);
     return true;
 }
 
