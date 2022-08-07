@@ -23,19 +23,21 @@ int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
     return 0;
 }
 
-int mkdirs(string path, mode_t mode) {
+int mkdirs(const char *path, mode_t mode) {
+    char buf[4096];
+    strlcpy(buf, path, sizeof(buf));
     errno = 0;
-    for (char *p = path.data() + 1; *p; ++p) {
+    for (char *p = &buf[1]; *p; ++p) {
         if (*p == '/') {
             *p = '\0';
-            if (mkdir(path.data(), mode) == -1) {
+            if (mkdir(buf, mode) == -1) {
                 if (errno != EEXIST)
                     return -1;
             }
             *p = '/';
         }
     }
-    if (mkdir(path.data(), mode) == -1) {
+    if (mkdir(buf, mode) == -1) {
         if (errno != EEXIST)
             return -1;
     }
