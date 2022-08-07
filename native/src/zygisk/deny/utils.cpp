@@ -179,20 +179,20 @@ static bool validate(const char *pkg, const char *proc) {
     return pkg_valid && proc_valid;
 }
 
-static auto add_hide_set(const char *pkg, const char *proc) {
+static bool add_hide_set(const char *pkg, const char *proc) {
     auto p = pkg_to_procs[pkg].emplace(proc);
     if (!p.second)
-        return p;
+        return false;
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
     if (!do_kill)
-        return p;
+        return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&proc_name_match<str_starts>>(proc, true);
     } else {
         kill_process(proc);
     }
-    return p;
+    return true;
 }
 
 static void clear_data() {
@@ -234,8 +234,7 @@ static int add_list(const char *pkg, const char *proc) {
         mutex_guard lock(data_lock);
         if (!ensure_data())
             return DenyResponse::ERROR;
-        auto p = add_hide_set(pkg, proc);
-        if (!p.second)
+        if (!add_hide_set(pkg, proc))
             return DenyResponse::ITEM_EXIST;
         auto it = pkg_to_procs.find(pkg);
         update_pkg_uid(it->first, false);
@@ -408,15 +407,8 @@ bool is_deny_target(int uid, string_view process) {
         if (it == app_id_to_pkgs.end())
             return false;
         for (const auto &pkg : it->second) {
-            const auto &procs = pkg_to_procs.find(pkg);
-            if (procs == pkg_to_procs.end()) {
-                LOGE("is_deny_target[%d, %s]: package not found [%s]\n", app_id, process.data(), pkg.data());
-                continue;
-            } else {
-                if (procs->second.count(process)) {
-                    return true;
-                }
-            }
+            if (pkg_to_procs.find(pkg)->second.count(process))
+                return true;
         }
     }
     return false;
