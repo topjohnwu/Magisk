@@ -179,20 +179,20 @@ static bool validate(const char *pkg, const char *proc) {
     return pkg_valid && proc_valid;
 }
 
-static auto add_hide_set(const char *pkg, const char *proc) {
+static bool add_hide_set(const char *pkg, const char *proc) {
     auto p = pkg_to_procs[pkg].emplace(proc);
     if (!p.second)
-        return p;
+        return false;
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
     if (!do_kill)
-        return p;
+        return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&proc_name_match<str_starts>>(proc, true);
     } else {
         kill_process(proc);
     }
-    return p;
+    return true;
 }
 
 static void clear_data() {
@@ -234,10 +234,10 @@ static int add_list(const char *pkg, const char *proc) {
         mutex_guard lock(data_lock);
         if (!ensure_data())
             return DenyResponse::ERROR;
-        auto p = add_hide_set(pkg, proc);
-        if (!p.second)
+        if (!add_hide_set(pkg, proc))
             return DenyResponse::ITEM_EXIST;
-        update_pkg_uid(*p.first, false);
+        auto it = pkg_to_procs.find(pkg);
+        update_pkg_uid(it->first, false);
     }
 
     // Add to database
