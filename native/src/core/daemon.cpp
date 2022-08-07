@@ -447,13 +447,16 @@ int connect_daemon(int req, bool create) {
         break;
     case MainResponse::ERROR:
         LOGE("Daemon error\n");
-        exit(-1);
+        fd = -1;
+        break;
     case MainResponse::ROOT_REQUIRED:
         LOGE("Root is required for this operation\n");
-        exit(-1);
+        fd = -1;
+        break;
     case MainResponse::ACCESS_DENIED:
         LOGE("Access denied\n");
-        exit(-1);
+        fd = -1;
+        break;
     default:
         __builtin_unreachable();
     }

@@ -59,6 +59,7 @@ int remote_request_unmount();
 
 inline int zygisk_request(int req) {
     int fd = connect_daemon(MainRequest::ZYGISK);
+    if (fd < 0) return fd;
     write_int(fd, req);
     return fd;
 }
