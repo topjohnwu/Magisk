@@ -440,7 +440,7 @@ void restore_folder(const char *dir, vector<raw_file> &files) {
     for (raw_file &file : files) {
         string path = base + "/" + file.path;
         if (S_ISDIR(file.attr.st.st_mode)) {
-            mkdirs(path, 0);
+            mkdirs(path.data(), 0);
         } else if (S_ISREG(file.attr.st.st_mode)) {
             if (auto fp = xopen_file(path.data(), "we"))
                 fwrite(file.content.data(), 1, file.content.size(), fp.get());
