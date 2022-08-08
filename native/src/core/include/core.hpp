@@ -91,3 +91,4 @@ extern std::atomic<bool> denylist_enforced;
 int denylist_cli(int argc, char **argv);
 void initialize_denylist();
 bool is_deny_target(int uid, std::string_view process);
+void revert_unmount(int pid = -1) noexcept;

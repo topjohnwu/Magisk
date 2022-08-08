@@ -227,25 +227,14 @@ object Zygisk : BaseSettingsItem.Toggle() {
         get() = Config.zygisk
         set(value) {
             Config.zygisk = value
-            DenyList.isEnabled = value
-            DenyListConfig.isEnabled = value
             notifyPropertyChanged(BR.description)
-            DenyList.notifyPropertyChanged(BR.description)
         }
     val mismatch get() = value != Info.isZygiskEnabled
 }
 
 object DenyList : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_denylist_title.asText()
-    override val description get() =
-        if (isEnabled) {
-            if (Zygisk.mismatch)
-                R.string.reboot_apply_change.asText()
-            else
-                R.string.settings_denylist_summary.asText()
-        } else {
-            R.string.settings_denylist_error.asText(R.string.zygisk.asText())
-        }
+    override val description get() = R.string.settings_denylist_summary.asText()
 
     override var value = Config.denyList
         set(value) {
@@ -260,18 +249,11 @@ object DenyList : BaseSettingsItem.Toggle() {
                 }
             }
         }
-
-    override fun refresh() {
-        isEnabled = Zygisk.value
-    }
 }
 
 object DenyListConfig : BaseSettingsItem.Blank() {
     override val title = R.string.settings_denylist_config_title.asText()
     override val description = R.string.settings_denylist_config_summary.asText()
-    override fun refresh() {
-        isEnabled = Zygisk.value
-    }
 }
 
 // --- Superuser
