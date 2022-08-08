@@ -51,16 +51,20 @@ static void *unload_first_stage(void *) {
     return nullptr;
 }
 
+#if defined(__LP64__)
+// Use symlink to workaround linker bug on old broken Android
+// https://issuetracker.google.com/issues/36914295
+#define SECOND_STAGE_PATH "/system/bin/app_process"
+#else
+#define SECOND_STAGE_PATH "/system/bin/app_process32"
+#endif
+
 static void second_stage_entry() {
     zygisk_logging();
     ZLOGD("inject 2nd stage\n");
 
     MAGISKTMP = getenv(MAGISKTMP_ENV);
-#if defined(__LP64__)
-    self_handle = dlopen("/system/bin/app_process", RTLD_NOLOAD);
-#else
-    self_handle = dlopen("/system/bin/app_process32", RTLD_NOLOAD);
-#endif
+    self_handle = dlopen(SECOND_STAGE_PATH, RTLD_NOLOAD);
     dlclose(self_handle);
 
     unsetenv(MAGISKTMP_ENV);
@@ -81,12 +85,18 @@ static void first_stage_entry() {
     }
 
     // Load second stage
+    android_dlextinfo info {
+        .flags = ANDROID_DLEXT_FORCE_LOAD
+    };
     setenv(INJECT_ENV_2, "1", 1);
-#if defined(__LP64__)
-    dlopen("/system/bin/app_process", RTLD_LAZY);
-#else
-    dlopen("/system/bin/app_process32", RTLD_LAZY);
-#endif
+    if (android_dlopen_ext(SECOND_STAGE_PATH, RTLD_LAZY, &info) == nullptr) {
+        // Android 5.x doesn't support ANDROID_DLEXT_FORCE_LOAD
+        ZLOGI("ANDROID_DLEXT_FORCE_LOAD is not supported, fallback to dlopen\n");
+        if (dlopen(SECOND_STAGE_PATH, RTLD_LAZY) == nullptr) {
+            ZLOGE("Cannot load the second stage\n");
+            unsetenv(INJECT_ENV_2);
+        }
+    }
 }
 
 [[gnu::constructor]] [[maybe_unused]]
