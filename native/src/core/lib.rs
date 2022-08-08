@@ -72,6 +72,8 @@ pub mod ffi {
         #[cxx_name = "resolve_preinit_dir_rs"]
         fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
 
+        fn switch_mnt_ns(pid: i32) -> i32;
+
         #[cxx_name = "MagiskD"]
         type CxxMagiskD;
         fn post_fs_data(self: &CxxMagiskD) -> bool;
@@ -90,7 +92,7 @@ pub mod ffi {
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
         fn setup_mounts();
         fn find_preinit_device() -> String;
-        fn revert_unmount();
+        fn revert_unmount(pid: i32);
         unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;

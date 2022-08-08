@@ -10,7 +10,7 @@ use base::{
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
-use crate::ffi::{get_magisk_tmp, resolve_preinit_dir};
+use crate::ffi::{get_magisk_tmp, resolve_preinit_dir, switch_mnt_ns};
 use crate::get_prop;
 
 pub fn setup_mounts() {
@@ -275,7 +275,14 @@ pub fn find_preinit_device() -> String {
         .to_string()
 }
 
-pub fn revert_unmount() {
+pub fn revert_unmount(pid: i32) {
+    if pid > 0 {
+        if switch_mnt_ns(pid) != 0 {
+            return;
+        }
+        debug!("denylist: handling PID=[{}]", pid);
+    }
+
     let mut targets = Vec::new();
 
     // Unmount Magisk tmpfs and mounts from module files

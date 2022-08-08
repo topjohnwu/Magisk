@@ -33,8 +33,6 @@ static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 atomic<bool> denylist_enforced = false;
 
-#define do_kill (zygisk_enabled && denylist_enforced)
-
 static void rescan_apps() {
     LOGD("denylist: rescanning apps\n");
 
@@ -121,7 +119,7 @@ static bool proc_name_match(int pid, string_view name) {
     return false;
 }
 
-static bool proc_context_match(int pid, string_view context) {
+bool proc_context_match(int pid, string_view context) {
     char buf[PATH_MAX];
     sprintf(buf, "/proc/%d/attr/current", pid);
     if (auto fp = open_file(buf, "re")) {
@@ -186,7 +184,7 @@ static bool add_hide_set(const char *pkg, const char *proc) {
     if (!p.second)
         return false;
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
-    if (!do_kill)
+    if (!denylist_enforced)
         return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
@@ -350,15 +348,21 @@ int enable_deny() {
 
         LOGI("* Enable DenyList\n");
 
-        denylist_enforced = true;
-
         if (!ensure_data()) {
             denylist_enforced = false;
             return DenyResponse::ERROR;
         }
 
+        if (!zygisk_enabled) {
+            logcat_exit = false;
+            if (new_daemon_thread(&logcat))
+                return DenyResponse::ERROR;
+        }
+
+        denylist_enforced = true;
+
         // On Android Q+, also kill blastula pool and all app zygotes
-        if (SDK_INT >= 29 && zygisk_enabled) {
+        if (SDK_INT >= 29) {
             kill_process("usap32", true);
             kill_process("usap64", true);
             kill_process<&proc_context_match>("u:r:app_zygote:s0", true);
@@ -373,6 +377,10 @@ int disable_deny() {
     if (denylist_enforced) {
         denylist_enforced = false;
         LOGI("* Disable DenyList\n");
+
+        if (!zygisk_enabled) {
+            logcat_exit = true;
+        }
     }
     update_deny_config();
     return DenyResponse::OK;
