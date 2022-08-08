@@ -74,6 +74,16 @@ jobs:
           ./ccache -zp
           python build.py -vr all
 
+      - name: Upload release binary symbols
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-symbols-release
+          path: |
+            native/obj/local/**/
+            !native/obj/local/**/*.a
+            !native/obj/local/**/objs
+
       - name: Build debug
         run: |
           python build.py -v all
@@ -85,7 +95,17 @@ jobs:
       # Only upload artifacts built on Linux
       - name: Upload build artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}
           path: out
+
+      - name: Upload debug binary symbols
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-symbols-debug
+          path: |
+            native/obj/local/**/
+            !native/obj/local/**/*.a
+            !native/obj/local/**/objs
