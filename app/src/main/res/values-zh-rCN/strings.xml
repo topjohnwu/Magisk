@@ -230,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">超级用户权限丢失，应用无法在隐藏状态下继续工作，请恢复到原始 Magisk 应用。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">允许访问存储空间以使用此功能</string>
+    <string name="post_notifications_denied">允许发送通知以使用此功能</string>
     <string name="install_unknown_denied">允许安装未知应用以使用此功能</string>
     <string name="add_shortcut_title">添加快捷方式到桌面</string>
     <string name="add_shortcut_msg">隐藏后应用的名字和图标可能难以识别。需要在桌面上添加具有原始名称和图标的快捷方式吗？</string>
