@@ -93,8 +93,6 @@ static void first_stage_entry() {
         // Android 5.x doesn't support ANDROID_DLEXT_FORCE_LOAD
         ZLOGI("ANDROID_DLEXT_FORCE_LOAD is not supported, fallback to dlopen\n");
         if (dlopen(SECOND_STAGE_PATH, RTLD_LAZY) == nullptr) {
-            // the second stage cannot be properly triggered,
-            // don't let it triggered in non-zygote process to avoid errors
             ZLOGE("Cannot load the second stage\n");
             unsetenv(INJECT_ENV_2);
         }
