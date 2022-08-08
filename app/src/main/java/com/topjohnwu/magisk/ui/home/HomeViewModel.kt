@@ -43,6 +43,7 @@ class HomeViewModel(
 
     val magiskState
         get() = when {
+            Info.isRooted && Info.env.isUnsupported -> State.OUTDATED
             !Info.env.isActive -> State.INVALID
             Info.env.versionCode < BuildConfig.VERSION_CODE -> State.OUTDATED
             else -> State.UP_TO_DATE
