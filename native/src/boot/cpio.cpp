@@ -176,7 +176,7 @@ void cpio::add(mode_t mode, const char *name, const char *file) {
     auto m = mmap_data(file);
     auto e = new cpio_entry(S_IFREG | mode);
     e->filesize = m.sz;
-    e->data = xmalloc(m.sz);
+    e->data = malloc(m.sz);
     memcpy(e->data, m.buf, m.sz);
     insert(name, e);
     fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
@@ -236,7 +236,7 @@ void cpio::load_cpio(const char *buf, size_t sz) {
             continue;
         }
         auto entry = new cpio_entry(hdr);
-        entry->data = xmalloc(entry->filesize);
+        entry->data = malloc(entry->filesize);
         memcpy(entry->data, buf + pos, entry->filesize);
         pos += entry->filesize;
         insert(name, entry);

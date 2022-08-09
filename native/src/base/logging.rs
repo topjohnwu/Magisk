@@ -7,11 +7,11 @@ use crate::ffi::LogLevel;
 // Ugly hack to avoid using enum
 #[allow(non_snake_case, non_upper_case_globals)]
 mod LogFlag {
-    pub const DisableError: u32 = 0x1;
-    pub const DisableWarn: u32 = 0x2;
-    pub const DisableInfo: u32 = 0x4;
-    pub const DisableDebug: u32 = 0x8;
-    pub const ExitOnError: u32 = 0x10;
+    pub const DisableError: u32 = 1 << 0;
+    pub const DisableWarn: u32 = 1 << 1;
+    pub const DisableInfo: u32 = 1 << 2;
+    pub const DisableDebug: u32 = 1 << 3;
+    pub const ExitOnError: u32 = 1 << 4;
 }
 
 // We don't need to care about thread safety, because all
@@ -92,7 +92,6 @@ pub fn cmdline_logging() {
             eprint!("{}", args);
         }
     }
-
     fn write(level: LogLevel, msg: &[u8]) {
         if level == LogLevel::Info {
             stdout().write_all(msg).ok();
@@ -112,28 +111,47 @@ pub fn cmdline_logging() {
 }
 
 #[macro_export]
+macro_rules! perror {
+    ($fmt:expr) => {
+        $crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!(
+            concat!($fmt, " failed with {}: {}"),
+            crate::errno(),
+            crate::error_str()
+        ))
+    };
+    ($fmt:expr, $($args:tt)*) => {
+        $crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!(
+            concat!($fmt, " failed with {}: {}"),
+            $($args)*,
+            crate::errno(),
+            crate::error_str()
+        ))
+    };
+}
+
+#[macro_export]
 macro_rules! error {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!($($arg)+)))
+    ($($args:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!($($args)+)))
 }
 
 #[macro_export]
 macro_rules! warn {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Warn, format_args_nl!($($arg)+)))
+    ($($args:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Warn, format_args_nl!($($args)+)))
 }
 
 #[macro_export]
 macro_rules! info {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Info, format_args_nl!($($arg)+)))
+    ($($args:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Info, format_args_nl!($($args)+)))
 }
 
 #[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! debug {
-    ($($arg:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Debug, format_args_nl!($($arg)+)))
+    ($($args:tt)+) => ($crate::log_impl($crate::ffi::LogLevel::Debug, format_args_nl!($($args)+)))
 }
 
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! debug {
-    ($($arg:tt)+) => {};
+    ($($args:tt)+) => {};
 }

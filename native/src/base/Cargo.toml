@@ -1,6 +1,6 @@
 [package]
 name = "base"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
 
 [lib]
@@ -8,3 +8,4 @@ path = "lib.rs"
 
 [dependencies]
 cxx = { path = "../external/cxx-rs" }
+libc = "0.2"

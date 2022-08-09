@@ -4,9 +4,10 @@ version = 3
 
 [[package]]
 name = "base"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "cxx",
+ "libc",
 ]
 
 [[package]]
@@ -38,8 +39,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "libc"
+version = "0.2.127"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "505e71a4706fa491e9b1b55f51b95d4037d0821ee40131190475f692b35b009b"
+
+[[package]]
 name = "magisk"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "base",
  "cxx",
@@ -47,14 +54,14 @@ dependencies = [
 
 [[package]]
 name = "magiskboot"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "base",
 ]
 
 [[package]]
 name = "magiskinit"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "base",
  "cxx",
@@ -62,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "magiskpolicy"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "base",
 ]

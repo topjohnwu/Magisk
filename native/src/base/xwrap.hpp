@@ -5,12 +5,12 @@
 #include <poll.h>
 #include <fcntl.h>
 
+extern "C" {
+
 FILE *xfopen(const char *pathname, const char *mode);
 FILE *xfdopen(int fd, const char *mode);
-int xopen(const char *pathname, int flags);
-int xopen(const char *pathname, int flags, mode_t mode);
-int xopenat(int dirfd, const char *pathname, int flags);
-int xopenat(int dirfd, const char *pathname, int flags, mode_t mode);
+int xopen(const char *pathname, int flags, mode_t mode = 0);
+int xopenat(int dirfd, const char *pathname, int flags, mode_t mode = 0);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
@@ -24,16 +24,12 @@ struct dirent *xreaddir(DIR *dirp);
 pid_t xsetsid();
 int xsocket(int domain, int type, int protocol);
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
-int xconnect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 int xlisten(int sockfd, int backlog);
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
-void *xmalloc(size_t size);
-void *xcalloc(size_t nmemb, size_t size);
-void *xrealloc(void *ptr, size_t size);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
 int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                    void *(*start_routine) (void *), void *arg);
+                    void *(*start_routine)(void *), void *arg);
 int xaccess(const char *path, int mode);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
@@ -64,8 +60,5 @@ int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
 int xinotify_init1(int flags);
 char *xrealpath(const char *path, char *resolved_path);
 int xmknod(const char *pathname, mode_t mode, dev_t dev);
-long xptrace(int request, pid_t pid, void *addr = nullptr, void *data = nullptr);
-static inline long xptrace(int request, pid_t pid, void *addr, uintptr_t data) {
-    return xptrace(request, pid, addr, reinterpret_cast<void *>(data));
-}
-#define WEVENT(s) (((s) & 0xffff0000) >> 16)
+
+} // extern "C"

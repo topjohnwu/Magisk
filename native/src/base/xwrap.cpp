@@ -14,54 +14,6 @@
 
 using namespace std;
 
-FILE *xfopen(const char *pathname, const char *mode) {
-    FILE *fp = fopen(pathname, mode);
-    if (fp == nullptr) {
-        PLOGE("fopen: %s", pathname);
-    }
-    return fp;
-}
-
-FILE *xfdopen(int fd, const char *mode) {
-    FILE *fp = fdopen(fd, mode);
-    if (fp == nullptr) {
-        PLOGE("fopen");
-    }
-    return fp;
-}
-
-int xopen(const char *pathname, int flags) {
-    int fd = open(pathname, flags);
-    if (fd < 0) {
-        PLOGE("open: %s", pathname);
-    }
-    return fd;
-}
-
-int xopen(const char *pathname, int flags, mode_t mode) {
-    int fd = open(pathname, flags, mode);
-    if (fd < 0) {
-        PLOGE("open: %s", pathname);
-    }
-    return fd;
-}
-
-int xopenat(int dirfd, const char *pathname, int flags) {
-    int fd = openat(dirfd, pathname, flags);
-    if (fd < 0) {
-        PLOGE("openat: %s", pathname);
-    }
-    return fd;
-}
-
-int xopenat(int dirfd, const char *pathname, int flags, mode_t mode) {
-    int fd = openat(dirfd, pathname, flags, mode);
-    if (fd < 0) {
-        PLOGE("openat: %s", pathname);
-    }
-    return fd;
-}
-
 // Write exact same size as count
 ssize_t xwrite(int fd, const void *buf, size_t count) {
     size_t write_sz = 0;
@@ -213,30 +165,6 @@ int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
         PLOGE("accept4");
     }
     return fd;
-}
-
-void *xmalloc(size_t size) {
-    void *p = malloc(size);
-    if (p == nullptr) {
-        PLOGE("malloc");
-    }
-    return p;
-}
-
-void *xcalloc(size_t nmemb, size_t size) {
-    void *p = calloc(nmemb, size);
-    if (p == nullptr) {
-        PLOGE("calloc");
-    }
-    return p;
-}
-
-void *xrealloc(void *ptr, size_t size) {
-    void *p = realloc(ptr, size);
-    if (p == nullptr) {
-        PLOGE("realloc");
-    }
-    return p;
 }
 
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags) {
@@ -513,12 +441,5 @@ int xmknod(const char *pathname, mode_t mode, dev_t dev) {
     if (ret < 0) {
         PLOGE("mknod");
     }
-    return ret;
-}
-
-long xptrace(int request, pid_t pid, void *addr, void *data) {
-    long ret = ptrace(request, pid, addr, data);
-    if (ret < 0)
-        PLOGE("ptrace %d", pid);
     return ret;
 }

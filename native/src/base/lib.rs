@@ -1,10 +1,13 @@
 #![feature(format_args_nl)]
 
+pub use libc;
 pub use logging::*;
 pub use misc::*;
+pub use xwrap::*;
 
 mod logging;
 mod misc;
+mod xwrap;
 
 #[cxx::bridge]
 pub mod ffi {
