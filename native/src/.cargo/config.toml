@@ -1,0 +1,4 @@
+[build]
+# This is only used to make the IDE happy, the actual compilation will
+# have the target overriden by command-line
+target = "aarch64-linux-android"
