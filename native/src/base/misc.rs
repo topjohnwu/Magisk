@@ -104,11 +104,7 @@ pub unsafe fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
 }
 
 pub fn errno() -> &'static mut i32 {
-    // On Android, errno is obtained through the __errno function for thread local storage
-    extern "C" {
-        fn __errno() -> *mut i32;
-    }
-    unsafe { &mut *__errno() }
+    unsafe { &mut *libc::__errno() }
 }
 
 pub fn error_str() -> &'static str {
