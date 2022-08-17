@@ -16,15 +16,15 @@ import tarfile
 
 
 def error(str):
-    if is_ci:
-        print(f'\n ! {str}\n')
+    if no_color:
+        print(f'\n! {str}\n')
     else:
         print(f'\n\033[41m{str}\033[0m\n')
     sys.exit(1)
 
 
 def header(str):
-    if is_ci:
+    if no_color:
         print(f'\n{str}\n')
     else:
         print(f'\n\033[44m{str}\033[0m\n')
@@ -36,12 +36,16 @@ def vprint(str):
 
 
 is_windows = os.name == 'nt'
-is_ci = 'CI' in os.environ and os.environ['CI'] == 'true'
 EXE_EXT = '.exe' if is_windows else ''
 
-if not is_ci and is_windows:
-    import colorama
-    colorama.init()
+no_color = False
+if is_windows:
+    try:
+        import colorama
+        colorama.init()
+    except ImportError:
+        # We can't do ANSI color codes in terminal on Windows without colorama
+        no_color = True
 
 # Environment checks
 if not sys.version_info >= (3, 6):
@@ -232,19 +236,23 @@ def run_cargo_build(args):
 
     # Install cxxbridge and generate C++ bindings
     native_out = op.join('..', 'out')
+    local_cargo_root = op.join(native_out, '.cargo')
     cfg = op.join('.cargo', 'config.toml')
     cfg_bak = op.join('.cargo', 'config.toml.bak')
-    mv(cfg, cfg_bak)
-    cxx_src = op.join('external', 'cxx-rs', 'gen', 'cmd')
-    local_cargo_root = op.join(native_out, '.cargo')
-    mkdir_p(local_cargo_root)
-    cmds = [cargo, 'install', '--root', local_cargo_root, '--path', cxx_src]
-    if not args.verbose:
-        cmds.append('-q')
-    proc = execv(cmds, env)
-    mv(cfg_bak, cfg)
-    if proc.returncode != 0:
-        error('cxxbridge-cmd installation failed!')
+    try:
+        # Hide the config file for cargo install
+        mv(cfg, cfg_bak)
+        cxx_src = op.join('external', 'cxx-rs', 'gen', 'cmd')
+        mkdir_p(local_cargo_root)
+        cmds = [cargo, 'install', '--root', local_cargo_root, '--path', cxx_src]
+        if not args.verbose:
+            cmds.append('-q')
+        proc = execv(cmds, env)
+        if proc.returncode != 0:
+            error('cxxbridge-cmd installation failed!')
+    finally:
+        # Make sure the config file rename is always reverted
+        mv(cfg_bak, cfg)
     cxxbridge = op.join(local_cargo_root, 'bin', 'cxxbridge' + EXE_EXT)
     mkdir(native_gen_path)
     for p in ['base', 'boot', 'core', 'init', 'sepolicy']:
@@ -419,15 +427,15 @@ def cleanup(args):
     if args.target:
         args.target = set(args.target) & support_targets
     else:
-        # If nothing specified, clean everything
         args.target = support_targets
 
     if 'native' in args.target:
         header('* Cleaning native')
-        rm_rf(op.join('native', 'out'))
         rm_rf(op.join('native', 'libs'))
         rm_rf(op.join('native', 'obj'))
-        rm_rf(op.join('native', 'rust', 'target'))
+        rm_rf(op.join('native', 'out'))
+        rm_rf(op.join('native', 'src', 'target'))
+        rm_rf(op.join('native', 'src', 'external', 'cxx-rs', 'target'))
 
     if 'java' in args.target:
         header('* Cleaning java')
