@@ -13,8 +13,19 @@ trap cleanup EXIT
 emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-type='google_apis'
 emu_args='-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim'
+
+case $(uname -m) in
+  'arm64'|'aarch64')
+    arch=arm64-v8a
+    ;;
+  *)
+    arch=x86_64
+    ;;
+esac
+
+# Should be either 'google_apis' or 'default'
+type='google_apis'
 
 wait_for_boot() {
   while true; do
@@ -31,7 +42,7 @@ test_api() {
   local pkg pid img_dir ramdisk features
 
   # Setup emulator
-  pkg="system-images;android-$1;$type;x86_64"
+  pkg="system-images;android-$1;$type;$arch"
 
   echo -e "\n\033[44m* Testing $pkg\033[0m\n"
 
@@ -39,7 +50,7 @@ test_api() {
   echo no | "$avd" create avd -f -n test -k $pkg
 
   # Launch emulator and patch
-  img_dir="$ANDROID_SDK_ROOT/system-images/android-$1/$type/x86_64"
+  img_dir="$ANDROID_SDK_ROOT/system-images/android-$1/$type/$arch"
   ramdisk="$img_dir/ramdisk.img"
   features="$img_dir/advancedFeatures.ini"
   if [ -f "${ramdisk}.bak" ]; then
@@ -78,13 +89,15 @@ test_api() {
 ./build.py binary
 ./build.py app
 
-# We test the following API levels for the following reason:
+# We test these API levels for the following reason
+
 # API 23: legacy rootfs w/o Treble
 # API 26: legacy rootfs with Treble
 # API 28: legacy system-as-root
-# API 32: 2 Stage Init
+# API 29: 2 Stage Init
+# API 33: latest Android
 
-for api in 23 26 28 32; do
+for api in 23 26 28 29 33; do
   test_api $api
 done
 
