@@ -98,7 +98,7 @@
 - [App] Fix a bug in the stub app that causes APK installation to fail
 - [App] Hide annoying errors in logs when hidden as stub
 - [App] Fix issues when patching ODIN tar files when the app is hidden
-- [General] Remove all pre Android 5.0 support
+- [General] Remove all pre Android 11.0 support
 - [General] Update BusyBox to use proper libc
 - [General] Fix C++ undefined behaviors
 - [General] Several `sepolicy.rule` copy/installation fixes
@@ -126,7 +126,7 @@
 - [General] Magisk and Magisk Manager is now merged into the same package!
 - [App] The term "Magisk Manager" is no longer used elsewhere. We refer it as the Magisk app.
 - [App] Support hiding the Magisk app with advanced technique (stub APK loading) on Android 5.0+ (it used to be 9.0+)
-- [App] Disallow re-packaging the Magisk app on devices lower than Android 5.0
+- [App] Disallow re-packaging the Magisk app on devices lower than Android 11.0
 - [App] Detect and warn about multiple invalid states and provide instructions on how to resolve it
 - [MagiskHide] Fix a bug when stopping MagiskHide does not take effect
 - [MagiskBoot] Fix bug when unpacking `lz4_lg` compressed boot images
