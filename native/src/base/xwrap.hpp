@@ -5,6 +5,10 @@
 #include <poll.h>
 #include <fcntl.h>
 
+#include <base-rs.hpp>
+
+using rust::xpipe2;
+
 extern "C" {
 
 FILE *xfopen(const char *pathname, const char *mode);
@@ -14,13 +18,12 @@ int xopenat(int dirfd, const char *pathname, int flags, mode_t mode = 0);
 ssize_t xwrite(int fd, const void *buf, size_t count);
 ssize_t xread(int fd, void *buf, size_t count);
 ssize_t xxread(int fd, void *buf, size_t count);
-off_t xlseek(int fd, off_t offset, int whence);
-int xpipe2(int pipefd[2], int flags);
+off64_t xlseek64(int fd, off64_t offset, int whence);
 int xsetns(int fd, int nstype);
 int xunshare(int flags);
 DIR *xopendir(const char *name);
 DIR *xfdopendir(int fd);
-struct dirent *xreaddir(DIR *dirp);
+dirent *xreaddir(DIR *dirp);
 pid_t xsetsid();
 int xsocket(int domain, int type, int protocol);
 int xbind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
@@ -28,10 +31,8 @@ int xlisten(int sockfd, int backlog);
 int xaccept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags);
 ssize_t xsendmsg(int sockfd, const struct msghdr *msg, int flags);
 ssize_t xrecvmsg(int sockfd, struct msghdr *msg, int flags);
-int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                    void *(*start_routine)(void *), void *arg);
 int xaccess(const char *path, int mode);
-int xfaccessat(int dirfd, const char *pathname);
+int xfaccessat(int dirfd, const char *pathname, int mode, int flags);
 int xstat(const char *pathname, struct stat *buf);
 int xlstat(const char *pathname, struct stat *buf);
 int xfstat(int fd, struct stat *buf);

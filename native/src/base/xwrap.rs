@@ -1,10 +1,11 @@
+use std::ffi::CStr;
 use std::os::unix::io::RawFd;
 
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, sockaddr, socklen_t, ssize_t, SYS_dup3,
 };
 
-use crate::{perror, ptr_to_str};
+use crate::{errno, error, perror, ptr_to_str};
 
 #[no_mangle]
 pub extern "C" fn xfopen(path: *const c_char, mode: *const c_char) -> *mut libc::FILE {
@@ -58,6 +59,95 @@ macro_rules! xopen {
     ($path:expr, $flags:expr, $mode:expr) => {
         xopen($path, $flags, $mode)
     };
+}
+
+// Fully write data slice
+pub fn xwrite(fd: RawFd, data: &[u8]) -> isize {
+    unsafe {
+        let mut write_sz: usize = 0;
+        let mut r: ssize_t;
+        let mut remain: &[u8] = data;
+        loop {
+            r = libc::write(fd, remain.as_ptr().cast(), remain.len());
+            if r < 0 {
+                if *errno() == libc::EINTR {
+                    continue;
+                }
+                perror!("write");
+                return r as isize;
+            }
+            let r = r as usize;
+            write_sz += r;
+            remain = &remain[r..];
+            if r == 0 || remain.len() == 0 {
+                break;
+            }
+        }
+        if remain.len() != 0 {
+            error!("write ({} != {})", write_sz, data.len())
+        }
+        return write_sz as isize;
+    }
+}
+
+pub fn xread(fd: RawFd, data: &mut [u8]) -> isize {
+    unsafe {
+        let r = libc::read(fd, data.as_mut_ptr().cast(), data.len());
+        if r < 0 {
+            perror!("read");
+        }
+        return r;
+    }
+}
+
+// Fully read size of data slice
+pub fn xxread(fd: RawFd, data: &mut [u8]) -> isize {
+    unsafe {
+        let mut read_sz: usize = 0;
+        let mut r: ssize_t;
+        let mut remain: &mut [u8] = data;
+        loop {
+            r = libc::read(fd, remain.as_mut_ptr().cast(), remain.len());
+            if r < 0 {
+                if *errno() == libc::EINTR {
+                    continue;
+                }
+                perror!("read");
+                return r as isize;
+            }
+            let r = r as usize;
+            read_sz += r;
+            remain = &mut remain[r..];
+            if r == 0 || remain.len() == 0 {
+                break;
+            }
+        }
+        if remain.len() != 0 {
+            error!("read ({} != {})", read_sz, data.len())
+        }
+        return read_sz as isize;
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn xlseek64(fd: RawFd, offset: i64, whence: i32) -> i64 {
+    unsafe {
+        let r = libc::lseek64(fd, offset, whence);
+        if r < 0 {
+            perror!("lseek64");
+        }
+        return r;
+    }
+}
+
+pub fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32 {
+    unsafe {
+        let r = libc::pipe2(fds.as_mut_ptr(), flags);
+        if r < 0 {
+            perror!("pipe2");
+        }
+        return r;
+    }
 }
 
 #[no_mangle]
@@ -198,6 +288,22 @@ pub extern "C" fn xaccess(path: *const c_char, mode: i32) -> i32 {
 }
 
 #[no_mangle]
+pub extern "C" fn xfaccessat(dirfd: RawFd, path: *const c_char, mode: i32, flags: i32) -> i32 {
+    unsafe {
+        #[allow(unused_mut)]
+        let mut r = libc::faccessat(dirfd, path, mode, flags);
+        if r < 0 {
+            perror!("faccessat {}", ptr_to_str(path));
+        }
+        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+        if r > 0 && *errno() == 0 {
+            r = 0
+        }
+        return r;
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn xstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
     unsafe {
         let r = libc::stat(path, buf);
@@ -277,6 +383,24 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
         }
         return fd;
     }
+}
+
+pub fn xreadlink(path: &CStr, data: &mut [u8]) -> isize {
+    mod e {
+        extern "C" {
+            pub fn xreadlink(path: *const u8, buf: *mut u8, bufsz: usize) -> isize;
+        }
+    }
+    unsafe { e::xreadlink(path.as_ptr().cast(), data.as_mut_ptr(), data.len()) }
+}
+
+pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
+    mod e {
+        extern "C" {
+            pub fn xreadlinkat(dirfd: i32, path: *const u8, buf: *mut u8, bufsz: usize) -> isize;
+        }
+    }
+    unsafe { e::xreadlinkat(dirfd, path.as_ptr().cast(), data.as_mut_ptr(), data.len()) }
 }
 
 #[no_mangle]
@@ -376,7 +500,7 @@ pub extern "C" fn xrename(oldname: *const c_char, newname: *const c_char) -> i32
 pub extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         let r = libc::mkdir(path, mode);
-        if r < 0 {
+        if r < 0 && *errno() != libc::EEXIST {
             perror!("mkdir {}", ptr_to_str(path));
         }
         return r;
@@ -387,7 +511,7 @@ pub extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 pub extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         let r = libc::mkdirat(dirfd, path, mode);
-        if r < 0 {
+        if r < 0 && *errno() != libc::EEXIST {
             perror!("mkdirat {}", ptr_to_str(path));
         }
         return r;

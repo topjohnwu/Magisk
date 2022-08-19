@@ -85,14 +85,14 @@ pub fn log_impl(level: LogLevel, args: Arguments) {
 }
 
 pub fn cmdline_logging() {
-    fn print(level: LogLevel, args: Arguments) {
+    fn cmdline_print(level: LogLevel, args: Arguments) {
         if level == LogLevel::Info {
             print!("{}", args);
         } else {
             eprint!("{}", args);
         }
     }
-    fn write(level: LogLevel, msg: &[u8]) {
+    fn cmdline_write(level: LogLevel, msg: &[u8]) {
         if level == LogLevel::Info {
             stdout().write_all(msg).ok();
         } else {
@@ -101,8 +101,8 @@ pub fn cmdline_logging() {
     }
 
     let logger = Logger {
-        fmt: print,
-        write,
+        fmt: cmdline_print,
+        write: cmdline_write,
         flags: LogFlag::ExitOnError,
     };
     unsafe {

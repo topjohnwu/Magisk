@@ -55,7 +55,7 @@ int gen_rand_str(char *buf, int len, bool varlen) {
 }
 
 int exec_command(exec_t &exec) {
-    int pipefd[] = {-1, -1};
+    auto pipefd = array<int, 2>{-1, -1};
     int outfd = -1;
 
     if (exec.fd == -1) {
@@ -114,7 +114,11 @@ int new_daemon_thread(thread_entry entry, void *arg) {
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    return xpthread_create(&thread, &attr, entry, arg);
+    errno = pthread_create(&thread, &attr, entry, arg);
+    if (errno) {
+        PLOGE("pthread_create");
+    }
+    return errno;
 }
 
 static char *argv0;

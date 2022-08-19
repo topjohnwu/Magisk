@@ -107,7 +107,7 @@ static void poll_ctrl_handler(pollfd *pfd) {
 
 [[noreturn]] static void poll_loop() {
     // Register poll_ctrl
-    int pipefd[2];
+    auto pipefd = array<int, 2>{-1, -1};
     xpipe2(pipefd, O_CLOEXEC);
     poll_ctrl = pipefd[1];
     pollfd poll_ctrl_pfd = { pipefd[0], POLLIN, 0 };

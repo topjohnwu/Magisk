@@ -14,72 +14,19 @@
 
 using namespace std;
 
-// Write exact same size as count
 ssize_t xwrite(int fd, const void *buf, size_t count) {
-    size_t write_sz = 0;
-    ssize_t ret;
-    do {
-        ret = write(fd, (byte *) buf + write_sz, count - write_sz);
-        if (ret < 0) {
-            if (errno == EINTR)
-                continue;
-            PLOGE("write");
-            return ret;
-        }
-        write_sz += ret;
-    } while (write_sz != count && ret != 0);
-    if (write_sz != count) {
-        PLOGE("write (%zu != %zu)", count, write_sz);
-    }
-    return write_sz;
+    return rust::xwrite(fd, rust::Slice(static_cast<const uint8_t *>(buf), count));
 }
 
-// Read error other than EOF
 ssize_t xread(int fd, void *buf, size_t count) {
-    int ret = read(fd, buf, count);
-    if (ret < 0) {
-        PLOGE("read");
-    }
-    return ret;
+    return rust::xread(fd, rust::Slice(static_cast<uint8_t *>(buf), count));
 }
 
-// Read exact same size as count
 ssize_t xxread(int fd, void *buf, size_t count) {
-    size_t read_sz = 0;
-    ssize_t ret;
-    do {
-        ret = read(fd, (byte *) buf + read_sz, count - read_sz);
-        if (ret < 0) {
-            if (errno == EINTR)
-                continue;
-            PLOGE("read");
-            return ret;
-        }
-        read_sz += ret;
-    } while (read_sz != count && ret != 0);
-    if (read_sz != count) {
-        PLOGE("read (%zu != %zu)", count, read_sz);
-    }
-    return read_sz;
+    return rust::xxread(fd, rust::Slice(static_cast<uint8_t *>(buf), count));
 }
 
-off_t xlseek(int fd, off_t offset, int whence) {
-    off_t ret = lseek(fd, offset, whence);
-    if (ret < 0) {
-        PLOGE("lseek");
-    }
-    return ret;
-}
-
-int xpipe2(int pipefd[2], int flags) {
-    int ret = pipe2(pipefd, flags);
-    if (ret < 0) {
-        PLOGE("pipe2");
-    }
-    return ret;
-}
-
-struct dirent *xreaddir(DIR *dirp) {
+dirent *xreaddir(DIR *dirp) {
     errno = 0;
     for (dirent *e;;) {
         e = readdir(dirp);
@@ -93,15 +40,6 @@ struct dirent *xreaddir(DIR *dirp) {
         }
         return e;
     }
-}
-
-int xpthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                    void *(*start_routine) (void *), void *arg) {
-    errno = pthread_create(thread, attr, start_routine, arg);
-    if (errno) {
-        PLOGE("pthread_create");
-    }
-    return errno;
 }
 
 ssize_t xreadlink(const char *pathname, char *buf, size_t bufsiz) {
@@ -133,20 +71,6 @@ ssize_t xreadlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
     }
     return ret;
 #endif
-}
-
-int xfaccessat(int dirfd, const char *pathname) {
-    int ret = faccessat(dirfd, pathname, F_OK, 0);
-    if (ret < 0) {
-        PLOGE("faccessat %s", pathname);
-    }
-#if defined(__i386__) || defined(__x86_64__)
-    if (ret > 0 && errno == 0) {
-        LOGD("faccessat success but ret is %d\n", ret);
-        ret = 0;
-    }
-#endif
-    return ret;
 }
 
 int xmkdirs(const char *pathname, mode_t mode) {
