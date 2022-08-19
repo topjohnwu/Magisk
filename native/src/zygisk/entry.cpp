@@ -8,6 +8,7 @@
 #include <base.hpp>
 #include <daemon.hpp>
 #include <magisk.hpp>
+#include <selinux.hpp>
 
 #include "zygisk.hpp"
 #include "module.hpp"
@@ -51,30 +52,9 @@ static void *unload_first_stage(void *) {
     return nullptr;
 }
 
-#if defined(__LP64__)
-// Use symlink to workaround linker bug on old broken Android
-// https://issuetracker.google.com/issues/36914295
-#define SECOND_STAGE_PATH "/system/bin/app_process"
-#else
-#define SECOND_STAGE_PATH "/system/bin/app_process32"
-#endif
-
-static void second_stage_entry() {
+extern "C" void zygisk_inject_entry(void *handle) {
     zygisk_logging();
-    ZLOGD("inject 2nd stage\n");
-
-    MAGISKTMP = getenv(MAGISKTMP_ENV);
-    self_handle = dlopen(SECOND_STAGE_PATH, RTLD_NOLOAD);
-    dlclose(self_handle);
-
-    unsetenv(MAGISKTMP_ENV);
-    sanitize_environ();
-    hook_functions();
-    new_daemon_thread(&unload_first_stage, nullptr);
-}
-
-static void first_stage_entry() {
-    ZLOGD("inject 1st stage\n");
+    ZLOGD("load success\n");
 
     char *ld = getenv("LD_PRELOAD");
     if (char *c = strrchr(ld, ':')) {
@@ -84,31 +64,13 @@ static void first_stage_entry() {
         unsetenv("LD_PRELOAD");
     }
 
-    // Load second stage
-    android_dlextinfo info {
-        .flags = ANDROID_DLEXT_FORCE_LOAD
-    };
-    setenv(INJECT_ENV_2, "1", 1);
-    if (android_dlopen_ext(SECOND_STAGE_PATH, RTLD_LAZY, &info) == nullptr) {
-        // Android 5.x doesn't support ANDROID_DLEXT_FORCE_LOAD
-        ZLOGI("ANDROID_DLEXT_FORCE_LOAD is not supported, fallback to dlopen\n");
-        if (dlopen(SECOND_STAGE_PATH, RTLD_LAZY) == nullptr) {
-            ZLOGE("Cannot load the second stage\n");
-            unsetenv(INJECT_ENV_2);
-        }
-    }
-}
+    MAGISKTMP = getenv(MAGISKTMP_ENV);
+    self_handle = handle;
 
-[[gnu::constructor]] [[maybe_unused]]
-static void zygisk_init() {
-    android_logging();
-    if (getenv(INJECT_ENV_1)) {
-        unsetenv(INJECT_ENV_1);
-        first_stage_entry();
-    } else if (getenv(INJECT_ENV_2)) {
-        unsetenv(INJECT_ENV_2);
-        second_stage_entry();
-    }
+    unsetenv(MAGISKTMP_ENV);
+    sanitize_environ();
+    hook_functions();
+    new_daemon_thread(&unload_first_stage, nullptr);
 }
 
 // The following code runs in zygote/app process
@@ -239,7 +201,7 @@ static int zygote_start_counts[] = { 0, 0 };
 static void setup_files(int client, const sock_cred *cred) {
     LOGD("zygisk: setup files for pid=[%d]\n", cred->pid);
 
-    char buf[256];
+    char buf[4096];
     if (!get_exe(cred->pid, buf, sizeof(buf))) {
         write_int(client, 1);
         return;
@@ -278,22 +240,31 @@ static void setup_files(int client, const sock_cred *cred) {
         }
     }
 
-    // Hijack some binary in /system/bin to host 1st stage
+    // Ack
+    write_int(client, 0);
+
+    // Hijack some binary in /system/bin to host loader
     const char *hbin;
     string mbin;
     int app_fd;
     if (is_64_bit) {
         hbin = HIJACK_BIN64;
-        mbin = MAGISKTMP + "/" ZYGISKBIN "/magisk64";
+        mbin = MAGISKTMP + "/" ZYGISKBIN "/loader64.so";
         app_fd = app_process_64;
     } else {
         hbin = HIJACK_BIN32;
-        mbin = MAGISKTMP + "/" ZYGISKBIN "/magisk32";
+        mbin = MAGISKTMP + "/" ZYGISKBIN "/loader32.so";
         app_fd = app_process_32;
     }
+
+    // Receive and bind mount loader
+    int ld_fd = xopen(mbin.data(), O_WRONLY | O_TRUNC | O_CREAT | O_CLOEXEC, 0755);
+    string ld_data = read_string(client);
+    xwrite(ld_fd, ld_data.data(), ld_data.size());
+    close(ld_fd);
+    setfilecon(mbin.data(), "u:object_r:" SEPOL_FILE_TYPE ":s0");
     xmount(mbin.data(), hbin, nullptr, MS_BIND, nullptr);
 
-    write_int(client, 0);
     send_fd(client, app_fd);
     write_string(client, MAGISKTMP);
 }

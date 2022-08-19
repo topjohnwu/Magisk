@@ -7,6 +7,7 @@
 #include <socket.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
+#include <embed.hpp>
 
 #include "zygisk.hpp"
 
@@ -73,6 +74,10 @@ int app_process_main(int argc, char *argv[]) {
             if (read_int(socket) != 0)
                 break;
 
+            // Send over zygisk loader
+            write_int(socket, sizeof(zygisk_ld));
+            xwrite(socket, zygisk_ld, sizeof(zygisk_ld));
+
             int app_proc_fd = recv_fd(socket);
             if (app_proc_fd < 0)
                 break;
@@ -86,7 +91,6 @@ int app_process_main(int argc, char *argv[]) {
             } else {
                 setenv("LD_PRELOAD", HIJACK_BIN, 1);
             }
-            setenv(INJECT_ENV_1, "1", 1);
             setenv(MAGISKTMP_ENV, tmp.data(), 1);
 
             close(socket);

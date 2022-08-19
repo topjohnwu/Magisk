@@ -28,5 +28,5 @@ LOCAL_MODULE := libcompat
 LOCAL_SRC_FILES := compat/compat.cpp
 # Fix static variables' ctor/dtor when using LTO
 # See: https://github.com/android/ndk/issues/1461
-LOCAL_EXPORT_LDLIBS := -static -T src/lto_fix.lds
+LOCAL_EXPORT_LDFLAGS := -static -T src/lto_fix.lds
 include $(BUILD_STATIC_LIBRARY)

@@ -5,8 +5,6 @@
 #include <vector>
 #include <daemon.hpp>
 
-#define INJECT_ENV_1   "MAGISK_INJ_1"
-#define INJECT_ENV_2   "MAGISK_INJ_2"
 #define MAGISKTMP_ENV  "MAGISKTMP"
 
 #define HIJACK_BIN64   "/system/bin/appwidget"
@@ -55,7 +53,6 @@ extern void *self_handle;
 
 void hook_functions();
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
-int remote_request_unmount();
 
 inline int zygisk_request(int req) {
     int fd = connect_daemon(MainRequest::ZYGISK);

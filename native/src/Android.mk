@@ -47,6 +47,7 @@ LOCAL_SRC_FILES := \
     zygisk/deny/revert.cpp
 
 LOCAL_LDLIBS := -llog
+LOCAL_LDFLAGS := -Wl,--dynamic-list=src/exported_sym.txt
 
 include $(BUILD_EXECUTABLE)
 
@@ -55,8 +56,13 @@ endif
 ifdef B_PRELOAD
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := preload
+LOCAL_MODULE := init-ld
 LOCAL_SRC_FILES := init/preload.c
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := zygisk-ld
+LOCAL_SRC_FILES := zygisk/loader.c
 include $(BUILD_SHARED_LIBRARY)
 
 endif

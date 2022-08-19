@@ -6,19 +6,7 @@
 #include <xz.h>
 
 #include <base.hpp>
-#include <binaries.h>
-
-#if defined(__arm__)
-#include <armeabi-v7a_binaries.h>
-#elif defined(__aarch64__)
-#include <arm64-v8a_binaries.h>
-#elif defined(__i386__)
-#include <x86_binaries.h>
-#elif defined(__x86_64__)
-#include <x86_64_binaries.h>
-#else
-#error Unsupported ABI
-#endif
+#include <embed.hpp>
 
 #include "init.hpp"
 
@@ -78,7 +66,7 @@ int dump_manager(const char *path, mode_t mode) {
 }
 
 int dump_preload(const char *path, mode_t mode) {
-    return dump_bin(preload_xz, sizeof(preload_xz), path, mode);
+    return dump_bin(init_ld_xz, sizeof(init_ld_xz), path, mode);
 }
 
 class RecoveryInit : public BaseInit {
