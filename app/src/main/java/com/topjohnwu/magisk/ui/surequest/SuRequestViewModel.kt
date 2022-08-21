@@ -189,15 +189,15 @@ class SuRequestViewModel(
 
     // Invisible for accessibility services
     object EmptyAccessibilityDelegate : View.AccessibilityDelegate() {
-        override fun sendAccessibilityEvent(host: View?, eventType: Int) {}
-        override fun performAccessibilityAction(host: View?, action: Int, args: Bundle?) = true
-        override fun sendAccessibilityEventUnchecked(host: View?, event: AccessibilityEvent?) {}
-        override fun dispatchPopulateAccessibilityEvent(host: View?, event: AccessibilityEvent?) = true
-        override fun onPopulateAccessibilityEvent(host: View?, event: AccessibilityEvent?) {}
-        override fun onInitializeAccessibilityEvent(host: View?, event: AccessibilityEvent?) {}
+        override fun sendAccessibilityEvent(host: View, eventType: Int) {}
+        override fun performAccessibilityAction(host: View, action: Int, args: Bundle?) = true
+        override fun sendAccessibilityEventUnchecked(host: View, event: AccessibilityEvent) {}
+        override fun dispatchPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) = true
+        override fun onPopulateAccessibilityEvent(host: View, event: AccessibilityEvent) {}
+        override fun onInitializeAccessibilityEvent(host: View, event: AccessibilityEvent) {}
         override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {}
         override fun addExtraDataToAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo, extraDataKey: String, arguments: Bundle?) {}
-        override fun onRequestSendAccessibilityEvent(host: ViewGroup?, child: View?, event: AccessibilityEvent?): Boolean = false
-        override fun getAccessibilityNodeProvider(host: View?): AccessibilityNodeProvider? = null
+        override fun onRequestSendAccessibilityEvent(host: ViewGroup, child: View, event: AccessibilityEvent): Boolean = false
+        override fun getAccessibilityNodeProvider(host: View): AccessibilityNodeProvider? = null
     }
 }
