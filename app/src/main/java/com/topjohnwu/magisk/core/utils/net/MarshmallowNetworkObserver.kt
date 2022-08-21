@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.net.NetworkCapabilities
 import android.os.PowerManager
 import androidx.core.content.getSystemService
+import com.topjohnwu.magisk.utils.APKInstall
 
 @TargetApi(23)
 class MarshmallowNetworkObserver(
@@ -21,7 +22,7 @@ class MarshmallowNetworkObserver(
 
     init {
         val filter = IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
-        app.registerReceiver(receiver, filter)
+        APKInstall.registerReceiver(app, receiver, filter)
     }
 
     override fun stopObserving() {
