@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.arch
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
@@ -36,6 +36,22 @@ abstract class BaseViewModel : ViewModel(), ObservableHost {
         withPermission(WRITE_EXTERNAL_STORAGE) {
             if (!it) {
                 SnackbarEvent(R.string.external_rw_permission_denied).publish()
+            } else {
+                callback()
+            }
+        }
+    }
+
+    fun withNotifications(enforce: Boolean = false, callback: () -> Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            callback()
+            return
+        }
+
+        withPermission(POST_NOTIFICATIONS) {
+            if (enforce && !it) {
+                SnackbarEvent(R.string.post_notifications_denied).publish()
+                return@withPermission
             } else {
                 callback()
             }

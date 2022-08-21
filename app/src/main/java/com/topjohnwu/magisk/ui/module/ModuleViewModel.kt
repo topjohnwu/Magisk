@@ -70,7 +70,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun downloadPressed(item: OnlineModule?) =
         if (item != null && Info.isConnected.value == true) {
-            withExternalRW { ModuleInstallDialog(item).publish() }
+            withExternalRW { withNotifications { ModuleInstallDialog(item).publish() } }
         } else {
             SnackbarEvent(R.string.no_connection).publish()
         }

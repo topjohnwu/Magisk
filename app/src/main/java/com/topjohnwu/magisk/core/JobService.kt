@@ -45,7 +45,7 @@ class JobService : BaseJobService() {
     companion object {
         fun schedule(context: Context) {
             val scheduler = context.getSystemService<JobScheduler>() ?: return
-            if (Config.checkUpdate) {
+            if (Config.checkUpdate && Notifications.permissionGranted(context)) {
                 val cmp = JobService::class.java.cmp(context.packageName)
                 val info = JobInfo.Builder(Const.ID.JOB_SERVICE_ID, cmp)
                     .setPeriodic(TimeUnit.HOURS.toMillis(12))

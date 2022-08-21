@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.view
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,6 +8,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toIcon
@@ -48,6 +51,13 @@ object Notifications {
         val intent = pm.getLaunchIntentForPackage(context.packageName)!!
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         return intent
+    }
+
+    fun permissionGranted(context: Context): Boolean {
+        if (SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            return true
+        }
+        return context.checkSelfPermission(POST_NOTIFICATIONS) == PERMISSION_GRANTED
     }
 
     @SuppressLint("InlinedApi")

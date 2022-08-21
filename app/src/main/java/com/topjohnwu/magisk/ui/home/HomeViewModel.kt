@@ -119,7 +119,9 @@ class HomeViewModel(
         State.INVALID -> SnackbarEvent(R.string.no_connection).publish()
         else -> withExternalRW {
             withInstallPermission {
-                ManagerInstallDialog().publish()
+                withNotifications {
+                    ManagerInstallDialog().publish()
+                }
             }
         }
     }
