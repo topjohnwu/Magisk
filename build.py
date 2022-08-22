@@ -38,7 +38,7 @@ def vprint(str):
 is_windows = os.name == 'nt'
 EXE_EXT = '.exe' if is_windows else ''
 
-no_color = False
+no_color = 'CI' in os.environ and os.environ['CI'] == 'true'
 if is_windows:
     try:
         import colorama
