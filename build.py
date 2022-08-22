@@ -39,7 +39,7 @@ is_windows = os.name == 'nt'
 EXE_EXT = '.exe' if is_windows else ''
 
 no_color = 'CI' in os.environ and os.environ['CI'] == 'true'
-if is_windows:
+if not no_color and is_windows:
     try:
         import colorama
         colorama.init()
