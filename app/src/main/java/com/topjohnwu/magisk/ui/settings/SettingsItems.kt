@@ -12,8 +12,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -202,12 +200,7 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
 object UpdateChecker : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_check_update_title.asText()
     override val description = R.string.settings_check_update_summary.asText()
-    override var value
-        get() = Config.checkUpdate
-        set(value) {
-            Config.checkUpdate = value
-            JobService.schedule(AppContext)
-        }
+    override var value by Config::checkUpdate
 }
 
 object DoHToggle : BaseSettingsItem.Toggle() {
