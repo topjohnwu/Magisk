@@ -224,6 +224,7 @@
     <string name="unsupport_nonroot_stub_msg">O app oculto do Magisk não pode continuar a funcionar porque o SuperUsuário foi perdido. Por favor, restaure o APK original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Autorize a permissão de armazenamento para ativar esta funcionalidade</string>
+    <string name="post_notifications_denied">Autorize a permissão de notificaçoes para ativar esta funcionalidade</string>
     <string name="install_unknown_denied">Permita a "instalação apps desconhecidos" para ativar esta funcionalidade</string>
     <string name="add_shortcut_title">Adicionar Atalho à Tela Inicial</string>
     <string name="add_shortcut_msg">Depois de ocultar o app do Magisk, o seu nome e ícone ficarão difíceis de reconhecer. Deseja adicionar um atalho na tela inicial?</string>
