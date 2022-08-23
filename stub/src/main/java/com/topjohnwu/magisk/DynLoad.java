@@ -60,20 +60,24 @@ public class DynLoad {
 
         // Copy from external for easier development
         if (BuildConfig.DEBUG) {
-            File external = new File(context.getExternalFilesDir(null), "magisk.apk");
-            if (external.exists()) {
-                try {
-                    var in = new FileInputStream(external);
-                    var out = new FileOutputStream(apk);
-                    try (in; out) {
-                        APKInstall.transfer(in, out);
+            try {
+                File external = new File(context.getExternalFilesDir(null), "magisk.apk");
+                if (external.exists()) {
+                    try {
+                        var in = new FileInputStream(external);
+                        var out = new FileOutputStream(apk);
+                        try (in; out) {
+                            APKInstall.transfer(in, out);
+                        }
+                    } catch (IOException e) {
+                        Log.e(DynLoad.class.getSimpleName(), "", e);
+                        apk.delete();
+                    } finally {
+                        external.delete();
                     }
-                } catch (IOException e) {
-                    Log.e(DynLoad.class.getSimpleName(), "", e);
-                    apk.delete();
-                } finally {
-                    external.delete();
                 }
+            } catch (SecurityException e) {
+                // Do not crash in root service
             }
         }
 
