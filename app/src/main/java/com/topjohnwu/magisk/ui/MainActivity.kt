@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
@@ -52,10 +54,18 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
     private var isRootFragment = true
 
+    @SuppressLint("InlinedApi")
     override fun showMainUI(savedInstanceState: Bundle?) {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
+
+        // Ask permission to post notifications for background update check
+        if (Config.checkUpdate) {
+            withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+                Config.checkUpdate = it
+            }
+        }
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 

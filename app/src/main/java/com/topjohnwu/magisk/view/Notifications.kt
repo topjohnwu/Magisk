@@ -6,7 +6,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.content.getSystemService
@@ -16,6 +15,7 @@ import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.ktx.getBitmap
+import com.topjohnwu.magisk.ktx.selfLaunchIntent
 import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("DEPRECATION")
@@ -44,18 +44,10 @@ object Notifications {
         }
     }
 
-    fun selfLaunchIntent(context: Context): Intent {
-        val pm = context.packageManager
-        val intent = pm.getLaunchIntentForPackage(context.packageName)!!
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        return intent
-    }
-
     @SuppressLint("InlinedApi")
     fun updateDone(context: Context) {
-        setup(context)
         val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        val pending = PendingIntent.getActivity(context, 0, selfLaunchIntent(context), flag)
+        val pending = PendingIntent.getActivity(context, 0, context.selfLaunchIntent(), flag)
         val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, UPDATED_CHANNEL)
                 .setSmallIcon(context.getBitmap(R.drawable.ic_magisk_outline).toIcon())
@@ -72,7 +64,6 @@ object Notifications {
 
     fun updateAvailable(context: Context) {
         val intent = DownloadService.getPendingIntent(context, Subject.App())
-
         val bitmap = context.getBitmap(R.drawable.ic_magisk_outline)
         val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, UPDATE_CHANNEL)
@@ -90,7 +81,7 @@ object Notifications {
         mgr.notify(APP_UPDATE_NOTIFICATION_ID, builder.build())
     }
 
-    fun progress(context: Context, title: CharSequence): Notification.Builder {
+    fun startProgress(context: Context, title: CharSequence): Notification.Builder {
         val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, PROGRESS_CHANNEL)
         } else {

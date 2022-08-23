@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.download
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.app.PendingIntent.*
@@ -13,17 +14,14 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.ktx.copyAndClose
-import com.topjohnwu.magisk.ktx.forEach
-import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.ktx.*
 import com.topjohnwu.magisk.utils.APKInstall
-import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -51,7 +49,7 @@ class DownloadService : NotificationService() {
     }
 
     private fun download(subject: Subject) {
-        update(subject.notifyId)
+        notifyUpdate(subject.notifyId)
         val coroutineScope = CoroutineScope(job + Dispatchers.IO)
         coroutineScope.launch {
             try {
@@ -62,7 +60,7 @@ class DownloadService : NotificationService() {
                 }
                 val activity = ActivityTracker.foreground
                 if (activity != null && subject.autoLaunch) {
-                    remove(subject.notifyId)
+                    notifyRemove(subject.notifyId)
                     subject.pendingIntent(activity)?.send()
                 } else {
                     notifyFinish(subject)
@@ -92,7 +90,7 @@ class DownloadService : NotificationService() {
 
                 if (Info.stub!!.version < subject.stub.versionCode) {
                     // Also upgrade stub
-                    update(subject.notifyId) {
+                    notifyUpdate(subject.notifyId) {
                         it.setProgress(0, 0, true)
                             .setContentTitle(getString(R.string.hide_app_title))
                             .setContentText("")
@@ -118,7 +116,7 @@ class DownloadService : NotificationService() {
                         StubApk.restartProcess(it)
                     } ?: run {
                         // Or else kill the current process after posting notification
-                        subject.intent = Notifications.selfLaunchIntent(this)
+                        subject.intent = selfLaunchIntent()
                         subject.postDownload = { Runtime.getRuntime().exit(0) }
                     }
                     return
@@ -206,12 +204,16 @@ class DownloadService : NotificationService() {
             }
         }
 
-        fun start(context: Context, subject: Subject) {
-            val app = context.applicationContext
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                app.startForegroundService(intent(app, subject))
-            } else {
-                app.startService(intent(app, subject))
+        @SuppressLint("InlinedApi")
+        fun start(activity: BaseActivity, subject: Subject) {
+            activity.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+                // Always download regardless of notification permission status
+                val app = activity.applicationContext
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    app.startForegroundService(intent(app, subject))
+                } else {
+                    app.startService(intent(app, subject))
+                }
             }
         }
     }

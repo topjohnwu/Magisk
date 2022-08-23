@@ -96,6 +96,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     override fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit) {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
+            UpdateChecker -> withPostNotificationPermission(andThen)
             Biometrics -> authenticate(andThen)
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()

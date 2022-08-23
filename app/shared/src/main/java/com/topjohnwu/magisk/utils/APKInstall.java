@@ -39,6 +39,16 @@ public final class APKInstall {
         }
     }
 
+    public static void registerReceiver(
+            Context context, BroadcastReceiver receiver, IntentFilter filter) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // noinspection InlinedApi
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            context.registerReceiver(receiver, filter);
+        }
+    }
+
     public static Session startSession(Context context) {
         return startSession(context, null, null, null);
     }
@@ -51,9 +61,9 @@ public final class APKInstall {
             // If pkg is not null, look for package added event
             var filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
             filter.addDataScheme("package");
-            context.registerReceiver(receiver, filter);
+            registerReceiver(context, receiver, filter);
         }
-        context.registerReceiver(receiver, new IntentFilter(receiver.sessionId));
+        registerReceiver(context, receiver, new IntentFilter(receiver.sessionId));
         return receiver;
     }
 

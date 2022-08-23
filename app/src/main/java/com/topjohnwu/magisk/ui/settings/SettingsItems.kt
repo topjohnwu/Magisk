@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -111,7 +112,7 @@ object Restore : BaseSettingsItem.Blank() {
 
     override fun onPressed(view: View, handler: Handler) {
         handler.onItemPressed(view, this) {
-            MagiskDialog(view.context).apply {
+            MagiskDialog(view.activity).apply {
                 setTitle(R.string.settings_restore_app_title)
                 setMessage(R.string.restore_app_confirmation)
                 setButton(MagiskDialog.ButtonType.POSITIVE) {

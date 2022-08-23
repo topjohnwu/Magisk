@@ -2,10 +2,7 @@ package com.topjohnwu.magisk.ktx
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ComponentName
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.Intent
+import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -33,6 +30,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
 import java.io.File
 import kotlin.Array
@@ -265,4 +263,15 @@ fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
         return getPackageInfo(pkgs[0], flag)
     }
     throw PackageManager.NameNotFoundException()
+}
+
+fun Context.registerRuntimeReceiver(receiver: BroadcastReceiver, filter: IntentFilter) {
+    APKInstall.registerReceiver(this, receiver, filter)
+}
+
+fun Context.selfLaunchIntent(): Intent {
+    val pm = packageManager
+    val intent = pm.getLaunchIntentForPackage(packageName)!!
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    return intent
 }

@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core.base
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -82,9 +81,15 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun withPermission(permission: String, callback: (Boolean) -> Unit) {
-        if (permission == WRITE_EXTERNAL_STORAGE &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            permission == WRITE_EXTERNAL_STORAGE) {
             // We do not need external rw on R+
+            callback(true)
+            return
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            permission == POST_NOTIFICATIONS) {
+            // All apps have notification permissions before T
             callback(true)
             return
         }

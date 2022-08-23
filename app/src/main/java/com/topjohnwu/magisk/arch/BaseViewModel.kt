@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.arch
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.databinding.PropertyChangeRegistry
@@ -47,6 +46,17 @@ abstract class BaseViewModel : ViewModel(), ObservableHost {
         withPermission(REQUEST_INSTALL_PACKAGES) {
             if (!it) {
                 SnackbarEvent(R.string.install_unknown_denied).publish()
+            } else {
+                callback()
+            }
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    inline fun withPostNotificationPermission(crossinline callback: () -> Unit) {
+        withPermission(POST_NOTIFICATIONS) {
+            if (!it) {
+                SnackbarEvent(R.string.post_notifications_denied).publish()
             } else {
                 callback()
             }
