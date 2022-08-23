@@ -36,6 +36,7 @@ class PolicyRvItem(
     var isEnabled
         get() = item.policy == SuPolicy.ALLOW
         set(value) = setImpl(value, isEnabled) {
+            notifyPropertyChanged(BR.enabled)
             viewModel.togglePolicy(this, value)
         }
 
