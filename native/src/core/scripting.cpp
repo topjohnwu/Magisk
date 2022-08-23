@@ -154,6 +154,7 @@ constexpr char install_script[] = R"EOF(
 APK=%s
 log -t Magisk "pm_install: $APK"
 log -t Magisk "pm_install: $(pm install -g -r $APK 2>&1)"
+appops set com.topjohnwu.magisk REQUEST_INSTALL_PACKAGES allow
 rm -f $APK
 )EOF";
 

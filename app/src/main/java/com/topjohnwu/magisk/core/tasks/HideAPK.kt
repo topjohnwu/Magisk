@@ -129,7 +129,7 @@ object HideAPK {
             launchApp(activity, pkg)
         }
 
-        val cmd = "adb_pm_install $repack ${activity.applicationInfo.uid}"
+        val cmd = "adb_pm_install $repack $pkg"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
@@ -177,7 +177,7 @@ object HideAPK {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()
         }
-        val cmd = "adb_pm_install $apk ${activity.applicationInfo.uid}"
+        val cmd = "adb_pm_install $apk $APPLICATION_ID"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {
