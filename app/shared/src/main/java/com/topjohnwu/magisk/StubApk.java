@@ -11,6 +11,7 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.content.res.loader.ResourcesLoader;
 import android.content.res.loader.ResourcesProvider;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
 import java.io.File;
@@ -28,7 +29,7 @@ public class StubApk {
     private static File getDynDir(ApplicationInfo info) {
         if (dynDir == null) {
             final String dataDir;
-            if (SDK_INT >= 24) {
+            if (SDK_INT >= Build.VERSION_CODES.N) {
                 // Use device protected path to allow directBootAware
                 dataDir = info.deviceProtectedDataDir;
             } else {
@@ -57,7 +58,7 @@ public class StubApk {
     }
 
     public static void addAssetPath(Resources res, String path) {
-        if (SDK_INT >= 30) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
             try (var fd = ParcelFileDescriptor.open(new File(path), MODE_READ_ONLY)) {
                 var loader = new ResourcesLoader();
                 loader.addProvider(ResourcesProvider.loadFromApk(fd));

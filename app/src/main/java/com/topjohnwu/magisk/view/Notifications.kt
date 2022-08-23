@@ -7,6 +7,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toIcon
@@ -32,7 +33,7 @@ object Notifications {
     private val nextId = AtomicInteger(APP_UPDATE_NOTIFICATION_ID)
 
     fun setup(context: Context) {
-        if (SDK_INT >= 26) {
+        if (SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(UPDATE_CHANNEL,
                 context.getString(R.string.update_channel), NotificationManager.IMPORTANCE_DEFAULT)
             val channel2 = NotificationChannel(PROGRESS_CHANNEL,
@@ -55,7 +56,7 @@ object Notifications {
         setup(context)
         val flag = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         val pending = PendingIntent.getActivity(context, 0, selfLaunchIntent(context), flag)
-        val builder = if (SDK_INT >= 26) {
+        val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, UPDATED_CHANNEL)
                 .setSmallIcon(context.getBitmap(R.drawable.ic_magisk_outline).toIcon())
         } else {
@@ -73,7 +74,7 @@ object Notifications {
         val intent = DownloadService.getPendingIntent(context, Subject.App())
 
         val bitmap = context.getBitmap(R.drawable.ic_magisk_outline)
-        val builder = if (SDK_INT >= 26) {
+        val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, UPDATE_CHANNEL)
                 .setSmallIcon(bitmap.toIcon())
         } else {
@@ -90,7 +91,7 @@ object Notifications {
     }
 
     fun progress(context: Context, title: CharSequence): Notification.Builder {
-        val builder = if (SDK_INT >= 26) {
+        val builder = if (SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(context, PROGRESS_CHANNEL)
         } else {
             Notification.Builder(context).setPriority(Notification.PRIORITY_LOW)

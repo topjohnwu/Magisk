@@ -17,6 +17,7 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Process
 import android.view.View
@@ -44,7 +45,7 @@ fun Context.getBitmap(id: Int): Bitmap {
     var drawable = AppCompatResources.getDrawable(this, id)!!
     if (drawable is BitmapDrawable)
         return drawable.bitmap
-    if (SDK_INT >= 26 && drawable is AdaptiveIconDrawable) {
+    if (SDK_INT >= Build.VERSION_CODES.O && drawable is AdaptiveIconDrawable) {
         drawable = LayerDrawable(arrayOf(drawable.background, drawable.foreground))
     }
     val bitmap = Bitmap.createBitmap(
@@ -58,7 +59,7 @@ fun Context.getBitmap(id: Int): Bitmap {
 }
 
 val Context.deviceProtectedContext: Context get() =
-    if (SDK_INT >= 24) {
+    if (SDK_INT >= Build.VERSION_CODES.N) {
         createDeviceProtectedStorageContext()
     } else { this }
 

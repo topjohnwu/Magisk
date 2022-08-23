@@ -199,7 +199,7 @@ class DownloadService : NotificationService() {
         fun getPendingIntent(context: Context, subject: Subject): PendingIntent {
             val flag = FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT or FLAG_ONE_SHOT
             val intent = intent(context, subject)
-            return if (Build.VERSION.SDK_INT >= 26) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 getForegroundService(context, REQUEST_CODE, intent, flag)
             } else {
                 getService(context, REQUEST_CODE, intent, flag)
@@ -208,7 +208,7 @@ class DownloadService : NotificationService() {
 
         fun start(context: Context, subject: Subject) {
             val app = context.applicationContext
-            if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 app.startForegroundService(intent(app, subject))
             } else {
                 app.startService(intent(app, subject))

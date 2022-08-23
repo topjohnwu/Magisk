@@ -25,7 +25,7 @@ class RequestInstall : ActivityResultContract<Unit, Boolean>() {
         context: Context,
         input: Unit
     ): SynchronousResult<Boolean>? {
-        if (Build.VERSION.SDK_INT < 26)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
             return SynchronousResult(true)
         if (context.packageManager.canRequestPackageInstalls())
             return SynchronousResult(true)

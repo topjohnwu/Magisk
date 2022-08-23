@@ -104,7 +104,7 @@ public class DynLoad {
     // Dynamically load APK and create the Application instance from the loaded APK
     static Application createAndSetupApp(Application context) {
         // On API >= 29, AppComponentFactory will replace the ClassLoader for us
-        if (Build.VERSION.SDK_INT < 29)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
             replaceClassLoader(context);
 
         // noinspection InlinedApi
@@ -145,7 +145,7 @@ public class DynLoad {
                     .newInstance(data.getObject());
 
             // Create the receiver component factory
-            if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && componentFactory != null) {
                 Object factory = cl.loadClass(appInfo.appComponentFactory).newInstance();
                 var delegate = (DelegateComponentFactory) componentFactory;
                 delegate.receiver = (AppComponentFactory) factory;

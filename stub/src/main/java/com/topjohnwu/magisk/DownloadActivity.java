@@ -186,7 +186,7 @@ public class DownloadActivity extends Activity {
     }
 
     private void loadResources() throws Exception {
-        if (Build.VERSION.SDK_INT >= 30) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             var fd = Os.memfd_create("res.apk", 0);
             try {
                 decryptResources(new FileOutputStream(fd));

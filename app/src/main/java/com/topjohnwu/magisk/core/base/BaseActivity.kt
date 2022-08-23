@@ -52,7 +52,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     val realCallingPackage: String? get() {
         callingPackage?.let { return it }
-        if (Build.VERSION.SDK_INT >= 22) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             mReferrerField.get(this)?.let { return it as String }
         }
         return null
@@ -82,8 +82,9 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun withPermission(permission: String, callback: (Boolean) -> Unit) {
-        if (permission == WRITE_EXTERNAL_STORAGE && Build.VERSION.SDK_INT >= 30) {
-            // We do not need external rw on 30+
+        if (permission == WRITE_EXTERNAL_STORAGE &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // We do not need external rw on R+
             callback(true)
             return
         }
