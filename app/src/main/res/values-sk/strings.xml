@@ -229,7 +229,8 @@
     <string name="unsupport_external_storage_msg">Magisk je nainštalovaný na externom úložisku. Prosím, presuňte apku na interné úložisko.</string>
     <string name="unsupport_nonroot_stub_msg">Skrytá aplikácia Magisk nemôže pokračovať v práci, lebo root sa stratil. Prosím, obnovte ju z pôvodného súboru APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
-    <string name="external_rw_permission_denied">Udeľte povolenie pre povolenie tejto funkcie</string>
+    <string name="external_rw_permission_denied">Udeľte povolenie na zapnutie tejto funkcie</string>
+    <string name="post_notifications_denied">Udeľte upozorneniam povolenie na zapnutie tejto funkcie</string>
     <string name="install_unknown_denied">Povoľte "inštaláciu neznámych aplikácii" na povolenie tejto funkcie</string>
     <string name="add_shortcut_title">Pridať odkaz na domovskú obrazovku</string>
     <string name="add_shortcut_msg">Po skrytí tejto aplikácie sa jej názov a ikona môžu stať ťažko rozoznateľnými. Chcete pridať krajší odkaz na domovskú obrazovku?</string>
