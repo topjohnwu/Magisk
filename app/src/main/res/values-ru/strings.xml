@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Модули</string>
-    <string name="superuser">Superuser</string>
+    <string name="superuser">Superuser</string> <!--Do not translate! #6016-->
     <string name="logs">Лог</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
@@ -230,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Предоставьте разрешение на доступ к хранилищу</string>
+    <string name="post_notifications_denied">Предоставьте разрешение на отправку уведомлений</string>
     <string name="install_unknown_denied">Предоставьте разрешение на "Установку из неизвестных источников"</string>
     <string name="add_shortcut_title">Добавление ярлыка</string>
     <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
