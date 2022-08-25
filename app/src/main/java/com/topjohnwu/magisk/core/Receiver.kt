@@ -51,7 +51,7 @@ open class Receiver : BaseReceiver() {
                 @Suppress("DEPRECATION")
                 val installer = context.packageManager.getInstallerPackageName(context.packageName)
                 if (installer == context.packageName) {
-                    Notifications.updateDone(context)
+                    Notifications.updateDone()
                 }
             }
         }

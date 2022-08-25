@@ -87,7 +87,7 @@ open class NotificationService : BaseService() {
     }
 
     protected fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit = {}) {
-        fun create() = Notifications.startProgress(this, "")
+        fun create() = Notifications.startProgress("")
 
         val wasEmpty = !hasNotifications
         val notification = notifications.getOrPut(id, ::create).also(editor)

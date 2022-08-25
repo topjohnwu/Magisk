@@ -33,7 +33,7 @@ class JobService : BaseJobService() {
         svc.fetchUpdate()?.let {
             Info.remote = it
             if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
-                Notifications.updateAvailable(this)
+                Notifications.updateAvailable()
         }
     }
 
