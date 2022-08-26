@@ -34,9 +34,11 @@ abstract class BaseActivity : AppCompatActivity() {
         permissionCallback?.invoke(it)
         permissionCallback = null
     }
+
+    private var installCallback: ((Boolean) -> Unit)? = null
     private val requestInstall = registerForActivityResult(RequestInstall()) {
-        permissionCallback?.invoke(it)
-        permissionCallback = null
+        installCallback?.invoke(it)
+        installCallback = null
     }
 
     private var contentCallback: ContentResultCallback? = null
@@ -93,10 +95,11 @@ abstract class BaseActivity : AppCompatActivity() {
             callback(true)
             return
         }
-        permissionCallback = callback
         if (permission == REQUEST_INSTALL_PACKAGES) {
+            installCallback = callback
             requestInstall.launch(Unit)
         } else {
+            permissionCallback = callback
             requestPermission.launch(permission)
         }
     }

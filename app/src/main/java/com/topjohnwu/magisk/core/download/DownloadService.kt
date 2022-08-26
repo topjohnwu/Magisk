@@ -101,15 +101,9 @@ class DownloadService : NotificationService() {
                     zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
 
                     // Patch and install
-                    val session = APKInstall.startSession(this)
-                    session.openStream(this).use {
-                        val label = applicationInfo.nonLocalizedLabel
-                        if (!HideAPK.patch(this, apk, it, packageName, label)) {
-                            throw IOException("HideAPK patch error")
-                        }
-                    }
+                    subject.intent = HideAPK.upgrade(this, apk) ?:
+                        throw IOException("HideAPK patch error")
                     apk.delete()
-                    subject.intent = session.waitIntent()
                 } else {
                     ActivityTracker.foreground?.let {
                         // Relaunch the process if we are foreground
