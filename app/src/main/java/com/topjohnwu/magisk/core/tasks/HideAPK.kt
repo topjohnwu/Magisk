@@ -71,14 +71,24 @@ object HideAPK {
         pkg: String, label: CharSequence
     ): Boolean {
         val info = context.packageManager.getPackageArchiveInfo(apk.path, 0) ?: return false
-        val name = info.applicationInfo.nonLocalizedLabel.toString()
+        val origLabel = info.applicationInfo.nonLocalizedLabel.toString()
         try {
             JarMap.open(apk, true).use { jar ->
                 val je = jar.getJarEntry(ANDROID_MANIFEST)
                 val xml = AXML(jar.getRawData(je))
 
-                if (!xml.findAndPatch(APPLICATION_ID to pkg, name to label.toString()))
+                if (!xml.patchStrings {
+                    for (i in it.indices) {
+                        val s = it[i]
+                        if (s.contains(APPLICATION_ID)) {
+                            it[i] = s.replace(APPLICATION_ID, pkg)
+                        } else if (s == origLabel) {
+                            it[i] = label.toString()
+                        }
+                    }
+                }) {
                     return false
+                }
 
                 // Write apk changes
                 jar.getOutputStream(je).use { it.write(xml.bytes) }
