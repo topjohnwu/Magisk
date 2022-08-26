@@ -31,6 +31,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
@@ -44,14 +45,12 @@ class DownloadService : NotificationService() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         job.cancel()
     }
 
     private fun download(subject: Subject) {
         notifyUpdate(subject.notifyId)
-        val coroutineScope = CoroutineScope(job + Dispatchers.IO)
-        coroutineScope.launch {
+        CoroutineScope(job + Dispatchers.IO).launch {
             try {
                 val stream = service.fetchFile(subject.url).toProgressStream(subject)
                 when (subject) {
@@ -75,7 +74,7 @@ class DownloadService : NotificationService() {
         }
     }
 
-    private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
+    private fun handleApp(stream: InputStream, subject: Subject.App) {
         fun writeTee(output: OutputStream) {
             val uri =  MediaStoreUtils.getFile("${subject.title}.apk").uri
             val external = uri.outputStream()
@@ -96,9 +95,10 @@ class DownloadService : NotificationService() {
                             .setContentText("")
                     }
 
-                    // Download
+                    // Extract stub
                     val apk = subject.file.toFile()
-                    service.fetchFile(subject.stub.link).byteStream().writeTo(apk)
+                    val zf = ZipFile(updateApk)
+                    zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
 
                     // Patch and install
                     val session = APKInstall.startSession(this)

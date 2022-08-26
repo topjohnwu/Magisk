@@ -9,9 +9,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.Provider
-import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
 import com.topjohnwu.magisk.ktx.await
@@ -39,8 +37,6 @@ object HideAPK {
 
     // Some arbitrary limit
     const val MAX_LABEL_LENGTH = 32
-
-    private val svc get() = ServiceLocator.networkService
 
     private fun genPackageName(): String {
         val random = SecureRandom()
@@ -113,17 +109,13 @@ object HideAPK {
         activity.finish()
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
+    private fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
-            svc.fetchFile(Info.remote.stub.link).byteStream().writeTo(stub)
+            activity.assets.open("stub.apk").writeTo(stub)
         } catch (e: IOException) {
             Timber.e(e)
-            stub.createNewFile()
-            val cmd = "\$MAGISKBIN/magiskinit -x manager ${stub.path}"
-            if (!Shell.cmd(cmd).exec().isSuccess)
-                return false
+            return false
         }
 
         // Generate a new random package name and signature

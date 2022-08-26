@@ -11,6 +11,7 @@ import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
@@ -218,13 +219,29 @@ fun Project.setupApp() {
     }
 
     android.applicationVariants.all {
-        preBuildProvider.get().dependsOn(syncResources)
+        val variantCapped = name.capitalize(Locale.ROOT)
+        val variantLowered = name.toLowerCase(Locale.ROOT)
+
+        val copyStub = tasks.register("copy${variantCapped}StubApk", Copy::class.java) {
+            dependsOn(syncResources)
+            into("src/main/assets")
+            from(rootProject.file("out/stub-${variantLowered}.apk")) {
+                rename { "stub.apk" }
+            }
+            onlyIf {
+                if (inputs.sourceFiles.files.size != 1)
+                    throw StopExecutionException("Please build stub first! (./build.py stub)")
+                true
+            }
+        }
+
+        preBuildProvider.get().dependsOn(copyStub)
 
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
         val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
 
-        val genSrcTask = tasks.register("generate${name.capitalize(Locale.ROOT)}KeyData") {
+        val genSrcTask = tasks.register("generate${variantCapped}KeyData") {
             inputs.dir(keysDir)
             outputs.file(outSrc)
             doLast {
