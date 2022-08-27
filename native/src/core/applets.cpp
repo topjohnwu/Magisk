@@ -8,45 +8,68 @@
 
 using namespace std;
 
-using main_fun = int (*)(int, char *[]);
+struct Applet {
+    string_view name;
+    int (*fn)(int, char *[]);
+};
 
-constexpr const char *applets[] = { "su", "resetprop", "zygisk", nullptr };
-static main_fun applet_mains[] = { su_client_main, resetprop_main, zygisk_main, nullptr };
+constexpr Applet applets[] = {
+    { "su", su_client_main },
+    { "resetprop", resetprop_main },
+};
 
-static int call_applet(int argc, char *argv[]) {
-    // Applets
-    string_view base = basename(argv[0]);
-    for (int i = 0; applets[i]; ++i) {
-        if (base == applets[i]) {
-            return (*applet_mains[i])(argc, argv);
-        }
-    }
-    fprintf(stderr, "%s: applet not found\n", base.data());
-    return 1;
-}
+constexpr Applet private_applets[] = {
+    { "zygisk", zygisk_main },
+};
 
 int main(int argc, char *argv[]) {
+    if (argc < 1)
+        return 1;
+
     enable_selinux();
     cmdline_logging();
     init_argv0(argc, argv);
 
-    string_view base = basename(argv[0]);
+    string_view argv0 = basename(argv[0]);
 
     // app_process is actually not an applet
-    if (str_starts(base, "app_process")) {
+    if (argv0.starts_with("app_process")) {
         return app_process_main(argc, argv);
     }
 
     umask(0);
-    if (base == "magisk" || base == "magisk32" || base == "magisk64") {
+
+    if (argv[0][0] == '\0') {
+        // When argv[0] is an empty string, we're calling private applets
+        if (argc < 2)
+            return 1;
+        --argc;
+        ++argv;
+        for (const auto &app : private_applets) {
+            if (argv[0] == app.name) {
+                return app.fn(argc, argv);
+            }
+        }
+        fprintf(stderr, "%s: applet not found\n", argv[0]);
+        return 1;
+    }
+
+    if (argv0 == "magisk" || argv0 == "magisk32" || argv0 == "magisk64") {
         if (argc > 1 && argv[1][0] != '-') {
-            // Calling applet via magisk [applet] args
+            // Calling applet with "magisk [applet] args..."
             --argc;
             ++argv;
+            argv0 = argv[0];
         } else {
             return magisk_main(argc, argv);
         }
     }
 
-    return call_applet(argc, argv);
+    for (const auto &app : applets) {
+        if (argv0 == app.name) {
+            return app.fn(argc, argv);
+        }
+    }
+    fprintf(stderr, "%s: applet not found\n", argv0.data());
+    return 1;
 }

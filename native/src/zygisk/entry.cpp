@@ -177,7 +177,7 @@ static void connect_companion(int client, bool is_64_bit) {
             fcntl(fds[1], F_SETFD, 0);
             char buf[16];
             snprintf(buf, sizeof(buf), "%d", fds[1]);
-            execl(exe.data(), "zygisk", "companion", buf, (char *) nullptr);
+            execl(exe.data(), "", "zygisk", "companion", buf, (char *) nullptr);
             exit(-1);
         }
         close(fds[1]);
