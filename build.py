@@ -64,7 +64,7 @@ cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
 triples = ['armv7a-linux-androideabi', 'i686-linux-android', 'aarch64-linux-android', 'x86_64-linux-android']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox']
-support_targets = default_targets + ['resetprop', 'test']
+support_targets = default_targets + ['resetprop']
 rust_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy']
 
 sdk_path = os.environ['ANDROID_SDK_ROOT']
@@ -220,6 +220,8 @@ def run_ndk_build(flags):
 def run_cargo_build(args):
     os.chdir(op.join('native', 'src'))
     targets = set(args.target) & set(rust_targets)
+    if 'resetprop' in args.target:
+        targets.add('magisk')
 
     env = os.environ.copy()
     env['CARGO_BUILD_RUSTC'] = op.join(rust_bin, 'rustc' + EXE_EXT)

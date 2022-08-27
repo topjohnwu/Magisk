@@ -4,30 +4,34 @@ LOCAL_PATH := $(call my-dir)
 # Rust compilation outputs
 ###########################
 
-ifdef B_MAGISK
+LIBRARY_PATH = ../out/$(TARGET_ARCH_ABI)/libmagisk-rs.a
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LIBRARY_PATH)))
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk-rs
-LOCAL_SRC_FILES := ../out/$(TARGET_ARCH_ABI)/libmagisk-rs.a
+LOCAL_SRC_FILES := $(LIBRARY_PATH)
 include $(PREBUILT_STATIC_LIBRARY)
 endif
 
-ifdef B_BOOT
+LIBRARY_PATH = ../out/$(TARGET_ARCH_ABI)/libmagiskboot-rs.a
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LIBRARY_PATH)))
 include $(CLEAR_VARS)
 LOCAL_MODULE := boot-rs
-LOCAL_SRC_FILES := ../out/$(TARGET_ARCH_ABI)/libmagiskboot-rs.a
+LOCAL_SRC_FILES := $(LIBRARY_PATH)
 include $(PREBUILT_STATIC_LIBRARY)
 endif
 
-ifdef B_INIT
+LIBRARY_PATH = ../out/$(TARGET_ARCH_ABI)/libmagiskinit-rs.a
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LIBRARY_PATH)))
 include $(CLEAR_VARS)
 LOCAL_MODULE := init-rs
-LOCAL_SRC_FILES := ../out/$(TARGET_ARCH_ABI)/libmagiskinit-rs.a
+LOCAL_SRC_FILES := $(LIBRARY_PATH)
 include $(PREBUILT_STATIC_LIBRARY)
 endif
 
-ifdef B_POLICY
+LIBRARY_PATH = ../out/$(TARGET_ARCH_ABI)/libmagiskpolicy-rs.a
+ifneq (,$(wildcard $(LOCAL_PATH)/$(LIBRARY_PATH)))
 include $(CLEAR_VARS)
 LOCAL_MODULE := policy-rs
-LOCAL_SRC_FILES := ../out/$(TARGET_ARCH_ABI)/libmagiskpolicy-rs.a
+LOCAL_SRC_FILES := $(LIBRARY_PATH)
 include $(PREBUILT_STATIC_LIBRARY)
 endif

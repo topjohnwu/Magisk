@@ -150,27 +150,12 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \
-    resetprop/persist_properties.cpp \
     resetprop/resetprop.cpp \
+    resetprop/persist.cpp \
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 include $(BUILD_EXECUTABLE)
 
-endif
-
-ifdef B_TEST
-ifneq (,$(wildcard src/test.cpp))
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := test
-LOCAL_STATIC_LIBRARIES := \
-    libbase \
-    libphmap
-
-LOCAL_SRC_FILES := test.cpp
-include $(BUILD_EXECUTABLE)
-
-endif
 endif
 
 ########################

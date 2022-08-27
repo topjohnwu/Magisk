@@ -6,6 +6,8 @@
 #include <resetprop.hpp>
 #include <base.hpp>
 
+#undef __INTRODUCED_IN
+#define __INTRODUCED_IN(...)
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <_system_properties.h>
 
