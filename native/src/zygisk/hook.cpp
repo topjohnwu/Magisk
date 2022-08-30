@@ -43,10 +43,10 @@ void name##_post();
 struct HookContext {
     JNIEnv *env;
     union {
-        AppSpecializeArgs_v3 *args;
-        ServerSpecializeArgs_v1 *server_args;
-        void *raw_args;
-    };
+        void *ptr;
+        AppSpecializeArgs_v3 *app;
+        ServerSpecializeArgs_v1 *server;
+    } args;
     const char *process;
     vector<ZygiskModule> modules;
     bitset<FLAG_MAX> state;
@@ -54,7 +54,7 @@ struct HookContext {
     int pid;
     uint32_t flags;
 
-    HookContext() : pid(-1), flags(0) {}
+    HookContext() : env(nullptr), args{nullptr}, process(nullptr), pid(-1), flags(0) {}
 
     static void close_fds();
     void unload_zygisk();
@@ -280,39 +280,49 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
 }
 
 ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
-: raw_entry(entry), api(this), id(id), handle(handle) {}
+: id(id), handle(handle), entry{entry}, api{}, mod{nullptr} {
+    // Make sure all pointers are null
+    memset(&api, 0, sizeof(api));
+    api.base.impl = this;
+    api.base.registerModule = &ZygiskModule::RegisterModule;
+}
 
-ApiTable::ApiTable(ZygiskModule *m)
-: module(m), registerModule(&ZygiskModule::RegisterModule) {}
-
-bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
-    long ver = *module;
+bool ZygiskModule::RegisterModule(api_abi_base *api, long *module) {
+    long api_version = *module;
     // Unsupported version
-    if (ver > ZYGISK_API_VERSION)
+    if (api_version > ZYGISK_API_VERSION)
         return false;
 
     // Set the actual module_abi*
-    table->module->ver = module;
+    api->impl->mod = { module };
 
     // Fill in API accordingly with module API version
-    switch (ver) {
+    switch (api_version) {
     case 3:
-    case 2:
-        table->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
-        table->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
+    case 2: {
+        auto v2 = static_cast<api_abi_v2 *>(api);
+        v2->getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        v2->getFlags = [](auto) { return ZygiskModule::getFlags(); };
+    }
         // fallthrough
-    case 1:
-        table->v1.hookJniNativeMethods = &hookJniNativeMethods;
-        table->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
+    case 1: {
+        auto v1 = static_cast<api_abi_v1 *>(api);
+        v1->hookJniNativeMethods = &hookJniNativeMethods;
+        v1->pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
             xhook_register(p, s, n, o);
         };
-        table->v1.pltHookExclude = [](const char *p, const char *s) {
+        v1->pltHookExclude = [](const char *p, const char *s) {
             xhook_ignore(p, s);
         };
-        table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
-        table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
-        table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+        v1->pltHookCommit = [] {
+            bool r = xhook_refresh(0) == 0;
+            xhook_clear();
+            return r;
+        };
+        v1->connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+        v1->setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
         break;
+    }
     default:
         // Unknown version number
         return false;
@@ -395,17 +405,17 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
     }
 
     for (auto &m : modules) {
-        m.entry(&m.api, env);
+        m.onLoad(env);
         if (state[APP_SPECIALIZE]) {
-            m.preAppSpecialize(args);
+            m.preAppSpecialize(args.app);
         } else if (state[SERVER_SPECIALIZE]) {
-            m.preServerSpecialize(server_args);
+            m.preServerSpecialize(args.server);
         }
     }
 
     // Add all ignored fd onto whitelist
-    if (state[APP_SPECIALIZE] && args->fds_to_ignore) {
-        if (jintArray fdsToIgnore = *args->fds_to_ignore) {
+    if (state[APP_SPECIALIZE] && args.app->fds_to_ignore) {
+        if (jintArray fdsToIgnore = *args.app->fds_to_ignore) {
             int len = env->GetArrayLength(fdsToIgnore);
             int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
             for (int i = 0; i < len; ++i) {
@@ -431,11 +441,11 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
 void HookContext::run_modules_post() {
     for (const auto &m : modules) {
         if (state[APP_SPECIALIZE]) {
-            m.postAppSpecialize(args);
+            m.postAppSpecialize(args.app);
         } else if (state[SERVER_SPECIALIZE]) {
-            m.postServerSpecialize(server_args);
+            m.postServerSpecialize(args.server);
         }
-        m.doUnload();
+        m.tryUnload();
     }
 }
 
@@ -452,7 +462,7 @@ void HookContext::unload_zygisk() {
 
         // Strip out all API function pointers
         for (auto &m : modules) {
-            memset(&m.api, 0, sizeof(m.api));
+            m.clearApi();
         }
 
         new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
@@ -464,7 +474,7 @@ void HookContext::unload_zygisk() {
 void HookContext::nativeSpecializeAppProcess_pre() {
     g_ctx = this;
     state[APP_SPECIALIZE] = true;
-    process = env->GetStringUTFChars(args->nice_name, nullptr);
+    process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     if (state[FORK_AND_SPECIALIZE]) {
         ZLOGV("pre  forkAndSpecialize [%s]\n", process);
     } else {
@@ -472,7 +482,7 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     }
 
     vector<int> module_fds;
-    int fd = remote_get_info(args->uid, process, &flags, module_fds);
+    int fd = remote_get_info(args.app->uid, process, &flags, module_fds);
     if ((flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
         ZLOGI("[%s] is on the denylist\n", process);
         state[DO_UNMOUNT] = true;
@@ -492,7 +502,7 @@ void HookContext::nativeSpecializeAppProcess_post() {
         ZLOGV("post specialize [%s]\n", process);
     }
 
-    env->ReleaseStringUTFChars(args->nice_name, process);
+    env->ReleaseStringUTFChars(args.app->nice_name, process);
     run_modules_post();
     if (flags & PROCESS_IS_MAGISK_APP) {
         setenv("ZYGISK_ENABLED", "1", 1);

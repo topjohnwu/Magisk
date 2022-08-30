@@ -97,7 +97,7 @@ class ForkAndSpec(JNIHook):
                 decl += ind(1) + f'args.{a.name} = &{a.name};'
         decl += ind(1) + 'HookContext ctx;'
         decl += ind(1) + 'ctx.env = env;'
-        decl += ind(1) + 'ctx.raw_args = &args;'
+        decl += ind(1) + 'ctx.args = { &args };'
         decl += ind(1) + f'ctx.{self.base_name()}_pre();'
         decl += ind(1) + self.orig_method() + '('
         decl += ind(2) + f'env, clazz, {self.name_list()}'

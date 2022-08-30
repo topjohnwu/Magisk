@@ -220,7 +220,7 @@ struct Api {
     bool pltHookCommit();
 
 private:
-    internal::api_table *impl;
+    internal::api_table *tbl;
     template <class T> friend void internal::entry_impl(internal::api_table *, JNIEnv *);
 };
 
@@ -244,46 +244,43 @@ void zygisk_module_entry(zygisk::internal::api_table *table, JNIEnv *env) { \
 #define REGISTER_ZYGISK_COMPANION(func) \
 void zygisk_companion_entry(int client) { func(client); }
 
-/************************************************************************************
- * All the code after this point is internal code used to interface with Zygisk
- * and guarantee ABI stability. You do not have to understand what it is doing.
- ************************************************************************************/
+/*********************************************************
+ * The following is internal ABI implementation detail.
+ * You do not have to understand what it is doing.
+ *********************************************************/
 
 namespace internal {
 
 struct module_abi {
     long api_version;
-    ModuleBase *_this;
+    ModuleBase *impl;
 
     void (*preAppSpecialize)(ModuleBase *, AppSpecializeArgs *);
     void (*postAppSpecialize)(ModuleBase *, const AppSpecializeArgs *);
     void (*preServerSpecialize)(ModuleBase *, ServerSpecializeArgs *);
     void (*postServerSpecialize)(ModuleBase *, const ServerSpecializeArgs *);
 
-    module_abi(ModuleBase *module) : api_version(ZYGISK_API_VERSION), _this(module) {
-        preAppSpecialize = [](auto self, auto args) { self->preAppSpecialize(args); };
-        postAppSpecialize = [](auto self, auto args) { self->postAppSpecialize(args); };
-        preServerSpecialize = [](auto self, auto args) { self->preServerSpecialize(args); };
-        postServerSpecialize = [](auto self, auto args) { self->postServerSpecialize(args); };
+    module_abi(ModuleBase *module) : api_version(ZYGISK_API_VERSION), impl(module) {
+        preAppSpecialize = [](auto m, auto args) { m->preAppSpecialize(args); };
+        postAppSpecialize = [](auto m, auto args) { m->postAppSpecialize(args); };
+        preServerSpecialize = [](auto m, auto args) { m->preServerSpecialize(args); };
+        postServerSpecialize = [](auto m, auto args) { m->postServerSpecialize(args); };
     }
 };
 
 struct api_table {
-    // These first 2 entries are permanent, shall never change
-    void *_this;
+    // Base
+    void *impl;
     bool (*registerModule)(api_table *, module_abi *);
 
-    // Utility functions
     void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
     void (*pltHookRegister)(const char *, const char *, void *, void **);
     void (*pltHookExclude)(const char *, const char *);
     bool (*pltHookCommit)();
-
-    // Zygisk functions
-    int  (*connectCompanion)(void * /* _this */);
-    void (*setOption)(void * /* _this */, Option);
-    int  (*getModuleDir)(void * /* _this */);
-    uint32_t (*getFlags)(void * /* _this */);
+    int  (*connectCompanion)(void * /* impl */);
+    void (*setOption)(void * /* impl */, Option);
+    int  (*getModuleDir)(void * /* impl */);
+    uint32_t (*getFlags)(void * /* impl */);
 };
 
 template <class T>
@@ -292,35 +289,35 @@ void entry_impl(api_table *table, JNIEnv *env) {
     if (!table->registerModule(table, new module_abi(module)))
         return;
     auto api = new Api();
-    api->impl = table;
+    api->tbl = table;
     module->onLoad(api, env);
 }
 
 } // namespace internal
 
 inline int Api::connectCompanion() {
-    return impl->connectCompanion ? impl->connectCompanion(impl->_this) : -1;
+    return tbl->connectCompanion ? tbl->connectCompanion(tbl->impl) : -1;
 }
 inline int Api::getModuleDir() {
-    return impl->getModuleDir ? impl->getModuleDir(impl->_this) : -1;
+    return tbl->getModuleDir ? tbl->getModuleDir(tbl->impl) : -1;
 }
 inline void Api::setOption(Option opt) {
-    if (impl->setOption) impl->setOption(impl->_this, opt);
+    if (tbl->setOption) tbl->setOption(tbl->impl, opt);
 }
 inline uint32_t Api::getFlags() {
-    return impl->getFlags ? impl->getFlags(impl->_this) : 0;
+    return tbl->getFlags ? tbl->getFlags(tbl->impl) : 0;
 }
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
-    if (impl->hookJniNativeMethods) impl->hookJniNativeMethods(env, className, methods, numMethods);
+    if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, className, methods, numMethods);
 }
 inline void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
-    if (impl->pltHookRegister) impl->pltHookRegister(regex, symbol, newFunc, oldFunc);
+    if (tbl->pltHookRegister) tbl->pltHookRegister(regex, symbol, newFunc, oldFunc);
 }
 inline void Api::pltHookExclude(const char *regex, const char *symbol) {
-    if (impl->pltHookExclude) impl->pltHookExclude(regex, symbol);
+    if (tbl->pltHookExclude) tbl->pltHookExclude(regex, symbol);
 }
 inline bool Api::pltHookCommit() {
-    return impl->pltHookCommit != nullptr && impl->pltHookCommit();
+    return tbl->pltHookCommit != nullptr && tbl->pltHookCommit();
 }
 
 } // namespace zygisk
