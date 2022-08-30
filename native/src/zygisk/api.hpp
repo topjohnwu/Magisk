@@ -1,8 +1,22 @@
-// All content of this file is released to the public domain.
+/* Copyright 2022 John "topjohnwu" Wu
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+ * OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
 
-// This file is the public API for Zygisk modules.
-// DO NOT use this file for developing Zygisk modules as it might contain WIP changes.
-// Always use the following header for development as those are finalized APIs:
+// This is the public API for Zygisk modules.
+// DO NOT MODIFY ANY CODE IN THIS HEADER.
+
+// WARNING: this file may contain changes that are not finalized.
+// Always use the following published header for development:
 // https://github.com/topjohnwu/zygisk-module-sample/blob/master/module/jni/zygisk.hpp
 
 #pragma once
