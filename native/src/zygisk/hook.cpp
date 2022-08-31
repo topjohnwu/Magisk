@@ -154,13 +154,19 @@ DCL_HOOK_FUNC(int, fork) {
 // Unmount stuffs in the process's private mount namespace
 DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
-    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
+    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0 &&
+        // For some unknown reason, unmounting app_process in SysUI can break.
+        // This is reproducible on the official AVD running API 26 and 27.
+        // Simply avoid doing any unmounts for SysUI to avoid potential issues.
+        g_ctx->process && g_ctx->process != "com.android.systemui"sv) {
         if (g_ctx->state[DO_UNMOUNT]) {
             revert_unmount();
         } else {
             umount2("/system/bin/app_process64", MNT_DETACH);
             umount2("/system/bin/app_process32", MNT_DETACH);
         }
+        // Restore errno back to 0
+        errno = 0;
     }
     return res;
 }
