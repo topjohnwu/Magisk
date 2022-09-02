@@ -173,7 +173,7 @@ struct ZygiskModule {
 
     ZygiskModule(int id, void *handle, void *entry);
 
-    static bool RegisterModule(api_abi_base *api, long *module);
+    static bool RegisterModuleImpl(api_abi_base *api, long *module);
 
 private:
     const int id;

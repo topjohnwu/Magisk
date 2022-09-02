@@ -76,36 +76,51 @@ extern "C" void zygisk_inject_entry(void *handle) {
 // The following code runs in zygote/app process
 
 extern "C" void zygisk_log_write(int prio, const char *msg, int len) {
-    // If we don't have log pipe set, ask magiskd for it
-    // This could happen multiple times in zygote because it was closed to prevent crashing
+    // If we don't have the log pipe set, request magiskd for it. This could actually happen
+    // multiple times in the zygote daemon (parent process) because we had to close this
+    // file descriptor to prevent crashing.
+    //
+    // For some reason, zygote sanitizes and checks FDs *before* forking. This results in the fact
+    // that *every* time before zygote forks, it has to close all logging related FDs in order
+    // to pass FD checks, just to have it re-initialized immediately after any
+    // logging happens ¯\_(ツ)_/¯.
+    //
+    // To be consistent with this behavior, we also have to close the log pipe to magiskd
+    // to make zygote NOT crash if necessary. For nativeForkAndSpecialize, we can actually
+    // add this FD into fds_to_ignore to pass the check. For other cases, we accomplish this by
+    // hooking __android_log_close and closing it at the same time as the rest of logging FDs.
+
     if (logd_fd < 0) {
-        // Change logging temporarily to prevent infinite recursion and stack overflow
         android_logging();
         if (int fd = zygisk_request(ZygiskRequest::GET_LOG_PIPE); fd >= 0) {
+            int log_pipe = -1;
             if (read_int(fd) == 0) {
-                logd_fd = recv_fd(fd);
+                log_pipe = recv_fd(fd);
             }
             close(fd);
+            if (log_pipe >= 0) {
+                // Only re-enable zygisk logging if possible
+                logd_fd = log_pipe;
+                zygisk_logging();
+            }
+        } else {
+            return;
         }
-        zygisk_logging();
     }
 
+    // Block SIGPIPE
     sigset_t mask;
     sigset_t orig_mask;
-    bool sig = false;
-    // Make sure SIGPIPE won't crash zygote
-    if (logd_fd >= 0) {
-        sig = true;
-        sigemptyset(&mask);
-        sigaddset(&mask, SIGPIPE);
-        pthread_sigmask(SIG_BLOCK, &mask, &orig_mask);
-    }
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGPIPE);
+    pthread_sigmask(SIG_BLOCK, &mask, &orig_mask);
+
     magisk_log_write(prio, msg, len);
-    if (sig) {
-        timespec ts{};
-        sigtimedwait(&mask, nullptr, &ts);
-        pthread_sigmask(SIG_SETMASK, &orig_mask, nullptr);
-    }
+
+    // Consume SIGPIPE if exists, then restore mask
+    timespec ts{};
+    sigtimedwait(&mask, nullptr, &ts);
+    pthread_sigmask(SIG_SETMASK, &orig_mask, nullptr);
 }
 
 static inline bool should_load_modules(uint32_t flags) {
