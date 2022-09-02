@@ -122,15 +122,13 @@ data class LocalModule(
 
     companion object {
 
-        private val PERSIST get() = "${Const.MAGISKTMP}/mirror/persist/magisk"
-
         fun loaded() = RootUtils.fs.getFile(Const.MAGISK_PATH).exists()
 
         suspend fun installed() = withContext(Dispatchers.IO) {
             RootUtils.fs.getFile(Const.MAGISK_PATH)
                 .listFiles()
                 .orEmpty()
-                .filter { !it.isFile }
+                .filter { !it.isFile && !it.isHidden }
                 .map { LocalModule("${Const.MAGISK_PATH}/${it.name}") }
                 .sortedBy { it.name.lowercase(Locale.ROOT) }
         }
