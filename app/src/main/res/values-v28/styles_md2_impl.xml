@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="WidgetFoundation.Card.Elevated.V28" parent="WidgetFoundation.Card.Elevated.V21">
+        <item name="android:outlineSpotShadowColor">@android:color/transparent</item>
+        <item name="android:outlineAmbientShadowColor">@android:color/transparent</item>
+    </style>
+
+    <style name="WidgetFoundation.Card.Elevated" parent="WidgetFoundation.Card.Elevated.V28"/>
+</resources>

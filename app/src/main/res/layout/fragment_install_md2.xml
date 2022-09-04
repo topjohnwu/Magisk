@@ -33,10 +33,11 @@
             android:paddingTop="@dimen/l_50">
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card"
+                style="@style/WidgetFoundation.Card.Elevated"
                 gone="@{viewModel.skipOptions}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/l_50"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:focusable="false">
@@ -97,6 +98,7 @@
                             android:layout_height="wrap_content"
                             android:checked="@={Config.keepVerity}"
                             android:text="@string/keep_dm_verity"
+                            android:textAppearance="@style/AppearanceFoundation.Body"
                             tools:checked="true" />
 
                         <CheckBox
@@ -106,6 +108,7 @@
                             android:layout_height="wrap_content"
                             android:checked="@={Config.keepEnc}"
                             android:text="@string/keep_force_encryption"
+                            android:textAppearance="@style/AppearanceFoundation.Body"
                             app:tint="?colorPrimary" />
 
                         <CheckBox
@@ -115,6 +118,7 @@
                             android:layout_height="wrap_content"
                             android:checked="@={Config.patchVbmeta}"
                             android:text="@string/patch_vbmeta"
+                            android:textAppearance="@style/AppearanceFoundation.Body"
                             app:tint="?colorPrimary" />
 
                         <CheckBox
@@ -133,9 +137,10 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card"
+                style="@style/WidgetFoundation.Card.Elevated"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/l_50"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
@@ -197,7 +202,8 @@
                             style="@style/WidgetFoundation.RadioButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/select_patch_file" />
+                            android:text="@string/select_patch_file"
+                            android:textAppearance="@style/AppearanceFoundation.Body" />
 
                         <RadioButton
                             android:id="@+id/method_direct"
@@ -205,7 +211,8 @@
                             gone="@{!viewModel.rooted}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/direct_install" />
+                            android:text="@string/direct_install"
+                            android:textAppearance="@style/AppearanceFoundation.Body" />
 
                         <RadioButton
                             android:id="@+id/method_inactive_slot"
@@ -213,7 +220,8 @@
                             gone="@{viewModel.noSecondSlot}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/install_inactive_slot" />
+                            android:text="@string/install_inactive_slot"
+                            android:textAppearance="@style/AppearanceFoundation.Body" />
 
                     </RadioGroup>
 
@@ -222,10 +230,11 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
-                style="@style/WidgetFoundation.Card"
+                style="@style/WidgetFoundation.Card.Elevated"
                 gone="@{viewModel.notes.length == 0}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/l_50"
                 android:layout_marginStart="@dimen/l1"
                 android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"

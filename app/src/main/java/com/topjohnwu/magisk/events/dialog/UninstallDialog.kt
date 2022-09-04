@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.events.dialog
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.NavigationActivity
@@ -17,29 +18,12 @@ class UninstallDialog : DialogEvent() {
             setTitle(R.string.uninstall_magisk_title)
             setMessage(R.string.uninstall_magisk_msg)
             setButton(MagiskDialog.ButtonType.POSITIVE) {
-                text = R.string.restore_img
-                onClick { restore(dialog.context) }
-            }
-            setButton(MagiskDialog.ButtonType.NEGATIVE) {
-                text = R.string.complete_uninstall
+                text = "Yes"
                 onClick { completeUninstall(dialog) }
             }
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun restore(context: Context) {
-        val dialog = ProgressDialog(context).apply {
-            setMessage(context.getString(R.string.restore_img_msg))
-            show()
-        }
-
-        Shell.cmd("restore_imgs").submit { result ->
-            dialog.dismiss()
-            if (result.isSuccess) {
-                Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT)
-            } else {
-                Utils.toast(R.string.restore_fail, Toast.LENGTH_LONG)
+            setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                text = "No"
+                dialog.dismiss()
             }
         }
     }

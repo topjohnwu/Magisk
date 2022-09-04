@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_background">#0D0D0D</color>
-    <color name="switch_thumb_disabled">@android:color/system_neutral1_700</color>
-    <color name="switch_thumb_off">@android:color/system_neutral1_400</color>
-    <color name="switch_track_on">@color/color_switch_track_on</color>
-    <color name="switch_track_off">@android:color/system_neutral1_700</color>
+    <color name="error">#F87464</color>
+    <color name="on_error">#690005</color>
 </resources>

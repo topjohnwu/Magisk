@@ -37,12 +37,12 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>() {
         super.onCreateView(inflater, container, savedInstanceState)
 
         // If titles are squished, hide icons
-        with(binding.homeMagiskWrapper) {
-            checkTitle(homeMagiskTitle)
-        }
-        with(binding.homeManagerWrapper) {
-            checkTitle(homeManagerTitle)
-        }
+//        with(binding.homeMagiskWrapper) {
+//            checkTitle(homeMagiskTitle)
+//        }
+//        with(binding.homeManagerWrapper) {
+//            checkTitle(homeManagerTitle)
+//        }
 
         return binding.root
     }

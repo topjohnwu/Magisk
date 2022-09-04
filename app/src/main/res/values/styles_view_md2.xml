@@ -27,6 +27,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:textAppearance">@style/AppearanceFoundation.Caption.Variant</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="W.Home.ItemContent.Right">
@@ -61,4 +62,14 @@
 
     <!--endregion-->
 
+    <!--region Shape-->
+
+    <style name="W.Shape" />
+
+    <style name="W.Shape.Rounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!--endregion-->
 </resources>

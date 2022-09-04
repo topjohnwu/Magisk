@@ -28,6 +28,7 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/internal_action_bar_size"
             android:paddingBottom="@dimen/internal_action_bar_size"
+            android:layout_marginBottom="@dimen/l3"
             app:fitsSystemWindowsInsets="top|bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_module_md2" />

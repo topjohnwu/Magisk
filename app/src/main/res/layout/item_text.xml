@@ -17,6 +17,7 @@
         android:padding="@dimen/l1"
         android:text="@{item.text}"
         android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
+        android:textColor="@android:color/white"
         tools:text="@tools:sample/lorem/random" />
 
 </layout>

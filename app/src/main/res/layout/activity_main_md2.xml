@@ -47,6 +47,7 @@
                 app:layout_scrollFlags="noScroll"
                 tools:layout_marginTop="24dp"
                 app:titleTextAppearance="@style/AppearanceFoundation.Title"
+                app:subtitleTextAppearance="@style/AppearanceFoundation.Body"
                 tools:title="Home" />
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -59,7 +60,8 @@
             android:layout_gravity="bottom|center_horizontal"
             android:fitsSystemWindows="false"
             android:paddingBottom="0dp"
-            app:itemTextAppearance="@style/AppearanceFoundation.Caption"
+            app:itemTextAppearanceActive="@style/AppearanceFoundation.Body"
+            app:itemTextAppearanceInactive="@style/AppearanceFoundation.Body"
             app:fitsSystemWindowsInsets="start|end|bottom"
             app:itemHorizontalTranslationEnabled="false"
             app:labelVisibilityMode="labeled"

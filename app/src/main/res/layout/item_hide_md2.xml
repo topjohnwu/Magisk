@@ -18,7 +18,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card"
+        style="@style/WidgetFoundation.Card.Elevated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="false"
@@ -101,7 +101,6 @@
                 app:extraBindings="@{viewModel.extraBindings}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?colorSurfaceVariant"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="2"

@@ -28,7 +28,9 @@
     <string name="home_installed_version">Installed</string>
     <string name="home_latest_version">Latest</string>
     <string name="invalid_update_channel">Invalid Update Channel</string>
-    <string name="uninstall_magisk_title">Uninstall Magisk</string>
+    <string name="uninstall_title">Uninstall Magisk</string>
+    <string name="uninstall_description">Choose Restore Images if you want to save modules for next Magisk Flash</string>
+    <string name="uninstall_magisk_title">Uninstall Magisk?</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
 
     <!--Install-->
@@ -85,6 +87,7 @@
     <string name="log_data_magisk_none">Magisk logs are empty, that\'s weird</string>
     <string name="menuSaveLog">Save log</string>
     <string name="menuClearLog">Clear log now</string>
+    <string name="menuLogToggle">Show Manager logs</string>
     <string name="logs_cleared">Log successfully cleared</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>

@@ -125,7 +125,7 @@ class MagiskDialog(
         materialShapeDrawable.initializeElevationOverlay(context)
         materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)
         materialShapeDrawable.elevation = context.resources.getDimension(R.dimen.margin_generic)
-        materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l_50))
+        materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l1_75))
 
         val inset = context.resources.getDimensionPixelSize(com.google.android.material.R.dimen.appcompat_dialog_background_inset)
         window?.apply {

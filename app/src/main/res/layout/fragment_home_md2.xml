@@ -17,15 +17,29 @@
 
     </data>
 
-    <androidx.core.widget.NestedScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:fillViewport="true"
         android:paddingTop="@dimen/internal_action_bar_size"
         android:paddingBottom="@dimen/l3"
+        android:layout_marginStart="@dimen/l1"
+        android:layout_marginEnd="@dimen/l1"
         app:fitsSystemWindowsInsets="top|bottom"
-        tools:layout_marginTop="24dp">
+        tools:layout_marginTop="22dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/WidgetFoundation.Card"
+            app:cardBackgroundColor="?android:colorBackground"
+            android:layout_marginBottom="@dimen/l_75"
+            android:paddingBottom="@dimen/l_75">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,25 +48,22 @@
             android:orientation="vertical"
             android:paddingTop="@dimen/l1">
 
-            <Button
-                style="@style/WidgetFoundation.Button"
-                gone="@{!viewModel.showTest}"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:onClick="@{() -> viewModel.onTestPressed()}"
-                android:text="TEST"
-                android:textAllCaps="false"
-                tools:visibility="gone" />
+                    <Button
+                        style="@style/WidgetFoundation.Button"
+                        gone="@{!viewModel.showTest}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:onClick="@{() -> viewModel.onTestPressed()}"
+                        android:text="TEST"
+                        android:textAllCaps="false"
+                        tools:visibility="gone" />
 
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     goneUnless="@{viewModel.noticeVisible}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    android:layout_marginBottom="@dimen/l1"
                     android:focusable="false">
 
                     <TextView
@@ -66,177 +77,264 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
-                        android:id="@+id/home_notice_hide"
-                        style="@style/WidgetFoundation.Button.Text.OnPrimary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="@{() -> viewModel.hideNotice()}"
-                        android:text="@string/hide"
-                        android:textAllCaps="false"
-                        android:layout_marginEnd="10dp"
-                        android:backgroundTint="@android:color/transparent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <include
-                android:id="@+id/home_magisk_wrapper"
-                layout="@layout/include_home_magisk"
-                viewModel="@{viewModel}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper" />
-
-            <include
-                android:id="@+id/home_manager_wrapper"
-                layout="@layout/include_home_manager"
-                viewModel="@{viewModel}"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/l1"
-                android:layout_marginTop="@dimen/l1"
-                android:layout_marginEnd="@dimen/l1"
-                app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
-
-            <Space
-                goneUnless="@{Info.env.isActive}"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/l1" />
-
-            <Button
-                goneUnless="@{Info.env.isActive}"
-                style="@style/WidgetFoundation.Button.Error"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="@dimen/l2"
-                android:layout_marginEnd="@dimen/l2"
-                android:onClick="@{() -> viewModel.onDeletePressed()}"
-                android:text="@string/uninstall_magisk_title"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                app:cornerRadius="10dp"
-                app:icon="@drawable/ic_delete_md2" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/l1"
-                    android:paddingBottom="@dimen/l1"
-                    android:layout_gravity="bottom"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l1"
-                    android:layout_marginTop="@dimen/l1"
-                    android:focusable="false">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l1"
-                        android:layout_marginEnd="@dimen/l1"
-                        android:text="@string/home_support_title"
-                        android:textAppearance="@style/AppearanceFoundation.Title" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l1"
-                        android:layout_marginTop="@dimen/l_50"
-                        android:layout_marginEnd="@dimen/l1"
-                        android:text="@string/home_support_content"
-                        android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingTop="@dimen/l_50" >
-
-                        <include
-                            item="@{IconLink.Patreon.INSTANCE}"
-                            layout="@layout/item_icon_link"
-                            viewModel="@{viewModel}"
+                            android:id="@+id/home_notice_hide"
+                            style="@style/WidgetFoundation.Button.Text.OnPrimary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" />
+                            android:onClick="@{() -> viewModel.hideNotice()}"
+                            android:text="@string/hide"
+                            android:textAllCaps="false"
+                            android:layout_marginEnd="10dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                        <include
-                            item="@{IconLink.PayPal.Project.INSTANCE}"
-                            layout="@layout/item_icon_link"
-                            viewModel="@{viewModel}"
-                            android:layout_width="wrap_content"
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <include
+                        android:id="@+id/home_magisk_wrapper"
+                        layout="@layout/include_home_magisk"
+                        viewModel="@{viewModel}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@+id/home_device_wrapper" />
+
+                    <include
+                        android:id="@+id/home_manager_wrapper"
+                        layout="@layout/include_home_manager"
+                        viewModel="@{viewModel}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_75"
+                        app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
+
+                    <Space
+                        goneUnless="@{Info.env.isActive}"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/l_75" />
+
+                    <com.google.android.material.card.MaterialCardView
+                            goneUnless="@{Info.env.isActive}"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" />
+                            style="@style/WidgetFoundation.Card.Elevated"
+                            app:cardBackgroundColor="@color/error">
 
-                    </LinearLayout>
+                        <com.google.android.material.card.MaterialCardView
+                                style="@style/WidgetFoundation.Card.Elevated"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/l_50">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:padding="@dimen/l_75">
+
+                                <Button
+                                        android:id="@+id/uninstall_magisk_icon"
+                                        android:layout_width="60dp"
+                                        android:layout_height="60dp"
+                                        style="?materialIconButtonFilledStyle"
+                                        app:backgroundTint="@color/error"
+                                        app:iconTint="@color/on_error"
+                                        app:iconGravity="textStart"
+                                        app:icon="@drawable/ic_delete_md2"
+                                        app:layout_constraintLeft_toLeftOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        android:clickable="false" />
+
+                                <TextView
+                                        android:id="@+id/uninstall_title"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/uninstall_title"
+                                        app:layout_constraintLeft_toRightOf="@id/uninstall_magisk_icon"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        android:layout_marginStart="@dimen/l_50"
+                                        android:textAppearance="@style/AppearanceFoundation.Title" />
+
+                                <TextView
+                                        android:id="@+id/uninstall_description"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/l_125"
+                                        android:text="@string/uninstall_description"
+                                        android:textAppearance="@style/AppearanceFoundation.Body"
+                                        app:layout_constraintTop_toBottomOf="@id/uninstall_title"
+                                        app:layout_constraintLeft_toLeftOf="@id/uninstall_title"
+                                        app:layout_constraintRight_toRightOf="parent"/>
+
+                                <Button
+                                        android:id="@+id/complete_uninstall"
+                                        style="@style/WidgetFoundation.Button.Outlined"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:padding="@dimen/l_75"
+                                        android:text="@string/complete_uninstall"
+                                        android:onClick="@{() -> viewModel.onDeletePressed()}"
+                                        android:textAllCaps="false"
+                                        android:textStyle="bold"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/error"
+                                        app:icon="@drawable/ic_update_md2"
+                                        app:iconGravity="textStart"
+                                        app:iconTint="@color/error"
+                                        app:strokeColor="@color/error"
+                                        android:layout_marginTop="@dimen/l_50"
+                                        app:layout_constraintTop_toBottomOf="@id/uninstall_description" />
+
+                                <Button
+                                        style="@style/WidgetFoundation.Button.Outlined"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:padding="@dimen/l_75"
+                                        android:text="@string/restore_img"
+                                        android:onClick="@{() -> viewModel.onRestorePressed()}"
+                                        android:textAllCaps="false"
+                                        android:textStyle="bold"
+                                        android:textSize="16sp"
+                                        android:textColor="@color/error"
+                                        app:icon="@drawable/ic_update_md2"
+                                        app:iconGravity="textStart"
+                                        app:iconTint="@color/error"
+                                        app:strokeColor="@color/error"
+                                        android:layout_marginTop="@dimen/l_50"
+                                        app:layout_constraintTop_toBottomOf="@id/complete_uninstall" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        style="@style/WidgetFoundation.Card.Elevated"-->
+<!--                        android:layout_gravity="bottom"-->
+<!--                        android:layout_marginTop="@dimen/l_75"-->
+<!--                        android:focusable="false">-->
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="@dimen/l1">-->
+
+<!--                            <TextView-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="@string/home_support_title"-->
+<!--                                android:textSize="@dimen/text_home_title"-->
+<!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
+
+<!--                            <TextView-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50"-->
+<!--                                android:text="@string/home_support_content"-->
+<!--                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />-->
+
+<!--                            <LinearLayout-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:orientation="horizontal"-->
+<!--                                android:paddingTop="@dimen/l_50" >-->
+
+<!--                                <include-->
+<!--                                    item="@{IconLink.Patreon.INSTANCE}"-->
+<!--                                    layout="@layout/item_icon_link"-->
+<!--                                    viewModel="@{viewModel}"-->
+<!--                                    android:layout_width="wrap_content"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:layout_weight="1" />-->
+
+<!--                                <include-->
+<!--                                    item="@{IconLink.PayPal.Project.INSTANCE}"-->
+<!--                                    layout="@layout/item_icon_link"-->
+<!--                                    viewModel="@{viewModel}"-->
+<!--                                    android:layout_width="wrap_content"-->
+<!--                                    android:layout_height="wrap_content"-->
+<!--                                    android:layout_weight="1" />-->
+
+<!--                            </LinearLayout>-->
+
+<!--                        </LinearLayout>-->
+
+<!--                    </com.google.android.material.card.MaterialCardView>-->
+
+<!--                    <com.google.android.material.card.MaterialCardView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        style="@style/WidgetFoundation.Card.Elevated"-->
+<!--                        android:layout_gravity="bottom"-->
+<!--                        android:layout_marginTop="@dimen/l_25"-->
+<!--                        android:focusable="false">-->
+
+<!--                        <LinearLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:orientation="vertical"-->
+<!--                            android:padding="@dimen/l1">-->
+
+<!--                            <TextView-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="@string/home_follow_title"-->
+<!--                                android:textSize="@dimen/text_home_title"-->
+<!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
+
+<!--                            <include-->
+<!--                                item="@{DeveloperItem.John.INSTANCE}"-->
+<!--                                layout="@layout/item_developer"-->
+<!--                                viewModel="@{viewModel}"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50" />-->
+
+<!--                            <include-->
+<!--                                item="@{DeveloperItem.Vvb.INSTANCE}"-->
+<!--                                layout="@layout/item_developer"-->
+<!--                                viewModel="@{viewModel}"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50" />-->
+
+<!--                            <include-->
+<!--                                item="@{DeveloperItem.YU.INSTANCE}"-->
+<!--                                layout="@layout/item_developer"-->
+<!--                                viewModel="@{viewModel}"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50" />-->
+
+<!--                            <include-->
+<!--                                item="@{DeveloperItem.Rikka.INSTANCE}"-->
+<!--                                layout="@layout/item_developer"-->
+<!--                                viewModel="@{viewModel}"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50" />-->
+
+<!--                            <include-->
+<!--                                item="@{DeveloperItem.Dng.INSTANCE}"-->
+<!--                                layout="@layout/item_developer"-->
+<!--                                viewModel="@{viewModel}"-->
+<!--                                android:layout_width="wrap_content"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:layout_marginTop="@dimen/l_50" />-->
+
+<!--                        </LinearLayout>-->
+
+<!--                    </com.google.android.material.card.MaterialCardView>-->
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/l1"
-                    android:layout_gravity="bottom"
-                    android:layout_margin="@dimen/l1"
-                    android:focusable="false">
+            </androidx.core.widget.NestedScrollView>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/l1"
-                        android:layout_marginEnd="@dimen/l1"
-                        android:text="@string/home_follow_title"
-                        android:textAppearance="@style/AppearanceFoundation.Title" />
+        </com.google.android.material.card.MaterialCardView>
 
-                    <include
-                        item="@{DeveloperItem.John.INSTANCE}"
-                        layout="@layout/item_developer"
-                        viewModel="@{viewModel}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50" />
-
-                    <include
-                        item="@{DeveloperItem.Vvb.INSTANCE}"
-                        layout="@layout/item_developer"
-                        viewModel="@{viewModel}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50" />
-
-                    <include
-                        item="@{DeveloperItem.YU.INSTANCE}"
-                        layout="@layout/item_developer"
-                        viewModel="@{viewModel}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50" />
-
-                    <include
-                        item="@{DeveloperItem.Rikka.INSTANCE}"
-                        layout="@layout/item_developer"
-                        viewModel="@{viewModel}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50" />
-
-                    <include
-                        item="@{DeveloperItem.Dng.INSTANCE}"
-                        layout="@layout/item_developer"
-                        viewModel="@{viewModel}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/l_50" />
-
-                </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+    </RelativeLayout>
 
 </layout>

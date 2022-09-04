@@ -16,7 +16,7 @@
     </data>
 
     <com.google.android.material.card.MaterialCardView
-        style="@style/WidgetFoundation.Card"
+        style="@style/WidgetFoundation.Card.Elevated"
         isEnabled="@{item.enabled}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,8 +24,7 @@
         android:clickable="@{item.enabled}"
         android:focusable="@{item.enabled}"
         android:onClick="@{(view) -> item.onPressed(view, handler)}"
-        tools:layout_gravity="center"
-        app:cardBackgroundColor="@android:color/transparent">
+        tools:layout_gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,46 +34,75 @@
             android:paddingStart="@{item.icon == 0 ? @dimen/l1 : 0}"
             android:paddingEnd="@dimen/l1">
 
-            <ImageView
+            <Button
+                style="?attr/materialIconButtonFilledStyle"
                 android:id="@+id/icon"
-                style="@style/WidgetFoundation.Icon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="@dimen/l_125"
                 gone="@{item.icon == 0}"
-                android:background="@null"
-                app:srcCompat="@{item.icon}"
-                tools:srcCompat="@drawable/ic_fingerprint" />
+                app:icon="@{item.icon}"
+                android:clickable="false"
+                app:iconGravity="textStart"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                tools:icon="@drawable/ic_fingerprint" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:paddingTop="@dimen/l1"
                 android:paddingBottom="@dimen/l1">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:gravity="start"
                     android:text="@{item.title}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
+                    android:textSize="18sp"
                     android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/description_container"
+                    app:layout_constraintHorizontal_bias="0.0"
                     tools:lines="1"
                     tools:text="@tools:sample/lorem/random" />
 
-                <TextView
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/description_container"
                     gone="@{item.description.empty}"
-                    android:layout_width="match_parent"
+                    style="@style/WidgetFoundation.Card.Elevated"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@{item.description}"
-                    android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
-                    tools:lines="2"
-                    tools:text="@tools:sample/lorem/random" />
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:cardCornerRadius="@dimen/l_75">
 
-            </LinearLayout>
+                    <TextView
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:text="@{item.description}"
+                            android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
+                            android:lines="1"
+                            android:layout_gravity="center"
+                            android:layout_margin="@dimen/l_25"
+                            android:layout_marginLeft="@dimen/l_50"
+                            android:layout_marginRight="@dimen/l_50"/>
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+                </androidx.cardview.widget.CardView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/selector_indicator"
                 goneUnless="@{item.showSwitch}"
                 isEnabled="@{item.enabled}"

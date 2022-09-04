@@ -16,7 +16,7 @@
     <style name="AppearanceFoundation.Title" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textStyle">bold</item>
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="fontFamily">@font/googlesans</item>
     </style>
 
     <style name="AppearanceFoundation.Title.OnPrimary">
@@ -28,7 +28,7 @@
     <!--region Body-->
     <style name="AppearanceFoundation.Body" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="fontFamily">@font/product_sans_light</item>
+        <item name="android:fontFamily">@font/googlesans</item>
     </style>
 
     <!--endregion-->
@@ -36,7 +36,7 @@
     <!--region Caption-->
     <style name="AppearanceFoundation.Caption" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="fontFamily">@font/product_sans_light</item>
+        <item name="android:fontFamily">@font/googlesans</item>
     </style>
 
 
@@ -58,12 +58,12 @@
     <style name="AppearanceFoundation.Tiny" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">11sp</item>
-        <item name="fontFamily">@font/product_sans_light</item>
+        <item name="android:fontFamily">@font/googlesans</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Bold">
         <item name="android:textStyle">bold</item>
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="android:fontFamily">@font/googlesans</item>
     </style>
 
     <style name="AppearanceFoundation.Tiny.Secondary">
@@ -75,5 +75,4 @@
     </style>
 
     <!--endregion-->
-
 </resources>

@@ -24,17 +24,19 @@
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/l_50"
+                android:paddingRight="@dimen/l_50"
+                android:scrollbars="none">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:paddingTop="@dimen/internal_action_bar_size"
-                    android:paddingBottom="128dp"
+                    android:textStyle="bold"
                     android:text="@{viewModel.consoleText}"
                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                    android:textColor="?attr/colorOnSurface"
+                    android:textColor="@android:color/white"
                     app:layout_fitsSystemWindowsInsets="top|bottom"
                     tools:text="@tools:sample/lorem/random" />
 

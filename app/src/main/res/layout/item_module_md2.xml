@@ -19,177 +19,175 @@
 
     </data>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
-        tools:isEnabled="false"
-        tools:layout_gravity="center"
-        tools:layout_margin="@dimen/l1">
+    <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/WidgetFoundation.Card.Elevated"
+            isEnabled="@{!item.removed &amp;&amp; item.enabled &amp;&amp; !item.showNotice}"
+            tools:isEnabled="false"
+            tools:layout_gravity="center"
+            tools:layout_margin="@dimen/l1">
+
 
             <ImageView
-                android:id="@+id/module_state_icon"
-                gone="@{!item.removed &amp;&amp; !item.updated}"
-                srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:adjustViewBounds="true"
-                android:alpha=".05"
-                android:background="@null"
-                android:duplicateParentState="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?colorOnSurface"
-                tools:srcCompat="@drawable/ic_update_md2" />
+                    android:id="@+id/module_state_icon"
+                    gone="@{!item.removed &amp;&amp; !item.updated}"
+                    srcCompat="@{item.removed ? R.drawable.ic_delete_md2 : (item.updated ? R.drawable.ic_update_md2 : 0)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:alpha=".05"
+                    android:background="@null"
+                    android:duplicateParentState="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="?colorOnSurface"
+                    tools:srcCompat="@drawable/ic_update_md2" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:duplicateParentState="true">
-
-                <TextView
-                    android:id="@+id/module_title"
-                    strikeThrough="@{item.removed}"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l_50"
-                    android:duplicateParentState="true"
-                    android:text="@{item.item.name}"
-                    android:textAppearance="@style/AppearanceFoundation.Title"
-                    android:textColor="?android:textColorPrimary"
-                    android:textStyle="bold"
-                    android:textSize="30sp"
-                    app:layout_constraintEnd_toStartOf="@+id/module_indicator"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@tools:sample/lorem" />
-
-                <TextView
-                    android:id="@+id/module_version_author"
-                    strikeThrough="@{item.removed}"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:duplicateParentState="true"
-                    android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
-                    android:textAppearance="@style/AppearanceFoundation.Title"
-                    android:textColor="?android:textColorSecondary"
-                    android:textSize="15sp"
-                    app:layout_constraintEnd_toEndOf="@+id/module_title"
-                    app:layout_constraintStart_toStartOf="@+id/module_title"
-                    app:layout_constraintTop_toBottomOf="@+id/module_title"
-                    tools:text="@tools:sample/lorem" />
-
-                <TextView
-                    android:id="@+id/module_description"
-                    gone="@{item.item.description.empty}"
-                    strikeThrough="@{item.removed}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l5"
-                    android:layout_marginStart="@dimen/l1"
-                    android:duplicateParentState="true"
-                    android:maxLines="5"
-                    android:text="@{item.item.description}"
-                    android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                    android:textColor="?android:textColorSecondary"
-                    android:textSize="13sp"
-                    app:layout_constraintEnd_toStartOf="@+id/module_indicator"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
-                    tools:lines="4"
-                    tools:text="@tools:sample/lorem/random" />
+                    android:animateLayoutChanges="true"
+                    android:duplicateParentState="true">
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/module_indicator"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginEnd="8dp"
-                    android:checked="@={item.enabled}"
-                    app:layout_constraintBottom_toTopOf="@+id/module_divider"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/module_version_author"
-                    app:layout_constraintVertical_bias="0.659" />
+                <TextView
+                        android:id="@+id/module_title"
+                        strikeThrough="@{item.removed}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        android:layout_marginTop="@dimen/l1"
+                        android:layout_marginEnd="@dimen/l3"
+                        android:duplicateParentState="true"
+                        android:text="@{item.item.name}"
+                        android:textAppearance="@style/AppearanceFoundation.Title"
+                        android:textColor="?android:textColorPrimary"
+                        android:textSize="22sp"
+                        app:layout_constraintEnd_toStartOf="@+id/module_indicator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="@tools:sample/lorem"/>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/module_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:layout_marginEnd="@dimen/l1"
+                        android:layout_marginTop="4dp"
+                        android:checked="@={item.enabled}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/module_title"/>
+
+                <TextView
+                        android:id="@+id/module_version_author"
+                        strikeThrough="@{item.removed}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:duplicateParentState="true"
+                        android:text="@{@string/module_version_author(item.item.version, item.item.author)}"
+                        android:textAppearance="@style/AppearanceFoundation.Title"
+                        android:textColor="?android:textColorSecondary"
+                        android:textSize="13sp"
+                        app:layout_constraintEnd_toEndOf="@+id/module_title"
+                        app:layout_constraintStart_toStartOf="@+id/module_title"
+                        app:layout_constraintTop_toBottomOf="@+id/module_title"
+                        tools:text="@tools:sample/lorem" />
+
+
+                <TextView
+                        android:id="@+id/module_description"
+                        gone="@{item.item.description.empty}"
+                        strikeThrough="@{item.removed}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50"
+                        android:layout_marginEnd="@dimen/l5"
+                        android:layout_marginStart="@dimen/l1"
+                        android:duplicateParentState="true"
+                        android:maxLines="5"
+                        android:text="@{item.item.description}"
+                        android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
+                        android:textColor="?android:textColorSecondary"
+                        android:textSize="13sp"
+                        app:layout_constraintEnd_toStartOf="@+id/module_indicator"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/module_version_author"
+                        tools:lines="4"
+                        tools:text="@tools:sample/lorem/random" />
 
                 <View
-                    android:id="@+id/module_divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="@dimen/l1"
-                    android:background="@android:color/transparent"
-                    app:layout_constraintTop_toBottomOf="@+id/module_description" />
+                        android:id="@+id/module_divider"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/l1"
+                        android:background="@android:color/transparent"
+                        app:layout_constraintTop_toBottomOf="@+id/module_description" />
 
                 <Button
-                    android:id="@+id/module_update"
-                    style="@style/WidgetFoundation.Button.Text"
-                    goneUnless="@{item.showUpdate}"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:enabled="@{item.updateReady}"
-                    android:focusable="true"
-                    android:onClick="@{() -> viewModel.downloadPressed(item.item.updateInfo)}"
-                    android:text="@string/update"
-                    android:textAllCaps="false"
-                    app:icon="@drawable/ic_update_md2"
-                    app:iconGravity="textEnd"
-                    app:layout_constraintBottom_toBottomOf="@+id/module_remove"
-                    app:layout_constraintEnd_toStartOf="@+id/module_remove"
-                    app:layout_constraintTop_toTopOf="@+id/module_remove"
-                    app:srcCompat="@drawable/ic_download_md2" />
+                        android:id="@+id/module_update"
+                        style="?materialIconButtonOutlinedStyle"
+                        goneUnless="@{item.showUpdate}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:enabled="@{item.updateReady}"
+                        android:focusable="true"
+                        android:onClick="@{() -> viewModel.downloadPressed(item.item.updateInfo)}"
+                        app:icon="@drawable/ic_update_md2"
+                        app:iconGravity="textStart"
+                        app:layout_constraintBottom_toBottomOf="@+id/module_remove"
+                        app:layout_constraintEnd_toStartOf="@+id/module_remove"
+                        app:layout_constraintTop_toTopOf="@+id/module_remove" />
 
                 <Button
-                    android:id="@+id/module_remove"
-                    style="@style/WidgetFoundation.Button.Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:enabled="@{!item.updated}"
-                    android:focusable="true"
-                    android:onClick="@{() -> item.delete()}"
-                    android:text="@{item.removed ? @string/module_state_restore : @string/module_state_remove}"
-                    android:textAllCaps="false"
-                    app:icon="@{item.removed ? @drawable/ic_restart : @drawable/ic_delete_md2}"
-                    app:iconGravity="textEnd"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/module_divider"
-                    tools:icon="@drawable/ic_delete_md2"
-                    tools:text="Remove" />
+                        style="?materialIconButtonFilledStyle"
+                        android:id="@+id/module_remove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:enabled="@{!item.updated}"
+                        android:focusable="true"
+                        android:onClick="@{() -> item.delete()}"
+                        android:layout_marginEnd="@dimen/l1"
+                        android:layout_marginBottom="@dimen/l_50"
+                        app:icon="@{item.removed ? @drawable/ic_restart : @drawable/ic_delete_md2}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/module_divider"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:icon="@drawable/ic_delete_md2" />
 
                 <androidx.constraintlayout.widget.Barrier
-                    android:id="@+id/bottom_bar_barrier"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:barrierDirection="start"
-                    app:referencedIds="@{viewModel.bottomBarBarrierIds}"
-                    tools:constraint_referenced_ids="module_update,module_remove" />
+                        android:id="@+id/bottom_bar_barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="start"
+                        app:referencedIds="@{viewModel.bottomBarBarrierIds}"
+                        tools:constraint_referenced_ids="module_update,module_remove" />
 
                 <TextView
-                    android:id="@+id/module_notice_text"
-                    goneUnless="@{item.showNotice}"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/l1"
-                    android:layout_marginEnd="@dimen/l_50"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="@{item.noticeText}"
-                    android:textAppearance="@style/AppearanceFoundation.Caption.Primary"
-                    app:layout_constraintBottom_toBottomOf="@+id/module_remove"
-                    app:layout_constraintEnd_toStartOf="@+id/bottom_bar_barrier"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/module_remove"
-                    tools:lines="2"
-                    tools:text="@tools:sample/lorem/random"
-                    tools:visibility="visible" />
+                        android:id="@+id/module_notice_text"
+                        goneUnless="@{item.showNotice}"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/l1"
+                        android:layout_marginEnd="@dimen/l_50"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="@{item.noticeText}"
+                        android:textAppearance="@style/AppearanceFoundation.Caption.Primary"
+                        app:layout_constraintBottom_toBottomOf="@+id/module_remove"
+                        app:layout_constraintEnd_toStartOf="@+id/bottom_bar_barrier"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/module_remove"
+                        tools:lines="2"
+                        tools:text="@tools:sample/lorem/random"
+                        tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 
 </layout>

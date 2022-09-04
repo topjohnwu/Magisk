@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="@dimen/l1"
+        android:layout_marginStart="@dimen/l_25"
         android:paddingTop="@dimen/l1">
 
         <TextView
@@ -22,8 +22,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{item.title}"
-            android:textAppearance="@style/AppearanceFoundation.Tiny.Secondary"
+            android:textAppearance="@style/AppearanceFoundation.Title"
             android:textStyle="bold"
+            android:textSize="24sp"
             tools:text="@tools:sample/lorem" />
 
         <TextView
