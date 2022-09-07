@@ -45,6 +45,10 @@ class DenyListRvItem(
                     .filterNot { it.isEnabled }
                     .filter { isExpanded || it.defaultSelection }
             } else {
+                info.unusedDenyList.removeAll { denyItem ->
+                    Shell.cmd("magisk --denylist rm ${denyItem.packageName} ${denyItem.process}").submit()
+                    true
+                }
                 processes.filter { it.isEnabled }
             }.forEach { it.toggle() }
         }

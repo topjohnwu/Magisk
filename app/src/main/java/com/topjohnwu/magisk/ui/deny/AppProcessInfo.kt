@@ -43,6 +43,14 @@ class AppProcessInfo(
     val packageName: String get() = info.packageName
     val processes = fetchProcesses(pm)
 
+    val unusedDenyList: MutableList<CmdlineListItem> by lazy {
+        this.denyList.filter {
+            processes.none { processInfo ->
+                it.packageName == processInfo.packageName && it.process == processInfo.name
+            }
+        }.toMutableList()
+    }
+
     override fun compareTo(other: AppProcessInfo) = comparator.compare(this, other)
 
     fun isSystemApp() = info.flags and ApplicationInfo.FLAG_SYSTEM != 0
