@@ -142,7 +142,7 @@ static void pb_getprop(prop_cb *prop_cb) {
 
 static bool file_getprop(const char *name, char *value) {
     char path[4096];
-    snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
+    ssprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
     int fd = open(path, O_RDONLY | O_CLOEXEC);
     if (fd < 0)
         return false;
@@ -230,7 +230,7 @@ bool persist_deleteprop(const char *name) {
         return false;
     } else {
         char path[4096];
-        snprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
+        ssprintf(path, sizeof(path), PERSISTENT_PROPERTY_DIR "/%s", name);
         if (unlink(path) == 0) {
             LOGD("resetprop: unlink [%s]\n", path);
             return true;

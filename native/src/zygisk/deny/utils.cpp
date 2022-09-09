@@ -71,7 +71,7 @@ static void update_pkg_uid(const string &pkg, bool remove) {
     char buf[PATH_MAX] = {0};
     // For each user
     while ((entry = xreaddir(data_dir.get()))) {
-        snprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
+        ssprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
         if (fstatat(dirfd(data_dir.get()), buf, &st, 0) == 0) {
             int app_id = to_app_id(st.st_uid);
             if (remove) {
@@ -242,7 +242,7 @@ static int add_list(const char *pkg, const char *proc) {
 
     // Add to database
     char sql[4096];
-    snprintf(sql, sizeof(sql),
+    ssprintf(sql, sizeof(sql),
             "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DenyResponse::ERROR)
@@ -286,9 +286,9 @@ static int rm_list(const char *pkg, const char *proc) {
 
     char sql[4096];
     if (proc[0] == '\0')
-        snprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'", pkg);
+        ssprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'", pkg);
     else
-        snprintf(sql, sizeof(sql),
+        ssprintf(sql, sizeof(sql),
                 "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DenyResponse::ERROR)

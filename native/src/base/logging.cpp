@@ -13,7 +13,7 @@ using namespace std;
 
 static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[4096];
-    int ret = vsnprintf(buf, sizeof(buf), fmt, ap);
+    int ret = vssprintf(buf, sizeof(buf), fmt, ap);
     log_with_rs(level, rust::Str(buf, ret));
     return ret;
 }
@@ -41,10 +41,15 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
     }
 
     char fmt_buf[4096];
-    auto len = strlcpy(fmt_buf, tag, sizeof(fmt_buf));
+    auto len = strlcpy(fmt_buf, tag, sizeof(fmt_buf) - 1);
     // Prevent format specifications in the tag
     std::replace(fmt_buf, fmt_buf + len, '%', '_');
-    snprintf(fmt_buf + len, sizeof(fmt_buf) - len, ": %s", fmt);
+    len = ssprintf(fmt_buf + len, sizeof(fmt_buf) - len - 1, ": %s", fmt) + len;
+    // Ensure the fmt string always ends with newline
+    if (fmt_buf[len - 1] != '\n') {
+        fmt_buf[len] = '\n';
+        fmt_buf[len + 1] = '\0';
+    }
     va_list argv;
     va_start(argv, fmt);
     int ret = cpp_logger(level, fmt_buf, argv);

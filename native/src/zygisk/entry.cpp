@@ -161,7 +161,7 @@ static vector<int> get_module_fds(bool is_64_bit) {
 }
 
 static bool get_exe(int pid, char *buf, size_t sz) {
-    snprintf(buf, sz, "/proc/%d/exe", pid);
+    ssprintf(buf, sz, "/proc/%d/exe", pid);
     return xreadlink(buf, buf, sz) > 0;
 }
 
@@ -191,7 +191,7 @@ static void connect_companion(int client, bool is_64_bit) {
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
             char buf[16];
-            snprintf(buf, sizeof(buf), "%d", fds[1]);
+            ssprintf(buf, sizeof(buf), "%d", fds[1]);
             execl(exe.data(), "", "zygisk", "companion", buf, (char *) nullptr);
             exit(-1);
         }
@@ -340,7 +340,7 @@ static void get_process_info(int client, const sock_cred *cred) {
         if (!as_const(bits)[id]) {
             // Either not a zygisk module, or incompatible
             char buf[4096];
-            snprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
+            ssprintf(buf, sizeof(buf), MODULEROOT "/%s/zygisk",
                 module_list->operator[](id).name.data());
             if (int dirfd = open(buf, O_RDONLY | O_CLOEXEC); dirfd >= 0) {
                 close(xopenat(dirfd, "unloaded", O_CREAT | O_RDONLY, 0644));
@@ -363,7 +363,7 @@ static void send_log_pipe(int fd) {
 static void get_moddir(int client) {
     int id = read_int(client);
     char buf[4096];
-    snprintf(buf, sizeof(buf), MODULEROOT "/%s", module_list->operator[](id).name.data());
+    ssprintf(buf, sizeof(buf), MODULEROOT "/%s", module_list->operator[](id).name.data());
     int dfd = xopen(buf, O_RDONLY | O_CLOEXEC);
     send_fd(client, dfd);
     close(dfd);

@@ -44,7 +44,7 @@ int app_process_main(int argc, char *argv[]) {
         if (fork_dont_care() == 0) {
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
-            snprintf(buf, sizeof(buf), "%d", fds[1]);
+            ssprintf(buf, sizeof(buf), "%d", fds[1]);
 #if defined(__LP64__)
             execlp("magisk", "", "zygisk", "passthrough", buf, "1", (char *) nullptr);
 #else

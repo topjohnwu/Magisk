@@ -146,6 +146,8 @@ int sigemptyset(sigset_t *set) {
     return 0;
 }
 
+#undef vsnprintf
+#undef snprintf
 #include "fortify.hpp"
 
 #endif

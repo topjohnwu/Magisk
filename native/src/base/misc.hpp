@@ -156,6 +156,15 @@ std::string &replace_all(std::string &str, std::string_view from, std::string_vi
 std::vector<std::string> split(const std::string &s, const std::string &delims);
 std::vector<std::string_view> split_ro(std::string_view, std::string_view delims);
 
+// Similar to vsnprintf, but the return value is the written number of bytes
+int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);
+// Similar to snprintf, but the return value is the written number of bytes
+int ssprintf(char *dest, size_t size, const char *fmt, ...);
+
+// Ban usage of unsafe cstring functions
+#define vsnprintf  __use_vssprintf_instead__
+#define snprintf   __use_ssprintf_instead__
+
 struct exec_t {
     bool err = false;
     int fd = -2;

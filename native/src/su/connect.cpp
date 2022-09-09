@@ -52,7 +52,7 @@ public:
         switch (type) {
         case INT:
             vec.push_back("--ei");
-            snprintf(buf, sizeof(buf), "%d", int_val);
+            ssprintf(buf, sizeof(buf), "%d", int_val);
             str = buf;
             val = str.data();
             break;
@@ -75,7 +75,7 @@ public:
         switch (type) {
         case INT:
             str += ":i:";
-            snprintf(buf, sizeof(buf), "%d", int_val);
+            ssprintf(buf, sizeof(buf), "%d", int_val);
             str += buf;
             break;
         case BOOL:
@@ -114,13 +114,13 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     char exe[128];
     char target[128];
     char user[4];
-    snprintf(user, sizeof(user), "%d", to_user_id(info->eval_uid));
+    ssprintf(user, sizeof(user), "%d", to_user_id(info->eval_uid));
 
     if (zygisk_enabled) {
 #if defined(__LP64__)
-        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_64);
+        ssprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_64);
 #else
-        snprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
+        ssprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
 #endif
     } else {
         strlcpy(exe, "/system/bin/app_process", sizeof(exe));
@@ -128,7 +128,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // First try content provider call method
     if (provider) {
-        snprintf(target, sizeof(target), "content://%s.provider", info->mgr_pkg.data());
+        ssprintf(target, sizeof(target), "content://%s.provider", info->mgr_pkg.data());
         vector<const char *> args{ CALL_PROVIDER };
         for (auto &e : data) {
             e.add_bind(args);
@@ -165,7 +165,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
     // Finally, fallback to start activity with component name
     args[4] = "-n";
-    snprintf(target, sizeof(target), "%s/com.topjohnwu.magisk.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
+    ssprintf(target, sizeof(target), "%s/com.topjohnwu.magisk.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
     exec.fd = -2;
     exec.fork = fork_dont_care;
     exec_command(exec);

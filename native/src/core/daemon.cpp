@@ -286,13 +286,13 @@ done:
 
 static void switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
-    snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
+    ssprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
     if (access(buf, F_OK) != 0)
         return;
     int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
     if (fd == -1)
         return;
-    snprintf(buf, sizeof(buf), "%d\n", pid);
+    ssprintf(buf, sizeof(buf), "%d\n", pid);
     xwrite(fd, buf, strlen(buf));
     close(fd);
 }

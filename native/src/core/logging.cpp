@@ -114,7 +114,7 @@ static void *logfile_writer(void *arg) {
         }
         long ms = tv.tv_usec / 1000;
         size_t off = strftime(aux, sizeof(aux), "%m-%d %T", &tm);
-        off += snprintf(aux + off, sizeof(aux) - off,
+        off += ssprintf(aux + off, sizeof(aux) - off,
                 ".%03ld %5d %5d %c : ", ms, meta.pid, meta.tid, type);
 
         iov[0].iov_len = off;

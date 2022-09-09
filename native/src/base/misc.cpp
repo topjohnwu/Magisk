@@ -168,7 +168,7 @@ uint32_t binary_gcd(uint32_t u, uint32_t v) {
 
 int switch_mnt_ns(int pid) {
     char mnt[32];
-    snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+    ssprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
     if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
 
     int fd, ret;
@@ -210,4 +210,17 @@ vector<string> split(const string &s, const string &delims) {
 
 vector<string_view> split_ro(string_view s, string_view delims) {
     return split_impl<string_view>(s, delims);
+}
+
+#undef vsnprintf
+int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
+    return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
+}
+
+int ssprintf(char *dest, size_t size, const char *fmt, ...) {
+    va_list va;
+    va_start(va, fmt);
+    int r = vssprintf(dest, size, fmt, va);
+    va_end(va);
+    return r;
 }

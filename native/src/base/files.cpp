@@ -10,7 +10,7 @@
 using namespace std;
 
 ssize_t fd_path(int fd, char *path, size_t size) {
-    snprintf(path, size, "/proc/self/fd/%d", fd);
+    ssprintf(path, size, "/proc/self/fd/%d", fd);
     return xreadlink(path, path, size);
 }
 

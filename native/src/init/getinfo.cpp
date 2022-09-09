@@ -125,7 +125,7 @@ extern "C" void klog_write(const char *msg, int len) {
 static int klog_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[4096];
     strlcpy(buf, "magiskinit: ", sizeof(buf));
-    int len = vsnprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
+    int len = vssprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
     log_with_rs(level, rust::Str(buf, len));
     return len;
 }
@@ -211,7 +211,7 @@ void BootConfig::print() {
 }
 
 #define read_dt(name, key)                                          \
-snprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
+ssprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
