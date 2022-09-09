@@ -23,7 +23,7 @@
 
 #include <jni.h>
 
-#define ZYGISK_API_VERSION 3
+#define ZYGISK_API_VERSION 4
 
 /*
 
@@ -73,12 +73,11 @@ struct ServerSpecializeArgs;
 class ModuleBase {
 public:
 
-    // This function is called when the module is loaded into the target process.
-    // A Zygisk API handle will be sent as an argument; call utility functions or interface
-    // with Zygisk through this handle.
+    // This method is called as soon as the module is loaded into the target process.
+    // A Zygisk API handle will be passed as an argument.
     virtual void onLoad([[maybe_unused]] Api *api, [[maybe_unused]] JNIEnv *env) {}
 
-    // This function is called before the app process is specialized.
+    // This method is called before the app process is specialized.
     // At this point, the process just got forked from zygote, but no app specific specialization
     // is applied. This means that the process does not have any sandbox restrictions and
     // still runs with the same privilege of zygote.
@@ -92,16 +91,16 @@ public:
     // See Api::connectCompanion() for more info.
     virtual void preAppSpecialize([[maybe_unused]] AppSpecializeArgs *args) {}
 
-    // This function is called after the app process is specialized.
+    // This method is called after the app process is specialized.
     // At this point, the process has all sandbox restrictions enabled for this application.
-    // This means that this function runs as the same privilege of the app's own code.
+    // This means that this method runs as the same privilege of the app's own code.
     virtual void postAppSpecialize([[maybe_unused]] const AppSpecializeArgs *args) {}
 
-    // This function is called before the system server process is specialized.
+    // This method is called before the system server process is specialized.
     // See preAppSpecialize(args) for more info.
     virtual void preServerSpecialize([[maybe_unused]] ServerSpecializeArgs *args) {}
 
-    // This function is called after the system server process is specialized.
+    // This method is called after the system server process is specialized.
     // At this point, the process runs with the privilege of system_server.
     virtual void postServerSpecialize([[maybe_unused]] const ServerSpecializeArgs *args) {}
 };
@@ -173,21 +172,21 @@ enum StateFlag : uint32_t {
     PROCESS_ON_DENYLIST = (1u << 1),
 };
 
-// All API functions will stop working after post[XXX]Specialize as Zygisk will be unloaded
+// All API methods will stop working after post[XXX]Specialize as Zygisk will be unloaded
 // from the specialized process afterwards.
 struct Api {
 
     // Connect to a root companion process and get a Unix domain socket for IPC.
     //
-    // This API only works in the pre[XXX]Specialize functions due to SELinux restrictions.
+    // This API only works in the pre[XXX]Specialize methods due to SELinux restrictions.
     //
-    // The pre[XXX]Specialize functions run with the same privilege of zygote.
+    // The pre[XXX]Specialize methods run with the same privilege of zygote.
     // If you would like to do some operations with superuser permissions, register a handler
     // function that would be called in the root process with REGISTER_ZYGISK_COMPANION(func).
     // Another good use case for a companion process is that if you want to share some resources
     // across multiple processes, hold the resources in the companion process and pass it over.
     //
-    // The root companion process is ABI aware; that is, when calling this function from a 32-bit
+    // The root companion process is ABI aware; that is, when calling this method from a 32-bit
     // process, you will be connected to a 32-bit companion process, and vice versa for 64-bit.
     //
     // Returns a file descriptor to a socket that is connected to the socket passed to your
@@ -196,8 +195,8 @@ struct Api {
 
     // Get the file descriptor of the root folder of the current module.
     //
-    // This API only works in the pre[XXX]Specialize functions.
-    // Accessing the directory returned is only possible in the pre[XXX]Specialize functions
+    // This API only works in the pre[XXX]Specialize methods.
+    // Accessing the directory returned is only possible in the pre[XXX]Specialize methods
     // or in the root companion process (assuming that you sent the fd over the socket).
     // Both restrictions are due to SELinux and UID.
     //
@@ -205,7 +204,7 @@ struct Api {
     int getModuleDir();
 
     // Set various options for your module.
-    // Please note that this function accepts one single option at a time.
+    // Please note that this method accepts one single option at a time.
     // Check zygisk::Option for the full list of options available.
     void setOption(Option opt);
 
@@ -213,9 +212,17 @@ struct Api {
     // Returns bitwise-or'd zygisk::StateFlag values.
     uint32_t getFlags();
 
+    // Exempt the provided file descriptor from being automatically closed.
+    //
+    // This API only make sense in preAppSpecialize; calling this method in any other situation
+    // is either a no-op (returns true) or an error (returns false).
+    //
+    // When false is returned, the provided file descriptor will eventually be closed by zygote.
+    bool exemptFd(int fd);
+
     // Hook JNI native methods for a class
     //
-    // Lookup all registered JNI native methods and replace it with your own functions.
+    // Lookup all registered JNI native methods and replace it with your own methods.
     // The original function pointer will be saved in each JNINativeMethod's fnPtr.
     // If no matching class, method name, or signature is found, that specific JNINativeMethod.fnPtr
     // will be set to nullptr.
@@ -295,6 +302,7 @@ struct api_table {
     void (*setOption)(void * /* impl */, Option);
     int  (*getModuleDir)(void * /* impl */);
     uint32_t (*getFlags)(void * /* impl */);
+    bool (*exemptFd)(int);
 };
 
 template <class T>
@@ -320,6 +328,9 @@ inline void Api::setOption(Option opt) {
 }
 inline uint32_t Api::getFlags() {
     return tbl->getFlags ? tbl->getFlags(tbl->impl) : 0;
+}
+inline bool Api::exemptFd(int fd) {
+    return tbl->exemptFd != nullptr && tbl->exemptFd(fd);
 }
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, className, methods, numMethods);

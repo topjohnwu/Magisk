@@ -10,14 +10,17 @@ struct ZygiskModule;
 struct AppSpecializeArgs_v1;
 using  AppSpecializeArgs_v2 = AppSpecializeArgs_v1;
 struct AppSpecializeArgs_v3;
+using  AppSpecializeArgs_v4 = AppSpecializeArgs_v3;
 
 struct module_abi_v1;
 using  module_abi_v2 = module_abi_v1;
 using  module_abi_v3 = module_abi_v1;
+using  module_abi_v4 = module_abi_v1;
 
 struct api_abi_v1;
 struct api_abi_v2;
 using  api_abi_v3 = api_abi_v2;
+struct api_abi_v4;
 
 struct AppSpecializeArgs_v3 {
     jint &uid;
@@ -132,6 +135,10 @@ struct api_abi_v2 : public api_abi_v1 {
     uint32_t (*getFlags)(ZygiskModule *);
 };
 
+struct api_abi_v4 : public api_abi_v2 {
+    bool (*exemptFd)(int);
+};
+
 #define call_app(method)               \
 switch (*mod.api_version) {            \
 case 1:                                \
@@ -141,6 +148,7 @@ case 2: {                              \
     break;                             \
 }                                      \
 case 3:                                \
+case 4:                                \
     mod.v1->method(mod.v1->impl, args);\
     break;                             \
 }
