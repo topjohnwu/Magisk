@@ -209,7 +209,7 @@ def gen_jni_def(clz, methods):
 
     decl = ''
     for m in methods:
-        decl += ind(0) + f'{m.ret.type.cpp} {m.name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
+        decl += ind(0) + f'[[clang::no_stack_protector]] {m.ret.type.cpp} {m.name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
         decl += m.body()
         if m.ret.value:
             decl += ind(1) + f'return {m.ret.value};'
