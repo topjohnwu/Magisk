@@ -78,7 +78,7 @@ dependencies {
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
     implementation("io.noties.markwon:core:4.6.2")
 
-    val vLibsu = "5.0.2"
+    val vLibsu = "5.0.3"
     implementation("com.github.topjohnwu.libsu:core:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:service:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:nio:${vLibsu}")
@@ -97,24 +97,23 @@ dependencies {
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
-    val vRoom = "2.5.0-alpha02"
+    val vRoom = "2.5.0-alpha03"
     implementation("androidx.room:room-runtime:${vRoom}")
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.5.1"
+    val vNav = "2.5.2"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.appcompat:appcompat:1.5.0")
-    implementation("androidx.preference:preference:1.2.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.fragment:fragment-ktx:1.5.2")
     implementation("androidx.transition:transition:1.4.1")
-    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
     implementation("com.google.android.material:material:1.6.1")
 }
