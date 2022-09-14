@@ -26,7 +26,10 @@ android {
         vectorDrawables.useSupportLibrary = true
         versionName = Config.version
         versionCode = Config.versionCode
-        ndk.abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            debugSymbolLevel = "FULL"
+        }
     }
 
     buildTypes {
@@ -53,9 +56,6 @@ android {
             excludes += "/*.txt"
             excludes += "/*.bin"
             excludes += "/*.json"
-        }
-        jniLibs {
-            keepDebugSymbols += "**/*.so"
         }
     }
 }
