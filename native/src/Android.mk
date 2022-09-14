@@ -58,11 +58,13 @@ ifdef B_PRELOAD
 include $(CLEAR_VARS)
 LOCAL_MODULE := init-ld
 LOCAL_SRC_FILES := init/preload.c
+LOCAL_STRIP_MODE := --strip-all
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := zygisk-ld
 LOCAL_SRC_FILES := zygisk/loader.c
+LOCAL_STRIP_MODE := --strip-all
 include $(BUILD_SHARED_LIBRARY)
 
 endif
