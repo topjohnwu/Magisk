@@ -12,36 +12,35 @@ use crate::{canonical_path, cstr, errno, error, mkdirs, perror, ptr_to_str, read
 mod unsafe_impl {
     use std::ffi::CStr;
     use std::os::unix::io::RawFd;
-    use std::slice;
 
     use cfg_if::cfg_if;
     use libc::{c_char, nfds_t, off_t, pollfd};
 
-    use crate::{perror, ptr_to_str};
+    use crate::{perror, ptr_to_str, slice_from_ptr, slice_from_ptr_mut};
 
     #[no_mangle]
     unsafe extern "C" fn xwrite(fd: RawFd, buf: *const u8, bufsz: usize) -> isize {
-        super::xwrite(fd, slice::from_raw_parts(buf, bufsz))
+        super::xwrite(fd, slice_from_ptr(buf, bufsz))
     }
 
     #[no_mangle]
     unsafe extern "C" fn xread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
-        super::xread(fd, slice::from_raw_parts_mut(buf, bufsz))
+        super::xread(fd, slice_from_ptr_mut(buf, bufsz))
     }
 
     #[no_mangle]
     unsafe extern "C" fn xxread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
-        super::xxread(fd, slice::from_raw_parts_mut(buf, bufsz))
+        super::xxread(fd, slice_from_ptr_mut(buf, bufsz))
     }
 
     #[no_mangle]
     unsafe extern "C" fn xcanonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        super::xcanonical_path(CStr::from_ptr(path), slice::from_raw_parts_mut(buf, bufsz))
+        super::xcanonical_path(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
     }
 
     #[no_mangle]
     unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        super::xreadlink(CStr::from_ptr(path), slice::from_raw_parts_mut(buf, bufsz))
+        super::xreadlink(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
     }
 
     #[no_mangle]

@@ -1,7 +1,7 @@
 use std::cmp::min;
 use std::ffi::CStr;
-use std::fmt;
 use std::fmt::Arguments;
+use std::{fmt, slice};
 
 struct BufFmtWriter<'a> {
     buf: &'a mut [u8],
@@ -117,4 +117,24 @@ pub fn errno() -> &'static mut i32 {
 
 pub fn error_str() -> &'static str {
     unsafe { ptr_to_str(libc::strerror(*errno())) }
+}
+
+// When len is 0, don't care whether buf is null or not
+#[inline]
+pub unsafe fn slice_from_ptr<'a, T>(buf: *const T, len: usize) -> &'a [T] {
+    if len == 0 {
+        &[]
+    } else {
+        slice::from_raw_parts(buf, len)
+    }
+}
+
+// When len is 0, don't care whether buf is null or not
+#[inline]
+pub unsafe fn slice_from_ptr_mut<'a, T>(buf: *mut T, len: usize) -> &'a mut [T] {
+    if len == 0 {
+        &mut []
+    } else {
+        slice::from_raw_parts_mut(buf, len)
+    }
 }

@@ -7,9 +7,10 @@ use crate::{bfmt_cstr, errno, xopen};
 
 mod unsafe_impl {
     use std::ffi::CStr;
-    use std::slice;
 
     use libc::c_char;
+
+    use crate::slice_from_ptr_mut;
 
     #[no_mangle]
     pub unsafe extern "C" fn read_link(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
@@ -22,7 +23,7 @@ mod unsafe_impl {
 
     #[no_mangle]
     unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        super::canonical_path(CStr::from_ptr(path), slice::from_raw_parts_mut(buf, bufsz))
+        super::canonical_path(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
     }
 }
 
