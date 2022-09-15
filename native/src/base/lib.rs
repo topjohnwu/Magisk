@@ -2,10 +2,12 @@
 
 pub use libc;
 
+pub use files::*;
 pub use logging::*;
 pub use misc::*;
 pub use xwrap::*;
 
+mod files;
 mod logging;
 mod misc;
 mod xwrap;
@@ -31,9 +33,7 @@ pub mod ffi {
 #[cxx::bridge(namespace = "rust")]
 pub mod ffi2 {
     extern "Rust" {
-        fn xwrite(fd: i32, data: &[u8]) -> isize;
-        fn xread(fd: i32, data: &mut [u8]) -> isize;
-        fn xxread(fd: i32, data: &mut [u8]) -> isize;
         fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
+        fn fd_path(fd: i32, buf: &mut [u8]) -> isize;
     }
 }

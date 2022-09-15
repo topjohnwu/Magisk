@@ -9,38 +9,12 @@
 
 using namespace std;
 
-ssize_t fd_path(int fd, char *path, size_t size) {
-    ssprintf(path, size, "/proc/self/fd/%d", fd);
-    return xreadlink(path, path, size);
-}
-
 int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_path(dirfd, path, size) < 0)
+    if (fd_path(dirfd, byte_slice(path, size)) < 0)
         return -1;
     auto len = strlen(path);
     path[len] = '/';
-    strlcpy(path + len + 1, name, size - len - 1);
-    return 0;
-}
-
-int mkdirs(const char *path, mode_t mode) {
-    char buf[4096];
-    strlcpy(buf, path, sizeof(buf));
-    errno = 0;
-    for (char *p = &buf[1]; *p; ++p) {
-        if (*p == '/') {
-            *p = '\0';
-            if (mkdir(buf, mode) == -1) {
-                if (errno != EEXIST)
-                    return -1;
-            }
-            *p = '/';
-        }
-    }
-    if (mkdir(buf, mode) == -1) {
-        if (errno != EEXIST)
-            return -1;
-    }
+    strscpy(path + len + 1, name, size - len - 1);
     return 0;
 }
 
@@ -410,14 +384,14 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
 
 void backup_folder(const char *dir, vector<raw_file> &files) {
     char path[PATH_MAX];
-    xrealpath(dir, path);
+    xcanonical_path(dir, path, sizeof(path));
     int len = strlen(path);
     pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         int fd = xopenat(dfd, entry->d_name, O_RDONLY);
         if (fd < 0)
             return SKIP;
         run_finally f([&]{ close(fd); });
-        if (fd_path(fd, path, sizeof(path)) < 0)
+        if (fd_path(fd, byte_slice(path, sizeof(path))) < 0)
             return SKIP;
         raw_file file;
         file.path = path + len + 1;

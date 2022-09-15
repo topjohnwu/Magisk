@@ -1,11 +1,100 @@
 use std::ffi::CStr;
 use std::os::unix::io::RawFd;
+use std::ptr;
 
 use libc::{
-    c_char, c_uint, c_ulong, c_void, dev_t, mode_t, sockaddr, socklen_t, ssize_t, SYS_dup3,
+    c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
+    ssize_t, SYS_dup3,
 };
 
-use crate::{errno, error, perror, ptr_to_str};
+use crate::{canonical_path, cstr, errno, error, mkdirs, perror, ptr_to_str, readlink};
+
+mod unsafe_impl {
+    use std::ffi::CStr;
+    use std::os::unix::io::RawFd;
+    use std::slice;
+
+    use cfg_if::cfg_if;
+    use libc::{c_char, nfds_t, off_t, pollfd};
+
+    use crate::{perror, ptr_to_str};
+
+    #[no_mangle]
+    unsafe extern "C" fn xwrite(fd: RawFd, buf: *const u8, bufsz: usize) -> isize {
+        super::xwrite(fd, slice::from_raw_parts(buf, bufsz))
+    }
+
+    #[no_mangle]
+    unsafe extern "C" fn xread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
+        super::xread(fd, slice::from_raw_parts_mut(buf, bufsz))
+    }
+
+    #[no_mangle]
+    unsafe extern "C" fn xxread(fd: RawFd, buf: *mut u8, bufsz: usize) -> isize {
+        super::xxread(fd, slice::from_raw_parts_mut(buf, bufsz))
+    }
+
+    #[no_mangle]
+    unsafe extern "C" fn xcanonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+        super::xcanonical_path(CStr::from_ptr(path), slice::from_raw_parts_mut(buf, bufsz))
+    }
+
+    #[no_mangle]
+    unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+        super::xreadlink(CStr::from_ptr(path), slice::from_raw_parts_mut(buf, bufsz))
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn xreadlinkat(
+        dirfd: RawFd,
+        path: *const c_char,
+        buf: *mut u8,
+        bufsz: usize,
+    ) -> isize {
+        // readlinkat() may fail on x86 platform, returning random value
+        // instead of number of bytes placed in buf (length of link)
+        cfg_if! {
+            if #[cfg(any(target_arch = "x86", target_arch = "x86_64"))] {
+                libc::memset(buf.cast(), 0, bufsz);
+                let r = libc::readlinkat(dirfd, path, buf.cast(), bufsz - 1);
+                if r < 0 {
+                    perror!("readlinkat {}", ptr_to_str(path))
+                }
+            } else {
+                let r = libc::readlinkat(dirfd, path, buf.cast(), bufsz - 1);
+                if r < 0 {
+                    perror!("readlinkat {}", ptr_to_str(path))
+                } else {
+                    *buf.offset(r) = b'\0';
+                }
+            }
+        }
+        return r;
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn xpoll(fds: *mut pollfd, nfds: nfds_t, timeout: i32) -> i32 {
+        let r = libc::poll(fds, nfds, timeout);
+        if r < 0 {
+            perror!("poll");
+        }
+        return r;
+    }
+
+    #[no_mangle]
+    pub unsafe extern "C" fn xsendfile(
+        out_fd: RawFd,
+        in_fd: RawFd,
+        offset: *mut off_t,
+        count: usize,
+    ) -> isize {
+        let r = libc::sendfile(out_fd, in_fd, offset, count);
+        if r < 0 {
+            perror!("sendfile");
+        }
+        return r;
+    }
+}
 
 #[no_mangle]
 pub extern "C" fn xfopen(path: *const c_char, mode: *const c_char) -> *mut libc::FILE {
@@ -191,6 +280,29 @@ pub extern "C" fn xfdopendir(fd: RawFd) -> *mut libc::DIR {
             perror!("fdopendir");
         }
         return dp;
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn xreaddir(dirp: *mut libc::DIR) -> *mut libc::dirent {
+    #[allow(unused_unsafe)]
+    unsafe {
+        *errno() = 0;
+        loop {
+            let e = libc::readdir(dirp);
+            if e.is_null() {
+                if *errno() != 0 {
+                    perror!("readdir")
+                }
+            } else {
+                // Filter out . and ..
+                let s = CStr::from_ptr((*e).d_name.as_ptr());
+                if s == cstr!(".") || s == cstr!("..") {
+                    continue;
+                }
+            };
+            return e;
+        }
     }
 }
 
@@ -386,21 +498,15 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
 }
 
 pub fn xreadlink(path: &CStr, data: &mut [u8]) -> isize {
-    mod e {
-        extern "C" {
-            pub fn xreadlink(path: *const u8, buf: *mut u8, bufsz: usize) -> isize;
-        }
+    let r = readlink(path, data);
+    if r < 0 {
+        perror!("readlink {}", path.to_str().unwrap_or(""))
     }
-    unsafe { e::xreadlink(path.as_ptr().cast(), data.as_mut_ptr(), data.len()) }
+    return r;
 }
 
 pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
-    mod e {
-        extern "C" {
-            pub fn xreadlinkat(dirfd: i32, path: *const u8, buf: *mut u8, bufsz: usize) -> isize;
-        }
-    }
-    unsafe { e::xreadlinkat(dirfd, path.as_ptr().cast(), data.as_mut_ptr(), data.len()) }
+    unsafe { unsafe_impl::xreadlinkat(dirfd, path.as_ptr(), data.as_mut_ptr(), data.len()) }
 }
 
 #[no_mangle]
@@ -508,11 +614,46 @@ pub extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 }
 
 #[no_mangle]
+pub extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
+    let r = mkdirs(path, mode);
+    if r < 0 {
+        perror!("mkdirs {}", ptr_to_str(path));
+    }
+    return r;
+}
+
+#[no_mangle]
 pub extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i32 {
     unsafe {
         let r = libc::mkdirat(dirfd, path, mode);
         if r < 0 && *errno() != libc::EEXIST {
             perror!("mkdirat {}", ptr_to_str(path));
+        }
+        return r;
+    }
+}
+
+pub fn xsendfile(out_fd: RawFd, in_fd: RawFd, offset: Option<&mut off_t>, count: usize) -> isize {
+    unsafe {
+        let p = offset.map_or(ptr::null_mut(), |it| it);
+        unsafe_impl::xsendfile(out_fd, in_fd, p, count)
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn xmmap(
+    addr: *mut c_void,
+    len: usize,
+    prot: i32,
+    flags: i32,
+    fd: RawFd,
+    offset: off_t,
+) -> *mut c_void {
+    unsafe {
+        let r = libc::mmap(addr, len, prot, flags, fd, offset);
+        if r == libc::MAP_FAILED {
+            perror!("mmap");
+            return ptr::null_mut();
         }
         return r;
     }
@@ -527,6 +668,18 @@ pub extern "C" fn xfork() -> i32 {
         }
         return r;
     }
+}
+
+pub fn xpoll(fds: &mut [pollfd], timeout: i32) -> i32 {
+    unsafe { unsafe_impl::xpoll(fds.as_mut_ptr(), fds.len() as nfds_t, timeout) }
+}
+
+pub fn xcanonical_path(path: &CStr, buf: &mut [u8]) -> isize {
+    let r = canonical_path(path, buf);
+    if r < 0 {
+        perror!("canonical_path {}", path.to_str().unwrap_or(""))
+    }
+    return r;
 }
 
 #[no_mangle]

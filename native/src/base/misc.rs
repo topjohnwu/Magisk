@@ -41,6 +41,21 @@ pub fn fmt_to_buf(buf: &mut [u8], args: Arguments) -> usize {
     }
 }
 
+#[macro_export]
+macro_rules! bfmt {
+    ($buf:expr, $($args:tt)*) => {
+        $crate::fmt_to_buf($buf, format_args!($($args)*));
+    };
+}
+
+#[macro_export]
+macro_rules! bfmt_cstr {
+    ($buf:expr, $($args:tt)*) => {{
+        let len = $crate::fmt_to_buf($buf, format_args!($($args)*));
+        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&$buf[..(len + 1)]) }
+    }};
+}
+
 // The cstr! macro is inspired by https://github.com/Nugine/const-str
 
 macro_rules! const_assert {
@@ -88,19 +103,12 @@ macro_rules! cstr {
     ($s:literal) => {{
         const LEN: usize = $crate::ToCStr($s).eval_len();
         const BUF: [u8; LEN] = $crate::ToCStr($s).eval_bytes();
-        unsafe { CStr::from_bytes_with_nul_unchecked(&BUF) }
+        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&BUF) }
     }};
 }
 
-#[macro_export]
-macro_rules! r_cstr {
-    ($s:literal) => {
-        cstr!($s).as_ptr()
-    };
-}
-
-pub unsafe fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
-    CStr::from_ptr(ptr.cast()).to_str().unwrap_or("")
+pub fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
+    unsafe { CStr::from_ptr(ptr.cast()) }.to_str().unwrap_or("")
 }
 
 pub fn errno() -> &'static mut i32 {

@@ -130,7 +130,7 @@ void init_argv0(int argc, char **argv) {
 
 void set_nice_name(const char *name) {
     memset(argv0, 0, name_len);
-    strlcpy(argv0, name, name_len);
+    strscpy(argv0, name, name_len);
     prctl(PR_SET_NAME, name);
 }
 
@@ -223,4 +223,9 @@ int ssprintf(char *dest, size_t size, const char *fmt, ...) {
     int r = vssprintf(dest, size, fmt, va);
     va_end(va);
     return r;
+}
+
+#undef strlcpy
+size_t strscpy(char *dest, const char *src, size_t size) {
+    return std::min(strlcpy(dest, src, size), size - 1);
 }

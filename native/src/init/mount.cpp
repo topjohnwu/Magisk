@@ -118,8 +118,8 @@ static void switch_root(const string &path) {
 
 void MagiskInit::mount_rules_dir() {
     char path[128];
-    xrealpath(BLOCKDIR, blk_info.block_dev);
-    xrealpath(MIRRDIR, path);
+    xcanonical_path(BLOCKDIR, blk_info.block_dev, sizeof(blk_info.block_dev));
+    xcanonical_path(MIRRDIR, path, sizeof(path));
     char *b = blk_info.block_dev + strlen(blk_info.block_dev);
     char *p = path + strlen(path);
 
@@ -206,7 +206,7 @@ success:
         // Create symlink with relative path
         char s[128];
         s[0] = '.';
-        strlcpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
+        strscpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
         xsymlink(s, path);
     } else {
         xsymlink(custom_rules_dir.data(), path);

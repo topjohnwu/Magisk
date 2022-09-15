@@ -14,7 +14,6 @@ LOCAL_SRC_FILES := \
     misc.cpp \
     selinux.cpp \
     logging.cpp \
-    xwrap.cpp \
     stream.cpp \
     ../external/cxx-rs/src/cxx.cc
 include $(BUILD_STATIC_LIBRARY)

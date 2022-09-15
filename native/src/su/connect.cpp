@@ -123,7 +123,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
         ssprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
 #endif
     } else {
-        strlcpy(exe, "/system/bin/app_process", sizeof(exe));
+        strscpy(exe, "/system/bin/app_process", sizeof(exe));
     }
 
     // First try content provider call method
@@ -158,7 +158,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     };
 
     // Then try start activity without package name
-    strlcpy(target, info->mgr_pkg.data(), sizeof(target));
+    strscpy(target, info->mgr_pkg.data(), sizeof(target));
     exec_command_sync(exec);
     if (check_no_error(exec.fd))
         return;

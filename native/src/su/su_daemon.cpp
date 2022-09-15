@@ -142,7 +142,7 @@ void prune_su_access() {
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
     char query[256], *err;
-    strlcpy(query, "SELECT uid FROM policies", sizeof(query));
+    strscpy(query, "SELECT uid FROM policies", sizeof(query));
     err = db_exec(query, [&](db_row &row) -> bool {
         int uid = parse_int(row["uid"]);
         int app_id = to_app_id(uid);
@@ -412,7 +412,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     char path[32];
     ssprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
     char cwd[PATH_MAX];
-    if (realpath(path, cwd))
+    if (canonical_path(path, cwd, sizeof(cwd)))
         chdir(cwd);
     ssprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
     auto env = full_read(path);

@@ -57,8 +57,8 @@ int xmkdirat(int dirfd, const char *pathname, mode_t mode);
 void *xmmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset);
 ssize_t xsendfile(int out_fd, int in_fd, off_t *offset, size_t count);
 pid_t xfork();
-int xpoll(struct pollfd *fds, nfds_t nfds, int timeout);
-char *xrealpath(const char *path, char *resolved_path);
+int xpoll(pollfd *fds, nfds_t nfds, int timeout);
+ssize_t xcanonical_path(const char *path, char *buf, size_t bufsiz);
 int xmknod(const char *pathname, mode_t mode, dev_t dev);
 
 } // extern "C"

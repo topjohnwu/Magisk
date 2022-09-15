@@ -58,9 +58,16 @@ struct mmap_data : public byte_data {
     mmap_data& operator=(mmap_data &&other) { swap(other); return *this; }
 };
 
-ssize_t fd_path(int fd, char *path, size_t size);
-int fd_pathat(int dirfd, const char *name, char *path, size_t size);
+extern "C" {
+
 int mkdirs(const char *path, mode_t mode);
+ssize_t canonical_path(const char *path, char *buf, size_t bufsiz);
+ssize_t read_link(const char *pathname, char *buf, size_t bufsiz);
+
+} // extern "C"
+
+using rust::fd_path;
+int fd_pathat(int dirfd, const char *name, char *path, size_t size);
 void rm_rf(const char *path);
 void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);

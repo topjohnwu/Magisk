@@ -41,7 +41,7 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
     }
 
     char fmt_buf[4096];
-    auto len = strlcpy(fmt_buf, tag, sizeof(fmt_buf) - 1);
+    auto len = strscpy(fmt_buf, tag, sizeof(fmt_buf) - 1);
     // Prevent format specifications in the tag
     std::replace(fmt_buf, fmt_buf + len, '%', '_');
     len = ssprintf(fmt_buf + len, sizeof(fmt_buf) - len - 1, ": %s", fmt) + len;
