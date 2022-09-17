@@ -8,7 +8,7 @@
     <string name="install">ইনস্টল করুন</string>
     <string name="section_home">হোম</string>
     <string name="section_theme">থিম</string>
-    <string name="denylist">ডিনাইলিস্ট তালিকা</string>
+    <string name="denylist">ডিনাইলিস্ট</string>
 
     <!--Home-->
     <string name="no_connection">কোনো সংযোগ উপলব্ধ নেই</string>
@@ -75,7 +75,6 @@
     <string name="su_revoke_msg">%1$s সুপার ব্যবহারকারীর অধিকার প্রত্যাহার করতে নিশ্চিত করুন৷</string>
     <string name="toast">টোস্ট</string>
     <string name="none">কোনোটিই নয়</string>
-
     <string name="superuser_toggle_notification">বিজ্ঞপ্তি</string>
     <string name="superuser_toggle_revoke">প্রত্যাহার করুন</string>
     <string name="superuser_policy_none">কোনো অ্যাপ এখনও সুপার ইউজারের অনুমতি চায়নি।</string>
@@ -218,21 +217,22 @@
     <string name="restore_fail">স্টক ব্যাকআপ বিদ্যমান নেই!</string>
     <string name="setup_fail">সেটআপ ব্যর্থ হয়েছে৷</string>
     <string name="env_fix_title">অতিরিক্ত সেটআপ প্রয়োজন</string>
-    <string name="env_fix_msg">ম্যাজিস্ক সঠিকভাবে কাজ করার জন্য আপনার ডিভাইসের অতিরিক্ত সেটআপ প্রয়োজন।  আপনি কি এগিয়ে যেতে এবং রিবুট করতে চান??</string>
+    <string name="env_fix_msg">ম্যাজিস্ক সঠিকভাবে কাজ করার জন্য আপনার ডিভাইসের অতিরিক্ত সেটআপ প্রয়োজন। আপনি কি এগিয়ে যেতে এবং রিবুট করতে চান?</string>
     <string name="setup_msg">চলমান পরিবেশ সেটআপ…</string>
     <string name="authenticate">প্রমাণীকরণ</string>
     <string name="unsupport_magisk_title">অসমর্থিত ম্যাজিস্ক সংস্করণ</string>
-    <string name="unsupport_magisk_msg">অ্যাপটির এই সংস্করণটি %1$s-এর চেয়ে কম ম্যাগিস্ক সংস্করণগুলিকে সমর্থন করে না৷\n\nঅ্যাপটি এমন আচরণ করবে যেন কোনও ম্যাজিস্ক ইনস্টল করা নেই, দয়া করে যত তাড়াতাড়ি সম্ভব ম্যাজিস্ক আপগ্রেড করুন.</string>
+    <string name="unsupport_magisk_msg">অ্যাপটির এই সংস্করণটি %1$s-এর চেয়ে কম ম্যাগিস্ক সংস্করণগুলিকে সমর্থন করে না৷\n\nঅ্যাপটি এমন আচরণ করবে যেন কোনও ম্যাজিস্ক ইনস্টল করা নেই, দয়া করে যত তাড়াতাড়ি সম্ভব ম্যাজিস্ক আপগ্রেড করুন।</string>
     <string name="unsupport_general_title">অস্বাভাবিক অবস্থা</string>
-    <string name="unsupport_system_app_msg">এই অ্যাপটিকে একটি সিস্টেম অ্যাপ হিসেবে চালানো সমর্থিত নয়।  অনুগ্রহ করে অ্যাপটিকে একটি ব্যবহারকারী অ্যাপে ফিরিয়ে দিন।</string>
-    <string name="unsupport_other_su_msg">ম্যাজিস্ক থেকে নয় একটি \"su\" বাইনারি সনাক্ত করা হয়েছে।  অনুগ্রহ করে কোনো প্রতিযোগী রুট সমাধান সরান এবং/অথবা ম্যাজিস্ক পুনরায় ইনস্টল করুন।</string>
-    <string name="unsupport_external_storage_msg">ম্যাজিস্ক বহিরাগত স্টোরেজ ইনস্টল করা হয়.  অনুগ্রহ করে অ্যাপটিকে অভ্যন্তরীণ সঞ্চয়স্থানে সরান৷</string>
-    <string name="unsupport_nonroot_stub_msg">লুকানো ম্যাজিস্ক অ্যাপটি কাজ চালিয়ে যেতে পারে না কারণ রুট হারিয়ে গেছে।  অনুগ্রহ করে আসল APK পুনরুদ্ধার করুন।</string>
+    <string name="unsupport_system_app_msg">এই অ্যাপটিকে একটি সিস্টেম অ্যাপ হিসেবে চালানো সমর্থিত নয়। অনুগ্রহ করে অ্যাপটিকে একটি ব্যবহারকারী অ্যাপে ফিরিয়ে দিন।</string>
+    <string name="unsupport_other_su_msg">ম্যাজিস্ক থেকে নয় একটি \"su\" বাইনারি সনাক্ত করা হয়েছে। অনুগ্রহ করে কোনো প্রতিযোগী রুট সমাধান সরান এবং/অথবা ম্যাজিস্ক পুনরায় ইনস্টল করুন।</string>
+    <string name="unsupport_external_storage_msg">ম্যাজিস্ক বহিরাগত স্টোরেজ ইনস্টল করা হয়। অনুগ্রহ করে অ্যাপটিকে অভ্যন্তরীণ সঞ্চয়স্থানে সরান৷</string>
+    <string name="unsupport_nonroot_stub_msg">লুকানো ম্যাজিস্ক অ্যাপটি কাজ চালিয়ে যেতে পারে না কারণ রুট হারিয়ে গেছে। অনুগ্রহ করে আসল APK পুনরুদ্ধার করুন।</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">এই কার্যকারিতা সক্ষম করতে স্টোরেজ অনুমতি দিন</string>
+    <string name="post_notifications_denied">নোটিফিকেশন এর অনোমতি দিন</string>
     <string name="install_unknown_denied">এই কার্যকারিতা সক্ষম করতে "অজানা অ্যাপগুলি ইনস্টল করুন" এর অনুমতি দিন</string>
     <string name="add_shortcut_title">হোম স্ক্রিনে শর্টকাট যোগ করুন</string>
-    <string name="add_shortcut_msg">এই অ্যাপটি লুকানোর পরে, এর নাম এবং আইকন চিনতে অসুবিধা হতে পারে।  আপনি কি হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করতে চান?</string>
+    <string name="add_shortcut_msg">এই অ্যাপটি লুকানোর পরে, এর নাম এবং আইকন চিনতে অসুবিধা হতে পারে। আপনি কি হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করতে চান?</string>
     <string name="app_not_found">এই ক্রিয়াটি পরিচালনা করার জন্য কোনো অ্যাপ পাওয়া যায়নি</string>
     <string name="reboot_apply_change">পরিবর্তনগুলি প্রয়োগ করতে রিবুট করুন</string>
     <string name="restore_app_confirmation">এটি লুকানো অ্যাপটিকে মূল অ্যাপে ফিরিয়ে আনবে। আপনি কি সত্যিই এটি করতে চান?</string>
