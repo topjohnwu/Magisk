@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">സജ്ജീകരണം പൂർത്തിയാക്കാൻ പൂർണ്ണ മജിസ്കിലേക്ക് അപ്ഗ്രേഡ് ചെയ്യുക. ഡൗൺലോഡ് ചെയ്ത് ഇൻസ്റ്റാൾ ചെയ്യണോ?</string>
+    <string name="no_internet_msg">ദയവായി ഇന്റർനെറ്റിലേക്ക് കണക്റ്റുചെയ്യുക! പൂർണ്ണ മജിസ്കിലേക്ക് അപ്‌ഗ്രേഡ് ചെയ്യേണ്ടതുണ്ട്.</string>
+    <string name="dling">ഡൗൺലോഡ് ചെയ്യുന്നു</string>
+    <string name="relaunch_app">ആപ്പ് സ്വമേധയാ വീണ്ടും തുറക്കുക</string>
+</resources>
