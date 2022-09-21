@@ -118,8 +118,8 @@ static void switch_root(const string &path) {
 
 void MagiskInit::mount_rules_dir() {
     char path[128];
-    xcanonical_path(BLOCKDIR, blk_info.block_dev, sizeof(blk_info.block_dev));
-    xcanonical_path(MIRRDIR, path, sizeof(path));
+    xrealpath(BLOCKDIR, blk_info.block_dev, sizeof(blk_info.block_dev));
+    xrealpath(MIRRDIR, path, sizeof(path));
     char *b = blk_info.block_dev + strlen(blk_info.block_dev);
     char *p = path + strlen(path);
 

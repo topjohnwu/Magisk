@@ -411,8 +411,8 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     umask(022);
     char path[32];
     ssprintf(path, sizeof(path), "/proc/%d/cwd", ctx.pid);
-    char cwd[PATH_MAX];
-    if (canonical_path(path, cwd, sizeof(cwd)))
+    char cwd[4096];
+    if (realpath(path, cwd, sizeof(cwd)) > 0)
         chdir(cwd);
     ssprintf(path, sizeof(path), "/proc/%d/environ", ctx.pid);
     auto env = full_read(path);

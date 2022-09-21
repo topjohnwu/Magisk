@@ -384,7 +384,7 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
 
 void backup_folder(const char *dir, vector<raw_file> &files) {
     char path[PATH_MAX];
-    xcanonical_path(dir, path, sizeof(path));
+    xrealpath(dir, path, sizeof(path));
     int len = strlen(path);
     pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         int fd = xopenat(dfd, entry->d_name, O_RDONLY);

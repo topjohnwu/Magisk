@@ -74,6 +74,9 @@ void mv_dir(int src, int dest);
 void cp_afc(const char *src, const char *dest);
 void link_path(const char *src, const char *dest);
 void link_dir(int src, int dest);
+static inline ssize_t realpath(const char *path, char *buf, size_t bufsiz) {
+    return canonical_path(path, buf, bufsiz);
+}
 int getattr(const char *path, file_attr *a);
 int getattrat(int dirfd, const char *name, file_attr *a);
 int fgetattr(int fd, file_attr *a);

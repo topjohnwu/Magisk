@@ -7,7 +7,7 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{canonical_path, cstr, errno, error, mkdirs, perror, ptr_to_str, readlink};
+use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, realpath};
 
 mod unsafe_impl {
     use std::ffi::CStr;
@@ -16,6 +16,7 @@ mod unsafe_impl {
     use cfg_if::cfg_if;
     use libc::{c_char, nfds_t, off_t, pollfd};
 
+    use crate::unsafe_impl::read_link;
     use crate::{perror, ptr_to_str, slice_from_ptr, slice_from_ptr_mut};
 
     #[no_mangle]
@@ -34,13 +35,17 @@ mod unsafe_impl {
     }
 
     #[no_mangle]
-    unsafe extern "C" fn xcanonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        super::xcanonical_path(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
+    unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+        super::xrealpath(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
     }
 
     #[no_mangle]
-    unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        super::xreadlink(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
+    pub unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+        let r = read_link(path, buf, bufsz);
+        if r < 0 {
+            perror!("readlink");
+        }
+        return r;
     }
 
     #[no_mangle]
@@ -137,16 +142,6 @@ pub extern "C" fn xopenat(dirfd: RawFd, path: *const c_char, flags: i32, mode: m
         }
         return r;
     }
-}
-
-#[macro_export]
-macro_rules! xopen {
-    ($path:expr, $flags:expr) => {
-        xopen($path, $flags, 0)
-    };
-    ($path:expr, $flags:expr, $mode:expr) => {
-        xopen($path, $flags, $mode)
-    };
 }
 
 // Fully write data slice
@@ -496,14 +491,12 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
     }
 }
 
+#[inline]
 pub fn xreadlink(path: &CStr, data: &mut [u8]) -> isize {
-    let r = readlink(path, data);
-    if r < 0 {
-        perror!("readlink {}", path.to_str().unwrap_or(""))
-    }
-    return r;
+    unsafe { unsafe_impl::xreadlink(path.as_ptr(), data.as_mut_ptr(), data.len()) }
 }
 
+#[inline]
 pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
     unsafe { unsafe_impl::xreadlinkat(dirfd, path.as_ptr(), data.as_mut_ptr(), data.len()) }
 }
@@ -632,6 +625,7 @@ pub extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i
     }
 }
 
+#[inline]
 pub fn xsendfile(out_fd: RawFd, in_fd: RawFd, offset: Option<&mut off_t>, count: usize) -> isize {
     unsafe {
         let p = offset.map_or(ptr::null_mut(), |it| it);
@@ -669,14 +663,15 @@ pub extern "C" fn xfork() -> i32 {
     }
 }
 
+#[inline]
 pub fn xpoll(fds: &mut [pollfd], timeout: i32) -> i32 {
     unsafe { unsafe_impl::xpoll(fds.as_mut_ptr(), fds.len() as nfds_t, timeout) }
 }
 
-pub fn xcanonical_path(path: &CStr, buf: &mut [u8]) -> isize {
-    let r = canonical_path(path, buf);
+pub fn xrealpath(path: &CStr, buf: &mut [u8]) -> isize {
+    let r = realpath(path, buf);
     if r < 0 {
-        perror!("canonical_path {}", path.to_str().unwrap_or(""))
+        perror!("realpath {}", path.to_str().unwrap_or(""))
     }
     return r;
 }
