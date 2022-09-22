@@ -24,8 +24,10 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
-      NDK_CCACHE: ${{ github.workspace }}/ccache
+      NDK_CCACHE: ccache
       CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      RUSTC_WRAPPER: sccache
 
     steps:
       - name: Check out
@@ -45,7 +47,17 @@ jobs:
           python-version: '3.x'
 
       - name: Set up ccache
-        run: bash .github/ccache.sh
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}
+
+      - name: Set up sccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          variant: sccache
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v2
@@ -61,7 +73,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ${{ github.workspace }}/.ccache
             ~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-build-cache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-cache-
@@ -71,13 +82,11 @@ jobs:
 
       - name: Build release
         run: |
-          ./ccache -zp
           python build.py -vr all
 
       - name: Build debug
         run: |
           python build.py -v all
-          ./ccache -s
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
