@@ -367,7 +367,6 @@ static void daemon_entry() {
             return true;
         });
     }
-    rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
