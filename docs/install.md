@@ -50,7 +50,7 @@ Let's continue to [Patching Images](#patching-images).
 - If your device does **NOT** have a separate `vbmeta` partition, check the **"Patch vbmeta in boot image"** option
 - Choose **"Select and Patch a File"** in method, and select the boot/recovery image
 - Start the installation, and copy the patched image to your PC using ADB:<br>
-  `adb pull /sdcard/Download/magisk_patched_[random_strings].img`
+  `adb pull /sdcard/Download/magisk_patched_[random_strings].img` (For windows use `adb ls /sdcard/Download/` to get the filename.)
 - Flash the patched boot/recovery image to your device.<br>
   For most devices, reboot into fastboot mode and flash with command:<br>
   `fastboot flash boot /path/to/magisk_patched.img` or <br>
