@@ -1,7 +1,7 @@
 use std::ffi::CStr;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 
-use libc::{c_char, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH};
+use libc::{c_char, c_uint, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH};
 
 use crate::{bfmt_cstr, errno, xopen};
 
@@ -27,6 +27,17 @@ pub mod unsafe_impl {
     }
 }
 
+pub fn __open_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd> {
+    unsafe {
+        let fd = libc::open(path.as_ptr(), flags, mode as c_uint);
+        if fd >= 0 {
+            Some(OwnedFd::from_raw_fd(fd))
+        } else {
+            None
+        }
+    }
+}
+
 pub fn __xopen_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd> {
     let fd = xopen(path.as_ptr(), flags, mode);
     if fd >= 0 {
@@ -34,6 +45,16 @@ pub fn __xopen_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd>
     } else {
         None
     }
+}
+
+#[macro_export]
+macro_rules! open_fd {
+    ($path:expr, $flags:expr) => {
+        crate::__open_fd_impl($path, $flags, 0)
+    };
+    ($path:expr, $flags:expr, $mode:expr) => {
+        crate::__open_fd_impl($path, $flags, $mode)
+    };
 }
 
 #[macro_export]
@@ -58,7 +79,7 @@ pub fn fd_path(fd: RawFd, buf: &mut [u8]) -> isize {
 
 // Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
 pub fn realpath(path: &CStr, buf: &mut [u8]) -> isize {
-    if let Some(fd) = xopen_fd!(path, O_PATH | O_CLOEXEC) {
+    if let Some(fd) = open_fd!(path, O_PATH | O_CLOEXEC) {
         let mut st1: libc::stat;
         let mut st2: libc::stat;
         unsafe {
