@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <dlfcn.h>
 
-__attribute__((constructor))
+[[gnu::constructor]]
 static void preload_init() {
     // Make sure our next exec won't get bugged
     unsetenv("LD_PRELOAD");
