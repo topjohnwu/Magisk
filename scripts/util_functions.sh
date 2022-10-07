@@ -739,7 +739,19 @@ install_module() {
 
   # Extract prop file
   unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
-  [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
+  if [ ! -f $TMPDIR/module.prop ]
+  then
+	  SUBFILE=$(zipinfo -1 $ZIPFILE)
+	  shopt -s nocasematch
+	  if [[ $SUBFILE =~ .*\.zip ]]
+	  then
+		  unzip -o "$ZIPFILE" $SUBFILE -d $TMPDIR >&2
+		  ZIPFILE="$TMPDIR/$SUBFILE"
+      unzip -o "$ZIPFILE" module.prop -d $TMPDIR >&2
+	  fi
+	  shopt -u nocasematch
+	  [ ! -f $TMPDIR/module.prop ] && abort "! Unable to extract zip file!"
+fi
 
   local MODDIRNAME=modules
   $BOOTMODE && MODDIRNAME=modules_update
