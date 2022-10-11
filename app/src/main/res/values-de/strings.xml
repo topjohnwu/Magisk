@@ -20,7 +20,7 @@
     <string name="home_package">Paket</string>
     <string name="home_app_title">App</string>
 
-    <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
+    <string name="home_notice_content">Magisk NUR von der offiziellen Github Seite herunterladen. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstützen Sie uns</string>
     <string name="home_follow_title">Folgen Sie uns</string>
     <string name="home_item_source">Quelle</string>
