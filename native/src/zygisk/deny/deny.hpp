@@ -49,4 +49,5 @@ void ls_list(int client);
 bool is_deny_target(int uid, std::string_view process);
 void revert_unmount();
 
+extern int sys_ui_app_id;
 extern std::atomic<bool> denylist_enforced;
