@@ -230,8 +230,8 @@
     <string name="unsupport_nonroot_stub_msg">App kann im versteckten Zustand nicht weiter funktionieren, da Root verloren gegangen ist. Ursprüngliche APK bitte wiederherstellen.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
+    <string name="post_notifications_denied">Benachrichtigungen die Erlaubnis erteilen, diese Funktion zu aktivieren</string>
     <string name="install_unknown_denied">Unbekannte Apps installieren erlauben, um diese Funktion zu aktivieren</string>
-
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
     <string name="add_shortcut_msg">Nachdem Sie diese App verstecken, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten Sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
