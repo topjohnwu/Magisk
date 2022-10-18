@@ -147,7 +147,9 @@ fi
 
 ui_print "- Patching ramdisk"
 
-echo "KEEPVERITY=$KEEPVERITY" > config
+dd if=/dev/random of=config bs=8 count=1 2>/dev/null
+echo -e "\n" >> config
+echo "KEEPVERITY=$KEEPVERITY" >> config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config

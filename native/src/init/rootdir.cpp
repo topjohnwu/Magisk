@@ -184,10 +184,13 @@ static void extract_files(bool sbin) {
 void SARBase::patch_ro_root() {
     string tmp_dir;
 
+    // Initialize random number engine
+    gen_rand_str(nullptr, 0, magisk_cfg.buf);
+
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
     } else {
-        char buf[8];
+        char buf[16];
         gen_rand_str(buf, sizeof(buf));
         tmp_dir = "/dev/"s + buf;
         xmkdir(tmp_dir.data(), 0);
@@ -282,6 +285,9 @@ void MagiskInit::patch_rw_root() {
         mv_path("/overlay.d", "/");
     }
     rm_rf("/.backup");
+
+    // Initialize random number engine
+    gen_rand_str(nullptr, 0, magisk_cfg.buf);
 
     // Patch init.rc
     patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
