@@ -147,8 +147,9 @@ fi
 
 ui_print "- Patching ramdisk"
 
-dd if=/dev/random of=config bs=8 count=1 2>/dev/null
-echo -e "\n" >> config
+echo -n "RANDOMSEED=" > config
+dd if=/dev/random of=config ibs=8 count=1 obs=11 seek=1 2>/dev/null
+echo -ne "\n" >> config
 echo "KEEPVERITY=$KEEPVERITY" >> config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config

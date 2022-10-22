@@ -62,6 +62,12 @@ protected:
     mmap_data magisk_cfg;
     std::string custom_rules_dir;
 
+    void magisk_cfg_skip_seed() {
+        // "RANDOMSEED=" + 8 bytes seed + "\n"
+        magisk_cfg.buf += 20;
+        magisk_cfg.sz -= 20;
+    }
+
 #if ENABLE_AVD_HACK
     // When this boolean is set, this means we are currently
     // running magiskinit on legacy SAR AVD emulator

@@ -185,7 +185,8 @@ void SARBase::patch_ro_root() {
     string tmp_dir;
 
     // Initialize random number engine
-    gen_rand_str(nullptr, 0, magisk_cfg.buf);
+    gen_rand_str(nullptr, 0, magisk_cfg.buf + strlen("RANDOMSEED="));
+    magisk_cfg_skip_seed();
 
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
@@ -287,7 +288,8 @@ void MagiskInit::patch_rw_root() {
     rm_rf("/.backup");
 
     // Initialize random number engine
-    gen_rand_str(nullptr, 0, magisk_cfg.buf);
+    gen_rand_str(nullptr, 0, magisk_cfg.buf + strlen("RANDOMSEED="));
+    magisk_cfg_skip_seed();
 
     // Patch init.rc
     patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
