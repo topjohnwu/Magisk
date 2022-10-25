@@ -64,6 +64,7 @@ mod unsafe_impl {
                 if r < 0 {
                     perror!("readlinkat {}", ptr_to_str(path))
                 }
+                libc::strlen(buf.cast()).try_into().unwrap_or(-1)
             } else {
                 let r = libc::readlinkat(dirfd, path, buf.cast(), bufsz - 1);
                 if r < 0 {
@@ -71,9 +72,9 @@ mod unsafe_impl {
                 } else {
                     *buf.offset(r) = b'\0';
                 }
+                r
             }
         }
-        return r;
     }
 
     #[no_mangle]
@@ -492,13 +493,21 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
 }
 
 #[inline]
-pub fn xreadlink(path: &CStr, data: &mut [u8]) -> isize {
-    unsafe { unsafe_impl::xreadlink(path.as_ptr(), data.as_mut_ptr(), data.len()) }
+pub fn xreadlink(path: &CStr, buf: &mut [u8]) -> isize {
+    if ptr::eq(path.as_ptr(), buf.as_ptr().cast()) {
+        error!("xreadlink path == buf");
+        return -1;
+    }
+    unsafe { unsafe_impl::xreadlink(path.as_ptr(), buf.as_mut_ptr(), buf.len()) }
 }
 
 #[inline]
-pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
-    unsafe { unsafe_impl::xreadlinkat(dirfd, path.as_ptr(), data.as_mut_ptr(), data.len()) }
+pub fn xreadlinkat(dirfd: RawFd, path: &CStr, buf: &mut [u8]) -> isize {
+    if ptr::eq(path.as_ptr(), buf.as_ptr().cast()) {
+        error!("xreadlinkat path == buf");
+        return -1;
+    }
+    unsafe { unsafe_impl::xreadlinkat(dirfd, path.as_ptr(), buf.as_mut_ptr(), buf.len()) }
 }
 
 #[no_mangle]
@@ -669,6 +678,10 @@ pub fn xpoll(fds: &mut [pollfd], timeout: i32) -> i32 {
 }
 
 pub fn xrealpath(path: &CStr, buf: &mut [u8]) -> isize {
+    if ptr::eq(path.as_ptr(), buf.as_ptr().cast()) {
+        error!("xreadlinkat path == buf");
+        return -1;
+    }
     let r = realpath(path, buf);
     if r < 0 {
         perror!("realpath {}", path.to_str().unwrap_or(""))
