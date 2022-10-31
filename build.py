@@ -309,13 +309,7 @@ def binary_dump(src, var_name, compressor=xz):
 
 
 def dump_bin_header(args):
-    stub = op.join(config['outdir'], f'stub-{"release" if args.release else "debug"}.apk')
-    if not op.exists(stub):
-        error('Build stub APK before building "magiskinit"')
     mkdir_p(native_gen_path)
-    with open(stub, 'rb') as src:
-        text = binary_dump(src, 'manager_xz')
-        write_if_diff(op.join(native_gen_path, 'binaries.h'), text)
     for arch in archs:
         preload = op.join('native', 'out', arch, 'libinit-ld.so')
         with open(preload, 'rb') as src:
@@ -430,11 +424,6 @@ def build_apk(args, module):
 def build_app(args):
     header('* Building the Magisk app')
     build_apk(args, 'app')
-
-
-def build_stub(args):
-    header('* Building the stub app')
-    build_apk(args, 'stub')
 
 
 def cleanup(args):
@@ -554,7 +543,6 @@ def patch_avd_ramdisk(args):
 
 
 def build_all(args):
-    build_stub(args)
     build_binary(args)
     build_app(args)
 
@@ -581,9 +569,6 @@ binary_parser.set_defaults(func=build_binary)
 
 app_parser = subparsers.add_parser('app', help='build the Magisk app')
 app_parser.set_defaults(func=build_app)
-
-stub_parser = subparsers.add_parser('stub', help='build the stub app')
-stub_parser.set_defaults(func=build_stub)
 
 avd_parser = subparsers.add_parser(
     'emulator', help='setup AVD for development')

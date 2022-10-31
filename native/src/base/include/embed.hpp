@@ -1,5 +1,3 @@
-#include <binaries.h>
-
 #if defined(__arm__)
 #include <armeabi-v7a_binaries.h>
 #elif defined(__aarch64__)
