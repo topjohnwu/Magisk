@@ -12,8 +12,7 @@ pub mod unsafe_impl {
 
     use crate::slice_from_ptr_mut;
 
-    #[no_mangle]
-    pub unsafe extern "C" fn read_link(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+    pub unsafe fn readlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
         let r = libc::readlink(path, buf.cast(), bufsz - 1);
         if r >= 0 {
             *buf.offset(r) = b'\0';
@@ -68,7 +67,7 @@ macro_rules! xopen_fd {
 }
 
 pub fn readlink(path: &CStr, data: &mut [u8]) -> isize {
-    unsafe { unsafe_impl::read_link(path.as_ptr(), data.as_mut_ptr(), data.len()) }
+    unsafe { unsafe_impl::readlink(path.as_ptr(), data.as_mut_ptr(), data.len()) }
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut [u8]) -> isize {

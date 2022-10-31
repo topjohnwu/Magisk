@@ -16,7 +16,7 @@ mod unsafe_impl {
     use cfg_if::cfg_if;
     use libc::{c_char, nfds_t, off_t, pollfd};
 
-    use crate::unsafe_impl::read_link;
+    use crate::unsafe_impl::readlink;
     use crate::{perror, ptr_to_str, slice_from_ptr, slice_from_ptr_mut};
 
     #[no_mangle]
@@ -41,7 +41,7 @@ mod unsafe_impl {
 
     #[no_mangle]
     pub unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        let r = read_link(path, buf, bufsz);
+        let r = readlink(path, buf, bufsz);
         if r < 0 {
             perror!("readlink");
         }

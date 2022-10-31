@@ -61,8 +61,7 @@ struct mmap_data : public byte_data {
 extern "C" {
 
 int mkdirs(const char *path, mode_t mode);
-ssize_t canonical_path(const char *path, char *buf, size_t bufsiz);
-ssize_t read_link(const char *pathname, char *buf, size_t bufsiz);
+ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 
 } // extern "C"
 
@@ -74,7 +73,8 @@ void mv_dir(int src, int dest);
 void cp_afc(const char *src, const char *dest);
 void link_path(const char *src, const char *dest);
 void link_dir(int src, int dest);
-static inline ssize_t realpath(const char *path, char *buf, size_t bufsiz) {
+static inline ssize_t realpath(
+        const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz) {
     return canonical_path(path, buf, bufsiz);
 }
 int getattr(const char *path, file_attr *a);
