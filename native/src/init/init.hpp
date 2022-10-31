@@ -36,7 +36,6 @@ bool check_two_stage();
 void setup_klog();
 const char *backup_init();
 void restore_ramdisk_init();
-int dump_manager(const char *path, mode_t mode);
 int dump_preload(const char *path, mode_t mode);
 
 /***************

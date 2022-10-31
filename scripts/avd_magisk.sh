@@ -120,6 +120,7 @@ fi
 # Magisk stuff
 mkdir -p $MAGISKBIN 2>/dev/null
 unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
+unzip -oj magisk.apk 'assets/stub.apk' -d $MAGISKTMP
 mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
@@ -142,8 +143,6 @@ ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
-
-./magiskinit -x manager $MAGISKTMP/stub.apk
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block
