@@ -41,10 +41,6 @@ static void rescan_apps() {
 
     app_id_to_pkgs.clear();
 
-    struct stat st{};
-    if (xstat("/data/data/com.android.systemui", &st) == 0)
-        sys_ui_app_id = to_app_id(st.st_uid);
-
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
         return;
@@ -54,6 +50,7 @@ static void rescan_apps() {
         int dfd = xopenat(dirfd(data_dir.get()), entry->d_name, O_RDONLY);
         if (auto dir = xopen_dir(dfd)) {
             while ((entry = xreaddir(dir.get()))) {
+                struct stat st{};
                 // For each package
                 if (xfstatat(dfd, entry->d_name, &st, 0))
                     continue;
@@ -61,6 +58,8 @@ static void rescan_apps() {
                 if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
                     app_id_to_pkgs[app_id].insert(it->first);
                 }
+                if (entry->d_name == "com.android.systemui"sv)
+                    sys_ui_app_id = app_id;
             }
         } else {
             close(dfd);

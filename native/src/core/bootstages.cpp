@@ -126,7 +126,7 @@ static bool magisk_env() {
     string pkg;
     get_manager(0, &pkg);
 
-    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
+    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR,
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths

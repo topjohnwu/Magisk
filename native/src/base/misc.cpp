@@ -214,7 +214,11 @@ vector<string_view> split_ro(string_view s, string_view delims) {
 
 #undef vsnprintf
 int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
-    return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
+    if (size > 0) {
+        *dest = 0;
+        return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
+    }
+    return -1;
 }
 
 int ssprintf(char *dest, size_t size, const char *fmt, ...) {
