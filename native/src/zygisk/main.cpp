@@ -13,6 +13,120 @@
 
 using namespace std;
 
+static bool is_valid_environment_variable(const char* name) {
+    // According to the kernel source, by default the kernel uses 32*PAGE_SIZE
+    // as the maximum size for an environment variable definition.
+    const int MAX_ENV_LEN = 32*4096;
+
+    if (name == nullptr) {
+        return false;
+    }
+
+    // Parse the string, looking for the first '=' there, and its size.
+    int pos = 0;
+    int first_equal_pos = -1;
+    while (pos < MAX_ENV_LEN) {
+        if (name[pos] == '\0') {
+            break;
+        }
+        if (name[pos] == '=' && first_equal_pos < 0) {
+            first_equal_pos = pos;
+        }
+        pos++;
+    }
+
+    // Check that it's smaller than MAX_ENV_LEN (to detect non-zero terminated strings).
+    if (pos >= MAX_ENV_LEN) {
+        return false;
+    }
+
+    // Check that it contains at least one equal sign that is not the first character
+    if (first_equal_pos < 1) {
+        return false;
+    }
+
+    return true;
+}
+
+static const char* env_match(const char* envstr, const char* name) {
+    size_t i = 0;
+
+    while (envstr[i] == name[i] && name[i] != '\0') {
+        ++i;
+    }
+
+    if (name[i] == '\0' && envstr[i] == '=') {
+        return envstr + i + 1;
+    }
+
+    return nullptr;
+}
+
+static bool is_unsafe_environment_variable(const char* name) {
+    // None of these should be allowed when the AT_SECURE auxv
+    // flag is set. This flag is set to inform userspace that a
+    // security transition has occurred, for example, as a result
+    // of executing a setuid program or the result of an SELinux
+    // security transition.
+    static constexpr const char* UNSAFE_VARIABLE_NAMES[] = {
+            "ANDROID_DNS_MODE",
+            "GCONV_PATH",
+            "GETCONF_DIR",
+            "HOSTALIASES",
+            "JE_MALLOC_CONF",
+            "LD_AOUT_LIBRARY_PATH",
+            "LD_AOUT_PRELOAD",
+            "LD_AUDIT",
+            "LD_CONFIG_FILE",
+            "LD_DEBUG",
+            "LD_DEBUG_OUTPUT",
+            "LD_DYNAMIC_WEAK",
+            "LD_LIBRARY_PATH",
+            "LD_ORIGIN_PATH",
+//            "LD_PRELOAD",
+            "LD_PROFILE",
+            "LD_SHOW_AUXV",
+            "LD_USE_LOAD_BIAS",
+            "LIBC_DEBUG_MALLOC_OPTIONS",
+            "LIBC_HOOKS_ENABLE",
+            "LOCALDOMAIN",
+            "LOCPATH",
+            "MALLOC_CHECK_",
+            "MALLOC_CONF",
+            "MALLOC_TRACE",
+            "NIS_PATH",
+            "NLSPATH",
+            "RESOLV_HOST_CONF",
+            "RES_OPTIONS",
+            "SCUDO_OPTIONS",
+            "TMPDIR",
+            "TZDIR",
+    };
+    for (const auto& unsafe_variable_name : UNSAFE_VARIABLE_NAMES) {
+        if (env_match(name, unsafe_variable_name) != nullptr) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static void sanitize_environment_variables(char** env) {
+    char** src = env;
+    char** dst = env;
+    for (; src[0] != nullptr; ++src) {
+        if (!is_valid_environment_variable(src[0])) {
+            continue;
+        }
+        // Remove various unsafe environment variables if we're loading a setuid program.
+        if (is_unsafe_environment_variable(src[0])) {
+            continue;
+        }
+        dst[0] = src[0];
+        ++dst;
+    }
+    dst[0] = nullptr;
+}
+
 // Entrypoint for app_process overlay
 int app_process_main(int argc, char *argv[]) {
     android_logging();
@@ -95,6 +209,8 @@ int app_process_main(int argc, char *argv[]) {
             close(socket);
 
             fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
+            fprintf(xopen_file("/proc/self/attr/current", "w").get(), "u:r:init:s0");
+            sanitize_environment_variables(environ);
             fexecve(app_proc_fd, argv, environ);
         } while (false);
 
