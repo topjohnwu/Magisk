@@ -182,8 +182,6 @@ struct ZygiskModule {
 
     ZygiskModule(int id, void *handle, void *entry);
 
-    static bool RegisterModuleImpl(api_abi_base *api, long *module);
-
 private:
     const int id;
     bool unload = false;
@@ -194,16 +192,20 @@ private:
         void (* const fn)(void *, void *);
     } entry;
 
-    union {
+    union ApiTable {
         api_abi_base base;
         api_abi_v1 v1;
         api_abi_v2 v2;
+        api_abi_v4 v4;
     } api;
 
     union {
         long *api_version;
         module_abi_v1 *v1;
     } mod;
+
+public:
+    static bool RegisterModuleImpl(ApiTable *api, long *module);
 };
 
 } // namespace
