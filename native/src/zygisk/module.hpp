@@ -1,6 +1,8 @@
 #pragma once
 
 #include "api.hpp"
+#include <list>
+#include <regex.h>
 
 namespace {
 
@@ -140,6 +142,8 @@ struct api_abi_v2 : public api_abi_v1 {
 
 struct api_abi_v4 : public api_abi_v2 {
     bool (*exemptFd)(int);
+    void (*pltHookRegisterInode)(ino_t, const char *, void *, void **);
+    void (*pltHookExcludeInode)(ino_t, const char *);
 };
 
 union ApiTable {
@@ -210,6 +214,29 @@ private:
         long *api_version;
         module_abi_v1 *v1;
     } mod;
+
+    struct RegisterInfo {
+        regex_t regex;
+        ino_t inode;
+        std::string symbol;
+        void *callback;
+        void **backup;
+    };
+
+    struct IgnoreInfo {
+        regex_t regex;
+        ino_t inode;
+        std::string symbol;
+    };
+    inline static pthread_mutex_t hook_lock = PTHREAD_MUTEX_INITIALIZER;
+    inline static std::list<RegisterInfo> register_info {};
+    inline static std::list<IgnoreInfo> ignore_info {};
+
+    static void PltHookRegister(const char *lib, const char *symbol, void *callback, void **backup);
+    static void PltHookRegister(ino_t inode, const char *symbol, void *callback, void **backup);
+    static void PltHookExclude(const char *lib, const char *symbol);
+    static void PltHookExclude(ino_t inode, const char *symbol);
+    static bool CommitPltHook();
 };
 
 } // namespace

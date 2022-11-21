@@ -84,3 +84,4 @@ export KEEPFORCEENCRYPT=true
 
 rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 ./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz
+pm install magisk.apk || true
