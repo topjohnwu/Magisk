@@ -2,6 +2,7 @@
 #include <sys/mount.h>
 #include <dlfcn.h>
 #include <bitset>
+#include <list>
 
 #include <xhook.h>
 
@@ -54,7 +55,7 @@ struct HookContext {
     } args;
 
     const char *process;
-    vector<ZygiskModule> modules;
+    list<ZygiskModule> modules;
 
     int pid;
     bitset<FLAG_MAX> flags;
@@ -485,10 +486,6 @@ void HookContext::fork_post() {
 }
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
-    // Because the data structure stored in the vector is self referencing, in order to prevent
-    // dangling pointers, the vector has to be pre-allocated to ensure reallocation does not occur
-    modules.reserve(fds.size());
-
     for (int i = 0; i < fds.size(); ++i) {
         struct stat s{};
         if (fstat(fds[i], &s) != 0 || !S_ISREG(s.st_mode)) {
@@ -509,8 +506,16 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
         close(fds[i]);
     }
 
+    for (auto it = modules.begin(); it != modules.end();) {
+        it->onLoad(env);
+        if (it->valid()) {
+            ++it;
+        } else {
+            it = modules.erase(it);
+        }
+    }
+
     for (auto &m : modules) {
-        m.onLoad(env);
         if (flags[APP_SPECIALIZE]) {
             m.preAppSpecialize(args.app);
         } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
