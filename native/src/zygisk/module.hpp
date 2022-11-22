@@ -180,10 +180,8 @@ struct ZygiskModule {
     void postServerSpecialize(const ServerSpecializeArgs_v1 *args) const {
         mod.v1->postServerSpecialize(mod.v1->impl, args);
     }
-    bool valid() const {
-        return entry.fn && mod.api_version;
-    }
 
+    bool valid() const;
     int connectCompanion() const;
     int getModuleDir() const;
     void setOption(zygisk::Option opt);

@@ -313,6 +313,9 @@ ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
 }
 
 bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
+    if (api == nullptr || module == nullptr)
+        return false;
+
     long api_version = *module;
     // Unsupported version
     if (api_version > ZYGISK_API_VERSION)
@@ -353,6 +356,24 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
     }
 
     return true;
+}
+
+bool ZygiskModule::valid() const {
+    if (mod.api_version == nullptr)
+        return false;
+    switch (*mod.api_version) {
+    case 4:
+        // fallthrough
+    case 3:
+        // fallthrough
+    case 2:
+        // fallthrough
+    case 1:
+        return mod.v1->impl && mod.v1->preAppSpecialize && mod.v1->postAppSpecialize &&
+            mod.v1->preServerSpecialize && mod.v1->postServerSpecialize;
+    default:
+        return false;
+    }
 }
 
 int ZygiskModule::connectCompanion() const {
