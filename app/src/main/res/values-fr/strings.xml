@@ -138,7 +138,7 @@
     <string name="settings_zygisk_summary">Exécuter des parties de Magisk dans le service zygote</string>
     <string name="settings_denylist_title">Imposer Liste Exclusion</string>
     <string name="settings_denylist_summary">Les processus figurant sur la liste des exclusions verront toutes les modifications de Magisk annulées.</string>
-    <string name="settings_denylist_error">Cette fonctionnalité requière %1$s pour être activée</string>
+    <string name="settings_denylist_error">Cette fonctionnalité requiert %1$s pour être activée</string>
     <string name="settings_denylist_config_title">Configurer Liste Exclusion</string>
     <string name="settings_denylist_config_summary">Sélectionner le processus à inclure dans la liste d’exclusion</string>
     <string name="settings_hosts_title">Fichier d’hôtes hors partition système</string>
