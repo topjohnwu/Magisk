@@ -311,47 +311,41 @@ ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
     api.base.registerModule = &ZygiskModule::RegisterModuleImpl;
 }
 
-bool ZygiskModule::RegisterModuleImpl(api_abi_base *api, long *module) {
+bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
     long api_version = *module;
     // Unsupported version
     if (api_version > ZYGISK_API_VERSION)
         return false;
 
     // Set the actual module_abi*
-    api->impl->mod = { module };
+    api->base.impl->mod = { module };
 
     // Fill in API accordingly with module API version
     switch (api_version) {
-    case 4: {
-        auto v4 = static_cast<api_abi_v4 *>(api);
-        v4->exemptFd = [](int fd) { return g_ctx != nullptr && g_ctx->exempt_fd(fd); };
-    }
+    case 4:
+        api->v4.exemptFd = [](int fd) { return g_ctx != nullptr && g_ctx->exempt_fd(fd); };
         // fallthrough
     case 3:
-    case 2: {
-        auto v2 = static_cast<api_abi_v2 *>(api);
-        v2->getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
-        v2->getFlags = [](auto) { return ZygiskModule::getFlags(); };
-    }
+    case 2:
+        api->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
         // fallthrough
-    case 1: {
-        auto v1 = static_cast<api_abi_v1 *>(api);
-        v1->hookJniNativeMethods = &hookJniNativeMethods;
-        v1->pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
+    case 1:
+        api->v1.hookJniNativeMethods = &hookJniNativeMethods;
+        api->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
             xhook_register(p, s, n, o);
         };
-        v1->pltHookExclude = [](const char *p, const char *s) {
+        api->v1.pltHookExclude = [](const char *p, const char *s) {
             xhook_ignore(p, s);
         };
-        v1->pltHookCommit = [] {
+        api->v1.pltHookCommit = [] {
             bool r = xhook_refresh(0) == 0;
             xhook_clear();
             return r;
         };
-        v1->connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
-        v1->setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+        api->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+        api->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
         break;
-    }
     default:
         // Unknown version number
         return false;
