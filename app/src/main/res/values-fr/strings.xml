@@ -25,8 +25,8 @@
     <string name="home_follow_title">Suivez-nous</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
-    <string name="home_installed_version">Installé</string>
-    <string name="home_latest_version">Dernière</string>
+    <string name="home_installed_version">Version installée</string>
+    <string name="home_latest_version">Dernière version</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
