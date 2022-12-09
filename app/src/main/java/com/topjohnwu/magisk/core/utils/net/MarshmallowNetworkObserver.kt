@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.topjohnwu.magisk.core.utils.net
 
 import android.annotation.TargetApi
@@ -32,7 +30,7 @@ class MarshmallowNetworkObserver(
 
     override fun getCurrentState() {
         callback(manager.getNetworkCapabilities(manager.activeNetwork)
-            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false)
     }
 
     private inner class IdleBroadcastReceiver: BroadcastReceiver() {
