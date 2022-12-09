@@ -1,4 +1,4 @@
-# Magisk Changelog
+# Registro de cambios de Magisk
 
 ### v25.2
 
