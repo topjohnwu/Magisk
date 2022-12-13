@@ -4,6 +4,8 @@
 #include "magiskboot.hpp"
 #include "compress.hpp"
 
+#include "boot-rs.cpp"
+
 using namespace std;
 
 static void print_formats() {
@@ -45,6 +47,9 @@ Supported actions:
     If '-n' is provided, all compression operations will be skipped.
     If env variable PATCHVBMETAFLAG is set to true, all disable flags in
     the boot image's vbmeta header will be set.
+
+  extract <payload.bin> <outbootimg>
+    Extract the boot image from payload.bin to <outbootimg>.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace it with <hexpattern2>
@@ -201,6 +206,8 @@ int main(int argc, char *argv[]) {
     } else if (argc > 3 && action == "dtb") {
         if (dtb_commands(argc - 2, argv + 2))
             usage(argv[0]);
+    } else if (argc > 3 && action == "extract") {
+        return rust::extract_boot_from_payload(argv[2], argv[3]) ? 0 : 1;
     } else {
         usage(argv[0]);
     }

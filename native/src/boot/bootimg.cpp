@@ -9,6 +9,7 @@
 #include "bootimg.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
+#include "boot-rs.hpp"
 
 using namespace std;
 
