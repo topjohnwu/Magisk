@@ -230,7 +230,6 @@
     <string name="unsupport_nonroot_stub_msg">Aplikasi Magisk yang tersembunyi tidak dapat terus berfungsi karena root hilang. Tolong pulihkan APK asli.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Berikan izin akses ke penyimpanan untuk mengaktifkan fungsi ini</string>
-    <string name="post_notifications_denied">Berikan izin akses ke notifikasi untuk mengaktifkan fungsi ini</string>
     <string name="install_unknown_denied">Izinkan "Sumber tidak dikenal" untuk mengaktifkan fungsi ini</string>
     <string name="add_shortcut_title">Tambahkan pintasan ke layar utama</string>
     <string name="add_shortcut_msg">Setelah menyembunyikan aplikasi ini, nama dan ikonnya mungkin sulit dikenali. Apakah Anda ingin menambahkan pintasan cantik ke layar utama?</string>
