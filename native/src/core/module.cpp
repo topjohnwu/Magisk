@@ -614,8 +614,7 @@ void magic_mount() {
         system->collect_files(module, fd);
         close(fd);
     }
-    string_view path_env = getenv("PATH");
-    if (MAGISKTMP != "/sbin" || path_env.find("/sbin") == string_view::npos) {
+    if (MAGISKTMP != "/sbin" || !str_contains(getenv("PATH") ?: "", "/sbin")) {
         // Need to inject our binaries into /system/bin
         inject_magisk_bins(system);
     }
