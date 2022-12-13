@@ -290,6 +290,8 @@ private:
             }
             if (!bwrite(outbuf, sizeof(outbuf) - strm.avail_out))
                 return false;
+            if (code == BZ_STREAM_END)
+                return true;
         } while (strm.avail_out == 0);
         return true;
     }
@@ -722,4 +724,21 @@ void compress(const char *method, const char *infile, const char *outfile) {
 
     if (rm_in)
         unlink(infile);
+}
+
+namespace rust {
+bool decompress(const unsigned char *in, uint64_t in_size, int fd) {
+    format_t type = check_fmt(in, in_size);
+
+    if (!COMPRESSED(type)) {
+        LOGE("Input file is not a supported compressed type!\n");
+        return false;
+    }
+
+    auto strm = get_decoder(type, make_unique<fd_stream>(fd));
+    if (!strm->write(in, in_size)) {
+        return false;
+    }
+    return true;
+}
 }

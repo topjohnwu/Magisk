@@ -9,3 +9,6 @@ path = "lib.rs"
 
 [dependencies]
 base = { path = "../base" }
+cxx = { path = "../external/cxx-rs" }
+protobuf = "3.2.0"
+byteorder = "1"
