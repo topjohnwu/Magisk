@@ -57,7 +57,9 @@ done
 ./magiskboot decompress ramdisk.cpio.tmp ramdisk.cpio
 cp ramdisk.cpio ramdisk.cpio.orig
 
-touch config
+echo -n "RANDOMSEED=" > config
+dd if=/dev/random of=config ibs=8 count=1 obs=11 seek=1 2>/dev/null
+echo -ne "\n" >> config
 
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
