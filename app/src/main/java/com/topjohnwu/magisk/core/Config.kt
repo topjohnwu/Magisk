@@ -6,21 +6,24 @@ import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.repository.BoolDBPropertyNoWrite
+import com.topjohnwu.magisk.core.repository.DBConfig
+import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.refreshLocale
-import com.topjohnwu.magisk.data.preference.PreferenceModel
-import com.topjohnwu.magisk.data.repository.DBBoolSettingsNoWrite
-import com.topjohnwu.magisk.data.repository.DBConfig
-import com.topjohnwu.magisk.di.ServiceLocator
 import com.topjohnwu.magisk.ui.theme.Theme
+import kotlinx.coroutines.GlobalScope
 import org.xmlpull.v1.XmlPullParser
 import java.io.File
 import java.io.InputStream
 
-object Config : PreferenceModel, DBConfig {
+object Config : PreferenceConfig, DBConfig {
 
     override val stringDB get() = ServiceLocator.stringDB
     override val settingsDB get() = ServiceLocator.settingsDB
     override val context get() = ServiceLocator.deContext
+    override val coroutineScope get() = GlobalScope
 
     @get:SuppressLint("ApplySharedPref")
     val prefsFile: File get() {
@@ -70,6 +73,7 @@ object Config : PreferenceModel, DBConfig {
         const val BETA_CHANNEL = 1
         const val CUSTOM_CHANNEL = 2
         const val CANARY_CHANNEL = 3
+        const val DEBUG_CHANNEL = 4
 
         // root access mode
         const val ROOT_ACCESS_DISABLED = 0
@@ -106,6 +110,8 @@ object Config : PreferenceModel, DBConfig {
 
     private val defaultChannel =
         if (BuildConfig.DEBUG)
+            Value.DEBUG_CHANNEL
+        else if (Const.APP_IS_CANARY)
             Value.CANARY_CHANNEL
         else
             Value.DEFAULT_CHANNEL
@@ -131,7 +137,15 @@ object Config : PreferenceModel, DBConfig {
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var suTapjack by preference(Key.SU_TAPJACK, true)
-    var checkUpdate by preference(Key.CHECK_UPDATES, true)
+    private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
+    var checkUpdate
+        get() = checkUpdatePrefs
+        set(value) {
+            if (checkUpdatePrefs != value) {
+                checkUpdatePrefs = value
+                JobService.schedule(AppContext)
+            }
+        }
     var doh by preference(Key.DOH, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 
@@ -149,7 +163,7 @@ object Config : PreferenceModel, DBConfig {
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
     var zygisk by dbSettings(Key.ZYGISK, false)
-    var denyList by DBBoolSettingsNoWrite(Key.DENYLIST, false)
+    var denyList by BoolDBPropertyNoWrite(Key.DENYLIST, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
 
@@ -158,7 +172,7 @@ object Config : PreferenceModel, DBConfig {
     fun load(pkg: String?) {
         // Only try to load prefs when fresh install and a previous package name is set
         if (pkg != null && prefs.all.isEmpty()) runCatching {
-            context.contentResolver.openInputStream(Provider.PREFS_URI(pkg))?.use {
+            context.contentResolver.openInputStream(Provider.preferencesUri(pkg))?.use {
                 prefs.edit { parsePrefs(it) }
             }
         }
@@ -169,10 +183,11 @@ object Config : PreferenceModel, DBConfig {
                 suBiometric = true
             remove(SU_FINGERPRINT)
             prefs.getString(Key.UPDATE_CHANNEL, null).also {
-                if (it == null)
+                if (it == null ||
+                    it.toInt() > Value.DEBUG_CHANNEL ||
+                    it.toInt() < Value.DEFAULT_CHANNEL) {
                     putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-                else if (it.toInt() > Value.CANARY_CHANNEL)
-                    putString(Key.UPDATE_CHANNEL, Value.CANARY_CHANNEL.toString())
+                }
             }
         }
     }

@@ -92,7 +92,7 @@
     <string name="settings_user_independent">Visų</string>
     <string name="owner_only_summary">Tik įrenginio savininkas turi root prieigą</string>
     <string name="owner_manage_summary">Tik įrenginio savinkas gali tvarkyti root prieigą ir gauti lenteles prašančias root prieigos</string>
-    <string name="user_indepenent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
+    <string name="user_independent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
 
     <string name="mount_namespace_mode">Root sesijos vardų srities režimas</string>
     <string name="settings_ns_global">Globali vardų sritis</string>

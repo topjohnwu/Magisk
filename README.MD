@@ -18,9 +18,10 @@ Some highlight features:
 
 [Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
 
-[![](https://img.shields.io/badge/Magisk-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
-[![](https://img.shields.io/badge/Magisk%20Beta-v24.3-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v24.3)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk-v25.2-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v25.2)
+[![](https://img.shields.io/badge/Magisk%20Beta-v25.2-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v25.2)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-release.apk)
+[![](https://img.shields.io/badge/Magisk-Debug-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
 
 ## Useful Links
 
@@ -30,7 +31,7 @@ Some highlight features:
 
 ## Bug Reports
 
-**Only bug reports from Canary builds will be accepted.**
+**Only bug reports from Debug builds will be accepted.**
 
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
@@ -40,7 +41,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 
 - Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
 - Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
-- Install Python 3.6+ \
+- Install Python 3.8+ \
   (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
 - Configure to use the JDK bundled in Android Studio:
   - macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`
@@ -50,9 +51,15 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - Run `./build.py ndk` to let the script download and install NDK for you
 - To start building, run `build.py` to see your options. \
   For each action, use `-h` to access help (e.g. `./build.py all -h`)
-- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native (C++/C) sources.
+- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native sources.
 - Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
-- To sign APKs and zips with your own private keys, set signing configs in `config.prop`. For more info, check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key).
+
+## Signing and Distribution
+
+- The certificate of the key used to sign the final Magisk APK product is also directly embedded into some executables. In release builds, Magisk's root daemon will enforce this certificate check and reject and forcefully uninstall any non-matching Magisk apps to protect users from malicious and unverified Magisk APKs.
+- To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to bypass the signature check.
+- To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
+- Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
 
 ## Translation Contributions
 

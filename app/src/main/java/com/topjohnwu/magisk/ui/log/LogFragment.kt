@@ -8,8 +8,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentLogMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.ui.MainActivity
 import com.topjohnwu.magisk.utils.MotionRevealHelper
 import rikka.recyclerview.addEdgeSpacing
@@ -20,6 +20,9 @@ class LogFragment : BaseFragment<FragmentLogMd2Binding>() {
 
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()
+    override val snackbarView: View?
+        get() = if (isMagiskLogVisible) binding.logFilterSuperuser.snackbarContainer
+                else super.snackbarView
     override val snackbarAnchorView get() = binding.logFilterToggle
 
     private var actionSave: MenuItem? = null

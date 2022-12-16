@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.utils.Utils
 object Shortcuts {
 
     fun setupDynamic(context: Context) {
-        if (Build.VERSION.SDK_INT >= 25) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val manager = context.getSystemService<ShortcutManager>() ?: return
             manager.dynamicShortcuts = getShortCuts(context)
         }
@@ -36,7 +36,7 @@ object Shortcuts {
     }
 
     private fun Context.getIconCompat(id: Int): IconCompat {
-        return if (Build.VERSION.SDK_INT >= 26)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             IconCompat.createWithAdaptiveBitmap(getBitmap(id))
         else
             IconCompat.createWithBitmap(getBitmap(id))

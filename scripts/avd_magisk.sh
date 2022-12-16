@@ -3,8 +3,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support emulator ABI: x86_64 and arm64
-# Support API level: 23 - 31 (21 and 22 images do not have SELinux)
+# Support API level: 21 - 33
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py emulator
@@ -46,15 +45,15 @@ if [ -z "$FIRST_STAGE" ]; then
   fi
 fi
 
-pm install -r $(pwd)/app-debug.apk
+pm install -r $(pwd)/magisk.apk
 
 # Extract files from APK
-unzip -oj app-debug.apk 'assets/util_functions.sh'
+unzip -oj magisk.apk 'assets/util_functions.sh'
 . ./util_functions.sh
 
 api_level_arch_detect
 
-unzip -oj app-debug.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
+unzip -oj magisk.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
@@ -69,12 +68,14 @@ if [ -d /dev/avd-magisk ]; then
 fi
 
 # SELinux stuffs
-if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
-  ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
-elif [ -f /sepolicy ]; then
-  ./magiskpolicy --load /sepolicy --live --magisk 2>&1
-else
-  ./magiskpolicy --live --magisk 2>&1
+if [ -d /sys/fs/selinux ]; then
+  if [ -f /vendor/etc/selinux/precompiled_sepolicy ]; then
+    ./magiskpolicy --load /vendor/etc/selinux/precompiled_sepolicy --live --magisk 2>&1
+  elif [ -f /sepolicy ]; then
+    ./magiskpolicy --load /sepolicy --live --magisk 2>&1
+  else
+    ./magiskpolicy --live --magisk 2>&1
+  fi
 fi
 
 MAGISKTMP=/sbin
@@ -118,8 +119,7 @@ fi
 
 # Magisk stuff
 mkdir -p $MAGISKBIN 2>/dev/null
-unzip -oj app-debug.apk 'assets/*' -x 'assets/chromeos/*' \
--x 'assets/bootctl' -x 'assets/main.jar' -d $MAGISKBIN
+unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
 mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
@@ -133,11 +133,17 @@ cp -af ./magiskboot $MAGISKBIN/magiskboot
 cp -af ./magiskinit $MAGISKBIN/magiskinit
 cp -af ./busybox $MAGISKBIN/busybox
 
-ln -s ./magisk64 $MAGISKTMP/magisk
+if $IS64BIT; then
+  ln -s ./magisk64 $MAGISKTMP/magisk
+else
+  ln -s ./magisk32 $MAGISKTMP/magisk
+fi
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
+
+./magiskinit -x manager $MAGISKTMP/stub.apk
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block

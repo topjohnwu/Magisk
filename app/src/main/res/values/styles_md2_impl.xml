@@ -61,11 +61,6 @@
         <item name="iconPadding">@dimen/l_50</item>
     </style>
 
-    <style name="WidgetFoundation.Button.Text.Secondary">
-        <item name="android:textColor">?colorSecondary</item>
-        <item name="iconTint">?colorSecondary</item>
-    </style>
-
     <style name="WidgetFoundation.Button.Text.OnPrimary">
         <item name="rippleColor">?colorOnPrimary</item>
         <item name="android:textColor">?colorOnPrimary</item>

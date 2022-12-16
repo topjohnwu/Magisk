@@ -150,7 +150,7 @@
     <string name="settings_user_independent">مستقل از کاربر</string>
     <string name="owner_only_summary">فقط مالک دسترسی روت دارد</string>
     <string name="owner_manage_summary">فقط مالک می تواند دسترسی روت را مدیریت کرده و درخواست های پرامپت را دریافت کند</string>
-    <string name="user_indepenent_summary">هر کاربر قوانین روت جداگانه خود را دارد</string>
+    <string name="user_independent_summary">هر کاربر قوانین روت جداگانه خود را دارد</string>
 
     <string name="mount_namespace_mode">نصب کردن Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>

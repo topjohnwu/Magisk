@@ -2,7 +2,7 @@
 
     <!--Sections-->
     <string name="modules">Модули</string>
-    <string name="superuser">Суперпользователь</string>
+    <string name="superuser">Superuser</string> <!--Do not translate! #6016-->
     <string name="logs">Лог</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Скачивайте Magisk только из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
+    <string name="home_follow_title">Подписывайтесь</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
     <string name="home_installed_version">Установлен</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">Модуль отключён, поскольку активирован %1$s</string>
     <string name="suspend_text_zygisk">Модуль отключён, поскольку %1$s не активирован</string>
     <string name="zygisk_module_unloaded">Модуль Zygisk не запущен из-за несовместимости</string>
+    <string name="module_empty">Модули не установлены</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Оттенок</string>
@@ -177,7 +179,7 @@
     <string name="settings_user_independent">Правила пользователей</string>
     <string name="owner_only_summary">Только администратору доступен Root-доступ</string>
     <string name="owner_manage_summary">Администратор управляет Root-доступом пользователей и обрабатывает запросы</string>
-    <string name="user_indepenent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
+    <string name="user_independent_summary">Каждый пользователь управляет собственными правилами Root-доступа</string>
 
     <string name="mount_namespace_mode">Настройка пространств имён</string>
     <string name="settings_ns_global">Общее пространство имён</string>
@@ -228,11 +230,12 @@
     <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Предоставьте разрешение на доступ к хранилищу</string>
+    <string name="post_notifications_denied">Предоставьте разрешение на отправку уведомлений</string>
     <string name="install_unknown_denied">Предоставьте разрешение на "Установку из неизвестных источников"</string>
     <string name="add_shortcut_title">Добавление ярлыка</string>
     <string name="add_shortcut_msg">После скрытия приложения Magisk его название и иконка могут быть неудобны для восприятия. Хотите создать ярлык на рабочем столе?</string>
     <string name="app_not_found">Приложение для обработки этого действия не найдено</string>
-    <string name="reboot_apply_change">Перезагрузить для применения изменений</string>
+    <string name="reboot_apply_change">Перезагрузите устройство для применения изменений</string>
     <string name="restore_app_confirmation">Это действие восстановит пересобранное для скрытия приложение к исходному состоянию. Вы действительно хотите продолжить?</string>
 
 </resources>

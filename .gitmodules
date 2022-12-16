@@ -1,42 +1,45 @@
 [submodule "selinux"]
-	path = native/jni/external/selinux
+	path = native/src/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
 [submodule "busybox"]
-	path = native/jni/external/busybox
+	path = native/src/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
 [submodule "dtc"]
-	path = native/jni/external/dtc
+	path = native/src/external/dtc
 	url = https://github.com/dgibson/dtc.git
 [submodule "lz4"]
-	path = native/jni/external/lz4
+	path = native/src/external/lz4
 	url = https://github.com/lz4/lz4.git
 [submodule "bzip2"]
-	path = native/jni/external/bzip2
+	path = native/src/external/bzip2
 	url = https://github.com/nemequ/bzip2.git
 [submodule "xz"]
-	path = native/jni/external/xz
+	path = native/src/external/xz
 	url = https://github.com/xz-mirror/xz.git
 [submodule "nanopb"]
-	path = native/jni/external/nanopb
+	path = native/src/external/nanopb
 	url = https://github.com/nanopb/nanopb.git
 [submodule "mincrypt"]
-	path = native/jni/external/mincrypt
+	path = native/src/external/mincrypt
 	url = https://github.com/topjohnwu/mincrypt.git
 [submodule "pcre"]
-	path = native/jni/external/pcre
+	path = native/src/external/pcre
 	url = https://android.googlesource.com/platform/external/pcre
 [submodule "libcxx"]
-	path = native/jni/external/libcxx
+	path = native/src/external/libcxx
 	url = https://github.com/topjohnwu/libcxx.git
 [submodule "zlib"]
-	path = native/jni/external/zlib
+	path = native/src/external/zlib
 	url = https://android.googlesource.com/platform/external/zlib
 [submodule "parallel-hashmap"]
-	path = native/jni/external/parallel-hashmap
+	path = native/src/external/parallel-hashmap
 	url = https://github.com/greg7mdp/parallel-hashmap.git
+[submodule "zopfli"]
+	path = native/src/external/zopfli
+	url = https://github.com/google/zopfli.git
+[submodule "cxx-rs"]
+	path = native/src/external/cxx-rs
+	url = https://github.com/topjohnwu/cxx.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git
-[submodule "zopfli"]
-	path = native/jni/external/zopfli
-	url = https://github.com/google/zopfli.git

@@ -153,7 +153,7 @@
     <string name="settings_user_independent">مستقل </string>
     <string name="owner_only_summary">للمالك فقط له صلاحيات الروت</string>
     <string name="owner_manage_summary">فقط المالك من يرفض و يمنح صلاحيات الروت</string>
-    <string name="user_indepenent_summary">كل مستخدم له قواعد روت خاصة به</string>
+    <string name="user_independent_summary">كل مستخدم له قواعد روت خاصة به</string>
 
     <string name="mount_namespace_mode">نمط Mount Namespace</string>
     <string name="settings_ns_global">نمط Namespace العام</string>

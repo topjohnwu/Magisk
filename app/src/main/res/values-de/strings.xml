@@ -21,14 +21,15 @@
     <string name="home_app_title">App</string>
 
     <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
-    <string name="home_support_title">Unterstützen Sie uns</string>
+    <string name="home_support_title">Unterstütze uns</string>
+    <string name="home_follow_title">Folge uns</string>
     <string name="home_item_source">Quelle</string>
-    <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Sie können uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
+    <string name="home_support_content">Magisk ist und wird immer frei und quelloffen sein. Du kannst uns jedoch jederzeit mit einer kleinen Spende unterstützen.</string>
     <string name="home_installed_version">Installiert</string>
     <string name="home_latest_version">Neueste</string>
     <string name="invalid_update_channel">Ungültiger Update-Kanal</string>
     <string name="uninstall_magisk_title">Magisk deinstallieren</string>
-    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nIhre Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>
+    <string name="uninstall_magisk_msg">Alle Module werden deaktiviert/entfernt!\nRoot wird entfernt!\nDeine Daten werden potentiell verschlüsselt, wenn sie nicht bereits verschlüsselt sind!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Erzwungene Verschlüsselung beibehalten</string>
@@ -42,7 +43,7 @@
     <string name="manager_download_install">Tippen zum Herunterladen und Installieren</string>
     <string name="direct_install">Direkte Installation (empfohlen)</string>
     <string name="install_inactive_slot">In inaktiven Slot installieren (nach OTA)</string>
-    <string name="install_inactive_slot_msg">Ihr Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Verwenden Sie diese Option nur, wenn OTA abgeschlossen ist.\nWeiter?</string>
+    <string name="install_inactive_slot_msg">Dein Gerät wird gezwungen, nach einem Neustart in den inaktiven Slot zu booten! Diese Option nur verwenden, wenn OTA abgeschlossen ist.\nWeiter?</string>
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image (*.img) oder ein ODIN tarfile (*.tar) auswählen</string>
@@ -51,11 +52,11 @@
 
     <!--Superuser-->
     <string name="su_request_title">Superuser-Anfrage</string>
-    <string name="touch_filtered_warning">Weil eine App eine Superuser-Anfrage verdeckt, kann Magisk Ihre Antwort nicht verifizieren</string>
+    <string name="touch_filtered_warning">Weil eine App eine Superuser-Anfrage verdeckt, kann Magisk deine Antwort nicht verifizieren</string>
     <string name="deny">Verweigern</string>
     <string name="prompt">Fragen</string>
     <string name="grant">Gewähren</string>
-    <string name="su_warning">Sie gewähren vollen Zugriff auf Ihr Gerät. Verweigern Sie den Zugriff, wenn Sie sich nicht sicher sind!</string>
+    <string name="su_warning">Zugriff auf dein Gerät gewähren. Verweigere den Zugriff, wenn du nicht sicher bist!</string>
     <string name="forever">Für immer</string>
     <string name="once">Einmalig</string>
     <string name="tenmin">10 Minuten</string>
@@ -80,7 +81,7 @@
     <string name="superuser_policy_none">Bisher hat noch keine App um die Erlaubnis des Superusers gebeten.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Sie sind protokollfrei, versuchen Sie Ihre SU-fähigen Apps mehr zu nutzen.</string>
+    <string name="log_data_none">Du bist protokollfrei, versuche deine SU-fähigen Apps mehr zu nutzen.</string>
     <string name="log_data_magisk_none">Magisk-Protokolle sind leer, das ist seltsam.</string>
     <string name="menuSaveLog">Protokoll speichern</string>
     <string name="menuClearLog">Protokoll jetzt löschen</string>
@@ -111,10 +112,11 @@
     <string name="suspend_text_riru">Modul ausgesetzt, weil %1$s aktiviert ist</string>
     <string name="suspend_text_zygisk">Modul ausgesetzt, weil %1$s nicht aktiviert ist</string>
     <string name="zygisk_module_unloaded">Zygisk-Modul aufgrund von Inkompatibilität nicht geladen</string>
+    <string name="module_empty">Kein Modul installiert</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Themen-Modus</string>
-    <string name="settings_dark_mode_message">Modus auswählen, der am besten zu Ihrem Stil passt!</string>
+    <string name="settings_dark_mode_message">Modus auswählen, der am besten zu deinem Stil passt!</string>
     <string name="settings_dark_mode_light">Immer hell</string>
     <string name="settings_dark_mode_system">System folgen</string>
     <string name="settings_dark_mode_dark">Immer dunkel</string>
@@ -177,7 +179,7 @@
     <string name="settings_user_independent">Benutzerunabhängig</string>
     <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
     <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffsanfragen</string>
-    <string name="user_indepenent_summary">Jeder Nutzer hat seine eigenen Root-Regeln</string>
+    <string name="user_independent_summary">Jeder Nutzer hat seine eigenen Root-Regeln</string>
 
     <string name="mount_namespace_mode">Mount Namespace Modus</string>
     <string name="settings_ns_global">Globaler Namespace</string>
@@ -190,9 +192,12 @@
     <!--Notifications-->
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Fortschrittsmitteilungen</string>
+    <string name="updated_channel">Update abgeschlossen</string>
     <string name="download_complete">Download abgeschlossen</string>
     <string name="download_file_error">Fehler beim Herunterladen der Datei</string>
     <string name="magisk_update_title">Magisk Update verfügbar!</string>
+    <string name="updated_title">Magisk aktualisiert</string>
+    <string name="updated_text">Tippen, um die App zu öffnen</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
@@ -225,10 +230,12 @@
     <string name="unsupport_nonroot_stub_msg">App kann im versteckten Zustand nicht weiter funktionieren, da Root verloren gegangen ist. Ursprüngliche APK bitte wiederherstellen.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
+    <string name="install_unknown_denied">Unbekannte Apps installieren erlauben, um diese Funktion zu aktivieren</string>
+
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
-    <string name="add_shortcut_msg">Nachdem Sie diese App verstecken, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchten Sie zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
+    <string name="add_shortcut_msg">Nachdem du diese App versteckst, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchtest du zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
     <string name="reboot_apply_change">Neustart zum Änderungen übernehmen</string>
-    <string name="restore_app_confirmation">Dadurch wird die versteckte App wieder zur ursprünglichen App. Wollen Sie das wirklich tun?</string>
+    <string name="restore_app_confirmation">Dadurch wird die versteckte App wieder zur ursprünglichen App. Willst du das wirklich tun?</string>
 
 </resources>

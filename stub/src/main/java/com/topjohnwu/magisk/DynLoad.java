@@ -28,6 +28,7 @@ import io.michaelrocks.paranoid.Obfuscate;
 public class DynLoad {
 
     static Object componentFactory;
+    static ClassLoader activeClassLoader = DynLoad.class.getClassLoader();
 
     static StubApk.Data createApkData() {
         var data = new StubApk.Data();
@@ -59,20 +60,24 @@ public class DynLoad {
 
         // Copy from external for easier development
         if (BuildConfig.DEBUG) {
-            File external = new File(context.getExternalFilesDir(null), "magisk.apk");
-            if (external.exists()) {
-                try {
-                    var in = new FileInputStream(external);
-                    var out = new FileOutputStream(apk);
-                    try (in; out) {
-                        APKInstall.transfer(in, out);
+            try {
+                File external = new File(context.getExternalFilesDir(null), "magisk.apk");
+                if (external.exists()) {
+                    try {
+                        var in = new FileInputStream(external);
+                        var out = new FileOutputStream(apk);
+                        try (in; out) {
+                            APKInstall.transfer(in, out);
+                        }
+                    } catch (IOException e) {
+                        Log.e(DynLoad.class.getSimpleName(), "", e);
+                        apk.delete();
+                    } finally {
+                        external.delete();
                     }
-                } catch (IOException e) {
-                    Log.e(DynLoad.class.getSimpleName(), "", e);
-                    apk.delete();
-                } finally {
-                    external.delete();
                 }
+            } catch (SecurityException e) {
+                // Do not crash in root service
             }
         }
 
@@ -103,7 +108,7 @@ public class DynLoad {
     // Dynamically load APK and create the Application instance from the loaded APK
     static Application createAndSetupApp(Application context) {
         // On API >= 29, AppComponentFactory will replace the ClassLoader for us
-        if (Build.VERSION.SDK_INT < 29)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
             replaceClassLoader(context);
 
         // noinspection InlinedApi
@@ -144,13 +149,17 @@ public class DynLoad {
                     .newInstance(data.getObject());
 
             // Create the receiver component factory
-            if (Build.VERSION.SDK_INT >= 28 && componentFactory != null) {
-                Object factory = cl.loadClass(appInfo.appComponentFactory).newInstance();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && componentFactory != null) {
                 var delegate = (DelegateComponentFactory) componentFactory;
-                delegate.receiver = (AppComponentFactory) factory;
+                if (appInfo.appComponentFactory == null) {
+                    delegate.receiver = new AppComponentFactory();
+                } else {
+                    Object factory = cl.loadClass(appInfo.appComponentFactory).newInstance();
+                    delegate.receiver = (AppComponentFactory) factory;
+                }
             }
 
-            DelegateClassLoader.cl = cl;
+            activeClassLoader = cl;
 
             // Send real application to attachBaseContext
             attachContext(app, context);
@@ -161,7 +170,7 @@ public class DynLoad {
             apk.delete();
         }
 
-        DelegateClassLoader.cl = new StubClassLoader(info);
+        activeClassLoader = new StubClassLoader(info);
         return null;
     }
 

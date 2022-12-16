@@ -6,10 +6,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
+import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
-import com.topjohnwu.magisk.di.viewModel
 import com.topjohnwu.magisk.events.RebootEvent
 
 class HomeFragment : BaseFragment<FragmentHomeMd2Binding>() {

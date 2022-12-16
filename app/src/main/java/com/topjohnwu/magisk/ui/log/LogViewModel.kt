@@ -1,20 +1,20 @@
 package com.topjohnwu.magisk.ui.log
 
+import android.system.Os
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.data.repository.LogRepository
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.diffListOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.now
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
@@ -25,7 +25,7 @@ import java.io.FileInputStream
 
 class LogViewModel(
     private val repo: LogRepository
-) : BaseViewModel() {
+) : AsyncLoadViewModel() {
 
     // --- empty view
 
@@ -35,8 +35,8 @@ class LogViewModel(
     // --- su log
 
     val items = diffListOf<LogRvItem>()
-    val itemBinding = itemBindingOf<LogRvItem> {
-        it.bindExtra(BR.viewModel, this)
+    val extraBindings = bindExtra {
+        it.put(BR.viewModel, this)
     }
 
     // --- magisk log
@@ -44,7 +44,7 @@ class LogViewModel(
     var consoleText = " "
         set(value) = set(value, field, { field = it }, BR.consoleText)
 
-    override fun refresh() = viewModelScope.launch {
+    override suspend fun doLoadWork() {
         consoleText = repo.fetchMagiskLogs()
         val (suLogs, diff) = withContext(Dispatchers.Default) {
             val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
@@ -59,24 +59,30 @@ class LogViewModel(
 
     fun saveMagiskLog() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
-            val filename = "magisk_log_%s.log".format(now.toTime(timeFormatStandard))
+            val filename = "magisk_log_%s.log".format(
+                System.currentTimeMillis().toTime(timeFormatStandard))
             val logFile = MediaStoreUtils.getFile(filename, true)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---Detected Device Info---\n\n")
                 file.write("isAB=${Info.isAB}\n")
                 file.write("isSAR=${Info.isSAR}\n")
                 file.write("ramdisk=${Info.ramdisk}\n")
+                val uname = Os.uname()
+                file.write("kernel=${uname.sysname} ${uname.machine} ${uname.release} ${uname.version}\n")
 
                 file.write("\n\n---System Properties---\n\n")
                 ProcessBuilder("getprop").start()
                     .inputStream.reader().use { it.copyTo(file) }
+
+                file.write("\n\n---Environment Variables---\n\n")
+                System.getenv().forEach { (key, value) -> file.write("${key}=${value}\n") }
 
                 file.write("\n\n---System MountInfo---\n\n")
                 FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                file.write(consoleText)
+                if (Info.env.isActive) file.write(consoleText)
 
                 file.write("\n---Manager Logs---\n")
                 file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")
@@ -89,12 +95,12 @@ class LogViewModel(
 
     fun clearMagiskLog() = repo.clearMagiskLogs {
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 
     fun clearLog() = viewModelScope.launch {
         repo.clearLogs()
         SnackbarEvent(R.string.logs_cleared).publish()
-        requestRefresh()
+        startLoading()
     }
 }

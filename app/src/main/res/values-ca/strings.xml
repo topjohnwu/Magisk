@@ -166,7 +166,7 @@
     <string name="settings_user_independent">Usuari Independent</string>
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
     <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'accés d\'arrel i rebre sol·licituds d\'altres usuaris</string>
-    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
+    <string name="user_independent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
 
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>

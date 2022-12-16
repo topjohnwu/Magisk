@@ -177,7 +177,7 @@
     <string name="settings_user_independent">사용자별</string>
     <string name="owner_only_summary">소유자만 루트 액세스를 갖습니다.</string>
     <string name="owner_manage_summary">소유자만 루트 액세스를 관리하고 요청 시도를 받을 수 있습니다.</string>
-    <string name="user_indepenent_summary">각각의 사용자가 개별적인 루트 규칙을 갖습니다.</string>
+    <string name="user_independent_summary">각각의 사용자가 개별적인 루트 규칙을 갖습니다.</string>
 
     <string name="mount_namespace_mode">이름공간 마운트 모드</string>
     <string name="settings_ns_global">전역 이름공간</string>

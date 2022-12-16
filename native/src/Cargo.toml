@@ -1,0 +1,20 @@
+[workspace]
+exclude = ["external"]
+members = ["base", "boot", "core", "init", "sepolicy"]
+
+[profile.dev]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[patch.crates-io]
+cxx = { path = "external/cxx-rs" }

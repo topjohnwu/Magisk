@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Descarga Magisk SÓLO de la página de GitHub oficial. Archivos de fuentes desconocidas pueden resultar maliciosos!</string>
     <string name="home_support_title">Apóyenos</string>
+    <string name="home_follow_title">Síganos</string>
     <string name="home_item_source">Código fuente</string>
     <string name="home_support_content">Magisk es, y siempre será gratuito y de código abierto. Sin embargo, puede apoyarnos enviando una pequeña donación.</string>
     <string name="home_installed_version">Instalado</string>
@@ -33,6 +34,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantener cifrado forzado</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Parche vbmeta en la imagen de arranque</string>
     <string name="recovery_mode">Modo recovery</string>
     <string name="install_options_title">Opciones</string>
     <string name="install_method_title">Método</string>
@@ -109,6 +111,8 @@
     <string name="update_available">Actualización disponible</string>
     <string name="suspend_text_riru">Módulo suspendido porque %1$s está habilitado</string>
     <string name="suspend_text_zygisk">Módulo suspendido porque %1$s no está habilitado</string>
+    <string name="zygisk_module_unloaded">Módulo Zygisk no cargado debido a incompatibilidad</string>
+    <string name="module_empty">Ningún módulo instalado</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Elegir modo</string>
@@ -175,7 +179,7 @@
     <string name="settings_user_independent">Usuario independiente</string>
     <string name="owner_only_summary">Sólo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Sólo el administrador puede supervisar el acceso root y recibir solicitudes de otros usuarios</string>
-    <string name="user_indepenent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
+    <string name="user_independent_summary">Cada usuario tiene separadas sus propias reglas de root </string>
 
     <string name="mount_namespace_mode">Montar Namespace </string>
     <string name="settings_ns_global">Global Namespace</string>
@@ -188,9 +192,12 @@
     <!--Notifications-->
     <string name="update_channel">Actualización de Magisk</string>
     <string name="progress_channel">Notificaciones de progreso</string>
+    <string name="updated_channel">Actualización completa</string>
     <string name="download_complete">Descarga Completa</string>
     <string name="download_file_error">Error descargando archivo</string>
     <string name="magisk_update_title">¡Actualización de Magisk disponible!</string>
+    <string name="updated_title">Magisk Actualizado</string>
+    <string name="updated_text">Toca para abrir la aplicación</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Sí</string>
@@ -216,10 +223,18 @@
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_msg">Esta versión de la app no soporta versiones de Magisk inferiores a la %1$s.\n\nLa aplicación se comportará como si no tuvieses Magisk instalado, por favor actualiza Magisk tan pronto como sea posible.</string>
+    <string name="unsupport_general_title">Estado anormal</string>
+    <string name="unsupport_system_app_msg">No se admite la ejecución de esta aplicación como una aplicación del sistema. Revierta la aplicación a una aplicación de usuario.</string>
+    <string name="unsupport_other_su_msg">Se ha detectado un binario \"su\" que no es de Magisk. Elimine cualquier solución raíz de la competencia y/o reinstale Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk está instalado en el almacenamiento externo. Mueva la aplicación al almacenamiento interno.</string>
+    <string name="unsupport_nonroot_stub_msg">La aplicación Magisk oculta no puede seguir funcionando porque se perdió la raíz. Restaura el APK original.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Conceder permiso de almacenamiento para habilitar esta funcionalidad</string>
+    <string name="install_unknown_denied">Permitir "instalar aplicaciones desconocidas" para habilitar esta funcionalidad</string>
     <string name="add_shortcut_title">Añadir un atajo a la pantalla de inicio</string>
     <string name="add_shortcut_msg">Tras esconder la app, su nombre e icono pueden resultar difíciles de reconocer. ¿Quieres añadir un acceso directo más bonito a la pantalla principal?</string>
     <string name="app_not_found">No se ha encontrado ninguna app para manejar esta acción</string>
     <string name="reboot_apply_change">Reiniciar para aplicar cambios</string>
+    <string name="restore_app_confirmation">Esto restaurará la aplicación oculta a la aplicación original. ¿Realmente quieres hacer esto?</string>
 
 </resources>

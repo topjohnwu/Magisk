@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.utils
 
 import android.content.res.Resources
-import android.widget.TextView
-import androidx.databinding.BindingAdapter
 
 abstract class TextHolder {
 
@@ -46,9 +44,3 @@ abstract class TextHolder {
 fun Int.asText(): TextHolder = TextHolder.Resource(this)
 fun Int.asText(vararg params: Any): TextHolder = TextHolder.ResourceArgs(this, *params)
 fun CharSequence.asText(): TextHolder = TextHolder.String(this)
-
-
-@BindingAdapter("android:text")
-fun TextView.setText(text: TextHolder) {
-    this.text = text.getText(context.resources)
-}

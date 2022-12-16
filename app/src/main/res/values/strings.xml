@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
+    <string name="home_follow_title">Follow Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free, and open source. You can however show us that you care by making a donation.</string>
     <string name="home_installed_version">Installed</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
     <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
     <string name="zygisk_module_unloaded">Zygisk module not loaded due to incompatibility</string>
+    <string name="module_empty">No module installed</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -177,7 +179,7 @@
     <string name="settings_user_independent">User-Independent</string>
     <string name="owner_only_summary">Only owner has root access</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
-    <string name="user_indepenent_summary">Each user has their own separate root rules</string>
+    <string name="user_independent_summary">Each user has their own separate root rules</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
@@ -228,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">The hidden Magisk app cannot continue to work because root was lost. Please restore the original APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
+    <string name="post_notifications_denied">Grant notifications permission to enable this functionality</string>
     <string name="install_unknown_denied">Allow "install unknown apps" to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>

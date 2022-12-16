@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="java.util.Arrays"/>
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.surequest.SuRequestViewModel" />
@@ -101,8 +99,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:enabled="@{viewModel.grantEnabled}"
-                app:items="@{Arrays.asList(@stringArray/allow_timeout)}"
-                app:itemBinding="@{viewModel.itemBinding}"
+                app:items="@{@stringArray/allow_timeout}"
+                app:layout="@{@layout/item_spinner}"
                 android:selection="@={viewModel.selectedItemPosition}" />
 
             <TextView
@@ -149,6 +147,7 @@
                     android:enabled="@{viewModel.grantEnabled}"
                     android:text="@string/grant" />
 
+                <requestFocus />
             </LinearLayout>
 
         </LinearLayout>

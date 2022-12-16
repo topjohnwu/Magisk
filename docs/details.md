@@ -90,11 +90,10 @@ DATABIN=$SECURE_DIR/magisk
 
 `magiskinit` will replace `init` as the first program to run.
 
-- Early mount required partitions. On legacy system-as-root devices, we switch root to system; on 2SI devices, we patch fstab and execute the original `init` to mount partitions for us.
-- Load sepolicy either from `/sepolicy`, precompiled sepolicy in vendor, or compile split sepolicy
-- Patch sepolicy rules and dump to `/sepolicy` or `/sbin/.se` or `/dev/.se`
-- Patch `init` or `libselinux.so` to force the system to load the patched policies
+- Early mount required partitions. On legacy system-as-root devices, we switch root to system; on 2SI devices, we patch the original `init` to redirect the 2nd stage init file to magiskinit and execute it to mount partitions for us.
 - Inject magisk services into `init.rc`
+- On devices using monolithic policy, load sepolicy from `/sepolicy`; otherwise we hijack nodes in selinuxfs with FIFO, set `LD_PRELOAD` to hook `security_load_policy` and assist hijacking on 2SI devices, and start a daemon to wait until init tries to load sepolicy.
+- Patch sepolicy rules. If we are using "hijack" method, load patched sepolicy into kernel, unblock init and exit daemon
 - Execute the original `init` to continue the boot process
 
 ### post-fs-data

@@ -7,7 +7,7 @@ import android.content.Context
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.BaseJobService
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class JobService : BaseJobService() {
         svc.fetchUpdate()?.let {
             Info.remote = it
             if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
-                Notifications.updateAvailable(this)
+                Notifications.updateAvailable()
         }
     }
 

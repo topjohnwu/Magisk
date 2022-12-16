@@ -177,7 +177,7 @@
     <string name="settings_user_independent">Kasutajast sõltumatu</string>
     <string name="owner_only_summary">Ainult omanikul on juurkasutaja õigused</string>
     <string name="owner_manage_summary">Ainult omanik saab hallata juurkasutaja ligipääsu ja saada taotlusküsimusi</string>
-    <string name="user_indepenent_summary">Igal kasutajal on oma isiklikud juurkasutaja reeglid.</string>
+    <string name="user_independent_summary">Igal kasutajal on oma isiklikud juurkasutaja reeglid.</string>
 
     <string name="mount_namespace_mode">Nimeruumi monteerimisrežiim</string>
     <string name="settings_ns_global">Globaalne nimeruum</string>

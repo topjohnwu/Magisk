@@ -9,7 +9,7 @@
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
     <string name="denylist">Lista odmów</string>
-    
+
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
     <string name="app_changelog">Dziennik zmian</string>
@@ -177,7 +177,7 @@
     <string name="settings_user_independent">Niezależni użytkownicy</string>
     <string name="owner_only_summary">Tylko właściciel ma dostęp do roota</string>
     <string name="owner_manage_summary">Tylko właściciel może zarządzać ustawieniami dostępu do roota i otrzymywać żądania dostępu</string>
-    <string name="user_indepenent_summary">Każdy użytkownik ma niezależne ustawienia dostępu do roota</string>
+    <string name="user_independent_summary">Każdy użytkownik ma niezależne ustawienia dostępu do roota</string>
 
     <string name="mount_namespace_mode">Tryb przestrzeni nazw montowania</string>
     <string name="settings_ns_global">Globalna przestrzeń nazw</string>

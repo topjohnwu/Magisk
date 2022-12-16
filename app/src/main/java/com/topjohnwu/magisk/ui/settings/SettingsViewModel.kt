@@ -11,13 +11,11 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.databinding.adapterOf
-import com.topjohnwu.magisk.databinding.itemBindingOf
-import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.events.AddHomeIconEvent
-import com.topjohnwu.magisk.events.RecreateEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.ktx.activity
@@ -27,9 +25,10 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
 
-    val adapter = adapterOf<BaseSettingsItem>()
-    val itemBinding = itemBindingOf<BaseSettingsItem> { it.bindExtra(BR.handler, this) }
     val items = createItems()
+    val extraBindings = bindExtra {
+        it.put(BR.handler, this)
+    }
 
     init {
         viewModelScope.launch {
@@ -54,10 +53,9 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             AppSettings,
             UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
-        if (Info.env.isActive) {
-            if (Const.USER_ID == 0) {
-                if (hidden) list.add(Restore) else list.add(Hide)
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 &&
+                Info.env.isActive && Const.USER_ID == 0) {
+            if (hidden) list.add(Restore) else list.add(Hide)
         }
 
         // Magisk
@@ -78,15 +76,15 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
                 Tapjack, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
                 AutomaticResponse, RequestTimeout, SUNotification
             ))
-            if (Build.VERSION.SDK_INT < 23) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 // Biometric is only available on 6.0+
                 list.remove(Biometrics)
             }
-            if (Build.VERSION.SDK_INT < 26) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 // Re-authenticate is not feasible on 8.0+
                 list.add(Reauthenticate)
             }
-            if (Build.VERSION.SDK_INT >= 31) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 // Can hide overlay windows on 12.0+
                 list.remove(Tapjack)
             }
@@ -98,6 +96,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     override fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit) {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
+            UpdateChecker -> withPostNotificationPermission(andThen)
             Biometrics -> authenticate(andThen)
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
@@ -110,7 +109,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
 
     override fun onItemAction(view: View, item: BaseSettingsItem) {
         when (item) {
-            Language -> RecreateEvent().publish()
             UpdateChannel -> openUrlIfNecessary(view)
             is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
             Restore -> viewModelScope.launch { HideAPK.restore(view.activity) }

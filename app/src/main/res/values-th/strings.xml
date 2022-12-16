@@ -98,7 +98,7 @@
     <string name="settings_user_independent">ตามผู้ใช้</string>
     <string name="owner_only_summary">เฉพาะเจ้าของที่มีสิทธิ์การเข้าถึง root</string>
     <string name="owner_manage_summary">เจ้าของสามารถจัดการสิทธิ์การเข้าถึง root</string>
-    <string name="user_indepenent_summary">ผู้ใช้แต่ละคนสามารถจัดการกฏของตนเอง</string>
+    <string name="user_independent_summary">ผู้ใช้แต่ละคนสามารถจัดการกฏของตนเอง</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>

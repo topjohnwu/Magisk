@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.topjohnwu.magisk">
-
-    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name=".core.App"
         android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:multiArch="true"
+        tools:remove="android:appComponentFactory"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
 
         <activity
@@ -29,7 +27,6 @@
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
-            android:excludeFromRecents="true"
             android:exported="false"
             android:taskAffinity=""
             tools:ignore="AppLinkUrlError">
@@ -41,7 +38,6 @@
 
         <receiver
             android:name=".core.Receiver"
-            android:directBootAware="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />

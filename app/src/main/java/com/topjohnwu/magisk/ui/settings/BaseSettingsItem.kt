@@ -8,6 +8,7 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.view.MagiskDialog
 
@@ -57,6 +58,8 @@ sealed class BaseSettingsItem : ObservableRvItem() {
             set(checked, value, { onPressed(view, handler) })
 
         override fun onPressed(view: View, handler: Handler) {
+            // Make sure the checked state is synced
+            notifyPropertyChanged(BR.checked)
             handler.onItemPressed(view, this) {
                 value = !value
                 notifyPropertyChanged(BR.checked)
@@ -72,7 +75,7 @@ sealed class BaseSettingsItem : ObservableRvItem() {
 
         override fun onPressed(view: View, handler: Handler) {
             handler.onItemPressed(view, this) {
-                MagiskDialog(view.context).apply {
+                MagiskDialog(view.activity).apply {
                     setTitle(title.getText(view.resources))
                     setView(getView(view.context))
                     setButton(MagiskDialog.ButtonType.POSITIVE) {
@@ -115,7 +118,7 @@ sealed class BaseSettingsItem : ObservableRvItem() {
 
         override fun onPressed(view: View, handler: Handler) {
             handler.onItemPressed(view, this) {
-                MagiskDialog(view.context).apply {
+                MagiskDialog(view.activity).apply {
                     setTitle(title.getText(view.resources))
                     setButton(MagiskDialog.ButtonType.NEGATIVE) {
                         text = android.R.string.cancel

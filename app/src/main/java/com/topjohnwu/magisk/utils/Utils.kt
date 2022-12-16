@@ -9,7 +9,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.di.AppContext
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.superuser.internal.UiThreadHandler
 
 object Utils {

@@ -1,14 +1,22 @@
 package com.topjohnwu.magisk;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.ParcelFileDescriptor.MODE_READ_ONLY;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.content.res.loader.ResourcesLoader;
+import android.content.res.loader.ResourcesProvider;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -22,7 +30,7 @@ public class StubApk {
     private static File getDynDir(ApplicationInfo info) {
         if (dynDir == null) {
             final String dataDir;
-            if (SDK_INT >= 24) {
+            if (SDK_INT >= Build.VERSION_CODES.N) {
                 // Use device protected path to allow directBootAware
                 dataDir = info.deviceProtectedDataDir;
             } else {
@@ -50,12 +58,33 @@ public class StubApk {
         return new File(getDynDir(info), "update.apk");
     }
 
-    public static void addAssetPath(AssetManager asset, String path) {
-        try {
-            if (addAssetPath == null)
-                addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
-            addAssetPath.invoke(asset, path);
-        } catch (Exception ignored) {}
+    @TargetApi(Build.VERSION_CODES.R)
+    private static ResourcesLoader getResourcesLoader(File path) throws IOException {
+        var loader = new ResourcesLoader();
+        ResourcesProvider provider;
+        if (path.isDirectory()) {
+            provider = ResourcesProvider.loadFromDirectory(path.getPath(), null);
+        } else {
+            var fd = ParcelFileDescriptor.open(path, MODE_READ_ONLY);
+            provider = ResourcesProvider.loadFromApk(fd);
+        }
+        loader.addProvider(provider);
+        return loader;
+    }
+
+    public static void addAssetPath(Resources res, String path) {
+        if (SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                res.addLoaders(getResourcesLoader(new File(path)));
+            } catch (IOException ignored) {}
+        } else {
+            AssetManager asset = res.getAssets();
+            try {
+                if (addAssetPath == null)
+                    addAssetPath = AssetManager.class.getMethod("addAssetPath", String.class);
+                addAssetPath.invoke(asset, path);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static void restartProcess(Activity activity) {

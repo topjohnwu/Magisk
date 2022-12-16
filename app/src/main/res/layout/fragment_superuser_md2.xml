@@ -19,9 +19,9 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/superuser_list"
-            goneUnless="@{viewModel.loaded || !viewModel.items.empty}"
-            itemBinding="@{viewModel.itemBinding}"
-            items="@{viewModel.items}"
+            gone="@{viewModel.loading}"
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -33,7 +33,7 @@
             tools:listitem="@layout/item_policy_md2" />
 
         <LinearLayout
-            goneUnless="@{viewModel.loading &amp;&amp; viewModel.items.empty}"
+            goneUnless="@{viewModel.loading}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -51,24 +51,6 @@
             <ProgressBar
                 style="@style/WidgetFoundation.ProgressBar.Indeterminate"
                 android:layout_marginTop="@dimen/l1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            goneUnless="@{viewModel.loadFailed}"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical"
-            tools:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_available"
-                android:textAppearance="@style/AppearanceFoundation.Title"
-                android:textStyle="bold" />
 
         </LinearLayout>
 

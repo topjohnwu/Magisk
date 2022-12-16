@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder.LITTLE_ENDIAN
 import java.nio.charset.Charset
-import java.util.*
 
 class AXML(b: ByteArray) {
 
@@ -30,7 +29,7 @@ class AXML(b: ByteArray) {
      * Followed by an array of uint32_t with size = number of strings
      * Each entry points to an offset into the string data
      */
-    fun findAndPatch(vararg patterns: Pair<String, String>): Boolean {
+    fun patchStrings(patchFn: (Array<String>) -> Unit): Boolean {
         val buffer = ByteBuffer.wrap(bytes).order(LITTLE_ENDIAN)
 
         fun findStringPool(): Int {
@@ -43,7 +42,6 @@ class AXML(b: ByteArray) {
             return -1
         }
 
-        var patch = false
         val start = findStringPool()
         if (start < 0)
             return false
@@ -58,34 +56,26 @@ class AXML(b: ByteArray) {
         val dataOff = start + intBuf.get()
         intBuf.get()
 
-        val strings = ArrayList<String>(count)
-        // Read and patch all strings
-        loop@ for (i in 0 until count) {
+        val strList = ArrayList<String>(count)
+        // Collect all strings in the pool
+        for (i in 0 until count) {
             val off = dataOff + intBuf.get()
             val len = buffer.getShort(off)
-            val str = String(bytes, off + 2, len * 2, UTF_16LE)
-            for ((from, to) in patterns) {
-                if (str.contains(from)) {
-                    strings.add(str.replace(from, to))
-                    patch = true
-                    continue@loop
-                }
-            }
-            strings.add(str)
+            strList.add(String(bytes, off + 2, len * 2, UTF_16LE))
         }
 
-        if (!patch)
-            return false
+        val strArr = strList.toTypedArray()
+        patchFn(strArr)
 
         // Write everything before string data, will patch values later
         val baos = RawByteStream()
         baos.write(bytes, 0, dataOff)
 
         // Write string data
-        val strList = IntArray(count)
+        val offList = IntArray(count)
         for (i in 0 until count) {
-            strList[i] = baos.size() - dataOff
-            val str = strings[i]
+            offList[i] = baos.size() - dataOff
+            val str = strArr[i]
             baos.write(str.length.toShortBytes())
             baos.write(str.toByteArray(UTF_16LE))
             // Null terminate
@@ -104,7 +94,7 @@ class AXML(b: ByteArray) {
         // Patch index table
         newBuffer.position(start + STRING_INDICES_OFF)
         val newIntBuf = newBuffer.asIntBuffer()
-        strList.forEach { newIntBuf.put(it) }
+        offList.forEach { newIntBuf.put(it) }
 
         // Write the rest of the chunks
         val nextOff = start + size
