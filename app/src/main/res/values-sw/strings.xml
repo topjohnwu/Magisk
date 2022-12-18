@@ -1,17 +1,17 @@
 <resources>
 
     <!--Sections-->
-    <string name="modules">Modules</string>
-    <string name="superuser">Superuser</string>
-    <string name="logs">Logs</string>
-    <string name="settings">Settings</string>
-    <string name="install">Install</string>
-    <string name="section_home">Home</string>
-    <string name="section_theme">Themes</string>
+    <string name="modules">Moduli</string>
+    <string name="superuser">Mtumiaji mkuu</string>
+    <string name="logs">Kumbukumbu</string>
+    <string name="settings">Mipangilio</string>
+    <string name="install">Sakinisha</string>
+    <string name="section_home">Nyumbanik</string>
+    <string name="section_theme">Mandhari</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
-    <string name="no_connection">No connection available</string>
+    <string name="no_connection">Hakuna muunganisho unaopatikana</string>
     <string name="app_changelog">Changelog</string>
     <string name="loading">Loading…</string>
     <string name="update">Update</string>
