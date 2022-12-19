@@ -12,13 +12,13 @@
 
     <!--Home-->
     <string name="no_connection">Hakuna muunganisho unaopatikana</string>
-    <string name="app_changelog">Changelog</string>
+    <string name="app_changelog">Kumbukumbu</string>
     <string name="loading">Loading…</string>
-    <string name="update">Update</string>
-    <string name="not_available">N/A</string>
-    <string name="hide">Hide</string>
-    <string name="home_package">Package</string>
-    <string name="home_app_title">App</string>
+    <string name="update">Sasisha</string>
+    <string name="not_available">Haipatikani</string>
+    <string name="hide">Ficha</string>
+    <string name="home_package">Kifurushi</string>
+    <string name="home_app_title">Programu</string>
 
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
