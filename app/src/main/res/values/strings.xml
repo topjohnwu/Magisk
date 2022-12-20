@@ -46,7 +46,7 @@
     <string name="install_inactive_slot_msg">Your device will be FORCED to boot to the current inactive slot after a reboot!\nOnly use this option after OTA is done.\nContinue?</string>
     <string name="setup_title">Additional Setup</string>
     <string name="select_patch_file">Select and Patch a File</string>
-    <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar)</string>
+    <string name="patch_file_msg">Select a raw image (*.img) or an ODIN tarfile (*.tar) or a payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Rebooting in 5 seconds…</string>
     <string name="flash_screen_title">Installation</string>
 

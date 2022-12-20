@@ -1,6 +1,9 @@
 package com.topjohnwu.magisk.core.tasks
 
 import android.net.Uri
+import android.os.Build
+import android.os.ParcelFileDescriptor
+import android.system.ErrnoException
 import android.system.Os
 import android.widget.Toast
 import androidx.annotation.WorkerThread
@@ -15,6 +18,7 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.withStreams
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.fileDescriptor
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
@@ -40,6 +44,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 abstract class MagiskInstallImpl protected constructor(
     protected val console: MutableList<String> = NOPList.getInstance(),
@@ -119,7 +124,8 @@ abstract class MagiskInstallImpl protected constructor(
                 } ?: emptyArray()
 
                 // Also symlink magisk32 on non 64-bit only 64-bit devices
-                val lib32 = info.javaClass.getDeclaredField("secondaryNativeLibraryDir").get(info) as String?
+                val lib32 = info.javaClass.getDeclaredField("secondaryNativeLibraryDir")
+                    .get(info) as String?
                 if (lib32 != null) {
                     libs += File(lib32, "libmagisk32.so")
                 }
@@ -171,6 +177,73 @@ abstract class MagiskInstallImpl protected constructor(
     private fun newTarEntry(name: String, size: Long): TarEntry {
         console.add("-- Writing: $name")
         return TarEntry(TarHeader.createHeader(name, size, 0, false, 420 /* 0644 */))
+    }
+
+    @Throws(IOException::class)
+    private fun processZip(input: InputStream) {
+        ZipInputStream(input).use { zipIn ->
+            lateinit var entry: ZipEntry
+            while (zipIn.nextEntry?.also { entry = it } != null) {
+                if (entry.isDirectory) continue
+                when (entry.name.substringAfterLast('/')) {
+                    "payload.bin" -> {
+                        console.add("- Extracting payload")
+                        val dest = File(installDir, "payload.bin")
+                        FileOutputStream(dest).use { zipIn.copyTo(it) }
+                        processPayload(Uri.fromFile(dest))
+                        break
+                    }
+                    "init_boot.img" -> {
+                        console.add("- Extracting init_boot image")
+                        FileOutputStream("$installDir/boot.img").use { zipIn.copyTo(it) }
+                        break
+                    }
+                    "boot.img" -> {
+                        console.add("- Extracting boot image")
+                        FileOutputStream("$installDir/boot.img").use { zipIn.copyTo(it) }
+                        // no break here since there might be an init_boot.img
+                    }
+                }
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    @Synchronized
+    private fun processPayload(input: Uri) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            throw IOException("Payload is only supported on Android Oreo or above")
+        }
+        try {
+            console.add("- Processing payload.bin")
+            console.add("-- Extracting boot.img")
+            input.fileDescriptor("r").use { fd ->
+                val bk = ParcelFileDescriptor.fromFd(0)
+                try {
+                    Os.dup2(fd.fileDescriptor, 0)
+                    val process = ProcessBuilder()
+                        .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                        .command(
+                            "$installDir/magiskboot",
+                            "extract",
+                            "-",
+                            "$installDir/boot.img"
+                        )
+                        .start()
+                    if (process.waitFor() != 0) {
+                        throw IOException(
+                            "magiskboot extract failed with code ${
+                                process.errorStream.readBytes().toString(Charsets.UTF_8)
+                            }"
+                        )
+                    }
+                } finally {
+                    Os.dup2(bk.fileDescriptor, 0)
+                }
+            }
+        } catch (e: ErrnoException) {
+            throw IOException(e)
+        }
     }
 
     @Throws(IOException::class)
@@ -259,7 +332,10 @@ abstract class MagiskInstallImpl protected constructor(
             uri.inputStream().buffered().use { src ->
                 src.mark(500)
                 val magic = ByteArray(5)
-                if (src.skip(257) != 257L || src.read(magic) != magic.size) {
+                val headMagic = ByteArray(4)
+                if (src.read(headMagic) != headMagic.size || src.skip(253) != 253L ||
+                    src.read(magic) != magic.size
+                ) {
                     console.add("! Invalid input file")
                     return false
                 }
@@ -280,10 +356,16 @@ abstract class MagiskInstallImpl protected constructor(
                     outFile = MediaStoreUtils.getFile("$filename.tar", true)
                     processTar(src, outFile!!.uri.outputStream())
                 } else {
-                    // raw image
                     srcBoot = installDir.getChildFile("boot.img")
-                    console.add("- Copying image to cache")
-                    src.cleanPump(srcBoot.newOutputStream())
+                    if (headMagic.contentEquals("CrAU".toByteArray())) {
+                        processPayload(uri)
+                    } else if (headMagic.contentEquals("PK\u0003\u0004".toByteArray())) {
+                        processZip(src)
+                    } else {
+                        console.add("- Copying image to cache")
+                        src.cleanPump(srcBoot.newOutputStream())
+                    }
+                    // raw image
                     outFile = MediaStoreUtils.getFile("$filename.img", true)
                     outFile!!.uri.outputStream()
                 }
