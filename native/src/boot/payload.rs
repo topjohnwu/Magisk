@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io;
 use std::io::{BufReader, ErrorKind, Read, Seek, SeekFrom, Write};
-use std::os::fd::AsRawFd;
+use std::os::fd::{AsRawFd, FromRawFd};
 
 use byteorder::{BigEndian, ReadBytesExt};
 use protobuf::{EnumFull, Message};
@@ -24,7 +24,11 @@ macro_rules! data_err {
 static PAYLOAD_MAGIC: &str = "CrAU";
 
 fn do_extract_boot_from_payload(in_path: &str, out_path: &str) -> io::Result<()> {
-    let mut reader = BufReader::new(File::open(in_path)?);
+    let mut reader = BufReader::new(if in_path == "-" {
+        unsafe { File::from_raw_fd(0) }
+    } else {
+        File::open(in_path)?
+    });
 
     let buf = &mut [0u8; 4];
     reader.read_exact(buf)?;
@@ -79,7 +83,11 @@ fn do_extract_boot_from_payload(in_path: &str, out_path: &str) -> io::Result<()>
         .block_size
         .ok_or(data_err!("block size not found"))? as u64;
 
-    let mut out_file = File::create(out_path)?;
+    let mut out_file = if out_path == "-" {
+        unsafe { File::from_raw_fd(1) }
+    } else {
+        File::create(out_path)?
+    };
 
     for operation in boot.operations.iter() {
         let data_len = operation
