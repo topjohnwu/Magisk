@@ -18,11 +18,6 @@ import java.util.jar.JarFile
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
-        if (shell.isRoot) {
-            Info.isRooted = true
-            RootUtils.bindTask?.let { shell.execTask(it) }
-            RootUtils.bindTask = null
-        }
         shell.newJob().apply {
             add("export ASH_STANDALONE=1")
 
@@ -46,20 +41,22 @@ class ShellInit : Shell.Initializer() {
                 Info.noDataExec = !shell.newJob().add("$localBB sh -c \"$localBB true\"").exec().isSuccess
             }
 
+            val entry = if (shell.isRoot) "nsenter -t \$PPID -m sh" else "sh"
+
             if (Info.noDataExec) {
                 // Copy it out of /data to workaround Samsung bullshit
                 add(
                     "if [ -x \$MAGISKTMP/busybox/busybox ]; then",
                     "  cp -af $localBB \$MAGISKTMP/busybox/busybox",
-                    "  exec \$MAGISKTMP/busybox/busybox sh",
+                    "  exec \$MAGISKTMP/busybox/busybox $entry",
                     "else",
                     "  cp -af $localBB /dev/.busybox",
-                    "  exec /dev/.busybox sh",
+                    "  exec /dev/.busybox $entry",
                     "fi"
                 )
             } else {
                 // Directly execute the file
-                add("exec $localBB sh")
+                add("exec $localBB $entry")
             }
 
             add(context.rawResource(R.raw.manager))
@@ -68,6 +65,12 @@ class ShellInit : Shell.Initializer() {
             }
             add("app_init")
         }.exec()
+
+        if (shell.isRoot) {
+            Info.isRooted = true
+            RootUtils.bindTask?.let { shell.execTask(it) }
+            RootUtils.bindTask = null
+        }
 
         fun fastCmd(cmd: String) = ShellUtils.fastCmd(shell, cmd)
         fun getVar(name: String) = fastCmd("echo \$$name")

@@ -1,4 +1,6 @@
+#include <set>
 #include <sys/mount.h>
+#include <sys/sysmacros.h>
 
 #include <magisk.hpp>
 #include <base.hpp>
@@ -12,30 +14,51 @@ static void lazy_unmount(const char* mountpoint) {
         LOGD("denylist: Unmounted (%s)\n", mountpoint);
 }
 
-#define TMPFS_MNT(dir) (mentry->mnt_type == "tmpfs"sv && str_starts(mentry->mnt_dir, "/" #dir))
+void revert_daemon(int pid, int client) {
+    if (fork_dont_care() == 0) {
+        revert_unmount(pid);
+        write_int(client, DenyResponse::OK);
+        _exit(0);
+    }
+}
 
-void revert_unmount() {
+void revert_unmount(int pid, const char *ref_pid) {
     vector<string> targets;
-
-    // Unmount dummy skeletons and MAGISKTMP
-    targets.push_back(MAGISKTMP);
-    parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
-        if (TMPFS_MNT(system) || TMPFS_MNT(vendor) || TMPFS_MNT(product) || TMPFS_MNT(system_ext))
-            targets.emplace_back(mentry->mnt_dir);
-        return true;
-    });
-
-    for (auto &s : reversed(targets))
-        lazy_unmount(s.data());
-    targets.clear();
-
-    // Unmount all Magisk created mounts
-    parse_mnt("/proc/self/mounts", [&](mntent *mentry) {
-        if (str_contains(mentry->mnt_fsname, BLOCKDIR))
-            targets.emplace_back(mentry->mnt_dir);
-        return true;
-    });
-
-    for (auto &s : reversed(targets))
+    set<unsigned> peer_groups;
+    {
+        auto mount_info = ParseMountInfo(ref_pid);
+        {
+            // in case someone mounts something from magisktmp to a private mount points globally
+            auto global_mount_info = ParseMountInfo("1");
+            mount_info.insert(mount_info.end(),
+                              std::make_move_iterator(global_mount_info.begin()),
+                              std::make_move_iterator(global_mount_info.end()));
+        }
+        if (pid > 0) {
+            if (switch_mnt_ns(pid))
+                return;
+            LOGD("denylist: handling PID=[%d]\n", pid);
+        }
+        {
+            // in case someone mounts something from magisktmp to a private mount points privately
+            auto self_mount_info = ParseMountInfo("self");
+            mount_info.insert(mount_info.end(),
+                              std::make_move_iterator(self_mount_info.begin()),
+                              std::make_move_iterator(self_mount_info.end()));
+        }
+        for (auto &info : mount_info) {
+            if (info.target.starts_with(MAGISKTMP) || peer_groups.contains(info.optional.master) ||
+                peer_groups.contains(info.optional.shared)) {
+                targets.emplace_back(std::move(info.target));
+                if (info.optional.master != 0) {
+                    peer_groups.insert(info.optional.master);
+                }
+                if (info.optional.shared != 0) {
+                    peer_groups.insert(info.optional.shared);
+                }
+            }
+        }
+    }
+    for (auto &s : targets)
         lazy_unmount(s.data());
 }

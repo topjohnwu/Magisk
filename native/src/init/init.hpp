@@ -60,8 +60,6 @@ class MagiskInit : public BaseInit {
 private:
     void mount_rules_dir();
 protected:
-    std::string custom_rules_dir;
-
 #if ENABLE_AVD_HACK
     // When this boolean is set, this means we are currently
     // running magiskinit on legacy SAR AVD emulator

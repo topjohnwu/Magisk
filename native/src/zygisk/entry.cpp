@@ -17,7 +17,7 @@
 using namespace std;
 
 void *self_handle = nullptr;
-
+pid_t magiskd_pid = -1;
 // Make sure /proc/self/environ is sanitized
 // Filter env and reset MM_ENV_END
 static void sanitize_environ() {
@@ -398,6 +398,10 @@ void zygisk_handler(int client, const sock_cred *cred) {
         break;
     case ZygiskRequest::GET_MODDIR:
         get_moddir(client);
+        break;
+    case ZygiskRequest::ZYGISK_UNMOUNT:
+        LOGD("zygisk: cleanup mount namespace for pid=[%d]\n", cred->pid);
+        revert_daemon(cred->pid, client);
         break;
     default:
         // Unknown code

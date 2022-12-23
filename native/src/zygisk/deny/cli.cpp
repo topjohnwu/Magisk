@@ -29,7 +29,7 @@ Actions:
 
 void denylist_handler(int client, const sock_cred *cred) {
     if (client < 0) {
-        revert_unmount();
+        revert_daemon(1, -client);
         return;
     }
 
@@ -82,12 +82,17 @@ int denylist_cli(int argc, char **argv) {
     else if (argv[1] == "status"sv)
         req = DenyRequest::STATUS;
     else if (argv[1] == "exec"sv && argc > 2) {
+        switch_mnt_ns(1);
         xunshare(CLONE_NEWNS);
         xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
         int fd = connect_daemon(MainRequest::GET_PATH);
+        sock_cred cred;
+        if (!get_client_cred(fd, &cred)) {
+            exit(1);
+        }
         MAGISKTMP = read_string(fd);
         close(fd);
-        revert_unmount();
+        revert_unmount(-1, to_string(cred.pid).data());
         execvp(argv[2], argv + 2);
         exit(1);
     } else {

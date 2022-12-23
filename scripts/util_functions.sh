@@ -641,7 +641,7 @@ copy_sepolicy_rules() {
 
   # Find current active RULESDIR
   local RULESDIR
-  local ACTIVEDIR=$(magisk --path)/.magisk/mirror/sepolicy.rules
+  local ACTIVEDIR=$(magisk --path)/.magisk/sepolicy.rules
   if [ -L $ACTIVEDIR ]; then
     RULESDIR=$(readlink $ACTIVEDIR)
     [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(magisk --path)/.magisk/mirror/$RULESDIR"

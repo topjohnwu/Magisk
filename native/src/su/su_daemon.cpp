@@ -384,11 +384,14 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     switch (ctx.info->cfg[SU_MNT_NS]) {
         case NAMESPACE_MODE_GLOBAL:
             LOGD("su: use global namespace\n");
+            switch_mnt_ns(1);
             break;
         case NAMESPACE_MODE_REQUESTER:
             LOGD("su: use namespace of pid=[%d]\n", ctx.pid);
-            if (switch_mnt_ns(ctx.pid))
+            if (switch_mnt_ns(ctx.pid)) {
+                switch_mnt_ns(1);
                 LOGD("su: setns failed, fallback to global\n");
+            }
             break;
         case NAMESPACE_MODE_ISOLATE:
             LOGD("su: use new isolated namespace\n");

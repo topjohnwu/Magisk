@@ -185,8 +185,7 @@ static void handle_request_sync(int client, int code) {
         setup_logfile(true);
         break;
     case MainRequest::STOP_DAEMON:
-        denylist_handler(-1, nullptr);
-        write_int(client, 0);
+        denylist_handler(-client, nullptr);
         // Terminate the daemon!
         exit(0);
     default:
@@ -273,7 +272,10 @@ static void handle_request(pollfd *pfd) {
         exec_task([=] { handle_request_async(client, code, cred); });
     } else {
         close(client);
-        exec_task([=] { boot_stage_handler(code); });
+        if (code == MainRequest::POST_FS_DATA) // post-fs-data requires to run synchronously
+            boot_stage_handler(code);
+        else
+            exec_task([=] { boot_stage_handler(code); });
     }
     return;
 

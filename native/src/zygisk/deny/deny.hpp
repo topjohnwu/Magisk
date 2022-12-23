@@ -47,7 +47,10 @@ void ls_list(int client);
 
 // Utility functions
 bool is_deny_target(int uid, std::string_view process);
-void revert_unmount();
+
+// Revert
+void revert_daemon(int pid, int client);
+void revert_unmount(int pid = -1, const char *ref_pid = "self");
 
 extern int sys_ui_app_id;
 extern std::atomic<bool> denylist_enforced;

@@ -18,6 +18,7 @@ enum : int {
     CONNECT_COMPANION,
     GET_MODDIR,
     PASSTHROUGH,
+    ZYGISK_UNMOUNT,
     END
 };
 }

@@ -15,13 +15,16 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
     sepol->magisk_rules();
 
     // Custom rules
-    if (!custom_rules_dir.empty()) {
-        if (auto dir = xopen_dir(custom_rules_dir.data())) {
+    char buf[PATH_MAX] = MIRRDIR;
+    if (readlink(RULESDIR, buf + sizeof(MIRRDIR) - 1, sizeof(buf) - sizeof(MIRRDIR) + 1) > 0) {
+        if (auto dir = xopen_dir(buf)) {
+            auto len = strlen(buf);
+            auto p = buf + len;
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
-                auto rule = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
-                if (xaccess(rule.data(), R_OK) == 0) {
-                    LOGD("Loading custom sepolicy patch: [%s]\n", rule.data());
-                    sepol->load_rule_file(rule.data());
+                ssprintf(p, sizeof(buf) - len, "/%s/sepolicy.rule", entry->d_name);
+                if (xaccess(p, R_OK) == 0) {
+                    LOGD("Loading custom sepolicy patch: [%s]\n", buf);
+                    sepol->load_rule_file(buf);
                 }
             }
         }
@@ -96,13 +99,16 @@ bool MagiskInit::hijack_sepolicy() {
 
     // Read all custom rules into memory
     string rules;
-    if (!custom_rules_dir.empty()) {
-        if (auto dir = xopen_dir(custom_rules_dir.data())) {
+    char buf[PATH_MAX] = MIRRDIR;
+    if (readlink(RULESDIR, buf + sizeof(MIRRDIR) - 1, sizeof(buf) - sizeof(MIRRDIR) + 1) > 0) {
+        if (auto dir = xopen_dir(buf)) {
+            auto len = strlen(buf);
+            auto p = buf + len;
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
-                auto rule_file = custom_rules_dir + "/" + entry->d_name + "/sepolicy.rule";
-                if (xaccess(rule_file.data(), R_OK) == 0) {
-                    LOGD("Load custom sepolicy patch: [%s]\n", rule_file.data());
-                    full_read(rule_file.data(), rules);
+                ssprintf(p, sizeof(buf) - len, "/%s/sepolicy.rule", entry->d_name);
+                if (xaccess(buf, R_OK) == 0) {
+                    LOGD("Load custom sepolicy patch: [%s]\n", buf);
+                    full_read(buf, rules);
                     rules += '\n';
                 }
             }
@@ -120,7 +126,6 @@ bool MagiskInit::hijack_sepolicy() {
         // The only purpose here is actually to wait for init to mount selinuxfs for us
         int fd = xopen(MOCK_COMPAT, O_WRONLY);
 
-        char buf[4096];
         ssprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
         xumount2(buf, MNT_DETACH);
 

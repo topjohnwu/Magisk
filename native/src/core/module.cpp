@@ -31,10 +31,10 @@ class module_node;
 class root_node;
 
 template<class T> static bool isa(node_entry *node);
-static int bind_mount(const char *from, const char *to) {
-    int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
+static int bind_mount(const char *from, const char *to, const char *action) {
+    int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
-        VLOGD("bind_mnt", from, to);
+        VLOGD(action, from, to);
     return ret;
 }
 
@@ -78,7 +78,7 @@ protected:
     template<class T>
     explicit node_entry(T*) : _file_type(0), node_type(type_id<T>()) {}
 
-    void create_and_mount(const string &src);
+    void create_and_mount(const string &src, const char *action);
 
     // Use top bit of _file_type for node exist status
     bool exist() { return static_cast<bool>(_file_type & (1 << 7)); }
@@ -114,10 +114,9 @@ public:
         children.clear();
     }
 
-    // Return false to indicate need to upgrade to module
-    bool collect_files(const char *module, int dfd);
+    void collect_files(const char *module, int dfd);
 
-    // Return false to indicate need to upgrade to skeleton
+    // Return true to indicate need to upgrade to tmpfs
     bool prepare();
 
     // Default directory mount logic
@@ -211,17 +210,25 @@ protected:
     template<class To, class From = node_entry, class ...Args>
     iterator upgrade(iterator it, Args &&...args);
 
+    bool skip_mirror() const { return _skip_mirror; }
+    void set_skip_mirror(bool b) { _skip_mirror = b; }
+
     // dir nodes host children
     map_type children;
 
     // Root node lookup cache
     root_node *_root = nullptr;
+    bool _skip_mirror = false;
 };
 
 class root_node : public dir_node {
 public:
-    explicit root_node(const char *name) : dir_node(name, this), prefix("") {}
-    explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {}
+    explicit root_node(const char *name) : dir_node(name, this), prefix("") {
+        set_exist(true);
+    }
+    explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {
+        set_exist(true);
+    }
     const char * const prefix;
 };
 
@@ -254,7 +261,7 @@ class mirror_node : public node_entry {
 public:
     explicit mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
     void mount() override {
-        create_and_mount(mirror_path());
+        create_and_mount(mirror_path(), "mirror");
     }
 };
 
@@ -286,6 +293,7 @@ void node_entry::merge(node_entry *other) {
     // Merge children if both is dir
     if (auto a = dyn_cast<dir_node>(this)) {
         if (auto b = dyn_cast<dir_node>(other)) {
+            a->_skip_mirror = b->_skip_mirror;
             a->children.merge(b->children);
             for (auto &pair : a->children)
                 pair.second->_parent = a;
@@ -364,17 +372,19 @@ node_entry* dir_node::extract(string_view name) {
 
 tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
     string mirror = mirror_path();
-    if (auto dir = open_dir(mirror.data())) {
-        set_exist(true);
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            // Insert mirror nodes
-            emplace<mirror_node>(entry->d_name, entry);
+    if (!skip_mirror()) {
+        if (auto dir = open_dir(mirror.data())) {
+            set_exist(true);
+            for (dirent *entry; (entry = xreaddir(dir.get()));) {
+                if (entry->d_type == DT_DIR) {
+                    // create a dummy inter_node to upgrade later
+                    emplace<inter_node>(entry->d_name, entry->d_name, "mirror");
+                } else {
+                    // Insert mirror nodes
+                    emplace<mirror_node>(entry->d_name, entry);
+                }
+            }
         }
-    } else {
-        // It is actually possible that mirror does not exist (nested mount points)
-        // Set self to non exist so this node will be ignored at mount
-        // Keep it the same as `node`
-        return;
     }
 
     for (auto it = children.begin(); it != children.end(); ++it) {
@@ -386,7 +396,7 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
 
 // We need to upgrade to tmpfs node if any child:
 // - Target does not exist
-// - Source or target is a symlink
+// - Source or target is a symlink (since we cannot bind mount link)
 bool node_entry::should_be_tmpfs(node_entry *child) {
     struct stat st;
     if (lstat(child->node_path().data(), &st) != 0) {
@@ -401,6 +411,11 @@ bool node_entry::should_be_tmpfs(node_entry *child) {
 
 bool dir_node::prepare() {
     bool to_tmpfs = false;
+    if (!exist()) {
+        // If not exist, we need to create it by mounting tmpfs
+        to_tmpfs = true;
+        set_exist(true);
+    }
     for (auto it = children.begin(); it != children.end();) {
         if (should_be_tmpfs(it->second)) {
             if (node_type > type_id<tmpfs_node>()) {
@@ -412,62 +427,47 @@ bool dir_node::prepare() {
             }
             // Tell parent to upgrade self to tmpfs
             to_tmpfs = true;
-            // If child is inter_node and it does not (need to) exist, upgrade to module
-            if (auto dn = dyn_cast<inter_node>(it->second); dn) {
-                if (!dn->exist()) {
-                    if (auto nit = upgrade<module_node, inter_node>(it); nit != children.end()) {
-                        it = nit;
-                        goto next_node;
-                    }
-                }
-            }
         }
-        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->is_dir() && !dn->prepare()) {
+        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->prepare()) {
             // Upgrade child to tmpfs
             it = upgrade<tmpfs_node>(it);
         }
-next_node:
         ++it;
     }
-    return !to_tmpfs;
+    return to_tmpfs;
 }
 
-bool dir_node::collect_files(const char *module, int dfd) {
+void dir_node::collect_files(const char *module, int dfd) {
     auto dir = xopen_dir(xopenat(dfd, _name.data(), O_RDONLY | O_CLOEXEC));
     if (!dir)
-        return true;
+        return;
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        inter_node *dn;
         if (entry->d_name == ".replace"sv) {
-            // Stop traversing and tell parent to upgrade self to module
-            return false;
+            set_skip_mirror(true);
+            continue;
         }
-
         if (entry->d_type == DT_DIR) {
-            dir_node *dn;
             if (auto it = children.find(entry->d_name); it == children.end()) {
                 dn = emplace<inter_node>(entry->d_name, entry->d_name, module);
             } else {
                 dn = dyn_cast<inter_node>(it->second);
-                // it has been accessed by at least two modules, it must be guarantee to exist
-                // set it so that it won't be upgrade to module_node but tmpfs_node
-                if (dn) dn->set_exist(true);
             }
-            if (dn && !dn->collect_files(module, dirfd(dir.get()))) {
-                upgrade<module_node>(dn->name(), module);
+            if (dn) {
+                dn->collect_files(module, dirfd(dir.get()));
             }
         } else {
             emplace<module_node>(entry->d_name, module, entry);
         }
     }
-    return true;
 }
 
 /************************
  * Mount Implementations
  ************************/
 
-void node_entry::create_and_mount(const string &src) {
+void node_entry::create_and_mount(const string &src, const char *action) {
     const string &dest = node_path();
     if (is_lnk()) {
         VLOGD("cp_link", src.data(), dest.data());
@@ -479,7 +479,7 @@ void node_entry::create_and_mount(const string &src) {
             close(xopen(dest.data(), O_RDONLY | O_CREAT | O_CLOEXEC, 0));
         else
             return;
-        bind_mount(src.data(), dest.data());
+        bind_mount(src.data(), dest.data(), action);
     }
 }
 
@@ -488,14 +488,12 @@ void module_node::mount() {
     if (exist())
         clone_attr(mirror_path().data(), src.data());
     if (isa<tmpfs_node>(parent()))
-        create_and_mount(src);
-    else if (is_dir() || is_reg())
-        bind_mount(src.data(), node_path().data());
+        create_and_mount(src, "module");
+    else
+        bind_mount(src.data(), node_path().data(), "module");
 }
 
 void tmpfs_node::mount() {
-    if (!exist())
-        return;
     string src = mirror_path();
     const string &dest = node_path();
     file_attr a{};
@@ -503,11 +501,15 @@ void tmpfs_node::mount() {
         getattr(src.data(), &a);
     else
         getattr(parent()->node_path().data(), &a);
-    mkdir(dest.data(), 0);
     if (!isa<tmpfs_node>(parent())) {
-        // We don't need another layer of tmpfs if parent is skel
-        xmount("tmpfs", dest.data(), "tmpfs", 0, nullptr);
-        VLOGD("mnt_tmp", "tmpfs", dest.data());
+        // instead of directly mount tmpfs, we use the worker dir so that we can track
+        // the peer group
+        auto worker_dir = MAGISKTMP + "/" WORKERDIR + dest;
+        mkdirs(worker_dir.data(), 0);
+        create_and_mount(worker_dir, skip_mirror() ? "replace" : "tmpfs");
+    } else {
+        // We don't need another layer of tmpfs if parent is tmpfs
+        mkdir(dest.data(), 0);
     }
     setattr(dest.data(), &a);
     dir_node::mount();
@@ -538,7 +540,7 @@ public:
             VLOGD("create", "./magiskpolicy", dest.data());
             xsymlink("./magiskpolicy", dest.data());
         }
-        create_and_mount(src);
+        create_and_mount(src, "magisk");
     }
 };
 
@@ -563,18 +565,20 @@ vector<module_info> *module_list;
 int app_process_32 = -1;
 int app_process_64 = -1;
 
-#define mount_zygisk(bit)                                                               \
-if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
-    app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
-    string zbin = zygisk_bin + "/app_process" #bit;                                     \
-    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
-    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
-    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
-    xsendfile(out, src, nullptr, INT_MAX);                                              \
-    close(out);                                                                         \
-    close(src);                                                                         \
-    clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
-    bind_mount(zbin.data(), "/system/bin/app_process" #bit);                            \
+#define mount_zygisk(bit)                                                                         \
+/* /proc/1/root to workaround fd opened from
+ * different ns is considered as nosuid since kernel 4.8*/                                        \
+if (access("/proc/1/root/system/bin/app_process" #bit, F_OK) == 0) {                              \
+    app_process_##bit = xopen("/proc/1/root/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);  \
+    string zbin = zygisk_bin + "/app_process" #bit;                                               \
+    string mbin = MAGISKTMP + "/magisk" #bit;                                                     \
+    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                           \
+    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                              \
+    xsendfile(out, src, nullptr, INT_MAX);                                                        \
+    close(out);                                                                                   \
+    close(src);                                                                                   \
+    clone_attr("/proc/1/root/system/bin/app_process" #bit, zbin.data());                          \
+    bind_mount(zbin.data(), "/system/bin/app_process" #bit, "zygisk");                                      \
 }
 
 void magic_mount() {
@@ -621,7 +625,9 @@ void magic_mount() {
 
     if (!system->is_empty()) {
         // Handle special read-only partitions
-        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
+        for (const char *part : { "/vendor", "/vendor_dlkm","/product",
+                                  "/system_ext", "/system_dlkm",
+                                  "/odm", "/odm_dlkm" }) {
             struct stat st{};
             if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
                 if (auto old = system->extract(part + 1)) {
@@ -667,15 +673,6 @@ static void prepare_modules() {
         close(mfd);
         rm_rf(MODULEUPGRADE);
     }
-
-    // Setup module mount (workaround nosuid selabel issue)
-    auto src = MAGISKTMP + "/" MIRRDIR MODULEROOT;
-    auto dest = MAGISKTMP + "/" MODULEMNT;
-    xmkdir(dest.data(), 0755);
-    bind_mount(src.data(), dest.data());
-
-    restorecon();
-    chmod(SECURE_DIR, 0700);
 }
 
 template<typename Func>
@@ -698,9 +695,7 @@ static void collect_modules(bool open_zygisk) {
     foreach_module([=](int dfd, dirent *entry, int modfd) {
         if (faccessat(modfd, "remove", F_OK, 0) == 0) {
             LOGI("%s: remove\n", entry->d_name);
-            auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
-            if (access(uninstaller.data(), F_OK) == 0)
-                exec_script(uninstaller.data());
+            exec_module_scripts("uninstall", {entry->d_name});
             frm_rf(xdup(modfd));
             unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
             return;
@@ -786,11 +781,7 @@ void disable_modules() {
 }
 
 void remove_modules() {
-    foreach_module([](int, dirent *entry, int) {
-        auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
-        if (access(uninstaller.data(), F_OK) == 0)
-            exec_script(uninstaller.data());
-    });
+    exec_module_scripts("uninstall");
     rm_rf(MODULEROOT);
 }
 

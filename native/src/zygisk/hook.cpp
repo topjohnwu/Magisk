@@ -76,6 +76,7 @@ struct HookContext {
     void unload_zygisk();
     void sanitize_fds();
     bool exempt_fd(int fd);
+    void toggle_unmount();
 };
 
 #undef DCL_PRE_POST
@@ -167,14 +168,10 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
         // This is reproducible on the official AVD running API 26 and 27.
         // Simply avoid doing any unmounts for SysUI to avoid potential issues.
         (g_ctx->info_flags & PROCESS_IS_SYS_UI) == 0) {
-        if (g_ctx->flags[DO_REVERT_UNMOUNT]) {
-            revert_unmount();
-        } else {
             umount2("/system/bin/app_process64", MNT_DETACH);
             umount2("/system/bin/app_process32", MNT_DETACH);
-        }
-        // Restore errno back to 0
-        errno = 0;
+            // Restore errno back to 0
+            errno = 0;
     }
     return res;
 }
@@ -200,6 +197,14 @@ DCL_HOOK_FUNC(void, android_log_close) {
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
     if (g_ctx) {
+        if (g_ctx->flags[DO_REVERT_UNMOUNT]) {
+            if (int fd = zygisk_request(ZygiskRequest::ZYGISK_UNMOUNT); fd >= 0) {
+                if (read_int(fd) == DenyResponse::OK) {
+                    ZLOGD("mount namespace cleaned up\n");
+                }
+                close(fd);
+            }
+        }
         g_ctx->flags[CAN_UNLOAD_ZYGISK] = unhook_functions();
     }
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
@@ -583,6 +588,13 @@ void HookContext::app_specialize_post() {
     g_ctx = nullptr;
     close(logd_fd.exchange(-1));
     android_logging();
+}
+
+void HookContext::toggle_unmount() {
+    if (flags[APP_SPECIALIZE]) {
+        // TODO: Handle MOUNT_EXTERNAL_NONE
+        flags[DO_REVERT_UNMOUNT] = args.app->mount_external != 0;
+    }
 }
 
 void HookContext::unload_zygisk() {

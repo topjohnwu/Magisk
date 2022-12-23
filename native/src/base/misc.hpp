@@ -182,6 +182,7 @@ struct exec_t {
     void (*pre_exec)() = nullptr;
     int (*fork)() = xfork;
     const char **argv = nullptr;
+    pid_t ns_pid = -1;
 };
 
 int exec_command(exec_t &exec);
@@ -212,3 +213,22 @@ void exec_command_async(Args &&...args) {
     };
     exec_command(exec);
 }
+
+struct MountInfo {
+    unsigned int id;
+    unsigned int parent;
+    dev_t device;
+    std::string root;
+    std::string target;
+    std::string vfs_option;
+    struct {
+        unsigned int shared;
+        unsigned int master;
+        unsigned int propagate_from;
+    } optional;
+    std::string type;
+    std::string source;
+    std::string fs_option;
+};
+
+std::vector<MountInfo> ParseMountInfo(const char *pid);

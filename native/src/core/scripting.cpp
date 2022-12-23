@@ -27,14 +27,6 @@ static void set_script_env() {
     setenv("PATH", new_path, 1);
     if (zygisk_enabled)
         setenv("ZYGISK_ENABLED", "1", 1);
-};
-
-void exec_script(const char *script) {
-    exec_t exec {
-        .pre_exec = set_script_env,
-        .fork = fork_no_orphan
-    };
-    exec_command_sync(exec, BBEXEC_CMD, script);
 }
 
 static timespec pfs_timeout;
@@ -100,7 +92,8 @@ void exec_common_scripts(const char *stage) {
             strcpy(name, entry->d_name);
             exec_t exec {
                 .pre_exec = set_script_env,
-                .fork = pfs ? xfork : fork_dont_care
+                .fork = pfs ? xfork : fork_dont_care,
+                .ns_pid = 1,
             };
             exec_command(exec, BBEXEC_CMD, path);
             PFS_WAIT()
@@ -141,7 +134,8 @@ void exec_module_scripts(const char *stage, const vector<string_view> &modules) 
         LOGI("%s: exec [%s.sh]\n", module, stage);
         exec_t exec {
             .pre_exec = set_script_env,
-            .fork = pfs ? xfork : fork_dont_care
+            .fork = pfs ? xfork : fork_dont_care,
+            .ns_pid = 1,
         };
         exec_command(exec, BBEXEC_CMD, path);
         PFS_WAIT()
@@ -237,6 +231,7 @@ void install_module(const char *file) {
     close(fd);
 
     const char *argv[] = { "/system/bin/sh", "-c", install_module_script, nullptr };
+    switch_mnt_ns(1);
     execve(argv[0], (char **) argv, environ);
     abort(stdout, "Failed to execute BusyBox shell");
 }

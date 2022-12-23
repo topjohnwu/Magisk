@@ -117,13 +117,13 @@ static void switch_root(const string &path) {
 }
 
 void MagiskInit::mount_rules_dir() {
-    char path[128];
+    char path[PATH_MAX] = {};
     xrealpath(BLOCKDIR, blk_info.block_dev, sizeof(blk_info.block_dev));
     xrealpath(MIRRDIR, path, sizeof(path));
     char *b = blk_info.block_dev + strlen(blk_info.block_dev);
     char *p = path + strlen(path);
 
-    auto do_mount = [&](const char *type) -> bool {
+    auto do_mount = [&path](const char *type) -> bool {
         xmkdir(path, 0755);
         bool success = xmount(blk_info.block_dev, path, type, 0, nullptr) == 0;
         if (success)
@@ -149,7 +149,7 @@ void MagiskInit::mount_rules_dir() {
     strcpy(p, "/data/unencrypted");
     if (xaccess(path, F_OK) == 0) {
         // FBE, need to use an unencrypted path
-        custom_rules_dir = path + "/magisk"s;
+        strcat(p, RULESENTRY);
     } else {
         // Skip if /data/adb does not exist
         strcpy(p, SECURE_DIR);
@@ -160,7 +160,6 @@ void MagiskInit::mount_rules_dir() {
             goto cache;
         }
         // Unencrypted, directly use module paths
-        custom_rules_dir = string(path);
     }
     goto success;
 
@@ -177,7 +176,7 @@ cache:
     }
     if (!do_mount("ext4"))
         goto metadata;
-    custom_rules_dir = path + "/magisk"s;
+    strcat(p, RULESENTRY);
     goto success;
 
 metadata:
@@ -187,7 +186,7 @@ metadata:
     strcpy(p, "/metadata");
     if (setup_block() < 0 || !do_mount("ext4"))
         goto persist;
-    custom_rules_dir = path + "/magisk"s;
+    strcat(p, RULESENTRY);
     goto success;
 
 persist:
@@ -197,20 +196,11 @@ persist:
     strcpy(p, "/persist");
     if (setup_block() < 0 || !do_mount("ext4"))
         return;
-    custom_rules_dir = path + "/magisk"s;
+    strcat(p, RULESENTRY);
 
 success:
     // Create symlinks so we don't need to go through this logic again
-    strcpy(p, "/sepolicy.rules");
-    if (char *rel = strstr(custom_rules_dir.data(), MIRRDIR)) {
-        // Create symlink with relative path
-        char s[128];
-        s[0] = '.';
-        strscpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
-        xsymlink(s, path);
-    } else {
-        xsymlink(custom_rules_dir.data(), path);
-    }
+    xsymlink(p, RULESDIR);
 }
 
 bool LegacySARInit::mount_system_root() {
@@ -311,6 +301,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(INTLROOT, 0755);
     xmkdir(MIRRDIR, 0);
     xmkdir(BLOCKDIR, 0);
+    xmkdir(WORKERDIR, 0);
 
     mount_rules_dir();
 

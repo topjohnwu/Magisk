@@ -13,13 +13,15 @@
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"
 #define DATABIN         SECURE_DIR "/magisk"
 #define MAGISKDB        SECURE_DIR "/magisk.db"
+#define BLOCKBYNAMEDIR  "/dev/block/by-name"
 
 // tmpfs paths
 extern std::string  MAGISKTMP;
 #define INTLROOT    ".magisk"
 #define MIRRDIR     INTLROOT "/mirror"
-#define RULESDIR    MIRRDIR "/sepolicy.rules"
+#define RULESDIR    INTLROOT "/sepolicy.rules"
 #define BLOCKDIR    INTLROOT "/block"
+#define WORKERDIR   INTLROOT "/worker"
 #define MODULEMNT   INTLROOT "/modules"
 #define BBPATH      INTLROOT "/busybox"
 #define ROOTOVL     INTLROOT "/rootdir"
@@ -27,6 +29,7 @@ extern std::string  MAGISKTMP;
 #define ROOTMNT     ROOTOVL "/.mount_list"
 #define ZYGISKBIN   INTLROOT "/zygisk"
 #define SELINUXMOCK INTLROOT "/selinux"
+#define RULESENTRY  "/magisk"
 
 constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 
