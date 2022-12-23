@@ -12,6 +12,7 @@
 #include <daemon.hpp>
 #include <resetprop.hpp>
 #include <selinux.hpp>
+#include <mntinfo.hpp>
 
 #include "core.hpp"
 
@@ -24,97 +25,131 @@ bool zygisk_enabled = false;
  * Setup *
  *********/
 
-#define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
-#define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) ssprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) ssprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
-
-#define do_mount_mirror(part) {     \
-    SETMIR(buf1, part);             \
-    SETBLK(buf2, part);             \
-    unlink(buf2);                   \
-    mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-    xmkdir(buf1, 0755);             \
-    int flags = 0;                  \
-    auto opts = split_ro(me->mnt_opts, ",");\
-    for (string_view s : opts) {    \
-        if (s == "ro") {            \
-            flags |= MS_RDONLY;     \
-            break;                  \
-        }                           \
-    }                               \
-    xmount(buf2, buf1, me->mnt_type, flags, nullptr); \
-    LOGI("mount: %s\n", buf1);      \
+static bool mount_correct(const std::string_view dev, const std::string_view dir, const std::string_view root, const std::string_view type, int flags = 0){
+    int ret = xmount(dev.data(), dir.data(), type.data(), flags, nullptr);
+    if (ret) return false;
+    if (root != "/"sv){
+        string mnt_dir = string(dir) + string(root);
+        if (xmount(mnt_dir.data(), dir.data(), nullptr, MS_BIND, nullptr)){
+       	    umount2(dir.data(), MNT_DETACH);
+       	    return false;
+        }
+    }
+    LOGD("mount: %s\n", dir.data());
+    return true;
 }
 
-#define mount_mirror(part) \
-if (MNT_DIR_IS("/" #part)  \
-    && !MNT_TYPE_IS("tmpfs") \
-    && !MNT_TYPE_IS("overlay") \
-    && lstat(me->mnt_dir, &st) == 0) { \
-    do_mount_mirror(part); \
-    break;                 \
+static bool mount_recreate(const std::string_view from, const std::string_view to){
+    return !xmount(from.data(), to.data(), nullptr, MS_BIND, nullptr) &&
+           !xmount("", to.data(), nullptr, MS_PRIVATE, nullptr);
 }
-
-#define link_mirror(part) \
-SETMIR(buf1, part); \
-if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
-    xsymlink("./system/" #part, buf1); \
-    LOGI("link: %s\n", buf1); \
-}
-
-#define link_orig_dir(dir, part) \
-if (MNT_DIR_IS(dir) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay")) { \
-    SETMIR(buf1, part);          \
-    rmdir(buf1);                 \
-    xsymlink(dir, buf1);         \
-    LOGI("link: %s\n", buf1);    \
-    break;                       \
-}
-
-#define link_orig(part) link_orig_dir("/" #part, part)
 
 static void mount_mirrors() {
-    char buf1[4096];
-    char buf2[4096];
+	LOGI("* Mount mirrors\n");
 
-    LOGI("* Mounting mirrors\n");
+    string mirror_dir = MAGISKTMP + "/" MIRRDIR;
+    string block_dir = MAGISKTMP + "/" BLOCKDIR;
+    string system_mirror = mirror_dir + "/system";
+    
+    std::vector<string> mounted_dirs;
 
-    parse_mnt("/proc/mounts", [&](mntent *me) {
+    auto mount_info = ParseMountInfo("1");
+
+    for (auto &info : mount_info) {
+        const char *mnt_dir = info.target.data();
+        const char *mnt_type = info.type.data();
+        const char *mnt_opts = info.fs_option.data();
+        const char *mnt_root = info.root.data();
+        int matched = 0;
         struct stat st{};
-        do {
-            mount_mirror(system)
-            mount_mirror(vendor)
-            mount_mirror(product)
-            mount_mirror(system_ext)
-            mount_mirror(data)
-            link_orig(cache)
-            link_orig(metadata)
-            link_orig(persist)
-            link_orig_dir("/mnt/vendor/persist", persist)
-            if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
-                xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-                break;
+            if (lstat(mnt_dir, &st) != 0)
+                continue;
+            // skip mount subtree of /data to avoid problem
+            if (string(mnt_dir).starts_with("/data/"))
+                continue;
+            for (const char *part : { MIRRORS }) {
+                if (mnt_dir == string_view(part))
+				    matched = 1;
             }
-        } while (false);
-        return true;
-    });
-    SETMIR(buf1, system);
-    if (access(buf1, F_OK) != 0) {
-        xsymlink("./system_root/system", buf1);
-        LOGI("link: %s\n", buf1);
-        parse_mnt("/proc/mounts", [&](mntent *me) {
-            struct stat st;
-            if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
-                do_mount_mirror(system_root)
-                return false;
+            for (const auto &dir : mounted_dirs) {
+                if (info.target.starts_with(dir + "/")){
+                    string dest = mirror_dir + mnt_dir;
+                    if (mount_recreate(mnt_dir, dest))
+                        LOGD("mount: %s\n", dest.data());
+                    continue;
+                }
+                if (string_view(mnt_dir) == dir) {
+                    // Already mounted
+                    continue;
+                }
             }
-            return true;
-        });
+            if (mnt_type == "tmpfs"sv || mnt_type == "overlay"sv || mnt_type == "rootfs"sv){
+           	    if (matched == 1){
+  	    	        string dest = mirror_dir + mnt_dir;
+                    xmkdir(dest.data(), 0755);
+                    // if root partition like /system is overlay
+                    if (mount_recreate(mnt_dir, dest))
+                        LOGD("mount: %s\n", dest.data());
+           	    }
+                continue;
+            }
+            int flags = 0;
+            auto opts = split_ro(mnt_opts, ",");
+            for (string_view s : opts) {
+                if (s == "ro") {
+                    flags |= MS_RDONLY;
+                    break;
+                }
+            }
+            if (mnt_dir == "/"sv) {
+                string src = block_dir + "/system_root";
+                string dest = mirror_dir + "/system_root";
+                mknod(src.data(), S_IFBLK | 0600, st.st_dev);
+                xmkdir(dest.data(), 0755);
+                symlink("./system_root/system", system_mirror.data());
+                if (mount_correct(src.data(), dest.data(), mnt_root, mnt_type, flags)){
+                    mounted_dirs.emplace_back("/system");
+                    mounted_dirs.emplace_back("/");
+                }
+                continue;
+            }
+            if (matched == 1){
+                    string src = block_dir + mnt_dir;
+                    string dest = mirror_dir + mnt_dir;
+                    mknod(src.data(), S_IFBLK | 0600, st.st_dev);
+                    xmkdir(dest.data(), 0755);
+                    if (mount_correct(src.data(), dest.data(), mnt_root, mnt_type, flags)){
+                        goto add_mounted_dir;
+                    }
+                    continue;
+            }
+            continue;
+
+        add_mounted_dir:
+            mounted_dirs.emplace_back(mnt_dir);
     }
-    link_mirror(vendor)
-    link_mirror(product)
-    link_mirror(system_ext)
+
+    for (const char *part : { SPEC_PARTS }){
+        string dest = mirror_dir + part;
+        string src = string("./system") + part;
+        if (access(dest.data(), F_OK) != 0 && access(part, F_OK) == 0) {
+            symlink(src.data(), dest.data());
+        }
+    }
+    for (const char *part : { SE_MIRRORS }){
+        string dest = mirror_dir + part;
+        string src = part;
+        if (access(part, F_OK) == 0) {
+            symlink(src.data(), dest.data());
+        }
+    }
+    if (access("/persist", F_OK) != 0 && access("/mnt/vendor/persist", F_OK) == 0){
+        string dest = mirror_dir + "/persist";
+   	    symlink("/mnt/vendor/persist", dest.data());
+    }
+    if (access(system_mirror.data(), F_OK) != 0) {
+        symlink("./system_root/system", system_mirror.data());
+    }
 }
 
 static bool magisk_env() {
@@ -296,16 +331,8 @@ void post_fs_data(int client) {
     prune_su_access();
 
     if (access(SECURE_DIR, F_OK) != 0) {
-        if (SDK_INT < 24) {
-            // There is no FBE pre 7.0, we can directly create the folder without issues
-            xmkdir(SECURE_DIR, 0700);
-        } else {
-            // If the folder is not automatically created by Android,
-            // do NOT proceed further. Manual creation of the folder
-            // will have no encryption flag, which will cause bootloops on FBE devices.
-            LOGE(SECURE_DIR " is not present, abort\n");
-            goto early_abort;
-        }
+        LOGE(SECURE_DIR " is not present, abort\n");
+        goto early_abort;
     }
 
     if (!magisk_env()) {

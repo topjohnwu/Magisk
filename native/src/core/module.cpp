@@ -32,7 +32,7 @@ class root_node;
 
 template<class T> static bool isa(node_entry *node);
 static int bind_mount(const char *from, const char *to) {
-    int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
+    int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
         VLOGD("bind_mnt", from, to);
     return ret;
@@ -506,7 +506,7 @@ void tmpfs_node::mount() {
     mkdir(dest.data(), 0);
     if (!isa<tmpfs_node>(parent())) {
         // We don't need another layer of tmpfs if parent is skel
-        xmount("tmpfs", dest.data(), "tmpfs", 0, nullptr);
+        xmount("magisktmpfs", dest.data(), "tmpfs", 0, nullptr);
         VLOGD("mnt_tmp", "tmpfs", dest.data());
     }
     setattr(dest.data(), &a);
@@ -621,7 +621,7 @@ void magic_mount() {
 
     if (!system->is_empty()) {
         // Handle special read-only partitions
-        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
+        for (const char *part : { SPEC_PARTS, OTHER_PARTS }) {
             struct stat st{};
             if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
                 if (auto old = system->extract(part + 1)) {

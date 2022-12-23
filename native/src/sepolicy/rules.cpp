@@ -182,6 +182,8 @@ void sepolicy::magisk_rules() {
     allow("zygote", "zygote", "process", "execmem");
     allow("zygote", "fs_type", "filesystem", "unmount");
     allow("system_server", "system_server", "process", "execmem");
+    allow("zygote", "init", "file", ALL);
+    allow("zygote", "init", "dir", ALL);
 
     // Shut llkd up
     dontaudit("llkd", SEPOL_PROC_DOMAIN, "process", "ptrace");

@@ -192,8 +192,7 @@ static void handle_request_sync(int client, int code) {
         setup_logfile(true);
         break;
     case MainRequest::STOP_DAEMON:
-        denylist_handler(-1, nullptr);
-        write_int(client, 0);
+        denylist_handler(-client, nullptr);
         // Terminate the daemon!
         exit(0);
     default:
