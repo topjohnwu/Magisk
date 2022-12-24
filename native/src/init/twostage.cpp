@@ -26,6 +26,7 @@ void LegacySARInit::first_stage_prep() {
         write(dest, init.buf, init.sz);
         fclone_attr(src, dest);
         close(dest);
+        close(src);
     }
     xmount("/data/init", "/init", nullptr, MS_BIND, nullptr);
 }
