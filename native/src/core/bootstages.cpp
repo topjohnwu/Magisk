@@ -313,7 +313,8 @@ void post_fs_data(int client) {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
+    if (getprop("persist.sys.safemode", true) == "1" ||
+        getprop("ro.sys.safemode") == "1" || check_key_combo()) {
         safe_mode = true;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
