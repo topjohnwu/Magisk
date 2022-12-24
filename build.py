@@ -368,6 +368,9 @@ def build_binary(args):
 
     flag = ''
 
+    if args.arch in archs:
+        flag += f' APP_ABI={args.arch}'
+
     if 'magisk' in args.target or 'magiskinit' in args.target:
         flag += ' B_PRELOAD=1'
 
@@ -393,6 +396,9 @@ def build_binary(args):
 
     flag = ''
 
+    if args.arch in archs:
+        flag += f' APP_ABI={args.arch}'
+
     if 'magisk' in args.target:
         flag += ' B_MAGISK=1'
 
@@ -406,8 +412,13 @@ def build_binary(args):
 
     # BusyBox is built with different libc
 
+    flag = 'B_BB=1'
+
+    if args.arch in archs:
+        flag += f' APP_ABI={args.arch}'
+
     if 'busybox' in args.target:
-        run_ndk_build('B_BB=1')
+        run_ndk_build(flag)
 
 
 def build_apk(args, module):
@@ -577,6 +588,8 @@ binary_parser = subparsers.add_parser('binary', help='build binaries')
 binary_parser.add_argument(
     'target', nargs='*', help=f"{', '.join(support_targets)}, \
     or empty for defaults ({', '.join(default_targets)})")
+binary_parser.add_argument(
+    "-a", "--arch", help=f"{', '.join(archs)}")  
 binary_parser.set_defaults(func=build_binary)
 
 app_parser = subparsers.add_parser('app', help='build the Magisk app')
