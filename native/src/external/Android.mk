@@ -383,7 +383,9 @@ include $(CLEAR_VARS)
 LOCAL_MODULE:= libz
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/zlib
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_CFLAGS := -DHAVE_HIDDEN -DZLIB_CONST -Wall -Werror -Wno-unused -Wno-unused-parameter
+LOCAL_CFLAGS := \
+    -DHAVE_HIDDEN -DZLIB_CONST -Wall -Werror \
+    -Wno-unused -Wno-unused-parameter -Wno-deprecated-non-prototype
 LOCAL_SRC_FILES := \
     zlib/adler32.c \
     zlib/compress.c \

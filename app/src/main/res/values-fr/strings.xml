@@ -25,8 +25,8 @@
     <string name="home_follow_title">Suivez-nous</string>
     <string name="home_item_source">Sources</string>
     <string name="home_support_content">Magisk est, et sera toujours, libre et open source. Vous pouvez cependant nous témoigner de votre soutien en envoyant un petit don.</string>
-    <string name="home_installed_version">Installé</string>
-    <string name="home_latest_version">Dernière</string>
+    <string name="home_installed_version">Version installée</string>
+    <string name="home_latest_version">Dernière version</string>
     <string name="invalid_update_channel">Canal de mise à jour invalide</string>
     <string name="uninstall_magisk_title">Désinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Tous les modules seront désactivés ou supprimés !\nL’accès super‑utiliateur sera perdu !\nVos données seront potentiellement chiffrées si elles ne le sont pas déjà.</string>
@@ -138,7 +138,7 @@
     <string name="settings_zygisk_summary">Exécuter des parties de Magisk dans le service zygote</string>
     <string name="settings_denylist_title">Imposer Liste Exclusion</string>
     <string name="settings_denylist_summary">Les processus figurant sur la liste des exclusions verront toutes les modifications de Magisk annulées.</string>
-    <string name="settings_denylist_error">Cette fonctionnalité requière %1$s pour être activée</string>
+    <string name="settings_denylist_error">Cette fonctionnalité requiert %1$s pour être activée</string>
     <string name="settings_denylist_config_title">Configurer Liste Exclusion</string>
     <string name="settings_denylist_config_summary">Sélectionner le processus à inclure dans la liste d’exclusion</string>
     <string name="settings_hosts_title">Fichier d’hôtes hors partition système</string>
@@ -230,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">Cette application ne peut continuer à fonctionner en étant masquée car l’accès en tant que super‑utilisateur a été perdu. Merci de restaurer l’APK originel.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Permettre l’accès au stockage pour activer cette fonctionnalité</string>
+    <string name="post_notifications_denied">Permettre l’accès aux notifications pour activer cette fonctionnalité</string>
     <string name="install_unknown_denied">Autoriser "installation d’applications inconnues" pour activer cette fonctionnalité</string>
     <string name="add_shortcut_title">Ajouter un raccourci à l’écran d’accueil</string>
     <string name="add_shortcut_msg">Après avoir masqué Magisk, son nom et son icône peuvent devenir difficiles à reconnaître. Voulez‑vous ajouter un joli raccourci vers l’écran d’accueil ?</string>

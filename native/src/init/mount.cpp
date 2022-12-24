@@ -118,8 +118,8 @@ static void switch_root(const string &path) {
 
 void MagiskInit::mount_rules_dir() {
     char path[128];
-    xrealpath(BLOCKDIR, blk_info.block_dev);
-    xrealpath(MIRRDIR, path);
+    xrealpath(BLOCKDIR, blk_info.block_dev, sizeof(blk_info.block_dev));
+    xrealpath(MIRRDIR, path, sizeof(path));
     char *b = blk_info.block_dev + strlen(blk_info.block_dev);
     char *p = path + strlen(path);
 
@@ -206,7 +206,7 @@ success:
         // Create symlink with relative path
         char s[128];
         s[0] = '.';
-        strlcpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
+        strscpy(s + 1, rel + sizeof(MIRRDIR) - 1, sizeof(s) - 1);
         xsymlink(s, path);
     } else {
         xsymlink(custom_rules_dir.data(), path);
@@ -214,8 +214,6 @@ success:
 }
 
 bool LegacySARInit::mount_system_root() {
-    backup_files();
-
     LOGD("Mounting system_root\n");
 
     // there's no /dev in stub cpio
@@ -296,11 +294,19 @@ void BaseInit::exec_init() {
     exit(1);
 }
 
+void BaseInit::prepare_data() {
+    LOGD("Setup data tmp\n");
+    xmkdir("/data", 0755);
+    xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
+
+    cp_afc("/init", "/data/magiskinit");
+    cp_afc("/.backup", "/data/.backup");
+    cp_afc("/overlay.d", "/data/overlay.d");
+}
+
 void MagiskInit::setup_tmp(const char *path) {
     LOGD("Setup Magisk tmp at %s\n", path);
-    xmount("tmpfs", path, "tmpfs", 0, "mode=755");
-
-    chdir(path);
+    chdir("/data");
 
     xmkdir(INTLROOT, 0755);
     xmkdir(MIRRDIR, 0);
@@ -308,14 +314,15 @@ void MagiskInit::setup_tmp(const char *path) {
 
     mount_rules_dir();
 
-    int fd = xopen(INTLROOT "/config", O_WRONLY | O_CREAT, 0);
-    xwrite(fd, magisk_cfg.buf, magisk_cfg.sz);
-    close(fd);
+    cp_afc(".backup/.magisk", INTLROOT "/config");
+    rm_rf(".backup");
 
     // Create applet symlinks
     for (int i = 0; applet_names[i]; ++i)
         xsymlink("./magisk", applet_names[i]);
     xsymlink("./magiskpolicy", "supolicy");
+
+    xmount(".", path, nullptr, MS_BIND, nullptr);
 
     chdir("/");
 }

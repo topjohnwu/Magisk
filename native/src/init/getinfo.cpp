@@ -124,8 +124,8 @@ extern "C" void klog_write(const char *msg, int len) {
 
 static int klog_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[4096];
-    strlcpy(buf, "magiskinit: ", sizeof(buf));
-    int len = vsnprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
+    strscpy(buf, "magiskinit: ", sizeof(buf));
+    int len = vssprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
     log_with_rs(level, rust::Str(buf, len));
     return len;
 }
@@ -174,10 +174,10 @@ void BootConfig::set(const kv_pairs &kv) {
                 LOGW("Skip invalid androidboot.slot_suffix=[normal]\n");
                 continue;
             }
-            strlcpy(slot, value.data(), sizeof(slot));
+            strscpy(slot, value.data(), sizeof(slot));
         } else if (key == "androidboot.slot") {
             slot[0] = '_';
-            strlcpy(slot + 1, value.data(), sizeof(slot) - 1);
+            strscpy(slot + 1, value.data(), sizeof(slot) - 1);
         } else if (key == "skip_initramfs") {
             skip_initramfs = true;
         } else if (key == "androidboot.force_normal_boot") {
@@ -185,13 +185,13 @@ void BootConfig::set(const kv_pairs &kv) {
         } else if (key == "rootwait") {
             rootwait = true;
         } else if (key == "androidboot.android_dt_dir") {
-            strlcpy(dt_dir, value.data(), sizeof(dt_dir));
+            strscpy(dt_dir, value.data(), sizeof(dt_dir));
         } else if (key == "androidboot.hardware") {
-            strlcpy(hardware, value.data(), sizeof(hardware));
+            strscpy(hardware, value.data(), sizeof(hardware));
         } else if (key == "androidboot.hardware.platform") {
-            strlcpy(hardware_plat, value.data(), sizeof(hardware_plat));
+            strscpy(hardware_plat, value.data(), sizeof(hardware_plat));
         } else if (key == "androidboot.fstab_suffix") {
-            strlcpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
+            strscpy(fstab_suffix, value.data(), sizeof(fstab_suffix));
         } else if (key == "qemu") {
             emulator = true;
         }
@@ -211,12 +211,12 @@ void BootConfig::print() {
 }
 
 #define read_dt(name, key)                                          \
-snprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
+ssprintf(file_name, sizeof(file_name), "%s/" name, config->dt_dir); \
 if (access(file_name, R_OK) == 0) {                                 \
     string data = full_read(file_name);                             \
     if (!data.empty()) {                                            \
         data.pop_back();                                            \
-        strlcpy(config->key, data.data(), sizeof(config->key));     \
+        strscpy(config->key, data.data(), sizeof(config->key));     \
     }                                                               \
 }
 
@@ -245,7 +245,7 @@ void load_kernel_info(BootConfig *config) {
     });
 
     if (config->dt_dir[0] == '\0')
-        strlcpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
+        strscpy(config->dt_dir, DEFAULT_DT_DIR, sizeof(config->dt_dir));
 
     char file_name[128];
     read_dt("fstab_suffix", fstab_suffix)

@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.log
 
+import android.system.Os
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
@@ -66,17 +67,22 @@ class LogViewModel(
                 file.write("isAB=${Info.isAB}\n")
                 file.write("isSAR=${Info.isSAR}\n")
                 file.write("ramdisk=${Info.ramdisk}\n")
+                val uname = Os.uname()
+                file.write("kernel=${uname.sysname} ${uname.machine} ${uname.release} ${uname.version}\n")
 
                 file.write("\n\n---System Properties---\n\n")
                 ProcessBuilder("getprop").start()
                     .inputStream.reader().use { it.copyTo(file) }
+
+                file.write("\n\n---Environment Variables---\n\n")
+                System.getenv().forEach { (key, value) -> file.write("${key}=${value}\n") }
 
                 file.write("\n\n---System MountInfo---\n\n")
                 FileInputStream("/proc/self/mountinfo").reader().use { it.copyTo(file) }
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                file.write(consoleText)
+                if (Info.env.isActive) file.write(consoleText)
 
                 file.write("\n---Manager Logs---\n")
                 file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")

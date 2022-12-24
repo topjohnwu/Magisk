@@ -228,6 +228,7 @@
     <string name="unsupport_nonroot_stub_msg">Aplikacioni nuk mund të vazhdojë të punojë në gjendjen e fshehur pasi rrënja ishte e humbur. Ju lutemi rivendoseni përsëri në APK-në origjinale.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Jepni lejen e ruajtjes për të aktivizuar këtë funksion</string>
+    <string name="post_notifications_denied">Jepni lejen e njoftimeve për të aktivizuar këtë funksion</string>
     <string name="install_unknown_denied">Lejo "instaloni aplikacione të panjohura" për të aktivizuar këtë funksion</string>
     <string name="add_shortcut_title">Shto shkurtore në ekranin bazë</string>
     <string name="add_shortcut_msg">Pas fshehjes së këtij aplikacioni, emri dhe ikona e tij mund të bëhen të vështira për tu njohur.  Dëshironi të shtoni një shkurtore mjaft të bukur në ekranin bazë?</string>

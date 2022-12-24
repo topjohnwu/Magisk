@@ -27,6 +27,8 @@ static unique_ptr<map<string, set<string, StringCmp>, StringCmp>> pkg_to_procs_;
 static unique_ptr<map<int, set<string_view>>> app_id_to_pkgs_;
 #define app_id_to_pkgs (*app_id_to_pkgs_)
 
+int sys_ui_app_id = -1;
+
 // Locks the data structures above
 static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -48,13 +50,16 @@ static void rescan_apps() {
         int dfd = xopenat(dirfd(data_dir.get()), entry->d_name, O_RDONLY);
         if (auto dir = xopen_dir(dfd)) {
             while ((entry = xreaddir(dir.get()))) {
-                // For each package
                 struct stat st{};
-                xfstatat(dfd, entry->d_name, &st, 0);
+                // For each package
+                if (xfstatat(dfd, entry->d_name, &st, 0))
+                    continue;
                 int app_id = to_app_id(st.st_uid);
                 if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
                     app_id_to_pkgs[app_id].insert(it->first);
                 }
+                if (entry->d_name == "com.android.systemui"sv)
+                    sys_ui_app_id = app_id;
             }
         } else {
             close(dfd);
@@ -71,7 +76,7 @@ static void update_pkg_uid(const string &pkg, bool remove) {
     char buf[PATH_MAX] = {0};
     // For each user
     while ((entry = xreaddir(data_dir.get()))) {
-        snprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
+        ssprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
         if (fstatat(dirfd(data_dir.get()), buf, &st, 0) == 0) {
             int app_id = to_app_id(st.st_uid);
             if (remove) {
@@ -179,20 +184,20 @@ static bool validate(const char *pkg, const char *proc) {
     return pkg_valid && proc_valid;
 }
 
-static auto add_hide_set(const char *pkg, const char *proc) {
+static bool add_hide_set(const char *pkg, const char *proc) {
     auto p = pkg_to_procs[pkg].emplace(proc);
     if (!p.second)
-        return p;
+        return false;
     LOGI("denylist add: [%s/%s]\n", pkg, proc);
     if (!do_kill)
-        return p;
+        return true;
     if (str_eql(pkg, ISOLATED_MAGIC)) {
         // Kill all matching isolated processes
         kill_process<&proc_name_match<str_starts>>(proc, true);
     } else {
         kill_process(proc);
     }
-    return p;
+    return true;
 }
 
 static void clear_data() {
@@ -234,15 +239,15 @@ static int add_list(const char *pkg, const char *proc) {
         mutex_guard lock(data_lock);
         if (!ensure_data())
             return DenyResponse::ERROR;
-        auto p = add_hide_set(pkg, proc);
-        if (!p.second)
+        if (!add_hide_set(pkg, proc))
             return DenyResponse::ITEM_EXIST;
-        update_pkg_uid(*p.first, false);
+        auto it = pkg_to_procs.find(pkg);
+        update_pkg_uid(it->first, false);
     }
 
     // Add to database
     char sql[4096];
-    snprintf(sql, sizeof(sql),
+    ssprintf(sql, sizeof(sql),
             "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DenyResponse::ERROR)
@@ -286,9 +291,9 @@ static int rm_list(const char *pkg, const char *proc) {
 
     char sql[4096];
     if (proc[0] == '\0')
-        snprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'", pkg);
+        ssprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'", pkg);
     else
-        snprintf(sql, sizeof(sql),
+        ssprintf(sql, sizeof(sql),
                 "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
     char *err = db_exec(sql);
     db_err_cmd(err, return DenyResponse::ERROR)

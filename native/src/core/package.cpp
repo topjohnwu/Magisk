@@ -100,7 +100,7 @@ int get_manager(int user_id, string *pkg, bool install) {
 
     auto check_dyn = [&](int u) -> bool {
 #if ENFORCE_SIGNATURE
-        snprintf(app_path, sizeof(app_path),
+        ssprintf(app_path, sizeof(app_path),
             "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, u, mgr_pkg->data());
         int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
         if (dyn < 0) {
@@ -124,7 +124,7 @@ int get_manager(int user_id, string *pkg, bool install) {
         }
         // Just need to check whether the app is installed in the user
         const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
-        snprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
+        ssprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
         if (access(app_path, F_OK) == 0) {
             // Always check dyn signature for repackaged app
             if (!mgr_pkg->empty() && !check_dyn(user_id))
@@ -165,7 +165,7 @@ int get_manager(int user_id, string *pkg, bool install) {
 
             bool invalid = false;
             auto check_pkg = [&](int u) -> bool {
-                snprintf(app_path, sizeof(app_path),
+                ssprintf(app_path, sizeof(app_path),
                          "%s/%d/%s", APP_DATA_DIR, u, str[SU_MANAGER].data());
                 if (stat(app_path, &st) == 0) {
                     int app_id = to_app_id(st.st_uid);
@@ -223,7 +223,7 @@ int get_manager(int user_id, string *pkg, bool install) {
 
         bool invalid = false;
         auto check_pkg = [&](int u) -> bool {
-            snprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
+            ssprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
 #if ENFORCE_SIGNATURE
                 string apk = find_apk_path(JAVA_PACKAGE_NAME);

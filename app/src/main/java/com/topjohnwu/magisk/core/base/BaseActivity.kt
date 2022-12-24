@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core.base
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -35,9 +34,11 @@ abstract class BaseActivity : AppCompatActivity() {
         permissionCallback?.invoke(it)
         permissionCallback = null
     }
+
+    private var installCallback: ((Boolean) -> Unit)? = null
     private val requestInstall = registerForActivityResult(RequestInstall()) {
-        permissionCallback?.invoke(it)
-        permissionCallback = null
+        installCallback?.invoke(it)
+        installCallback = null
     }
 
     private var contentCallback: ContentResultCallback? = null
@@ -52,7 +53,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     val realCallingPackage: String? get() {
         callingPackage?.let { return it }
-        if (Build.VERSION.SDK_INT >= 22) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
             mReferrerField.get(this)?.let { return it as String }
         }
         return null
@@ -82,15 +83,23 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun withPermission(permission: String, callback: (Boolean) -> Unit) {
-        if (permission == WRITE_EXTERNAL_STORAGE && Build.VERSION.SDK_INT >= 30) {
-            // We do not need external rw on 30+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            permission == WRITE_EXTERNAL_STORAGE) {
+            // We do not need external rw on R+
             callback(true)
             return
         }
-        permissionCallback = callback
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU &&
+            permission == POST_NOTIFICATIONS) {
+            // All apps have notification permissions before T
+            callback(true)
+            return
+        }
         if (permission == REQUEST_INSTALL_PACKAGES) {
+            installCallback = callback
             requestInstall.launch(Unit)
         } else {
+            permissionCallback = callback
             requestPermission.launch(permission)
         }
     }

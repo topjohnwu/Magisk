@@ -22,7 +22,7 @@ The result of **Ramdisk** determines whether your device has ramdisk in the boot
 
 If you are using a Samsung device that is launched with Android 9.0 or higher, you can now jump to [its own section](#samsung-system-as-root).
 
-If your device has boot ramdisk, get a copy of the `boot.img`.<br>
+If your device has boot ramdisk, get a copy of the `boot.img` (or `init_boot.img` if exists).<br>
 If your device does **NOT** have boot ramdisk, get a copy of the `recovery.img`.<br>
 You should be able to extract the file you need from official firmware packages or your custom ROM zip.
 
@@ -38,7 +38,7 @@ Quick recap, at this point, you should have known and prepared:
 
 1. Whether your device has boot ramdisk
 2. Whether your device has a separate `vbmeta` partition
-3. A `boot.img` or `recovery.img` based on (1)
+3. A `boot.img`, `init_boot.img` or `recovery.img` based on (1)
 
 Let's continue to [Patching Images](#patching-images).
 

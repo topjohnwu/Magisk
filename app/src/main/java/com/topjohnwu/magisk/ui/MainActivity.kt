@@ -1,5 +1,7 @@
 package com.topjohnwu.magisk.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
@@ -10,6 +12,7 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
@@ -20,12 +23,15 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 class MainViewModel : BaseViewModel()
@@ -52,10 +58,19 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
     private var isRootFragment = true
 
+    @SuppressLint("InlinedApi")
     override fun showMainUI(savedInstanceState: Bundle?) {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
+        checkStubComponent()
+
+        // Ask permission to post notifications for background update check
+        if (Config.checkUpdate) {
+            withPermission(Manifest.permission.POST_NOTIFICATIONS) {
+                Config.checkUpdate = it
+            }
+        }
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
@@ -217,4 +232,22 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
             }.show()
         }
     }
+
+    @SuppressLint("InlinedApi")
+    private fun checkStubComponent() {
+        if (intent.component?.className?.contains(HideAPK.PLACEHOLDER) == true) {
+            // The stub APK was not properly patched, re-apply our changes
+            withPermission(Manifest.permission.REQUEST_INSTALL_PACKAGES) { granted ->
+                if (granted) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val apk = File(applicationInfo.sourceDir)
+                        HideAPK.upgrade(this@MainActivity, apk)?.let {
+                            startActivity(it)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

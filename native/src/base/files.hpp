@@ -39,16 +39,6 @@ protected:
     void swap(byte_data &o);
 };
 
-struct raw_file {
-    std::string path;
-    file_attr attr;
-    std::string content;
-
-    raw_file() : attr{} {}
-    raw_file(const raw_file&) = delete;
-    raw_file(raw_file &&o) : path(std::move(o.path)), attr(o.attr), content(std::move(o.content)) {}
-};
-
 struct mmap_data : public byte_data {
     mmap_data() = default;
     mmap_data(const mmap_data&) = delete;
@@ -58,15 +48,25 @@ struct mmap_data : public byte_data {
     mmap_data& operator=(mmap_data &&other) { swap(other); return *this; }
 };
 
-ssize_t fd_path(int fd, char *path, size_t size);
+extern "C" {
+
+int mkdirs(const char *path, mode_t mode);
+ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
+
+} // extern "C"
+
+using rust::fd_path;
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
-int mkdirs(std::string path, mode_t mode);
 void rm_rf(const char *path);
 void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);
 void cp_afc(const char *src, const char *dest);
 void link_path(const char *src, const char *dest);
 void link_dir(int src, int dest);
+static inline ssize_t realpath(
+        const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz) {
+    return canonical_path(path, buf, bufsiz);
+}
 int getattr(const char *path, file_attr *a);
 int getattrat(int dirfd, const char *name, file_attr *a);
 int fgetattr(int fd, file_attr *a);
@@ -89,8 +89,6 @@ void parse_prop_file(const char *file,
 void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
-void backup_folder(const char *dir, std::vector<raw_file> &files);
-void restore_folder(const char *dir, std::vector<raw_file> &files);
 std::string find_apk_path(const char *pkg);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;

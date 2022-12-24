@@ -219,7 +219,7 @@ void byte_stream::resize(size_t new_pos, bool zero) {
         resize = true;
     }
     if (resize) {
-        _buf = (uint8_t *) xrealloc(_buf, _cap);
+        _buf = (uint8_t *) realloc(_buf, _cap);
         if (zero)
             memset(_buf + old_cap, 0, _cap - old_cap);
     }

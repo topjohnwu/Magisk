@@ -119,7 +119,7 @@
     <string name="settings_download_path_title">Caminho para Baixar</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em %1$s</string>
     <string name="settings_hide_app_title">Ocultar o app do Magisk</string>
-    <string name="settings_hide_app_summary">Instala o app ooulto com ID aleatório e nome personalizado</string>
+    <string name="settings_hide_app_summary">Instala o app oculto com ID aleatório e nome personalizado</string>
     <string name="settings_restore_app_title">Restaurar o App do Magisk</string>
     <string name="settings_restore_app_summary">Desoculta o app do Magisk e restaura o APK original</string>
     <string name="language">Idioma</string>
@@ -224,6 +224,7 @@
     <string name="unsupport_nonroot_stub_msg">O app oculto do Magisk não pode continuar a funcionar porque o SuperUsuário foi perdido. Por favor, restaure o APK original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Autorize a permissão de armazenamento para ativar esta funcionalidade</string>
+    <string name="post_notifications_denied">Autorize a permissão de notificaçoes para ativar esta funcionalidade</string>
     <string name="install_unknown_denied">Permita a "instalação apps desconhecidos" para ativar esta funcionalidade</string>
     <string name="add_shortcut_title">Adicionar Atalho à Tela Inicial</string>
     <string name="add_shortcut_msg">Depois de ocultar o app do Magisk, o seu nome e ícone ficarão difíceis de reconhecer. Deseja adicionar um atalho na tela inicial?</string>

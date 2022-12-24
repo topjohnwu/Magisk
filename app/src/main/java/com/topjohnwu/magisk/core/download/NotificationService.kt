@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core.download
 
 import android.app.Notification
 import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseService
@@ -30,11 +31,11 @@ open class NotificationService : BaseService() {
         val total = max.toFloat() / 1048576
         val id = subject.notifyId
 
-        update(id) { it.setContentTitle(subject.title) }
+        notifyUpdate(id) { it.setContentTitle(subject.title) }
 
         return ProgressInputStream(byteStream()) {
             val progress = it.toFloat() / 1048576
-            update(id) { notification ->
+            notifyUpdate(id) { notification ->
                 if (max > 0) {
                     broadcast(progress / total, subject)
                     notification
@@ -49,7 +50,7 @@ open class NotificationService : BaseService() {
     }
 
     private fun finalNotify(id: Int, editor: (Notification.Builder) -> Unit): Int {
-        val notification = remove(id)?.also(editor) ?: return -1
+        val notification = notifyRemove(id)?.also(editor) ?: return -1
         val newId = Notifications.nextId()
         Notifications.mgr.notify(newId, notification.build())
         return newId
@@ -73,28 +74,31 @@ open class NotificationService : BaseService() {
         subject.pendingIntent(this)?.let { intent -> it.setContentIntent(intent) }
     }
 
-    private fun create() = Notifications.progress(this, "")
-
-    private fun updateForeground() {
+    private fun updateForegroundState() {
         if (hasNotifications) {
             val (id, notification) = notifications.entries.first()
             startForeground(id, notification.build())
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_DETACH)
         } else {
+            @Suppress("DEPRECATION")
             stopForeground(false)
         }
     }
 
-    protected fun update(id: Int, editor: (Notification.Builder) -> Unit = {}) {
+    protected fun notifyUpdate(id: Int, editor: (Notification.Builder) -> Unit = {}) {
+        fun create() = Notifications.startProgress("")
+
         val wasEmpty = !hasNotifications
         val notification = notifications.getOrPut(id, ::create).also(editor)
         if (wasEmpty)
-            updateForeground()
+            updateForegroundState()
         else
             Notifications.mgr.notify(id, notification.build())
     }
 
-    protected fun remove(id: Int): Notification.Builder? {
-        val n = notifications.remove(id)?.also { updateForeground() }
+    protected fun notifyRemove(id: Int): Notification.Builder? {
+        val n = notifications.remove(id)?.also { updateForegroundState() }
         Notifications.mgr.cancel(id)
         return n
     }

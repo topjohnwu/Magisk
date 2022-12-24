@@ -291,7 +291,7 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
         datum = &get_avtab_node(&key, &xperms)->datum;
 
         if (datum->xperms == nullptr)
-            datum->xperms = auto_cast(xmalloc(sizeof(xperms)));
+            datum->xperms = auto_cast(malloc(sizeof(xperms)));
 
         memcpy(datum->xperms, &xperms, sizeof(xperms));
     }
@@ -425,7 +425,7 @@ bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c,
     }
 
     if (trans == nullptr) {
-        trans = auto_cast(xcalloc(sizeof(*trans), 1));
+        trans = auto_cast(calloc(sizeof(*trans), 1));
         filename_trans_key_t *new_key = auto_cast(malloc(sizeof(*new_key)));
         *new_key = key;
         new_key->name = strdup(key.name);
@@ -447,7 +447,7 @@ bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char 
     }
 
     // Allocate genfs context
-    ocontext_t *newc = auto_cast(xcalloc(sizeof(*newc), 1));
+    ocontext_t *newc = auto_cast(calloc(sizeof(*newc), 1));
     newc->u.name = strdup(path);
     memcpy(&newc->context[0], ctx, sizeof(*ctx));
     free(ctx);
@@ -463,7 +463,7 @@ bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char 
         last_gen = node;
     }
     if (newfs == nullptr) {
-        newfs = auto_cast(xcalloc(sizeof(*newfs), 1));
+        newfs = auto_cast(calloc(sizeof(*newfs), 1));
         newfs->fstype = strdup(fs_name);
         // Insert
         if (last_gen)
@@ -505,7 +505,7 @@ bool sepol_impl::add_type(const char *type_name, uint32_t flavor) {
         return true;
     }
 
-    type = auto_cast(xmalloc(sizeof(type_datum_t)));
+    type = auto_cast(malloc(sizeof(type_datum_t)));
     type_datum_init(type);
     type->primary = 1;
     type->flavor = flavor;
@@ -517,8 +517,8 @@ bool sepol_impl::add_type(const char *type_name, uint32_t flavor) {
     ebitmap_set_bit(&db->global->branch_list->declared.p_types_scope, value - 1, 1);
 
     auto new_size = sizeof(ebitmap_t) * db->p_types.nprim;
-    db->type_attr_map = auto_cast(xrealloc(db->type_attr_map, new_size));
-    db->attr_type_map = auto_cast(xrealloc(db->attr_type_map, new_size));
+    db->type_attr_map = auto_cast(realloc(db->type_attr_map, new_size));
+    db->attr_type_map = auto_cast(realloc(db->attr_type_map, new_size));
     ebitmap_init(&db->type_attr_map[value - 1]);
     ebitmap_init(&db->attr_type_map[value - 1]);
     ebitmap_set_bit(&db->type_attr_map[value - 1], value - 1, 1);

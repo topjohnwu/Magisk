@@ -67,9 +67,10 @@ object Info {
     ) {
         val versionCode = when {
             code < Const.Version.MIN_VERCODE -> -1
-            else -> if (isRooted) code else -1
+            isRooted ->  code
+            else -> -1
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
-        val isActive = versionCode >= 0
+        val isActive = versionCode > 0
     }
 }

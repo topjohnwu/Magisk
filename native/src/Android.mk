@@ -47,6 +47,7 @@ LOCAL_SRC_FILES := \
     zygisk/deny/revert.cpp
 
 LOCAL_LDLIBS := -llog
+LOCAL_LDFLAGS := -Wl,--dynamic-list=src/exported_sym.txt
 
 include $(BUILD_EXECUTABLE)
 
@@ -55,8 +56,13 @@ endif
 ifdef B_PRELOAD
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := preload
+LOCAL_MODULE := init-ld
 LOCAL_SRC_FILES := init/preload.c
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := zygisk-ld
+LOCAL_SRC_FILES := zygisk/loader.c
 include $(BUILD_SHARED_LIBRARY)
 
 endif
@@ -144,27 +150,12 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_SRC_FILES := \
     core/applet_stub.cpp \
-    resetprop/persist_properties.cpp \
     resetprop/resetprop.cpp \
+    resetprop/persist.cpp \
 
 LOCAL_CFLAGS := -DAPPLET_STUB_MAIN=resetprop_main
 include $(BUILD_EXECUTABLE)
 
-endif
-
-ifdef B_TEST
-ifneq (,$(wildcard src/test.cpp))
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := test
-LOCAL_STATIC_LIBRARIES := \
-    libbase \
-    libphmap
-
-LOCAL_SRC_FILES := test.cpp
-include $(BUILD_EXECUTABLE)
-
-endif
 endif
 
 ########################

@@ -408,7 +408,7 @@ private:
 protected: name() = default;            \
 public:                                 \
 name(void *ptr) {                       \
-    raw = xmalloc(sizeof(hdr));         \
+    raw = malloc(sizeof(hdr));          \
     memcpy(raw, ptr, sizeof(hdr));      \
 }                                       \
 size_t hdr_size() override {            \

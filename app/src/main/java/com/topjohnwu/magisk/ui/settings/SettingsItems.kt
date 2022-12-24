@@ -12,8 +12,6 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -23,6 +21,7 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -113,7 +112,7 @@ object Restore : BaseSettingsItem.Blank() {
 
     override fun onPressed(view: View, handler: Handler) {
         handler.onItemPressed(view, this) {
-            MagiskDialog(view.context).apply {
+            MagiskDialog(view.activity).apply {
                 setTitle(R.string.settings_restore_app_title)
                 setMessage(R.string.restore_app_confirmation)
                 setButton(MagiskDialog.ButtonType.POSITIVE) {
@@ -206,12 +205,7 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
 object UpdateChecker : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_check_update_title.asText()
     override val icon = R.drawable.ic_loop
-    override var value
-        get() = Config.checkUpdate
-        set(value) {
-            Config.checkUpdate = value
-            JobService.schedule(AppContext)
-        }
+    override var value by Config::checkUpdate
 }
 
 object DoHToggle : BaseSettingsItem.Toggle() {

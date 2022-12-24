@@ -6,6 +6,7 @@ import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.repository.BoolDBPropertyNoWrite
 import com.topjohnwu.magisk.core.repository.DBConfig
@@ -136,7 +137,15 @@ object Config : PreferenceConfig, DBConfig {
 //    var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Base.ordinal)
     var suReAuth by preference(Key.SU_REAUTH, false)
     var suTapjack by preference(Key.SU_TAPJACK, true)
-    var checkUpdate by preference(Key.CHECK_UPDATES, true)
+    private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
+    var checkUpdate
+        get() = checkUpdatePrefs
+        set(value) {
+            if (checkUpdatePrefs != value) {
+                checkUpdatePrefs = value
+                JobService.schedule(AppContext)
+            }
+        }
     var doh by preference(Key.DOH, false)
     var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
 

@@ -26,6 +26,11 @@ static inline void __check_buffer_access(const char* fn, const char* action,
         __fortify_fatal("%s: prevented %zu-byte %s %zu-byte buffer", fn, claim, action, actual);
     }
 }
+void* __memcpy_chk(void* dst, const void* src, size_t count, size_t dst_len) {
+    __check_count("memcpy", "count", count);
+    __check_buffer_access("memcpy", "write into", count, dst_len);
+    return __call_bypassing_fortify(memcpy)(dst, src, count);
+}
 char* __strcpy_chk(char* dst, const char* src, size_t dst_len) {
     // TODO: optimize so we don't scan src twice.
     size_t src_len = __builtin_strlen(src) + 1;

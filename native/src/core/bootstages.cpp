@@ -26,8 +26,8 @@ bool zygisk_enabled = false;
 
 #define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
 #define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
+#define SETMIR(b, part) ssprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
+#define SETBLK(b, part) ssprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
 #define do_mount_mirror(part) {     \
     SETMIR(buf1, part);             \
@@ -126,7 +126,7 @@ static bool magisk_env() {
     string pkg;
     get_manager(0, &pkg);
 
-    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
+    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR,
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths

@@ -2,10 +2,7 @@ package com.topjohnwu.magisk.ktx
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ComponentName
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.Intent
+import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -17,6 +14,7 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Process
 import android.view.View
@@ -32,6 +30,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
 import java.io.File
 import kotlin.Array
@@ -44,7 +43,7 @@ fun Context.getBitmap(id: Int): Bitmap {
     var drawable = AppCompatResources.getDrawable(this, id)!!
     if (drawable is BitmapDrawable)
         return drawable.bitmap
-    if (SDK_INT >= 26 && drawable is AdaptiveIconDrawable) {
+    if (SDK_INT >= Build.VERSION_CODES.O && drawable is AdaptiveIconDrawable) {
         drawable = LayerDrawable(arrayOf(drawable.background, drawable.foreground))
     }
     val bitmap = Bitmap.createBitmap(
@@ -58,7 +57,7 @@ fun Context.getBitmap(id: Int): Bitmap {
 }
 
 val Context.deviceProtectedContext: Context get() =
-    if (SDK_INT >= 24) {
+    if (SDK_INT >= Build.VERSION_CODES.N) {
         createDeviceProtectedStorageContext()
     } else { this }
 
@@ -264,4 +263,15 @@ fun PackageManager.getPackageInfo(uid: Int, pid: Int): PackageInfo? {
         return getPackageInfo(pkgs[0], flag)
     }
     throw PackageManager.NameNotFoundException()
+}
+
+fun Context.registerRuntimeReceiver(receiver: BroadcastReceiver, filter: IntentFilter) {
+    APKInstall.registerReceiver(this, receiver, filter)
+}
+
+fun Context.selfLaunchIntent(): Intent {
+    val pm = packageManager
+    val intent = pm.getLaunchIntentForPackage(packageName)!!
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    return intent
 }

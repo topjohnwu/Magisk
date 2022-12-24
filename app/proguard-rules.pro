@@ -11,6 +11,9 @@
 -assumenosideeffects class java.util.Objects {
     public static ** requireNonNull(...);
 }
+-assumenosideeffects public class kotlin.coroutines.jvm.internal.DebugMetadataKt {
+   private static ** getDebugMetadataAnnotation(...) return null;
+}
 
 # Stub
 -keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }

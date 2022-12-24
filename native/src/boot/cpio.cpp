@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include <libgen.h>
 #include <algorithm>
 
 #include <base.hpp>
@@ -79,17 +80,21 @@ void cpio::extract_entry(const entry_map::value_type &e, const char *file) {
     fprintf(stderr, "Extract [%s] to [%s]\n", e.first.data(), file);
     unlink(file);
     rmdir(file);
+    // Make sure parent folders exist
+    char *parent = dirname(file);
+    xmkdirs(parent, 0755);
     if (S_ISDIR(e.second->mode)) {
-        ::mkdir(file, e.second->mode & 0777);
+        xmkdir(file, e.second->mode & 0777);
     } else if (S_ISREG(e.second->mode)) {
-        int fd = creat(file, e.second->mode & 0777);
+        int fd = xopen(file, O_CREAT | O_WRONLY | O_TRUNC, e.second->mode & 0777);
         xwrite(fd, e.second->data, e.second->filesize);
         fchown(fd, e.second->uid, e.second->gid);
         close(fd);
-    } else if (S_ISLNK(e.second->mode)) {
-        auto target = strndup((char *) e.second->data, e.second->filesize);
+    } else if (S_ISLNK(e.second->mode) && e.second->filesize < 4096) {
+        char target[4096];
+        memcpy(target, e.second->data, e.second->filesize);
+        target[e.second->filesize] = '\0';
         symlink(target, file);
-        free(target);
     }
 }
 
@@ -171,7 +176,7 @@ void cpio::add(mode_t mode, const char *name, const char *file) {
     auto m = mmap_data(file);
     auto e = new cpio_entry(S_IFREG | mode);
     e->filesize = m.sz;
-    e->data = xmalloc(m.sz);
+    e->data = malloc(m.sz);
     memcpy(e->data, m.buf, m.sz);
     insert(name, e);
     fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
@@ -231,7 +236,7 @@ void cpio::load_cpio(const char *buf, size_t sz) {
             continue;
         }
         auto entry = new cpio_entry(hdr);
-        entry->data = xmalloc(entry->filesize);
+        entry->data = malloc(entry->filesize);
         memcpy(entry->data, buf + pos, entry->filesize);
         pos += entry->filesize;
         insert(name, entry);

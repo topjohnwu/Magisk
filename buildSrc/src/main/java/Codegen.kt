@@ -82,7 +82,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(
         """
         |<provider
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_0"
         |    android:authorities="${'$'}{applicationId}.provider"
         |    android:directBootAware="true"
         |    android:exported="false"
@@ -92,7 +92,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(
         """
         |<receiver
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_1"
         |    android:exported="false">
         |    <intent-filter>
         |        <action android:name="android.intent.action.LOCALE_CHANGED" />
@@ -111,7 +111,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(
         """
         |<activity
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_2"
         |    android:exported="true">
         |    <intent-filter>
         |        <action android:name="android.intent.action.MAIN" />
@@ -123,7 +123,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(
         """
         |<activity
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_3"
         |    android:directBootAware="true"
         |    android:exported="false"
         |    android:taskAffinity=""
@@ -138,56 +138,49 @@ fun genStubManifest(srcDir: File, outDir: File): String {
     cmpList.add(
         """
         |<service
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_4"
         |    android:exported="false" />""".ind(2)
     )
 
     cmpList.add(
         """
         |<service
-        |    android:name="%s"
+        |    android:name="x.COMPONENT_PLACEHOLDER_5"
         |    android:exported="false"
         |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
     )
 
-    val names = mutableListOf<String>()
-    names.addAll(c1)
-    names.addAll(c2.subList(0, 10))
-    names.addAll(c3.subList(0, 10))
-    names.shuffle(RANDOM)
+    val classNameGenerator = sequence {
+        fun notJavaKeyword(name: String) = when (name) {
+            "do", "if", "for", "int", "new", "try" -> false
+            else -> true
+        }
 
-    val pkgNames = names
-        // Distinct by lower case to support case insensitive file systems
-        .distinctBy { it.toLowerCase(Locale.ROOT) }
-        // Old Android does not support capitalized package names
-        // Check Android 7.0.0 PackageParser#buildClassName
-        .map { it.decapitalize(Locale.ROOT) }
+        fun List<String>.process() = asSequence()
+            .filter(::notJavaKeyword)
+            // Distinct by lower case to support case insensitive file systems
+            .distinctBy { it.toLowerCase(Locale.ROOT) }
 
-    fun isJavaKeyword(name: String) = when (name) {
-        "do", "if", "for", "int", "new", "try" -> true
-        else -> false
-    }
+        val names = mutableListOf<String>()
+        names.addAll(c1)
+        names.addAll(c2.process().take(30))
+        names.addAll(c3.process().take(30))
+        names.shuffle(RANDOM)
 
-    val cmps = mutableListOf<String>()
-    val usedNames = mutableListOf<String>()
+        while (true) {
+            val cls = StringBuilder()
+            cls.append(names.random(kRANDOM))
+            cls.append('.')
+            cls.append(names.random(kRANDOM))
+            // Old Android does not support capitalized package names
+            // Check Android 7.0.0 PackageParser#buildClassName
+            cls[0] = cls[0].toLowerCase()
+            yield(cls.toString())
+        }
+    }.distinct().iterator()
 
-    fun genCmpName(): String {
-        var pkgName: String
-        do {
-            pkgName = pkgNames.random(kRANDOM)
-        } while (isJavaKeyword(pkgName))
-
-        var clzName: String
-        do {
-            clzName = names.random(kRANDOM)
-        } while (isJavaKeyword(clzName))
-        val cmp = "${pkgName}.${clzName}"
-        usedNames.add(cmp)
-        return cmp
-    }
-
-    fun genClass(type: String) {
-        val clzName = genCmpName()
+    fun genClass(type: String): String {
+        val clzName = classNameGenerator.next()
         val (pkg, name) = clzName.split('.')
         val pkgDir = File(outDir, pkg)
         pkgDir.mkdirs()
@@ -195,22 +188,18 @@ fun genStubManifest(srcDir: File, outDir: File): String {
             it.println("package $pkg;")
             it.println("public class $name extends com.topjohnwu.magisk.$type {}")
         }
+        return clzName
     }
 
     // Generate 2 non redirect-able classes
-    genClass("DelegateComponentFactory")
-    genClass("DelegateApplication")
-
-    for (gen in cmpList) {
-        val name = genCmpName()
-        cmps.add(gen.format(name))
-    }
+    val factory = genClass("DelegateComponentFactory")
+    val app = genClass("DelegateApplication")
 
     // Shuffle the order of the components
-    cmps.shuffle(RANDOM)
+    cmpList.shuffle(RANDOM)
 
     val xml = File(srcDir, "AndroidManifest.xml").readText()
-    return xml.format(usedNames[0], usedNames[1], cmps.joinToString("\n\n"))
+    return xml.format(factory, app, cmpList.joinToString("\n\n"))
 }
 
 fun genEncryptedResources(res: InputStream, outDir: File) {

@@ -7,6 +7,23 @@ namespace {
 struct HookContext;
 struct ZygiskModule;
 
+struct AppSpecializeArgs_v1;
+using  AppSpecializeArgs_v2 = AppSpecializeArgs_v1;
+struct AppSpecializeArgs_v3;
+using  AppSpecializeArgs_v4 = AppSpecializeArgs_v3;
+
+struct module_abi_v1;
+using  module_abi_v2 = module_abi_v1;
+using  module_abi_v3 = module_abi_v1;
+using  module_abi_v4 = module_abi_v1;
+
+struct api_abi_v1;
+struct api_abi_v2;
+using  api_abi_v3 = api_abi_v2;
+struct api_abi_v4;
+
+union ApiTable;
+
 struct AppSpecializeArgs_v3 {
     jint &uid;
     jint &gid;
@@ -64,17 +81,6 @@ struct AppSpecializeArgs_v1 {
             mount_data_dirs(v3->mount_data_dirs), mount_storage_dirs(v3->mount_storage_dirs) {}
 };
 
-struct module_abi_raw {
-    long api_version;
-    void *_this;
-    void (*preAppSpecialize)(void *, void *);
-    void (*postAppSpecialize)(void *, const void *);
-    void (*preServerSpecialize)(void *, void *);
-    void (*postServerSpecialize)(void *, const void *);
-};
-
-using module_abi_v1 = module_abi_raw;
-
 struct ServerSpecializeArgs_v1 {
     jint &uid;
     jint &gid;
@@ -91,54 +97,77 @@ struct ServerSpecializeArgs_v1 {
             effective_capabilities(effective_capabilities) {}
 };
 
+struct module_abi_v1 {
+    long api_version;
+    void *impl;
+    void (*preAppSpecialize)(void *, void *);
+    void (*postAppSpecialize)(void *, const void *);
+    void (*preServerSpecialize)(void *, void *);
+    void (*postServerSpecialize)(void *, const void *);
+};
+
 enum : uint32_t {
     PROCESS_GRANTED_ROOT = zygisk::StateFlag::PROCESS_GRANTED_ROOT,
     PROCESS_ON_DENYLIST = zygisk::StateFlag::PROCESS_ON_DENYLIST,
 
+    PROCESS_IS_SYS_UI = (1u << 29),
     DENYLIST_ENFORCING = (1u << 30),
     PROCESS_IS_MAGISK_APP = (1u << 31),
 
     UNMOUNT_MASK = (PROCESS_ON_DENYLIST | DENYLIST_ENFORCING),
-    PRIVATE_MASK = (0x3u << 30)
+    PRIVATE_MASK = (PROCESS_IS_SYS_UI | DENYLIST_ENFORCING | PROCESS_IS_MAGISK_APP)
 };
 
-struct ApiTable {
-    // These first 2 entries are permanent
-    ZygiskModule *module;
+struct api_abi_base {
+    ZygiskModule *impl;
     bool (*registerModule)(ApiTable *, long *);
-
-    struct {
-        void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-        void (*pltHookRegister)(const char *, const char *, void *, void **);
-        void (*pltHookExclude)(const char *, const char *);
-        bool (*pltHookCommit)();
-
-        int (*connectCompanion)(ZygiskModule *);
-        void (*setOption)(ZygiskModule *, zygisk::Option);
-    } v1{};
-    struct {
-        int (*getModuleDir)(ZygiskModule *);
-        uint32_t (*getFlags)(ZygiskModule *);
-    } v2{};
-
-    ApiTable(ZygiskModule *m);
 };
 
-#define call_app(method)            \
-switch (*ver) {                     \
-case 1:                             \
-case 2: {                           \
-    AppSpecializeArgs_v1 a(args);   \
-    v1->method(v1->_this, &a);      \
-    break;                          \
-}                                   \
-case 3:                             \
-    v1->method(v1->_this, args);    \
-    break;                          \
+struct api_abi_v1 : public api_abi_base {
+    void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    void (*pltHookRegister)(const char *, const char *, void *, void **);
+    void (*pltHookExclude)(const char *, const char *);
+    bool (*pltHookCommit)();
+
+    int (*connectCompanion)(ZygiskModule *);
+    void (*setOption)(ZygiskModule *, zygisk::Option);
+};
+
+struct api_abi_v2 : public api_abi_v1 {
+    int (*getModuleDir)(ZygiskModule *);
+    uint32_t (*getFlags)(ZygiskModule *);
+};
+
+struct api_abi_v4 : public api_abi_v2 {
+    bool (*exemptFd)(int);
+};
+
+union ApiTable {
+    api_abi_base base;
+    api_abi_v1 v1;
+    api_abi_v2 v2;
+    api_abi_v4 v4;
+};
+
+#define call_app(method)               \
+switch (*mod.api_version) {            \
+case 1:                                \
+case 2: {                              \
+    AppSpecializeArgs_v1 a(args);      \
+    mod.v1->method(mod.v1->impl, &a);  \
+    break;                             \
+}                                      \
+case 3:                                \
+case 4:                                \
+    mod.v1->method(mod.v1->impl, args);\
+    break;                             \
 }
 
 struct ZygiskModule {
 
+    void onLoad(void *env) {
+        entry.fn(&api, env);
+    }
     void preAppSpecialize(AppSpecializeArgs_v3 *args) const {
         call_app(preAppSpecialize)
     }
@@ -146,37 +175,41 @@ struct ZygiskModule {
         call_app(postAppSpecialize)
     }
     void preServerSpecialize(ServerSpecializeArgs_v1 *args) const {
-        v1->preServerSpecialize(v1->_this, args);
+        mod.v1->preServerSpecialize(mod.v1->impl, args);
     }
     void postServerSpecialize(const ServerSpecializeArgs_v1 *args) const {
-        v1->postServerSpecialize(v1->_this, args);
+        mod.v1->postServerSpecialize(mod.v1->impl, args);
     }
 
+    bool valid() const;
     int connectCompanion() const;
     int getModuleDir() const;
     void setOption(zygisk::Option opt);
     static uint32_t getFlags();
-    void doUnload() const { if (unload) dlclose(handle); }
+    void tryUnload() const { if (unload) dlclose(handle); }
+    void clearApi() { memset(&api, 0, sizeof(api)); }
     int getId() const { return id; }
 
     ZygiskModule(int id, void *handle, void *entry);
 
-    static bool RegisterModule(ApiTable *table, long *module);
-
-    union {
-        void (* const entry)(void *, void *);
-        void * const raw_entry;
-    };
-    ApiTable api;
+    static bool RegisterModuleImpl(ApiTable *api, long *module);
 
 private:
     const int id;
     bool unload = false;
+
     void * const handle;
     union {
-        long *ver = nullptr;
+        void * const ptr;
+        void (* const fn)(void *, void *);
+    } entry;
+
+    ApiTable api;
+
+    union {
+        long *api_version;
         module_abi_v1 *v1;
-    };
+    } mod;
 };
 
 } // namespace

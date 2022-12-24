@@ -513,34 +513,39 @@ sign_chromeos() {
 }
 
 remove_system_su() {
-  if [ -f /system/bin/su -o -f /system/xbin/su ] && [ ! -f /su/bin/su ]; then
+  [ -d /postinstall/tmp ] && POSTINST=/postinstall
+  cd $POSTINST/system
+  if [ -f bin/su -o -f xbin/su ] && [ ! -f /su/bin/su ]; then
     ui_print "- Removing system installed root"
     blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
-    mount -o rw,remount /system
+    mount -o rw,remount $POSTINST/system
     # SuperSU
-    if [ -e /system/bin/.ext/.su ]; then
-      mv -f /system/bin/app_process32_original /system/bin/app_process32 2>/dev/null
-      mv -f /system/bin/app_process64_original /system/bin/app_process64 2>/dev/null
-      mv -f /system/bin/install-recovery_original.sh /system/bin/install-recovery.sh 2>/dev/null
-      cd /system/bin
+    cd bin
+    if [ -e .ext/.su ]; then
+      mv -f app_process32_original app_process32 2>/dev/null
+      mv -f app_process64_original app_process64 2>/dev/null
+      mv -f install-recovery_original.sh install-recovery.sh 2>/dev/null
       if [ -e app_process64 ]; then
         ln -sf app_process64 app_process
       elif [ -e app_process32 ]; then
         ln -sf app_process32 app_process
       fi
     fi
-    rm -rf /system/.pin /system/bin/.ext /system/etc/.installed_su_daemon /system/etc/.has_su_daemon \
-    /system/xbin/daemonsu /system/xbin/su /system/xbin/sugote /system/xbin/sugote-mksh /system/xbin/supolicy \
-    /system/bin/app_process_init /system/bin/su /cache/su /system/lib/libsupol.so /system/lib64/libsupol.so \
-    /system/su.d /system/etc/install-recovery.sh /system/etc/init.d/99SuperSUDaemon /cache/install-recovery.sh \
-    /system/.supersu /cache/.supersu /data/.supersu \
-    /system/app/Superuser.apk /system/app/SuperSU /cache/Superuser.apk
-  elif [ -f /cache/su.img -o -f /data/su.img -o -d /data/adb/su -o -d /data/su ]; then
+    # More SuperSU, SuperUser & ROM su
+    cd ..
+    rm -rf .pin bin/.ext etc/.installed_su_daemon etc/.has_su_daemon \
+    xbin/daemonsu xbin/su xbin/sugote xbin/sugote-mksh xbin/supolicy \
+    bin/app_process_init bin/su /cache/su lib/libsupol.so lib64/libsupol.so \
+    su.d etc/init.d/99SuperSUDaemon etc/install-recovery.sh /cache/install-recovery.sh \
+    .supersu /cache/.supersu /data/.supersu \
+    app/Superuser.apk app/SuperSU /cache/Superuser.apk
+  elif [ -f /cache/su.img -o -f /data/su.img -o -d /data/su -o -d /data/adb/su ]; then
     ui_print "- Removing systemless installed root"
     umount -l /su 2>/dev/null
-    rm -rf /cache/su.img /data/su.img /data/adb/su /data/adb/suhide /data/su /cache/.supersu /data/.supersu \
-    /cache/supersu_install /data/supersu_install
+    rm -rf /cache/su.img /data/su.img /data/su /data/adb/su /data/adb/suhide \
+    /cache/.supersu /data/.supersu /cache/supersu_install /data/supersu_install
   fi
+  cd $TMPDIR
 }
 
 api_level_arch_detect() {

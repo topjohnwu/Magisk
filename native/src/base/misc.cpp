@@ -55,7 +55,7 @@ int gen_rand_str(char *buf, int len, bool varlen) {
 }
 
 int exec_command(exec_t &exec) {
-    int pipefd[] = {-1, -1};
+    auto pipefd = array<int, 2>{-1, -1};
     int outfd = -1;
 
     if (exec.fd == -1) {
@@ -114,7 +114,11 @@ int new_daemon_thread(thread_entry entry, void *arg) {
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    return xpthread_create(&thread, &attr, entry, arg);
+    errno = pthread_create(&thread, &attr, entry, arg);
+    if (errno) {
+        PLOGE("pthread_create");
+    }
+    return errno;
 }
 
 static char *argv0;
@@ -126,7 +130,7 @@ void init_argv0(int argc, char **argv) {
 
 void set_nice_name(const char *name) {
     memset(argv0, 0, name_len);
-    strlcpy(argv0, name, name_len);
+    strscpy(argv0, name, name_len);
     prctl(PR_SET_NAME, name);
 }
 
@@ -164,7 +168,7 @@ uint32_t binary_gcd(uint32_t u, uint32_t v) {
 
 int switch_mnt_ns(int pid) {
     char mnt[32];
-    snprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+    ssprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
     if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
 
     int fd, ret;
@@ -206,4 +210,26 @@ vector<string> split(const string &s, const string &delims) {
 
 vector<string_view> split_ro(string_view s, string_view delims) {
     return split_impl<string_view>(s, delims);
+}
+
+#undef vsnprintf
+int vssprintf(char *dest, size_t size, const char *fmt, va_list ap) {
+    if (size > 0) {
+        *dest = 0;
+        return std::min(vsnprintf(dest, size, fmt, ap), (int) size - 1);
+    }
+    return -1;
+}
+
+int ssprintf(char *dest, size_t size, const char *fmt, ...) {
+    va_list va;
+    va_start(va, fmt);
+    int r = vssprintf(dest, size, fmt, va);
+    va_end(va);
+    return r;
+}
+
+#undef strlcpy
+size_t strscpy(char *dest, const char *src, size_t size) {
+    return std::min(strlcpy(dest, src, size), size - 1);
 }
