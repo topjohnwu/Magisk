@@ -158,12 +158,14 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
         break;
-    case MainRequest::REMOVE_MODULES:
+    case MainRequest::REMOVE_MODULES: {
+        int do_reboot = read_int(client);
         remove_modules();
         write_int(client, 0);
         close(client);
-        reboot();
+        if (do_reboot) reboot();
         break;
+    }
     case MainRequest::ZYGISK:
     case MainRequest::ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
