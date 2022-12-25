@@ -65,11 +65,20 @@ static void load_overlay_rc(const char *overlay) {
     auto dir = open_dir(overlay);
     if (!dir) return;
 
+    auto root = xopen_dir("/");
+
     int dfd = dirfd(dir.get());
+    int rootfd = dirfd(root.get());
     // Do not allow overwrite init.rc
     unlinkat(dfd, "init.rc", 0);
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (str_ends(entry->d_name, ".rc")) {
+        if (!str_ends(entry->d_name, ".rc")) {
+            continue;
+        }
+        if (faccessat(rootfd, entry->d_name, F_OK, AT_SYMLINK_NOFOLLOW) == 0) {
+            LOGD("Replace rc script [%s]\n", entry->d_name);
+            continue;
+        } else {
             LOGD("Found rc script [%s]\n", entry->d_name);
             int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
             rc_list.push_back(full_read(rc));
