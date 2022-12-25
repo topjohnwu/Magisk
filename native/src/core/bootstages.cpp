@@ -280,6 +280,9 @@ void post_fs_data(int client) {
 
     mutex_guard lock(stage_lock);
 
+    if (DAEMON_STATE >= STATE_POST_FS_DATA_DONE)
+        goto unblock_init;
+
     if (getenv("REMOUNT_ROOT"))
         xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
