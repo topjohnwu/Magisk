@@ -178,9 +178,11 @@ static void handle_request_sync(int client, int code) {
     case MainRequest::CHECK_VERSION_CODE:
         write_int(client, MAGISK_VER_CODE);
         break;
-    case MainRequest::GET_PATH:
-        write_string(client, MAGISKTMP.data());
+    case MainRequest::GET_PATH: {
+        string path = "/proc/" + to_string(getpid()) + "/root" + MAGISKTMP;
+        write_string(client, path.data());
         break;
+    }
     case MainRequest::START_DAEMON:
         setup_logfile(true);
         break;
@@ -356,7 +358,7 @@ static void daemon_entry() {
 
     restore_tmpcon();
 
-    // SAR cleanups
+    // Cleanups
     auto mount_list = MAGISKTMP + "/" ROOTMNT;
     if (access(mount_list.data(), F_OK) == 0) {
         file_readline(true, mount_list.data(), [](string_view line) -> bool {
@@ -365,6 +367,15 @@ static void daemon_entry() {
         });
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
+    if (getenv("REMOUNT_ROOT")) {
+        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+        unsetenv("REMOUNT_ROOT");
+    }
+
+    // New mount namespace for magiskd
+    xunshare(CLONE_NEWNS);
+    // Fix sdcardfs bug on old kernel
+    xmount(nullptr, "/mnt", nullptr, MS_SLAVE | MS_REC, nullptr);
 
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";

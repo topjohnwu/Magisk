@@ -181,6 +181,11 @@ void sepolicy::magisk_rules() {
     allow("zygote", "zygote", "capability", "sys_resource");  // prctl PR_SET_MM
     allow("zygote", "zygote", "process", "execmem");
     allow("zygote", "fs_type", "filesystem", "unmount");
+    allow("zygote", SEPOL_PROC_DOMAIN, "dir", "getattr");
+    allow("zygote", SEPOL_PROC_DOMAIN, "dir", "search");
+    allow("zygote", SEPOL_PROC_DOMAIN, "lnk_file", "getattr");
+    allow("zygote", SEPOL_PROC_DOMAIN, "lnk_file", "read");
+    allow("zygote", SEPOL_PROC_DOMAIN, "file", "read");
     allow("system_server", "system_server", "process", "execmem");
 
     // Shut llkd up
