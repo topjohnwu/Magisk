@@ -48,8 +48,8 @@ if not no_color and is_windows:
         no_color = True
 
 # Environment checks
-if not sys.version_info >= (3, 6):
-    error('Requires Python 3.6+')
+if not sys.version_info >= (3, 8):
+    error('Requires Python 3.8+')
 
 if 'ANDROID_SDK_ROOT' not in os.environ:
     error('Please add Android SDK path to ANDROID_SDK_ROOT environment variable!')
