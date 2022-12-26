@@ -32,7 +32,7 @@ class root_node;
 
 template<class T> static bool isa(node_entry *node);
 static int bind_mount(const char *reason, const char *from, const char *to) {
-    int ret = xmount(from, to, nullptr, MS_BIND, nullptr);
+    int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
         VLOGD(reason, from, to);
     return ret;
@@ -623,7 +623,9 @@ void magic_mount() {
 
     if (!system->is_empty()) {
         // Handle special read-only partitions
-        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
+        for (const char *part : { "/vendor", "/vendor_dlkm","/product",
+                                  "/system_ext", "/system_dlkm",
+                                  "/odm", "/odm_dlkm" }) {
             struct stat st{};
             if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
                 if (auto old = system->extract(part + 1)) {
@@ -669,15 +671,6 @@ static void prepare_modules() {
         close(mfd);
         rm_rf(MODULEUPGRADE);
     }
-
-    // Setup module mount (workaround nosuid selabel issue)
-    auto src = MAGISKTMP + "/" MIRRDIR MODULEROOT;
-    auto dest = MAGISKTMP + "/" MODULEMNT;
-    xmkdir(dest.data(), 0755);
-    bind_mount("mod_mnt", src.data(), dest.data());
-
-    restorecon();
-    chmod(SECURE_DIR, 0700);
 }
 
 template<typename Func>
