@@ -3,25 +3,27 @@ import java.io.File
 import java.io.InputStream
 import java.io.PrintStream
 import java.security.SecureRandom
-import java.util.*
+import java.util.Arrays
+import java.util.Locale
 import javax.crypto.Cipher
 import javax.crypto.CipherOutputStream
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.asKotlinRandom
 
-// Set non-zero value here to fix the random seed for reproducible builds
-// CI builds are always reproducible
-val RAND_SEED = if (System.getenv("CI") != null) 42 else 0
-private lateinit var RANDOM: Random
+var RAND_SEED: ByteArray? = null
+private lateinit var RANDOM: SecureRandom
 private val kRANDOM get() = RANDOM.asKotlinRandom()
 
 private val c1 = mutableListOf<String>()
 private val c2 = mutableListOf<String>()
 private val c3 = mutableListOf<String>()
 
-fun initRandom(dict: File) {
-    RANDOM = if (RAND_SEED != 0) Random(RAND_SEED.toLong()) else SecureRandom()
+fun initRandom(seed: ByteArray, dict: File) {
+    if (Arrays.equals(seed, RAND_SEED)) return
+    RAND_SEED = seed
+    RANDOM = SecureRandom.getInstance("SHA1PRNG")
+    RANDOM.setSeed(seed)
     c1.clear()
     c2.clear()
     c3.clear()

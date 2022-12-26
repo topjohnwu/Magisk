@@ -1,10 +1,12 @@
+import java.util.Arrays
+
 plugins {
     id("com.android.application")
     id("io.michaelrocks.paranoid")
 }
 
 paranoid {
-    obfuscationSeed = if (RAND_SEED != 0) RAND_SEED else null
+    obfuscationSeed = Arrays.hashCode(RAND_SEED)
     includeSubprojects = true
 }
 
