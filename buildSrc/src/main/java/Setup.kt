@@ -192,10 +192,14 @@ fun Project.setupApp() {
 
     android.applicationVariants.all {
         val variantCapped = name.capitalize(Locale.ROOT)
-        val variantLowered = name.toLowerCase(Locale.ROOT)
+
+        val stubTask = tasks.getByPath(":stub:package$variantCapped")
+        val stubApk = stubTask.outputs.files.asFileTree.filter {
+            it.name.endsWith(".apk")
+        }
 
         val syncAssets = tasks.register("sync${variantCapped}Assets", Sync::class) {
-            dependsOn(syncResources)
+            dependsOn(syncResources, stubTask)
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
             into("src/main/assets")
@@ -210,12 +214,7 @@ fun Project.setupApp() {
                     include("kernel_data_key.vbprivk", "kernel.keyblock")
                 }
             }
-            val task = tasks.getByPath(":stub:package$variantCapped")
-            dependsOn(task)
-            val apk = task.outputs.files.asFileTree.filter {
-                it.name.endsWith(".apk")
-            }
-            from(apk) {
+            from(stubApk) {
                 rename { "stub.apk" }
             }
             filesMatching("**/util_functions.sh") {
