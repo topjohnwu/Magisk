@@ -257,7 +257,7 @@ Since `/` is read-only on system-as-root devices, Magisk provides an overlay sys
 
 Overlay files shall be placed in the `overlay.d` folder in boot image ramdisk, and they follow these rules:
 
-1. All `*.rc` files in `overlay.d` will be read and concatenated **AFTER** `init.rc`
+1. Each `*.rc` file (except for `init.rc`) in `overlay.d` will be read and concatenated **AFTER** `init.rc` if it does not exist in the root directory, otherwise it will **REPLACE** the existing one.
 2. Existing files can be replaced by files located at the same relative path
 3. Files that correspond to a non-existing file will be ignored
 
