@@ -117,7 +117,7 @@ public:
     // Return false to indicate need to upgrade to module
     bool collect_files(const char *module, int dfd);
 
-    // Return false to indicate need to upgrade to skeleton
+    // Return true to indicate need to upgrade to skeleton
     bool prepare();
 
     // Default directory mount logic
@@ -422,14 +422,14 @@ bool dir_node::prepare() {
                 }
             }
         }
-        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->is_dir() && !dn->prepare()) {
+        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->is_dir() && dn->prepare()) {
             // Upgrade child to tmpfs
             it = upgrade<tmpfs_node>(it);
         }
 next_node:
         ++it;
     }
-    return !to_tmpfs;
+    return to_tmpfs;
 }
 
 bool dir_node::collect_files(const char *module, int dfd) {
