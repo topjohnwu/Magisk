@@ -698,9 +698,7 @@ static void collect_modules(bool open_zygisk) {
     foreach_module([=](int dfd, dirent *entry, int modfd) {
         if (faccessat(modfd, "remove", F_OK, 0) == 0) {
             LOGI("%s: remove\n", entry->d_name);
-            auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
-            if (access(uninstaller.data(), F_OK) == 0)
-                exec_script(uninstaller.data());
+            exec_module_scripts("uninstall", {entry->d_name});
             frm_rf(xdup(modfd));
             unlinkat(dfd, entry->d_name, AT_REMOVEDIR);
             return;
@@ -786,11 +784,7 @@ void disable_modules() {
 }
 
 void remove_modules() {
-    foreach_module([](int, dirent *entry, int) {
-        auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
-        if (access(uninstaller.data(), F_OK) == 0)
-            exec_script(uninstaller.data());
-    });
+    exec_module_scripts("uninstall");
     rm_rf(MODULEROOT);
 }
 

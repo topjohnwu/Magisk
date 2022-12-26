@@ -29,14 +29,6 @@ static void set_script_env() {
         setenv("ZYGISK_ENABLED", "1", 1);
 };
 
-void exec_script(const char *script) {
-    exec_t exec {
-        .pre_exec = set_script_env,
-        .fork = fork_no_orphan
-    };
-    exec_command_sync(exec, BBEXEC_CMD, script);
-}
-
 static timespec pfs_timeout;
 
 #define PFS_SETUP() \
