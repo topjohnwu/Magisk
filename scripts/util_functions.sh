@@ -471,7 +471,7 @@ flash_image() {
   return 0
 }
 
-# Common installation script for flash_script.sh and addon.d.sh
+# Common installation script for flash_script.sh
 install_magisk() {
   cd $MAGISKBIN
 

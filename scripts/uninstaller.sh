@@ -149,13 +149,6 @@ rm -rf \
 /data/adb/post-fs-data.d /data/adb/service.d /data/adb/modules* \
 /data/unencrypted/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
 
-ADDOND=/system/addon.d/99-magisk.sh
-if [ -f $ADDOND ]; then
-  blockdev --setrw /dev/block/mapper/system$SLOT 2>/dev/null
-  mount -o rw,remount /system || mount -o rw,remount /
-  rm -f $ADDOND
-fi
-
 cd /
 
 if $BOOTMODE; then

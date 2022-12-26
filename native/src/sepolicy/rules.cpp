@@ -64,7 +64,7 @@ void sepolicy::magisk_rules() {
         }
 
         // Allow these processes to access MagiskSU
-        vector<const char *> clients{ "init", "shell", "update_engine", "appdomain" };
+        vector<const char *> clients{ "init", "shell", "appdomain" };
         for (auto type : clients) {
             if (!exists(type))
                 continue;
@@ -188,9 +188,6 @@ void sepolicy::magisk_rules() {
     // Keep /data/adb/* context
     deny("init", "adb_data_file", "dir", "search");
     deny("vendor_init", "adb_data_file", "dir", "search");
-
-    // Allow update_engine/addon.d-v2 to run permissive on all ROMs
-    permissive("update_engine");
 
 #if 0
     // Remove all dontaudit in debug mode
