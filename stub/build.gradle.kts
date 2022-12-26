@@ -1,10 +1,12 @@
+import java.util.Arrays
+
 plugins {
     id("com.android.application")
     id("org.lsposed.lsparanoid")
 }
 
 lsparanoid {
-    seed = if (RAND_SEED != 0) RAND_SEED else null
+    seed = Arrays.hashCode(RAND_SEED)
     includeDependencies = true
     global = true
 }
