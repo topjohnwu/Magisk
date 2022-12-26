@@ -114,11 +114,10 @@ public:
         children.clear();
     }
 
-    // Return false to indicate need to upgrade to module
-    bool collect_files(const char *module, int dfd);
+    void collect_files(const char *module, int dfd);
 
     // Return true to indicate need to upgrade to skeleton
-    bool prepare();
+    bool prepare(bool should_skip_mirror=false);
 
     // Default directory mount logic
     void mount() override {
@@ -171,6 +170,9 @@ public:
         return iterator_to_node<T>(upgrade<T>(children.find(name), args...));
     }
 
+    bool skip_mirror() const { return _skip_mirror; }
+    void set_skip_mirror(bool b) { _skip_mirror = b; }
+
 protected:
     template<class T>
     dir_node(const char *name, uint8_t file_type, T *self) : node_entry(name, file_type, self) {
@@ -216,12 +218,19 @@ protected:
 
     // Root node lookup cache
     root_node *_root = nullptr;
+
+    // Skip binding mirror for this directory
+    bool _skip_mirror = false;
 };
 
 class root_node : public dir_node {
 public:
-    explicit root_node(const char *name) : dir_node(name, this), prefix("") {}
-    explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {}
+    explicit root_node(const char *name) : dir_node(name, this), prefix("") {
+        set_exist(true);
+    }
+    explicit root_node(node_entry *node) : dir_node(node, this), prefix("/system") {
+        set_exist(true);
+    }
     const char * const prefix;
 };
 
@@ -286,6 +295,7 @@ void node_entry::merge(node_entry *other) {
     // Merge children if both is dir
     if (auto a = dyn_cast<dir_node>(this)) {
         if (auto b = dyn_cast<dir_node>(other)) {
+            a->_skip_mirror = b->_skip_mirror;
             a->children.merge(b->children);
             for (auto &pair : a->children)
                 pair.second->_parent = a;
@@ -364,17 +374,19 @@ node_entry* dir_node::extract(string_view name) {
 
 tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
     string mirror = mirror_path();
-    if (auto dir = open_dir(mirror.data())) {
-        set_exist(true);
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            // Insert mirror nodes
-            emplace<mirror_node>(entry->d_name, entry);
+    if (!skip_mirror()) {
+        if (auto dir = open_dir(mirror.data())) {
+            set_exist(true);
+            for (dirent *entry; (entry = xreaddir(dir.get()));) {
+                if (entry->d_type == DT_DIR) {
+                    // create a dummy inter_node to upgrade later
+                    emplace<inter_node>(entry->d_name, entry->d_name, "mirror");
+                } else {
+                    // Insert mirror nodes
+                    emplace<mirror_node>(entry->d_name, entry);
+                }
+            }
         }
-    } else {
-        // It is actually possible that mirror does not exist (nested mount points)
-        // Set self to non exist so this node will be ignored at mount
-        // Keep it the same as `node`
-        return;
     }
 
     for (auto it = children.begin(); it != children.end(); ++it) {
@@ -386,9 +398,9 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
 
 // We need to upgrade to tmpfs node if any child:
 // - Target does not exist
-// - Source or target is a symlink
+// - Source or target is a symlink (since we cannot bind mount link)
 bool node_entry::should_be_tmpfs(node_entry *child) {
-    struct stat st;
+    struct stat st{};
     if (lstat(child->node_path().data(), &st) != 0) {
         return true;
     } else {
@@ -399,8 +411,16 @@ bool node_entry::should_be_tmpfs(node_entry *child) {
     return false;
 }
 
-bool dir_node::prepare() {
+bool dir_node::prepare(bool should_skip_mirror) {
+    if (!skip_mirror() && should_skip_mirror) {
+        set_skip_mirror(true);
+    }
     bool to_tmpfs = false;
+    if (!exist()) {
+        // If not exist, we need to create it by mounting tmpfs
+        to_tmpfs = true;
+        set_exist(true);
+    }
     for (auto it = children.begin(); it != children.end();) {
         if (should_be_tmpfs(it->second)) {
             if (node_type > type_id<tmpfs_node>()) {
@@ -422,45 +442,41 @@ bool dir_node::prepare() {
                 }
             }
         }
-        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->is_dir() && dn->prepare()) {
+        if (auto dn = dyn_cast<dir_node>(it->second); dn && dn->prepare(skip_mirror())) {
             // Upgrade child to tmpfs
             it = upgrade<tmpfs_node>(it);
         }
 next_node:
         ++it;
     }
-    return to_tmpfs;
+    return to_tmpfs || skip_mirror();
 }
 
-bool dir_node::collect_files(const char *module, int dfd) {
+void dir_node::collect_files(const char *module, int dfd) {
     auto dir = xopen_dir(xopenat(dfd, _name.data(), O_RDONLY | O_CLOEXEC));
     if (!dir)
-        return true;
+        return;
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        inter_node *dn;
         if (entry->d_name == ".replace"sv) {
-            // Stop traversing and tell parent to upgrade self to module
-            return false;
+            set_skip_mirror(true);
+            continue;
         }
 
         if (entry->d_type == DT_DIR) {
-            dir_node *dn;
             if (auto it = children.find(entry->d_name); it == children.end()) {
                 dn = emplace<inter_node>(entry->d_name, entry->d_name, module);
             } else {
                 dn = dyn_cast<inter_node>(it->second);
-                // it has been accessed by at least two modules, it must be guarantee to exist
-                // set it so that it won't be upgrade to module_node but tmpfs_node
-                if (dn) dn->set_exist(true);
             }
-            if (dn && !dn->collect_files(module, dirfd(dir.get()))) {
-                upgrade<module_node>(dn->name(), module);
+            if (dn) {
+                dn->collect_files(module, dirfd(dir.get()));
             }
         } else {
             emplace<module_node>(entry->d_name, module, entry);
         }
     }
-    return true;
 }
 
 /************************
@@ -489,13 +505,11 @@ void module_node::mount() {
         clone_attr(mirror_path().data(), src.data());
     if (isa<tmpfs_node>(parent()))
         create_and_mount("module", src);
-    else if (is_dir() || is_reg())
+    else
         bind_mount("module", src.data(), node_path().data());
 }
 
 void tmpfs_node::mount() {
-    if (!exist())
-        return;
     string src = mirror_path();
     const string &dest = node_path();
     file_attr a{};
@@ -507,8 +521,9 @@ void tmpfs_node::mount() {
         // We don't need another layer of tmpfs if parent is skel
         auto worker_dir = MAGISKTMP + "/" WORKERDIR + dest;
         mkdirs(worker_dir.data(), 0);
-        create_and_mount("tmpfs", worker_dir);
+        create_and_mount(skip_mirror() ? "replace" : "tmpfs", worker_dir);
     } else {
+        // We don't need another layer of tmpfs if parent is tmpfs
         mkdir(dest.data(), 0);
     }
     setattr(dest.data(), &a);
