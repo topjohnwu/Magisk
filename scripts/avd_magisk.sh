@@ -48,7 +48,7 @@ fi
 pm install -r $(pwd)/magisk.apk
 
 # Extract files from APK
-unzip -oj magisk.apk 'assets/util_functions.sh'
+unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
 . ./util_functions.sh
 
 api_level_arch_detect
@@ -120,12 +120,11 @@ fi
 # Magisk stuff
 mkdir -p $MAGISKBIN 2>/dev/null
 unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
-unzip -oj magisk.apk 'assets/stub.apk' -d $MAGISKTMP
 mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
 
-for file in magisk32 magisk64 magiskpolicy; do
+for file in magisk32 magisk64 magiskpolicy stub.apk; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file
