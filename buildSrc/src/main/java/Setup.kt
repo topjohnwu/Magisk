@@ -45,7 +45,7 @@ private val Project.android: BaseAppModuleExtension
 fun Project.setupCommon() {
     androidBase {
         compileSdkVersion(33)
-        buildToolsVersion = "32.0.0"
+        buildToolsVersion = "33.0.1"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
