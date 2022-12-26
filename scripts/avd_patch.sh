@@ -57,18 +57,20 @@ done
 ./magiskboot decompress ramdisk.cpio.tmp ramdisk.cpio
 cp ramdisk.cpio ramdisk.cpio.orig
 
-touch config
+export KEEPVERITY=false
+export KEEPFORCEENCRYPT=true
 
+echo "KEEPVERITY=$KEEPVERITY" > config
+echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
 
+dd if=/dev/random of=seed ibs=8 count=1 2>/dev/null
+
 ./magiskboot compress=xz magisk32 magisk32.xz
 ./magiskboot compress=xz magisk64 magisk64.xz
 ./magiskboot compress=xz stub.apk stub.xz
-
-export KEEPVERITY=false
-export KEEPFORCEENCRYPT=true
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 init magiskinit" \
@@ -77,11 +79,12 @@ export KEEPFORCEENCRYPT=true
 "add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
 "add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
+"mkdir 000 .backup" \
+"add 000 .backup/.seed seed" \
 "patch" \
 "backup ramdisk.cpio.orig" \
-"mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
+rm -f ramdisk.cpio.orig config seed magisk*.xz stub.xz
 ./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz
 pm install magisk.apk || true

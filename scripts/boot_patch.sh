@@ -154,6 +154,8 @@ echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
+dd if=/dev/random of=seed ibs=8 count=1 2>/dev/null
+
 # Compress to save precious ramdisk space
 SKIP32="#"
 SKIP64="#"
@@ -174,12 +176,13 @@ fi
 "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
 "$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
+"mkdir 000 .backup" \
+"add 000 .backup/.seed seed" \
 "patch" \
 "backup ramdisk.cpio.orig" \
-"mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
+rm -f ramdisk.cpio.orig config seed magisk*.xz stub.xz
 
 #################
 # Binary Patches

@@ -33,23 +33,29 @@ int fork_no_orphan() {
     return 0;
 }
 
-int gen_rand_str(char *buf, int len, bool varlen) {
-    constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static std::mt19937 gen([]{
-        if (access("/dev/urandom", F_OK) != 0)
-            mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
-        int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-        unsigned seed;
-        xxread(fd, &seed, sizeof(seed));
+int gen_rand_str(char *buf, int len, const void *seed_buf, bool varlen) {
+    static std::mt19937_64 gen([&] {
+        std::mt19937_64::result_type seed;
+        if (seed_buf == nullptr) {
+            int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+            xxread(fd, &seed, sizeof(seed));
+            close(fd);
+        } else {
+            memcpy(&seed, seed_buf, sizeof(seed));
+        }
         return seed;
     }());
-    std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
+
+    if (len == 0)
+        return 0;
     if (varlen) {
         std::uniform_int_distribution<int> len_dist(len / 2, len);
         len = len_dist(gen);
     }
-    for (int i = 0; i < len - 1; ++i)
-        buf[i] = ALPHANUM[dist(gen)];
+    std::uniform_int_distribution<int> alphabet('a', 'z');
+    for (int i = 0; i < len - 1; ++i) {
+        buf[i] = static_cast<char>(alphabet(gen));
+    }
     buf[len - 1] = '\0';
     return len - 1;
 }

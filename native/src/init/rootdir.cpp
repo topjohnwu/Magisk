@@ -187,12 +187,18 @@ static void extract_files(bool sbin) {
 void MagiskInit::patch_ro_root() {
     mount_list.emplace_back("/data");
 
+    {
+        auto seed = mmap_data("/data/.backup/.seed");
+        // Initialize random engine
+        gen_rand_str(nullptr, 0, seed.buf);
+    }
+
     string tmp_dir;
 
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
     } else {
-        char buf[8];
+        char buf[16];
         gen_rand_str(buf, sizeof(buf));
         tmp_dir = "/dev/"s + buf;
         xmkdir(tmp_dir.data(), 0);
@@ -271,6 +277,13 @@ void RootFSInit::prepare() {
 
 void MagiskInit::patch_rw_root() {
     mount_list.emplace_back("/data");
+
+    {
+        auto seed = mmap_data("/data/.backup/.seed");
+        // Initialize random engine
+        gen_rand_str(nullptr, 0, seed.buf);
+    }
+
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");
