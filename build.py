@@ -425,6 +425,19 @@ def build_app(args):
     header('* Building the Magisk app')
     build_apk(args, 'app')
 
+    # Stub building is directly integrated into the main app
+    # build process. Copy the stub APK into output directory.
+    build_type = 'release' if args.release else 'debug'
+    apk = f'stub-{build_type}.apk'
+    source = op.join('app', 'src', 'main', 'assets', 'stub.apk')
+    target = op.join(config['outdir'], apk)
+    cp(source, target)
+
+
+def build_stub(args):
+    header('* Building the stub app')
+    build_apk(args, 'stub')
+
 
 def cleanup(args):
     support_targets = {'native', 'java'}
@@ -444,6 +457,7 @@ def cleanup(args):
     if 'java' in args.target:
         header('* Cleaning java')
         execv([gradlew, 'app:clean', 'app:shared:clean', 'stub:clean'])
+        rm_rf(op.join('app', 'src', 'main', 'assets'))
 
 
 def setup_ndk(args):
@@ -569,6 +583,9 @@ binary_parser.set_defaults(func=build_binary)
 
 app_parser = subparsers.add_parser('app', help='build the Magisk app')
 app_parser.set_defaults(func=build_app)
+
+stub_parser = subparsers.add_parser('stub', help='build the stub app')
+stub_parser.set_defaults(func=build_stub)
 
 avd_parser = subparsers.add_parser(
     'emulator', help='setup AVD for development')
