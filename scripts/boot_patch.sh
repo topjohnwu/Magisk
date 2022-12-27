@@ -68,6 +68,9 @@ if [ -c "$BOOTIMAGE" ]; then
   BOOTIMAGE=boot.img
 fi
 
+export ISENCRYPTED
+RULES_CONFIG="$(./magiskinit --rules-device-config)" || abort "! Unable to find rules partition!"
+
 # Flags
 [ -z $KEEPVERITY ] && KEEPVERITY=false
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false

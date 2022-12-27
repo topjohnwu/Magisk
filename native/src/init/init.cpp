@@ -83,6 +83,9 @@ int main(int argc, char *argv[]) {
     if (name == "magisk"sv)
         return magisk_proxy_main(argc, argv);
 
+    if (name == "magiskinit"sv && argc == 2 && argv[1] == "--rules-device-config"sv)
+        return rust::rules_device_config();
+
     if (getpid() != 1)
         return 1;
 
