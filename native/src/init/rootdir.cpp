@@ -172,8 +172,7 @@ static void extract_files(bool sbin) {
     } else {
         xsymlink("./magisk32", "magisk");
     }
-
-    {
+    if (access(stub_xz, F_OK) == 0) {
         auto stub = mmap_data(stub_xz);
         unlink(stub_xz);
         int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
