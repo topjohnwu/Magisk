@@ -131,18 +131,17 @@
                                     android:layout_height="wrap_content"
                                     android:padding="@dimen/l_75">
 
-                                <Button
+                                <com.google.android.material.imageview.ShapeableImageView
                                         android:id="@+id/uninstall_magisk_icon"
                                         android:layout_width="60dp"
                                         android:layout_height="60dp"
-                                        style="?materialIconButtonFilledStyle"
-                                        app:backgroundTint="@color/error"
-                                        app:iconTint="@color/on_error"
-                                        app:iconGravity="textStart"
-                                        app:icon="@drawable/ic_delete_md2"
+                                        android:background="@color/error"
+                                        android:tint="@color/on_error"
+                                        app:srcCompat="@drawable/ic_delete_md2"
+                                        app:shapeAppearanceOverlay="@style/W.Shape.Rounded"
+                                        android:scaleType="center"
                                         app:layout_constraintLeft_toLeftOf="parent"
-                                        app:layout_constraintTop_toTopOf="parent"
-                                        android:clickable="false" />
+                                        app:layout_constraintTop_toTopOf="parent" />
 
                                 <TextView
                                         android:id="@+id/uninstall_title"

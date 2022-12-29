@@ -53,6 +53,7 @@
             android:textAllCaps="false"
             android:textColor="?colorOnPrimary"
             android:textStyle="bold"
+            android:fontFamily="@font/googlesans"
             app:backgroundTint="?colorPrimary"
             app:icon="@drawable/ic_restart"
             app:iconTint="?colorOnPrimary"

@@ -242,7 +242,6 @@ object Zygisk : BaseSettingsItem.Toggle() {
 object DenyList : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_denylist_title.asText()
     override val icon = R.drawable.ic_deny_list
-
     override var value = Config.denyList
         set(value) {
             field = value
@@ -264,7 +263,6 @@ object DenyList : BaseSettingsItem.Toggle() {
 
 object DenyListConfig : BaseSettingsItem.Blank() {
     override val title = R.string.settings_denylist_config_title.asText()
-    override val icon = R.drawable.ic_deny_list_config
     override fun refresh() {
         isEnabled = Zygisk.value
     }
