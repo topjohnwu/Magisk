@@ -1,14 +1,13 @@
 package com.topjohnwu.magisk.core.utils.net
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import android.os.Build
 import androidx.collection.ArraySet
 
-@TargetApi(21)
 open class LollipopNetworkObserver(
     context: Context,
     callback: ConnectionCallback
@@ -17,10 +16,13 @@ open class LollipopNetworkObserver(
     private val networkCallback = NetCallback()
 
     init {
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-        manager.registerNetworkCallback(request, networkCallback)
+        val builder = NetworkRequest.Builder()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        } else {
+            builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }
+        manager.registerNetworkCallback(builder.build(), networkCallback)
     }
 
     @Suppress("DEPRECATION")

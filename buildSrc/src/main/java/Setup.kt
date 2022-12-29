@@ -15,8 +15,7 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
-import org.gradle.kotlin.dsl.filter
-import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -40,12 +39,12 @@ private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
     }
 
 private val Project.android: BaseAppModuleExtension
-    get() = extensions.getByName("android") as BaseAppModuleExtension
+    get() = extensions["android"] as BaseAppModuleExtension
 
 fun Project.setupCommon() {
     androidBase {
         compileSdkVersion(33)
-        buildToolsVersion = "32.0.0"
+        buildToolsVersion = "33.0.1"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
@@ -112,14 +111,14 @@ private fun Project.setupAppCommon() {
         }
 
         buildTypes {
-            signingConfigs.getByName("config").also {
-                getByName("debug") {
+            signingConfigs["config"].also {
+                debug {
                     signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs.getByName("debug")
+                    else signingConfigs["debug"]
                 }
-                getByName("release") {
+                release {
                     signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs.getByName("debug")
+                    else signingConfigs["debug"]
                 }
             }
         }
@@ -147,7 +146,7 @@ private fun Project.setupAppCommon() {
 fun Project.setupApp() {
     setupAppCommon()
 
-    val syncLibs = tasks.register("syncLibs", Sync::class.java) {
+    val syncLibs by tasks.registering(Sync::class) {
         into("src/main/jniLibs")
         into("armeabi-v7a") {
             from(rootProject.file("native/out/armeabi-v7a")) {
@@ -180,35 +179,8 @@ fun Project.setupApp() {
         }
     }
 
-    val syncAssets = tasks.register("syncAssets", Sync::class.java) {
+    val syncResources by tasks.registering(Sync::class) {
         dependsOn(syncLibs)
-        inputs.property("version", Config.version)
-        inputs.property("versionCode", Config.versionCode)
-        into("src/main/assets")
-        from(rootProject.file("scripts")) {
-            include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
-            include("uninstaller.sh", "module_installer.sh")
-        }
-        from(rootProject.file("tools/bootctl"))
-        into("chromeos") {
-            from(rootProject.file("tools/futility"))
-            from(rootProject.file("tools/keys")) {
-                include("kernel_data_key.vbprivk", "kernel.keyblock")
-            }
-        }
-        filesMatching("**/util_functions.sh") {
-            filter {
-                it.replace(
-                    "#MAGISK_VERSION_STUB",
-                    "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
-                )
-            }
-            filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
-        }
-    }
-
-    val syncResources = tasks.register("syncResources", Sync::class.java) {
-        dependsOn(syncAssets)
         into("src/main/resources/META-INF/com/google/android")
         from(rootProject.file("scripts/update_binary.sh")) {
             rename { "update-binary" }
@@ -220,22 +192,43 @@ fun Project.setupApp() {
 
     android.applicationVariants.all {
         val variantCapped = name.capitalize(Locale.ROOT)
-        val variantLowered = name.toLowerCase(Locale.ROOT)
 
-        val copyStub = tasks.register("copy${variantCapped}StubApk", Copy::class.java) {
-            dependsOn(syncResources)
+        val stubTask = tasks.getByPath(":stub:package$variantCapped")
+        val stubApk = stubTask.outputs.files.asFileTree.filter {
+            it.name.endsWith(".apk")
+        }
+
+        val syncAssets = tasks.register("sync${variantCapped}Assets", Sync::class) {
+            dependsOn(syncResources, stubTask)
+            inputs.property("version", Config.version)
+            inputs.property("versionCode", Config.versionCode)
             into("src/main/assets")
-            from(rootProject.file("out/stub-${variantLowered}.apk")) {
+            from(rootProject.file("scripts")) {
+                include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
+                include("uninstaller.sh", "module_installer.sh")
+            }
+            from(rootProject.file("tools/bootctl"))
+            into("chromeos") {
+                from(rootProject.file("tools/futility"))
+                from(rootProject.file("tools/keys")) {
+                    include("kernel_data_key.vbprivk", "kernel.keyblock")
+                }
+            }
+            from(stubApk) {
                 rename { "stub.apk" }
             }
-            onlyIf {
-                if (inputs.sourceFiles.files.size != 1)
-                    throw StopExecutionException("Please build stub first! (./build.py stub)")
-                true
+            filesMatching("**/util_functions.sh") {
+                filter {
+                    it.replace(
+                        "#MAGISK_VERSION_STUB",
+                        "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
+                    )
+                }
+                filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
             }
         }
 
-        preBuildProvider.get().dependsOn(copyStub)
+        preBuildProvider.get().dependsOn(syncAssets)
 
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")

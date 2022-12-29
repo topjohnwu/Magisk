@@ -31,15 +31,19 @@ enum : int {
     _SYNC_BARRIER_,
 
     SUPERUSER,
-    POST_FS_DATA,
-    LATE_START,
-    BOOT_COMPLETE,
     ZYGOTE_RESTART,
     DENYLIST,
     SQLITE_CMD,
     REMOVE_MODULES,
     ZYGISK,
     ZYGISK_PASSTHROUGH,
+
+    _STAGE_BARRIER_,
+
+    POST_FS_DATA,
+    LATE_START,
+    BOOT_COMPLETE,
+
     END,
 };
 }
@@ -84,10 +88,7 @@ extern std::atomic<int> logd_fd;
 extern "C" void magisk_log_write(int prio, const char *msg, int len);
 
 // Daemon handlers
-void post_fs_data(int client);
-void late_start(int client);
-void boot_complete(int client);
-void zygote_restart(int client);
+void boot_stage_handler(int code);
 void denylist_handler(int client, const sock_cred *cred);
 void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);

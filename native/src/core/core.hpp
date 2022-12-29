@@ -4,17 +4,7 @@
 #include <vector>
 
 extern bool RECOVERY_MODE;
-extern int DAEMON_STATE;
 extern std::atomic<ino_t> pkg_xml_ino;
-
-// Daemon state
-enum : int {
-    STATE_NONE,
-    STATE_POST_FS_DATA,
-    STATE_POST_FS_DATA_DONE,
-    STATE_LATE_START_DONE,
-    STATE_BOOT_COMPLETE
-};
 
 void unlock_blocks();
 void reboot();
