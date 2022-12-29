@@ -779,13 +779,33 @@ void handle_modules() {
     collect_modules(true);
 }
 
+void clear_rules() {
+    char buf[PATH_MAX];
+    ssprintf(buf, sizeof(buf), "%s/%s", MAGISKTMP.data(), RULESDIR);
+    auto dir = xopen_dir(buf);
+    if (!dir) return;
+    struct stat st1{};
+    struct stat st2{};
+    int dir_fd = dirfd(dir.get());
+    xfstat(dir_fd, &st1);
+    xstat(MODULEROOT, &st2);
+    if (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
+        return;
+    foreach_module([&dir_fd, &buf](auto, auto entry, auto) {
+        ssprintf(buf, sizeof(buf), "%s/%s", entry->d_name, "sepolicy.rule");
+        unlinkat(dir_fd, buf, 0);
+    });
+}
+
 void disable_modules() {
+    clear_rules();
     foreach_module([](int, auto, int modfd) {
         close(xopenat(modfd, "disable", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
     });
 }
 
 void remove_modules() {
+    clear_rules();
     foreach_module([](int, dirent *entry, int) {
         auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
         if (access(uninstaller.data(), F_OK) == 0)
