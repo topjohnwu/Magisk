@@ -111,15 +111,23 @@ class RootUtils(stub: Any?) : RootService() {
         }
 
         fun await() {
-            // We cannot await on the main thread
-            if (Info.isRooted && !ShellUtils.onMainThread())
+            if (!Info.isRooted)
+                return
+            if (!ShellUtils.onMainThread()) {
                 acquireSharedInterruptibly(1)
+            } else if (state != 0) {
+                throw IllegalStateException("Cannot await on the main thread")
+            }
         }
     }
 
     companion object {
         var bindTask: Shell.Task? = null
-        var fs = FileSystemManager.getLocal()
+        var fs: FileSystemManager = FileSystemManager.getLocal()
+            get() {
+                Connection.await()
+                return field
+            }
             private set
         var obj: IRootUtils? = null
             get() {
