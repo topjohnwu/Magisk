@@ -96,6 +96,8 @@ object Notifications {
             .setContentTitle(title)
             .setProgress(0, 0, true)
             .setOngoing(true)
+        if (SDK_INT >= Build.VERSION_CODES.S)
+            builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
         return builder
     }
 
