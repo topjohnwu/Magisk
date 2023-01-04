@@ -382,49 +382,6 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
     }
 }
 
-void backup_folder(const char *dir, vector<raw_file> &files) {
-    char path[PATH_MAX];
-    xrealpath(dir, path, sizeof(path));
-    int len = strlen(path);
-    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
-        int fd = xopenat(dfd, entry->d_name, O_RDONLY);
-        if (fd < 0)
-            return SKIP;
-        run_finally f([&]{ close(fd); });
-        if (fd_path(fd, byte_slice(path, sizeof(path))) < 0)
-            return SKIP;
-        raw_file file;
-        file.path = path + len + 1;
-        if (fgetattr(fd, &file.attr) < 0)
-            return SKIP;
-        if (entry->d_type == DT_REG) {
-            file.content = full_read(fd);
-        } else if (entry->d_type == DT_LNK) {
-            xreadlinkat(dfd, entry->d_name, path, sizeof(path));
-            file.content = path;
-        }
-        files.emplace_back(std::move(file));
-        return CONTINUE;
-    });
-}
-
-void restore_folder(const char *dir, vector<raw_file> &files) {
-    string base(dir);
-    // Pre-order means folders will always be first
-    for (raw_file &file : files) {
-        string path = base + "/" + file.path;
-        if (S_ISDIR(file.attr.st.st_mode)) {
-            mkdirs(path.data(), 0);
-        } else if (S_ISREG(file.attr.st.st_mode)) {
-            if (auto fp = xopen_file(path.data(), "we"))
-                fwrite(file.content.data(), 1, file.content.size(), fp.get());
-        } else if (S_ISLNK(file.attr.st.st_mode)) {
-            symlink(file.content.data(), path.data());
-        }
-        setattr(path.data(), &file.attr);
-    }
-}
-
 sDIR make_dir(DIR *dp) {
     return sDIR(dp, [](DIR *dp){ return dp ? closedir(dp) : 1; });
 }
@@ -491,10 +448,10 @@ mmap_data::mmap_data(const char *name, bool rw) {
 
 string find_apk_path(const char *pkg) {
     char buf[PATH_MAX];
+    size_t len = strlen(pkg);
     pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         if (entry->d_type != DT_DIR)
             return SKIP;
-        size_t len = strlen(pkg);
         if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
             fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
             return ABORT;

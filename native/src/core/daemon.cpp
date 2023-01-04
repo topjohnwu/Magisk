@@ -21,7 +21,6 @@ int SDK_INT = -1;
 string MAGISKTMP;
 
 bool RECOVERY_MODE = false;
-int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
 
@@ -143,17 +142,11 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::SUPERUSER:
         su_daemon_handler(client, &cred);
         break;
-    case MainRequest::POST_FS_DATA:
-        post_fs_data(client);
-        break;
-    case MainRequest::LATE_START:
-        late_start(client);
-        break;
-    case MainRequest::BOOT_COMPLETE:
-        boot_complete(client);
-        break;
     case MainRequest::ZYGOTE_RESTART:
-        zygote_restart(client);
+        close(client);
+        LOGI("** zygote restarted\n");
+        pkg_xml_ino = 0;
+        prune_su_access();
         break;
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
@@ -232,7 +225,9 @@ static void handle_request(pollfd *pfd) {
     }
 
     code = read_int(client);
-    if (code < 0 || code >= MainRequest::END || code == MainRequest::_SYNC_BARRIER_) {
+    if (code < 0 || code >= MainRequest::END ||
+        code == MainRequest::_SYNC_BARRIER_ ||
+        code == MainRequest::_STAGE_BARRIER_) {
         // Unknown request code
         goto done;
     }
@@ -274,10 +269,12 @@ static void handle_request(pollfd *pfd) {
     if (code < MainRequest::_SYNC_BARRIER_) {
         handle_request_sync(client, code);
         goto done;
+    } else if (code < MainRequest::_STAGE_BARRIER_) {
+        exec_task([=] { handle_request_async(client, code, cred); });
+    } else {
+        close(client);
+        exec_task([=] { boot_stage_handler(code); });
     }
-
-    // Handle async requests in another thread
-    exec_task([=] { handle_request_async(client, code, cred); });
     return;
 
 done:

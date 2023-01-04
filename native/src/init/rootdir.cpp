@@ -68,8 +68,18 @@ static void load_overlay_rc(const char *overlay) {
     int dfd = dirfd(dir.get());
     // Do not allow overwrite init.rc
     unlinkat(dfd, "init.rc", 0);
+
+    // '/' + name + '\0'
+    char buf[NAME_MAX + 2];
+    buf[0] = '/';
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (str_ends(entry->d_name, ".rc")) {
+        if (!str_ends(entry->d_name, ".rc")) {
+            continue;
+        }
+        strscpy(buf + 1, entry->d_name, sizeof(buf) - 1);
+        if (access(buf, F_OK) == 0) {
+            LOGD("Replace rc script [%s]\n", entry->d_name);
+        } else {
             LOGD("Found rc script [%s]\n", entry->d_name);
             int rc = xopenat(dfd, entry->d_name, O_RDONLY | O_CLOEXEC);
             rc_list.push_back(full_read(rc));
@@ -130,19 +140,6 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
     }
 }
 
-void SARBase::backup_files() {
-    if (access("/overlay.d", F_OK) == 0)
-        backup_folder("/overlay.d", overlays);
-    else if (access("/data/overlay.d", F_OK) == 0)
-        backup_folder("/data/overlay.d", overlays);
-
-    self = mmap_data("/proc/self/exe");
-    if (access("/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/.backup/.magisk");
-    else if (access("/data/.backup/.magisk", R_OK) == 0)
-        magisk_cfg = mmap_data("/data/.backup/.magisk");
-}
-
 static void patch_socket_name(const char *path) {
     static char rstr[16] = { 0 };
     if (rstr[0] == '\0')
@@ -154,6 +151,7 @@ static void patch_socket_name(const char *path) {
 static void extract_files(bool sbin) {
     const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
     const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
+    const char *stub_xz = sbin ? "/sbin/stub.xz" : "stub.xz";
 
     if (access(m32, F_OK) == 0) {
         auto magisk = mmap_data(m32);
@@ -174,14 +172,21 @@ static void extract_files(bool sbin) {
     } else {
         xsymlink("./magisk32", "magisk");
     }
-
-    dump_manager("stub.apk", 0);
+    if (access(stub_xz, F_OK) == 0) {
+        auto stub = mmap_data(stub_xz);
+        unlink(stub_xz);
+        int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
+        unxz(fd, stub.buf, stub.sz);
+        close(fd);
+    }
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
-void SARBase::patch_ro_root() {
+void MagiskInit::patch_ro_root() {
+    mount_list.emplace_back("/data");
+
     string tmp_dir;
 
     if (access("/sbin", F_OK) == 0) {
@@ -205,7 +210,7 @@ void SARBase::patch_ro_root() {
     if (tmp_dir == "/sbin")
         recreate_sbin(ROOTMIR "/sbin", true);
 
-    xmkdir(ROOTOVL, 0);
+    xrename("overlay.d", ROOTOVL);
 
 #if ENABLE_AVD_HACK
     // Handle avd hack
@@ -222,9 +227,6 @@ void SARBase::patch_ro_root() {
     }
 #endif
 
-    // Handle overlay.d
-    restore_folder(ROOTOVL, overlays);
-    overlays.clear();
     load_overlay_rc(ROOTOVL);
     if (access(ROOTOVL "/sbin", F_OK) == 0) {
         // Move files in overlay.d/sbin into tmp_dir
@@ -260,9 +262,7 @@ void SARBase::patch_ro_root() {
 }
 
 void RootFSInit::prepare() {
-    self = mmap_data("/init");
-    magisk_cfg = mmap_data("/.backup/.magisk");
-
+    prepare_data();
     LOGD("Restoring /init\n");
     rename(backup_init(), "/init");
 }
@@ -270,6 +270,7 @@ void RootFSInit::prepare() {
 #define PRE_TMPDIR "/magisk-tmp"
 
 void MagiskInit::patch_rw_root() {
+    mount_list.emplace_back("/data");
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");
@@ -307,9 +308,7 @@ void MagiskInit::patch_rw_root() {
     chdir("/");
 
     // Dump magiskinit as magisk
-    int fd = xopen("/sbin/magisk", O_WRONLY | O_CREAT, 0755);
-    write(fd, self.buf, self.sz);
-    close(fd);
+    cp_afc(REDIR_PATH, "/sbin/magisk");
 }
 
 int magisk_proxy_main(int argc, char *argv[]) {

@@ -39,16 +39,6 @@ protected:
     void swap(byte_data &o);
 };
 
-struct raw_file {
-    std::string path;
-    file_attr attr;
-    std::string content;
-
-    raw_file() : attr{} {}
-    raw_file(const raw_file&) = delete;
-    raw_file(raw_file &&o) : path(std::move(o.path)), attr(o.attr), content(std::move(o.content)) {}
-};
-
 struct mmap_data : public byte_data {
     mmap_data() = default;
     mmap_data(const mmap_data&) = delete;
@@ -99,8 +89,6 @@ void parse_prop_file(const char *file,
 void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
-void backup_folder(const char *dir, std::vector<raw_file> &files);
-void restore_folder(const char *dir, std::vector<raw_file> &files);
 std::string find_apk_path(const char *pkg);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;

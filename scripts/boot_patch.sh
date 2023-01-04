@@ -6,7 +6,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
+# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE
 #
 # This script should be placed in a directory with the following files:
 #
@@ -14,12 +14,13 @@
 #
 # boot_patch.sh      script    A script to patch boot image for Magisk.
 #                  (this file) The script will use files in its same
-#                              directory to complete the patching process
+#                              directory to complete the patching process.
 # util_functions.sh  script    A script which hosts all functions required
-#                              for this script to work properly
-# magiskinit         binary    The binary to replace /init
-# magisk(32/64)      binary    The magisk binaries
-# magiskboot         binary    A tool to manipulate boot images
+#                              for this script to work properly.
+# magiskinit         binary    The binary to replace /init.
+# magisk(32/64)      binary    The magisk binaries.
+# magiskboot         binary    A tool to manipulate boot images.
+# stub.apk           binary    The stub Magisk app to embed into ramdisk.
 # chromeos           folder    This folder includes the utility and keys to sign
 #                  (optional)  chromeos boot images. Only used for Pixel C.
 #
@@ -164,6 +165,7 @@ if [ -f magisk64 ]; then
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
 fi
+./magiskboot compress=xz stub.apk stub.xz
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 $INIT magiskinit" \
@@ -171,12 +173,13 @@ fi
 "mkdir 0750 overlay.d/sbin" \
 "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
 "$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
+"add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 
 #################
 # Binary Patches

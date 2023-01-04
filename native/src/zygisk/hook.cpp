@@ -2,6 +2,7 @@
 #include <sys/mount.h>
 #include <dlfcn.h>
 #include <bitset>
+#include <list>
 
 #include <xhook.h>
 
@@ -54,7 +55,7 @@ struct HookContext {
     } args;
 
     const char *process;
-    vector<ZygiskModule> modules;
+    list<ZygiskModule> modules;
 
     int pid;
     bitset<FLAG_MAX> flags;
@@ -311,53 +312,68 @@ ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
     api.base.registerModule = &ZygiskModule::RegisterModuleImpl;
 }
 
-bool ZygiskModule::RegisterModuleImpl(api_abi_base *api, long *module) {
+bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
+    if (api == nullptr || module == nullptr)
+        return false;
+
     long api_version = *module;
     // Unsupported version
     if (api_version > ZYGISK_API_VERSION)
         return false;
 
     // Set the actual module_abi*
-    api->impl->mod = { module };
+    api->base.impl->mod = { module };
 
     // Fill in API accordingly with module API version
     switch (api_version) {
-    case 4: {
-        auto v4 = static_cast<api_abi_v4 *>(api);
-        v4->exemptFd = [](int fd) { return g_ctx != nullptr && g_ctx->exempt_fd(fd); };
-    }
+    case 4:
+        api->v4.exemptFd = [](int fd) { return g_ctx != nullptr && g_ctx->exempt_fd(fd); };
         // fallthrough
     case 3:
-    case 2: {
-        auto v2 = static_cast<api_abi_v2 *>(api);
-        v2->getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
-        v2->getFlags = [](auto) { return ZygiskModule::getFlags(); };
-    }
+    case 2:
+        api->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
         // fallthrough
-    case 1: {
-        auto v1 = static_cast<api_abi_v1 *>(api);
-        v1->hookJniNativeMethods = &hookJniNativeMethods;
-        v1->pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
+    case 1:
+        api->v1.hookJniNativeMethods = &hookJniNativeMethods;
+        api->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
             xhook_register(p, s, n, o);
         };
-        v1->pltHookExclude = [](const char *p, const char *s) {
+        api->v1.pltHookExclude = [](const char *p, const char *s) {
             xhook_ignore(p, s);
         };
-        v1->pltHookCommit = [] {
+        api->v1.pltHookCommit = [] {
             bool r = xhook_refresh(0) == 0;
             xhook_clear();
             return r;
         };
-        v1->connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
-        v1->setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+        api->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+        api->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
         break;
-    }
     default:
         // Unknown version number
         return false;
     }
 
     return true;
+}
+
+bool ZygiskModule::valid() const {
+    if (mod.api_version == nullptr)
+        return false;
+    switch (*mod.api_version) {
+    case 4:
+        // fallthrough
+    case 3:
+        // fallthrough
+    case 2:
+        // fallthrough
+    case 1:
+        return mod.v1->impl && mod.v1->preAppSpecialize && mod.v1->postAppSpecialize &&
+            mod.v1->preServerSpecialize && mod.v1->postServerSpecialize;
+    default:
+        return false;
+    }
 }
 
 int ZygiskModule::connectCompanion() const {
@@ -491,10 +507,6 @@ void HookContext::fork_post() {
 }
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
-    // Because the data structure stored in the vector is self referencing, in order to prevent
-    // dangling pointers, the vector has to be pre-allocated to ensure reallocation does not occur
-    modules.reserve(fds.size());
-
     for (int i = 0; i < fds.size(); ++i) {
         struct stat s{};
         if (fstat(fds[i], &s) != 0 || !S_ISREG(s.st_mode)) {
@@ -515,8 +527,16 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
         close(fds[i]);
     }
 
+    for (auto it = modules.begin(); it != modules.end();) {
+        it->onLoad(env);
+        if (it->valid()) {
+            ++it;
+        } else {
+            it = modules.erase(it);
+        }
+    }
+
     for (auto &m : modules) {
-        m.onLoad(env);
         if (flags[APP_SPECIALIZE]) {
             m.preAppSpecialize(args.app);
         } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
