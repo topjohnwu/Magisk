@@ -24,7 +24,7 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", "1.7.21"))
+    implementation(kotlin("gradle-plugin", "1.8.0"))
     implementation("com.android.tools.build:gradle:7.3.1")
     implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3")
     implementation("io.michaelrocks:paranoid-gradle-plugin:0.3.7")
