@@ -1,8 +1,6 @@
 #pragma once
 
 #include "api.hpp"
-#include <list>
-#include <regex.h>
 
 namespace {
 
@@ -126,24 +124,28 @@ struct api_abi_base {
 };
 
 struct api_abi_v1 : public api_abi_base {
-    void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-    void (*pltHookRegister)(const char *, const char *, void *, void **);
-    void (*pltHookExclude)(const char *, const char *);
-    bool (*pltHookCommit)();
-
-    int (*connectCompanion)(ZygiskModule *);
-    void (*setOption)(ZygiskModule *, zygisk::Option);
+    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    /* 1 */ void (*pltHookRegister)(const char *, const char *, void *, void **);
+    /* 2 */ void (*pltHookExclude)(const char *, const char *);
+    /* 3 */ bool (*pltHookCommit)();
+    /* 4 */ int (*connectCompanion)(ZygiskModule *);
+    /* 5 */ void (*setOption)(ZygiskModule *, zygisk::Option);
 };
 
 struct api_abi_v2 : public api_abi_v1 {
-    int (*getModuleDir)(ZygiskModule *);
-    uint32_t (*getFlags)(ZygiskModule *);
+    /* 6 */ int (*getModuleDir)(ZygiskModule *);
+    /* 7 */ uint32_t (*getFlags)(ZygiskModule *);
 };
 
-struct api_abi_v4 : public api_abi_v2 {
-    bool (*exemptFd)(int);
-    void (*pltHookRegisterInode)(ino_t, const char *, void *, void **);
-    void (*pltHookExcludeInode)(ino_t, const char *);
+struct api_abi_v4 : public api_abi_base {
+    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    /* 1 */ void (*pltHookRegister)(ino_t, const char *, void *, void **);
+    /* 2 */ bool (*exemptFd)(int);
+    /* 3 */ bool (*pltHookCommit)();
+    /* 4 */ int (*connectCompanion)(ZygiskModule *);
+    /* 5 */ void (*setOption)(ZygiskModule *, zygisk::Option);
+    /* 6 */ int (*getModuleDir)(ZygiskModule *);
+    /* 7 */ uint32_t (*getFlags)(ZygiskModule *);
 };
 
 union ApiTable {
@@ -214,29 +216,6 @@ private:
         long *api_version;
         module_abi_v1 *v1;
     } mod;
-
-    struct RegisterInfo {
-        regex_t regex;
-        ino_t inode;
-        std::string symbol;
-        void *callback;
-        void **backup;
-    };
-
-    struct IgnoreInfo {
-        regex_t regex;
-        ino_t inode;
-        std::string symbol;
-    };
-    inline static pthread_mutex_t hook_lock = PTHREAD_MUTEX_INITIALIZER;
-    inline static std::list<RegisterInfo> register_info {};
-    inline static std::list<IgnoreInfo> ignore_info {};
-
-    static void PltHookRegister(const char *lib, const char *symbol, void *callback, void **backup);
-    static void PltHookRegister(ino_t inode, const char *symbol, void *callback, void **backup);
-    static void PltHookExclude(const char *lib, const char *symbol);
-    static void PltHookExclude(ino_t inode, const char *symbol);
-    static bool CommitPltHook();
 };
 
 } // namespace
