@@ -228,21 +228,9 @@ struct Api {
     // will be set to nullptr.
     void hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods);
 
-    // For ELFs loaded in memory matching `regex`, replace function `symbol` with `newFunc`.
-    // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
-    void pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc);
-
-    // For ELFs loaded in memory matching `regex`, exclude hooks registered for `symbol`.
-    // If `symbol` is nullptr, then all symbols will be excluded.
-    void pltHookExclude(const char *regex, const char *symbol);
-
     // For ELFs loaded in memory matching `inode`, replace function `symbol` with `newFunc`.
     // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
-    void pltHookRegisterInode(ino_t inode, const char *symbol, void *newFunc, void **oldFunc);
-
-    // For ELFs loaded in memory matching `inode`, exclude hooks registered for `symbol`.
-    // If `symbol` is nullptr, then all symbols will be excluded.
-    void pltHookExcludeInode(ino_t inode, const char *symbol);
+    void pltHookRegister(ino_t inode, const char *symbol, void *newFunc, void **oldFunc);
 
     // Commit all the hooks that was previously registered.
     // Returns false if an error occurred.
@@ -303,16 +291,13 @@ struct api_table {
     bool (*registerModule)(api_table *, module_abi *);
 
     void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-    void (*pltHookRegister)(const char *, const char *, void *, void **);
-    void (*pltHookExclude)(const char *, const char *);
+    void (*pltHookRegister)(ino_t, const char *, void *, void **);
+    bool (*exemptFd)(int);
     bool (*pltHookCommit)();
     int  (*connectCompanion)(void * /* impl */);
     void (*setOption)(void * /* impl */, Option);
     int  (*getModuleDir)(void * /* impl */);
     uint32_t (*getFlags)(void * /* impl */);
-    bool (*exemptFd)(int);
-    void (*pltHookRegisterInode)(ino_t, const char *, void *, void **);
-    void (*pltHookExcludeInode)(ino_t, const char *);
 };
 
 template <class T>
@@ -342,20 +327,11 @@ inline uint32_t Api::getFlags() {
 inline bool Api::exemptFd(int fd) {
     return tbl->exemptFd != nullptr && tbl->exemptFd(fd);
 }
-inline void Api::pltHookRegisterInode(ino_t inode, const char *symbol, void *newFunc, void **oldFunc) {
-    if (tbl->pltHookExcludeInode) tbl->pltHookRegisterInode(inode, symbol, newFunc, oldFunc);
-}
-inline void Api::pltHookExcludeInode(ino_t inode, const char *symbol) {
-    if (tbl->pltHookExcludeInode) tbl->pltHookExcludeInode(inode, symbol);
-}
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, className, methods, numMethods);
 }
-inline void Api::pltHookRegister(const char *regex, const char *symbol, void *newFunc, void **oldFunc) {
-    if (tbl->pltHookRegister) tbl->pltHookRegister(regex, symbol, newFunc, oldFunc);
-}
-inline void Api::pltHookExclude(const char *regex, const char *symbol) {
-    if (tbl->pltHookExclude) tbl->pltHookExclude(regex, symbol);
+inline void Api::pltHookRegister(ino_t inode, const char *symbol, void *newFunc, void **oldFunc) {
+    if (tbl->pltHookRegister) tbl->pltHookRegister(inode, symbol, newFunc, oldFunc);
 }
 inline bool Api::pltHookCommit() {
     return tbl->pltHookCommit != nullptr && tbl->pltHookCommit();
