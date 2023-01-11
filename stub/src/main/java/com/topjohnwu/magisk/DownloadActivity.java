@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipFile;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -187,6 +188,16 @@ public class DownloadActivity extends Activity {
             }
         } else {
             File dir = new File(getCodeCacheDir(), "res");
+            dir.mkdirs();
+
+            // addAssetPath requires a directory containing AndroidManifest.xml on Android 5
+            try (var stubApk = new ZipFile(getPackageCodePath());
+                 var manifest = new FileOutputStream(new File(dir, "AndroidManifest.xml"))) {
+                var stubManifest = stubApk.getInputStream(
+                        stubApk.getEntry("AndroidManifest.xml"));
+                APKInstall.transfer(stubManifest, manifest);
+            }
+
             decryptResources(new FileOutputStream(new File(dir, "resources.arsc")));
             StubApk.addAssetPath(getResources(), dir.getPath());
         }
