@@ -34,9 +34,6 @@ enum : int {
 #define HIJACK_BIN HIJACK_BIN32
 #endif
 
-// Find the memory address + size of the pages matching name + inode
-std::pair<void*, size_t> find_map_range(const char *name, unsigned long inode);
-
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 

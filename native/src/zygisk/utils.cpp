@@ -17,24 +17,6 @@ static vector<lsplt::MapInfo> find_maps(const char *name) {
     return maps;
 }
 
-std::pair<void *, size_t> find_map_range(const char *name, unsigned long inode) {
-    auto maps = find_maps(name);
-    uintptr_t start = 0u;
-    uintptr_t end = 0u;
-    for (const auto &map : maps) {
-        if (map.inode == inode) {
-            if (start == 0) {
-                start = map.start;
-                end = map.end;
-            } else if (map.start == end) {
-                end = map.end;
-            }
-        }
-    }
-    LOGD("found map %s with start = %zx, end = %zx\n", name, start, end);
-    return make_pair(reinterpret_cast<void *>(start), end - start);
-}
-
 void unmap_all(const char *name) {
     auto maps = find_maps(name);
     for (auto &info : maps) {
