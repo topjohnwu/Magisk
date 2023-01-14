@@ -12,10 +12,8 @@ class ModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {
 
     private val svc get() = ServiceLocator.networkService
 
-    override suspend fun getMarkdownText(): String {
-        val str = svc.fetchString(item.changelog)
-        return if (str.length > 1000) str.substring(0, 1000) else str
-    }
+    override suspend fun getMarkdownText(): String =
+        svc.fetchString(item.changelog)
 
     override fun build(dialog: MagiskDialog) {
         super.build(dialog)
