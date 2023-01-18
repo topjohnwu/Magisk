@@ -779,37 +779,40 @@ void handle_modules() {
     collect_modules(true);
 }
 
-void clear_rules() {
-    char buf[PATH_MAX];
-    ssprintf(buf, sizeof(buf), "%s/%s", MAGISKTMP.data(), RULESDIR);
-    auto dir = xopen_dir(buf);
-    if (!dir) return;
+static int check_rules_dir(char *buf, size_t sz) {
+    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), RULESDIR);
     struct stat st1{};
     struct stat st2{};
-    int dir_fd = dirfd(dir.get());
-    xfstat(dir_fd, &st1);
-    xstat(MODULEROOT, &st2);
+    if (xstat(buf, &st1) < 0 || xstat(MODULEROOT, &st2) < 0)
+        return 0;
     if (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
-        return;
-    foreach_module([&dir_fd, &buf](auto, auto entry, auto) {
-        ssprintf(buf, sizeof(buf), "%s/%s", entry->d_name, "sepolicy.rule");
-        unlinkat(dir_fd, buf, 0);
-    });
+        return 0;
+    return off;
 }
 
 void disable_modules() {
-    clear_rules();
-    foreach_module([](int, auto, int modfd) {
+    char buf[4096];
+    int off = check_rules_dir(buf, sizeof(buf));
+    foreach_module([&](int, dirent *entry, int modfd) {
         close(xopenat(modfd, "disable", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
+        if (off) {
+            ssprintf(buf + off, sizeof(buf) - off, "/%s/%s", entry->d_name, "sepolicy.rule");
+            unlink(buf);
+        }
     });
 }
 
 void remove_modules() {
-    clear_rules();
-    foreach_module([](int, dirent *entry, int) {
+    char buf[4096];
+    int off = check_rules_dir(buf, sizeof(buf));
+    foreach_module([&](int, dirent *entry, int) {
         auto uninstaller = MODULEROOT + "/"s + entry->d_name + "/uninstall.sh";
         if (access(uninstaller.data(), F_OK) == 0)
             exec_script(uninstaller.data());
+        if (off) {
+            ssprintf(buf + off, sizeof(buf) - off, "/%s/%s", entry->d_name, "sepolicy.rule");
+            unlink(buf);
+        }
     });
     rm_rf(MODULEROOT);
 }
