@@ -20,11 +20,12 @@ extern std::string  MAGISKTMP;
 #define MIRRDIR     INTLROOT "/mirror"
 #define RULESDIR    MIRRDIR "/sepolicy.rules"
 #define BLOCKDIR    INTLROOT "/block"
+#define WORKERDIR   INTLROOT "/worker"
 #define MODULEMNT   INTLROOT "/modules"
 #define BBPATH      INTLROOT "/busybox"
 #define ROOTOVL     INTLROOT "/rootdir"
 #define SHELLPTS    INTLROOT "/pts"
-#define ROOTMNT     ROOTOVL "/.mount_list"
+#define ROOTMNT     ROOTOVL  "/.mount_list"
 #define ZYGISKBIN   INTLROOT "/zygisk"
 #define SELINUXMOCK INTLROOT "/selinux"
 
