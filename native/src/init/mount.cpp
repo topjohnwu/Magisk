@@ -311,6 +311,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(INTLROOT, 0755);
     xmkdir(MIRRDIR, 0);
     xmkdir(BLOCKDIR, 0);
+    xmkdir(WORKERDIR, 0);
 
     mount_rules_dir();
 
