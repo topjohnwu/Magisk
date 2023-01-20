@@ -119,20 +119,19 @@ int get_manager(int user_id, string *pkg, bool install) {
     };
 
     if (skip_mgr_check.test_and_set()) {
-        if (mgr_app_id < 0) {
-            goto not_found;
-        }
-        // Just need to check whether the app is installed in the user
-        const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
-        ssprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
-        if (access(app_path, F_OK) == 0) {
-            // Always check dyn signature for repackaged app
-            if (!mgr_pkg->empty() && !check_dyn(user_id))
+        if (mgr_app_id >= 0) {
+            // Just need to check whether the app is installed in the user
+            const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
+            ssprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
+            if (access(app_path, F_OK) == 0) {
+                // Always check dyn signature for repackaged app
+                if (!mgr_pkg->empty() && !check_dyn(user_id))
+                    goto not_found;
+                if (pkg) *pkg = name;
+                return user_id * AID_USER_OFFSET + mgr_app_id;
+            } else {
                 goto not_found;
-            if (pkg) *pkg = name;
-            return user_id * AID_USER_OFFSET + mgr_app_id;
-        } else {
-            goto not_found;
+            }
         }
     } else {
         // Here, we want to actually find the manager app and cache the results.
