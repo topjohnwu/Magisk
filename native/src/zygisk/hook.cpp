@@ -107,7 +107,7 @@ struct HookContext {
 #undef DCL_PRE_POST
 
 // Global variables
-vector<tuple<ino_t, const char *, void **>> *plt_hook_list;
+vector<tuple<dev_t, ino_t, const char *, void **>> *plt_hook_list;
 map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
 hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
@@ -368,10 +368,10 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
         api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
     }
     if (api_version >= 4) {
-        api->v4.pltHookRegister = [](ino_t inode, const char *symbol, void *fn, void **backup) {
-            if (inode == 0 || symbol == nullptr || fn == nullptr)
+        api->v4.pltHookRegister = [](dev_t dev, ino_t inode, const char *symbol, void *fn, void **backup) {
+            if (dev == 0 || inode == 0 || symbol == nullptr || fn == nullptr)
                 return;
-            lsplt::RegisterHook(inode, symbol, fn, backup);
+            lsplt::RegisterHook(dev, inode, symbol, fn, backup);
         };
         api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
     }
@@ -416,7 +416,7 @@ void HookContext::plt_hook_process_regex() {
                 }
             }
             if (!ignored) {
-                lsplt::RegisterHook(map.inode, reg.symbol, reg.callback, reg.backup);
+                lsplt::RegisterHook(map.dev, map.inode, reg.symbol, reg.callback, reg.backup);
             }
         }
     }
@@ -777,19 +777,19 @@ static bool hook_commit() {
     }
 }
 
-static void hook_register(ino_t inode, const char *symbol, void *new_func, void **old_func) {
-    if (!lsplt::RegisterHook(inode, symbol, new_func, old_func)) {
+static void hook_register(dev_t dev, ino_t inode, const char *symbol, void *new_func, void **old_func) {
+    if (!lsplt::RegisterHook(dev, inode, symbol, new_func, old_func)) {
         ZLOGE("Failed to register plt_hook \"%s\"\n", symbol);
         return;
     }
-    plt_hook_list->emplace_back(inode, symbol, old_func);
+    plt_hook_list->emplace_back(dev, inode, symbol, old_func);
 }
 
-#define PLT_HOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
-    hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
+#define PLT_HOOK_REGISTER_SYM(DEV, INODE, SYM, NAME) \
+    hook_register(DEV, INODE, SYM, (void*) new_##NAME, (void **) &old_##NAME)
 
-#define PLT_HOOK_REGISTER(PATH_REGEX, NAME) \
-    PLT_HOOK_REGISTER_SYM(PATH_REGEX, #NAME, NAME)
+#define PLT_HOOK_REGISTER(DEV, INODE, NAME) \
+    PLT_HOOK_REGISTER_SYM(DEV, INODE, #NAME, NAME)
 
 void hook_functions() {
     default_new(plt_hook_list);
@@ -797,24 +797,26 @@ void hook_functions() {
     default_new(jni_method_map);
 
     ino_t android_runtime_inode = 0;
+    dev_t android_runtime_dev = 0;
     for (auto &map : lsplt::MapInfo::Scan()) {
         if (map.path.ends_with("libandroid_runtime.so")) {
             android_runtime_inode = map.inode;
+            android_runtime_dev = map.dev;
             break;
         }
     }
 
-    PLT_HOOK_REGISTER(android_runtime_inode, fork);
-    PLT_HOOK_REGISTER(android_runtime_inode, unshare);
-    PLT_HOOK_REGISTER(android_runtime_inode, jniRegisterNativeMethods);
-    PLT_HOOK_REGISTER(android_runtime_inode, selinux_android_setcontext);
-    PLT_HOOK_REGISTER_SYM(android_runtime_inode, "__android_log_close", android_log_close);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, jniRegisterNativeMethods);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
+    PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
     hook_commit();
 
     // Remove unhooked methods
     plt_hook_list->erase(
             std::remove_if(plt_hook_list->begin(), plt_hook_list->end(),
-            [](auto &t) { return *std::get<2>(t) == nullptr;}),
+            [](auto &t) { return *std::get<3>(t) == nullptr;}),
             plt_hook_list->end());
 
     if (old_jniRegisterNativeMethods == nullptr) {
@@ -822,7 +824,7 @@ void hook_functions() {
         struct stat self_stat{};
         stat("/proc/self/exe", &self_stat);
         // android::AndroidRuntime::setArgv0(const char*, bool)
-        PLT_HOOK_REGISTER_SYM(self_stat.st_ino, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
+        PLT_HOOK_REGISTER_SYM(self_stat.st_dev, self_stat.st_ino, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
         hook_commit();
 
         // We still need old_jniRegisterNativeMethods as other code uses it
@@ -856,8 +858,8 @@ static bool unhook_functions() {
     delete jni_hook_list;
 
     // Unhook plt_hook
-    for (const auto &[inode, sym, old_func] : *plt_hook_list) {
-        if (!lsplt::RegisterHook(inode, sym, *old_func, nullptr)) {
+    for (const auto &[dev, inode, sym, old_func] : *plt_hook_list) {
+        if (!lsplt::RegisterHook(dev, inode, sym, *old_func, nullptr)) {
             ZLOGE("Failed to register plt_hook [%s]\n", sym);
             success = false;
         }

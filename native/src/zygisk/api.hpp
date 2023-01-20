@@ -230,7 +230,7 @@ struct Api {
 
     // For ELFs loaded in memory matching `inode`, replace function `symbol` with `newFunc`.
     // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
-    void pltHookRegister(ino_t inode, const char *symbol, void *newFunc, void **oldFunc);
+    void pltHookRegister(dev_t dev, ino_t inode, const char *symbol, void *newFunc, void **oldFunc);
 
     // Commit all the hooks that was previously registered.
     // Returns false if an error occurred.
@@ -291,7 +291,7 @@ struct api_table {
     bool (*registerModule)(api_table *, module_abi *);
 
     void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-    void (*pltHookRegister)(ino_t, const char *, void *, void **);
+    void (*pltHookRegister)(dev_t, ino_t, const char *, void *, void **);
     bool (*exemptFd)(int);
     bool (*pltHookCommit)();
     int  (*connectCompanion)(void * /* impl */);
@@ -330,8 +330,8 @@ inline bool Api::exemptFd(int fd) {
 inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
     if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, className, methods, numMethods);
 }
-inline void Api::pltHookRegister(ino_t inode, const char *symbol, void *newFunc, void **oldFunc) {
-    if (tbl->pltHookRegister) tbl->pltHookRegister(inode, symbol, newFunc, oldFunc);
+inline void Api::pltHookRegister(dev_t dev, ino_t inode, const char *symbol, void *newFunc, void **oldFunc) {
+    if (tbl->pltHookRegister) tbl->pltHookRegister(dev, inode, symbol, newFunc, oldFunc);
 }
 inline bool Api::pltHookCommit() {
     return tbl->pltHookCommit != nullptr && tbl->pltHookCommit();
