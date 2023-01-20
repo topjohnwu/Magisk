@@ -139,7 +139,7 @@ struct api_abi_v2 : public api_abi_v1 {
 
 struct api_abi_v4 : public api_abi_base {
     /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-    /* 1 */ void (*pltHookRegister)(ino_t, const char *, void *, void **);
+    /* 1 */ void (*pltHookRegister)(dev_t, ino_t, const char *, void *, void **);
     /* 2 */ bool (*exemptFd)(int);
     /* 3 */ bool (*pltHookCommit)();
     /* 4 */ int (*connectCompanion)(ZygiskModule *);
