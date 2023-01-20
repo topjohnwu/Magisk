@@ -178,9 +178,8 @@ public class DownloadActivity extends Activity {
                 decryptResources(new FileOutputStream(fd));
                 Os.lseek(fd, 0, OsConstants.SEEK_SET);
                 var loader = new ResourcesLoader();
-                try (var pfd = ParcelFileDescriptor.dup(fd);
-                     var provider = ResourcesProvider.loadFromTable(pfd, null)) {
-                    loader.addProvider(provider);
+                try (var pfd = ParcelFileDescriptor.dup(fd)) {
+                    loader.addProvider(ResourcesProvider.loadFromTable(pfd, null));
                     getResources().addLoaders(loader);
                 }
             } finally {
