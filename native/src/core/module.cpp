@@ -798,7 +798,7 @@ void disable_modules() {
     foreach_module([&](int, dirent *entry, int modfd) {
         close(xopenat(modfd, "disable", O_RDONLY | O_CREAT | O_CLOEXEC, 0));
         if (off) {
-            ssprintf(buf + off, sizeof(buf) - off, "/%s/%s", entry->d_name, "sepolicy.rule");
+            ssprintf(buf + off, sizeof(buf) - off, "/%s/sepolicy.rule", entry->d_name);
             unlink(buf);
         }
     });
@@ -812,7 +812,7 @@ void remove_modules() {
         if (access(uninstaller.data(), F_OK) == 0)
             exec_script(uninstaller.data());
         if (off) {
-            ssprintf(buf + off, sizeof(buf) - off, "/%s/%s", entry->d_name, "sepolicy.rule");
+            ssprintf(buf + off, sizeof(buf) - off, "/%s/sepolicy.rule", entry->d_name);
             unlink(buf);
         }
     });
