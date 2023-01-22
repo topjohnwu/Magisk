@@ -25,7 +25,6 @@ struct BootConfig {
 
 #define DEFAULT_DT_DIR "/proc/device-tree/firmware/android"
 #define INIT_PATH  "/system/bin/init"
-#define REDIR_PATH "/data/magiskinit"
 
 extern std::vector<std::string> mount_list;
 
@@ -48,7 +47,6 @@ protected:
     char **argv = nullptr;
 
     [[noreturn]] void exec_init();
-    void prepare_data();
 public:
     BaseInit(char *argv[], BootConfig *config = nullptr) : config(config), argv(argv) {}
     virtual ~BaseInit() = default;
@@ -59,6 +57,8 @@ class MagiskInit : public BaseInit {
 private:
     void mount_rules_dir();
 protected:
+    mmap_data self;
+    mmap_data magisk_cfg;
     std::string custom_rules_dir;
 
 #if ENABLE_AVD_HACK
@@ -71,12 +71,16 @@ protected:
     bool hijack_sepolicy();
     void setup_tmp(const char *path);
     void patch_rw_root();
-    void patch_ro_root();
 public:
     using BaseInit::BaseInit;
 };
 
 class SARBase : public MagiskInit {
+protected:
+    std::vector<raw_file> overlays;
+
+    void backup_files();
+    void patch_ro_root();
 public:
     using MagiskInit::MagiskInit;
 };
@@ -129,7 +133,6 @@ public:
         LOGD("%s\n", __FUNCTION__);
     };
     void start() override {
-        prepare_data();
         if (mount_system_root())
             first_stage_prep();
         else
