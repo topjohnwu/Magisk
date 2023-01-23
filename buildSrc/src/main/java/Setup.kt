@@ -135,10 +135,15 @@ private fun Project.setupAppCommon() {
     android.applicationVariants.all {
         val projectName = project.name.toLowerCase(Locale.ROOT)
         val variantCapped = name.capitalize(Locale.ROOT)
-        tasks.getByPath(":$projectName:package$variantCapped").doLast {
-            val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
-            val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
-            addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
+        tasks.getByPath(":$projectName:package$variantCapped").apply {
+            outputs.upToDateWhen {
+                false
+            }
+            doLast {
+                val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
+                val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
+                addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
+            }
         }
     }
 }
