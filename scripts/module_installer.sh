@@ -1,4 +1,4 @@
-#!/sbin/sh
+build.gradle#!/sbin/sh
 
 #################
 # Initialization
