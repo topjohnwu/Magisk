@@ -73,8 +73,6 @@ fun genKeyData(keysDir: File, outSrc: File) {
 }
 
 fun genStubManifest(srcDir: File, outDir: File): String {
-    outDir.deleteRecursively()
-
     fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
 
     val cmpList = mutableListOf<String>()
