@@ -238,14 +238,13 @@ abstract class MagiskInstallImpl protected constructor(
             }
             boot.delete()
         } else {
-            if (!initBoot.exists()) {
-                if (!boot.exists()) {
+            srcBoot = when {
+                initBoot.exists() -> initBoot
+                boot.exists() -> boot
+                else -> {
                     console.add("! No boot image found")
                     throw IOException()
                 }
-                srcBoot = boot
-            } else {
-                srcBoot = initBoot
             }
         }
         return tarOut
@@ -306,14 +305,13 @@ abstract class MagiskInstallImpl protected constructor(
         try {
             val newBoot = installDir.getChildFile("new-boot.img")
             if (outStream is TarOutputStream) {
-                val name =
-                    if (srcBoot.path.contains("recovery")) {
-                        "recovery.img"
-                    } else if (srcBoot.path.contains("init_boot")) {
-                        "init_boot.img"
-                    } else {
-                        "boot.img"
+                val name = with(srcBoot.path) {
+                    when {
+                        contains("recovery") -> "recovery.img"
+                        contains("init_boot") -> "init_boot.img"
+                        else -> "boot.img"
                     }
+                }
                 outStream.putNextEntry(newTarEntry(name, newBoot.length()))
             }
             newBoot.newInputStream().cleanPump(outStream)
