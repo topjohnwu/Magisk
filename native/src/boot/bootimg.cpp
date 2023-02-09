@@ -419,13 +419,6 @@ void boot_img::parse_image(const uint8_t *addr, format_t type) {
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
     }
-    if (!hdr->is_vendor && hdr->ramdisk_size() == 0 && hdr->header_version() == 4) {
-        // When a v4 boot image does not contain ramdisk, we will have to create
-        // the CPIO from scratch. However, since this ramdisk will have to be merged
-        // with other vendor ramdisks, it has to use the exact same compression method.
-        // v4 GKIs are required to use lz4 (legacy), so hardcode it here.
-        r_fmt = LZ4_LEGACY;
-    }
     if (auto size = hdr->extra_size()) {
         e_fmt = check_fmt_lg(extra, size);
         fprintf(stderr, "%-*s [%s]\n", PADDING, "EXTRA_FMT", fmt2name[e_fmt]);
@@ -645,8 +638,16 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     }
     if (access(RAMDISK_FILE, R_OK) == 0) {
         auto m = mmap_data(RAMDISK_FILE);
-        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf, m.sz)) && COMPRESSED(boot.r_fmt)) {
-            hdr->ramdisk_size() = compress(boot.r_fmt, fd, m.buf, m.sz);
+        auto r_fmt = boot.r_fmt;
+        if (!skip_comp && !hdr->is_vendor && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
+            // A v4 boot image ramdisk will have to be merged with other vendor ramdisks,
+            // and they have to use the exact same compression method. v4 GKIs are required to
+            // use lz4 (legacy), so hardcode the format here.
+            fprintf(stderr, "RAMDISK_FMT: [%s] -> [%s]\n", fmt2name[r_fmt], fmt2name[LZ4_LEGACY]);
+            r_fmt = LZ4_LEGACY;
+        }
+        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf, m.sz)) && COMPRESSED(r_fmt)) {
+            hdr->ramdisk_size() = compress(r_fmt, fd, m.buf, m.sz);
         } else {
             hdr->ramdisk_size() = xwrite(fd, m.buf, m.sz);
         }
