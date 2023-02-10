@@ -117,24 +117,12 @@ static void switch_root(const string &path) {
 }
 
 void MagiskInit::mount_rules_dir() {
-    int major = 0;
-    int minor = 0;
-
-    parse_prop_file(".backup/.magisk", [&](auto key, auto value) -> bool {
-        if (key == "RULES_MAJOR") {
-            major = parse_int(value);
-        } else if (key == "RULES_MINOR") {
-            minor = parse_int(value);
-        }
-        return !major || !minor;
-    });
-
-    if (!major || !minor) return;
-    xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, makedev(major, minor));
+    if (config->rules_dev == 0)
+        return;
+    xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, config->rules_dev);
     xmkdir(MIRRDIR "/rules", 0);
     if (xmount(BLOCKDIR "/rules", MIRRDIR "/rules", "ext4", 0, nullptr) == 0) {
-        run_finally umount([] { xumount2(MIRRDIR "/rules", MNT_DETACH); });
-        std::string custom_rules_dir = MIRRDIR "/rules";
+        string custom_rules_dir = MIRRDIR "/rules";
         if (access((custom_rules_dir + "/unencrypted").data(), F_OK) == 0) {
             custom_rules_dir += "/unencrypted/magisk";
         } else if (access((custom_rules_dir + "/adb").data(), F_OK) == 0) {
@@ -147,6 +135,7 @@ void MagiskInit::mount_rules_dir() {
         xmkdirs(custom_rules_dir.data(), 0700);
         LOGD("sepolicy.rules: %s -> %s\n", custom_rules_dir.data(), RULESDIR);
         xmount(custom_rules_dir.data(), RULESDIR, nullptr, MS_BIND, nullptr);
+        xumount2(MIRRDIR "/rules", MNT_DETACH);
     }
 }
 

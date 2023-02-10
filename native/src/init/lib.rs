@@ -1,8 +1,9 @@
+use std::env;
+use std::path::Path;
+
 pub use base;
 use base::read_lines;
 pub use logging::*;
-use std::env;
-use std::path::Path;
 
 mod logging;
 
@@ -10,32 +11,30 @@ mod logging;
 pub mod ffi2 {
     extern "Rust" {
         fn setup_klog();
-
-        fn rules_device_config() -> i32;
+        fn print_rules_device() -> i32;
     }
 }
 
-pub fn rules_device_config() -> i32 {
+pub fn print_rules_device() -> i32 {
     const UNKNOWN: i32 = 0;
     const PERSIST: i32 = UNKNOWN + 1;
     const METADATA: i32 = PERSIST + 1;
     const CACHE: i32 = METADATA + 1;
     const UNENCRYPTED: i32 = CACHE + 1;
     const DATA: i32 = UNENCRYPTED + 1;
-    const OLD: i32 = DATA + 1;
+    const EXISTING: i32 = DATA + 1;
 
     let encrypted = env::var("ISENCRYPTED").map_or(false, |var| var == "true");
 
     let mut matched = UNKNOWN;
-    let mut major = 0u32;
-    let mut minor = 0u32;
+    let mut rules_dev = String::new();
 
     if let Ok(lines) = read_lines("/proc/self/mountinfo") {
         for line in lines {
             if let Ok(line) = line {
                 let new_matched;
                 if line.contains("/.magisk/sepolicy.rules ") {
-                    new_matched = OLD;
+                    new_matched = EXISTING;
                 } else if line.contains(" - ext4 ") && !line.contains("/dm-") {
                     if line.contains(" / /cache ") && matched < CACHE {
                         new_matched = CACHE;
@@ -61,21 +60,14 @@ pub fn rules_device_config() -> i32 {
                     continue;
                 }
                 if let Some(device) = line.splitn(4, ' ').nth(2) {
-                    device.split_once(':').map(|(a, b)| {
-                        a.parse::<u32>().ok().map(|a| {
-                            b.parse::<u32>().ok().map(|b| {
-                                major = a;
-                                minor = b;
-                                matched = new_matched;
-                            })
-                        })
-                    });
+                    rules_dev.clear();
+                    rules_dev += device;
+                    matched = new_matched;
                 }
             }
         }
         if matched > UNKNOWN {
-            println!("RULES_MAJOR={}", major);
-            println!("RULES_MINOR={}", minor);
+            println!("{rules_dev}");
             return 0;
         } else {
             eprintln!("Failed to find sepolicy rules partition");
@@ -83,5 +75,5 @@ pub fn rules_device_config() -> i32 {
     } else {
         eprintln!("Error reading /proc/self/mountinfo");
     }
-    1
+    return 1;
 }

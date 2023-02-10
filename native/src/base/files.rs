@@ -136,10 +136,7 @@ pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
     }
 }
 
-pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
+pub fn read_lines<P: AsRef<Path>>(path: P) -> io::Result<io::Lines<io::BufReader<File>>> {
+    let file = File::open(path)?;
     Ok(io::BufReader::new(file).lines())
 }

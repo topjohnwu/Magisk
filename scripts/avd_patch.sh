@@ -48,9 +48,6 @@ unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
 
 api_level_arch_detect
 
-export ISENCRYPTED
-RULES_CONFIG="$(./magiskinit --rules-device-config)" || abort "! Unable to find rules partition!"
-
 unzip -oj magisk.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
@@ -62,10 +59,11 @@ cp ramdisk.cpio ramdisk.cpio.orig
 
 touch config
 
+echo "RULESDEVICE=$(ISENCRYPTED=true ./magiskinit --rules-device)" >> config
+
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
-echo "$RULES_CONFIG" >> config
 
 ./magiskboot compress=xz magisk32 magisk32.xz
 ./magiskboot compress=xz magisk64 magisk64.xz

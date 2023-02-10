@@ -237,9 +237,14 @@ void load_kernel_info(BootConfig *config) {
     config->set(parse_bootconfig(full_read("/proc/bootconfig")));
 
     parse_prop_file("/.backup/.magisk", [=](auto key, auto value) -> bool {
-        if (key == "RECOVERYMODE" && value == "true") {
-            config->skip_initramfs = config->emulator || !check_key_combo();
-            return false;
+        if (key == "RECOVERYMODE") {
+            if (value == "true") {
+                config->skip_initramfs = config->emulator || !check_key_combo();
+            }
+        } else if (key == "RULESDEVICE") {
+            int major = 0, minor = 0;
+            sscanf(value.data(), "%d:%d", &major, &minor);
+            config->rules_dev = makedev(major, minor);
         }
         return true;
     });
