@@ -114,7 +114,7 @@ static void *logfile_writer(void *arg) {
         }
         long ms = tv.tv_usec / 1000;
         size_t off = strftime(aux, sizeof(aux), "%m-%d %T", &tm);
-        off += snprintf(aux + off, sizeof(aux) - off,
+        off += ssprintf(aux + off, sizeof(aux) - off,
                 ".%03ld %5d %5d %c : ", ms, meta.pid, meta.tid, type);
 
         iov[0].iov_len = off;
@@ -125,27 +125,28 @@ static void *logfile_writer(void *arg) {
 }
 
 void magisk_log_write(int prio, const char *msg, int len) {
-    if (logd_fd >= 0) {
-        // Truncate
-        len = std::min(MAX_MSG_LEN, len);
+    if (logd_fd < 0)
+        return;
 
-        log_meta meta = {
-            .prio = prio,
-            .len = len,
-            .pid = getpid(),
-            .tid = gettid()
-        };
+    // Truncate
+    len = std::min(MAX_MSG_LEN, len);
 
-        iovec iov[2];
-        iov[0].iov_base = &meta;
-        iov[0].iov_len = sizeof(meta);
-        iov[1].iov_base = (void *) msg;
-        iov[1].iov_len = len;
+    log_meta meta = {
+        .prio = prio,
+        .len = len,
+        .pid = getpid(),
+        .tid = gettid()
+    };
 
-        if (writev(logd_fd, iov, 2) < 0) {
-            // Stop trying to write to file
-            close(logd_fd.exchange(-1));
-        }
+    iovec iov[2];
+    iov[0].iov_base = &meta;
+    iov[0].iov_len = sizeof(meta);
+    iov[1].iov_base = (void *) msg;
+    iov[1].iov_len = len;
+
+    if (writev(logd_fd, iov, 2) < 0) {
+        // Stop trying to write to file
+        close(logd_fd.exchange(-1));
     }
 }
 

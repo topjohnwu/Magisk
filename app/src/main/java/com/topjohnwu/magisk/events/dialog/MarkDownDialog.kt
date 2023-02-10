@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ abstract class MarkDownDialog : DialogEvent() {
             val view = LayoutInflater.from(context).inflate(R.layout.markdown_window_md2, null)
             setView(view)
             val tv = view.findViewById<TextView>(R.id.md_txt)
-            (ownerActivity as BaseActivity).lifecycleScope.launch {
+            activity.lifecycleScope.launch {
                 try {
                     val text = withContext(Dispatchers.IO) { getMarkdownText() }
                     ServiceLocator.markwon.setMarkdown(tv, text)

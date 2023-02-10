@@ -265,7 +265,7 @@ static bool dt_table_patch(const Header *hdr, const char *out) {
         if (dtb_map.count(offset) == 0) {
             auto blob = buf + offset;
             uint32_t size = fdt_totalsize(blob);
-            auto fdt = xmalloc(size + MAX_FDT_GROWTH);
+            auto fdt = malloc(size + MAX_FDT_GROWTH);
             memcpy(fdt, blob, size);
             fdt_open_into(fdt, fdt, size + MAX_FDT_GROWTH);
             dtb_map[offset] = { fdt, offset };
@@ -345,7 +345,7 @@ static bool blob_patch(uint8_t *dtb, size_t dtb_sz, const char *out) {
         if (curr == nullptr)
             break;
         auto len = fdt_totalsize(curr);
-        auto fdt = static_cast<uint8_t *>(xmalloc(len + MAX_FDT_GROWTH));
+        auto fdt = static_cast<uint8_t *>(malloc(len + MAX_FDT_GROWTH));
         memcpy(fdt, curr, len);
         fdt_pack(fdt);
         uint32_t padding = len - fdt_totalsize(fdt);

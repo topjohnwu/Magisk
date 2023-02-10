@@ -5,8 +5,6 @@
 #include <vector>
 #include <daemon.hpp>
 
-#define INJECT_ENV_1   "MAGISK_INJ_1"
-#define INJECT_ENV_2   "MAGISK_INJ_2"
 #define MAGISKTMP_ENV  "MAGISKTMP"
 
 #define HIJACK_BIN64   "/system/bin/appwidget"
@@ -36,9 +34,6 @@ enum : int {
 #define HIJACK_BIN HIJACK_BIN32
 #endif
 
-// Find the memory address + size of the pages matching name + inode
-std::pair<void*, size_t> find_map_range(const char *name, unsigned long inode);
-
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 
@@ -55,10 +50,10 @@ extern void *self_handle;
 
 void hook_functions();
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
-int remote_request_unmount();
 
 inline int zygisk_request(int req) {
     int fd = connect_daemon(MainRequest::ZYGISK);
+    if (fd < 0) return fd;
     write_int(fd, req);
     return fd;
 }

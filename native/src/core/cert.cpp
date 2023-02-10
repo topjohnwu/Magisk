@@ -103,11 +103,11 @@ string read_certificate(int fd, int version) {
     for (int i = 0;; i++) {
         // i is the absolute offset to end of file
         uint16_t comment_sz = 0;
-        xlseek(fd, -static_cast<off_t>(sizeof(comment_sz)) - i, SEEK_END);
+        xlseek64(fd, -static_cast<off64_t>(sizeof(comment_sz)) - i, SEEK_END);
         xxread(fd, &comment_sz, sizeof(comment_sz));
         if (comment_sz == i) {
             // Double check if we actually found the structure
-            xlseek(fd, -static_cast<off_t>(sizeof(EOCD)), SEEK_CUR);
+            xlseek64(fd, -static_cast<off64_t>(sizeof(EOCD)), SEEK_CUR);
             uint32_t magic = 0;
             xxread(fd, &magic, sizeof(magic));
             if (magic == EOCD_MAGIC) {
@@ -125,14 +125,14 @@ string read_certificate(int fd, int version) {
     // Seek and read central_dir_off to find start of central directory
     uint32_t central_dir_off = 0;
     {
-        constexpr off_t off = offsetof(EOCD, central_dir_off) - sizeof(EOCD::magic);
-        xlseek(fd, off, SEEK_CUR);
+        constexpr off64_t off = offsetof(EOCD, central_dir_off) - sizeof(EOCD::magic);
+        xlseek64(fd, off, SEEK_CUR);
     }
     xxread(fd, &central_dir_off, sizeof(central_dir_off));
 
     // Parse APK comment to get version code
     if (version >= 0) {
-        xlseek(fd, sizeof(EOCD::comment_sz), SEEK_CUR);
+        xlseek64(fd, sizeof(EOCD::comment_sz), SEEK_CUR);
         FILE *fp = fdopen(fd, "r");  // DO NOT close this file pointer
         int apk_ver = -1;
         parse_prop_file(fp, [&](string_view key, string_view value) -> bool {
@@ -152,7 +152,7 @@ string read_certificate(int fd, int version) {
     // Next, find the start of the APK signing block
     {
         constexpr int off = sizeof(signing_block::block_sz_) + sizeof(signing_block::magic);
-        xlseek(fd, (off_t) (central_dir_off - off), SEEK_SET);
+        xlseek64(fd, (off64_t) (central_dir_off - off), SEEK_SET);
     }
     xxread(fd, &u64, sizeof(u64));  // u64 = block_sz_
     char magic[sizeof(signing_block::magic)] = {0};
@@ -163,7 +163,7 @@ string read_certificate(int fd, int version) {
         return {};
     }
     uint64_t signing_blk_sz = 0;
-    xlseek(fd, -static_cast<off_t>(u64 + sizeof(signing_blk_sz)), SEEK_CUR);
+    xlseek64(fd, -static_cast<off64_t>(u64 + sizeof(signing_blk_sz)), SEEK_CUR);
     xxread(fd, &signing_blk_sz, sizeof(signing_blk_sz));
     if (signing_blk_sz != u64) {
         // block_sz != block_sz_, invalid signing block format, abort
@@ -184,12 +184,12 @@ string read_certificate(int fd, int version) {
         xxread(fd, &id, sizeof(id));
         if (id == SIGNATURE_SCHEME_V2_MAGIC) {
             // Skip [signer sequence length] + [1st signer length] + [signed data length]
-            xlseek(fd, sizeof(uint32_t) * 3, SEEK_CUR);
+            xlseek64(fd, sizeof(uint32_t) * 3, SEEK_CUR);
 
             xxread(fd, &u32, sizeof(u32)); // digest sequence length
-            xlseek(fd, u32, SEEK_CUR);     // skip all digests
+            xlseek64(fd, u32, SEEK_CUR);     // skip all digests
 
-            xlseek(fd, sizeof(uint32_t), SEEK_CUR); // cert sequence length
+            xlseek64(fd, sizeof(uint32_t), SEEK_CUR); // cert sequence length
             xxread(fd, &u32, sizeof(u32));          // 1st cert length
 
             string cert;
@@ -199,7 +199,7 @@ string read_certificate(int fd, int version) {
             return cert;
         } else {
             // Skip this id-value pair
-            xlseek(fd, u64 - sizeof(id), SEEK_CUR);
+            xlseek64(fd, u64 - sizeof(id), SEEK_CUR);
         }
     }
 

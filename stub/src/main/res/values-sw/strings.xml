@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="upgrade_msg">Pata toleo jipya la Magisk kamili ili kumaliza usanidi. Pakua na usakinishe?</string>
+    <string name="no_internet_msg">Tafadhali unganisha kwenye Mtandao! Kusasisha hadi Magisk kamili inahitajika.</string>
+    <string name="dling">Inapakua</string>
+    <string name="relaunch_app">Tafadhali zindua upya programu wewe mwenyewe</string>
+</resources>

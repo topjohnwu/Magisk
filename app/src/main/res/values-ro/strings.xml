@@ -12,7 +12,7 @@
 
     <!--Home-->
     <string name="no_connection">Nu există conexiune disponibilă</string>
-    <string name="app_changelog">Jurnalul schimbărilor</string>
+    <string name="app_changelog">Jurnalul modificărilor</string>
     <string name="loading">Se încarcă…</string>
     <string name="update">Actualizează</string>
     <string name="not_available">N/A</string>
@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
+    <string name="home_follow_title">Urmărește-ne</string>
     <string name="home_item_source">Sursă</string>
     <string name="home_support_content">Magisk este și va fi întotdeauna gratuit și open-source. Cu toate acestea, ne poți arăta că îți pasă făcând o donație.</string>
     <string name="home_installed_version">Versiune instalată</string>
@@ -111,6 +112,7 @@
     <string name="suspend_text_riru">Modul suspendat deoarece %1$s este activat</string>
     <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
     <string name="zygisk_module_unloaded">Modulul Zygisk nu a fost încărcat din cauza incompatibilității</string>
+    <string name="module_empty">Niciun modul instalat</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mod pentru temă</string>

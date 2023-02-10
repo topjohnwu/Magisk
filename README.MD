@@ -43,7 +43,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
 - Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git` \
   (Windows only: BEFORE cloning, enable developer mode in Settings and run `git config --global core.symlinks true`!)
-- Install Python 3.6+ \
+- Install Python 3.8+ \
   (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
 - (Windows only) Install Visual Studio 2013+ with the Windows 10/11 SDK and the Visual C++ option
 - Configure to use the JDK bundled in Android Studio:

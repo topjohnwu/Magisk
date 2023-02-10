@@ -11,12 +11,15 @@
 -assumenosideeffects class java.util.Objects {
     public static ** requireNonNull(...);
 }
+-assumenosideeffects public class kotlin.coroutines.jvm.internal.DebugMetadataKt {
+   private static ** getDebugMetadataAnnotation(...) return null;
+}
 
 # Stub
 -keep class com.topjohnwu.magisk.core.App { <init>(java.lang.Object); }
 -keepclassmembers class androidx.appcompat.app.AppCompatDelegateImpl {
-  boolean mActivityHandlesUiModeChecked;
-  boolean mActivityHandlesUiMode;
+  boolean mActivityHandlesConfigFlagsChecked;
+  int mActivityHandlesConfigFlags;
 }
 
 # main

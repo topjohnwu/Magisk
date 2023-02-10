@@ -221,7 +221,7 @@ void magisk_cpio::backup(const char *orig) {
     if (!rm_list.empty()) {
         auto rm_list_file = new cpio_entry(S_IFREG);
         rm_list_file->filesize = rm_list.length();
-        rm_list_file->data = xmalloc(rm_list.length());
+        rm_list_file->data = malloc(rm_list.length());
         memcpy(rm_list_file->data, rm_list.data(), rm_list.length());
         backups.emplace(".backup/.rmlist", rm_list_file);
     }

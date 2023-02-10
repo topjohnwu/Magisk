@@ -9,10 +9,10 @@
 static inline int sigtimedwait(const sigset_t* set, siginfo_t* info, const timespec* timeout) {
     union {
         sigset_t set;
-        sigset_t set64;
+        sigset64_t set64;
     } s{};
     s.set = *set;
-    return syscall(__NR_rt_sigtimedwait, &s.set64, info, timeout, sizeof(sigset64_t));
+    return syscall(__NR_rt_sigtimedwait, &s.set64, info, timeout, sizeof(s.set64));
 }
 
 static inline int fexecve(int fd, char* const* argv, char* const* envp) {

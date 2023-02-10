@@ -21,7 +21,6 @@ int SDK_INT = -1;
 string MAGISKTMP;
 
 bool RECOVERY_MODE = false;
-int DAEMON_STATE = STATE_NONE;
 
 static struct stat self_st;
 
@@ -107,7 +106,7 @@ static void poll_ctrl_handler(pollfd *pfd) {
 
 [[noreturn]] static void poll_loop() {
     // Register poll_ctrl
-    int pipefd[2];
+    auto pipefd = array<int, 2>{-1, -1};
     xpipe2(pipefd, O_CLOEXEC);
     poll_ctrl = pipefd[1];
     pollfd poll_ctrl_pfd = { pipefd[0], POLLIN, 0 };
@@ -143,27 +142,23 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::SUPERUSER:
         su_daemon_handler(client, &cred);
         break;
-    case MainRequest::POST_FS_DATA:
-        post_fs_data(client);
-        break;
-    case MainRequest::LATE_START:
-        late_start(client);
-        break;
-    case MainRequest::BOOT_COMPLETE:
-        boot_complete(client);
-        break;
     case MainRequest::ZYGOTE_RESTART:
-        zygote_restart(client);
+        close(client);
+        LOGI("** zygote restarted\n");
+        pkg_xml_ino = 0;
+        prune_su_access();
         break;
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
         break;
-    case MainRequest::REMOVE_MODULES:
+    case MainRequest::REMOVE_MODULES: {
+        int do_reboot = read_int(client);
         remove_modules();
         write_int(client, 0);
         close(client);
-        reboot();
+        if (do_reboot) reboot();
         break;
+    }
     case MainRequest::ZYGISK:
     case MainRequest::ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
@@ -232,7 +227,9 @@ static void handle_request(pollfd *pfd) {
     }
 
     code = read_int(client);
-    if (code < 0 || code >= MainRequest::END || code == MainRequest::_SYNC_BARRIER_) {
+    if (code < 0 || code >= MainRequest::END ||
+        code == MainRequest::_SYNC_BARRIER_ ||
+        code == MainRequest::_STAGE_BARRIER_) {
         // Unknown request code
         goto done;
     }
@@ -274,10 +271,12 @@ static void handle_request(pollfd *pfd) {
     if (code < MainRequest::_SYNC_BARRIER_) {
         handle_request_sync(client, code);
         goto done;
+    } else if (code < MainRequest::_STAGE_BARRIER_) {
+        exec_task([=] { handle_request_async(client, code, cred); });
+    } else {
+        close(client);
+        exec_task([=] { boot_stage_handler(code); });
     }
-
-    // Handle async requests in another thread
-    exec_task([=] { handle_request_async(client, code, cred); });
     return;
 
 done:
@@ -286,13 +285,13 @@ done:
 
 static void switch_cgroup(const char *cgroup, int pid) {
     char buf[32];
-    snprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
+    ssprintf(buf, sizeof(buf), "%s/cgroup.procs", cgroup);
     if (access(buf, F_OK) != 0)
         return;
     int fd = xopen(buf, O_WRONLY | O_APPEND | O_CLOEXEC);
     if (fd == -1)
         return;
-    snprintf(buf, sizeof(buf), "%d\n", pid);
+    ssprintf(buf, sizeof(buf), "%d\n", pid);
     xwrite(fd, buf, strlen(buf));
     close(fd);
 }
@@ -447,13 +446,16 @@ int connect_daemon(int req, bool create) {
         break;
     case MainResponse::ERROR:
         LOGE("Daemon error\n");
-        exit(-1);
+        close(fd);
+        return -1;
     case MainResponse::ROOT_REQUIRED:
         LOGE("Root is required for this operation\n");
-        exit(-1);
+        close(fd);
+        return -1;
     case MainResponse::ACCESS_DENIED:
         LOGE("Access denied\n");
-        exit(-1);
+        close(fd);
+        return -1;
     default:
         __builtin_unreachable();
     }

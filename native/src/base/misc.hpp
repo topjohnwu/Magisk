@@ -6,6 +6,8 @@
 #include <string_view>
 #include <bitset>
 
+#include <base-rs.hpp>
+
 #define DISALLOW_COPY_AND_MOVE(clazz) \
 clazz(const clazz &) = delete; \
 clazz(clazz &&) = delete;
@@ -118,6 +120,11 @@ struct StringCmp {
     bool operator()(std::string_view a, std::string_view b) const { return a < b; }
 };
 
+template<typename T>
+rust::Slice<uint8_t> byte_slice(T *buf, size_t sz) {
+    return rust::Slice(reinterpret_cast<uint8_t *>(buf), sz);
+}
+
 int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
@@ -155,6 +162,19 @@ int gen_rand_str(char *buf, int len, bool varlen = true);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 std::vector<std::string> split(const std::string &s, const std::string &delims);
 std::vector<std::string_view> split_ro(std::string_view, std::string_view delims);
+
+// Similar to vsnprintf, but the return value is the written number of bytes
+int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);
+// Similar to snprintf, but the return value is the written number of bytes
+int ssprintf(char *dest, size_t size, const char *fmt, ...);
+// This is not actually the strscpy from the Linux kernel.
+// Silently truncates, and returns the number of bytes written.
+extern "C" size_t strscpy(char *dest, const char *src, size_t size);
+
+// Ban usage of unsafe cstring functions
+#define vsnprintf  __use_vssprintf_instead__
+#define snprintf   __use_ssprintf_instead__
+#define strlcpy    __use_strscpy_instead__
 
 struct exec_t {
     bool err = false;

@@ -131,7 +131,7 @@ abstract class MagiskInstallImpl protected constructor(
             }
 
             // Extract scripts
-            for (script in listOf("util_functions.sh", "boot_patch.sh", "addon.d.sh")) {
+            for (script in listOf("util_functions.sh", "boot_patch.sh", "addon.d.sh", "stub.apk")) {
                 val dest = File(installDir, script)
                 context.assets.open(script).writeTo(dest)
             }
@@ -190,6 +190,7 @@ abstract class MagiskInstallImpl protected constructor(
 
             while (tarIn.nextEntry?.let { entry = it } != null) {
                 if (entry.name.startsWith("boot.img") ||
+                    entry.name.startsWith("init_boot.img") ||
                     (Config.recovery && entry.name.contains("recovery.img"))) {
                     val name = entry.name.replace(".lz4", "")
                     console.add("-- Extracting: $name")
@@ -216,6 +217,7 @@ abstract class MagiskInstallImpl protected constructor(
             }
         }
         val boot = installDir.getChildFile("boot.img")
+        val initBoot = installDir.getChildFile("init_boot.img")
         val recovery = installDir.getChildFile("recovery.img")
         if (Config.recovery && recovery.exists() && boot.exists()) {
             // Install to recovery
@@ -236,11 +238,14 @@ abstract class MagiskInstallImpl protected constructor(
             }
             boot.delete()
         } else {
-            if (!boot.exists()) {
-                console.add("! No boot image found")
-                throw IOException()
+            srcBoot = when {
+                initBoot.exists() -> initBoot
+                boot.exists() -> boot
+                else -> {
+                    console.add("! No boot image found")
+                    throw IOException()
+                }
             }
-            srcBoot = boot
         }
         return tarOut
     }
@@ -300,7 +305,13 @@ abstract class MagiskInstallImpl protected constructor(
         try {
             val newBoot = installDir.getChildFile("new-boot.img")
             if (outStream is TarOutputStream) {
-                val name = if (srcBoot.path.contains("recovery")) "recovery.img" else "boot.img"
+                val name = with(srcBoot.path) {
+                    when {
+                        contains("recovery") -> "recovery.img"
+                        contains("init_boot") -> "init_boot.img"
+                        else -> "boot.img"
+                    }
+                }
                 outStream.putNextEntry(newTarEntry(name, newBoot.length()))
             }
             newBoot.newInputStream().cleanPump(outStream)

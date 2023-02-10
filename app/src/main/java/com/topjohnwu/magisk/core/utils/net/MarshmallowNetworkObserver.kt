@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.topjohnwu.magisk.core.utils.net
 
 import android.annotation.TargetApi
@@ -10,6 +8,7 @@ import android.content.IntentFilter
 import android.net.NetworkCapabilities
 import android.os.PowerManager
 import androidx.core.content.getSystemService
+import com.topjohnwu.magisk.ktx.registerRuntimeReceiver
 
 @TargetApi(23)
 class MarshmallowNetworkObserver(
@@ -21,7 +20,7 @@ class MarshmallowNetworkObserver(
 
     init {
         val filter = IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
-        app.registerReceiver(receiver, filter)
+        app.registerRuntimeReceiver(receiver, filter)
     }
 
     override fun stopObserving() {
@@ -31,7 +30,7 @@ class MarshmallowNetworkObserver(
 
     override fun getCurrentState() {
         callback(manager.getNetworkCapabilities(manager.activeNetwork)
-            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false)
     }
 
     private inner class IdleBroadcastReceiver: BroadcastReceiver() {

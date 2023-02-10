@@ -71,7 +71,7 @@ bool MagiskInit::hijack_sepolicy() {
         // This only happens on Android 8.0 - 9.0
 
         char buf[4096];
-        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
+        ssprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
         dt_compat = full_read(buf);
         if (dt_compat.empty()) {
             // Device does not do early mount and uses monolithic policy
@@ -121,7 +121,7 @@ bool MagiskInit::hijack_sepolicy() {
         int fd = xopen(MOCK_COMPAT, O_WRONLY);
 
         char buf[4096];
-        snprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
+        ssprintf(buf, sizeof(buf), "%s/fstab/compatible", config->dt_dir);
         xumount2(buf, MNT_DETACH);
 
         hijack();

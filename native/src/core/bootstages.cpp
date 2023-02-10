@@ -17,7 +17,17 @@
 
 using namespace std;
 
-static bool safe_mode = false;
+// Boot stage state
+enum : int {
+    FLAG_NONE = 0,
+    FLAG_POST_FS_DATA_DONE = (1 << 0),
+    FLAG_LATE_START_DONE = (1 << 1),
+    FLAG_BOOT_COMPLETE = (1 << 2),
+    FLAG_SAFE_MODE = (1 << 3),
+};
+
+static int boot_state = FLAG_NONE;
+
 bool zygisk_enabled = false;
 
 /*********
@@ -26,8 +36,8 @@ bool zygisk_enabled = false;
 
 #define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
 #define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) snprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) snprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
+#define SETMIR(b, part) ssprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
+#define SETBLK(b, part) ssprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
 
 #define do_mount_mirror(part) {     \
     SETMIR(buf1, part);             \
@@ -78,6 +88,12 @@ static void mount_mirrors() {
     char buf1[4096];
     char buf2[4096];
 
+    LOGI("* Prepare worker\n");
+
+    ssprintf(buf1, sizeof(buf1), "%s/" WORKERDIR, MAGISKTMP.data());
+    xmount(buf1, buf1, nullptr, MS_BIND, nullptr);
+    xmount(nullptr, buf1, nullptr, MS_PRIVATE, nullptr);
+
     LOGI("* Mounting mirrors\n");
 
     parse_mnt("/proc/mounts", [&](mntent *me) {
@@ -126,7 +142,7 @@ static bool magisk_env() {
     string pkg;
     get_manager(0, &pkg);
 
-    sprintf(buf, "%s/0/%s/install", APP_DATA_DIR,
+    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR,
             pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
 
     // Alternative binaries paths
@@ -272,21 +288,15 @@ static bool check_key_combo() {
  * Boot Stage Handlers *
  ***********************/
 
-static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 extern int disable_deny();
 
-void post_fs_data(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-
+static void post_fs_data() {
     if (getenv("REMOUNT_ROOT"))
         xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 
     if (!check_data())
-        goto unblock_init;
+        return;
 
-    DAEMON_STATE = STATE_POST_FS_DATA;
     setup_logfile(true);
 
     LOGI("** post-fs-data mode running\n");
@@ -313,8 +323,9 @@ void post_fs_data(int client) {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
-        safe_mode = true;
+    if (getprop("persist.sys.safemode", true) == "1" ||
+        getprop("ro.sys.safemode") == "1" || check_key_combo()) {
+        boot_state |= FLAG_SAFE_MODE;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
         disable_deny();
@@ -330,39 +341,25 @@ void post_fs_data(int client) {
 early_abort:
     // We still do magic mount because root itself might need it
     magic_mount();
-    DAEMON_STATE = STATE_POST_FS_DATA_DONE;
-
-unblock_init:
-    close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+    boot_state |= FLAG_POST_FS_DATA_DONE;
 }
 
-void late_start(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-    run_finally fin([]{ DAEMON_STATE = STATE_LATE_START_DONE; });
+static void late_start() {
     setup_logfile(false);
 
     LOGI("** late_start service mode running\n");
 
-    if (DAEMON_STATE < STATE_POST_FS_DATA_DONE || safe_mode)
-        return;
-
     exec_common_scripts("service");
     exec_module_scripts("service");
+
+    boot_state |= FLAG_LATE_START_DONE;
 }
 
-void boot_complete(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-    DAEMON_STATE = STATE_BOOT_COMPLETE;
+static void boot_complete() {
+    boot_state |= FLAG_BOOT_COMPLETE;
     setup_logfile(false);
 
     LOGI("** boot-complete triggered\n");
-
-    if (safe_mode)
-        return;
 
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)
@@ -373,10 +370,26 @@ void boot_complete(int client) {
     get_manager(0, nullptr, true);
 }
 
-void zygote_restart(int client) {
-    close(client);
+void boot_stage_handler(int code) {
+    // Make sure boot stage execution is always serialized
+    static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
+    mutex_guard lock(stage_lock);
 
-    LOGI("** zygote restarted\n");
-    pkg_xml_ino = 0;
-    prune_su_access();
+    switch (code) {
+    case MainRequest::POST_FS_DATA:
+        if ((boot_state & FLAG_POST_FS_DATA_DONE) == 0)
+            post_fs_data();
+        close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+        break;
+    case MainRequest::LATE_START:
+        if ((boot_state & FLAG_POST_FS_DATA_DONE) && (boot_state & FLAG_SAFE_MODE) == 0)
+            late_start();
+        break;
+    case MainRequest::BOOT_COMPLETE:
+        if ((boot_state & FLAG_SAFE_MODE) == 0)
+            boot_complete();
+        break;
+    default:
+        __builtin_unreachable();
+    }
 }

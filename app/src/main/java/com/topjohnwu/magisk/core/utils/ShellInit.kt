@@ -53,8 +53,8 @@ class ShellInit : Shell.Initializer() {
                     "  cp -af $localBB \$MAGISKTMP/busybox/busybox",
                     "  exec \$MAGISKTMP/busybox/busybox sh",
                     "else",
-                    "  cp -af $localBB /dev/.busybox",
-                    "  exec /dev/.busybox sh",
+                    "  cp -af $localBB /dev/busybox",
+                    "  exec /dev/busybox sh",
                     "fi"
                 )
             } else {

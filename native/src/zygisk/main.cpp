@@ -7,6 +7,7 @@
 #include <socket.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
+#include <embed.hpp>
 
 #include "zygisk.hpp"
 
@@ -43,19 +44,18 @@ int app_process_main(int argc, char *argv[]) {
         if (fork_dont_care() == 0) {
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
-            snprintf(buf, sizeof(buf), "%d", fds[1]);
+            ssprintf(buf, sizeof(buf), "%d", fds[1]);
 #if defined(__LP64__)
-            execlp("magisk", "zygisk", "passthrough", buf, "1", (char *) nullptr);
+            execlp("magisk", "", "zygisk", "passthrough", buf, "1", (char *) nullptr);
 #else
-            execlp("magisk", "zygisk", "passthrough", buf, "0", (char *) nullptr);
+            execlp("magisk", "", "zygisk", "passthrough", buf, "0", (char *) nullptr);
 #endif
             exit(-1);
         }
 
         close(fds[1]);
         if (read_int(fds[0]) != 0) {
-            fprintf(stderr, "Failed to connect magisk daemon, "
-                            "try umount %s or reboot.\n", argv[0]);
+            fprintf(stderr, "Failed to connect magiskd, try umount %s or reboot.\n", argv[0]);
             return 1;
         }
         int app_proc_fd = recv_fd(fds[0]);
@@ -73,6 +73,10 @@ int app_process_main(int argc, char *argv[]) {
             if (read_int(socket) != 0)
                 break;
 
+            // Send over zygisk loader
+            write_int(socket, sizeof(zygisk_ld));
+            xwrite(socket, zygisk_ld, sizeof(zygisk_ld));
+
             int app_proc_fd = recv_fd(socket);
             if (app_proc_fd < 0)
                 break;
@@ -86,7 +90,6 @@ int app_process_main(int argc, char *argv[]) {
             } else {
                 setenv("LD_PRELOAD", HIJACK_BIN, 1);
             }
-            setenv(INJECT_ENV_1, "1", 1);
             setenv(MAGISKTMP_ENV, tmp.data(), 1);
 
             close(socket);
@@ -127,8 +130,8 @@ static void zygiskd(int socket) {
             struct stat s{};
             if (fstat(fd, &s) == 0 && S_ISREG(s.st_mode)) {
                 android_dlextinfo info {
-                        .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
-                        .library_fd = fd,
+                    .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+                    .library_fd = fd,
                 };
                 if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
                     *(void **) &entry = dlsym(h, "zygisk_companion_entry");

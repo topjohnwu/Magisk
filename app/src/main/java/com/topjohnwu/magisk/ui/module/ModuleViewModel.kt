@@ -35,7 +35,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
     var loading = true
         private set(value) = set(value, field, { field = it }, BR.loading)
 
-    init {
+    private suspend fun init() = withContext(Dispatchers.IO) {
         if (Info.env.isActive && LocalModule.loaded()) {
             items.insertItem(InstallModule)
                 .insertList(itemsInstalled)
@@ -44,6 +44,9 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     override suspend fun doLoadWork() {
         loading = true
+        if (items.isEmpty()) {
+            init()
+        }
         loadInstalled()
         loading = false
         loadUpdateInfo()

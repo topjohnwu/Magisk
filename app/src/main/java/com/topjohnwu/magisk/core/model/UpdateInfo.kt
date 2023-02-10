@@ -22,8 +22,7 @@ data class MagiskJson(
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class StubJson(
-    val versionCode: Int = -1,
-    val link: String = ""
+    val versionCode: Int = -1
 ) : Parcelable
 
 @JsonClass(generateAdapter = true)

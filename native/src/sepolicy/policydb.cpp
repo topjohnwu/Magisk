@@ -87,7 +87,7 @@ sepolicy *sepolicy::from_data(char *data, size_t len) {
     pf.len = len;
     pf.type = PF_USE_MEMORY;
 
-    auto db = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+    auto db = static_cast<policydb_t *>(malloc(sizeof(policydb_t)));
     if (policydb_init(db) || policydb_read(db, &pf, 0)) {
         LOGE("Fail to load policy from data\n");
         free(db);
@@ -107,7 +107,7 @@ sepolicy *sepolicy::from_file(const char *file) {
     pf.fp = fp.get();
     pf.type = PF_USE_STDIO;
 
-    auto db = static_cast<policydb_t *>(xmalloc(sizeof(policydb_t)));
+    auto db = static_cast<policydb_t *>(malloc(sizeof(policydb_t)));
     if (policydb_init(db) || policydb_read(db, &pf, 0)) {
         LOGE("Fail to load policy from %s\n", file);
         free(db);

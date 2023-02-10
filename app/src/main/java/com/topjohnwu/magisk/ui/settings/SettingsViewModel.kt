@@ -53,7 +53,8 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             AppSettings,
             UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
-        if (Build.VERSION.SDK_INT >= 22 && Info.env.isActive && Const.USER_ID == 0) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 &&
+                Info.env.isActive && Const.USER_ID == 0) {
             if (hidden) list.add(Restore) else list.add(Hide)
         }
 
@@ -75,15 +76,15 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
                 Tapjack, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
                 AutomaticResponse, RequestTimeout, SUNotification
             ))
-            if (Build.VERSION.SDK_INT < 23) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 // Biometric is only available on 6.0+
                 list.remove(Biometrics)
             }
-            if (Build.VERSION.SDK_INT < 26) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 // Re-authenticate is not feasible on 8.0+
                 list.add(Reauthenticate)
             }
-            if (Build.VERSION.SDK_INT >= 31) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 // Can hide overlay windows on 12.0+
                 list.remove(Tapjack)
             }
@@ -95,6 +96,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
     override fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit) {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
+            UpdateChecker -> withPostNotificationPermission(andThen)
             Biometrics -> authenticate(andThen)
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()

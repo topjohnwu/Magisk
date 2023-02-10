@@ -1,9 +1,11 @@
 #include <android/dlext.h>
 #include <sys/mount.h>
 #include <dlfcn.h>
+#include <regex.h>
 #include <bitset>
+#include <list>
 
-#include <xhook.h>
+#include <lsplt.hpp>
 
 #include <base.hpp>
 #include <flags.h>
@@ -21,18 +23,21 @@ using xstring = jni_hook::string;
 
 // Extreme verbose logging
 //#define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...)
+#define ZLOGV(...) (void*)0
 
 static bool unhook_functions();
 
 namespace {
 
 enum {
-    DO_UNMOUNT,
-    FORK_AND_SPECIALIZE,
+    POST_SPECIALIZE,
+    APP_FORK_AND_SPECIALIZE,
     APP_SPECIALIZE,
-    SERVER_SPECIALIZE,
-    CAN_DLCLOSE,
+    SERVER_FORK_AND_SPECIALIZE,
+    DO_REVERT_UNMOUNT,
+    CAN_UNLOAD_ZYGISK,
+    SKIP_FD_SANITIZATION,
+
     FLAG_MAX
 };
 
@@ -40,37 +45,69 @@ enum {
 void name##_pre();         \
 void name##_post();
 
+#define MAX_FD_SIZE 1024
+
 struct HookContext {
     JNIEnv *env;
     union {
-        AppSpecializeArgs_v3 *args;
-        ServerSpecializeArgs_v1 *server_args;
-        void *raw_args;
-    };
+        void *ptr;
+        AppSpecializeArgs_v3 *app;
+        ServerSpecializeArgs_v1 *server;
+    } args;
+
     const char *process;
-    vector<ZygiskModule> modules;
-    bitset<FLAG_MAX> state;
+    list<ZygiskModule> modules;
 
     int pid;
-    uint32_t flags;
+    bitset<FLAG_MAX> flags;
+    uint32_t info_flags;
+    bitset<MAX_FD_SIZE> allowed_fds;
+    vector<int> exempted_fds;
 
-    HookContext() : pid(-1), flags(0) {}
+    struct RegisterInfo {
+        regex_t regex;
+        string symbol;
+        void *callback;
+        void **backup;
+    };
 
-    static void close_fds();
-    void unload_zygisk();
+    struct IgnoreInfo {
+        regex_t regex;
+        string symbol;
+    };
 
-    DCL_PRE_POST(fork)
+    pthread_mutex_t hook_info_lock;
+    vector<RegisterInfo> register_info;
+    vector<IgnoreInfo> ignore_info;
+
+    HookContext() :
+    env(nullptr), args{nullptr}, process(nullptr), pid(-1), info_flags(0),
+    hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {}
+
     void run_modules_pre(const vector<int> &fds);
     void run_modules_post();
+    DCL_PRE_POST(fork)
+    DCL_PRE_POST(app_specialize)
     DCL_PRE_POST(nativeForkAndSpecialize)
     DCL_PRE_POST(nativeSpecializeAppProcess)
     DCL_PRE_POST(nativeForkSystemServer)
+
+    void unload_zygisk();
+    void sanitize_fds();
+    bool exempt_fd(int fd);
+
+    // Compatibility shim
+    void plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup);
+    void plt_hook_exclude(const char *regex, const char *symbol);
+    void plt_hook_process_regex();
+
+    bool plt_hook_commit();
 };
 
 #undef DCL_PRE_POST
 
 // Global variables
-vector<tuple<const char *, const char *, void **>> *xhook_list;
+vector<tuple<dev_t, ino_t, const char *, void **>> *plt_hook_list;
 map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
 hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
@@ -124,8 +161,6 @@ string get_class_name(JNIEnv *env, jclass clazz) {
     return className;
 }
 
-// -----------------------------------------------------------------
-
 #define DCL_HOOK_FUNC(ret, func, ...) \
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
@@ -146,7 +181,6 @@ DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
 }
 
 // Skip actual fork and return cached result if applicable
-// Also unload first stage zygisk if necessary
 DCL_HOOK_FUNC(int, fork) {
     return (g_ctx && g_ctx->pid >= 0) ? g_ctx->pid : old_fork();
 }
@@ -154,20 +188,37 @@ DCL_HOOK_FUNC(int, fork) {
 // Unmount stuffs in the process's private mount namespace
 DCL_HOOK_FUNC(int, unshare, int flags) {
     int res = old_unshare(flags);
-    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0) {
-        if (g_ctx->state[DO_UNMOUNT]) {
+    if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0 &&
+        // For some unknown reason, unmounting app_process in SysUI can break.
+        // This is reproducible on the official AVD running API 26 and 27.
+        // Simply avoid doing any unmounts for SysUI to avoid potential issues.
+        (g_ctx->info_flags & PROCESS_IS_SYS_UI) == 0) {
+        if (g_ctx->flags[DO_REVERT_UNMOUNT]) {
             revert_unmount();
         } else {
             umount2("/system/bin/app_process64", MNT_DETACH);
             umount2("/system/bin/app_process32", MNT_DETACH);
         }
+        // Restore errno back to 0
+        errno = 0;
     }
     return res;
 }
 
-// A place to clean things up before zygote evaluates fd table
+// Close logd_fd if necessary to prevent crashing
+// For more info, check comments in zygisk_log_write
 DCL_HOOK_FUNC(void, android_log_close) {
-    HookContext::close_fds();
+    if (g_ctx == nullptr) {
+        // Happens during un-managed fork like nativeForkApp, nativeForkUsap
+        close(logd_fd.exchange(-1));
+    } else if (!g_ctx->flags[SKIP_FD_SANITIZATION]) {
+        close(logd_fd.exchange(-1));
+        if (g_ctx->pid <= 0) {
+            // Switch to plain old android logging because we cannot talk
+            // to magiskd to fetch our log pipe afterwards anyways.
+            android_logging();
+        }
+    }
     old_android_log_close();
 }
 
@@ -175,7 +226,7 @@ DCL_HOOK_FUNC(void, android_log_close) {
 DCL_HOOK_FUNC(int, selinux_android_setcontext,
         uid_t uid, int isSystemServer, const char *seinfo, const char *pkgname) {
     if (g_ctx) {
-        g_ctx->state[CAN_DLCLOSE] = unhook_functions();
+        g_ctx->flags[CAN_UNLOAD_ZYGISK] = unhook_functions();
     }
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }
@@ -280,45 +331,122 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
 }
 
 ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
-: raw_entry(entry), api(this), id(id), handle(handle) {}
+: id(id), handle(handle), entry{entry}, api{}, mod{nullptr} {
+    // Make sure all pointers are null
+    memset(&api, 0, sizeof(api));
+    api.base.impl = this;
+    api.base.registerModule = &ZygiskModule::RegisterModuleImpl;
+}
 
-ApiTable::ApiTable(ZygiskModule *m)
-: module(m), registerModule(&ZygiskModule::RegisterModule) {}
+bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
+    if (api == nullptr || module == nullptr)
+        return false;
 
-bool ZygiskModule::RegisterModule(ApiTable *table, long *module) {
-    long ver = *module;
+    long api_version = *module;
     // Unsupported version
-    if (ver > ZYGISK_API_VERSION)
+    if (api_version > ZYGISK_API_VERSION)
         return false;
 
     // Set the actual module_abi*
-    table->module->ver = module;
+    api->base.impl->mod = { module };
 
     // Fill in API accordingly with module API version
-    switch (ver) {
-    case 3:
-    case 2:
-        table->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
-        table->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
-        // fallthrough
-    case 1:
-        table->v1.hookJniNativeMethods = &hookJniNativeMethods;
-        table->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
-            xhook_register(p, s, n, o);
+    if (api_version >= 1) {
+        api->v1.hookJniNativeMethods = hookJniNativeMethods;
+        api->v1.pltHookRegister = [](auto a, auto b, auto c, auto d) {
+            if (g_ctx) g_ctx->plt_hook_register(a, b, c, d);
         };
-        table->v1.pltHookExclude = [](const char *p, const char *s) {
-            xhook_ignore(p, s);
+        api->v1.pltHookExclude = [](auto a, auto b) {
+            if (g_ctx) g_ctx->plt_hook_exclude(a, b);
         };
-        table->v1.pltHookCommit = []{ bool r = xhook_refresh(0) == 0; xhook_clear(); return r; };
-        table->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
-        table->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
-        break;
-    default:
-        // Unknown version number
-        return false;
+        api->v1.pltHookCommit = []() { return g_ctx && g_ctx->plt_hook_commit(); };
+        api->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
+        api->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
+    }
+    if (api_version >= 2) {
+        api->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
+    }
+    if (api_version >= 4) {
+        api->v4.pltHookCommit = lsplt::CommitHook;
+        api->v4.pltHookRegister = [](dev_t dev, ino_t inode, const char *symbol, void *fn, void **backup) {
+            if (dev == 0 || inode == 0 || symbol == nullptr || fn == nullptr)
+                return;
+            lsplt::RegisterHook(dev, inode, symbol, fn, backup);
+        };
+        api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
     }
 
     return true;
+}
+
+void HookContext::plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup) {
+    if (regex == nullptr || symbol == nullptr || fn == nullptr)
+        return;
+    regex_t re;
+    if (regcomp(&re, regex, REG_NOSUB) != 0)
+        return;
+    mutex_guard lock(hook_info_lock);
+    register_info.emplace_back(RegisterInfo{re, symbol, fn, backup});
+}
+
+void HookContext::plt_hook_exclude(const char *regex, const char *symbol) {
+    if (!regex) return;
+    regex_t re;
+    if (regcomp(&re, regex, REG_NOSUB) != 0)
+        return;
+    mutex_guard lock(hook_info_lock);
+    ignore_info.emplace_back(IgnoreInfo{re, symbol ?: ""});
+}
+
+void HookContext::plt_hook_process_regex() {
+    if (register_info.empty())
+        return;
+    for (auto &map : lsplt::MapInfo::Scan()) {
+        if (map.offset != 0 || !map.is_private || !(map.perms & PROT_READ)) continue;
+        for (auto &reg: register_info) {
+            if (regexec(&reg.regex, map.path.data(), 0, nullptr, 0) != 0)
+                continue;
+            bool ignored = false;
+            for (auto &ign: ignore_info) {
+                if (regexec(&ign.regex, map.path.data(), 0, nullptr, 0) != 0)
+                    continue;
+                if (ign.symbol.empty() || ign.symbol == reg.symbol) {
+                    ignored = true;
+                    break;
+                }
+            }
+            if (!ignored) {
+                lsplt::RegisterHook(map.dev, map.inode, reg.symbol, reg.callback, reg.backup);
+            }
+        }
+    }
+}
+
+bool HookContext::plt_hook_commit() {
+    {
+        mutex_guard lock(hook_info_lock);
+        plt_hook_process_regex();
+        register_info.clear();
+        ignore_info.clear();
+    }
+    return lsplt::CommitHook();
+}
+
+
+bool ZygiskModule::valid() const {
+    if (mod.api_version == nullptr)
+        return false;
+    switch (*mod.api_version) {
+    case 4:
+    case 3:
+    case 2:
+    case 1:
+        return mod.v1->impl && mod.v1->preAppSpecialize && mod.v1->postAppSpecialize &&
+            mod.v1->preServerSpecialize && mod.v1->postServerSpecialize;
+    default:
+        return false;
+    }
 }
 
 int ZygiskModule::connectCompanion() const {
@@ -344,7 +472,7 @@ void ZygiskModule::setOption(zygisk::Option opt) {
         return;
     switch (opt) {
     case zygisk::FORCE_DENYLIST_UNMOUNT:
-        g_ctx->state[DO_UNMOUNT] = true;
+        g_ctx->flags[DO_REVERT_UNMOUNT] = true;
         break;
     case zygisk::DLCLOSE_MODULE_LIBRARY:
         unload = true;
@@ -353,15 +481,105 @@ void ZygiskModule::setOption(zygisk::Option opt) {
 }
 
 uint32_t ZygiskModule::getFlags() {
-    return g_ctx ? (g_ctx->flags & ~PRIVATE_MASK) : 0;
+    return g_ctx ? (g_ctx->info_flags & ~PRIVATE_MASK) : 0;
+}
+
+// -----------------------------------------------------------------
+
+int sigmask(int how, int signum) {
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, signum);
+    return sigprocmask(how, &set, nullptr);
+}
+
+void HookContext::fork_pre() {
+    g_ctx = this;
+    // Do our own fork before loading any 3rd party code
+    // First block SIGCHLD, unblock after original fork is done
+    sigmask(SIG_BLOCK, SIGCHLD);
+    pid = old_fork();
+    if (pid != 0 || flags[SKIP_FD_SANITIZATION])
+        return;
+
+    // Record all open fds
+    auto dir = xopen_dir("/proc/self/fd");
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if (fd < 0 || fd >= MAX_FD_SIZE) {
+            close(fd);
+            continue;
+        }
+        allowed_fds[fd] = true;
+    }
+    // The dirfd should not be allowed
+    allowed_fds[dirfd(dir.get())] = false;
+}
+
+void HookContext::sanitize_fds() {
+    if (flags[SKIP_FD_SANITIZATION])
+        return;
+
+    if (flags[APP_FORK_AND_SPECIALIZE]) {
+        auto update_fd_array = [&](int off) -> jintArray {
+            if (exempted_fds.empty())
+                return nullptr;
+
+            jintArray array = env->NewIntArray(off + exempted_fds.size());
+            if (array == nullptr)
+                return nullptr;
+
+            env->SetIntArrayRegion(array, off, exempted_fds.size(), exempted_fds.data());
+            for (int fd : exempted_fds) {
+                if (fd >= 0 && fd < MAX_FD_SIZE) {
+                    allowed_fds[fd] = true;
+                }
+            }
+            *args.app->fds_to_ignore = array;
+            flags[SKIP_FD_SANITIZATION] = true;
+            return array;
+        };
+
+        if (jintArray fdsToIgnore = *args.app->fds_to_ignore) {
+            int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
+            int len = env->GetArrayLength(fdsToIgnore);
+            for (int i = 0; i < len; ++i) {
+                int fd = arr[i];
+                if (fd >= 0 && fd < MAX_FD_SIZE) {
+                    allowed_fds[fd] = true;
+                }
+            }
+            if (jintArray newFdList = update_fd_array(len)) {
+                env->SetIntArrayRegion(newFdList, 0, len, arr);
+            }
+            env->ReleaseIntArrayElements(fdsToIgnore, arr, JNI_ABORT);
+        } else {
+            update_fd_array(0);
+        }
+    }
+
+    if (pid != 0)
+        return;
+
+    // Close all forbidden fds to prevent crashing
+    auto dir = xopen_dir("/proc/self/fd");
+    int dfd = dirfd(dir.get());
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd) {
+            close(fd);
+        }
+    }
+}
+
+void HookContext::fork_post() {
+    // Unblock SIGCHLD in case the original method didn't
+    sigmask(SIG_UNBLOCK, SIGCHLD);
+    g_ctx = nullptr;
+    unload_zygisk();
 }
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
-
-    // Since we directly use the pointer to elements in the vector, in order to prevent dangling
-    // pointers, the vector has to be pre-allocated to ensure reallocation does not occur
-    modules.reserve(fds.size());
-
     for (int i = 0; i < fds.size(); ++i) {
         struct stat s{};
         if (fstat(fds[i], &s) != 0 || !S_ISREG(s.st_mode)) {
@@ -376,75 +594,72 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
             if (void *e = dlsym(h, "zygisk_module_entry")) {
                 modules.emplace_back(i, h, e);
             }
-        } else if (g_ctx->state[SERVER_SPECIALIZE]) {
+        } else if (g_ctx->flags[SERVER_FORK_AND_SPECIALIZE]) {
             LOGW("Failed to dlopen zygisk module: %s\n", dlerror());
         }
         close(fds[i]);
     }
 
-    // Record all open fds
-    bitset<1024> open_fds;
-    auto dir = open_dir("/proc/self/fd");
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        int fd = parse_int(entry->d_name);
-        if (fd < 0 || fd >= 1024) {
-            close(fd);
-            continue;
+    for (auto it = modules.begin(); it != modules.end();) {
+        it->onLoad(env);
+        if (it->valid()) {
+            ++it;
+        } else {
+            it = modules.erase(it);
         }
-        open_fds[fd] = true;
     }
 
     for (auto &m : modules) {
-        m.entry(&m.api, env);
-        if (state[APP_SPECIALIZE]) {
-            m.preAppSpecialize(args);
-        } else if (state[SERVER_SPECIALIZE]) {
-            m.preServerSpecialize(server_args);
-        }
-    }
-
-    // Add all ignored fd onto whitelist
-    if (state[APP_SPECIALIZE] && args->fds_to_ignore) {
-        if (jintArray fdsToIgnore = *args->fds_to_ignore) {
-            int len = env->GetArrayLength(fdsToIgnore);
-            int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
-            for (int i = 0; i < len; ++i) {
-                int fd = arr[i];
-                if (fd >= 0 && fd < 1024) {
-                    open_fds[fd] = true;
-                }
-            }
-            env->ReleaseIntArrayElements(fdsToIgnore, arr, JNI_ABORT);
-        }
-    }
-
-    // Close all unrecorded fds
-    rewinddir(dir.get());
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        int fd = parse_int(entry->d_name);
-        if (fd < 0 || fd >= 1024 || !open_fds[fd]) {
-            close(fd);
+        if (flags[APP_SPECIALIZE]) {
+            m.preAppSpecialize(args.app);
+        } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
+            m.preServerSpecialize(args.server);
         }
     }
 }
 
 void HookContext::run_modules_post() {
+    flags[POST_SPECIALIZE] = true;
     for (const auto &m : modules) {
-        if (state[APP_SPECIALIZE]) {
-            m.postAppSpecialize(args);
-        } else if (state[SERVER_SPECIALIZE]) {
-            m.postServerSpecialize(server_args);
+        if (flags[APP_SPECIALIZE]) {
+            m.postAppSpecialize(args.app);
+        } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
+            m.postServerSpecialize(args.server);
         }
-        m.doUnload();
+        m.tryUnload();
     }
 }
 
-void HookContext::close_fds() {
+void HookContext::app_specialize_pre() {
+    flags[APP_SPECIALIZE] = true;
+
+    vector<int> module_fds;
+    int fd = remote_get_info(args.app->uid, process, &info_flags, module_fds);
+    if ((info_flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
+        ZLOGI("[%s] is on the denylist\n", process);
+        flags[DO_REVERT_UNMOUNT] = true;
+    } else if (fd >= 0) {
+        run_modules_pre(module_fds);
+    }
+    close(fd);
+}
+
+
+void HookContext::app_specialize_post() {
+    run_modules_post();
+    if (info_flags & PROCESS_IS_MAGISK_APP) {
+        setenv("ZYGISK_ENABLED", "1", 1);
+    }
+
+    // Cleanups
+    env->ReleaseStringUTFChars(args.app->nice_name, process);
+    g_ctx = nullptr;
     close(logd_fd.exchange(-1));
+    android_logging();
 }
 
 void HookContext::unload_zygisk() {
-    if (state[CAN_DLCLOSE]) {
+    if (flags[CAN_UNLOAD_ZYGISK]) {
         // Do NOT call the destructor
         operator delete(jni_method_map);
         // Directly unmap the whole memory block
@@ -452,85 +667,69 @@ void HookContext::unload_zygisk() {
 
         // Strip out all API function pointers
         for (auto &m : modules) {
-            memset(&m.api, 0, sizeof(m.api));
+            m.clearApi();
         }
 
         new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
     }
 }
 
+bool HookContext::exempt_fd(int fd) {
+    if (flags[POST_SPECIALIZE] || flags[SKIP_FD_SANITIZATION])
+        return true;
+    if (!flags[APP_FORK_AND_SPECIALIZE])
+        return false;
+    exempted_fds.push_back(fd);
+    return true;
+}
+
 // -----------------------------------------------------------------
 
 void HookContext::nativeSpecializeAppProcess_pre() {
+    process = env->GetStringUTFChars(args.app->nice_name, nullptr);
+    ZLOGV("pre  specialize [%s]\n", process);
     g_ctx = this;
-    state[APP_SPECIALIZE] = true;
-    process = env->GetStringUTFChars(args->nice_name, nullptr);
-    if (state[FORK_AND_SPECIALIZE]) {
-        ZLOGV("pre  forkAndSpecialize [%s]\n", process);
-    } else {
-        ZLOGV("pre  specialize [%s]\n", process);
-    }
-
-    vector<int> module_fds;
-    int fd = remote_get_info(args->uid, process, &flags, module_fds);
-    if ((flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
-        ZLOGI("[%s] is on the denylist\n", process);
-        state[DO_UNMOUNT] = true;
-    } else if (fd >= 0) {
-        run_modules_pre(module_fds);
-    }
-    close(fd);
-
-    close_fds();
-    android_logging();
+    // App specialize does not check FD
+    flags[SKIP_FD_SANITIZATION] = true;
+    app_specialize_pre();
 }
 
 void HookContext::nativeSpecializeAppProcess_post() {
-    if (state[FORK_AND_SPECIALIZE]) {
-        ZLOGV("post forkAndSpecialize [%s]\n", process);
-    } else {
-        ZLOGV("post specialize [%s]\n", process);
-    }
-
-    env->ReleaseStringUTFChars(args->nice_name, process);
-    run_modules_post();
-    if (flags & PROCESS_IS_MAGISK_APP) {
-        setenv("ZYGISK_ENABLED", "1", 1);
-    }
-    g_ctx = nullptr;
-    if (!state[FORK_AND_SPECIALIZE]) {
-        unload_zygisk();
-    }
+    ZLOGV("post specialize [%s]\n", process);
+    app_specialize_post();
+    unload_zygisk();
 }
 
 void HookContext::nativeForkSystemServer_pre() {
-    fork_pre();
-    state[SERVER_SPECIALIZE] = true;
-    if (pid == 0) {
-        ZLOGV("pre  forkSystemServer\n");
-        vector<int> module_fds;
-        int fd = remote_get_info(1000, "system_server", &flags, module_fds);
-        if (fd >= 0) {
-            if (module_fds.empty()) {
-                write_int(fd, 0);
-            } else {
-                run_modules_pre(module_fds);
+    ZLOGV("pre  forkSystemServer\n");
+    flags[SERVER_FORK_AND_SPECIALIZE] = true;
 
-                // Send the bitset of module status back to magiskd from system_server
-                dynamic_bitset bits;
-                for (const auto &m : modules)
-                    bits[m.getId()] = true;
-                write_int(fd, bits.slots());
-                for (int i = 0; i < bits.slots(); ++i) {
-                    auto l = bits.get_slot(i);
-                    xwrite(fd, &l, sizeof(l));
-                }
+    fork_pre();
+    if (pid != 0)
+        return;
+
+    vector<int> module_fds;
+    int fd = remote_get_info(1000, "system_server", &info_flags, module_fds);
+    if (fd >= 0) {
+        if (module_fds.empty()) {
+            write_int(fd, 0);
+        } else {
+            run_modules_pre(module_fds);
+
+            // Send the bitset of module status back to magiskd from system_server
+            dynamic_bitset bits;
+            for (const auto &m : modules)
+                bits[m.getId()] = true;
+            write_int(fd, bits.slots());
+            for (int i = 0; i < bits.slots(); ++i) {
+                auto l = bits.get_slot(i);
+                xwrite(fd, &l, sizeof(l));
             }
-            close(fd);
         }
-        close_fds();
-        android_logging();
+        close(fd);
     }
+
+    sanitize_fds();
 }
 
 void HookContext::nativeForkSystemServer_post() {
@@ -542,101 +741,92 @@ void HookContext::nativeForkSystemServer_post() {
 }
 
 void HookContext::nativeForkAndSpecialize_pre() {
-    fork_pre();
-    state[FORK_AND_SPECIALIZE] = true;
-    if (pid == 0) {
-        nativeSpecializeAppProcess_pre();
+    process = env->GetStringUTFChars(args.app->nice_name, nullptr);
+    ZLOGV("pre  forkAndSpecialize [%s]\n", process);
+
+    flags[APP_FORK_AND_SPECIALIZE] = true;
+    if (args.app->fds_to_ignore == nullptr) {
+        // The field fds_to_ignore don't exist before Android 8.0, which FDs are not checked
+        flags[SKIP_FD_SANITIZATION] = true;
+    } else if (logd_fd >= 0) {
+        exempted_fds.push_back(logd_fd);
     }
+
+    fork_pre();
+    if (pid == 0) {
+        app_specialize_pre();
+    }
+    sanitize_fds();
 }
 
 void HookContext::nativeForkAndSpecialize_post() {
     if (pid == 0) {
-        nativeSpecializeAppProcess_post();
+        ZLOGV("post forkAndSpecialize [%s]\n", process);
+        app_specialize_post();
     }
     fork_post();
 }
 
-int sigmask(int how, int signum) {
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, signum);
-    return sigprocmask(how, &set, nullptr);
-}
-
-// Do our own fork before loading any 3rd party code
-// First block SIGCHLD, unblock after original fork is done
-void HookContext::fork_pre() {
-    g_ctx = this;
-    sigmask(SIG_BLOCK, SIGCHLD);
-    pid = old_fork();
-}
-
-// Unblock SIGCHLD in case the original method didn't
-void HookContext::fork_post() {
-    sigmask(SIG_UNBLOCK, SIGCHLD);
-    g_ctx = nullptr;
-    unload_zygisk();
-}
-
 } // namespace
 
-static bool hook_refresh() {
-    if (xhook_refresh(0) == 0) {
-        xhook_clear();
+static bool hook_commit() {
+    if (lsplt::CommitHook()) {
         return true;
     } else {
-        ZLOGE("xhook failed\n");
+        ZLOGE("plt_hook failed\n");
         return false;
     }
 }
 
-static int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
-    int ret = xhook_register(path, symbol, new_func, old_func);
-    if (ret != 0) {
-        ZLOGE("Failed to register hook \"%s\"\n", symbol);
-        return ret;
+static void hook_register(dev_t dev, ino_t inode, const char *symbol, void *new_func, void **old_func) {
+    if (!lsplt::RegisterHook(dev, inode, symbol, new_func, old_func)) {
+        ZLOGE("Failed to register plt_hook \"%s\"\n", symbol);
+        return;
     }
-    xhook_list->emplace_back(path, symbol, old_func);
-    return 0;
+    plt_hook_list->emplace_back(dev, inode, symbol, old_func);
 }
 
-#define XHOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
-    hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
+#define PLT_HOOK_REGISTER_SYM(DEV, INODE, SYM, NAME) \
+    hook_register(DEV, INODE, SYM, (void*) new_##NAME, (void **) &old_##NAME)
 
-#define XHOOK_REGISTER(PATH_REGEX, NAME) \
-    XHOOK_REGISTER_SYM(PATH_REGEX, #NAME, NAME)
-
-#define ANDROID_RUNTIME ".*/libandroid_runtime.so$"
-#define APP_PROCESS     "^/system/bin/app_process.*"
+#define PLT_HOOK_REGISTER(DEV, INODE, NAME) \
+    PLT_HOOK_REGISTER_SYM(DEV, INODE, #NAME, NAME)
 
 void hook_functions() {
-#if MAGISK_DEBUG
-    // xhook_enable_debug(1);
-    xhook_enable_sigsegv_protection(0);
-#endif
-    default_new(xhook_list);
+    default_new(plt_hook_list);
     default_new(jni_hook_list);
     default_new(jni_method_map);
 
-    XHOOK_REGISTER(ANDROID_RUNTIME, fork);
-    XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
-    XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
-    XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
-    XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
-    hook_refresh();
+    ino_t android_runtime_inode = 0;
+    dev_t android_runtime_dev = 0;
+    for (auto &map : lsplt::MapInfo::Scan()) {
+        if (map.path.ends_with("libandroid_runtime.so")) {
+            android_runtime_inode = map.inode;
+            android_runtime_dev = map.dev;
+            break;
+        }
+    }
+
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, jniRegisterNativeMethods);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
+    PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
+    hook_commit();
 
     // Remove unhooked methods
-    xhook_list->erase(
-            std::remove_if(xhook_list->begin(), xhook_list->end(),
-            [](auto &t) { return *std::get<2>(t) == nullptr;}),
-            xhook_list->end());
+    plt_hook_list->erase(
+            std::remove_if(plt_hook_list->begin(), plt_hook_list->end(),
+            [](auto &t) { return *std::get<3>(t) == nullptr;}),
+            plt_hook_list->end());
 
     if (old_jniRegisterNativeMethods == nullptr) {
         ZLOGD("jniRegisterNativeMethods not hooked, using fallback\n");
-
+        struct stat self_stat{};
+        stat("/proc/self/exe", &self_stat);
         // android::AndroidRuntime::setArgv0(const char*, bool)
-        XHOOK_REGISTER_SYM(APP_PROCESS, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
-        hook_refresh();
+        PLT_HOOK_REGISTER_SYM(self_stat.st_dev, self_stat.st_ino, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
+        hook_commit();
 
         // We still need old_jniRegisterNativeMethods as other code uses it
         // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char*, const JNINativeMethod*, int)
@@ -668,16 +858,16 @@ static bool unhook_functions() {
     }
     delete jni_hook_list;
 
-    // Unhook xhook
-    for (const auto &[path, sym, old_func] : *xhook_list) {
-        if (xhook_register(path, sym, *old_func, nullptr) != 0) {
-            ZLOGE("Failed to register xhook [%s]\n", sym);
+    // Unhook plt_hook
+    for (const auto &[dev, inode, sym, old_func] : *plt_hook_list) {
+        if (!lsplt::RegisterHook(dev, inode, sym, *old_func, nullptr)) {
+            ZLOGE("Failed to register plt_hook [%s]\n", sym);
             success = false;
         }
     }
-    delete xhook_list;
-    if (!hook_refresh()) {
-        ZLOGE("Failed to restore xhook\n");
+    delete plt_hook_list;
+    if (!hook_commit()) {
+        ZLOGE("Failed to restore plt_hook\n");
         success = false;
     }
 
