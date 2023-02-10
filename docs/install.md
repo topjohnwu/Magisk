@@ -53,8 +53,8 @@ Let's continue to [Patching Images](#patching-images).
   `adb pull /sdcard/Download/magisk_patched_[random_strings].img`
 - Flash the patched boot/recovery image to your device.<br>
   For most devices, reboot into fastboot mode and flash with command:<br>
-  `fastboot flash boot /path/to/magisk_patched.img` or <br>
-  `fastboot flash recovery /path/to/magisk_patched.img`
+  `fastboot flash [partition] /path/to/magisk_patched.img`. <br>
+  Which partition we need to flash depends on which image you patched. For example, if you patched `boot.img`, replace `[partition]` to `boot`.
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
   `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img`
 - Reboot and voila!
