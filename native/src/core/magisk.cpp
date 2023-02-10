@@ -23,7 +23,7 @@ Options:
    -v                        print running daemon version
    -V                        print running daemon version code
    --list                    list all available applets
-   --remove-modules [-n]     remove all modules and reboot if -n is not given
+   --remove-modules [-n]     remove all modules, reboot if -n is not provided
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
