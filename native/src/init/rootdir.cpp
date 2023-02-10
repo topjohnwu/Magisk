@@ -277,11 +277,9 @@ void MagiskInit::patch_rw_root() {
     link_path("/sbin", "/root");
 
     // Handle overlays
-    if (access("/overlay.d", F_OK) == 0) {
-        LOGD("Merge overlay.d\n");
-        load_overlay_rc("/overlay.d");
-        mv_path("/overlay.d", "/");
-    }
+    load_overlay_rc("/overlay.d");
+    mv_path("/overlay.d", "/");
+    rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
     // Patch init.rc

@@ -268,6 +268,7 @@ mount_partitions() {
     SLOT=`grep_cmdline androidboot.slot`
     [ -z $SLOT ] || SLOT=_${SLOT}
   fi
+  [ "$SLOT" = "normal" ] && unset SLOT
   [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"
 
   # Mount ro partitions
