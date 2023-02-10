@@ -68,8 +68,8 @@ abstract class BaseActivity : AppCompatActivity() {
             // Overwrite private members to avoid nasty "false" stack traces being logged
             val delegate = delegate
             val clz = delegate.javaClass
-            clz.reflectField("mActivityHandlesUiModeChecked").set(delegate, true)
-            clz.reflectField("mActivityHandlesUiMode").set(delegate, false)
+            clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
+            clz.reflectField("mActivityHandlesConfigFlags").set(delegate, 0)
         }
         contentCallback = savedInstanceState?.getParcelable(CONTENT_CALLBACK_KEY)
         super.onCreate(savedInstanceState)
