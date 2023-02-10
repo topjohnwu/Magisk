@@ -113,8 +113,8 @@ hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
 // Current context
 HookContext *g_ctx;
-const JNINativeInterface *old_functions;
-JNINativeInterface *new_functions;
+const JNINativeInterface *old_functions = nullptr;
+JNINativeInterface *new_functions = nullptr;
 
 } // namespace
 
@@ -144,15 +144,9 @@ if (methods[i].name == #method##sv) {                                           
 
 namespace {
 
-jclass gClassRef;
-jmethodID class_getName;
 string get_class_name(JNIEnv *env, jclass clazz) {
-    if (!gClassRef) {
-        jclass cls = env->FindClass("java/lang/Class");
-        gClassRef = (jclass) env->NewGlobalRef(cls);
-        env->DeleteLocalRef(cls);
-        class_getName = env->GetMethodID(gClassRef, "getName", "()Ljava/lang/String;");
-    }
+    static auto class_getName = env->GetMethodID(
+            env->FindClass("java/lang/Class"), "getName", "()Ljava/lang/String;");
     auto nameRef = (jstring) env->CallObjectMethod(clazz, class_getName);
     const char *name = env->GetStringUTFChars(nameRef, nullptr);
     string className(name);
@@ -173,11 +167,45 @@ jint env_RegisterNatives(
     return old_functions->RegisterNatives(env, clazz, newMethods.get() ?: methods, numMethods);
 }
 
-DCL_HOOK_FUNC(int, jniRegisterNativeMethods,
-        JNIEnv *env, const char *className, const JNINativeMethod *methods, int numMethods) {
-    ZLOGV("jniRegisterNativeMethods [%s]\n", className);
-    auto newMethods = hookAndSaveJNIMethods(className, methods, numMethods);
-    return old_jniRegisterNativeMethods(env, className, newMethods.get() ?: methods, numMethods);
+DCL_HOOK_FUNC(void, androidSetCreateThreadFunc, void *func) {
+    ZLOGD("androidSetCreateThreadFunc\n");
+    using method_sig = jint(*)(JavaVM **, jsize, jsize *);
+    do {
+        auto get_created_vms = reinterpret_cast<method_sig>(
+                dlsym(RTLD_DEFAULT, "JNI_GetCreatedJavaVMs"));
+        if (!get_created_vms) {
+            for (auto &map: lsplt::MapInfo::Scan()) {
+                if (!map.path.ends_with("/libnativehelper.so")) continue;
+                void *h = dlopen(map.path.data(), RTLD_LAZY);
+                if (!h) {
+                    LOGW("cannot dlopen libnativehelper.so: %s\n", dlerror());
+                    break;
+                }
+                get_created_vms = reinterpret_cast<method_sig>(dlsym(h, "JNI_GetCreatedJavaVMs"));
+                dlclose(h);
+                break;
+            }
+            if (!get_created_vms) {
+                LOGW("JNI_GetCreatedJavaVMs not found\n");
+                break;
+            }
+        }
+        JavaVM *vm = nullptr;
+        jsize num = 0;
+        jint res = get_created_vms(&vm, 1, &num);
+        if (res != JNI_OK || vm == nullptr) break;
+        JNIEnv *env = nullptr;
+        res = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+        if (res != JNI_OK || env == nullptr) break;
+        default_new(new_functions);
+        memcpy(new_functions, env->functions, sizeof(*new_functions));
+        new_functions->RegisterNatives = &env_RegisterNatives;
+
+        // Replace the function table in JNIEnv to hook RegisterNatives
+        old_functions = env->functions;
+        env->functions = new_functions;
+    } while (false);
+    old_androidSetCreateThreadFunc(func);
 }
 
 // Skip actual fork and return cached result if applicable
@@ -231,67 +259,6 @@ DCL_HOOK_FUNC(int, selinux_android_setcontext,
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }
 
-// -----------------------------------------------------------------
-
-// The original android::AppRuntime virtual table
-void **gAppRuntimeVTable;
-
-// This method is a trampoline for hooking JNIEnv->RegisterNatives
-void onVmCreated(void *self, JNIEnv* env) {
-    ZLOGD("AppRuntime::onVmCreated\n");
-
-    // Restore virtual table
-    auto new_table = *reinterpret_cast<void***>(self);
-    *reinterpret_cast<void***>(self) = gAppRuntimeVTable;
-    delete[] new_table;
-
-    new_functions = new JNINativeInterface();
-    memcpy(new_functions, env->functions, sizeof(*new_functions));
-    new_functions->RegisterNatives = &env_RegisterNatives;
-
-    // Replace the function table in JNIEnv to hook RegisterNatives
-    old_functions = env->functions;
-    env->functions = new_functions;
-}
-
-template<int N>
-void vtable_entry(void *self, JNIEnv* env) {
-    // The first invocation will be onVmCreated. It will also restore the vtable.
-    onVmCreated(self, env);
-    // Call original function
-    reinterpret_cast<decltype(&onVmCreated)>(gAppRuntimeVTable[N])(self, env);
-}
-
-// This method is a trampoline for swizzling android::AppRuntime vtable
-bool swizzled = false;
-DCL_HOOK_FUNC(void, setArgv0, void *self, const char *argv0, bool setProcName) {
-    if (swizzled) {
-        old_setArgv0(self, argv0, setProcName);
-        return;
-    }
-
-    ZLOGD("AndroidRuntime::setArgv0\n");
-
-    // We don't know which entry is onVmCreated, so overwrite every one
-    // We also don't know the size of the vtable, but 8 is more than enough
-    auto new_table = new void*[8];
-    new_table[0] = reinterpret_cast<void*>(&vtable_entry<0>);
-    new_table[1] = reinterpret_cast<void*>(&vtable_entry<1>);
-    new_table[2] = reinterpret_cast<void*>(&vtable_entry<2>);
-    new_table[3] = reinterpret_cast<void*>(&vtable_entry<3>);
-    new_table[4] = reinterpret_cast<void*>(&vtable_entry<4>);
-    new_table[5] = reinterpret_cast<void*>(&vtable_entry<5>);
-    new_table[6] = reinterpret_cast<void*>(&vtable_entry<6>);
-    new_table[7] = reinterpret_cast<void*>(&vtable_entry<7>);
-
-    // Swizzle C++ vtable to hook virtual function
-    gAppRuntimeVTable = *reinterpret_cast<void***>(self);
-    *reinterpret_cast<void***>(self) = new_table;
-    swizzled = true;
-
-    old_setArgv0(self, argv0, setProcName);
-}
-
 #undef DCL_HOOK_FUNC
 
 // -----------------------------------------------------------------
@@ -327,7 +294,8 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
     if (hooks.empty())
         return;
 
-    old_jniRegisterNativeMethods(env, clz, hooks.data(), hooks.size());
+    old_functions->RegisterNatives(env, env->FindClass(clz), hooks.data(),
+                                   static_cast<int>(hooks.size()));
 }
 
 ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
@@ -525,11 +493,12 @@ void HookContext::sanitize_fds() {
             if (exempted_fds.empty())
                 return nullptr;
 
-            jintArray array = env->NewIntArray(off + exempted_fds.size());
+            jintArray array = env->NewIntArray(static_cast<int>(off + exempted_fds.size()));
             if (array == nullptr)
                 return nullptr;
 
-            env->SetIntArrayRegion(array, off, exempted_fds.size(), exempted_fds.data());
+            env->SetIntArrayRegion(array, off, static_cast<int>(exempted_fds.size()),
+                                   exempted_fds.data());
             for (int fd : exempted_fds) {
                 if (fd >= 0 && fd < MAX_FD_SIZE) {
                     allowed_fds[fd] = true;
@@ -720,7 +689,7 @@ void HookContext::nativeForkSystemServer_pre() {
             dynamic_bitset bits;
             for (const auto &m : modules)
                 bits[m.getId()] = true;
-            write_int(fd, bits.slots());
+            write_int(fd, static_cast<int>(bits.slots()));
             for (int i = 0; i < bits.slots(); ++i) {
                 auto l = bits.get_slot(i);
                 xwrite(fd, &l, sizeof(l));
@@ -810,30 +779,15 @@ void hook_functions() {
 
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
-    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, jniRegisterNativeMethods);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, androidSetCreateThreadFunc);
     PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
     hook_commit();
-
     // Remove unhooked methods
     plt_hook_list->erase(
             std::remove_if(plt_hook_list->begin(), plt_hook_list->end(),
             [](auto &t) { return *std::get<3>(t) == nullptr;}),
             plt_hook_list->end());
-
-    if (old_jniRegisterNativeMethods == nullptr) {
-        ZLOGD("jniRegisterNativeMethods not hooked, using fallback\n");
-        struct stat self_stat{};
-        stat("/proc/self/exe", &self_stat);
-        // android::AndroidRuntime::setArgv0(const char*, bool)
-        PLT_HOOK_REGISTER_SYM(self_stat.st_dev, self_stat.st_ino, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
-        hook_commit();
-
-        // We still need old_jniRegisterNativeMethods as other code uses it
-        // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char*, const JNINativeMethod*, int)
-        constexpr char sig[] = "_ZN7android14AndroidRuntime21registerNativeMethodsEP7_JNIEnvPKcPK15JNINativeMethodi";
-        *(void **) &old_jniRegisterNativeMethods = dlsym(RTLD_DEFAULT, sig);
-    }
 }
 
 static bool unhook_functions() {
@@ -842,17 +796,14 @@ static bool unhook_functions() {
     // Restore JNIEnv
     if (g_ctx->env->functions == new_functions) {
         g_ctx->env->functions = old_functions;
-        if (gClassRef) {
-            g_ctx->env->DeleteGlobalRef(gClassRef);
-            gClassRef = nullptr;
-            class_getName = nullptr;
-        }
+        delete new_functions;
     }
 
     // Unhook JNI methods
     for (const auto &[clz, methods] : *jni_hook_list) {
-        if (!methods.empty() && old_jniRegisterNativeMethods(
-                g_ctx->env, clz.data(), methods.data(), methods.size()) != 0) {
+        if (!methods.empty() && g_ctx->env->RegisterNatives(
+                g_ctx->env->FindClass(clz.data()), methods.data(),
+                static_cast<int>(methods.size())) != 0) {
             ZLOGE("Failed to restore JNI hook of class [%s]\n", clz.data());
             success = false;
         }
