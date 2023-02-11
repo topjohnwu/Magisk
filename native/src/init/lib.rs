@@ -2,6 +2,7 @@ use std::env;
 use std::path::Path;
 
 pub use base;
+use base::libc::{dev_t, makedev};
 use base::read_lines;
 pub use logging::*;
 
@@ -27,7 +28,7 @@ pub fn print_rules_device() -> i32 {
     let encrypted = env::var("ISENCRYPTED").map_or(false, |var| var == "true");
 
     let mut matched = UNKNOWN;
-    let mut rules_dev = String::new();
+    let mut rules_dev: dev_t = 0;
 
     if let Ok(lines) = read_lines("/proc/self/mountinfo") {
         for line in lines {
@@ -60,9 +61,14 @@ pub fn print_rules_device() -> i32 {
                     continue;
                 }
                 if let Some(device) = line.splitn(4, ' ').nth(2) {
-                    rules_dev.clear();
-                    rules_dev += device;
-                    matched = new_matched;
+                    device.split_once(':').map(|(a, b)| {
+                        a.parse::<i32>().ok().map(|a| {
+                            b.parse::<i32>().ok().map(|b| {
+                                rules_dev = unsafe { makedev(a, b) };
+                                matched = new_matched;
+                            })
+                        })
+                    });
                 }
             }
         }

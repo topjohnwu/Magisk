@@ -1,6 +1,7 @@
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <libgen.h>
+#include <inttypes.h>
 
 #include <base.hpp>
 #include <selinux.hpp>
@@ -117,9 +118,16 @@ static void switch_root(const string &path) {
 }
 
 void MagiskInit::mount_rules_dir() {
-    if (config->rules_dev == 0)
-        return;
-    xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, config->rules_dev);
+    dev_t rules_dev = 0;
+    parse_prop_file(".backup/.magisk", [&rules_dev](auto key, auto value) -> bool {
+        if (key == "RULESDEVICE") {
+            sscanf(value.data(), "%" PRIuPTR, &rules_dev);
+            return false;
+        }
+        return true;
+    });
+    if (!rules_dev) return;
+    xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, rules_dev);
     xmkdir(MIRRDIR "/rules", 0);
     if (xmount(BLOCKDIR "/rules", MIRRDIR "/rules", "ext4", 0, nullptr) == 0) {
         string custom_rules_dir = MIRRDIR "/rules";

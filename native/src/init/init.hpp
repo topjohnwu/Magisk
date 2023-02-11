@@ -18,7 +18,6 @@ struct BootConfig {
     char fstab_suffix[32];
     char hardware[32];
     char hardware_plat[32];
-    dev_t rules_dev;
 
     void set(const kv_pairs &);
     void print();
