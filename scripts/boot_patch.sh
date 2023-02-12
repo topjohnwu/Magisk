@@ -73,11 +73,15 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+[ -z $ISENCRYPTED ] && ISENCRYPTED=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
+export ISENCRYPTED
 
 chmod -R 755 .
+
+RULESDEVICE="$(./magiskinit --rules-device)" || abort "! Unable to find rules partition!"
 
 #########
 # Unpack
@@ -152,6 +156,7 @@ echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
+echo "RULESDEVICE=$RULESDEVICE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
 # Compress to save precious ramdisk space

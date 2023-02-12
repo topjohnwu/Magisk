@@ -637,37 +637,14 @@ run_migrations() {
 }
 
 copy_sepolicy_rules() {
-  # Remove all existing rule folders
-  rm -rf /data/unencrypted/magisk /cache/magisk /metadata/magisk /persist/magisk /mnt/vendor/persist/magisk
-
-  # Find current active RULESDIR
-  local RULESDIR
-  local ACTIVEDIR=$(magisk --path)/.magisk/mirror/sepolicy.rules
-  if [ -L $ACTIVEDIR ]; then
-    RULESDIR=$(readlink $ACTIVEDIR)
-    [ "${RULESDIR:0:1}" != "/" ] && RULESDIR="$(magisk --path)/.magisk/mirror/$RULESDIR"
-  elif ! $ISENCRYPTED; then
-    RULESDIR=$NVBASE/modules
-  elif [ -d /data/unencrypted ] && ! grep ' /data ' /proc/mounts | grep -qE 'dm-|f2fs'; then
-    RULESDIR=/data/unencrypted/magisk
-  elif grep ' /cache ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/cache/magisk
-  elif grep ' /metadata ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/metadata/magisk
-  elif grep ' /persist ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/persist/magisk
-  elif grep ' /mnt/vendor/persist ' /proc/mounts | grep -q 'ext4' ; then
-    RULESDIR=/mnt/vendor/persist/magisk
-  else
+  local RULESDIR=$(magisk --path)/.magisk/sepolicy.rules
+  if ! grep -q " $RULESDIR " /proc/mounts; then
     ui_print "- Unable to find sepolicy rules dir"
     return 1
   fi
 
-  if [ -d ${RULESDIR%/magisk} ]; then
-    echo "RULESDIR=$RULESDIR" >&2
-  else
-    ui_print "- Unable to find sepolicy rules dir ${RULESDIR%/magisk}"
-    return 1
+  if ! grep -q "/adb/modules $RULESDIR " /proc/self/mountinfo; then
+    rm -rf $RULESDIR/*
   fi
 
   # Copy all enabled sepolicy.rule
