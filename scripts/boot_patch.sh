@@ -185,7 +185,7 @@ fi
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz stub.apk
 
 #################
 # Binary Patches
