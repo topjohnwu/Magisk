@@ -1,5 +1,9 @@
 use std::ffi::CStr;
+use std::fs::File;
+use std::io;
+use std::io::BufRead;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::path::Path;
 
 use libc::{c_char, c_uint, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH};
 
@@ -130,4 +134,9 @@ pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
         }
         0
     }
+}
+
+pub fn read_lines<P: AsRef<Path>>(path: P) -> io::Result<io::Lines<io::BufReader<File>>> {
+    let file = File::open(path)?;
+    Ok(io::BufReader::new(file).lines())
 }
