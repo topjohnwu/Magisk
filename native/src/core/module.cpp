@@ -305,6 +305,9 @@ void load_modules() {
         mount_zygisk(32)
         mount_zygisk(64)
     }
+
+    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
+    xmount(nullptr, worker_dir.data(), nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 }
 
 /************************

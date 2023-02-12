@@ -113,8 +113,8 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d $MAGISKTMP/modules/hosts ] && return
-  cd $MAGISKTMP/modules
+  [ -d $NVBASE/modules/hosts ] && return
+  cd $NVBASE/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts

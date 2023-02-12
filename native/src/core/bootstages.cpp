@@ -69,7 +69,7 @@ static void mount_mirrors() {
     LOGI("* Mounting module root\n");
     if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
         if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
-            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
             restorecon();
             chmod(SECURE_DIR, 0700);
         }
