@@ -231,7 +231,7 @@ void BaseInit::exec_init() {
 void BaseInit::prepare_data() {
     LOGD("Setup data tmp\n");
     xmkdir("/data", 0755);
-    xmount("tmpfs", "/data", "tmpfs", 0, "mode=755");
+    xmount("magisk", "/data", "tmpfs", 0, "mode=755");
 
     cp_afc("/init", "/data/magiskinit");
     cp_afc("/.backup", "/data/.backup");
