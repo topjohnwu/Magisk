@@ -122,6 +122,11 @@ abstract class MagiskInstallImpl protected constructor(
                 val lib32 = info.javaClass.getDeclaredField("secondaryNativeLibraryDir").get(info) as String?
                 if (lib32 != null) {
                     libs += File(lib32, "libmagisk32.so")
+                } else {
+                    // Copy magisk32 from assets if the native library isn't available
+                    val name = "libmagisk32.so"
+                    val dest = File(installDir, "magisk32")
+                    context.assets.open(name).writeTo(dest)
                 }
 
                 for (lib in libs) {

@@ -9,10 +9,8 @@ object Const {
 
     val CPU_ABI: String get() = Build.SUPPORTED_ABIS[0]
 
-    // Null if 32-bit only or 64-bit only
-    val CPU_ABI_32 =
-        if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) null
-        else Build.SUPPORTED_32_BIT_ABIS.firstOrNull()
+    // Force ABI since the device is going to lie to us
+    val CPU_ABI_32 = "armeabi-v7a"
 
     // Paths
     const val MAGISK_PATH  = "/data/adb/modules"
