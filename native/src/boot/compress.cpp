@@ -43,13 +43,17 @@ public:
         case ENCODE:
             deflateEnd(&strm);
             break;
+        default:
+            break;
         }
     }
 
 protected:
     enum mode_t {
         DECODE,
-        ENCODE
+        ENCODE,
+        WAIT,
+        COPY
     } mode;
 
     gz_strm(mode_t mode, stream_ptr &&base) :
@@ -61,6 +65,8 @@ protected:
         case ENCODE:
             deflateInit2(&strm, 9, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY);
             break;
+        default:
+            break;
         }
     }
 
@@ -69,6 +75,20 @@ private:
     uint8_t outbuf[CHUNK];
 
     bool do_write(const void *buf, size_t len, int flush) {
+        if (mode == WAIT) {
+            if (len == 0) return true;
+            Bytef b[1] = {0x1f};
+            if (*(Bytef *)buf == 0x8b) {
+                mode = DECODE;
+                inflateReset(&strm);
+                strm.next_in = b;
+                strm.avail_in = 1;
+                inflate(&strm, flush);
+            } else {
+                mode = COPY;
+                bwrite(b, 1);
+            }
+        }
         strm.next_in = (Bytef *) buf;
         strm.avail_in = len;
         do {
@@ -82,6 +102,11 @@ private:
                 case ENCODE:
                     code = deflate(&strm, flush);
                     break;
+                case COPY:
+                    return bwrite(buf, len);
+                default:
+                    // should have been handled
+                    return false;
             }
             if (code == Z_STREAM_ERROR) {
                 LOGW("gzip %s failed (%d)\n", mode ? "encode" : "decode", code);
@@ -89,6 +114,31 @@ private:
             }
             if (!bwrite(outbuf, sizeof(outbuf) - strm.avail_out))
                 return false;
+            if (mode == DECODE && code == Z_STREAM_END) {
+                if (strm.avail_in > 1) {
+                    if (strm.next_in[0] == 0x1f && strm.next_in[1] == 0x8b) {
+                        // There is still data in the stream, we need to reset the stream
+                        // and continue decoding
+                        inflateReset(&strm);
+                        strm.avail_out = 0;
+                        continue;
+                    }
+                } else if (strm.avail_in == 1) {
+                    if (strm.next_in[0] == 0x1f) {
+                        // If there is only one byte left, we need to wait for the next byte
+                        // to determine if it is a gzip header
+                        mode = WAIT;
+                        return true;
+                    }
+                } else {
+                    // The next inflate won't consume any data but fallback
+                    // to the previous two conditions
+                    return true;
+                }
+                // There is still data in the stream, we need to copy it
+                mode = COPY;
+                bwrite(strm.next_in, strm.avail_in);
+            }
         } while (strm.avail_out == 0);
         return true;
     }
