@@ -368,6 +368,7 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
         api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
     }
     if (api_version >= 4) {
+        api->v4.pltHookCommit = lsplt::CommitHook;
         api->v4.pltHookRegister = [](dev_t dev, ino_t inode, const char *symbol, void *fn, void **backup) {
             if (dev == 0 || inode == 0 || symbol == nullptr || fn == nullptr)
                 return;
@@ -519,7 +520,7 @@ void HookContext::sanitize_fds() {
     if (flags[SKIP_FD_SANITIZATION])
         return;
 
-    if (flags[APP_FORK_AND_SPECIALIZE]) {
+    if (flags[APP_FORK_AND_SPECIALIZE] && args.app->fds_to_ignore) {
         auto update_fd_array = [&](int off) -> jintArray {
             if (exempted_fds.empty())
                 return nullptr;
@@ -565,7 +566,7 @@ void HookContext::sanitize_fds() {
     int dfd = dirfd(dir.get());
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         int fd = parse_int(entry->d_name);
-        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd) {
+        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd && fd != logd_fd) {
             close(fd);
         }
     }
@@ -745,8 +746,9 @@ void HookContext::nativeForkAndSpecialize_pre() {
 
     flags[APP_FORK_AND_SPECIALIZE] = true;
     if (args.app->fds_to_ignore == nullptr) {
-        // The field fds_to_ignore don't exist before Android 8.0, which FDs are not checked
-        flags[SKIP_FD_SANITIZATION] = true;
+        // if fds_to_ignore does not exist and there's no FileDescriptorTable::Create,
+        // we can skip fd sanitization
+        flags[SKIP_FD_SANITIZATION] = !dlsym(RTLD_DEFAULT, "_ZN19FileDescriptorTable6CreateEv");
     } else if (logd_fd >= 0) {
         exempted_fds.push_back(logd_fd);
     }
