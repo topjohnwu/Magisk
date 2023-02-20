@@ -1,10 +1,11 @@
 #include <android/dlext.h>
 #include <sys/mount.h>
 #include <dlfcn.h>
+#include <regex.h>
 #include <bitset>
 #include <list>
 
-#include <xhook.h>
+#include <lsplt.hpp>
 
 #include <base.hpp>
 #include <flags.h>
@@ -22,7 +23,7 @@ using xstring = jni_hook::string;
 
 // Extreme verbose logging
 //#define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...)
+#define ZLOGV(...) (void*)0
 
 static bool unhook_functions();
 
@@ -63,7 +64,25 @@ struct HookContext {
     bitset<MAX_FD_SIZE> allowed_fds;
     vector<int> exempted_fds;
 
-    HookContext() : env(nullptr), args{nullptr}, process(nullptr), pid(-1), info_flags(0) {}
+    struct RegisterInfo {
+        regex_t regex;
+        string symbol;
+        void *callback;
+        void **backup;
+    };
+
+    struct IgnoreInfo {
+        regex_t regex;
+        string symbol;
+    };
+
+    pthread_mutex_t hook_info_lock;
+    vector<RegisterInfo> register_info;
+    vector<IgnoreInfo> ignore_info;
+
+    HookContext() :
+    env(nullptr), args{nullptr}, process(nullptr), pid(-1), info_flags(0),
+    hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {}
 
     void run_modules_pre(const vector<int> &fds);
     void run_modules_post();
@@ -76,12 +95,19 @@ struct HookContext {
     void unload_zygisk();
     void sanitize_fds();
     bool exempt_fd(int fd);
+
+    // Compatibility shim
+    void plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup);
+    void plt_hook_exclude(const char *regex, const char *symbol);
+    void plt_hook_process_regex();
+
+    bool plt_hook_commit();
 };
 
 #undef DCL_PRE_POST
 
 // Global variables
-vector<tuple<const char *, const char *, void **>> *xhook_list;
+vector<tuple<dev_t, ino_t, const char *, void **>> *plt_hook_list;
 map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
 hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 
@@ -325,49 +351,96 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
     api->base.impl->mod = { module };
 
     // Fill in API accordingly with module API version
-    switch (api_version) {
-    case 4:
-        api->v4.exemptFd = [](int fd) { return g_ctx != nullptr && g_ctx->exempt_fd(fd); };
-        // fallthrough
-    case 3:
-    case 2:
-        api->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
-        api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
-        // fallthrough
-    case 1:
-        api->v1.hookJniNativeMethods = &hookJniNativeMethods;
-        api->v1.pltHookRegister = [](const char *p, const char *s, void *n, void **o) {
-            xhook_register(p, s, n, o);
+    if (api_version >= 1) {
+        api->v1.hookJniNativeMethods = hookJniNativeMethods;
+        api->v1.pltHookRegister = [](auto a, auto b, auto c, auto d) {
+            if (g_ctx) g_ctx->plt_hook_register(a, b, c, d);
         };
-        api->v1.pltHookExclude = [](const char *p, const char *s) {
-            xhook_ignore(p, s);
+        api->v1.pltHookExclude = [](auto a, auto b) {
+            if (g_ctx) g_ctx->plt_hook_exclude(a, b);
         };
-        api->v1.pltHookCommit = [] {
-            bool r = xhook_refresh(0) == 0;
-            xhook_clear();
-            return r;
-        };
+        api->v1.pltHookCommit = []() { return g_ctx && g_ctx->plt_hook_commit(); };
         api->v1.connectCompanion = [](ZygiskModule *m) { return m->connectCompanion(); };
         api->v1.setOption = [](ZygiskModule *m, auto opt) { m->setOption(opt); };
-        break;
-    default:
-        // Unknown version number
-        return false;
+    }
+    if (api_version >= 2) {
+        api->v2.getModuleDir = [](ZygiskModule *m) { return m->getModuleDir(); };
+        api->v2.getFlags = [](auto) { return ZygiskModule::getFlags(); };
+    }
+    if (api_version >= 4) {
+        api->v4.pltHookCommit = lsplt::CommitHook;
+        api->v4.pltHookRegister = [](dev_t dev, ino_t inode, const char *symbol, void *fn, void **backup) {
+            if (dev == 0 || inode == 0 || symbol == nullptr || fn == nullptr)
+                return;
+            lsplt::RegisterHook(dev, inode, symbol, fn, backup);
+        };
+        api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
     }
 
     return true;
 }
+
+void HookContext::plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup) {
+    if (regex == nullptr || symbol == nullptr || fn == nullptr)
+        return;
+    regex_t re;
+    if (regcomp(&re, regex, REG_NOSUB) != 0)
+        return;
+    mutex_guard lock(hook_info_lock);
+    register_info.emplace_back(RegisterInfo{re, symbol, fn, backup});
+}
+
+void HookContext::plt_hook_exclude(const char *regex, const char *symbol) {
+    if (!regex) return;
+    regex_t re;
+    if (regcomp(&re, regex, REG_NOSUB) != 0)
+        return;
+    mutex_guard lock(hook_info_lock);
+    ignore_info.emplace_back(IgnoreInfo{re, symbol ?: ""});
+}
+
+void HookContext::plt_hook_process_regex() {
+    if (register_info.empty())
+        return;
+    for (auto &map : lsplt::MapInfo::Scan()) {
+        if (map.offset != 0 || !map.is_private || !(map.perms & PROT_READ)) continue;
+        for (auto &reg: register_info) {
+            if (regexec(&reg.regex, map.path.data(), 0, nullptr, 0) != 0)
+                continue;
+            bool ignored = false;
+            for (auto &ign: ignore_info) {
+                if (regexec(&ign.regex, map.path.data(), 0, nullptr, 0) != 0)
+                    continue;
+                if (ign.symbol.empty() || ign.symbol == reg.symbol) {
+                    ignored = true;
+                    break;
+                }
+            }
+            if (!ignored) {
+                lsplt::RegisterHook(map.dev, map.inode, reg.symbol, reg.callback, reg.backup);
+            }
+        }
+    }
+}
+
+bool HookContext::plt_hook_commit() {
+    {
+        mutex_guard lock(hook_info_lock);
+        plt_hook_process_regex();
+        register_info.clear();
+        ignore_info.clear();
+    }
+    return lsplt::CommitHook();
+}
+
 
 bool ZygiskModule::valid() const {
     if (mod.api_version == nullptr)
         return false;
     switch (*mod.api_version) {
     case 4:
-        // fallthrough
     case 3:
-        // fallthrough
     case 2:
-        // fallthrough
     case 1:
         return mod.v1->impl && mod.v1->preAppSpecialize && mod.v1->postAppSpecialize &&
             mod.v1->preServerSpecialize && mod.v1->postServerSpecialize;
@@ -447,7 +520,7 @@ void HookContext::sanitize_fds() {
     if (flags[SKIP_FD_SANITIZATION])
         return;
 
-    if (flags[APP_FORK_AND_SPECIALIZE]) {
+    if (flags[APP_FORK_AND_SPECIALIZE] && args.app->fds_to_ignore) {
         auto update_fd_array = [&](int off) -> jintArray {
             if (exempted_fds.empty())
                 return nullptr;
@@ -493,7 +566,7 @@ void HookContext::sanitize_fds() {
     int dfd = dirfd(dir.get());
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         int fd = parse_int(entry->d_name);
-        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd) {
+        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd && fd != logd_fd) {
             close(fd);
         }
     }
@@ -673,8 +746,9 @@ void HookContext::nativeForkAndSpecialize_pre() {
 
     flags[APP_FORK_AND_SPECIALIZE] = true;
     if (args.app->fds_to_ignore == nullptr) {
-        // The field fds_to_ignore don't exist before Android 8.0, which FDs are not checked
-        flags[SKIP_FD_SANITIZATION] = true;
+        // if fds_to_ignore does not exist and there's no FileDescriptorTable::Create,
+        // we can skip fd sanitization
+        flags[SKIP_FD_SANITIZATION] = !dlsym(RTLD_DEFAULT, "_ZN19FileDescriptorTable6CreateEv");
     } else if (logd_fd >= 0) {
         exempted_fds.push_back(logd_fd);
     }
@@ -696,63 +770,64 @@ void HookContext::nativeForkAndSpecialize_post() {
 
 } // namespace
 
-static bool hook_refresh() {
-    if (xhook_refresh(0) == 0) {
-        xhook_clear();
+static bool hook_commit() {
+    if (lsplt::CommitHook()) {
         return true;
     } else {
-        ZLOGE("xhook failed\n");
+        ZLOGE("plt_hook failed\n");
         return false;
     }
 }
 
-static int hook_register(const char *path, const char *symbol, void *new_func, void **old_func) {
-    int ret = xhook_register(path, symbol, new_func, old_func);
-    if (ret != 0) {
-        ZLOGE("Failed to register hook \"%s\"\n", symbol);
-        return ret;
+static void hook_register(dev_t dev, ino_t inode, const char *symbol, void *new_func, void **old_func) {
+    if (!lsplt::RegisterHook(dev, inode, symbol, new_func, old_func)) {
+        ZLOGE("Failed to register plt_hook \"%s\"\n", symbol);
+        return;
     }
-    xhook_list->emplace_back(path, symbol, old_func);
-    return 0;
+    plt_hook_list->emplace_back(dev, inode, symbol, old_func);
 }
 
-#define XHOOK_REGISTER_SYM(PATH_REGEX, SYM, NAME) \
-    hook_register(PATH_REGEX, SYM, (void*) new_##NAME, (void **) &old_##NAME)
+#define PLT_HOOK_REGISTER_SYM(DEV, INODE, SYM, NAME) \
+    hook_register(DEV, INODE, SYM, (void*) new_##NAME, (void **) &old_##NAME)
 
-#define XHOOK_REGISTER(PATH_REGEX, NAME) \
-    XHOOK_REGISTER_SYM(PATH_REGEX, #NAME, NAME)
-
-#define ANDROID_RUNTIME ".*/libandroid_runtime.so$"
-#define APP_PROCESS     "^/system/bin/app_process.*"
+#define PLT_HOOK_REGISTER(DEV, INODE, NAME) \
+    PLT_HOOK_REGISTER_SYM(DEV, INODE, #NAME, NAME)
 
 void hook_functions() {
-#if MAGISK_DEBUG
-    // xhook_enable_debug(1);
-    xhook_enable_sigsegv_protection(0);
-#endif
-    default_new(xhook_list);
+    default_new(plt_hook_list);
     default_new(jni_hook_list);
     default_new(jni_method_map);
 
-    XHOOK_REGISTER(ANDROID_RUNTIME, fork);
-    XHOOK_REGISTER(ANDROID_RUNTIME, unshare);
-    XHOOK_REGISTER(ANDROID_RUNTIME, jniRegisterNativeMethods);
-    XHOOK_REGISTER(ANDROID_RUNTIME, selinux_android_setcontext);
-    XHOOK_REGISTER_SYM(ANDROID_RUNTIME, "__android_log_close", android_log_close);
-    hook_refresh();
+    ino_t android_runtime_inode = 0;
+    dev_t android_runtime_dev = 0;
+    for (auto &map : lsplt::MapInfo::Scan()) {
+        if (map.path.ends_with("libandroid_runtime.so")) {
+            android_runtime_inode = map.inode;
+            android_runtime_dev = map.dev;
+            break;
+        }
+    }
+
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, jniRegisterNativeMethods);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
+    PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
+    hook_commit();
 
     // Remove unhooked methods
-    xhook_list->erase(
-            std::remove_if(xhook_list->begin(), xhook_list->end(),
-            [](auto &t) { return *std::get<2>(t) == nullptr;}),
-            xhook_list->end());
+    plt_hook_list->erase(
+            std::remove_if(plt_hook_list->begin(), plt_hook_list->end(),
+            [](auto &t) { return *std::get<3>(t) == nullptr;}),
+            plt_hook_list->end());
 
     if (old_jniRegisterNativeMethods == nullptr) {
         ZLOGD("jniRegisterNativeMethods not hooked, using fallback\n");
-
+        struct stat self_stat{};
+        stat("/proc/self/exe", &self_stat);
         // android::AndroidRuntime::setArgv0(const char*, bool)
-        XHOOK_REGISTER_SYM(APP_PROCESS, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
-        hook_refresh();
+        PLT_HOOK_REGISTER_SYM(self_stat.st_dev, self_stat.st_ino, "_ZN7android14AndroidRuntime8setArgv0EPKcb", setArgv0);
+        hook_commit();
 
         // We still need old_jniRegisterNativeMethods as other code uses it
         // android::AndroidRuntime::registerNativeMethods(_JNIEnv*, const char*, const JNINativeMethod*, int)
@@ -784,16 +859,16 @@ static bool unhook_functions() {
     }
     delete jni_hook_list;
 
-    // Unhook xhook
-    for (const auto &[path, sym, old_func] : *xhook_list) {
-        if (xhook_register(path, sym, *old_func, nullptr) != 0) {
-            ZLOGE("Failed to register xhook [%s]\n", sym);
+    // Unhook plt_hook
+    for (const auto &[dev, inode, sym, old_func] : *plt_hook_list) {
+        if (!lsplt::RegisterHook(dev, inode, sym, *old_func, nullptr)) {
+            ZLOGE("Failed to register plt_hook [%s]\n", sym);
             success = false;
         }
     }
-    delete xhook_list;
-    if (!hook_refresh()) {
-        ZLOGE("Failed to restore xhook\n");
+    delete plt_hook_list;
+    if (!hook_commit()) {
+        ZLOGE("Failed to restore plt_hook\n");
         success = false;
     }
 

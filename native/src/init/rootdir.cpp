@@ -267,7 +267,8 @@ void RootFSInit::prepare() {
     rename(backup_init(), "/init");
 }
 
-#define PRE_TMPDIR "/magisk-tmp"
+#define PRE_TMPSRC "/magisk"
+#define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
 void MagiskInit::patch_rw_root() {
     mount_list.emplace_back("/data");
@@ -277,11 +278,9 @@ void MagiskInit::patch_rw_root() {
     link_path("/sbin", "/root");
 
     // Handle overlays
-    if (access("/overlay.d", F_OK) == 0) {
-        LOGD("Merge overlay.d\n");
-        load_overlay_rc("/overlay.d");
-        mv_path("/overlay.d", "/");
-    }
+    load_overlay_rc("/overlay.d");
+    mv_path("/overlay.d", "/");
+    rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
     // Patch init.rc
@@ -294,6 +293,8 @@ void MagiskInit::patch_rw_root() {
         treble = init.contains(SPLIT_PLAT_CIL);
     }
 
+    xmkdir(PRE_TMPSRC, 0);
+    xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
     xmkdir(PRE_TMPDIR, 0);
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
@@ -321,10 +322,12 @@ int magisk_proxy_main(int argc, char *argv[]) {
     unlink("/sbin/magisk");
 
     // Move tmpfs to /sbin
-    // For some reason MS_MOVE won't work, as a workaround bind mount then unmount
-    xmount(PRE_TMPDIR, "/sbin", nullptr, MS_BIND | MS_REC, nullptr);
-    xumount2(PRE_TMPDIR, MNT_DETACH);
+    // make parent private before MS_MOVE
+    xmount(nullptr, PRE_TMPSRC, nullptr, MS_PRIVATE, nullptr);
+    xmount(PRE_TMPDIR, "/sbin", nullptr, MS_MOVE, nullptr);
+    xumount2(PRE_TMPSRC, MNT_DETACH);
     rmdir(PRE_TMPDIR);
+    rmdir(PRE_TMPSRC);
 
     // Create symlinks pointing back to /root
     recreate_sbin("/root", false);

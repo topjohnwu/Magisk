@@ -88,6 +88,12 @@ static void mount_mirrors() {
     char buf1[4096];
     char buf2[4096];
 
+    LOGI("* Prepare worker\n");
+
+    ssprintf(buf1, sizeof(buf1), "%s/" WORKERDIR, MAGISKTMP.data());
+    xmount(buf1, buf1, nullptr, MS_BIND, nullptr);
+    xmount(nullptr, buf1, nullptr, MS_PRIVATE, nullptr);
+
     LOGI("* Mounting mirrors\n");
 
     parse_mnt("/proc/mounts", [&](mntent *me) {

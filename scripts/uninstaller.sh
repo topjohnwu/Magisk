@@ -137,6 +137,11 @@ case $((STATUS & 3)) in
     ;;
 esac
 
+if $BOOTMODE; then
+  ui_print "- Removing modules"
+  magisk --remove-modules -n
+fi
+
 ui_print "- Removing Magisk files"
 rm -rf \
 /cache/*magisk* /cache/unblock /data/*magisk* /data/cache/*magisk* /data/property/*magisk* \

@@ -2,12 +2,13 @@ import java.util.Arrays
 
 plugins {
     id("com.android.application")
-    id("io.michaelrocks.paranoid")
+    id("org.lsposed.lsparanoid")
 }
 
-paranoid {
-    obfuscationSeed = Arrays.hashCode(RAND_SEED)
-    includeSubprojects = true
+lsparanoid {
+    seed = Arrays.hashCode(RAND_SEED)
+    includeDependencies = true
+    global = true
 }
 
 android {

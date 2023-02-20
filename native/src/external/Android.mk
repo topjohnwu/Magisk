@@ -361,21 +361,17 @@ LOCAL_SRC_FILES := \
     pcre2_workaround.c
 include $(BUILD_STATIC_LIBRARY)
 
-# libxhook.a
+# liblsplt.a
 include $(CLEAR_VARS)
-LOCAL_MODULE:= libxhook
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/libxhook
+LOCAL_MODULE:= liblsplt
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/lsplt/lsplt/src/main/jni/include
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_CFLAGS := -Wall -Wextra -Werror -fvisibility=hidden -D__android_log_print=magisk_log_print
-LOCAL_CONLYFLAGS := -std=c11
+LOCAL_CPPFLAGS := -std=c++20
+LOCAL_STATIC_LIBRARIES := libcxx
 LOCAL_SRC_FILES := \
-    libxhook/xh_log.c \
-    libxhook/xh_version.c \
-    libxhook/xh_jni.c \
-    libxhook/xhook.c \
-    libxhook/xh_core.c \
-    libxhook/xh_util.c \
-    libxhook/xh_elf.c
+    lsplt/lsplt/src/main/jni/elf_util.cc \
+    lsplt/lsplt/src/main/jni/lsplt.cc
 include $(BUILD_STATIC_LIBRARY)
 
 # libz.a

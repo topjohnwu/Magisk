@@ -46,7 +46,7 @@ struct zimage_hdr {
     uint32_t magic;      /* zImage magic */
     uint32_t start;      /* absolute load/run zImage address */
     uint32_t end;        /* zImage end address */
-    uint32_t endian;     /* endianess flag */
+    uint32_t endian;     /* endianness flag */
     // There could be more fields, but we don't care
 } __attribute__((packed));
 

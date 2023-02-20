@@ -59,6 +59,8 @@ cp ramdisk.cpio ramdisk.cpio.orig
 
 touch config
 
+echo "RULESDEVICE=$(ISENCRYPTED=true ./magiskinit --rules-device)" >> config
+
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
@@ -84,3 +86,4 @@ export KEEPFORCEENCRYPT=true
 
 rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 ./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz
+pm install magisk.apk || true

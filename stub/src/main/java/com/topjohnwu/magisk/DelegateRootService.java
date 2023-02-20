@@ -9,9 +9,6 @@ import android.util.Log;
 import java.io.File;
 import java.lang.reflect.Constructor;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 public class DelegateRootService extends ContextWrapper {
 
     public DelegateRootService() {

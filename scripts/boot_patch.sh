@@ -6,7 +6,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE
+# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, SYSTEM_ROOT
 #
 # This script should be placed in a directory with the following files:
 #
@@ -73,11 +73,16 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+[ -z $SYSTEM_ROOT ] && SYSTEM_ROOT=false
+[ -z $ISENCRYPTED ] && ISENCRYPTED=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
+export ISENCRYPTED
 
 chmod -R 755 .
+
+RULESDEVICE="$(./magiskinit --rules-device)" || abort "! Unable to find rules partition!"
 
 #########
 # Unpack
@@ -152,6 +157,7 @@ echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
+echo "RULESDEVICE=$RULESDEVICE" >> config
 [ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
 
 # Compress to save precious ramdisk space
@@ -198,21 +204,28 @@ for dt in dtb kernel_dtb extra; do
 done
 
 if [ -f kernel ]; then
+  PATCHEDKERNEL=false
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
-  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
+  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054 \
+  && PATCHEDKERNEL=true
 
   # Remove Samsung defex
   # Before: [mov w2, #-221]   (-__NR_execve)
   # After:  [mov w2, #-32768]
-  ./magiskboot hexpatch kernel 821B8012 E2FF8F12
+  ./magiskboot hexpatch kernel 821B8012 E2FF8F12 && PATCHEDKERNEL=true
 
-  # Force kernel to load rootfs
+  # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
-  ./magiskboot hexpatch kernel \
+  $SYSTEM_ROOT && ./magiskboot hexpatch kernel \
   736B69705F696E697472616D667300 \
-  77616E745F696E697472616D667300
+  77616E745F696E697472616D667300 \
+  && PATCHEDKERNEL=true
+
+  # If the kernel doesn't need to be patched at all,
+  # keep raw kernel to avoid bootloops on some weird devices
+  $PATCHEDKERNEL || rm -f kernel
 fi
 
 #################
