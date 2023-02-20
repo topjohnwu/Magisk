@@ -14,13 +14,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
 // Wrap the actual classloader as we only want to resolve classname
 // mapping when loading from platform (via LoadedApk.mClassLoader)
-@Obfuscate
 class AppClassLoader extends ClassLoader {
-
     final Map<String, String> mapping = new HashMap<>();
 
     AppClassLoader(File apk) {

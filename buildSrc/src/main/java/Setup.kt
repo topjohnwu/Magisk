@@ -53,12 +53,12 @@ fun Project.setupCommon() {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
 
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
         }
     }
 }
@@ -133,8 +133,8 @@ private fun Project.setupAppCommon() {
     }
 
     android.applicationVariants.all {
-        val projectName = project.name.toLowerCase(Locale.ROOT)
-        val variantCapped = name.capitalize(Locale.ROOT)
+        val projectName = project.name.lowercase()
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
         tasks.getByPath(":$projectName:package$variantCapped").doLast {
             val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
             val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
@@ -191,7 +191,7 @@ fun Project.setupApp() {
     }
 
     android.applicationVariants.all {
-        val variantCapped = name.capitalize(Locale.ROOT)
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
 
         val stubTask = tasks.getByPath(":stub:package$variantCapped")
         val stubApk = stubTask.outputs.files.asFileTree.filter {
@@ -249,8 +249,8 @@ fun Project.setupStub() {
     setupAppCommon()
 
     android.applicationVariants.all {
-        val variantCapped = name.capitalize(Locale.ROOT)
-        val variantLowered = name.toLowerCase(Locale.ROOT)
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
+        val variantLowered = name.lowercase()
         val manifest = file("src/${variantLowered}/AndroidManifest.xml")
         val outSrcDir = File(buildDir, "generated/source/obfuscate/${variantLowered}")
         val templateDir = file("template")
@@ -299,11 +299,12 @@ fun Project.setupStub() {
     }
     // Override optimizeReleaseResources task
     tasks.whenTaskAdded {
-        val apk = File(buildDir, "intermediates/processed_res/" +
-            "release/out/resources-release.ap_")
-        val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
-            "release/resources-release-optimize.ap_")
         if (name == "optimizeReleaseResources") {
+            dependsOn("generateReleaseObfuscatedSources")
+            val apk = File(buildDir, "intermediates/processed_res/" +
+                    "release/out/resources-release.ap_")
+            val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
+                    "release/resources-release-optimize.ap_")
             doLast { apk.copyTo(optRes, true) }
         }
     }
