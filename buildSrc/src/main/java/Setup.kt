@@ -11,11 +11,11 @@ import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -36,6 +36,11 @@ private fun Project.android(configure: Action<BaseAppModuleExtension>) =
 private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
     (this as ExtensionAware).extensions.findByName("kotlinOptions")?.let {
         configure.execute(it as KotlinJvmOptions)
+    }
+
+private fun BaseExtension.kotlin(configure: Action<KotlinAndroidProjectExtension>) =
+    (this as ExtensionAware).extensions.findByName("kotlin")?.let {
+        configure.execute(it as KotlinAndroidProjectExtension)
     }
 
 private val Project.android: BaseAppModuleExtension
@@ -59,6 +64,10 @@ fun Project.setupCommon() {
 
         kotlinOptions {
             jvmTarget = "17"
+        }
+
+        kotlin {
+            jvmToolchain(17)
         }
     }
 }
@@ -129,6 +138,10 @@ private fun Project.setupAppCommon() {
 
         dependenciesInfo {
             includeInApk = false
+        }
+
+        buildFeatures {
+            buildConfig = true
         }
     }
 
