@@ -4,7 +4,7 @@
 #include <utility>
 #include <bitset>
 #include <cxx.h>
-
+#include <memory>
 #include "format.hpp"
 
 /******************
@@ -375,9 +375,11 @@ struct dyn_img_hdr {
     decl_var(dtb_size, 32)
 
     // v4 specific
+    decl_var(vendor_ramdisk_table_size, 32)
+    decl_var(vendor_ramdisk_table_entry_num, 32)
+    decl_val(vendor_ramdisk_table_entry_size, 32)
+    decl_var(bootconfig_size, 32)
     decl_val(signature_size, 32)
-    decl_val(vendor_ramdisk_table_size, 32)
-    decl_val(bootconfig_size, 32)
 
     virtual ~dyn_img_hdr() {
         free(raw);
@@ -553,8 +555,10 @@ struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
 struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
     impl_cls(vnd_v4)
 
-    impl_val(vendor_ramdisk_table_size)
-    impl_val(bootconfig_size)
+    impl_var(vendor_ramdisk_table_size)
+    impl_var(vendor_ramdisk_table_entry_num)
+    impl_val(vendor_ramdisk_table_entry_size)
+    impl_var(bootconfig_size)
 };
 
 #undef __impl_cls
@@ -598,7 +602,6 @@ struct boot_img {
 
     // The format of kernel, ramdisk and extra
     format_t k_fmt = UNKNOWN;
-    format_t r_fmt = UNKNOWN;
     format_t e_fmt = UNKNOWN;
 
     /*************************************************************
@@ -646,6 +649,10 @@ struct boot_img {
     const uint8_t *extra;
     const uint8_t *recovery_dtbo;
     const uint8_t *dtb;
+    const uint8_t *vendor_ramdisk_table;
+    const uint8_t *bootconfig;
+
+    std::vector<std::tuple<std::unique_ptr<vendor_ramdisk_table_entry_v4>, format_t>> ramdisk_table_entries;
 
     // dtb embedded in kernel
     byte_view kernel_dtb;
@@ -653,7 +660,7 @@ struct boot_img {
     // Blocks defined in header but we do not care
     byte_view ignore;
 
-    boot_img(const char *);
+    boot_img(const char *, bool);
     ~boot_img();
 
     bool parse_image(const uint8_t *addr, format_t type);
