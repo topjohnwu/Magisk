@@ -57,6 +57,10 @@ android {
             keepDebugSymbols += "**/*.so"
         }
     }
+
+    kotlin {
+        jvmToolchain(17)
+    }
 }
 
 setupApp()

@@ -4,9 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 public class DelegateApplication extends Application {
 
     private Application receiver;
