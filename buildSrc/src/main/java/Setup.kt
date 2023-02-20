@@ -134,6 +134,7 @@ private fun Project.setupAppCommon() {
 
         lint {
             disable += "MissingTranslation"
+            checkReleaseBuilds = false
         }
 
         dependenciesInfo {
@@ -193,7 +194,6 @@ fun Project.setupApp() {
     }
 
     val syncResources by tasks.registering(Sync::class) {
-        dependsOn(syncLibs)
         into("src/main/resources/META-INF/com/google/android")
         from(rootProject.file("scripts/update_binary.sh")) {
             rename { "update-binary" }
@@ -206,13 +206,16 @@ fun Project.setupApp() {
     android.applicationVariants.all {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
 
+        tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(syncLibs)
+        processJavaResourcesProvider.configure { dependsOn(syncResources) }
+
         val stubTask = tasks.getByPath(":stub:package$variantCapped")
         val stubApk = stubTask.outputs.files.asFileTree.filter {
             it.name.endsWith(".apk")
         }
 
         val syncAssets = tasks.register("sync${variantCapped}Assets", Sync::class) {
-            dependsOn(syncResources, stubTask)
+            dependsOn(stubTask)
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
             into("src/main/assets")
@@ -240,8 +243,7 @@ fun Project.setupApp() {
                 filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
             }
         }
-
-        preBuildProvider.get().dependsOn(syncAssets)
+        mergeAssetsProvider.configure { dependsOn(syncAssets) }
 
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
@@ -265,7 +267,8 @@ fun Project.setupStub() {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
         val variantLowered = name.lowercase()
         val manifest = file("src/${variantLowered}/AndroidManifest.xml")
-        val outSrcDir = File(buildDir, "generated/source/obfuscate/${variantLowered}")
+        val outManifestDir = File(buildDir, "generated/source/manifest/${variantLowered}")
+        val outResDir = File(buildDir, "generated/source/res/${variantLowered}")
         val templateDir = file("template")
         val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
         val apk = File(buildDir, "intermediates/processed_res/" +
@@ -273,51 +276,52 @@ fun Project.setupStub() {
         val apkTmp = File("${apk}.tmp")
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
+            inputs.property("seed", RAND_SEED)
+            inputs.dir(templateDir)
+            outputs.dir(outManifestDir)
+            outputs.file(manifest)
             doLast {
-                val xml = genStubManifest(templateDir, outSrcDir)
+                val xml = genStubManifest(templateDir, outManifestDir)
                 manifest.parentFile.mkdirs()
                 PrintStream(manifest).use {
                     it.print(xml)
                 }
             }
         }
-        tasks.getByPath(":stub:process${variantCapped}MainManifest").dependsOn(genManifestTask)
+        preBuildProvider.configure { dependsOn(genManifestTask) }
+        registerJavaGeneratingTask(genManifestTask, outManifestDir)
 
-        val genSrcTask = tasks.register("generate${variantCapped}ObfuscatedSources") {
-            dependsOn(":stub:process${variantCapped}Resources")
-            inputs.file(apk)
-            outputs.file(apk)
-            doLast {
-                exec {
-                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-                }
-
-                val bos = ByteArrayOutputStream()
-                ZipFile(apkTmp).use { src ->
-                    ZipOutputStream(apk.outputStream()).use {
-                        it.setLevel(Deflater.BEST_COMPRESSION)
-                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
-                        it.closeEntry()
-                    }
-                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
-                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
-                    }
-                }
-                apkTmp.delete()
-                genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outSrcDir)
+        val processResourcesTask = tasks.getByPath(":stub:process${variantCapped}Resources")
+        processResourcesTask.doLast {
+            exec {
+                commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
             }
+
+            val bos = ByteArrayOutputStream()
+            ZipFile(apkTmp).use { src ->
+                ZipOutputStream(apk.outputStream()).use {
+                    it.setLevel(Deflater.BEST_COMPRESSION)
+                    it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                    src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                    it.closeEntry()
+                }
+                DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                    src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
+                }
+            }
+            apkTmp.delete()
+            genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outResDir)
         }
-        registerJavaGeneratingTask(genSrcTask, outSrcDir)
+        @Suppress("DEPRECATION")
+        registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
     // Override optimizeReleaseResources task
+    val apk = File(buildDir, "intermediates/processed_res/" +
+        "release/out/resources-release.ap_")
+    val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
+        "release/resources-release-optimize.ap_")
     tasks.whenTaskAdded {
         if (name == "optimizeReleaseResources") {
-            dependsOn("generateReleaseObfuscatedSources")
-            val apk = File(buildDir, "intermediates/processed_res/" +
-                    "release/out/resources-release.ap_")
-            val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
-                    "release/resources-release-optimize.ap_")
             doLast { apk.copyTo(optRes, true) }
         }
     }
