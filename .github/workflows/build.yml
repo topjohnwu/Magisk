@@ -75,6 +75,7 @@ jobs:
         with:
           path: |
             ~/.gradle/caches/build-cache-*
+            .gradle/configuration-cache
           key: ${{ runner.os }}-build-cache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-cache-
 
@@ -88,6 +89,10 @@ jobs:
       - name: Build debug
         run: |
           python build.py -v all
+
+      - name: Stop deamon
+        run: |
+          ./gradlew --stop
 
       # Only upload artifacts built on Linux
       - name: Upload build artifact

@@ -2,6 +2,8 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.builder.internal.packaging.IncrementalPackager
 import com.android.builder.model.SigningConfig
+import com.android.ide.common.signing.CertificateInfo
+import com.android.ide.common.signing.KeystoreHelper
 import com.android.tools.build.apkzlib.sign.SigningExtension
 import com.android.tools.build.apkzlib.sign.SigningOptions
 import com.android.tools.build.apkzlib.zfile.ZFiles
@@ -15,6 +17,7 @@ import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.kotlin.dsl.*
+import org.gradle.process.ExecOperations
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.ByteArrayInputStream
@@ -22,10 +25,10 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
 import java.security.KeyStore
-import java.security.cert.X509Certificate
 import java.util.*
 import java.util.jar.JarFile
 import java.util.zip.*
+import javax.inject.Inject
 
 private fun Project.androidBase(configure: Action<BaseExtension>) =
     extensions.configure("android", configure)
@@ -82,16 +85,11 @@ private fun SigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
     return entry as KeyStore.PrivateKeyEntry
 }
 
-private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eocdComment: String) {
-    val privateKey = signConfig.getPrivateKey()
-    val signingOptions = SigningOptions.builder()
-        .setMinSdkVersion(minSdk)
-        .setV1SigningEnabled(true)
-        .setV2SigningEnabled(true)
-        .setKey(privateKey.privateKey)
-        .setCertificates(privateKey.certificate as X509Certificate)
-        .setValidation(SigningOptions.Validation.ASSUME_INVALID)
-        .build()
+private fun addComment(apkPath: File, certificateInfo: CertificateInfo, minSdk: Int, eocdComment: String) {
+    val signingOptions = SigningOptions.builder().setMinSdkVersion(minSdk).setV1SigningEnabled(true)
+        .setV2SigningEnabled(true).setKey(certificateInfo.key)
+        .setCertificates(certificateInfo.certificate)
+        .setValidation(SigningOptions.Validation.ASSUME_INVALID).build()
     val options = ZFileOptions().apply {
         noTimestamps = true
         autoSortFiles = true
@@ -102,6 +100,11 @@ private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eo
         it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
         it.get(JarFile.MANIFEST_NAME)?.delete()
     }
+}
+
+interface Injected {
+    @get:Inject
+    val exec: ExecOperations
 }
 
 private fun Project.setupAppCommon() {
@@ -147,12 +150,20 @@ private fun Project.setupAppCommon() {
     }
 
     android.applicationVariants.all {
-        val projectName = project.name.lowercase()
         val variantCapped = name.replaceFirstChar { it.uppercase() }
-        tasks.getByPath(":$projectName:package$variantCapped").doLast {
+        val storeFile = signingConfig.storeFile
+        val storePassword = signingConfig.storePassword
+        val keyAlias = signingConfig.keyAlias
+        val keyPassword = signingConfig.keyPassword
+        val storeType = signingConfig.storeType
+        val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
+        val minSdk = android.defaultConfig.minSdk!!
+        tasks.getByPath("package$variantCapped").doLast {
             val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
-            val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
-            addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
+            val certificateInfo = KeystoreHelper.getCertificateInfo(
+                storeType, storeFile, storePassword, keyPassword, keyAlias
+            )
+            addComment(apk, certificateInfo, minSdk, comment)
         }
     }
 }
@@ -205,6 +216,7 @@ fun Project.setupApp() {
 
     android.applicationVariants.all {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
+        val variant = name
 
         tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(syncLibs)
         processJavaResourcesProvider.configure { dependsOn(syncResources) }
@@ -218,7 +230,7 @@ fun Project.setupApp() {
             dependsOn(stubTask)
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
-            into("src/main/assets")
+            into("src/$variant/assets")
             from(rootProject.file("scripts")) {
                 include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
                 include("uninstaller.sh", "module_installer.sh")
@@ -245,11 +257,10 @@ fun Project.setupApp() {
         }
         mergeAssetsProvider.configure { dependsOn(syncAssets) }
 
-        val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
-        val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
-
         val genSrcTask = tasks.register("generate${variantCapped}KeyData") {
+            val keysDir = rootProject.file("tools/keys")
+            val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
             inputs.dir(keysDir)
             outputs.file(outSrc)
             doLast {
@@ -292,8 +303,9 @@ fun Project.setupStub() {
         registerJavaGeneratingTask(genManifestTask, outManifestDir)
 
         val processResourcesTask = tasks.getByPath(":stub:process${variantCapped}Resources")
+        val injected = objects.newInstance<Injected>()
         processResourcesTask.doLast {
-            exec {
+            injected.exec.exec {
                 commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
             }
 
