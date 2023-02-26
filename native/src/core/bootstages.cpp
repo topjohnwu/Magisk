@@ -1,7 +1,6 @@
 #include <sys/mount.h>
 #include <sys/wait.h>
 #include <sys/sysmacros.h>
-#include <sys/statvfs.h>
 #include <linux/input.h>
 #include <libgen.h>
 #include <vector>
@@ -71,19 +70,7 @@ static void mount_mirrors() {
     LOGI("* Mounting module root\n");
     if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
         if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
-            // remount to clear nosuid flag
-            struct statvfs st{};
-            statvfs(dest.data(), &st);
-            for (const auto &info: parse_mount_info("self")) {
-                if (info.target != dest) {
-                    continue;
-                }
-                // strip rw, from fs options
-                if (auto pos = info.fs_option.find_first_of(','); pos != string::npos) {
-                    xmount("", dest.data(), nullptr,  MS_REMOUNT | (st.f_flag & ~MS_NOSUID), info.fs_option.data() + pos + 1);
-                }
-                break;
-            }
+            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
             restorecon();
             chmod(SECURE_DIR, 0700);
         }
