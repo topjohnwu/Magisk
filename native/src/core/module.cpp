@@ -30,7 +30,7 @@ string node_entry::mirror_dir;
  *************************/
 
 tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
-    if (!skip_mirror) {
+    if (!skip_mirror()) {
         string mirror = mirror_path();
         if (auto dir = open_dir(mirror.data())) {
             set_exist(true);
@@ -54,14 +54,11 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
 }
 
 bool dir_node::prepare() {
-    bool to_tmpfs = skip_mirror;
-    if (!exist()) {
-        // If not exist, we need to create it by mounting tmpfs
-        to_tmpfs = true;
-        set_exist(true);
-    }
+    // If direct replace or not exist, mount ourselves as tmpfs
+    bool upgrade_to_tmpfs = skip_mirror() || !exist();
+
     for (auto it = children.begin(); it != children.end();) {
-        // We need to upgrade to tmpfs node if any child:
+        // We also need to upgrade to tmpfs node if any child:
         // - Target does not exist
         // - Source or target is a symlink (since we cannot bind mount symlink)
         bool cannot_mnt;
@@ -80,12 +77,12 @@ bool dir_node::prepare() {
                 it = children.erase(it);
                 continue;
             }
-            // Tell parent to upgrade self to tmpfs
-            to_tmpfs = true;
+            upgrade_to_tmpfs = true;
         }
         if (auto dn = dyn_cast<dir_node>(it->second)) {
-            if (skip_mirror) {
-                dn->skip_mirror = true;
+            if (skip_mirror()) {
+                // Propagate skip mirror state to all children
+                dn->set_skip_mirror(true);
             }
             if (dn->prepare()) {
                 // Upgrade child to tmpfs
@@ -94,7 +91,7 @@ bool dir_node::prepare() {
         }
         ++it;
     }
-    return to_tmpfs;
+    return upgrade_to_tmpfs;
 }
 
 void dir_node::collect_module_files(const char *module, int dfd) {
@@ -103,20 +100,20 @@ void dir_node::collect_module_files(const char *module, int dfd) {
         return;
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        inter_node *dn;
         if (entry->d_name == ".replace"sv) {
-            skip_mirror = true;
+            set_skip_mirror(true);
             continue;
         }
 
         if (entry->d_type == DT_DIR) {
+            inter_node *node;
             if (auto it = children.find(entry->d_name); it == children.end()) {
-                dn = emplace<inter_node>(entry->d_name, entry->d_name);
+                node = emplace<inter_node>(entry->d_name, entry->d_name);
             } else {
-                dn = dyn_cast<inter_node>(it->second);
+                node = dyn_cast<inter_node>(it->second);
             }
-            if (dn) {
-                dn->collect_module_files(module, dirfd(dir.get()));
+            if (node) {
+                node->collect_module_files(module, dirfd(dir.get()));
             }
         } else {
             emplace<module_node>(entry->d_name, module, entry);
@@ -169,7 +166,7 @@ void tmpfs_node::mount() {
     if (!isa<tmpfs_node>(parent())) {
         auto worker_dir = MAGISKTMP + "/" WORKERDIR + dest;
         mkdirs(worker_dir.data(), 0);
-        create_and_mount(skip_mirror ? "replace" : "tmpfs", worker_dir);
+        create_and_mount(skip_mirror() ? "replace" : "tmpfs", worker_dir);
     } else {
         // We don't need another layer of tmpfs if parent is tmpfs
         mkdir(dest.data(), 0);

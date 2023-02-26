@@ -55,18 +55,23 @@ public:
 protected:
     template<class T>
     node_entry(const char *name, uint8_t file_type, T*)
-    : _name(name), _file_type(file_type), _node_type(type_id<T>()) {}
+    : _name(name), _file_type(file_type & 15), _node_type(type_id<T>()) {}
 
     template<class T>
     explicit node_entry(T*) : _file_type(0), _node_type(type_id<T>()) {}
 
-    void consume(node_entry *other);
+    virtual void consume(node_entry *other) {
+        _name.swap(other->_name);
+        _file_type = other->_file_type;
+        _parent = other->_parent;
+        delete other;
+    }
+
     void create_and_mount(const char *reason, const string &src);
 
-    // Use top bit of _file_type for node exist status
+    // Use bit 7 of _file_type for exist status
     bool exist() const { return static_cast<bool>(_file_type & (1 << 7)); }
     void set_exist(bool b) { if (b) _file_type |= (1 << 7); else _file_type &= ~(1 << 7); }
-    uint8_t file_type() const { return static_cast<uint8_t>(_file_type & ~(1 << 7)); }
 
 private:
     friend class dir_node;
@@ -74,21 +79,21 @@ private:
     template<class T>
     friend bool isa(node_entry *node);
 
+    uint8_t file_type() const { return static_cast<uint8_t>(_file_type & 15); }
+
     // Node properties
     string _name;
-    uint8_t _file_type;
-    const uint8_t _node_type;
-
     dir_node *_parent = nullptr;
 
     // Cache, it should only be used within prepare
     string _node_path;
+
+    uint8_t _file_type;
+    const uint8_t _node_type;
 };
 
 class dir_node : public node_entry {
 public:
-    friend void node_entry::consume(node_entry *other);
-
     using map_type = map<string_view, node_entry *>;
     using iterator = map_type::iterator;
 
@@ -97,6 +102,10 @@ public:
             delete it.second;
         children.clear();
     }
+
+    /**************
+     * Entrypoints
+     **************/
 
     // Traverse through module directories to generate a tree of module files
     void collect_module_files(const char *module, int dfd);
@@ -160,15 +169,29 @@ protected:
     template<class T>
     dir_node(const char *name, T *self) : node_entry(name, DT_DIR, self) {
         if constexpr (std::is_same_v<T, root_node>)
-        _root = self;
+            _root = self;
     }
 
     template<class T>
     dir_node(node_entry *node, T *self) : node_entry(self) {
-        consume(node);
         if constexpr (std::is_same_v<T, root_node>)
-        _root = self;
+            _root = self;
+        dir_node::consume(node);
     }
+
+    void consume(node_entry *other) override {
+        if (auto o = dyn_cast<dir_node>(other)) {
+            children.merge(o->children);
+            for (auto &pair : children)
+                pair.second->_parent = this;
+        }
+        node_entry::consume(other);
+    }
+
+    // Use bit 6 of _file_type
+    // Skip binding mirror for this directory
+    bool skip_mirror() const { return static_cast<bool>(_file_type & (1 << 6)); }
+    void set_skip_mirror(bool b) { if (b) _file_type |= (1 << 6); else _file_type &= ~(1 << 6); }
 
     template<class T = node_entry>
     T *iterator_to_node(iterator it) {
@@ -229,9 +252,6 @@ protected:
     // dir nodes host children
     map_type children;
 
-    // Skip binding mirror for this directory
-    bool skip_mirror = false;
-
 private:
     // Root node lookup cache
     root_node *_root = nullptr;
@@ -259,7 +279,7 @@ public:
     : node_entry(entry->d_name, entry->d_type, this), module(module) {}
 
     module_node(node_entry *node, const char *module) : node_entry(this), module(module) {
-        consume(node);
+        node_entry::consume(node);
     }
 
     void mount() override;
@@ -293,21 +313,4 @@ const string &node_entry::node_path() {
     if (_parent && _node_path.empty())
         _node_path = _parent->node_path() + '/' + _name;
     return _node_path;
-}
-
-void node_entry::consume(node_entry *other) {
-    _name.swap(other->_name);
-    _file_type = other->_file_type;
-    _parent = other->_parent;
-
-    // Merge children if both is dir
-    if (auto a = dyn_cast<dir_node>(this)) {
-        if (auto b = dyn_cast<dir_node>(other)) {
-            a->skip_mirror = b->skip_mirror;
-            a->children.merge(b->children);
-            for (auto &pair : a->children)
-                pair.second->_parent = a;
-        }
-    }
-    delete other;
 }
