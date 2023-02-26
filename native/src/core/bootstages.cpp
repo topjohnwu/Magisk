@@ -290,7 +290,7 @@ static void post_fs_data() {
 
 early_abort:
     // We still do magic mount because root itself might need it
-    magic_mount();
+    load_modules();
     boot_state |= FLAG_POST_FS_DATA_DONE;
 }
 
