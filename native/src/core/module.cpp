@@ -37,7 +37,7 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
                 if (entry->d_type == DT_DIR) {
                     // create a dummy inter_node to upgrade later
-                    emplace<inter_node>(entry->d_name, entry->d_name, "");
+                    emplace<inter_node>(entry->d_name, entry->d_name);
                 } else {
                     // Insert mirror nodes
                     emplace<mirror_node>(entry->d_name, entry);
@@ -61,7 +61,18 @@ bool dir_node::prepare() {
         set_exist(true);
     }
     for (auto it = children.begin(); it != children.end();) {
-        if (require_tmpfs_upgrade(it->second)) {
+        // We need to upgrade to tmpfs node if any child:
+        // - Target does not exist
+        // - Source or target is a symlink (since we cannot bind mount symlink)
+        bool cannot_mnt;
+        if (struct stat st{}; lstat(it->second->node_path().data(), &st) != 0) {
+            cannot_mnt = true;
+        } else {
+            it->second->set_exist(true);
+            cannot_mnt = it->second->is_lnk() || S_ISLNK(st.st_mode);
+        }
+
+        if (cannot_mnt) {
             if (_node_type > type_id<tmpfs_node>()) {
                 // Upgrade will fail, remove the unsupported child node
                 LOGW("Unable to add: %s, skipped\n", it->second->node_path().data());
@@ -71,15 +82,6 @@ bool dir_node::prepare() {
             }
             // Tell parent to upgrade self to tmpfs
             to_tmpfs = true;
-            // If child is inter_node and it does not exist, upgrade to module
-            if (auto dn = dyn_cast<inter_node>(it->second)) {
-                if (!dn->exist()) {
-                    if (auto nit = upgrade<module_node, inter_node>(it); nit != children.end()) {
-                        it = nit;
-                        goto next_node;
-                    }
-                }
-            }
         }
         if (auto dn = dyn_cast<dir_node>(it->second)) {
             if (skip_mirror) {
@@ -90,7 +92,6 @@ bool dir_node::prepare() {
                 it = upgrade<tmpfs_node>(it);
             }
         }
-next_node:
         ++it;
     }
     return to_tmpfs;
@@ -110,7 +111,7 @@ void dir_node::collect_module_files(const char *module, int dfd) {
 
         if (entry->d_type == DT_DIR) {
             if (auto it = children.find(entry->d_name); it == children.end()) {
-                dn = emplace<inter_node>(entry->d_name, entry->d_name, module);
+                dn = emplace<inter_node>(entry->d_name, entry->d_name);
             } else {
                 dn = dyn_cast<inter_node>(it->second);
             }
@@ -141,6 +142,10 @@ void node_entry::create_and_mount(const char *reason, const string &src) {
             return;
         bind_mount(reason, src.data(), dest.data());
     }
+}
+
+void mirror_node::mount() {
+    create_and_mount("mirror", mirror_path());
 }
 
 void module_node::mount() {
@@ -205,7 +210,7 @@ public:
 static void inject_magisk_bins(root_node *system) {
     auto bin = system->get_child<inter_node>("bin");
     if (!bin) {
-        bin = new inter_node("bin", "");
+        bin = new inter_node("bin");
         system->insert(bin);
     }
 

@@ -175,9 +175,9 @@ protected:
         return static_cast<T*>(it == children.end() ? nullptr : it->second);
     }
 
-    template<typename Func>
-    iterator insert(string_view name, uint8_t type, const Func &fn) {
-        return insert_at(children.find(name), type, fn);
+    template<typename Builder>
+    iterator insert(string_view name, uint8_t type, const Builder &builder) {
+        return insert_at(children.find(name), type, builder);
     }
 
     // Emplace insert a new node, or upgrade if the requested type has a higher rank.
@@ -216,17 +216,11 @@ protected:
         return it;
     }
 
-    template<class To, class From = node_entry, class ...Args>
+    template<class T, class ...Args>
     iterator upgrade(iterator it, Args &&...args) {
-        return insert_at(it, type_id<To>(), [&](node_entry *&ex) -> node_entry * {
-            if (!ex)
-                return nullptr;
-            if constexpr (!std::is_same_v<From, node_entry>) {
-                // Type check if type is specified
-                if (!isa<From>(ex))
-                    return nullptr;
-            }
-            auto node = new To(static_cast<From *>(ex), std::forward<Args>(args)...);
+        return insert_at(it, type_id<T>(), [&](node_entry *&ex) -> node_entry * {
+            if (!ex) return nullptr;
+            auto node = new T(ex, std::forward<Args>(args)...);
             ex = nullptr;
             return node;
         });
@@ -241,21 +235,6 @@ protected:
 private:
     // Root node lookup cache
     root_node *_root = nullptr;
-
-    // We need to upgrade to tmpfs node if any child:
-    // - Target does not exist
-    // - Source or target is a symlink (since we cannot bind mount link)
-    bool require_tmpfs_upgrade(node_entry *child) {
-        struct stat st{};
-        if (lstat(child->node_path().data(), &st) != 0) {
-            return true;
-        } else {
-            child->set_exist(true);
-            if (child->is_lnk() || S_ISLNK(st.st_mode))
-                return true;
-        }
-        return false;
-    }
 };
 
 class root_node : public dir_node {
@@ -271,10 +250,7 @@ public:
 
 class inter_node : public dir_node {
 public:
-    inter_node(const char *name, const char *module) : dir_node(name, this), module(module) {}
-private:
-    const char *module;
-    friend class module_node;
+    inter_node(const char *name) : dir_node(name, this) {}
 };
 
 class module_node : public node_entry {
@@ -286,8 +262,6 @@ public:
         consume(node);
     }
 
-    explicit module_node(inter_node *node) : module_node(node, node->module) {}
-
     void mount() override;
 private:
     const char *module;
@@ -297,9 +271,7 @@ private:
 class mirror_node : public node_entry {
 public:
     explicit mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
-    void mount() override {
-        create_and_mount("mirror", mirror_path());
-    }
+    void mount() override;
 };
 
 class tmpfs_node : public dir_node {
