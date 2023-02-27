@@ -19,7 +19,7 @@ def error(str):
     if no_color:
         print(f'\n! {str}\n')
     else:
-        print(f'\n\033[41m{str}\033[0m\n')
+        print(f'\n\033[101m\033[1m{str}\033[0m\n')
     sys.exit(1)
 
 
@@ -27,7 +27,7 @@ def header(str):
     if no_color:
         print(f'\n{str}\n')
     else:
-        print(f'\n\033[44m{str}\033[0m\n')
+        print(f'\n\033[44m\033[1m{str}\033[0m\n')
 
 
 def vprint(str):
