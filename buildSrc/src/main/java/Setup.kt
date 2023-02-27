@@ -220,7 +220,7 @@ fun Project.setupApp() {
             dependsOn(stubTask)
             inputs.property("version", Config.version)
             inputs.property("versionCode", Config.versionCode)
-            into("src/main/assets")
+            into("src/${this@all.name}/assets")
             from(rootProject.file("scripts")) {
                 include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
                 include("uninstaller.sh", "module_installer.sh")
