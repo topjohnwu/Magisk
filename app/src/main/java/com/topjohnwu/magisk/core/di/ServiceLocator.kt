@@ -39,7 +39,6 @@ object ServiceLocator {
         NetworkService(
             createApiService(retrofit, Const.Url.GITHUB_PAGE_URL),
             createApiService(retrofit, Const.Url.GITHUB_RAW_URL),
-            createApiService(retrofit, Const.Url.GITHUB_API_URL)
         )
     }
 }
