@@ -372,6 +372,12 @@ static void daemon_entry() {
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 
+    // Unshare magiskd
+    xunshare(CLONE_NEWNS);
+    xmount(nullptr, MAGISKTMP.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
+    // Fix sdcardfs bug on old kernel
+    xmount(nullptr, "/mnt", nullptr, MS_SLAVE | MS_REC, nullptr);
+
     // Load config status
     auto config = MAGISKTMP + "/" INTLROOT "/config";
     parse_prop_file(config.data(), [](auto key, auto val) -> bool {
