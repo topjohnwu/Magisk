@@ -653,6 +653,7 @@ copy_sepolicy_rules() {
     local MODDIR=${r%/*}
     [ -f $MODDIR/disable ] && continue
     [ -f $MODDIR/remove ] && continue
+    [ -f $MODDIR/update ] && continue
     local MODNAME=${MODDIR##*/}
     mkdir -p $RULESDIR/$MODNAME
     cp -f $r $RULESDIR/$MODNAME/sepolicy.rule
