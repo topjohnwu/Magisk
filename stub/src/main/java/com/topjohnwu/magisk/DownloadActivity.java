@@ -81,7 +81,7 @@ public class DownloadActivity extends Activity {
         ProviderInstaller.install(this);
 
         if (Networking.checkNetworkStatus(this)) {
-            if (apkLink == null) {
+            if (BuildConfig.APK_URL == null) {
                 fetchCanary();
             } else {
                 showDialog();
