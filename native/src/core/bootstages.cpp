@@ -234,9 +234,6 @@ static bool check_key_combo() {
 extern int disable_deny();
 
 static void post_fs_data() {
-    if (getenv("REMOUNT_ROOT"))
-        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-
     if (!check_data())
         return;
 
