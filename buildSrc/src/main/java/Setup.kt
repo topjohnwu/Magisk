@@ -153,7 +153,7 @@ private fun Project.setupAppCommon() {
             val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
             val comment = "version=${Config.version}\n" +
                 "versionCode=${Config.versionCode}\n" +
-                "stubVersion=${Config.stubVersion}}\n"
+                "stubVersion=${Config.stubVersion}\n"
             addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
     }
