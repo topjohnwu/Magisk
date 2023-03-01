@@ -5,7 +5,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:statusBarColor">@android:color/system_neutral1_900</item>
+        <item name="android:statusBarColor">?android:colorBackground</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
