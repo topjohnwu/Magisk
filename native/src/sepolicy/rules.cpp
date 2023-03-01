@@ -188,8 +188,8 @@ void sepolicy::magisk_rules() {
     dontaudit("llkd", SEPOL_CLIENT_DOMAIN, "process", "ptrace");
 
     // Keep /data/adb/* context
-    deny("init","adb_data_file","dir","search");
-    deny("vendor_init","adb_data_file","dir","search");
+    deny("init", "adb_data_file", "dir", "search");
+    deny("vendor_init", "adb_data_file", "dir", "search");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");
