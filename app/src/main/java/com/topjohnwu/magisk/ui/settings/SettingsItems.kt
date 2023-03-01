@@ -272,7 +272,6 @@ object DenyListConfig : BaseSettingsItem.Blank() {
 
 object Tapjack : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_su_tapjack_title.asText()
-    override val description = R.string.settings_su_tapjack_summary.asText()
     override var value by Config::suTapjack
 }
 
