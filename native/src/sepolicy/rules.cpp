@@ -137,8 +137,6 @@ void sepolicy::magisk_rules() {
     // Let init run stuffs
     allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
     allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-    allow("init", "tmpfs", "file", "getattr");
-    allow("init", "tmpfs", "file", "execute");
 
     // suRights
     allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
