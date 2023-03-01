@@ -300,6 +300,19 @@ public:
     void mount() override;
 };
 
+class magisk_node : public node_entry {
+public:
+    explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+    void mount() override;
+};
+
+template<bool is64bit>
+class zygisk_node : public magisk_node {
+public:
+    explicit zygisk_node(const char *name) : magisk_node(name) {}
+    void mount() override;
+};
+
 template<class T>
 static bool isa(node_entry *node) {
     return node && (node->_node_type & type_id<T>());

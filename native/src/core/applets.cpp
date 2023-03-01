@@ -32,11 +32,6 @@ int main(int argc, char *argv[]) {
 
     string_view argv0 = basename(argv[0]);
 
-    // app_process is actually not an applet
-    if (argv0.starts_with("app_process")) {
-        return app_process_main(argc, argv);
-    }
-
     umask(0);
 
     if (argv[0][0] == '\0') {

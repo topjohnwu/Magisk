@@ -2,11 +2,9 @@
 #include <android/dlext.h>
 
 #if defined(__LP64__)
-// Use symlink to workaround linker bug on old broken Android
-// https://issuetracker.google.com/issues/36914295
-#define SECOND_STAGE_PATH "/system/bin/app_process"
+#define SECOND_STAGE_PATH "/system/bin/magisk64"
 #else
-#define SECOND_STAGE_PATH "/system/bin/app_process32"
+#define SECOND_STAGE_PATH "/system/bin/magisk32"
 #endif
 
 __attribute__((constructor))

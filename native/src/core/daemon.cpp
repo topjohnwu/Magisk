@@ -143,10 +143,11 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         su_daemon_handler(client, &cred);
         break;
     case MainRequest::ZYGOTE_RESTART:
-        close(client);
         LOGI("** zygote restarted\n");
         pkg_xml_ino = 0;
         prune_su_access();
+        remount_zygisk();
+        close(client);
         break;
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
@@ -160,7 +161,6 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     }
     case MainRequest::ZYGISK:
-    case MainRequest::ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
         break;
     default:

@@ -95,7 +95,7 @@ void restore_tmpcon() {
         setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
 
     if (SDK_INT >= 26) {
-        string magisk = MAGISKTMP + "/magisk";
-        setfilecon(magisk.data(), EXEC_CON);
+        setfilecon((MAGISKTMP + "/magisk32").data(), EXEC_CON);
+        setfilecon((MAGISKTMP + "/magisk64").data(), EXEC_CON);
     }
 }

@@ -10,16 +10,58 @@
 
 #include "core.hpp"
 #include "node.hpp"
+#include "embed.hpp"
 
 using namespace std;
 
 #define VLOGD(tag, from, to) LOGD("%-8s: %s <- %s\n", tag, to, from)
 
-static int bind_mount(const char *reason, const char *from, const char *to) {
+namespace {
+int bind_mount(const char *reason, const char *from, const char *to) {
     int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
         VLOGD(reason, from, to);
     return ret;
+}
+
+std::atomic_uint zygote_start_count{1};
+
+template<bool is64bit>
+std::string prepare_zygisk_loader() {
+    static std::string loader = [] {
+        auto zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
+        string src = zygisk_bin + "/libzygisk_loader" + (is64bit ? "64" : "32") + ".so";
+        xmkdir(zygisk_bin.data(), 0);
+        int out = xopen(src.data(), O_WRONLY | O_CREAT | O_CLOEXEC, 0);
+        if constexpr (is64bit) {
+#ifdef __LP64__
+            xwrite(out, zygisk64_ld, sizeof(zygisk64_ld));
+#endif
+        } else {
+            xwrite(out, zygisk32_ld, sizeof(zygisk32_ld));
+        }
+        close(out);
+        return src;
+    }();
+    return loader;
+}
+
+template<bool is64bit>
+void mount_zygisk(bool rollback) {
+    auto lib = "/system/lib"s + (is64bit ? "64" : "") + "/" + native_bridge;
+    auto loader = prepare_zygisk_loader<is64bit>();
+    if (struct stat lib_st{}, loader_st{}; // use to check if mount is needed
+            xstat(lib.data(), &lib_st) == 0 && xstat(loader.data(), &loader_st) == 0) {
+        if (!rollback && (lib_st.st_ino != loader_st.st_ino || lib_st.st_dev != loader_st.st_dev)) {
+            // Our native bridge hasn't been mounted yet or has been unmounted before
+            xmount(loader.data(), lib.data(), nullptr, MS_BIND, nullptr);
+        } else if (rollback && lib_st.st_ino == loader_st.st_ino && lib_st.st_dev == loader_st.st_dev) {
+            // We have mounted our native bridge overrode the original one, unmount it for rollback
+            xumount2(lib.data(), MNT_DETACH);
+        }
+    }
+}
+
 }
 
 string node_entry::module_mnt;
@@ -179,30 +221,31 @@ void tmpfs_node::mount() {
  * Magisk Stuffs
  ****************/
 
-class magisk_node : public node_entry {
-public:
-    explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
+void magisk_node::mount() {
+    const string src = MAGISKTMP + "/" + name();
+    if (access(src.data(), F_OK))
+        return;
 
-    void mount() override {
-        const string src = MAGISKTMP + "/" + name();
-        if (access(src.data(), F_OK))
-            return;
-
-        const string &dir_name = parent()->node_path();
-        if (name() == "magisk") {
-            for (int i = 0; applet_names[i]; ++i) {
-                string dest = dir_name + "/" + applet_names[i];
-                VLOGD("create", "./magisk", dest.data());
-                xsymlink("./magisk", dest.data());
-            }
-        } else {
-            string dest = dir_name + "/supolicy";
-            VLOGD("create", "./magiskpolicy", dest.data());
-            xsymlink("./magiskpolicy", dest.data());
+    const string &dir_name = parent()->node_path();
+    if (name() == "magisk") {
+        for (int i = 0; applet_names[i]; ++i) {
+            string dest = dir_name + "/" + applet_names[i];
+            VLOGD("create", "./magisk", dest.data());
+            xsymlink("./magisk", dest.data());
         }
-        create_and_mount("magisk", src);
+    } else if (name() == "magiskpolicy") {
+        string dest = dir_name + "/supolicy";
+        VLOGD("create", "./magiskpolicy", dest.data());
+        xsymlink("./magiskpolicy", dest.data());
     }
-};
+    create_and_mount("magisk", src);
+}
+
+template<bool is64bit>
+void zygisk_node<is64bit>::mount() {
+    auto src = prepare_zygisk_loader<is64bit>();
+    create_and_mount("zygisk", src);
+}
 
 static void inject_magisk_bins(root_node *system) {
     auto bin = system->get_child<inter_node>("bin");
@@ -213,6 +256,10 @@ static void inject_magisk_bins(root_node *system) {
 
     // Insert binaries
     bin->insert(new magisk_node("magisk"));
+    if (access("/system/bin/linker32", F_OK) == 0)
+        bin->insert(new magisk_node("magisk32"));
+    if (access("/system/bin/linker64", F_OK) == 0)
+        bin->insert(new magisk_node("magisk64"));
     bin->insert(new magisk_node("magiskpolicy"));
 
     // Also delete all applets to make sure no modules can override it
@@ -222,22 +269,6 @@ static void inject_magisk_bins(root_node *system) {
 }
 
 vector<module_info> *module_list;
-int app_process_32 = -1;
-int app_process_64 = -1;
-
-#define mount_zygisk(bit)                                                               \
-if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
-    app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
-    string zbin = zygisk_bin + "/app_process" #bit;                                     \
-    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
-    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
-    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
-    xsendfile(out, src, nullptr, INT_MAX);                                              \
-    close(out);                                                                         \
-    close(src);                                                                         \
-    clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
-    bind_mount("zygisk", zbin.data(), "/system/bin/app_process" #bit);                  \
-}
 
 void load_modules() {
     node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
@@ -276,9 +307,41 @@ void load_modules() {
         system->collect_module_files(module, fd);
         close(fd);
     }
-    if (MAGISKTMP != "/sbin" || !str_contains(getenv("PATH") ?: "", "/sbin")) {
-        // Need to inject our binaries into /system/bin
-        inject_magisk_bins(system);
+
+    inject_magisk_bins(system);
+
+    if (zygisk_enabled) {
+        native_bridge = getprop(NBPROP);
+        // If the system has built-in native bridge, we mount on top of it to avoid unnecessary property changes
+        // If not, we change the property to install our fake native bridge
+        if (native_bridge.empty() || native_bridge == "0") {
+            native_bridge = ZYGISKLDR;
+            setprop(NBPROP, ZYGISKLDR, false);
+            if (access("/system/lib", F_OK) == 0) {
+                auto lib = system->get_child<inter_node>("lib");
+                if (!lib) {
+                    lib = new inter_node("lib");
+                    system->insert(lib);
+                }
+                lib->insert(new zygisk_node<false>(native_bridge.data()));
+            }
+
+            if (access("/system/lib64", F_OK) == 0) {
+                auto lib64 = system->get_child<inter_node>("lib64");
+                if (!lib64) {
+                    lib64 = new inter_node("lib64");
+                    system->insert(lib64);
+                }
+                lib64->insert(new zygisk_node<true>(native_bridge.data()));
+            }
+        }
+
+        // Weather Huawei's Maple compiler is enabled.
+        // If so, system server will be created by a special Zygote which ignores the native bridge
+        // and make system server out of our control. Avoid it by disabling.
+        if (getprop("ro.maple.enable") == "1") {
+            setprop("ro.maple.enable", "0", false);
+        }
     }
 
     if (!system->is_empty()) {
@@ -295,13 +358,9 @@ void load_modules() {
         root->prepare();
         root->mount();
     }
-
-    // Mount on top of modules to enable zygisk
-    if (zygisk_enabled) {
-        string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
-        mkdir(zygisk_bin.data(), 0);
-        mount_zygisk(32)
-        mount_zygisk(64)
+    if (native_bridge != ZYGISKLDR) {
+        mount_zygisk<true>(false);
+        mount_zygisk<false>(false);
     }
 }
 
@@ -479,4 +538,19 @@ void exec_module_scripts(const char *stage) {
     std::transform(module_list->begin(), module_list->end(), std::back_inserter(module_names),
         [](const module_info &info) -> string_view { return info.name; });
     exec_module_scripts(stage, module_names);
+}
+
+// Used to remount zygisk after soft reboot
+void remount_zygisk() {
+    bool rollback = false;
+    if (zygote_start_count.fetch_add(1) >= 5) {
+        LOGW("zygote crashes too many times, rolling-back\n");
+        rollback = true;
+    }
+    if (native_bridge == ZYGISKLDR) {
+        rollback ? setprop(NBPROP, "0") : setprop(NBPROP, ZYGISKLDR);
+    } else {
+        mount_zygisk<false>(rollback);
+        mount_zygisk<true>(rollback);
+    }
 }

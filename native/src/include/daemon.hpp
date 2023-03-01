@@ -36,7 +36,6 @@ enum : int {
     SQLITE_CMD,
     REMOVE_MODULES,
     ZYGISK,
-    ZYGISK_PASSTHROUGH,
 
     _STAGE_BARRIER_,
 
@@ -68,8 +67,7 @@ struct module_info {
 };
 
 extern bool zygisk_enabled;
-extern int app_process_32;
-extern int app_process_64;
+extern std::string native_bridge;
 extern std::vector<module_info> *module_list;
 
 int connect_daemon(int req, bool create = false);
@@ -102,7 +100,8 @@ std::vector<bool> get_app_no_list();
 int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
 void prune_su_access();
 
-// Denylist
+// Zygisk
+void remount_zygisk();
 extern std::atomic_flag skip_pkg_rescan;
 void initialize_denylist();
 int denylist_cli(int argc, char **argv);

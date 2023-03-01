@@ -62,6 +62,7 @@ except FileNotFoundError:
 
 cpu_count = multiprocessing.cpu_count()
 archs = ['armeabi-v7a', 'x86', 'arm64-v8a', 'x86_64']
+archs32map = {'x86_64': 'x86', 'arm64-v8a': 'armeabi-v7a'}
 triples = ['armv7a-linux-androideabi', 'i686-linux-android', 'aarch64-linux-android', 'x86_64-linux-android']
 default_targets = ['magisk', 'magiskinit', 'magiskboot', 'magiskpolicy', 'busybox']
 support_targets = default_targets + ['resetprop']
@@ -317,9 +318,17 @@ def dump_bin_header(args):
         preload = op.join('native', 'out', arch, 'libinit-ld.so')
         with open(preload, 'rb') as src:
             text = binary_dump(src, 'init_ld_xz')
-        preload = op.join('native', 'out', arch, 'libzygisk-ld.so')
-        with open(preload, 'rb') as src:
-            text += binary_dump(src, 'zygisk_ld', compressor=lambda x: x)
+        if archs32map.get(arch) is not None:
+            preload = op.join('native', 'out', arch, 'libzygisk-ld.so')
+            with open(preload, 'rb') as src:
+                text += binary_dump(src, 'zygisk64_ld', compressor=lambda x: x)
+            preload = op.join('native', 'out', archs32map[arch], 'libzygisk-ld.so')
+            with open(preload, 'rb') as src:
+                text += binary_dump(src, 'zygisk32_ld', compressor=lambda x: x)
+        else:
+            preload = op.join('native', 'out', arch, 'libzygisk-ld.so')
+            with open(preload, 'rb') as src:
+                text += binary_dump(src, 'zygisk32_ld', compressor=lambda x: x)
         write_if_diff(op.join(native_gen_path, f'{arch}_binaries.h'), text)
 
 

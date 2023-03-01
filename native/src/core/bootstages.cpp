@@ -29,6 +29,7 @@ enum : int {
 static int boot_state = FLAG_NONE;
 
 bool zygisk_enabled = false;
+std::string native_bridge = "";
 
 /*********
  * Setup *
