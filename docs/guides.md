@@ -120,7 +120,7 @@ All files you want to replace/inject should be placed in this folder. This folde
 
 If you place a file named `.replace` in any of the folders, instead of merging its contents, that folder will directly replace the one in the real system. This can be very handy for swapping out an entire folder.
 
-If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
+If you want to replace files in `/vendor`, `/vendor_dlkm`, `/product`, `/system_ext`, `/system_dlkm`, `/odm`, or `/odm_dlkm`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
 
 #### Zygisk
 

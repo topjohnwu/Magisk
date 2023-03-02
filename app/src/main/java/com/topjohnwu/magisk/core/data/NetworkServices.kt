@@ -12,14 +12,11 @@ private const val FILE = "file"
 
 interface GithubPageServices {
 
-    @GET("{$FILE}")
-    suspend fun fetchUpdateJSON(@Path(FILE) file: String): UpdateInfo
+    @GET
+    suspend fun fetchUpdateJSON(@Url file: String): UpdateInfo
 }
 
 interface RawServices {
-
-    @GET
-    suspend fun fetchCustomUpdate(@Url url: String): UpdateInfo
 
     @GET
     @Streaming

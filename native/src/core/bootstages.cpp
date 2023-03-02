@@ -34,103 +34,47 @@ bool zygisk_enabled = false;
  * Setup *
  *********/
 
-#define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
-#define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) ssprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) ssprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
-
-#define do_mount_mirror(part) {     \
-    SETMIR(buf1, part);             \
-    SETBLK(buf2, part);             \
-    unlink(buf2);                   \
-    mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-    xmkdir(buf1, 0755);             \
-    int flags = 0;                  \
-    auto opts = split_ro(me->mnt_opts, ",");\
-    for (string_view s : opts) {    \
-        if (s == "ro") {            \
-            flags |= MS_RDONLY;     \
-            break;                  \
-        }                           \
-    }                               \
-    xmount(buf2, buf1, me->mnt_type, flags, nullptr); \
-    LOGI("mount: %s\n", buf1);      \
+static bool mount_mirror(const std::string_view from, const std::string_view to) {
+    return !xmkdirs(to.data(), 0755) &&
+           // recursively bind mount to mirror dir, rootfs will fail before 3.12 kernel
+           // because of MS_NOUSER
+           !mount(from.data(), to.data(), nullptr, MS_BIND | MS_REC, nullptr) &&
+           // make mirror dir as a private mount so that it won't be affected by magic mount
+           !xmount("", to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
 }
-
-#define mount_mirror(part) \
-if (MNT_DIR_IS("/" #part)  \
-    && !MNT_TYPE_IS("tmpfs") \
-    && !MNT_TYPE_IS("overlay") \
-    && lstat(me->mnt_dir, &st) == 0) { \
-    do_mount_mirror(part); \
-    break;                 \
-}
-
-#define link_mirror(part) \
-SETMIR(buf1, part); \
-if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
-    xsymlink("./system/" #part, buf1); \
-    LOGI("link: %s\n", buf1); \
-}
-
-#define link_orig_dir(dir, part) \
-if (MNT_DIR_IS(dir) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay")) { \
-    SETMIR(buf1, part);          \
-    rmdir(buf1);                 \
-    xsymlink(dir, buf1);         \
-    LOGI("link: %s\n", buf1);    \
-    break;                       \
-}
-
-#define link_orig(part) link_orig_dir("/" #part, part)
 
 static void mount_mirrors() {
-    char buf1[4096];
-    char buf2[4096];
-
     LOGI("* Prepare worker\n");
-
-    ssprintf(buf1, sizeof(buf1), "%s/" WORKERDIR, MAGISKTMP.data());
-    xmount(buf1, buf1, nullptr, MS_BIND, nullptr);
-    xmount(nullptr, buf1, nullptr, MS_PRIVATE, nullptr);
+    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
+    xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
+    xmount(nullptr, worker_dir.data(), nullptr, MS_PRIVATE, nullptr);
 
     LOGI("* Mounting mirrors\n");
-
-    parse_mnt("/proc/mounts", [&](mntent *me) {
-        struct stat st{};
-        do {
-            mount_mirror(system)
-            mount_mirror(vendor)
-            mount_mirror(product)
-            mount_mirror(system_ext)
-            mount_mirror(data)
-            link_orig(cache)
-            link_orig(metadata)
-            link_orig(persist)
-            link_orig_dir("/mnt/vendor/persist", persist)
-            if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
-                xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-                break;
+    // recursively bind mount / to mirror dir
+    if (auto mirror_dir = MAGISKTMP + "/" MIRRDIR; !mount_mirror("/", mirror_dir)) {
+        LOGI("fallback to mount subtree\n");
+        // rootfs may fail, fallback to bind mount each mount point
+        std::vector<string> mounted_dirs {{ MAGISKTMP }};
+        for (const auto &info: parse_mount_info("self")) {
+            if (info.type == "rootfs"sv) continue;
+            bool mounted = std::any_of(mounted_dirs.begin(), mounted_dirs.end(), [&](const auto &dir) {
+                return str_starts(info.target, dir);
+            });
+            if (!mounted && mount_mirror(info.target, mirror_dir + info.target)) {
+                mounted_dirs.emplace_back(info.target);
             }
-        } while (false);
-        return true;
-    });
-    SETMIR(buf1, system);
-    if (access(buf1, F_OK) != 0) {
-        xsymlink("./system_root/system", buf1);
-        LOGI("link: %s\n", buf1);
-        parse_mnt("/proc/mounts", [&](mntent *me) {
-            struct stat st;
-            if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
-                do_mount_mirror(system_root)
-                return false;
-            }
-            return true;
-        });
+        }
     }
-    link_mirror(vendor)
-    link_mirror(product)
-    link_mirror(system_ext)
+
+    LOGI("* Mounting module root\n");
+    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
+        if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
+            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+            restorecon();
+            chmod(SECURE_DIR, 0700);
+        }
+    }
+
 }
 
 static bool magisk_env() {
@@ -291,9 +235,6 @@ static bool check_key_combo() {
 extern int disable_deny();
 
 static void post_fs_data() {
-    if (getenv("REMOUNT_ROOT"))
-        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-
     if (!check_data())
         return;
 
@@ -306,16 +247,8 @@ static void post_fs_data() {
     prune_su_access();
 
     if (access(SECURE_DIR, F_OK) != 0) {
-        if (SDK_INT < 24) {
-            // There is no FBE pre 7.0, we can directly create the folder without issues
-            xmkdir(SECURE_DIR, 0700);
-        } else {
-            // If the folder is not automatically created by Android,
-            // do NOT proceed further. Manual creation of the folder
-            // will have no encryption flag, which will cause bootloops on FBE devices.
-            LOGE(SECURE_DIR " is not present, abort\n");
-            goto early_abort;
-        }
+        LOGE(SECURE_DIR " is not present, abort\n");
+        goto early_abort;
     }
 
     if (!magisk_env()) {
@@ -340,7 +273,7 @@ static void post_fs_data() {
 
 early_abort:
     // We still do magic mount because root itself might need it
-    magic_mount();
+    load_modules();
     boot_state |= FLAG_POST_FS_DATA_DONE;
 }
 

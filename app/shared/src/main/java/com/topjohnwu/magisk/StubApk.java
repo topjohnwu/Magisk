@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 public class StubApk {
     private static File dynDir;
     private static Method addAssetPath;

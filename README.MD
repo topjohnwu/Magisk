@@ -27,7 +27,6 @@ Some highlight features:
 
 - [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
-- [Magisk Troubleshoot Wiki](https://www.didgeridoohan.com/magisk/HomePage) (by [@Didgeridoohan](https://github.com/Didgeridoohan))
 
 ## Bug Reports
 

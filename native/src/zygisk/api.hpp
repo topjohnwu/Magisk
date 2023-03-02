@@ -27,18 +27,38 @@
 
 /*
 
-Define a class and inherit zygisk::ModuleBase to implement the functionality of your module.
-Use the macro REGISTER_ZYGISK_MODULE(className) to register that class to Zygisk.
+***************
+* Introduction
+***************
+
+On Android, all app processes are forked from a special daemon called "Zygote".
+For each new app process, zygote will fork a new process and perform "specialization".
+This specialization operation enforces the Android security sandbox on the newly forked
+process to make sure that 3rd party application code is only loaded after it is being
+restricted within a sandbox.
+
+On Android, there is also this special process called "system_server". This single
+process hosts a significant portion of system services, which controls how the
+Android operating system and apps interact with each other.
+
+The Zygisk framework provides a way to allow developers to build modules and run custom
+code before and after system_server and any app processes' specialization.
+This enable developers to inject code and alter the behavior of system_server and app processes.
 
 Please note that modules will only be loaded after zygote has forked the child process.
-THIS MEANS ALL OF YOUR CODE RUNS IN THE APP/SYSTEM SERVER PROCESS, NOT THE ZYGOTE DAEMON!
+THIS MEANS ALL OF YOUR CODE RUNS IN THE APP/SYSTEM_SERVER PROCESS, NOT THE ZYGOTE DAEMON!
+
+*********************
+* Development Guide
+*********************
+
+Define a class and inherit zygisk::ModuleBase to implement the functionality of your module.
+Use the macro REGISTER_ZYGISK_MODULE(className) to register that class to Zygisk.
 
 Example code:
 
 static jint (*orig_logger_entry_max)(JNIEnv *env);
 static jint my_logger_entry_max(JNIEnv *env) { return orig_logger_entry_max(env); }
-
-static void example_handler(int socket) { ... }
 
 class ExampleModule : public zygisk::ModuleBase {
 public:
@@ -59,6 +79,21 @@ private:
 };
 
 REGISTER_ZYGISK_MODULE(ExampleModule)
+
+-----------------------------------------------------------------------------------------
+
+Since your module class's code runs with either Zygote's privilege in pre[XXX]Specialize,
+or runs in the sandbox of the target process in post[XXX]Specialize, the code in your class
+never runs in a true superuser environment.
+
+If your module require access to superuser permissions, you can create and register
+a root companion handler function. This function runs in a separate root companion
+daemon process, and an Unix domain socket is provided to allow you to perform IPC between
+your target process and the root companion process.
+
+Example code:
+
+static void example_handler(int socket) { ... }
 
 REGISTER_ZYGISK_COMPANION(example_handler)
 
@@ -93,7 +128,7 @@ public:
 
     // This method is called after the app process is specialized.
     // At this point, the process has all sandbox restrictions enabled for this application.
-    // This means that this method runs as the same privilege of the app's own code.
+    // This means that this method runs with the same privilege of the app's own code.
     virtual void postAppSpecialize([[maybe_unused]] const AppSpecializeArgs *args) {}
 
     // This method is called before the system server process is specialized.
@@ -228,7 +263,16 @@ struct Api {
     // will be set to nullptr.
     void hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods);
 
-    // For ELFs loaded in memory matching `inode`, replace function `symbol` with `newFunc`.
+    // Hook functions in the PLT (Procedure Linkage Table) of ELFs loaded in memory.
+    //
+    // Parsing /proc/[PID]/maps will give you the memory map of a process. As an example:
+    //
+    //       <address>       <perms>  <offset>   <dev>  <inode>           <pathname>
+    // 56b4346000-56b4347000  r-xp    00002000   fe:00    235       /system/bin/app_process64
+    // (More details: https://man7.org/linux/man-pages/man5/proc.5.html)
+    //
+    // The `dev` and `inode` pair uniquely identifies a file being mapped into memory.
+    // For matching ELFs loaded in memory, replace function `symbol` with `newFunc`.
     // If `oldFunc` is not nullptr, the original function pointer will be saved to `oldFunc`.
     void pltHookRegister(dev_t dev, ino_t inode, const char *symbol, void *newFunc, void **oldFunc);
 
@@ -252,11 +296,11 @@ void zygisk_module_entry(zygisk::internal::api_table *table, JNIEnv *env) { \
 //
 // The function runs in a superuser daemon process and handles a root companion request from
 // your module running in a target process. The function has to accept an integer value,
-// which is a socket that is connected to the target process.
+// which is a Unix domain socket that is connected to the target process.
 // See Api::connectCompanion() for more info.
 //
 // NOTE: the function can run concurrently on multiple threads.
-// Be aware of race conditions if you have a globally shared resource.
+// Be aware of race conditions if you have globally shared resources.
 
 #define REGISTER_ZYGISK_COMPANION(func) \
 void zygisk_companion_entry(int client) { func(client); }

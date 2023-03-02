@@ -24,7 +24,7 @@
     <string name="home_support_title">サポートする</string>
     <string name="home_follow_title">フォローする</string>
     <string name="home_item_source">ソース</string>
-    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ることで､ Magisk の開発を支援することができます。</string>
+    <string name="home_support_content">Magisk はフリーでオープンソースです。寄付を送ると､ Magisk の開発を支援することができます。</string>
     <string name="home_installed_version">インストール済</string>
     <string name="home_latest_version">最新版</string>
     <string name="invalid_update_channel">不正な更新チャンネルです</string>
@@ -81,7 +81,7 @@
     <string name="superuser_policy_none">スーパーユーザー権限の許可を求めたアプリはまだありません</string>
 
     <!--Logs-->
-    <string name="log_data_none">ログはありません。スーパーユーザを使用するアプリをもっと使ってみてください</string>
+    <string name="log_data_none">ログはありません。スーパーユーザー権限を使用するアプリをもっと使ってみてください</string>
     <string name="log_data_magisk_none">おかしなことに Magisk のログは空です</string>
     <string name="menuSaveLog">ログを保存</string>
     <string name="menuClearLog">ログを消去</string>
@@ -135,7 +135,7 @@
     <string name="settings_update_beta">ベータ版</string>
     <string name="settings_update_custom">カスタム</string>
     <string name="settings_update_custom_msg">カスタム URL を入力</string>
-    <string name="settings_zygisk_summary">Magisk の一部を zygote デーモン上で実行します</string>
+    <string name="settings_zygisk_summary">Magisk の一部を Zygote デーモン上で実行します</string>
     <string name="settings_denylist_title">DenyList を適用</string>
     <string name="settings_denylist_summary">DenyList 内のプロセスは Magisk の変更がすべて戻されます</string>
     <string name="settings_denylist_error">この機能を使用するには %1$s が有効化されている必要があります</string>
@@ -230,6 +230,7 @@
     <string name="unsupport_nonroot_stub_msg">root 権限が失われたため､隠し Magisk アプリが動作できなくなりました。元の APK を復元してください。</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">この機能を有効にするにはストレージ権限を許可してください</string>
+    <string name="post_notifications_denied">この機能を有効化するには権限を許可してください</string>
     <string name="install_unknown_denied">この機能を有効化するには、不明なソースからのインストールを許可してください</string>
     <string name="add_shortcut_title">ホーム画面にショートカットを追加</string>
     <string name="add_shortcut_msg">アプリを隠すと、アプリ名やアイコンが判別しにくいことがあります。分かりやすいようホーム画面にショートカットを追加しますか？</string>

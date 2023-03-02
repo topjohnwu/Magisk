@@ -43,9 +43,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 public class DownloadActivity extends Activity {
 
     private static final String APP_NAME = "Magisk";
@@ -84,7 +81,7 @@ public class DownloadActivity extends Activity {
         ProviderInstaller.install(this);
 
         if (Networking.checkNetworkStatus(this)) {
-            if (apkLink == null) {
+            if (BuildConfig.APK_URL == null) {
                 fetchCanary();
             } else {
                 showDialog();

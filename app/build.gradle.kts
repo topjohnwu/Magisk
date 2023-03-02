@@ -39,9 +39,10 @@ android {
 
     buildFeatures {
         dataBinding = true
+        aidl = true
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/*"
             excludes += "/META-INF/versions/**"
