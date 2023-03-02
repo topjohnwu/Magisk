@@ -137,8 +137,6 @@ void sepolicy::magisk_rules() {
     // Let init run stuffs
     allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
     allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-    allow("init", "tmpfs", "file", "getattr");
-    allow("init", "tmpfs", "file", "execute");
 
     // suRights
     allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
@@ -186,6 +184,10 @@ void sepolicy::magisk_rules() {
     // Shut llkd up
     dontaudit("llkd", SEPOL_PROC_DOMAIN, "process", "ptrace");
     dontaudit("llkd", SEPOL_CLIENT_DOMAIN, "process", "ptrace");
+
+    // Keep /data/adb/* context
+    deny("init", "adb_data_file", "dir", "search");
+    deny("vendor_init", "adb_data_file", "dir", "search");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");
