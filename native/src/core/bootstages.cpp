@@ -47,6 +47,7 @@ static void mount_mirrors() {
     LOGI("* Prepare worker\n");
     auto worker_dir = MAGISKTMP + "/" WORKERDIR;
     xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
+    xmount(nullptr, worker_dir.data(), nullptr, MS_PRIVATE, nullptr);
 
     LOGI("* Mounting mirrors\n");
     // recursively bind mount / to mirror dir
