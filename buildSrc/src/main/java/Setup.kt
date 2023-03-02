@@ -1,26 +1,29 @@
+import com.android.build.api.artifact.ArtifactTransformationRequest
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.dsl.ApkSigningConfig
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.builder.internal.packaging.IncrementalPackager
-import com.android.builder.model.SigningConfig
 import com.android.tools.build.apkzlib.sign.SigningExtension
 import com.android.tools.build.apkzlib.sign.SigningOptions
 import com.android.tools.build.apkzlib.zfile.ZFiles
 import com.android.tools.build.apkzlib.zip.ZFileOptions
 import org.apache.tools.ant.filters.FixCrLfFilter
 import org.gradle.api.Action
+import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.Delete
-import org.gradle.api.tasks.StopExecutionException
-import org.gradle.api.tasks.Sync
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
 import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.PrintStream
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.*
@@ -45,6 +48,9 @@ private fun BaseExtension.kotlin(configure: Action<KotlinAndroidProjectExtension
 
 private val Project.android: BaseAppModuleExtension
     get() = extensions["android"] as BaseAppModuleExtension
+
+private val Project.androidComponents
+    get() = extensions.getByType(ApplicationAndroidComponentsExtension::class.java)
 
 fun Project.setupCommon() {
     androidBase {
@@ -72,7 +78,7 @@ fun Project.setupCommon() {
     }
 }
 
-private fun SigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
+private fun ApkSigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
     val keyStore = KeyStore.getInstance(storeType ?: KeyStore.getDefaultType())
     storeFile!!.inputStream().use {
         keyStore.load(it, storePassword!!.toCharArray())
@@ -82,7 +88,7 @@ private fun SigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
     return entry as KeyStore.PrivateKeyEntry
 }
 
-private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eocdComment: String) {
+private fun addComment(inFile: File, outFile: File, signConfig: ApkSigningConfig, minSdk: Int, eocdComment: String) {
     val privateKey = signConfig.getPrivateKey()
     val signingOptions = SigningOptions.builder()
         .setMinSdkVersion(minSdk)
@@ -96,11 +102,38 @@ private fun addComment(apkPath: File, signConfig: SigningConfig, minSdk: Int, eo
         noTimestamps = true
         autoSortFiles = true
     }
-    ZFiles.apk(apkPath, options).use {
+    outFile.parentFile.mkdirs()
+    inFile.copyTo(outFile, overwrite = true)
+    ZFiles.apk(outFile, options).use {
         SigningExtension(signingOptions).register(it)
         it.eocdComment = eocdComment.toByteArray()
         it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
         it.get(JarFile.MANIFEST_NAME)?.delete()
+    }
+}
+
+abstract class AddCommentTask: DefaultTask() {
+    @get:Input
+    abstract val comment: Property<String>
+
+    @get:Input
+    abstract val signingConfig: Property<ApkSigningConfig>
+
+    @get:InputFiles
+    abstract val apkFolder: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val outFolder: DirectoryProperty
+
+    @get:Internal
+    abstract val transformationRequest: Property<ArtifactTransformationRequest<AddCommentTask>>
+
+    @TaskAction
+    fun taskAction() = transformationRequest.get().submit(this) { artifact ->
+        val inFile = File(artifact.outputFile)
+        val outFile = outFolder.file(inFile.name).get().asFile
+        addComment(inFile, outFile, signingConfig.get(), 0, comment.get())
+        outFile
     }
 }
 
@@ -146,15 +179,22 @@ private fun Project.setupAppCommon() {
         }
     }
 
-    android.applicationVariants.all {
-        val projectName = project.name.lowercase()
-        val variantCapped = name.replaceFirstChar { it.uppercase() }
-        tasks.getByPath(":$projectName:package$variantCapped").doLast {
-            val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
-            val comment = "version=${Config.version}\n" +
+    androidComponents.onVariants { variant ->
+        val commentTask = tasks.register(
+            "comment${variant.name.replaceFirstChar { it.uppercase() }}",
+            AddCommentTask::class.java
+        )
+        val transformationRequest = variant.artifacts.use(commentTask)
+            .wiredWithDirectories(AddCommentTask::apkFolder, AddCommentTask::outFolder)
+            .toTransformMany(SingleArtifact.APK)
+        val signingConfig = android.buildTypes.getByName(variant.buildType!!).signingConfig
+        commentTask.configure {
+            this.transformationRequest.set(transformationRequest)
+            this.signingConfig.set(signingConfig)
+            this.comment.set("version=${Config.version}\n" +
                 "versionCode=${Config.versionCode}\n" +
-                "stubVersion=${Config.stubVersion}\n"
-            addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
+                "stubVersion=${Config.stubVersion}\n")
+            this.outFolder.set(File(buildDir, "outputs/apk/${variant.name}"))
         }
     }
 }
@@ -265,33 +305,45 @@ fun Project.setupApp() {
 fun Project.setupStub() {
     setupAppCommon()
 
+
+    androidComponents.onVariants { variant ->
+        val manifestUpdater =
+            project.tasks.register(
+                "${variant.name}ManifestProducer",
+                ManifestUpdater::class.java
+            ) {
+                dependsOn("generate${variant.name.replaceFirstChar { it.uppercase() }}ObfuscatedClass")
+                appClassDir.set(File(buildDir, "generated/source/app/${variant.name}"))
+                factoryClassDir.set(File(buildDir, "generated/source/factory/${variant.name}"))
+            }
+        variant.artifacts.use(manifestUpdater)
+            .wiredWithFiles(
+                ManifestUpdater::mergedManifest,
+                ManifestUpdater::outputManifest)
+            .toTransform(SingleArtifact.MERGED_MANIFEST)
+    }
+
     android.applicationVariants.all {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
         val variantLowered = name.lowercase()
-        val manifest = file("src/${variantLowered}/AndroidManifest.xml")
-        val outManifestDir = File(buildDir, "generated/source/manifest/${variantLowered}")
+        val outFactoryClassDir = File(buildDir, "generated/source/factory/${variantLowered}")
+        val outAppClassDir = File(buildDir, "generated/source/app/${variantLowered}")
         val outResDir = File(buildDir, "generated/source/res/${variantLowered}")
-        val templateDir = file("template")
         val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
         val apk = File(buildDir, "intermediates/processed_res/" +
             "${variantLowered}/out/resources-${variantLowered}.ap_")
         val apkTmp = File("${apk}.tmp")
 
-        val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
+        val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
             inputs.property("seed", RAND_SEED)
-            inputs.dir(templateDir)
-            outputs.dir(outManifestDir)
-            outputs.file(manifest)
+            outputs.dirs(outFactoryClassDir, outAppClassDir)
             doLast {
-                val xml = genStubManifest(templateDir, outManifestDir)
-                manifest.parentFile.mkdirs()
-                PrintStream(manifest).use {
-                    it.print(xml)
-                }
+                outFactoryClassDir.mkdirs()
+                outAppClassDir.mkdirs()
+                genStubClass(outFactoryClassDir, outAppClassDir)
             }
         }
-        preBuildProvider.configure { dependsOn(genManifestTask) }
-        registerJavaGeneratingTask(genManifestTask, outManifestDir)
+        registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
 
         val processResourcesTask = tasks.getByPath(":stub:process${variantCapped}Resources")
         processResourcesTask.doLast {
