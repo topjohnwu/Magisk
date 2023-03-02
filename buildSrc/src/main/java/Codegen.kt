@@ -1,3 +1,7 @@
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.*
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
@@ -72,23 +76,41 @@ fun genKeyData(keysDir: File, outSrc: File) {
     }
 }
 
-fun genStubManifest(srcDir: File, outDir: File): String {
-    fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
+@CacheableTask
+abstract class ManifestUpdater: DefaultTask() {
+    @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val mergedManifest: RegularFileProperty
 
-    val cmpList = mutableListOf<String>()
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val factoryClassDir: DirectoryProperty
 
-    cmpList.add(
-        """
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val appClassDir: DirectoryProperty
+
+    @get:OutputFile
+    abstract val outputManifest: RegularFileProperty
+
+    @TaskAction
+    fun taskAction() {
+        fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
+
+        val cmpList = mutableListOf<String>()
+
+        cmpList.add(
+            """
         |<provider
         |    android:name="x.COMPONENT_PLACEHOLDER_0"
         |    android:authorities="${'$'}{applicationId}.provider"
         |    android:directBootAware="true"
         |    android:exported="false"
         |    android:grantUriPermissions="true" />""".ind(2)
-    )
+        )
 
-    cmpList.add(
-        """
+        cmpList.add(
+            """
         |<receiver
         |    android:name="x.COMPONENT_PLACEHOLDER_1"
         |    android:exported="false">
@@ -104,10 +126,10 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |        <data android:scheme="package" />
         |    </intent-filter>
         |</receiver>""".ind(2)
-    )
+        )
 
-    cmpList.add(
-        """
+        cmpList.add(
+            """
         |<activity
         |    android:name="x.COMPONENT_PLACEHOLDER_2"
         |    android:exported="true">
@@ -116,37 +138,55 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         |        <category android:name="android.intent.category.LAUNCHER" />
         |    </intent-filter>
         |</activity>""".ind(2)
-    )
+        )
 
-    cmpList.add(
-        """
+        cmpList.add(
+            """
         |<activity
         |    android:name="x.COMPONENT_PLACEHOLDER_3"
         |    android:directBootAware="true"
         |    android:exported="false"
-        |    android:taskAffinity=""
-        |    tools:ignore="AppLinkUrlError">
+        |    android:taskAffinity="">
         |    <intent-filter>
         |        <action android:name="android.intent.action.VIEW"/>
         |        <category android:name="android.intent.category.DEFAULT"/>
         |    </intent-filter>
         |</activity>""".ind(2)
-    )
+        )
 
-    cmpList.add(
-        """
+        cmpList.add(
+            """
         |<service
         |    android:name="x.COMPONENT_PLACEHOLDER_4"
         |    android:exported="false" />""".ind(2)
-    )
+        )
 
-    cmpList.add(
-        """
+        cmpList.add(
+            """
         |<service
         |    android:name="x.COMPONENT_PLACEHOLDER_5"
         |    android:exported="false"
         |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
-    )
+        )
+
+        // Shuffle the order of the components
+        cmpList.shuffle(RANDOM)
+        val (factoryPkg, factoryClass) = factoryClassDir.asFileTree.first().let {
+            it.parentFile.name to it.name.removeSuffix(".java")
+        }
+        val (appPkg, appClass) = appClassDir.asFileTree.first().let {
+            it.parentFile.name to it.name.removeSuffix(".java")
+        }
+        var manifest = mergedManifest.asFile.get().readText()
+        manifest = manifest.replace("<application", """<application android:appComponentFactory="$factoryPkg.$factoryClass" android:name="$appPkg.$appClass"""")
+        manifest = manifest.replace("</application", "${cmpList.joinToString("\n\n")}\n</application")
+        outputManifest.get().asFile.writeText(manifest)
+    }
+}
+
+
+fun genStubClass(factoryOutDir: File, appOutDir: File) {
+    fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
 
     val classNameGenerator = sequence {
         fun notJavaKeyword(name: String) = when (name) {
@@ -176,7 +216,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         }
     }.distinct().iterator()
 
-    fun genClass(type: String): String {
+    fun genClass(type: String, outDir: File) {
         val clzName = classNameGenerator.next()
         val (pkg, name) = clzName.split('.')
         val pkgDir = File(outDir, pkg)
@@ -185,18 +225,10 @@ fun genStubManifest(srcDir: File, outDir: File): String {
             it.println("package $pkg;")
             it.println("public class $name extends com.topjohnwu.magisk.$type {}")
         }
-        return clzName
     }
 
-    // Generate 2 non redirect-able classes
-    val factory = genClass("DelegateComponentFactory")
-    val app = genClass("DelegateApplication")
-
-    // Shuffle the order of the components
-    cmpList.shuffle(RANDOM)
-
-    val xml = File(srcDir, "AndroidManifest.xml").readText()
-    return xml.format(factory, app, cmpList.joinToString("\n\n"))
+    genClass("DelegateComponentFactory", factoryOutDir)
+    genClass("DelegateApplication", appOutDir)
 }
 
 fun genEncryptedResources(res: InputStream, outDir: File) {
