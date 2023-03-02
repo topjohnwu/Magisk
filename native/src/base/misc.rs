@@ -108,7 +108,11 @@ macro_rules! cstr {
 }
 
 pub fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
-    unsafe { CStr::from_ptr(ptr.cast()) }.to_str().unwrap_or("")
+    if ptr.is_null() {
+        "(null)"
+    } else {
+        unsafe { CStr::from_ptr(ptr.cast()) }.to_str().unwrap_or("")
+    }
 }
 
 pub fn errno() -> &'static mut i32 {

@@ -22,6 +22,8 @@ struct api_abi_v2;
 using  api_abi_v3 = api_abi_v2;
 struct api_abi_v4;
 
+union ApiTable;
+
 struct AppSpecializeArgs_v3 {
     jint &uid;
     jint &gid;
@@ -118,26 +120,39 @@ enum : uint32_t {
 
 struct api_abi_base {
     ZygiskModule *impl;
-    bool (*registerModule)(api_abi_base *, long *);
+    bool (*registerModule)(ApiTable *, long *);
 };
 
 struct api_abi_v1 : public api_abi_base {
-    void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
-    void (*pltHookRegister)(const char *, const char *, void *, void **);
-    void (*pltHookExclude)(const char *, const char *);
-    bool (*pltHookCommit)();
-
-    int (*connectCompanion)(ZygiskModule *);
-    void (*setOption)(ZygiskModule *, zygisk::Option);
+    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    /* 1 */ void (*pltHookRegister)(const char *, const char *, void *, void **);
+    /* 2 */ void (*pltHookExclude)(const char *, const char *);
+    /* 3 */ bool (*pltHookCommit)();
+    /* 4 */ int (*connectCompanion)(ZygiskModule *);
+    /* 5 */ void (*setOption)(ZygiskModule *, zygisk::Option);
 };
 
 struct api_abi_v2 : public api_abi_v1 {
-    int (*getModuleDir)(ZygiskModule *);
-    uint32_t (*getFlags)(ZygiskModule *);
+    /* 6 */ int (*getModuleDir)(ZygiskModule *);
+    /* 7 */ uint32_t (*getFlags)(ZygiskModule *);
 };
 
-struct api_abi_v4 : public api_abi_v2 {
-    bool (*exemptFd)(int);
+struct api_abi_v4 : public api_abi_base {
+    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    /* 1 */ void (*pltHookRegister)(dev_t, ino_t, const char *, void *, void **);
+    /* 2 */ bool (*exemptFd)(int);
+    /* 3 */ bool (*pltHookCommit)();
+    /* 4 */ int (*connectCompanion)(ZygiskModule *);
+    /* 5 */ void (*setOption)(ZygiskModule *, zygisk::Option);
+    /* 6 */ int (*getModuleDir)(ZygiskModule *);
+    /* 7 */ uint32_t (*getFlags)(ZygiskModule *);
+};
+
+union ApiTable {
+    api_abi_base base;
+    api_abi_v1 v1;
+    api_abi_v2 v2;
+    api_abi_v4 v4;
 };
 
 #define call_app(method)               \
@@ -172,6 +187,7 @@ struct ZygiskModule {
         mod.v1->postServerSpecialize(mod.v1->impl, args);
     }
 
+    bool valid() const;
     int connectCompanion() const;
     int getModuleDir() const;
     void setOption(zygisk::Option opt);
@@ -182,7 +198,7 @@ struct ZygiskModule {
 
     ZygiskModule(int id, void *handle, void *entry);
 
-    static bool RegisterModuleImpl(api_abi_base *api, long *module);
+    static bool RegisterModuleImpl(ApiTable *api, long *module);
 
 private:
     const int id;
@@ -194,11 +210,7 @@ private:
         void (* const fn)(void *, void *);
     } entry;
 
-    union {
-        api_abi_base base;
-        api_abi_v1 v1;
-        api_abi_v2 v2;
-    } api;
+    ApiTable api;
 
     union {
         long *api_version;

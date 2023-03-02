@@ -10,7 +10,11 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.*
+import com.topjohnwu.magisk.databinding.MergeObservableList
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.diffListOf
+import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
@@ -35,16 +39,17 @@ class ModuleViewModel : AsyncLoadViewModel() {
     var loading = true
         private set(value) = set(value, field, { field = it }, BR.loading)
 
-    init {
-        if (Info.env.isActive && LocalModule.loaded()) {
-            items.insertItem(InstallModule)
-                .insertList(itemsInstalled)
-        }
-    }
-
     override suspend fun doLoadWork() {
         loading = true
-        loadInstalled()
+        val moduleLoaded = Info.env.isActive &&
+                withContext(Dispatchers.IO) { LocalModule.loaded() }
+        if (moduleLoaded) {
+            loadInstalled()
+            if (items.isEmpty()) {
+                items.insertItem(InstallModule)
+                    .insertList(itemsInstalled)
+            }
+        }
         loading = false
         loadUpdateInfo()
     }

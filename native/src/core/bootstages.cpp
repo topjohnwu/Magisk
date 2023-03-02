@@ -17,104 +17,63 @@
 
 using namespace std;
 
-static bool safe_mode = false;
+// Boot stage state
+enum : int {
+    FLAG_NONE = 0,
+    FLAG_POST_FS_DATA_DONE = (1 << 0),
+    FLAG_LATE_START_DONE = (1 << 1),
+    FLAG_BOOT_COMPLETE = (1 << 2),
+    FLAG_SAFE_MODE = (1 << 3),
+};
+
+static int boot_state = FLAG_NONE;
+
 bool zygisk_enabled = false;
 
 /*********
  * Setup *
  *********/
 
-#define MNT_DIR_IS(dir) (me->mnt_dir == string_view(dir))
-#define MNT_TYPE_IS(type) (me->mnt_type == string_view(type))
-#define SETMIR(b, part) ssprintf(b, sizeof(b), "%s/" MIRRDIR "/" #part, MAGISKTMP.data())
-#define SETBLK(b, part) ssprintf(b, sizeof(b), "%s/" BLOCKDIR "/" #part, MAGISKTMP.data())
-
-#define do_mount_mirror(part) {     \
-    SETMIR(buf1, part);             \
-    SETBLK(buf2, part);             \
-    unlink(buf2);                   \
-    mknod(buf2, S_IFBLK | 0600, st.st_dev); \
-    xmkdir(buf1, 0755);             \
-    int flags = 0;                  \
-    auto opts = split_ro(me->mnt_opts, ",");\
-    for (string_view s : opts) {    \
-        if (s == "ro") {            \
-            flags |= MS_RDONLY;     \
-            break;                  \
-        }                           \
-    }                               \
-    xmount(buf2, buf1, me->mnt_type, flags, nullptr); \
-    LOGI("mount: %s\n", buf1);      \
+static bool mount_mirror(const std::string_view from, const std::string_view to) {
+    return !xmkdirs(to.data(), 0755) &&
+           // recursively bind mount to mirror dir, rootfs will fail before 3.12 kernel
+           // because of MS_NOUSER
+           !mount(from.data(), to.data(), nullptr, MS_BIND | MS_REC, nullptr) &&
+           // make mirror dir as a private mount so that it won't be affected by magic mount
+           !xmount("", to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
 }
-
-#define mount_mirror(part) \
-if (MNT_DIR_IS("/" #part)  \
-    && !MNT_TYPE_IS("tmpfs") \
-    && !MNT_TYPE_IS("overlay") \
-    && lstat(me->mnt_dir, &st) == 0) { \
-    do_mount_mirror(part); \
-    break;                 \
-}
-
-#define link_mirror(part) \
-SETMIR(buf1, part); \
-if (access("/system/" #part, F_OK) == 0 && access(buf1, F_OK) != 0) { \
-    xsymlink("./system/" #part, buf1); \
-    LOGI("link: %s\n", buf1); \
-}
-
-#define link_orig_dir(dir, part) \
-if (MNT_DIR_IS(dir) && !MNT_TYPE_IS("tmpfs") && !MNT_TYPE_IS("overlay")) { \
-    SETMIR(buf1, part);          \
-    rmdir(buf1);                 \
-    xsymlink(dir, buf1);         \
-    LOGI("link: %s\n", buf1);    \
-    break;                       \
-}
-
-#define link_orig(part) link_orig_dir("/" #part, part)
 
 static void mount_mirrors() {
-    char buf1[4096];
-    char buf2[4096];
+    LOGI("* Prepare worker\n");
+    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
+    xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
 
     LOGI("* Mounting mirrors\n");
-
-    parse_mnt("/proc/mounts", [&](mntent *me) {
-        struct stat st{};
-        do {
-            mount_mirror(system)
-            mount_mirror(vendor)
-            mount_mirror(product)
-            mount_mirror(system_ext)
-            mount_mirror(data)
-            link_orig(cache)
-            link_orig(metadata)
-            link_orig(persist)
-            link_orig_dir("/mnt/vendor/persist", persist)
-            if (SDK_INT >= 24 && MNT_DIR_IS("/proc") && !strstr(me->mnt_opts, "hidepid=2")) {
-                xmount(nullptr, "/proc", nullptr, MS_REMOUNT, "hidepid=2,gid=3009");
-                break;
+    // recursively bind mount / to mirror dir
+    if (auto mirror_dir = MAGISKTMP + "/" MIRRDIR; !mount_mirror("/", mirror_dir)) {
+        LOGI("fallback to mount subtree\n");
+        // rootfs may fail, fallback to bind mount each mount point
+        std::vector<string> mounted_dirs {{ MAGISKTMP }};
+        for (const auto &info: parse_mount_info("self")) {
+            if (info.type == "rootfs"sv) continue;
+            bool mounted = std::any_of(mounted_dirs.begin(), mounted_dirs.end(), [&](const auto &dir) {
+                return str_starts(info.target, dir);
+            });
+            if (!mounted && mount_mirror(info.target, mirror_dir + info.target)) {
+                mounted_dirs.emplace_back(info.target);
             }
-        } while (false);
-        return true;
-    });
-    SETMIR(buf1, system);
-    if (access(buf1, F_OK) != 0) {
-        xsymlink("./system_root/system", buf1);
-        LOGI("link: %s\n", buf1);
-        parse_mnt("/proc/mounts", [&](mntent *me) {
-            struct stat st;
-            if (MNT_DIR_IS("/") && me->mnt_type != "rootfs"sv && stat("/", &st) == 0) {
-                do_mount_mirror(system_root)
-                return false;
-            }
-            return true;
-        });
+        }
     }
-    link_mirror(vendor)
-    link_mirror(product)
-    link_mirror(system_ext)
+
+    LOGI("* Mounting module root\n");
+    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
+        if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
+            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+            restorecon();
+            chmod(SECURE_DIR, 0700);
+        }
+    }
+
 }
 
 static bool magisk_env() {
@@ -272,21 +231,12 @@ static bool check_key_combo() {
  * Boot Stage Handlers *
  ***********************/
 
-static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
 extern int disable_deny();
 
-void post_fs_data(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-
-    if (getenv("REMOUNT_ROOT"))
-        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-
+static void post_fs_data() {
     if (!check_data())
-        goto unblock_init;
+        return;
 
-    DAEMON_STATE = STATE_POST_FS_DATA;
     setup_logfile(true);
 
     LOGI("** post-fs-data mode running\n");
@@ -296,16 +246,8 @@ void post_fs_data(int client) {
     prune_su_access();
 
     if (access(SECURE_DIR, F_OK) != 0) {
-        if (SDK_INT < 24) {
-            // There is no FBE pre 7.0, we can directly create the folder without issues
-            xmkdir(SECURE_DIR, 0700);
-        } else {
-            // If the folder is not automatically created by Android,
-            // do NOT proceed further. Manual creation of the folder
-            // will have no encryption flag, which will cause bootloops on FBE devices.
-            LOGE(SECURE_DIR " is not present, abort\n");
-            goto early_abort;
-        }
+        LOGE(SECURE_DIR " is not present, abort\n");
+        goto early_abort;
     }
 
     if (!magisk_env()) {
@@ -313,8 +255,9 @@ void post_fs_data(int client) {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" || check_key_combo()) {
-        safe_mode = true;
+    if (getprop("persist.sys.safemode", true) == "1" ||
+        getprop("ro.sys.safemode") == "1" || check_key_combo()) {
+        boot_state |= FLAG_SAFE_MODE;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
         disable_deny();
@@ -329,40 +272,26 @@ void post_fs_data(int client) {
 
 early_abort:
     // We still do magic mount because root itself might need it
-    magic_mount();
-    DAEMON_STATE = STATE_POST_FS_DATA_DONE;
-
-unblock_init:
-    close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+    load_modules();
+    boot_state |= FLAG_POST_FS_DATA_DONE;
 }
 
-void late_start(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-    run_finally fin([]{ DAEMON_STATE = STATE_LATE_START_DONE; });
+static void late_start() {
     setup_logfile(false);
 
     LOGI("** late_start service mode running\n");
 
-    if (DAEMON_STATE < STATE_POST_FS_DATA_DONE || safe_mode)
-        return;
-
     exec_common_scripts("service");
     exec_module_scripts("service");
+
+    boot_state |= FLAG_LATE_START_DONE;
 }
 
-void boot_complete(int client) {
-    close(client);
-
-    mutex_guard lock(stage_lock);
-    DAEMON_STATE = STATE_BOOT_COMPLETE;
+static void boot_complete() {
+    boot_state |= FLAG_BOOT_COMPLETE;
     setup_logfile(false);
 
     LOGI("** boot-complete triggered\n");
-
-    if (safe_mode)
-        return;
 
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)
@@ -373,10 +302,26 @@ void boot_complete(int client) {
     get_manager(0, nullptr, true);
 }
 
-void zygote_restart(int client) {
-    close(client);
+void boot_stage_handler(int code) {
+    // Make sure boot stage execution is always serialized
+    static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
+    mutex_guard lock(stage_lock);
 
-    LOGI("** zygote restarted\n");
-    pkg_xml_ino = 0;
-    prune_su_access();
+    switch (code) {
+    case MainRequest::POST_FS_DATA:
+        if ((boot_state & FLAG_POST_FS_DATA_DONE) == 0)
+            post_fs_data();
+        close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+        break;
+    case MainRequest::LATE_START:
+        if ((boot_state & FLAG_POST_FS_DATA_DONE) && (boot_state & FLAG_SAFE_MODE) == 0)
+            late_start();
+        break;
+    case MainRequest::BOOT_COMPLETE:
+        if ((boot_state & FLAG_SAFE_MODE) == 0)
+            boot_complete();
+        break;
+    default:
+        __builtin_unreachable();
+    }
 }

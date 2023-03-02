@@ -375,7 +375,7 @@
 - [Daemon] Check whether a valid Magisk Manager is installed on boot, if not, install stub APK embedded in magiskinit
 - [Daemon] Check whether Magisk Manager is repackaged (hidden), and prevent malware from hijacking com.topjohnwu.magisk
 - [Daemon] Introduce new daemon: magisklogd, a dedicated daemon to handle all logcat related monitoring
-- [Daemon] Replace old invincible mode with handshake between magiskd and magisklogd, one will respwan the other if disconnected
+- [Daemon] Replace old invincible mode with handshake between magiskd and magisklogd, one will respawn the other if disconnected
 - [Daemon] Support GSI adbd bind mounting
 - [MagiskInit] Support detecting block names in upper case (Samsung)
 - [MagiskBoot] Check DTB headers to prevent false detections within kernel binary
@@ -497,11 +497,11 @@
 
 ### v14.3 (1437)
 
-- [MagiskBoot] Fix Pixel C installtion
+- [MagiskBoot] Fix Pixel C installation
 - [MagiskBoot] Handle special `lz4_legacy` format properly, should fix all LG devices
 - [Daemon] New universal logcat monitor is added, support plug-and-play to worker threads
 - [Daemon] Invincible mode: daemon will be restarted by init, everything should seamlessly through daemon restarts
-- [Daemon] Add new restorecon action, will go through and fix all Magisk files with selinux unlabled to `system_file` context
+- [Daemon] Add new restorecon action, will go through and fix all Magisk files with selinux unlabeled to `system_file` context
 - [Daemon] Add brute-force image resizing mode, should prevent the notorious Samsung crappy resize2fs from affecting the result
 - [resetprop] Add new "-p" flag, used to toggle whether alter/access the actual persist storage for persist props
 
@@ -522,7 +522,7 @@
 - [Daemon/MagiskSU] Proper file based encryption support
 - [Daemon] Create core folders if not exist
 - [resetprop] Fix a bug which delete props won't remove persist props not in memory
-- [MagicMount] Remove usage of dummy folder, directly mount tmpfs and constuct file structure skeleton in place
+- [MagicMount] Remove usage of dummy folder, directly mount tmpfs and construct file structure skeleton in place
 
 ### v14.0
 
@@ -561,7 +561,7 @@
 - [General] Merge MagiskSU, magiskhide, resetprop, magiskpolicy into one binary
 - [General] Add Android O support (tested on DP3)
 - [General] Dynamic link libselinux.so, libsqlite.so from system to greatly reduce binary size
-- [General] Remove bundled busybox because it casues a lot of issues
+- [General] Remove bundled busybox because it causes a lot of issues
 - [General] Unlock all block devices for read-write support instead of emmc only (just figured not all devices uses emmc lol)
 - [Scripts] Run all ext4 image operations through magisk binary in flash scripts
 - [Scripts] Updated scripts to use magisk native commands to increase compatibility
@@ -676,7 +676,7 @@
 - [resetprop] Magisk will now patch "ro.boot.verifiedbootstate", "ro.boot.flash.locked", "ro.boot.veritymode" to bypass Safety Net
 - [Magic Mount] Move dummy skeleton / mirror / mountinfo filesystem tree to tmpfs
 - [Magic Mount] Rewritten dummy cloning mechanism from scratch, will result in minimal bind mounts, minimal file traversal, eliminate all possible issues that might happen in extreme cases
-- [Magic Mount] Adding new items to /systen/bin, /system/vendor, /system/lib(64) is properly supported (devices with seperate vendor partition is not supported yet)
+- [Magic Mount] Adding new items to /system/bin, /system/vendor, /system/lib(64) is properly supported (devices with separate vendor partition is not supported yet)
 - [Magisk Hide] Rewritten from scratch, now run in daemon mode, proper list monitoring, proper mount detection, and maybe more.....
 - [Boot Image] Add support for Motorola boot image dtb, it shall now unpack correctly
 - [Uninstaller] Add removal of SuperSU custom patch script

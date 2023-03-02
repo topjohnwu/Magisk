@@ -44,9 +44,18 @@ class DenyListRvItem(
                 processes
                     .filterNot { it.isEnabled }
                     .filter { isExpanded || it.defaultSelection }
+                    .forEach { it.toggle() }
             } else {
-                processes.filter { it.isEnabled }
-            }.forEach { it.toggle() }
+                Shell.cmd("magisk --denylist rm ${info.packageName}").submit()
+                processes.filter { it.isEnabled }.forEach {
+                    if (it.process.isIsolated) {
+                        it.toggle()
+                    } else {
+                        it.isEnabled = !it.isEnabled
+                        notifyPropertyChanged(BR.enabled)
+                    }
+                }
+            }
         }
 
     init {

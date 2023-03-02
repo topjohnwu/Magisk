@@ -120,7 +120,7 @@ All files you want to replace/inject should be placed in this folder. This folde
 
 If you place a file named `.replace` in any of the folders, instead of merging its contents, that folder will directly replace the one in the real system. This can be very handy for swapping out an entire folder.
 
-If you want to replace files in `/vendor`, `/product`, or `/system_ext`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
+If you want to replace files in `/vendor`, `/vendor_dlkm`, `/product`, `/system_ext`, `/system_dlkm`, `/odm`, or `/odm_dlkm`, please place them under `system/vendor`, `system/product`, and `system/system_ext` respectively. Magisk will transparently handle whether these partitions are in a separate partition or not.
 
 #### Zygisk
 
@@ -257,7 +257,7 @@ Since `/` is read-only on system-as-root devices, Magisk provides an overlay sys
 
 Overlay files shall be placed in the `overlay.d` folder in boot image ramdisk, and they follow these rules:
 
-1. All `*.rc` files in `overlay.d` will be read and concatenated **AFTER** `init.rc`
+1. Each `*.rc` file (except for `init.rc`) in `overlay.d` will be read and concatenated **AFTER** `init.rc` if it does not exist in the root directory, otherwise it will **REPLACE** the existing one.
 2. Existing files can be replaced by files located at the same relative path
 3. Files that correspond to a non-existing file will be ignored
 

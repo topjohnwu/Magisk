@@ -20,7 +20,7 @@
 #####################################################################
 
 mount_sbin() {
-  mount -t tmpfs -o 'mode=0755' tmpfs /sbin
+  mount -t tmpfs -o 'mode=0755' magisk /sbin
   chcon u:object_r:rootfs:s0 /sbin
 }
 
@@ -48,7 +48,7 @@ fi
 pm install -r $(pwd)/magisk.apk
 
 # Extract files from APK
-unzip -oj magisk.apk 'assets/util_functions.sh'
+unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
 . ./util_functions.sh
 
 api_level_arch_detect
@@ -114,7 +114,7 @@ else
   # Android Q+ without sbin
   MAGISKTMP=/dev/avd-magisk
   mkdir /dev/avd-magisk
-  mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-magisk
+  mount -t tmpfs -o 'mode=0755' magisk /dev/avd-magisk
 fi
 
 # Magisk stuff
@@ -124,7 +124,7 @@ mkdir $NVBASE/modules 2>/dev/null
 mkdir $POSTFSDATAD 2>/dev/null
 mkdir $SERVICED 2>/dev/null
 
-for file in magisk32 magisk64 magiskpolicy; do
+for file in magisk32 magisk64 magiskpolicy stub.apk; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file
@@ -142,8 +142,6 @@ ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
-
-./magiskinit -x manager $MAGISKTMP/stub.apk
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block

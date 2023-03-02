@@ -40,6 +40,9 @@
 [submodule "cxx-rs"]
 	path = native/src/external/cxx-rs
 	url = https://github.com/topjohnwu/cxx.git
+[submodule "lsplt"]
+	path = native/src/external/lsplt
+	url = https://github.com/LSPosed/LSPlt.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

@@ -21,9 +21,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DynLoad {
 

@@ -53,8 +53,8 @@ class ShellInit : Shell.Initializer() {
                     "  cp -af $localBB \$MAGISKTMP/busybox/busybox",
                     "  exec \$MAGISKTMP/busybox/busybox sh",
                     "else",
-                    "  cp -af $localBB /dev/.busybox",
-                    "  exec /dev/.busybox sh",
+                    "  cp -af $localBB /dev/busybox",
+                    "  exec /dev/busybox sh",
                     "fi"
                 )
             } else {
@@ -73,7 +73,6 @@ class ShellInit : Shell.Initializer() {
         fun getVar(name: String) = fastCmd("echo \$$name")
         fun getBool(name: String) = getVar(name).toBoolean()
 
-        Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
         Info.vbmeta = getBool("VBMETAEXIST")

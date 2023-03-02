@@ -43,7 +43,7 @@ if [ -z "$FIRST_STAGE" ]; then
 fi
 
 # Extract files from APK
-unzip -oj magisk.apk 'assets/util_functions.sh'
+unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
 . ./util_functions.sh
 
 api_level_arch_detect
@@ -59,12 +59,15 @@ cp ramdisk.cpio ramdisk.cpio.orig
 
 touch config
 
+echo "RULESDEVICE=$(ISENCRYPTED=true ./magiskinit --rules-device)" >> config
+
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
 
 ./magiskboot compress=xz magisk32 magisk32.xz
 ./magiskboot compress=xz magisk64 magisk64.xz
+./magiskboot compress=xz stub.apk stub.xz
 
 export KEEPVERITY=false
 export KEEPFORCEENCRYPT=true
@@ -75,10 +78,12 @@ export KEEPFORCEENCRYPT=true
 "mkdir 0750 overlay.d/sbin" \
 "add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
 "add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
+"add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 ./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz
+pm install magisk.apk || true

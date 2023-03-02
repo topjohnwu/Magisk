@@ -1,7 +1,7 @@
 ## OTA Upgrade Guides
 Magisk does not modify most read-only partitions, which means applying official OTAs is much simpler. Here are the tutorials for several different kind of devices to apply OTAs and preserve Magisk after the installation (if possible). This is just a general guide as procedures for each device may vary.
 
-**NOTE: In order to apply OTAs, you HAVE to make sure you haven't modified any read-only partitons yourself (such as `/system` or `/vendor`) in any way. Even remounting the partition to rw will tamper block verification!!**
+**NOTE: In order to apply OTAs, you HAVE to make sure you haven't modified and read-only partitions yourself (such as `/system` or `/vendor`) in any way. Even remounting the partition to rw will tamper block verification!!**
 
 ### Prerequisites
 - Please disable *Automatic system updates* in developer options, so it won't install OTAs without your acknowledgement.

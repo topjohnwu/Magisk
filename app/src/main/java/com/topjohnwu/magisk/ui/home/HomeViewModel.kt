@@ -67,7 +67,6 @@ class HomeViewModel(
 
     val managerInstalledVersion
         get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
-            Info.stub?.let { " (${it.version})" }.orEmpty() +
             if (BuildConfig.DEBUG) " (D)" else ""
 
     @get:Bindable
@@ -92,7 +91,7 @@ class HomeViewModel(
 
             val isDebug = Config.updateChannel == Config.Value.DEBUG_CHANNEL
             managerRemoteVersion =
-                ("${magisk.version} (${magisk.versionCode}) (${stub.versionCode})" +
+                ("${magisk.version} (${magisk.versionCode})" +
                     if (isDebug) " (D)" else "").asText()
         } ?: run {
             appState = State.INVALID

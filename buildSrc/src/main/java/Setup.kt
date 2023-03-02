@@ -11,12 +11,11 @@ import org.gradle.api.Action
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
-import org.gradle.kotlin.dsl.filter
-import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -39,13 +38,18 @@ private fun BaseExtension.kotlinOptions(configure: Action<KotlinJvmOptions>) =
         configure.execute(it as KotlinJvmOptions)
     }
 
+private fun BaseExtension.kotlin(configure: Action<KotlinAndroidProjectExtension>) =
+    (this as ExtensionAware).extensions.findByName("kotlin")?.let {
+        configure.execute(it as KotlinAndroidProjectExtension)
+    }
+
 private val Project.android: BaseAppModuleExtension
-    get() = extensions.getByName("android") as BaseAppModuleExtension
+    get() = extensions["android"] as BaseAppModuleExtension
 
 fun Project.setupCommon() {
     androidBase {
         compileSdkVersion(33)
-        buildToolsVersion = "32.0.0"
+        buildToolsVersion = "33.0.1"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
@@ -54,12 +58,16 @@ fun Project.setupCommon() {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
 
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "17"
+        }
+
+        kotlin {
+            jvmToolchain(17)
         }
     }
 }
@@ -112,33 +120,40 @@ private fun Project.setupAppCommon() {
         }
 
         buildTypes {
-            signingConfigs.getByName("config").also {
-                getByName("debug") {
+            signingConfigs["config"].also {
+                debug {
                     signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs.getByName("debug")
+                    else signingConfigs["debug"]
                 }
-                getByName("release") {
+                release {
                     signingConfig = if (it.storeFile?.exists() == true) it
-                    else signingConfigs.getByName("debug")
+                    else signingConfigs["debug"]
                 }
             }
         }
 
         lint {
             disable += "MissingTranslation"
+            checkReleaseBuilds = false
         }
 
         dependenciesInfo {
             includeInApk = false
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
     }
 
     android.applicationVariants.all {
-        val projectName = project.name.toLowerCase(Locale.ROOT)
-        val variantCapped = name.capitalize(Locale.ROOT)
+        val projectName = project.name.lowercase()
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
         tasks.getByPath(":$projectName:package$variantCapped").doLast {
             val apk = outputs.files.asFileTree.filter { it.name.endsWith(".apk") }.singleFile
-            val comment = "version=${Config.version}\nversionCode=${Config.versionCode}"
+            val comment = "version=${Config.version}\n" +
+                "versionCode=${Config.versionCode}\n" +
+                "stubVersion=${Config.stubVersion}\n"
             addComment(apk, signingConfig, android.defaultConfig.minSdk!!, comment)
         }
     }
@@ -147,7 +162,7 @@ private fun Project.setupAppCommon() {
 fun Project.setupApp() {
     setupAppCommon()
 
-    val syncLibs = tasks.register("syncLibs", Sync::class.java) {
+    val syncLibs by tasks.registering(Sync::class) {
         into("src/main/jniLibs")
         into("armeabi-v7a") {
             from(rootProject.file("native/out/armeabi-v7a")) {
@@ -180,35 +195,7 @@ fun Project.setupApp() {
         }
     }
 
-    val syncAssets = tasks.register("syncAssets", Sync::class.java) {
-        dependsOn(syncLibs)
-        inputs.property("version", Config.version)
-        inputs.property("versionCode", Config.versionCode)
-        into("src/main/assets")
-        from(rootProject.file("scripts")) {
-            include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
-            include("uninstaller.sh", "module_installer.sh")
-        }
-        from(rootProject.file("tools/bootctl"))
-        into("chromeos") {
-            from(rootProject.file("tools/futility"))
-            from(rootProject.file("tools/keys")) {
-                include("kernel_data_key.vbprivk", "kernel.keyblock")
-            }
-        }
-        filesMatching("**/util_functions.sh") {
-            filter {
-                it.replace(
-                    "#MAGISK_VERSION_STUB",
-                    "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
-                )
-            }
-            filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
-        }
-    }
-
-    val syncResources = tasks.register("syncResources", Sync::class.java) {
-        dependsOn(syncAssets)
+    val syncResources by tasks.registering(Sync::class) {
         into("src/main/resources/META-INF/com/google/android")
         from(rootProject.file("scripts/update_binary.sh")) {
             rename { "update-binary" }
@@ -219,23 +206,46 @@ fun Project.setupApp() {
     }
 
     android.applicationVariants.all {
-        val variantCapped = name.capitalize(Locale.ROOT)
-        val variantLowered = name.toLowerCase(Locale.ROOT)
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
 
-        val copyStub = tasks.register("copy${variantCapped}StubApk", Copy::class.java) {
-            dependsOn(syncResources)
-            into("src/main/assets")
-            from(rootProject.file("out/stub-${variantLowered}.apk")) {
-                rename { "stub.apk" }
-            }
-            onlyIf {
-                if (inputs.sourceFiles.files.size != 1)
-                    throw StopExecutionException("Please build stub first! (./build.py stub)")
-                true
-            }
+        tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(syncLibs)
+        processJavaResourcesProvider.configure { dependsOn(syncResources) }
+
+        val stubTask = tasks.getByPath(":stub:package$variantCapped")
+        val stubApk = stubTask.outputs.files.asFileTree.filter {
+            it.name.endsWith(".apk")
         }
 
-        preBuildProvider.get().dependsOn(copyStub)
+        val syncAssets = tasks.register("sync${variantCapped}Assets", Sync::class) {
+            dependsOn(stubTask)
+            inputs.property("version", Config.version)
+            inputs.property("versionCode", Config.versionCode)
+            into("src/${this@all.name}/assets")
+            from(rootProject.file("scripts")) {
+                include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
+                include("uninstaller.sh", "module_installer.sh")
+            }
+            from(rootProject.file("tools/bootctl"))
+            into("chromeos") {
+                from(rootProject.file("tools/futility"))
+                from(rootProject.file("tools/keys")) {
+                    include("kernel_data_key.vbprivk", "kernel.keyblock")
+                }
+            }
+            from(stubApk) {
+                rename { "stub.apk" }
+            }
+            filesMatching("**/util_functions.sh") {
+                filter {
+                    it.replace(
+                        "#MAGISK_VERSION_STUB",
+                        "MAGISK_VER='${Config.version}'\nMAGISK_VER_CODE=${Config.versionCode}"
+                    )
+                }
+                filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+            }
+        }
+        mergeAssetsProvider.configure { dependsOn(syncAssets) }
 
         val keysDir = rootProject.file("tools/keys")
         val outSrcDir = File(buildDir, "generated/source/keydata/$name")
@@ -256,10 +266,11 @@ fun Project.setupStub() {
     setupAppCommon()
 
     android.applicationVariants.all {
-        val variantCapped = name.capitalize(Locale.ROOT)
-        val variantLowered = name.toLowerCase(Locale.ROOT)
+        val variantCapped = name.replaceFirstChar { it.uppercase() }
+        val variantLowered = name.lowercase()
         val manifest = file("src/${variantLowered}/AndroidManifest.xml")
-        val outSrcDir = File(buildDir, "generated/source/obfuscate/${variantLowered}")
+        val outManifestDir = File(buildDir, "generated/source/manifest/${variantLowered}")
+        val outResDir = File(buildDir, "generated/source/res/${variantLowered}")
         val templateDir = file("template")
         val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
         val apk = File(buildDir, "intermediates/processed_res/" +
@@ -267,49 +278,51 @@ fun Project.setupStub() {
         val apkTmp = File("${apk}.tmp")
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedManifest") {
+            inputs.property("seed", RAND_SEED)
+            inputs.dir(templateDir)
+            outputs.dir(outManifestDir)
+            outputs.file(manifest)
             doLast {
-                val xml = genStubManifest(templateDir, outSrcDir)
+                val xml = genStubManifest(templateDir, outManifestDir)
                 manifest.parentFile.mkdirs()
                 PrintStream(manifest).use {
                     it.print(xml)
                 }
             }
         }
-        tasks.getByPath(":stub:process${variantCapped}MainManifest").dependsOn(genManifestTask)
+        preBuildProvider.configure { dependsOn(genManifestTask) }
+        registerJavaGeneratingTask(genManifestTask, outManifestDir)
 
-        val genSrcTask = tasks.register("generate${variantCapped}ObfuscatedSources") {
-            dependsOn(":stub:process${variantCapped}Resources")
-            inputs.file(apk)
-            outputs.file(apk)
-            doLast {
-                exec {
-                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-                }
-
-                val bos = ByteArrayOutputStream()
-                ZipFile(apkTmp).use { src ->
-                    ZipOutputStream(apk.outputStream()).use {
-                        it.setLevel(Deflater.BEST_COMPRESSION)
-                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
-                        it.closeEntry()
-                    }
-                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
-                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
-                    }
-                }
-                apkTmp.delete()
-                genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outSrcDir)
+        val processResourcesTask = tasks.getByPath(":stub:process${variantCapped}Resources")
+        processResourcesTask.doLast {
+            exec {
+                commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
             }
+
+            val bos = ByteArrayOutputStream()
+            ZipFile(apkTmp).use { src ->
+                ZipOutputStream(apk.outputStream()).use {
+                    it.setLevel(Deflater.BEST_COMPRESSION)
+                    it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                    src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                    it.closeEntry()
+                }
+                DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                    src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
+                }
+            }
+            apkTmp.delete()
+            genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outResDir)
         }
-        registerJavaGeneratingTask(genSrcTask, outSrcDir)
+        @Suppress("DEPRECATION")
+        registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
     // Override optimizeReleaseResources task
+    val apk = File(buildDir, "intermediates/processed_res/" +
+        "release/out/resources-release.ap_")
+    val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
+        "release/resources-release-optimize.ap_")
     tasks.whenTaskAdded {
-        val apk = File(buildDir, "intermediates/processed_res/" +
-            "release/out/resources-release.ap_")
-        val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
-            "release/resources-release-optimize.ap_")
         if (name == "optimizeReleaseResources") {
             doLast { apk.copyTo(optRes, true) }
         }

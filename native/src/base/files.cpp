@@ -1,10 +1,12 @@
 #include <sys/sendfile.h>
+#include <sys/sysmacros.h>
 #include <linux/fs.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <libgen.h>
 
 #include <base.hpp>
+#include <misc.hpp>
 #include <selinux.hpp>
 
 using namespace std;
@@ -382,47 +384,84 @@ void parse_mnt(const char *file, const function<bool(mntent*)> &fn) {
     }
 }
 
-void backup_folder(const char *dir, vector<raw_file> &files) {
-    char path[PATH_MAX];
-    xrealpath(dir, path, sizeof(path));
-    int len = strlen(path);
-    pre_order_walk(xopen(dir, O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
-        int fd = xopenat(dfd, entry->d_name, O_RDONLY);
-        if (fd < 0)
-            return SKIP;
-        run_finally f([&]{ close(fd); });
-        if (fd_path(fd, byte_slice(path, sizeof(path))) < 0)
-            return SKIP;
-        raw_file file;
-        file.path = path + len + 1;
-        if (fgetattr(fd, &file.attr) < 0)
-            return SKIP;
-        if (entry->d_type == DT_REG) {
-            file.content = full_read(fd);
-        } else if (entry->d_type == DT_LNK) {
-            xreadlinkat(dfd, entry->d_name, path, sizeof(path));
-            file.content = path;
-        }
-        files.emplace_back(std::move(file));
-        return CONTINUE;
-    });
-}
+std::vector<mount_info> parse_mount_info(const char *pid) {
+    char buf[PATH_MAX] = {};
+    ssprintf(buf, sizeof(buf), "/proc/%s/mountinfo", pid);
+    std::vector<mount_info> result;
 
-void restore_folder(const char *dir, vector<raw_file> &files) {
-    string base(dir);
-    // Pre-order means folders will always be first
-    for (raw_file &file : files) {
-        string path = base + "/" + file.path;
-        if (S_ISDIR(file.attr.st.st_mode)) {
-            mkdirs(path.data(), 0);
-        } else if (S_ISREG(file.attr.st.st_mode)) {
-            if (auto fp = xopen_file(path.data(), "we"))
-                fwrite(file.content.data(), 1, file.content.size(), fp.get());
-        } else if (S_ISLNK(file.attr.st.st_mode)) {
-            symlink(file.content.data(), path.data());
+    file_readline(buf, [&result](string_view line) -> bool {
+        int root_start = 0, root_end = 0;
+        int target_start = 0, target_end = 0;
+        int vfs_option_start = 0, vfs_option_end = 0;
+        int type_start = 0, type_end = 0;
+        int source_start = 0, source_end = 0;
+        int fs_option_start = 0, fs_option_end = 0;
+        int optional_start = 0, optional_end = 0;
+        unsigned int id, parent, maj, min;
+        sscanf(line.data(),
+               "%u "           // (1) id
+               "%u "           // (2) parent
+               "%u:%u "        // (3) maj:min
+               "%n%*s%n "      // (4) mountroot
+               "%n%*s%n "      // (5) target
+               "%n%*s%n"       // (6) vfs options (fs-independent)
+               "%n%*[^-]%n - " // (7) optional fields
+               "%n%*s%n "      // (8) FS type
+               "%n%*s%n "      // (9) source
+               "%n%*s%n",      // (10) fs options (fs specific)
+               &id, &parent, &maj, &min, &root_start, &root_end, &target_start,
+               &target_end, &vfs_option_start, &vfs_option_end,
+               &optional_start, &optional_end, &type_start, &type_end,
+               &source_start, &source_end, &fs_option_start, &fs_option_end);
+
+        auto root = line.substr(root_start, root_end - root_start);
+        auto target = line.substr(target_start, target_end - target_start);
+        auto vfs_option =
+                line.substr(vfs_option_start, vfs_option_end - vfs_option_start);
+        ++optional_start;
+        --optional_end;
+        auto optional = line.substr(
+                optional_start,
+                optional_end - optional_start > 0 ? optional_end - optional_start : 0);
+
+        auto type = line.substr(type_start, type_end - type_start);
+        auto source = line.substr(source_start, source_end - source_start);
+        auto fs_option =
+                line.substr(fs_option_start, fs_option_end - fs_option_start);
+
+        unsigned int shared = 0;
+        unsigned int master = 0;
+        unsigned int propagate_from = 0;
+        if (auto pos = optional.find("shared:"); pos != std::string_view::npos) {
+            shared = parse_int(optional.substr(pos + 7));
         }
-        setattr(path.data(), &file.attr);
-    }
+        if (auto pos = optional.find("master:"); pos != std::string_view::npos) {
+            master = parse_int(optional.substr(pos + 7));
+        }
+        if (auto pos = optional.find("propagate_from:");
+                pos != std::string_view::npos) {
+            propagate_from = parse_int(optional.substr(pos + 15));
+        }
+
+        result.emplace_back(mount_info {
+                .id = id,
+                .parent = parent,
+                .device = static_cast<dev_t>(makedev(maj, min)),
+                .root {root},
+                .target {target},
+                .vfs_option {vfs_option},
+                .optional {
+                        .shared = shared,
+                        .master = master,
+                        .propagate_from = propagate_from,
+                },
+                .type {type},
+                .source {source},
+                .fs_option {fs_option},
+        });
+        return true;
+    });
+    return result;
 }
 
 sDIR make_dir(DIR *dp) {
@@ -491,10 +530,10 @@ mmap_data::mmap_data(const char *name, bool rw) {
 
 string find_apk_path(const char *pkg) {
     char buf[PATH_MAX];
+    size_t len = strlen(pkg);
     pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
         if (entry->d_type != DT_DIR)
             return SKIP;
-        size_t len = strlen(pkg);
         if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
             fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
             return ABORT;

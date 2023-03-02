@@ -25,9 +25,6 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 public final class APKInstall {
 
     public static void transfer(InputStream in, OutputStream out) throws IOException {

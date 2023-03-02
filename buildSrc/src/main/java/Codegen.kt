@@ -73,8 +73,6 @@ fun genKeyData(keysDir: File, outSrc: File) {
 }
 
 fun genStubManifest(srcDir: File, outDir: File): String {
-    outDir.deleteRecursively()
-
     fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
 
     val cmpList = mutableListOf<String>()
@@ -159,7 +157,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         fun List<String>.process() = asSequence()
             .filter(::notJavaKeyword)
             // Distinct by lower case to support case insensitive file systems
-            .distinctBy { it.toLowerCase(Locale.ROOT) }
+            .distinctBy { it.lowercase() }
 
         val names = mutableListOf<String>()
         names.addAll(c1)
@@ -174,8 +172,7 @@ fun genStubManifest(srcDir: File, outDir: File): String {
             cls.append(names.random(kRANDOM))
             // Old Android does not support capitalized package names
             // Check Android 7.0.0 PackageParser#buildClassName
-            cls[0] = cls[0].toLowerCase()
-            yield(cls.toString())
+            yield(cls.toString().replaceFirstChar { it.lowercase() })
         }
     }.distinct().iterator()
 
