@@ -137,7 +137,8 @@ fun genStubManifest(srcDir: File, outDir: File): String {
         """
         |<service
         |    android:name="x.COMPONENT_PLACEHOLDER_4"
-        |    android:exported="false" />""".ind(2)
+        |    android:exported="false"
+        |    android:foregroundServiceType="dataSync" />""".ind(2)
     )
 
     cmpList.add(
