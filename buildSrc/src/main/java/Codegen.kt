@@ -1,10 +1,11 @@
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.InputStream
 import java.io.PrintStream
 import java.security.SecureRandom
 import java.util.*
@@ -78,6 +79,9 @@ fun genKeyData(keysDir: File, outSrc: File) {
 
 @CacheableTask
 abstract class ManifestUpdater: DefaultTask() {
+    @get:Input
+    abstract val applicationId: Property<String>
+
     @get:InputFile
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val mergedManifest: RegularFileProperty
@@ -99,74 +103,68 @@ abstract class ManifestUpdater: DefaultTask() {
 
         val cmpList = mutableListOf<String>()
 
-        cmpList.add(
-            """
-        |<provider
-        |    android:name="x.COMPONENT_PLACEHOLDER_0"
-        |    android:authorities="${'$'}{applicationId}.provider"
-        |    android:directBootAware="true"
-        |    android:exported="false"
-        |    android:grantUriPermissions="true" />""".ind(2)
+        cmpList.add("""
+            |<provider
+            |    android:name="x.COMPONENT_PLACEHOLDER_0"
+            |    android:authorities="${'$'}{applicationId}.provider"
+            |    android:directBootAware="true"
+            |    android:exported="false"
+            |    android:grantUriPermissions="true" />""".ind(2)
         )
 
-        cmpList.add(
-            """
-        |<receiver
-        |    android:name="x.COMPONENT_PLACEHOLDER_1"
-        |    android:exported="false">
-        |    <intent-filter>
-        |        <action android:name="android.intent.action.LOCALE_CHANGED" />
-        |        <action android:name="android.intent.action.UID_REMOVED" />
-        |        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-        |    </intent-filter>
-        |    <intent-filter>
-        |        <action android:name="android.intent.action.PACKAGE_REPLACED" />
-        |        <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
-        |
-        |        <data android:scheme="package" />
-        |    </intent-filter>
-        |</receiver>""".ind(2)
+        cmpList.add("""
+            |<receiver
+            |    android:name="x.COMPONENT_PLACEHOLDER_1"
+            |    android:exported="false">
+            |    <intent-filter>
+            |        <action android:name="android.intent.action.LOCALE_CHANGED" />
+            |        <action android:name="android.intent.action.UID_REMOVED" />
+            |        <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            |    </intent-filter>
+            |    <intent-filter>
+            |        <action android:name="android.intent.action.PACKAGE_REPLACED" />
+            |        <action android:name="android.intent.action.PACKAGE_FULLY_REMOVED" />
+            |
+            |        <data android:scheme="package" />
+            |    </intent-filter>
+            |</receiver>""".ind(2)
         )
 
-        cmpList.add(
-            """
-        |<activity
-        |    android:name="x.COMPONENT_PLACEHOLDER_2"
-        |    android:exported="true">
-        |    <intent-filter>
-        |        <action android:name="android.intent.action.MAIN" />
-        |        <category android:name="android.intent.category.LAUNCHER" />
-        |    </intent-filter>
-        |</activity>""".ind(2)
+        cmpList.add("""
+            |<activity
+            |    android:name="x.COMPONENT_PLACEHOLDER_2"
+            |    android:exported="true">
+            |    <intent-filter>
+            |        <action android:name="android.intent.action.MAIN" />
+            |        <category android:name="android.intent.category.LAUNCHER" />
+            |    </intent-filter>
+            |</activity>""".ind(2)
         )
 
-        cmpList.add(
-            """
-        |<activity
-        |    android:name="x.COMPONENT_PLACEHOLDER_3"
-        |    android:directBootAware="true"
-        |    android:exported="false"
-        |    android:taskAffinity="">
-        |    <intent-filter>
-        |        <action android:name="android.intent.action.VIEW"/>
-        |        <category android:name="android.intent.category.DEFAULT"/>
-        |    </intent-filter>
-        |</activity>""".ind(2)
+        cmpList.add("""
+            |<activity
+            |    android:name="x.COMPONENT_PLACEHOLDER_3"
+            |    android:directBootAware="true"
+            |    android:exported="false"
+            |    android:taskAffinity="">
+            |    <intent-filter>
+            |        <action android:name="android.intent.action.VIEW"/>
+            |        <category android:name="android.intent.category.DEFAULT"/>
+            |    </intent-filter>
+            |</activity>""".ind(2)
         )
 
-        cmpList.add(
-            """
-        |<service
-        |    android:name="x.COMPONENT_PLACEHOLDER_4"
-        |    android:exported="false" />""".ind(2)
+        cmpList.add("""
+            |<service
+            |    android:name="x.COMPONENT_PLACEHOLDER_4"
+            |    android:exported="false" />""".ind(2)
         )
 
-        cmpList.add(
-            """
-        |<service
-        |    android:name="x.COMPONENT_PLACEHOLDER_5"
-        |    android:exported="false"
-        |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
+        cmpList.add("""
+            |<service
+            |    android:name="x.COMPONENT_PLACEHOLDER_5"
+            |    android:exported="false"
+            |    android:permission="android.permission.BIND_JOB_SERVICE" />""".ind(2)
         )
 
         // Shuffle the order of the components
@@ -177,15 +175,19 @@ abstract class ManifestUpdater: DefaultTask() {
         val (appPkg, appClass) = appClassDir.asFileTree.first().let {
             it.parentFile.name to it.name.removeSuffix(".java")
         }
-        var manifest = mergedManifest.asFile.get().readText()
-        manifest = manifest.replace("<application", """<application android:appComponentFactory="$factoryPkg.$factoryClass" android:name="$appPkg.$appClass"""")
-        manifest = manifest.replace("</application", "${cmpList.joinToString("\n\n")}\n</application")
+        val components = cmpList.joinToString("\n\n")
+            .replace("\${applicationId}", applicationId.get())
+        val manifest = mergedManifest.asFile.get().readText().replace(Regex(".*\\<application"), """
+            |<application
+            |    android:appComponentFactory="$factoryPkg.$factoryClass"
+            |    android:name="$appPkg.$appClass"""".ind(1)
+        ).replace(Regex(".*\\<\\/application"), components + "\n    </application")
         outputManifest.get().asFile.writeText(manifest)
     }
 }
 
 
-fun genStubClass(factoryOutDir: File, appOutDir: File) {
+fun genStubClasses(factoryOutDir: File, appOutDir: File) {
     fun String.ind(level: Int) = replaceIndentByMargin("    ".repeat(level))
 
     val classNameGenerator = sequence {
@@ -231,7 +233,7 @@ fun genStubClass(factoryOutDir: File, appOutDir: File) {
     genClass("DelegateApplication", appOutDir)
 }
 
-fun genEncryptedResources(res: InputStream, outDir: File) {
+fun genEncryptedResources(res: ByteArray, outDir: File) {
     val mainPkgDir = File(outDir, "com/topjohnwu/magisk")
     mainPkgDir.mkdirs()
 
@@ -245,7 +247,7 @@ fun genEncryptedResources(res: InputStream, outDir: File) {
     cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), IvParameterSpec(iv))
     val bos = ByteArrayOutputStream()
 
-    res.use {
+    ByteArrayInputStream(res).use {
         CipherOutputStream(bos, cipher).use { os ->
             it.transferTo(os)
         }
