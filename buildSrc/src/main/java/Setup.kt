@@ -264,7 +264,7 @@ fun Project.setupApp() {
         tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(syncLibs)
         processJavaResourcesProvider.configure { dependsOn(syncResources) }
 
-        val stubTask = tasks.getByPath(":stub:package$variantCapped")
+        val stubTask = tasks.getByPath(":stub:comment$variantCapped")
         val stubApk = stubTask.outputs.files.asFileTree.filter {
             it.name.endsWith(".apk")
         }
