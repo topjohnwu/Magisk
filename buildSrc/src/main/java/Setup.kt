@@ -357,7 +357,6 @@ fun Project.setupStub() {
         registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
 
         val processResourcesTask = tasks.named("process${variantCapped}Resources") {
-            inputs.file(apk)
             outputs.dir(outResDir)
             doLast {
                 val apkTmp = File("${apk}.tmp")
