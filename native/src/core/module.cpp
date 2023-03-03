@@ -283,9 +283,7 @@ void load_modules() {
 
     if (!system->is_empty()) {
         // Handle special read-only partitions
-        for (const char *part : { "/vendor", "/vendor_dlkm","/product",
-                                  "/system_ext", "/system_dlkm",
-                                  "/odm", "/odm_dlkm" }) {
+        for (const char *part : { "/vendor", "/product", "/system_ext" }) {
             struct stat st{};
             if (lstat(part, &st) == 0 && S_ISDIR(st.st_mode)) {
                 if (auto old = system->extract(part + 1)) {
