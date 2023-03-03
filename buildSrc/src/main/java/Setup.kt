@@ -17,18 +17,33 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
-import org.gradle.kotlin.dsl.*
+import org.gradle.api.tasks.Delete
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.StopExecutionException
+import org.gradle.api.tasks.Sync
+import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.filter
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.registering
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.security.KeyStore
 import java.security.cert.X509Certificate
-import java.util.*
 import java.util.jar.JarFile
-import java.util.zip.*
+import java.util.zip.Deflater
+import java.util.zip.DeflaterOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 private fun Project.androidBase(configure: Action<BaseExtension>) =
     extensions.configure("android", configure)
@@ -88,30 +103,6 @@ private fun ApkSigningConfig.getPrivateKey(): KeyStore.PrivateKeyEntry {
     return entry as KeyStore.PrivateKeyEntry
 }
 
-private fun addComment(inFile: File, outFile: File, signConfig: ApkSigningConfig, minSdk: Int, eocdComment: String) {
-    val privateKey = signConfig.getPrivateKey()
-    val signingOptions = SigningOptions.builder()
-        .setMinSdkVersion(minSdk)
-        .setV1SigningEnabled(true)
-        .setV2SigningEnabled(true)
-        .setKey(privateKey.privateKey)
-        .setCertificates(privateKey.certificate as X509Certificate)
-        .setValidation(SigningOptions.Validation.ASSUME_INVALID)
-        .build()
-    val options = ZFileOptions().apply {
-        noTimestamps = true
-        autoSortFiles = true
-    }
-    outFile.parentFile.mkdirs()
-    inFile.copyTo(outFile, overwrite = true)
-    ZFiles.apk(outFile, options).use {
-        SigningExtension(signingOptions).register(it)
-        it.eocdComment = eocdComment.toByteArray()
-        it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
-        it.get(JarFile.MANIFEST_NAME)?.delete()
-    }
-}
-
 abstract class AddCommentTask: DefaultTask() {
     @get:Input
     abstract val comment: Property<String>
@@ -132,7 +123,29 @@ abstract class AddCommentTask: DefaultTask() {
     fun taskAction() = transformationRequest.get().submit(this) { artifact ->
         val inFile = File(artifact.outputFile)
         val outFile = outFolder.file(inFile.name).get().asFile
-        addComment(inFile, outFile, signingConfig.get(), 0, comment.get())
+
+        val privateKey = signingConfig.get().getPrivateKey()
+        val signingOptions = SigningOptions.builder()
+            .setMinSdkVersion(0)
+            .setV1SigningEnabled(true)
+            .setV2SigningEnabled(true)
+            .setKey(privateKey.privateKey)
+            .setCertificates(privateKey.certificate as X509Certificate)
+            .setValidation(SigningOptions.Validation.ASSUME_INVALID)
+            .build()
+        val options = ZFileOptions().apply {
+            noTimestamps = true
+            autoSortFiles = true
+        }
+        outFile.parentFile.mkdirs()
+        inFile.copyTo(outFile, overwrite = true)
+        ZFiles.apk(outFile, options).use {
+            SigningExtension(signingOptions).register(it)
+            it.eocdComment = comment.get().toByteArray()
+            it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
+            it.get(JarFile.MANIFEST_NAME)?.delete()
+        }
+
         outFile
     }
 }
@@ -305,16 +318,15 @@ fun Project.setupApp() {
 fun Project.setupStub() {
     setupAppCommon()
 
-
     androidComponents.onVariants { variant ->
+        val variantName = variant.name
+        val variantCapped = variantName.replaceFirstChar { it.uppercase() }
         val manifestUpdater =
-            project.tasks.register(
-                "${variant.name}ManifestProducer",
-                ManifestUpdater::class.java
-            ) {
-                dependsOn("generate${variant.name.replaceFirstChar { it.uppercase() }}ObfuscatedClass")
-                appClassDir.set(File(buildDir, "generated/source/app/${variant.name}"))
-                factoryClassDir.set(File(buildDir, "generated/source/factory/${variant.name}"))
+            project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
+                dependsOn("generate${variantCapped}ObfuscatedClass")
+                applicationId.set(variant.applicationId)
+                appClassDir.set(File(buildDir, "generated/source/app/$variantName"))
+                factoryClassDir.set(File(buildDir, "generated/source/factory/$variantName"))
             }
         variant.artifacts.use(manifestUpdater)
             .wiredWithFiles(
@@ -340,33 +352,34 @@ fun Project.setupStub() {
             doLast {
                 outFactoryClassDir.mkdirs()
                 outAppClassDir.mkdirs()
-                genStubClass(outFactoryClassDir, outAppClassDir)
+                genStubClasses(outFactoryClassDir, outAppClassDir)
             }
         }
         registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
 
-        val processResourcesTask = tasks.getByPath(":stub:process${variantCapped}Resources")
-        processResourcesTask.doLast {
-            exec {
-                commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
-            }
+        val processResourcesTask = tasks.named("process${variantCapped}Resources") {
+            doLast {
+                exec {
+                    commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
+                }
 
-            val bos = ByteArrayOutputStream()
-            ZipFile(apkTmp).use { src ->
-                ZipOutputStream(apk.outputStream()).use {
-                    it.setLevel(Deflater.BEST_COMPRESSION)
-                    it.putNextEntry(ZipEntry("AndroidManifest.xml"))
-                    src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
-                    it.closeEntry()
+                val bos = ByteArrayOutputStream()
+                ZipFile(apkTmp).use { src ->
+                    ZipOutputStream(apk.outputStream()).use {
+                        it.setLevel(Deflater.BEST_COMPRESSION)
+                        it.putNextEntry(ZipEntry("AndroidManifest.xml"))
+                        src.getInputStream(src.getEntry("AndroidManifest.xml")).transferTo(it)
+                        it.closeEntry()
+                    }
+                    DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
+                        src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
+                    }
                 }
-                DeflaterOutputStream(bos, Deflater(Deflater.BEST_COMPRESSION)).use {
-                    src.getInputStream(src.getEntry("resources.arsc")).transferTo(it)
-                }
+                apkTmp.delete()
+                genEncryptedResources(bos.toByteArray(), outResDir)
             }
-            apkTmp.delete()
-            genEncryptedResources(ByteArrayInputStream(bos.toByteArray()), outResDir)
         }
-        @Suppress("DEPRECATION")
+
         registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
     // Override optimizeReleaseResources task
