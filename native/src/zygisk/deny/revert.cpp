@@ -27,11 +27,12 @@ void revert_unmount() {
 
     if (targets.empty()) return;
 
-    for (auto last_target = targets.cbegin(), iter = next(targets.cbegin()); iter != targets.cend();) {
-        if (iter->starts_with(*last_target)) {
+    auto last_target = *targets.cbegin() + '/';
+    for (auto iter = next(targets.cbegin()); iter != targets.cend();) {
+        if (iter->starts_with(last_target)) {
             iter = targets.erase(iter);
         } else {
-            last_target = iter++;
+            last_target = *iter++ + '/';
         }
     }
 

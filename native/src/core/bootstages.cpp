@@ -3,7 +3,7 @@
 #include <sys/sysmacros.h>
 #include <linux/input.h>
 #include <libgen.h>
-#include <vector>
+#include <set>
 #include <string>
 
 #include <magisk.hpp>
@@ -54,14 +54,17 @@ static void mount_mirrors() {
     if (auto mirror_dir = MAGISKTMP + "/" MIRRDIR; !mount_mirror("/", mirror_dir)) {
         LOGI("fallback to mount subtree\n");
         // rootfs may fail, fallback to bind mount each mount point
-        std::vector<string> mounted_dirs {{ MAGISKTMP }};
+        set<string, greater<>> mounted_dirs {{ MAGISKTMP }};
         for (const auto &info: parse_mount_info("self")) {
             if (info.type == "rootfs"sv) continue;
-            bool mounted = std::any_of(mounted_dirs.begin(), mounted_dirs.end(), [&](const auto &dir) {
-                return str_starts(info.target, dir);
-            });
-            if (!mounted && mount_mirror(info.target, mirror_dir + info.target)) {
-                mounted_dirs.emplace_back(info.target);
+            // the greatest mount point that less than info.target, which is possibly a parent
+            if (auto last_mount = mounted_dirs.upper_bound(info.target);
+                last_mount != mounted_dirs.end() && info.target.starts_with(*last_mount + '/')) {
+                continue;
+            }
+            if (mount_mirror(info.target, mirror_dir + info.target)) {
+                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + info.target).data(), info.target.data());
+                mounted_dirs.insert(info.target);
             }
         }
     }
