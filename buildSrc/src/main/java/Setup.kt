@@ -344,7 +344,6 @@ fun Project.setupStub() {
         val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
         val apk = File(buildDir, "intermediates/processed_res/" +
             "${variantLowered}/out/resources-${variantLowered}.ap_")
-        val apkTmp = File("${apk}.tmp")
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
             inputs.property("seed", RAND_SEED)
@@ -358,7 +357,10 @@ fun Project.setupStub() {
         registerJavaGeneratingTask(genManifestTask, outFactoryClassDir, outAppClassDir)
 
         val processResourcesTask = tasks.named("process${variantCapped}Resources") {
+            inputs.file(apk)
+            outputs.dir(outResDir)
             doLast {
+                val apkTmp = File("${apk}.tmp")
                 exec {
                     commandLine(aapt, "optimize", "-o", apkTmp, "--collapse-resource-names", apk)
                 }
