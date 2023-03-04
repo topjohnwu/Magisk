@@ -105,6 +105,11 @@ int __system_property_delete(const char *name, bool trim_node) {
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
+const char* __system_property_get_context(const char *name) {
+  return system_properties.GetContext(name);
+}
+
+__BIONIC_WEAK_FOR_NATIVE_BRIDGE
 uint32_t __system_property_serial(const prop_info* pi) {
   return system_properties.Serial(pi);
 }

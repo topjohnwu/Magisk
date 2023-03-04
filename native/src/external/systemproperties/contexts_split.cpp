@@ -344,6 +344,16 @@ prop_area* ContextsSplit::GetPropAreaForName(const char* name) {
   return cnode->pa();
 }
 
+const char* ContextsSplit::GetContextForName(const char* name) {
+  auto entry = ListFind(prefixes_, [name](PrefixNode* l) {
+      return l->prefix[0] == '*' || !strncmp(l->prefix, name, l->prefix_len);
+  });
+  if (!entry) {
+    return nullptr;
+  }
+  return entry->context->context();
+}
+
 void ContextsSplit::ForEach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
   ListForEach(contexts_, [propfn, cookie](ContextListNode* l) {
     if (l->CheckAccessAndOpen()) {

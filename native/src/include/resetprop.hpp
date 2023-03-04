@@ -5,6 +5,7 @@
 
 int setprop(const char *name, const char *value, bool prop_svc = true);
 std::string getprop(const char *name, bool persist = false);
+const char* getpropcontext(const char *name);
 void getprops(void (*callback)(const char *, const char *, void *),
         void *cookie = nullptr, bool persist = false);
 int delprop(const char *name, bool persist = false);

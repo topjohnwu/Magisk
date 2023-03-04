@@ -144,6 +144,12 @@ prop_area* ContextsSerialized::GetPropAreaForName(const char* name) {
   return context_node->pa();
 }
 
+const char* ContextsSerialized::GetContextForName(const char* name) {
+  const char* context;
+  property_info_area_file_->GetPropertyInfo(name, &context, nullptr);
+  return context;
+}
+
 void ContextsSerialized::ForEach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) {
   for (size_t i = 0; i < num_context_nodes_; ++i) {
     if (context_nodes_[i].CheckAccessAndOpen()) {

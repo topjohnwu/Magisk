@@ -47,6 +47,10 @@ class ContextsPreSplit : public Contexts {
     return pre_split_prop_area_;
   }
 
+  virtual const char* GetContextForName(const char* name) override {
+    return nullptr;
+  }
+
   virtual prop_area* GetSerialPropArea() override {
     return pre_split_prop_area_;
   }

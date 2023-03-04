@@ -325,6 +325,13 @@ int SystemProperties::Delete(const char *name, bool trim_node) {
   return 0;
 }
 
+const char* SystemProperties::GetContext(const char* name) {
+  if (!initialized_) {
+    return nullptr;
+  }
+  return contexts_->GetContextForName(name);
+}
+
 // Wait for non-locked serial, and retrieve it with acquire semantics.
 uint32_t SystemProperties::Serial(const prop_info* pi) {
   uint32_t serial = load_const_atomic(&pi->serial, memory_order_acquire);
