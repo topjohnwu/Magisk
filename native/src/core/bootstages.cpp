@@ -40,17 +40,28 @@ static bool mount_mirror(const std::string_view from, const std::string_view to)
            // because of MS_NOUSER
            !mount(from.data(), to.data(), nullptr, MS_BIND | MS_REC, nullptr) &&
            // make mirror dir as a private mount so that it won't be affected by magic mount
-           !xmount("", to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
+           !xmount(nullptr, to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
 }
 
 static void mount_mirrors() {
-    LOGI("* Prepare worker\n");
+    LOGI("* Mounting mirrors\n");
+
+    // Bind remount module root to clear nosuid
+    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
+        auto dest = MAGISKTMP + "/" MODULEMNT;
+        xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
+        chmod(SECURE_DIR, 0700);
+        restorecon();
+    }
+
+    // Prepare worker
     auto worker_dir = MAGISKTMP + "/" WORKERDIR;
     xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
     xmount(nullptr, worker_dir.data(), nullptr, MS_PRIVATE, nullptr);
 
-    LOGI("* Mounting mirrors\n");
-    // recursively bind mount / to mirror dir
+    // Recursively bind mount / to mirror dir
     if (auto mirror_dir = MAGISKTMP + "/" MIRRDIR; !mount_mirror("/", mirror_dir)) {
         LOGI("fallback to mount subtree\n");
         // rootfs may fail, fallback to bind mount each mount point
@@ -68,16 +79,6 @@ static void mount_mirrors() {
             }
         }
     }
-
-    LOGI("* Mounting module root\n");
-    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
-        if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
-            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
-            restorecon();
-            chmod(SECURE_DIR, 0700);
-        }
-    }
-
 }
 
 static bool magisk_env() {
