@@ -106,7 +106,6 @@ void parse_prop_file(const char *file,
 void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 std::vector<mount_info> parse_mount_info(const char *pid);
-void parse_mnt(const char *file, const std::function<bool(mntent*)> &fn);
 std::string find_apk_path(const char *pkg);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
