@@ -49,6 +49,7 @@ static void mount_mirrors() {
     // Bind remount module root to clear nosuid
     if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
         auto dest = MAGISKTMP + "/" MODULEMNT;
+        xmkdir(dest.data(), 0755);
         xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
