@@ -6,7 +6,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_l(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir) {
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_l)>(nativeForkAndSpecialize_orig)(
@@ -19,7 +18,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_o)>(nativeForkAndSpecialize_orig)(
@@ -33,7 +31,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_p)>(nativeForkAndSpecialize_orig)(
@@ -48,7 +45,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_q_alt)>(nativeForkAndSpecialize_orig)(
@@ -67,7 +63,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     args.mount_data_dirs = &mount_data_dirs;
     args.mount_storage_dirs = &mount_storage_dirs;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_r)>(nativeForkAndSpecialize_orig)(
@@ -79,7 +74,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_m(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _0, jint _1, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir) {
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_m)>(nativeForkAndSpecialize_orig)(
@@ -91,7 +85,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_n(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _2, jint _3, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir, jint _4) {
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_n)>(nativeForkAndSpecialize_orig)(
@@ -104,7 +97,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_o)>(nativeForkAndSpecialize_orig)(
@@ -118,7 +110,6 @@ void *nativeForkAndSpecialize_orig = nullptr;
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_p)>(nativeForkAndSpecialize_orig)(
@@ -181,7 +172,6 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeSpecializeAppProcess_pre();
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_q)>(nativeSpecializeAppProcess_orig)(
@@ -194,7 +184,6 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeSpecializeAppProcess_pre();
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_q_alt)>(nativeSpecializeAppProcess_orig)(
@@ -211,7 +200,6 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     args.mount_data_dirs = &mount_data_dirs;
     args.mount_storage_dirs = &mount_storage_dirs;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeSpecializeAppProcess_pre();
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_r)>(nativeSpecializeAppProcess_orig)(
@@ -223,7 +211,6 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeSpecializeAppProcess_pre();
     reinterpret_cast<decltype(&nativeSpecializeAppProcess_samsung_q)>(nativeSpecializeAppProcess_orig)(
@@ -259,7 +246,6 @@ void *nativeForkSystemServer_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkSystemServer_l(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities) {
     ServerSpecializeArgs_v1 args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkSystemServer_pre();
     reinterpret_cast<decltype(&nativeForkSystemServer_l)>(nativeForkSystemServer_orig)(
@@ -271,7 +257,6 @@ void *nativeForkSystemServer_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkSystemServer_samsung_q(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jint _11, jint _12, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities) {
     ServerSpecializeArgs_v1 args(uid, gid, gids, runtime_flags, permitted_capabilities, effective_capabilities);
     HookContext ctx;
-    ctx.env = env;
     ctx.args = { &args };
     ctx.nativeForkSystemServer_pre();
     reinterpret_cast<decltype(&nativeForkSystemServer_samsung_q)>(nativeForkSystemServer_orig)(

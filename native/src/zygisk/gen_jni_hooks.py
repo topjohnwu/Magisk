@@ -96,7 +96,6 @@ class ForkAndSpec(JNIHook):
             if a.set_arg:
                 decl += ind(1) + f'args.{a.name} = &{a.name};'
         decl += ind(1) + 'HookContext ctx;'
-        decl += ind(1) + 'ctx.env = env;'
         decl += ind(1) + 'ctx.args = { &args };'
         decl += ind(1) + f'ctx.{self.base_name()}_pre();'
         decl += ind(1) + self.orig_method() + '('
