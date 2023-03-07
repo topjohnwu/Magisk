@@ -199,13 +199,17 @@ static void extract_files(bool sbin) {
 }
 
 void MagiskInit::parse_config_file() {
-    parse_prop_file("/data/.backup/.magisk", [this](auto key, auto value) -> bool {
+    uint64_t seed = 0;
+    parse_prop_file("/data/.backup/.magisk", [&](auto key, auto value) -> bool {
         if (key == "PREINITDEVICE") {
             preinit_dev = value;
-            return false;
+        } else if (key == "RANDOMSEED") {
+            value.remove_prefix(2); // 0x
+            seed = parse_uint64_hex(value);
         }
         return true;
     });
+    gen_rand_str(nullptr, 0, &seed);
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
@@ -220,7 +224,7 @@ void MagiskInit::patch_ro_root() {
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
     } else {
-        char buf[8];
+        char buf[16];
         gen_rand_str(buf, sizeof(buf));
         tmp_dir = "/dev/"s + buf;
         xmkdir(tmp_dir.data(), 0);

@@ -70,6 +70,8 @@ fi
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
+RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
+echo "RANDOMSEED=0x$RANDOMSEED" >> config
 
 ./magiskboot compress=xz magisk32 magisk32.xz
 ./magiskboot compress=xz magisk64 magisk64.xz
