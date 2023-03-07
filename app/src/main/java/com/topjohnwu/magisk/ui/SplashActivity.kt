@@ -30,6 +30,8 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
 
     companion object {
         private var skipSplash = false
+        private var stopped = true
+        private var needShowMainUI = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +89,19 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
         }
     }
 
+    override fun onStop() {
+        stopped = true
+        super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        stopped = false
+        if (needShowMainUI) {
+            showMainUI(null)
+        }
+    }
+
     private fun preLoad(savedState: Bundle?) {
         val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)?.let {
             // Make sure the calling package matches (prevent DoS)
@@ -121,7 +136,8 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                 // Re-launch main activity without splash theme
                 relaunch()
             } else {
-                showMainUI(savedState)
+                if (!stopped) showMainUI(savedState)
+                else needShowMainUI = true
             }
         }
     }
@@ -140,5 +156,4 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
             Shell.cmd("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
         }
     }
-
 }
