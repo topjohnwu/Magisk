@@ -53,7 +53,7 @@ static void mount_mirrors() {
         xmkdir(MODULEROOT, 0755);
         xmkdir(dest.data(), 0755);
         xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
-        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_NOATIME, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
         chmod(SECURE_DIR, 0700);
         restorecon();
