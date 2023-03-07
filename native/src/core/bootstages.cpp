@@ -47,10 +47,13 @@ static void mount_mirrors() {
     LOGI("* Mounting mirrors\n");
 
     // Bind remount module root to clear nosuid
-    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
+    if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
         auto dest = MAGISKTMP + "/" MODULEMNT;
+        xmkdir(SECURE_DIR, 0700);
+        xmkdir(MODULEROOT, 0755);
+        xmkdir(dest.data(), 0755);
         xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
-        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_NOATIME, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
         chmod(SECURE_DIR, 0700);
         restorecon();
@@ -112,7 +115,6 @@ static bool magisk_env() {
 
     // Directories in /data/adb
     xmkdir(DATABIN, 0755);
-    xmkdir(MODULEROOT, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
 
