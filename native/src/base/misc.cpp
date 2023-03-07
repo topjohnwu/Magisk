@@ -33,23 +33,29 @@ int fork_no_orphan() {
     return 0;
 }
 
-int gen_rand_str(char *buf, int len, bool varlen) {
-    constexpr char ALPHANUM[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static std::mt19937 gen([]{
-        if (access("/dev/urandom", F_OK) != 0)
-            mknod("/dev/urandom", 0600 | S_IFCHR, makedev(1, 9));
-        int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-        unsigned seed;
-        xxread(fd, &seed, sizeof(seed));
+int gen_rand_str(char *buf, int len, const void *seed_buf, bool varlen) {
+    static mt19937_64 gen([&] {
+        mt19937_64::result_type seed;
+        if (seed_buf == nullptr) {
+            int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
+            xxread(fd, &seed, sizeof(seed));
+            close(fd);
+        } else {
+            memcpy(&seed, seed_buf, sizeof(seed));
+        }
         return seed;
     }());
-    std::uniform_int_distribution<int> dist(0, sizeof(ALPHANUM) - 2);
+
+    if (len == 0)
+        return 0;
     if (varlen) {
         std::uniform_int_distribution<int> len_dist(len / 2, len);
         len = len_dist(gen);
     }
-    for (int i = 0; i < len - 1; ++i)
-        buf[i] = ALPHANUM[dist(gen)];
+    std::uniform_int_distribution<int> alphabet('a', 'z');
+    for (int i = 0; i < len - 1; ++i) {
+        buf[i] = static_cast<char>(alphabet(gen));
+    }
     buf[len - 1] = '\0';
     return len - 1;
 }
@@ -134,19 +140,36 @@ void set_nice_name(const char *name) {
     prctl(PR_SET_NAME, name);
 }
 
+template<typename T>
+static T parse_num(string_view s, int base) {
+    T acc = 0;
+    for (char c: s) {
+        if (isdigit(c)) {
+            c -= '0';
+        } else if (base > 10 && isalpha(c)) {
+            c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+        } else {
+            return -1;
+        }
+        if (c >= base) {
+            return -1;
+        }
+        acc *= base;
+        acc += c;
+    }
+    return acc;
+}
+
 /*
  * Bionic's atoi runs through strtol().
  * Use our own implementation for faster conversion.
  */
 int parse_int(string_view s) {
-    int val = 0;
-    for (char c : s) {
-        if (!c) break;
-        if (c > '9' || c < '0')
-            return -1;
-        val = val * 10 + c - '0';
-    }
-    return val;
+    return parse_num<int>(s, 10);
+}
+
+uint64_t parse_uint64_hex(string_view s) {
+    return parse_num<uint64_t>(s, 16);
 }
 
 uint32_t binary_gcd(uint32_t u, uint32_t v) {

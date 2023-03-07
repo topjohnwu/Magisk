@@ -173,6 +173,8 @@ if [ -n "$PREINITDEVICE" ]; then
   echo "PREINITDEVICE=$PREINITDEVICE" >> config
 fi
 [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
+RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
+echo "RANDOMSEED=0x$RANDOMSEED" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 $INIT magiskinit" \
