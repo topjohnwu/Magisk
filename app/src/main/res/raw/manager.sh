@@ -13,8 +13,11 @@ env_check() {
   if [ "$2" -ge 25000 ]; then
     [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
   fi
-  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
-  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 1
+  if [ "$2" -ge 25210 ]; then
+    [ -b "$MAGISKTMP/block/rules" ] || return 2
+  fi
+  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 3
+  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 3
   return 0
 }
 
@@ -41,7 +44,7 @@ fix_env() {
   rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
-  rm $1/stub.apk
+  rm $1/stub.apk 2>/dev/null
   cp_readlink $1 $MAGISKBIN
   rm -rf $1
   chown -R 0:0 $MAGISKBIN

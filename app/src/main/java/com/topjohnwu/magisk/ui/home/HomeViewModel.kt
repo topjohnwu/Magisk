@@ -135,8 +135,9 @@ class HomeViewModel(
     private suspend fun ensureEnv() {
         if (magiskState == State.INVALID || checkedEnv) return
         val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
-        if (!Shell.cmd(cmd).await().isSuccess) {
-            EnvFixDialog(this).publish()
+        val code = Shell.cmd(cmd).await().code
+        if (code != 0) {
+            EnvFixDialog(this, code).publish()
         }
         checkedEnv = true
     }
