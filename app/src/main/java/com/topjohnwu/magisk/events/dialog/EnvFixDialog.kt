@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.launch
 
-class EnvFixDialog(private val vm: HomeViewModel) : DialogEvent() {
+class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : DialogEvent() {
 
     override fun build(dialog: MagiskDialog) {
         dialog.apply {
@@ -38,8 +38,10 @@ class EnvFixDialog(private val vm: HomeViewModel) : DialogEvent() {
             }
         }
 
-        if (Info.env.versionCode != BuildConfig.VERSION_CODE ||
+        if (code == 2 || // No rules block, module policy not loaded
+            Info.env.versionCode != BuildConfig.VERSION_CODE ||
             Info.env.versionString != BuildConfig.VERSION_NAME) {
+            dialog.setMessage(R.string.env_full_fix_msg)
             dialog.setButton(MagiskDialog.ButtonType.POSITIVE) {
                 text = android.R.string.ok
                 onClick {
