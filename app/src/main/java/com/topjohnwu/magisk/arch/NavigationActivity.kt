@@ -20,13 +20,11 @@ abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Bindin
     val navigation: NavController get() = navHostFragment.navController
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        return currentFocus?.let {
-            currentFragment?.onKeyEvent(event).takeIf { it == true }
-        } ?: super.dispatchKeyEvent(event)
+        return if (binded && currentFragment?.onKeyEvent(event) == true) true else super.dispatchKeyEvent(event)
     }
 
     override fun onBackPressed() {
-        currentFocus?.let {
+        if (binded) {
             if (currentFragment?.onBackPressed() == false) {
                 super.onBackPressed()
             }
