@@ -74,15 +74,11 @@ fi
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 [ -z $SYSTEM_ROOT ] && SYSTEM_ROOT=false
-[ -z $ISENCRYPTED ] && ISENCRYPTED=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
-export ISENCRYPTED
 
 chmod -R 755 .
-
-RULESDEVICE="$(./magiskinit --rules-device)" || abort "! Unable to find rules partition!"
 
 #########
 # Unpack
@@ -153,25 +149,28 @@ fi
 
 ui_print "- Patching ramdisk"
 
-echo "KEEPVERITY=$KEEPVERITY" > config
-echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
-echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
-echo "RECOVERYMODE=$RECOVERYMODE" >> config
-echo "RULESDEVICE=$RULESDEVICE" >> config
-[ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
-
 # Compress to save precious ramdisk space
 SKIP32="#"
 SKIP64="#"
 if [ -f magisk32 ]; then
+  $BOOTMODE && [ -z "$RULESDEVICE" ] && RULESDEVICE=$(./magisk32 --rules-device)
   ./magiskboot compress=xz magisk32 magisk32.xz
   unset SKIP32
 fi
 if [ -f magisk64 ]; then
+  $BOOTMODE && [ -z "$RULESDEVICE" ] && RULESDEVICE=$(./magisk64 --rules-device)
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
 fi
 ./magiskboot compress=xz stub.apk stub.xz
+
+echo "KEEPVERITY=$KEEPVERITY" > config
+echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
+echo "RECOVERYMODE=$RECOVERYMODE" >> config
+[ -n "$RULESDEVICE" ] && ui_print "- Rules partition device ID: $RULESDEVICE"
+[ -n "$RULESDEVICE" ] && echo "RULESDEVICE=$RULESDEVICE" >> config
+[ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 $INIT magiskinit" \
