@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.BR
 
 class RvItemAdapter<T: RvItem>(
-    private val items: List<T>,
+    internal val items: List<T>,
     private val extraBindings: SparseArray<*>?
 ) : RecyclerView.Adapter<RvItemAdapter.ViewHolder>() {
 
@@ -113,6 +113,8 @@ inline fun bindExtra(body: (SparseArray<Any?>) -> Unit) = SparseArray<Any?>().al
 @BindingAdapter("items", "extraBindings", requireAll = false)
 fun <T: RvItem> RecyclerView.setAdapter(items: List<T>?, extraBindings: SparseArray<*>?) {
     if (items != null) {
-        adapter = RvItemAdapter(items, extraBindings)
+        if ((adapter as? RvItemAdapter<T>)?.items != items) {
+            adapter = RvItemAdapter(items, extraBindings)
+        }
     }
 }
