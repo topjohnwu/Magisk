@@ -1,4 +1,3 @@
-#!/sbin/sh
 
 #################
 # Initialization
