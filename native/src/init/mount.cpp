@@ -2,7 +2,6 @@
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <libgen.h>
-#include <inttypes.h>
 
 #include <base.hpp>
 #include <selinux.hpp>
@@ -112,33 +111,38 @@ static void switch_root(const string &path) {
     frm_rf(root);
 }
 
-void MagiskInit::mount_rules_dir() {
-    dev_t rules_dev = 0;
-    parse_prop_file(".backup/.magisk", [&rules_dev](auto key, auto value) -> bool {
-        if (key == "RULESDEVICE") {
-            sscanf(value.data(), "%" PRIuPTR, &rules_dev);
-            return false;
-        }
-        return true;
-    });
+static void mount_rules_dir(string path, dev_t rules_dev) {
     if (!rules_dev) return;
     xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, rules_dev);
     xmkdir(MIRRDIR "/rules", 0);
-    if (xmount(BLOCKDIR "/rules", MIRRDIR "/rules", "ext4", 0, nullptr) == 0) {
-        string custom_rules_dir = MIRRDIR "/rules";
-        if (access((custom_rules_dir + "/unencrypted").data(), F_OK) == 0) {
-            custom_rules_dir += "/unencrypted/magisk";
-        } else if (access((custom_rules_dir + "/adb").data(), F_OK) == 0) {
-            custom_rules_dir += "/adb/modules";
-        } else {
-            custom_rules_dir += "/magisk";
+
+    bool mounted = false;
+    // first of all, find if rules dev is already mounted
+    for (auto &info : parse_mount_info("self")) {
+        if (info.root == "/" && info.device == rules_dev) {
+            // Already mounted, just bind mount
+            xmount(info.target.data(), MIRRDIR "/rules", nullptr, MS_BIND, nullptr);
+            mounted = true;
+            break;
         }
+    }
+
+    if (mounted || mount(BLOCKDIR "/rules", MIRRDIR "/rules", "ext4", MS_RDONLY, nullptr) == 0 ||
+        mount(BLOCKDIR "/rules", MIRRDIR "/rules", "f2fs", MS_RDONLY, nullptr) == 0) {
+        string custom_rules_dir = find_rules_dir(MIRRDIR "/rules");
         // Create bind mount
         xmkdirs(RULESDIR, 0);
-        xmkdirs(custom_rules_dir.data(), 0700);
-        LOGD("sepolicy.rules: %s -> %s\n", custom_rules_dir.data(), RULESDIR);
-        xmount(custom_rules_dir.data(), RULESDIR, nullptr, MS_BIND, nullptr);
+        if (access(custom_rules_dir.data(), F_OK)) {
+            LOGW("empty sepolicy.rules: %s\n", custom_rules_dir.data());
+        } else {
+            LOGD("sepolicy.rules: %s\n", custom_rules_dir.data());
+            xmount(custom_rules_dir.data(), RULESDIR, nullptr, MS_BIND, nullptr);
+            mount_list.emplace_back(path += "/" RULESDIR);
+        }
         xumount2(MIRRDIR "/rules", MNT_DETACH);
+    } else {
+        PLOGE("Failed to mount sepolicy.rules %u:%u", major(rules_dev), minor(rules_dev));
+        unlink(BLOCKDIR "/rules");
     }
 }
 
@@ -242,7 +246,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
     xmkdir(WORKERDIR, 0);
 
-    mount_rules_dir();
+    mount_rules_dir(path, rules_dev);
 
     cp_afc(".backup/.magisk", INTLROOT "/config");
     rm_rf(".backup");

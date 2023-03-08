@@ -45,6 +45,7 @@ static bool mount_mirror(const std::string_view from, const std::string_view to)
 
 static void mount_mirrors() {
     LOGI("* Mounting mirrors\n");
+    auto self_mount_info = parse_mount_info("self");
 
     // Bind remount module root to clear nosuid
     if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
@@ -59,6 +60,34 @@ static void mount_mirrors() {
         restorecon();
     }
 
+    // check and mount sepolicy.rules
+    {
+        dev_t rules_dev;
+        auto rules = MAGISKTMP + "/" BLOCKDIR "/rules";
+        if (struct stat st{}; stat(rules.data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
+            rules_dev = st.st_rdev;
+        } else {
+            // install from recovery, find now
+            // this helps Magisk app to copy sepolicy.rules when fixing environment
+            rules_dev = find_rules_device(self_mount_info);
+        }
+
+        for (const auto &info: self_mount_info) {
+            if (info.root == "/" && info.device == rules_dev) {
+                auto flags = split_ro(info.fs_option, ",");
+                auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+                    return flag == "rw"sv;
+                });
+                if (!rw) continue;
+                string custom_rules_dir = find_rules_dir(info.target.data());
+                xmkdir(custom_rules_dir.data(), 0700);
+                auto rules_dir = MAGISKTMP + "/" RULESDIR;
+                mount_mirror(custom_rules_dir, rules_dir);
+                break;
+            }
+        }
+    }
+
     // Prepare worker
     auto worker_dir = MAGISKTMP + "/" WORKERDIR;
     xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
@@ -69,7 +98,7 @@ static void mount_mirrors() {
         LOGI("fallback to mount subtree\n");
         // rootfs may fail, fallback to bind mount each mount point
         set<string, greater<>> mounted_dirs {{ MAGISKTMP }};
-        for (const auto &info: parse_mount_info("self")) {
+        for (const auto &info: self_mount_info) {
             if (info.type == "rootfs"sv) continue;
             // the greatest mount point that less than info.target, which is possibly a parent
             if (auto last_mount = mounted_dirs.upper_bound(info.target);
@@ -82,6 +111,50 @@ static void mount_mirrors() {
             }
         }
     }
+}
+
+dev_t find_rules_device(const std::vector<mount_info> &infos) {
+    const int UNKNOWN = 0;
+    const int PERSIST = 1;
+    const int METADATA = 2;
+    const int CACHE = 3;
+    const int DATA = 4;
+    int matched = UNKNOWN;
+    dev_t rules_dev = 0;
+    bool encrypted = getprop("ro.crypto.state") == "encrypted";
+
+    for (const auto &info: infos) {
+        if (info.target.ends_with(RULESDIR))
+            return info.device;
+        if (info.root != "/" || info.source.find("/dm-") != string::npos)
+            continue;
+        if (info.type != "ext4" && info.type != "f2fs")
+            continue;
+        auto flags = split_ro(info.fs_option, ",");
+        auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+            return flag == "rw"sv;
+        });
+        if (!rw) continue;
+        int new_matched;
+        if (info.target == "/cache" && matched < CACHE) {
+            new_matched = CACHE;
+        } else if (info.target == "/data" && matched < DATA) {
+            if (encrypted && access("/data/unencrypted", F_OK)) {
+                continue;
+            } else {
+                new_matched = DATA;
+            }
+        } else if (info.target == "/metadata" && matched < METADATA) {
+            new_matched = METADATA;
+        } else if ((info.target == "/persist" || info.target == "/mnt/vendor/persist") &&
+                   matched < PERSIST) {
+            new_matched = PERSIST;
+        } else continue;
+
+        rules_dev = info.device;
+        matched = new_matched;
+    }
+    return rules_dev;
 }
 
 static bool magisk_env() {
