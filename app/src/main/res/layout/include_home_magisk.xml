@@ -112,6 +112,8 @@
 
                         <LinearLayout
                             android:id="@+id/home_magisk_installed_version"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item.Top"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -129,6 +131,8 @@
 
                         <LinearLayout
                             android:id="@+id/home_device_details_zygisk"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
                             app:layout_constraintTop_toBottomOf="@+id/home_magisk_installed_version">
@@ -146,13 +150,16 @@
 
                         <LinearLayout
                             android:id="@+id/home_device_details_ramdisk"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="@+id/home_magisk_installed_version"
                             app:layout_constraintTop_toBottomOf="@+id/home_device_details_zygisk">
 
                             <TextView
                                 style="@style/W.Home.ItemContent"
-                                android:text="Ramdisk" />
+                                android:text="Ramdisk"
+                                tools:ignore="HardcodedText" />
 
                             <TextView
                                 style="@style/W.Home.ItemContent.Right"

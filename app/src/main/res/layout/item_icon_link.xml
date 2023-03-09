@@ -24,6 +24,7 @@
         android:minWidth="48dp"
         android:onClick="@{() -> viewModel.onLinkPressed(item.link)}"
         android:padding="@dimen/l_50"
+        android:contentDescription="@{item.title}"
         tools:layout_gravity="center">
 
         <ImageView

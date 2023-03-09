@@ -29,6 +29,7 @@
             android:text="@{item.handle}"
             android:textAppearance="@style/AppearanceFoundation.Caption"
             android:textStyle="bold"
+            android:contentDescription="@{item.name}"
             tools:text="\@topjohnwu" />
 
         <androidx.recyclerview.widget.RecyclerView

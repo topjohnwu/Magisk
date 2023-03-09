@@ -113,6 +113,8 @@
 
                         <LinearLayout
                             android:id="@+id/home_manager_latest_version"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item.Top"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -130,6 +132,8 @@
 
                         <LinearLayout
                             android:id="@+id/home_manager_installed_version"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_latest_version">
@@ -147,6 +151,8 @@
 
                         <LinearLayout
                             android:id="@+id/home_manager_internal_connection"
+                            android:focusable="true"
+                            android:focusableInTouchMode="false"
                             style="@style/W.Home.Item.Bottom"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/home_manager_installed_version">
