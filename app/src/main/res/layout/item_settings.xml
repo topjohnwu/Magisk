@@ -15,7 +15,7 @@
 
     </data>
 
-    <com.google.android.material.card.MaterialCardView
+    <com.topjohnwu.magisk.widget.CheckableMaterialCardView
         style="@style/WidgetFoundation.Card"
         isEnabled="@{item.enabled}"
         android:layout_width="match_parent"
@@ -23,12 +23,15 @@
         android:alpha="@{item.enabled ? 1f : .5f}"
         android:clickable="@{item.enabled}"
         android:focusable="@{item.enabled}"
+        android:checkable="@{item.showSwitch}"
+        android:checked="@{item.checked}"
         android:onClick="@{(view) -> item.onPressed(view, handler)}"
         tools:layout_gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="false"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="@{item.icon == 0 ? @dimen/l1 : 0}"
@@ -59,8 +62,10 @@
                     android:text="@{item.title}"
                     android:textAppearance="@style/AppearanceFoundation.Body"
                     android:textStyle="bold"
+                    android:accessibilityHeading="true"
                     tools:lines="1"
-                    tools:text="@tools:sample/lorem/random" />
+                    tools:text="@tools:sample/lorem/random"
+                    tools:targetApi="p" />
 
                 <TextView
                     gone="@{item.description.empty}"
@@ -81,10 +86,11 @@
                 android:layout_height="wrap_content"
                 android:checked="@{item.checked}"
                 android:focusable="@{item.enabled}"
+                android:importantForAccessibility="no"
                 android:onCheckedChanged="@{(v, c) -> item.onToggle(v, handler, c)}" />
 
         </LinearLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+    </com.topjohnwu.magisk.widget.CheckableMaterialCardView>
 
 </layout>
