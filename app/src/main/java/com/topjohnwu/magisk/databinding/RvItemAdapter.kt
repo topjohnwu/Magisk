@@ -113,7 +113,7 @@ inline fun bindExtra(body: (SparseArray<Any?>) -> Unit) = SparseArray<Any?>().al
 @BindingAdapter("items", "extraBindings", requireAll = false)
 fun <T: RvItem> RecyclerView.setAdapter(items: List<T>?, extraBindings: SparseArray<*>?) {
     if (items != null) {
-        if ((adapter as? RvItemAdapter<T>)?.items != items) {
+        if ((adapter as? RvItemAdapter<T>)?.items !== items) {
             adapter = RvItemAdapter(items, extraBindings)
         }
     }
