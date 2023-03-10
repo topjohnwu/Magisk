@@ -1,55 +1,38 @@
 package com.topjohnwu.magisk.databinding
 
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Collections
 
 class FilterableDiffObservableList<T>(
-    callback: Callback<T>
+    callback: Callback<T>,
+    private val scope: CoroutineScope
 ) : DiffObservableList<T>(callback) {
 
-    var filter: ((T) -> Boolean)? = null
-        set(value) {
-            field = value
-            queueUpdate()
-        }
-    @Volatile
-    private var sublist: MutableList<T> = super.list
+    private var sublist: MutableList<T> = list
+    private var job: Job? = null
 
     // ---
 
-    private val ui by lazy { Handler(Looper.getMainLooper()) }
-    private val handler = Handler(HandlerThread("List${hashCode()}").apply { start() }.looper)
-    private val updater = Runnable {
-        val filter = filter ?: { true }
-        val newList = super.list.filter(filter)
-        val diff = synchronized(this) { doCalculateDiff(sublist, newList) }
-        ui.post {
-            sublist = Collections.synchronizedList(newList)
-            diff.dispatchUpdatesTo(listCallback)
+    fun filter(filter: (T) -> Boolean) {
+        job?.cancel()
+        job = scope.launch(Dispatchers.Default) {
+            val newList = list.filter(filter)
+            val diff = synchronized(this) { doCalculateDiff(sublist, newList) }
+            withContext(Dispatchers.Main) {
+                sublist = Collections.synchronizedList(newList)
+                diff.dispatchUpdatesTo(listCallback)
+            }
         }
-    }
-
-    private fun queueUpdate() {
-        handler.removeCallbacks(updater)
-        handler.post(updater)
-    }
-
-    fun hasFilter() = filter != null
-
-    fun filter(switch: (T) -> Boolean) {
-        filter = switch
-    }
-
-    fun reset() {
-        filter = null
     }
 
     // ---
 
     override fun get(index: Int): T {
-        return sublist.get(index)
+        return sublist[index]
     }
 
     override fun add(element: T): Boolean {

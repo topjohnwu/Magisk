@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.deny
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import androidx.databinding.Bindable
+import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.di.AppContext
@@ -37,7 +38,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             query()
         }
 
-    val items = filterableListOf<DenyListRvItem>()
+    val items = filterableListOf<DenyListRvItem>(viewModelScope)
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
@@ -68,7 +69,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
         query()
     }
 
-    fun query() {
+    private fun query() {
         items.filter {
             fun filterSystem() = isShowSystem || !it.info.isSystemApp()
 
