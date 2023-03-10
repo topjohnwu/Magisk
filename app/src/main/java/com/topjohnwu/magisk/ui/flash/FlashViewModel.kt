@@ -92,14 +92,7 @@ class FlashViewModel : BaseViewModel() {
         _state.value = if (success) State.SUCCESS else State.FAILED
     }
 
-    fun onMenuItemClicked(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> savePressed()
-        }
-        return true
-    }
-
-    private fun savePressed() = withExternalRW {
+    fun savePressed() = withExternalRW {
         viewModelScope.launch(Dispatchers.IO) {
             val name = "magisk_install_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard)

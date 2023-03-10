@@ -59,7 +59,11 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return viewModel.onMenuItemClicked(item)
+        when (item.itemId) {
+            R.id.action_save -> viewModel.savePressed()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
