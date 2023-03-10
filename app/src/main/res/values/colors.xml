@@ -5,6 +5,6 @@
     <color name="light">#e0e0e0</color>
     <color name="su_request_background">#e0e0e0</color>
     <color name="splash_background">@color/ic_launcher_background</color>
-    <color name="error">#e22424</color>
-    <color name="on_error">#ffffff</color>
+    <color name="error">#ffdad7</color>
+    <color name="on_error">#410102</color>
 </resources>

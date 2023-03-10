@@ -41,12 +41,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/l1">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/l1">
 
                     <Button
                         style="@style/WidgetFoundation.Button"
@@ -60,31 +60,31 @@
                         tools:visibility="gone" />
 
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    goneUnless="@{viewModel.noticeVisible}"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="false">
-
-                    <TextView
-                        android:id="@+id/home_notice_content"
-                        android:layout_width="0dp"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        goneUnless="@{viewModel.noticeVisible}"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/l1"
-                        android:text="@string/home_notice_content"
-                        app:layout_constraintEnd_toStartOf="@+id/home_notice_hide"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:focusable="false">
 
-                    <Button
+                        <TextView
+                            android:id="@+id/home_notice_content"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/l1"
+                            android:text="@string/home_notice_content"
+                            app:layout_constraintEnd_toStartOf="@+id/home_notice_hide"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
                             android:id="@+id/home_notice_hide"
                             style="@style/WidgetFoundation.Button.Text.OnPrimary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
                             android:onClick="@{() -> viewModel.hideNotice()}"
                             android:text="@string/hide"
                             android:textAllCaps="false"
-                            android:layout_marginEnd="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -114,219 +114,214 @@
                         android:layout_height="@dimen/l_75" />
 
                     <com.google.android.material.card.MaterialCardView
-                            goneUnless="@{Info.env.isActive}"
+                        style="@style/WidgetFoundation.Card.Elevated"
+                        goneUnless="@{Info.env.isActive}"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/error">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            style="@style/WidgetFoundation.Card.Elevated"
-                            app:cardBackgroundColor="@color/error">
+                            android:paddingStart="22dp"
+                            android:paddingTop="@dimen/l1"
+                            android:paddingEnd="22dp"
+                            android:paddingBottom="@dimen/l1">
 
-                        <com.google.android.material.card.MaterialCardView
-                                style="@style/WidgetFoundation.Card.Elevated"
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/uninstall_magisk_icon"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:background="@color/on_error"
+                                android:scaleType="center"
+                                android:tint="@color/error"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:shapeAppearanceOverlay="@style/W.Shape.Rounded"
+                                app:srcCompat="@drawable/ic_delete_md2" />
+
+                            <TextView
+                                android:id="@+id/uninstall_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/l_50"
+                                android:text="@string/uninstall_title"
+                                android:textAppearance="@style/AppearanceFoundation.Title"
+                                android:textColor="@color/on_error"
+                                app:layout_constraintLeft_toRightOf="@id/uninstall_magisk_icon"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/uninstall_description"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/l_125"
+                                android:text="@string/uninstall_description"
+                                android:textAppearance="@style/AppearanceFoundation.Body"
+                                android:textColor="@color/on_error"
+                                app:layout_constraintLeft_toLeftOf="@id/uninstall_title"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/uninstall_title" />
+
+                            <Button
+                                android:id="@+id/complete_uninstall"
+                                style="@style/WidgetFoundation.Button.Outlined"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_margin="@dimen/l_50">
+                                android:layout_marginTop="@dimen/l_50"
+                                android:onClick="@{() -> viewModel.onDeletePressed()}"
+                                android:padding="@dimen/l_75"
+                                android:text="@string/complete_uninstall"
+                                android:textAllCaps="false"
+                                android:textColor="@color/on_error"
+                                android:textSize="16sp"
+                                app:icon="@drawable/ic_delete_md2"
+                                app:iconGravity="textStart"
+                                app:iconTint="@color/on_error"
+                                app:layout_constraintTop_toBottomOf="@id/uninstall_description"
+                                app:strokeColor="@color/on_error" />
 
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:padding="@dimen/l_75">
+                            <Button
+                                style="@style/WidgetFoundation.Button.Outlined"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/l_50"
+                                android:onClick="@{() -> viewModel.onRestorePressed()}"
+                                android:padding="@dimen/l_75"
+                                android:text="@string/restore_img"
+                                android:textAllCaps="false"
+                                android:textColor="@color/on_error"
+                                android:textSize="16sp"
+                                app:icon="@drawable/ic_restore"
+                                app:iconGravity="textStart"
+                                app:iconTint="@color/on_error"
+                                app:layout_constraintTop_toBottomOf="@id/complete_uninstall"
+                                app:strokeColor="@color/on_error" />
 
-                                <com.google.android.material.imageview.ShapeableImageView
-                                        android:id="@+id/uninstall_magisk_icon"
-                                        android:layout_width="60dp"
-                                        android:layout_height="60dp"
-                                        android:background="@color/error"
-                                        android:tint="@color/on_error"
-                                        app:srcCompat="@drawable/ic_delete_md2"
-                                        app:shapeAppearanceOverlay="@style/W.Shape.Rounded"
-                                        android:scaleType="center"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        app:layout_constraintTop_toTopOf="parent" />
-
-                                <TextView
-                                        android:id="@+id/uninstall_title"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/uninstall_title"
-                                        app:layout_constraintLeft_toRightOf="@id/uninstall_magisk_icon"
-                                        app:layout_constraintTop_toTopOf="parent"
-                                        android:layout_marginStart="@dimen/l_50"
-                                        android:textAppearance="@style/AppearanceFoundation.Title" />
-
-                                <TextView
-                                        android:id="@+id/uninstall_description"
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginTop="@dimen/l_125"
-                                        android:text="@string/uninstall_description"
-                                        android:textAppearance="@style/AppearanceFoundation.Body"
-                                        app:layout_constraintTop_toBottomOf="@id/uninstall_title"
-                                        app:layout_constraintLeft_toLeftOf="@id/uninstall_title"
-                                        app:layout_constraintRight_toRightOf="parent"/>
-
-                                <Button
-                                        android:id="@+id/complete_uninstall"
-                                        style="@style/WidgetFoundation.Button.Outlined"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:padding="@dimen/l_75"
-                                        android:text="@string/complete_uninstall"
-                                        android:onClick="@{() -> viewModel.onDeletePressed()}"
-                                        android:textAllCaps="false"
-                                        android:textStyle="bold"
-                                        android:textSize="16sp"
-                                        android:textColor="@color/error"
-                                        app:icon="@drawable/ic_update_md2"
-                                        app:iconGravity="textStart"
-                                        app:iconTint="@color/error"
-                                        app:strokeColor="@color/error"
-                                        android:layout_marginTop="@dimen/l_50"
-                                        app:layout_constraintTop_toBottomOf="@id/uninstall_description" />
-
-                                <Button
-                                        style="@style/WidgetFoundation.Button.Outlined"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:padding="@dimen/l_75"
-                                        android:text="@string/restore_img"
-                                        android:onClick="@{() -> viewModel.onRestorePressed()}"
-                                        android:textAllCaps="false"
-                                        android:textStyle="bold"
-                                        android:textSize="16sp"
-                                        android:textColor="@color/error"
-                                        app:icon="@drawable/ic_update_md2"
-                                        app:iconGravity="textStart"
-                                        app:iconTint="@color/error"
-                                        app:strokeColor="@color/error"
-                                        android:layout_marginTop="@dimen/l_50"
-                                        app:layout_constraintTop_toBottomOf="@id/complete_uninstall" />
-
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-<!--                    <com.google.android.material.card.MaterialCardView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        style="@style/WidgetFoundation.Card.Elevated"-->
-<!--                        android:layout_gravity="bottom"-->
-<!--                        android:layout_marginTop="@dimen/l_75"-->
-<!--                        android:focusable="false">-->
+                    <!--                    <com.google.android.material.card.MaterialCardView-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        style="@style/WidgetFoundation.Card.Elevated"-->
+                    <!--                        android:layout_gravity="bottom"-->
+                    <!--                        android:layout_marginTop="@dimen/l_75"-->
+                    <!--                        android:focusable="false">-->
 
-<!--                        <LinearLayout-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:orientation="vertical"-->
-<!--                            android:padding="@dimen/l1">-->
+                    <!--                        <LinearLayout-->
+                    <!--                            android:layout_width="match_parent"-->
+                    <!--                            android:layout_height="wrap_content"-->
+                    <!--                            android:orientation="vertical"-->
+                    <!--                            android:padding="@dimen/l1">-->
 
-<!--                            <TextView-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:text="@string/home_support_title"-->
-<!--                                android:textSize="@dimen/text_home_title"-->
-<!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
+                    <!--                            <TextView-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:text="@string/home_support_title"-->
+                    <!--                                android:textSize="@dimen/text_home_title"-->
+                    <!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
 
-<!--                            <TextView-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50"-->
-<!--                                android:text="@string/home_support_content"-->
-<!--                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />-->
+                    <!--                            <TextView-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50"-->
+                    <!--                                android:text="@string/home_support_content"-->
+                    <!--                                android:textAppearance="@style/AppearanceFoundation.Caption.Variant" />-->
 
-<!--                            <LinearLayout-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:orientation="horizontal"-->
-<!--                                android:paddingTop="@dimen/l_50" >-->
+                    <!--                            <LinearLayout-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:orientation="horizontal"-->
+                    <!--                                android:paddingTop="@dimen/l_50" >-->
 
-<!--                                <include-->
-<!--                                    item="@{IconLink.Patreon.INSTANCE}"-->
-<!--                                    layout="@layout/item_icon_link"-->
-<!--                                    viewModel="@{viewModel}"-->
-<!--                                    android:layout_width="wrap_content"-->
-<!--                                    android:layout_height="wrap_content"-->
-<!--                                    android:layout_weight="1" />-->
+                    <!--                                <include-->
+                    <!--                                    item="@{IconLink.Patreon.INSTANCE}"-->
+                    <!--                                    layout="@layout/item_icon_link"-->
+                    <!--                                    viewModel="@{viewModel}"-->
+                    <!--                                    android:layout_width="wrap_content"-->
+                    <!--                                    android:layout_height="wrap_content"-->
+                    <!--                                    android:layout_weight="1" />-->
 
-<!--                                <include-->
-<!--                                    item="@{IconLink.PayPal.Project.INSTANCE}"-->
-<!--                                    layout="@layout/item_icon_link"-->
-<!--                                    viewModel="@{viewModel}"-->
-<!--                                    android:layout_width="wrap_content"-->
-<!--                                    android:layout_height="wrap_content"-->
-<!--                                    android:layout_weight="1" />-->
+                    <!--                                <include-->
+                    <!--                                    item="@{IconLink.PayPal.Project.INSTANCE}"-->
+                    <!--                                    layout="@layout/item_icon_link"-->
+                    <!--                                    viewModel="@{viewModel}"-->
+                    <!--                                    android:layout_width="wrap_content"-->
+                    <!--                                    android:layout_height="wrap_content"-->
+                    <!--                                    android:layout_weight="1" />-->
 
-<!--                            </LinearLayout>-->
+                    <!--                            </LinearLayout>-->
 
-<!--                        </LinearLayout>-->
+                    <!--                        </LinearLayout>-->
 
-<!--                    </com.google.android.material.card.MaterialCardView>-->
+                    <!--                    </com.google.android.material.card.MaterialCardView>-->
 
-<!--                    <com.google.android.material.card.MaterialCardView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        style="@style/WidgetFoundation.Card.Elevated"-->
-<!--                        android:layout_gravity="bottom"-->
-<!--                        android:layout_marginTop="@dimen/l_25"-->
-<!--                        android:focusable="false">-->
+                    <!--                    <com.google.android.material.card.MaterialCardView-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        style="@style/WidgetFoundation.Card.Elevated"-->
+                    <!--                        android:layout_gravity="bottom"-->
+                    <!--                        android:layout_marginTop="@dimen/l_25"-->
+                    <!--                        android:focusable="false">-->
 
-<!--                        <LinearLayout-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:orientation="vertical"-->
-<!--                            android:padding="@dimen/l1">-->
+                    <!--                        <LinearLayout-->
+                    <!--                            android:layout_width="match_parent"-->
+                    <!--                            android:layout_height="wrap_content"-->
+                    <!--                            android:orientation="vertical"-->
+                    <!--                            android:padding="@dimen/l1">-->
 
-<!--                            <TextView-->
-<!--                                android:layout_width="match_parent"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:text="@string/home_follow_title"-->
-<!--                                android:textSize="@dimen/text_home_title"-->
-<!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
+                    <!--                            <TextView-->
+                    <!--                                android:layout_width="match_parent"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:text="@string/home_follow_title"-->
+                    <!--                                android:textSize="@dimen/text_home_title"-->
+                    <!--                                android:textAppearance="@style/AppearanceFoundation.Title" />-->
 
-<!--                            <include-->
-<!--                                item="@{DeveloperItem.John.INSTANCE}"-->
-<!--                                layout="@layout/item_developer"-->
-<!--                                viewModel="@{viewModel}"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50" />-->
+                    <!--                            <include-->
+                    <!--                                item="@{DeveloperItem.John.INSTANCE}"-->
+                    <!--                                layout="@layout/item_developer"-->
+                    <!--                                viewModel="@{viewModel}"-->
+                    <!--                                android:layout_width="wrap_content"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50" />-->
 
-<!--                            <include-->
-<!--                                item="@{DeveloperItem.Vvb.INSTANCE}"-->
-<!--                                layout="@layout/item_developer"-->
-<!--                                viewModel="@{viewModel}"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50" />-->
+                    <!--                            <include-->
+                    <!--                                item="@{DeveloperItem.Vvb.INSTANCE}"-->
+                    <!--                                layout="@layout/item_developer"-->
+                    <!--                                viewModel="@{viewModel}"-->
+                    <!--                                android:layout_width="wrap_content"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50" />-->
 
-<!--                            <include-->
-<!--                                item="@{DeveloperItem.YU.INSTANCE}"-->
-<!--                                layout="@layout/item_developer"-->
-<!--                                viewModel="@{viewModel}"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50" />-->
+                    <!--                            <include-->
+                    <!--                                item="@{DeveloperItem.YU.INSTANCE}"-->
+                    <!--                                layout="@layout/item_developer"-->
+                    <!--                                viewModel="@{viewModel}"-->
+                    <!--                                android:layout_width="wrap_content"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50" />-->
 
-<!--                            <include-->
-<!--                                item="@{DeveloperItem.Rikka.INSTANCE}"-->
-<!--                                layout="@layout/item_developer"-->
-<!--                                viewModel="@{viewModel}"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50" />-->
+                    <!--                            <include-->
+                    <!--                                item="@{DeveloperItem.Rikka.INSTANCE}"-->
+                    <!--                                layout="@layout/item_developer"-->
+                    <!--                                viewModel="@{viewModel}"-->
+                    <!--                                android:layout_width="wrap_content"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50" />-->
 
-<!--                            <include-->
-<!--                                item="@{DeveloperItem.Dng.INSTANCE}"-->
-<!--                                layout="@layout/item_developer"-->
-<!--                                viewModel="@{viewModel}"-->
-<!--                                android:layout_width="wrap_content"-->
-<!--                                android:layout_height="wrap_content"-->
-<!--                                android:layout_marginTop="@dimen/l_50" />-->
+                    <!--                            <include-->
+                    <!--                                item="@{DeveloperItem.Dng.INSTANCE}"-->
+                    <!--                                layout="@layout/item_developer"-->
+                    <!--                                viewModel="@{viewModel}"-->
+                    <!--                                android:layout_width="wrap_content"-->
+                    <!--                                android:layout_height="wrap_content"-->
+                    <!--                                android:layout_marginTop="@dimen/l_50" />-->
 
-<!--                        </LinearLayout>-->
+                    <!--                        </LinearLayout>-->
 
-<!--                    </com.google.android.material.card.MaterialCardView>-->
+                    <!--                    </com.google.android.material.card.MaterialCardView>-->
 
                 </LinearLayout>
 
