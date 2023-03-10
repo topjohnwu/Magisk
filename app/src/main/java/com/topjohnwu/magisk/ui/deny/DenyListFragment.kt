@@ -1,12 +1,12 @@
 package com.topjohnwu.magisk.ui.deny
 
-import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
@@ -17,17 +17,16 @@ import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
 
-class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
+class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
 
     override val layoutRes = R.layout.fragment_deny_md2
     override val viewModel by viewModel<DenyListViewModel>()
 
     private lateinit var searchView: SearchView
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
+    override fun onStart() {
+        super.onStart()
         activity?.setTitle(R.string.denylist)
-        setHasOptionsMenu(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -56,7 +55,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
         return super.onBackPressed()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_deny_md2, menu)
         searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.queryHint = searchView.context.getString(R.string.hide_filter_hint)
@@ -73,7 +72,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
         })
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_show_system -> {
                 val check = !item.isChecked
@@ -91,7 +90,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
+    override fun onPrepareMenu(menu: Menu) {
         val showSystem = menu.findItem(R.id.action_show_system)
         val showOS = menu.findItem(R.id.action_show_OS)
         showOS.isEnabled = showSystem.isChecked

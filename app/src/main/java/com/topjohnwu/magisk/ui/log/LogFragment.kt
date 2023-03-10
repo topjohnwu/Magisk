@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
@@ -16,7 +17,7 @@ import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
 
-class LogFragment : BaseFragment<FragmentLogMd2Binding>() {
+class LogFragment : BaseFragment<FragmentLogMd2Binding>(), MenuProvider {
 
     override val layoutRes = R.layout.fragment_log_md2
     override val viewModel by viewModel<LogViewModel>()
@@ -40,8 +41,7 @@ class LogFragment : BaseFragment<FragmentLogMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        setHasOptionsMenu(true)
-        activity?.title = resources.getString(R.string.logs)
+        activity?.setTitle(R.string.logs)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,15 +58,14 @@ class LogFragment : BaseFragment<FragmentLogMd2Binding>() {
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_log_md2, menu)
         actionSave = menu.findItem(R.id.action_save)?.also {
             it.isVisible = !isMagiskLogVisible
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_save -> viewModel.saveMagiskLog()
             R.id.action_clear ->

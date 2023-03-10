@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
@@ -66,6 +67,8 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (this is MenuProvider)
+            activity?.addMenuProvider(this, viewLifecycleOwner)
         binding.addOnRebindCallback(object : OnRebindCallback<Binding>() {
             override fun onPreBind(binding: Binding): Boolean {
                 this@BaseFragment.onPreBind(binding)
