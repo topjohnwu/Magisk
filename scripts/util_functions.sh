@@ -491,7 +491,8 @@ install_magisk() {
       abort "! Insufficient partition size"
       ;;
     2)
-      abort "! $BOOTIMAGE is read only"
+      ui_print "! $BOOTIMAGE cannot be directly upgraded"
+      abort "! Try patching the boot image then flashing it from fastboot"
       ;;
   esac
 
