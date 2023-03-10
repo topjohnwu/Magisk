@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+    # Theme guide
+    This should provide all the information you need to create new !color! themes.
+    ## Inheritance
+    You might want to inherit default values from "base" theme. You can do so implicitly by just
+    writing `<style name="ThemeFoundationMD2.MySuperAwesomeTheme" parent="ThemeFoundationMD2.Piplup">`.
+    With this approach you can only change values you (don't) like - such as `colorPrimary` or
+    `colorSecondary`.
+    ## Day / Night ? How do I define both in one theme?
+    Define Theme here for "Day" theme and in `values-night` directory define theme with same name
+    and parent if applicable. The framework will automatically switch between day/night themes based
+    on user's requested configuration. (Always light, Always dark, Follow system)
+    You might choose to define only "Day" theme with Dark colors to have dark theme regardless.
+    That's super lazy approach and is discouraged but the framework permits it.
+    ## What to theme
+    Generally I'd suggest theming only `colorPrimary`, `colorSecondary`, `colorTertiary` ,`colorSurface` and their variants. Make
+    sure that text is readable if displayed on primary or secondary color!
+    You can check that very easily by visiting https://www.colorhexa.com/. After you put in your
+    color hex, you can scroll down to "Preview" where it will compute whether dark/bright text
+    should be displayed on top of it. Then you must edit respective `colorOn...`.
+    Also check "Color Blindness Simulator". Primary and secondary colors must not match or be
+    similar in type. Text on color must have enough contrast so it can be read by everyone!
+    !! Themes that will not satisfy these requirements will be promptly deleted without further
+    !! notice. In repeated attempts to push such themes you will be automatically blacklisted.
+    -->
+
+    <style name="ThemeFoundationMD2" parent="Foundation.Default" />
+
+    <!--1st party themes-->
+
+    <style name="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#006397</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#CCE5FF</item>
+        <item name="colorOnPrimaryContainer">#001D31</item>
+        <item name="colorSecondary">#51606F</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#D4E4F6</item>
+        <item name="colorOnSecondaryContainer">#0D1D2A</item>
+        <item name="colorTertiary">#67587A</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#EDDCFF</item>
+        <item name="colorOnTertiaryContainer">#221534</item>
+        <item name="android:colorBackground">#FCFCFF</item>
+        <item name="colorOnBackground">#1A1C1E</item>
+        <item name="colorSurface">#FCFCFF</item>
+        <item name="colorOnSurface">#1A1C1E</item>
+        <item name="colorSurfaceVariant">#DEE3EB</item>
+        <item name="colorOnSurfaceVariant">#42474E</item>
+        <item name="colorOutline">#72787E</item>
+        <item name="colorOnSurfaceInverse">#F0F0F4</item>
+        <item name="colorSurfaceInverse">#2F3133</item>
+        <item name="colorPrimaryInverse">#92CCFF</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Rayquaza" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#006D44</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#91F7BD</item>
+        <item name="colorOnPrimaryContainer">#002111</item>
+        <item name="colorSecondary">#4E6355</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#D0E8D6</item>
+        <item name="colorOnSecondaryContainer">#0B1F14</item>
+        <item name="colorTertiary">#3C6471</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#BFE9F9</item>
+        <item name="colorOnTertiaryContainer">#001F27</item>
+        <item name="android:colorBackground">#FBFDF8</item>
+        <item name="colorOnBackground">#191C1A</item>
+        <item name="colorSurface">#FBFDF8</item>
+        <item name="colorOnSurface">#191C1A</item>
+        <item name="colorSurfaceVariant">#DCE5DC</item>
+        <item name="colorOnSurfaceVariant">#404942</item>
+        <item name="colorOutline">#717972</item>
+        <item name="colorOnSurfaceInverse">#F0F1ED</item>
+        <item name="colorSurfaceInverse">#2E312E</item>
+        <item name="colorPrimaryInverse">#75DAA2</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Zapdos" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#7D5800</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#FFDEA9</item>
+        <item name="colorOnPrimaryContainer">#271900</item>
+        <item name="colorSecondary">#6D5C3F</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#F7DFBB</item>
+        <item name="colorOnSecondaryContainer">#251A04</item>
+        <item name="colorTertiary">#4D6544</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#CFEBC0</item>
+        <item name="colorOnTertiaryContainer">#0B2006</item>
+        <item name="android:colorBackground">#FFFBFF</item>
+        <item name="colorOnBackground">#1F1B16</item>
+        <item name="colorSurface">#FFFBFF</item>
+        <item name="colorOnSurface">#1F1B16</item>
+        <item name="colorSurfaceVariant">#EEE1CF</item>
+        <item name="colorOnSurfaceVariant">#4E4639</item>
+        <item name="colorOutline">#807667</item>
+        <item name="colorOnSurfaceInverse">#F8EFE7</item>
+        <item name="colorSurfaceInverse">#34302A</item>
+        <item name="colorPrimaryInverse">#F8BD49</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Charmeleon" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#9C4238</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#FFDAD5</item>
+        <item name="colorOnPrimaryContainer">#410001</item>
+        <item name="colorSecondary">#775652</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#FFDAD5</item>
+        <item name="colorOnSecondaryContainer">#2C1512</item>
+        <item name="colorTertiary">#705C2E</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#FCDFA6</item>
+        <item name="colorOnTertiaryContainer">#261A00</item>
+        <item name="colorOnBackground">#201A19</item>
+        <item name="colorSurface">#FFFBFF</item>
+        <item name="colorOnSurface">#201A19</item>
+        <item name="colorSurfaceVariant">#F5DDDA</item>
+        <item name="colorOnSurfaceVariant">#534341</item>
+        <item name="colorOutline">#857370</item>
+        <item name="colorOnSurfaceInverse">#FBEEEC</item>
+        <item name="colorSurfaceInverse">#362F2E</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Mew" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#9A4057</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#FFD9DF</item>
+        <item name="colorOnPrimaryContainer">#3F0016</item>
+        <item name="colorSecondary">#75565C</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#FFD9DF</item>
+        <item name="colorOnSecondaryContainer">#2B151A</item>
+        <item name="colorTertiary">#7A5732</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#FFDCBC</item>
+        <item name="colorOnTertiaryContainer">#2C1700</item>
+        <item name="android:colorBackground">#FFFBFF</item>
+        <item name="colorOnBackground">#201A1B</item>
+        <item name="colorSurface">#FFFBFF</item>
+        <item name="colorOnSurface">#201A1B</item>
+        <item name="colorSurfaceVariant">#F3DDE0</item>
+        <item name="colorOnSurfaceVariant">#524345</item>
+        <item name="colorOutline">#847375</item>
+        <item name="colorOnSurfaceInverse">#FAEEEE</item>
+        <item name="colorSurfaceInverse">#362F30</item>
+        <item name="colorPrimaryInverse">#FFB1C0</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Salamence" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#00687C</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#B0ECFF</item>
+        <item name="colorOnPrimaryContainer">#001F27</item>
+        <item name="colorSecondary">#4B6269</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#CEE7EF</item>
+        <item name="colorOnSecondaryContainer">#061E25</item>
+        <item name="colorTertiary">#585C7E</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#DEE0FF</item>
+        <item name="colorOnTertiaryContainer">#141937</item>
+        <item name="android:colorBackground">#FBFCFE</item>
+        <item name="colorOnBackground">#191C1D</item>
+        <item name="colorSurface">#FBFCFE</item>
+        <item name="colorOnSurface">#191C1D</item>
+        <item name="colorSurfaceVariant">#DBE4E8</item>
+        <item name="colorOnSurfaceVariant">#40484B</item>
+        <item name="colorOutline">#70787C</item>
+        <item name="colorOnSurfaceInverse">#EFF1F2</item>
+        <item name="colorSurfaceInverse">#2E3132</item>
+        <item name="colorPrimaryInverse">#58D6F7</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Fraxure" parent="ThemeFoundationMD2.Piplup">
+        <item name="colorPrimary">#006A60</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#74F8E5</item>
+        <item name="colorOnPrimaryContainer">#00201C</item>
+        <item name="colorSecondary">#4A635F</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#CCE8E2</item>
+        <item name="colorOnSecondaryContainer">#05201C</item>
+        <item name="colorTertiary">#456179</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#CCE5FF</item>
+        <item name="colorOnTertiaryContainer">#001E31</item>
+        <item name="android:colorBackground">#FAFDFB</item>
+        <item name="colorOnBackground">#191C1B</item>
+        <item name="colorSurface">#FAFDFB</item>
+        <item name="colorOnSurface">#191C1B</item>
+        <item name="colorSurfaceVariant">#DAE5E1</item>
+        <item name="colorOnSurfaceVariant">#3F4947</item>
+        <item name="colorOutline">#6F7977</item>
+        <item name="colorOnSurfaceInverse">#EFF1EF</item>
+        <item name="colorSurfaceInverse">#2D3130</item>
+        <item name="colorPrimaryInverse">#53DBC9</item>
+    </style>
+
+    <style name="ThemeFoundationMD2.Dynamic"/>
+
+    <!--3rd party themes-->
+
+</resources>

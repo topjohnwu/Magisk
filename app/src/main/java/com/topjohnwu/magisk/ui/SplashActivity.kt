@@ -18,7 +18,7 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.RootUtils
-//import com.topjohnwu.magisk.ui.theme.Theme
+import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
@@ -33,7 +33,7 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.Theme_Foundation)
+        setTheme(Theme.selected.themeRes)
 
         if (isRunningAsStub && !skipSplash) {
             // Manually apply splash theme for stub

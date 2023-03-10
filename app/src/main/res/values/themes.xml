@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Base.V21.Theme.Foundation" parent="Theme.Material3.DynamicColors.Light">
+    <style name="Base.V21.Theme.Foundation.Light" parent="Theme.Material3.DynamicColors.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -9,7 +9,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="Theme.Foundation" parent="Base.V21.Theme.Foundation" />
+    <style name="Theme.Foundation.Light" parent="Base.V21.Theme.Foundation.Light" />
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="android:windowBackground">@drawable/ic_splash_activity</item>

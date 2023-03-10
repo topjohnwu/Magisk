@@ -120,9 +120,9 @@
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
     <string name="settings_dark_mode_message">Select mode which best suits your style!</string>
-    <string name="settings_dark_mode_light">Always Light</string>
-    <string name="settings_dark_mode_system">Follow System</string>
-    <string name="settings_dark_mode_dark">Always Dark</string>
+    <string name="settings_dark_mode_light">Light</string>
+    <string name="settings_dark_mode_system">System</string>
+    <string name="settings_dark_mode_dark">Dark</string>
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
@@ -208,6 +208,7 @@
     <string name="repo_install_title">Install %1$s %2$s(%3$d)</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
+    <string name="theme_mode">Theme Mode</string>
     <string name="release_notes">Release notes</string>
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>

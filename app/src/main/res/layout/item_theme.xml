@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.theme.ThemeViewModel" />
+
+        <variable
+            name="theme"
+            type="com.topjohnwu.magisk.ui.theme.Theme" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card.Elevated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/l1"
+        android:onClick="@{() -> viewModel.saveTheme(theme)}">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/theme_desc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/theme_icon"
+                app:layout_constraintBottom_toTopOf="@id/theme_colors"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="@dimen/l_75"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                app:flexDirection="row"
+                app:flexWrap="wrap"
+                app:alignItems="center">
+
+                <TextView
+                    android:id="@+id/theme_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/l1"
+                    android:text="@{theme.themeName}"
+                    android:textAppearance="@style/AppearanceFoundation.Large"
+                    android:textStyle="bold"
+                    tools:text="Piplup" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/WidgetFoundation.Card.Elevated"
+                    gone="@{!theme.isSelected}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#307606">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="@dimen/l_25"
+                        android:paddingBottom="@dimen/l_25"
+                        android:paddingRight="@dimen/l_50"
+                        android:paddingLeft="@dimen/l_50"
+                        android:text="ACTIVE"
+                        android:textColor="#4AEF3D"
+                        android:textStyle="bold"
+                        android:textAppearance="@style/AppearanceFoundation.Tiny.Bold" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/theme_colors"
+                style="@style/WidgetFoundation.Card.Elevated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="@dimen/l_75"
+                app:layout_constraintTop_toBottomOf="@id/theme_desc"
+                app:cardBackgroundColor="?colorOnSecondary"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?colorPrimary"
+                    android:padding="@dimen/l_25"
+                    app:shapeAppearanceOverlay="@style/W.Shape.Rounded" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="40dp"
+                    android:background="?colorSecondary"
+                    android:padding="@dimen/l_25"
+                    app:shapeAppearanceOverlay="@style/W.Shape.Rounded" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="80dp"
+                    android:background="?colorTertiary"
+                    android:padding="@dimen/l_25"
+                    app:shapeAppearanceOverlay="@style/W.Shape.Rounded" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="120dp"
+                    android:background="?colorPrimaryInverse"
+                    android:padding="@dimen/l_25"
+                    app:shapeAppearanceOverlay="@style/W.Shape.Rounded" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/WidgetFoundation.Card.Elevated"
+                android:id="@+id/theme_icon"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:cardBackgroundColor="?colorSurface"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_theme_magisk"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>
