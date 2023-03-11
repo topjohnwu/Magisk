@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.TextItem
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,11 +94,13 @@ class SuperuserViewModel(
             ))
             policies to itemsPolicies.calculateDiff(policies)
         }
-        itemsPolicies.update(policies, diff)
-        if (itemsPolicies.isNotEmpty())
-            itemsHelpers.clear()
-        else if (itemsHelpers.isEmpty())
-            itemsHelpers.add(itemNoData)
+        UiThreadHandler.handler.post {
+            itemsPolicies.update(policies, diff)
+            if (itemsPolicies.isNotEmpty())
+                itemsHelpers.clear()
+            else if (itemsHelpers.isEmpty())
+                itemsHelpers.add(itemNoData)
+        }
         loading = false
     }
 
@@ -106,9 +109,11 @@ class SuperuserViewModel(
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {
             db.delete(item.item.uid)
-            itemsPolicies.removeAll { it.itemSameAs(item) }
-            if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
-                itemsHelpers.add(itemNoData)
+            UiThreadHandler.handler.post {
+                itemsPolicies.removeAll { it.itemSameAs(item) }
+                if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
+                    itemsHelpers.add(itemNoData)
+                }
             }
         }
 
@@ -131,9 +136,11 @@ class SuperuserViewModel(
                 item.item.notification -> R.string.su_snack_notif_on
                 else -> R.string.su_snack_notif_off
             }
-            itemsPolicies.forEach {
-                if (it.item.uid == item.item.uid) {
-                    it.notifyPropertyChanged(BR.shouldNotify)
+            UiThreadHandler.handler.post {
+                itemsPolicies.forEach {
+                    if (it.item.uid == item.item.uid) {
+                        it.notifyPropertyChanged(BR.shouldNotify)
+                    }
                 }
             }
             SnackbarEvent(res.asText(item.appName)).publish()
@@ -147,9 +154,11 @@ class SuperuserViewModel(
                 item.item.logging -> R.string.su_snack_log_on
                 else -> R.string.su_snack_log_off
             }
-            itemsPolicies.forEach {
-                if (it.item.uid == item.item.uid) {
-                    it.notifyPropertyChanged(BR.shouldLog)
+            UiThreadHandler.handler.post {
+                itemsPolicies.forEach {
+                    if (it.item.uid == item.item.uid) {
+                        it.notifyPropertyChanged(BR.shouldLog)
+                    }
                 }
             }
             SnackbarEvent(res.asText(item.appName)).publish()
@@ -162,9 +171,11 @@ class SuperuserViewModel(
                 val res = if (enable) R.string.su_snack_grant else R.string.su_snack_deny
                 item.item.policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
                 db.update(item.item)
-                itemsPolicies.forEach {
-                    if (it.item.uid == item.item.uid) {
-                        it.notifyPropertyChanged(BR.enabled)
+                UiThreadHandler.handler.post {
+                    itemsPolicies.forEach {
+                        if (it.item.uid == item.item.uid) {
+                            it.notifyPropertyChanged(BR.enabled)
+                        }
                     }
                 }
                 SnackbarEvent(res.asText(item.appName)).publish()

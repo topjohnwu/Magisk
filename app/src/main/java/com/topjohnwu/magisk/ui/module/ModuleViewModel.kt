@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -45,9 +46,11 @@ class ModuleViewModel : AsyncLoadViewModel() {
                 withContext(Dispatchers.IO) { LocalModule.loaded() }
         if (moduleLoaded) {
             loadInstalled()
-            if (items.isEmpty()) {
-                items.insertItem(InstallModule)
-                    .insertList(itemsInstalled)
+            UiThreadHandler.handler.post {
+                if (items.isEmpty()) {
+                    items.insertItem(InstallModule)
+                        .insertList(itemsInstalled)
+                }
             }
         }
         loading = false

@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,11 +51,13 @@ class LogViewModel(
             val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
         }
-        items.firstOrNull()?.isTop = false
-        items.lastOrNull()?.isBottom = false
-        items.update(suLogs, diff)
-        items.firstOrNull()?.isTop = true
-        items.lastOrNull()?.isBottom = true
+        UiThreadHandler.handler.post {
+            items.firstOrNull()?.isTop = false
+            items.lastOrNull()?.isBottom = false
+            items.update(suLogs, diff)
+            items.firstOrNull()?.isTop = true
+            items.lastOrNull()?.isBottom = true
+        }
     }
 
     fun saveMagiskLog() = withExternalRW {

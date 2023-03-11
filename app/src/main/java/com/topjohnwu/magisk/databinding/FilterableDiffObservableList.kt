@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.databinding
 
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,8 +22,8 @@ class FilterableDiffObservableList<T>(
         job?.cancel()
         job = scope.launch(Dispatchers.Default) {
             val newList = list.filter(filter)
-            val diff = synchronized(this) { doCalculateDiff(sublist, newList) }
-            withContext(Dispatchers.Main) {
+            val diff = synchronized(this) { doCalculateDiff(ArrayList(sublist), newList) }
+            UiThreadHandler.handler.post {
                 sublist = Collections.synchronizedList(newList)
                 diff.dispatchUpdatesTo(listCallback)
             }

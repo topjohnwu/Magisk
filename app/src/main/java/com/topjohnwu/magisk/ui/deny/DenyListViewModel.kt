@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
@@ -65,8 +66,10 @@ class DenyListViewModel : AsyncLoadViewModel() {
             apps.sort()
             apps to items.calculateDiff(apps)
         }
-        items.update(apps, diff)
-        query()
+        UiThreadHandler.handler.post {
+            items.update(apps, diff)
+            query()
+        }
     }
 
     private fun query() {

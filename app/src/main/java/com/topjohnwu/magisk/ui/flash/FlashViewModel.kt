@@ -23,6 +23,7 @@ import com.topjohnwu.magisk.ktx.synchronized
 import com.topjohnwu.magisk.ktx.timeFormatStandard
 import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.superuser.CallbackList
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,7 +48,10 @@ class FlashViewModel : BaseViewModel() {
     private val outItems = object : CallbackList<String>() {
         override fun onAddElement(e: String?) {
             e ?: return
-            items.add(ConsoleItem(e))
+            val item = ConsoleItem(e)
+            UiThreadHandler.handler.post {
+                items.add(item)
+            }
             logItems.add(e)
         }
     }
