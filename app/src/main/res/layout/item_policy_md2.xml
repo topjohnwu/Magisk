@@ -148,7 +148,7 @@
                         android:backgroundTint="?colorPrimaryContainer"
                         android:onClick="@{() -> item.revoke()}"
                         app:icon="@drawable/ic_delete_md2"
-                        app:iconTint="@color/error"
+                        app:iconTint="?colorOnPrimaryContainer"
                         app:iconGravity="textStart" />
 
                 </LinearLayout>
