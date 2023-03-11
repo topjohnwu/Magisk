@@ -296,13 +296,6 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
-
-  # Mount sepolicy rules dir locations in recovery (best effort)
-  if ! $BOOTMODE; then
-    mount_name "cache cac" /cache
-    mount_name metadata /metadata
-    mount_name persist /persist
-  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -636,10 +629,10 @@ run_migrations() {
   done
 }
 
-copy_sepolicy_rules() {
-  local RULESDIR=$(magisk --path)/.magisk/sepolicy.rules
+copy_rules() {
+  local RULESDIR=$(magisk --path)/.magisk/rules
   if ! grep -q " $RULESDIR " /proc/mounts; then
-    ui_print "- Unable to find sepolicy rules dir"
+    ui_print "- Unable to find rules dir"
     return 1
   fi
 
@@ -792,10 +785,10 @@ install_module() {
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
 
-  # Copy over custom sepolicy rules
+  # Copy over custom rules
   if [ -f $MODPATH/sepolicy.rule ]; then
     ui_print "- Installing custom sepolicy rules"
-    copy_sepolicy_rules
+    copy_rules
   fi
 
   # Remove stuff that doesn't belong to modules and clean up any empty directories
