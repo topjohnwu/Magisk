@@ -182,7 +182,6 @@ object UpdateChannel : BaseSettingsItem.Selector() {
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
     override val title = R.string.settings_update_custom.asText()
-    override val description get() = value.asText()
     override var value
         get() = Config.customChannelUrl
         set(value) {
