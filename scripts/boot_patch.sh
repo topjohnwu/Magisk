@@ -77,6 +77,7 @@ fi
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
+export MAGISKTMP
 
 chmod -R 755 .
 
