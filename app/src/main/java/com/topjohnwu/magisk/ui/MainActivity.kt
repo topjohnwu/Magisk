@@ -147,7 +147,7 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
     }
 
     fun invalidateToolbar() {
-        //binding.mainToolbar.startAnimations()
+        binding.mainToolbar.startAnimations()
         binding.mainToolbar.invalidate()
     }
 
