@@ -45,12 +45,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/l_25"
+                    android:paddingRight="@dimen/l_25"
+                    android:paddingTop="@dimen/l_75"
+                    android:paddingBottom="@dimen/l_75">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingStart="3dp"
+                        android:paddingEnd="3dp">
 
                         <ImageView
                             style="@style/WidgetFoundation.Icon"
@@ -87,8 +93,8 @@
                         android:layout_marginEnd="@dimen/l1"
                         android:layout_marginBottom="@dimen/l_50"
                         android:orientation="vertical"
-                        android:paddingStart="3dp"
-                        android:paddingEnd="3dp"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
                         tools:layout_gravity="center">
 
                         <CheckBox
@@ -149,12 +155,18 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingLeft="@dimen/l_25"
+                    android:paddingRight="@dimen/l_25"
+                    android:paddingTop="@dimen/l_75"
+                    android:paddingBottom="@dimen/l_75">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp">
 
                         <ImageView
                             style="@style/WidgetFoundation.Icon"
@@ -245,10 +257,13 @@
                     markdownText="@{viewModel.notes}"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
                     android:breakStrategy="simple"
                     android:hyphenationFrequency="none"
                     android:textAppearance="@style/AppearanceFoundation.Caption"
+                    android:layout_marginStart="@dimen/l1_75"
+                    android:layout_marginEnd="@dimen/l1_75"
+                    android:layout_marginTop="@dimen/l1"
+                    android:layout_marginBottom="@dimen/l1"
                     tools:ignore="UnusedAttribute"
                     tools:maxLines="5"
                     tools:text="@tools:sample/lorem/random"
