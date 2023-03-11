@@ -116,7 +116,7 @@
 
                     <Button
                         gone="@{viewModel.magiskState != State.OUTDATED}"
-                        style="@style/WidgetFoundation.Button.Text"
+                        style="@style/WidgetFoundation.Button"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:onClick="@{() -> viewModel.onMagiskPressed()}"
