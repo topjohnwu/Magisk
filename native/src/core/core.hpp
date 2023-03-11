@@ -6,7 +6,7 @@
 extern bool RECOVERY_MODE;
 extern std::atomic<ino_t> pkg_xml_ino;
 
-dev_t find_rules_device(const std::vector<mount_info> &infos);
+dev_t find_rules_device();
 void unlock_blocks();
 void reboot();
 void start_log_daemon();

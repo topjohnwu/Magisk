@@ -61,17 +61,8 @@ static void mount_mirrors() {
     }
 
     // check and mount sepolicy.rules
-    {
-        dev_t rules_dev;
-        auto rules = MAGISKTMP + "/" BLOCKDIR "/rules";
-        if (struct stat st{}; stat(rules.data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
-            rules_dev = st.st_rdev;
-        } else {
-            // install from recovery, find now
-            // this helps Magisk app to copy sepolicy.rules when fixing environment
-            rules_dev = find_rules_device(self_mount_info);
-        }
-
+    if (struct stat st{}; stat((MAGISKTMP + "/" BLOCKDIR "/rules").data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
+        dev_t rules_dev = st.st_rdev;
         for (const auto &info: self_mount_info) {
             if (info.root == "/" && info.device == rules_dev) {
                 auto flags = split_ro(info.fs_option, ",");
@@ -113,7 +104,7 @@ static void mount_mirrors() {
     }
 }
 
-dev_t find_rules_device(const std::vector<mount_info> &infos) {
+dev_t find_rules_device() {
     const int UNKNOWN = 0;
     const int PERSIST = 1;
     const int METADATA = 2;
@@ -122,8 +113,11 @@ dev_t find_rules_device(const std::vector<mount_info> &infos) {
     int matched = UNKNOWN;
     dev_t rules_dev = 0;
     bool encrypted = getprop("ro.crypto.state") == "encrypted";
+    string custom_rules_dir;
 
-    for (const auto &info: infos) {
+    bool mount = getuid() == 0 && getenv("MAGISKTMP");
+
+    for (const auto &info: parse_mount_info("self")) {
         if (info.target.ends_with(RULESDIR))
             return info.device;
         if (info.root != "/" || info.source.find("/dm-") != string::npos)
@@ -151,9 +145,20 @@ dev_t find_rules_device(const std::vector<mount_info> &infos) {
             new_matched = PERSIST;
         } else continue;
 
+        if (mount) {
+            custom_rules_dir = find_rules_dir(info.target.data());
+        }
         rules_dev = info.device;
         matched = new_matched;
     }
+
+    if (!custom_rules_dir.empty()) {
+        auto rules_dir = getenv("MAGISKTMP") + "/sepolicy.rules"s;
+        mkdirs(custom_rules_dir.data(), 0700);
+        mkdirs(rules_dir.data(), 0700);
+        xmount(custom_rules_dir.data(), rules_dir.data(), nullptr, MS_BIND, nullptr);
+    }
+
     return rules_dev;
 }
 
