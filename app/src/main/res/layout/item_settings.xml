@@ -80,7 +80,7 @@
                     android:id="@+id/description_container"
                     gone="@{item.description.empty}"
                     style="@style/WidgetFoundation.Card.Elevated"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -90,6 +90,8 @@
                     <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
+                            android:paddingLeft="@dimen/l_25"
+                            android:paddingRight="@dimen/l_25"
                             android:text="@{item.description}"
                             android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
                             android:lines="1"
