@@ -4,6 +4,8 @@
     <!--region Display-->
     <style name="AppearanceFoundation.Large" parent="TextAppearance.AppCompat.Large">
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textSize">30sp</item>
+        <item name="fontFamily">@font/googlesans</item>
     </style>
 
     <style name="AppearanceFoundation.Large.Secondary">
