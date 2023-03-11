@@ -43,10 +43,10 @@ data class LocalModule(
         set(enable) {
             if (enable) {
                 disableFile.delete()
-                Shell.cmd("copy_sepolicy_rules").submit()
+                Shell.cmd("copy_rules").submit()
             } else {
                 !disableFile.createNewFile()
-                Shell.cmd("copy_sepolicy_rules").submit()
+                Shell.cmd("copy_rules").submit()
             }
         }
 
@@ -56,10 +56,10 @@ data class LocalModule(
             if (remove) {
                 if (updateFile.exists()) return
                 removeFile.createNewFile()
-                Shell.cmd("copy_sepolicy_rules").submit()
+                Shell.cmd("copy_rules").submit()
             } else {
                 removeFile.delete()
-                Shell.cmd("copy_sepolicy_rules").submit()
+                Shell.cmd("copy_rules").submit()
             }
         }
 

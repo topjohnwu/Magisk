@@ -67,7 +67,7 @@ direct_install() {
   rm -f $1/new-boot.img
   fix_env $1
   run_migrations
-  copy_sepolicy_rules
+  copy_rules
 
   return 0
 }

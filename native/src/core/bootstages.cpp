@@ -60,7 +60,7 @@ static void mount_mirrors() {
         restorecon();
     }
 
-    // check and mount sepolicy.rules
+    // check and mount rules
     if (struct stat st{}; stat((MAGISKTMP + "/" BLOCKDIR "/rules").data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
         dev_t rules_dev = st.st_rdev;
         for (const auto &info: self_mount_info) {
@@ -153,7 +153,7 @@ dev_t find_rules_device() {
     }
 
     if (!custom_rules_dir.empty()) {
-        auto rules_dir = getenv("MAGISKTMP") + "/sepolicy.rules"s;
+        auto rules_dir = getenv("MAGISKTMP") + "/rules"s;
         mkdirs(custom_rules_dir.data(), 0700);
         mkdirs(rules_dir.data(), 0700);
         xmount(custom_rules_dir.data(), rules_dir.data(), nullptr, MS_BIND, nullptr);

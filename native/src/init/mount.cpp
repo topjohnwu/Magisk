@@ -133,15 +133,15 @@ static void mount_rules_dir(string path, dev_t rules_dev) {
         // Create bind mount
         xmkdirs(RULESDIR, 0);
         if (access(custom_rules_dir.data(), F_OK)) {
-            LOGW("empty sepolicy.rules: %s\n", custom_rules_dir.data());
+            LOGW("empty rules: %s\n", custom_rules_dir.data());
         } else {
-            LOGD("sepolicy.rules: %s\n", custom_rules_dir.data());
+            LOGD("rules: %s\n", custom_rules_dir.data());
             xmount(custom_rules_dir.data(), RULESDIR, nullptr, MS_BIND, nullptr);
             mount_list.emplace_back(path += "/" RULESDIR);
         }
         xumount2(MIRRDIR "/rules", MNT_DETACH);
     } else {
-        PLOGE("Failed to mount sepolicy.rules %u:%u", major(rules_dev), minor(rules_dev));
+        PLOGE("Failed to mount rules %u:%u", major(rules_dev), minor(rules_dev));
         unlink(BLOCKDIR "/rules");
     }
 }

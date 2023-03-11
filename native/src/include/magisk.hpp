@@ -18,7 +18,7 @@
 extern std::string  MAGISKTMP;
 #define INTLROOT    ".magisk"
 #define MIRRDIR     INTLROOT "/mirror"
-#define RULESDIR    INTLROOT "/sepolicy.rules"
+#define RULESDIR    INTLROOT "/rules"
 #define BLOCKDIR    INTLROOT "/block"
 #define WORKERDIR   INTLROOT "/worker"
 #define MODULEMNT   INTLROOT "/modules"
