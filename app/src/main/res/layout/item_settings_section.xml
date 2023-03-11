@@ -22,9 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{item.title}"
-            android:textAppearance="@style/AppearanceFoundation.Title"
+            android:textAppearance="@style/AppearanceFoundation.Caption.Primary"
             android:textStyle="bold"
-            android:textSize="24sp"
             tools:text="@tools:sample/lorem" />
 
         <TextView
