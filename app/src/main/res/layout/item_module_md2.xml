@@ -75,10 +75,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
                         android:layout_marginEnd="@dimen/l1"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="9dp"
                         android:checked="@={item.enabled}"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/module_title"/>
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                 <TextView
                         android:id="@+id/module_version_author"

@@ -18,12 +18,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginStart="@dimen/l1"
         android:layout_marginEnd="@dimen/l1"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="68dp"
         android:onClick="@{() -> viewModel.installPressed()}"
         app:layout_fitsSystemWindowsInsets="bottom"
-        app:srcCompat="@drawable/ic_module_storage_md2"
+        app:srcCompat="@drawable/ic_add"
         tools:layout_marginBottom="64dp"/>
 
 </layout>
