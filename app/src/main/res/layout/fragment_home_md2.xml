@@ -64,6 +64,7 @@
                         goneUnless="@{viewModel.noticeVisible}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/l1"
                         android:focusable="false">
 
                         <TextView
