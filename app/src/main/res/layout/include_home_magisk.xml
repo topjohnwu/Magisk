@@ -137,7 +137,6 @@
                         android:padding="@dimen/l_75"
                         android:text="@string/install"
                         android:textAllCaps="false"
-                        android:textStyle="bold"
                         android:textSize="16sp"
                         app:icon="@drawable/ic_install"
                         app:iconGravity="textStart"/>

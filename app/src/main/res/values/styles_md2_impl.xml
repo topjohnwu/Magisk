@@ -25,7 +25,6 @@
     <style name="WidgetFoundation.Card.Elevated" parent="WidgetFoundation.Card.Elevated.V21"/>
 
     <style name="WidgetFoundation.Button" parent="Widget.Material3.Button">
-        <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/googlesans</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
@@ -38,7 +37,6 @@
     </style>
 
     <style name="WidgetFoundation.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/googlesans</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
@@ -47,7 +45,6 @@
     </style>
 
     <style name="WidgetFoundation.Button.Text" parent="Widget.Material3.Button.TextButton">
-        <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/googlesans</item>
         <item name="iconGravity">textStart</item>
         <item name="iconPadding">@dimen/l_50</item>
