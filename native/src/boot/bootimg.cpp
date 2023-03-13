@@ -590,7 +590,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
                 fprintf(stderr, "! Recompressed kernel is too large, using original kernel\n");
                 ftruncate64(fd, lseek64(fd, - (off64_t) hdr->kernel_size(), SEEK_CUR));
                 xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-            } else {
+            } else if (!skip_comp) {
                 // Pad zeros to make sure the zImage file size does not change
                 // Also ensure the last 4 bytes are the uncompressed vmlinux size
                 uint32_t sz = m.sz;
