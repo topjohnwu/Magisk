@@ -57,6 +57,8 @@ typedef enum {
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
+#define AMONET_MICROLOADER_SZ 1024
+#define AMONET_MICROLOADER_MAGIC "microloader"
 #define AVB_FOOTER_MAGIC "AVBf"
 #define AVB_MAGIC "AVB0"
 #define ZIMAGE_MAGIC "\x18\x28\x6f\x01"

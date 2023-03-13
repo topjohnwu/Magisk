@@ -266,6 +266,14 @@ dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
         flags[ACCLAIM_FLAG] = true;
         fprintf(stderr, "ACCLAIM_LOADER\n");
         addr += ACCLAIM_PRE_HEADER_SZ;
+    } else if (str_contains(string_view((const char *) addr, AMONET_MICROLOADER_SZ), AMONET_MICROLOADER_MAGIC) &&
+               string_view((const char *)addr + AMONET_MICROLOADER_SZ, BOOT_MAGIC_SIZE) == BOOT_MAGIC) {
+        flags[AMONET_FLAG] = true;
+        fprintf(stderr, "AMONET_MICROLOADER\n");
+        uint8_t microloader[AMONET_MICROLOADER_SZ];
+        memcpy(microloader, addr, AMONET_MICROLOADER_SZ);
+        memcpy(addr, addr + AMONET_MICROLOADER_SZ, AMONET_MICROLOADER_SZ);
+        memcpy(addr + AMONET_MICROLOADER_SZ, microloader, AMONET_MICROLOADER_SZ);
     }
 
     // addr could be adjusted
@@ -787,5 +795,10 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Blob header
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf);
         b_hdr->size = off.total - sizeof(blob_hdr);
+    }
+
+    if (boot.flags[AMONET_FLAG]) {
+        memcpy(out.buf + off.header + AMONET_MICROLOADER_SZ, out.buf + off.header, AMONET_MICROLOADER_SZ);
+        memcpy(out.buf + off.header, boot.hdr_addr + AMONET_MICROLOADER_SZ, AMONET_MICROLOADER_SZ);
     }
 }
