@@ -51,13 +51,14 @@ bool dir_node::prepare() {
     for (auto it = children.begin(); it != children.end();) {
         // We also need to upgrade to tmpfs node if any child:
         // - Target does not exist
-        // - Source or target is a symlink (since we cannot bind mount symlink)
+        // - Source or target is a symlink (since we cannot bind mount symlink) or whiteout
         bool cannot_mnt;
         if (struct stat st{}; lstat(it->second->node_path().data(), &st) != 0) {
-            cannot_mnt = true;
+            // if it's a whiteout, we don't care if the target doesn't exist
+            cannot_mnt = !it->second->is_wht();
         } else {
             it->second->set_exist(true);
-            cannot_mnt = it->second->is_lnk() || S_ISLNK(st.st_mode);
+            cannot_mnt = it->second->is_lnk() || S_ISLNK(st.st_mode) || it->second->is_wht();
         }
 
         if (cannot_mnt) {
@@ -107,6 +108,14 @@ void dir_node::collect_module_files(const char *module, int dfd) {
                 node->collect_module_files(module, dirfd(dir.get()));
             }
         } else {
+            if (entry->d_type == DT_CHR) {
+                struct stat st{};
+                int ret = fstatat(dirfd(dir.get()), entry->d_name, &st, AT_SYMLINK_NOFOLLOW);
+                if (ret == 0 && st.st_rdev == 0) {
+                    // if the file is a whiteout, mark it as such
+                    entry->d_type = DT_WHT;
+                }
+            }
             emplace<module_node>(entry->d_name, module, entry);
         }
     }
@@ -136,6 +145,10 @@ void node_entry::create_and_mount(const char *reason, const string &src, bool ro
 }
 
 void module_node::mount() {
+    if (is_wht()) {
+        VLOGD("delete", "null", node_path().data());
+        return;
+    }
     std::string path = module + (parent()->root()->prefix + node_path());
     string mnt_src = module_mnt + path;
     {
