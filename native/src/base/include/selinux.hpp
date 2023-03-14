@@ -18,10 +18,12 @@
 
 // Unconstrained domain the daemon and root processes run in
 #define SEPOL_PROC_DOMAIN   "magisk"
+#define MAGISK_PROC_CON     "u:r:" SEPOL_PROC_DOMAIN ":s0"
 // Highly constrained domain, sole purpose is to connect to daemon
 #define SEPOL_CLIENT_DOMAIN "magisk_client"
 // Unconstrained file type that anyone can access
 #define SEPOL_FILE_TYPE     "magisk_file"
+#define MAGISK_FILE_CON     "u:object_r:" SEPOL_FILE_TYPE ":s0"
 // Special file type to allow clients to transit to client domain automatically
 #define SEPOL_EXEC_TYPE     "magisk_exec"
 
@@ -40,4 +42,3 @@ bool selinux_enabled();
 void enable_selinux();
 void restorecon();
 void restore_tmpcon();
-void restore_databincon();

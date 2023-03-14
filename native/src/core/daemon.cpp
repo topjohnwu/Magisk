@@ -317,7 +317,7 @@ static void daemon_entry() {
         close(fd);
 
     setsid();
-    setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+    setcon(MAGISK_PROC_CON);
 
     start_log_daemon();
 

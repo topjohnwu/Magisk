@@ -72,7 +72,7 @@ on property:init.svc.zygote=restarting
 
 on property:init.svc.zygote=stopped
     exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-)EOF", tmp_dir, "u:r:" SEPOL_PROC_DOMAIN ":s0");
+)EOF", tmp_dir, MAGISK_PROC_CON);
 
     fclose(rc);
     clone_attr(src, dest);

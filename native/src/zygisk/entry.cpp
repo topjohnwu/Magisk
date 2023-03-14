@@ -266,7 +266,7 @@ static void setup_files(int client, const sock_cred *cred) {
     string ld_data = read_string(client);
     xwrite(ld_fd, ld_data.data(), ld_data.size());
     close(ld_fd);
-    setfilecon(mbin.data(), "u:object_r:" SEPOL_FILE_TYPE ":s0");
+    setfilecon(mbin.data(), MAGISK_FILE_CON);
     xmount(mbin.data(), hbin, nullptr, MS_BIND, nullptr);
 
     send_fd(client, app_fd);

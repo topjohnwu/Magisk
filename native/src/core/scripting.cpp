@@ -159,7 +159,7 @@ rm -f $APK
 )EOF";
 
 void install_apk(const char *apk) {
-    setfilecon(apk, "u:object_r:" SEPOL_FILE_TYPE ":s0");
+    setfilecon(apk, MAGISK_FILE_CON);
     exec_t exec {
         .fork = fork_no_orphan
     };

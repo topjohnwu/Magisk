@@ -197,7 +197,7 @@ int app_request(const su_context &ctx) {
     gen_rand_str(fifo + 12, 32);
     mkfifo(fifo, 0600);
     chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
-    setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
+    setfilecon(fifo, MAGISK_FILE_CON);
 
     // Send request
     vector<Extra> extras;

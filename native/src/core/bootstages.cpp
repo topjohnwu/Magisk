@@ -57,7 +57,6 @@ static void mount_mirrors() {
         xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
         chmod(SECURE_DIR, 0700);
-        restorecon();
     }
 
     // Check and mount preinit mirror
@@ -226,8 +225,7 @@ static bool magisk_env() {
     xmkdir(DATABIN, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
-
-    restore_databincon();
+    restorecon();
 
     if (access(DATABIN "/busybox", X_OK))
         return false;
