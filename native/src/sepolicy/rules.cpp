@@ -8,9 +8,6 @@ void sepolicy::magisk_rules() {
     // Temp suppress warnings
     set_log_level_state(LogLevel::Warn, false);
 
-    // This indicates API 26+
-    bool new_rules = exists("untrusted_app_25");
-
     // Prevent anything to change sepolicy except ourselves
     deny(ALL, "kernel", "security", "load_policy");
 
@@ -39,84 +36,15 @@ void sepolicy::magisk_rules() {
     allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "sock_file", ALL);
 
-    if (new_rules) {
-        // Make client type literally untrusted_app
-        type(SEPOL_CLIENT_DOMAIN, "domain");
-        typeattribute(SEPOL_CLIENT_DOMAIN, "coredomain");
-        typeattribute(SEPOL_CLIENT_DOMAIN, "appdomain");
-        typeattribute(SEPOL_CLIENT_DOMAIN, "untrusted_app_all");
-        typeattribute(SEPOL_CLIENT_DOMAIN, "netdomain");
-        typeattribute(SEPOL_CLIENT_DOMAIN, "bluetoothdomain");
-
-        type(SEPOL_EXEC_TYPE, "file_type");
-        typeattribute(SEPOL_EXEC_TYPE, "exec_type");
-
-        // Basic su client needs
-        allow(SEPOL_CLIENT_DOMAIN, SEPOL_EXEC_TYPE, "file", ALL);
-        allow(SEPOL_CLIENT_DOMAIN, SEPOL_CLIENT_DOMAIN, ALL, ALL);
-
-        const char *pts[]{"devpts", "untrusted_app_devpts", "untrusted_app_25_devpts"};
-        for (auto type : pts) {
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "getattr");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "read");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "write");
-            allow(SEPOL_CLIENT_DOMAIN, type, "chr_file", "ioctl");
-        }
-
-        // Allow these processes to access MagiskSU
-        vector<const char *> clients{ "shell", "update_engine", "appdomain" };
-        for (auto type : clients) {
-            if (!exists(type))
-                continue;
-            // exec magisk
-            allow(type, SEPOL_EXEC_TYPE, "file", "read");
-            allow(type, SEPOL_EXEC_TYPE, "file", "open");
-            allow(type, SEPOL_EXEC_TYPE, "file", "getattr");
-            allow(type, SEPOL_EXEC_TYPE, "file", "execute");
-            allow(SEPOL_CLIENT_DOMAIN, type, "process", "sigchld");
-
-            // Auto transit to client domain
-            allow(type, SEPOL_CLIENT_DOMAIN, "process", "transition");
-            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "siginh");
-            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "rlimitinh");
-            dontaudit(type, SEPOL_CLIENT_DOMAIN, "process", "noatsecure");
-
-            // Kill client process
-            allow(type, SEPOL_CLIENT_DOMAIN, "process", "signal");
-        }
-
-        // type transition require actual types, not attributes
-        const char *app_types[]{
-            "system_app", "priv_app", "platform_app", "untrusted_app", "untrusted_app_25",
-            "untrusted_app_27", "untrusted_app_29", "untrusted_app_30", "untrusted_app_32"};
-        clients.pop_back();
-        clients.insert(clients.end(), app_types, app_types + std::size(app_types));
-        for (auto type : clients) {
-            // Auto transit to client domain
-            type_transition(type, SEPOL_EXEC_TYPE, "process", SEPOL_CLIENT_DOMAIN);
-        }
-
-        // Allow system_server to manage magisk_client
-        allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "getpgid");
-        allow("system_server", SEPOL_CLIENT_DOMAIN, "process", "sigkill");
-
-        // Don't allow pesky processes to monitor audit deny logs when poking magisk daemon socket
-        dontaudit(ALL, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
-
-        // Only allow client processes and zygote to connect to magisk daemon socket
-        allow(SEPOL_CLIENT_DOMAIN, SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
-        allow("zygote", SEPOL_PROC_DOMAIN, "unix_stream_socket", ALL);
-    } else {
-        // Fallback to poking holes in sandbox as Android 4.3 to 7.1 set PR_SET_NO_NEW_PRIVS
-
-        // Allow these processes to access MagiskSU
-        const char *clients[] { "init", "shell", "appdomain", "zygote" };
-        for (auto type : clients) {
-            if (!exists(type))
-                continue;
-            allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
-            allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
-        }
+    // Allow these processes to access MagiskSU
+    const char *clients[]{"zygote", "shell",
+                          "system_app", "platform_app", "priv_app",
+                          "untrusted_app", "untrusted_app_all"};
+    for (auto type: clients) {
+        if (!exists(type))
+            continue;
+        allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "connectto");
+        allow(type, SEPOL_PROC_DOMAIN, "unix_stream_socket", "getopt");
     }
 
     // Let everyone access tmpfs files (for SAR sbin overlay)
@@ -137,10 +65,6 @@ void sepolicy::magisk_rules() {
     // Let init run stuffs
     allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
     allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-    allow("init", SEPOL_EXEC_TYPE, "file", "read");
-    allow("init", SEPOL_EXEC_TYPE, "file", "open");
-    allow("init", SEPOL_EXEC_TYPE, "file", "getattr");
-    allow("init", SEPOL_EXEC_TYPE, "file", "execute");
 
     // suRights
     allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
@@ -187,7 +111,6 @@ void sepolicy::magisk_rules() {
 
     // Shut llkd up
     dontaudit("llkd", SEPOL_PROC_DOMAIN, "process", "ptrace");
-    dontaudit("llkd", SEPOL_CLIENT_DOMAIN, "process", "ptrace");
 
     // Keep /data/adb/* context
     deny("init", "adb_data_file", "dir", "search");
