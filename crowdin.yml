@@ -1,0 +1,22 @@
+"project_id_env": "CROWDIN_PROJECT_ID"
+"api_token_env": "CROWDIN_API_TOKEN"
+"base_path": "."
+"base_url": "https://magisk.crowdin.com/api/v2"
+"pull_request_title": "[translation] Update translation from Crowdin"
+"preserve_hierarchy": true
+files: [
+  {
+    "source": "/app/src/main/res/values/strings.xml",
+    "translation": "/app/src/main/res/values-%two_letters_code%/%original_file_name%",
+    "type": "android",
+    "dest": "/app/strings.xml",
+    "skip_untranslated_strings": true
+  },
+  {
+    "source": "/stub/src/main/res/values/strings.xml",
+    "translation": "/stub/src/main/res/values-%two_letters_code%/%original_file_name%",
+    "type": "android",
+    "dest": "/stub/strings.xml",
+    "skip_untranslated_strings": true
+  }
+]
