@@ -79,6 +79,7 @@ static void mount_mirrors() {
                 xmkdir(preinit_dir.data(), 0700);
                 auto mirror_dir = MAGISKTMP + "/" PREINITMIRR;
                 mount_mirror(preinit_dir, mirror_dir);
+                xmount(nullptr, mirror_dir.data(), nullptr, MS_UNBINDABLE, nullptr);
                 break;
             }
         }
@@ -109,23 +110,24 @@ static void mount_mirrors() {
     }
 }
 
-dev_t find_preinit_device() {
-    const int UNKNOWN = 0;
-    const int PERSIST = 1;
-    const int METADATA = 2;
-    const int CACHE = 3;
-    const int DATA = 4;
-    int matched = UNKNOWN;
-    dev_t rules_dev = 0;
+string find_preinit_device() {
+    enum {
+        UNKNOWN,
+        PERSIST,
+        METADATA,
+        CACHE,
+        DATA,
+    } matched = UNKNOWN;
     bool encrypted = getprop("ro.crypto.state") == "encrypted";
-    string preinit_dir;
-
     bool mount = getuid() == 0 && getenv("MAGISKTMP");
+
+    string preinit_source;
+    string preinit_dir;
 
     for (const auto &info: parse_mount_info("self")) {
         if (info.target.ends_with(PREINITMIRR))
-            return info.device;
-        if (info.root != "/" || info.source.find("/dm-") != string::npos)
+            return basename(info.source.data());
+        if (info.root != "/" || info.source[0] != '/' || info.source.find("/dm-") != string::npos)
             continue;
         if (info.type != "ext4" && info.type != "f2fs")
             continue;
@@ -134,27 +136,46 @@ dev_t find_preinit_device() {
             return flag == "rw"sv;
         });
         if (!rw) continue;
-        int new_matched;
-        if (info.target == "/cache" && matched < CACHE) {
-            new_matched = CACHE;
-        } else if (info.target == "/data" && matched < DATA) {
-            if (encrypted && access("/data/unencrypted", F_OK)) {
+        if (auto base = std::string_view(info.source).substr(0, info.source.find_last_of('/'));
+            !base.ends_with("/by-name") && !base.ends_with("/block")) {
+            continue;
+        }
+
+        switch (matched) {
+            case UNKNOWN:
+                if (info.target == "/persist" || info.target == "/mnt/vendor/persist") {
+                    matched = PERSIST;
+                    break;
+                }
+                [[fallthrough]];
+            case PERSIST:
+                if (info.target == "/metadata") {
+                    matched = METADATA;
+                    break;
+                }
+                [[fallthrough]];
+            case METADATA:
+                if (info.target == "/cache") {
+                    matched = CACHE;
+                    break;
+                }
+                [[fallthrough]];
+            case CACHE:
+                if (info.target == "/data") {
+                    if (!encrypted || access("/data/unencrypted", F_OK) == 0) {
+                        matched = DATA;
+                        break;
+                    }
+                }
+                [[fallthrough]];
+            case DATA:
                 continue;
-            } else {
-                new_matched = DATA;
-            }
-        } else if (info.target == "/metadata" && matched < METADATA) {
-            new_matched = METADATA;
-        } else if ((info.target == "/persist" || info.target == "/mnt/vendor/persist") &&
-                   matched < PERSIST) {
-            new_matched = PERSIST;
-        } else continue;
+        }
 
         if (mount) {
             preinit_dir = resolve_preinit_dir(info.target.data());
         }
-        rules_dev = info.device;
-        matched = new_matched;
+        preinit_source = info.source;
     }
 
     if (!preinit_dir.empty()) {
@@ -163,8 +184,7 @@ dev_t find_preinit_device() {
         mkdirs(mirror_dir.data(), 0700);
         xmount(preinit_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
     }
-
-    return rules_dev;
+    return preinit_source.empty() ? "" : basename(preinit_source.data());
 }
 
 static bool magisk_env() {
