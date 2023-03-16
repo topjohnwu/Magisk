@@ -129,6 +129,10 @@ static void mount_preinit_dir(string path, dev_t preinit_dev) {
         }
     }
 
+    // Since we are mounting the block device directly, make sure to ONLY mount the partitions
+    // as read-only, or else the kernel might crash due to crappy drivers.
+    // After the device boots up, magiskd will properly bind mount the correct partition
+    // on to PREINITMIRR as writable. For more details, check bootstages.cpp
     if (mounted || mount(PREINITDEV, PREINITMNT, "ext4", MS_RDONLY, nullptr) == 0 ||
         mount(PREINITDEV, PREINITMNT, "f2fs", MS_RDONLY, nullptr) == 0) {
         string preinit_dir = resolve_preinit_dir(PREINITMNT);

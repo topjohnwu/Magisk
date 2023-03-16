@@ -62,6 +62,11 @@ static void mount_mirrors() {
 
     // Check and mount preinit mirror
     if (struct stat st{}; stat((MAGISKTMP + "/" PREINITDEV).data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
+        // DO NOT mount the block device directly, as we do not know the flags and configs
+        // to properly mount the partition; mounting block devices directly as rw could cause
+        // crashes if the filesystem driver is crap (e.g. some broken F2FS drivers).
+        // What we do instead is to scan through the current mountinfo and find a pre-existing
+        // mount point mounting our desired partition, and then bind mount the target folder.
         dev_t preinit_dev = st.st_rdev;
         for (const auto &info: self_mount_info) {
             if (info.root == "/" && info.device == preinit_dev) {
