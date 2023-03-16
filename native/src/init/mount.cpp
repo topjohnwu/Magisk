@@ -17,12 +17,14 @@ struct devinfo {
     char devname[32];
     char partname[32];
     char dmname[32];
+    char devpath[PATH_MAX];
 };
 
 static vector<devinfo> dev_list;
 
 static void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
+    dev->devpath[0] = '\0';
     parse_prop_file(uevent, [=](string_view key, string_view value) -> bool {
         if (key == "MAJOR")
             dev->major = parse_int(value.data());
@@ -38,7 +40,7 @@ static void parse_device(devinfo *dev, const char *uevent) {
 }
 
 static void collect_devices() {
-    char path[128];
+    char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
         for (dirent *entry; (entry = readdir(dir.get()));) {
@@ -51,6 +53,8 @@ static void collect_devices() {
                 auto name = rtrim(full_read(path));
                 strcpy(dev.dmname, name.data());
             }
+            sprintf(path, "/sys/dev/block/%s", entry->d_name);
+            xrealpath(path, dev.devpath, sizeof(dev.devpath));
             dev_list.push_back(dev);
         }
     }
@@ -61,7 +65,7 @@ static struct {
     char block_dev[64];
 } blk_info;
 
-static int64_t setup_block() {
+static dev_t setup_block() {
     if (dev_list.empty())
         collect_devices();
 
@@ -71,6 +75,10 @@ static int64_t setup_block() {
                 LOGD("Setup %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
             else if (strcasecmp(dev.dmname, blk_info.partname) == 0)
                 LOGD("Setup %s: [%s] (%d, %d)\n", dev.dmname, dev.devname, dev.major, dev.minor);
+            else if (strcasecmp(dev.devname, blk_info.partname) == 0)
+                LOGD("Setup %s: [%s] (%d, %d)\n", dev.devname, dev.devname, dev.major, dev.minor);
+            else if (std::string_view(dev.devpath).ends_with("/"s + blk_info.partname))
+                LOGD("Setup %s: [%s] (%d, %d)\n", dev.devpath, dev.devname, dev.major, dev.minor);
             else
                 continue;
 
@@ -85,7 +93,7 @@ static int64_t setup_block() {
     }
 
     // The requested partname does not exist
-    return -1;
+    return 0;
 }
 
 static void switch_root(const string &path) {
@@ -113,15 +121,20 @@ static void switch_root(const string &path) {
 
 #define PREINITMNT MIRRDIR "/preinit"
 
-static void mount_preinit_dir(string path, dev_t preinit_dev) {
-    if (!preinit_dev) return;
-    xmknod(PREINITDEV, S_IFBLK | 0600, preinit_dev);
+static void mount_preinit_dir(string path, string preinit_dev) {
+    if (preinit_dev.empty()) return;
+    strcpy(blk_info.partname, preinit_dev.data());
+    strcpy(blk_info.block_dev, PREINITDEV);
+    auto dev = setup_block();
+    if (dev == 0) {
+        LOGE("Cannot find preinit %s, abort!\n", preinit_dev.data());
+        return;
+    }
     xmkdir(PREINITMNT, 0);
-
     bool mounted = false;
     // First, find if it is already mounted
     for (auto &info : parse_mount_info("self")) {
-        if (info.root == "/" && info.device == preinit_dev) {
+        if (info.root == "/" && info.device == dev) {
             // Already mounted, just bind mount
             xmount(info.target.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
             mounted = true;
@@ -147,7 +160,7 @@ static void mount_preinit_dir(string path, dev_t preinit_dev) {
         }
         xumount2(PREINITMNT, MNT_DETACH);
     } else {
-        PLOGE("Failed to mount rules %u:%u", major(preinit_dev), minor(preinit_dev));
+        PLOGE("Failed to mount preinit %s\n", preinit_dev.data());
         unlink(PREINITDEV);
     }
 }
@@ -164,18 +177,18 @@ bool LegacySARInit::mount_system_root() {
         // Try legacy SAR dm-verity
         strcpy(blk_info.partname, "vroot");
         auto dev = setup_block();
-        if (dev >= 0)
+        if (dev > 0)
             goto mount_root;
 
         // Try NVIDIA naming scheme
         strcpy(blk_info.partname, "APP");
         dev = setup_block();
-        if (dev >= 0)
+        if (dev > 0)
             goto mount_root;
 
         sprintf(blk_info.partname, "system%s", config->slot);
         dev = setup_block();
-        if (dev >= 0)
+        if (dev > 0)
             goto mount_root;
 
         // Poll forever if rootwait was given in cmdline

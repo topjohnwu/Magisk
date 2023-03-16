@@ -1,5 +1,4 @@
 #include <sys/mount.h>
-#include <sys/sysmacros.h>
 #include <libgen.h>
 
 #include <base.hpp>
@@ -134,9 +133,14 @@ int magisk_main(int argc, char *argv[]) {
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
     } else if (argv[1] == "--preinit-device"sv) {
-        auto dev = find_preinit_device();
-        if (dev) printf("%u:%u\n", major(dev), minor(dev));
-        return dev ? 0 : 1;
+        set_log_level_state(LogLevel::Warn, false);
+        auto name = find_preinit_device();
+        LOGD("preinit device: %s\n", name.data());
+        if (!name.empty())  {
+            printf("%s\n", name.data());
+            return 0;
+        }
+        return 1;
     }
 #if 0
     /* Entry point for testing stuffs */
