@@ -29,14 +29,14 @@ constexpr char MAGISK_RC[] =
 "\n"
 
 "on property:sys.boot_completed=1\n"
-"    exec %1$s/magisk --boot-complete\n"
+"    exec u:r:" SEPOL_PROC_DOMAIN ":s0 0 0 -- %1$s/magisk --boot-complete\n"
 "\n"
 
 "on property:init.svc.zygote=restarting\n"
-"    exec %1$s/magisk --zygote-restart\n"
+"    exec u:r:" SEPOL_PROC_DOMAIN ":s0 0 0 -- %1$s/magisk --zygote-restart\n"
 "\n"
 
 "on property:init.svc.zygote=stopped\n"
-"    exec %1$s/magisk --zygote-restart\n"
+"    exec u:r:" SEPOL_PROC_DOMAIN ":s0 0 0 -- %1$s/magisk --zygote-restart\n"
 "\n"
 ;
