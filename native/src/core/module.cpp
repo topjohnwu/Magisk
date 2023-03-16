@@ -437,7 +437,7 @@ void handle_modules() {
 }
 
 static int check_rules_dir(char *buf, size_t sz) {
-    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), RULESDIR);
+    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), PREINITMIRR);
     struct stat st1{};
     struct stat st2{};
     if (xstat(buf, &st1) < 0 || xstat(MODULEROOT, &st2) < 0)

@@ -14,7 +14,7 @@ env_check() {
     [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
   fi
   if [ "$2" -ge 25210 ]; then
-    [ -b "$MAGISKTMP/block/rules" ] || return 2
+    [ -b "$MAGISKTMP/.magisk/block/preinit" ] || return 2
   fi
   grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 3
   grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 3
@@ -67,7 +67,7 @@ direct_install() {
   rm -f $1/new-boot.img
   fix_env $1
   run_migrations
-  copy_rules
+  copy_preinit_files
 
   return 0
 }

@@ -57,7 +57,7 @@ public:
 
 class MagiskInit : public BaseInit {
 private:
-    dev_t rules_dev = 0;
+    dev_t preinit_dev = 0;
 
     void parse_config_file();
     void patch_sepolicy(const char *in, const char *out);

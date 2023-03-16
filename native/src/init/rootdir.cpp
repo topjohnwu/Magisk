@@ -185,7 +185,7 @@ static void extract_files(bool sbin) {
 void MagiskInit::parse_config_file() {
     dev_t dev = 0;
     parse_prop_file("/data/.backup/.magisk", [&dev](auto key, auto value) -> bool {
-        if (key == "RULESDEVICE") {
+        if (key == "PREINITDEVICE") {
             unsigned int dev_major = 0;
             unsigned int dev_minor = 0;
             sscanf(value.data(), "%u:%u", &dev_major, &dev_minor);
@@ -194,7 +194,7 @@ void MagiskInit::parse_config_file() {
         }
         return true;
     });
-    rules_dev = dev;
+    preinit_dev = dev;
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"

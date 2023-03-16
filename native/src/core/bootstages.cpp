@@ -60,20 +60,20 @@ static void mount_mirrors() {
         restorecon();
     }
 
-    // check and mount rules
-    if (struct stat st{}; stat((MAGISKTMP + "/" BLOCKDIR "/rules").data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
-        dev_t rules_dev = st.st_rdev;
+    // Check and mount preinit mirror
+    if (struct stat st{}; stat((MAGISKTMP + "/" PREINITDEV).data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
+        dev_t preinit_dev = st.st_rdev;
         for (const auto &info: self_mount_info) {
-            if (info.root == "/" && info.device == rules_dev) {
+            if (info.root == "/" && info.device == preinit_dev) {
                 auto flags = split_ro(info.fs_option, ",");
                 auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
                     return flag == "rw"sv;
                 });
                 if (!rw) continue;
-                string custom_rules_dir = find_rules_dir(info.target.data());
-                xmkdir(custom_rules_dir.data(), 0700);
-                auto rules_dir = MAGISKTMP + "/" RULESDIR;
-                mount_mirror(custom_rules_dir, rules_dir);
+                string preinit_dir = resolve_preinit_dir(info.target.data());
+                xmkdir(preinit_dir.data(), 0700);
+                auto mirror_dir = MAGISKTMP + "/" PREINITMIRR;
+                mount_mirror(preinit_dir, mirror_dir);
                 break;
             }
         }
@@ -104,7 +104,7 @@ static void mount_mirrors() {
     }
 }
 
-dev_t find_rules_device() {
+dev_t find_preinit_device() {
     const int UNKNOWN = 0;
     const int PERSIST = 1;
     const int METADATA = 2;
@@ -113,12 +113,12 @@ dev_t find_rules_device() {
     int matched = UNKNOWN;
     dev_t rules_dev = 0;
     bool encrypted = getprop("ro.crypto.state") == "encrypted";
-    string custom_rules_dir;
+    string preinit_dir;
 
     bool mount = getuid() == 0 && getenv("MAGISKTMP");
 
     for (const auto &info: parse_mount_info("self")) {
-        if (info.target.ends_with(RULESDIR))
+        if (info.target.ends_with(PREINITMIRR))
             return info.device;
         if (info.root != "/" || info.source.find("/dm-") != string::npos)
             continue;
@@ -146,17 +146,17 @@ dev_t find_rules_device() {
         } else continue;
 
         if (mount) {
-            custom_rules_dir = find_rules_dir(info.target.data());
+            preinit_dir = resolve_preinit_dir(info.target.data());
         }
         rules_dev = info.device;
         matched = new_matched;
     }
 
-    if (!custom_rules_dir.empty()) {
-        auto rules_dir = getenv("MAGISKTMP") + "/rules"s;
-        mkdirs(custom_rules_dir.data(), 0700);
-        mkdirs(rules_dir.data(), 0700);
-        xmount(custom_rules_dir.data(), rules_dir.data(), nullptr, MS_BIND, nullptr);
+    if (!preinit_dir.empty()) {
+        auto mirror_dir = string(getenv("MAGISKTMP")) + "/" PREINITMIRR;
+        mkdirs(preinit_dir.data(), 0700);
+        mkdirs(mirror_dir.data(), 0700);
+        xmount(preinit_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
     }
 
     return rules_dev;
