@@ -412,7 +412,7 @@ static void boot_complete() {
     get_manager(0, nullptr, true);
 }
 
-void boot_stage_handler(int code) {
+void boot_stage_handler(int client, int code) {
     // Make sure boot stage execution is always serialized
     static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
     mutex_guard lock(stage_lock);
@@ -421,13 +421,15 @@ void boot_stage_handler(int code) {
     case MainRequest::POST_FS_DATA:
         if ((boot_state & FLAG_POST_FS_DATA_DONE) == 0)
             post_fs_data();
-        close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+        close(client);
         break;
     case MainRequest::LATE_START:
+        close(client);
         if ((boot_state & FLAG_POST_FS_DATA_DONE) && (boot_state & FLAG_SAFE_MODE) == 0)
             late_start();
         break;
     case MainRequest::BOOT_COMPLETE:
+        close(client);
         if ((boot_state & FLAG_SAFE_MODE) == 0)
             boot_complete();
         break;

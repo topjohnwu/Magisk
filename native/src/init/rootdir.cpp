@@ -4,9 +4,9 @@
 
 #include <magisk.hpp>
 #include <base.hpp>
+#include <selinux.hpp>
 
 #include "init.hpp"
-#include "magiskrc.inc"
 
 using namespace std;
 
@@ -52,11 +52,27 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     rc_list.clear();
 
     // Inject Magisk rc scripts
-    char pfd_svc[16], ls_svc[16];
-    gen_rand_str(pfd_svc, sizeof(pfd_svc));
-    gen_rand_str(ls_svc, sizeof(ls_svc));
-    LOGD("Inject magisk services: [%s] [%s]\n", pfd_svc, ls_svc);
-    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc);
+    LOGD("Inject magisk rc\n");
+    fprintf(rc, R"EOF(
+on post-fs-data
+    start logd
+    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
+
+on property:vold.decrypt=trigger_restart_framework
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on nonencrypted
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on property:sys.boot_completed=1
+    exec %2$s 0 0 -- %1$s/magisk --boot-complete
+
+on property:init.svc.zygote=restarting
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+
+on property:init.svc.zygote=stopped
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+)EOF", tmp_dir, "u:r:" SEPOL_PROC_DOMAIN ":s0");
 
     fclose(rc);
     clone_attr(src, dest);

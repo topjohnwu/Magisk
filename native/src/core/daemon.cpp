@@ -274,8 +274,7 @@ static void handle_request(pollfd *pfd) {
     } else if (code < MainRequest::_STAGE_BARRIER_) {
         exec_task([=] { handle_request_async(client, code, cred); });
     } else {
-        close(client);
-        exec_task([=] { boot_stage_handler(code); });
+        exec_task([=] { boot_stage_handler(client, code); });
     }
     return;
 

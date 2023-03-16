@@ -90,7 +90,9 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(MainRequest::STOP_DAEMON);
         return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
-        close(connect_daemon(MainRequest::POST_FS_DATA, true));
+        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
+        struct pollfd pfd = { fd, POLLIN, 0 };
+        poll(&pfd, 1, 1000 * POST_FS_DATA_WAIT_TIME);
         return 0;
     } else if (argv[1] == "--service"sv) {
         close(connect_daemon(MainRequest::LATE_START, true));
