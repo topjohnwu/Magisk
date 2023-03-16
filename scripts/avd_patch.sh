@@ -63,9 +63,9 @@ export KEEPFORCEENCRYPT=true
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 if [ -e "/system/bin/linker64" ]; then
-  echo "RULESDEVICE=$(./magisk64 --rules-device)" >> config
+  echo "PREINITDEVICE=$(./magisk64 --preinit-device)" >> config
 else
-  echo "RULESDEVICE=$(./magisk32 --rules-device)" >> config
+  echo "PREINITDEVICE=$(./magisk32 --preinit-device)" >> config
 fi
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true

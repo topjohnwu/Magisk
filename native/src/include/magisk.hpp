@@ -15,19 +15,20 @@
 #define MAGISKDB        SECURE_DIR "/magisk.db"
 
 // tmpfs paths
-extern std::string  MAGISKTMP;
-#define INTLROOT    ".magisk"
-#define MIRRDIR     INTLROOT "/mirror"
-#define RULESDIR    INTLROOT "/rules"
-#define BLOCKDIR    INTLROOT "/block"
-#define WORKERDIR   INTLROOT "/worker"
-#define MODULEMNT   INTLROOT "/modules"
-#define BBPATH      INTLROOT "/busybox"
-#define ROOTOVL     INTLROOT "/rootdir"
-#define SHELLPTS    INTLROOT "/pts"
-#define ROOTMNT     ROOTOVL  "/.mount_list"
-#define ZYGISKBIN   INTLROOT "/zygisk"
-#define SELINUXMOCK INTLROOT "/selinux"
+extern std::string    MAGISKTMP;
+#define INTLROOT      ".magisk"
+#define MIRRDIR       INTLROOT "/mirror"
+#define PREINITMIRR   INTLROOT "/preinit"
+#define BLOCKDIR      INTLROOT "/block"
+#define PREINITDEV    BLOCKDIR "/preinit"
+#define WORKERDIR     INTLROOT "/worker"
+#define MODULEMNT     INTLROOT "/modules"
+#define BBPATH        INTLROOT "/busybox"
+#define ROOTOVL       INTLROOT "/rootdir"
+#define SHELLPTS      INTLROOT "/pts"
+#define ROOTMNT       ROOTOVL  "/.mount_list"
+#define ZYGISKBIN     INTLROOT "/zygisk"
+#define SELINUXMOCK   INTLROOT "/selinux"
 
 constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 

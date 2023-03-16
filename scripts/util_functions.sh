@@ -49,7 +49,7 @@ getvar() {
   local VARNAME=$1
   local VALUE
   local PROPPATH='/data/.magisk /cache/.magisk'
-  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/.magisk/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
@@ -629,7 +629,7 @@ run_migrations() {
   done
 }
 
-copy_rules() {
+copy_preinit_files() {
   local RULESDIR=$(magisk --path)/.magisk/rules
   if ! grep -q " $RULESDIR " /proc/mounts; then
     ui_print "- Unable to find rules dir"
@@ -785,10 +785,10 @@ install_module() {
     cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
   fi
 
-  # Copy over custom rules
+  # Copy over custom sepolicy rules
   if [ -f $MODPATH/sepolicy.rule ]; then
     ui_print "- Installing custom sepolicy rules"
-    copy_rules
+    copy_preinit_files
   fi
 
   # Remove stuff that doesn't belong to modules and clean up any empty directories

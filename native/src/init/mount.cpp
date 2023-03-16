@@ -111,38 +111,40 @@ static void switch_root(const string &path) {
     frm_rf(root);
 }
 
-static void mount_rules_dir(string path, dev_t rules_dev) {
-    if (!rules_dev) return;
-    xmknod(BLOCKDIR "/rules", S_IFBLK | 0600, rules_dev);
-    xmkdir(MIRRDIR "/rules", 0);
+#define PREINITMNT MIRRDIR "/preinit"
+
+static void mount_preinit_dir(string path, dev_t preinit_dev) {
+    if (!preinit_dev) return;
+    xmknod(PREINITDEV, S_IFBLK | 0600, preinit_dev);
+    xmkdir(PREINITMNT, 0);
 
     bool mounted = false;
-    // first of all, find if rules dev is already mounted
+    // First, find if it is already mounted
     for (auto &info : parse_mount_info("self")) {
-        if (info.root == "/" && info.device == rules_dev) {
+        if (info.root == "/" && info.device == preinit_dev) {
             // Already mounted, just bind mount
-            xmount(info.target.data(), MIRRDIR "/rules", nullptr, MS_BIND, nullptr);
+            xmount(info.target.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
             mounted = true;
             break;
         }
     }
 
-    if (mounted || mount(BLOCKDIR "/rules", MIRRDIR "/rules", "ext4", MS_RDONLY, nullptr) == 0 ||
-        mount(BLOCKDIR "/rules", MIRRDIR "/rules", "f2fs", MS_RDONLY, nullptr) == 0) {
-        string custom_rules_dir = find_rules_dir(MIRRDIR "/rules");
+    if (mounted || mount(PREINITDEV, PREINITMNT, "ext4", MS_RDONLY, nullptr) == 0 ||
+        mount(PREINITDEV, PREINITMNT, "f2fs", MS_RDONLY, nullptr) == 0) {
+        string preinit_dir = resolve_preinit_dir(PREINITMNT);
         // Create bind mount
-        xmkdirs(RULESDIR, 0);
-        if (access(custom_rules_dir.data(), F_OK)) {
-            LOGW("empty rules: %s\n", custom_rules_dir.data());
+        xmkdirs(PREINITMIRR, 0);
+        if (access(preinit_dir.data(), F_OK)) {
+            LOGW("empty preinit: %s\n", preinit_dir.data());
         } else {
-            LOGD("rules: %s\n", custom_rules_dir.data());
-            xmount(custom_rules_dir.data(), RULESDIR, nullptr, MS_BIND, nullptr);
-            mount_list.emplace_back(path += "/" RULESDIR);
+            LOGD("preinit: %s\n", preinit_dir.data());
+            xmount(preinit_dir.data(), PREINITMIRR, nullptr, MS_BIND, nullptr);
+            mount_list.emplace_back(path += "/" PREINITMIRR);
         }
-        xumount2(MIRRDIR "/rules", MNT_DETACH);
+        xumount2(PREINITMNT, MNT_DETACH);
     } else {
-        PLOGE("Failed to mount rules %u:%u", major(rules_dev), minor(rules_dev));
-        unlink(BLOCKDIR "/rules");
+        PLOGE("Failed to mount rules %u:%u", major(preinit_dev), minor(preinit_dev));
+        unlink(PREINITDEV);
     }
 }
 
@@ -246,7 +248,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
     xmkdir(WORKERDIR, 0);
 
-    mount_rules_dir(path, rules_dev);
+    mount_preinit_dir(path, preinit_dev);
 
     cp_afc(".backup/.magisk", INTLROOT "/config");
     rm_rf(".backup");

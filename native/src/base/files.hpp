@@ -107,7 +107,7 @@ void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 std::vector<mount_info> parse_mount_info(const char *pid);
 std::string find_apk_path(const char *pkg);
-std::string find_rules_dir(const char *base_dir);
+std::string resolve_preinit_dir(const char *base_dir);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
 using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;

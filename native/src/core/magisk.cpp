@@ -122,7 +122,6 @@ int magisk_main(int argc, char *argv[]) {
             do_reboot = 1;
         } else {
             usage();
-            exit(1);
         }
         int fd = connect_daemon(MainRequest::REMOVE_MODULES);
         write_int(fd, do_reboot);
@@ -134,8 +133,8 @@ int magisk_main(int argc, char *argv[]) {
         return 0;
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
-    } else if (argv[1] == "--rules-device"sv) {
-        auto dev = find_rules_device();
+    } else if (argv[1] == "--preinit-device"sv) {
+        auto dev = find_preinit_device();
         if (dev) printf("%u:%u\n", major(dev), minor(dev));
         return dev ? 0 : 1;
     }

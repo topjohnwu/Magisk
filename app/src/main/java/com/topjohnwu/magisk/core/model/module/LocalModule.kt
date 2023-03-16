@@ -43,10 +43,10 @@ data class LocalModule(
         set(enable) {
             if (enable) {
                 disableFile.delete()
-                Shell.cmd("copy_rules").submit()
+                Shell.cmd("copy_preinit_files").submit()
             } else {
                 !disableFile.createNewFile()
-                Shell.cmd("copy_rules").submit()
+                Shell.cmd("copy_preinit_files").submit()
             }
         }
 
@@ -56,10 +56,10 @@ data class LocalModule(
             if (remove) {
                 if (updateFile.exists()) return
                 removeFile.createNewFile()
-                Shell.cmd("copy_rules").submit()
+                Shell.cmd("copy_preinit_files").submit()
             } else {
                 removeFile.delete()
-                Shell.cmd("copy_rules").submit()
+                Shell.cmd("copy_preinit_files").submit()
             }
         }
 

@@ -77,7 +77,6 @@ fi
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
-export MAGISKTMP
 
 chmod -R 755 .
 
@@ -138,7 +137,7 @@ case $((STATUS & 3)) in
     ;;
 esac
 
-# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+# Workaround custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
 INIT=init
 if [ $((STATUS & 4)) -ne 0 ]; then
   INIT=init.real
@@ -153,15 +152,15 @@ ui_print "- Patching ramdisk"
 # Compress to save precious ramdisk space
 SKIP32="#"
 SKIP64="#"
-if [ -f magisk32 ]; then
-  $BOOTMODE && [ -z "$RULESDEVICE" ] && RULESDEVICE=$(./magisk32 --rules-device)
-  ./magiskboot compress=xz magisk32 magisk32.xz
-  unset SKIP32
-fi
 if [ -f magisk64 ]; then
-  $BOOTMODE && [ -z "$RULESDEVICE" ] && RULESDEVICE=$(./magisk64 --rules-device)
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
+fi
+if [ -f magisk32 ]; then
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
+  ./magiskboot compress=xz magisk32 magisk32.xz
+  unset SKIP32
 fi
 ./magiskboot compress=xz stub.apk stub.xz
 
@@ -169,8 +168,10 @@ echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
-[ -n "$RULESDEVICE" ] && ui_print "- Rules partition device ID: $RULESDEVICE"
-[ -n "$RULESDEVICE" ] && echo "RULESDEVICE=$RULESDEVICE" >> config
+if [ -n "$PREINITDEVICE" ]; then
+  ui_print "- Pre-init storage partition device ID: $PREINITDEVICE"
+  echo "PREINITDEVICE=$PREINITDEVICE" >> config
+fi
 [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
 
 ./magiskboot cpio ramdisk.cpio \
