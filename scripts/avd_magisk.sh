@@ -149,7 +149,5 @@ touch $MAGISKTMP/.magisk/config
 
 # Boot up
 $MAGISKTMP/magisk --post-fs-data
-while [ ! -f /dev/.magisk_unblock ]; do sleep 1; done
-rm /dev/.magisk_unblock
 start
 $MAGISKTMP/magisk --service
