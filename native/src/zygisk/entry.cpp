@@ -306,8 +306,6 @@ static void get_process_info(int client, const sock_cred *cred) {
     int manager_app_id = get_manager();
     if (to_app_id(uid) == manager_app_id) {
         flags |= PROCESS_IS_MAGISK_APP;
-    } else if (to_app_id(uid) == sys_ui_app_id) {
-        flags |= PROCESS_IS_SYS_UI;
     }
     if (denylist_enforced) {
         flags |= DENYLIST_ENFORCING;
