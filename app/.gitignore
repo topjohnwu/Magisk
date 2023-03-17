@@ -3,7 +3,6 @@
 /local.properties
 .idea/
 /build
-app/release
 *.hprof
 .externalNativeBuild/
 *.apk

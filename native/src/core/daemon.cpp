@@ -358,13 +358,17 @@ static void daemon_entry() {
 
     restore_tmpcon();
 
-    // SAR cleanups
+    // Cleanups
     auto mount_list = MAGISKTMP + "/" ROOTMNT;
     if (access(mount_list.data(), F_OK) == 0) {
         file_readline(true, mount_list.data(), [](string_view line) -> bool {
             umount2(line.data(), MNT_DETACH);
             return true;
         });
+    }
+    if (getenv("REMOUNT_ROOT")) {
+        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+        unsetenv("REMOUNT_ROOT");
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 

@@ -1,3 +1,4 @@
+#include <set>
 #include <sys/mount.h>
 #include <sys/sysmacros.h>
 #include <libgen.h>
@@ -91,23 +92,17 @@ static int64_t setup_block() {
 static void switch_root(const string &path) {
     LOGD("Switch root to %s\n", path.data());
     int root = xopen("/", O_RDONLY);
-    vector<string> mounts;
-    parse_mnt("/proc/mounts", [&](mntent *me) {
-        // Skip root and self
-        if (me->mnt_dir == "/"sv || me->mnt_dir == path)
-            return true;
-        // Do not include subtrees
-        for (const auto &m : mounts) {
-            if (strncmp(me->mnt_dir, m.data(), m.length()) == 0 && me->mnt_dir[m.length()] == '/')
-                return true;
+    for (set<string, greater<>> mounts; auto &info : parse_mount_info("self")) {
+        if (info.target == "/" || info.target == path)
+            continue;
+        if (auto last_mount = mounts.upper_bound(info.target);
+                last_mount != mounts.end() && info.target.starts_with(*last_mount + '/')) {
+            continue;
         }
-        mounts.emplace_back(me->mnt_dir);
-        return true;
-    });
-    for (auto &dir : mounts) {
-        auto new_path = path + dir;
+        mounts.emplace(info.target);
+        auto new_path = path + info.target;
         xmkdir(new_path.data(), 0755);
-        xmount(dir.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
+        xmount(info.target.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
     }
     chdir(path.data());
     xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);

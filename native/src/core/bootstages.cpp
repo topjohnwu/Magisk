@@ -3,7 +3,7 @@
 #include <sys/sysmacros.h>
 #include <linux/input.h>
 #include <libgen.h>
-#include <vector>
+#include <set>
 #include <string>
 
 #include <magisk.hpp>
@@ -40,40 +40,48 @@ static bool mount_mirror(const std::string_view from, const std::string_view to)
            // because of MS_NOUSER
            !mount(from.data(), to.data(), nullptr, MS_BIND | MS_REC, nullptr) &&
            // make mirror dir as a private mount so that it won't be affected by magic mount
-           !xmount("", to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
+           !xmount(nullptr, to.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
 }
 
 static void mount_mirrors() {
-    LOGI("* Prepare worker\n");
+    LOGI("* Mounting mirrors\n");
+
+    // Bind remount module root to clear nosuid
+    if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
+        auto dest = MAGISKTMP + "/" MODULEMNT;
+        xmkdir(SECURE_DIR, 0700);
+        xmkdir(MODULEROOT, 0755);
+        xmkdir(dest.data(), 0755);
+        xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_NOATIME, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
+        chmod(SECURE_DIR, 0700);
+        restorecon();
+    }
+
+    // Prepare worker
     auto worker_dir = MAGISKTMP + "/" WORKERDIR;
     xmount("worker", worker_dir.data(), "tmpfs", 0, "mode=755");
+    xmount(nullptr, worker_dir.data(), nullptr, MS_PRIVATE, nullptr);
 
-    LOGI("* Mounting mirrors\n");
-    // recursively bind mount / to mirror dir
+    // Recursively bind mount / to mirror dir
     if (auto mirror_dir = MAGISKTMP + "/" MIRRDIR; !mount_mirror("/", mirror_dir)) {
         LOGI("fallback to mount subtree\n");
         // rootfs may fail, fallback to bind mount each mount point
-        std::vector<string> mounted_dirs {{ MAGISKTMP }};
+        set<string, greater<>> mounted_dirs {{ MAGISKTMP }};
         for (const auto &info: parse_mount_info("self")) {
             if (info.type == "rootfs"sv) continue;
-            bool mounted = std::any_of(mounted_dirs.begin(), mounted_dirs.end(), [&](const auto &dir) {
-                return str_starts(info.target, dir);
-            });
-            if (!mounted && mount_mirror(info.target, mirror_dir + info.target)) {
-                mounted_dirs.emplace_back(info.target);
+            // the greatest mount point that less than info.target, which is possibly a parent
+            if (auto last_mount = mounted_dirs.upper_bound(info.target);
+                last_mount != mounted_dirs.end() && info.target.starts_with(*last_mount + '/')) {
+                continue;
+            }
+            if (mount_mirror(info.target, mirror_dir + info.target)) {
+                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + info.target).data(), info.target.data());
+                mounted_dirs.insert(info.target);
             }
         }
     }
-
-    LOGI("* Mounting module root\n");
-    if (access(SECURE_DIR, F_OK) == 0 || (SDK_INT < 24 && xmkdir(SECURE_DIR, 0700))) {
-        if (auto dest = MAGISKTMP + "/" MODULEMNT; mount_mirror(MODULEROOT, dest)) {
-            xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND, nullptr);
-            restorecon();
-            chmod(SECURE_DIR, 0700);
-        }
-    }
-
 }
 
 static bool magisk_env() {
@@ -107,7 +115,6 @@ static bool magisk_env() {
 
     // Directories in /data/adb
     xmkdir(DATABIN, 0755);
-    xmkdir(MODULEROOT, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
 
@@ -234,9 +241,6 @@ static bool check_key_combo() {
 extern int disable_deny();
 
 static void post_fs_data() {
-    if (getenv("REMOUNT_ROOT"))
-        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
-
     if (!check_data())
         return;
 

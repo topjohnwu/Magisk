@@ -88,7 +88,7 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
 
 - Installing Magisk **WILL** trip KNOX
 - Installing Magisk for the first time **REQUIRES** a full data wipe (this is **NOT** counting the data wipe when unlocking bootloader). Backup your data before continue.
-- Download Odin (only runs on Windows) that supports your device.
+- Download Odin (for Windows) or [Heimdall](https://www.glassechidna.com.au/heimdall/) (for Linux) that supports your device.
 
 ### Unlocking Bootloader
 

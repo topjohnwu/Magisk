@@ -160,7 +160,6 @@ object HideAPK {
 
     private fun launchApp(activity: Activity, pkg: String) {
         val intent = activity.packageManager.getLaunchIntentForPackage(pkg) ?: return
-        Config.suManager = if (pkg == APPLICATION_ID) "" else pkg
         val self = activity.packageName
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
         activity.grantUriPermission(pkg, Provider.preferencesUri(self), flag)
@@ -191,6 +190,7 @@ object HideAPK {
             launchApp(activity, pkg)
         }
 
+        Config.suManager = pkg
         val cmd = "adb_pm_install $repack $pkg"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
@@ -239,6 +239,7 @@ object HideAPK {
             launchApp(activity, APPLICATION_ID)
             dialog.dismiss()
         }
+        Config.suManager = ""
         val cmd = "adb_pm_install $apk $APPLICATION_ID"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {

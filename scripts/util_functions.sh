@@ -336,7 +336,7 @@ mount_apex() {
       [ -f /apex/original_apex ] && APEX=/apex/original_apex # unzip doesn't do return codes
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
+      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1 | tr -dc [:alnum:].-_'\n')
       [ -z $DEST ] && DEST=$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
       [ -z $DEST ] && continue
       DEST=/apex/$DEST
@@ -352,7 +352,7 @@ mount_apex() {
       if [ -f $APEX/apex_manifest.json ]; then
         DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
       elif [ -f $APEX/apex_manifest.pb ]; then
-        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1)
+        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1 | tr -dc [:alnum:].-_'\n')
       else
         continue
       fi
@@ -653,6 +653,7 @@ copy_sepolicy_rules() {
     local MODDIR=${r%/*}
     [ -f $MODDIR/disable ] && continue
     [ -f $MODDIR/remove ] && continue
+    [ -f $MODDIR/update ] && continue
     local MODNAME=${MODDIR##*/}
     mkdir -p $RULESDIR/$MODNAME
     cp -f $r $RULESDIR/$MODNAME/sepolicy.rule
