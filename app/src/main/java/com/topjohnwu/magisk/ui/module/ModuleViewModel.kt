@@ -10,10 +10,10 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.databinding.DiffRvItemList
 import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
@@ -26,7 +26,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
 
-    private val itemsInstalled = diffListOf<LocalModuleRvItem>()
+    private val itemsInstalled = DiffRvItemList<LocalModuleRvItem>()
 
     val items = MergeObservableList<RvItem>()
     val extraBindings = bindExtra {

@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.databinding.DiffRvItemFilterList
 import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.filterableListOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.superuser.Shell
@@ -38,7 +38,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             query()
         }
 
-    val items = filterableListOf<DenyListRvItem>(viewModelScope)
+    val items = DiffRvItemFilterList<DenyListRvItem>(viewModelScope)
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
