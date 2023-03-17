@@ -42,7 +42,6 @@ object Shortcuts {
             IconCompat.createWithBitmap(getBitmap(id))
     }
 
-    @RequiresApi(api = 23)
     private fun Context.getIcon(id: Int) = getIconCompat(id).toIcon(this)
 
     @RequiresApi(api = 25)
