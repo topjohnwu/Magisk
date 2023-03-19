@@ -11,6 +11,9 @@ import android.net.NetworkRequest
 import android.os.PowerManager
 import androidx.collection.ArraySet
 import androidx.core.content.getSystemService
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.topjohnwu.magisk.ktx.registerRuntimeReceiver
 
 typealias ConnectionCallback = (Boolean) -> Unit
@@ -18,7 +21,7 @@ typealias ConnectionCallback = (Boolean) -> Unit
 class NetworkObserver(
     context: Context,
     private val callback: ConnectionCallback
-) {
+): DefaultLifecycleObserver {
     private val manager = context.getSystemService<ConnectivityManager>()!!
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -44,27 +47,33 @@ class NetworkObserver(
             if (context.isIdleMode()) {
                 callback(false)
             } else {
-                getCurrentState()
+                postCurrentState()
             }
         }
     }
 
     init {
-        val builder = NetworkRequest.Builder()
-        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        manager.registerNetworkCallback(builder.build(), networkCallback)
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            .build()
+        manager.registerNetworkCallback(request, networkCallback)
         val filter = IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
         context.applicationContext.registerRuntimeReceiver(receiver, filter)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
-    fun getCurrentState() {
+    override fun onStart(owner: LifecycleOwner) {
+        postCurrentState()
+    }
+
+    private fun postCurrentState() {
         callback(manager.getNetworkCapabilities(manager.activeNetwork)
             ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) ?: false)
     }
 
     companion object {
         fun observe(context: Context, callback: ConnectionCallback): NetworkObserver {
-            return NetworkObserver(context, callback).apply { getCurrentState() }
+            return NetworkObserver(context, callback).apply { postCurrentState() }
         }
     }
 }
