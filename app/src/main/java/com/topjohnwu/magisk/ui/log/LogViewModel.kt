@@ -26,6 +26,9 @@ import java.io.FileInputStream
 class LogViewModel(
     private val repo: LogRepository
 ) : AsyncLoadViewModel() {
+    @get:Bindable
+    var loading = true
+        private set(value) = set(value, field, { field = it }, BR.loading)
 
     // --- empty view
 
@@ -34,27 +37,34 @@ class LogViewModel(
 
     // --- su log
 
-    val items = DiffRvItemList<LogRvItem>()
+    val items = DiffRvItemList<SuLogRvItem>()
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
 
     // --- magisk log
-    @get:Bindable
-    var consoleText = " "
-        set(value) = set(value, field, { field = it }, BR.consoleText)
+    val logs = DiffRvItemList<LogRvItem>()
+    var magiskLogRaw = " "
 
     override suspend fun doLoadWork() {
-        consoleText = repo.fetchMagiskLogs()
-        val (suLogs, diff) = withContext(Dispatchers.Default) {
-            val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
+        loading = true
+         val (logs, logDiff) = withContext(Dispatchers.Default) {
+            magiskLogRaw = repo.fetchMagiskLogs()
+            val logs = magiskLogRaw.split('\n').map { LogRvItem(it) }
+            logs to this@LogViewModel.logs.calculateDiff(logs)
+        }
+        this.logs.update(logs, logDiff)
+
+        val (suLogs, suDiff) = withContext(Dispatchers.Default) {
+            val suLogs = repo.fetchSuLogs().map { SuLogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
         }
         items.firstOrNull()?.isTop = false
         items.lastOrNull()?.isBottom = false
-        items.update(suLogs, diff)
+        items.update(suLogs, suDiff)
         items.firstOrNull()?.isTop = true
         items.lastOrNull()?.isBottom = true
+        loading = false
     }
 
     fun saveMagiskLog() = withExternalRW {
@@ -82,7 +92,7 @@ class LogViewModel(
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                if (Info.env.isActive) file.write(consoleText)
+                if (Info.env.isActive) file.write(magiskLogRaw)
 
                 file.write("\n---Manager Logs---\n")
                 file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")

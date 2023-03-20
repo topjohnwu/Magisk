@@ -9,7 +9,7 @@
 
         <variable
             name="item"
-            type="com.topjohnwu.magisk.ui.log.LogRvItem" />
+            type="com.topjohnwu.magisk.ui.log.SuLogRvItem" />
 
         <variable
             name="viewModel"
