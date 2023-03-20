@@ -126,7 +126,7 @@ int get_manager(int user_id, string *pkg, bool install) {
             if (access(app_path, F_OK) == 0) {
                 // Always check dyn signature for repackaged app
                 if (!mgr_pkg->empty() && !check_dyn(user_id))
-                    goto not_found;
+                    goto ignore;
                 if (pkg) *pkg = name;
                 return user_id * AID_USER_OFFSET + mgr_app_id;
             } else {
@@ -163,7 +163,7 @@ int get_manager(int user_id, string *pkg, bool install) {
             // Check the repackaged package name
 
             bool invalid = false;
-            auto check_pkg = [&](int u) -> bool {
+            auto check_stub_apk = [&](int u) -> bool {
                 ssprintf(app_path, sizeof(app_path),
                          "%s/%d/%s", APP_DATA_DIR, u, str[SU_MANAGER].data());
                 if (stat(app_path, &st) == 0) {
@@ -194,16 +194,16 @@ int get_manager(int user_id, string *pkg, bool install) {
                 return false;
             };
 
-            if (check_pkg(user_id)) {
+            if (check_stub_apk(user_id)) {
                 if (!check_dyn(user_id))
-                    goto not_found;
+                    goto ignore;
                 if (pkg) *pkg = *mgr_pkg;
                 return st.st_uid;
             }
             if (!invalid) {
                 collect_users();
                 for (int u : users) {
-                    if (check_pkg(u)) {
+                    if (check_stub_apk(u)) {
                         // Found repackaged app, but not installed in the requested user
                         goto not_found;
                     }
@@ -212,16 +212,13 @@ int get_manager(int user_id, string *pkg, bool install) {
                 }
             }
 
-            // Repackaged app not found, remove package from db
-            rm_db_strings(SU_MANAGER);
-
-            // Fallthrough
+            // Repackaged app not found, fall through
         }
 
         // Check the original package name
 
         bool invalid = false;
-        auto check_pkg = [&](int u) -> bool {
+        auto check_apk = [&](int u) -> bool {
             ssprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
 #if ENFORCE_SIGNATURE
@@ -246,14 +243,14 @@ int get_manager(int user_id, string *pkg, bool install) {
             return false;
         };
 
-        if (check_pkg(user_id)) {
+        if (check_apk(user_id)) {
             if (pkg) *pkg = JAVA_PACKAGE_NAME;
             return st.st_uid;
         }
         if (!invalid) {
             collect_users();
             for (int u : users) {
-                if (check_pkg(u)) {
+                if (check_apk(u)) {
                     // Found app, but not installed in the requested user
                     goto not_found;
                 }
@@ -271,8 +268,9 @@ int get_manager(int user_id, string *pkg, bool install) {
         install_stub();
 
 not_found:
-    const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
-    LOGW("pkg: cannot find %s for user=[%d]\n", name, user_id);
+    LOGW("pkg: cannot find %s for user=[%d]\n",
+         mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data(), user_id);
+ignore:
     if (pkg) pkg->clear();
     return -1;
 }

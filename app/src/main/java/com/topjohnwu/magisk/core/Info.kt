@@ -7,7 +7,7 @@ import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.core.utils.net.NetworkObserver
+import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 

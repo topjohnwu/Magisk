@@ -3,7 +3,7 @@
 #   AVD Magisk Setup
 #####################################################################
 #
-# Support API level: 21 - 33
+# Support API level: 23 - 33
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py emulator
@@ -20,7 +20,7 @@
 #####################################################################
 
 mount_sbin() {
-  mount -t tmpfs -o 'mode=0755' tmpfs /sbin
+  mount -t tmpfs -o 'mode=0755' magisk /sbin
   chcon u:object_r:rootfs:s0 /sbin
 }
 
@@ -114,7 +114,7 @@ else
   # Android Q+ without sbin
   MAGISKTMP=/dev/avd-magisk
   mkdir /dev/avd-magisk
-  mount -t tmpfs -o 'mode=0755' tmpfs /dev/avd-magisk
+  mount -t tmpfs -o 'mode=0755' magisk /dev/avd-magisk
 fi
 
 # Magisk stuff

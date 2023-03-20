@@ -590,7 +590,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
                 fprintf(stderr, "! Recompressed kernel is too large, using original kernel\n");
                 ftruncate64(fd, lseek64(fd, - (off64_t) hdr->kernel_size(), SEEK_CUR));
                 xwrite(fd, boot.kernel, boot.hdr->kernel_size());
-            } else {
+            } else if (!skip_comp) {
                 // Pad zeros to make sure the zImage file size does not change
                 // Also ensure the last 4 bytes are the uncompressed vmlinux size
                 uint32_t sz = m.sz;
@@ -601,6 +601,9 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
             // zImage size shall remain the same
             hdr->kernel_size() = boot.hdr->kernel_size();
         }
+    } else if (boot.hdr->kernel_size() != 0) {
+        xwrite(fd, boot.kernel, boot.hdr->kernel_size());
+        hdr->kernel_size() = boot.hdr->kernel_size();
     }
     if (boot.flags[ZIMAGE_KERNEL]) {
         // Copy zImage tail and adjust size accordingly

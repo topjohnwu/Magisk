@@ -1,11 +1,12 @@
 plugins {
     id("com.android.application")
-    id("io.michaelrocks.paranoid")
+    id("org.lsposed.lsparanoid")
 }
 
-paranoid {
-    obfuscationSeed = if (RAND_SEED != 0) RAND_SEED else null
-    includeSubprojects = true
+lsparanoid {
+    seed = if (RAND_SEED != 0) RAND_SEED else null
+    includeDependencies = true
+    global = true
 }
 
 android {

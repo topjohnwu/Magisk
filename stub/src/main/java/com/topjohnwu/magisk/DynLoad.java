@@ -21,9 +21,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DynLoad {
 
@@ -191,7 +188,7 @@ public class DynLoad {
             mcl.set(loadedApk, new DelegateClassLoader());
         } catch (Exception e) {
             // Actually impossible as this method is only called on API < 29,
-            // and API 21 - 28 do not restrict access to these fields.
+            // and API 23 - 28 do not restrict access to these fields.
             Log.e(DynLoad.class.getSimpleName(), "", e);
         }
     }

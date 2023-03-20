@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.databinding
 import androidx.databinding.PropertyChangeRegistry
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
 
 abstract class RvItem {
     abstract val layoutRes: Int
@@ -33,27 +34,6 @@ abstract class DiffRvItem<T> : RvItem() {
             is ComparableRv<*> -> comparableEqual(other)
             else -> this == other
         }
-
-    companion object {
-        private val callback = object : DiffObservableList.Callback<DiffRvItem<Any>> {
-            override fun areItemsTheSame(
-                oldItem: DiffRvItem<Any>,
-                newItem: DiffRvItem<Any>
-            ): Boolean {
-                return oldItem::class == newItem::class && oldItem.itemSameAs(newItem)
-            }
-
-            override fun areContentsTheSame(
-                oldItem: DiffRvItem<Any>,
-                newItem: DiffRvItem<Any>
-            ): Boolean {
-                return oldItem.contentSameAs(newItem)
-            }
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        fun <T : AnyDiffRvItem> callback() = callback as DiffObservableList.Callback<T>
-    }
 }
 
 typealias AnyDiffRvItem = DiffRvItem<*>
@@ -65,3 +45,27 @@ abstract class ObservableDiffRvItem<T> : DiffRvItem<T>(), ObservableHost {
 abstract class ObservableRvItem : RvItem(), ObservableHost {
     override var callbacks: PropertyChangeRegistry? = null
 }
+
+private object DiffRvItemCallback : DiffObservableList.Callback<DiffRvItem<Any>> {
+    override fun areItemsTheSame(
+        oldItem: DiffRvItem<Any>,
+        newItem: DiffRvItem<Any>
+    ): Boolean {
+        return oldItem::class == newItem::class && oldItem.itemSameAs(newItem)
+    }
+
+    override fun areContentsTheSame(
+        oldItem: DiffRvItem<Any>,
+        newItem: DiffRvItem<Any>
+    ): Boolean {
+        return oldItem.contentSameAs(newItem)
+    }
+}
+
+@Suppress("UNCHECKED_CAST")
+class DiffRvItemList<T: AnyDiffRvItem> : DiffObservableList<T>(DiffRvItemCallback as Callback<T>)
+
+@Suppress("UNCHECKED_CAST")
+class DiffRvItemFilterList<T: AnyDiffRvItem>(
+    scope: CoroutineScope
+) : FilterableDiffObservableList<T>(DiffRvItemCallback as Callback<T>, scope)

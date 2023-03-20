@@ -3,10 +3,9 @@
 /local.properties
 .idea/
 /build
-app/release
 *.hprof
 .externalNativeBuild/
 *.apk
-src/main/assets
-src/main/jniLibs
-src/main/resources
+src/*/assets
+src/*/jniLibs
+src/*/resources

@@ -34,7 +34,7 @@ void LegacySARInit::first_stage_prep() {
 
 bool SecondStageInit::prepare() {
     umount2("/init", MNT_DETACH);
-    umount2("/proc/self/exe", MNT_DETACH);
+    unlink("/data/init");
 
     // Make sure init dmesg logs won't get messed up
     argv[0] = (char *) INIT_PATH;

@@ -73,7 +73,6 @@ class ShellInit : Shell.Initializer() {
         fun getVar(name: String) = fastCmd("echo \$$name")
         fun getBool(name: String) = getVar(name).toBoolean()
 
-        Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
         Info.vbmeta = getBool("VBMETAEXIST")
