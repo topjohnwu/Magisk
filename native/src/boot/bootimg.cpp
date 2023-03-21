@@ -32,7 +32,7 @@ static off_t compress(format_t type, int fd, const void *in, size_t size) {
     return now - prev;
 }
 
-static void dump(void *buf, size_t size, const char *filename) {
+static void dump(const void *buf, size_t size, const char *filename) {
     if (size == 0)
         return;
     int fd = creat(filename, 0644);
@@ -150,7 +150,7 @@ void dyn_img_hdr::load_hdr_file() {
 
 boot_img::boot_img(const char *image) : map(image) {
     fprintf(stderr, "Parsing boot image: [%s]\n", image);
-    for (uint8_t *addr = map.buf; addr < map.buf + map.sz; ++addr) {
+    for (const uint8_t *addr = map.buf; addr < map.buf + map.sz; ++addr) {
         format_t fmt = check_fmt(addr, map.sz);
         switch (fmt) {
         case CHROMEOS:
@@ -184,15 +184,15 @@ boot_img::~boot_img() {
     delete hdr;
 }
 
-static int find_dtb_offset(uint8_t *buf, unsigned sz) {
-    uint8_t * const end = buf + sz;
+static int find_dtb_offset(const uint8_t *buf, unsigned sz) {
+    const uint8_t * const end = buf + sz;
 
-    for (uint8_t *curr = buf; curr < end; curr += sizeof(fdt_header)) {
+    for (auto curr = buf; curr < end; curr += sizeof(fdt_header)) {
         curr = static_cast<uint8_t*>(memmem(curr, end - curr, DTB_MAGIC, sizeof(fdt32_t)));
         if (curr == nullptr)
             return -1;
 
-        auto fdt_hdr = reinterpret_cast<fdt_header *>(curr);
+        auto fdt_hdr = reinterpret_cast<const fdt_header *>(curr);
 
         // Check that fdt_header.totalsize does not overflow kernel image size
         uint32_t totalsize = fdt32_to_cpu(fdt_hdr->totalsize);
@@ -205,7 +205,7 @@ static int find_dtb_offset(uint8_t *buf, unsigned sz) {
             continue;
 
         // Check that fdt_node_header.tag of first node is FDT_BEGIN_NODE
-        auto fdt_node_hdr = reinterpret_cast<fdt_node_header *>(curr + off_dt_struct);
+        auto fdt_node_hdr = reinterpret_cast<const fdt_node_header *>(curr + off_dt_struct);
         if (fdt32_to_cpu(fdt_node_hdr->tag) != FDT_BEGIN_NODE)
             continue;
 
@@ -214,7 +214,7 @@ static int find_dtb_offset(uint8_t *buf, unsigned sz) {
     return -1;
 }
 
-static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
+static format_t check_fmt_lg(const uint8_t *buf, unsigned sz) {
     format_t fmt = check_fmt(buf, sz);
     if (fmt == LZ4_LEGACY) {
         // We need to check if it is LZ4_LG
@@ -233,10 +233,10 @@ static format_t check_fmt_lg(uint8_t *buf, unsigned sz) {
 
 #define CMD_MATCH(s) BUFFER_MATCH(h->cmdline, s)
 
-dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
+dyn_img_hdr *boot_img::create_hdr(const uint8_t *addr, format_t type) {
     if (type == AOSP_VENDOR) {
         fprintf(stderr, "VENDOR_BOOT_HDR\n");
-        auto h = reinterpret_cast<boot_img_hdr_vnd_v3*>(addr);
+        auto h = reinterpret_cast<const boot_img_hdr_vnd_v3*>(addr);
         hdr_addr = addr;
         switch (h->header_version) {
         case 4:
@@ -246,12 +246,46 @@ dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
         }
     }
 
-    auto h = reinterpret_cast<boot_img_hdr_v0*>(addr);
+    auto h = reinterpret_cast<const boot_img_hdr_v0*>(addr);
 
     if (h->page_size >= 0x02000000) {
         fprintf(stderr, "PXA_BOOT_HDR\n");
         hdr_addr = addr;
         return new dyn_img_pxa(addr);
+    }
+
+    auto make_hdr = [](const uint8_t *ptr) -> dyn_img_hdr * {
+        auto h = reinterpret_cast<const boot_img_hdr_v0*>(ptr);
+        switch (h->header_version) {
+        case 1:
+            return new dyn_img_v1(ptr);
+        case 2:
+            return new dyn_img_v2(ptr);
+        case 3:
+            return new dyn_img_v3(ptr);
+        case 4:
+            return new dyn_img_v4(ptr);
+        default:
+            return new dyn_img_v0(ptr);
+        }
+    };
+
+    // For NOOKHD and ACCLAIM, the entire boot image is shifted by a fixed offset.
+    // For AMONET, only the header is internally shifted by a fixed offset.
+
+    if (BUFFER_CONTAIN(addr, AMONET_MICROLOADER_SZ, AMONET_MICROLOADER_MAGIC) &&
+        BUFFER_MATCH(addr + AMONET_MICROLOADER_SZ, BOOT_MAGIC)) {
+        flags[AMONET_FLAG] = true;
+        fprintf(stderr, "AMONET_MICROLOADER\n");
+
+        // The real header is shifted, copy to temporary buffer
+        h = reinterpret_cast<const boot_img_hdr_v0*>(addr + AMONET_MICROLOADER_SZ);
+        auto real_hdr_sz = h->page_size - AMONET_MICROLOADER_SZ;
+        auto buf = make_unique<uint8_t[]>(h->page_size);
+        memcpy(buf.get(), h, real_hdr_sz);
+
+        hdr_addr = addr;
+        return make_hdr(buf.get());
     }
 
     if (CMD_MATCH(NOOKHD_RL_MAGIC) ||
@@ -262,36 +296,15 @@ dyn_img_hdr *boot_img::create_hdr(uint8_t *addr, format_t type) {
         flags[NOOKHD_FLAG] = true;
         fprintf(stderr, "NOOKHD_LOADER\n");
         addr += NOOKHD_PRE_HEADER_SZ;
-    } else if (memcmp(h->name, ACCLAIM_MAGIC, 10) == 0) {
+    } else if (BUFFER_MATCH(h->name, ACCLAIM_MAGIC)) {
         flags[ACCLAIM_FLAG] = true;
         fprintf(stderr, "ACCLAIM_LOADER\n");
         addr += ACCLAIM_PRE_HEADER_SZ;
-    } else if (str_contains(string_view((const char *) addr, AMONET_MICROLOADER_SZ), AMONET_MICROLOADER_MAGIC) &&
-               string_view((const char *)addr + AMONET_MICROLOADER_SZ, BOOT_MAGIC_SIZE) == BOOT_MAGIC) {
-        flags[AMONET_FLAG] = true;
-        fprintf(stderr, "AMONET_MICROLOADER\n");
-        uint8_t microloader[AMONET_MICROLOADER_SZ];
-        memcpy(microloader, addr, AMONET_MICROLOADER_SZ);
-        memcpy(addr, addr + AMONET_MICROLOADER_SZ, AMONET_MICROLOADER_SZ);
-        memcpy(addr + AMONET_MICROLOADER_SZ, microloader, AMONET_MICROLOADER_SZ);
     }
 
     // addr could be adjusted
-    h = reinterpret_cast<boot_img_hdr_v0*>(addr);
     hdr_addr = addr;
-
-    switch (h->header_version) {
-    case 1:
-        return new dyn_img_v1(addr);
-    case 2:
-        return new dyn_img_v2(addr);
-    case 3:
-        return new dyn_img_v3(addr);
-    case 4:
-        return new dyn_img_v4(addr);
-    default:
-        return new dyn_img_v0(addr);
-    }
+    return make_hdr(addr);
 }
 
 #define get_block(name)                 \
@@ -306,7 +319,7 @@ if (hdr->name##_size()) {                                           \
     off += blk_sz;                                                  \
 }
 
-void boot_img::parse_image(uint8_t *addr, format_t type) {
+void boot_img::parse_image(const uint8_t *addr, format_t type) {
     hdr = create_hdr(addr, type);
 
     if (char *id = hdr->id()) {
@@ -345,7 +358,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         if (k_fmt == MTK) {
             fprintf(stderr, "MTK_KERNEL_HDR\n");
             flags[MTK_KERNEL] = true;
-            k_hdr = reinterpret_cast<mtk_hdr *>(kernel);
+            k_hdr = reinterpret_cast<const mtk_hdr *>(kernel);
             fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", k_hdr->size);
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", k_hdr->name);
             kernel += sizeof(mtk_hdr);
@@ -353,7 +366,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
             k_fmt = check_fmt_lg(kernel, hdr->kernel_size());
         }
         if (k_fmt == ZIMAGE) {
-            z_hdr = reinterpret_cast<zimage_hdr *>(kernel);
+            z_hdr = reinterpret_cast<const zimage_hdr *>(kernel);
             if (void *gzip_offset = memmem(kernel, hdr->kernel_size(), GZIP1_MAGIC "\x08\x00", 4)) {
                 fprintf(stderr, "ZIMAGE_KERNEL\n");
                 z_info.hdr_sz = (uint8_t *) gzip_offset - kernel;
@@ -397,7 +410,7 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         if (r_fmt == MTK) {
             fprintf(stderr, "MTK_RAMDISK_HDR\n");
             flags[MTK_RAMDISK] = true;
-            r_hdr = reinterpret_cast<mtk_hdr *>(ramdisk);
+            r_hdr = reinterpret_cast<const mtk_hdr *>(ramdisk);
             fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", r_hdr->size);
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
             ramdisk += sizeof(mtk_hdr);
@@ -432,15 +445,15 @@ void boot_img::parse_image(uint8_t *addr, format_t type) {
         }
 
         // Find AVB footer
-        void *footer = tail + tail_size - sizeof(AvbFooter);
+        const void *footer = tail + tail_size - sizeof(AvbFooter);
         if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
-            avb_footer = reinterpret_cast<AvbFooter*>(footer);
+            avb_footer = reinterpret_cast<const AvbFooter*>(footer);
             // Double check if meta header exists
-            void *meta = hdr_addr + __builtin_bswap64(avb_footer->vbmeta_offset);
+            const void *meta = hdr_addr + __builtin_bswap64(avb_footer->vbmeta_offset);
             if (BUFFER_MATCH(meta, AVB_MAGIC)) {
                 fprintf(stderr, "VBMETA\n");
                 flags[AVB_FLAG] = true;
-                vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(meta);
+                vbmeta = reinterpret_cast<const AvbVBMetaImageHeader*>(meta);
             }
         }
     }
@@ -771,7 +784,12 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     hdr->print();
 
     // Copy main header
-    memcpy(out.buf + off.header, hdr->raw_hdr(), hdr->hdr_size());
+    if (boot.flags[AMONET_FLAG]) {
+        auto real_hdr_sz = std::min(hdr->hdr_space() - AMONET_MICROLOADER_SZ, hdr->hdr_size());
+        memcpy(out.buf + off.header + AMONET_MICROLOADER_SZ, hdr->raw_hdr(), real_hdr_sz);
+    } else {
+        memcpy(out.buf + off.header, hdr->raw_hdr(), hdr->hdr_size());
+    }
 
     if (boot.flags[AVB_FLAG]) {
         // Copy and patch AVB structures
@@ -795,10 +813,5 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Blob header
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf);
         b_hdr->size = off.total - sizeof(blob_hdr);
-    }
-
-    if (boot.flags[AMONET_FLAG]) {
-        memcpy(out.buf + off.header + AMONET_MICROLOADER_SZ, out.buf + off.header, AMONET_MICROLOADER_SZ);
-        memcpy(out.buf + off.header, boot.hdr_addr + AMONET_MICROLOADER_SZ, AMONET_MICROLOADER_SZ);
     }
 }
