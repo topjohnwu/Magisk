@@ -219,6 +219,7 @@
     <string name="setup_fail">Nastavenie zlyhalo</string>
     <string name="env_fix_title">Vyžaduje sa ďalšie nastavenie</string>
     <string name="env_fix_msg">Aby Magisk fungoval správne, vaše zariadenie potrebuje ďalšie nastavenie. Chcete pokračovať a reštartovať?</string>
+    <string name="env_full_fix_msg">Vaše zariadenie potrebuje na správne fungovanie reflash Magisku. Preinštalujte Magisk priamo z aplikácie, režim obnovenia nemôže získať správne informácie o zariadení.</string>
     <string name="setup_msg">Nastavenie je spustené…</string>
     <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
