@@ -59,7 +59,6 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 - To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to bypass the signature check.
 
     For how to do this:
-
       1. Change the channel to custom `https://github.com/topjohnwu/magisk-files/raw/master/debug.json`
       2. Reinstall the manager with this channel in the manager, this will switch the manager to debug version
       3. Reinstall Magisk with this debug version manager
