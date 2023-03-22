@@ -219,6 +219,7 @@
     <string name="setup_fail">安装失败</string>
     <string name="env_fix_title">需要修复运行环境</string>
     <string name="env_fix_msg">需要一些额外的安装才能使 Magisk 正常工作。完成后自动重启，是否继续？</string>
+    <string name="env_full_fix_msg">需要重新安装才能使 Magisk 正常工作。请在应用内重新安装，recovery 模式无法正确获取设备信息。</string>
     <string name="setup_msg">正在修复运行环境</string>
     <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
