@@ -630,14 +630,14 @@ run_migrations() {
 }
 
 copy_preinit_files() {
-  local RULESDIR=$(magisk --path)/.magisk/rules
-  if ! grep -q " $RULESDIR " /proc/mounts; then
-    ui_print "- Unable to find rules dir"
+  local PREINITDIR=$(magisk --path)/.magisk/preinit
+  if ! grep -q " $PREINITDIR " /proc/mounts; then
+    ui_print "- Unable to find preinit dir"
     return 1
   fi
 
-  if ! grep -q "/adb/modules $RULESDIR " /proc/self/mountinfo; then
-    rm -rf $RULESDIR/*
+  if ! grep -q "/adb/modules $PREINITDIR " /proc/self/mountinfo; then
+    rm -rf $PREINITDIR/*
   fi
 
   # Copy all enabled sepolicy.rule
@@ -648,8 +648,8 @@ copy_preinit_files() {
     [ -f $MODDIR/remove ] && continue
     [ -f $MODDIR/update ] && continue
     local MODNAME=${MODDIR##*/}
-    mkdir -p $RULESDIR/$MODNAME
-    cp -f $r $RULESDIR/$MODNAME/sepolicy.rule
+    mkdir -p $PREINITDIR/$MODNAME
+    cp -f $r $PREINITDIR/$MODNAME/sepolicy.rule
   done
 }
 
