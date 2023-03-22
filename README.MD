@@ -57,6 +57,11 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 
 - The certificate of the key used to sign the final Magisk APK product is also directly embedded into some executables. In release builds, Magisk's root daemon will enforce this certificate check and reject and forcefully uninstall any non-matching Magisk apps to protect users from malicious and unverified Magisk APKs.
 - To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to bypass the signature check.
+  For how to do this:
+    1. Change the channel to custom `https://github.com/topjohnwu/magisk-files/raw/master/debug.json`
+    2. Reinstall the manager with this channel in the manager, this will switch the manager to debug version
+    3. Reinstall Magisk with this debug version manager
+    4. Reboot the phone
 - To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
 - Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
 
