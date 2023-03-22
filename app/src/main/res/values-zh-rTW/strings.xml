@@ -219,6 +219,7 @@
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">需要修復執行環境</string>
     <string name="env_fix_msg">缺少讓 Magisk 正常執行所需的檔案。請您同意讓 Magisk 額外下載安裝包進行修復安裝，修復完成後將自動重新啟動。請問您是否繼續？</string>
+    <string name="env_full_fix_msg">需要重新安裝才能使 Magisk 正常工作。請在應用程式內重新安裝，recovery 模式無法正確獲取設備訊息。</string>
     <string name="setup_msg">正在修復執行環境……</string>
     <string name="authenticate">驗證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
