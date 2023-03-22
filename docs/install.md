@@ -59,7 +59,7 @@ Let's continue to [Patching Images](#patching-images).
   where `[_x]` should be `_a` or `_b` or empty depending on your device
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
   `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
-- Reboot and launch Magisk app (you will see a stub Magisk app if you have wipped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
+- Reboot and launch Magisk app (you will see a stub Magisk app if you have wiped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
 - Voila!
 
 ## Uninstallation
@@ -135,7 +135,8 @@ Installing using custom recoveries is only possible if your device has boot ramd
 
 - Download the Magisk APK
 - Rename the `.apk` file extension to `.zip`, for example: `Magisk-v24.0.apk` → `Magisk-v24.0.zip`. If you have trouble renaming the file extension (like on Windows), use a file manager on Android or the one included in the custom recovery to rename the file.
-- Flash the zip just like any other ordinary flashable zip.
+- Flash the zip just like any other ordinary flashable zip (for advanced users, you can bypass environment fix after boot by setting `PREINITDEVICE` environment variable to a correct partition name).
 - Reboot and check whether the Magisk app is installed. If it isn't installed automatically, manually install the APK.
+- Launch the Magisk app, and it will show a dialog asking for a reinstallation. Do the reinstallation **within app** and reboot (if you are using MTK devices that lock the boot partition after boot, please [patch the boot image](#patching-images) and flash it by custom recovery or fastboot).
 
 > Warning: the `sepolicy.rule` file of modules may be stored in the `cache` partition. DO NOT WIPE THE `CACHE` PARTITION.
