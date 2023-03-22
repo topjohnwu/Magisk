@@ -60,10 +60,10 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 
     For how to do this:
 
-        1. Change the channel to custom `https://github.com/topjohnwu/magisk-files/raw/master/debug.json`
-        2. Reinstall the manager with this channel in the manager, this will switch the manager to debug version
-        3. Reinstall Magisk with this debug version manager
-        4. Reboot the phone
+    1. Change the channel to custom `https://github.com/topjohnwu/magisk-files/raw/master/debug.json`
+    2. Reinstall the manager with this channel in the manager, this will switch the manager to debug version
+    3. Reinstall Magisk with this debug version manager
+    4. Reboot the phone
 - To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
 - Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
 
