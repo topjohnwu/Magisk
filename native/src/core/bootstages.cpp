@@ -68,6 +68,7 @@ static void mount_mirrors() {
         // What we do instead is to scan through the current mountinfo and find a pre-existing
         // mount point mounting our desired partition, and then bind mount the target folder.
         dev_t preinit_dev = st.st_rdev;
+        bool mounted = false;
         for (const auto &info: self_mount_info) {
             if (info.root == "/" && info.device == preinit_dev) {
                 auto flags = split_ro(info.fs_option, ",");
@@ -78,10 +79,15 @@ static void mount_mirrors() {
                 string preinit_dir = resolve_preinit_dir(info.target.data());
                 xmkdir(preinit_dir.data(), 0700);
                 auto mirror_dir = MAGISKTMP + "/" PREINITMIRR;
-                mount_mirror(preinit_dir, mirror_dir);
-                xmount(nullptr, mirror_dir.data(), nullptr, MS_UNBINDABLE, nullptr);
-                break;
+                if ((mounted = mount_mirror(preinit_dir, mirror_dir))) {
+                    xmount(nullptr, mirror_dir.data(), nullptr, MS_UNBINDABLE, nullptr);
+                    break;
+                }
             }
+        }
+        if (!mounted) {
+            LOGW("preinit mirror not mounted %u:%u\n", major(preinit_dev), minor(preinit_dev));
+            unlink((MAGISKTMP + "/" PREINITDEV).data());
         }
     }
 
