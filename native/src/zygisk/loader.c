@@ -10,7 +10,7 @@
 #endif
 
 __attribute__((constructor))
-static void zygisk_loader() {
+static void zygisk_loader(void) {
     android_dlextinfo info = {
         .flags = ANDROID_DLEXT_FORCE_LOAD
     };
@@ -19,6 +19,10 @@ static void zygisk_loader() {
         void(*entry)(void*) = dlsym(handle, "zygisk_inject_entry");
         if (entry) {
             entry(handle);
+        }
+        void (*unload)(void) = dlsym(handle, "unload_first_stage");
+        if (unload) {
+            __attribute__((musttail)) return unload();
         }
     }
 }
