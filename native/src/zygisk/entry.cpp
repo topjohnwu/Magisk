@@ -43,13 +43,10 @@ static void zygisk_cleanup_wait() {
     }
 }
 
-static void *unload_first_stage(void *) {
-    // Wait 10us to make sure 1st stage is done
-    timespec ts = { .tv_sec = 0, .tv_nsec = 10000L };
-    nanosleep(&ts, nullptr);
+extern "C" void unload_first_stage() {
+    ZLOGD("unloading first stage\n");
     unmap_all(HIJACK_BIN);
     xumount2(HIJACK_BIN, MNT_DETACH);
-    return nullptr;
 }
 
 extern "C" void zygisk_inject_entry(void *handle) {
@@ -70,7 +67,6 @@ extern "C" void zygisk_inject_entry(void *handle) {
     unsetenv(MAGISKTMP_ENV);
     sanitize_environ();
     hook_functions();
-    new_daemon_thread(&unload_first_stage, nullptr);
 }
 
 // The following code runs in zygote/app process

@@ -259,6 +259,29 @@ DCL_HOOK_FUNC(int, selinux_android_setcontext,
     return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
 }
 
+dev_t art_dev = 0;
+ino_t art_inode = 0;
+pthread_t main_thread = 0;
+DCL_HOOK_FUNC(int, pthread_attr_destroy, void* target) {
+    int res = old_pthread_attr_destroy((pthread_attr_t *)target);
+
+    if (main_thread != pthread_self()) {
+        return res;
+    }
+
+    ZLOGD("pthread_attr_destroy(%p)\n", target);
+
+    lsplt::RegisterHook(art_dev, art_inode, "pthread_attr_destroy", reinterpret_cast<void*>(*old_pthread_attr_destroy), nullptr);
+    lsplt::CommitHook();
+
+    // Directly call `dlclose` will crash because when `dlclose` returns, CPU will try to execute code at an
+    // unmapped address. Because both `pthread_attr_destroy` and `dlclose` have same 
+    // parameter types (a pointer) and return type (an int), the way they treat arguments and results
+    // are the same. We can use `musttail` to let the compiler reuse our stack frame and thus
+    // dlclose will directly return to the caller of `pthread_attr_destroy`
+    [[clang::musttail]] return dlclose(self_handle);
+}
+
 #undef DCL_HOOK_FUNC
 
 // -----------------------------------------------------------------
@@ -646,7 +669,23 @@ void HookContext::unload_zygisk() {
             m.clearApi();
         }
 
-        new_daemon_thread(reinterpret_cast<thread_entry>(&dlclose), self_handle);
+        // We cannot directly `dlclose` ourselves here, otherwise when `dlclose` returns, it will return
+        // to our code which have been unmapped, causing a segment fault. Instead, we hook
+        // `pthread_attr_destroy` which will be called when VM daemon threads start and
+        // do some magic. Check comment in our replacement of the function for more info.
+        for (auto &map : lsplt::MapInfo::Scan()) {
+            if (map.path.ends_with("/libart.so")) {
+                ZLOGD("hook pthread_attr_destroy\n");
+                art_inode = map.inode;
+                art_dev = map.dev;
+                main_thread = pthread_self();
+                lsplt::RegisterHook(art_dev, art_inode, "pthread_attr_destroy",
+                                    reinterpret_cast<void *>(new_pthread_attr_destroy),
+                                    reinterpret_cast<void **>(&old_pthread_attr_destroy));
+                lsplt::CommitHook();
+                break;
+            }
+        }
     }
 }
 
