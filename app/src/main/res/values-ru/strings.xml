@@ -3,7 +3,7 @@
     <!--Sections-->
     <string name="modules">Модули</string>
     <string name="superuser">Superuser</string> <!--Do not translate! #6016-->
-    <string name="logs">Лог</string>
+    <string name="logs">Логи</string>
     <string name="settings">Настройки</string>
     <string name="install">Установка</string>
     <string name="section_home">Главная</string>
@@ -15,27 +15,27 @@
     <string name="app_changelog">Изменения</string>
     <string name="loading">Загрузка…</string>
     <string name="update">Обновить</string>
-    <string name="not_available">Н/Д</string>
+    <string name="not_available">Не установлен</string>
     <string name="hide">Скрыть</string>
     <string name="home_package">Имя пакета</string>
     <string name="home_app_title">Приложение</string>
 
     <string name="home_notice_content">Скачивайте Magisk только из официального репозитория на GitHub. Файлы из других источников могут содержать вредоносный код!</string>
     <string name="home_support_title">Поддержите нас</string>
-    <string name="home_follow_title">Подписывайтесь</string>
+    <string name="home_follow_title">Подпишитесь</string>
     <string name="home_item_source">Исходный код</string>
     <string name="home_support_content">Magisk был и всегда будет бесплатным и открытым проектом. Однако Вы всегда можете поддержать нас, отправив небольшое пожертвование.</string>
-    <string name="home_installed_version">Установлен</string>
-    <string name="home_latest_version">Доступен</string>
+    <string name="home_installed_version">Текущая версия</string>
+    <string name="home_latest_version">Последняя версия</string>
     <string name="invalid_update_channel">Некорректный канал обновлений</string>
     <string name="uninstall_magisk_title">Удаление Magisk</string>
-    <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будет недоступен!\nБудет активировано шифрование хранилища (если отключалось ранее)!</string>
+    <string name="uninstall_magisk_msg">Все модули будут отключены либо удалены!\nRoot-доступ будет недоступен!\nБудет активировано шифрование /data (если отключалось при установке)!</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Не отключать шифрование /data</string>
     <string name="keep_dm_verity">Не отключать AVB 2.0/dm-verity</string>
     <string name="patch_vbmeta">Патчить vbmeta в boot образе</string>
-    <string name="recovery_mode">Установка в recovery образ</string>
+    <string name="recovery_mode">Патчить recovery образ вместо boot</string>
     <string name="install_options_title">Опции</string>
     <string name="install_method_title">Способ</string>
     <string name="install_next">Далее</string>
@@ -43,7 +43,7 @@
     <string name="manager_download_install">Нажмите для установки</string>
     <string name="direct_install">Автоматическая установка (рекомендуется)</string>
     <string name="install_inactive_slot">Установка во второй слот (после OTA-обновления)</string>
-    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции Magisk после OTA!\nПродолжить?</string>
+    <string name="install_inactive_slot_msg">Ваше устройство будет принудительно перезагружено в неактивный (противоположный) слот!\nИспользуйте эту опцию только при интеграции Magisk после OTA-обновления!\nПродолжить?</string>
     <string name="setup_title">Расширенная установка</string>
     <string name="select_patch_file">Пропатчить boot образ</string>
     <string name="patch_file_msg">Выберите файл образа (*.img) или архив ODIN (*.tar)</string>
@@ -74,18 +74,18 @@
     <string name="su_revoke_title">Сброс настроек прав</string>
     <string name="su_revoke_msg">Сбросить настройки для %1$s?</string>
     <string name="toast">Всплывающие уведомления</string>
-    <string name="none">Ничего</string>
+    <string name="none">Отключены</string>
 
     <string name="superuser_toggle_notification">Уведомления</string>
     <string name="superuser_toggle_revoke">Отозвать</string>
     <string name="superuser_policy_none">Приложения ещё не запрашивали права суперпользователя</string>
 
     <!--Logs-->
-    <string name="log_data_none">Лог отсутствует</string>
-    <string name="log_data_magisk_none">Лог отсутствует</string>
-    <string name="menuSaveLog">Сохранить лог</string>
-    <string name="menuClearLog">Очистить лог</string>
-    <string name="logs_cleared">Лог успешно очищен</string>
+    <string name="log_data_none">Логи отсутствуют</string>
+    <string name="log_data_magisk_none">Логи отсутствуют</string>
+    <string name="menuSaveLog">Сохранить логи</string>
+    <string name="menuClearLog">Очистить логи</string>
+    <string name="logs_cleared">Логи успешно очищены</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Целевой UID: %1$d</string>
 
@@ -219,13 +219,14 @@
     <string name="setup_fail">Ошибка установки</string>
     <string name="env_fix_title">Требуется расширенная установка</string>
     <string name="env_fix_msg">Требуется расширенная установка Magisk для корректной работы. Продолжить и выполнить перезагрузку?</string>
+    <string name="env_full_fix_msg">Необходимо переустановить Magisk для корректной работы на вашем устройстве. Пожалуйста, переустановите Magisk в самом приложении (не из recovery).</string>
     <string name="setup_msg">Настройка рабочей среды…</string>
     <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Неподдерживаемая версия Magisk</string>
     <string name="unsupport_magisk_msg">Эта версия приложения Magisk не поддерживает версию Magisk ниже %1$s.\n\nПриложение будет работать так, словно Magisk не установлен, пожалуйста, обновите Magisk как можно скорее.</string>
     <string name="unsupport_general_title">Неподдерживаемые условия</string>
     <string name="unsupport_system_app_msg">Запуск приложения в качестве системного невозможен. Пожалуйста, переустановите его как пользовательское.</string>
-    <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите стороннего провайдера Root-прав и/или переустановите Magisk.</string>
+    <string name="unsupport_other_su_msg">Обнаружен неподдерживаемый бинарный файл \"su\". Пожалуйста, удалите сторонний провайдер Root-прав и/или переустановите Magisk.</string>
     <string name="unsupport_external_storage_msg">Приложение установлено во внешнее хранилище. Пожалуйста, переустановите его во внутреннее хранилище.</string>
     <string name="unsupport_nonroot_stub_msg">Пересобранное для скрытия приложение Magisk не может дальше работать, поскольку Root-права недоступны. Пожалуйста, восстановите приложение к исходному состоянию.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
