@@ -53,7 +53,8 @@
     <string name="flash_screen_title">Installation</string>
 
     <!--Superuser-->
-    <string name="su_request_title">Superuser Request</string>
+    <string name="su_request_title">Allow %1$s to have superuser privileges?</string>
+    <string name="package_name">Package Name:</string>
     <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>

@@ -7,6 +7,9 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">?android:colorBackground</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="suRequestBackground">?colorSurface</item>
+        <item name="suRequestButtonBackground">?colorPrimaryContainer</item>
+        <item name="suRequestButtonText">?colorOnPrimaryContainer</item>
     </style>
 
     <style name="Theme.Foundation.Light" parent="Base.V21.Theme.Foundation.Light" />

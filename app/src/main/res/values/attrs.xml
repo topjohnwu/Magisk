@@ -16,6 +16,9 @@
     <attr name="colorOnPrimaryVariant" format="color" />
     <attr name="colorOnSurfaceVariant" format="color" />
     <attr name="colorSurfaceSurfaceVariant" format="color" />
+    <attr name="suRequestBackground" format="reference|color" />
+    <attr name="suRequestButtonBackground" format="reference|color" />
+    <attr name="suRequestButtonText" format="reference|color" />
 
     <!--endregion-->
 
