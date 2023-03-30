@@ -1,7 +1,5 @@
 ![](docs/images/logo.png)
 
-![Downloads](https://img.shields.io/github/downloads/datnerdguy/Magisk/latest/total?label=Downloads)
-
 #### This is not an officially supported Google product
 #### This project is not in any way affiliated with offical Magisk or [@topjohnwu](https://github.com/topjohnwu)
 
@@ -17,7 +15,7 @@ Some highlight features:
 
 ## Downloads
 
-[![](https://img.shields.io/badge/Magisk-v25.2.1-blue)](https://github.com/datnerdguy/Magisk/releases/tag/v25.2.1)
+[![](https://img.shields.io/badge/Magisk-v25.2.3-blue)](https://github.com/datnerdguy/Magisk-Monet/releases/tag/v25.2.3)
 
 ## Useful Links
 
@@ -35,7 +33,7 @@ For Magisk app crashes, record and upload the logcat when the crash occurs.
 ## Building and Development
 
 - Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
-- Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
+- Clone sources: `git clone --recurse-submodules https://github.com/datnerdguy/Magisk-Monet.git`
 - Install Python 3.8+ \
   (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
 - Configure to use the JDK bundled in Android Studio:
