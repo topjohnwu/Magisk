@@ -52,8 +52,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             AppSettings,
             UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
         ))
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1 &&
-                Info.env.isActive && Const.USER_ID == 0) {
+        if (Info.env.isActive && Const.USER_ID == 0) {
             if (hidden) list.add(Restore) else list.add(Hide)
         }
 
@@ -75,10 +74,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
                 Tapjack, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
                 AutomaticResponse, RequestTimeout, SUNotification
             ))
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                // Biometric is only available on 6.0+
-                list.remove(Biometrics)
-            }
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 // Re-authenticate is not feasible on 8.0+
                 list.add(Reauthenticate)

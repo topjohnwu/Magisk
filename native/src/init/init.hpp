@@ -57,9 +57,13 @@ public:
 
 class MagiskInit : public BaseInit {
 private:
-    void mount_rules_dir();
+    std::string preinit_dev;
+
+    void parse_config_file();
+    void patch_sepolicy(const char *in, const char *out);
+    bool hijack_sepolicy();
+    void setup_tmp(const char *path);
 protected:
-    std::string custom_rules_dir;
 
 #if ENABLE_AVD_HACK
     // When this boolean is set, this means we are currently
@@ -67,9 +71,6 @@ protected:
     bool avd_hack = false;
 #endif
 
-    void patch_sepolicy(const char *in, const char *out);
-    bool hijack_sepolicy();
-    void setup_tmp(const char *path);
     void patch_rw_root();
     void patch_ro_root();
 public:

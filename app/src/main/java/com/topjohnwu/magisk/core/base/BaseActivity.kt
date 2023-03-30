@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.core.base
 
-import android.Manifest.permission.*
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -53,9 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     val realCallingPackage: String? get() {
         callingPackage?.let { return it }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            mReferrerField.get(this)?.let { return it as String }
-        }
+        mReferrerField.get(this)?.let { return it as String }
         return null
     }
 
@@ -68,8 +68,8 @@ abstract class BaseActivity : AppCompatActivity() {
             // Overwrite private members to avoid nasty "false" stack traces being logged
             val delegate = delegate
             val clz = delegate.javaClass
-            clz.reflectField("mActivityHandlesUiModeChecked").set(delegate, true)
-            clz.reflectField("mActivityHandlesUiMode").set(delegate, false)
+            clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
+            clz.reflectField("mActivityHandlesConfigFlags").set(delegate, 0)
         }
         contentCallback = savedInstanceState?.getParcelable(CONTENT_CALLBACK_KEY)
         super.onCreate(savedInstanceState)

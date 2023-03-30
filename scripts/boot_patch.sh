@@ -6,7 +6,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE
+# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, SYSTEM_ROOT
 #
 # This script should be placed in a directory with the following files:
 #
@@ -73,6 +73,7 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+[ -z $SYSTEM_ROOT ] && SYSTEM_ROOT=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
@@ -136,7 +137,7 @@ case $((STATUS & 3)) in
     ;;
 esac
 
-# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+# Workaround custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
 INIT=init
 if [ $((STATUS & 4)) -ne 0 ]; then
   INIT=init.real
@@ -148,24 +149,30 @@ fi
 
 ui_print "- Patching ramdisk"
 
+# Compress to save precious ramdisk space
+SKIP32="#"
+SKIP64="#"
+if [ -f magisk64 ]; then
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
+  ./magiskboot compress=xz magisk64 magisk64.xz
+  unset SKIP64
+fi
+if [ -f magisk32 ]; then
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
+  ./magiskboot compress=xz magisk32 magisk32.xz
+  unset SKIP32
+fi
+./magiskboot compress=xz stub.apk stub.xz
+
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
-[ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
-
-# Compress to save precious ramdisk space
-SKIP32="#"
-SKIP64="#"
-if [ -f magisk32 ]; then
-  ./magiskboot compress=xz magisk32 magisk32.xz
-  unset SKIP32
+if [ -n "$PREINITDEVICE" ]; then
+  ui_print "- Pre-init storage partition device ID: $PREINITDEVICE"
+  echo "PREINITDEVICE=$PREINITDEVICE" >> config
 fi
-if [ -f magisk64 ]; then
-  ./magiskboot compress=xz magisk64 magisk64.xz
-  unset SKIP64
-fi
-./magiskboot compress=xz stub.apk stub.xz
+[ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 $INIT magiskinit" \
@@ -179,7 +186,7 @@ fi
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz stub.apk
 
 #################
 # Binary Patches
@@ -198,21 +205,28 @@ for dt in dtb kernel_dtb extra; do
 done
 
 if [ -f kernel ]; then
+  PATCHEDKERNEL=false
   # Remove Samsung RKP
   ./magiskboot hexpatch kernel \
   49010054011440B93FA00F71E9000054010840B93FA00F7189000054001840B91FA00F7188010054 \
-  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054
+  A1020054011440B93FA00F7140020054010840B93FA00F71E0010054001840B91FA00F7181010054 \
+  && PATCHEDKERNEL=true
 
   # Remove Samsung defex
   # Before: [mov w2, #-221]   (-__NR_execve)
   # After:  [mov w2, #-32768]
-  ./magiskboot hexpatch kernel 821B8012 E2FF8F12
+  ./magiskboot hexpatch kernel 821B8012 E2FF8F12 && PATCHEDKERNEL=true
 
-  # Force kernel to load rootfs
+  # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
-  ./magiskboot hexpatch kernel \
+  $SYSTEM_ROOT && ./magiskboot hexpatch kernel \
   736B69705F696E697472616D667300 \
-  77616E745F696E697472616D667300
+  77616E745F696E697472616D667300 \
+  && PATCHEDKERNEL=true
+
+  # If the kernel doesn't need to be patched at all,
+  # keep raw kernel to avoid bootloops on some weird devices
+  $PATCHEDKERNEL || rm -f kernel
 fi
 
 #################

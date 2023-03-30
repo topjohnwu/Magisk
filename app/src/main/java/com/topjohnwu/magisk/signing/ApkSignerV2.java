@@ -680,7 +680,7 @@ public abstract class ApkSignerV2 {
                 return "SHA-512";
             default:
                 throw new IllegalArgumentException(
-                        "Unknown content digest algorthm: " + digestAlgorithm);
+                        "Unknown content digest algorithm: " + digestAlgorithm);
         }
     }
 
@@ -692,7 +692,7 @@ public abstract class ApkSignerV2 {
                 return 512 / 8;
             default:
                 throw new IllegalArgumentException(
-                        "Unknown content digest algorthm: " + digestAlgorithm);
+                        "Unknown content digest algorithm: " + digestAlgorithm);
         }
     }
 

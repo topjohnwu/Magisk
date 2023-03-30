@@ -22,10 +22,7 @@ import java.net.HttpURLConnection;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
-public class Request implements Closeable {
+public class Request {
     private final HttpURLConnection conn;
     private Executor executor = null;
     private int code = -1;
@@ -58,11 +55,6 @@ public class Request implements Closeable {
 
     Request(HttpURLConnection c) {
         conn = c;
-    }
-
-    @Override
-    public void close() {
-        conn.disconnect();
     }
 
     public Request addHeaders(String key, String value) {

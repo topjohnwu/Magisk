@@ -151,12 +151,14 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
     case MainRequest::SQLITE_CMD:
         exec_sql(client);
         break;
-    case MainRequest::REMOVE_MODULES:
+    case MainRequest::REMOVE_MODULES: {
+        int do_reboot = read_int(client);
         remove_modules();
         write_int(client, 0);
         close(client);
-        reboot();
+        if (do_reboot) reboot();
         break;
+    }
     case MainRequest::ZYGISK:
     case MainRequest::ZYGISK_PASSTHROUGH:
         zygisk_handler(client, &cred);
@@ -272,8 +274,7 @@ static void handle_request(pollfd *pfd) {
     } else if (code < MainRequest::_STAGE_BARRIER_) {
         exec_task([=] { handle_request_async(client, code, cred); });
     } else {
-        close(client);
-        exec_task([=] { boot_stage_handler(code); });
+        exec_task([=] { boot_stage_handler(client, code); });
     }
     return;
 
@@ -356,13 +357,17 @@ static void daemon_entry() {
 
     restore_tmpcon();
 
-    // SAR cleanups
+    // Cleanups
     auto mount_list = MAGISKTMP + "/" ROOTMNT;
     if (access(mount_list.data(), F_OK) == 0) {
         file_readline(true, mount_list.data(), [](string_view line) -> bool {
             umount2(line.data(), MNT_DETACH);
             return true;
         });
+    }
+    if (getenv("REMOUNT_ROOT")) {
+        xmount(nullptr, "/", nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+        unsetenv("REMOUNT_ROOT");
     }
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 

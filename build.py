@@ -195,9 +195,12 @@ def clean_elf():
     else:
         elf_cleaner = op.join('native', 'out', 'elf-cleaner')
         if not op.exists(elf_cleaner):
-            execv(['g++', '-std=c++11', 'tools/termux-elf-cleaner/termux-elf-cleaner.cpp',
+            execv(['gcc', '-DPACKAGE_NAME="termux-elf-cleaner"',
+                   '-DPACKAGE_VERSION="2.1.1"', '-DCOPYRIGHT="Copyright (C) 2022 Termux."',
+                   'tools/termux-elf-cleaner/elf-cleaner.cpp',
+                   'tools/termux-elf-cleaner/arghandling.c',
                    '-o', elf_cleaner])
-    args = [elf_cleaner]
+    args = [elf_cleaner, "--api-level", "23"]
     args.extend(op.join('native', 'out', arch, bin)
                 for arch in archs for bin in ['magisk', 'magiskpolicy'])
     execv(args)
@@ -429,7 +432,7 @@ def build_app(args):
     # build process. Copy the stub APK into output directory.
     build_type = 'release' if args.release else 'debug'
     apk = f'stub-{build_type}.apk'
-    source = op.join('app', 'src', 'main', 'assets', 'stub.apk')
+    source = op.join('app', 'src', build_type, 'assets', 'stub.apk')
     target = op.join(config['outdir'], apk)
     cp(source, target)
 
@@ -457,7 +460,8 @@ def cleanup(args):
     if 'java' in args.target:
         header('* Cleaning java')
         execv([gradlew, 'app:clean', 'app:shared:clean', 'stub:clean'])
-        rm_rf(op.join('app', 'src', 'main', 'assets'))
+        rm_rf(op.join('app', 'src', 'debug'))
+        rm_rf(op.join('app', 'src', 'release'))
 
 
 def setup_ndk(args):

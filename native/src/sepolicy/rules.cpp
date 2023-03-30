@@ -64,7 +64,7 @@ void sepolicy::magisk_rules() {
         }
 
         // Allow these processes to access MagiskSU
-        vector<const char *> clients{ "init", "shell", "update_engine", "appdomain" };
+        vector<const char *> clients{ "shell", "update_engine", "appdomain" };
         for (auto type : clients) {
             if (!exists(type))
                 continue;
@@ -88,7 +88,7 @@ void sepolicy::magisk_rules() {
         // type transition require actual types, not attributes
         const char *app_types[]{
             "system_app", "priv_app", "platform_app", "untrusted_app", "untrusted_app_25",
-            "untrusted_app_27", "untrusted_app_29", "untrusted_app_30"};
+            "untrusted_app_27", "untrusted_app_29", "untrusted_app_30", "untrusted_app_32"};
         clients.pop_back();
         clients.insert(clients.end(), app_types, app_types + std::size(app_types));
         for (auto type : clients) {
@@ -137,8 +137,10 @@ void sepolicy::magisk_rules() {
     // Let init run stuffs
     allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
     allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
-    allow("init", "tmpfs", "file", "getattr");
-    allow("init", "tmpfs", "file", "execute");
+    allow("init", SEPOL_EXEC_TYPE, "file", "read");
+    allow("init", SEPOL_EXEC_TYPE, "file", "open");
+    allow("init", SEPOL_EXEC_TYPE, "file", "getattr");
+    allow("init", SEPOL_EXEC_TYPE, "file", "execute");
 
     // suRights
     allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
@@ -186,6 +188,10 @@ void sepolicy::magisk_rules() {
     // Shut llkd up
     dontaudit("llkd", SEPOL_PROC_DOMAIN, "process", "ptrace");
     dontaudit("llkd", SEPOL_CLIENT_DOMAIN, "process", "ptrace");
+
+    // Keep /data/adb/* context
+    deny("init", "adb_data_file", "dir", "search");
+    deny("vendor_init", "adb_data_file", "dir", "search");
 
     // Allow update_engine/addon.d-v2 to run permissive on all ROMs
     permissive("update_engine");

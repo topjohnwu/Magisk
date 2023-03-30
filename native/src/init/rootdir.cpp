@@ -1,11 +1,12 @@
 #include <sys/mount.h>
 #include <libgen.h>
+#include <sys/sysmacros.h>
 
 #include <magisk.hpp>
 #include <base.hpp>
+#include <selinux.hpp>
 
 #include "init.hpp"
-#include "magiskrc.inc"
 
 using namespace std;
 
@@ -51,11 +52,27 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     rc_list.clear();
 
     // Inject Magisk rc scripts
-    char pfd_svc[16], ls_svc[16];
-    gen_rand_str(pfd_svc, sizeof(pfd_svc));
-    gen_rand_str(ls_svc, sizeof(ls_svc));
-    LOGD("Inject magisk services: [%s] [%s]\n", pfd_svc, ls_svc);
-    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc);
+    LOGD("Inject magisk rc\n");
+    fprintf(rc, R"EOF(
+on post-fs-data
+    start logd
+    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
+
+on property:vold.decrypt=trigger_restart_framework
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on nonencrypted
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on property:sys.boot_completed=1
+    exec %2$s 0 0 -- %1$s/magisk --boot-complete
+
+on property:init.svc.zygote=restarting
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+
+on property:init.svc.zygote=stopped
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+)EOF", tmp_dir, "u:r:" SEPOL_PROC_DOMAIN ":s0");
 
     fclose(rc);
     clone_attr(src, dest);
@@ -181,11 +198,22 @@ static void extract_files(bool sbin) {
     }
 }
 
+void MagiskInit::parse_config_file() {
+    parse_prop_file("/data/.backup/.magisk", [this](auto key, auto value) -> bool {
+        if (key == "PREINITDEVICE") {
+            preinit_dev = value;
+            return false;
+        }
+        return true;
+    });
+}
+
 #define ROOTMIR     MIRRDIR "/system_root"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void MagiskInit::patch_ro_root() {
     mount_list.emplace_back("/data");
+    parse_config_file();
 
     string tmp_dir;
 
@@ -267,21 +295,22 @@ void RootFSInit::prepare() {
     rename(backup_init(), "/init");
 }
 
-#define PRE_TMPDIR "/magisk-tmp"
+#define PRE_TMPSRC "/magisk"
+#define PRE_TMPDIR PRE_TMPSRC "/tmp"
 
 void MagiskInit::patch_rw_root() {
     mount_list.emplace_back("/data");
+    parse_config_file();
+
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");
     link_path("/sbin", "/root");
 
     // Handle overlays
-    if (access("/overlay.d", F_OK) == 0) {
-        LOGD("Merge overlay.d\n");
-        load_overlay_rc("/overlay.d");
-        mv_path("/overlay.d", "/");
-    }
+    load_overlay_rc("/overlay.d");
+    mv_path("/overlay.d", "/");
+    rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
     // Patch init.rc
@@ -294,6 +323,8 @@ void MagiskInit::patch_rw_root() {
         treble = init.contains(SPLIT_PLAT_CIL);
     }
 
+    xmkdir(PRE_TMPSRC, 0);
+    xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
     xmkdir(PRE_TMPDIR, 0);
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
@@ -321,10 +352,12 @@ int magisk_proxy_main(int argc, char *argv[]) {
     unlink("/sbin/magisk");
 
     // Move tmpfs to /sbin
-    // For some reason MS_MOVE won't work, as a workaround bind mount then unmount
-    xmount(PRE_TMPDIR, "/sbin", nullptr, MS_BIND | MS_REC, nullptr);
-    xumount2(PRE_TMPDIR, MNT_DETACH);
+    // make parent private before MS_MOVE
+    xmount(nullptr, PRE_TMPSRC, nullptr, MS_PRIVATE, nullptr);
+    xmount(PRE_TMPDIR, "/sbin", nullptr, MS_MOVE, nullptr);
+    xumount2(PRE_TMPSRC, MNT_DETACH);
     rmdir(PRE_TMPDIR);
+    rmdir(PRE_TMPSRC);
 
     // Create symlinks pointing back to /root
     recreate_sbin("/root", false);

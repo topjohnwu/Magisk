@@ -9,7 +9,7 @@ import java.io.InputStream;
 
 class BadRequest extends Request {
 
-    private IOException ex;
+    private final IOException ex;
 
     BadRequest(IOException e) { super(null); ex = e; }
 

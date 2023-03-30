@@ -5,22 +5,19 @@ import androidx.databinding.ListChangeRegistry
 import androidx.databinding.ObservableList
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
-import java.util.*
+import java.util.AbstractList
 
-/**
- * @param callback    The callback that controls the behavior of the DiffObservableList.
- * @param detectMoves True if DiffUtil should try to detect moved items, false otherwise.
- */
 open class DiffObservableList<T>(
-    private val callback: Callback<T>,
-    private val detectMoves: Boolean = true
+    private val callback: Callback<T>
 ) : AbstractList<T>(), ObservableList<T> {
 
-    protected var list: MutableList<T> = ArrayList()
+    protected var list: List<T> = emptyList()
     private val listeners = ListChangeRegistry()
     protected val listCallback = ObservableListUpdateCallback()
 
     override val size: Int get() = list.size
+
+    override fun get(index: Int) = list[index]
 
     /**
      * Calculates the list of update operations that can convert this list into the given one.
@@ -30,8 +27,7 @@ open class DiffObservableList<T>(
      * list into the given one.
      */
     fun calculateDiff(newItems: List<T>): DiffUtil.DiffResult {
-        val frozenList = ArrayList(list)
-        return doCalculateDiff(frozenList, newItems)
+        return doCalculateDiff(list, newItems)
     }
 
     protected fun doCalculateDiff(oldItems: List<T>, newItems: List<T>): DiffUtil.DiffResult {
@@ -51,7 +47,7 @@ open class DiffObservableList<T>(
                 val newItem = newItems[newItemPosition]
                 return callback.areContentsTheSame(oldItem, newItem)
             }
-        }, detectMoves)
+        }, true)
     }
 
     /**
@@ -63,24 +59,8 @@ open class DiffObservableList<T>(
      */
     @MainThread
     fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
-        list = newItems.toMutableList()
+        list = ArrayList(newItems)
         diffResult.dispatchUpdatesTo(listCallback)
-    }
-
-    /**
-     * Sets this list to the given items. This is a convenience method for calling [ ][.calculateDiff] followed by [.update].
-     *
-     *
-     * **Warning!** If the lists are large this operation may be too slow for the main thread. In
-     * that case, you should call [.calculateDiff] on a background thread and then
-     * [.update] on the main thread.
-     *
-     * @param newItems The items to set this list to.
-     */
-    @MainThread
-    fun update(newItems: List<T>) {
-        val diffResult = doCalculateDiff(list, newItems)
-        update(newItems, diffResult)
     }
 
     override fun addOnListChangedCallback(listener: ObservableList.OnListChangedCallback<out ObservableList<T>>) {
@@ -91,53 +71,6 @@ open class DiffObservableList<T>(
         listeners.remove(listener)
     }
 
-    override fun get(index: Int) = list[index]
-
-    override fun add(index: Int, element: T) {
-        list.add(index, element)
-        notifyAdd(index, 1)
-    }
-
-    override fun addAll(elements: Collection<T>) = addAll(size, elements)
-
-    override fun addAll(index: Int, elements: Collection<T>): Boolean {
-        val added = list.addAll(index, elements)
-        if (added) {
-            notifyAdd(index, elements.size)
-        }
-        return added
-    }
-
-    override fun clear() {
-        val oldSize = size
-        list.clear()
-        if (oldSize != 0) {
-            notifyRemove(0, oldSize)
-        }
-    }
-
-    override fun remove(element: T): Boolean {
-        val index = indexOf(element)
-        return if (index >= 0) {
-            removeAt(index)
-            true
-        } else {
-            false
-        }
-    }
-
-    override fun removeAt(index: Int): T {
-        val element = list.removeAt(index)
-        notifyRemove(index, 1)
-        return element
-    }
-
-    override fun set(index: Int, element: T): T {
-        val old = list.set(index, element)
-        listeners.notifyChanged(this, index, 1)
-        return old
-    }
-
     private fun notifyAdd(start: Int, count: Int) {
         listeners.notifyInserted(this, start, count)
     }
@@ -146,38 +79,8 @@ open class DiffObservableList<T>(
         listeners.notifyRemoved(this, start, count)
     }
 
-    /**
-     * A Callback class used by DiffUtil while calculating the diff between two lists.
-     */
     interface Callback<T> {
-        /**
-         * Called by the DiffUtil to decide whether two object represent the same Item.
-         *
-         *
-         * For example, if your items have unique ids, this method should check their id equality.
-         *
-         * @param oldItem The old item.
-         * @param newItem The new item.
-         * @return True if the two items represent the same object or false if they are different.
-         */
         fun areItemsTheSame(oldItem: T, newItem: T): Boolean
-
-        /**
-         * Called by the DiffUtil when it wants to check whether two items have the same data.
-         * DiffUtil uses this information to detect if the contents of an item has changed.
-         *
-         *
-         * DiffUtil uses this method to check equality instead of [Object.equals] so
-         * that you can change its behavior depending on your UI.
-         *
-         *
-         * This method is called only if [.areItemsTheSame] returns `true` for
-         * these items.
-         *
-         * @param oldItem The old item.
-         * @param newItem The new item which replaces the old item.
-         * @return True if the contents of the items are the same or false if they are different.
-         */
         fun areContentsTheSame(oldItem: T, newItem: T): Boolean
     }
 

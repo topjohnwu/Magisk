@@ -44,20 +44,23 @@ Let's continue to [Patching Images](#patching-images).
 
 ## Patching Images
 
-- Copy the boot/recovery image to your device
+- Copy the boot/init_boot/recovery image to your device
 - Press the **Install** button in the Magisk card
 - If you are patching a recovery image, check the **"Recovery Mode"** option
 - If your device does **NOT** have a separate `vbmeta` partition, check the **"Patch vbmeta in boot image"** option
-- Choose **"Select and Patch a File"** in method, and select the boot/recovery image
+- Choose **"Select and Patch a File"** in method, and select the boot/init_boot/recovery image
 - Start the installation, and copy the patched image to your PC using ADB:<br>
   `adb pull /sdcard/Download/magisk_patched_[random_strings].img`
-- Flash the patched boot/recovery image to your device.<br>
-  For most devices, reboot into fastboot mode and flash with command:<br>
-  `fastboot flash boot /path/to/magisk_patched.img` or <br>
-  `fastboot flash recovery /path/to/magisk_patched.img`
+- Flash the patched boot/init_boot/recovery image to your device;<br>
+  for most devices, reboot into fastboot mode and flash with command:<br>
+  `fastboot flash boot[_x] /path/to/magisk_patched_[random_strings].img` or <br>
+  `fastboot flash init_boot[_x] /path/to/magisk_patched.img_[random_strings]` or <br>
+  `fastboot flash recovery /path/to/magisk_patched.img_[random_strings]`, <br>
+  where `[_x]` should be `_a` or `_b` or empty depending on your device
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
-  `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img`
-- Reboot and voila!
+  `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
+- Reboot and launch Magisk app (you will see a stub Magisk app if you have wipped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
+- Voila!
 
 ## Uninstallation
 
@@ -85,7 +88,7 @@ As a summary, after installing Magisk in recovery **(starting from power off)**:
 
 - Installing Magisk **WILL** trip KNOX
 - Installing Magisk for the first time **REQUIRES** a full data wipe (this is **NOT** counting the data wipe when unlocking bootloader). Backup your data before continue.
-- Download Odin (only runs on Windows) that supports your device.
+- Download Odin (for Windows) or [Heimdall](https://www.glassechidna.com.au/heimdall/) (for Linux) that supports your device.
 
 ### Unlocking Bootloader
 
@@ -131,7 +134,7 @@ Once you have rooted your Samsung device, you can no longer upgrade your Android
 Installing using custom recoveries is only possible if your device has boot ramdisk. Installing Magisk through custom recoveries on modern devices is no longer recommended. If you face any issues, please use the proper [Patch Image](#patching-images) method.
 
 - Download the Magisk APK
-- Rename the `.apk` file extension to `.zip`, for example: `Magisk-v24.0.apk` → `Magisk-v24.0.zip`. If you have trouble renaming the file extension (like on Windows), use a file manager on Android or the one included in TWRP to rename the file.
+- Rename the `.apk` file extension to `.zip`, for example: `Magisk-v24.0.apk` → `Magisk-v24.0.zip`. If you have trouble renaming the file extension (like on Windows), use a file manager on Android or the one included in the custom recovery to rename the file.
 - Flash the zip just like any other ordinary flashable zip.
 - Reboot and check whether the Magisk app is installed. If it isn't installed automatically, manually install the APK.
 

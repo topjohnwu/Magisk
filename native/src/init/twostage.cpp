@@ -3,6 +3,7 @@
 #include <magisk.hpp>
 #include <base.hpp>
 #include <socket.hpp>
+#include <sys/vfs.h>
 
 #include "init.hpp"
 
@@ -33,17 +34,13 @@ void LegacySARInit::first_stage_prep() {
 
 bool SecondStageInit::prepare() {
     umount2("/init", MNT_DETACH);
-    umount2("/proc/self/exe", MNT_DETACH);
+    unlink("/data/init");
 
     // Make sure init dmesg logs won't get messed up
     argv[0] = (char *) INIT_PATH;
 
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    // Check if root and system are on different filesystems
-    struct stat root{}, system{};
-    xstat("/", &root);
-    xstat("/system", &system);
-    if (root.st_dev != system.st_dev) {
+    if (struct statfs sfs{}; statfs("/", &sfs) == 0 && sfs.f_type == RAMFS_MAGIC) {
         // We are still on rootfs, so make sure we will execute the init of the 2nd stage
         unlink("/init");
         xsymlink(INIT_PATH, "/init");

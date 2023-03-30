@@ -41,7 +41,7 @@ class ShellInit : Shell.Initializer() {
             }
 
             if (shell.isRoot) {
-                add("export MAGISKTMP=\$(magisk --path)/.magisk")
+                add("export MAGISKTMP=\$(magisk --path)")
                 // Test if we can properly execute stuff in /data
                 Info.noDataExec = !shell.newJob().add("$localBB sh -c \"$localBB true\"").exec().isSuccess
             }
@@ -49,12 +49,12 @@ class ShellInit : Shell.Initializer() {
             if (Info.noDataExec) {
                 // Copy it out of /data to workaround Samsung bullshit
                 add(
-                    "if [ -x \$MAGISKTMP/busybox/busybox ]; then",
-                    "  cp -af $localBB \$MAGISKTMP/busybox/busybox",
-                    "  exec \$MAGISKTMP/busybox/busybox sh",
+                    "if [ -x \$MAGISKTMP/.magisk/busybox/busybox ]; then",
+                    "  cp -af $localBB \$MAGISKTMP/.magisk/busybox/busybox",
+                    "  exec \$MAGISKTMP/.magisk/busybox/busybox sh",
                     "else",
-                    "  cp -af $localBB /dev/.busybox",
-                    "  exec /dev/.busybox sh",
+                    "  cp -af $localBB /dev/busybox",
+                    "  exec /dev/busybox sh",
                     "fi"
                 )
             } else {
@@ -73,7 +73,6 @@ class ShellInit : Shell.Initializer() {
         fun getVar(name: String) = fastCmd("echo \$$name")
         fun getBool(name: String) = getVar(name).toBoolean()
 
-        Const.MAGISKTMP = getVar("MAGISKTMP")
         Info.isSAR = getBool("SYSTEM_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
         Info.vbmeta = getBool("VBMETAEXIST")

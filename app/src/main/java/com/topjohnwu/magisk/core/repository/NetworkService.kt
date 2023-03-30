@@ -8,7 +8,6 @@ import com.topjohnwu.magisk.core.Config.Value.DEBUG_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.DEFAULT_CHANNEL
 import com.topjohnwu.magisk.core.Config.Value.STABLE_CHANNEL
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.data.GithubApiServices
 import com.topjohnwu.magisk.core.data.GithubPageServices
 import com.topjohnwu.magisk.core.data.RawServices
 import retrofit2.HttpException
@@ -17,8 +16,7 @@ import java.io.IOException
 
 class NetworkService(
     private val pages: GithubPageServices,
-    private val raw: RawServices,
-    private val api: GithubApiServices
+    private val raw: RawServices
 ) {
     suspend fun fetchUpdate() = safe {
         var info = when (Config.updateChannel) {
@@ -42,7 +40,7 @@ class NetworkService(
     private suspend fun fetchBetaUpdate() = pages.fetchUpdateJSON("beta.json")
     private suspend fun fetchCanaryUpdate() = pages.fetchUpdateJSON("canary.json")
     private suspend fun fetchDebugUpdate() = pages.fetchUpdateJSON("debug.json")
-    private suspend fun fetchCustomUpdate(url: String) = raw.fetchCustomUpdate(url)
+    private suspend fun fetchCustomUpdate(url: String) = pages.fetchUpdateJSON(url)
 
     private inline fun <T> safe(factory: () -> T): T? {
         return try {

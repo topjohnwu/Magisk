@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Base.V21.Theme.Foundation.Light" parent="Theme.Material3.DynamicColors.Light">
+    <style name="Base.V23.Theme.Foundation" parent="Theme.Material3.DynamicColors.Light">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">?android:colorBackground</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="suRequestBackground">?colorSurface</item>
         <item name="suRequestButtonBackground">?colorPrimaryContainer</item>
         <item name="suRequestButtonText">?colorOnPrimaryContainer</item>
     </style>
 
-    <style name="Theme.Foundation.Light" parent="Base.V21.Theme.Foundation.Light" />
+    <style name="Theme.Foundation" parent="Base.V23.Theme.Foundation" />
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
-        <item name="android:windowBackground">@drawable/ic_splash_activity</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_magisk_padded</item>
     </style>
 
-    <style name="Base.V21.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.Material3.Dialog">
+    <style name="Base.V23.ThemeOverlay.Foundation.Dialog" parent="ThemeOverlay.Material3.Dialog">
         <item name="android:windowMinWidthMajor">@dimen/abc_dialog_min_width_major</item>
         <item name="android:windowMinWidthMinor">@dimen/abc_dialog_min_width_minor</item>
     </style>
 
-    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V21.ThemeOverlay.Foundation.Dialog" />
+    <style name="ThemeOverlay.Foundation.Dialog" parent="Base.V23.ThemeOverlay.Foundation.Dialog" />
 
 </resources>

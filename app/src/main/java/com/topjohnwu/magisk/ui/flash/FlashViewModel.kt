@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.ui.flash
 
 import android.view.MenuItem
 import androidx.databinding.Bindable
+import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -15,7 +16,6 @@ import com.topjohnwu.magisk.core.tasks.FlashZip
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.databinding.diffListOf
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.ktx.reboot
@@ -40,7 +40,7 @@ class FlashViewModel : BaseViewModel() {
     var showReboot = Info.isRooted
         set(value) = set(value, field, { field = it }, BR.showReboot)
 
-    val items = diffListOf<ConsoleItem>()
+    val items = ObservableArrayList<ConsoleItem>()
     lateinit var args: FlashFragmentArgs
 
     private val logItems = mutableListOf<String>().synchronized()

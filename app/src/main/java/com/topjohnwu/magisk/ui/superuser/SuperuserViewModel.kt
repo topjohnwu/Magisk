@@ -34,7 +34,7 @@ class SuperuserViewModel(
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
     private val itemsHelpers = ObservableArrayList<TextItem>()
-    private val itemsPolicies = diffListOf<PolicyRvItem>()
+    private val itemsPolicies = DiffRvItemList<PolicyRvItem>()
 
     val items = MergeObservableList<AnyDiffRvItem>()
         .insertList(itemsHelpers)

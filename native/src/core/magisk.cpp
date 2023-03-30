@@ -23,7 +23,7 @@ Options:
    -v                        print running daemon version
    -V                        print running daemon version code
    --list                    list all available applets
-   --remove-modules          remove all modules and reboot
+   --remove-modules [-n]     remove all modules, reboot if -n is not provided
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
@@ -90,7 +90,9 @@ int magisk_main(int argc, char *argv[]) {
         int fd = connect_daemon(MainRequest::STOP_DAEMON);
         return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
-        close(connect_daemon(MainRequest::POST_FS_DATA, true));
+        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
+        struct pollfd pfd = { fd, POLLIN, 0 };
+        poll(&pfd, 1, 1000 * POST_FS_DATA_WAIT_TIME);
         return 0;
     } else if (argv[1] == "--service"sv) {
         close(connect_daemon(MainRequest::LATE_START, true));
@@ -114,7 +116,16 @@ int magisk_main(int argc, char *argv[]) {
             printf("%s\n", res.data());
         }
     } else if (argv[1] == "--remove-modules"sv) {
+        int do_reboot;
+        if (argc == 3 && argv[2] == "-n"sv) {
+            do_reboot = 0;
+        } else if (argc == 2) {
+            do_reboot = 1;
+        } else {
+            usage();
+        }
         int fd = connect_daemon(MainRequest::REMOVE_MODULES);
+        write_int(fd, do_reboot);
         return read_int(fd);
     } else if (argv[1] == "--path"sv) {
         int fd = connect_daemon(MainRequest::GET_PATH);
@@ -123,6 +134,15 @@ int magisk_main(int argc, char *argv[]) {
         return 0;
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
+    } else if (argv[1] == "--preinit-device"sv) {
+        set_log_level_state(LogLevel::Warn, false);
+        auto name = find_preinit_device();
+        LOGD("preinit device: %s\n", name.data());
+        if (!name.empty())  {
+            printf("%s\n", name.data());
+            return 0;
+        }
+        return 1;
     }
 #if 0
     /* Entry point for testing stuffs */

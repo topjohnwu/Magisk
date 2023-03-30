@@ -8,7 +8,7 @@
     <string name="install">Cài đặt</string>
     <string name="section_home">Trang chủ</string>
     <string name="section_theme">Chủ đề</string>
-    <string name="denylist">DenyList</string>
+    <string name="denylist">Danh sách loại trừ</string>
 
     <!--Home-->
     <string name="no_connection">Không có kết nối</string>
@@ -136,8 +136,8 @@
     <string name="settings_update_custom">Kênh tùy chỉnh</string>
     <string name="settings_update_custom_msg">Chèn một URL tùy chỉnh</string>
     <string name="settings_zygisk_summary">Khởi chạy các thành phần của Magisk trong tiến trình nền zygote</string>
-    <string name="settings_denylist_title">Thực thi DenyList</string>
-    <string name="settings_denylist_summary">Các tiến trình trong DenyList sẽ bị hoàn nguyên mọi sửa đổi bởi Magisk</string>
+    <string name="settings_denylist_title">Thực thi danh sách loại trừ</string>
+    <string name="settings_denylist_summary">Mọi sửa đổi do Magisk thực hiện sẽ bị loại khỏi các quy trình trong danh sách loại trừ</string>
     <string name="settings_denylist_error">Tính năng này yêu cầu %1$s được bật</string>
     <string name="settings_denylist_config_title">Cấu hình DenyList</string>
     <string name="settings_denylist_config_summary">Chọn các quy trình được đưa vào DenyList</string>
@@ -169,7 +169,7 @@
     <string name="settings_su_biometric_summary">Sử dụng xác thực sinh trắc học để xác nhận yêu cầu Superuser</string>
     <string name="no_biometric">Thiết bị của bạn không được hỗ trợ hoặc không có phương pháp xác thực sinh trắc học nào được kích hoạt</string>
     <string name="settings_customization">Tùy biến</string>
-    <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó nhận ra tên và biểu tượng sau khi ẩn ứng dụng</string>
+    <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó tìm ra tên và biểu tượng sau khi ẩn ứng dụng</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 

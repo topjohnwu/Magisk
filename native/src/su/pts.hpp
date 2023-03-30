@@ -85,7 +85,7 @@ int watch_sigwinch_async(int master, int slave);
  * pump_stdin_async
  *
  * Forward data from STDIN to the given FD
- * in a seperate thread
+ * in a separate thread
  */
 void pump_stdin_async(int outfd);
 

@@ -31,6 +31,7 @@ typedef enum {
 #define COMPRESSED_ANY(fmt)  ((fmt) >= GZIP && (fmt) <= LZOP)
 
 #define BUFFER_MATCH(buf, s) (memcmp(buf, s, sizeof(s) - 1) == 0)
+#define BUFFER_CONTAIN(buf, sz, s) (memmem(buf, sz, s, sizeof(s) - 1) != nullptr)
 
 #define BOOT_MAGIC      "ANDROID!"
 #define VENDOR_BOOT_MAGIC "VNDRBOOT"
@@ -57,6 +58,8 @@ typedef enum {
 #define NOOKHD_PRE_HEADER_SZ 1048576
 #define ACCLAIM_MAGIC   "BauwksBoot"
 #define ACCLAIM_PRE_HEADER_SZ 262144
+#define AMONET_MICROLOADER_MAGIC "microloader"
+#define AMONET_MICROLOADER_SZ 1024
 #define AVB_FOOTER_MAGIC "AVBf"
 #define AVB_MAGIC "AVB0"
 #define ZIMAGE_MAGIC "\x18\x28\x6f\x01"

@@ -20,12 +20,14 @@ abstract class NavigationActivity<Binding : ViewDataBinding> : UIActivity<Bindin
     val navigation: NavController get() = navHostFragment.navController
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        return currentFragment?.onKeyEvent(event) == true || super.dispatchKeyEvent(event)
+        return if (binded && currentFragment?.onKeyEvent(event) == true) true else super.dispatchKeyEvent(event)
     }
 
     override fun onBackPressed() {
-        if (currentFragment?.onBackPressed()?.not() == true) {
-            super.onBackPressed()
+        if (binded) {
+            if (currentFragment?.onBackPressed() == false) {
+                super.onBackPressed()
+            }
         }
     }
 
