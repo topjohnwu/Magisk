@@ -274,7 +274,7 @@ def run_cargo_build(args):
     env['TARGET_CC'] = op.join(llvm_bin, 'clang' + EXE_EXT)
     env['RUSTFLAGS'] = '-Clinker-plugin-lto'
     for (arch, triple) in zip(archs, triples):
-        env['TARGET_CFLAGS'] = f'--target={triple}21'
+        env['TARGET_CFLAGS'] = f'--target={triple}23'
         rust_triple = 'thumbv7neon-linux-androideabi' if triple.startswith('armv7') else triple
         proc = execv([*cmds, '--target', rust_triple], env)
         if proc.returncode != 0:
@@ -479,12 +479,11 @@ def setup_ndk(args):
     mv(op.join(ndk_root, f'ondk-{ndk_ver}'), ndk_path)
 
     header('* Patching static libs')
-    for target in ['aarch64-linux-android', 'arm-linux-androideabi',
-                   'i686-linux-android', 'x86_64-linux-android']:
+    for target in ['arm-linux-androideabi', 'i686-linux-android']:
         arch = target.split('-')[0]
         lib_dir = op.join(
             ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-            'sysroot', 'usr', 'lib', f'{target}', '21')
+            'sysroot', 'usr', 'lib', f'{target}', '23')
         if not op.exists(lib_dir):
             continue
         src_dir = op.join('tools', 'ndk-bins', '21', arch)

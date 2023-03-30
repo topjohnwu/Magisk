@@ -26,22 +26,30 @@ static inline void __check_buffer_access(const char* fn, const char* action,
         __fortify_fatal("%s: prevented %zu-byte %s %zu-byte buffer", fn, claim, action, actual);
     }
 }
+
+[[gnu::weak]]
 void* __memcpy_chk(void* dst, const void* src, size_t count, size_t dst_len) {
     __check_count("memcpy", "count", count);
     __check_buffer_access("memcpy", "write into", count, dst_len);
     return __call_bypassing_fortify(memcpy)(dst, src, count);
 }
+
+[[gnu::weak]]
 char* __strcpy_chk(char* dst, const char* src, size_t dst_len) {
     // TODO: optimize so we don't scan src twice.
     size_t src_len = __builtin_strlen(src) + 1;
     __check_buffer_access("strcpy", "write into", src_len, dst_len);
     return __builtin_strcpy(dst, src);
 }
+
+[[gnu::weak]]
 size_t __strlcpy_chk(char* dst, const char* src,
                      size_t supplied_size, size_t dst_len_from_compiler) {
     __check_buffer_access("strlcpy", "write into", supplied_size, dst_len_from_compiler);
     return __call_bypassing_fortify(strlcpy)(dst, src, supplied_size);
 }
+
+[[gnu::weak]]
 char* __strchr_chk(const char* p, int ch, size_t s_len) {
     for (;; ++p, s_len--) {
         if (__predict_false(s_len == 0)) {
@@ -55,6 +63,8 @@ char* __strchr_chk(const char* p, int ch, size_t s_len) {
         }
     }
 }
+
+[[gnu::weak]]
 char* __strcat_chk(char* dst, const char* src, size_t dst_buf_size) {
     char* save = dst;
     size_t dst_len = __strlen_chk(dst, dst_buf_size);
@@ -68,6 +78,8 @@ char* __strcat_chk(char* dst, const char* src, size_t dst_buf_size) {
     }
     return save;
 }
+
+[[gnu::weak]]
 size_t __strlen_chk(const char* s, size_t s_len) {
     // TODO: "prevented" here would be a lie because this strlen can run off the end.
     // strlen is too important to be expensive, so we wanted to be able to call the optimized
@@ -78,6 +90,8 @@ size_t __strlen_chk(const char* s, size_t s_len) {
     }
     return ret;
 }
+
+[[gnu::weak]]
 int __vsprintf_chk(char* dst, int /*flags*/,
                    size_t dst_len_from_compiler, const char* format, va_list va) {
     // The compiler uses SIZE_MAX to mean "no idea", but our vsnprintf rejects sizes that large.
@@ -88,12 +102,16 @@ int __vsprintf_chk(char* dst, int /*flags*/,
     __check_buffer_access("vsprintf", "write into", result + 1, dst_len_from_compiler);
     return result;
 }
+
+[[gnu::weak]]
 mode_t __umask_chk(mode_t mode) {
     if (__predict_false((mode & 0777) != mode)) {
         __fortify_fatal("umask: called with invalid mask %o", mode);
     }
     return __umask_real(mode);
 }
+
+[[gnu::weak]]
 ssize_t __read_chk(int fd, void* buf, size_t count, size_t buf_size) {
     __check_count("read", "count", count);
     __check_buffer_access("read", "write into", count, buf_size);
@@ -105,11 +123,22 @@ static inline bool needs_mode(int flags) {
 static inline int force_O_LARGEFILE(int flags) {
     return flags | O_LARGEFILE;
 }
+
+[[gnu::weak]]
 int __open_2(const char* pathname, int flags) {
     if (needs_mode(flags)) __fortify_fatal("open: called with O_CREAT/O_TMPFILE but no mode");
     return __openat_real(AT_FDCWD, pathname, force_O_LARGEFILE(flags), 0);
 }
+
+[[gnu::weak]]
 int __openat_2(int fd, const char* pathname, int flags) {
     if (needs_mode(flags)) __fortify_fatal("open: called with O_CREAT/O_TMPFILE but no mode");
     return __openat_real(fd, pathname, force_O_LARGEFILE(flags), 0);
+}
+
+[[gnu::weak]]
+int __vsnprintf_chk(char* dst, size_t supplied_size, int /*flags*/,
+                               size_t dst_len_from_compiler, const char* format, va_list va) {
+    __check_buffer_access("vsnprintf", "write into", supplied_size, dst_len_from_compiler);
+    return vsnprintf(dst, supplied_size, format, va);
 }
