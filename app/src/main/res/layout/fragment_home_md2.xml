@@ -61,7 +61,7 @@
 
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        goneUnless="@{viewModel.noticeVisible}"
+                        gone="@{true}"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="@dimen/l1"
