@@ -15,7 +15,7 @@ android {
     val canary = !Config.version.contains(".")
 
     val url = if (canary) null
-    else "https://cdn.jsdelivr.net/gh/topjohnwu/magisk-files@${Config.version}/app-release.apk"
+    else "https://cdn.jsdelivr.net/gh/datnerdguy/magisk-monet-files@${Config.version}(${Config.versionCode})/app-release.apk"
 
     defaultConfig {
         applicationId = "com.topjohnwu.magisk"
