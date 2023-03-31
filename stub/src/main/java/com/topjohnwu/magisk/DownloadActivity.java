@@ -186,7 +186,7 @@ public class DownloadActivity extends Activity {
             File dir = new File(getCodeCacheDir(), "res");
             dir.mkdirs();
 
-            // addAssetPath requires a directory containing AndroidManifest.xml on Android 6.0
+            // addAssetPath requires a directory containing AndroidManifest.xml on Android 5
             try (var stubApk = new ZipFile(getPackageCodePath());
                  var manifest = new FileOutputStream(new File(dir, "AndroidManifest.xml"))) {
                 var stubManifest = stubApk.getInputStream(

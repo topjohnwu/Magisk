@@ -169,12 +169,12 @@ int sigemptyset(sigset_t *set) {
 #undef vsnprintf
 #undef snprintf
 #include "fortify.hpp"
-
+/*
 extern FILE __sF[];
 
 [[gnu::weak]] FILE* stdin = &__sF[0];
 [[gnu::weak]] FILE* stdout = &__sF[1];
 [[gnu::weak]] FILE* stderr = &__sF[2];
-
+*/
 } // extern "C"
 #endif

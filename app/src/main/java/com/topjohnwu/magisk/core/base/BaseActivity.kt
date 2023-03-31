@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.core.base
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -55,7 +53,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     val realCallingPackage: String? get() {
         callingPackage?.let { return it }
-        mReferrerField.get(this)?.let { return it as String }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            mReferrerField.get(this)?.let { return it as String }
+        }
         return null
     }
 

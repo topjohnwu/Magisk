@@ -7,7 +7,7 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Base.V27.Theme.Foundation" parent="Base.V23.Theme.Foundation">
+    <style name="Base.V27.Theme.Foundation" parent="Base.V21.Theme.Foundation">
         <item name="android:navigationBarDividerColor">@android:color/transparent</item>
     </style>
 

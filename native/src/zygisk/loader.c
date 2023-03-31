@@ -14,7 +14,10 @@ static void zygisk_loader(void) {
     android_dlextinfo info = {
         .flags = ANDROID_DLEXT_FORCE_LOAD
     };
-    void *handle = android_dlopen_ext(SECOND_STAGE_PATH, RTLD_LAZY, &info);
+    // Android 5.x doesn't support ANDROID_DLEXT_FORCE_LOAD
+    void *handle =
+            android_dlopen_ext(SECOND_STAGE_PATH, RTLD_LAZY, &info) ?:
+            dlopen(SECOND_STAGE_PATH, RTLD_LAZY);
     if (handle) {
         void(*entry)(void*) = dlsym(handle, "zygisk_inject_entry");
         if (entry) {

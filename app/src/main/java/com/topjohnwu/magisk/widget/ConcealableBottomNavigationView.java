@@ -23,6 +23,8 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
     };
 
     private boolean isHidden;
+    private int lastHeight = -1;
+
     public ConcealableBottomNavigationView(@NonNull Context context) {
         this(context, null);
     }
@@ -40,6 +42,14 @@ public class ConcealableBottomNavigationView extends BottomNavigationView {
     }
 
     private void recreateAnimator(int height) {
+        if (lastHeight == height) return;
+        lastHeight = height;
+
+        // End the current animation before setting a new one
+        // otherwise it crashes on Android 5.0
+        StateListAnimator lastAnimator = getStateListAnimator();
+        if (lastAnimator != null) lastAnimator.jumpToCurrentState();
+
         Animator toHidden = ObjectAnimator.ofFloat(this, "translationY", height);
         toHidden.setDuration(175);
         toHidden.setInterpolator(new FastOutLinearInInterpolator());

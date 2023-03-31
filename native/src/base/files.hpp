@@ -35,6 +35,7 @@ struct byte_data {
     int patch(str_pairs list) { return patch(true, list); }
     int patch(bool log, str_pairs list);
     bool contains(std::string_view pattern, bool log = true) const;
+    bool contains_raw(const char* pattern) const;
 protected:
     void swap(byte_data &o);
 };

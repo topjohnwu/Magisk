@@ -94,6 +94,14 @@ int magisk_main(int argc, char *argv[]) {
         struct pollfd pfd = { fd, POLLIN, 0 };
         poll(&pfd, 1, 1000 * POST_FS_DATA_WAIT_TIME);
         return 0;
+    } else if (argv[1] == "--post-fs-data-legacy"sv) {
+        // This is only used on older devices which don't support exec
+        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
+        struct pollfd pfd = { fd, POLLIN, 0 };
+        poll(&pfd, 1, 1000 * POST_FS_DATA_WAIT_TIME);
+
+        creat("/dev/.magisk_unblock", 0);
+        return 0;
     } else if (argv[1] == "--service"sv) {
         close(connect_daemon(MainRequest::LATE_START, true));
         return 0;

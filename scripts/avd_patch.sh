@@ -3,7 +3,7 @@
 #   AVD MagiskInit Setup
 #####################################################################
 #
-# Support API level: 23 - 33
+# Support API level: 23 - 33 (21 and 22 images do not have SELinux)
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py avd_patch path/to/booted/avd-image/ramdisk.img

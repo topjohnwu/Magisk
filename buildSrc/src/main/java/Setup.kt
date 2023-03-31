@@ -74,7 +74,7 @@ fun Project.setupCommon() {
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
-            minSdk = 23
+            minSdk = 21
             targetSdk = 33
         }
 

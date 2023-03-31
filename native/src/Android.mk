@@ -144,6 +144,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := resetprop
 LOCAL_STATIC_LIBRARIES := \
     libbase \
+    libcompat \
     libnanopb \
     libsystemproperties \
     libmagisk-rs

@@ -200,7 +200,7 @@ def clean_elf():
                    'tools/termux-elf-cleaner/elf-cleaner.cpp',
                    'tools/termux-elf-cleaner/arghandling.c',
                    '-o', elf_cleaner])
-    args = [elf_cleaner, "--api-level", "23"]
+    args = [elf_cleaner]
     args.extend(op.join('native', 'out', arch, bin)
                 for arch in archs for bin in ['magisk', 'magiskpolicy'])
     execv(args)
@@ -274,7 +274,7 @@ def run_cargo_build(args):
     env['TARGET_CC'] = op.join(llvm_bin, 'clang' + EXE_EXT)
     env['RUSTFLAGS'] = '-Clinker-plugin-lto'
     for (arch, triple) in zip(archs, triples):
-        env['TARGET_CFLAGS'] = f'--target={triple}23'
+        env['TARGET_CFLAGS'] = f'--target={triple}21'
         rust_triple = 'thumbv7neon-linux-androideabi' if triple.startswith('armv7') else triple
         proc = execv([*cmds, '--target', rust_triple], env)
         if proc.returncode != 0:
@@ -483,7 +483,7 @@ def setup_ndk(args):
         arch = target.split('-')[0]
         lib_dir = op.join(
             ndk_path, 'toolchains', 'llvm', 'prebuilt', f'{os_name}-x86_64',
-            'sysroot', 'usr', 'lib', f'{target}', '23')
+            'sysroot', 'usr', 'lib', f'{target}', '21')
         if not op.exists(lib_dir):
             continue
         src_dir = op.join('tools', 'ndk-bins', '21', arch)

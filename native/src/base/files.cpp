@@ -463,6 +463,18 @@ bool byte_data::contains(string_view pattern, bool log) const {
     return false;
 }
 
+bool byte_data::contains_raw(const char* pattern) const {
+    if (buf == nullptr)
+        return false;
+    auto len = strlen(pattern);
+    for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+        if (memcmp(p, pattern, len) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void byte_data::swap(byte_data &o) {
     std::swap(buf, o.buf);
     std::swap(sz, o.sz);

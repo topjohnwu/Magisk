@@ -10,9 +10,83 @@
 
 using namespace std;
 
+constexpr char MAGISK_RC[] = R"EOF(
+on post-fs-data
+    start logd
+    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
+
+on property:vold.decrypt=trigger_restart_framework
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on nonencrypted
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on property:sys.boot_completed=1
+    exec %2$s 0 0 -- %1$s/magisk --boot-complete
+
+on property:init.svc.zygote=restarting
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+
+on property:init.svc.zygote=stopped
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+)EOF";
+
+#define UNBLOCKFILE "/dev/.magisk_unblock"
+#define quote(s) #s
+#define str(s) quote(s)
+constexpr char MAGISK_RC_LEGACY[] =
+"on post-fs-data\n"
+"    start logd\n"
+"    rm " UNBLOCKFILE "\n"
+"    start %2$s\n"
+"    wait " UNBLOCKFILE " " str(POST_FS_DATA_WAIT_TIME) "\n"
+"    rm " UNBLOCKFILE "\n"
+"\n"
+
+"service %2$s %1$s/magisk --post-fs-data-legacy\n"
+"    user root\n"
+"    seclabel u:r:" SEPOL_PROC_DOMAIN ":s0\n"
+"    oneshot\n"
+"\n"
+
+"service %3$s %1$s/magisk --service\n"
+"    class late_start\n"
+"    user root\n"
+"    seclabel " MAGISK_PROC_CON "\n"
+"    oneshot\n"
+"\n"
+
+"on property:sys.boot_completed=1\n"
+"    start %4$s\n"
+"\n"
+
+"service %4$s %1$s/magisk --boot-complete\n"
+"    user root\n"
+"    seclabel " MAGISK_PROC_CON "\n"
+"    oneshot\n"
+"\n"
+
+"on property:init.svc.zygote=restarting\n"
+"    start %5$s\n"
+"\n"
+
+"on property:init.svc.zygote=stopped\n"
+"    start %5$s\n"
+"\n"
+
+"service %5$s %1$s/magisk --zygote-restart\n"
+"    user root\n"
+"    seclabel " MAGISK_PROC_CON "\n"
+"    oneshot\n"
+"\n"
+;
+#undef str
+#undef quote
+#undef UNBLOCKFILE
+
 static vector<string> rc_list;
 
-static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
+static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir, bool can_exec) {
     FILE *rc = xfopen(dest, "we");
     if (!rc) {
         PLOGE("%s: open %s failed", __PRETTY_FUNCTION__, src);
@@ -53,26 +127,17 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
 
     // Inject Magisk rc scripts
     LOGD("Inject magisk rc\n");
-    fprintf(rc, R"EOF(
-on post-fs-data
-    start logd
-    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
-
-on property:vold.decrypt=trigger_restart_framework
-    exec %2$s 0 0 -- %1$s/magisk --service
-
-on nonencrypted
-    exec %2$s 0 0 -- %1$s/magisk --service
-
-on property:sys.boot_completed=1
-    exec %2$s 0 0 -- %1$s/magisk --boot-complete
-
-on property:init.svc.zygote=restarting
-    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-
-on property:init.svc.zygote=stopped
-    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-)EOF", tmp_dir, MAGISK_PROC_CON);
+    if (can_exec) {
+        fprintf(rc, MAGISK_RC, tmp_dir, MAGISK_PROC_CON);
+    } else {
+        char pfd_svc[16], ls_svc[16], bc_svc[16], zr_svc[16];
+        gen_rand_str(pfd_svc, sizeof(pfd_svc));
+        gen_rand_str(ls_svc, sizeof(ls_svc));
+        gen_rand_str(bc_svc, sizeof(bc_svc));
+        gen_rand_str(zr_svc, sizeof(zr_svc));
+        LOGD("Inject magisk services: [%s] [%s] [%s] [%s]\n", pfd_svc, ls_svc, bc_svc, zr_svc);
+        fprintf(rc, MAGISK_RC_LEGACY, tmp_dir, pfd_svc, ls_svc, bc_svc, zr_svc);
+    }
 
     fclose(rc);
     clone_attr(src, dest);
@@ -269,9 +334,9 @@ void MagiskInit::patch_ro_root() {
     if (access(NEW_INITRC, F_OK) == 0) {
         // Android 11's new init.rc
         xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
-        patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data());
+        patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data(), true);
     } else {
-        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
+        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data(), true);
     }
 
     // Extract magisk
@@ -317,15 +382,18 @@ void MagiskInit::patch_rw_root() {
     rm_rf("/data/overlay.d");
     rm_rf("/.backup");
 
-    // Patch init.rc
-    patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
-    rename("/init.p.rc", "/init.rc");
-
-    bool treble;
+    bool treble, support_exec;
     {
         auto init = mmap_data("/init");
         treble = init.contains(SPLIT_PLAT_CIL);
+
+        // Android 5.x devices don't support exec, check it by checking this error message
+        support_exec = init.contains_raw("exec called without command");
     }
+
+    // Patch init.rc
+    patch_init_rc("/init.rc", "/init.p.rc", "/sbin", support_exec);
+    rename("/init.p.rc", "/init.rc");
 
     xmkdir(PRE_TMPSRC, 0);
     xmount("tmpfs", PRE_TMPSRC, "tmpfs", 0, "mode=755");
