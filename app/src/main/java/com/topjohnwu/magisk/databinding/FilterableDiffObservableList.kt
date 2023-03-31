@@ -6,10 +6,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class FilterableDiffObservableList<T>(
-    callback: Callback<T>,
+open class FilterableDiffObservableList<T : DiffItem<*>>(
     private val scope: CoroutineScope
-) : DiffObservableList<T>(callback) {
+) : DiffObservableList<T>() {
 
     private var sublist: List<T> = emptyList()
     private var job: Job? = null
@@ -24,7 +23,7 @@ open class FilterableDiffObservableList<T>(
             val diff = doCalculateDiff(oldList, newList)
             withContext(Dispatchers.Main) {
                 sublist = newList
-                diff.dispatchUpdatesTo(listCallback)
+                diff.dispatchUpdatesTo(this@FilterableDiffObservableList)
             }
         }
     }

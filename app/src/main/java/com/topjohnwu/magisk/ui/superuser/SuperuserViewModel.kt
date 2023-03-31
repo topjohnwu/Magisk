@@ -34,9 +34,9 @@ class SuperuserViewModel(
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
     private val itemsHelpers = ObservableArrayList<TextItem>()
-    private val itemsPolicies = DiffRvItemList<PolicyRvItem>()
+    private val itemsPolicies = DiffObservableList<PolicyRvItem>()
 
-    val items = MergeObservableList<AnyDiffRvItem>()
+    val items = MergeObservableList<RvItem>()
         .insertList(itemsHelpers)
         .insertList(itemsPolicies)
     val extraBindings = bindExtra {
@@ -54,7 +54,7 @@ class SuperuserViewModel(
             return
         }
         loading = true
-        val (policies, diff) = withContext(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             db.deleteOutdated()
             db.delete(AppContext.applicationInfo.uid)
             val policies = ArrayList<PolicyRvItem>()
@@ -91,9 +91,8 @@ class SuperuserViewModel(
                 { it.appName.lowercase(currentLocale) },
                 { it.packageName }
             ))
-            policies to itemsPolicies.calculateDiff(policies)
+            itemsPolicies.update(policies)
         }
-        itemsPolicies.update(policies, diff)
         if (itemsPolicies.isNotEmpty())
             itemsHelpers.clear()
         else if (itemsHelpers.isEmpty())

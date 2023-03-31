@@ -5,8 +5,9 @@ import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
-import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.set
 
 class PolicyRvItem(
@@ -16,7 +17,7 @@ class PolicyRvItem(
     private val isSharedUid: Boolean,
     val icon: Drawable,
     val appName: String
-) : ObservableDiffRvItem<PolicyRvItem>(), RvContainer<SuPolicy> {
+) : ObservableRvItem(), DiffItem<PolicyRvItem>, ItemWrapper<SuPolicy> {
 
     override val layoutRes = R.layout.item_policy_md2
 

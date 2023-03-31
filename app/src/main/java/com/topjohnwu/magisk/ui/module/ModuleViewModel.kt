@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.DiffRvItemList
+import com.topjohnwu.magisk.databinding.DiffObservableList
 import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
@@ -26,7 +26,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
 
-    private val itemsInstalled = DiffRvItemList<LocalModuleRvItem>()
+    private val itemsInstalled = DiffObservableList<LocalModuleRvItem>()
 
     val items = MergeObservableList<RvItem>()
     val extraBindings = bindExtra {
@@ -57,11 +57,10 @@ class ModuleViewModel : AsyncLoadViewModel() {
     override fun onNetworkChanged(network: Boolean) = startLoading()
 
     private suspend fun loadInstalled() {
-        val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
-        val diff = withContext(Dispatchers.Default) {
-            itemsInstalled.calculateDiff(installed)
+        withContext(Dispatchers.Default) {
+            val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
+            itemsInstalled.update(installed)
         }
-        itemsInstalled.update(installed, diff)
     }
 
     private suspend fun loadUpdateInfo() {

@@ -11,7 +11,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.databinding.DiffRvItemList
+import com.topjohnwu.magisk.databinding.DiffObservableList
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
@@ -37,28 +37,26 @@ class LogViewModel(
 
     // --- su log
 
-    val items = DiffRvItemList<SuLogRvItem>()
+    val items = DiffObservableList<SuLogRvItem>()
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
 
     // --- magisk log
-    val logs = DiffRvItemList<LogRvItem>()
+    val logs = DiffObservableList<LogRvItem>()
     var magiskLogRaw = " "
 
     override suspend fun doLoadWork() {
         loading = true
-         val (logs, logDiff) = withContext(Dispatchers.Default) {
-            magiskLogRaw = repo.fetchMagiskLogs()
-            val logs = magiskLogRaw.split('\n').map { LogRvItem(it) }
-            logs to this@LogViewModel.logs.calculateDiff(logs)
-        }
-        this.logs.update(logs, logDiff)
 
         val (suLogs, suDiff) = withContext(Dispatchers.Default) {
+            magiskLogRaw = repo.fetchMagiskLogs()
+            val newLogs = magiskLogRaw.split('\n').map { LogRvItem(it) }
+            logs.update(newLogs)
             val suLogs = repo.fetchSuLogs().map { SuLogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
         }
+
         items.firstOrNull()?.isTop = false
         items.lastOrNull()?.isBottom = false
         items.update(suLogs, suDiff)

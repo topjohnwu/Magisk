@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.ComparableRv
-import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.ktx.startAnimations
@@ -15,7 +15,7 @@ import kotlin.math.roundToInt
 
 class DenyListRvItem(
     val info: AppProcessInfo
-) : ObservableDiffRvItem<DenyListRvItem>(), ComparableRv<DenyListRvItem> {
+) : ObservableRvItem(), DiffItem<DenyListRvItem>, Comparable<DenyListRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_md2
 
@@ -100,7 +100,7 @@ class DenyListRvItem(
 
 class ProcessRvItem(
     val process: ProcessInfo
-) : ObservableDiffRvItem<ProcessRvItem>() {
+) : ObservableRvItem(), DiffItem<ProcessRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_process_md2
 
@@ -122,10 +122,9 @@ class ProcessRvItem(
     val defaultSelection get() =
         process.isIsolated || process.isAppZygote || process.name == process.packageName
 
-    override fun contentSameAs(other: ProcessRvItem) =
-        process.isEnabled == other.process.isEnabled
-
     override fun itemSameAs(other: ProcessRvItem) =
         process.name == other.process.name && process.packageName == other.process.packageName
 
+    override fun contentSameAs(other: ProcessRvItem) =
+        process.isEnabled == other.process.isEnabled
 }

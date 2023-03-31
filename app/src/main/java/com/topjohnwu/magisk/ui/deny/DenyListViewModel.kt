@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.di.AppContext
-import com.topjohnwu.magisk.databinding.DiffRvItemFilterList
+import com.topjohnwu.magisk.databinding.FilterableDiffObservableList
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.ktx.concurrentMap
@@ -38,7 +38,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             query()
         }
 
-    val items = DiffRvItemFilterList<DenyListRvItem>(viewModelScope)
+    val items = FilterableDiffObservableList<DenyListRvItem>(viewModelScope)
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
@@ -50,7 +50,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         loading = true
-        val (apps, diff) = withContext(Dispatchers.Default) {
+        withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
             val denyList = Shell.cmd("magisk --denylist ls").exec().out
                 .map { CmdlineListItem(it) }
@@ -63,9 +63,8 @@ class DenyListViewModel : AsyncLoadViewModel() {
                     .toCollection(ArrayList(size))
             }
             apps.sort()
-            apps to items.calculateDiff(apps)
+            items.update(apps)
         }
-        items.update(apps, diff)
         query()
     }
 

@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="@dimen/l1"
-        android:text="@{item.text}"
+        android:text="@{item.item}"
         android:textAppearance="@style/AppearanceFoundation.Tiny.Variant"
         tools:text="@tools:sample/lorem/random" />
 
