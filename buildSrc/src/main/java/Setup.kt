@@ -388,8 +388,8 @@ fun Project.setupStub() {
         "release/out/resources-release.ap_")
     val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
         "release/resources-release-optimize.ap_")
-    tasks.whenTaskAdded {
-        if (name == "optimizeReleaseResources") {
+    afterEvaluate {
+        tasks.named("optimizeReleaseResources") {
             doLast { apk.copyTo(optRes, true) }
         }
     }

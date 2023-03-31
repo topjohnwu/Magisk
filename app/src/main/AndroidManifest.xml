@@ -13,7 +13,6 @@
 
     <application
         android:name=".core.App"
-        android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:multiArch="true"
         tools:ignore="UnusedAttribute,GoogleAppIndexingWarning"
