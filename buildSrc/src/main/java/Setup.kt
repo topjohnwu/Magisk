@@ -190,6 +190,12 @@ private fun Project.setupAppCommon() {
         buildFeatures {
             buildConfig = true
         }
+
+        packaging {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
     }
 
     androidComponents.onVariants { variant ->
