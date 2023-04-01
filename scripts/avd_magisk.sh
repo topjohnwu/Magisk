@@ -145,9 +145,12 @@ ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
 mkdir -p $MAGISKTMP/.magisk/mirror
 mkdir $MAGISKTMP/.magisk/block
+mkdir $MAGISKTMP/.magisk/worker
 touch $MAGISKTMP/.magisk/config
 
 # Boot up
+export MAGISKTMP
+$MAGISKTMP/magisk --preinit-device
 $MAGISKTMP/magisk --post-fs-data
 start
 $MAGISKTMP/magisk --service
