@@ -62,7 +62,8 @@
 
         <service
             android:name=".core.download.DownloadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <service
             android:name=".core.JobService"
