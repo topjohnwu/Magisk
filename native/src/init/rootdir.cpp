@@ -158,14 +158,6 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
     }
 }
 
-static void patch_socket_name(const char *path) {
-    static char rstr[16] = { 0 };
-    if (rstr[0] == '\0')
-        gen_rand_str(rstr, sizeof(rstr));
-    auto bin = mmap_data(path, true);
-    bin.patch({ make_pair(MAIN_SOCKET, rstr) });
-}
-
 static void extract_files(bool sbin) {
     const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
     const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
@@ -177,7 +169,6 @@ static void extract_files(bool sbin) {
         int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
-        patch_socket_name("magisk32");
     }
     if (access(m64, F_OK) == 0) {
         auto magisk = mmap_data(m64);
@@ -185,7 +176,6 @@ static void extract_files(bool sbin) {
         int fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
         unxz(fd, magisk.buf, magisk.sz);
         close(fd);
-        patch_socket_name("magisk64");
         xsymlink("./magisk64", "magisk");
     } else {
         xsymlink("./magisk32", "magisk");

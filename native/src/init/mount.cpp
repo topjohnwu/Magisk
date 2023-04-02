@@ -273,7 +273,7 @@ void MagiskInit::setup_tmp(const char *path) {
 
     mount_preinit_dir(path, preinit_dev);
 
-    cp_afc(".backup/.magisk", INTLROOT "/config");
+    cp_afc(".backup/.magisk", MAIN_CONFIG);
     rm_rf(".backup");
 
     // Create applet symlinks
