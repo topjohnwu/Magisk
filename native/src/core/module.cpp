@@ -147,6 +147,10 @@ void mirror_node::mount() {
 
 void module_node::mount() {
     string src = module_mnt + module + parent()->root()->prefix + node_path();
+    if (node_path() == "/system/etc/hosts") {
+        // special case for /system/etc/hosts to ensure it is writable
+        src = std::string(MODULEROOT) + module + parent()->root()->prefix + "/system/etc/hosts";
+    }
     if (exist())
         clone_attr(mirror_path().data(), src.data());
     if (isa<tmpfs_node>(parent()))
@@ -303,6 +307,9 @@ void load_modules() {
         mount_zygisk(32)
         mount_zygisk(64)
     }
+
+    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
+    xmount(nullptr, worker_dir.data(), nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 }
 
 /************************
