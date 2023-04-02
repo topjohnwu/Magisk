@@ -88,7 +88,7 @@ static void poll_ctrl_handler(pollfd *pfd) {
     int code = read_int(pfd->fd);
     switch (code) {
     case POLL_CTRL_NEW: {
-        pollfd new_fd;
+        pollfd new_fd{};
         poll_callback cb;
         xxread(pfd->fd, &new_fd, sizeof(new_fd));
         xxread(pfd->fd, &cb, sizeof(cb));
@@ -101,6 +101,8 @@ static void poll_ctrl_handler(pollfd *pfd) {
         unregister_poll(fd, auto_close);
         break;
     }
+    default:
+        __builtin_unreachable();
     }
 }
 
@@ -372,7 +374,7 @@ static void daemon_entry() {
     rm_rf((MAGISKTMP + "/" ROOTOVL).data());
 
     // Load config status
-    auto config = MAGISKTMP + "/" INTLROOT "/config";
+    auto config = MAGISKTMP + "/" MAIN_CONFIG;
     parse_prop_file(config.data(), [](auto key, auto val) -> bool {
         if (key == "RECOVERYMODE" && val == "true")
             RECOVERY_MODE = true;
@@ -394,11 +396,14 @@ static void daemon_entry() {
         }
     }
 
-    sockaddr_un sun{};
-    socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (xbind(fd, (sockaddr *) &sun, len))
+    sockaddr_un addr = {.sun_family = AF_LOCAL};
+    strcpy(addr.sun_path, (MAGISKTMP + "/" MAIN_SOCKET).data());
+    unlink(addr.sun_path);
+    if (xbind(fd, (sockaddr *) &addr, sizeof(addr)))
         exit(1);
+    chmod(addr.sun_path, 0666);
+    setfilecon(addr.sun_path, MAGISK_FILE_CON);
     xlisten(fd, 10);
 
     default_new(poll_map);
@@ -414,10 +419,16 @@ static void daemon_entry() {
 }
 
 int connect_daemon(int req, bool create) {
-    sockaddr_un sun{};
-    socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
-    int fd = xsocket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-    if (connect(fd, (sockaddr *) &sun, len)) {
+    int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
+    sockaddr_un addr = {.sun_family = AF_LOCAL};
+    string tmp;
+    for (const auto &info: parse_mount_info("self")) {
+        if (info.source == "magisk" && info.root == "/") {
+            tmp = info.target;
+        }
+    }
+    strcpy(addr.sun_path, (tmp + "/" MAIN_SOCKET).data());
+    if (connect(fd, (sockaddr *) &addr, sizeof(addr))) {
         if (!create || getuid() != AID_ROOT) {
             LOGE("No daemon is currently running!\n");
             close(fd);
@@ -426,8 +437,8 @@ int connect_daemon(int req, bool create) {
 
         char buf[64];
         xreadlink("/proc/self/exe", buf, sizeof(buf));
-        if (str_starts(buf, "/system/bin/")) {
-            LOGE("Start daemon on /dev or /sbin\n");
+        if (tmp.empty() || !str_starts(buf, tmp)) {
+            LOGE("Start daemon on magisk tmpfs\n");
             close(fd);
             return -1;
         }
@@ -437,7 +448,7 @@ int connect_daemon(int req, bool create) {
             daemon_entry();
         }
 
-        while (connect(fd, (struct sockaddr *) &sun, len))
+        while (connect(fd, (sockaddr *) &addr, sizeof(addr)))
             usleep(10000);
     }
     write_int(fd, req);
