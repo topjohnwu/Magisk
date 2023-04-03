@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
     <string name="zygisk_module_unloaded">Moduli Zygisk nuk është ngarkuar për shkak të papajtueshmërisë</string>
     <string name="module_empty">Ska module të instaluar</string>
+    <string name="confirm_install">Të instalohet moduli %1$s?</string>
+    <string name="confirm_install_title">Konfirmo instalimin</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
