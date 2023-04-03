@@ -2,11 +2,9 @@ package com.topjohnwu.magisk.ui.module
 
 import android.os.Bundle
 import android.view.View
-import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addInvalidateItemDecorationsObserver
@@ -23,7 +21,7 @@ class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
         activity?.title = resources.getString(R.string.modules)
         viewModel.data.observe(this) {
             it ?: return@observe
-            MainDirections.actionFlashFragment(Const.Value.FLASH_ZIP, it).navigate()
+            viewModel.requestInstallLocalModule(it)
             viewModel.data.value = null
         }
     }

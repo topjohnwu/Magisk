@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">%1$s 未启用，此模块暂停加载</string>
     <string name="zygisk_module_unloaded">存在兼容性问题，此模块未加载</string>
     <string name="module_empty">未安装任何模块</string>
+    <string name="confirm_install">安装模块 %1$s？</string>
+    <string name="confirm_install_title">安装确认</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">主题模式</string>
