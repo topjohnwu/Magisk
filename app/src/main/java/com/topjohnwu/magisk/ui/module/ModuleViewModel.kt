@@ -17,6 +17,7 @@ import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
+import com.topjohnwu.magisk.events.dialog.ConfirmInstallLocalModuleDialog
 import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -81,6 +82,10 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun installPressed() = withExternalRW {
         GetContentEvent("application/zip", UriCallback()).publish()
+    }
+
+    fun requestInstallLocalModule(uri: Uri) {
+        ConfirmInstallLocalModuleDialog(this, uri).publish()
     }
 
     @Parcelize
