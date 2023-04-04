@@ -126,9 +126,11 @@ string find_preinit_device() {
     } matched = UNKNOWN;
     bool encrypted = getprop("ro.crypto.state") == "encrypted";
     bool mount = getuid() == 0 && getenv("MAGISKTMP");
+    bool make_dev = mount && getenv("MAKEDEV");
 
     string preinit_source;
     string preinit_dir;
+    dev_t preinit_dev;
 
     for (const auto &info: parse_mount_info("self")) {
         if (info.target.ends_with(PREINITMIRR))
@@ -180,6 +182,7 @@ string find_preinit_device() {
 
         if (mount) {
             preinit_dir = resolve_preinit_dir(info.target.data());
+            preinit_dev = info.device;
         }
         preinit_source = info.source;
     }
@@ -189,6 +192,10 @@ string find_preinit_device() {
         mkdirs(preinit_dir.data(), 0700);
         mkdirs(mirror_dir.data(), 0700);
         xmount(preinit_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
+        if (make_dev) {
+            auto dev_path = string(getenv("MAGISKTMP")) + "/" PREINITDEV;
+            xmknod(dev_path.data(), S_IFBLK | 0600, preinit_dev);
+        }
     }
     return preinit_source.empty() ? "" : basename(preinit_source.data());
 }
