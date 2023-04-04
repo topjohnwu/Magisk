@@ -145,10 +145,10 @@ void set_nice_name(const char *name) {
     prctl(PR_SET_NAME, name);
 }
 
-template<typename T>
-static T parse_num(string_view s, int base) {
-    T acc = 0;
-    for (char c: s) {
+template<typename T, int base>
+static T parse_num(string_view s) {
+    T val = 0;
+    for (char c : s) {
         if (isdigit(c)) {
             c -= '0';
         } else if (base > 10 && isalpha(c)) {
@@ -159,10 +159,10 @@ static T parse_num(string_view s, int base) {
         if (c >= base) {
             return -1;
         }
-        acc *= base;
-        acc += c;
+        val *= base;
+        val += c;
     }
-    return acc;
+    return val;
 }
 
 /*
@@ -170,11 +170,11 @@ static T parse_num(string_view s, int base) {
  * Use our own implementation for faster conversion.
  */
 int parse_int(string_view s) {
-    return parse_num<int>(s, 10);
+    return parse_num<int, 10>(s);
 }
 
 uint64_t parse_uint64_hex(string_view s) {
-    return parse_num<uint64_t>(s, 16);
+    return parse_num<uint64_t, 16>(s);
 }
 
 uint32_t binary_gcd(uint32_t u, uint32_t v) {
