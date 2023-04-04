@@ -1,16 +1,17 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import android.app.ProgressDialog
 import android.content.Context
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 
-class UninstallDialog : DialogEvent() {
+class UninstallDialog : DialogBuilder {
 
     override fun build(dialog: MagiskDialog) {
         dialog.apply {

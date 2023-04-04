@@ -16,8 +16,8 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.events.AddHomeIconEvent
+import com.topjohnwu.magisk.events.BiometricEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.BiometricEvent
 import com.topjohnwu.magisk.ktx.activity
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell

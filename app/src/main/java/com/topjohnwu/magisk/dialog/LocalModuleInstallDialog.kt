@@ -1,17 +1,18 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import android.net.Uri
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class ConfirmInstallLocalModuleDialog(
+class LocalModuleInstallDialog(
     private val viewModel: ModuleViewModel,
     private val uri: Uri
-) : DialogEvent() {
+) : DialogBuilder {
     override fun build(dialog: MagiskDialog) {
         dialog.apply {
             setTitle(R.string.confirm_install_title)

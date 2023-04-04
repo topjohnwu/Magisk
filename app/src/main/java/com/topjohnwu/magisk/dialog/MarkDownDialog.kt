@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import android.view.LayoutInflater
 import android.widget.TextView
@@ -6,6 +6,7 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.IOException
 
-abstract class MarkDownDialog : DialogEvent() {
+abstract class MarkDownDialog : DialogBuilder {
 
     abstract suspend fun getMarkdownText(): String
 

@@ -22,8 +22,8 @@ import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
-import com.topjohnwu.magisk.events.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,7 @@ class InstallViewModel(
                     GetContentEvent("*/*", UriCallback()).publish()
                 }
                 R.id.method_inactive_slot -> {
-                    SecondSlotWarningDialog().publish()
+                    SecondSlotWarningDialog().show()
                 }
             }
         }

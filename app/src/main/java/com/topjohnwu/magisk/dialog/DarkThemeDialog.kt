@@ -1,13 +1,14 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatDelegate
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class DarkThemeDialog : DialogEvent() {
+class DarkThemeDialog : DialogBuilder {
 
     override fun build(dialog: MagiskDialog) {
         val activity = dialog.ownerActivity!!

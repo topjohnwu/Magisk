@@ -1,9 +1,10 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class SecondSlotWarningDialog : DialogEvent() {
+class SecondSlotWarningDialog : DialogBuilder {
 
     override fun build(dialog: MagiskDialog) {
         dialog.apply {

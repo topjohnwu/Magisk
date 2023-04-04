@@ -183,12 +183,8 @@ fun ApplicationInfo.getLabel(pm: PackageManager): String {
 
 fun Context.unwrap(): Context {
     var context = this
-    while (true) {
-        if (context is ContextWrapper)
-            context = context.baseContext
-        else
-            break
-    }
+    while (context is ContextWrapper)
+        context = context.baseContext
     return context
 }
 

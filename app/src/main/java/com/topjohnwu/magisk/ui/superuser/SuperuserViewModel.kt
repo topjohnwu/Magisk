@@ -16,9 +16,9 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.*
+import com.topjohnwu.magisk.dialog.SuperuserRevokeDialog
+import com.topjohnwu.magisk.events.BiometricEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.BiometricEvent
-import com.topjohnwu.magisk.events.dialog.SuperuserRevokeDialog
 import com.topjohnwu.magisk.ktx.getLabel
 import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
@@ -116,10 +116,7 @@ class SuperuserViewModel(
                 onSuccess { updateState() }
             }.publish()
         } else {
-            SuperuserRevokeDialog {
-                appName = item.title
-                onSuccess { updateState() }
-            }.publish()
+            SuperuserRevokeDialog(item.title) { updateState() }.show()
         }
     }
 

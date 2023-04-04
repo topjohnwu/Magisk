@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
@@ -8,7 +8,7 @@ import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.view.MagiskDialog
 
-class ModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {
+class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {
 
     private val svc get() = ServiceLocator.networkService
 

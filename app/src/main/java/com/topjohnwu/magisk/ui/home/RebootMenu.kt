@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.events
+package com.topjohnwu.magisk.ui.home
 
 import android.os.Build
 import android.os.PowerManager
@@ -10,7 +10,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.ktx.reboot as systemReboot
 
-object RebootEvent {
+object RebootMenu {
 
     private fun reboot(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -25,14 +25,14 @@ object RebootEvent {
         return true
     }
 
-    fun inflateMenu(activity: BaseActivity): PopupMenu {
+    fun inflate(activity: BaseActivity): PopupMenu {
         val themeWrapper = ContextThemeWrapper(activity, R.style.Foundation_PopupMenu)
         val menu = PopupMenu(themeWrapper, activity.findViewById(R.id.action_reboot))
         activity.menuInflater.inflate(R.menu.menu_reboot, menu.menu)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
             activity.getSystemService<PowerManager>()?.isRebootingUserspaceSupported == true)
             menu.menu.findItem(R.id.action_reboot_userspace).isVisible = true
-        menu.setOnMenuItemClickListener(::reboot)
+        menu.setOnMenuItemClickListener(RebootMenu::reboot)
         return menu
     }
 

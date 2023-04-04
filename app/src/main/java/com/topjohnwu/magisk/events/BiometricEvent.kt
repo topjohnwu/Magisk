@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.events
 
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.UIActivity
@@ -9,8 +9,8 @@ class BiometricEvent(
     builder: Builder.() -> Unit
 ) : ViewEvent(), ActivityExecutor {
 
-    private var listenerOnFailure: GenericDialogListener = {}
-    private var listenerOnSuccess: GenericDialogListener = {}
+    private var listenerOnFailure: () -> Unit = {}
+    private var listenerOnSuccess: () -> Unit = {}
 
     init {
         builder(Builder())
@@ -26,11 +26,11 @@ class BiometricEvent(
 
     inner class Builder internal constructor() {
 
-        fun onFailure(listener: GenericDialogListener) {
+        fun onFailure(listener: () -> Unit) {
             listenerOnFailure = listener
         }
 
-        fun onSuccess(listener: GenericDialogListener) {
+        fun onSuccess(listener: () -> Unit) {
             listenerOnSuccess = listener
         }
     }

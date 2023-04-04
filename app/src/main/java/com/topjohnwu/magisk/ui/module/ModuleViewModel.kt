@@ -15,10 +15,10 @@ import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
+import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.ConfirmInstallLocalModuleDialog
-import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -75,7 +75,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun downloadPressed(item: OnlineModule?) =
         if (item != null && Info.isConnected.value == true) {
-            withExternalRW { ModuleInstallDialog(item).publish() }
+            withExternalRW { OnlineModuleInstallDialog(item).show() }
         } else {
             SnackbarEvent(R.string.no_connection).publish()
         }
@@ -85,7 +85,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
     }
 
     fun requestInstallLocalModule(uri: Uri) {
-        ConfirmInstallLocalModuleDialog(this, uri).publish()
+        LocalModuleInstallDialog(this, uri).show()
     }
 
     @Parcelize

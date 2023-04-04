@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.events.dialog
+package com.topjohnwu.magisk.dialog
 
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.BuildConfig
@@ -6,11 +6,12 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
+import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.view.MagiskDialog
 import kotlinx.coroutines.launch
 
-class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : DialogEvent() {
+class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : DialogBuilder {
 
     override fun build(dialog: MagiskDialog) {
         dialog.apply {

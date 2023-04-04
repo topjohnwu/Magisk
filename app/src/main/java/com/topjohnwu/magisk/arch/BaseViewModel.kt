@@ -7,11 +7,12 @@ import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.ObservableHost
 import com.topjohnwu.magisk.events.BackPressEvent
+import com.topjohnwu.magisk.events.DialogBuilder
+import com.topjohnwu.magisk.events.DialogEvent
 import com.topjohnwu.magisk.events.NavigationEvent
 import com.topjohnwu.magisk.events.PermissionEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
@@ -65,13 +66,12 @@ abstract class BaseViewModel : ViewModel(), ObservableHost {
 
     fun back() = BackPressEvent().publish()
 
-    fun <Event : ViewEvent> Event.publish() {
+    fun ViewEvent.publish() {
         _viewEvents.postValue(this)
     }
 
-    fun <Event : ViewEventWithScope> Event.publish() {
-        scope = viewModelScope
-        _viewEvents.postValue(this)
+    fun DialogBuilder.show() {
+        DialogEvent(this).publish()
     }
 
     fun NavDirections.navigate(pop: Boolean = false) {
