@@ -233,14 +233,14 @@ void MagiskInit::patch_ro_root() {
     setup_tmp(tmp_dir.data());
     chdir(tmp_dir.data());
 
-    // Mount system_root mirror
-    xmkdir(ROOTMIR, 0755);
-    xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
-    mount_list.emplace_back(tmp_dir + "/" ROOTMIR);
-
     // Recreate original sbin structure if necessary
-    if (tmp_dir == "/sbin")
+    if (tmp_dir == "/sbin") {
+        // Mount system_root mirror
+        xmkdir(ROOTMIR, 0755);
+        xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
         recreate_sbin(ROOTMIR "/sbin", true);
+        xumount2(ROOTMIR, MNT_DETACH);
+    }
 
     xrename("overlay.d", ROOTOVL);
 
