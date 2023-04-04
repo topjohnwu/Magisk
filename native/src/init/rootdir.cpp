@@ -209,7 +209,7 @@ void MagiskInit::parse_config_file() {
         }
         return true;
     });
-    gen_rand_str(nullptr, 0, &seed);
+    get_rand(&seed);
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"

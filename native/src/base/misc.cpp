@@ -33,7 +33,7 @@ int fork_no_orphan() {
     return 0;
 }
 
-int gen_rand_str(char *buf, int len, const void *seed_buf, bool varlen) {
+mt19937_64 &get_rand(const void *seed_buf) {
     static mt19937_64 gen([&] {
         mt19937_64::result_type seed;
         if (seed_buf == nullptr) {
@@ -45,6 +45,11 @@ int gen_rand_str(char *buf, int len, const void *seed_buf, bool varlen) {
         }
         return seed;
     }());
+    return gen;
+}
+
+int gen_rand_str(char *buf, int len, bool varlen) {
+    auto gen = get_rand();
 
     if (len == 0)
         return 0;
