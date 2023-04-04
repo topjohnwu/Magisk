@@ -71,7 +71,7 @@ static void mount_mirrors() {
         bool mounted = false;
         for (const auto &info: self_mount_info) {
             if (info.root == "/" && info.device == preinit_dev) {
-                auto flags = split_ro(info.fs_option, ",");
+                auto flags = split_view(info.fs_option, ",");
                 auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
                     return flag == "rw"sv;
                 });
@@ -137,7 +137,7 @@ string find_preinit_device() {
             continue;
         if (info.type != "ext4" && info.type != "f2fs")
             continue;
-        auto flags = split_ro(info.fs_option, ",");
+        auto flags = split_view(info.fs_option, ",");
         auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
             return flag == "rw"sv;
         });

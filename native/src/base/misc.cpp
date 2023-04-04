@@ -217,14 +217,14 @@ string &replace_all(string &str, string_view from, string_view to) {
     return str;
 }
 
-template <class T>
-static auto split_impl(T s, T delims) {
-    vector<std::decay_t<T>> result;
+template <typename T>
+static auto split_impl(string_view s, string_view delims) {
+    vector<T> result;
     size_t base = 0;
     size_t found;
     while (true) {
         found = s.find_first_of(delims, base);
-        result.push_back(s.substr(base, found - base));
+        result.emplace_back(s.substr(base, found - base));
         if (found == string::npos)
             break;
         base = found + 1;
@@ -232,11 +232,11 @@ static auto split_impl(T s, T delims) {
     return result;
 }
 
-vector<string> split(const string &s, const string &delims) {
-    return split_impl<const string&>(s, delims);
+vector<string> split(string_view s, string_view delims) {
+    return split_impl<string>(s, delims);
 }
 
-vector<string_view> split_ro(string_view s, string_view delims) {
+vector<string_view> split_view(string_view s, string_view delims) {
     return split_impl<string_view>(s, delims);
 }
 
