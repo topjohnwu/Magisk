@@ -149,7 +149,7 @@ void module_node::mount() {
     string src = module_mnt + module + parent()->root()->prefix + node_path();
     if (node_path() == "/system/etc/hosts") {
         // special case for /system/etc/hosts to ensure it is writable
-        src = std::string(MODULEROOT) + module + parent()->root()->prefix + "/system/etc/hosts";
+        src = std::string(MODULEROOT "/") + module + parent()->root()->prefix + "/system/etc/hosts";
     }
     if (exist())
         clone_attr(mirror_path().data(), src.data());
