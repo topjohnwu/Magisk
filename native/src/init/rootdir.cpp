@@ -231,7 +231,7 @@ void MagiskInit::patch_ro_root() {
     }
 
     setup_tmp(tmp_dir.data());
-    chdir("/data");
+    chdir(tmp_dir.data());
 
     if (tmp_dir == "/sbin") {
         // Recreate original sbin structure
