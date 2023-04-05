@@ -59,7 +59,7 @@ Let's continue to [Patching Images](#patching-images).
   where `[_x]` should be `_a` or `_b` or empty depending on your device
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
   `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
-- Reboot and launch Magisk app (you will see a stub Magisk app if you have wipped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
+- Reboot and launch Magisk app (you will see a stub Magisk app if you have wiped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
 - Voila!
 
 ## Uninstallation
@@ -131,11 +131,12 @@ Once you have rooted your Samsung device, you can no longer upgrade your Android
 
 > **This installation method is deprecated and is maintained with minimum effort. YOU HAVE BEEN WARNED!**
 
-Installing using custom recoveries is only possible if your device has boot ramdisk. Installing Magisk through custom recoveries on modern devices is no longer recommended. If you face any issues, please use the proper [Patch Image](#patching-images) method.
+Installing using custom recoveries is only possible if your device has boot ramdisk. Installing Magisk through custom recoveries on modern devices is no longer recommended. If you face any issues, please use the [Patch Image](#patching-images) method.
 
 - Download the Magisk APK
 - Rename the `.apk` file extension to `.zip`, for example: `Magisk-v24.0.apk` → `Magisk-v24.0.zip`. If you have trouble renaming the file extension (like on Windows), use a file manager on Android or the one included in the custom recovery to rename the file.
 - Flash the zip just like any other ordinary flashable zip.
 - Reboot and check whether the Magisk app is installed. If it isn't installed automatically, manually install the APK.
+- Launch the Magisk app; it will show a dialog asking for reinstallation. Do the reinstallation **directly within the app** and reboot (if you are using MTK devices that lock the boot partition after boot, please [patch the boot image](#patching-images) and flash it by custom recovery or fastboot).
 
 > Warning: the `sepolicy.rule` file of modules may be stored in the `cache` partition. DO NOT WIPE THE `CACHE` PARTITION.
