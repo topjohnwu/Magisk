@@ -115,7 +115,10 @@ public final class APKInstall {
                             var installer = context.getPackageManager().getPackageInstaller();
                             var info = installer.getSessionInfo(id);
                             if (info != null) {
-                                installer.abandonSession(info.getSessionId());
+                                try {
+                                    installer.abandonSession(info.getSessionId());
+                                } catch (Throwable ignored) {
+                                }
                             }
                         }
                         if (onFailure != null) {
