@@ -46,6 +46,7 @@ struct su_req_base {
     bool login = false;
     bool keepenv = false;
     bool mount_master = false;
+    int target_pid_ns_mnt = 0;
 } __attribute__((packed));
 
 struct su_request : public su_req_base {

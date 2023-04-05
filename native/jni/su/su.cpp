@@ -38,7 +38,9 @@ static void usage(int status) {
     "  -v, --version                 display version number and exit\n"
     "  -V                            display version code and exit\n"
     "  -mm, -M,\n"
-    "  --mount-master                force run in the global mount namespace\n\n");
+    "  --mount-master                force run in the global mount namespace\n"
+    "  -nsm, -N,\n"
+    "  --ns-mnt TARGET_PID           force run in the target pid mount namespace\n\n");
     exit(status);
 }
 
@@ -85,6 +87,7 @@ int su_client_main(int argc, char *argv[]) {
             { "version",                no_argument,        nullptr, 'v' },
             { "context",                required_argument,  nullptr, 'z' },
             { "mount-master",           no_argument,        nullptr, 'M' },
+            { "ns-mnt",                 no_argument,        nullptr, 'N' },
             { nullptr, 0, nullptr, 0 },
     };
 
@@ -92,13 +95,16 @@ int su_client_main(int argc, char *argv[]) {
 
     for (int i = 0; i < argc; i++) {
         // Replace -cn with -z, -mm with -M for supporting getopt_long
+        // -nsm with -N
         if (strcmp(argv[i], "-cn") == 0)
             strcpy(argv[i], "-z");
         else if (strcmp(argv[i], "-mm") == 0)
             strcpy(argv[i], "-M");
+        else if (strcmp(argv[i], "-nsm") == 0)
+            strcpy(argv[i], "-N");
     }
 
-    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:M", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:MN:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c':
                 for (int i = optind - 1; i < argc; ++i) {
@@ -132,6 +138,9 @@ int su_client_main(int argc, char *argv[]) {
                 break;
             case 'M':
                 su_req.mount_master = true;
+                break;
+            case 'N':
+                su_req.target_pid_ns_mnt = atoi(optarg);
                 break;
             default:
                 /* Bionic getopt_long doesn't terminate its error output by newline */

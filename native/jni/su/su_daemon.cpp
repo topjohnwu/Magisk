@@ -381,6 +381,8 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     // Handle namespaces
     if (ctx.req.mount_master)
         ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
+    else if (ctx.req.target_pid_ns_mnt > 0)
+        ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_REQ_PARAM;
     switch (ctx.info->cfg[SU_MNT_NS]) {
         case NAMESPACE_MODE_GLOBAL:
             LOGD("su: use global namespace\n");
@@ -395,6 +397,11 @@ void su_daemon_handler(int client, const sock_cred *cred) {
             switch_mnt_ns(ctx.pid);
             xunshare(CLONE_NEWNS);
             xmount(nullptr, "/", nullptr, MS_PRIVATE | MS_REC, nullptr);
+            break;
+        case NAMESPACE_MODE_REQ_PARAM:
+            LOGD("su: use namespace of pid=[%d] from su req\n", ctx.req.target_pid_ns_mnt);
+            if (switch_mnt_ns(ctx.req.target_pid_ns_mnt))
+                LOGD("su: setns failed, fallback to global\n");
             break;
     }
 

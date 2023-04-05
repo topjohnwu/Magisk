@@ -70,7 +70,8 @@ enum {
 enum {
     NAMESPACE_MODE_GLOBAL = 0,
     NAMESPACE_MODE_REQUESTER,
-    NAMESPACE_MODE_ISOLATE
+    NAMESPACE_MODE_ISOLATE,
+    NAMESPACE_MODE_REQ_PARAM
 };
 
 class db_settings : public db_dict<int, std::size(DB_SETTING_KEYS)> {
