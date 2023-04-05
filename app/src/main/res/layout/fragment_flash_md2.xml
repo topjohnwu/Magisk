@@ -24,7 +24,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/flash_content"
-                scrollToLast="@{true}"
+                scrollToLast="@{false}"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
