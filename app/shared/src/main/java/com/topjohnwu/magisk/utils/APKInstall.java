@@ -101,30 +101,25 @@ public final class APKInstall {
             } else if (sessionId.equals(intent.getAction())) {
                 int status = intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE_INVALID);
                 switch (status) {
-                    case STATUS_PENDING_USER_ACTION:
-                        userAction = intent.getParcelableExtra(Intent.EXTRA_INTENT);
-                        break;
-                    case STATUS_SUCCESS:
+                    case STATUS_PENDING_USER_ACTION ->
+                            userAction = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+                    case STATUS_SUCCESS -> {
                         if (packageName == null) {
                             onSuccess(context);
                         }
-                        break;
-                    default:
+                    }
+                    default -> {
                         int id = intent.getIntExtra(EXTRA_SESSION_ID, 0);
-                        if (id > 0) {
-                            var installer = context.getPackageManager().getPackageInstaller();
-                            var info = installer.getSessionInfo(id);
-                            if (info != null) {
-                                try {
-                                    installer.abandonSession(info.getSessionId());
-                                } catch (Throwable ignored) {
-                                }
-                            }
+                        var installer = context.getPackageManager().getPackageInstaller();
+                        try {
+                            installer.abandonSession(id);
+                        } catch (SecurityException ignored) {
                         }
                         if (onFailure != null) {
                             onFailure.run();
                         }
                         context.getApplicationContext().unregisterReceiver(this);
+                    }
                 }
                 latch.countDown();
             }
