@@ -77,11 +77,6 @@ public:
     using BaseInit::BaseInit;
 };
 
-class SARBase : public MagiskInit {
-public:
-    using MagiskInit::MagiskInit;
-};
-
 /***************
  * 2 Stage Init
  ***************/
@@ -99,17 +94,18 @@ public:
     }
 };
 
-class SecondStageInit : public SARBase {
+class SecondStageInit : public MagiskInit {
 private:
     bool prepare();
 public:
-    SecondStageInit(char *argv[]) : SARBase(argv) {
+    SecondStageInit(char *argv[]) : MagiskInit(argv) {
         setup_klog();
         LOGD("%s\n", __FUNCTION__);
     };
 
     void start() override {
-        if (prepare())
+        bool is_rootfs = prepare();
+        if (is_rootfs)
             patch_rw_root();
         else
             patch_ro_root();
@@ -121,17 +117,18 @@ public:
  * Legacy SAR
  *************/
 
-class LegacySARInit : public SARBase {
+class LegacySARInit : public MagiskInit {
 private:
     bool mount_system_root();
     void first_stage_prep();
 public:
-    LegacySARInit(char *argv[], BootConfig *config) : SARBase(argv, config) {
+    LegacySARInit(char *argv[], BootConfig *config) : MagiskInit(argv, config) {
         LOGD("%s\n", __FUNCTION__);
     };
     void start() override {
         prepare_data();
-        if (mount_system_root())
+        bool is_two_stage = mount_system_root();
+        if (is_two_stage)
             first_stage_prep();
         else
             patch_ro_root();
