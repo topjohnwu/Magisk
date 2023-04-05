@@ -28,7 +28,7 @@ using xstring = jni_hook::string;
 static void hook_unloader();
 static void unhook_functions();
 static void hook_jni_env();
-static bool unhook_jni(JNIEnv *env);
+static void restore_jni_env(JNIEnv *env);
 
 namespace {
 
@@ -96,8 +96,11 @@ struct HookContext {
     HookContext(JNIEnv *env, void *args) :
     env(env), args{args}, process(nullptr), pid(-1), info_flags(0),
     hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {
-        static bool unloaded = unhook_jni(env);
-        should_unmap_zygisk = unloaded;
+        static bool restored_env = false;
+        if (!restored_env) {
+            restore_jni_env(env);
+            restored_env = true;
+        }
         g_ctx = this;
     }
 
@@ -607,6 +610,26 @@ HookContext::~HookContext() {
     if (!is_child())
         return;
 
+    should_unmap_zygisk = true;
+
+    // Unhook JNI methods
+    for (const auto &[clz, methods] : *jni_hook_list) {
+        if (!methods.empty() && env->RegisterNatives(
+                env->FindClass(clz.data()), methods.data(),
+                static_cast<int>(methods.size())) != 0) {
+            ZLOGE("Failed to restore JNI hook of class [%s]\n", clz.data());
+            should_unmap_zygisk = false;
+        }
+    }
+    delete jni_hook_list;
+    jni_hook_list = nullptr;
+
+    // Do NOT directly call delete
+    operator delete(jni_method_map);
+    // Directly unmap the whole memory block
+    jni_hook::memory_block::release();
+    jni_method_map = nullptr;
+
     // Strip out all API function pointers
     for (auto &m : modules) {
         m.clearApi();
@@ -764,35 +787,11 @@ static void unhook_functions() {
         }
     }
     delete plt_hook_list;
+    plt_hook_list = nullptr;
     if (!lsplt::CommitHook()) {
         ZLOGE("Failed to restore plt_hook\n");
         should_unmap_zygisk = false;
     }
-}
-
-static bool unhook_jni(JNIEnv *env) {
-    // Restore JNIEnv
-    env->functions = old_functions;
-    delete new_functions;
-
-    bool success = true;
-
-    // Unhook JNI methods
-    for (const auto &[clz, methods] : *jni_hook_list) {
-        if (!methods.empty() && env->RegisterNatives(
-                env->FindClass(clz.data()), methods.data(),
-                static_cast<int>(methods.size())) != 0) {
-            ZLOGE("Failed to restore JNI hook of class [%s]\n", clz.data());
-            success = false;
-        }
-    }
-    delete jni_hook_list;
-
-    // Do NOT call the destructor
-    operator delete(jni_method_map);
-    // Directly unmap the whole memory block
-    jni_hook::memory_block::release();
-    return success;
 }
 
 // -----------------------------------------------------------------
@@ -861,6 +860,12 @@ static void hook_jni_env() {
     new_functions->RegisterNatives = &env_RegisterNatives;
     old_functions = env->functions;
     env->functions = new_functions;
+}
+
+static void restore_jni_env(JNIEnv *env) {
+    env->functions = old_functions;
+    delete new_functions;
+    new_functions = nullptr;
 }
 
 #define HOOK_JNI(method)                                                                     \
