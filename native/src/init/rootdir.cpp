@@ -233,8 +233,9 @@ void MagiskInit::patch_ro_root() {
     setup_tmp(tmp_dir.data());
     chdir(tmp_dir.data());
 
+    // Recreate original sbin structure if necessary
     if (tmp_dir == "/sbin") {
-        // Recreate original sbin structure
+        // Mount system_root mirror
         xmkdir(ROOTMIR, 0755);
         xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
         recreate_sbin(ROOTMIR "/sbin", true);
@@ -279,8 +280,7 @@ void MagiskInit::patch_ro_root() {
     // Oculus Go will use a special sepolicy if unlocked
     if (access("/sepolicy.unlocked", F_OK) == 0) {
         patch_sepolicy("/sepolicy.unlocked", ROOTOVL "/sepolicy.unlocked");
-    } else if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) ||
-               !hijack_sepolicy()) {
+    } else if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
         patch_sepolicy("/sepolicy", ROOTOVL "/sepolicy");
     }
 
