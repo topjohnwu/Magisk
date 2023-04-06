@@ -84,8 +84,8 @@ class ModuleViewModel : AsyncLoadViewModel() {
         GetContentEvent("application/zip", UriCallback()).publish()
     }
 
-    fun requestInstallLocalModule(uri: Uri) {
-        LocalModuleInstallDialog(this, uri).show()
+    fun requestInstallLocalModule(uri: Uri, displayName: String) {
+        LocalModuleInstallDialog(this, uri, displayName).show()
     }
 
     @Parcelize

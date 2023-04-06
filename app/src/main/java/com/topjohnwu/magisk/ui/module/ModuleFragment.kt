@@ -5,6 +5,7 @@ import android.view.View
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.core.utils.MediaStoreUtils.displayName
 import com.topjohnwu.magisk.databinding.FragmentModuleMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addInvalidateItemDecorationsObserver
@@ -21,7 +22,8 @@ class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
         activity?.title = resources.getString(R.string.modules)
         viewModel.data.observe(this) {
             it ?: return@observe
-            viewModel.requestInstallLocalModule(it)
+            val displayName = runCatching { it.displayName }.getOrNull() ?: return@observe
+            viewModel.requestInstallLocalModule(it, displayName)
             viewModel.data.value = null
         }
     }
