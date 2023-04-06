@@ -6,12 +6,35 @@ import androidx.databinding.ListChangeRegistry
 import androidx.databinding.ObservableList
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.AbstractList
 
-open class DiffObservableList<T : DiffItem<*>>
-    : AbstractList<T>(), ObservableList<T>, ListUpdateCallback {
+// Only expose the immutable List types
+interface DiffList<T : DiffItem<*>> : List<T> {
+    fun calculateDiff(newItems: List<T>): DiffUtil.DiffResult
+
+    @MainThread
+    fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult)
+
+    @WorkerThread
+    suspend fun update(newItems: List<T>)
+}
+
+interface FilterList<T : DiffItem<*>> : DiffList<T> {
+    fun filter(filter: (T) -> Boolean)
+}
+
+fun <T : DiffItem<*>> diffList(): DiffList<T> = DiffObservableList()
+
+fun <T : DiffItem<*>> filterList(scope: CoroutineScope): FilterList<T> =
+    FilterableDiffObservableList(scope)
+
+private open class DiffObservableList<T : DiffItem<*>>
+    : AbstractList<T>(), ObservableList<T>, DiffList<T>, ListUpdateCallback {
 
     protected var list: List<T> = emptyList()
         private set
@@ -21,7 +44,7 @@ open class DiffObservableList<T : DiffItem<*>>
 
     override fun get(index: Int) = list[index]
 
-    fun calculateDiff(newItems: List<T>): DiffUtil.DiffResult {
+    override fun calculateDiff(newItems: List<T>): DiffUtil.DiffResult {
         return doCalculateDiff(list, newItems)
     }
 
@@ -48,13 +71,13 @@ open class DiffObservableList<T : DiffItem<*>>
     }
 
     @MainThread
-    fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
+    override fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
         list = ArrayList(newItems)
         diffResult.dispatchUpdatesTo(this)
     }
 
     @WorkerThread
-    suspend fun update(newItems: List<T>) {
+    override suspend fun update(newItems: List<T>) {
         val diffResult = calculateDiff(newItems)
         withContext(Dispatchers.Main) {
             update(newItems, diffResult)
@@ -86,4 +109,36 @@ open class DiffObservableList<T : DiffItem<*>>
         modCount += 1
         listeners.notifyRemoved(this, position, count)
     }
+}
+
+private class FilterableDiffObservableList<T : DiffItem<*>>(
+    private val scope: CoroutineScope
+) : DiffObservableList<T>(), FilterList<T> {
+
+    private var sublist: List<T> = emptyList()
+    private var job: Job? = null
+
+    // ---
+
+    override fun filter(filter: (T) -> Boolean) {
+        job?.cancel()
+        job = scope.launch(Dispatchers.Default) {
+            val oldList = sublist
+            val newList = list.filter(filter)
+            val diff = doCalculateDiff(oldList, newList)
+            withContext(Dispatchers.Main) {
+                sublist = newList
+                diff.dispatchUpdatesTo(this@FilterableDiffObservableList)
+            }
+        }
+    }
+
+    // ---
+
+    override fun get(index: Int): T {
+        return sublist[index]
+    }
+
+    override val size: Int
+        get() = sublist.size
 }

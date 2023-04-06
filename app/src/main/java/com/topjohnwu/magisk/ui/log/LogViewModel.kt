@@ -13,8 +13,8 @@ import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
-import com.topjohnwu.magisk.databinding.DiffObservableList
 import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.diffList
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.view.TextItem
@@ -37,13 +37,13 @@ class LogViewModel(
 
     // --- su log
 
-    val items = DiffObservableList<SuLogRvItem>()
+    val items = diffList<SuLogRvItem>()
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
 
     // --- magisk log
-    val logs = DiffObservableList<LogRvItem>()
+    val logs = diffList<LogRvItem>()
     var magiskLogRaw = " "
 
     override suspend fun doLoadWork() {

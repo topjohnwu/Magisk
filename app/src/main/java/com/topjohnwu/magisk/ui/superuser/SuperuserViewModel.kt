@@ -34,7 +34,7 @@ class SuperuserViewModel(
     private val itemNoData = TextItem(R.string.superuser_policy_none)
 
     private val itemsHelpers = ObservableArrayList<TextItem>()
-    private val itemsPolicies = DiffObservableList<PolicyRvItem>()
+    private val itemsPolicies = diffList<PolicyRvItem>()
 
     val items = MergeObservableList<RvItem>()
         .insertList(itemsHelpers)
@@ -105,8 +105,10 @@ class SuperuserViewModel(
     fun deletePressed(item: PolicyRvItem) {
         fun updateState() = viewModelScope.launch {
             db.delete(item.item.uid)
-            itemsPolicies.removeAll { it.itemSameAs(item) }
-            if (itemsPolicies.isEmpty() && itemsHelpers.isEmpty()) {
+            val list = ArrayList(itemsPolicies)
+            list.removeAll { it.itemSameAs(item) }
+            itemsPolicies.update(list)
+            if (list.isEmpty() && itemsHelpers.isEmpty()) {
                 itemsHelpers.add(itemNoData)
             }
         }

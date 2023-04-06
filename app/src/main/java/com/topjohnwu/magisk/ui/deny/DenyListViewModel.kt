@@ -8,8 +8,8 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.concurrentMap
-import com.topjohnwu.magisk.databinding.FilterableDiffObservableList
 import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.filterList
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
             query()
         }
 
-    val items = FilterableDiffObservableList<DenyListRvItem>(viewModelScope)
+    val items = filterList<DenyListRvItem>(viewModelScope)
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }

@@ -46,11 +46,11 @@ class MergeObservableList<T> : AbstractList<T>(), ObservableList<T> {
         return this
     }
 
-    fun insertList(list: ObservableList<out T>): MergeObservableList<T> {
+    fun insertList(list: List<T>): MergeObservableList<T> {
         val idx = size
         lists.add(list)
         ++modCount
-        (list as ObservableList<T>).addOnListChangedCallback(callback)
+        (list as? ObservableList<T>)?.addOnListChangedCallback(callback)
         if (list.isNotEmpty())
             listeners.notifyInserted(this, idx, list.size)
         return this
@@ -72,11 +72,11 @@ class MergeObservableList<T> : AbstractList<T>(), ObservableList<T> {
         return false
     }
 
-    fun removeList(listToRemove: ObservableList<out T>): Boolean {
+    fun removeList(listToRemove: List<T>): Boolean {
         var idx = 0
         for ((i, list) in lists.withIndex()) {
             if (listToRemove === list) {
-                (list as ObservableList<T>).removeOnListChangedCallback(callback)
+                (list as? ObservableList<T>)?.removeOnListChangedCallback(callback)
                 lists.removeAt(i)
                 ++modCount
                 listeners.notifyRemoved(this, idx, list.size)
@@ -90,8 +90,8 @@ class MergeObservableList<T> : AbstractList<T>(), ObservableList<T> {
     override fun clear() {
         val sz = size
         for (list in lists) {
-            if (list is ObservableList<*>) {
-                (list as ObservableList<T>).removeOnListChangedCallback(callback)
+            if (list is ObservableList) {
+                list.removeOnListChangedCallback(callback)
             }
         }
         ++modCount
