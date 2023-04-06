@@ -44,7 +44,6 @@ fix_env() {
   rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
-  rm $1/stub.apk 2>/dev/null
   cp_readlink $1 $MAGISKBIN
   rm -rf $1
   chown -R 0:0 $MAGISKBIN

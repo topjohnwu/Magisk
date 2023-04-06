@@ -273,8 +273,8 @@ mount_partitions() {
 
   # Mount ro partitions
   if is_mounted /system_root; then
-    umount /system 2&>/dev/null
-    umount /system_root 2&>/dev/null
+    umount /system 2>/dev/null
+    umount /system_root 2>/dev/null
   fi
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init -o -L /system/init ]; then
@@ -329,7 +329,7 @@ mount_apex() {
       [ -f /apex/original_apex ] && APEX=/apex/original_apex # unzip doesn't do return codes
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1 | tr -dc [:alnum:].-_'\n')
+      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1 | tr -dc '[:alnum:].-_\n')
       [ -z $DEST ] && DEST=$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
       [ -z $DEST ] && continue
       DEST=/apex/$DEST
@@ -345,7 +345,7 @@ mount_apex() {
       if [ -f $APEX/apex_manifest.json ]; then
         DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
       elif [ -f $APEX/apex_manifest.pb ]; then
-        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1 | tr -dc [:alnum:].-_'\n')
+        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1 | tr -dc '[:alnum:].-_\n')
       else
         continue
       fi
