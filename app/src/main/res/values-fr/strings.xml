@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">Module suspendu car %1$s n’est pas actif</string>
     <string name="zygisk_module_unloaded">Module Zygisk non chargé en raison d’une incompatibilité</string>
     <string name="module_empty">Aucun module installé</string>
+    <string name="confirm_install">Installer le module %1$s?</string>
+    <string name="confirm_install_title">Confirmer l’installation</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Mode du thème</string>
@@ -217,6 +219,7 @@
     <string name="restore_done">Restauration effectuée !</string>
     <string name="restore_fail">La sauvegarde par défaut n’existe pas !</string>
     <string name="setup_fail">Échec de l’installation</string>
+    <string name="env_full_fix_msg">Votre périphérique nécessite de réinstaller Magisk pour fonctionner correctement. Merci de réinstaller Magisk par l’application, le mode de récupération ne pouvant pas récupérer les informations correctement.</string>
     <string name="env_fix_title">Installation supplémentaire requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez‑vous effectuer cette installation maintenant puis redémarrer ?</string>
     <string name="setup_msg">Configuration de l’environnement en cours…</string>
