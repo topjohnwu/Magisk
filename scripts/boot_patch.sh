@@ -186,9 +186,10 @@ echo "RANDOMSEED=0x$RANDOMSEED" >> config
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
-"add 000 .backup/.magisk config"
+"add 000 .backup/.magisk config" \
+|| abort "! Unable to patch ramdisk"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz stub.apk
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 
 #################
 # Binary Patches
