@@ -13,7 +13,7 @@
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
     <string name="app_changelog">Änderungen</string>
-    <string name="loading">Laden…</string>
+    <string name="loading">Laden …</string>
     <string name="update">Aktualisieren</string>
     <string name="not_available">N/A</string>
     <string name="hide">Verstecken</string>
@@ -47,7 +47,7 @@
     <string name="setup_title">Zusätzliche Einstellungen</string>
     <string name="select_patch_file">Eine Datei auswählen und patchen</string>
     <string name="patch_file_msg">Raw Image (*.img) oder ein ODIN tarfile (*.tar) auswählen</string>
-    <string name="reboot_delay_toast">Neustart in 5 Sekunden…</string>
+    <string name="reboot_delay_toast">Neustart in 5 Sekunden …</string>
     <string name="flash_screen_title">Installieren</string>
 
     <!--Superuser-->
@@ -113,7 +113,9 @@
     <string name="suspend_text_zygisk">Modul ausgesetzt, weil %1$s nicht aktiviert ist</string>
     <string name="zygisk_module_unloaded">Zygisk-Modul aufgrund von Inkompatibilität nicht geladen</string>
     <string name="module_empty">Kein Modul installiert</string>
-
+    <string name="confirm_install">Modul %1$s installieren?</string>
+    <string name="confirm_install_title">Installation bestätigen</string>
+ 
     <!--Settings-->
     <string name="settings_dark_mode_title">Themen-Modus</string>
     <string name="settings_dark_mode_message">Modus auswählen, der am besten zu deinem Stil passt!</string>
@@ -206,20 +208,21 @@
     <string name="download">Herunterladen</string>
     <string name="reboot">Neustart</string>
     <string name="release_notes">Anmerkungen zur Veröffentlichung</string>
-    <string name="flashing">Flashen…</string>
+    <string name="flashing">Flashen …</string>
     <string name="done">Fertig!</string>
     <string name="failure">Fehlgeschlagen</string>
-    <string name="hide_app_title">Magisk-App verstecken…</string>
+    <string name="hide_app_title">Magisk-App verstecken …</string>
     <string name="open_link_failed_toast">Keine App zum öffnen des Links gefunden</string>
     <string name="complete_uninstall">Vollständig deinstallieren</string>
     <string name="restore_img">Image wiederherstellen</string>
-    <string name="restore_img_msg">Wiederherstellen…</string>
+    <string name="restore_img_msg">Wiederherstellen …</string>
     <string name="restore_done">Wiederherstellen fertig!</string>
     <string name="restore_fail">Stock-Sicherung existiert nicht!</string>
     <string name="setup_fail">Setup fehlgeschlagen</string>
     <string name="env_fix_title">Zusätzliche Einrichtung erforderlich</string>
     <string name="env_fix_msg">Magisk braucht ein zusätzliches Setup, um auf deinem Gerät zu funktionieren. Willst du fortfahren und dein Gerät neustarten?</string>
-    <string name="setup_msg">Laufzeitumgebung einrichten…</string>
+    <string name="env_full_fix_msg">Dein Gerät benötigt einen Reflash von Magisk, um richtig zu funktionieren. Bitte Magisk innerhalb der App neu installieren, der Wiederherstellungsmodus kann keine korrekten Geräteinformationen abrufen.</string>
+    <string name="setup_msg">Laufzeitumgebung einrichten …</string>
     <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
     <string name="unsupport_magisk_msg">Diese App-Version unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre. Bitte Magisk so bald wie möglich aktualisieren.</string>
@@ -231,7 +234,7 @@
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Speichererlaubnis erteilen, um diese Funktion zu aktivieren</string>
     <string name="install_unknown_denied">Unbekannte Apps installieren erlauben, um diese Funktion zu aktivieren</string>
-
+    <string name="post_notifications_denied">Benachrichtigungen die Berechtigung erteilen, diese Funktion zu aktivieren</string>
     <string name="add_shortcut_title">Verknüpfung zum Startbildschirm hinzufügen</string>
     <string name="add_shortcut_msg">Nachdem du diese App versteckst, wird der Name und das Symbol eventuell schwer zu erkennen sein. Möchtest du zum Startbildschirm eine schöne Verknüpfung hinzufügen?</string>
     <string name="app_not_found">Keine App gefunden, die diese Aktion verarbeitet</string>
