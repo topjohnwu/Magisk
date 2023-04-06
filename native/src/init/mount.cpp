@@ -122,7 +122,7 @@ static void switch_root(const string &path) {
 
 #define PREINITMNT MIRRDIR "/preinit"
 
-static void mount_preinit_dir(string path, string preinit_dev) {
+static void mount_preinit_dir(string preinit_dev) {
     if (preinit_dev.empty()) return;
     strcpy(blk_info.partname, preinit_dev.data());
     strcpy(blk_info.block_dev, PREINITDEV);
@@ -157,7 +157,6 @@ static void mount_preinit_dir(string path, string preinit_dev) {
         } else {
             LOGD("preinit: %s\n", preinit_dir.data());
             xmount(preinit_dir.data(), PREINITMIRR, nullptr, MS_BIND, nullptr);
-            mount_list.emplace_back(path += "/" PREINITMIRR);
         }
         xumount2(PREINITMNT, MNT_DETACH);
     } else {
@@ -267,7 +266,7 @@ void MagiskInit::setup_tmp(const char *path) {
     xmkdir(BLOCKDIR, 0);
     xmkdir(WORKERDIR, 0);
 
-    mount_preinit_dir(path, preinit_dev);
+    mount_preinit_dir(preinit_dev);
 
     cp_afc(".backup/.magisk", MAIN_CONFIG);
     rm_rf(".backup");
@@ -277,7 +276,7 @@ void MagiskInit::setup_tmp(const char *path) {
         xsymlink("./magisk", applet_names[i]);
     xsymlink("./magiskpolicy", "supolicy");
 
-    xmount(".", path, nullptr, MS_BIND | MS_REC, nullptr);
+    xmount(".", path, nullptr, MS_BIND, nullptr);
 
     chdir("/");
 }
