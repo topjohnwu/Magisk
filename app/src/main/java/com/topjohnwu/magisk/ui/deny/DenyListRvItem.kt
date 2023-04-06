@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.arch.startAnimations
 import com.topjohnwu.magisk.databinding.DiffItem
 import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
 

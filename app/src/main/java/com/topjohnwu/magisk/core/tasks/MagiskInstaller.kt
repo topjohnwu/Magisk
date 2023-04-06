@@ -10,15 +10,15 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.ktx.withStreams
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.ktx.reboot
-import com.topjohnwu.magisk.ktx.withStreams
-import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.signing.SignBoot
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import com.topjohnwu.superuser.internal.NOPList
@@ -513,7 +513,7 @@ abstract class MagiskInstaller(
         override suspend fun exec(): Boolean {
             val success = super.exec()
             callback()
-            Utils.toast(
+            context.toast(
                 if (success) R.string.reboot_delay_toast else R.string.setup_fail,
                 Toast.LENGTH_LONG
             )

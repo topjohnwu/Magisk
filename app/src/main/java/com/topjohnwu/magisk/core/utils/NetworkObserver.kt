@@ -14,7 +14,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.topjohnwu.magisk.ktx.registerRuntimeReceiver
+import com.topjohnwu.magisk.core.ktx.registerRuntimeReceiver
 
 typealias ConnectionCallback = (Boolean) -> Unit
 

@@ -11,14 +11,14 @@ import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Provider
+import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.ktx.await
-import com.topjohnwu.magisk.ktx.writeTo
 import com.topjohnwu.magisk.signing.JarMap
 import com.topjohnwu.magisk.signing.SignApk
 import com.topjohnwu.magisk.utils.APKInstall
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Runnable
@@ -214,7 +214,7 @@ object HideAPK {
         }
         val onFailure = Runnable {
             dialog.dismiss()
-            Utils.toast(R.string.failure, Toast.LENGTH_LONG)
+            activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
         val success = withContext(Dispatchers.IO) {
             patchAndHide(activity, label, onFailure)
@@ -232,7 +232,7 @@ object HideAPK {
         }
         val onFailure = Runnable {
             dialog.dismiss()
-            Utils.toast(R.string.failure, Toast.LENGTH_LONG)
+            activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
         val apk = StubApk.current(activity)
         val session = APKInstall.startSession(activity, APPLICATION_ID, onFailure) {

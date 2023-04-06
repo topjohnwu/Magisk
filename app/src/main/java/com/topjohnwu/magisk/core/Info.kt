@@ -5,10 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.ktx.getProperty
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.core.utils.NetworkObserver
-import com.topjohnwu.magisk.ktx.getProperty
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 
 val isRunningAsStub get() = Info.stub != null
@@ -50,6 +50,11 @@ object Info {
                 field.postValue(it)
             }
         }
+    }
+
+    val showSuperUser: Boolean get() {
+        return env.isActive && (Const.USER_ID == 0
+                || Config.suMultiuserMode == Config.Value.MULTIUSER_MODE_USER)
     }
 
     private fun loadState(): Env {

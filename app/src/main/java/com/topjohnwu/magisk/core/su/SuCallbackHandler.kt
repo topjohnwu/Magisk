@@ -7,11 +7,11 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.getLabel
+import com.topjohnwu.magisk.core.ktx.getPackageInfo
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.model.su.createSuLog
-import com.topjohnwu.magisk.ktx.getLabel
-import com.topjohnwu.magisk.ktx.getPackageInfo
-import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
@@ -93,7 +93,7 @@ object SuCallbackHandler {
             else
                 R.string.su_deny_toast
 
-            Utils.toast(context.getString(resId, appName), Toast.LENGTH_SHORT)
+            context.toast(context.getString(resId, appName), Toast.LENGTH_SHORT)
         }
     }
 }

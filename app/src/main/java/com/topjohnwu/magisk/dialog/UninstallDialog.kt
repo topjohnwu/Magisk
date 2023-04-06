@@ -5,9 +5,9 @@ import android.content.Context
 import android.widget.Toast
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 
@@ -38,9 +38,9 @@ class UninstallDialog : DialogBuilder {
         Shell.cmd("restore_imgs").submit { result ->
             dialog.dismiss()
             if (result.isSuccess) {
-                Utils.toast(R.string.restore_done, Toast.LENGTH_SHORT)
+                context.toast(R.string.restore_done, Toast.LENGTH_SHORT)
             } else {
-                Utils.toast(R.string.restore_fail, Toast.LENGTH_LONG)
+                context.toast(R.string.restore_fail, Toast.LENGTH_LONG)
             }
         }
     }

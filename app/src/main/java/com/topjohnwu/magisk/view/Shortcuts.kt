@@ -13,8 +13,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.ktx.getBitmap
-import com.topjohnwu.magisk.utils.Utils
+import com.topjohnwu.magisk.core.ktx.getBitmap
 
 object Shortcuts {
 
@@ -51,7 +50,7 @@ object Shortcuts {
 
         val shortCuts = mutableListOf<ShortcutInfo>()
 
-        if (Utils.showSuperUser()) {
+        if (Info.showSuperUser) {
             shortCuts.add(
                 ShortcutInfo.Builder(context, Const.Nav.SUPERUSER)
                     .setShortLabel(context.getString(R.string.superuser))

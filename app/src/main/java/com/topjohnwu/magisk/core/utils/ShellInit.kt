@@ -7,10 +7,10 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.ktx.cachedFile
-import com.topjohnwu.magisk.ktx.deviceProtectedContext
-import com.topjohnwu.magisk.ktx.rawResource
-import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.core.ktx.cachedFile
+import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
+import com.topjohnwu.magisk.core.ktx.rawResource
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File

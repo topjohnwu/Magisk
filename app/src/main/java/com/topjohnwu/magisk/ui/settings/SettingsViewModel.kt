@@ -13,13 +13,13 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.activity
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.BiometricEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.activity
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
 
@@ -69,7 +69,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         }
 
         // Superuser
-        if (Utils.showSuperUser()) {
+        if (Info.showSuperUser) {
             list.addAll(listOf(
                 Superuser,
                 Tapjack, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
@@ -128,7 +128,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
 
     private fun createHosts() {
         Shell.cmd("add_hosts_module").submit {
-            Utils.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
+            AppContext.toast(R.string.settings_hosts_toast, Toast.LENGTH_SHORT)
         }
     }
 }

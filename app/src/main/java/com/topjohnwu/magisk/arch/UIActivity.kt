@@ -5,13 +5,18 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
 import rikka.insets.WindowInsetsHelper
@@ -96,4 +101,15 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
         is ActivityExecutor -> event(this)
         else -> Unit
     }
+}
+
+fun ViewGroup.startAnimations() {
+    val transition = AutoTransition()
+        .setInterpolator(FastOutSlowInInterpolator())
+        .setDuration(400)
+        .excludeTarget(R.id.main_toolbar, true)
+    TransitionManager.beginDelayedTransition(
+        this,
+        transition
+    )
 }

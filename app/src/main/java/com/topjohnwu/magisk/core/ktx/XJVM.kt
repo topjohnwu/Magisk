@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ktx
+package com.topjohnwu.magisk.core.ktx
 
 import androidx.collection.SparseArrayCompat
 import com.topjohnwu.magisk.core.utils.currentLocale
@@ -11,7 +11,7 @@ import java.io.OutputStream
 import java.lang.reflect.Field
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Collections
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 

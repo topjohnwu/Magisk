@@ -20,12 +20,12 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -122,7 +122,7 @@ class InstallViewModel(
     @Parcelize
     class UriCallback : ContentResultCallback {
         override fun onActivityLaunch() {
-            Utils.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+            AppContext.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
         }
         override fun onActivityResult(result: Uri) {
             uri.value = result

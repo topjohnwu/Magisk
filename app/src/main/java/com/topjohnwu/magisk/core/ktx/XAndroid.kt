@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ktx
+package com.topjohnwu.magisk.core.ktx
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -6,7 +6,6 @@ import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -18,20 +17,16 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Process
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.transition.AutoTransition
-import androidx.transition.TransitionManager
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
 import kotlin.Array
 import kotlin.String
@@ -188,26 +183,11 @@ fun Context.unwrap(): Context {
     return context
 }
 
-fun Context.hasPermissions(vararg permissions: String) = permissions.all {
-    ContextCompat.checkSelfPermission(this, it) == PERMISSION_GRANTED
-}
-
 fun Activity.hideKeyboard() {
     val view = currentFocus ?: return
     getSystemService<InputMethodManager>()
         ?.hideSoftInputFromWindow(view.windowToken, 0)
     view.clearFocus()
-}
-
-fun ViewGroup.startAnimations() {
-    val transition = AutoTransition()
-        .setInterpolator(FastOutSlowInInterpolator())
-        .setDuration(400)
-        .excludeTarget(R.id.main_toolbar, true)
-    TransitionManager.beginDelayedTransition(
-        this,
-        transition
-    )
 }
 
 val View.activity: Activity get() {
@@ -270,4 +250,12 @@ fun Context.selfLaunchIntent(): Intent {
     val intent = pm.getLaunchIntentForPackage(packageName)!!
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
     return intent
+}
+
+fun Context.toast(msg: CharSequence, duration: Int) {
+    UiThreadHandler.run { Toast.makeText(this, msg, duration).show() }
+}
+
+fun Context.toast(resId: Int, duration: Int) {
+    UiThreadHandler.run { Toast.makeText(this, resId, duration).show() }
 }

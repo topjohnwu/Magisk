@@ -8,7 +8,7 @@ import android.widget.PopupMenu
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.ktx.reboot as systemReboot
+import com.topjohnwu.magisk.core.ktx.reboot as systemReboot
 
 object RebootMenu {
 

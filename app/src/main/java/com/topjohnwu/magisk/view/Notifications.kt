@@ -13,8 +13,8 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.core.download.Subject
-import com.topjohnwu.magisk.ktx.getBitmap
-import com.topjohnwu.magisk.ktx.selfLaunchIntent
+import com.topjohnwu.magisk.core.ktx.getBitmap
+import com.topjohnwu.magisk.core.ktx.selfLaunchIntent
 import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("DEPRECATION")

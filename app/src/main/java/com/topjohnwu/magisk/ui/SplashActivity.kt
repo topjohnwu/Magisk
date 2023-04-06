@@ -17,10 +17,10 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.ui.theme.Theme
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
@@ -80,7 +80,7 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                 onClick {
                     withPermission(REQUEST_INSTALL_PACKAGES) {
                         if (!it) {
-                            Utils.toast(R.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                            toast(R.string.install_unknown_denied, Toast.LENGTH_SHORT)
                             showInvalidStateMessage()
                         } else {
                             lifecycleScope.launch {

@@ -1,4 +1,4 @@
-package com.topjohnwu.magisk.ktx
+package com.topjohnwu.magisk.core.ktx
 
 import android.content.Context
 import com.topjohnwu.magisk.core.Config

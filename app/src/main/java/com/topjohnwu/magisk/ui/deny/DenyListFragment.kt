@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.core.ktx.hideKeyboard
 import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
-import com.topjohnwu.magisk.ktx.hideKeyboard
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect

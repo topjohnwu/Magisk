@@ -18,10 +18,10 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestPermissi
 import androidx.appcompat.app.AppCompatActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.reflectField
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.utils.RequestInstall
 import com.topjohnwu.magisk.core.wrap
-import com.topjohnwu.magisk.ktx.reflectField
-import com.topjohnwu.magisk.utils.Utils
 
 interface ContentResultCallback: ActivityResultCallback<Uri>, Parcelable {
     fun onActivityLaunch() {}
@@ -110,7 +110,7 @@ abstract class BaseActivity : AppCompatActivity() {
             getContent.launch(type)
             callback.onActivityLaunch()
         } catch (e: ActivityNotFoundException) {
-            Utils.toast(R.string.app_not_found, Toast.LENGTH_SHORT)
+            toast(R.string.app_not_found, Toast.LENGTH_SHORT)
         }
     }
 
