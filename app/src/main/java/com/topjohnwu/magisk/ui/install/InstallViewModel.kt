@@ -3,8 +3,8 @@ package com.topjohnwu.magisk.ui.install
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.SpannedString
 import android.widget.Toast
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
@@ -19,23 +19,22 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.di.AppContext
-import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.SecondSlotWarningDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.ui.flash.FlashFragment
+import io.noties.markwon.Markwon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
 
-class InstallViewModel(
-    svc: NetworkService
-) : BaseViewModel() {
+class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() {
 
     val isRooted get() = Info.isRooted
     val hideVbmeta = Info.vbmeta || Info.isSamsung || Info.isAB
@@ -65,7 +64,7 @@ class InstallViewModel(
     val data: LiveData<Uri?> get() = uri
 
     @get:Bindable
-    var notes: Spanned = SpannableStringBuilder()
+    var notes: Spanned = SpannedString("")
         set(value) = set(value, field, { field = it }, BR.notes)
 
     init {
@@ -81,7 +80,10 @@ class InstallViewModel(
                         str
                     }
                 }
-                notes = ServiceLocator.markwon.toMarkdown(text)
+                val spanned = markwon.toMarkdown(text)
+                withContext(Dispatchers.Main) {
+                    notes = spanned
+                }
             } catch (e: IOException) {
                 Timber.e(e)
             }
