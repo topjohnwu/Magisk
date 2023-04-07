@@ -42,7 +42,7 @@
     <string name="install_start">Getdik</string>
     <string name="manager_download_install">Endirib quraşdırmaq üçün bas</string>
     <string name="direct_install">Birbaşa Quraşdır (Tövsiyyə olunur)</string>
-    <string name="install_inactive_slot">Fəal olmayan Slot\'a quraşdır (OTA'dan sonra)</string>
+    <string name="install_inactive_slot">Fəal olmayan Slot\'a quraşdır (OTA\'dan sonra)</string>
     <string name="install_inactive_slot_msg">Cihazınız yenidən başladıqdan sonra fəal olmayan slotda başlamağa MƏCBUR ediləcək!\nBu seçimi ancaq OTA bitdikdən sonra tətbiq edin.\nDavam edilsin?</string>
     <string name="setup_title">Əlavə Sazlamalar</string>
     <string name="select_patch_file">Fayl seç və yamaqla</string>
