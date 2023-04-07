@@ -148,30 +148,31 @@ string find_preinit_device() {
             continue;
         }
 
+        bool skip_f2fs = false;
+        auto onMatch = [&] (auto m) {
+            return info.type == "f2fs" ? !skip_f2fs : (matched = m, skip_f2fs = true);
+        };
+
         switch (matched) {
             case UNKNOWN:
                 if (info.target == "/persist" || info.target == "/mnt/vendor/persist") {
-                    matched = PERSIST;
-                    break;
+                    if (onMatch(PERSIST)) break;
                 }
                 [[fallthrough]];
             case PERSIST:
                 if (info.target == "/metadata") {
-                    matched = METADATA;
-                    break;
+                    if (onMatch(METADATA)) break;
                 }
                 [[fallthrough]];
             case METADATA:
                 if (info.target == "/cache") {
-                    matched = CACHE;
-                    break;
+                    if (onMatch(CACHE)) break;
                 }
                 [[fallthrough]];
             case CACHE:
                 if (info.target == "/data") {
                     if (!encrypted || access("/data/unencrypted", F_OK) == 0) {
-                        matched = DATA;
-                        break;
+                        if (onMatch(DATA)) break;
                     }
                 }
                 [[fallthrough]];
