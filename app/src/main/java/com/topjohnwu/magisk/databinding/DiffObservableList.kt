@@ -141,4 +141,10 @@ private class FilterableDiffObservableList<T : DiffItem<*>>(
 
     override val size: Int
         get() = sublist.size
+
+    @MainThread
+    override fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
+        super.update(newItems, diffResult)
+        sublist = list
+    }
 }
