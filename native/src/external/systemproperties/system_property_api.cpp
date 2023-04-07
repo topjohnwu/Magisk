@@ -106,7 +106,13 @@ int __system_property_delete(const char *name, bool trim_node) {
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE
 uint32_t __system_property_serial(const prop_info* pi) {
-  return system_properties.Serial(pi);
+  // N.B. a previous version of this function was much heavier-weight
+  // and enforced acquire semantics, so give our load here acquire
+  // semantics just in case somebody depends on
+  // __system_property_serial enforcing memory order, e.g., in case
+  // someone spins on the result of this function changing before
+  // loading some value.
+  return atomic_load_explicit(&pi->serial, memory_order_acquire);
 }
 
 __BIONIC_WEAK_FOR_NATIVE_BRIDGE

@@ -130,7 +130,7 @@ const prop_info* SystemProperties::Find(const char* name) {
 
   prop_area* pa = contexts_->GetPropAreaForName(name);
   if (!pa) {
-    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Access denied finding property \"%s\"", name);
+    async_safe_format_log(ANDROID_LOG_WARN, "libc", "Access denied finding property \"%s\"", name);
     return nullptr;
   }
 
@@ -141,42 +141,58 @@ static bool is_read_only(const char* name) {
   return strncmp(name, "ro.", 3) == 0;
 }
 
-int SystemProperties::Read(const prop_info* pi, char* name, char* value) {
-  while (true) {
-    uint32_t serial = Serial(pi);  // acquire semantics
-    size_t len = SERIAL_VALUE_LEN(serial);
-    memcpy(value, pi->value, len + 1);
-    // TODO: Fix the synchronization scheme here.
-    // There is no fully supported way to implement this kind
-    // of synchronization in C++11, since the memcpy races with
-    // updates to pi, and the data being accessed is not atomic.
-    // The following fence is unintuitive, but would be the
-    // correct one if memcpy used memory_order_relaxed atomic accesses.
-    // In practice it seems unlikely that the generated code would
-    // would be any different, so this should be OK.
+uint32_t SystemProperties::ReadMutablePropertyValue(const prop_info* pi, char* value) {
+  // We assume the memcpy below gets serialized by the acquire fence.
+  uint32_t new_serial = load_const_atomic(&pi->serial, memory_order_acquire);
+  uint32_t serial;
+  unsigned int len;
+  for (;;) {
+    serial = new_serial;
+    len = SERIAL_VALUE_LEN(serial);
+    if (__predict_false(SERIAL_DIRTY(serial))) {
+      // See the comment in the prop_area constructor.
+      prop_area* pa = contexts_->GetPropAreaForName(pi->name);
+      memcpy(value, pa->dirty_backup_area(), len + 1);
+    } else {
+      memcpy(value, pi->value, len + 1);
+    }
     atomic_thread_fence(memory_order_acquire);
-    if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
-      if (name != nullptr) {
-        size_t namelen = strlcpy(name, pi->name, PROP_NAME_MAX);
-        if (namelen >= PROP_NAME_MAX) {
-          async_safe_format_log(ANDROID_LOG_ERROR, "libc",
-                                "The property name length for \"%s\" is >= %d;"
-                                " please use __system_property_read_callback"
-                                " to read this property. (the name is truncated to \"%s\")",
-                                pi->name, PROP_NAME_MAX - 1, name);
-        }
-      }
-      if (is_read_only(pi->name) && pi->is_long()) {
-        async_safe_format_log(
-            ANDROID_LOG_ERROR, "libc",
-            "The property \"%s\" has a value with length %zu that is too large for"
-            " __system_property_get()/__system_property_read(); use"
-            " __system_property_read_callback() instead.",
-            pi->name, strlen(pi->long_value()));
-      }
-      return len;
+    new_serial = load_const_atomic(&pi->serial, memory_order_relaxed);
+    if (__predict_true(serial == new_serial)) {
+      break;
+    }
+    // We need another fence here because we want to ensure that the memcpy in the
+    // next iteration of the loop occurs after the load of new_serial above. We could
+    // get this guarantee by making the load_const_atomic of new_serial
+    // memory_order_acquire instead of memory_order_relaxed, but then we'd pay the
+    // penalty of the memory_order_acquire even in the overwhelmingly common case
+    // that the serial number didn't change.
+    atomic_thread_fence(memory_order_acquire);
+  }
+  return serial;
+}
+
+int SystemProperties::Read(const prop_info* pi, char* name, char* value) {
+  uint32_t serial = ReadMutablePropertyValue(pi, value);
+  if (name != nullptr) {
+    size_t namelen = strlcpy(name, pi->name, PROP_NAME_MAX);
+    if (namelen >= PROP_NAME_MAX) {
+      async_safe_format_log(ANDROID_LOG_ERROR, "libc",
+                            "The property name length for \"%s\" is >= %d;"
+                            " please use __system_property_read_callback"
+                            " to read this property. (the name is truncated to \"%s\")",
+                            pi->name, PROP_NAME_MAX - 1, name);
     }
   }
+  if (is_read_only(pi->name) && pi->is_long()) {
+    async_safe_format_log(
+        ANDROID_LOG_ERROR, "libc",
+        "The property \"%s\" has a value with length %zu that is too large for"
+        " __system_property_get()/__system_property_read(); use"
+        " __system_property_read_callback() instead.",
+        pi->name, strlen(pi->long_value()));
+  }
+  return SERIAL_VALUE_LEN(serial);
 }
 
 void SystemProperties::ReadCallback(const prop_info* pi,
@@ -184,9 +200,9 @@ void SystemProperties::ReadCallback(const prop_info* pi,
                                                      const char* value, uint32_t serial),
                                     void* cookie) {
   // Read only properties don't need to copy the value to a temporary buffer, since it can never
-  // change.
+  // change.  We use relaxed memory order on the serial load for the same reason.
   if (is_read_only(pi->name)) {
-    uint32_t serial = Serial(pi);
+    uint32_t serial = load_const_atomic(&pi->serial, memory_order_relaxed);
     if (pi->is_long()) {
       callback(cookie, pi->name, pi->long_value(), serial);
     } else {
@@ -195,21 +211,9 @@ void SystemProperties::ReadCallback(const prop_info* pi,
     return;
   }
 
-  while (true) {
-    uint32_t serial = Serial(pi);  // acquire semantics
-    size_t len = SERIAL_VALUE_LEN(serial);
-    char value_buf[len + 1];
-
-    memcpy(value_buf, pi->value, len);
-    value_buf[len] = '\0';
-
-    // TODO: see todo in Read function
-    atomic_thread_fence(memory_order_acquire);
-    if (serial == load_const_atomic(&(pi->serial), memory_order_relaxed)) {
-      callback(cookie, pi->name, value_buf, serial);
-      return;
-    }
-  }
+  char value_buf[PROP_VALUE_MAX];
+  uint32_t serial = ReadMutablePropertyValue(pi, value_buf);
+  callback(cookie, pi->name, value_buf, serial);
 }
 
 int SystemProperties::Get(const char* name, char* value) {
@@ -232,26 +236,37 @@ int SystemProperties::Update(prop_info* pi, const char* value, unsigned int len)
     return -1;
   }
 
-  prop_area* pa = contexts_->GetSerialPropArea();
-  if (!pa) {
+  prop_area* serial_pa = contexts_->GetSerialPropArea();
+  if (!serial_pa) {
+    return -1;
+  }
+  prop_area* pa = contexts_->GetPropAreaForName(pi->name);
+  if (__predict_false(!pa)) {
+    async_safe_format_log(ANDROID_LOG_ERROR, "libc", "Could not find area for \"%s\"", pi->name);
     return -1;
   }
 
   uint32_t serial = atomic_load_explicit(&pi->serial, memory_order_relaxed);
+  unsigned int old_len = SERIAL_VALUE_LEN(serial);
+
+  // The contract with readers is that whenever the dirty bit is set, an undamaged copy
+  // of the pre-dirty value is available in the dirty backup area. The fence ensures
+  // that we publish our dirty area update before allowing readers to see a
+  // dirty serial.
+  memcpy(pa->dirty_backup_area(), pi->value, old_len + 1);
+  atomic_thread_fence(memory_order_release);
   serial |= 1;
   atomic_store_explicit(&pi->serial, serial, memory_order_relaxed);
-  // The memcpy call here also races.  Again pretend it
-  // used memory_order_relaxed atomics, and use the analogous
-  // counterintuitive fence.
-  atomic_thread_fence(memory_order_release);
   strlcpy(pi->value, value, len + 1);
-
-  atomic_store_explicit(&pi->serial, (len << 24) | ((serial + 1) & 0xffffff), memory_order_release);
-  __futex_wake(&pi->serial, INT32_MAX);
-
-  atomic_store_explicit(pa->serial(), atomic_load_explicit(pa->serial(), memory_order_relaxed) + 1,
+  // Now the primary value property area is up-to-date. Let readers know that they should
+  // look at the property value instead of the backup area.
+  atomic_thread_fence(memory_order_release);
+  atomic_store_explicit(&pi->serial, (len << 24) | ((serial + 1) & 0xffffff), memory_order_relaxed);
+  __futex_wake(&pi->serial, INT32_MAX);  // Fence by side effect
+  atomic_store_explicit(serial_pa->serial(),
+                        atomic_load_explicit(serial_pa->serial(), memory_order_relaxed) + 1,
                         memory_order_release);
-  __futex_wake(pa->serial(), INT32_MAX);
+  __futex_wake(serial_pa->serial(), INT32_MAX);
 
   return 0;
 }
@@ -323,16 +338,6 @@ int SystemProperties::Delete(const char *name, bool trim_node) {
                         memory_order_release);
   __futex_wake(serial_pa->serial(), INT32_MAX);
   return 0;
-}
-
-// Wait for non-locked serial, and retrieve it with acquire semantics.
-uint32_t SystemProperties::Serial(const prop_info* pi) {
-  uint32_t serial = load_const_atomic(&pi->serial, memory_order_acquire);
-  while (SERIAL_DIRTY(serial)) {
-    __futex_wait(const_cast<_Atomic(uint_least32_t)*>(&pi->serial), serial, nullptr);
-    serial = load_const_atomic(&pi->serial, memory_order_acquire);
-  }
-  return serial;
 }
 
 uint32_t SystemProperties::WaitAny(uint32_t old_serial) {

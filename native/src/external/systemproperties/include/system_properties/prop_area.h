@@ -106,6 +106,20 @@ class prop_area {
     memset(reserved_, 0, sizeof(reserved_));
     // Allocate enough space for the root node.
     bytes_used_ = sizeof(prop_bt);
+    // To make property reads wait-free, we reserve a
+    // PROP_VALUE_MAX-sized block of memory, the "dirty backup area",
+    // just after the root node. When we're about to modify a
+    // property, we copy the old value into the dirty backup area and
+    // copy the new value into the prop_info structure. Before
+    // starting the latter copy, we mark the property's serial as
+    // being dirty. If a reader comes along while we're doing the
+    // property update and sees a dirty serial, the reader copies from
+    // the dirty backup area instead of the property value
+    // proper. After the copy, the reader checks whether the property
+    // serial is the same: if it is, the dirty backup area hasn't been
+    // reused for something else and we can complete the
+    // read immediately.
+    bytes_used_ +=  __BIONIC_ALIGN(PROP_VALUE_MAX, sizeof(uint_least32_t));
   }
 
   const prop_info* find(const char* name);
@@ -122,6 +136,9 @@ class prop_area {
   }
   uint32_t version() const {
     return version_;
+  }
+  char* dirty_backup_area() {
+    return data_ + sizeof (prop_bt);
   }
 
  private:
