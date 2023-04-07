@@ -101,7 +101,7 @@
     <string name="no_info_provided">(Məlumat verilməyib)</string>
     <string name="reboot_userspace">Yumuşaq başlatma</string>
     <string name="reboot_recovery">Bərpaya başlat</string>
-    <string name="reboot_bootloader">Bootloader'ə başlat</string>
+    <string name="reboot_bootloader">Bootloader\'ə başlat</string>
     <string name="reboot_download">Yükləməyə başlat</string>
     <string name="reboot_edl">EDL\'ə başlat</string>
     <string name="module_version_author">%2$s tərəfindən %1$s buraxılışı</string>
