@@ -38,7 +38,7 @@ Advanced Options (Internal APIs):
    --sqlite SQL              exec SQL commands to Magisk database
    --path                    print Magisk tmpfs mount path
    --denylist ARGS           denylist config CLI
-   --preinit-device          print the device that stores preinit files
+   --preinit-device          resolve a device to store preinit files
 
 Available applets:
 )EOF");
