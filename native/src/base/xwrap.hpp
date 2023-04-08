@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unistd.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <poll.h>
