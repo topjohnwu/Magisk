@@ -22,6 +22,7 @@
 
     <string name="home_notice_content">Pobieraj Magisk tylko z oficjalnej strony GitHub. Pliki z nieznanych źródeł mogą być szkodliwe!</string>
     <string name="home_support_title">Wesprzyj nas</string>
+    <string name="home_follow_title">Śledź nas</string>
     <string name="home_item_source">Źródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Niemniej możesz nam pokazać, że Ci zależy, wysyłając drobną darowiznę.</string>
     <string name="home_installed_version">Zainstalowany</string>
@@ -90,7 +91,7 @@
 
     <!--SafetyNet-->
 
-    <!-- MagiskHide -->
+    <!--MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
     <string name="show_os_app">Pokaż aplikacje OS</string>
     <string name="hide_filter_hint">Filtruj według nazwy</string>
@@ -111,6 +112,9 @@
     <string name="suspend_text_riru">Moduł uśpiony ponieważ %1$s jest włączony</string>
     <string name="suspend_text_zygisk">Moduł uśpiony ponieważ %1$s jest wyłączony</string>
     <string name="zygisk_module_unloaded">Moduł Zygisk nie załadowany ze względu na niekompatybilność</string>
+    <string name="module_empty">Żaden moduł nie jest zainstalowany</string>
+    <string name="confirm_install">Zainstaloać moduł %1$s?</string>
+    <string name="confirm_install_title">Potwierdzenie instalacji</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -217,6 +221,7 @@
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga dodatkowej konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie wymaga dodatkowej konfiguracji aby Magisk działał właściwie. Czy chcesz kontynuować i uruchomić ponownie?</string>
+    <string name="env_full_fix_msg">Twoje urządzenie musi wgrać ponowanie Magisk, aby działać poprawnie. Proszę przeinstaluj Magisk w aplikacji, tryb Recovery nie potrafi poprawnie rozpoznać urządzenia.</string>
     <string name="setup_msg">Uruchamianie środowiska konfiguracji…</string>
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magisk</string>
@@ -228,6 +233,7 @@
     <string name="unsupport_nonroot_stub_msg">Ta aplikacja nie może dłużej działać w trybie ukrycia jako że root został utracony. Proszę przywrócić ją do oryginalnego stanu.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcję.</string>
+    <string name="post_notifications_denied">Zezwól na otrzymywanie powiadomień, aby aktywować tą funkcję</string>
     <string name="install_unknown_denied">Zezwól na "Instaluj z nieznanych źródeł" by włączyć tą funkcję</string>
     <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
     <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
