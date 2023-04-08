@@ -27,18 +27,6 @@ enum : int {
 #define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
 #endif
 
-// Unmap all pages matching the name
-void unmap_all(const char *name);
-
-// Remap all matching pages with anonymous pages
-void remap_all(const char *name);
-
-// Get library name + offset (from start of ELF), given function address
-uintptr_t get_function_off(int pid, uintptr_t addr, char *lib);
-
-// Get function address, given library name + offset
-uintptr_t get_function_addr(int pid, const char *lib, uintptr_t off);
-
 extern void *self_handle;
 
 void hook_functions();

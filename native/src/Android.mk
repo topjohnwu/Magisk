@@ -35,7 +35,6 @@ LOCAL_SRC_FILES := \
     core/su/su_daemon.cpp \
     zygisk/entry.cpp \
     zygisk/main.cpp \
-    zygisk/utils.cpp \
     zygisk/hook.cpp \
     zygisk/memory.cpp \
     zygisk/native_bridge.cpp \

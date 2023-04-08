@@ -4,7 +4,6 @@
 #include "../files.hpp"
 #include "../misc.hpp"
 #include "../logging.hpp"
-#include "../missing.hpp"
 #include "../base-rs.hpp"
 
 using rust::xpipe2;
