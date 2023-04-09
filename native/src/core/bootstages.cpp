@@ -116,13 +116,17 @@ static void mount_mirrors() {
 }
 
 string find_preinit_device() {
-    enum {
+    enum part_t {
         UNKNOWN,
         PERSIST,
         METADATA,
         CACHE,
         DATA,
-    } matched = UNKNOWN;
+    };
+
+    part_t ext4_type = UNKNOWN;
+    part_t f2fs_type = UNKNOWN;
+
     bool encrypted = getprop("ro.crypto.state") == "encrypted";
     bool mount = getuid() == 0 && getenv("MAGISKTMP");
     bool make_dev = mount && getenv("MAKEDEV");
@@ -136,6 +140,9 @@ string find_preinit_device() {
             return basename(info.source.data());
         if (info.root != "/" || info.source[0] != '/' || info.source.find("/dm-") != string::npos)
             continue;
+        // Skip all non ext4 partitions once we found a matching ext4 partition
+        if (ext4_type != UNKNOWN && info.type != "ext4")
+            continue;
         if (info.type != "ext4" && info.type != "f2fs")
             continue;
         auto flags = split_view(info.fs_option, ",");
@@ -148,6 +155,7 @@ string find_preinit_device() {
             continue;
         }
 
+        part_t &matched = (info.type == "f2fs") ? f2fs_type : ext4_type;
         switch (matched) {
             case UNKNOWN:
                 if (info.target == "/persist" || info.target == "/mnt/vendor/persist") {
@@ -175,7 +183,7 @@ string find_preinit_device() {
                     }
                 }
                 [[fallthrough]];
-            case DATA:
+            default:
                 continue;
         }
 
@@ -184,7 +192,14 @@ string find_preinit_device() {
             preinit_dev = info.device;
         }
         preinit_source = info.source;
+
+        // Cannot find any better partition, stop finding
+        if (ext4_type == DATA)
+            break;
     }
+
+    if (preinit_source.empty())
+        return "";
 
     if (!preinit_dir.empty()) {
         auto mirror_dir = string(getenv("MAGISKTMP")) + "/" PREINITMIRR;
@@ -196,7 +211,7 @@ string find_preinit_device() {
             xmknod(dev_path.data(), S_IFBLK | 0600, preinit_dev);
         }
     }
-    return preinit_source.empty() ? "" : basename(preinit_source.data());
+    return basename(preinit_source.data());
 }
 
 static bool magisk_env() {
