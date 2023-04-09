@@ -229,7 +229,7 @@ app_init() {
   check_boot_ramdisk && RAMDISKEXIST=true
   get_flags
   run_migrations
-  SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+  SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
 }
 
