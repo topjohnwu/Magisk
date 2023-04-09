@@ -8,6 +8,7 @@
     <string name="install">Instalovat</string>
     <string name="section_home">Domů</string>
     <string name="section_theme">Téma</string>
+    <string name="denylist">DenyList</string>
 
     <!--Home-->
     <string name="no_connection">Žádné připojení</string>
@@ -19,10 +20,12 @@
     <string name="home_package">Balíček</string>
     <string name="home_app_title">Aplikace</string>
 
+    <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky GitHub. Soubory z neznámých zdrojů mohou být škodlivé!</string>
     <string name="home_support_title">Podpořte nás</string>
+    <string name="home_follow_title">Sledujte nás</string>
     <string name="home_item_source">Zdroj</string>
     <string name="home_support_content">Magisk je a vždy bude svobodný s otevřeným kódem. Můžete nám však zaslat malý dar jako poděkování.</string>
-    <string name="home_installed_version">Nainstalovano</string>
+    <string name="home_installed_version">Nainstalováno</string>
     <string name="home_latest_version">Poslední</string>
     <string name="invalid_update_channel">Neplatný kanál aktualizace</string>
     <string name="uninstall_magisk_title">Odinstalovat Magisk</string>
@@ -31,6 +34,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Ponechat Force Encryption</string>
     <string name="keep_dm_verity">Ponechat AVB 2.0/DM-Verity</string>
+    <string name="patch_vbmeta">Patchnout vbmeta do boot obrazu</string>
     <string name="recovery_mode">Režim Recovery</string>
     <string name="install_options_title">Možnosti</string>
     <string name="install_method_title">Způsob</string>
@@ -105,6 +109,12 @@
     <string name="module_state_restore">Obnovit</string>
     <string name="module_action_install_external">Instalace z úložiště</string>
     <string name="update_available">Dostupná aktualizace</string>
+    <string name="suspend_text_riru">Modul pozastaven, protože je povolen %1$s</string>
+    <string name="suspend_text_zygisk">Modul pozastaven, protože %1$s není povoleno</string>
+    <string name="zygisk_module_unloaded">Modul Zygisk nebyl načten z důvodu nekompatibility</string>
+    <string name="module_empty">Není nainstalován žádný modul</string>
+    <string name="confirm_install">Instalovat modul %1$s?</string>
+    <string name="confirm_install_title">Potvrzení instalace</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Režim motivu</string>
@@ -127,6 +137,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
+    <string name="settings_zygisk_summary">Spusťte části Magisku v Zygote daemon</string>
+    <string name="settings_denylist_title">Vynutit DenyList</string>
+    <string name="settings_denylist_summary">Na procesy v DenyListu nebudou aplikovány žádné změny nebo modifikace</string>
+    <string name="settings_denylist_error">Tato funkce vyžaduje povolení %1$s</string>
+    <string name="settings_denylist_config_title">Nastavit DenyList</string>
+    <string name="settings_denylist_config_summary">Vyberte procesy, které mají být zahrnuty do DenyListu</string>
     <string name="settings_hosts_title">Nesystémový hostitel</string>
     <string name="settings_hosts_summary">Přidáte modul pro podporu nesystémových hostitelů v aplikaci AdBlock.</string>
     <string name="settings_hosts_toast">Přidán systémový modul hostitelů</string>
@@ -178,33 +194,51 @@
     <!--Notifications-->
     <string name="update_channel">Aktualizace Magisk</string>
     <string name="progress_channel">Oznámení o průběhu</string>
+    <string name="updated_channel">Aktualizace dokončena</string>
     <string name="download_complete">Stahování dokončeno</string>
     <string name="download_file_error">Chyba při stahování souboru</string>
     <string name="magisk_update_title">Aktualizace Magisk je dostupná!</string>
+    <string name="updated_title">Magisk aktualizován</string>
+    <string name="updated_text">Ťukněte pro otevření aplikace</string>
 
-    <!--Toasts, Dialogs-->
-    <string name="yes">ANO</string>
-    <string name="no">NE</string>
+<!--Toasts, Dialogs-->
+    <string name="yes">Ano</string>
+    <string name="no">Ne</string>
     <string name="repo_install_title">Instalovat %1$s %2$s(%3$d)</string>
     <string name="download">Stáhnout</string>
     <string name="reboot">Restartovat</string>
-    <string name="release_notes">Poznámky k vydání</string>
-    <string name="flashing">Instalování…</string>
+    <string name="release_notes">Seznam změn</string>
+    <string name="flashing">Flashuji…</string>
     <string name="done">Hotovo!</string>
-    <string name="failure">Selhalo!</string>
-    <string name="open_link_failed_toast">Nebyla nalezena žádná aplikace pro otevření odkazu.</string>
-    <string name="complete_uninstall">Odinstalovat</string>
+    <string name="failure">Nepodařilo se!</string>
+    <string name="hide_app_title">Skrývám Magisk aplikaci…</string>
+    <string name="open_link_failed_toast">Nebyla nalezena žádná aplikace pro otevření odkazu</string>
+    <string name="complete_uninstall">Kompletní odinstalace</string>
     <string name="restore_img">Obnovit obrazy</string>
     <string name="restore_img_msg">Obnovování…</string>
-    <string name="restore_done">Obnovení bylo provedeno!</string>
-    <string name="restore_fail">Výchozí záloha neexistuje!</string>
+    <string name="restore_done">Proces obnovování dokončen!</string>
+    <string name="restore_fail">Původní záloha neexistuje!</string>
     <string name="setup_fail">Nastavení selhalo</string>
-    <string name="env_fix_title">Vyžaduje se další nastavení</string>
-    <string name="setup_msg">Nastavení je spuštěno…</string>
+    <string name="env_fix_title">Vyžadováno dodatečné nastavení</string>
+    <string name="env_fix_msg">Aby Magisk správně fungoval, potřebuje vaše zařízení další nastavení. Chcete pokračovat a restartovat?</string>
+    <string name="env_full_fix_msg">Aby vaše zařízení správně fungovalo, potřebuje se Magisk znovu flashnotu. Znovu nainstalujte Magisk v aplikaci, režim obnovení nemůže získat správné informace o zařízení.</string>
+    <string name="setup_msg">Probíhá nastavení prostředí…</string>
     <string name="authenticate">Ověřit</string>
     <string name="unsupport_magisk_title">Nepodporovaná verze Magisk</string>
-    <string name="external_rw_permission_denied">Udělte oprávnění pro povolení této funkce.</string>
-    <string name="add_shortcut_title">Přidat odkaz na domovskou obrazovku</string>
-    <string name="app_not_found">Nelze nalézt žádnou aplikaci, která dokáže provést tuto akci.</string>
+    <string name="unsupport_magisk_msg">ato verze aplikace nepodporuje verze Magisk nižší než %1$s.\n\nAplikace se bude chovat, jako by Magisk nebyl nainstalován, aktualizujte prosím Magisk co nejdříve.</string>
+    <string name="unsupport_general_title">Abnormální stav</string>
+    <string name="unsupport_system_app_msg">Spuštění této aplikace jako systémové aplikace není podporováno. Vraťte aplikaci zpět na uživatelskou aplikaci.</string>
+    <string name="unsupport_other_su_msg">Byl detekován binární soubor \"su\", který nepochází z Magisk. Odeberte jakékoli konkurenční kořenové řešení a/nebo přeinstalujte Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk je nainstalován na externí úložiště. Přesuňte aplikaci do interního úložiště.</string>
+    <string name="unsupport_nonroot_stub_msg">Skrytá aplikace Magisk nemůže pokračovat v práci, protože byl ztracen root. Obnovte prosím původní soubor APK.</string>
+    <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
+    <string name="external_rw_permission_denied">Chcete-li tuto funkci povolit, udělte oprávnění úložiště</string>
+    <string name="post_notifications_denied">Chcete-li tuto funkci povolit, udělte oprávnění oznámení</string>
+    <string name="install_unknown_denied">Povolte "instalovat aplikace z neznámých zdrojů" pro aktivaci této funkce</string>
+    <string name="add_shortcut_title">Přidat zástupce na domovskou obrazovku</string>
+    <string name="add_shortcut_msg">Po skrytí této aplikace může být obtížné rozpoznat její název a ikonu. Chcete přidat hezkou zkratku na domovskou obrazovku?</string>
+    <string name="app_not_found">Nebyla nalezena žádná aplikace, která by tuto akci zvládla</string>
+    <string name="reboot_apply_change">Restartujte pro použití změn</string>
+    <string name="restore_app_confirmation">Tím se skrytá aplikace obnoví zpět do původní aplikace. Opravdu to chcete udělat?</string>
 
 </resources>
