@@ -24,8 +24,11 @@ interface DiffList<T : DiffItem<*>> : List<T> {
     suspend fun update(newItems: List<T>)
 }
 
-interface FilterList<T : DiffItem<*>> : DiffList<T> {
+interface FilterList<T : DiffItem<*>> : List<T> {
     fun filter(filter: (T) -> Boolean)
+
+    @MainThread
+    fun set(newItems: List<T>)
 }
 
 fun <T : DiffItem<*>> diffList(): DiffList<T> = DiffObservableList()
@@ -37,7 +40,6 @@ private open class DiffObservableList<T : DiffItem<*>>
     : AbstractList<T>(), ObservableList<T>, DiffList<T>, ListUpdateCallback {
 
     protected var list: List<T> = emptyList()
-        private set
     private val listeners = ListChangeRegistry()
 
     override val size: Int get() = list.size
@@ -117,10 +119,12 @@ private class FilterableDiffObservableList<T : DiffItem<*>>(
 
     private var sublist: List<T> = emptyList()
     private var job: Job? = null
+    private var lastFilter: ((T) -> Boolean)? = null
 
     // ---
 
     override fun filter(filter: (T) -> Boolean) {
+        lastFilter = filter
         job?.cancel()
         job = scope.launch(Dispatchers.Default) {
             val oldList = sublist
@@ -143,8 +147,10 @@ private class FilterableDiffObservableList<T : DiffItem<*>>(
         get() = sublist.size
 
     @MainThread
-    override fun update(newItems: List<T>, diffResult: DiffUtil.DiffResult) {
-        super.update(newItems, diffResult)
-        sublist = list
+    override fun set(newItems: List<T>) {
+        onRemoved(0, sublist.size)
+        list = newItems
+        sublist = emptyList()
+        lastFilter?.let { filter(it) }
     }
 }
