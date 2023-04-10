@@ -137,7 +137,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
     <string name="settings_update_custom_msg">Özel bir kanal URL\'si ekleyin</string>
-    <string name="settings_zygisk_summary">Zygote arka plan programında Magisk'in bazı bölümlerini çalıştırın</string>
+    <string name="settings_zygisk_summary">Zygote arka plan programında Magisk\'in bazı bölümlerini çalıştırın</string>
     <string name="settings_denylist_title">Reddetme Listesini Zorla</string>
     <string name="settings_denylist_summary">Reddetme listesindeki işlemlerde tüm Magisk değişiklikleri geri alınır</string>
     <string name="settings_denylist_error">Bu özelliğin etkinleştirilmesi için %1$s gerekir</string>
