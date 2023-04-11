@@ -1,5 +1,11 @@
 # Magisk Changelog
 
+### v26.1
+
+- [App] Fix crashing when revoking root permissions
+- [MagiskInit] Always prefer `ext4` partitions over `f2fs` when selecting the pre-init partition
+- [General] Restore module files' context/owner/group from mirror. This is a regression introduced in v26.0
+
 ### v26.0
 
 - [General] Bump minimum supported Android version to Android 6.0
