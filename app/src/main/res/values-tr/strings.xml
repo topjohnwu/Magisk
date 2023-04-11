@@ -26,7 +26,7 @@
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk ücretsiz ve açık kaynaktır ve her zaman öyle kalacaktır. Ancak bağış yaparak bize değer verdiğinizi gösterebilirsiniz.</string>
     <string name="home_installed_version">Yüklendi</string>
-    <string name="home_latest_version">En sonuncu</string>
+    <string name="home_latest_version">En son sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldırın</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacak!\nKök kaldırılacak!\nMagisk kullanılarak şifrelenmemiş herhangi bir dahili depolama yeniden şifrelenecek!</string>
@@ -137,7 +137,7 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
     <string name="settings_update_custom_msg">Özel bir kanal URL\'si ekleyin</string>
-    <string name="settings_zygisk_summary">Zygote arka plan programında Magisk\'in bazı bölümlerini çalıştırın</string>
+    <string name="settings_zygisk_summary">Zygisk arka plan programında Magisk\'in bazı bölümlerini çalıştırın</string>
     <string name="settings_denylist_title">Reddetme Listesini Zorla</string>
     <string name="settings_denylist_summary">Reddetme listesindeki işlemlerde tüm Magisk değişiklikleri geri alınır</string>
     <string name="settings_denylist_error">Bu özelliğin etkinleştirilmesi için %1$s gerekir</string>
@@ -165,7 +165,7 @@
     <string name="superuser_notification">Süper Kullanıcı Bildirimi</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulaması yapın</string>
     <string name="settings_su_reauth_summary">Uygulamaları yükselttikten sonra Süper Kullanıcı izinlerini tekrar isteyin</string>
-    <string name="settings_su_tapjack_title">Tapjacking Koruması</string>
+    <string name="settings_su_tapjack_title">Sahte Ekran Koruması</string>
     <string name="settings_su_tapjack_summary">Süper Kullanıcı bilgi istemi iletişim kutusu, herhangi bir başka pencere veya yer paylaşımı tarafından engellendiğinde girişe yanıt vermeyecektir.</string>
     <string name="settings_su_biometric_title">Biyometrik Kimlik Doğrulama</string>
     <string name="settings_su_biometric_summary">Süper Kullanıcı isteklerine izin vermek için biyometrik kimlik doğrulamayı kullanın</string>
