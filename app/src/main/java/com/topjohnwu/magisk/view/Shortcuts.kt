@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
@@ -13,6 +14,7 @@ import androidx.core.graphics.drawable.IconCompat
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.getBitmap
 
 object Shortcuts {
@@ -29,19 +31,21 @@ object Shortcuts {
         val info = ShortcutInfoCompat.Builder(context, Const.Nav.HOME)
             .setShortLabel(context.getString(R.string.magisk))
             .setIntent(intent)
-            .setIcon(context.getIconCompat(R.drawable.ic_launcher))
+            .setIcon(IconCompat.createFromIcon(context, context.getIcon(R.drawable.ic_launcher)))
             .build()
         ShortcutManagerCompat.requestPinShortcut(context, info, null)
     }
 
-    private fun Context.getIconCompat(id: Int): IconCompat {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            IconCompat.createWithAdaptiveBitmap(getBitmap(id))
-        else
-            IconCompat.createWithBitmap(getBitmap(id))
+    private fun Context.getIcon(id: Int): Icon {
+        return if (isRunningAsStub) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                Icon.createWithAdaptiveBitmap(getBitmap(id))
+            else
+                Icon.createWithBitmap(getBitmap(id))
+        } else {
+            Icon.createWithResource(this, id)
+        }
     }
-
-    private fun Context.getIcon(id: Int) = getIconCompat(id).toIcon(this)
 
     @RequiresApi(api = 25)
     private fun getShortCuts(context: Context): List<ShortcutInfo> {
