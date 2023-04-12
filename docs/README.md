@@ -5,7 +5,6 @@
 - [Frequently Asked Questions](faq.md)
 - [Release Notes](releases/index.md)
 - [Magisk Changelog](changes.md)
-- [Magisk Manager Changelog](app_changes.md)
 
 The following sections are for developers
 
