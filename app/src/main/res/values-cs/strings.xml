@@ -7,7 +7,7 @@
     <string name="settings">Nastavení</string>
     <string name="install">Instalovat</string>
     <string name="section_home">Domů</string>
-    <string name="section_theme">Téma</string>
+    <string name="section_theme">Témata</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -52,7 +52,7 @@
 
     <!--Superuser-->
     <string name="su_request_title">Požadavek SuperUser</string>
-    <string name="touch_filtered_warning">Protože aplikace zavírá požadavek SuperUser, Magisk nemůže ověřit Vaši odpověď</string>
+    <string name="touch_filtered_warning">Magisk nemůže ověřit Vaši odpověď, protože aplikace zavírá požadavek SuperUser</string>
     <string name="deny">Zakázat</string>
     <string name="prompt">Zeptat se</string>
     <string name="grant">Povolit</string>
@@ -72,7 +72,7 @@
     <string name="su_snack_log_on">Protokolování %1$s je povoleno</string>
     <string name="su_snack_log_off">Protokolování %1$s je zakázáno</string>
     <string name="su_revoke_title">Smazat?</string>
-    <string name="su_revoke_msg">Chcete smazat protokol k oprávnění pro %1$s?</string>
+    <string name="su_revoke_msg">Potvrzením odeberete %1$s oprávnění SuperUser</string>
     <string name="toast">Text</string>
     <string name="none">Žádné</string>
 
@@ -81,8 +81,8 @@
     <string name="superuser_policy_none">Žádná aplikace nepožádala o oprávnění SuperUser.</string>
 
     <!--Logs-->
-    <string name="log_data_none">Žádné protokoly. Vyzkoušejte nějakou aplikaci vyžadující oprávnění SuperUser.</string>
-    <string name="log_data_magisk_none">Protokoly Magisk jsou prázdné. To je zvláštní!</string>
+    <string name="log_data_none">Nemáte žádné protokoly. Vyzkoušejte nějakou aplikaci vyžadující oprávnění SuperUser</string>
+    <string name="log_data_magisk_none">Protokoly Magisk jsou prázdné. To je zvláštní</string>
     <string name="menuSaveLog">Uložit protokol</string>
     <string name="menuClearLog">Smazat protokol</string>
     <string name="logs_cleared">Protokol byl smazán</string>
@@ -109,8 +109,8 @@
     <string name="module_state_restore">Obnovit</string>
     <string name="module_action_install_external">Instalace z úložiště</string>
     <string name="update_available">Dostupná aktualizace</string>
-    <string name="suspend_text_riru">Modul pozastaven, protože je povolen %1$s</string>
-    <string name="suspend_text_zygisk">Modul pozastaven, protože %1$s není povoleno</string>
+    <string name="suspend_text_riru">Modul byl pozastaven, protože je povolen %1$s</string>
+    <string name="suspend_text_zygisk">Modul byl pozastaven, protože %1$s není povoleno</string>
     <string name="zygisk_module_unloaded">Modul Zygisk nebyl načten z důvodu nekompatibility</string>
     <string name="module_empty">Není nainstalován žádný modul</string>
     <string name="confirm_install">Instalovat modul %1$s?</string>
@@ -125,29 +125,29 @@
     <string name="settings_download_path_title">Složka pro stahování</string>
     <string name="settings_download_path_message">Soubory budou uloženy do %1$s.</string>
     <string name="settings_hide_app_title">Skrýt aplikaci Magisk</string>
-    <string name="settings_hide_app_summary">Skryjete aplikaci náhodným ID balíčku a vlastním názvem aplikace.</string>
+    <string name="settings_hide_app_summary">Skryje aplikaci náhodným ID balíčku a vlastním názvem aplikace</string>
     <string name="settings_restore_app_title">Obnovit aplikaci Magisk</string>
-    <string name="settings_restore_app_summary">Obnovíte aplikaci zpět do původního APK.</string>
+    <string name="settings_restore_app_summary">Obnoví aplikaci zpět do původního APK</string>
     <string name="language">Jazyk</string>
     <string name="system_default">(výchozí podle systému)</string>
     <string name="settings_check_update_title">Zkontrolovat aktualizace</string>
-    <string name="settings_check_update_summary">Povolíte pravidelnou kontrolu aktualizace na pozadí.</string>
+    <string name="settings_check_update_summary">Povolí pravidelnou kontrolu aktualizace na pozadí</string>
     <string name="settings_update_channel_title">Kanál aktualizace</string>
     <string name="settings_update_stable">Stabilní</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Vlastní</string>
     <string name="settings_update_custom_msg">Vložte vlastní URL</string>
-    <string name="settings_zygisk_summary">Spusťte části Magisku v Zygote daemon</string>
+    <string name="settings_zygisk_summary">Spustí části Magisku v démonu Zygote</string>
     <string name="settings_denylist_title">Vynutit DenyList</string>
-    <string name="settings_denylist_summary">Na procesy v DenyListu nebudou aplikovány žádné změny nebo modifikace</string>
+    <string name="settings_denylist_summary">Na procesy v Denylistu nebudou aplikovány žádné změny, nebo modifikace způsobené Magiskem</string>
     <string name="settings_denylist_error">Tato funkce vyžaduje povolení %1$s</string>
     <string name="settings_denylist_config_title">Nastavit DenyList</string>
-    <string name="settings_denylist_config_summary">Vyberte procesy, které mají být zahrnuty do DenyListu</string>
-    <string name="settings_hosts_title">Nesystémový hostitel</string>
-    <string name="settings_hosts_summary">Přidáte modul pro podporu nesystémových hostitelů v aplikaci AdBlock.</string>
-    <string name="settings_hosts_toast">Přidán systémový modul hostitelů</string>
+    <string name="settings_denylist_config_summary">Vyberte procesy, které mají být zahrnuty v DenyListu</string>
+    <string name="settings_hosts_title">Nesystémoví hostitelé</string>
+    <string name="settings_hosts_summary">Přidá modul pro podporu nesystémových hostitelů v aplikaci AdBlock</string>
+    <string name="settings_hosts_toast">Modul nesystémových hostitelů přidán</string>
     <string name="settings_app_name_hint">Nový název</string>
-    <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem.</string>
+    <string name="settings_app_name_helper">Název aplikace bude nahrazen tímto názvem</string>
     <string name="settings_app_name_error">Neplatný formát</string>
     <string name="settings_su_app_adb">Aplikace a ADB</string>
     <string name="settings_su_app">Pouze aplikace</string>
@@ -166,14 +166,14 @@
     <string name="settings_su_reauth_title">Opětovné ověření po aktualizaci</string>
     <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUser po aktualizaci aplikace.</string>
     <string name="settings_su_tapjack_title">Povolit ochranu před TapJack</string>
-    <string name="settings_su_tapjack_summary">Okno dialogu SuperUser nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem.</string>
+    <string name="settings_su_tapjack_summary">Okno dialogu SuperUser nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem</string>
     <string name="settings_su_biometric_title">Povolit biometrické ověření</string>
-    <string name="settings_su_biometric_summary">Použijte biometrické ověření pro povolení požadavků SuperUser.</string>
-    <string name="no_biometric">Nepodporované zařízení nebo není biometrické ověření povolené</string>
+    <string name="settings_su_biometric_summary">Použije biometrické ověření pro povolení požadavků SuperUser</string>
+    <string name="no_biometric">Nepodporované zařízení, nebo není povolené biometrické ověření</string>
     <string name="settings_customization">Přizpůsobit</string>
-    <string name="setting_add_shortcut_summary">Přidejte odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
-    <string name="settings_doh_title">DNS nebo HTTPS</string>
-    <string name="settings_doh_description">Řešení pro opravy DNS v některých zemích.</string>
+    <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
+    <string name="settings_doh_title">DNS přes HTTPS</string>
+    <string name="settings_doh_description">Obejde DNS v některých zemích</string>
 
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Vlastník zařízení</string>
@@ -199,7 +199,7 @@
     <string name="download_file_error">Chyba při stahování souboru</string>
     <string name="magisk_update_title">Aktualizace Magisk je dostupná!</string>
     <string name="updated_title">Magisk aktualizován</string>
-    <string name="updated_text">Ťukněte pro otevření aplikace</string>
+    <string name="updated_text">Klepnutím otevřete aplikaci</string>
 
 <!--Toasts, Dialogs-->
     <string name="yes">Ano</string>
@@ -211,7 +211,7 @@
     <string name="flashing">Flashuji…</string>
     <string name="done">Hotovo!</string>
     <string name="failure">Nepodařilo se!</string>
-    <string name="hide_app_title">Skrývám Magisk aplikaci…</string>
+    <string name="hide_app_title">Skrývám aplikaci Magisk…</string>
     <string name="open_link_failed_toast">Nebyla nalezena žádná aplikace pro otevření odkazu</string>
     <string name="complete_uninstall">Kompletní odinstalace</string>
     <string name="restore_img">Obnovit obrazy</string>
@@ -220,25 +220,25 @@
     <string name="restore_fail">Původní záloha neexistuje!</string>
     <string name="setup_fail">Nastavení selhalo</string>
     <string name="env_fix_title">Vyžadováno dodatečné nastavení</string>
-    <string name="env_fix_msg">Aby Magisk správně fungoval, potřebuje vaše zařízení další nastavení. Chcete pokračovat a restartovat?</string>
-    <string name="env_full_fix_msg">Aby vaše zařízení správně fungovalo, potřebuje se Magisk znovu flashnotu. Znovu nainstalujte Magisk v aplikaci, režim obnovení nemůže získat správné informace o zařízení.</string>
+    <string name="env_fix_msg">Aby mohl Magisk správně fungovat, je třeba zařízení dodatečně nastavit. Chcete pokračovat a restartovat zařízení?</string>
+    <string name="env_full_fix_msg">Aby vaše zařízení správně fungovalo, potřebuje se Magisk znovu flashnout. Nainstalujte znovu Magisk v aplikaci, režim Recovery nemůže získat správné informace o zařízení.</string>
     <string name="setup_msg">Probíhá nastavení prostředí…</string>
     <string name="authenticate">Ověřit</string>
     <string name="unsupport_magisk_title">Nepodporovaná verze Magisk</string>
-    <string name="unsupport_magisk_msg">ato verze aplikace nepodporuje verze Magisk nižší než %1$s.\n\nAplikace se bude chovat, jako by Magisk nebyl nainstalován, aktualizujte prosím Magisk co nejdříve.</string>
+    <string name="unsupport_magisk_msg">Tato verze aplikace nepodporuje Magisk ve verzi nižší než %1$s.\n\nAplikace se bude chovat, jako by žádný Magisk nebyl nainstalován. Aktualizujte prosím Magisk co nejdříve.</string>
     <string name="unsupport_general_title">Abnormální stav</string>
-    <string name="unsupport_system_app_msg">Spuštění této aplikace jako systémové aplikace není podporováno. Vraťte aplikaci zpět na uživatelskou aplikaci.</string>
-    <string name="unsupport_other_su_msg">Byl detekován binární soubor \"su\", který nepochází z Magisk. Odeberte jakékoli konkurenční kořenové řešení a/nebo přeinstalujte Magisk.</string>
-    <string name="unsupport_external_storage_msg">Magisk je nainstalován na externí úložiště. Přesuňte aplikaci do interního úložiště.</string>
-    <string name="unsupport_nonroot_stub_msg">Skrytá aplikace Magisk nemůže pokračovat v práci, protože byl ztracen root. Obnovte prosím původní soubor APK.</string>
+    <string name="unsupport_system_app_msg">Spuštění této aplikace jako systémové, není podporováno. Změňte prosím aplikaci zpět na uživatelskou.</string>
+    <string name="unsupport_other_su_msg">Byl detekován binární soubor \"su\", který nepochází z Magisk. Odeberte jakékoli konkurenční ROOT řešení a/nebo přeinstalujte Magisk.</string>
+    <string name="unsupport_external_storage_msg">Magisk je nainstalován na externím úložišti. Přesuňte prosím aplikaci do interního úložiště.</string>
+    <string name="unsupport_nonroot_stub_msg">Skrytá aplikace Magisk nemůže dále fungovat, protože byl ztracen ROOT. Obnovte prosím původní soubor APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
-    <string name="external_rw_permission_denied">Chcete-li tuto funkci povolit, udělte oprávnění úložiště</string>
-    <string name="post_notifications_denied">Chcete-li tuto funkci povolit, udělte oprávnění oznámení</string>
-    <string name="install_unknown_denied">Povolte "instalovat aplikace z neznámých zdrojů" pro aktivaci této funkce</string>
+    <string name="external_rw_permission_denied">Pro povolení této funkce, povolte oprávnění pro přístup k úložišti</string>
+    <string name="post_notifications_denied">Pro povolení této funkce, povolte oznámení</string>
+    <string name="install_unknown_denied">Pro povolení této funkce, povolte "instalovat aplikace z neznámých zdrojů"</string>
     <string name="add_shortcut_title">Přidat zástupce na domovskou obrazovku</string>
-    <string name="add_shortcut_msg">Po skrytí této aplikace může být obtížné rozpoznat její název a ikonu. Chcete přidat hezkou zkratku na domovskou obrazovku?</string>
-    <string name="app_not_found">Nebyla nalezena žádná aplikace, která by tuto akci zvládla</string>
-    <string name="reboot_apply_change">Restartujte pro použití změn</string>
-    <string name="restore_app_confirmation">Tím se skrytá aplikace obnoví zpět do původní aplikace. Opravdu to chcete udělat?</string>
+    <string name="add_shortcut_msg">Po skrytí této aplikace může být obtížné rozpoznat její název a ikonu. Chcete přidat na domovskou obrazovku hezkého zástupce?</string>
+    <string name="app_not_found">Nebyla nalezena žádná aplikace, která by tuto akci provedla</string>
+    <string name="reboot_apply_change">Pro použití změn restartujte zařízení</string>
+    <string name="restore_app_confirmation">Tímto skrytou aplikaci obnovíte zpět na původní aplikaci. Opravdu to chcete udělat?</string>
 
 </resources>
