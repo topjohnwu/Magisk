@@ -104,7 +104,7 @@ prop_area* prop_area::map_prop_area_rw(const char* filename, const char* context
   return pa;
 }
 
-prop_area* prop_area::map_fd_ro(const int fd) {
+prop_area* prop_area::map_fd_ro(const int fd, const bool rw) {
   struct stat fd_stat;
   if (fstat(fd, &fd_stat) < 0) {
     return nullptr;
@@ -119,8 +119,8 @@ prop_area* prop_area::map_fd_ro(const int fd) {
   pa_size_ = fd_stat.st_size;
   pa_data_size_ = pa_size_ - sizeof(prop_area);
 
-  /* resetprop: add PROT_WRITE */
-  void* const map_result = mmap(nullptr, pa_size_, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  int prot = rw ? PROT_READ | PROT_WRITE : PROT_READ;
+  void* const map_result = mmap(nullptr, pa_size_, prot, MAP_SHARED, fd, 0);
   if (map_result == MAP_FAILED) {
     return nullptr;
   }
@@ -134,12 +134,26 @@ prop_area* prop_area::map_fd_ro(const int fd) {
   return pa;
 }
 
-prop_area* prop_area::map_prop_area(const char* filename) {
-  /* resetprop: O_RDONLY -> O_RDWR */
-  int fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);
-  if (fd == -1) return nullptr;
+prop_area* prop_area::map_prop_area(const char* filename, bool* try_rw) {
+  bool rw = false;
+  int fd = -1;
+  if (try_rw) {
+    fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDWR);
+  }
+  if (fd == -1) {
+    fd = open(filename, O_CLOEXEC | O_NOFOLLOW | O_RDONLY);
+    if (fd == -1) {
+      return nullptr;
+    }
+  } else {
+    rw = true;
+  }
 
-  prop_area* map_result = map_fd_ro(fd);
+  if (try_rw) {
+    *try_rw = rw;
+  }
+
+  prop_area* map_result = map_fd_ro(fd, rw);
   close(fd);
 
   return map_result;

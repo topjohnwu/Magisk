@@ -237,7 +237,7 @@ int SystemProperties::Update(prop_info* pi, const char* value, unsigned int len)
   }
 
   prop_area* serial_pa = contexts_->GetSerialPropArea();
-  if (!serial_pa) {
+  if (serial_pa == nullptr || !contexts_->rw_) {
     return -1;
   }
   prop_area* pa = contexts_->GetPropAreaForName(pi->name);
@@ -286,7 +286,7 @@ int SystemProperties::Add(const char* name, unsigned int namelen, const char* va
   }
 
   prop_area* serial_pa = contexts_->GetSerialPropArea();
-  if (serial_pa == nullptr) {
+  if (serial_pa == nullptr || !contexts_->rw_) {
     return -1;
   }
 
@@ -316,7 +316,7 @@ int SystemProperties::Delete(const char *name, bool trim_node) {
   }
 
   prop_area* serial_pa = contexts_->GetSerialPropArea();
-  if (serial_pa == nullptr) {
+  if (serial_pa == nullptr || !contexts_->rw_) {
     return -1;
   }
 

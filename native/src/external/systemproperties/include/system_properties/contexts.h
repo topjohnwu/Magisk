@@ -42,4 +42,5 @@ class Contexts {
   virtual void ForEach(void (*propfn)(const prop_info* pi, void* cookie), void* cookie) = 0;
   virtual void ResetAccess() = 0;
   virtual void FreeAndUnmap() = 0;
+  bool rw_ = false;
 };

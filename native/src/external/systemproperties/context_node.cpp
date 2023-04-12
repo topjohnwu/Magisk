@@ -42,7 +42,7 @@
 // For this reason, the below three functions use a bionic Lock and static
 // allocation of memory for each filename.
 
-bool ContextNode::Open(bool access_rw, bool* fsetxattr_failed) {
+bool ContextNode::Open(bool access_rw, bool* fsetxattr_failed, bool rw) {
   lock_.lock();
   if (pa_) {
     lock_.unlock();
@@ -59,7 +59,7 @@ bool ContextNode::Open(bool access_rw, bool* fsetxattr_failed) {
   if (access_rw) {
     pa_ = prop_area::map_prop_area_rw(filename, context_, fsetxattr_failed);
   } else {
-    pa_ = prop_area::map_prop_area(filename);
+    pa_ = prop_area::map_prop_area(filename, rw ? &rw : nullptr);
   }
   lock_.unlock();
   return pa_;

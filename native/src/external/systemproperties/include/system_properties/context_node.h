@@ -44,7 +44,7 @@ class ContextNode {
 
   BIONIC_DISALLOW_COPY_AND_ASSIGN(ContextNode);
 
-  bool Open(bool access_rw, bool* fsetxattr_failed);
+  bool Open(bool access_rw, bool* fsetxattr_failed, bool rw = false);
   bool CheckAccessAndOpen();
   void ResetAccess();
   void Unmap();
