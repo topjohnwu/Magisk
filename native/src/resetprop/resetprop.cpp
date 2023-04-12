@@ -65,6 +65,8 @@ Flags:
            (this flag only affects setprop)
    -p      read/write props from/to persistent storage
            (this flag only affects getprop and delprop)
+   -Z      show property contexts instead of values
+           (this flag only affects getprop)
 
 )EOF", arg0);
     exit(1);
@@ -283,6 +285,12 @@ static void print_props(bool persist) {
     }, nullptr, persist);
 }
 
+static void print_props_context() {
+    getprops([](const char *name, const char *, auto) {
+        printf("[%s]: [%s]\n", name, getpropcontext(name).data());
+    }, nullptr, false);
+}
+
 string getprop(const char *name, bool persist) {
     return get_impl()->getprop(name, persist);
 }
@@ -316,6 +324,7 @@ int resetprop_main(int argc, char *argv[]) {
     bool prop_svc = true;
     bool persist = false;
     bool verbose = false;
+    bool context = false;
     char *argv0 = argv[0];
 
     --argc;
@@ -343,6 +352,9 @@ int resetprop_main(int argc, char *argv[]) {
             case 'n':
                 prop_svc = false;
                 continue;
+            case 'Z':
+                context = true;
+                continue;
             case '\0':
                 break;
             case 'h':
@@ -359,10 +371,13 @@ int resetprop_main(int argc, char *argv[]) {
 
     switch (argc) {
     case 0:
-        print_props(persist);
+        if (context)
+            print_props_context();
+        else
+            print_props(persist);
         return 0;
     case 1: {
-        string prop = getprop(argv[0], persist);
+        string prop = context ? getpropcontext(argv[0]) : getprop(argv[0], persist);
         if (prop.empty())
             return 1;
         printf("%s\n", prop.data());

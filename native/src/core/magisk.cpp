@@ -136,7 +136,6 @@ int magisk_main(int argc, char *argv[]) {
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
     } else if (argv[1] == "--preinit-device"sv) {
-        set_log_level_state(LogLevel::Warn, false);
         auto name = find_preinit_device();
         LOGD("preinit device: %s\n", name.data());
         if (!name.empty())  {
