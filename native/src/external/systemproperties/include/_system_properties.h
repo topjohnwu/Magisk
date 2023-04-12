@@ -111,6 +111,12 @@ int __system_property_add(const char* __name, unsigned int __name_length, const 
 */
 int __system_property_delete(const char *__name, bool __trim_node);
 
+/* Get context of a property. Added in resetprop
+**
+** Returns the context on success, nullptr if fail.
+**/
+const char* __system_property_get_context(const char* __name);
+
 /* Update the value of a system property returned by
 ** __system_property_find.  Can only be done by a single process
 ** that has write access to the property area, and that process

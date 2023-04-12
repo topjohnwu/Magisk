@@ -118,6 +118,7 @@ static void read_prop(const prop_info *pi, void *cb) {
 struct sysprop_stub {
     virtual int setprop(const char *name, const char *value, bool trigger) { return 1; }
     virtual string getprop(const char *name, bool persist) { return string(); }
+    virtual string getcontext(const char *name) { return string(); }
     virtual void getprops(void (*callback)(const char *, const char *, void *),
             void *cookie, bool persist) {}
     virtual int delprop(const char *name, bool persist) { return 1; }
@@ -211,6 +212,18 @@ struct resetprop : public sysprop {
         return val;
     }
 
+    string getcontext(const char *name) override {
+        if (!check_legal_property_name(name))
+            return "";
+        auto val = __system_property_get_context(name);
+        if (val == nullptr) {
+            LOGD("resetprop: prop [%s] does not support context\n", name);
+            return "";
+        }
+        LOGD("resetprop: getcontext [%s]: [%s]\n", name, val);
+        return val;
+    }
+
     void getprops(void (*callback)(const char *, const char *, void *),
             void *cookie, bool persist) override {
         prop_list list;
@@ -272,6 +285,10 @@ static void print_props(bool persist) {
 
 string getprop(const char *name, bool persist) {
     return get_impl()->getprop(name, persist);
+}
+
+string getpropcontext(const char *name) {
+    return get_impl()->getcontext(name);
 }
 
 void getprops(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {

@@ -68,6 +68,7 @@ class SystemProperties {
   int Update(prop_info* pi, const char* value, unsigned int len);
   int Add(const char* name, unsigned int namelen, const char* value, unsigned int valuelen);
   int Delete(const char *name, bool trim_node);
+  const char* GetContext(const char* name);
   uint32_t WaitAny(uint32_t old_serial);
   bool Wait(const prop_info* pi, uint32_t old_serial, uint32_t* new_serial_ptr,
             const timespec* relative_timeout);

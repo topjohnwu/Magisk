@@ -340,6 +340,13 @@ int SystemProperties::Delete(const char *name, bool trim_node) {
   return 0;
 }
 
+const char* SystemProperties::GetContext(const char* name) {
+  if (!initialized_) {
+    return nullptr;
+  }
+  return contexts_->GetContextForName(name);
+}
+
 uint32_t SystemProperties::WaitAny(uint32_t old_serial) {
   uint32_t new_serial;
   Wait(nullptr, old_serial, &new_serial, nullptr);
