@@ -14,7 +14,7 @@ Magisk does not modify most read-only partitions, which means applying official 
 
 ### Devices with A/B Partitions
 
-**Notes:** For the moment `Install to Inactive Slot` method won't work for all Pixel 6 and 7 models (https://github.com/topjohnwu/Magisk/issues/5959). Either follow ["Non A/B" Devices](#non-ab-devices) guide below or use a 3rd party tool like [PixelFlasher](https://github.com/badabing2005/PixelFlasher)
+**Notes:** For the moment `Install to Inactive Slot` method won't work for all Pixel 6 and 7 models (https://github.com/topjohnwu/Magisk/issues/5959). Either follow ["Non A/B" Devices](#non-ab-devices) guide below or use other 3rd party pixel rooting/flashing tools.
 
 
 It is possible to have the OTA installed to the inactive slot and have the Magisk app install Magisk onto the updated partitions. The out-of-the-box OTA installation works seamlessly and Magisk can be preserved after the installation.
