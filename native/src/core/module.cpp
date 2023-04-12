@@ -146,17 +146,19 @@ void mirror_node::mount() {
 }
 
 void module_node::mount() {
-    string src = module_mnt + module + parent()->root()->prefix + node_path();
-    if (node_path() == "/system/etc/hosts") {
+    std::string path = module + (parent()->root()->prefix + node_path());
+    string mnt_src = module_mnt + path;
+    {
+        string src = MODULEROOT "/" + path;
+        if (exist()) clone_attr(mirror_path().data(), src.data());
         // special case for /system/etc/hosts to ensure it is writable
-        src = std::string(MODULEROOT "/") + module + parent()->root()->prefix + "/system/etc/hosts";
+        if (node_path() == "/system/etc/hosts") mnt_src = std::move(src);
     }
-    if (exist())
-        clone_attr(mirror_path().data(), src.data());
-    if (isa<tmpfs_node>(parent()))
-        create_and_mount("module", src);
-    else
-        bind_mount("module", src.data(), node_path().data());
+    if (isa<tmpfs_node>(parent())) {
+        create_and_mount("module", mnt_src);
+    } else {
+        bind_mount("module", mnt_src.data(), node_path().data());
+    }
 }
 
 void tmpfs_node::mount() {
