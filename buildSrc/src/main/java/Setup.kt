@@ -70,7 +70,7 @@ private val Project.androidComponents
 fun Project.setupCommon() {
     androidBase {
         compileSdkVersion(33)
-        buildToolsVersion = "33.0.1"
+        buildToolsVersion = "33.0.2"
         ndkPath = "$sdkDirectory/ndk/magisk"
 
         defaultConfig {
