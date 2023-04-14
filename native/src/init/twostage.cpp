@@ -40,7 +40,9 @@ bool SecondStageInit::prepare() {
     argv[0] = (char *) INIT_PATH;
 
     // Some weird devices like meizu, uses 2SI but still have legacy rootfs
-    if (struct statfs sfs{}; statfs("/", &sfs) == 0 && sfs.f_type == RAMFS_MAGIC) {
+    struct statfs sfs{};
+    statfs("/", &sfs);
+    if (sfs.f_type == RAMFS_MAGIC || sfs.f_type == TMPFS_MAGIC) {
         // We are still on rootfs, so make sure we will execute the init of the 2nd stage
         unlink("/init");
         xsymlink(INIT_PATH, "/init");
