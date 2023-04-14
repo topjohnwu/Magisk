@@ -13,8 +13,8 @@ import android.util.DisplayMetrics
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.ktx.unwrap
 import com.topjohnwu.magisk.core.utils.syncLocale
-import com.topjohnwu.magisk.ktx.unwrap
 
 lateinit var AppApkPath: String
 

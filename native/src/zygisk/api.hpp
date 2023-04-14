@@ -1,4 +1,4 @@
-/* Copyright 2022 John "topjohnwu" Wu
+/* Copyright 2022-2023 John "topjohnwu" Wu
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -346,12 +346,13 @@ struct api_table {
 
 template <class T>
 void entry_impl(api_table *table, JNIEnv *env) {
-    ModuleBase *module = new T();
-    if (!table->registerModule(table, new module_abi(module)))
-        return;
-    auto api = new Api();
-    api->tbl = table;
-    module->onLoad(api, env);
+    static Api api;
+    api.tbl = table;
+    static T module;
+    ModuleBase *m = &module;
+    static module_abi abi(m);
+    if (!table->registerModule(table, &abi)) return;
+    m->onLoad(&api, env);
 }
 
 } // namespace internal
@@ -385,10 +386,10 @@ inline bool Api::pltHookCommit() {
 
 extern "C" {
 
-[[gnu::visibility("default")]] [[gnu::used]]
+[[gnu::visibility("default"), maybe_unused]]
 void zygisk_module_entry(zygisk::internal::api_table *, JNIEnv *);
 
-[[gnu::visibility("default")]] [[gnu::used]]
+[[gnu::visibility("default"), maybe_unused]]
 void zygisk_companion_entry(int);
 
 } // extern "C"

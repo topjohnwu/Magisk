@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.ktx.concurrentMap
 import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.filterableListOf
+import com.topjohnwu.magisk.databinding.filterList
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.ktx.concurrentMap
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
@@ -23,22 +23,22 @@ class DenyListViewModel : AsyncLoadViewModel() {
     var isShowSystem = false
         set(value) {
             field = value
-            query()
+            doQuery(query)
         }
 
     var isShowOS = false
         set(value) {
             field = value
-            query()
+            doQuery(query)
         }
 
     var query = ""
         set(value) {
             field = value
-            query()
+            doQuery(value)
         }
 
-    val items = filterableListOf<DenyListRvItem>(viewModelScope)
+    val items = filterList<DenyListRvItem>(viewModelScope)
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
@@ -50,7 +50,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
     @SuppressLint("InlinedApi")
     override suspend fun doLoadWork() {
         loading = true
-        val (apps, diff) = withContext(Dispatchers.Default) {
+        val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
             val denyList = Shell.cmd("magisk --denylist ls").exec().out
                 .map { CmdlineListItem(it) }
@@ -63,22 +63,22 @@ class DenyListViewModel : AsyncLoadViewModel() {
                     .toCollection(ArrayList(size))
             }
             apps.sort()
-            apps to items.calculateDiff(apps)
+            apps
         }
-        items.update(apps, diff)
-        query()
+        items.set(apps)
+        doQuery(query)
     }
 
-    private fun query() {
+    private fun doQuery(s: String) {
         items.filter {
             fun filterSystem() = isShowSystem || !it.info.isSystemApp()
 
             fun filterOS() = (isShowSystem && isShowOS) || it.info.isApp()
 
             fun filterQuery(): Boolean {
-                fun inName() = it.info.label.contains(query, true)
-                fun inPackage() = it.info.packageName.contains(query, true)
-                fun inProcesses() = it.processes.any { p -> p.process.name.contains(query, true) }
+                fun inName() = it.info.label.contains(s, true)
+                fun inPackage() = it.info.packageName.contains(s, true)
+                fun inProcesses() = it.processes.any { p -> p.process.name.contains(s, true) }
                 return inName() || inPackage() || inProcesses()
             }
 

@@ -7,10 +7,10 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.ktx.cachedFile
-import com.topjohnwu.magisk.ktx.deviceProtectedContext
-import com.topjohnwu.magisk.ktx.rawResource
-import com.topjohnwu.magisk.ktx.writeTo
+import com.topjohnwu.magisk.core.ktx.cachedFile
+import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
+import com.topjohnwu.magisk.core.ktx.rawResource
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
 import java.io.File
@@ -41,7 +41,7 @@ class ShellInit : Shell.Initializer() {
             }
 
             if (shell.isRoot) {
-                add("export MAGISKTMP=\$(magisk --path)/.magisk")
+                add("export MAGISKTMP=\$(magisk --path)")
                 // Test if we can properly execute stuff in /data
                 Info.noDataExec = !shell.newJob().add("$localBB sh -c \"$localBB true\"").exec().isSuccess
             }
@@ -49,9 +49,9 @@ class ShellInit : Shell.Initializer() {
             if (Info.noDataExec) {
                 // Copy it out of /data to workaround Samsung bullshit
                 add(
-                    "if [ -x \$MAGISKTMP/busybox/busybox ]; then",
-                    "  cp -af $localBB \$MAGISKTMP/busybox/busybox",
-                    "  exec \$MAGISKTMP/busybox/busybox sh",
+                    "if [ -x \$MAGISKTMP/.magisk/busybox/busybox ]; then",
+                    "  cp -af $localBB \$MAGISKTMP/.magisk/busybox/busybox",
+                    "  exec \$MAGISKTMP/.magisk/busybox/busybox sh",
                     "else",
                     "  cp -af $localBB /dev/busybox",
                     "  exec /dev/busybox sh",

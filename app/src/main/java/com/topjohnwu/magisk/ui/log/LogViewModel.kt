@@ -8,15 +8,15 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.ktx.timeFormatStandard
+import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.diffListOf
+import com.topjohnwu.magisk.databinding.diffList
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.ktx.timeFormatStandard
-import com.topjohnwu.magisk.ktx.toTime
 import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,6 +26,9 @@ import java.io.FileInputStream
 class LogViewModel(
     private val repo: LogRepository
 ) : AsyncLoadViewModel() {
+    @get:Bindable
+    var loading = true
+        private set(value) = set(value, field, { field = it }, BR.loading)
 
     // --- empty view
 
@@ -34,27 +37,32 @@ class LogViewModel(
 
     // --- su log
 
-    val items = diffListOf<LogRvItem>()
+    val items = diffList<SuLogRvItem>()
     val extraBindings = bindExtra {
         it.put(BR.viewModel, this)
     }
 
     // --- magisk log
-    @get:Bindable
-    var consoleText = " "
-        set(value) = set(value, field, { field = it }, BR.consoleText)
+    val logs = diffList<LogRvItem>()
+    var magiskLogRaw = " "
 
     override suspend fun doLoadWork() {
-        consoleText = repo.fetchMagiskLogs()
-        val (suLogs, diff) = withContext(Dispatchers.Default) {
-            val suLogs = repo.fetchSuLogs().map { LogRvItem(it) }
+        loading = true
+
+        val (suLogs, suDiff) = withContext(Dispatchers.Default) {
+            magiskLogRaw = repo.fetchMagiskLogs()
+            val newLogs = magiskLogRaw.split('\n').map { LogRvItem(it) }
+            logs.update(newLogs)
+            val suLogs = repo.fetchSuLogs().map { SuLogRvItem(it) }
             suLogs to items.calculateDiff(suLogs)
         }
+
         items.firstOrNull()?.isTop = false
         items.lastOrNull()?.isBottom = false
-        items.update(suLogs, diff)
+        items.update(suLogs, suDiff)
         items.firstOrNull()?.isTop = true
         items.lastOrNull()?.isBottom = true
+        loading = false
     }
 
     fun saveMagiskLog() = withExternalRW {
@@ -82,7 +90,7 @@ class LogViewModel(
 
                 file.write("\n---Magisk Logs---\n")
                 file.write("${Info.env.versionString} (${Info.env.versionCode})\n\n")
-                if (Info.env.isActive) file.write(consoleText)
+                if (Info.env.isActive) file.write(magiskLogRaw)
 
                 file.write("\n---Manager Logs---\n")
                 file.write("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})\n\n")

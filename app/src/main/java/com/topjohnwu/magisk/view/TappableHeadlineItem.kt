@@ -1,9 +1,10 @@
 package com.topjohnwu.magisk.view
 
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.DiffRvItem
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.RvItem
 
-sealed class TappableHeadlineItem : DiffRvItem<TappableHeadlineItem>() {
+sealed class TappableHeadlineItem : RvItem(), DiffItem<TappableHeadlineItem> {
 
     abstract val title: Int
     abstract val icon: Int

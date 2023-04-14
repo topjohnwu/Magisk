@@ -12,39 +12,28 @@ Magisk will mount a `tmpfs` directory to store some temporary data. For devices 
 # Binaries like magisk, magiskinit, and all symlinks to
 # applets are directly stored in this path. This means when
 # this is /sbin, these binaries will be directly in PATH.
-MAGISKBASE=$(magisk --path)
+MAGISKTMP=$(magisk --path)
 
 # Magisk internal stuffs
-MAGISKTMP=$MAGISKBASE/.magisk
-
-# Magisk's BusyBox directory. Within this folder stores
-# the busybox binary and symlinks to all of its applets.
-# Any usage of this directory is deprecated, please
-# directly call /data/adb/magisk/busybox and use
-# BusyBox's ASH Standalone mode.
-# The creation of this path will be removed in the future.
-$MAGISKTMP/busybox
+INTERNALDIR=$MAGISKTMP/.magisk
 
 # /data/adb/modules will be bind mounted here.
 # The original folder is not used due to nosuid mount flag.
-$MAGISKTMP/modules
+$INTERNALDIR/modules
 
 # The current Magisk installation config
-$MAGISKTMP/config
+$INTERNALDIR/config
 
 # Partition mirrors
 # Each directory in this path will be mounted with the
 # partition of its directory name.
 # e.g. system, system_ext, vendor, data ...
-$MAGISKTMP/mirror
-
-# Block devices Magisk creates internally to mount mirrors.
-$MAGISKTMP/block
+$INTERNALDIR/mirror
 
 # Root directory patch files
 # On system-as-root devices, / is not writable.
 # All pre-init patched files are stored here and bind mounted.
-$MAGISKTMP/rootdir
+$INTERNALDIR/rootdir
 ```
 
 ### Paths in `/data`

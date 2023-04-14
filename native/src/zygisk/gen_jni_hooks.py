@@ -95,9 +95,7 @@ class ForkAndSpec(JNIHook):
         for a in self.args:
             if a.set_arg:
                 decl += ind(1) + f'args.{a.name} = &{a.name};'
-        decl += ind(1) + 'HookContext ctx;'
-        decl += ind(1) + 'ctx.env = env;'
-        decl += ind(1) + 'ctx.args = { &args };'
+        decl += ind(1) + 'HookContext ctx(env, &args);'
         decl += ind(1) + f'ctx.{self.base_name()}_pre();'
         decl += ind(1) + self.orig_method() + '('
         decl += ind(2) + f'env, clazz, {self.name_list()}'
@@ -233,8 +231,8 @@ def gen_jni_def(clz, methods):
 
 def gen_jni_hook():
     decl = ''
-    decl += ind(0) + 'unique_ptr<JNINativeMethod[]> hookAndSaveJNIMethods(const char *className, const JNINativeMethod *methods, int numMethods) {'
-    decl += ind(1) + 'unique_ptr<JNINativeMethod[]> newMethods;'
+    decl += ind(0) + 'static JNINativeMethod *hookAndSaveJNIMethods(const char *className, const JNINativeMethod *methods, int numMethods) {'
+    decl += ind(1) + 'JNINativeMethod *newMethods = nullptr;'
     decl += ind(1) + 'int clz_id = -1;'
     decl += ind(1) + 'int hook_cnt = 0;'
     decl += ind(1) + 'do {'
@@ -249,8 +247,8 @@ def gen_jni_hook():
     decl += ind(1) + '} while (false);'
 
     decl += ind(1) + 'if (hook_cnt) {'
-    decl += ind(2) + 'newMethods = make_unique<JNINativeMethod[]>(numMethods);'
-    decl += ind(2) + 'memcpy(newMethods.get(), methods, sizeof(JNINativeMethod) * numMethods);'
+    decl += ind(2) + 'newMethods = new JNINativeMethod[numMethods];'
+    decl += ind(2) + 'memcpy(newMethods, methods, sizeof(JNINativeMethod) * numMethods);'
     decl += ind(1) + '}'
 
     decl += ind(1) + 'auto &class_map = (*jni_method_map)[className];'
@@ -284,6 +282,7 @@ with open('jni_hooks.hpp', 'w') as f:
     methods = [server_l, server_samsung_q]
     f.write(gen_jni_def(zygote, methods))
 
-    f.write(gen_jni_hook())
+    f.write('\n} // namespace\n')
 
-    f.write('\n\n} // namespace\n')
+    f.write(gen_jni_hook())
+    f.write('\n')

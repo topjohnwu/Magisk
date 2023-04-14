@@ -407,7 +407,7 @@ private:
 #define __impl_cls(name, hdr)           \
 protected: name() = default;            \
 public:                                 \
-name(void *ptr) {                       \
+name(const void *ptr) {                 \
     raw = malloc(sizeof(hdr));          \
     memcpy(raw, ptr, sizeof(hdr));      \
 }                                       \
@@ -556,6 +556,7 @@ enum {
     BLOB_FLAG,
     NOOKHD_FLAG,
     ACCLAIM_FLAG,
+    AMONET_FLAG,
     AVB_FLAG,
     ZIMAGE_KERNEL,
     BOOT_FLAGS_MAX
@@ -576,13 +577,13 @@ struct boot_img {
     format_t r_fmt = UNKNOWN;
     format_t e_fmt = UNKNOWN;
 
-    /***************************************************
-     * Following pointers points within the mmap region
-     ***************************************************/
+    /*************************************************************
+     * Following pointers points within the read-only mmap region
+     *************************************************************/
 
     // MTK headers
-    mtk_hdr *k_hdr;
-    mtk_hdr *r_hdr;
+    const mtk_hdr *k_hdr;
+    const mtk_hdr *r_hdr;
 
     // The pointers/values after parse_image
     // +---------------+
@@ -592,40 +593,40 @@ struct boot_img {
     // +---------------+
     // | z_info.tail   | z_info.tail_sz
     // +---------------+
-    zimage_hdr *z_hdr;
+    const zimage_hdr *z_hdr;
     struct {
         uint32_t hdr_sz;
         uint32_t tail_sz = 0;
-        uint8_t *tail = nullptr;
+        const uint8_t *tail = nullptr;
     } z_info;
 
     // Pointer to dtb that is embedded in kernel
-    uint8_t *kernel_dtb;
+    const uint8_t *kernel_dtb;
 
     // Pointer to end of image
-    uint8_t *tail;
+    const uint8_t *tail;
     size_t tail_size = 0;
 
     // AVB structs
-    AvbFooter *avb_footer;
-    AvbVBMetaImageHeader *vbmeta;
+    const AvbFooter *avb_footer;
+    const AvbVBMetaImageHeader *vbmeta;
 
     // Pointers to blocks defined in header
-    uint8_t *hdr_addr;
-    uint8_t *kernel;
-    uint8_t *ramdisk;
-    uint8_t *second;
-    uint8_t *extra;
-    uint8_t *recovery_dtbo;
-    uint8_t *dtb;
+    const uint8_t *hdr_addr;
+    const uint8_t *kernel;
+    const uint8_t *ramdisk;
+    const uint8_t *second;
+    const uint8_t *extra;
+    const uint8_t *recovery_dtbo;
+    const uint8_t *dtb;
 
     // Pointer to blocks defined in header, but we do not care
-    uint8_t *ignore;
+    const uint8_t *ignore;
     size_t ignore_size = 0;
 
     boot_img(const char *);
     ~boot_img();
 
-    void parse_image(uint8_t *addr, format_t type);
-    dyn_img_hdr *create_hdr(uint8_t *addr, format_t type);
+    void parse_image(const uint8_t *addr, format_t type);
+    dyn_img_hdr *create_hdr(const uint8_t *addr, format_t type);
 };

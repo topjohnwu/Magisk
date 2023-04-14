@@ -6,14 +6,15 @@ import androidx.core.view.updateLayoutParams
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.DiffRvItem
-import com.topjohnwu.magisk.databinding.RvContainer
-import com.topjohnwu.magisk.databinding.ViewAwareRvItem
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.ViewAwareItem
 import kotlin.math.max
 
 class ConsoleItem(
     override val item: String
-) : DiffRvItem<ConsoleItem>(), ViewAwareRvItem, RvContainer<String> {
+) : RvItem(), ViewAwareItem, DiffItem<ConsoleItem>, ItemWrapper<String> {
     override val layoutRes = R.layout.item_console_md2
 
     private var parentWidth = -1

@@ -74,15 +74,11 @@ fi
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
 [ -z $SYSTEM_ROOT ] && SYSTEM_ROOT=false
-[ -z $ISENCRYPTED ] && ISENCRYPTED=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
-export ISENCRYPTED
 
 chmod -R 755 .
-
-RULESDEVICE="$(./magiskinit --rules-device)" || abort "! Unable to find rules partition!"
 
 #########
 # Unpack
@@ -141,7 +137,7 @@ case $((STATUS & 3)) in
     ;;
 esac
 
-# Work around custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
+# Workaround custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
 INIT=init
 if [ $((STATUS & 4)) -ne 0 ]; then
   INIT=init.real
@@ -153,25 +149,32 @@ fi
 
 ui_print "- Patching ramdisk"
 
+# Compress to save precious ramdisk space
+SKIP32="#"
+SKIP64="#"
+if [ -f magisk64 ]; then
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk64 --preinit-device)
+  ./magiskboot compress=xz magisk64 magisk64.xz
+  unset SKIP64
+fi
+if [ -f magisk32 ]; then
+  $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk32 --preinit-device)
+  ./magiskboot compress=xz magisk32 magisk32.xz
+  unset SKIP32
+fi
+./magiskboot compress=xz stub.apk stub.xz
+
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
-echo "RULESDEVICE=$RULESDEVICE" >> config
-[ ! -z $SHA1 ] && echo "SHA1=$SHA1" >> config
-
-# Compress to save precious ramdisk space
-SKIP32="#"
-SKIP64="#"
-if [ -f magisk32 ]; then
-  ./magiskboot compress=xz magisk32 magisk32.xz
-  unset SKIP32
+if [ -n "$PREINITDEVICE" ]; then
+  ui_print "- Pre-init storage partition device ID: $PREINITDEVICE"
+  echo "PREINITDEVICE=$PREINITDEVICE" >> config
 fi
-if [ -f magisk64 ]; then
-  ./magiskboot compress=xz magisk64 magisk64.xz
-  unset SKIP64
-fi
-./magiskboot compress=xz stub.apk stub.xz
+[ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
+RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
+echo "RANDOMSEED=0x$RANDOMSEED" >> config
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 $INIT magiskinit" \
@@ -183,9 +186,10 @@ fi
 "patch" \
 "backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
-"add 000 .backup/.magisk config"
+"add 000 .backup/.magisk config" \
+|| abort "! Unable to patch ramdisk"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz stub.apk
+rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
 
 #################
 # Binary Patches

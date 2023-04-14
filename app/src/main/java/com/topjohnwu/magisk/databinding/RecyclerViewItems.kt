@@ -8,60 +8,28 @@ abstract class RvItem {
     abstract val layoutRes: Int
 }
 
-interface RvContainer<E> {
+abstract class ObservableRvItem : RvItem(), ObservableHost {
+    override var callbacks: PropertyChangeRegistry? = null
+}
+
+interface ItemWrapper<E> {
     val item: E
 }
 
-interface ViewAwareRvItem {
+interface ViewAwareItem {
     fun onBind(binding: ViewDataBinding, recyclerView: RecyclerView)
 }
 
-interface ComparableRv<T> : Comparable<T> {
-    @Suppress("UNCHECKED_CAST")
-    fun comparableEqual(o: Any?) =
-        o != null && o::class == this::class && compareTo(o as T) == 0
-}
+interface DiffItem<T : Any> {
 
-abstract class DiffRvItem<T> : RvItem() {
-
-    // Defer to contentSameAs by default
-    open fun itemSameAs(other: T) = true
-
-    open fun contentSameAs(other: T) =
-        when (this) {
-            is RvContainer<*> -> item == (other as RvContainer<*>).item
-            is ComparableRv<*> -> comparableEqual(other)
+    fun itemSameAs(other: T): Boolean {
+        if (this === other) return true
+        return when (this) {
+            is ItemWrapper<*> -> item == (other as ItemWrapper<*>).item
+            is Comparable<*> -> compareValues(this, other as Comparable<*>) == 0
             else -> this == other
         }
-
-    companion object {
-        private val callback = object : DiffObservableList.Callback<DiffRvItem<Any>> {
-            override fun areItemsTheSame(
-                oldItem: DiffRvItem<Any>,
-                newItem: DiffRvItem<Any>
-            ): Boolean {
-                return oldItem::class == newItem::class && oldItem.itemSameAs(newItem)
-            }
-
-            override fun areContentsTheSame(
-                oldItem: DiffRvItem<Any>,
-                newItem: DiffRvItem<Any>
-            ): Boolean {
-                return oldItem.contentSameAs(newItem)
-            }
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        fun <T : AnyDiffRvItem> callback() = callback as DiffObservableList.Callback<T>
     }
-}
 
-typealias AnyDiffRvItem = DiffRvItem<*>
-
-abstract class ObservableDiffRvItem<T> : DiffRvItem<T>(), ObservableHost {
-    override var callbacks: PropertyChangeRegistry? = null
-}
-
-abstract class ObservableRvItem : RvItem(), ObservableHost {
-    override var callbacks: PropertyChangeRegistry? = null
+    fun contentSameAs(other: T) = true
 }

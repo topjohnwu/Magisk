@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseService
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.synchronized
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
-import com.topjohnwu.magisk.ktx.synchronized
 import com.topjohnwu.magisk.view.Notifications
 import okhttp3.ResponseBody
 import java.io.InputStream

@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
-import com.topjohnwu.magisk.events.RebootEvent
 
 class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
 
@@ -69,7 +68,7 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
         when (item.itemId) {
             R.id.action_settings ->
                 HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
-            R.id.action_reboot -> activity?.let { RebootEvent.inflateMenu(it).show() }
+            R.id.action_reboot -> activity?.let { RebootMenu.inflate(it).show() }
             else -> return super.onOptionsItemSelected(item)
         }
         return true

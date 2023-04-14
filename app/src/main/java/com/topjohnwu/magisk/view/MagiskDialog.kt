@@ -22,7 +22,14 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.databinding.*
+import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.ObservableHost
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.databinding.setAdapter
 import com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener
 
 typealias DialogButtonClickListener = (DialogInterface) -> Unit
@@ -166,7 +173,7 @@ class MagiskDialog(
     class DialogItem(
         override val item: CharSequence,
         val position: Int
-    ) : DiffRvItem<DialogItem>(), RvContainer<CharSequence> {
+    ) : RvItem(), DiffItem<DialogItem>, ItemWrapper<CharSequence> {
         override val layoutRes = R.layout.item_list_single_line
     }
 

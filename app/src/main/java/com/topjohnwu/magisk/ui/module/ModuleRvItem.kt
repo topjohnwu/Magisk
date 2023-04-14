@@ -5,20 +5,21 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.module.LocalModule
-import com.topjohnwu.magisk.databinding.DiffRvItem
-import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
-import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.ObservableRvItem
+import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
 
-object InstallModule : DiffRvItem<InstallModule>() {
+object InstallModule : RvItem(), DiffItem<InstallModule> {
     override val layoutRes = R.layout.item_module_download
 }
 
 class LocalModuleRvItem(
     override val item: LocalModule
-) : ObservableDiffRvItem<LocalModuleRvItem>(), RvContainer<LocalModule> {
+) : ObservableRvItem(), DiffItem<LocalModuleRvItem>, ItemWrapper<LocalModule> {
 
     override val layoutRes = R.layout.item_module_md2
 

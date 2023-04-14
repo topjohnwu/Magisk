@@ -5,16 +5,20 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.base.BaseActivity
-import com.topjohnwu.magisk.widget.Pre23CardViewBackgroundColorFixLayoutInflaterListener
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
 
@@ -35,11 +39,6 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
             .addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
-            .apply {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                    this.addOnViewCreatedListener(Pre23CardViewBackgroundColorFixLayoutInflaterListener.getInstance())
-                }
-            }
 
         super.onCreate(savedInstanceState)
 
@@ -102,4 +101,15 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
         is ActivityExecutor -> event(this)
         else -> Unit
     }
+}
+
+fun ViewGroup.startAnimations() {
+    val transition = AutoTransition()
+        .setInterpolator(FastOutSlowInInterpolator())
+        .setDuration(400)
+        .excludeTarget(R.id.main_toolbar, true)
+    TransitionManager.beginDelayedTransition(
+        this,
+        transition
+    )
 }

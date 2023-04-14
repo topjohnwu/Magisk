@@ -45,6 +45,7 @@ static bool mount_mirror(const std::string_view from, const std::string_view to)
 
 static void mount_mirrors() {
     LOGI("* Mounting mirrors\n");
+    auto self_mount_info = parse_mount_info("self");
 
     // Bind remount module root to clear nosuid
     if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
@@ -53,10 +54,40 @@ static void mount_mirrors() {
         xmkdir(MODULEROOT, 0755);
         xmkdir(dest.data(), 0755);
         xmount(MODULEROOT, dest.data(), nullptr, MS_BIND, nullptr);
-        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_NOATIME, nullptr);
+        xmount(nullptr, dest.data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
         xmount(nullptr, dest.data(), nullptr, MS_PRIVATE, nullptr);
         chmod(SECURE_DIR, 0700);
-        restorecon();
+    }
+
+    // Check and mount preinit mirror
+    if (struct stat st{}; stat((MAGISKTMP + "/" PREINITDEV).data(), &st) == 0 && (st.st_mode & S_IFBLK)) {
+        // DO NOT mount the block device directly, as we do not know the flags and configs
+        // to properly mount the partition; mounting block devices directly as rw could cause
+        // crashes if the filesystem driver is crap (e.g. some broken F2FS drivers).
+        // What we do instead is to scan through the current mountinfo and find a pre-existing
+        // mount point mounting our desired partition, and then bind mount the target folder.
+        dev_t preinit_dev = st.st_rdev;
+        bool mounted = false;
+        for (const auto &info: self_mount_info) {
+            if (info.root == "/" && info.device == preinit_dev) {
+                auto flags = split_view(info.fs_option, ",");
+                auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+                    return flag == "rw"sv;
+                });
+                if (!rw) continue;
+                string preinit_dir = resolve_preinit_dir(info.target.data());
+                xmkdir(preinit_dir.data(), 0700);
+                auto mirror_dir = MAGISKTMP + "/" PREINITMIRR;
+                if ((mounted = mount_mirror(preinit_dir, mirror_dir))) {
+                    xmount(nullptr, mirror_dir.data(), nullptr, MS_UNBINDABLE, nullptr);
+                    break;
+                }
+            }
+        }
+        if (!mounted) {
+            LOGW("preinit mirror not mounted %u:%u\n", major(preinit_dev), minor(preinit_dev));
+            unlink((MAGISKTMP + "/" PREINITDEV).data());
+        }
     }
 
     // Prepare worker
@@ -69,7 +100,7 @@ static void mount_mirrors() {
         LOGI("fallback to mount subtree\n");
         // rootfs may fail, fallback to bind mount each mount point
         set<string, greater<>> mounted_dirs {{ MAGISKTMP }};
-        for (const auto &info: parse_mount_info("self")) {
+        for (const auto &info: self_mount_info) {
             if (info.type == "rootfs"sv) continue;
             // the greatest mount point that less than info.target, which is possibly a parent
             if (auto last_mount = mounted_dirs.upper_bound(info.target);
@@ -82,6 +113,105 @@ static void mount_mirrors() {
             }
         }
     }
+}
+
+string find_preinit_device() {
+    enum part_t {
+        UNKNOWN,
+        PERSIST,
+        METADATA,
+        CACHE,
+        DATA,
+    };
+
+    part_t ext4_type = UNKNOWN;
+    part_t f2fs_type = UNKNOWN;
+
+    bool encrypted = getprop("ro.crypto.state") == "encrypted";
+    bool mount = getuid() == 0 && getenv("MAGISKTMP");
+    bool make_dev = mount && getenv("MAKEDEV");
+
+    string preinit_source;
+    string preinit_dir;
+    dev_t preinit_dev;
+
+    for (const auto &info: parse_mount_info("self")) {
+        if (info.target.ends_with(PREINITMIRR))
+            return basename(info.source.data());
+        if (info.root != "/" || info.source[0] != '/' || info.source.find("/dm-") != string::npos)
+            continue;
+        // Skip all non ext4 partitions once we found a matching ext4 partition
+        if (ext4_type != UNKNOWN && info.type != "ext4")
+            continue;
+        if (info.type != "ext4" && info.type != "f2fs")
+            continue;
+        auto flags = split_view(info.fs_option, ",");
+        auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+            return flag == "rw"sv;
+        });
+        if (!rw) continue;
+        if (auto base = std::string_view(info.source).substr(0, info.source.find_last_of('/'));
+            !base.ends_with("/by-name") && !base.ends_with("/block")) {
+            continue;
+        }
+
+        part_t &matched = (info.type == "f2fs") ? f2fs_type : ext4_type;
+        switch (matched) {
+            case UNKNOWN:
+                if (info.target == "/persist" || info.target == "/mnt/vendor/persist") {
+                    matched = PERSIST;
+                    break;
+                }
+                [[fallthrough]];
+            case PERSIST:
+                if (info.target == "/metadata") {
+                    matched = METADATA;
+                    break;
+                }
+                [[fallthrough]];
+            case METADATA:
+                if (info.target == "/cache") {
+                    matched = CACHE;
+                    break;
+                }
+                [[fallthrough]];
+            case CACHE:
+                if (info.target == "/data") {
+                    if (!encrypted || access("/data/unencrypted", F_OK) == 0) {
+                        matched = DATA;
+                        break;
+                    }
+                }
+                [[fallthrough]];
+            default:
+                continue;
+        }
+
+        if (mount) {
+            preinit_dir = resolve_preinit_dir(info.target.data());
+            preinit_dev = info.device;
+        }
+        preinit_source = info.source;
+
+        // Cannot find any better partition, stop finding
+        if (ext4_type == DATA)
+            break;
+    }
+
+    if (preinit_source.empty())
+        return "";
+
+    if (!preinit_dir.empty()) {
+        auto mirror_dir = string(getenv("MAGISKTMP")) + "/" PREINITMIRR;
+        mkdirs(preinit_dir.data(), 0700);
+        mkdirs(mirror_dir.data(), 0700);
+        xmount(preinit_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
+        if (make_dev) {
+            auto dev_path = string(getenv("MAGISKTMP")) + "/" PREINITDEV;
+            xmknod(dev_path.data(), S_IFBLK | 0600, preinit_dev);
+        }
+    }
+    return basename(preinit_source.data());
 }
 
 static bool magisk_env() {
@@ -117,8 +247,7 @@ static bool magisk_env() {
     xmkdir(DATABIN, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
-
-    restore_databincon();
+    restorecon();
 
     if (access(DATABIN "/busybox", X_OK))
         return false;
@@ -309,7 +438,7 @@ static void boot_complete() {
     get_manager(0, nullptr, true);
 }
 
-void boot_stage_handler(int code) {
+void boot_stage_handler(int client, int code) {
     // Make sure boot stage execution is always serialized
     static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
     mutex_guard lock(stage_lock);
@@ -318,13 +447,15 @@ void boot_stage_handler(int code) {
     case MainRequest::POST_FS_DATA:
         if ((boot_state & FLAG_POST_FS_DATA_DONE) == 0)
             post_fs_data();
-        close(xopen(UNBLOCKFILE, O_RDONLY | O_CREAT, 0));
+        close(client);
         break;
     case MainRequest::LATE_START:
+        close(client);
         if ((boot_state & FLAG_POST_FS_DATA_DONE) && (boot_state & FLAG_SAFE_MODE) == 0)
             late_start();
         break;
     case MainRequest::BOOT_COMPLETE:
+        close(client);
         if ((boot_state & FLAG_SAFE_MODE) == 0)
             boot_complete();
         break;

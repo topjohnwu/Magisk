@@ -13,11 +13,12 @@ import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
-import com.topjohnwu.magisk.databinding.diffListOf
+import com.topjohnwu.magisk.databinding.diffList
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
+import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
 import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
@@ -26,7 +27,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
 
-    private val itemsInstalled = diffListOf<LocalModuleRvItem>()
+    private val itemsInstalled = diffList<LocalModuleRvItem>()
 
     val items = MergeObservableList<RvItem>()
     val extraBindings = bindExtra {
@@ -57,11 +58,10 @@ class ModuleViewModel : AsyncLoadViewModel() {
     override fun onNetworkChanged(network: Boolean) = startLoading()
 
     private suspend fun loadInstalled() {
-        val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
-        val diff = withContext(Dispatchers.Default) {
-            itemsInstalled.calculateDiff(installed)
+        withContext(Dispatchers.Default) {
+            val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
+            itemsInstalled.update(installed)
         }
-        itemsInstalled.update(installed, diff)
     }
 
     private suspend fun loadUpdateInfo() {
@@ -75,13 +75,17 @@ class ModuleViewModel : AsyncLoadViewModel() {
 
     fun downloadPressed(item: OnlineModule?) =
         if (item != null && Info.isConnected.value == true) {
-            withExternalRW { ModuleInstallDialog(item).publish() }
+            withExternalRW { OnlineModuleInstallDialog(item).show() }
         } else {
             SnackbarEvent(R.string.no_connection).publish()
         }
 
     fun installPressed() = withExternalRW {
         GetContentEvent("application/zip", UriCallback()).publish()
+    }
+
+    fun requestInstallLocalModule(uri: Uri, displayName: String) {
+        LocalModuleInstallDialog(this, uri, displayName).show()
     }
 
     @Parcelize

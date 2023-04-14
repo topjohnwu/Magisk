@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">此模組因 %1$s 未啟用而暫停運作</string>
     <string name="zygisk_module_unloaded">此模組因不相容 Zygisk 而未載入</string>
     <string name="module_empty">未安裝任何模組</string>
+    <string name="confirm_install">安裝模組 %1$s？</string>
+    <string name="confirm_install_title">安裝確認</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">主題模式</string>
@@ -219,6 +221,7 @@
     <string name="setup_fail">安裝失敗</string>
     <string name="env_fix_title">需要修復執行環境</string>
     <string name="env_fix_msg">缺少讓 Magisk 正常執行所需的檔案。請您同意讓 Magisk 額外下載安裝包進行修復安裝，修復完成後將自動重新啟動。請問您是否繼續？</string>
+    <string name="env_full_fix_msg">需要重新安裝才能使 Magisk 正常工作。請在應用程式內重新安裝，recovery 模式無法正確獲取設備訊息。</string>
     <string name="setup_msg">正在修復執行環境……</string>
     <string name="authenticate">驗證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>

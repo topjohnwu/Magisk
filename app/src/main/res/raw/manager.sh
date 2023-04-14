@@ -13,8 +13,11 @@ env_check() {
   if [ "$2" -ge 25000 ]; then
     [ -f "$MAGISKBIN/magiskpolicy" ] || return 1
   fi
-  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 1
-  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 1
+  if [ "$2" -ge 25210 ]; then
+    [ -b "$MAGISKTMP/.magisk/block/preinit" ] || return 2
+  fi
+  grep -xqF "MAGISK_VER='$1'" "$MAGISKBIN/util_functions.sh" || return 3
+  grep -xqF "MAGISK_VER_CODE=$2" "$MAGISKBIN/util_functions.sh" || return 3
   return 0
 }
 
@@ -41,7 +44,6 @@ fix_env() {
   rm -rf $MAGISKBIN/*
   mkdir -p $MAGISKBIN 2>/dev/null
   chmod 700 $NVBASE
-  rm $1/stub.apk
   cp_readlink $1 $MAGISKBIN
   rm -rf $1
   chown -R 0:0 $MAGISKBIN
@@ -64,7 +66,7 @@ direct_install() {
   rm -f $1/new-boot.img
   fix_env $1
   run_migrations
-  copy_sepolicy_rules
+  copy_preinit_files
 
   return 0
 }
@@ -114,8 +116,8 @@ EOF
 
 add_hosts_module() {
   # Do not touch existing hosts module
-  [ -d $MAGISKTMP/modules/hosts ] && return
-  cd $MAGISKTMP/modules
+  [ -d $NVBASE/modules/hosts ] && return
+  cd $NVBASE/modules
   mkdir -p hosts/system/etc
   cat << EOF > hosts/module.prop
 id=hosts
@@ -226,7 +228,7 @@ app_init() {
   check_boot_ramdisk && RAMDISKEXIST=true
   get_flags
   run_migrations
-  SHA1=$(grep_prop SHA1 $MAGISKTMP/config)
+  SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
 }
 

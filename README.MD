@@ -4,7 +4,6 @@
 
 ## Introduction
 
-Magisk 32-bit is a modification of Magisk, which is a suite of software primarily designed as a root solution for multilib Android devicesthat are Zygote64 only.<br>
 Some highlight features:
 
 - **MagiskSU**: Provide root access for applications
@@ -46,8 +45,6 @@ The sources for [Magisk Delta 32-bit are available in the delta-32bit branch](ht
 ## Installation
 
 - [**Recommended instructions are on the XDA thread**](https://forum.xda-developers.com/t/4521029/)
-
-- [Instructions can also be followed on the GitHub download repository](https://github.com/Namelesswonder/magisk-files)
 
 ## Useful Links
 

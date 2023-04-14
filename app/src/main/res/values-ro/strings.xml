@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">Modul suspendat deoarece %1$s nu este activat</string>
     <string name="zygisk_module_unloaded">Modulul Zygisk nu a fost încărcat din cauza incompatibilității</string>
     <string name="module_empty">Niciun modul instalat</string>
+    <string name="confirm_install">Instalezi modulul %1$s?</string>
+    <string name="confirm_install_title">Confirmare pentru instalare</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mod pentru temă</string>
@@ -219,6 +221,7 @@
     <string name="setup_fail">Configurare eșuată</string>
     <string name="env_fix_title">Necesită configurare suplimentară</string>
     <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Vrei să continui și să repornești?</string>
+    <string name="env_full_fix_msg">Dispozitivul are nevoie de rescrierea în memoria flash a Magisk pentru a funcționa corect. Te rugăm să reinstalezi Magisk în cadrul aplicației, modul de recuperare nu poate obține informații corecte despre dispozitiv.</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
     <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
@@ -230,6 +233,7 @@
     <string name="unsupport_nonroot_stub_msg">Aplicația Magisk ascunsă nu poate continua să funcționeze deoarece rootul a fost pierdut. Te rugăm să restaurezi APK-ul original.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Acordă permisiunea de stocare pentru a activa această funcționalitate</string>
+    <string name="post_notifications_denied">Acordă permisiunea de notificări pentru a activa această funcționalitate</string>
     <string name="install_unknown_denied">Permite „instalarea de aplicații necunoscute” pentru a activa această funcționalitate</string>
     <string name="add_shortcut_title">Adaugă comandă rapidă pe ecranul de pornire</string>
     <string name="add_shortcut_msg">După ascunderea acestei aplicații, numele și pictograma acesteia ar putea deveni dificil de recunoscut. Vrei să adaugi o comandă rapidă frumoasă pe ecranul de pornire?</string>

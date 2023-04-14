@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -21,8 +22,6 @@ import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.ktx.activity
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
@@ -357,6 +356,6 @@ object Reauthenticate : BaseSettingsItem.Toggle() {
     override var value by Config::suReAuth
 
     override fun refresh() {
-        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Utils.showSuperUser()
+        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Info.showSuperUser
     }
 }

@@ -10,8 +10,8 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
+import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.ktx.getLabel
 import java.util.*
 
 class CmdlineListItem(line: String) {

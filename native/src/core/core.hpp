@@ -6,6 +6,7 @@
 extern bool RECOVERY_MODE;
 extern std::atomic<ino_t> pkg_xml_ino;
 
+std::string find_preinit_device();
 void unlock_blocks();
 void reboot();
 void start_log_daemon();

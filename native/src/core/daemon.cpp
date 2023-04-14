@@ -274,8 +274,7 @@ static void handle_request(pollfd *pfd) {
     } else if (code < MainRequest::_STAGE_BARRIER_) {
         exec_task([=] { handle_request_async(client, code, cred); });
     } else {
-        close(client);
-        exec_task([=] { boot_stage_handler(code); });
+        exec_task([=] { boot_stage_handler(client, code); });
     }
     return;
 
@@ -318,7 +317,7 @@ static void daemon_entry() {
         close(fd);
 
     setsid();
-    setcon("u:r:" SEPOL_PROC_DOMAIN ":s0");
+    setcon(MAGISK_PROC_CON);
 
     start_log_daemon();
 

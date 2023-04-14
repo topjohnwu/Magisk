@@ -4,9 +4,9 @@ APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
 APP_LDFLAGS      := -flto
 APP_CPPFLAGS     := -std=c++20
 APP_STL          := none
-APP_PLATFORM     := android-21
+APP_PLATFORM     := android-23
 APP_THIN_ARCHIVE := true
-APP_STRIP_MODE   := --strip-all
+APP_STRIP_MODE   := none
 
 # Busybox should use stock libc.a
 ifdef B_BB

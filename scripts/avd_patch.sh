@@ -3,7 +3,7 @@
 #   AVD MagiskInit Setup
 #####################################################################
 #
-# Support API level: 23 - 33 (21 and 22 images do not have SELinux)
+# Support API level: 23 - 33
 #
 # With an emulator booted and accessible via ADB, usage:
 # ./build.py avd_patch path/to/booted/avd-image/ramdisk.img
@@ -57,20 +57,25 @@ done
 ./magiskboot decompress ramdisk.cpio.tmp ramdisk.cpio
 cp ramdisk.cpio ramdisk.cpio.orig
 
-touch config
+export KEEPVERITY=false
+export KEEPFORCEENCRYPT=true
 
-echo "RULESDEVICE=$(ISENCRYPTED=true ./magiskinit --rules-device)" >> config
-
+echo "KEEPVERITY=$KEEPVERITY" > config
+echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
+if [ -e "/system/bin/linker64" ]; then
+  echo "PREINITDEVICE=$(./magisk64 --preinit-device)" >> config
+else
+  echo "PREINITDEVICE=$(./magisk32 --preinit-device)" >> config
+fi
 # For API 28, we also patch advancedFeatures.ini to disable SAR
 # Manually override skip_initramfs by setting RECOVERYMODE=true
 [ $API = "28" ] && echo 'RECOVERYMODE=true' >> config
+RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
+echo "RANDOMSEED=0x$RANDOMSEED" >> config
 
 ./magiskboot compress=xz magisk32 magisk32.xz
 ./magiskboot compress=xz magisk64 magisk64.xz
 ./magiskboot compress=xz stub.apk stub.xz
-
-export KEEPVERITY=false
-export KEEPFORCEENCRYPT=true
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 init magiskinit" \

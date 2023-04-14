@@ -145,29 +145,19 @@ static void exec_cmd(const char *action, vector<Extra> &data,
             return;
     }
 
+    // Then try start activity with package name
+    strscpy(target, info->mgr_pkg.data(), sizeof(target));
     vector<const char *> args{ START_ACTIVITY };
     for (auto &e : data) {
         e.add_intent(args);
     }
     args.push_back(nullptr);
     exec_t exec {
-        .err = true,
-        .fd = -1,
+        .fd = -2,
         .pre_exec = [] { setenv("CLASSPATH", "/system/framework/am.jar", 1); },
+        .fork = fork_dont_care,
         .argv = args.data()
     };
-
-    // Then try start activity without package name
-    strscpy(target, info->mgr_pkg.data(), sizeof(target));
-    exec_command_sync(exec);
-    if (check_no_error(exec.fd))
-        return;
-
-    // Finally, fallback to start activity with component name
-    args[4] = "-n";
-    ssprintf(target, sizeof(target), "%s/com.topjohnwu.magisk.ui.surequest.SuRequestActivity", info->mgr_pkg.data());
-    exec.fd = -2;
-    exec.fork = fork_dont_care;
     exec_command(exec);
 }
 
@@ -204,10 +194,10 @@ int app_request(const su_context &ctx) {
     // Create FIFO
     char fifo[64];
     strcpy(fifo, "/dev/socket/");
-    gen_rand_str(fifo + 12, 32, true);
+    gen_rand_str(fifo + 12, 32);
     mkfifo(fifo, 0600);
     chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
-    setfilecon(fifo, "u:object_r:" SEPOL_FILE_TYPE ":s0");
+    setfilecon(fifo, MAGISK_FILE_CON);
 
     // Send request
     vector<Extra> extras;

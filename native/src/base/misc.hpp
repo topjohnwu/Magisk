@@ -5,6 +5,7 @@
 #include <functional>
 #include <string_view>
 #include <bitset>
+#include <random>
 
 #include <base-rs.hpp>
 
@@ -125,6 +126,7 @@ rust::Slice<uint8_t> byte_slice(T *buf, size_t sz) {
     return rust::Slice(reinterpret_cast<uint8_t *>(buf), sz);
 }
 
+uint64_t parse_uint64_hex(std::string_view s);
 int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
@@ -158,10 +160,11 @@ void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
+std::mt19937_64 &get_rand(const void *seed_buf = nullptr);
 int gen_rand_str(char *buf, int len, bool varlen = true);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
-std::vector<std::string> split(const std::string &s, const std::string &delims);
-std::vector<std::string_view> split_ro(std::string_view, std::string_view delims);
+std::vector<std::string> split(std::string_view s, std::string_view delims);
+std::vector<std::string_view> split_view(std::string_view, std::string_view delims);
 
 // Similar to vsnprintf, but the return value is the written number of bytes
 int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);

@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.data.magiskdb
 
-import com.topjohnwu.magisk.ktx.await
+import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

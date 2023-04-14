@@ -49,7 +49,7 @@ getvar() {
   local VARNAME=$1
   local VALUE
   local PROPPATH='/data/.magisk /cache/.magisk'
-  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/config $PROPPATH"
+  [ ! -z $MAGISKTMP ] && PROPPATH="$MAGISKTMP/.magisk/config $PROPPATH"
   VALUE=$(grep_prop $VARNAME $PROPPATH)
   [ ! -z $VALUE ] && eval $VARNAME=\$VALUE
 }
@@ -273,8 +273,8 @@ mount_partitions() {
 
   # Mount ro partitions
   if is_mounted /system_root; then
-    umount /system 2&>/dev/null
-    umount /system_root 2&>/dev/null
+    umount /system 2>/dev/null
+    umount /system_root 2>/dev/null
   fi
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init -o -L /system/init ]; then
@@ -296,13 +296,6 @@ mount_partitions() {
 
   # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
   $BOOTMODE || mount_apex
-
-  # Mount sepolicy rules dir locations in recovery (best effort)
-  if ! $BOOTMODE; then
-    mount_name "cache cac" /cache
-    mount_name metadata /metadata
-    mount_name persist /persist
-  fi
 }
 
 # loop_setup <ext4_img>, sets LOOPDEV
@@ -336,7 +329,7 @@ mount_apex() {
       [ -f /apex/original_apex ] && APEX=/apex/original_apex # unzip doesn't do return codes
       # APEX APKs, extract and loop mount
       unzip -qo $APEX apex_payload.img -d /apex
-      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1)
+      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1 | tr -dc '[:alnum:].-_\n')
       [ -z $DEST ] && DEST=$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
       [ -z $DEST ] && continue
       DEST=/apex/$DEST
@@ -352,7 +345,7 @@ mount_apex() {
       if [ -f $APEX/apex_manifest.json ]; then
         DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
       elif [ -f $APEX/apex_manifest.pb ]; then
-        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1)
+        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1 | tr -dc '[:alnum:].-_\n')
       else
         continue
       fi
@@ -636,15 +629,15 @@ run_migrations() {
   done
 }
 
-copy_sepolicy_rules() {
-  local RULESDIR=$(magisk --path)/.magisk/sepolicy.rules
-  if ! grep -q " $RULESDIR " /proc/mounts; then
-    ui_print "- Unable to find sepolicy rules dir"
+copy_preinit_files() {
+  local PREINITDIR=$(magisk --path)/.magisk/preinit
+  if ! grep -q " $PREINITDIR " /proc/mounts; then
+    ui_print "- Unable to find preinit dir"
     return 1
   fi
 
-  if ! grep -q "/adb/modules $RULESDIR " /proc/self/mountinfo; then
-    rm -rf $RULESDIR/*
+  if ! grep -q "/adb/modules $PREINITDIR " /proc/self/mountinfo; then
+    rm -rf $PREINITDIR/*
   fi
 
   # Copy all enabled sepolicy.rule
@@ -655,8 +648,8 @@ copy_sepolicy_rules() {
     [ -f $MODDIR/remove ] && continue
     [ -f $MODDIR/update ] && continue
     local MODNAME=${MODDIR##*/}
-    mkdir -p $RULESDIR/$MODNAME
-    cp -f $r $RULESDIR/$MODNAME/sepolicy.rule
+    mkdir -p $PREINITDIR/$MODNAME
+    cp -f $r $PREINITDIR/$MODNAME/sepolicy.rule
   done
 }
 
@@ -795,7 +788,7 @@ install_module() {
   # Copy over custom sepolicy rules
   if [ -f $MODPATH/sepolicy.rule ]; then
     ui_print "- Installing custom sepolicy rules"
-    copy_sepolicy_rules
+    copy_preinit_files
   fi
 
   # Remove stuff that doesn't belong to modules and clean up any empty directories

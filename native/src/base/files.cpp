@@ -505,3 +505,15 @@ string find_apk_path(const char *pkg) {
     string path(buf);
     return path.append("/base.apk");
 }
+
+string resolve_preinit_dir(const char *base_dir) {
+    string dir = base_dir;
+    if (access((dir + "/unencrypted").data(), F_OK) == 0) {
+        dir += "/unencrypted/magisk";
+    } else if (access((dir + "/adb").data(), F_OK) == 0) {
+        dir += "/adb/modules";
+    } else {
+        dir += "/magisk";
+    }
+    return dir;
+}

@@ -146,13 +146,19 @@ void mirror_node::mount() {
 }
 
 void module_node::mount() {
-    string src = module_mnt + module + parent()->root()->prefix + node_path();
-    if (exist())
-        clone_attr(mirror_path().data(), src.data());
-    if (isa<tmpfs_node>(parent()))
-        create_and_mount("module", src);
-    else
-        bind_mount("module", src.data(), node_path().data());
+    std::string path = module + (parent()->root()->prefix + node_path());
+    string mnt_src = module_mnt + path;
+    {
+        string src = MODULEROOT "/" + path;
+        if (exist()) clone_attr(mirror_path().data(), src.data());
+        // special case for /system/etc/hosts to ensure it is writable
+        if (node_path() == "/system/etc/hosts") mnt_src = std::move(src);
+    }
+    if (isa<tmpfs_node>(parent())) {
+        create_and_mount("module", mnt_src);
+    } else {
+        bind_mount("module", mnt_src.data(), node_path().data());
+    }
 }
 
 void tmpfs_node::mount() {
@@ -303,6 +309,9 @@ void load_modules() {
         mount_zygisk(32)
         mount_zygisk(64)
     }
+
+    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
+    xmount(nullptr, worker_dir.data(), nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 }
 
 /************************
@@ -437,7 +446,7 @@ void handle_modules() {
 }
 
 static int check_rules_dir(char *buf, size_t sz) {
-    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), RULESDIR);
+    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), PREINITMIRR);
     struct stat st1{};
     struct stat st2{};
     if (xstat(buf, &st1) < 0 || xstat(MODULEROOT, &st2) < 0)

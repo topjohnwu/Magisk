@@ -1,11 +1,12 @@
 #include <sys/mount.h>
 #include <libgen.h>
+#include <sys/sysmacros.h>
 
 #include <magisk.hpp>
 #include <base.hpp>
+#include <selinux.hpp>
 
 #include "init.hpp"
-#include "magiskrc.inc"
 
 using namespace std;
 
@@ -82,11 +83,27 @@ static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir
     }
 
     // Inject Magisk rc scripts
-    char pfd_svc[16], ls_svc[16];
-    gen_rand_str(pfd_svc, sizeof(pfd_svc));
-    gen_rand_str(ls_svc, sizeof(ls_svc));
-    LOGD("Inject magisk services: [%s] [%s]\n", pfd_svc, ls_svc);
-    fprintf(rc, MAGISK_RC, tmp_dir, pfd_svc, ls_svc);
+    LOGD("Inject magisk rc\n");
+    fprintf(rc, R"EOF(
+on post-fs-data
+    start logd
+    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
+
+on property:vold.decrypt=trigger_restart_framework
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on nonencrypted
+    exec %2$s 0 0 -- %1$s/magisk --service
+
+on property:sys.boot_completed=1
+    exec %2$s 0 0 -- %1$s/magisk --boot-complete
+
+on property:init.svc.zygote=restarting
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+
+on property:init.svc.zygote=stopped
+    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
+)EOF", tmp_dir, MAGISK_PROC_CON);
 
     fclose(rc);
     clone_attr(src, dest);
@@ -212,18 +229,33 @@ static void extract_files(bool sbin) {
     }
 }
 
+void MagiskInit::parse_config_file() {
+    uint64_t seed = 0;
+    parse_prop_file("/data/.backup/.magisk", [&](auto key, auto value) -> bool {
+        if (key == "PREINITDEVICE") {
+            preinit_dev = value;
+        } else if (key == "RANDOMSEED") {
+            value.remove_prefix(2); // 0x
+            seed = parse_uint64_hex(value);
+        }
+        return true;
+    });
+    get_rand(&seed);
+}
+
 #define ROOTMIR     MIRRDIR "/system_root"
 #define NEW_INITRC  "/system/etc/init/hw/init.rc"
 
 void MagiskInit::patch_ro_root() {
     mount_list.emplace_back("/data");
+    parse_config_file();
 
     string tmp_dir;
 
     if (access("/sbin", F_OK) == 0) {
         tmp_dir = "/sbin";
     } else {
-        char buf[8];
+        char buf[16];
         gen_rand_str(buf, sizeof(buf));
         tmp_dir = "/dev/"s + buf;
         xmkdir(tmp_dir.data(), 0);
@@ -232,14 +264,14 @@ void MagiskInit::patch_ro_root() {
     setup_tmp(tmp_dir.data());
     chdir(tmp_dir.data());
 
-    // Mount system_root mirror
-    xmkdir(ROOTMIR, 0755);
-    xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
-    mount_list.emplace_back(tmp_dir + "/" ROOTMIR);
-
     // Recreate original sbin structure if necessary
-    if (tmp_dir == "/sbin")
+    if (tmp_dir == "/sbin") {
+        // Mount system_root mirror
+        xmkdir(ROOTMIR, 0755);
+        xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
         recreate_sbin(ROOTMIR "/sbin", true);
+        xumount2(ROOTMIR, MNT_DETACH);
+    }
 
     xrename("overlay.d", ROOTOVL);
 
@@ -303,6 +335,8 @@ void RootFSInit::prepare() {
 
 void MagiskInit::patch_rw_root() {
     mount_list.emplace_back("/data");
+    parse_config_file();
+
     // Create hardlink mirror of /sbin to /root
     mkdir("/root", 0777);
     clone_attr("/sbin", "/root");

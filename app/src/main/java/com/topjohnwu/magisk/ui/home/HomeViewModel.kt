@@ -1,25 +1,32 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.*
+import com.topjohnwu.magisk.arch.ActivityExecutor
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
+import com.topjohnwu.magisk.arch.ContextExecutor
+import com.topjohnwu.magisk.arch.UIActivity
+import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.download.Subject.App
+import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.repository.NetworkService
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.EnvFixDialog
+import com.topjohnwu.magisk.dialog.ManagerInstallDialog
+import com.topjohnwu.magisk.dialog.UninstallDialog
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.EnvFixDialog
-import com.topjohnwu.magisk.events.dialog.ManagerInstallDialog
-import com.topjohnwu.magisk.events.dialog.UninstallDialog
-import com.topjohnwu.magisk.ktx.await
-import com.topjohnwu.magisk.utils.Utils
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
@@ -108,17 +115,25 @@ class HomeViewModel(
     }
 
     fun onLinkPressed(link: String) = object : ViewEvent(), ContextExecutor {
-        override fun invoke(context: Context) = Utils.openLink(context, link.toUri())
+        override fun invoke(context: Context) {
+            val intent = Intent(Intent.ACTION_VIEW, link.toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                context.toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
+            }
+        }
     }.publish()
 
-    fun onDeletePressed() = UninstallDialog().publish()
+    fun onDeletePressed() = UninstallDialog().show()
 
     fun onManagerPressed() = when (appState) {
         State.LOADING -> SnackbarEvent(R.string.loading).publish()
         State.INVALID -> SnackbarEvent(R.string.no_connection).publish()
         else -> withExternalRW {
             withInstallPermission {
-                ManagerInstallDialog().publish()
+                ManagerInstallDialog().show()
             }
         }
     }
@@ -135,8 +150,9 @@ class HomeViewModel(
     private suspend fun ensureEnv() {
         if (magiskState == State.INVALID || checkedEnv) return
         val cmd = "env_check ${Info.env.versionString} ${Info.env.versionCode}"
-        if (!Shell.cmd(cmd).await().isSuccess) {
-            EnvFixDialog(this).publish()
+        val code = Shell.cmd(cmd).await().code
+        if (code != 0) {
+            EnvFixDialog(this, code).show()
         }
         checkedEnv = true
     }

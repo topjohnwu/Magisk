@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">Moduli është pezulluar sepse %1$s nuk është i aktivizuar</string>
     <string name="zygisk_module_unloaded">Moduli Zygisk nuk është ngarkuar për shkak të papajtueshmërisë</string>
     <string name="module_empty">Ska module të instaluar</string>
+    <string name="confirm_install">Të instalohet moduli %1$s?</string>
+    <string name="confirm_install_title">Konfirmo instalimin</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mënyra e temës</string>
@@ -217,6 +219,7 @@
     <string name="setup_fail">Konfigurimi dështoi</string>
     <string name="env_fix_title">Kërkon Konfigurim shtesë</string>
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet.  Dëshironi të vazhdoni dhe rindizni?</string>
+    <string name="env_full_fix_msg">Pajisja juaj ka nevojë për re-flashuar Magisk që të funksionojë siç duhet. Ju lutemi ri-instaloni Magisk brenda aplikacionit, modaliteti i rikuperimit nuk mund të marrë informacionin e saktë të pajisjes.</string>
     <string name="setup_msg">Konfigurimi i mjedisit të funksionimit…</string>
     <string name="authenticate">Vërtetoj</string>
     <string name="unsupport_magisk_title">Version Magjik i Pambështetur</string>

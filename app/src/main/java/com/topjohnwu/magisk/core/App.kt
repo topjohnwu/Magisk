@@ -5,9 +5,14 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import androidx.lifecycle.ProcessLifecycleAccessor
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.utils.*
+import com.topjohnwu.magisk.core.utils.DispatcherExecutor
+import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.core.utils.ShellInit
+import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.core.utils.setConfig
 import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
@@ -72,6 +77,11 @@ open class App() : Application() {
         refreshLocale()
         resources.patch()
         Notifications.setup()
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ProcessLifecycleAccessor.init(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
