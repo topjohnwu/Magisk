@@ -109,6 +109,8 @@
     <string name="suspend_text_zygisk">Módulo suspenso porque %1$s não está ativo</string>
     <string name="zygisk_module_unloaded">Modulo Zygisk não carregado devido a incompatibilidade</string>
     <string name="module_empty">Nenhum módulo instalado</string>
+    <string name="confirm_install">Instalar módulo %1$s?</string>
+    <string name="confirm_install_title">Confirmação de Instalação</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Modo de tema</string>
@@ -213,6 +215,7 @@
     <string name="setup_fail">Falha na instalação</string>
     <string name="env_fix_title">Configuração adicional exigida</string>
     <string name="env_fix_msg">Seu dispositivo exige uma configuração adicional para o Magisk funcionar corretamente. Deseja continuar e reiniciar?</string>
+    <string name="env_full_fix_msg">Seu dispositivo precisa refazer o flash do Magisk para funcionar corretamente. Reinstale o Magisk no aplicativo, o modo de recuperação não pode obter as devidas informações do dispositivo.</string>
     <string name="setup_msg">Executando a configuração do ambiente…</string>
     <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versão do Magisk não suportada</string>
