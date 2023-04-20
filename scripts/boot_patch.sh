@@ -127,6 +127,8 @@ case $((STATUS & 3)) in
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
     [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
+    # Retain PREINITDEVICE in recovery flash if previously found during booted patching
+    $BOOTMODE || [ -z $PREINITDEVICE ] && PREINITDEVICE=`(./magiskboot cpio ramdisk.cpio "extract .backup/.magisk .tmp"; grep PREINITDEVICE .tmp | cut -d= -f2; rm -f .tmp) 2>/dev/null`
     ./magiskboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img
