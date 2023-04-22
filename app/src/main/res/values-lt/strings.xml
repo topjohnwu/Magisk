@@ -9,8 +9,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Neteisingas atnaujinimų nustatymas</string>
-    <string name="safetynet_api_error">SafetyNet API Klaida</string>
-    <string name="safetynet_res_invalid">Gautas neteisingas atsakymas</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Palikti priverstinį šifravimą</string>
@@ -28,7 +26,6 @@
     <!--Repo Fragment-->
     <string name="update_available">Galimas atnaujinimas</string>
     <string name="home_installed_version">Instaliuota</string>
-    <string name="sorting_order">Išdėliojimo tvarka</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Išsaugoti įvykių sąrašą</string>
@@ -39,13 +36,11 @@
     <string name="app_changelog">Pakeitimų sąrašas</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Instaliuoti %1$s</string>
-    <string name="repo_install_msg">Ar jūs norite instaliuoti %1$s?</string>
+    <string name="repo_install_title">Instaliuoti %1$s %2$s(%3$d)</string>
     <string name="download">Atsisiųsti</string>
     <string name="reboot">Perkrauti</string>
     <string name="magisk_update_title">Atsirado nauja Magisk versija!</string>
     <string name="release_notes">Pakeitimai</string>
-    <string name="repo_cache_cleared">Repo failai išvalyti</string>
     <string name="manager_download_install">Paspauskite, kad atsisiųstumėte ir instaliuotumėte</string>
     <string name="update_channel">Magisk Atnaujinimai</string>
     <string name="flashing">Instaliuojama</string>
@@ -55,7 +50,6 @@
     <string name="restore_img_msg">Atstatome…</string>
     <string name="restore_done">Atstatymas įvykdytas!</string>
     <string name="restore_fail">Gamyklinis atstatymo failas neegzistuoja!</string>
-    <string name="proprietary_title">Atsisiųsti patentuotą kodą</string>
     <string name="setup_fail">Pasiruošimas nesėkmingas</string>
     <string name="env_fix_title">Reikalingas papildomas pasiruošimas</string>
     <string name="setup_title">Papildomas pasiruošimas</string>
@@ -98,7 +92,7 @@
     <string name="settings_user_independent">Visų</string>
     <string name="owner_only_summary">Tik įrenginio savininkas turi root prieigą</string>
     <string name="owner_manage_summary">Tik įrenginio savinkas gali tvarkyti root prieigą ir gauti lenteles prašančias root prieigos</string>
-    <string name="user_indepenent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
+    <string name="user_independent_summary">Kiekvienas vartotojas turi savo atskiras root taisykles</string>
 
     <string name="mount_namespace_mode">Root sesijos vardų srities režimas</string>
     <string name="settings_ns_global">Globali vardų sritis</string>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorOverlay">#1AFFFFFF</color>
     <color name="splash_background">#0D0D0D</color>
 </resources>

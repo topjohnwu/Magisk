@@ -6,4 +6,9 @@
             android:drawable="@drawable/ic_extension"
             android:inset="30%" />
     </foreground>
+    <monochrome>
+        <inset
+            android:drawable="@drawable/ic_extension"
+            android:inset="30%" />
+    </monochrome>
 </adaptive-icon>

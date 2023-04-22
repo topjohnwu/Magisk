@@ -5,11 +5,9 @@
     <string name="superuser">Superusuari</string>
     <string name="logs">Registre</string>
     <string name="settings">Configuració</string>
-    <string name="refresh">Refresca les dades locals</string>
     <string name="install">Instal·lar</string>
     <string name="section_home">Inici</string>
     <string name="section_theme">Temes</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Connexió no disponible</string>
@@ -30,7 +28,6 @@
     <string name="invalid_update_channel">Canal d\'actualització invàlid</string>
     <string name="uninstall_magisk_title">Desinstal·lar Magisk</string>
     <string name="uninstall_magisk_msg">Tots els mòduls seran desactivats i eliminats! L\'accés d\'arrel s\'eliminarà i, possiblement, xifrarà totes les dades (si no estan ja xifrades).</string>
-    <string name="home_check_safetynet">Comprova SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Mantenir el xifrat forçat</string>
@@ -90,19 +87,11 @@
     <string name="target_uid">UID de l\'objectiu: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Error en l\'API de SafetyNet</string>
-    <string name="safetynet_res_invalid">La resposta és invàlida</string>
-    <string name="safetynet_attest_success">Èxit!</string>
-    <string name="safetynet_attest_failure">Certificació fallida!</string>
-    <string name="safetynet_attest_loading">Esperi uns segons…</string>
-    <string name="safetynet_attest_restart">Intenta de nou</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">Mostra aplicacions del sistema</string>
     <string name="show_os_app">Mostra aplicacions del SO</string>
     <string name="hide_filter_hint">Filtra per nom</string>
-    <string name="hide_scroll_up">Vés amunt</string>
-    <string name="hide_filters">Filtres</string>
     <string name="hide_search">Cerca</string>
 
     <!--Module-->
@@ -113,15 +102,10 @@
     <string name="reboot_download">Reiniciar en Mode Download</string>
     <string name="reboot_edl">Reiniciar a EDL</string>
     <string name="module_version_author">%1$s per %2$s</string>
-    <string name="module_section_pending">Actualitzacions</string>
-    <string name="module_section_pending_action">Actualitza tot</string>
     <string name="module_state_remove">Eliminar</string>
     <string name="module_state_restore">Recuperar</string>
     <string name="module_action_install_external">Instal·lar des de l\'emmagatzematge</string>
     <string name="update_available">Actualització Disponible</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">En línia</string>
-    <string name="sorting_order">Ordre de Classificació</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode del tema</string>
@@ -173,6 +157,8 @@
     <string name="no_biometric">El dispositiu no suporta o no té establerta configuració biomètrica</string>
     <string name="settings_customization">Personalització</string>
     <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
+    <string name="settings_doh_title">DNS sobre HTTPS</string>
+    <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
 
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
@@ -180,7 +166,7 @@
     <string name="settings_user_independent">Usuari Independent</string>
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
     <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'accés d\'arrel i rebre sol·licituds d\'altres usuaris</string>
-    <string name="user_indepenent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
+    <string name="user_independent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
 
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
@@ -200,12 +186,10 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Sí</string>
     <string name="no">No</string>
-    <string name="repo_install_title">Instal·lar %1$s</string>
-    <string name="repo_install_msg">Vol instal·lar %1$s ara?</string>
+    <string name="repo_install_title">Instal·lar %1$s %2$s(%3$d)</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
     <string name="release_notes">Notes de llançament</string>
-    <string name="repo_cache_cleared">Memòria cau del repositori netejada</string>
     <string name="flashing">Arranjament…</string>
     <string name="done">Fet!</string>
     <string name="failure">Fallit</string>
@@ -216,8 +200,6 @@
     <string name="restore_img_msg">Restaurant…</string>
     <string name="restore_done">Restauració feta!</string>
     <string name="restore_fail">La còpia de seguretat de Estock no existeix!</string>
-    <string name="proprietary_title">Baixar codi propietari</string>
-    <string name="proprietary_notice">Magisk és codi lliure i no conté codi de l\'API de SafetyNet, ja que és codi propietari de Google.\n\nVol permetre que Magisk Manager baixi una extensió  per poder fer la comprovació de SafetyNet?</string>
     <string name="setup_fail">Instal·lació fallida</string>
     <string name="env_fix_title">Es requereix instal·lació addicional</string>
     <string name="env_fix_msg">El teu dispositiu necessita instal·lació addicional per Magisk per funcionar correctament. Es baixarà el ZIP d\'instal·lació de Magisk, vol procedir a la instal·lació ara?</string>

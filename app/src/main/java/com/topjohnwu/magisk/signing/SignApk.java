@@ -17,7 +17,6 @@ import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -492,7 +491,7 @@ public class SignApk {
     }
 
     public static void sign(X509Certificate cert, PrivateKey key,
-                            JarMap inputJar, FileOutputStream outputFile) throws Exception {
+                            JarMap inputJar, OutputStream outputStream) throws Exception {
         int alignment = 4;
         int hashes = 0;
 
@@ -531,7 +530,7 @@ public class SignApk {
         // This assumes outputChunks are array-backed. To avoid this assumption, the
         // code could be rewritten to use FileChannel.
         for (ByteBuffer outputChunk : outputChunks) {
-            outputFile.write(outputChunk.array(),
+            outputStream.write(outputChunk.array(),
                     outputChunk.arrayOffset() + outputChunk.position(), outputChunk.remaining());
             outputChunk.position(outputChunk.limit());
         }

@@ -1,10 +1,11 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
-import android.content.ContextWrapper
+import android.content.Context
 import android.content.Intent
 import com.topjohnwu.magisk.core.base.BaseReceiver
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.GlobalScope
@@ -25,8 +26,9 @@ open class Receiver : BaseReceiver() {
         return if (uid == -1) null else uid
     }
 
-    override fun onReceive(context: ContextWrapper, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         intent ?: return
+        super.onReceive(context, intent)
 
         fun rmPolicy(uid: Int) = GlobalScope.launch {
             policyDB.delete(uid)
@@ -42,9 +44,16 @@ open class Receiver : BaseReceiver() {
                 getUid(intent)?.let { rmPolicy(it) }
             }
             Intent.ACTION_PACKAGE_FULLY_REMOVED -> {
-                getPkg(intent)?.let { Shell.su("magisk --denylist rm $it").submit() }
+                getPkg(intent)?.let { Shell.cmd("magisk --denylist rm $it").submit() }
             }
             Intent.ACTION_LOCALE_CHANGED -> Shortcuts.setupDynamic(context)
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                @Suppress("DEPRECATION")
+                val installer = context.packageManager.getInstallerPackageName(context.packageName)
+                if (installer == context.packageName) {
+                    Notifications.updateDone()
+                }
+            }
         }
     }
 }

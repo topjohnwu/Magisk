@@ -5,11 +5,9 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logs</string>
     <string name="settings">Settings</string>
-    <string name="refresh">Refresh Local Data</string>
     <string name="install">Install</string>
     <string name="section_home">Home</string>
     <string name="section_theme">Themes</string>
-    <string name="safetynet">SafetyNet</string>
     <string name="denylist">DenyList</string>
 
     <!--Home-->
@@ -24,6 +22,7 @@
 
     <string name="home_notice_content">Download Magisk ONLY from the official GitHub page. Files from unknown sources can be malicious!</string>
     <string name="home_support_title">Support Us</string>
+    <string name="home_follow_title">Follow Us</string>
     <string name="home_item_source">Source</string>
     <string name="home_support_content">Magisk is, and always will be, free, and open source. You can however show us that you care by making a donation.</string>
     <string name="home_installed_version">Installed</string>
@@ -31,11 +30,11 @@
     <string name="invalid_update_channel">Invalid Update Channel</string>
     <string name="uninstall_magisk_title">Uninstall Magisk</string>
     <string name="uninstall_magisk_msg">All modules will be disabled/removed!\nRoot will be removed!\nAny internal storage unencrypted through the use of Magisk will be re-encrypted!</string>
-    <string name="home_check_safetynet">Check SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
+    <string name="patch_vbmeta">Patch vbmeta in boot image</string>
     <string name="recovery_mode">Recovery Mode</string>
     <string name="install_options_title">Options</string>
     <string name="install_method_title">Method</string>
@@ -91,19 +90,11 @@
     <string name="target_uid">Target UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API Error</string>
-    <string name="safetynet_res_invalid">The response is invalid</string>
-    <string name="safetynet_attest_success">Success!</string>
-    <string name="safetynet_attest_failure">Attestation failed!</string>
-    <string name="safetynet_attest_loading">Just a sec…</string>
-    <string name="safetynet_attest_restart">Try again</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Show system apps</string>
     <string name="show_os_app">Show OS apps</string>
     <string name="hide_filter_hint">Filter by name</string>
-    <string name="hide_scroll_up">Scroll up</string>
-    <string name="hide_filters">Filters</string>
     <string name="hide_search">Search</string>
 
     <!--Module-->
@@ -114,17 +105,16 @@
     <string name="reboot_download">Reboot to Download</string>
     <string name="reboot_edl">Reboot to EDL</string>
     <string name="module_version_author">%1$s by %2$s</string>
-    <string name="module_section_pending">Updates</string>
-    <string name="module_section_pending_action">Update all</string>
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>
     <string name="module_action_install_external">Install from storage</string>
     <string name="update_available">Update Available</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
-    <string name="sorting_order">Sorting Order</string>
     <string name="suspend_text_riru">Module suspended because %1$s is enabled</string>
     <string name="suspend_text_zygisk">Module suspended because %1$s is not enabled</string>
+    <string name="zygisk_module_unloaded">Zygisk module not loaded due to incompatibility</string>
+    <string name="module_empty">No module installed</string>
+    <string name="confirm_install">Install module %1$s?</string>
+    <string name="confirm_install_title">Install Confirmation</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Theme Mode</string>
@@ -145,8 +135,8 @@
     <string name="settings_update_channel_title">Update Channel</string>
     <string name="settings_update_stable">Stable</string>
     <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Custom Channel</string>
-    <string name="settings_update_custom_msg">Insert a custom URL</string>
+    <string name="settings_update_custom">Custom</string>
+    <string name="settings_update_custom_msg">Insert a custom channel URL</string>
     <string name="settings_zygisk_summary">Run parts of Magisk in the zygote daemon</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
@@ -182,6 +172,8 @@
     <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
     <string name="settings_customization">Customization</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
 
     <string name="multiuser_mode">Multiuser Mode</string>
     <string name="settings_owner_only">Device Owner Only</string>
@@ -189,7 +181,7 @@
     <string name="settings_user_independent">User-Independent</string>
     <string name="owner_only_summary">Only owner has root access</string>
     <string name="owner_manage_summary">Only owner can manage root access and receive request prompts</string>
-    <string name="user_indepenent_summary">Each user has their own separate root rules</string>
+    <string name="user_independent_summary">Each user has their own separate root rules</string>
 
     <string name="mount_namespace_mode">Mount Namespace Mode</string>
     <string name="settings_ns_global">Global Namespace</string>
@@ -202,19 +194,20 @@
     <!--Notifications-->
     <string name="update_channel">Magisk Updates</string>
     <string name="progress_channel">Progress Notifications</string>
+    <string name="updated_channel">Update Complete</string>
     <string name="download_complete">Download complete</string>
     <string name="download_file_error">Error downloading file</string>
     <string name="magisk_update_title">Magisk Update Available!</string>
+    <string name="updated_title">Magisk Updated</string>
+    <string name="updated_text">Tap to open app</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="repo_install_title">Install %1$s</string>
-    <string name="repo_install_msg">Do you want to install %1$s now?</string>
+    <string name="repo_install_title">Install %1$s %2$s(%3$d)</string>
     <string name="download">Download</string>
     <string name="reboot">Reboot</string>
     <string name="release_notes">Release notes</string>
-    <string name="repo_cache_cleared">Repo cache cleared</string>
     <string name="flashing">Flashing…</string>
     <string name="done">Done!</string>
     <string name="failure">Failed!</string>
@@ -225,11 +218,10 @@
     <string name="restore_img_msg">Restoring…</string>
     <string name="restore_done">Restoration done!</string>
     <string name="restore_fail">Stock backup does not exist!</string>
-    <string name="proprietary_title">Download Proprietary Code</string>
-    <string name="proprietary_notice">Magisk is FOSS and doesn\'t include code for Google\'s proprietary SafetyNet API.\n\nDo you want to download a proprietary extension for SafetyNet checks?</string>
     <string name="setup_fail">Setup failed</string>
     <string name="env_fix_title">Requires Additional Setup</string>
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. Do you want to proceed and reboot?</string>
+    <string name="env_full_fix_msg">Your device needs reflash Magisk to work properly. Please reinstall Magisk within app, recovery mode cannot get correct device info.</string>
     <string name="setup_msg">Running environment setup…</string>
     <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
@@ -241,9 +233,12 @@
     <string name="unsupport_nonroot_stub_msg">The hidden Magisk app cannot continue to work because root was lost. Please restore the original APK.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Grant storage permission to enable this functionality</string>
+    <string name="post_notifications_denied">Grant notifications permission to enable this functionality</string>
+    <string name="install_unknown_denied">Allow "install unknown apps" to enable this functionality</string>
     <string name="add_shortcut_title">Add shortcut to home screen</string>
     <string name="add_shortcut_msg">After hiding this app, its name and icon might become difficult to recognize. Do you want to add a pretty shortcut to the home screen?</string>
     <string name="app_not_found">No app found to handle this action</string>
     <string name="reboot_apply_change">Reboot to apply changes</string>
+    <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
 
 </resources>

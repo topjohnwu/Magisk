@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.topjohnwu.magisk">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <permission
+        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        android:protectionLevel="signature"
+        tools:node="remove" />
+
+    <uses-permission
+        android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        tools:node="remove" />
 
     <application
         android:name=".core.App"
-        android:extractNativeLibs="true"
         android:icon="@drawable/ic_launcher"
         android:multiArch="true"
-        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning">
+        tools:ignore="UnusedAttribute,GoogleAppIndexingWarning"
+        tools:remove="android:appComponentFactory">
 
         <activity
             android:name=".ui.MainActivity"
@@ -29,8 +35,8 @@
         <activity
             android:name=".ui.surequest.SuRequestActivity"
             android:directBootAware="true"
-            android:excludeFromRecents="true"
             android:exported="false"
+            android:taskAffinity=""
             tools:ignore="AppLinkUrlError">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -40,11 +46,11 @@
 
         <receiver
             android:name=".core.Receiver"
-            android:directBootAware="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <action android:name="android.intent.action.UID_REMOVED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
@@ -56,7 +62,8 @@
 
         <service
             android:name=".core.download.DownloadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <service
             android:name=".core.JobService"
@@ -73,6 +80,13 @@
         <!-- We don't invalidate Room -->
         <service
             android:name="androidx.room.MultiInstanceInvalidationService"
+            tools:node="remove" />
+
+        <!-- We don't need emoji compat -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
             tools:node="remove" />
 
     </application>

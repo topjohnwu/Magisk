@@ -16,9 +16,9 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", "1.6.0"))
-    implementation("com.android.tools.build:gradle:7.0.4")
-    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.4.0-beta02")
-    implementation("io.michaelrocks:paranoid-gradle-plugin:0.3.7")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
+    implementation(kotlin("gradle-plugin", "1.8.10"))
+    implementation("com.android.tools.build:gradle:8.0.0")
+    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3")
+    implementation("org.lsposed.lsparanoid:gradle-plugin:0.5.2")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r")
 }

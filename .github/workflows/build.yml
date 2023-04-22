@@ -24,31 +24,44 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     env:
-      NDK_CCACHE: ${{ github.workspace }}/ccache
+      NDK_CCACHE: ccache
       CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      RUSTC_WRAPPER: sccache
 
     steps:
       - name: Check out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Set up Python 3
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
       - name: Set up ccache
-        run: bash .github/ccache.sh
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}
+
+      - name: Set up sccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          variant: sccache
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -58,10 +71,9 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Cache build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
-            ${{ github.workspace }}/.ccache
             ~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-build-cache-${{ github.sha }}
           restore-keys: ${{ runner.os }}-build-cache-
@@ -71,13 +83,11 @@ jobs:
 
       - name: Build release
         run: |
-          ./ccache -zp
           python build.py -vr all
 
       - name: Build debug
         run: |
           python build.py -v all
-          ./ccache -s
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
@@ -85,7 +95,14 @@ jobs:
       # Only upload artifacts built on Linux
       - name: Upload build artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ github.sha }}
           path: out
+
+      - name: Upload mapping and native debug symbols
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-symbols
+          path: app/build/outputs

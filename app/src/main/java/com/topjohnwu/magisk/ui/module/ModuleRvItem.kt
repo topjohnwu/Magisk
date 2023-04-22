@@ -5,86 +5,70 @@ import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.module.LocalModule
-import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.DiffRvItem
-import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
-import com.topjohnwu.magisk.databinding.RvContainer
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.ObservableRvItem
+import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
 
-object InstallModule : DiffRvItem<InstallModule>() {
+object InstallModule : RvItem(), DiffItem<InstallModule> {
     override val layoutRes = R.layout.item_module_download
-}
-
-class SectionTitle(
-    val title: Int,
-    _button: Int = 0,
-    _icon: Int = 0
-) : ObservableDiffRvItem<SectionTitle>() {
-    override val layoutRes = R.layout.item_section_md2
-
-    @get:Bindable
-    var button = _button
-        set(value) = set(value, field, { field = it }, BR.button)
-
-    @get:Bindable
-    var icon = _icon
-        set(value) = set(value, field, { field = it }, BR.icon)
-
-    @get:Bindable
-    var hasButton = _button != 0 && _icon != 0
-        set(value) = set(value, field, { field = it }, BR.hasButton)
-}
-
-class OnlineModuleRvItem(
-    override val item: OnlineModule
-) : ObservableDiffRvItem<OnlineModuleRvItem>(), RvContainer<OnlineModule> {
-    override val layoutRes: Int = R.layout.item_repo_md2
-
-    @get:Bindable
-    var progress = 0
-        set(value) = set(value, field, { field = it }, BR.progress)
-
-    var hasUpdate = false
-
-    override fun itemSameAs(other: OnlineModuleRvItem): Boolean = item.id == other.item.id
 }
 
 class LocalModuleRvItem(
     override val item: LocalModule
-) : ObservableDiffRvItem<LocalModuleRvItem>(), RvContainer<LocalModule> {
+) : ObservableRvItem(), DiffItem<LocalModuleRvItem>, ItemWrapper<LocalModule> {
 
     override val layoutRes = R.layout.item_module_md2
 
-    @get:Bindable
-    var online: OnlineModule? = null
-        set(value) = set(value, field, { field = it }, BR.online)
+    val showNotice: Boolean
+    val noticeText: TextHolder
+
+    init {
+        val isZygisk = item.isZygisk
+        val isRiru = item.isRiru
+        val zygiskUnloaded = isZygisk && item.zygiskUnloaded
+
+        showNotice = zygiskUnloaded ||
+            (Info.isZygiskEnabled && isRiru) ||
+            (!Info.isZygiskEnabled && isZygisk)
+        noticeText =
+            when {
+                zygiskUnloaded -> R.string.zygisk_module_unloaded.asText()
+                isRiru -> R.string.suspend_text_riru.asText(R.string.zygisk.asText())
+                else -> R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
+            }
+    }
 
     @get:Bindable
     var isEnabled = item.enable
-        set(value) = set(value, field, { field = it }, BR.enabled) {
+        set(value) = set(value, field, { field = it }, BR.enabled, BR.updateReady) {
             item.enable = value
         }
 
     @get:Bindable
     var isRemoved = item.remove
-        set(value) = set(value, field, { field = it }, BR.removed) {
+        set(value) = set(value, field, { field = it }, BR.removed, BR.updateReady) {
             item.remove = value
         }
 
-    val isSuspended =
-        (Info.isZygiskEnabled && item.isRiru) || (!Info.isZygiskEnabled && item.isZygisk)
+    @get:Bindable
+    val showUpdate get() = item.updateInfo != null
 
-    val suspendText =
-        if (item.isRiru) R.string.suspend_text_riru.asText(R.string.zygisk.asText())
-        else R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
+    @get:Bindable
+    val updateReady get() = item.outdated && !isRemoved && isEnabled
 
-    val isUpdated get() = item.updated
-    val isModified get() = isRemoved || isUpdated
+    val isUpdated = item.updated
 
-    fun delete(viewModel: ModuleViewModel) {
+    fun fetchedUpdateInfo() {
+        notifyPropertyChanged(BR.showUpdate)
+        notifyPropertyChanged(BR.updateReady)
+    }
+
+    fun delete() {
         isRemoved = !isRemoved
-        viewModel.updateActiveState()
     }
 
     override fun itemSameAs(other: LocalModuleRvItem): Boolean = item.id == other.item.id

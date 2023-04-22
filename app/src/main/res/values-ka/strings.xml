@@ -5,11 +5,9 @@
     <string name="superuser">სუპერმომხმარებელი</string>
     <string name="logs">ლოგები</string>
     <string name="settings">პარამეტრები</string>
-    <string name="refresh">ლოკალური მონაცემების დარეფრეშება</string>
     <string name="install">ინსტალაცია</string>
     <string name="section_home">საწყისი</string>
     <string name="section_theme">თემები</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">კავშირი არ არის</string>
@@ -30,7 +28,6 @@
     <string name="invalid_update_channel">არასწორი განახლების არხი</string>
     <string name="uninstall_magisk_title">Magisk-ის დეინსტალაცია</string>
     <string name="uninstall_magisk_msg">ყველა მოდული იქნება წაშლილი/გამორთული!\nRoot-ი წაიშლება!\nთქვენი მონაცემები დაიშიფრება!</string>
-    <string name="home_check_safetynet">SafetyNet-ის შემოწმება</string>
 
     <!--Install-->
     <string name="keep_force_encryption">შიფრირება ყოველთვის იყოს ჩართული</string>
@@ -90,19 +87,11 @@
     <string name="target_uid">სამიზნე UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API-ის შეცდომა</string>
-    <string name="safetynet_attest_success">წარმატება!</string>
-    <string name="safetynet_res_invalid">არასწორი პასუხი</string>
-    <string name="safetynet_attest_failure">ატესტაცია ჩაიშალა!</string>
-    <string name="safetynet_attest_loading">ერთი წამით…</string>
-    <string name="safetynet_attest_restart">სცადეთ თავიდან</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
     <string name="show_os_app">ოპერაციული სისტემის აპების ჩვენება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
-    <string name="hide_scroll_up">მაღლა ასქროლვა</string>
-    <string name="hide_filters">ფილტრები</string>
     <string name="hide_search">ძებნა</string>
 
     <!--Module Fragment-->
@@ -113,15 +102,10 @@
     <string name="reboot_download">Download-ში გადატვირთვა</string>
     <string name="reboot_edl">EDL-ში გადატვირთვა</string>
     <string name="module_version_author">%1$s %2$s-სგან</string>
-    <string name="module_section_pending">განახლებები</string>
-    <string name="module_section_pending_action">ყველას განახლება</string>
     <string name="module_state_remove">წაშლა</string>
     <string name="module_state_restore">აღდგენა</string>
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">ონლაინი</string>
-    <string name="sorting_order">სორტირება</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
@@ -173,6 +157,8 @@
     <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
     <string name="settings_customization">პერსონალიზაცია</string>
     <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
+    <string name="settings_doh_title">DNS HTTPS-ზე</string>
+    <string name="settings_doh_description">DNS-ის ლიმიტების მოხსნა კონკრეტულ სახელმწიფოებში</string>
 
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
@@ -180,7 +166,7 @@
     <string name="settings_user_independent">მომხმარებლისგან დამოუკიდებელი</string>
     <string name="owner_only_summary">მხოლოდ მფლობელს ჰქონდეს სუპერმომხმარებელთან წვდომა</string>
     <string name="owner_manage_summary">მხოლოდ მფლობელს ჰქონდეს ნებართვების მართვა</string>
-    <string name="user_indepenent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
+    <string name="user_independent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
 
     <string name="mount_namespace_mode">Namespace რეჟიმის დამონტაჟება</string>
     <string name="settings_ns_global">გლობალური Namespace-ი</string>
@@ -200,12 +186,9 @@
     <!--Toasts, Dialogs-->
     <string name="yes">დიახ</string>
     <string name="no">არა</string>
-    <string name="repo_install_title">%1$s-ის ინსტალაცია</string>
-    <string name="repo_install_msg">გნებავთ %1$s-ის ახლავე დაინსტალირება?</string>
     <string name="download">გადმოწერა</string>
     <string name="reboot">გადატვირთვა</string>
     <string name="release_notes">რელიზის შენიშვნები</string>
-    <string name="repo_cache_cleared">რეპოზიტორიის ქეში გასუფთავდა</string>
     <string name="flashing">მიმდინარეობს ჩაშენება…</string>
     <string name="done">დასრულდა!</string>
     <string name="failure">ჩაიშალა</string>
@@ -216,8 +199,6 @@
     <string name="restore_img_msg">მიმდინარეობს აღდგენა…</string>
     <string name="restore_done">აღდგენა დასრულდა!</string>
     <string name="restore_fail">საწყისი რეზერვი არ არსებობს!</string>
-    <string name="proprietary_title">კუთვნილი კოდის გადმოწერა</string>
-    <string name="proprietary_notice">Magisk-ი არის უფასო და გახსნილი წყაროს მქონე პროგრამა, იგი არ შეიცავს Google-ის კუთვნილ SafetyNet API-ს კოდს.\n\nგსურთ კუთვნილი დამატების გადმოწერა SafetyNet-ის შესამოწმებლად?</string>
     <string name="setup_fail">ინსტალაცია ჩაიშალა</string>
     <string name="env_fix_title">სჭირდება დამატებითი გამართვა</string>
     <string name="env_fix_msg">თქვენს მოწყობილობას სჭრიდება დამატებითი გამართვა იმისთვის რომ Magisk-მა იმუშავოს. გადმოიწერება "Magisk setup.zip" ფაილი, გსურთ გაგრძელება?</string>

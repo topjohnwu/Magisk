@@ -5,11 +5,10 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logi</string>
     <string name="settings">Ustawienia</string>
-    <string name="refresh">Odśwież dane lokalne</string>
     <string name="install">Instaluj</string>
     <string name="section_home">Strona główna</string>
     <string name="section_theme">Motywy</string>
-    <string name="safetynet">SafetyNet</string>
+    <string name="denylist">Lista odmów</string>
 
     <!--Home-->
     <string name="no_connection">Połączenie niedostępne</string>
@@ -23,6 +22,7 @@
 
     <string name="home_notice_content">Pobieraj Magisk tylko z oficjalnej strony GitHub. Pliki z nieznanych źródeł mogą być szkodliwe!</string>
     <string name="home_support_title">Wesprzyj nas</string>
+    <string name="home_follow_title">Śledź nas</string>
     <string name="home_item_source">Źródło</string>
     <string name="home_support_content">Magisk jest i zawsze będzie darmowy i otwarty. Niemniej możesz nam pokazać, że Ci zależy, wysyłając drobną darowiznę.</string>
     <string name="home_installed_version">Zainstalowany</string>
@@ -30,11 +30,11 @@
     <string name="invalid_update_channel">Nieprawidłowy kanał aktualizacji</string>
     <string name="uninstall_magisk_title">Odinstaluj Magisk</string>
     <string name="uninstall_magisk_msg">Wszystkie moduły zostaną wyłączone/usunięte!\nRoot zostanie usunięty!\nTwoje dane mogą zostać potencjalnie zaszyfrowane, jeśli jeszcze nie są!</string>
-    <string name="home_check_safetynet">Sprawdź SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
     <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację rozruchu)</string>
+    <string name="patch_vbmeta">Załataj vbmeta w obrazie rozruchowym</string>
     <string name="recovery_mode">Tryb Recovery</string>
     <string name="install_options_title">Opcje</string>
     <string name="install_method_title">Metoda</string>
@@ -90,19 +90,11 @@
     <string name="target_uid">Docelowy UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">Błąd API SafetyNet</string>
-    <string name="safetynet_res_invalid">Odpowiedź jest nieprawidłowa</string>
-    <string name="safetynet_attest_success">Sukces!</string>
-    <string name="safetynet_attest_failure">Zaświadczenie nieprawidłowe!</string>
-    <string name="safetynet_attest_loading">Jeszcze chwila…</string>
-    <string name="safetynet_attest_restart">Spróbuj ponownie</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
     <string name="show_os_app">Pokaż aplikacje OS</string>
     <string name="hide_filter_hint">Filtruj według nazwy</string>
-    <string name="hide_scroll_up">Przewiń do góry</string>
-    <string name="hide_filters">Filtry</string>
     <string name="hide_search">Szukaj</string>
 
     <!--Module -->
@@ -113,15 +105,16 @@
     <string name="reboot_download">Reboot do trybu Download</string>
     <string name="reboot_edl">Reboot do trybu EDL</string>
     <string name="module_version_author">%1$s od %2$s</string>
-    <string name="module_section_pending">Aktualizacje</string>
-    <string name="module_section_pending_action">Zaktualizuj wszystkie</string>
     <string name="module_state_remove">Usuń</string>
     <string name="module_state_restore">Przywróć</string>
     <string name="module_action_install_external">Zainstaluj z pamięci</string>
     <string name="update_available">Dostępna aktualizacja</string>
-    <string name="module_installed">Zainstalowane</string>
-    <string name="module_section_online">Aktywne</string>
-    <string name="sorting_order">Kolejność sortowania</string>
+    <string name="suspend_text_riru">Moduł uśpiony ponieważ %1$s jest włączony</string>
+    <string name="suspend_text_zygisk">Moduł uśpiony ponieważ %1$s jest wyłączony</string>
+    <string name="zygisk_module_unloaded">Moduł Zygisk nie załadowany ze względu na niekompatybilność</string>
+    <string name="module_empty">Żaden moduł nie jest zainstalowany</string>
+    <string name="confirm_install">Zainstaloać moduł %1$s?</string>
+    <string name="confirm_install_title">Potwierdzenie instalacji</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">Tryb motywu</string>
@@ -144,6 +137,12 @@
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Własny kanał</string>
     <string name="settings_update_custom_msg">Wprowadź adres URL własnego kanału</string>
+    <string name="settings_zygisk_summary">Uruchom cześć Magiska w zygocie Demona</string>
+    <string name="settings_denylist_title">Wymuś Listę Odmów</string>
+    <string name="settings_denylist_summary">Procesy z Listy Odmów będą miały wszystkie modyfikacje Magisk cofnięte</string>
+    <string name="settings_denylist_error">Ta funkcja wymaga aby %1$s było włączone</string>
+    <string name="settings_denylist_config_title">Ustaw Listę Odmów</string>
+    <string name="settings_denylist_config_summary">Wybierz proces który ma zostać zawarty w Liście Odmów</string>
     <string name="settings_hosts_title">Hosty Systemless</string>
     <string name="settings_hosts_summary">Wsparcie hostów Systemless dla aplikacji typu Adblock</string>
     <string name="settings_hosts_toast">Dodano moduł hostów Systemless</string>
@@ -173,6 +172,8 @@
     <string name="no_biometric">Urządzenie jest nieobsługiwane lub ustawienia biometryczne nie są włączone</string>
     <string name="settings_customization">Personalizacja</string>
     <string name="setting_add_shortcut_summary">Dodaj ładny skrót na ekranie głównym na wypadek, gdyby nazwa i ikona były trudne do rozpoznania po ukryciu aplikacji</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Zapobiegaj zatruwaniu DNS (DNS poisoning) w niektórych krajach</string>
 
     <string name="multiuser_mode">Tryb wielu użytkowników (Multiuser)</string>
     <string name="settings_owner_only">Tylko właściciel urządzenia</string>
@@ -180,7 +181,7 @@
     <string name="settings_user_independent">Niezależni użytkownicy</string>
     <string name="owner_only_summary">Tylko właściciel ma dostęp do roota</string>
     <string name="owner_manage_summary">Tylko właściciel może zarządzać ustawieniami dostępu do roota i otrzymywać żądania dostępu</string>
-    <string name="user_indepenent_summary">Każdy użytkownik ma niezależne ustawienia dostępu do roota</string>
+    <string name="user_independent_summary">Każdy użytkownik ma niezależne ustawienia dostępu do roota</string>
 
     <string name="mount_namespace_mode">Tryb przestrzeni nazw montowania</string>
     <string name="settings_ns_global">Globalna przestrzeń nazw</string>
@@ -193,19 +194,20 @@
     <!--Notifications-->
     <string name="update_channel">Aktualizacja Magisk</string>
     <string name="progress_channel">Powiadomienia o postępach</string>
+    <string name="updated_channel">Aktualizacja zakończona</string>
     <string name="download_complete">Pobieranie zakończone</string>
     <string name="download_file_error">Błąd pobierania pliku</string>
     <string name="magisk_update_title">Aktualizacja Magisk dostępna!</string>
+    <string name="updated_title">Magisk zaktualizowany</string>
+    <string name="updated_text">Naciśnij aby otworzyć applikację</string>
 
     <!--Toasts, Dialogs-->
     <string name="yes">Tak</string>
     <string name="no">Nie</string>
-    <string name="repo_install_title">Instalacja %1$s</string>
-    <string name="repo_install_msg">Czy chcesz teraz zainstalować %1$s ?</string>
+    <string name="repo_install_title">Instalacja %1$s %2$s(%3$d)</string>
     <string name="download">Pobierz</string>
     <string name="reboot">Reboot</string>
     <string name="release_notes">Lista zmian</string>
-    <string name="repo_cache_cleared">Wyczyszczono pamięć podręczną repozytoriów</string>
     <string name="flashing">Flashowanie…</string>
     <string name="done">Gotowe!</string>
     <string name="failure">Błąd</string>
@@ -216,11 +218,10 @@
     <string name="restore_img_msg">Przywracanie…</string>
     <string name="restore_done">Przywracanie zakończone!</string>
     <string name="restore_fail">Kopia zapasowa nie istnieje!</string>
-    <string name="proprietary_title">Pobierz kod własnościowy</string>
-    <string name="proprietary_notice">Magisk jest programem FOSS i nie zawiera kodu własnościowego Google SafetyNet API.\n\nCzy chcesz pobrać własnościowe rozszerzenie dla sprawdzenia SafetyNet?</string>
     <string name="setup_fail">Konfiguracja nieudana</string>
     <string name="env_fix_title">Wymaga dodatkowej konfiguracji</string>
     <string name="env_fix_msg">Twoje urządzenie wymaga dodatkowej konfiguracji aby Magisk działał właściwie. Czy chcesz kontynuować i uruchomić ponownie?</string>
+    <string name="env_full_fix_msg">Twoje urządzenie musi wgrać ponowanie Magisk, aby działać poprawnie. Proszę przeinstaluj Magisk w aplikacji, tryb Recovery nie potrafi poprawnie rozpoznać urządzenia.</string>
     <string name="setup_msg">Uruchamianie środowiska konfiguracji…</string>
     <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magisk</string>
@@ -232,8 +233,12 @@
     <string name="unsupport_nonroot_stub_msg">Ta aplikacja nie może dłużej działać w trybie ukrycia jako że root został utracony. Proszę przywrócić ją do oryginalnego stanu.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Zezwól na dostęp do pamięci wewnętrznej, aby włączyć tę funkcję.</string>
+    <string name="post_notifications_denied">Zezwól na otrzymywanie powiadomień, aby aktywować tą funkcję</string>
+    <string name="install_unknown_denied">Zezwól na "Instaluj z nieznanych źródeł" by włączyć tą funkcję</string>
     <string name="add_shortcut_title">Utwórz skrót na ekranie głównym</string>
     <string name="add_shortcut_msg">Po ukryciu tej aplikacji, jej nazwa i ikona może być trudna do rozpoznania. Czy chcesz dodać ładny skrót na ekranie głównym?</string>
     <string name="app_not_found">Nie znaleziono aplikacji do wykonania tej czynności</string>
+    <string name="reboot_apply_change">Uruchom ponownie by zastosować zmiany</string>
+    <string name="restore_app_confirmation">To przywróci ukrytą aplikację z powrotem do orginalnej aplikacji. Czy na pewno chcesz to zrobić?</string>
 
 </resources>

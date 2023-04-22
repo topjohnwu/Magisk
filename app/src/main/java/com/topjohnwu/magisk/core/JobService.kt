@@ -7,7 +7,7 @@ import android.content.Context
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.BaseJobService
-import com.topjohnwu.magisk.di.ServiceLocator
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,14 +23,18 @@ class JobService : BaseJobService() {
     override fun onStartJob(params: JobParameters): Boolean {
         val coroutineScope = CoroutineScope(Dispatchers.IO + job)
         coroutineScope.launch {
-            svc.fetchUpdate()?.run {
-                Info.remote = this
-                if (Info.env.isActive && BuildConfig.VERSION_CODE < magisk.versionCode)
-                    Notifications.managerUpdate(this@JobService)
-            }
+            doWork()
             jobFinished(params, false)
         }
         return false
+    }
+
+    private suspend fun doWork() {
+        svc.fetchUpdate()?.let {
+            Info.remote = it
+            if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
+                Notifications.updateAvailable()
+        }
     }
 
     override fun onStopJob(params: JobParameters): Boolean {

@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.view
 
-import android.content.Context
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
@@ -15,47 +15,39 @@ import androidx.appcompat.app.AppCompatDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.databinding.Bindable
 import androidx.databinding.PropertyChangeRegistry
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.*
-import me.tatarka.bindingcollectionadapter2.BindingRecyclerViewAdapters
-import me.tatarka.bindingcollectionadapter2.ItemBinding
+import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ItemWrapper
+import com.topjohnwu.magisk.databinding.ObservableHost
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.databinding.setAdapter
+import com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener
+
+typealias DialogButtonClickListener = (DialogInterface) -> Unit
 
 class MagiskDialog(
-    context: Context, theme: Int = 0
+    context: Activity, theme: Int = 0
 ) : AppCompatDialog(context, theme) {
 
     private val binding: DialogMagiskBaseBinding =
         DialogMagiskBaseBinding.inflate(LayoutInflater.from(context))
     private val data = Data()
 
+    val activity: BaseActivity get() = ownerActivity as BaseActivity
+
     init {
         binding.setVariable(BR.data, data)
         setCancelable(true)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        super.setContentView(binding.root)
-
-        val default = MaterialColors.getColor(context, R.attr.colorSurface, javaClass.canonicalName)
-        val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, default)
-        val materialShapeDrawable = MaterialShapeDrawable(context, null, R.attr.alertDialogStyle, R.style.MaterialAlertDialog_MaterialComponents)
-        materialShapeDrawable.initializeElevationOverlay(context)
-        materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)
-        materialShapeDrawable.elevation = context.resources.getDimension(R.dimen.margin_generic)
-        materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l_50))
-
-        val inset = context.resources.getDimensionPixelSize(R.dimen.appcompat_dialog_background_inset)
-        window?.apply {
-            setBackgroundDrawable(InsetDrawable(materialShapeDrawable, inset, inset, inset, inset))
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
+        setOwnerActivity(context)
     }
 
     inner class Data : ObservableHost {
@@ -73,160 +65,143 @@ class MagiskDialog(
         var message: CharSequence = ""
             set(value) = set(value, field, { field = it }, BR.message)
 
-        val buttonPositive = Button()
-        val buttonNeutral = Button()
-        val buttonNegative = Button()
-        val buttonIDGAF = Button()
+        val buttonPositive = ButtonViewModel()
+        val buttonNeutral = ButtonViewModel()
+        val buttonNegative = ButtonViewModel()
     }
 
     enum class ButtonType {
-        POSITIVE, NEUTRAL, NEGATIVE, IDGAF
+        POSITIVE, NEUTRAL, NEGATIVE
     }
 
-    inner class Button : ObservableHost {
+    interface Button {
+        var icon: Int
+        var text: Any
+        var isEnabled: Boolean
+        var doNotDismiss: Boolean
+
+        fun onClick(listener: DialogButtonClickListener)
+    }
+
+    inner class ButtonViewModel : Button, ObservableHost {
         override var callbacks: PropertyChangeRegistry? = null
 
         @get:Bindable
-        var icon = 0
-            set(value) = set(value, field, { field = it }, BR.icon)
+        override var icon = 0
+            set(value) = set(value, field, { field = it }, BR.icon, BR.gone)
 
         @get:Bindable
-        var title: CharSequence = ""
-            set(value) = set(value, field, { field = it }, BR.title)
+        var message: String = ""
+            set(value) = set(value, field, { field = it }, BR.message, BR.gone)
 
-        @get:Bindable
-        var isEnabled = true
-            set(value) = set(value, field, { field = it }, BR.enabled)
-
-        var onClickAction: OnDialogButtonClickListener = {}
-        var preventDismiss = false
-
-        fun clicked() {
-            //we might not want the click to dismiss the button to begin with
-            var prevention = preventDismiss
-
-            onClickAction(this@MagiskDialog)
-
-            //in case we don't want the dialog to close after clicking the button
-            //ie. the input is incorrect ...
-            //otherwise we disregard the request, bcs it just might reset the button in the new
-            //instance
-            if (preventDismiss) {
-                prevention = preventDismiss
+        override var text: Any
+            get() = message
+            set(value) {
+                message = when (value) {
+                    is Int -> context.getText(value)
+                    else -> value
+                }.toString()
             }
 
-            if (!prevention) {
+        @get:Bindable
+        val gone get() = icon == 0 && message.isEmpty()
+
+        @get:Bindable
+        override var isEnabled = true
+            set(value) = set(value, field, { field = it }, BR.enabled)
+
+        override var doNotDismiss = false
+
+        private var onClickAction: DialogButtonClickListener = {}
+
+        override fun onClick(listener: DialogButtonClickListener) {
+            onClickAction = listener
+        }
+
+        fun clicked() {
+            onClickAction(this@MagiskDialog)
+            if (!doNotDismiss) {
                 dismiss()
             }
         }
     }
 
-    inner class ButtonBuilder(private val button: Button) {
-        var icon: Int
-            get() = button.icon
-            set(value) {
-                button.icon = value
-            }
-        var title: CharSequence
-            get() = button.title
-            set(value) {
-                button.title = value
-            }
-        var titleRes: Int
-            get() = 0
-            set(value) {
-                button.title = context.getString(value)
-            }
-        var isEnabled: Boolean
-            get() = button.isEnabled
-            set(value) {
-                button.isEnabled = value
-            }
-        var preventDismiss: Boolean
-            get() = button.preventDismiss
-            set(value) {
-                button.preventDismiss = value
-            }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        super.setContentView(binding.root)
 
-        fun onClick(listener: OnDialogButtonClickListener) {
-            button.onClickAction = listener
+        val default = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurface, javaClass.canonicalName)
+        val surfaceColor = MaterialColors.getColor(context, R.attr.colorSurfaceSurfaceVariant, default)
+        val materialShapeDrawable = MaterialShapeDrawable(context, null, androidx.appcompat.R.attr.alertDialogStyle, com.google.android.material.R.style.MaterialAlertDialog_MaterialComponents)
+        materialShapeDrawable.initializeElevationOverlay(context)
+        materialShapeDrawable.fillColor = ColorStateList.valueOf(surfaceColor)
+        materialShapeDrawable.elevation = context.resources.getDimension(R.dimen.margin_generic)
+        materialShapeDrawable.setCornerSize(context.resources.getDimension(R.dimen.l_50))
+
+        val inset = context.resources.getDimensionPixelSize(com.google.android.material.R.dimen.appcompat_dialog_background_inset)
+        window?.apply {
+            setBackgroundDrawable(InsetDrawable(materialShapeDrawable, inset, inset, inset, inset))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
     }
 
-    fun applyTitle(@StringRes stringRes: Int) =
-        apply { data.title = context.getString(stringRes) }
+    override fun setTitle(@StringRes titleId: Int) { data.title = context.getString(titleId) }
 
-    fun applyTitle(title: CharSequence) =
-        apply { data.title = title }
+    override fun setTitle(title: CharSequence?) { data.title = title ?: "" }
 
-    fun applyMessage(@StringRes stringRes: Int, vararg args: Any) =
-        apply { data.message = context.getString(stringRes, *args) }
+    fun setMessage(@StringRes msgId: Int, vararg args: Any) {
+        data.message = context.getString(msgId, *args)
+    }
 
-    fun applyMessage(message: CharSequence) =
-        apply { data.message = message }
+    fun setMessage(message: CharSequence) { data.message = message }
 
-    fun applyIcon(@DrawableRes drawableRes: Int) =
-        apply {
-            data.icon = AppCompatResources.getDrawable(context, drawableRes)
-        }
+    fun setIcon(@DrawableRes drawableRes: Int) {
+        data.icon = AppCompatResources.getDrawable(context, drawableRes)
+    }
 
-    fun applyIcon(drawable: Drawable) =
-        apply { data.icon = drawable }
+    fun setIcon(drawable: Drawable) { data.icon = drawable }
 
-    fun applyButton(buttonType: ButtonType, builder: ButtonBuilder.() -> Unit) = apply {
+    fun setButton(buttonType: ButtonType, builder: Button.() -> Unit) {
         val button = when (buttonType) {
             ButtonType.POSITIVE -> data.buttonPositive
             ButtonType.NEUTRAL -> data.buttonNeutral
             ButtonType.NEGATIVE -> data.buttonNegative
-            ButtonType.IDGAF -> data.buttonIDGAF
         }
-        ButtonBuilder(button).apply(builder)
+        button.apply(builder)
     }
 
     class DialogItem(
         override val item: CharSequence,
         val position: Int
-    ) : DiffRvItem<DialogItem>(), RvContainer<CharSequence> {
+    ) : RvItem(), DiffItem<DialogItem>, ItemWrapper<CharSequence> {
         override val layoutRes = R.layout.item_list_single_line
     }
 
-    interface ActualOnDialogClickListener {
+    fun interface DialogClickListener {
         fun onClick(position: Int)
     }
 
-    fun applyAdapter(
+    fun setListItems(
         list: Array<out CharSequence>,
-        listener: OnDialogClickListener
-    ) = applyView(
+        listener: DialogClickListener
+    ) = setView(
         RecyclerView(context).also {
             it.isNestedScrollingEnabled = false
             it.layoutManager = LinearLayoutManager(context)
 
-            val actualListener = object : ActualOnDialogClickListener {
-                override fun onClick(position: Int) {
-                    listener(position)
-                    dismiss()
-                }
-            }
             val items = list.mapIndexed { i, cs -> DialogItem(cs, i) }
-            val binding = itemBindingOf<DialogItem> { it.bindExtra(BR.listener, actualListener) }
-                .let { ItemBinding.of(it) }
-
-            BindingRecyclerViewAdapters.setAdapter(it, binding, items, null, null, null, null)
+            val extraBindings = bindExtra { sa ->
+                sa.put(BR.listener, DialogClickListener { pos ->
+                    listener.onClick(pos)
+                    dismiss()
+                })
+            }
+            it.setAdapter(items, extraBindings)
         }
     )
 
-    fun cancellable(isCancellable: Boolean) = apply {
-        setCancelable(isCancellable)
-    }
-
-    fun <Binding : ViewDataBinding> applyView(
-        binding: Binding,
-        body: Binding.() -> Unit = {}
-    ) = applyView(binding.root).also { binding.apply(body) }
-
-    fun applyView(view: View) = apply {
-        resetView()
+    fun setView(view: View) {
+        binding.dialogBaseContainer.removeAllViews()
         binding.dialogBaseContainer.addView(
             view,
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -234,57 +209,24 @@ class MagiskDialog(
         )
     }
 
-    fun onCancel(callback: OnDialogButtonClickListener) =
-        apply { setOnCancelListener(callback) }
-
-    fun onDismiss(callback: OnDialogButtonClickListener) =
-        apply { setOnDismissListener(callback) }
-
-    fun onShow(callback: OnDialogButtonClickListener) =
-        apply { setOnShowListener(callback) }
-
-    fun reveal() = apply { super.show() }
-
-    // ---
-
-    fun resetView() = apply {
-        binding.dialogBaseContainer.removeAllViews()
-    }
-
-    fun resetTitle() = applyTitle("")
-    fun resetMessage() = applyMessage("")
-    fun resetIcon() = apply { data.icon = null }
-
-    fun resetButtons() = apply {
+    fun resetButtons() {
         ButtonType.values().forEach {
-            applyButton(it) {
-                title = ""
+            setButton(it) {
+                text = ""
                 icon = 0
                 isEnabled = true
-                preventDismiss = false
+                doNotDismiss = false
                 onClick {}
             }
         }
     }
 
-    fun reset() = resetTitle()
-        .resetMessage()
-        .resetView()
-        .resetIcon()
-        .resetButtons()
+    // Prevent calling setContentView
 
-    //region Deprecated Members
-    @Deprecated("Use applyTitle instead", ReplaceWith("applyTitle"))
-    override fun setTitle(title: CharSequence?) = Unit
-
-    @Deprecated("Use applyTitle instead", ReplaceWith("applyTitle"))
-    override fun setTitle(titleId: Int) = Unit
-
-    @Deprecated("Use reveal()", ReplaceWith("reveal()"))
-    override fun show() {
-    }
-    //endregion
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(layoutResID: Int) {}
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(view: View) {}
+    @Deprecated("Please use setView(view)", level = DeprecationLevel.ERROR)
+    override fun setContentView(view: View, params: ViewGroup.LayoutParams?) {}
 }
-
-typealias OnDialogButtonClickListener = (DialogInterface) -> Unit
-typealias OnDialogClickListener = (position: Int) -> Unit

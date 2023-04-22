@@ -12,39 +12,28 @@ Magisk will mount a `tmpfs` directory to store some temporary data. For devices 
 # Binaries like magisk, magiskinit, and all symlinks to
 # applets are directly stored in this path. This means when
 # this is /sbin, these binaries will be directly in PATH.
-MAGISKPATH=$(magisk --path)
+MAGISKTMP=$(magisk --path)
 
 # Magisk internal stuffs
-MAGISKTMP=$MAGISKBASE/.magisk
-
-# Magisk's BusyBox directory. Within this folder stores
-# the busybox binary and symlinks to all of its applets.
-# Any usage of this directory is deprecated, please
-# directly call /data/adb/magisk/busybox and use
-# BusyBox's ASH Standalone mode.
-# The creation of this path will be removed in the future.
-$MAGISKTMP/busybox
+INTERNALDIR=$MAGISKTMP/.magisk
 
 # /data/adb/modules will be bind mounted here.
 # The original folder is not used due to nosuid mount flag.
-$MAGISKTMP/modules
+$INTERNALDIR/modules
 
 # The current Magisk installation config
-$MAGISKTMP/config
+$INTERNALDIR/config
 
 # Partition mirrors
 # Each directory in this path will be mounted with the
 # partition of its directory name.
 # e.g. system, system_ext, vendor, data ...
-$MAGISKTMP/mirror
-
-# Block devices Magisk creates internally to mount mirrors.
-$MAGISKTMP/block
+$INTERNALDIR/mirror
 
 # Root directory patch files
 # On system-as-root devices, / is not writable.
 # All pre-init patched files are stored here and bind mounted.
-$MAGISKTMP/rootdir
+$INTERNALDIR/rootdir
 ```
 
 ### Paths in `/data`
@@ -54,7 +43,7 @@ Some binaries and files should be stored on non-volatile storages in `/data`. In
 - It is an existing folder on modern Android, so it cannot be used as an indication of the existence of Magisk.
 - The permission of the folder is by default `700`, owner as `root`, so non-root processes are unable to enter, read, write the folder in any possible way.
 - The folder is labeled with secontext `u:object_r:adb_data_file:s0`, and very few processes have the permission to do any interaction with that secontext.
-- The folder is located in *Device encrypted storage*, so it is accessible as soon as data is properly mounted in FBE (File-Based Encryption) devices.
+- The folder is located in _Device encrypted storage_, so it is accessible as soon as data is properly mounted in FBE (File-Based Encryption) devices.
 
 ```
 SECURE_DIR=/data/adb
@@ -90,11 +79,10 @@ DATABIN=$SECURE_DIR/magisk
 
 `magiskinit` will replace `init` as the first program to run.
 
-- Early mount required partitions. On legacy system-as-root devices, we switch root to system; on 2SI devices, we patch fstab and execute the original `init` to mount partitions for us.
-- Load sepolicy either from `/sepolicy`, precompiled sepolicy in vendor, or compile split sepolicy
-- Patch sepolicy rules and dump to `/sepolicy` or `/sbin/.se` or `/dev/.se`
-- Patch `init` or `libselinux.so` to force the system to load the patched policies
+- Early mount required partitions. On legacy system-as-root devices, we switch root to system; on 2SI devices, we patch the original `init` to redirect the 2nd stage init file to magiskinit and execute it to mount partitions for us.
 - Inject magisk services into `init.rc`
+- On devices using monolithic policy, load sepolicy from `/sepolicy`; otherwise we hijack nodes in selinuxfs with FIFO, set `LD_PRELOAD` to hook `security_load_policy` and assist hijacking on 2SI devices, and start a daemon to wait until init tries to load sepolicy.
+- Patch sepolicy rules. If we are using "hijack" method, load patched sepolicy into kernel, unblock init and exit daemon
 - Execute the original `init` to continue the boot process
 
 ### post-fs-data
@@ -113,16 +101,6 @@ Usually, system properties are designed to only be updated by `init` and read-on
 
 - `on property:foo=bar` actions registered in `*.rc` scripts will not be triggered if property changes does not go through `property_service`. The default set property behavior of `resetprop` matches `setprop`, which **WILL** trigger events (implemented by first deleting the property then set it via `property_service`). There is a flag `-n` to disable it if you need this special behavior.
 - persist properties (props that starts with `persist.`, like `persist.sys.usb.config`) are stored in both `prop_area` and `/data/property`. By default, deleting props will **NOT** remove it from persistent storage, meaning the property will be restored after the next reboot; reading props will **NOT** read from persistent storage, as this is the behavior of `getprop`. With the flag `-p`, deleting props will remove the prop in **BOTH** `prop_area` and `/data/property`, and reading props will be read from **BOTH** `prop_area` and persistent storage.
-
-## Magic Mount
-
-The details of the actual implementation and algorithm of Magic Mount is omitted here, please directly dive into the source code if interested (`core/module.cpp`).
-
-Even though the mounting logic is very complicated, the final result of Magic Mount is actually pretty simple. For each module, the folder `$MODPATH/system` will be recursively merged into the real `/system`; that is: existing files in the real system will be replaced by the one in modules' system, and new files in modules' system will be added to the real system.
-
-There is one additional trick you can use: if you place an empty file named `.replace` in any of the folders in a module's system, instead of merging the contents, that folder will directly replace the one in the real system. This will be very handy in some cases, for example swapping out a system app.
-
-If you want to replace files in `/vendor` or `/product`, please place them under `$MODPATH/system/vendor` or `$MODPATH/system/product`. Magisk will transparently handle both cases, whether vendor or product is a separate partition or not.
 
 ## SELinux Policies
 

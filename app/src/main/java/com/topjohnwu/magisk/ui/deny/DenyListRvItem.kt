@@ -5,17 +5,17 @@ import android.view.ViewGroup
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.databinding.ComparableRv
-import com.topjohnwu.magisk.databinding.ObservableDiffRvItem
+import com.topjohnwu.magisk.arch.startAnimations
+import com.topjohnwu.magisk.databinding.DiffItem
+import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.addOnPropertyChangedCallback
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.ktx.startAnimations
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
 
 class DenyListRvItem(
     val info: AppProcessInfo
-) : ObservableDiffRvItem<DenyListRvItem>(), ComparableRv<DenyListRvItem> {
+) : ObservableRvItem(), DiffItem<DenyListRvItem>, Comparable<DenyListRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_md2
 
@@ -44,9 +44,18 @@ class DenyListRvItem(
                 processes
                     .filterNot { it.isEnabled }
                     .filter { isExpanded || it.defaultSelection }
+                    .forEach { it.toggle() }
             } else {
-                processes.filter { it.isEnabled }
-            }.forEach { it.toggle() }
+                Shell.cmd("magisk --denylist rm ${info.packageName}").submit()
+                processes.filter { it.isEnabled }.forEach {
+                    if (it.process.isIsolated) {
+                        it.toggle()
+                    } else {
+                        it.isEnabled = !it.isEnabled
+                        notifyPropertyChanged(BR.enabled)
+                    }
+                }
+            }
         }
 
     init {
@@ -91,7 +100,7 @@ class DenyListRvItem(
 
 class ProcessRvItem(
     val process: ProcessInfo
-) : ObservableDiffRvItem<ProcessRvItem>() {
+) : ObservableRvItem(), DiffItem<ProcessRvItem> {
 
     override val layoutRes get() = R.layout.item_hide_process_md2
 
@@ -103,7 +112,7 @@ class ProcessRvItem(
         set(value) = set(value, process.isEnabled, { process.isEnabled = it }, BR.enabled) {
             val arg = if (it) "add" else "rm"
             val (name, pkg) = process
-            Shell.su("magisk --denylist $arg $pkg \'$name\'").submit()
+            Shell.cmd("magisk --denylist $arg $pkg \'$name\'").submit()
         }
 
     fun toggle() {
@@ -113,10 +122,9 @@ class ProcessRvItem(
     val defaultSelection get() =
         process.isIsolated || process.isAppZygote || process.name == process.packageName
 
-    override fun contentSameAs(other: ProcessRvItem) =
-        process.isEnabled == other.process.isEnabled
-
     override fun itemSameAs(other: ProcessRvItem) =
         process.name == other.process.name && process.packageName == other.process.packageName
 
+    override fun contentSameAs(other: ProcessRvItem) =
+        process.isEnabled == other.process.isEnabled
 }

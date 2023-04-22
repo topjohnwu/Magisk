@@ -6,17 +6,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Parcelable
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.model.MagiskJson
-import com.topjohnwu.magisk.core.model.StubJson
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.di.AppContext
-import com.topjohnwu.magisk.ktx.cachedFile
 import com.topjohnwu.magisk.ui.flash.FlashFragment
-import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -34,8 +31,10 @@ sealed class Subject : Parcelable {
     abstract val file: Uri
     abstract val title: String
     abstract val notifyId: Int
+    open val autoLaunch: Boolean get() = true
+    open val postDownload: (() -> Unit)? get() = null
 
-    abstract fun pendingIntent(context: Context): PendingIntent
+    abstract fun pendingIntent(context: Context): PendingIntent?
 
     @Parcelize
     class Module(
@@ -43,24 +42,22 @@ sealed class Subject : Parcelable {
         val action: Action,
         override val notifyId: Int = Notifications.nextId()
     ) : Subject() {
-        override val url: String get() = module.zip_url
+        override val url: String get() = module.zipUrl
         override val title: String get() = module.downloadFilename
+        override val autoLaunch: Boolean get() = action == Action.Flash
 
         @IgnoredOnParcel
         override val file by lazy {
             MediaStoreUtils.getFile(title).uri
         }
 
-        override fun pendingIntent(context: Context) = when (action) {
-            Action.Flash -> FlashFragment.installIntent(context, file)
-            else -> Intent().toPending(context)
-        }
+        override fun pendingIntent(context: Context) =
+            FlashFragment.installIntent(context, file)
     }
 
     @Parcelize
-    class Manager(
+    class App(
         private val json: MagiskJson = Info.remote.magisk,
-        val stub: StubJson = Info.remote.stub,
         override val notifyId: Int = Notifications.nextId()
     ) : Subject() {
         override val title: String get() = "Magisk-${json.version}(${json.versionCode})"
@@ -71,14 +68,12 @@ sealed class Subject : Parcelable {
             cachedFile("manager.apk")
         }
 
-        val externalFile get() = MediaStoreUtils.getFile("$title.apk").uri
+        @IgnoredOnParcel
+        override var postDownload: (() -> Unit)? = null
 
-        override fun pendingIntent(context: Context): PendingIntent {
-            val receiver = APKInstall.register(context, null, null)
-            APKInstall.installapk(context, file.toFile())
-            val intent = receiver.waitIntent() ?: Intent()
-            return intent.toPending(context)
-        }
+        @IgnoredOnParcel
+        var intent: Intent? = null
+        override fun pendingIntent(context: Context) = intent?.toPending(context)
     }
 
     @SuppressLint("InlinedApi")

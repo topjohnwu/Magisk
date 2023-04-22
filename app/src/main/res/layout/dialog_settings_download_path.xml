@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textUri"
-                android:text="@={data.result}"
+                android:text="@={data.inputResult}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="?colorOnSurface"
                 tools:text="@tools:sample/lorem" />

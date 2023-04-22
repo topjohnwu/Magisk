@@ -19,32 +19,8 @@
 
     <!--endregion-->
 
-    <declare-styleable name="WindowInsetsHelper">
-        <attr name="edgeToEdge" format="boolean"/>
-        <attr name="fitsSystemWindowsInsets" format="flags">
-            <flag name="top" value="0x30" />
-            <flag name="bottom" value="0x50" />
-            <flag name="left" value="0x03" />
-            <flag name="right" value="0x05" />
-            <flag name="start" value="0x00800003" />
-            <flag name="end" value="0x00800005" />
-        </attr>
-        <attr name="consumeSystemWindowsInsets" format="flags">
-            <flag name="top" value="0x30" />
-            <flag name="bottom" value="0x50" />
-            <flag name="left" value="0x03" />
-            <flag name="right" value="0x05" />
-            <flag name="start" value="0x00800003" />
-            <flag name="end" value="0x00800005" />
-        </attr>
-        <attr name="layout_fitsSystemWindowsInsets" format="flags">
-            <flag name="top" value="0x30" />
-            <flag name="bottom" value="0x50" />
-            <flag name="left" value="0x03" />
-            <flag name="right" value="0x05" />
-            <flag name="start" value="0x00800003" />
-            <flag name="end" value="0x00800005" />
-        </attr>
+    <declare-styleable name="ConcealableView">
+        <attr name="state_hidden" format="boolean" />
     </declare-styleable>
 
 </resources>

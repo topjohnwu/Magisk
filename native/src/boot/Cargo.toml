@@ -1,0 +1,11 @@
+[package]
+name = "magiskboot"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"]
+path = "lib.rs"
+
+[dependencies]
+base = { path = "../base" }

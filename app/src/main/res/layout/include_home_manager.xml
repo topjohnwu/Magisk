@@ -7,7 +7,7 @@
 
         <import type="com.topjohnwu.magisk.core.Info" />
 
-        <import type="com.topjohnwu.magisk.ui.home.MagiskState" />
+        <import type="com.topjohnwu.magisk.ui.home.HomeViewModel.State" />
 
         <variable
             name="viewModel"
@@ -64,7 +64,7 @@
 
                 <Button
                     style="@style/WidgetFoundation.Button"
-                    gone="@{viewModel.stateManager != MagiskState.OBSOLETE}"
+                    gone="@{viewModel.appState != State.OUTDATED}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> viewModel.onManagerPressed()}"
@@ -75,7 +75,7 @@
 
                 <Button
                     style="@style/WidgetFoundation.Button.Text"
-                    gone="@{viewModel.stateManager != MagiskState.UP_TO_DATE}"
+                    gone="@{viewModel.appState != State.UP_TO_DATE}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"

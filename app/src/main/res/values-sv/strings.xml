@@ -4,13 +4,11 @@
     <string name="superuser">Superuser</string>
     <string name="logs">Logg</string>
     <string name="settings">Inställningar</string>
-    <string name="refresh">Uppdatera lokal data</string>
     <string name="install">Installera</string>
     <string name="section_home">Hem</string>
     <string name="section_theme">Tema</string>
-    <string name="safetynet">SafetyNet</string>
 
-	<!--Home-->
+    <!--Home-->
     <string name="no_connection">Ingen anslutning tillgänglig</string>
     <string name="app_changelog">Ändringslogg</string>
     <string name="loading">Laddar…</string>
@@ -29,7 +27,6 @@
     <string name="invalid_update_channel">Ogiltig uppdateringskanal</string>
     <string name="uninstall_magisk_title">Avinstallera Magisk</string>
     <string name="uninstall_magisk_msg">Alla moduler kommer att bli inaktiverade/borttagna!\nRoot kommer också att avinstalleras!\nDin data kan komma att krypteras om den inte är det redan!</string>
-    <string name="home_check_safetynet">Kontrollera SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Bibehåll tvingad kryptering</string>
@@ -89,19 +86,11 @@
     <!-- <string name="target_uid">Target UID: %1$d</string> -->
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet API Fel</string>
-    <string name="safetynet_res_invalid">Svaret är ogiltigt</string>
-    <string name="safetynet_attest_success">Lyckades!</string>
-    <string name="safetynet_attest_failure">Bekräftelse misslyckades!</string>
-    <string name="safetynet_attest_loading">Vänta…</string>
-    <string name="safetynet_attest_restart">Försök igen</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Visa system-appar</string>
     <string name="show_os_app">Via OS-appar</string>
     <string name="hide_filter_hint">Filtrera med namn</string>
-    <string name="hide_scroll_up">Scrolla upp</string>
-    <string name="hide_filters">Filter</string>
     <string name="hide_search">Sök</string>
 
     <!--Module-->
@@ -112,15 +101,10 @@
     <string name="reboot_download">Omstart till Nedladdningsläge</string>
     <string name="reboot_edl">Omstart till EDL</string>
     <string name="module_version_author">%1$s av %2$s</string>
-    <string name="module_section_pending">Uppdateringar</string>
-    <string name="module_section_pending_action">Uppdatera alla</string>
     <string name="module_state_remove">Ta bort</string>
     <string name="module_state_restore">Återställ</string>
     <string name="module_action_install_external">Installera från lagringsmedia</string>
     <string name="update_available">Uppdatering tillgänglig</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Online</string>
-    <string name="sorting_order">Sorteringsordning</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Temaläge</string>
@@ -172,6 +156,8 @@
     <string name="no_biometric">Denna enhet stöds ej eller så är inte biometrisk autentisering aktiverad</string>
     <string name="settings_customization">Anpassning</string>
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
+    <string name="settings_doh_title">DNS över HTTPS</string>
+    <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
 
     <string name="multiuser_mode">Multiuser-läge</string>
     <string name="settings_owner_only">Endast enhetsägare</string>
@@ -179,7 +165,7 @@
     <string name="settings_user_independent">Användaroberoende</string>
     <string name="owner_only_summary">Endast ägare har root-åtkomst</string>
     <string name="owner_manage_summary">Endast ägare kan hantera root-åtkomst och ta emot bägärda förfrågningar</string>
-    <string name="user_indepenent_summary">Varje användare har sina egna separata root-regler</string>
+    <string name="user_independent_summary">Varje användare har sina egna separata root-regler</string>
 
     <string name="mount_namespace_mode">Montera namnrymdsläge</string>
     <string name="settings_ns_global">Global namnrymd</string>
@@ -200,12 +186,10 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nej</string>
-    <string name="repo_install_title">Installera %1$s</string>
-    <string name="repo_install_msg">Vill du installera %1$s nu?</string>
+    <string name="repo_install_title">Installera %1$s %2$s(%3$d)</string>
     <string name="download">Ladda ned</string>
     <string name="reboot">Omstart</string>
     <string name="release_notes">Utgivningsanmärkningar</string>
-    <string name="repo_cache_cleared">Repo-cache rensad</string>
     <string name="flashing">Flashar…</string>
     <string name="done">Färdig!</string>
     <string name="failure">Misslyckades!</string>
@@ -216,8 +200,6 @@
     <string name="restore_img_msg">Återställer…</string>
     <string name="restore_done">Återställning slutförd!</string>
     <string name="restore_fail">Orörd backup hittades inte!</string>
-    <string name="proprietary_title">Ladda ner proprietär kod</string>
-    <string name="proprietary_notice">Magisk är FOSS och innehåller inte kod för Googels proprietära SafetyNet-API.\n\nVill du ladda ner ett proprietärt tillägg för SafetyNet-kontroller</string>
     <string name="setup_fail">Installation misslyckades</string>
     <string name="env_fix_title">Kräver ytterligare installation</string>
     <string name="env_fix_msg">Din enhet behöver ytterligare installation för att Magisk ska fungera korrekt. Vill du fortsätta och starta om enheten?</string>

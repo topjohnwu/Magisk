@@ -10,8 +10,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за ажурирања</string>
-    <string name="safetynet_api_error">Грешка со SafetyNet API</string>
-    <string name="safetynet_res_invalid">Одговорот е невалиден.</string>
     <string name="keep_force_encryption">Задржи ја присилната енкрипција</string>
     <string name="keep_dm_verity">Задржи AVB 2.0/dm-verity</string>
     <string name="uninstall_magisk_title">Деинсталирај го Magisk</string>
@@ -27,7 +25,6 @@
     <!--Repo Fragment-->
     <string name="update_available">Достапно е ажурирање</string>
     <string name="home_installed_version">Инсталирано</string>
-    <string name="sorting_order">Начин на подредување</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Зачувај записник</string>
@@ -55,12 +52,10 @@
     <string name="reboot_delay_toast">Рестартирање за 5 секунди…</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Инсталирај %1$s</string>
-    <string name="repo_install_msg">Дали сакате да го инсталирате %1$s сега?</string>
+    <string name="repo_install_title">Инсталирај %1$s %2$s(%3$d)</string>
     <string name="download">Преземи</string>
     <string name="reboot">Рестартирај</string>
     <string name="release_notes">Белешки за изданието</string>
-    <string name="repo_cache_cleared">Кешот од репозиториумот е исчистен</string>
 
     <string name="flashing">Применувам</string>
     <string name="open_link_failed_toast">Не е пронајдена апликација за отворање на врската.</string>
@@ -69,7 +64,6 @@
     <string name="restore_img_msg">Враќање…</string>
     <string name="restore_done">Враќањето заврши!</string>
     <string name="restore_fail">Не постои оригинална резервна копија!</string>
-    <string name="proprietary_title">Превземи патентиран код</string>
     <string name="setup_fail">Поставувањето е неуспешно.</string>
     <string name="env_fix_title">Потребни е дополнително поставување</string>
     <string name="setup_msg">Надградба на работната околина…</string>
@@ -111,7 +105,7 @@
     <string name="settings_user_independent">Независно од корисникот</string>
     <string name="owner_only_summary">Само сопственикот има рут пристап.</string>
     <string name="owner_manage_summary">Само сопственикот може да управува со рут пристапот и да ги прима барања за рут пристап.</string>
-    <string name="user_indepenent_summary">Секој корисник има сопствени рут правила.</string>
+    <string name="user_independent_summary">Секој корисник има сопствени рут правила.</string>
 
     <string name="mount_namespace_mode">Поставете го режимот на именски простор</string>
     <string name="settings_ns_global">Глобален именски простор</string>

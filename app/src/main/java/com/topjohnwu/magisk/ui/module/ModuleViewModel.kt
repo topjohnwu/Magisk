@@ -1,165 +1,101 @@
 package com.topjohnwu.magisk.ui.module
 
+import android.net.Uri
 import androidx.databinding.Bindable
-import androidx.databinding.ObservableArrayList
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.arch.BaseViewModel
-import com.topjohnwu.magisk.arch.Queryable
+import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.ContentResultCallback
 import com.topjohnwu.magisk.core.model.module.LocalModule
 import com.topjohnwu.magisk.core.model.module.OnlineModule
-import com.topjohnwu.magisk.databinding.*
-import com.topjohnwu.magisk.events.OpenReadmeEvent
-import com.topjohnwu.magisk.events.SelectModuleEvent
+import com.topjohnwu.magisk.databinding.MergeObservableList
+import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.databinding.bindExtra
+import com.topjohnwu.magisk.databinding.diffList
+import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.dialog.LocalModuleInstallDialog
+import com.topjohnwu.magisk.dialog.OnlineModuleInstallDialog
+import com.topjohnwu.magisk.events.GetContentEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
-import com.topjohnwu.magisk.events.dialog.ModuleInstallDialog
-import com.topjohnwu.magisk.ktx.addOnListChangedCallback
-import com.topjohnwu.magisk.ktx.reboot
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.tatarka.bindingcollectionadapter2.collections.MergeObservableList
+import kotlinx.parcelize.Parcelize
 
-class ModuleViewModel : BaseViewModel(), Queryable {
+class ModuleViewModel : AsyncLoadViewModel() {
 
-    val bottomBarBarrierIds =
-        intArrayOf(R.id.module_info, R.id.module_remove)
+    val bottomBarBarrierIds = intArrayOf(R.id.module_update, R.id.module_remove)
 
-    override val queryDelay = 1000L
+    private val itemsInstalled = diffList<LocalModuleRvItem>()
 
-    @get:Bindable
-    var isRemoteLoading = false
-        set(value) = set(value, field, { field = it }, BR.remoteLoading)
-
-    @get:Bindable
-    var query = ""
-        set(value) = set(value, field, { field = it }, BR.query) {
-            submitQuery()
-            // Yes we do lie about the search being loaded
-            searchLoading = true
-        }
-
-    @get:Bindable
-    var searchLoading = false
-        set(value) = set(value, field, { field = it }, BR.searchLoading)
-
-    val itemsSearch = diffListOf<AnyDiffRvItem>()
-    val itemSearchBinding = itemBindingOf<AnyDiffRvItem> {
-        it.bindExtra(BR.viewModel, this)
-    }
-
-    private val installSectionList = ObservableArrayList<RvItem>()
-    private val itemsInstalled = diffListOf<LocalModuleRvItem>()
-    private val sectionInstalled = SectionTitle(
-        R.string.module_installed,
-        R.string.reboot,
-        R.drawable.ic_restart
-    ).also { it.hasButton = false }
-
-    val adapter = adapterOf<RvItem>()
     val items = MergeObservableList<RvItem>()
-    val itemBinding = itemBindingOf<RvItem> {
-        it.bindExtra(BR.viewModel, this)
+    val extraBindings = bindExtra {
+        it.put(BR.viewModel, this)
     }
 
-    // ---
+    val data get() = uri
 
-    init {
-        itemsInstalled.addOnListChangedCallback(
-            onItemRangeInserted = { _, _, _ ->
-                if (installSectionList.isEmpty())
-                    installSectionList.add(sectionInstalled)
-            },
-            onItemRangeRemoved = { list, _, _ ->
-                if (list.isEmpty())
-                    installSectionList.clear()
-            }
-        )
+    @get:Bindable
+    var loading = true
+        private set(value) = set(value, field, { field = it }, BR.loading)
 
-        if (Info.env.isActive) {
-            items.insertItem(InstallModule)
-                .insertList(installSectionList)
-                .insertList(itemsInstalled)
-        }
-    }
-
-    // ---
-
-    override fun refresh(): Job {
-        return viewModelScope.launch {
-            state = State.LOADING
+    override suspend fun doLoadWork() {
+        loading = true
+        val moduleLoaded = Info.env.isActive &&
+                withContext(Dispatchers.IO) { LocalModule.loaded() }
+        if (moduleLoaded) {
             loadInstalled()
-            state = State.LOADED
+            if (items.isEmpty()) {
+                items.insertItem(InstallModule)
+                    .insertList(itemsInstalled)
+            }
         }
+        loading = false
+        loadUpdateInfo()
     }
+
+    override fun onNetworkChanged(network: Boolean) = startLoading()
 
     private suspend fun loadInstalled() {
-        val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
-        val diff = withContext(Dispatchers.Default) {
-            itemsInstalled.calculateDiff(installed)
+        withContext(Dispatchers.Default) {
+            val installed = LocalModule.installed().map { LocalModuleRvItem(it) }
+            itemsInstalled.update(installed)
         }
-        itemsInstalled.update(installed, diff)
     }
 
-    fun forceRefresh() {
-        itemsInstalled.clear()
-        refresh()
-        submitQuery()
+    private suspend fun loadUpdateInfo() {
+        withContext(Dispatchers.IO) {
+            itemsInstalled.forEach {
+                if (it.item.fetch())
+                    it.fetchedUpdateInfo()
+            }
+        }
     }
 
-    // ---
-
-    private suspend fun queryInternal(query: String): List<AnyDiffRvItem> {
-        return if (query.isBlank()) {
-            itemsSearch.clear()
-            listOf()
+    fun downloadPressed(item: OnlineModule?) =
+        if (item != null && Info.isConnected.value == true) {
+            withExternalRW { OnlineModuleInstallDialog(item).show() }
         } else {
-            withContext(Dispatchers.Default) {
-                itemsInstalled.filter {
-                    it.item.id.contains(query, true)
-                            || it.item.name.contains(query, true)
-                            || it.item.description.contains(query, true)
-                }
-            }
+            SnackbarEvent(R.string.no_connection).publish()
+        }
+
+    fun installPressed() = withExternalRW {
+        GetContentEvent("application/zip", UriCallback()).publish()
+    }
+
+    fun requestInstallLocalModule(uri: Uri, displayName: String) {
+        LocalModuleInstallDialog(this, uri, displayName).show()
+    }
+
+    @Parcelize
+    class UriCallback : ContentResultCallback {
+        override fun onActivityResult(result: Uri) {
+            uri.value = result
         }
     }
 
-    override fun query() {
-        viewModelScope.launch {
-            val searched = queryInternal(query)
-            val diff = withContext(Dispatchers.Default) {
-                itemsSearch.calculateDiff(searched)
-            }
-            searchLoading = false
-            itemsSearch.update(searched, diff)
-        }
+    companion object {
+        private val uri = MutableLiveData<Uri?>()
     }
-
-    // ---
-
-    fun updateActiveState() {
-        sectionInstalled.hasButton = itemsInstalled.any { it.isModified }
-    }
-
-    fun sectionPressed(item: SectionTitle) = when (item) {
-        sectionInstalled -> reboot()
-        else -> Unit
-    }
-
-    // The following methods are not used, but kept for future integration
-
-    fun downloadPressed(item: OnlineModule) =
-        if (isConnected.get()) withExternalRW { ModuleInstallDialog(item).publish() }
-        else { SnackbarEvent(R.string.no_connection).publish() }
-
-    fun installPressed() = withExternalRW { SelectModuleEvent().publish() }
-
-    fun infoPressed(item: OnlineModule) =
-        if (isConnected.get()) OpenReadmeEvent(item).publish()
-        else SnackbarEvent(R.string.no_connection).publish()
-
-    fun infoPressed(item: LocalModuleRvItem) { infoPressed(item.online ?: return) }
 }

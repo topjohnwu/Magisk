@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 @JsonClass(generateAdapter = true)
 data class UpdateInfo(
     val magisk: MagiskJson = MagiskJson(),
-    val stub: StubJson = StubJson()
 )
 
 @Parcelize
@@ -19,20 +18,12 @@ data class MagiskJson(
     val note: String = ""
 ) : Parcelable
 
-@Parcelize
-@JsonClass(generateAdapter = true)
-data class StubJson(
-    val versionCode: Int = -1,
-    val link: String = ""
-) : Parcelable
-
 @JsonClass(generateAdapter = true)
 data class ModuleJson(
-    val id: String,
-    val last_update: Long,
-    val prop_url: String,
-    val zip_url: String,
-    val notes_url: String
+    val version: String,
+    val versionCode: Int,
+    val zipUrl: String,
+    val changelog: String,
 )
 
 @JsonClass(generateAdapter = true)

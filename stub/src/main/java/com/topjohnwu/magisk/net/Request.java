@@ -2,6 +2,8 @@ package com.topjohnwu.magisk.net;
 
 import android.os.AsyncTask;
 
+import com.topjohnwu.magisk.utils.APKInstall;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,11 +22,8 @@ import java.net.HttpURLConnection;
 import java.util.Scanner;
 import java.util.concurrent.Executor;
 
-import io.michaelrocks.paranoid.Obfuscate;
-
-@Obfuscate
-public class Request implements Closeable {
-    private HttpURLConnection conn;
+public class Request {
+    private final HttpURLConnection conn;
     private Executor executor = null;
     private int code = -1;
 
@@ -58,11 +57,6 @@ public class Request implements Closeable {
         conn = c;
     }
 
-    @Override
-    public void close() {
-        conn.disconnect();
-    }
-
     public Request addHeaders(String key, String value) {
         conn.setRequestProperty(key, value);
         return this;
@@ -90,6 +84,10 @@ public class Request implements Closeable {
 
     public Result<InputStream> execForInputStream() {
         return exec(this::getInputStream);
+    }
+
+    public void getAsInputStream(ResponseListener<InputStream> rs) {
+        submit(this::getInputStream, rs);
     }
 
     public void getAsFile(File out, ResponseListener<File> rs) {
@@ -192,13 +190,9 @@ public class Request implements Closeable {
     }
 
     private File dlFile(File f) throws IOException {
-        try (InputStream in  = getInputStream();
+        try (InputStream in = getInputStream();
              OutputStream out = new BufferedOutputStream(new FileOutputStream(f))) {
-            int len;
-            byte[] buf = new byte[4096];
-            while ((len = in.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
+            APKInstall.transfer(in, out);
         }
         return f;
     }
@@ -207,11 +201,8 @@ public class Request implements Closeable {
         int len = conn.getContentLength();
         len = len > 0 ? len : 32;
         ByteArrayOutputStream out = new ByteArrayOutputStream(len);
-        try (InputStream in  = getInputStream()) {
-            byte[] buf = new byte[4096];
-            while ((len = in.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
+        try (InputStream in = getInputStream()) {
+            APKInstall.transfer(in, out);
         }
         return out.toByteArray();
     }

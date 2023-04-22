@@ -5,11 +5,9 @@
     <string name="superuser">Superbruker</string>
     <string name="logs">Logg</string>
     <string name="settings">Innstillinger</string>
-    <string name="refresh">Gjenoppfrisk lokal data</string>
     <string name="install">Install</string>
     <string name="section_home">Hjem</string>
     <string name="section_theme">Drakter</string>
-    <string name="safetynet">SafetyNet</string>
 
     <!--Home-->
     <string name="no_connection">Mangler tilkobling</string>
@@ -30,7 +28,6 @@
     <string name="invalid_update_channel">Ugyldig installasjonskanal</string>
     <string name="uninstall_magisk_title">Avinstaller Magisk</string>
     <string name="uninstall_magisk_msg">Alle moduler vil bli avskrudd/fjernet.\nRot-tigang vil bli fjernet!\nKrypter din data hvis den ikke er det allerede.</string>
-    <string name="home_check_safetynet">Sjekk SafetyNet</string>
 
     <!--Install-->
     <string name="keep_force_encryption">Bevar påvunget kryptering</string>
@@ -90,19 +87,11 @@
     <string name="target_uid">Mål-UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">SafetyNet-API-feil</string>
-    <string name="safetynet_res_invalid">Ugyldig svar</string>
-    <string name="safetynet_attest_success">Vellykket!</string>
-    <string name="safetynet_attest_failure">Bekreftelse mislyktes!</string>
-    <string name="safetynet_attest_loading">Et øyeblikk…</string>
-    <string name="safetynet_attest_restart">Prøv igjen</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Vis systemprogrammer</string>
     <string name="show_os_app">Vis systemprogrammer</string>
     <string name="hide_filter_hint">Filtrer etter navn</string>
-    <string name="hide_scroll_up">Rull oppover</string>
-    <string name="hide_filters">Filtre</string>
     <string name="hide_search">Søk</string>
 
     <!--Module-->
@@ -113,15 +102,10 @@
     <string name="reboot_download">Omstart til nedlasting</string>
     <string name="reboot_edl">Omstart til EDL</string>
     <string name="module_version_author">%1$s av %2$s</string>
-    <string name="module_section_pending">Oppgraderinger</string>
-    <string name="module_section_pending_action">Oppgrader alle</string>
     <string name="module_state_remove">Fjern</string>
     <string name="module_state_restore">Gjenopprett</string>
     <string name="module_action_install_external">Installer fra lagring</string>
     <string name="update_available">Oppgradering tilgjengelig</string>
-    <string name="module_installed">@string/home_installed_version</string>
-    <string name="module_section_online">Nettbasert</string>
-    <string name="sorting_order">Rekkefølge</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Draktmodus</string>
@@ -173,6 +157,8 @@
     <string name="no_biometric">Ustøttet enhet, eller mangel på biometrisk oppsett</string>
     <string name="settings_customization">Tilpasning</string>
     <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
+    <string name="settings_doh_title">DNS over HTTPS</string>
+    <string name="settings_doh_description">Unngåelse av DNS-forgiftelse i noen land</string>
 
     <string name="multiuser_mode">Multibrukermodus</string>
     <string name="settings_owner_only">Kun for enhetseier</string>
@@ -180,7 +166,7 @@
     <string name="settings_user_independent">Brukeruavhengig</string>
     <string name="owner_only_summary">Rot-tilgang kun for eier</string>
     <string name="owner_manage_summary">Kun eier kan håndtere rot-tilgang og motta forespørsler</string>
-    <string name="user_indepenent_summary">Hver bruker har egne rot-regler</string>
+    <string name="user_independent_summary">Hver bruker har egne rot-regler</string>
 
     <string name="mount_namespace_mode">Modus for montering av navnerom</string>
     <string name="settings_ns_global">Omspennede navnerom</string>
@@ -200,12 +186,10 @@
     <!--Toasts, Dialogs-->
     <string name="yes">Ja</string>
     <string name="no">Nei</string>
-    <string name="repo_install_title">Installer %1$s</string>
-    <string name="repo_install_msg">Installer %1$s nå?</string>
+    <string name="repo_install_title">Installer %1$s %2$s(%3$d)</string>
     <string name="download">Last ned</string>
     <string name="reboot">Omstart</string>
     <string name="release_notes">Utgivelsesnotater</string>
-    <string name="repo_cache_cleared">Pakkebrønnshurtiglager tømt</string>
     <string name="flashing">Innbrenner …</string>
     <string name="done">Ferdig!</string>
     <string name="failure">Mislykket!</string>
@@ -216,8 +200,6 @@
     <string name="restore_img_msg">Gjenoppretter …</string>
     <string name="restore_done">Gjenoppretting fullført.</string>
     <string name="restore_fail">Fabrikk-sikkerhetskopi finnes ikke!</string>
-    <string name="proprietary_title">Last ned proprietær kode</string>
-    <string name="proprietary_notice">Magisk er fritt, og inneholder ikke Google sitt SafetyNet-API.\n\nLast ned ufri utvidelse for SafetyNet-sjekker?</string>
     <string name="setup_fail">Oppsett mislyktes</string>
     <string name="env_fix_title">Krever ytterligere oppsett</string>
     <string name="env_fix_msg">Enheten din krever ytterligere oppsett for at Magisk skal fungere rett. Fortsett med omstart?</string>

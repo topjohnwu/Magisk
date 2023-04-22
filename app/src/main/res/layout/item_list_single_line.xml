@@ -10,7 +10,7 @@
 
         <variable
             name="listener"
-            type="com.topjohnwu.magisk.view.MagiskDialog.ActualOnDialogClickListener" />
+            type="com.topjohnwu.magisk.view.MagiskDialog.DialogClickListener" />
 
     </data>
 

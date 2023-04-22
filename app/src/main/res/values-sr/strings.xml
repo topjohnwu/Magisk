@@ -10,8 +10,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Непостојећи Канал Ажурирања</string>
-    <string name="safetynet_api_error">СигурнаМрежа АПИ Грешка</string>
-    <string name="safetynet_res_invalid">Одговор није валидан</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Задржи форсирану енкрипцију</string>
@@ -36,13 +34,11 @@
     <string name="app_changelog">Дневник промена апликације</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Инсталирај %1$s</string>
-    <string name="repo_install_msg">Да ли желите да инсталирате %1$s?</string>
+    <string name="repo_install_title">Инсталирај %1$s %2$s(%3$d)</string>
     <string name="download">Преузми</string>
     <string name="reboot">Рестартуј</string>
     <string name="magisk_update_title">Нови Адбејт Магиска Доступан!</string>
     <string name="release_notes">Белешке обљављивања</string>
-    <string name="repo_cache_cleared">Кеш спремишта обрисан</string>
     <string name="manager_download_install">Притисни да преузмеш и инсталираш</string>
     <string name="update_channel">Магиск Ажурирање</string>
     <string name="flashing">Флешовање</string>
@@ -50,7 +46,6 @@
     <string name="complete_uninstall">Комплетна Унинсталација</string>
     <string name="restore_done">Повратак успешан!</string>
     <string name="restore_fail">Фабрички бекап не постоји!</string>
-    <string name="proprietary_title">Преузми Власнички Код</string>
     <string name="download_file_error">Грешка при преузимању фајла</string>
 
     <!--Settings Activity -->
@@ -87,7 +82,7 @@
     <string name="settings_user_independent">Независно од корисника</string>
     <string name="owner_only_summary">Само власник има приступ корену</string>
     <string name="owner_manage_summary">Само власник може да приступа корену и да прими захтеве за њега</string>
-    <string name="user_indepenent_summary">Сваки корисник има своја правила корена</string>
+    <string name="user_independent_summary">Сваки корисник има своја правила корена</string>
 
     <string name="mount_namespace_mode">Постоље режима имена простора</string>
     <string name="settings_ns_global">Глобално име простора</string>

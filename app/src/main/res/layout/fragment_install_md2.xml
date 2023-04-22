@@ -72,7 +72,7 @@
                             gone="@{viewModel.step != 0}"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:onClick="@{() -> viewModel.step(1)}"
+                            android:onClick="@{() -> viewModel.setStep(1)}"
                             android:text="@string/install_next" />
 
                     </LinearLayout>
@@ -106,6 +106,15 @@
                             android:layout_height="wrap_content"
                             android:checked="@={Config.keepEnc}"
                             android:text="@string/keep_force_encryption"
+                            app:tint="?colorPrimary" />
+
+                        <CheckBox
+                            style="@style/WidgetFoundation.Checkbox"
+                            gone="@{viewModel.hideVbmeta}"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="@={Config.patchVbmeta}"
+                            android:text="@string/patch_vbmeta"
                             app:tint="?colorPrimary" />
 
                         <CheckBox
@@ -214,11 +223,11 @@
 
             <com.google.android.material.card.MaterialCardView
                 style="@style/WidgetFoundation.Card"
-                gone="@{viewModel.notes.empty}"
+                gone="@{viewModel.notes.length == 0}"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/l1"
                 android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
                 android:layout_marginEnd="@dimen/l1"
                 android:focusable="false">
 
@@ -228,8 +237,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
+                    android:breakStrategy="simple"
+                    android:hyphenationFrequency="none"
                     android:textAppearance="@style/AppearanceFoundation.Caption"
-                    android:visibility="gone"
+                    tools:ignore="UnusedAttribute"
                     tools:maxLines="5"
                     tools:text="@tools:sample/lorem/random"
                     tools:visibility="visible" />

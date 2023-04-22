@@ -1,29 +1,36 @@
 package com.topjohnwu.magisk.core
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import com.topjohnwu.magisk.DynAPK
-import com.topjohnwu.magisk.core.utils.*
-import com.topjohnwu.magisk.di.ServiceLocator
+import androidx.lifecycle.ProcessLifecycleAccessor
+import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.utils.DispatcherExecutor
+import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.core.utils.ShellInit
+import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.core.utils.setConfig
+import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import kotlin.system.exitProcess
 
 open class App() : Application() {
 
     constructor(o: Any) : this() {
-        val data = DynAPK.Data(o)
+        val data = StubApk.Data(o)
         // Add the root service name mapping
-        data.classToComponent[RootRegistry::class.java.name] = data.rootService.name
+        data.classToComponent[RootUtils::class.java.name] = data.rootService.name
         // Send back the actual root service class
-        data.rootService = RootRegistry::class.java
+        data.rootService = RootUtils::class.java
         Info.stub = data
     }
 
@@ -37,43 +44,44 @@ open class App() : Application() {
     }
 
     override fun attachBaseContext(context: Context) {
-        Shell.setDefaultBuilder(Shell.Builder.create()
-            .setFlags(Shell.FLAG_MOUNT_MASTER)
-            .setInitializers(ShellInit::class.java)
-            .setTimeout(2))
-        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
-
         // Get the actual ContextImpl
         val app: Application
         val base: Context
         if (context is Application) {
             app = context
             base = context.baseContext
+            AppApkPath = StubApk.current(base).path
         } else {
             app = this
             base = context
+            AppApkPath = base.packageResourcePath
         }
         super.attachBaseContext(base)
         ServiceLocator.context = base
+        app.registerActivityLifecycleCallbacks(ActivityTracker)
+
+        Shell.setDefaultBuilder(Shell.Builder.create()
+            .setFlags(Shell.FLAG_MOUNT_MASTER)
+            .setInitializers(ShellInit::class.java)
+            .setContext(base)
+            .setTimeout(2))
+        Shell.EXECUTOR = DispatcherExecutor(Dispatchers.IO)
+        RootUtils.bindTask = RootService.bindOrTask(
+            intent<RootUtils>(),
+            UiThreadHandler.executor,
+            RootUtils.Connection
+        )
+        // Pre-heat the shell ASAP
+        Shell.getShell(null) {}
 
         refreshLocale()
-        AppApkPath = if (isRunningAsStub) {
-            DynAPK.current(base).path
-        } else {
-            base.packageResourcePath
-        }
-
-        base.resources.patch()
-        app.registerActivityLifecycleCallbacks(ForegroundTracker)
+        resources.patch()
+        Notifications.setup()
     }
 
     override fun onCreate() {
         super.onCreate()
-        RootRegistry.bindTask = RootService.createBindTask(
-            intent<RootRegistry>(),
-            UiThreadHandler.executor,
-            RootRegistry.Connection
-        )
+        ProcessLifecycleAccessor.init(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -85,20 +93,21 @@ open class App() : Application() {
     }
 }
 
-@SuppressLint("StaticFieldLeak")
-object ForegroundTracker : Application.ActivityLifecycleCallbacks {
+object ActivityTracker : Application.ActivityLifecycleCallbacks {
+
+    val foreground: Activity? get() = ref.get()
 
     @Volatile
-    var foreground: Activity? = null
-
-    val hasForeground get() = foreground != null
+    private var ref = WeakReference<Activity>(null)
 
     override fun onActivityResumed(activity: Activity) {
-        foreground = activity
+        if (activity is SuRequestActivity) return
+        ref = WeakReference(activity)
     }
 
     override fun onActivityPaused(activity: Activity) {
-        foreground = null
+        if (activity is SuRequestActivity) return
+        ref.clear()
     }
 
     override fun onActivityCreated(activity: Activity, bundle: Bundle?) {}

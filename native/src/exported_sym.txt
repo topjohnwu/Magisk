@@ -1,0 +1,4 @@
+{
+    zygisk_inject_entry;
+    unload_first_stage;
+};

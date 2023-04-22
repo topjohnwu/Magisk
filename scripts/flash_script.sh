@@ -48,7 +48,7 @@ ui_print "- Target image: $BOOTIMAGE"
 # Detect version and architecture
 api_level_arch_detect
 
-[ $API -lt 21 ] && abort "! Magisk only support Android 5.0 and above"
+[ $API -lt 23 ] && abort "! Magisk only support Android 6.0 and above"
 
 ui_print "- Device platform: $ABI"
 
@@ -57,8 +57,6 @@ cd $BINDIR
 for file in lib*.so; do mv "$file" "${file:3:${#file}-6}"; done
 cd /
 cp -af $INSTALLER/lib/$ABI32/libmagisk32.so $BINDIR/magisk32 2>/dev/null
-cp -af $CHROMEDIR/. $BINDIR/chromeos
-chmod -R 755 $BINDIR
 
 # Check if system root is installed and remove
 $BOOTMODE || remove_system_su
@@ -73,6 +71,11 @@ ui_print "- Constructing environment"
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
 cp -af $BINDIR/. $COMMONDIR/. $BBBIN $MAGISKBIN
+
+# Remove files only used by the Magisk app
+rm -f $MAGISKBIN/bootctl $MAGISKBIN/main.jar \
+  $MAGISKBIN/module_installer.sh $MAGISKBIN/uninstaller.sh
+
 chmod -R 755 $MAGISKBIN
 
 # addon.d

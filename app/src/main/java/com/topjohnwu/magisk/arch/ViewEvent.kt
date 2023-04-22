@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.arch
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * Class for passing events from ViewModels to Activities/Fragments
@@ -9,18 +8,14 @@ import kotlinx.coroutines.CoroutineScope
  */
 abstract class ViewEvent
 
-abstract class ViewEventWithScope: ViewEvent() {
-    lateinit var scope: CoroutineScope
-}
-
 interface ContextExecutor {
     operator fun invoke(context: Context)
 }
 
 interface ActivityExecutor {
-    operator fun invoke(activity: BaseUIActivity<*, *>)
+    operator fun invoke(activity: UIActivity<*>)
 }
 
 interface FragmentExecutor {
-    operator fun invoke(fragment: BaseUIFragment<*, *>)
+    operator fun invoke(fragment: BaseFragment<*>)
 }

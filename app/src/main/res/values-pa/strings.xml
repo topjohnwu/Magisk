@@ -5,11 +5,9 @@
     <string name="superuser">ਸੁਪਰਯੂਜ਼ਰ</string>
     <string name="logs">ਲੋਗਜ਼</string>
     <string name="settings">ਸੈਟਿੰਗਜ਼</string>
-    <string name="refresh">ਸਥਾਨਕ ਡੇਟਾ ਨੂੰ ਤਾਜ਼ਾ ਕਰੋ</string>
     <string name="install">ਇੰਸਟਾਲ</string>
     <string name="section_home">ਹੋਮ</string>
     <string name="section_theme">ਥੀਮ</string>
-    <string name="safetynet">ਸੇਫਟੀਨੇਟ</string>
 
     <!--Home-->
     <string name="no_connection">ਕੋਈ ਸੰਪਰਕ ਉਪਲਬਧ ਨਹੀਂ ਹੈ</string>
@@ -28,7 +26,6 @@
     <string name="invalid_update_channel">ਅਵੈਧ ਅਪਡੇਟ ਚੈਨਲ</string>
     <string name="uninstall_magisk_title">ਮੈਜਿਸਕ ਨੂੰ ਅਣਇੰਸਟੌਲ ਕਰੋ</string>
     <string name="uninstall_magisk_msg">ਸਾਰੇ ਮੋਡੀਊਲ ਅਯੋਗ/ਮਿਟਾ ਦਿੱਤੇ ਜਾਣਗੇ!\n ਰੂਟ ਨੂੰ ਹਟਾਇਆ ਜਾਏਗਾ!\n ਤੁਹਾਡਾ ਡਾਟਾ ਸੰਭਾਵਤ ਤੌਰ ਤੇ ਐਨਕ੍ਰਿਪਟ ਕੀਤਾ ਗਿਆ ਹੈ ਜੇ ਪਹਿਲਾਂ ਹੀ ਨਹੀਂ!</string>
-    <string name="home_check_safetynet">ਸੇਫਟੀਨੇਟ ਦੀ ਜਾਂਚ ਕਰੋ</string>
 
     <!--Install-->
     <string name="keep_force_encryption">ਫੋਰਸ ਇਨਕ੍ਰਿਪਸ਼ਨ ਨੂੰ ਸੁਰੱਖਿਅਤ ਰੱਖੋ</string>
@@ -87,19 +84,11 @@
     <string name="target_uid">ਟੀਚਾ UID: %1$d</string>
 
     <!--SafetyNet-->
-    <string name="safetynet_api_error">ਸੇਫਟੀਨੇਟ ਏਪੀਆਈ ਗਲਤੀ</string>
-    <string name="safetynet_res_invalid">ਜਵਾਬ ਅਵੈਧ ਹੈ</string>
-    <string name="safetynet_attest_success">ਸਫਲਤਾ!</string>
-    <string name="safetynet_attest_failure">ਤਸਦੀਕ ਅਸਫਲ!</string>
-    <string name="safetynet_attest_loading">ਸਿਰਫ ਇਕ ਸਕਿੰਟ…</string>
-    <string name="safetynet_attest_restart">ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ</string>
 
     <!-- MagiskHide -->
     <string name="show_system_app">ਸਿਸਟਮ ਐਪਸ ਦਿਖਾਓ</string>
     <string name="show_os_app">OS ਐਪਲੀਕੇਸ਼ਨ ਦਿਖਾਓ</string>
     <string name="hide_filter_hint">ਨਾਮ ਦੁਆਰਾ ਫਿਲਟਰ ਕਰੋ</string>
-    <string name="hide_scroll_up">ਉੱਪਰ ਸਕ੍ਰੌਲ ਕਰੋ</string>
-    <string name="hide_filters">ਫਿਲਟਰ</string>
     <string name="hide_search">ਖੋਜੋ</string>
 
     <!--Module -->
@@ -110,15 +99,10 @@
     <string name="reboot_download">ਡਾਊਨਲੋਡ ਮੋਡ ਰੀਬੂਟ</string>
     <string name="reboot_edl">EDL ਰੀਬੂਟ</string>
     <string name="module_version_author"> %2$s ਦੇ ਦੁਆਰਾ %1$s</string>
-    <string name="module_section_pending">ਅਪਡੇਟਸ</string>
-    <string name="module_section_pending_action">ਸਾਰੇ ਅਪਡੇਟ ਕਰੋ</string>
     <string name="module_state_remove">ਹਟਾਓ</string>
     <string name="module_state_restore">ਰੀਸਟੋਰ ਕਰੋ</string>
     <string name="module_action_install_external">ਸਟੋਰੇਜ ਤੋਂ ਇੰਸਟਾਲ ਕਰੋ</string>
     <string name="update_available">ਅਪਡੇਟ ਉਪਲੱਬਧ ਹੈ</string>
-    <string name="module_installed">ਇੰਸਟਾਲਡ</string>
-    <string name="module_section_online">ਆਨਲਾਈਨ</string>
-    <string name="sorting_order">ਲੜੀਬੱਧ ਵਿਧੀ</string>
 
     <!--Settings -->
     <string name="settings_dark_mode_title">ਥੀਮ ਮੋਡ</string>
@@ -164,6 +148,8 @@
     <string name="no_biometric">ਅਸਮਰਥਿਤ ਡਿਵਾਈਸ ਜਾਂ ਕੋਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਸੈਟਿੰਗ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ</string>
     <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
     <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
+    <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>
+    <string name="settings_doh_description">ਕੁਝ ਦੇਸ਼ਾਂ ਵਿੱਚ ਚੱਲ ਰਹੇ DNS ਵਿਸ਼ਾਕਤਤਾ ਦਾ ਹੱਲ</string>
 
     <string name="multiuser_mode">ਮਲਟੀ ਯੂਜ਼ਰ ਮੋਡ</string>
     <string name="settings_owner_only">ਸਿਰਫ ਡਿਵਾਈਸ ਮਾਲਕ</string>
@@ -171,7 +157,7 @@
     <string name="settings_user_independent">ਸੁਤੰਤਰ ਉਪਭੋਗਤਾ</string>
     <string name="owner_only_summary">ਸਿਰਫ ਮਾਲਕ ਕੋਲ ਰੂਟ ਐਕਸੈਸ ਹੈ</string>
     <string name="owner_manage_summary">ਸਿਰਫ ਮਾਲਕ ਰੂਟ ਐਕਸੈਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰ ਸਕਦੇ ਹਨ ਅਤੇ ਬੇਨਤੀ ਸਿਗਨਲ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੇ ਹਨ</string>
-    <string name="user_indepenent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
+    <string name="user_independent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
 
     <string name="mount_namespace_mode">ਮਾਉਂਟ ਨੇਮਸਪੇਸ ਮੋਡ</string>
     <string name="settings_ns_global">ਗਲੋਬਲ ਨੇਮਸਪੇਸ</string>
@@ -191,12 +177,10 @@
     <!--Toasts, Dialogs-->
     <string name="yes">ਹਾਂ</string>
     <string name="no">ਨਹੀਂ</string>
-    <string name="repo_install_title">ਇੰਸਟਾਲ %1$s</string>
-    <string name="repo_install_msg">ਕੀ ਤੁਸੀਂ ਹੁਣੇ %1$s ਇੰਸਟਾਲ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?</string>
+    <string name="repo_install_title">ਇੰਸਟਾਲ %1$s %2$s(%3$d)</string>
     <string name="download">ਡਾਊਨਲੋਡ</string>
     <string name="reboot">ਰੀਬੂਟ</string>
     <string name="release_notes">ਰੀਲਿਜ਼ ਨੋਟਿਸ</string>
-    <string name="repo_cache_cleared">ਰਿਪੋ ਕੈਚੇ ਸਾਫ਼ ਕੀਤਾ</string>
     <string name="flashing">ਫਲੈਸ਼ਿੰਗ …</string>
     <string name="done">ਸਫਲ ਹੋਇਆ!</string>
     <string name="failure">ਅਸਫਲ ਹੋਇਆ</string>
@@ -206,7 +190,6 @@
     <string name="restore_img_msg">ਰਿਸਟੋਰ ਹੋ ਰਿਹਾ ਹੈ …</string>
     <string name="restore_done">रिस्टोर ਸਫਲ ਹੋਇਆ!</string>
     <string name="restore_fail">ਸਟਾਕ ਬੈਕਅਪ ਮੌਜੂਦ ਨਹੀਂ ਹੈ!</string>
-    <string name="proprietary_title">ਮਲਕੀਅਤ ਕੋਡ ਡਾਉਨਲੋਡ ਕਰੋ</string>
     <string name="setup_fail">ਸੈਟਅਪ ਅਸਫਲ ਹੋਇਆ</string>
     <string name="env_fix_title">ਵਾਧੂ ਸੈਟਅਪ ਚਾਹੀਦਾ ਹੈ</string>
     <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ …</string>

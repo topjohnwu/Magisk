@@ -9,8 +9,6 @@
 
     <!--Status Fragment-->
     <string name="invalid_update_channel">Невалиден канал за актуализации</string>
-    <string name="safetynet_api_error">Грешка в SafetyNet ППИ</string>
-    <string name="safetynet_res_invalid">Невалиден отговор</string>
 
     <!--Install Fragment-->
     <string name="keep_force_encryption">Запазване на наложеното криптиране</string>
@@ -28,7 +26,6 @@
     <!--Repo Fragment-->
     <string name="update_available">Налице е актуализация.</string>
     <string name="home_installed_version">Инсталирани</string>
-    <string name="sorting_order">Сортиране</string>
 
     <!--Log Fragment-->
     <string name="menuSaveLog">Запазване на доклад</string>
@@ -39,13 +36,11 @@
     <string name="app_changelog">Списък с промени</string>
 
     <!--Toasts, Dialogs-->
-    <string name="repo_install_title">Инсталиране на %1$s</string>
-    <string name="repo_install_msg">Желаете ли да инсталирате %1$s сега?</string>
+    <string name="repo_install_title">Инсталиране на %1$s %2$s(%3$d)</string>
     <string name="download">Изтегляне</string>
     <string name="reboot">Рестартиране</string>
     <string name="magisk_update_title">Достъпно е издание на Magisk.</string>
     <string name="release_notes">Бележки</string>
-    <string name="repo_cache_cleared">Кешът на хранилището е изчистен.</string>
     <string name="manager_download_install">Докоснете за изтегляне и инсталиране.</string>
     <string name="update_channel">Актуализации на Magisk</string>
     <string name="flashing">Инсталиране</string>
@@ -59,7 +54,6 @@
     <string name="restore_img_msg">Възстановяване…</string>
     <string name="restore_done">Възстановяването е успешно!</string>
     <string name="restore_fail">Не е налице архив на стоковия образ!</string>
-    <string name="proprietary_title">Изтегляне на патентования код</string>
     <string name="setup_fail">Първоначалната настройка е неуспешна.</string>
     <string name="env_fix_title">Изисква допълнително настройване</string>
     <string name="setup_title">Допълнително надстройване</string>
@@ -103,7 +97,7 @@
     <string name="settings_user_independent">Независими потребители</string>
     <string name="owner_only_summary">Само собственикът има руут достъп.</string>
     <string name="owner_manage_summary">Само собственикът може да управлява руут достъпа и да получава запитвания за достъп.</string>
-    <string name="user_indepenent_summary">Всеки потребител има собствени правила за руут достъп.</string>
+    <string name="user_independent_summary">Всеки потребител има собствени правила за руут достъп.</string>
 
     <string name="mount_namespace_mode">Монтиране по именни пространства</string>
     <string name="settings_ns_global">Глобално</string>

@@ -10,8 +10,8 @@
             type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem" />
 
         <variable
-            name="callback"
-            type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem.Callback" />
+            name="handler"
+            type="com.topjohnwu.magisk.ui.settings.BaseSettingsItem.Handler" />
 
     </data>
 
@@ -23,7 +23,7 @@
         android:alpha="@{item.enabled ? 1f : .5f}"
         android:clickable="@{item.enabled}"
         android:focusable="@{item.enabled}"
-        android:onClick="@{(view) -> item.onPressed(view, callback)}"
+        android:onClick="@{(view) -> item.onPressed(view, handler)}"
         tools:layout_gravity="center">
 
         <LinearLayout
@@ -81,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:checked="@{item.checked}"
                 android:focusable="@{item.enabled}"
-                android:onCheckedChanged="@{(v, c) -> item.onToggle(v, callback, c)}" />
+                android:onCheckedChanged="@{(v, c) -> item.onToggle(v, handler, c)}" />
 
         </LinearLayout>
 

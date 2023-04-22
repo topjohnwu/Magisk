@@ -7,33 +7,6 @@
 
     <style name="W.Home" />
 
-    <style name="W.Home.Card" parent="WidgetFoundation.Card">
-        <item name="android:layout_marginStart">@dimen/l1</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <style name="W.Home.Card.First">
-        <item name="android:layout_marginStart">0dp</item>
-    </style>
-
-    <style name="W.Home.Title">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">@dimen/l1</item>
-        <item name="android:paddingEnd">@dimen/l1</item>
-        <item name="android:textAppearance">@style/AppearanceFoundation.Body</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">@dimen/l_50</item>
-        <item name="android:paddingBottom">@dimen/l_50</item>
-    </style>
-
-    <style name="W.Home.Section">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:background">?colorSurface</item>
-        <item name="android:alpha">.5</item>
-    </style>
-
     <style name="W.Home.Item">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

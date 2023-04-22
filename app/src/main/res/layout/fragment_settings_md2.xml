@@ -13,21 +13,31 @@
 
     </data>
 
-    <androidx.recyclerview.widget.RecyclerView
-        adapter="@{viewModel.adapter}"
-        itemBinding="@{viewModel.itemBinding}"
-        items="@{viewModel.items}"
-        android:id="@+id/settings_list"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:focusableInTouchMode="false"
-        android:clipToPadding="false"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/internal_action_bar_size"
-        app:fitsSystemWindowsInsets="top|bottom"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:layout_marginTop="24dp"
-        tools:listitem="@layout/item_settings"
-        tools:paddingTop="@dimen/l1" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            app:items="@{viewModel.items}"
+            app:extraBindings="@{viewModel.extraBindings}"
+            android:id="@+id/settings_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusableInTouchMode="false"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/internal_action_bar_size"
+            app:fitsSystemWindowsInsets="top|bottom"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:layout_marginTop="24dp"
+            tools:listitem="@layout/item_settings"
+            tools:paddingTop="@dimen/l1" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/snackbar_container"
+            app:fitsSystemWindowsInsets="top|bottom"/>
+    </FrameLayout>
 
 </layout>

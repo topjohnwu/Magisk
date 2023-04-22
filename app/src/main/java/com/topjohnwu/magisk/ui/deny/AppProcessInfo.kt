@@ -7,10 +7,11 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.*
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
+import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.utils.currentLocale
-import com.topjohnwu.magisk.ktx.getLabel
 import java.util.*
 
 class CmdlineListItem(line: String) {
@@ -67,7 +68,8 @@ class AppProcessInfo(
                 val proc = info.processName ?: info.packageName
                 createProcess("${proc}_zygote")
             } else {
-                val proc = if (SDK_INT >= 29) "${it.getProcName()}:${it.name}" else it.getProcName()
+                val proc = if (SDK_INT >= Build.VERSION_CODES.Q)
+                    "${it.getProcName()}:${it.name}" else it.getProcName()
                 createProcess(proc, ISOLATED_MAGIC)
             }
         } else {
