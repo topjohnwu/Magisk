@@ -394,6 +394,14 @@ static void daemon_entry() {
         }
     }
 
+    // We still need the original app_process if magiskd restarts with Zygisk enabled
+    auto mirror_dir = MAGISKTMP + "/" MIRRDIR;
+    if (access(mirror_dir.data(), F_OK) == 0) {
+        auto app_process = mirror_dir + "/system/bin/app_process";
+        app_process_32 = open((app_process + "32").data(), O_RDONLY | O_CLOEXEC);
+        app_process_64 = open((app_process + "64").data(), O_RDONLY | O_CLOEXEC);
+    }
+
     sockaddr_un sun{};
     socklen_t len = setup_sockaddr(&sun, MAIN_SOCKET);
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
