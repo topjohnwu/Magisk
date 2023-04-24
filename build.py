@@ -19,7 +19,7 @@ def error(str):
     if no_color:
         print(f'\n! {str}\n')
     else:
-        print(f'\n\033[41m{str}\033[0m\n')
+        print(f'\n\033[41;30m{str}\033[0m\n')
     sys.exit(1)
 
 
@@ -27,7 +27,7 @@ def header(str):
     if no_color:
         print(f'\n{str}\n')
     else:
-        print(f'\n\033[44m{str}\033[0m\n')
+        print(f'\n\033[44;30m{str}\033[0m\n')
 
 
 def vprint(str):
@@ -38,8 +38,8 @@ def vprint(str):
 is_windows = os.name == 'nt'
 EXE_EXT = '.exe' if is_windows else ''
 
-no_color = 'CI' in os.environ and os.environ['CI'] == 'true'
-if not no_color and is_windows:
+no_color = False
+if is_windows:
     try:
         import colorama
         colorama.init()
