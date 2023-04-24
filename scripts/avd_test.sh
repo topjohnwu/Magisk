@@ -19,7 +19,7 @@ type='google_apis'
 api_list='23 26 28 29 33'
 
 cleanup() {
-  echo -e '\n\033[41m! An error occurred\033[0m\n'
+  echo -e '\n\033[41;30m! An error occurred\033[0m\n'
   pkill -INT -P $$
   wait
 
@@ -60,7 +60,7 @@ run_test() {
   local pid
 
   # Setup emulator
-  echo -e "\n\033[44m* Testing $pkg\033[0m\n"
+  echo -e "\n\033[44;30m* Testing $pkg\033[0m\n"
   "$sdk" $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
 
