@@ -92,11 +92,6 @@ export -f wait_for_boot
 
 set -xe
 
-if grep -q 'ENABLE_AVD_HACK 0' native/src/init/init.hpp; then
-  echo -e '\n\033[41m! Please patch init.hpp\033[0m\n'
-  exit 1
-fi
-
 case $(uname -m) in
   'arm64'|'aarch64')
     arch=arm64-v8a

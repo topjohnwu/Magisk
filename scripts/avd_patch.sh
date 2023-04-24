@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #####################################################################
 #   AVD MagiskInit Setup
 #####################################################################
@@ -12,10 +11,6 @@
 # full integration test of magiskinit under several circumstances.
 # After patching ramdisk.img, close the emulator, then select
 # "Cold Boot Now" in AVD Manager to force a full reboot.
-#
-# P.S. If running against the API 28 image, modify init.hpp and set
-# ENABLE_AVD_HACK to 1 to enable special hacks designed specifically
-# for this use case.
 #
 #####################################################################
 # AVD Init Configurations:
