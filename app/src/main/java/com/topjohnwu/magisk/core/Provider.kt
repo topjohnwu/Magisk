@@ -16,7 +16,7 @@ class Provider : BaseProvider() {
 
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
         return when (uri.encodedPath ?: return null) {
-            "/prefs_file" -> ParcelFileDescriptor.open(Config.prefsFile, MODE_READ_ONLY)
+            "/prefs_file" -> ParcelFileDescriptor.open(Config.getPrefsFile(), MODE_READ_ONLY)
             else -> super.openFile(uri, mode)
         }
     }
