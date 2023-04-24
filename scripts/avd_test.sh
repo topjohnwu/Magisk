@@ -3,7 +3,7 @@
 emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-emu_args='-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim'
+emu_args='-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -show-kernel'
 
 # Should be either 'google_apis' or 'default'
 type='google_apis'
@@ -33,7 +33,7 @@ cleanup() {
 
 wait_for_boot() {
   while true; do
-    if [ -n "$(adb shell getprop sys.boot_completed)" ]; then
+    if [ "stopped" = "$(adb exec-out getprop init.svc.bootanim)" ]; then
       break
     fi
     sleep 2
@@ -68,7 +68,8 @@ run_test() {
   restore_avd
   "$emu" @test $emu_args &
   pid=$!
-  timeout 60 adb wait-for-device
+  timeout 180 bash -c wait_for_boot
+
   ./build.py avd_patch -s "$ramdisk"
   kill -INT $pid
   wait $pid
@@ -76,8 +77,7 @@ run_test() {
   # Test if it boots properly
   "$emu" @test $emu_args &
   pid=$!
-  timeout 60 adb wait-for-device
-  timeout 60 bash -c wait_for_boot
+  timeout 180 bash -c wait_for_boot
 
   adb shell magisk -v
   kill -INT $pid
@@ -101,8 +101,8 @@ case $(uname -m) in
     ;;
 esac
 
-# Build our executables
-./build.py all
+yes | "$sdk" --licenses
+"$sdk" --channel=3 --update
 
 for api in $api_list; do
   set_api_env $api

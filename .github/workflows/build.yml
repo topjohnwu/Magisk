@@ -106,3 +106,9 @@ jobs:
         with:
           name: ${{ github.sha }}-symbols
           path: app/build/outputs
+
+      - name: AVD test
+        if:  runner.os == 'macOS'
+        run: |
+          brew install coreutils
+          scripts/avd_test.sh
