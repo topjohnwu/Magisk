@@ -1,22 +1,19 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
-import android.util.Xml
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.repository.BoolDBPropertyNoWrite
 import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.ui.theme.Theme
 import kotlinx.coroutines.GlobalScope
-import org.xmlpull.v1.XmlPullParser
 import java.io.File
-import java.io.InputStream
 
 object Config : PreferenceConfig, DBConfig {
 
@@ -25,13 +22,12 @@ object Config : PreferenceConfig, DBConfig {
     override val context get() = ServiceLocator.deContext
     override val coroutineScope get() = GlobalScope
 
-    @get:SuppressLint("ApplySharedPref")
-    val prefsFile: File get() {
-        // Flush prefs to disk
-        prefs.edit().apply {
-            remove(Key.ASKED_HOME)
-        }.commit()
-        return File("${context.filesDir.parent}/shared_prefs", "${fileName}.xml")
+    private val prefsFile = File("${context.filesDir.parent}/shared_prefs", "${fileName}.xml")
+
+    @SuppressLint("ApplySharedPref")
+    fun getPrefsFile(): File {
+        prefs.edit().remove(Key.ASKED_HOME).commit()
+        return prefsFile
     }
 
     object Key {
@@ -172,9 +168,8 @@ object Config : PreferenceConfig, DBConfig {
     fun load(pkg: String?) {
         // Only try to load prefs when fresh install and a previous package name is set
         if (pkg != null && prefs.all.isEmpty()) runCatching {
-            context.contentResolver.openInputStream(Provider.preferencesUri(pkg))?.use {
-                prefs.edit { parsePrefs(it) }
-            }
+            context.contentResolver.openInputStream(Provider.preferencesUri(pkg))?.writeTo(prefsFile)
+            return
         }
 
         prefs.edit {
@@ -187,54 +182,6 @@ object Config : PreferenceConfig, DBConfig {
                     it.toInt() > Value.DEBUG_CHANNEL ||
                     it.toInt() < Value.DEFAULT_CHANNEL) {
                     putString(Key.UPDATE_CHANNEL, defaultChannel.toString())
-                }
-            }
-        }
-    }
-
-    private fun SharedPreferences.Editor.parsePrefs(input: InputStream) {
-        runCatching {
-            val parser = Xml.newPullParser()
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
-            parser.setInput(input, "UTF-8")
-            parser.nextTag()
-            parser.require(XmlPullParser.START_TAG, null, "map")
-            while (parser.next() != XmlPullParser.END_TAG) {
-                if (parser.eventType != XmlPullParser.START_TAG)
-                    continue
-                val key: String = parser.getAttributeValue(null, "name")
-                fun value() = parser.getAttributeValue(null, "value")!!
-                when (parser.name) {
-                    "string" -> {
-                        parser.require(XmlPullParser.START_TAG, null, "string")
-                        putString(key, parser.nextText())
-                        parser.require(XmlPullParser.END_TAG, null, "string")
-                    }
-                    "boolean" -> {
-                        parser.require(XmlPullParser.START_TAG, null, "boolean")
-                        putBoolean(key, value().toBoolean())
-                        parser.nextTag()
-                        parser.require(XmlPullParser.END_TAG, null, "boolean")
-                    }
-                    "int" -> {
-                        parser.require(XmlPullParser.START_TAG, null, "int")
-                        putInt(key, value().toInt())
-                        parser.nextTag()
-                        parser.require(XmlPullParser.END_TAG, null, "int")
-                    }
-                    "long" -> {
-                        parser.require(XmlPullParser.START_TAG, null, "long")
-                        putLong(key, value().toLong())
-                        parser.nextTag()
-                        parser.require(XmlPullParser.END_TAG, null, "long")
-                    }
-                    "float" -> {
-                        parser.require(XmlPullParser.START_TAG, null, "int")
-                        putFloat(key, value().toFloat())
-                        parser.nextTag()
-                        parser.require(XmlPullParser.END_TAG, null, "int")
-                    }
-                    else -> parser.next()
                 }
             }
         }
