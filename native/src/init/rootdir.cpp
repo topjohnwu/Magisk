@@ -244,7 +244,6 @@ void MagiskInit::patch_ro_root() {
 
     xrename("overlay.d", ROOTOVL);
 
-#if ENABLE_AVD_HACK
     // Handle avd hack
     if (avd_hack) {
         int src = xopen("/init", O_RDONLY | O_CLOEXEC);
@@ -257,7 +256,6 @@ void MagiskInit::patch_ro_root() {
         close(src);
         close(dest);
     }
-#endif
 
     load_overlay_rc(ROOTOVL);
     if (access(ROOTOVL "/sbin", F_OK) == 0) {
