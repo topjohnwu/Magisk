@@ -59,10 +59,6 @@ private:
     bool hijack_sepolicy();
     void setup_tmp(const char *path);
 protected:
-    // When this boolean is set, this means we are currently
-    // running magiskinit on legacy SAR AVD emulator
-    bool avd_hack = false;
-
     void patch_rw_root();
     void patch_ro_root();
 public:

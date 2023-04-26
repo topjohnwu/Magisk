@@ -23,6 +23,10 @@ struct devinfo {
 
 static vector<devinfo> dev_list;
 
+// When this boolean is set, this means we are currently
+// running magiskinit on legacy SAR AVD emulator
+bool avd_hack = false;
+
 static void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
     dev->devpath[0] = '\0';
