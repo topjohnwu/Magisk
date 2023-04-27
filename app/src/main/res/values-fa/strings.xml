@@ -112,9 +112,9 @@
     <string name="settings_check_update_title">چک کردن بروز رسانی ها</string>
     <string name="settings_check_update_summary"> برسی کردن به صورت دوره ای برای به روزرسانی در پس زمینه</string>
     <string name="settings_update_channel_title">کانال بروزرسانی</string>
-    <string name="settings_update_stable">Stable</string>
-    <string name="settings_update_beta">Beta</string>
-    <string name="settings_update_custom">Custom Channel</string>
+    <string name="settings_update_stable">پایدار</string>
+    <string name="settings_update_beta">آزمایشی</string>
+    <string name="settings_update_custom">شخصی سازی شده</string>
     <string name="settings_update_custom_msg">اضافه کردن یک URL سفارشی</string>
     <string name="settings_hosts_title">نصب بدون حذف یا تغییر در فایل ها</string>
     <string name="settings_hosts_summary">نصب بدون حذف یا تغییر در فایل ها رای ساپورت از برنامه های Adblock</string>
@@ -153,16 +153,16 @@
     <string name="user_independent_summary">هر کاربر قوانین روت جداگانه خود را دارد</string>
 
     <string name="mount_namespace_mode">نصب کردن Namespace Mode</string>
-    <string name="settings_ns_global">Global Namespace</string>
-    <string name="settings_ns_requester">Inherit Namespace</string>
-    <string name="settings_ns_isolate">Isolated Namespace</string>
+    <string name="settings_ns_global">سراسری Namespace</string>
+    <string name="settings_ns_requester">وراثتی Namespace</string>
+    <string name="settings_ns_isolate">منزوی Namespace</string>
     <string name="global_summary">همه سشن های روت از global namespace نصب شده استفاده میکنند</string>
     <string name="requester_summary">سشن های روت namespace دراخواست کننده را به ارث می برند</string>
     <string name="isolate_summary">هر سشن روت namespace جداگانه خود را دارد</string>
 
     <!--Notifications-->
     <string name="update_channel">Magisk بروزرسانی های</string>
-    <string name="progress_channel">Progress اعلان</string>
+    <string name="progress_channel">اعلان پیشرفت</string>
     <string name="download_complete">دانلود کامل شد</string>
     <string name="download_file_error">خطا در دانلود فایل</string>
     <string name="magisk_update_title">بروزرسانی Magisk در دسترس است!</string>
