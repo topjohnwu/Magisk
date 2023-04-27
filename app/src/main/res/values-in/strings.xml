@@ -20,7 +20,7 @@
     <string name="home_package">Paket</string>
     <string name="home_app_title">Aplikasi</string>
 
-    <string name="home_notice_content">Unduh Magisk HANYA dari halaman GitHub resmi kami. File dari sumber yang tidak dikenal bisa berbahaya!</string>
+    <string name="home_notice_content">Unduh Magisk HANYA dari halaman GitHub resmi kami. File dari sumber yang tidak dikenal dapat berbahaya!</string>
     <string name="home_support_title">Dukung kami</string>
     <string name="home_follow_title">Ikuti Kami</string>
     <string name="home_item_source">Sumber</string>
@@ -113,6 +113,8 @@
     <string name="suspend_text_zygisk">Modul ditangguhkan karena %1$s tidak diaktifkan</string>
     <string name="zygisk_module_unloaded">Modul Zygisk tidak dimuat karena ketidakcocokan</string>
     <string name="module_empty">Tidak ada modul terpasang</string>
+    <string name="confirm_install">Pasang modul %1$s?</string>
+    <string name="confirm_install_title">Konfirmasi Pasang</string>
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Mode tema</string>
@@ -219,6 +221,7 @@
     <string name="setup_fail">Penyiapan gagal</string>
     <string name="env_fix_title">Perlu penyiapan tambahan</string>
     <string name="env_fix_msg">Perangkat Anda membutuhkan pengaturan tambahan untuk Magisk agar berfungsi dengan benar. Apakah Anda ingin melanjutkan dan Menyalakan ulang?</string>
+    <string name="env_full_fix_msg">Perangkat Anda membutuhkan pemasangan ulang Magisk agar berfungsi dengan baik. Silakan pasang ulang Magisk dalam aplikasi, mode recovery tidak dapat memperoleh info perangkat yang benar.</string>
     <string name="setup_msg">Memproses penyiapan lingkungan…</string>
     <string name="authenticate">Autentikasi</string>
     <string name="unsupport_magisk_title">Versi Magisk tidak didukung</string>
