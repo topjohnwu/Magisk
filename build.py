@@ -257,8 +257,7 @@ def run_cargo_build(args):
         write_if_diff(op.join(native_gen_path, f'{p}-rs.hpp'), text)
 
     # Start building the actual build commands
-    cmds = [cargo, 'build', '-Z', 'build-std=std,panic_abort',
-           '-Z', 'build-std-features=panic_immediate_abort']
+    cmds = [cargo, 'build']
     for target in targets:
         cmds.append('-p')
         cmds.append(target)
