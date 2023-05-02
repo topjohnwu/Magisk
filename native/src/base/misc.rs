@@ -3,6 +3,13 @@ use std::ffi::CStr;
 use std::fmt::Arguments;
 use std::{fmt, slice};
 
+pub fn copy_str(dest: &mut [u8], src: &[u8]) -> usize {
+    let len = min(src.len(), dest.len() - 1);
+    dest[..len].copy_from_slice(&src[..len]);
+    dest[len] = b'\0';
+    len
+}
+
 struct BufFmtWriter<'a> {
     buf: &'a mut [u8],
     used: usize,
@@ -21,12 +28,7 @@ impl<'a> fmt::Write for BufFmtWriter<'a> {
             // Silent truncate
             return Ok(());
         }
-        let remain = &mut self.buf[self.used..];
-        let s_bytes = s.as_bytes();
-        let copied = min(s_bytes.len(), remain.len() - 1);
-        remain[..copied].copy_from_slice(&s_bytes[..copied]);
-        self.used += copied;
-        self.buf[self.used] = b'\0';
+        self.used += copy_str(&mut self.buf[self.used..], s.as_bytes());
         // Silent truncate
         Ok(())
     }
@@ -104,6 +106,13 @@ macro_rules! cstr {
         const LEN: usize = $crate::ToCStr($s).eval_len();
         const BUF: [u8; LEN] = $crate::ToCStr($s).eval_bytes();
         unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&BUF) }
+    }};
+}
+
+#[macro_export]
+macro_rules! str_ptr {
+    ($s:literal) => {{
+        cstr!($s).as_ptr()
     }};
 }
 

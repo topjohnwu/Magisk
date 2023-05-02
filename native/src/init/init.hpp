@@ -28,7 +28,6 @@ int magisk_proxy_main(int argc, char *argv[]);
 bool unxz(int fd, const uint8_t *buf, size_t size);
 void load_kernel_info(BootConfig *config);
 bool check_two_stage();
-void setup_klog();
 const char *backup_init();
 void restore_ramdisk_init();
 int dump_preload(const char *path, mode_t mode);
@@ -87,7 +86,6 @@ private:
     bool prepare();
 public:
     SecondStageInit(char *argv[]) : MagiskInit(argv) {
-        setup_klog();
         LOGD("%s\n", __FUNCTION__);
     };
 

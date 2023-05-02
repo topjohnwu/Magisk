@@ -117,55 +117,6 @@ static bool check_key_combo() {
     return false;
 }
 
-static FILE *kmsg;
-extern "C" void klog_write(const char *msg, int len) {
-    fprintf(kmsg, "%.*s", len, msg);
-}
-
-static int klog_with_rs(LogLevel level, const char *fmt, va_list ap) {
-    char buf[4096];
-    strscpy(buf, "magiskinit: ", sizeof(buf));
-    int len = vssprintf(buf + 12, sizeof(buf) - 12, fmt, ap) + 12;
-    log_with_rs(level, rust::Str(buf, len));
-    return len;
-}
-
-void setup_klog() {
-    // Shut down first 3 fds
-    int fd;
-    if (access("/dev/null", W_OK) == 0) {
-        fd = xopen("/dev/null", O_RDWR | O_CLOEXEC);
-    } else {
-        mknod("/null", S_IFCHR | 0666, makedev(1, 3));
-        fd = xopen("/null", O_RDWR | O_CLOEXEC);
-        unlink("/null");
-    }
-    xdup3(fd, STDIN_FILENO, O_CLOEXEC);
-    xdup3(fd, STDOUT_FILENO, O_CLOEXEC);
-    xdup3(fd, STDERR_FILENO, O_CLOEXEC);
-    if (fd > STDERR_FILENO)
-        close(fd);
-
-    if (access("/dev/kmsg", W_OK) == 0) {
-        fd = xopen("/dev/kmsg", O_WRONLY | O_CLOEXEC);
-    } else {
-        mknod("/kmsg", S_IFCHR | 0666, makedev(1, 11));
-        fd = xopen("/kmsg", O_WRONLY | O_CLOEXEC);
-        unlink("/kmsg");
-    }
-
-    kmsg = fdopen(fd, "w");
-    setbuf(kmsg, nullptr);
-    rust::setup_klog();
-    cpp_logger = klog_with_rs;
-
-    // Disable kmsg rate limiting
-    if (FILE *rate = fopen("/proc/sys/kernel/printk_devkmsg", "w")) {
-        fprintf(rate, "on\n");
-        fclose(rate);
-    }
-}
-
 void BootConfig::set(const kv_pairs &kv) {
     for (const auto &[key, value] : kv) {
         if (key == "androidboot.slot_suffix") {
@@ -231,7 +182,7 @@ void load_kernel_info(BootConfig *config) {
     mount_list.emplace_back("/sys");
 
     // Log to kernel
-    setup_klog();
+    rust::setup_klog();
 
     config->set(parse_cmdline(full_read("/proc/cmdline")));
     config->set(parse_bootconfig(full_read("/proc/bootconfig")));

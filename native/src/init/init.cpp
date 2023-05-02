@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
     BootConfig config{};
 
     if (argc > 1 && argv[1] == "selinux_setup"sv) {
+        rust::setup_klog();
         init = new SecondStageInit(argv);
     } else {
         // This will also mount /sys and /proc

@@ -349,7 +349,7 @@ void MagiskInit::patch_rw_root() {
 }
 
 int magisk_proxy_main(int argc, char *argv[]) {
-    setup_klog();
+    rust::setup_klog();
     LOGD("%s\n", __FUNCTION__);
 
     // Mount rootfs as rw to do post-init rootfs patches

@@ -53,20 +53,20 @@ pub fn __xopen_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd>
 #[macro_export]
 macro_rules! open_fd {
     ($path:expr, $flags:expr) => {
-        crate::__open_fd_impl($path, $flags, 0)
+        $crate::__open_fd_impl($path, $flags, 0)
     };
     ($path:expr, $flags:expr, $mode:expr) => {
-        crate::__open_fd_impl($path, $flags, $mode)
+        $crate::__open_fd_impl($path, $flags, $mode)
     };
 }
 
 #[macro_export]
 macro_rules! xopen_fd {
     ($path:expr, $flags:expr) => {
-        crate::__xopen_fd_impl($path, $flags, 0)
+        $crate::__xopen_fd_impl($path, $flags, 0)
     };
     ($path:expr, $flags:expr, $mode:expr) => {
-        crate::__xopen_fd_impl($path, $flags, $mode)
+        $crate::__xopen_fd_impl($path, $flags, $mode)
     };
 }
 
