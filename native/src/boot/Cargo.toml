@@ -7,6 +7,9 @@ edition = "2021"
 crate-type = ["staticlib"]
 path = "lib.rs"
 
+[build-dependencies]
+protobuf-codegen = "3.2.0"
+
 [dependencies]
 base = { path = "../base" }
 cxx = { path = "../external/cxx-rs" }
