@@ -1,7 +1,8 @@
+use std::cmp::min;
 use std::ffi::CStr;
 use std::fs::File;
 use std::io;
-use std::io::BufRead;
+use std::io::{BufRead, Write};
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::path::Path;
 
@@ -139,4 +140,20 @@ pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
 pub fn read_lines<P: AsRef<Path>>(path: P) -> io::Result<io::Lines<io::BufReader<File>>> {
     let file = File::open(path)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+pub trait WriteExt {
+    fn write_zeros(&mut self, len: usize) -> io::Result<()>;
+}
+
+impl<T: Write> WriteExt for T {
+    fn write_zeros(&mut self, mut len: usize) -> io::Result<()> {
+        let mut buf = [0 as u8; 4096];
+        while len > 0 {
+            let l = min(buf.len(), len);
+            self.write_all(&mut buf[..l])?;
+            len -= l;
+        }
+        Ok(())
+    }
 }
