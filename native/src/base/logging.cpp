@@ -18,8 +18,6 @@ static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     return ret;
 }
 
-int (*cpp_logger)(LogLevel level, const char *fmt, va_list ap) = fmt_and_log_with_rs;
-
 // Used to override external C library logging
 extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...) {
     LogLevel level;
@@ -52,17 +50,16 @@ extern "C" int magisk_log_print(int prio, const char *tag, const char *fmt, ...)
     }
     va_list argv;
     va_start(argv, fmt);
-    int ret = cpp_logger(level, fmt_buf, argv);
+    int ret = fmt_and_log_with_rs(level, fmt_buf, argv);
     va_end(argv);
     return ret;
 }
 
-#define LOG_BODY(level) { \
-    va_list argv;        \
-    va_start(argv, fmt); \
-    cpp_logger(LogLevel::level, fmt, argv); \
-    va_end(argv);        \
-}
+#define LOG_BODY(level)   \
+    va_list argv;         \
+    va_start(argv, fmt);  \
+    fmt_and_log_with_rs(LogLevel::level, fmt, argv); \
+    va_end(argv);         \
 
 // LTO will optimize out the NOP function
 #if MAGISK_DEBUG
@@ -76,5 +73,5 @@ void LOGE(const char *fmt, ...) { LOG_BODY(Error) }
 
 // Export raw symbol to fortify compat
 extern "C" void __vloge(const char* fmt, va_list ap) {
-    cpp_logger(LogLevel::Error, fmt, ap);
+    fmt_and_log_with_rs(LogLevel::Error, fmt, ap);
 }
