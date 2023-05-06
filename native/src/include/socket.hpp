@@ -10,7 +10,6 @@ struct sock_cred : public ucred {
     std::string context;
 };
 
-socklen_t setup_sockaddr(sockaddr_un *sun, const char *name);
 bool get_client_cred(int fd, sock_cred *cred);
 std::vector<int> recv_fds(int sockfd);
 int recv_fd(int sockfd);
