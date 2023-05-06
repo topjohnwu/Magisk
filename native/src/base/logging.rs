@@ -1,4 +1,4 @@
-use std::fmt::Arguments;
+use std::fmt::{Arguments, Display};
 use std::io::{stderr, stdout, Write};
 use std::process::exit;
 
@@ -154,4 +154,35 @@ macro_rules! debug {
 #[macro_export]
 macro_rules! debug {
     ($($args:tt)+) => {};
+}
+
+pub trait ResultExt {
+    fn ok_or_log(&self);
+    fn ok_or_msg(&self, args: Arguments);
+    fn log_on_error(&self) -> &Self;
+    fn msg_on_error(&self, args: Arguments) -> &Self;
+}
+
+impl<R, E: Display> ResultExt for Result<R, E> {
+    fn ok_or_log(&self) {
+        if let Err(e) = self {
+            error!("{}", e);
+        }
+    }
+
+    fn ok_or_msg(&self, args: Arguments) {
+        if let Err(e) = self {
+            error!("{}: {}", args, e);
+        }
+    }
+
+    fn log_on_error(&self) -> &Self {
+        self.ok_or_log();
+        self
+    }
+
+    fn msg_on_error(&self, args: Arguments) -> &Self {
+        self.ok_or_msg(args);
+        self
+    }
 }

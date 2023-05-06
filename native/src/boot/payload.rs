@@ -7,8 +7,8 @@ use byteorder::{BigEndian, ReadBytesExt};
 use protobuf::{EnumFull, Message};
 
 use base::libc::c_char;
-use base::WriteExt;
-use base::{error, ptr_to_str};
+use base::ptr_to_str;
+use base::{ResultExt, WriteExt};
 
 use crate::ffi;
 use crate::update_metadata::install_operation::Type;
@@ -148,11 +148,7 @@ fn do_extract_boot_from_payload(in_path: &str, out_path: &str) -> io::Result<()>
 pub fn extract_boot_from_payload(in_path: *const c_char, out_path: *const c_char) -> bool {
     let in_path = ptr_to_str(in_path);
     let out_path = ptr_to_str(out_path);
-    match do_extract_boot_from_payload(in_path, out_path) {
-        Ok(_) => true,
-        Err(err) => {
-            error!("Failed to extract boot from payload: {}", err);
-            false
-        }
-    }
+    do_extract_boot_from_payload(in_path, out_path)
+        .msg_on_error(format_args!("Failed to extract boot from payload"))
+        .is_ok()
 }
