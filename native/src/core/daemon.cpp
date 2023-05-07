@@ -398,7 +398,7 @@ static void daemon_entry() {
 
     fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
-    strcpy(addr.sun_path, (MAGISKTMP + "/" MAIN_SOCKET).data());
+    strcpy((MAGISKTMP + "/" MAIN_SOCKET).data(), addr.sun_path);
     unlink(addr.sun_path);
     if (xbind(fd, (sockaddr *) &addr, sizeof(addr)))
         exit(1);
@@ -427,7 +427,7 @@ int connect_daemon(int req, bool create) {
             tmp = info.target;
         }
     }
-    strcpy(addr.sun_path, (tmp + "/" MAIN_SOCKET).data());
+    strcpy((tmp + "/" MAIN_SOCKET).data(), addr.sun_path);
     if (connect(fd, (sockaddr *) &addr, sizeof(addr))) {
         if (!create || getuid() != AID_ROOT) {
             LOGE("No daemon is currently running!\n");
