@@ -207,6 +207,7 @@ public:
             xsymlink("./magiskpolicy", dest.data());
         }
         create_and_mount("magisk", src);
+        xmount(nullptr, node_path().data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
     }
 };
 
