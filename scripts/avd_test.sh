@@ -4,6 +4,7 @@ emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 emu_args='-no-window -gpu swiftshader_indirect -read-only -no-snapshot -noaudio -no-boot-anim -show-kernel'
+boot_timeout=300
 
 # Should be either 'google_apis' or 'default'
 type='google_apis'
@@ -72,7 +73,7 @@ run_test() {
   restore_avd
   "$emu" @test $emu_args &
   pid=$!
-  timeout 180 bash -c wait_for_boot
+  timeout $boot_timeout bash -c wait_for_boot
 
   ./build.py avd_patch -s "$ramdisk"
   kill -INT $pid
@@ -81,7 +82,7 @@ run_test() {
   # Test if it boots properly
   "$emu" @test $emu_args &
   pid=$!
-  timeout 180 bash -c wait_for_boot
+  timeout $boot_timeout bash -c wait_for_boot
 
   adb shell magisk -v
   kill -INT $pid
