@@ -130,7 +130,7 @@ uint64_t parse_uint64_hex(std::string_view s);
 int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
-int new_daemon_thread(thread_entry entry, void *arg = nullptr);
+extern "C" int new_daemon_thread(thread_entry entry, void *arg = nullptr);
 
 static inline bool str_contains(std::string_view s, std::string_view ss) {
     return s.find(ss) != std::string::npos;

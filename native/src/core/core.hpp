@@ -9,8 +9,6 @@ extern std::atomic<ino_t> pkg_xml_ino;
 std::string find_preinit_device();
 void unlock_blocks();
 void reboot();
-void start_log_daemon();
-void setup_logfile(bool reset);
 std::string read_certificate(int fd, int version = -1);
 
 // Module stuffs

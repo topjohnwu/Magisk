@@ -373,7 +373,7 @@ static void post_fs_data() {
     if (!check_data())
         return;
 
-    setup_logfile(true);
+    rust::get_magiskd().setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
 
@@ -413,7 +413,7 @@ early_abort:
 }
 
 static void late_start() {
-    setup_logfile(false);
+    rust::get_magiskd().setup_logfile();
 
     LOGI("** late_start service mode running\n");
 
@@ -425,7 +425,7 @@ static void late_start() {
 
 static void boot_complete() {
     boot_state |= FLAG_BOOT_COMPLETE;
-    setup_logfile(false);
+    rust::get_magiskd().setup_logfile();
 
     LOGI("** boot-complete triggered\n");
 

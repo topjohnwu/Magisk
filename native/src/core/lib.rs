@@ -1,6 +1,8 @@
 pub use base;
+use daemon::*;
 use logging::*;
 
+mod daemon;
 mod logging;
 
 #[cxx::bridge]
@@ -10,6 +12,20 @@ pub mod ffi {
         fn android_logging();
         fn magisk_logging();
         fn zygisk_logging();
+    }
+}
+
+#[cxx::bridge(namespace = "rust")]
+pub mod ffi2 {
+    extern "Rust" {
+        fn daemon_entry();
+        fn zygisk_entry();
+
+        type MagiskD;
+        fn get_magiskd() -> &'static MagiskD;
+        fn get_log_pipe(self: &MagiskD) -> i32;
+        fn close_log_pipe(self: &MagiskD);
+        fn setup_logfile(self: &MagiskD);
     }
 }
 

@@ -186,7 +186,7 @@ static void handle_request_sync(int client, int code) {
         write_string(client, MAGISKTMP.data());
         break;
     case MainRequest::START_DAEMON:
-        setup_logfile(true);
+        rust::get_magiskd().setup_logfile();
         break;
     case MainRequest::STOP_DAEMON:
         denylist_handler(-1, nullptr);
@@ -298,7 +298,7 @@ static void switch_cgroup(const char *cgroup, int pid) {
 }
 
 static void daemon_entry() {
-    magisk_logging();
+    android_logging();
 
     // Block all signals
     sigset_t block_set;
@@ -321,7 +321,7 @@ static void daemon_entry() {
     setsid();
     setcon(MAGISK_PROC_CON);
 
-    start_log_daemon();
+    rust::daemon_entry();
 
     LOGI(NAME_WITH_VER(Magisk) " daemon started\n");
 

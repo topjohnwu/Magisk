@@ -83,10 +83,6 @@ void clear_poll();
 // Thread pool
 void exec_task(std::function<void()> &&task);
 
-// Logging
-extern std::atomic<int> logd_fd;
-extern "C" void magisk_log_write(int prio, const char *msg, int len);
-
 // Daemon handlers
 void boot_stage_handler(int client, int code);
 void denylist_handler(int client, const sock_cred *cred);

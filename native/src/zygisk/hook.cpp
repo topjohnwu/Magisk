@@ -20,6 +20,8 @@ using namespace std;
 using jni_hook::hash_map;
 using jni_hook::tree_map;
 using xstring = jni_hook::string;
+using rust::MagiskD;
+using rust::get_magiskd;
 
 // Extreme verbose logging
 //#define ZLOGV(...) ZLOGD(__VA_ARGS__)
@@ -67,6 +69,7 @@ struct HookContext {
         AppSpecializeArgs_v3 *app;
         ServerSpecializeArgs_v1 *server;
     } args;
+    const MagiskD &magiskd;
 
     const char *process;
     list<ZygiskModule> modules;
@@ -94,7 +97,7 @@ struct HookContext {
     vector<IgnoreInfo> ignore_info;
 
     HookContext(JNIEnv *env, void *args) :
-    env(env), args{args}, process(nullptr), pid(-1), info_flags(0),
+    env(env), args{args}, magiskd(get_magiskd()), process(nullptr), pid(-1), info_flags(0),
     hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {
         static bool restored_env = false;
         if (!restored_env) {
@@ -171,9 +174,9 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
 DCL_HOOK_FUNC(void, android_log_close) {
     if (g_ctx == nullptr) {
         // Happens during un-managed fork like nativeForkApp, nativeForkUsap
-        close(logd_fd.exchange(-1));
+        get_magiskd().close_log_pipe();
     } else if (!g_ctx->flags[SKIP_FD_SANITIZATION]) {
-        close(logd_fd.exchange(-1));
+        g_ctx->magiskd.close_log_pipe();
         if (g_ctx->is_child()) {
             // Switch to plain old android logging because we cannot talk
             // to magiskd to fetch our log pipe afterwards anyways.
@@ -484,6 +487,7 @@ void HookContext::sanitize_fds() {
     int dfd = dirfd(dir.get());
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         int fd = parse_int(entry->d_name);
+        int logd_fd = magiskd.get_log_pipe();
         if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd && fd != logd_fd) {
             close(fd);
         }
@@ -570,7 +574,7 @@ void HookContext::app_specialize_post() {
 
     // Cleanups
     env->ReleaseStringUTFChars(args.app->nice_name, process);
-    close(logd_fd.exchange(-1));
+    magiskd.close_log_pipe();
     android_logging();
 }
 
@@ -690,8 +694,11 @@ void HookContext::nativeForkAndSpecialize_pre() {
         // if fds_to_ignore does not exist and there's no FileDescriptorTable::Create,
         // we can skip fd sanitization
         flags[SKIP_FD_SANITIZATION] = !dlsym(RTLD_DEFAULT, "_ZN19FileDescriptorTable6CreateEv");
-    } else if (logd_fd >= 0) {
-        exempted_fds.push_back(logd_fd);
+    } else {
+        int logd_fd = magiskd.get_log_pipe();
+        if (logd_fd >= 0) {
+            exempted_fds.push_back(logd_fd);
+        }
     }
 
     fork_pre();
