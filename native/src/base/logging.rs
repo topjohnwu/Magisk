@@ -62,12 +62,12 @@ pub fn set_log_level_state(level: LogLevel, enabled: bool) {
     }
 }
 
-pub fn log_with_rs(level: LogLevel, msg: &str) {
+pub fn log_with_rs(level: LogLevel, msg: &[u8]) {
     let logger = unsafe { LOGGER };
     if (logger.flags & level.to_disable_flag()) != 0 {
         return;
     }
-    (logger.write)(level, msg.as_bytes());
+    (logger.write)(level, msg);
     if level == LogLevel::Error && (logger.flags & LogFlag::ExitOnError) != 0 {
         exit(1);
     }

@@ -14,7 +14,7 @@ using namespace std;
 static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     char buf[4096];
     int ret = vssprintf(buf, sizeof(buf), fmt, ap);
-    log_with_rs(level, rust::Str(buf, ret));
+    log_with_rs(level, rust::Slice(reinterpret_cast<const uint8_t *>(buf), ret));
     return ret;
 }
 

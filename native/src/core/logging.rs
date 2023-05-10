@@ -219,7 +219,7 @@ fn zygisk_log_write(prio: i32, msg: &[u8]) {
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
-        let mut ts: timespec = std::mem::zeroed();
+        let ts: timespec = std::mem::zeroed();
         sigtimedwait(&mask, null_mut(), &ts);
         pthread_sigmask(SIG_SETMASK, &orig_mask, null_mut());
     }
