@@ -2,17 +2,17 @@ name: Magisk Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
-      - 'app/**'
-      - 'native/**'
-      - 'stub/**'
-      - 'buildSrc/**'
-      - 'build.py'
-      - 'gradle.properties'
-      - '.github/workflows/build.yml'
+      - "app/**"
+      - "native/**"
+      - "stub/**"
+      - "buildSrc/**"
+      - "build.py"
+      - "gradle.properties"
+      - ".github/workflows/build.yml"
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     env:
       NDK_CCACHE: ccache
       CCACHE_DIR: ${{ github.workspace }}/.ccache
@@ -33,19 +33,19 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
         with:
-          submodules: 'recursive'
+          submodules: "recursive"
           fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Set up Python 3
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
@@ -107,8 +107,39 @@ jobs:
           name: ${{ github.sha }}-symbols
           path: app/build/outputs
 
+  test:
+    name: Test on ${{ matrix.api }}
+    runs-on: macos-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [23, 26, 28, 29, 33]
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.sha }}
+          path: out
+
       - name: AVD test
-        if:  runner.os == 'macOS'
         run: |
           brew install coreutils
-          scripts/avd_test.sh
+          scripts/avd_test.sh ${{ matrix.api }}
