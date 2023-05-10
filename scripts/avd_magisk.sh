@@ -107,6 +107,8 @@ else
   # Android Q+ without sbin
   MAGISKTMP=/dev/avd-magisk
   mkdir /dev/avd-magisk
+  # If a file name 'magisk' is in current directory, mount will fail
+  rm magisk
   mount -t tmpfs -o 'mode=0755' magisk /dev/avd-magisk
 fi
 
