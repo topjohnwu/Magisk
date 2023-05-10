@@ -3,7 +3,7 @@
 emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-emu_args='-no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -show-kernel'
+emu_args='-no-window -gpu swiftshader_indirect -read-only -no-snapshot -noaudio -no-boot-anim -show-kernel'
 
 # Should be either 'google_apis' or 'default'
 type='google_apis'
@@ -20,8 +20,6 @@ api_list='23 26 28 29 33'
 
 cleanup() {
   echo -e '\n\033[41;30m! An error occurred\033[0m\n'
-  pkill -INT -P $$
-  wait
 
   for api in $api_list; do
     set_api_env $api
@@ -29,9 +27,12 @@ cleanup() {
   done
 
   "$avd" delete avd -n test
+  pkill -INT -P $$
+  wait
 }
 
 wait_for_boot() {
+  adb wait-for-device
   while true; do
     if [ "stopped" = "$(adb exec-out getprop init.svc.bootanim)" ]; then
       break
@@ -58,6 +59,9 @@ restore_avd() {
 
 run_test() {
   local pid
+  local api=$1
+
+  set_api_env $api
 
   # Setup emulator
   echo -e "\n\033[44;30m* Testing $pkg\033[0m\n"
@@ -104,10 +108,13 @@ esac
 yes | "$sdk" --licenses
 "$sdk" --channel=3 --update
 
-for api in $api_list; do
-  set_api_env $api
-  run_test
-done
+if [ -n "$1" ]; then
+  run_test $1
+else
+  for api in $api_list; do
+    run_test $api
+  done
+fi
 
 "$avd" delete avd -n test
 
