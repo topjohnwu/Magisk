@@ -126,7 +126,7 @@ case $((STATUS & 3)) in
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
     # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
+    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio "config SHA1" 2>/dev/null)
     ./magiskboot cpio ramdisk.cpio restore
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img

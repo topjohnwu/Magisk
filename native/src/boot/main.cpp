@@ -83,8 +83,8 @@ Supported actions:
         Create ramdisk backups from ORIG
       restore
         Restore ramdisk from ramdisk backup stored within incpio
-      sha1
-        Print stock boot SHA1 if previously backed up in ramdisk
+      config VARIABLE
+        Print stored config value if previously backed up in ramdisk
 
   dtb <file> <action> [args...]
     Do dtb related actions to <file>
