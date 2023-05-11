@@ -12,8 +12,9 @@ use num_traits::FromPrimitive;
 
 use base::ffi::LogLevel;
 use base::libc::{
-    getpid, gettid, gettimeofday, localtime_r, pipe2, pthread_sigmask, sigaddset, sigset_t,
-    sigtimedwait, timespec, timeval, tm, O_CLOEXEC, PIPE_BUF, SIGPIPE, SIG_BLOCK, SIG_SETMASK,
+    clock_gettime, getpid, gettid, localtime_r, pipe2, pthread_sigmask, sigaddset, sigset_t,
+    sigtimedwait, timespec, tm, CLOCK_REALTIME, O_CLOEXEC, PIPE_BUF, SIGPIPE, SIG_BLOCK,
+    SIG_SETMASK,
 };
 use base::*;
 
@@ -297,20 +298,23 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
             // Note: the obvious better implementation is to use the rust chrono crate, however
             // the crate cannot fetch the proper local timezone without pulling in a bunch of
-            // timezone handling code. To reduce final binary size, fallback to use libc.
+            // timezone handling code. To reduce binary size, fallback to use localtime_r in libc.
             let mut aux_len: usize;
             unsafe {
-                let mut tv: timeval = std::mem::zeroed();
+                let mut ts: timespec = std::mem::zeroed();
                 let mut tm: tm = std::mem::zeroed();
-                gettimeofday(&mut tv, null_mut());
-                localtime_r(&tv.tv_sec, &mut tm);
+                if clock_gettime(CLOCK_REALTIME, &mut ts) < 0
+                    || localtime_r(&ts.tv_sec, &mut tm) == null_mut()
+                {
+                    continue;
+                }
                 aux_len = strftime(
                     aux.as_mut_ptr().cast(),
                     aux.len(),
                     str_ptr!("%m-%d %T"),
                     &tm,
-                ) as usize;
-                let ms = tv.tv_usec / 1000;
+                );
+                let ms = ts.tv_nsec / 1000000;
                 aux_len += bfmt!(
                     &mut aux[aux_len..],
                     ".{:03} {:5} {:5} {} : ",
