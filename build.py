@@ -16,19 +16,21 @@ import tarfile
 from zipfile import ZipFile
 
 
-def error(str):
+def color_print(code, str):
     if no_color:
-        print(f"\n! {str}\n")
+        print(f"\n{str}\n")
     else:
-        print(f"\n\033[41;30m{str}\033[0m\n")
+        str.replace("\n", "\033[K\n")
+        print(f"{code}{str}\033[0m")
+
+
+def error(str):
+    color_print("\033[41;39m", f"\n! {str}\n")
     sys.exit(1)
 
 
 def header(str):
-    if no_color:
-        print(f"\n{str}\n")
-    else:
-        print(f"\n\033[44;30m{str}\033[0m\n")
+    color_print("\033[44;39m", f"\n{str}\n")
 
 
 def vprint(str):
@@ -54,14 +56,7 @@ if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
 if "ANDROID_SDK_ROOT" not in os.environ:
-    error("Please add Android SDK path to ANDROID_SDK_ROOT environment variable!")
-
-try:
-    subprocess.run(
-        ["javac", "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-    )
-except FileNotFoundError:
-    error("Please install JDK and make sure 'javac' is available in PATH")
+    error("Please set Android SDK path to environment variable ANDROID_SDK_ROOT!")
 
 cpu_count = multiprocessing.cpu_count()
 archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"]
@@ -433,15 +428,48 @@ def build_binary(args):
         run_ndk_build("B_BB=1")
 
 
-def build_apk(args, module):
-    build_type = "Release" if args.release else "Debug"
+def find_jdk():
+    env = os.environ.copy()
+    if "ANDROID_STUDIO" in env:
+        studio = env["ANDROID_STUDIO"]
+        jbr = op.join(studio, "jbr", "bin")
+        if not op.exists(jbr):
+            jbr = op.join(studio, "Contents", "jbr", "Contents", "Home", "bin")
+        if op.exists(jbr):
+            env["PATH"] = f'{jbr}:{env["PATH"]}'
 
+    no_jdk = False
+    try:
+        proc = subprocess.run(
+            ["javac", "-version"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            env=env,
+        )
+        no_jdk = proc.returncode != 0
+    except FileNotFoundError:
+        no_jdk = True
+
+    if no_jdk:
+        error(
+            "Please set Android Studio's path to environment variable ANDROID_STUDIO,\n"
+            + "or install JDK 17 and make sure 'javac' is available in PATH"
+        )
+
+    return env
+
+
+def build_apk(args, module):
+    env = find_jdk()
+
+    build_type = "Release" if args.release else "Debug"
     proc = execv(
         [
             gradlew,
             f"{module}:assemble{build_type}",
             "-PconfigPath=" + op.abspath(args.config),
-        ]
+        ],
+        env=env,
     )
     if proc.returncode != 0:
         error(f"Build {module} failed!")
