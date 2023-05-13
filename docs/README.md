@@ -7,7 +7,8 @@
 
 The following sections are for developers
 
-- [Developer Guides](guides.md)
+- [Building and Developing Magisk](build.md) (for developing Magisk itself)
+- [Developer Guides](guides.md) (for developers **using** Magisk)
 - [Magisk Tools](tools.md)
 - [Internal Details](details.md)
 - [Android Booting Shenanigans](boot.md)

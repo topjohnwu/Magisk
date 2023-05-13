@@ -26,6 +26,7 @@ Some highlight features:
 ## Useful Links
 
 - [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
+- [Building and Development](https://topjohnwu.github.io/Magisk/build.html)
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 
 ## Bug Reports
@@ -35,30 +36,6 @@ Some highlight features:
 For installation issues, upload both boot image and install logs.<br>
 For Magisk issues, upload boot logcat or dmesg.<br>
 For Magisk app crashes, record and upload the logcat when the crash occurs.
-
-## Building and Development
-
-- Magisk builds on any OS Android Studio supports. Install Android Studio and do the initial setups.
-- Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
-- Install Python 3.8+ \
-  (Windows only: select **'Add Python to PATH'** in installer, and run `pip install colorama` after install)
-- Configure to use the JDK bundled in Android Studio:
-  - macOS: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jre/Contents/Home"`
-  - Linux: `export PATH="/path/to/androidstudio/jre/bin:$PATH"`
-  - Windows: Add `C:\Path\To\Android Studio\jre\bin` to environment variable `PATH`
-- Set environment variable `ANDROID_SDK_ROOT` to the Android SDK folder (can be found in Android Studio settings)
-- Run `./build.py ndk` to let the script download and install NDK for you
-- To start building, run `build.py` to see your options. \
-  For each action, use `-h` to access help (e.g. `./build.py all -h`)
-- To start development, open the project with Android Studio. The IDE can be used for both app (Kotlin/Java) and native sources.
-- Optionally, set custom configs with `config.prop`. A sample `config.prop.sample` is provided.
-
-## Signing and Distribution
-
-- The certificate of the key used to sign the final Magisk APK product is also directly embedded into some executables. In release builds, Magisk's root daemon will enforce this certificate check and reject and forcefully uninstall any non-matching Magisk apps to protect users from malicious and unverified Magisk APKs.
-- To do any development on Magisk itself, switch to an **official debug build and reinstall Magisk** to bypass the signature check.
-- To distribute your own Magisk builds signed with your own keys, set your signing configs in `config.prop`.
-- Check [Google's Documentation](https://developer.android.com/studio/publish/app-signing.html#generate-key) for more details on generating your own key.
 
 ## Translation Contributions
 
