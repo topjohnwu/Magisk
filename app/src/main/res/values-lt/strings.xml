@@ -226,7 +226,7 @@
     <string name="authenticate">Autentifikavimas</string>
     <string name="unsupport_magisk_title">Nepalaikoma Magisk versija</string>
     <string name="unsupport_magisk_msg">Ši programėlės versija nepalaiko Magisk versijų, žemesnių už %1$s.\n\nProgramėlė veiks taip, lyg Magisk yra neįdiegtas. Kuo greičiau atnaujinkite Magisk.</string>
-    <string name="unsupport_general_title"Nenormali būsena</string>
+    <string name="unsupport_general_title">Nenormali būsena</string>
     <string name="unsupport_system_app_msg">Šios programėlės vykdymas kaip sistemos programėlės yra nepalaikomas. Nustatykite ją atgal į naudotojo programėlę.</string>
     <string name="unsupport_other_su_msg">Aptiktas dvejetainis failas \"su\" ne iš Magisk. Pašalinkite pašalinį root teisių tiekėją ir/arba iš naujo įdiekite Magisk.</string>
     <string name="unsupport_external_storage_msg">Magisk yra įdiegtas išorinėje saugykloje. Perkelkite programėlę į vidinę saugyklą.</string>
