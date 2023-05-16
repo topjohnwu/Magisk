@@ -22,3 +22,17 @@ void write_int_be(int fd, int val);
 std::string read_string(int fd);
 bool read_string(int fd, std::string &str);
 void write_string(int fd, std::string_view str);
+
+template<typename T> requires(std::is_trivially_copyable_v<T>)
+void write_vector(int fd, const std::vector<T> &vec) {
+    write_int(fd, static_cast<int>(vec.size()));
+    xwrite(fd, vec.data(), vec.size() * sizeof(T));
+}
+
+template<typename T> requires(std::is_trivially_copyable_v<T>)
+bool read_vector(int fd, std::vector<T> &vec) {
+    int size = read_int(fd);
+    if (size == -1) return false;
+    vec.resize(size);
+    return xread(fd, vec.data(), size * sizeof(T)) == size * sizeof(T);
+}
