@@ -13,10 +13,8 @@ pub mod ffi {
         fn magisk_logging();
         fn zygisk_logging();
     }
-}
 
-#[cxx::bridge(namespace = "rust")]
-pub mod ffi2 {
+    #[namespace = "rust"]
     extern "Rust" {
         fn daemon_entry();
         fn zygisk_entry();

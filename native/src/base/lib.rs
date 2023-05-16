@@ -30,10 +30,8 @@ pub mod ffi {
         fn set_log_level_state(level: LogLevel, enabled: bool);
         fn cmdline_logging();
     }
-}
 
-#[cxx::bridge(namespace = "rust")]
-pub mod ffi2 {
+    #[namespace = "rust"]
     extern "Rust" {
         fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
         fn fd_path(fd: i32, buf: &mut [u8]) -> isize;
