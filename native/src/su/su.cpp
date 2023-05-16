@@ -22,12 +22,12 @@
 
 int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGINT, 0 };
 
-static void usage(int status) {
+[[noreturn]] static void usage(int status) {
     FILE *stream = (status == EXIT_SUCCESS) ? stdout : stderr;
 
     fprintf(stream,
     "MagiskSU\n\n"
-    "Usage: su [options] [-] [user [argument...]]\n\n"
+    "Usage: su [options] [-] [user[:group,...] [argument...]]\n\n"
     "Options:\n"
     "  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
     "  -h, --help                    display this help message and exit\n"
@@ -110,7 +110,6 @@ int su_client_main(int argc, char *argv[]) {
                 break;
             case 'h':
                 usage(EXIT_SUCCESS);
-                break;
             case 'l':
                 su_req.login = true;
                 break;
@@ -146,12 +145,19 @@ int su_client_main(int argc, char *argv[]) {
     }
     /* username or uid */
     if (optind < argc) {
+        std::string_view uidgid = argv[optind];
+        auto sep = split_view(uidgid, ":");
+        if (sep.size() > 2) usage(EXIT_FAILURE);
+        auto user = std::string(sep[0]);
         struct passwd *pw;
-        pw = getpwnam(argv[optind]);
-        if (pw)
-            su_req.uid = pw->pw_uid;
-        else
-            su_req.uid = parse_int(argv[optind]);
+        pw = getpwnam(user.data());
+        su_req.uid = pw ? pw->pw_uid : parse_int(user);
+        if (sep.size() == 2) {
+            for (auto group : split_view(sep[1], ",")) {
+                pw = getpwnam(std::string(group).data());
+                su_req.gids.push_back(pw ? pw->pw_gid : parse_int(group));
+            }
+        }
         optind++;
     }
 
@@ -164,6 +170,7 @@ int su_client_main(int argc, char *argv[]) {
     xwrite(fd, &su_req, sizeof(su_req_base));
     write_string(fd, su_req.shell);
     write_string(fd, su_req.command);
+    write_vector(fd, su_req.gids);
 
     // Wait for ack from daemon
     if (read_int(fd)) {

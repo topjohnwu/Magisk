@@ -42,7 +42,7 @@ private:
 };
 
 struct su_req_base {
-    int uid = AID_ROOT;
+    uid_t uid = AID_ROOT;
     bool login = false;
     bool keepenv = false;
     bool mount_master = false;
@@ -51,6 +51,7 @@ struct su_req_base {
 struct su_request : public su_req_base {
     std::string shell = DEFAULT_SHELL;
     std::string command;
+    std::vector<gid_t> gids;
 };
 
 struct su_context {

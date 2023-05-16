@@ -166,7 +166,7 @@ void app_log(const su_context &ctx) {
         vector<Extra> extras;
         extras.reserve(6);
         extras.emplace_back("from.uid", ctx.info->uid);
-        extras.emplace_back("to.uid", ctx.req.uid);
+        extras.emplace_back("to.uid", static_cast<int>(ctx.req.uid));
         extras.emplace_back("pid", ctx.pid);
         extras.emplace_back("policy", ctx.info->access.policy);
         extras.emplace_back("command", get_cmd(ctx.req));
