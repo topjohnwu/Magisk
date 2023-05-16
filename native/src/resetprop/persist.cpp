@@ -75,7 +75,7 @@ PB_BIND(PersistentProperties_PersistentPropertyRecord, PersistentProperties_Pers
  * End of auto generated code
  * ***************************/
 
-static bool name_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
+static bool name_decode(pb_istream_t *stream, const pb_field_t *, void **arg) {
     string &name = *static_cast<string *>(*arg);
     name.resize(stream->bytes_left);
     return pb_read(stream, (pb_byte_t *)(name.data()), stream->bytes_left);
@@ -86,7 +86,7 @@ static bool name_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
            pb_encode_string(stream, (const pb_byte_t *) *arg, strlen((const char *) *arg));
 }
 
-static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **arg) {
+static bool prop_decode(pb_istream_t *stream, const pb_field_t *, void **arg) {
     PersistentProperties_PersistentPropertyRecord prop{};
     string name;
     prop.name.funcs.decode = name_decode;
@@ -94,7 +94,7 @@ static bool prop_decode(pb_istream_t *stream, const pb_field_t *field, void **ar
     if (!pb_decode(stream, &PersistentProperties_PersistentPropertyRecord_msg, &prop))
         return false;
     auto cb = static_cast<prop_cb*>(*arg);
-    cb->exec(std::move(name), prop.value);
+    cb->exec(name.data(), prop.value);
     return true;
 }
 
@@ -107,7 +107,7 @@ static bool prop_encode(pb_ostream_t *stream, const pb_field_t *field, void * co
         if (!pb_encode_tag_for_field(stream, field))
             return false;
         prop.name.arg = (void *) p.first.data();
-        strcpy(prop.value, p.second.data());
+        strscpy(prop.value, p.second.data(), sizeof(prop.value));
         if (!pb_encode_submessage(stream, &PersistentProperties_PersistentPropertyRecord_msg, &prop))
             return false;
     }
@@ -173,9 +173,9 @@ void persist_getprops(prop_cb *prop_cb) {
 
 struct match_prop_name : prop_cb {
     explicit match_prop_name(const char *name) : _name(name) { value[0] = '\0'; }
-    void exec(string &&name, const char *val) override {
-        if (name == _name)
-            strcpy(value, val);
+    void exec(const char *name, const char *val) override {
+        if (std::strcmp(name, _name) == 0)
+            strscpy(value, val, sizeof(value));
     }
     char value[PROP_VALUE_MAX];
 private:

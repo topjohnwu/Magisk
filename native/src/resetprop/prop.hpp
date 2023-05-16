@@ -8,12 +8,7 @@
 #define PERSISTENT_PROPERTY_DIR  "/data/property"
 
 struct prop_cb {
-    virtual void exec(const char *name, const char *value) {
-        exec(std::string(name), value);
-    }
-    virtual void exec(std::string &&name, const char *value) {
-        exec(name.data(), value);
-    }
+    virtual void exec(const char *name, const char *value) = 0;
 };
 
 using prop_list = std::map<std::string, std::string>;
@@ -22,9 +17,6 @@ struct prop_collector : prop_cb {
     explicit prop_collector(prop_list &list) : list(list) {}
     void exec(const char *name, const char *value) override {
         list.insert_or_assign(name, value);
-    }
-    void exec(std::string &&name, const char *value) override {
-        list.insert_or_assign(std::move(name), value);
     }
 private:
     prop_list &list;
