@@ -18,9 +18,9 @@ from zipfile import ZipFile
 
 def color_print(code, str):
     if no_color:
-        print(f"\n{str}\n")
+        print(str)
     else:
-        str.replace("\n", "\033[K\n")
+        str = str.replace("\n", f"\033[0m\n{code}")
         print(f"{code}{str}\033[0m")
 
 
