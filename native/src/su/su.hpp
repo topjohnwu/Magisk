@@ -45,7 +45,7 @@ struct su_req_base {
     uid_t uid = AID_ROOT;
     bool login = false;
     bool keepenv = false;
-    bool mount_master = false;
+    pid_t target = -1;
 } __attribute__((packed));
 
 struct su_request : public su_req_base {

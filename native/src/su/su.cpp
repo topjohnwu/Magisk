@@ -31,6 +31,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "Options:\n"
     "  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
     "  -z, --context CONTEXT         change SELinux context\n"
+    "  -t, --target PID              PID to take mount namespace from\n"
     "  -h, --help                    display this help message and exit\n"
     "  -, -l, --login                pretend the shell to be a login shell\n"
     "  -m, -p,\n"
@@ -86,6 +87,7 @@ int su_client_main(int argc, char *argv[]) {
             { "version",                no_argument,        nullptr, 'v' },
             { "context",                required_argument,  nullptr, 'z' },
             { "mount-master",           no_argument,        nullptr, 'M' },
+            { "target",                 required_argument,  nullptr, 't' },
             { nullptr, 0, nullptr, 0 },
     };
 
@@ -99,7 +101,7 @@ int su_client_main(int argc, char *argv[]) {
             strcpy(argv[i], "-M");
     }
 
-    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:M", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:Mt:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c':
                 for (int i = optind - 1; i < argc; ++i) {
@@ -131,7 +133,20 @@ int su_client_main(int argc, char *argv[]) {
                 su_req.context = optarg;
                 break;
             case 'M':
-                su_req.mount_master = true;
+            case 't':
+                if (su_req.target != -1) {
+                    fprintf(stderr, "Can't use -M and -t at the same time\n");
+                    usage(EXIT_FAILURE);
+                }
+                if (optarg == nullptr) {
+                    su_req.target = 0;
+                } else {
+                    su_req.target = parse_int(optarg);
+                    if (*optarg == '-' || su_req.target == -1) {
+                        fprintf(stderr, "Invalid PID: %s\n", optarg);
+                        usage(EXIT_FAILURE);
+                    }
+                }
                 break;
             default:
                 /* Bionic getopt_long doesn't terminate its error output by newline */
