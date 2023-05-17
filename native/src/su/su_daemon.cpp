@@ -264,6 +264,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (xxread(client, &ctx.req, sizeof(su_req_base)) < 0
         || !read_string(client, ctx.req.shell)
         || !read_string(client, ctx.req.command)
+        || !read_string(client, ctx.req.context)
         || !read_vector(client, ctx.req.gids)) {
         LOGW("su: remote process probably died, abort\n");
         ctx.info.reset();
@@ -453,6 +454,10 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     sigset_t block_set;
     sigemptyset(&block_set);
     sigprocmask(SIG_SETMASK, &block_set, nullptr);
+    if (!ctx.req.context.empty() && selinux_enabled()) {
+        auto f = xopen_file("/proc/self/attr/exec", "we");
+        if (f) fprintf(f.get(), "%s", ctx.req.context.data());
+    }
     set_identity(ctx.req.uid, ctx.req.gids);
     execvp(ctx.req.shell.data(), (char **) argv);
     fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell.data(), strerror(errno));

@@ -30,6 +30,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "Usage: su [options] [-] [user[:group,...] [argument...]]\n\n"
     "Options:\n"
     "  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
+    "  -z, --context CONTEXT         change SELinux context\n"
     "  -h, --help                    display this help message and exit\n"
     "  -, -l, --login                pretend the shell to be a login shell\n"
     "  -m, -p,\n"
@@ -127,7 +128,7 @@ int su_client_main(int argc, char *argv[]) {
                 printf("%s\n", MAGISK_VERSION ":MAGISKSU");
                 exit(EXIT_SUCCESS);
             case 'z':
-                // Do nothing, placed here for legacy support :)
+                su_req.context = optarg;
                 break;
             case 'M':
                 su_req.mount_master = true;
@@ -170,6 +171,7 @@ int su_client_main(int argc, char *argv[]) {
     xwrite(fd, &su_req, sizeof(su_req_base));
     write_string(fd, su_req.shell);
     write_string(fd, su_req.command);
+    write_string(fd, su_req.context);
     write_vector(fd, su_req.gids);
 
     // Wait for ack from daemon

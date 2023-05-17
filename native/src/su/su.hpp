@@ -51,6 +51,7 @@ struct su_req_base {
 struct su_request : public su_req_base {
     std::string shell = DEFAULT_SHELL;
     std::string command;
+    std::string context;
     std::vector<gid_t> gids;
 };
 
