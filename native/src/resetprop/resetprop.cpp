@@ -11,14 +11,11 @@
 using namespace std;
 
 #ifdef APPLET_STUB_MAIN
-#define system_property_set           __system_property_set
-#define system_property_find          __system_property_find
-#define system_property_read_callback __system_property_read_callback
-#define system_property_foreach       __system_property_foreach
+#define system_property_set             __system_property_set
+#define system_property_find            __system_property_find
+#define system_property_read_callback   __system_property_read_callback
+#define system_property_foreach         __system_property_foreach
 #define system_property_read(...)
-extern "C" int fsetxattr(int fd, const char* name, const void* value, size_t size, int flags) {
-    return syscall(__NR_fsetxattr, fd, name, value, size, flags);
-}
 #else
 static int (*system_property_set)(const char*, const char*);
 static int (*system_property_read)(const prop_info*, char*, char*);
@@ -26,18 +23,6 @@ static const prop_info *(*system_property_find)(const char*);
 static void (*system_property_read_callback)(
         const prop_info*, void (*)(void*, const char*, const char*, uint32_t), void*);
 static int (*system_property_foreach)(void (*)(const prop_info*, void*), void*);
-
-#define DLOAD(name) \
-*(void **) &name = dlsym(RTLD_DEFAULT, "__" #name)
-
-static void load_functions() {
-    DLOAD(system_property_set);
-    DLOAD(system_property_read);
-    DLOAD(system_property_find);
-    DLOAD(system_property_read_callback);
-    DLOAD(system_property_foreach);
-}
-#undef DLOAD
 #endif
 
 [[noreturn]] static void usage(char* arg0) {
@@ -96,7 +81,7 @@ illegal:
     return false;
 }
 
-static void read_prop(const prop_info *pi, void *cb) {
+static void read_prop_with_cb(const prop_info *pi, void *cb) {
     if (system_property_read_callback) {
         auto callback = [](void *cb, const char *name, const char *value, uint32_t) {
             static_cast<prop_cb*>(cb)->exec(name, value);
@@ -112,57 +97,37 @@ static void read_prop(const prop_info *pi, void *cb) {
     }
 }
 
-struct sysprop_stub {
-    virtual int setprop(const char *name, const char *value, bool trigger) { return 1; }
-    virtual string getprop(const char *name, bool persist) { return string(); }
-    virtual string getcontext(const char *name) { return string(); }
-    virtual void getprops(void (*callback)(const char *, const char *, void *),
-            void *cookie, bool persist) {}
-    virtual int delprop(const char *name, bool persist) { return 1; }
+struct prop_to_string : prop_cb {
+    explicit prop_to_string(string &s) : val(s) {}
+    void exec(const char *, const char *value) override {
+        val = value;
+    }
+private:
+    string &val;
 };
 
-struct sysprop : public sysprop_stub {
+struct resetprop {
 
-    int setprop(const char *name, const char *value, bool) override {
-        if (!check_legal_property_name(name))
-            return 1;
-        return system_property_set(name, value);
-    }
+    resetprop() {
 
-    struct prop_to_string : prop_cb {
-        explicit prop_to_string(string &s) : val(s) {}
-        void exec(const char *, const char *value) override {
-            val = value;
+#ifndef APPLET_STUB_MAIN
+#define DLOAD(name) (*(void **) &name = dlsym(RTLD_DEFAULT, "__" #name))
+        // Load platform implementations
+        DLOAD(system_property_set);
+        DLOAD(system_property_read);
+        DLOAD(system_property_find);
+        DLOAD(system_property_read_callback);
+        DLOAD(system_property_foreach);
+#undef DLOAD
+#endif
+
+        if (__system_properties_init()) {
+            LOGE("resetprop: __system_properties_init error\n");
         }
-    private:
-        string &val;
-    };
-
-    string getprop(const char *name, bool) override {
-        string val;
-        if (!check_legal_property_name(name))
-            return val;
-        auto pi = system_property_find(name);
-        if (pi == nullptr)
-            return val;
-        auto prop = prop_to_string(val);
-        read_prop(pi, &prop);
-        LOGD("resetprop: getprop [%s]: [%s]\n", name, val.data());
-        return val;
     }
 
-    void getprops(void (*callback)(const char*, const char*, void*), void *cookie, bool) override {
-        prop_list list;
-        prop_collector collector(list);
-        system_property_foreach(read_prop, &collector);
-        for (auto &[key, val] : list)
-            callback(key.data(), val.data(), cookie);
-    }
-};
 
-struct resetprop : public sysprop {
-
-    int setprop(const char *name, const char *value, bool prop_svc) override {
+    int setprop(const char *name, const char *value, bool prop_svc) {
         if (!check_legal_property_name(name))
             return 1;
 
@@ -200,8 +165,17 @@ struct resetprop : public sysprop {
         return ret;
     }
 
-    string getprop(const char *name, bool persist) override {
-        string val = sysprop::getprop(name, persist);
+    string getprop(const char *name, bool persist) {
+        string val;
+        if (!check_legal_property_name(name))
+            return val;
+        auto pi = system_property_find(name);
+        if (pi == nullptr)
+            return val;
+        auto cb = prop_to_string(val);
+        read_prop_with_cb(pi, &cb);
+        LOGD("resetprop: getprop [%s]: [%s]\n", name, val.data());
+
         if (val.empty() && persist && strncmp(name, "persist.", 8) == 0)
             val = persist_getprop(name);
         if (val.empty())
@@ -209,23 +183,19 @@ struct resetprop : public sysprop {
         return val;
     }
 
-    string getcontext(const char *name) override {
+    string getcontext(const char *name) {
         if (!check_legal_property_name(name))
             return "";
-        auto val = __system_property_get_context(name);
-        if (val == nullptr) {
-            LOGD("resetprop: prop [%s] does not support context\n", name);
-            return "";
-        }
+        auto val = __system_property_get_context(name) ?: "";
         LOGD("resetprop: getcontext [%s]: [%s]\n", name, val);
         return val;
     }
 
     void getprops(void (*callback)(const char *, const char *, void *),
-            void *cookie, bool persist) override {
+            void *cookie, bool persist) {
         prop_list list;
         prop_collector collector(list);
-        system_property_foreach(read_prop, &collector);
+        system_property_foreach(read_prop_with_cb, &collector);
         if (persist)
             persist_getprops(&collector);
         for (auto &[key, val] : list)
@@ -233,7 +203,7 @@ struct resetprop : public sysprop {
     }
 
     // Not an error when something is deleted
-    int delprop(const char *name, bool persist) override {
+    int delprop(const char *name, bool persist) {
         if (!check_legal_property_name(name))
             return 1;
         LOGD("resetprop: delete prop [%s]\n", name);
@@ -247,26 +217,8 @@ struct resetprop : public sysprop {
     }
 };
 
-static sysprop_stub *get_impl() {
-    static sysprop_stub *impl = nullptr;
-    if (impl == nullptr) {
-#ifdef APPLET_STUB_MAIN
-        if (__system_properties_init()) {
-            LOGE("resetprop: __system_properties_init error\n");
-            exit(1);
-        }
-        impl = new resetprop();
-#else
-        // Load platform implementations
-        load_functions();
-        if (__system_properties_init()) {
-            LOGW("resetprop: __system_properties_init error\n");
-            impl = new sysprop();
-        } else {
-            impl = new resetprop();
-        }
-#endif
-    }
+static resetprop *get_impl() {
+    static resetprop *impl = new resetprop();
     return impl;
 }
 
