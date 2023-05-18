@@ -43,6 +43,9 @@
 [submodule "lsplt"]
 	path = native/src/external/lsplt
 	url = https://github.com/LSPosed/LSPlt.git
+[submodule "system_properties"]
+	path = native/src/external/system_properties
+	url = https://github.com/topjohnwu/system_properties.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

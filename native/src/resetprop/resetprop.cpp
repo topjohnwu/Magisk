@@ -6,11 +6,6 @@
 #include <resetprop.hpp>
 #include <base.hpp>
 
-#undef __INTRODUCED_IN
-#define __INTRODUCED_IN(...)
-#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <_system_properties.h>
-
 #include "prop.hpp"
 
 using namespace std;
@@ -65,6 +60,8 @@ Flags:
            (this flag only affects setprop)
    -p      read/write props from/to persistent storage
            (this flag only affects getprop and delprop)
+   -Z      show property contexts instead of values
+           (this flag only affects getprop)
 
 )EOF", arg0);
     exit(1);
@@ -118,6 +115,7 @@ static void read_prop(const prop_info *pi, void *cb) {
 struct sysprop_stub {
     virtual int setprop(const char *name, const char *value, bool trigger) { return 1; }
     virtual string getprop(const char *name, bool persist) { return string(); }
+    virtual string getcontext(const char *name) { return string(); }
     virtual void getprops(void (*callback)(const char *, const char *, void *),
             void *cookie, bool persist) {}
     virtual int delprop(const char *name, bool persist) { return 1; }
@@ -211,6 +209,18 @@ struct resetprop : public sysprop {
         return val;
     }
 
+    string getcontext(const char *name) override {
+        if (!check_legal_property_name(name))
+            return "";
+        auto val = __system_property_get_context(name);
+        if (val == nullptr) {
+            LOGD("resetprop: prop [%s] does not support context\n", name);
+            return "";
+        }
+        LOGD("resetprop: getcontext [%s]: [%s]\n", name, val);
+        return val;
+    }
+
     void getprops(void (*callback)(const char *, const char *, void *),
             void *cookie, bool persist) override {
         prop_list list;
@@ -270,8 +280,18 @@ static void print_props(bool persist) {
     }, nullptr, persist);
 }
 
+static void print_props_context() {
+    getprops([](const char *name, const char *, auto) {
+        printf("[%s]: [%s]\n", name, getpropcontext(name).data());
+    }, nullptr, false);
+}
+
 string getprop(const char *name, bool persist) {
     return get_impl()->getprop(name, persist);
+}
+
+string getpropcontext(const char *name) {
+    return get_impl()->getcontext(name);
 }
 
 void getprops(void (*callback)(const char *, const char *, void *), void *cookie, bool persist) {
@@ -299,6 +319,7 @@ int resetprop_main(int argc, char *argv[]) {
     bool prop_svc = true;
     bool persist = false;
     bool verbose = false;
+    bool context = false;
     char *argv0 = argv[0];
 
     --argc;
@@ -326,6 +347,9 @@ int resetprop_main(int argc, char *argv[]) {
             case 'n':
                 prop_svc = false;
                 continue;
+            case 'Z':
+                context = true;
+                continue;
             case '\0':
                 break;
             case 'h':
@@ -342,10 +366,13 @@ int resetprop_main(int argc, char *argv[]) {
 
     switch (argc) {
     case 0:
-        print_props(persist);
+        if (context)
+            print_props_context();
+        else
+            print_props(persist);
         return 0;
     case 1: {
-        string prop = getprop(argv[0], persist);
+        string prop = context ? getpropcontext(argv[0]) : getprop(argv[0], persist);
         if (prop.empty())
             return 1;
         printf("%s\n", prop.data());

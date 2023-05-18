@@ -3,7 +3,8 @@
 #include <string>
 #include <map>
 
-#include <system_properties.h>
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <api/_system_properties.h>
 
 #define PERSISTENT_PROPERTY_DIR  "/data/property"
 
