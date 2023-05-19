@@ -7,6 +7,9 @@ edition = "2021"
 crate-type = ["staticlib"]
 path = "lib.rs"
 
+[build-dependencies]
+cxx-gen = { path = "../external/cxx-rs/gen/lib" }
+
 [dependencies]
 base = { path = "../base" }
 cxx = { path = "../external/cxx-rs" }

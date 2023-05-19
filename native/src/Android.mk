@@ -32,6 +32,7 @@ LOCAL_SRC_FILES := \
     core/thread.cpp \
     core/resetprop/persist.cpp \
     core/resetprop/resetprop.cpp \
+    core/core-rs.cpp \
     su/su.cpp \
     su/connect.cpp \
     su/pts.cpp \
@@ -85,7 +86,8 @@ LOCAL_SRC_FILES := \
     init/rootdir.cpp \
     init/getinfo.cpp \
     init/twostage.cpp \
-    init/selinux.cpp
+    init/selinux.cpp \
+    init/init-rs.cpp
 
 include $(BUILD_EXECUTABLE)
 
@@ -116,7 +118,8 @@ LOCAL_SRC_FILES := \
     boot/dtb.cpp \
     boot/ramdisk.cpp \
     boot/pattern.cpp \
-    boot/cpio.cpp
+    boot/cpio.cpp \
+    boot/boot-rs.cpp
 
 include $(BUILD_EXECUTABLE)
 

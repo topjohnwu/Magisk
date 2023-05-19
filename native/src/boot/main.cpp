@@ -4,8 +4,6 @@
 #include "magiskboot.hpp"
 #include "compress.hpp"
 
-#include "boot-rs.cpp"
-
 using namespace std;
 
 static void print_formats() {

@@ -3,8 +3,6 @@
 #include <cerrno>
 #include <cstdarg>
 
-#include <base-rs.hpp>
-
 void LOGD(const char *fmt, ...) __printflike(1, 2);
 void LOGI(const char *fmt, ...) __printflike(1, 2);
 void LOGW(const char *fmt, ...) __printflike(1, 2);

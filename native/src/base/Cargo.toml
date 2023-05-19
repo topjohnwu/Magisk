@@ -6,6 +6,9 @@ edition = "2021"
 [lib]
 path = "lib.rs"
 
+[build-dependencies]
+cxx-gen = { path = "../external/cxx-rs/gen/lib" }
+
 [dependencies]
 cxx = { path = "../external/cxx-rs" }
 libc = "0.2"

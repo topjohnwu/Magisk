@@ -6,9 +6,6 @@
 #include <flags.h>
 #include <base.hpp>
 
-// Just need to include it somewhere
-#include <base-rs.cpp>
-
 using namespace std;
 
 static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {

@@ -238,39 +238,14 @@ def run_ndk_build(flags):
 
 def run_cargo_build(args):
     os.chdir(op.join("native", "src"))
+    native_out = op.join("..", "out")
+
     targets = set(args.target) & set(rust_targets)
     if "resetprop" in args.target:
         targets.add("magisk")
 
     env = os.environ.copy()
     env["CARGO_BUILD_RUSTC"] = op.join(rust_bin, "rustc" + EXE_EXT)
-
-    # Install cxxbridge and generate C++ bindings
-    native_out = op.join("..", "out")
-    local_cargo_root = op.join(native_out, ".cargo")
-    cfg = op.join(".cargo", "config.toml")
-    cfg_bak = op.join(".cargo", "config.toml.bak")
-    try:
-        # Hide the config file for cargo install
-        mv(cfg, cfg_bak)
-        cxx_src = op.join("external", "cxx-rs", "gen", "cmd")
-        mkdir_p(local_cargo_root)
-        cmds = [cargo, "install", "--root", local_cargo_root, "--path", cxx_src]
-        if not args.verbose:
-            cmds.append("-q")
-        proc = execv(cmds, env)
-        if proc.returncode != 0:
-            error("cxxbridge-cmd installation failed!")
-    finally:
-        # Make sure the config file rename is always reverted
-        mv(cfg_bak, cfg)
-    cxxbridge = op.join(local_cargo_root, "bin", "cxxbridge" + EXE_EXT)
-    mkdir(native_gen_path)
-    for p in ["base", "boot", "core", "init", "sepolicy"]:
-        text = cmd_out([cxxbridge, op.join(p, "lib.rs")])
-        write_if_diff(op.join(native_gen_path, f"{p}-rs.cpp"), text)
-        text = cmd_out([cxxbridge, "--header", op.join(p, "lib.rs")])
-        write_if_diff(op.join(native_gen_path, f"{p}-rs.hpp"), text)
 
     # Start building the actual build commands
     cmds = [cargo, "build"]

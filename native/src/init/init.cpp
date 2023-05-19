@@ -10,8 +10,6 @@
 
 #include "init.hpp"
 
-#include <init-rs.cpp>
-
 using namespace std;
 
 bool unxz(int fd, const uint8_t *buf, size_t size) {

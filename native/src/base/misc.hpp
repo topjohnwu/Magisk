@@ -7,8 +7,6 @@
 #include <bitset>
 #include <random>
 
-#include <base-rs.hpp>
-
 #define DISALLOW_COPY_AND_MOVE(clazz) \
 clazz(const clazz &) = delete; \
 clazz(clazz &&) = delete;

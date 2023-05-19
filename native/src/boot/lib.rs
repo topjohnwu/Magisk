@@ -9,6 +9,7 @@ mod update_metadata;
 #[cxx::bridge(namespace = "rust")]
 pub mod ffi {
     extern "C++" {
+        include!("compress.hpp");
         pub unsafe fn decompress(in_: *const u8, in_size: u64, fd: i32) -> bool;
     }
 
