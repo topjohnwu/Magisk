@@ -187,14 +187,14 @@ string persist_getprop(const char *name) {
         auto prop = match_prop_name(name);
         pb_getprop(&prop);
         if (prop.value[0]) {
-            LOGD("resetprop: getprop (persist) [%s]: [%s]\n", name, prop.value);
+            LOGD("resetprop: get prop (persist) [%s]: [%s]\n", name, prop.value);
             return prop.value;
         }
     } else {
         // Try to read from file
         char value[PROP_VALUE_MAX];
         if (file_getprop(name, value)) {
-            LOGD("resetprop: getprop (persist) [%s]: [%s]\n", name, value);
+            LOGD("resetprop: get prop (persist) [%s]: [%s]\n", name, value);
             return value;
         }
     }
