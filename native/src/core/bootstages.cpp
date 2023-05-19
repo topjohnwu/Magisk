@@ -10,7 +10,6 @@
 #include <db.hpp>
 #include <base.hpp>
 #include <daemon.hpp>
-#include <resetprop.hpp>
 #include <selinux.hpp>
 
 #include "core.hpp"

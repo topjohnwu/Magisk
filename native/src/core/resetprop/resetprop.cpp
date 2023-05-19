@@ -3,10 +3,10 @@
 #include <vector>
 #include <map>
 
-#include <resetprop.hpp>
 #include <base.hpp>
 
-#include "prop.hpp"
+#include "../core.hpp"
+#include "resetprop.hpp"
 
 using namespace std;
 
@@ -333,9 +333,9 @@ int resetprop_main(int argc, char *argv[]) {
     }
 }
 
-/*******************
- * High-level APIs
- ********************/
+/***************
+ * Public APIs
+ ****************/
 
 string get_prop(const char *name, bool persist) {
     InitOnce();

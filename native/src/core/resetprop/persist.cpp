@@ -4,7 +4,7 @@
 
 #include <base.hpp>
 
-#include "prop.hpp"
+#include "resetprop.hpp"
 
 using namespace std;
 

@@ -8,7 +8,6 @@
 #include <daemon.hpp>
 #include <selinux.hpp>
 #include <db.hpp>
-#include <resetprop.hpp>
 #include <flags.h>
 
 #include <core-rs.cpp>

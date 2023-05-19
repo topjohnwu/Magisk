@@ -6,7 +6,6 @@
 #include <magisk.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <resetprop.hpp>
 
 #include "core.hpp"
 #include "node.hpp"
