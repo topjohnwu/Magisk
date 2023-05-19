@@ -264,7 +264,8 @@ void load_modules() {
         strcpy(b, "system.prop");
         if (access(buf, F_OK) == 0) {
             LOGI("%s: loading [system.prop]\n", module);
-            load_prop_file(buf, false);
+            // Do NOT go through property service as it could cause boot lock
+            load_prop_file(buf, true);
         }
 
         // Check whether skip mounting

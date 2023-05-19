@@ -3,10 +3,7 @@
 #include <string>
 #include <functional>
 
-int setprop(const char *name, const char *value, bool prop_svc = true);
-std::string getprop(const char *name, bool persist = false);
-std::string getpropcontext(const char *name);
-void getprops(void (*callback)(const char *, const char *, void *),
-        void *cookie = nullptr, bool persist = false);
-int delprop(const char *name, bool persist = false);
-void load_prop_file(const char *filename, bool prop_svc = true);
+std::string get_prop(const char *name, bool persist = false);
+int delete_prop(const char *name, bool persist = false);
+int set_prop(const char *name, const char *value, bool skip_svc = false);
+void load_prop_file(const char *filename, bool skip_svc = false);

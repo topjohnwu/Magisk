@@ -127,7 +127,7 @@ string find_preinit_device() {
     part_t ext4_type = UNKNOWN;
     part_t f2fs_type = UNKNOWN;
 
-    bool encrypted = getprop("ro.crypto.state") == "encrypted";
+    bool encrypted = get_prop("ro.crypto.state") == "encrypted";
     bool mount = getuid() == 0 && getenv("MAGISKTMP");
     bool make_dev = mount && getenv("MAKEDEV");
 
@@ -283,14 +283,14 @@ static bool check_data() {
     });
     if (!mnt)
         return false;
-    auto crypto = getprop("ro.crypto.state");
+    auto crypto = get_prop("ro.crypto.state");
     if (!crypto.empty()) {
         if (crypto != "encrypted") {
             // Unencrypted, we can directly access data
             return true;
         } else {
             // Encrypted, check whether vold is started
-            return !getprop("init.svc.vold").empty();
+            return !get_prop("init.svc.vold").empty();
         }
     }
     // ro.crypto.state is not set, assume it's unencrypted
@@ -391,8 +391,8 @@ static void post_fs_data() {
         goto early_abort;
     }
 
-    if (getprop("persist.sys.safemode", true) == "1" ||
-        getprop("ro.sys.safemode") == "1" || check_key_combo()) {
+    if (get_prop("persist.sys.safemode", true) == "1" ||
+        get_prop("ro.sys.safemode") == "1" || check_key_combo()) {
         boot_state |= FLAG_SAFE_MODE;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
