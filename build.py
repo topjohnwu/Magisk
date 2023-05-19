@@ -239,6 +239,7 @@ def run_ndk_build(flags):
 def run_cargo_build(args):
     os.chdir(op.join("native", "src"))
     native_out = op.join("..", "out")
+    mkdir(native_out)
 
     targets = set(args.target) & set(rust_targets)
     if "resetprop" in args.target:
