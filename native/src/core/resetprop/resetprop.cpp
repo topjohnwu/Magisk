@@ -29,9 +29,11 @@ struct PropFlags {
     void setSkipSvc() { flags |= 1; }
     void setPersist() { flags |= (1 << 1); }
     void setContext() { flags |= (1 << 2); }
+    void setPersistOnly() { flags |= (1 << 3); setPersist(); }
     bool isSkipSvc() const { return flags & 1; }
     bool isPersist() const { return flags & (1 << 1); }
     bool isContext() const { return flags & (1 << 2); }
+    bool isPersistOnly() const { return flags & (1 << 3); }
 private:
     uint32_t flags = 0;
 };
@@ -56,12 +58,13 @@ General flags:
    -v                print verbose output to stderr
 
 Read mode flags:
-   -Z      get property context instead of value
    -p      also read persistent props from storage
+   -P      only read persistent props from storage
+   -Z      get property context instead of value
 
 Write mode flags:
    -n      set properties bypassing property_service
-   -p      always write persistent props changes to storage
+   -p      always write persistent prop changes to storage
 
 )EOF", arg0);
     exit(1);
@@ -178,10 +181,12 @@ static string get_prop(const char *name, PropFlags flags) {
     }
 
     string val;
-    if (auto pi = system_property_find(name)) {
-        prop_to_string cb(val);
-        read_prop_with_cb(pi, &cb);
-        LOGD("resetprop: get prop [%s]: [%s]\n", name, val.data());
+    if (!flags.isPersistOnly()) {
+        if (auto pi = system_property_find(name)) {
+            prop_to_string cb(val);
+            read_prop_with_cb(pi, &cb);
+            LOGD("resetprop: get prop [%s]: [%s]\n", name, val.data());
+        }
     }
 
     if (val.empty() && flags.isPersist() && str_starts(name, "persist."))
@@ -195,7 +200,8 @@ static string get_prop(const char *name, PropFlags flags) {
 static void print_props(PropFlags flags) {
     prop_list list;
     prop_collector collector(list);
-    system_property_foreach(read_prop_with_cb, &collector);
+    if (!flags.isPersistOnly())
+        system_property_foreach(read_prop_with_cb, &collector);
     if (flags.isPersist())
         persist_get_props(&collector);
     for (auto &[key, val] : list) {
@@ -290,6 +296,9 @@ int resetprop_main(int argc, char *argv[]) {
                 continue;
             case 'p':
                 flags.setPersist();
+                continue;
+            case 'P':
+                flags.setPersistOnly();
                 continue;
             case 'v':
                 set_log_level_state(LogLevel::Debug, true);
