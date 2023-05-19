@@ -554,7 +554,7 @@ def setup_ndk(args):
         )
         if not op.exists(lib_dir):
             continue
-        src_dir = op.join("tools", "ndk-bins", "21", arch)
+        src_dir = op.join("tools", "ndk-bins", arch)
         rm(op.join(src_dir, ".DS_Store"))
         shutil.copytree(src_dir, lib_dir, copy_function=cp, dirs_exist_ok=True)
 

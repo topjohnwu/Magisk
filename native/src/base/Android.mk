@@ -22,8 +22,8 @@ include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libcompat
-# Workaround "hacky" libc.a missing symbols
-# To build Magisk with vanilla NDK, comment out the next line
+# Add "hacky" libc.a missing symbols back
+# All symbols in this library are weak, so a vanilla NDK should still link properly
 LOCAL_SRC_FILES := compat/compat.cpp
 # Fix static variables' ctor/dtor when using LTO
 # See: https://github.com/android/ndk/issues/1461

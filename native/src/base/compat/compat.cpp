@@ -1,17 +1,18 @@
-// This file implements all missing symbols that should exist in normal API 21
+// This file implements all missing symbols that should exist in normal API 23
 // libc.a but missing in our extremely lean libc.a replacements.
+
+#if !defined(__LP64__)
 
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <mntent.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/syscall.h>
-#include <sys/stat.h>
 
-#if !defined(__LP64__)
 extern "C" {
+
+#include "fortify.hpp"
 
 // Original source: https://github.com/freebsd/freebsd/blob/master/contrib/file/src/getline.c
 // License: BSD, full copyright notice please check original source
@@ -58,40 +59,7 @@ ssize_t getline(char **buf, size_t *bufsiz, FILE *fp) {
     return getdelim(buf, bufsiz, '\n', fp);
 }
 
-[[gnu::weak]]
-FILE *setmntent(const char *path, const char *mode) {
-    return fopen(path, mode);
-}
-
-[[gnu::weak]]
-int endmntent(FILE *fp) {
-    if (fp != nullptr) {
-        fclose(fp);
-    }
-    return 1;
-}
-
 // Missing system call wrappers
-
-[[gnu::weak]]
-int setns(int fd, int nstype) {
-    return syscall(__NR_setns, fd, nstype);
-}
-
-[[gnu::weak]]
-int unshare(int flags) {
-    return syscall(__NR_unshare, flags);
-}
-
-[[gnu::weak]]
-int accept4(int sockfd, struct sockaddr *addr, socklen_t *addrlen, int flags) {
-    return syscall(__NR_accept4, sockfd, addr, addrlen, flags);
-}
-
-[[gnu::weak]]
-int dup3(int oldfd, int newfd, int flags) {
-    return syscall(__NR_dup3, oldfd, newfd, flags);
-}
 
 [[gnu::weak]]
 ssize_t readlinkat(int dirfd, const char *pathname, char *buf, size_t bufsiz) {
@@ -107,11 +75,6 @@ int symlinkat(const char *target, int newdirfd, const char *linkpath) {
 int linkat(int olddirfd, const char *oldpath,
            int newdirfd, const char *newpath, int flags) {
     return syscall(__NR_linkat, olddirfd, oldpath, newdirfd, newpath, flags);
-}
-
-[[gnu::weak]]
-int inotify_init1(int flags) {
-    return syscall(__NR_inotify_init1, flags);
 }
 
 [[gnu::weak]]
@@ -141,34 +104,6 @@ int ftruncate64(int fd, off64_t length) {
 
 [[gnu::weak]]
 void android_set_abort_message(const char *) {}
-
-// Original source: <android/legacy_signal_inlines.h>
-[[gnu::weak]]
-int sigaddset(sigset_t *set, int signum) {
-    /* Signal numbers start at 1, but bit positions start at 0. */
-    int bit = signum - 1;
-    auto *local_set = (unsigned long *)set;
-    if (set == nullptr || bit < 0 || bit >= (int)(8 * sizeof(sigset_t))) {
-        errno = EINVAL;
-        return -1;
-    }
-    local_set[bit / LONG_BIT] |= 1UL << (bit % LONG_BIT);
-    return 0;
-}
-
-[[gnu::weak]]
-int sigemptyset(sigset_t *set) {
-    if (set == nullptr) {
-        errno = EINVAL;
-        return -1;
-    }
-    memset(set, 0, sizeof(sigset_t));
-    return 0;
-}
-
-#undef vsnprintf
-#undef snprintf
-#include "fortify.hpp"
 
 extern FILE __sF[];
 
