@@ -154,6 +154,12 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
         LOGD("resetprop: create prop [%s]: [%s] by %s\n", name, value, msg);
     }
 
+    // When bypassing property_service, persistent props won't be stored in storage.
+    // Explicitly handle this situation.
+    if (ret == 0 && flags.isSkipSvc() && flags.isPersist() && str_starts(name, "persist.")) {
+        ret = persist_set_prop(name, value) ? 0 : 1;
+    }
+
     if (ret) {
         LOGW("resetprop: set prop error\n");
     }
@@ -172,15 +178,15 @@ static string get_prop(const char *name, PropFlags flags) {
     }
 
     string val;
-    auto pi = system_property_find(name);
-    if (pi == nullptr)
-        return val;
-    auto cb = prop_to_string(val);
-    read_prop_with_cb(pi, &cb);
-    LOGD("resetprop: get prop [%s]: [%s]\n", name, val.data());
+    if (auto pi = system_property_find(name)) {
+        prop_to_string cb(val);
+        read_prop_with_cb(pi, &cb);
+        LOGD("resetprop: get prop [%s]: [%s]\n", name, val.data());
+    }
 
     if (val.empty() && flags.isPersist() && str_starts(name, "persist."))
-        val = persist_getprop(name);
+        val = persist_get_prop(name);
+
     if (val.empty())
         LOGD("resetprop: prop [%s] does not exist\n", name);
     return val;
@@ -191,7 +197,7 @@ static void print_props(PropFlags flags) {
     prop_collector collector(list);
     system_property_foreach(read_prop_with_cb, &collector);
     if (flags.isPersist())
-        persist_getprops(&collector);
+        persist_get_props(&collector);
     for (auto &[key, val] : list) {
         const char *v = flags.isContext() ?
                 (__system_property_get_context(key.data()) ?: "") :
@@ -208,7 +214,7 @@ static int delete_prop(const char *name, PropFlags flags) {
 
     int ret = __system_property_delete(name, true);
     if (flags.isPersist() && str_starts(name, "persist.")) {
-        if (persist_deleteprop(name))
+        if (persist_delete_prop(name))
             ret = 0;
     }
     return ret;
