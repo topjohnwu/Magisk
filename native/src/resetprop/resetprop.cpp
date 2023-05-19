@@ -121,10 +121,105 @@ private:
     string &val;
 };
 
-struct resetprop {
+static int set_prop(const char *name, const char *value, PropFlags flags) {
+    if (!check_legal_property_name(name))
+        return 1;
 
-    resetprop() {
+    const char *msg = flags.isSkipSvc() ? "modifying prop data structure" : "property_service";
 
+    auto pi = const_cast<prop_info *>(__system_property_find(name));
+
+    // Always delete existing read-only properties, because they could be
+    // long properties and cannot directly go through __system_property_update
+    if (pi != nullptr && str_starts(name, "ro.")) {
+        // Skip pruning nodes as we will add it back ASAP
+        __system_property_delete(name, false);
+        pi = nullptr;
+    }
+
+    int ret;
+    if (pi != nullptr) {
+        if (flags.isSkipSvc()) {
+            ret = __system_property_update(pi, value, strlen(value));
+        } else {
+            ret = system_property_set(name, value);
+        }
+        LOGD("resetprop: update prop [%s]: [%s] by %s\n", name, value, msg);
+    } else {
+        if (flags.isSkipSvc()) {
+            ret = __system_property_add(name, strlen(name), value, strlen(value));
+        } else {
+            ret = system_property_set(name, value);
+        }
+        LOGD("resetprop: create prop [%s]: [%s] by %s\n", name, value, msg);
+    }
+
+    if (ret)
+        LOGW("resetprop: setprop error\n");
+
+    return ret;
+}
+
+static string get_prop(const char *name, PropFlags flags) {
+    if (!check_legal_property_name(name))
+        return "";
+
+    if (flags.isContext()) {
+        auto val = __system_property_get_context(name) ?: "";
+        LOGD("resetprop: getcontext [%s]: [%s]\n", name, val);
+        return val;
+    }
+
+    string val;
+    auto pi = system_property_find(name);
+    if (pi == nullptr)
+        return val;
+    auto cb = prop_to_string(val);
+    read_prop_with_cb(pi, &cb);
+    LOGD("resetprop: getprop [%s]: [%s]\n", name, val.data());
+
+    if (val.empty() && flags.isPersist() && strncmp(name, "persist.", 8) == 0)
+        val = persist_getprop(name);
+    if (val.empty())
+        LOGD("resetprop: prop [%s] does not exist\n", name);
+    return val;
+}
+
+static void print_props(PropFlags flags) {
+    prop_list list;
+    prop_collector collector(list);
+    system_property_foreach(read_prop_with_cb, &collector);
+    if (flags.isPersist())
+        persist_getprops(&collector);
+    for (auto &[key, val] : list) {
+        const char *v = flags.isContext() ?
+                (__system_property_get_context(key.data()) ?: "") :
+                val.data();
+        printf("[%s]: [%s]\n", key.data(), v);
+    }
+}
+
+static int delete_prop(const char *name, PropFlags flags) {
+    LOGD("resetprop: delete prop [%s]\n", name);
+
+    int ret = __system_property_delete(name, true);
+    if (flags.isPersist() && str_starts(name, "persist.")) {
+        if (persist_deleteprop(name))
+            ret = 0;
+    }
+    return ret;
+}
+
+static void load_file(const char *filename, PropFlags flags) {
+    LOGD("resetprop: Parse prop file [%s]\n", filename);
+    parse_prop_file(filename, [=](auto key, auto val) -> bool {
+        set_prop(key.data(), val.data(), flags);
+        return true;
+    });
+}
+
+struct Initialize {
+    Initialize() {
 #ifndef APPLET_STUB_MAIN
 #define DLOAD(name) (*(void **) &name = dlsym(RTLD_DEFAULT, "__" #name))
         // Load platform implementations
@@ -135,115 +230,14 @@ struct resetprop {
         DLOAD(system_property_foreach);
 #undef DLOAD
 #endif
-
         if (__system_properties_init()) {
             LOGE("resetprop: __system_properties_init error\n");
         }
     }
-
-
-    int set_prop(const char *name, const char *value, PropFlags flags) {
-        if (!check_legal_property_name(name))
-            return 1;
-
-        const char *msg = flags.isSkipSvc() ? "modifying prop data structure" : "property_service";
-
-        auto pi = const_cast<prop_info *>(__system_property_find(name));
-
-        // Always delete existing read-only properties, because they could be
-        // long properties and cannot directly go through __system_property_update
-        if (pi != nullptr && str_starts(name, "ro.")) {
-            // Skip pruning nodes as we will add it back ASAP
-            __system_property_delete(name, false);
-            pi = nullptr;
-        }
-
-        int ret;
-        if (pi != nullptr) {
-            if (flags.isSkipSvc()) {
-                ret = __system_property_update(pi, value, strlen(value));
-            } else {
-                ret = system_property_set(name, value);
-            }
-            LOGD("resetprop: update prop [%s]: [%s] by %s\n", name, value, msg);
-        } else {
-            if (flags.isSkipSvc()) {
-                ret = __system_property_add(name, strlen(name), value, strlen(value));
-            } else {
-                ret = system_property_set(name, value);
-            }
-            LOGD("resetprop: create prop [%s]: [%s] by %s\n", name, value, msg);
-        }
-
-        if (ret)
-            LOGW("resetprop: setprop error\n");
-
-        return ret;
-    }
-
-    string get_prop(const char *name, PropFlags flags) {
-        if (!check_legal_property_name(name))
-            return "";
-
-        if (flags.isContext()) {
-            auto val = __system_property_get_context(name) ?: "";
-            LOGD("resetprop: getcontext [%s]: [%s]\n", name, val);
-            return val;
-        }
-
-        string val;
-        auto pi = system_property_find(name);
-        if (pi == nullptr)
-            return val;
-        auto cb = prop_to_string(val);
-        read_prop_with_cb(pi, &cb);
-        LOGD("resetprop: getprop [%s]: [%s]\n", name, val.data());
-
-        if (val.empty() && flags.isPersist() && strncmp(name, "persist.", 8) == 0)
-            val = persist_getprop(name);
-        if (val.empty())
-            LOGD("resetprop: prop [%s] does not exist\n", name);
-        return val;
-    }
-
-    void print_props(PropFlags flags) {
-        prop_list list;
-        prop_collector collector(list);
-        system_property_foreach(read_prop_with_cb, &collector);
-        if (flags.isPersist())
-            persist_getprops(&collector);
-        for (auto &[key, val] : list) {
-            const char *v = flags.isContext() ?
-                    (__system_property_get_context(key.data()) ?: "") :
-                    val.data();
-            printf("[%s]: [%s]\n", key.data(), v);
-        }
-    }
-
-    // Not an error when something is deleted
-    int delete_prop(const char *name, PropFlags flags) {
-        LOGD("resetprop: delete prop [%s]\n", name);
-
-        int ret = __system_property_delete(name, true);
-        if (flags.isPersist() && str_starts(name, "persist.")) {
-            if (persist_deleteprop(name))
-                ret = 0;
-        }
-        return ret;
-    }
-
-    void load_file(const char *filename, PropFlags flags) {
-        LOGD("resetprop: Parse prop file [%s]\n", filename);
-        parse_prop_file(filename, [&](auto key, auto val) -> bool {
-            set_prop(key.data(), val.data(), flags);
-            return true;
-        });
-    }
 };
 
-static resetprop *get_impl() {
-    static resetprop impl;
-    return &impl;
+static void InitOnce() {
+    struct Initialize init;
 }
 
 int resetprop_main(int argc, char *argv[]) {
@@ -265,6 +259,7 @@ int resetprop_main(int argc, char *argv[]) {
                 } else if (argv[0] == "--help"sv) {
                     usage(argv0);
                 }
+                break;
             case 'v':
                 set_log_level_state(LogLevel::Debug, true);
                 continue;
@@ -289,34 +284,34 @@ int resetprop_main(int argc, char *argv[]) {
         ++argv;
     }
 
-    resetprop *impl = get_impl();
+    InitOnce();
 
     if (flags.isDelete()) {
         if (argc != 1)
             usage(argv0);
-        return impl->delete_prop(argv[0], flags);
+        return delete_prop(argv[0], flags);
     }
 
     if (flags.isLoadFile()) {
         if (argc != 1)
             usage(argv0);
-        impl->load_file(argv[0], flags);
+        load_file(argv[0], flags);
         return 0;
     }
 
     switch (argc) {
     case 0:
-        impl->print_props(flags);
+        print_props(flags);
         return 0;
     case 1: {
-        string val = impl->get_prop(argv[0], flags);
+        string val = get_prop(argv[0], flags);
         if (val.empty())
             return 1;
         printf("%s\n", val.data());
         return 0;
     }
     case 2:
-        return impl->set_prop(argv[0], argv[1], flags);
+        return set_prop(argv[0], argv[1], flags);
     default:
         usage(argv0);
     }
@@ -327,25 +322,29 @@ int resetprop_main(int argc, char *argv[]) {
  ***********************************/
 
 string get_prop(const char *name, bool persist) {
+    InitOnce();
     PropFlags flags;
     if (persist) flags.setPersist();
-    return get_impl()->get_prop(name, flags);
+    return get_prop(name, flags);
 }
 
 int delete_prop(const char *name, bool persist) {
+    InitOnce();
     PropFlags flags;
     if (persist) flags.setPersist();
-    return get_impl()->delete_prop(name, flags);
+    return delete_prop(name, flags);
 }
 
 int set_prop(const char *name, const char *value, bool skip_svc) {
+    InitOnce();
     PropFlags flags;
     if (skip_svc) flags.setSkipSvc();
-    return get_impl()->set_prop(name, value, flags);
+    return set_prop(name, value, flags);
 }
 
 void load_prop_file(const char *filename, bool skip_svc) {
+    InitOnce();
     PropFlags flags;
     if (skip_svc) flags.setSkipSvc();
-    get_impl()->load_file(filename, flags);
+    load_file(filename, flags);
 }
