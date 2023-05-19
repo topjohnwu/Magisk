@@ -240,7 +240,7 @@ bool sepolicy::to_file(const char *file) {
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
 
-    auto fp = make_stream_fp<byte_stream>(data, len);
+    auto fp = make_channel_fp<byte_channel>(data, len);
     run_finally fin([=]{ free(data); });
 
     policy_file_t pf;
