@@ -195,9 +195,6 @@ public:
 
 protected:
     bool write_chunk(const void *buf, size_t len, bool final) override {
-        if (len == 0)
-            return true;
-
         auto in = static_cast<const unsigned char *>(buf);
 
         in_total += len;
@@ -514,7 +511,7 @@ public:
     }
 
 protected:
-    bool write_chunk(const void *buf, size_t len, bool final) override {
+    bool write_chunk(const void *buf, size_t len, bool) override {
         // This is an error
         if (len != chunk_sz)
             return false;
@@ -565,7 +562,7 @@ public:
     }
 
 protected:
-    bool write_chunk(const void *buf, size_t len, bool final) override {
+    bool write_chunk(const void *buf, size_t len, bool) override {
         auto in = static_cast<const char *>(buf);
         uint32_t block_sz = LZ4_compress_HC(in, out_buf, len, LZ4_COMPRESSED, LZ4HC_CLEVEL_MAX);
         if (block_sz == 0) {
@@ -585,7 +582,7 @@ private:
     uint32_t in_total;
 };
 
-filter_strm_ptr get_encoder(format_t type, out_strm_ptr &&base) {
+out_strm_ptr get_encoder(format_t type, out_strm_ptr &&base) {
     switch (type) {
         case XZ:
             return make_unique<xz_encoder>(std::move(base));
@@ -607,7 +604,7 @@ filter_strm_ptr get_encoder(format_t type, out_strm_ptr &&base) {
     }
 }
 
-filter_strm_ptr get_decoder(format_t type, out_strm_ptr &&base) {
+out_strm_ptr get_decoder(format_t type, out_strm_ptr &&base) {
     switch (type) {
         case XZ:
         case LZMA:
@@ -721,7 +718,6 @@ void compress(const char *method, const char *infile, const char *outfile) {
         unlink(infile);
 }
 
-namespace rust {
 bool decompress(const unsigned char *in, uint64_t in_size, int fd) {
     format_t type = check_fmt(in, in_size);
 
@@ -735,5 +731,4 @@ bool decompress(const unsigned char *in, uint64_t in_size, int fd) {
         return false;
     }
     return true;
-}
 }

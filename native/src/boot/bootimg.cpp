@@ -20,14 +20,14 @@ uint64_t dyn_img_hdr::j64 = 0;
 
 static void decompress(format_t type, int fd, const void *in, size_t size) {
     auto ptr = get_decoder(type, make_unique<fd_channel>(fd));
-    ptr->write(in, size, true);
+    ptr->write(in, size);
 }
 
 static off_t compress(format_t type, int fd, const void *in, size_t size) {
     auto prev = lseek(fd, 0, SEEK_CUR);
     {
         auto strm = get_encoder(type, make_unique<fd_channel>(fd));
-        strm->write(in, size, true);
+        strm->write(in, size);
     }
     auto now = lseek(fd, 0, SEEK_CUR);
     return now - prev;

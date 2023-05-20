@@ -18,15 +18,10 @@ using out_strm_ptr = std::unique_ptr<out_stream>;
 class filter_out_stream : public out_stream {
 public:
     filter_out_stream(out_strm_ptr &&base) : base(std::move(base)) {}
-
     bool write(const void *buf, size_t len) override;
-    virtual bool write(const void *buf, size_t len, bool final);
-
 protected:
     out_strm_ptr base;
 };
-
-using filter_strm_ptr = std::unique_ptr<filter_out_stream>;
 
 // Buffered output stream, writing in chunks
 class chunk_out_stream : public filter_out_stream {
@@ -40,7 +35,6 @@ public:
     ~chunk_out_stream() override { delete[] _buf; }
 
     bool write(const void *buf, size_t len) final;
-    bool write(const void *buf, size_t len, bool final) final;
 
 protected:
     // Classes inheriting this class has to call finalize() in its destructor
@@ -63,7 +57,7 @@ struct in_stream {
 };
 
 // A channel is something that is writable, readable, and seekable
-struct channel : public in_stream, public out_stream {
+struct channel : public out_stream, public in_stream {
     virtual off_t seek(off_t off, int whence) = 0;
     virtual ~channel() = default;
 };
