@@ -234,14 +234,10 @@ sepol_impl::~sepol_impl() {
 }
 
 bool sepolicy::to_file(const char *file) {
-    uint8_t *data;
-    size_t len;
-
     // No partial writes are allowed to /sys/fs/selinux/load, thus the reason why we
     // first dump everything into memory, then directly call write system call
-
-    auto fp = make_channel_fp<byte_channel>(data, len);
-    run_finally fin([=]{ free(data); });
+    heap_data data;
+    auto fp = make_channel_fp<byte_channel>(data);
 
     policy_file_t pf;
     policy_file_init(&pf);
@@ -255,7 +251,7 @@ bool sepolicy::to_file(const char *file) {
     int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
     if (fd < 0)
         return false;
-    xwrite(fd, data, len);
+    xwrite(fd, data.buf, data.sz);
 
     close(fd);
     return true;

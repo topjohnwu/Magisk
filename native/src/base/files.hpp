@@ -26,19 +26,6 @@ struct file_attr {
     char con[128];
 };
 
-struct byte_data {
-    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
-
-    uint8_t *buf = nullptr;
-    size_t sz = 0;
-
-    int patch(str_pairs list) { return patch(true, list); }
-    int patch(bool log, str_pairs list);
-    bool contains(std::string_view pattern, bool log = true) const;
-protected:
-    void swap(byte_data &o);
-};
-
 struct mount_info {
     unsigned int id;
     unsigned int parent;
@@ -56,13 +43,37 @@ struct mount_info {
     std::string fs_option;
 };
 
+struct byte_data {
+    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+
+    uint8_t *buf = nullptr;
+    size_t sz = 0;
+
+    int patch(str_pairs list) { return patch(true, list); }
+    int patch(bool log, str_pairs list);
+    bool contains(std::string_view pattern, bool log = true) const;
+protected:
+    void swap(byte_data &o);
+};
+
+#define MOVE_ONLY(clazz) \
+clazz() = default;       \
+clazz(const clazz&) = delete; \
+clazz(clazz &&o) { swap(o); } \
+clazz& operator=(clazz &&o) { swap(o); return *this; }
+
+struct heap_data : public byte_data {
+    MOVE_ONLY(heap_data)
+
+    explicit heap_data(size_t sz) { this->sz = sz; buf = new uint8_t[sz]; }
+    ~heap_data() { free(buf); }
+};
+
 struct mmap_data : public byte_data {
-    mmap_data() = default;
-    mmap_data(const mmap_data&) = delete;
-    mmap_data(mmap_data &&o) { swap(o); }
+    MOVE_ONLY(mmap_data)
+
     mmap_data(const char *name, bool rw = false);
     ~mmap_data() { if (buf) munmap(buf, sz); }
-    mmap_data& operator=(mmap_data &&other) { swap(other); return *this; }
 };
 
 extern "C" {
