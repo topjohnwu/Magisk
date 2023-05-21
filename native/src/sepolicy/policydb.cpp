@@ -248,9 +248,12 @@ bool sepolicy::to_file(const char *file) {
         return false;
     }
 
-    int fd = xopen(file, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
+    int fd = xopen(file, O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
     if (fd < 0)
         return false;
+    if (struct stat st{}; xfstat(fd, &st) == 0 && st.st_size > 0) {
+        ftruncate(fd, 0);
+    }
     xwrite(fd, data.buf, data.sz);
 
     close(fd);
