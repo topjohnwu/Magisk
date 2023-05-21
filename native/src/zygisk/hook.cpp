@@ -2,18 +2,19 @@
 #include <sys/mount.h>
 #include <dlfcn.h>
 #include <regex.h>
+#include <unwind.h>
 #include <bitset>
 #include <list>
 
 #include <lsplt.hpp>
 
 #include <base.hpp>
-#include <flags.h>
-#include <daemon.hpp>
+#include <magisk.hpp>
 
 #include "zygisk.hpp"
 #include "memory.hpp"
 #include "module.hpp"
+#include "native_bridge.h"
 #include "deny/deny.hpp"
 
 using namespace std;
@@ -29,6 +30,7 @@ static void hook_unloader();
 static void unhook_functions();
 static void hook_jni_env();
 static void restore_jni_env(JNIEnv *env);
+static void ReloadNativeBridge(const string &nb);
 
 namespace {
 
@@ -157,9 +159,6 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
         (g_ctx->info_flags & PROCESS_IS_SYS_UI) == 0) {
         if (g_ctx->flags[DO_REVERT_UNMOUNT]) {
             revert_unmount();
-        } else {
-            umount2("/system/bin/app_process64", MNT_DETACH);
-            umount2("/system/bin/app_process32", MNT_DETACH);
         }
         // Restore errno back to 0
         errno = 0;
@@ -207,6 +206,20 @@ DCL_HOOK_FUNC(int, pthread_attr_destroy, void *target) {
     }
 
     return res;
+}
+
+// it should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
+DCL_HOOK_FUNC(int, dlclose, void *handle) {
+    static bool kDone = false;
+    if (!kDone) {
+        ZLOGV("dlclose zygisk_loader\n");
+        kDone = true;
+        string nb = get_prop(NBPROP);
+        if (nb != ZYGISKLDR) {
+            ReloadNativeBridge(nb);
+        }
+    }
+    [[clang::musttail]] return old_dlclose(handle);
 }
 
 #undef DCL_HOOK_FUNC
@@ -714,6 +727,37 @@ void HookContext::nativeForkAndSpecialize_post() {
 
 // -----------------------------------------------------------------
 
+inline void *unwind_get_region_start(_Unwind_Context *ctx) {
+    auto fp = _Unwind_GetRegionStart(ctx);
+#if defined(__arm__)
+    auto pc = _Unwind_GetGR(ctx, 15); // r15 is pc
+    if (pc & 1) {
+        // Thumb mode
+        fp |= 1;
+    }
+#endif
+    return reinterpret_cast<void *>(fp);
+}
+
+static void ReloadNativeBridge(const string &nb) {
+    // Use unwind to find the address of LoadNativeBridge
+    // and call it to get NativeBridgeRuntimeCallbacks
+    void *load_native_bridge = nullptr;
+    _Unwind_Backtrace(+[](struct _Unwind_Context *ctx, void *arg) -> _Unwind_Reason_Code {
+        void *fp = unwind_get_region_start(ctx);
+        Dl_info info{};
+        dladdr(fp, &info);
+        ZLOGV("backtrace: %p %s\n", fp, info.dli_fname ? info.dli_fname : "???");
+        if (info.dli_fname && std::string_view(info.dli_fname).ends_with("/libart.so")) {
+            ZLOGV("LoadNativeBridge: %p\n", fp);
+            *reinterpret_cast<void **>(arg) = fp;
+            return _URC_END_OF_STACK;
+        }
+        return _URC_NO_REASON;
+    }, &load_native_bridge);
+    reinterpret_cast<bool (*)(const string &)>(load_native_bridge)(nb);
+}
+
 static void hook_register(dev_t dev, ino_t inode, const char *symbol, void *new_func, void **old_func) {
     if (!lsplt::RegisterHook(dev, inode, symbol, new_func, old_func)) {
         ZLOGE("Failed to register plt_hook \"%s\"\n", symbol);
@@ -741,15 +785,20 @@ void hook_functions() {
 
     ino_t android_runtime_inode = 0;
     dev_t android_runtime_dev = 0;
+    ino_t native_bridge_inode = 0;
+    dev_t native_bridge_dev = 0;
 
     for (auto &map : lsplt::MapInfo::Scan()) {
-        if (map.path.ends_with("libandroid_runtime.so")) {
+        if (map.path.ends_with("/libandroid_runtime.so")) {
             android_runtime_inode = map.inode;
             android_runtime_dev = map.dev;
-            break;
+        } else if (map.path.ends_with("/libnativebridge.so")) {
+            native_bridge_inode = map.inode;
+            native_bridge_dev = map.dev;
         }
     }
 
+    PLT_HOOK_REGISTER(native_bridge_dev, native_bridge_inode, dlclose);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, androidSetCreateThreadFunc);

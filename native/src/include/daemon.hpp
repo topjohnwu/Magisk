@@ -35,7 +35,6 @@ enum : int {
     SQLITE_CMD,
     REMOVE_MODULES,
     ZYGISK,
-    ZYGISK_PASSTHROUGH,
 
     _STAGE_BARRIER_,
 
@@ -67,9 +66,8 @@ struct module_info {
 };
 
 extern bool zygisk_enabled;
-extern int app_process_32;
-extern int app_process_64;
 extern std::vector<module_info> *module_list;
+void reset_zygisk(bool restore);
 
 extern "C" const char *get_magisk_tmp();
 int connect_daemon(int req, bool create = false);

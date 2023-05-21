@@ -6,9 +6,7 @@
 #include <android/dlext.h>
 
 #include <base.hpp>
-#include <daemon.hpp>
 #include <magisk.hpp>
-#include <selinux.hpp>
 
 #include "zygisk.hpp"
 #include "module.hpp"
@@ -18,43 +16,11 @@ using namespace std;
 
 void *self_handle = nullptr;
 
-// Make sure /proc/self/environ is sanitized
-// Filter env and reset MM_ENV_END
-static void sanitize_environ() {
-    char *cur = environ[0];
-
-    for (int i = 0; environ[i]; ++i) {
-        // Copy all env onto the original stack
-        size_t len = strlen(environ[i]);
-        memmove(cur, environ[i], len + 1);
-        environ[i] = cur;
-        cur += len + 1;
-    }
-
-    prctl(PR_SET_MM, PR_SET_MM_ENV_END, cur, 0, 0);
-}
-
-extern "C" void unload_first_stage() {
-    ZLOGD("unloading first stage\n");
-    unmap_all(HIJACK_BIN);
-    xumount2(HIJACK_BIN, MNT_DETACH);
-}
-
-extern "C" void zygisk_inject_entry(void *handle) {
-    zygisk_logging();
-    ZLOGD("load success\n");
-
-    char *ld = getenv("LD_PRELOAD");
-    if (char *c = strrchr(ld, ':')) {
-        *c = '\0';
-        setenv("LD_PRELOAD", ld, 1);  // Restore original LD_PRELOAD
-    } else {
-        unsetenv("LD_PRELOAD");
-    }
-
+extern "C" [[maybe_unused]] void zygisk_inject_entry(void *handle) {
     self_handle = handle;
-    sanitize_environ();
+    zygisk_logging();
     hook_functions();
+    ZLOGD("load success\n");
 }
 
 // The following code runs in zygote/app process
@@ -146,88 +112,6 @@ static void connect_companion(int client, bool is_64_bit) {
     send_fd(zygiskd_socket, client);
 }
 
-static timespec last_zygote_start;
-static int zygote_start_counts[] = { 0, 0 };
-#define zygote_start_count zygote_start_counts[is_64_bit]
-#define zygote_started (zygote_start_counts[0] + zygote_start_counts[1])
-#define zygote_start_reset(val) { zygote_start_counts[0] = val; zygote_start_counts[1] = val; }
-
-static void setup_files(int client, const sock_cred *cred) {
-    LOGD("zygisk: setup files for pid=[%d]\n", cred->pid);
-
-    char buf[4096];
-    if (!get_exe(cred->pid, buf, sizeof(buf))) {
-        write_int(client, 1);
-        return;
-    }
-
-    // Hijack some binary in /system/bin to host loader
-    const char *hbin;
-    string mbin;
-    int app_fd;
-    bool is_64_bit = str_ends(buf, "64");
-    if (is_64_bit) {
-        hbin = HIJACK_BIN64;
-        mbin = get_magisk_tmp() + "/"s ZYGISKBIN "/loader64.so";
-        app_fd = app_process_64;
-    } else {
-        hbin = HIJACK_BIN32;
-        mbin = get_magisk_tmp() + "/"s ZYGISKBIN "/loader32.so";
-        app_fd = app_process_32;
-    }
-
-    if (!zygote_started) {
-        // First zygote launch, record time
-        clock_gettime(CLOCK_MONOTONIC, &last_zygote_start);
-    }
-
-    if (zygote_start_count) {
-        // This zygote ABI had started before, kill existing zygiskd
-        close(zygiskd_sockets[0]);
-        close(zygiskd_sockets[1]);
-        zygiskd_sockets[0] = -1;
-        zygiskd_sockets[1] = -1;
-        xumount2(hbin, MNT_DETACH);
-    }
-    ++zygote_start_count;
-
-    if (zygote_start_count >= 5) {
-        // Bootloop prevention
-        timespec ts;
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        if (ts.tv_sec - last_zygote_start.tv_sec > 60) {
-            // This is very likely manual soft reboot
-            memcpy(&last_zygote_start, &ts, sizeof(ts));
-            zygote_start_reset(1);
-        } else {
-            // If any zygote relaunched more than 5 times within a minute,
-            // don't do any setups further to prevent bootloop.
-            zygote_start_reset(999);
-            write_int(client, 1);
-            return;
-        }
-    }
-
-    // Ack
-    write_int(client, 0);
-
-    // Receive and bind mount loader
-    int ld_fd = xopen(mbin.data(), O_WRONLY | O_TRUNC | O_CREAT | O_CLOEXEC, 0755);
-    string ld_data = read_string(client);
-    xwrite(ld_fd, ld_data.data(), ld_data.size());
-    close(ld_fd);
-    setfilecon(mbin.data(), MAGISK_FILE_CON);
-    xmount(mbin.data(), hbin, nullptr, MS_BIND, nullptr);
-
-    send_fd(client, app_fd);
-}
-
-static void magiskd_passthrough(int client) {
-    bool is_64_bit = read_int(client);
-    write_int(client, 0);
-    send_fd(client, is_64_bit ? app_process_64 : app_process_32);
-}
-
 extern bool uid_granted_root(int uid);
 static void get_process_info(int client, const sock_cred *cred) {
     int uid = read_int(client);
@@ -301,12 +185,6 @@ void zygisk_handler(int client, const sock_cred *cred) {
     int code = read_int(client);
     char buf[256];
     switch (code) {
-    case ZygiskRequest::SETUP:
-        setup_files(client, cred);
-        break;
-    case ZygiskRequest::PASSTHROUGH:
-        magiskd_passthrough(client);
-        break;
     case ZygiskRequest::GET_INFO:
         get_process_info(client, cred);
         break;
