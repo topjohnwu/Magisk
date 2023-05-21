@@ -36,7 +36,6 @@ LOCAL_SRC_FILES := \
     zygisk/entry.cpp \
     zygisk/main.cpp \
     zygisk/hook.cpp \
-    zygisk/memory.cpp \
     zygisk/native_bridge.cpp \
     zygisk/deny/cli.cpp \
     zygisk/deny/utils.cpp \

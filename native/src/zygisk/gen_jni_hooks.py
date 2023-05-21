@@ -213,16 +213,15 @@ def gen_jni_def(clz, methods):
             decl += ind(1) + f'return {m.ret.value};'
         decl += ind(0) + '}'
 
-    decl += ind(0) + f'const JNINativeMethod {m.base_name()}_methods[] = {{'
+    decl += ind(0) + f'std::array {m.base_name()}_methods {{'
     for m in methods:
-        decl += ind(1) + '{'
+        decl += ind(1) + 'JNINativeMethod {'
         decl += ind(2) + f'"{m.base_name()}",'
         decl += ind(2) + f'"{m.jni()}",'
         decl += ind(2) + f'(void *) &{m.name}'
         decl += ind(1) + '},'
     decl += ind(0) + '};'
     decl = ind(0) + f'void *{m.base_name()}_orig = nullptr;' + decl
-    decl += ind(0) + f'constexpr int {m.base_name()}_methods_num = std::size({m.base_name()}_methods);'
     decl += ind(0)
 
     hook_map[clz].append(m.base_name())
@@ -231,39 +230,22 @@ def gen_jni_def(clz, methods):
 
 def gen_jni_hook():
     decl = ''
-    decl += ind(0) + 'static JNINativeMethod *hookAndSaveJNIMethods(const char *className, const JNINativeMethod *methods, int numMethods) {'
-    decl += ind(1) + 'JNINativeMethod *newMethods = nullptr;'
-    decl += ind(1) + 'int clz_id = -1;'
-    decl += ind(1) + 'int hook_cnt = 0;'
-    decl += ind(1) + 'do {'
-
-    for index, (clz, methods) in enumerate(hook_map.items()):
-        decl += ind(2) + f'if (className == "{clz}"sv) {{'
-        decl += ind(3) + f'clz_id = {index};'
-        decl += ind(3) + f'hook_cnt = {len(methods)};'
-        decl += ind(3) + 'break;'
-        decl += ind(2) + '}'
-
-    decl += ind(1) + '} while (false);'
-
-    decl += ind(1) + 'if (hook_cnt) {'
-    decl += ind(2) + 'newMethods = new JNINativeMethod[numMethods];'
-    decl += ind(2) + 'memcpy(newMethods, methods, sizeof(JNINativeMethod) * numMethods);'
-    decl += ind(1) + '}'
-
-    decl += ind(1) + 'auto &class_map = (*jni_method_map)[className];'
-    decl += ind(1) + 'for (int i = 0; i < numMethods; ++i) {'
-
-    for index, methods in enumerate(hook_map.values()):
-        decl += ind(2) + f'if (hook_cnt && clz_id == {index}) {{'
+    decl += ind(0) + 'static void do_hook_zygote(JNIEnv *env) {'
+    decl += ind(1) + 'vector<JNINativeMethod> hooks;'
+    decl += ind(1) + 'const char *clz;'
+    for clz, methods in hook_map.items():
+        decl += ind(1) + f'clz = "{clz}";'
         for m in methods:
-            decl += ind(3) + f'HOOK_JNI({m})'
-        decl += ind(2) + '}'
+            decl += ind(1) + f'hookJniNativeMethods(env, clz, {m}_methods.data(), {m}_methods.size());'
+            decl += ind(1) + f'for (auto &method : {m}_methods) {{'
+            decl += ind(2) + f'if (method.fnPtr) {{'
+            decl += ind(3) + f'{m}_orig = method.fnPtr;'
+            decl += ind(3) + f'hooks.emplace_back(method);'
+            decl += ind(3) + f'break;'
+            decl += ind(2) + f'}}'
+            decl += ind(1) + f'}}'
+        decl += ind(1) + f'jni_hook_list->emplace(clz, std::move(hooks));'
 
-    decl += ind(2) + 'class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;'
-    decl += ind(1) + '}'
-
-    decl += ind(1) + 'return newMethods;'
     decl += ind(0) + '}'
     return decl
 
