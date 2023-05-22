@@ -25,7 +25,6 @@ enum : int {
     START_DAEMON,
     CHECK_VERSION,
     CHECK_VERSION_CODE,
-    GET_PATH,
     STOP_DAEMON,
 
     _SYNC_BARRIER_,
@@ -72,6 +71,7 @@ extern int app_process_32;
 extern int app_process_64;
 extern std::vector<module_info> *module_list;
 
+std::string find_magisk_tmp();
 int connect_daemon(int req, bool create = false);
 
 // Poll control

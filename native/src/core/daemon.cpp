@@ -179,9 +179,6 @@ static void handle_request_sync(int client, int code) {
     case MainRequest::CHECK_VERSION_CODE:
         write_int(client, MAGISK_VER_CODE);
         break;
-    case MainRequest::GET_PATH:
-        write_string(client, MAGISKTMP.data());
-        break;
     case MainRequest::START_DAEMON:
         rust::get_magiskd().setup_logfile();
         break;
@@ -240,7 +237,6 @@ static void handle_request(pollfd *pfd) {
     case MainRequest::BOOT_COMPLETE:
     case MainRequest::ZYGOTE_RESTART:
     case MainRequest::SQLITE_CMD:
-    case MainRequest::GET_PATH:
     case MainRequest::DENYLIST:
     case MainRequest::STOP_DAEMON:
         if (!is_root) {
@@ -415,15 +411,26 @@ static void daemon_entry() {
     poll_loop();
 }
 
+string find_magisk_tmp() {
+    if (access("/debug_ramdisk/" INTLROOT, F_OK) == 0) {
+        return "/debug_ramdisk";
+    }
+    if (access("/sbin/" INTLROOT, F_OK) == 0) {
+        return "/sbin";
+    }
+    // Fallback to lookup from mountinfo for manual mount, e.g. avd
+    for (const auto &mount: parse_mount_info("self")) {
+        if (mount.source == "magisk" && mount.root == "/") {
+            return mount.target;
+        }
+    }
+    return "";
+}
+
 int connect_daemon(int req, bool create) {
     int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
-    string tmp;
-    for (const auto &info: parse_mount_info("self")) {
-        if (info.source == "magisk" && info.root == "/") {
-            tmp = info.target;
-        }
-    }
+    string tmp = find_magisk_tmp();
     strcpy(addr.sun_path, (tmp + "/" MAIN_SOCKET).data());
     if (connect(fd, (sockaddr *) &addr, sizeof(addr))) {
         if (!create || getuid() != AID_ROOT) {
