@@ -27,9 +27,11 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
 
     fprintf(stream,
     "MagiskSU\n\n"
-    "Usage: su [options] [-] [user[:group,...] [argument...]]\n\n"
+    "Usage: su [options] [-] [user [argument...]]\n\n"
     "Options:\n"
     "  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
+    "  -g, --group GROUP             Specify the primary group\n"
+    "  -G, --supp-group GROUP        Specify a supplementary group. The first specified supplementary group is also used as a primary group if the option --group is not specified.\n"
     "  -z, --context CONTEXT         change SELinux context\n"
     "  -t, --target PID              PID to take mount namespace from\n"
     "  -h, --help                    display this help message and exit\n"
@@ -88,6 +90,8 @@ int su_client_main(int argc, char *argv[]) {
             { "context",                required_argument,  nullptr, 'z' },
             { "mount-master",           no_argument,        nullptr, 'M' },
             { "target",                 required_argument,  nullptr, 't' },
+            { "group",                  required_argument,  nullptr, 'g' },
+            { "supp-group",             required_argument,  nullptr, 'G' },
             { nullptr, 0, nullptr, 0 },
     };
 
@@ -101,7 +105,7 @@ int su_client_main(int argc, char *argv[]) {
             strcpy(argv[i], "-M");
     }
 
-    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:Mt:", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c':
                 for (int i = optind - 1; i < argc; ++i) {
@@ -148,6 +152,15 @@ int su_client_main(int argc, char *argv[]) {
                     }
                 }
                 break;
+            case 'g':
+            case 'G':
+                if (int gid = parse_int(optarg); gid >= 0) {
+                    su_req.gids.insert(c == 'g' ? su_req.gids.begin() : su_req.gids.end(), gid);
+                } else {
+                    fprintf(stderr, "Invalid GID: %s\n", optarg);
+                    usage(EXIT_FAILURE);
+                }
+                break;
             default:
                 /* Bionic getopt_long doesn't terminate its error output by newline */
                 fprintf(stderr, "\n");
@@ -161,19 +174,12 @@ int su_client_main(int argc, char *argv[]) {
     }
     /* username or uid */
     if (optind < argc) {
-        std::string_view uidgid = argv[optind];
-        auto sep = split_view(uidgid, ":");
-        if (sep.size() > 2) usage(EXIT_FAILURE);
-        auto user = std::string(sep[0]);
         struct passwd *pw;
-        pw = getpwnam(user.data());
-        su_req.uid = pw ? pw->pw_uid : parse_int(user);
-        if (sep.size() == 2) {
-            for (auto group : split_view(sep[1], ",")) {
-                pw = getpwnam(std::string(group).data());
-                su_req.gids.push_back(pw ? pw->pw_gid : parse_int(group));
-            }
-        }
+        pw = getpwnam(argv[optind]);
+        if (pw)
+            su_req.uid = pw->pw_uid;
+        else
+            su_req.uid = parse_int(argv[optind]);
         optind++;
     }
 
