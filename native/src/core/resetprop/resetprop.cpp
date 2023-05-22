@@ -115,14 +115,18 @@ static void read_prop_with_cb(const prop_info *pi, void *cb) {
     }
 }
 
+template<class StringType>
 struct prop_to_string : prop_cb {
-    explicit prop_to_string(string &s) : val(s) {}
     void exec(const char *, const char *value) override {
         val = value;
     }
-private:
-    string &val;
+    StringType val;
 };
+
+template<> void prop_to_string<rust::String>::exec(const char *, const char *value) {
+    // We do not want to crash when values are not UTF-8
+    val = rust::String::lossy(value);
+}
 
 static int set_prop(const char *name, const char *value, PropFlags flags) {
     if (!check_legal_property_name(name))
@@ -170,31 +174,33 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
     return ret;
 }
 
-static string get_prop(const char *name, PropFlags flags) {
+template<class StringType>
+static StringType get_prop(const char *name, PropFlags flags) {
     if (!check_legal_property_name(name))
-        return "";
+        return {};
+
+    prop_to_string<StringType> cb;
 
     if (flags.isContext()) {
-        auto val = __system_property_get_context(name) ?: "";
-        LOGD("resetprop: prop context [%s]: [%s]\n", name, val);
-        return val;
+        auto context = __system_property_get_context(name) ?: "";
+        LOGD("resetprop: prop context [%s]: [%s]\n", name, context);
+        cb.exec(name, context);
+        return cb.val;
     }
 
-    string val;
     if (!flags.isPersistOnly()) {
         if (auto pi = system_property_find(name)) {
-            prop_to_string cb(val);
             read_prop_with_cb(pi, &cb);
-            LOGD("resetprop: get prop [%s]: [%s]\n", name, val.data());
+            LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
         }
     }
 
-    if (val.empty() && flags.isPersist() && str_starts(name, "persist."))
-        val = persist_get_prop(name);
-
-    if (val.empty())
+    if (cb.val.empty() && flags.isPersist() && str_starts(name, "persist."))
+        persist_get_prop(name, &cb);
+    if (cb.val.empty())
         LOGD("resetprop: prop [%s] does not exist\n", name);
-    return val;
+
+    return cb.val;
 }
 
 static void print_props(PropFlags flags) {
@@ -335,7 +341,7 @@ int resetprop_main(int argc, char *argv[]) {
         print_props(flags);
         return 0;
     case 1: {
-        string val = get_prop(argv[0], flags);
+        auto val = get_prop<string>(argv[0], flags);
         if (val.empty())
             return 1;
         printf("%s\n", val.data());
@@ -352,11 +358,20 @@ int resetprop_main(int argc, char *argv[]) {
  * Public APIs
  ****************/
 
-string get_prop(const char *name, bool persist) {
+template<class StringType>
+static StringType get_prop_impl(const char *name, bool persist) {
     InitOnce();
     PropFlags flags;
     if (persist) flags.setPersist();
-    return get_prop(name, flags);
+    return get_prop<StringType>(name, flags);
+}
+
+rust::String get_prop_rs(const char *name, bool persist) {
+    return get_prop_impl<rust::String>(name, persist);
+}
+
+string get_prop(const char *name, bool persist) {
+    return get_prop_impl<string>(name, persist);
 }
 
 int delete_prop(const char *name, bool persist) {

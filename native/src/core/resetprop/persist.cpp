@@ -223,23 +223,22 @@ private:
     string_view _name;
 };
 
-string persist_get_prop(const char *name) {
+void persist_get_prop(const char *name, prop_cb *prop_cb) {
     if (check_pb()) {
         match_prop_name cb(name);
         pb_get_prop(&cb);
         if (cb.value[0]) {
             LOGD("resetprop: get prop (persist) [%s]: [%s]\n", name, cb.value);
-            return cb.value;
+            prop_cb->exec(name, cb.value);
         }
     } else {
         // Try to read from file
         char value[PROP_VALUE_MAX];
         if (file_get_prop(name, value)) {
             LOGD("resetprop: get prop (persist) [%s]: [%s]\n", name, value);
-            return value;
+            prop_cb->exec(name, value);
         }
     }
-    return "";
 }
 
 bool persist_delete_prop(const char *name) {

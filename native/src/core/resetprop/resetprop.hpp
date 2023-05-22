@@ -21,7 +21,7 @@ private:
     prop_list &list;
 };
 
-std::string persist_get_prop(const char *name);
+void persist_get_prop(const char *name, prop_cb *prop_cb);
 void persist_get_props(prop_cb *prop_cb);
 bool persist_delete_prop(const char *name);
 bool persist_set_prop(const char *name, const char *value);

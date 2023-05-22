@@ -1,12 +1,18 @@
 pub use base;
 use daemon::*;
 use logging::*;
+use std::ffi::CStr;
 
 mod daemon;
 mod logging;
 
 #[cxx::bridge]
 pub mod ffi {
+    extern "C++" {
+        include!("core.hpp");
+        unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
+    }
+
     extern "Rust" {
         fn rust_test_entry();
         fn android_logging();
@@ -28,3 +34,7 @@ pub mod ffi {
 }
 
 fn rust_test_entry() {}
+
+pub fn get_prop(name: &CStr, persist: bool) -> String {
+    unsafe { ffi::get_prop_rs(name.as_ptr(), persist) }
+}
