@@ -129,10 +129,12 @@ int magisk_main(int argc, char *argv[]) {
         write_int(fd, do_reboot);
         return read_int(fd);
     } else if (argv[1] == "--path"sv) {
-        int fd = connect_daemon(MainRequest::GET_PATH);
-        string path = read_string(fd);
-        printf("%s\n", path.data());
-        return 0;
+        string path = find_magisk_tmp();
+        if (!path.empty())  {
+            printf("%s\n", path.data());
+            return 0;
+        }
+        return 1;
     } else if (argc >= 3 && argv[1] == "--install-module"sv) {
         install_module(argv[2]);
     } else if (argv[1] == "--preinit-device"sv) {
