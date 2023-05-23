@@ -2,7 +2,9 @@
 
 #include <string>
 #include <vector>
-#include <cxx.h>
+
+#include "core-rs.hpp"
+#include "resetprop/resetprop.hpp"
 
 extern bool RECOVERY_MODE;
 extern std::atomic<ino_t> pkg_xml_ino;
@@ -27,10 +29,3 @@ void install_apk(const char *apk);
 void uninstall_pkg(const char *pkg);
 void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
-
-// System properties
-rust::String get_prop_rs(const char *name, bool persist);
-std::string get_prop(const char *name, bool persist = false);
-int delete_prop(const char *name, bool persist = false);
-int set_prop(const char *name, const char *value, bool skip_svc = false);
-void load_prop_file(const char *filename, bool skip_svc = false);

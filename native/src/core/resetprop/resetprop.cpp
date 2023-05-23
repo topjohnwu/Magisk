@@ -5,7 +5,6 @@
 
 #include <base.hpp>
 
-#include "../core.hpp"
 #include "resetprop.hpp"
 
 using namespace std;

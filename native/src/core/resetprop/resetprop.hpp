@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <cxx.h>
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <api/_system_properties.h>
@@ -20,6 +21,13 @@ struct prop_collector : prop_cb {
 private:
     prop_list &list;
 };
+
+// System properties
+rust::String get_prop_rs(const char *name, bool persist);
+std::string get_prop(const char *name, bool persist = false);
+int delete_prop(const char *name, bool persist = false);
+int set_prop(const char *name, const char *value, bool skip_svc = false);
+void load_prop_file(const char *filename, bool skip_svc = false);
 
 void persist_get_prop(const char *name, prop_cb *prop_cb);
 void persist_get_props(prop_cb *prop_cb);

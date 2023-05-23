@@ -9,7 +9,7 @@ mod logging;
 #[cxx::bridge]
 pub mod ffi {
     extern "C++" {
-        include!("core.hpp");
+        include!("resetprop/resetprop.hpp");
         unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
     }
 
