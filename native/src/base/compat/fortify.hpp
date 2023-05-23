@@ -140,5 +140,5 @@ int __openat_2(int fd, const char* pathname, int flags) {
 int __vsnprintf_chk(char* dst, size_t supplied_size, int /*flags*/,
                                size_t dst_len_from_compiler, const char* format, va_list va) {
     __check_buffer_access("vsnprintf", "write into", supplied_size, dst_len_from_compiler);
-    return vsnprintf(dst, supplied_size, format, va);
+    return __call_bypassing_fortify(vsnprintf)(dst, supplied_size, format, va);
 }

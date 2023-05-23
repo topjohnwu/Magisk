@@ -8,11 +8,15 @@
 
 using namespace std;
 
+#undef vsnprintf
 static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
-    char buf[4096];
-    int ret = vssprintf(buf, sizeof(buf), fmt, ap);
-    log_with_rs(level, rust::Slice(reinterpret_cast<const uint8_t *>(buf), ret));
-    return ret;
+    constexpr int sz = 4096;
+    char buf[sz];
+    buf[0] = '\0';
+    // Fortify logs when a fatal error occurs. Do not run through fortify again
+    int len = std::min(__call_bypassing_fortify(vsnprintf)(buf, sz, fmt, ap), sz - 1);
+    log_with_rs(level, rust::Slice(reinterpret_cast<const uint8_t *>(buf), len));
+    return len;
 }
 
 // Used to override external C library logging
