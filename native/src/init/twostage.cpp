@@ -2,7 +2,6 @@
 
 #include <magisk.hpp>
 #include <base.hpp>
-#include <socket.hpp>
 #include <sys/vfs.h>
 
 #include "init.hpp"

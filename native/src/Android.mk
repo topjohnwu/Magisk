@@ -33,10 +33,10 @@ LOCAL_SRC_FILES := \
     core/resetprop/persist.cpp \
     core/resetprop/resetprop.cpp \
     core/core-rs.cpp \
-    su/su.cpp \
-    su/connect.cpp \
-    su/pts.cpp \
-    su/su_daemon.cpp \
+    core/su/su.cpp \
+    core/su/connect.cpp \
+    core/su/pts.cpp \
+    core/su/su_daemon.cpp \
     zygisk/entry.cpp \
     zygisk/main.cpp \
     zygisk/utils.cpp \
