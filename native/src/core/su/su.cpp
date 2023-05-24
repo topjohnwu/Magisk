@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 - 2021, John Wu (@topjohnwu)
+ * Copyright 2017 - 2023, John Wu (@topjohnwu)
  * Copyright 2015, Pierre-Hugues Husson <phh@phh.me>
  * Copyright 2010, Adam Shanks (@ChainsDD)
  * Copyright 2008, Zinx Verituse (@zinxv)
@@ -29,20 +29,22 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     "MagiskSU\n\n"
     "Usage: su [options] [-] [user [argument...]]\n\n"
     "Options:\n"
-    "  -c, --command COMMAND         pass COMMAND to the invoked shell\n"
+    "  -c, --command COMMAND         Pass COMMAND to the invoked shell\n"
     "  -g, --group GROUP             Specify the primary group\n"
-    "  -G, --supp-group GROUP        Specify a supplementary group. The first specified supplementary group is also used as a primary group if the option --group is not specified.\n"
-    "  -z, --context CONTEXT         change SELinux context\n"
+    "  -G, --supp-group GROUP        Specify a supplementary group.\n"
+    "                                The first specified supplementary group is also used\n"
+    "                                as a primary group if the option -g is not specified.\n"
+    "  -Z, --context CONTEXT         Change SELinux context\n"
     "  -t, --target PID              PID to take mount namespace from\n"
-    "  -h, --help                    display this help message and exit\n"
-    "  -, -l, --login                pretend the shell to be a login shell\n"
+    "  -h, --help                    Display this help message and exit\n"
+    "  -, -l, --login                Pretend the shell to be a login shell\n"
     "  -m, -p,\n"
-    "  --preserve-environment        preserve the entire environment\n"
-    "  -s, --shell SHELL             use SHELL instead of the default " DEFAULT_SHELL "\n"
-    "  -v, --version                 display version number and exit\n"
-    "  -V                            display version code and exit\n"
+    "  --preserve-environment        Preserve the entire environment\n"
+    "  -s, --shell SHELL             Use SHELL instead of the default " DEFAULT_SHELL "\n"
+    "  -v, --version                 Display version number and exit\n"
+    "  -V                            Display version code and exit\n"
     "  -mm, -M,\n"
-    "  --mount-master                force run in the global mount namespace\n\n");
+    "  --mount-master                Force run in the global mount namespace\n\n");
     exit(status);
 }
 
@@ -87,7 +89,7 @@ int su_client_main(int argc, char *argv[]) {
             { "preserve-environment",   no_argument,        nullptr, 'p' },
             { "shell",                  required_argument,  nullptr, 's' },
             { "version",                no_argument,        nullptr, 'v' },
-            { "context",                required_argument,  nullptr, 'z' },
+            { "context",                required_argument,  nullptr, 'Z' },
             { "mount-master",           no_argument,        nullptr, 'M' },
             { "target",                 required_argument,  nullptr, 't' },
             { "group",                  required_argument,  nullptr, 'g' },
@@ -98,14 +100,15 @@ int su_client_main(int argc, char *argv[]) {
     su_request su_req;
 
     for (int i = 0; i < argc; i++) {
-        // Replace -cn with -z, -mm with -M for supporting getopt_long
-        if (strcmp(argv[i], "-cn") == 0)
-            strcpy(argv[i], "-z");
+        // Replace -cn and -z with -Z for backwards compatibility
+        if (strcmp(argv[i], "-cn") == 0 || strcmp(argv[i], "-z") == 0)
+            strcpy(argv[i], "-Z");
+        // Replace -mm with -M for supporting getopt_long
         else if (strcmp(argv[i], "-mm") == 0)
             strcpy(argv[i], "-M");
     }
 
-    while ((c = getopt_long(argc, argv, "c:hlmps:Vvuz:Mt:g:G:", long_opts, nullptr)) != -1) {
+    while ((c = getopt_long(argc, argv, "c:hlmps:VvuZ:Mt:g:G:", long_opts, nullptr)) != -1) {
         switch (c) {
             case 'c':
                 for (int i = optind - 1; i < argc; ++i) {
@@ -133,7 +136,7 @@ int su_client_main(int argc, char *argv[]) {
             case 'v':
                 printf("%s\n", MAGISK_VERSION ":MAGISKSU");
                 exit(EXIT_SUCCESS);
-            case 'z':
+            case 'Z':
                 su_req.context = optarg;
                 break;
             case 'M':
