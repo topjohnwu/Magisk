@@ -24,10 +24,10 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     env:
-      NDK_CCACHE: ccache
-      CCACHE_DIR: ${{ github.workspace }}/.ccache
-      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      NDK_CCACHE: sccache
       RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: true
+      CARGO_INCREMENTAL: 0
 
     steps:
       - name: Check out
@@ -47,18 +47,8 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: ${{ runner.os }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}
-
       - name: Set up sccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          variant: sccache
-          key: ${{ runner.os }}-${{ github.sha }}
-          restore-keys: ${{ runner.os }}
+        uses: mozilla-actions/sccache-action@v0.0.3
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
