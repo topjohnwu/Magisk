@@ -12,4 +12,4 @@ cxx-gen = { path = "../external/cxx-rs/gen/lib" }
 
 [dependencies]
 base = { path = "../base" }
-cxx = "1.0.69"
+cxx = { path = "../external/cxx-rs" }
