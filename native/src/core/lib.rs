@@ -1,8 +1,9 @@
-pub use base;
 use daemon::*;
 use logging::*;
 use std::ffi::CStr;
 
+#[path = "../include/consts.rs"]
+mod consts;
 mod daemon;
 mod logging;
 

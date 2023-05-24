@@ -2,7 +2,7 @@ use protobuf_codegen::Customize;
 
 use crate::gen::gen_cxx_binding;
 
-#[path = "../base/gen.rs"]
+#[path = "../include/gen.rs"]
 mod gen;
 
 fn main() {

@@ -20,6 +20,7 @@ use base::*;
 
 use crate::daemon::{MagiskD, MAGISKD};
 use crate::logging::LogFile::{Actual, Buffer};
+use crate::LOGFILE;
 
 #[allow(dead_code, non_camel_case_types)]
 #[derive(FromPrimitive, ToPrimitive)]

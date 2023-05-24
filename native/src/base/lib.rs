@@ -2,13 +2,11 @@
 
 pub use libc;
 
-pub use consts::*;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
 pub use xwrap::*;
 
-mod consts;
 mod files;
 mod logging;
 mod misc;
