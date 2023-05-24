@@ -69,16 +69,24 @@ RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
 echo "RANDOMSEED=0x$RANDOMSEED" >> config
 cat config
 
-./magiskboot compress=xz magisk32 magisk32.xz
-./magiskboot compress=xz magisk64 magisk64.xz
+SKIP32="#"
+SKIP64="#"
+if [ -f magisk64 ]; then
+  ./magiskboot compress=xz magisk64 magisk64.xz
+  unset SKIP64
+fi
+if [ -f magisk32 ]; then
+  ./magiskboot compress=xz magisk32 magisk32.xz
+  unset SKIP32
+fi
 ./magiskboot compress=xz stub.apk stub.xz
 
 ./magiskboot cpio ramdisk.cpio \
 "add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
-"add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
-"add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
+"$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
+"$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "patch" \
 "backup ramdisk.cpio.orig" \
