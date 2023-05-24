@@ -38,3 +38,19 @@ inline int zygisk_request(int req) {
     write_int(fd, req);
     return fd;
 }
+
+// The reference of the following structs
+// https://cs.android.com/android/platform/superproject/main/+/main:art/libnativebridge/include/nativebridge/native_bridge.h
+
+struct NativeBridgeRuntimeCallbacks {
+    const char* (*getMethodShorty)(JNIEnv* env, jmethodID mid);
+    uint32_t (*getNativeMethodCount)(JNIEnv* env, jclass clazz);
+    uint32_t (*getNativeMethods)(JNIEnv* env, jclass clazz, JNINativeMethod* methods,
+                                 uint32_t method_count);
+};
+
+struct NativeBridgeCallbacks {
+    uint32_t version;
+    void *padding[5];
+    bool (*isCompatibleWith)(uint32_t);
+};

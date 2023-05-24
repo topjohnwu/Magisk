@@ -3,15 +3,8 @@
 #include <unwind.h>
 
 #include <magisk.hpp>
+#include "zygisk.hpp"
 #include "../core/core.hpp"
-
-// The reference layout of this struct
-// https://cs.android.com/android/platform/superproject/main/+/main:art/libnativebridge/include/nativebridge/native_bridge.h
-struct NativeBridgeCallbacks {
-    uint32_t version;
-    void *padding[5];
-    bool (*isCompatibleWith)(uint32_t);
-};
 
 static bool is_compatible_with(uint32_t) {
     auto name = get_prop(NBPROP);

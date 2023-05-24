@@ -29,7 +29,7 @@ static void hook_unloader();
 static void unhook_functions();
 static void hook_jni_env();
 static void restore_jni_env(JNIEnv *env);
-static void ReloadNativeBridge(const string &nb);
+static void reload_native_bridge(const string &nb);
 
 namespace {
 
@@ -57,6 +57,7 @@ HookContext *g_ctx;
 bitset<MAX_FD_SIZE> *g_allowed_fds = nullptr;
 const JNINativeInterface *old_functions = nullptr;
 JNINativeInterface *new_functions = nullptr;
+const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
 
 #define DCL_PRE_POST(name) \
 void name##_pre();         \
@@ -213,11 +214,7 @@ DCL_HOOK_FUNC(int, dlclose, void *handle) {
     if (!kDone) {
         ZLOGV("dlclose zygisk_loader\n");
         kDone = true;
-        string nb = get_prop(NBPROP);
-        if (nb != ZYGISKLDR) {
-            auto orig_nb_path = nb.substr(sizeof(ZYGISKLDR) - 1);
-            ReloadNativeBridge(orig_nb_path);
-        }
+        reload_native_bridge(get_prop(NBPROP));
     }
     [[clang::musttail]] return old_dlclose(handle);
 }
@@ -730,6 +727,8 @@ void HookContext::nativeForkAndSpecialize_post() {
 inline void *unwind_get_region_start(_Unwind_Context *ctx) {
     auto fp = _Unwind_GetRegionStart(ctx);
 #if defined(__arm__)
+    // On arm32, we need to check if the pc is in thumb mode,
+    // if so, we need to set the lowest bit of fp to 1
     auto pc = _Unwind_GetGR(ctx, 15); // r15 is pc
     if (pc & 1) {
         // Thumb mode
@@ -739,23 +738,87 @@ inline void *unwind_get_region_start(_Unwind_Context *ctx) {
     return reinterpret_cast<void *>(fp);
 }
 
-static void ReloadNativeBridge(const string &nb) {
-    // Use unwind to find the address of LoadNativeBridge
-    // and call it to get NativeBridgeRuntimeCallbacks
-    void *load_native_bridge = nullptr;
+// As we use NativeBridgeRuntimeCallbacks to reload native bridge and to hook jni functions,
+// we need to find it by the native bridge's unwind context.
+// For abis that use registers to pass arguments, i.e. arm32, arm64, x86_64, the registers are
+// caller-saved, and they are not preserved in the unwind context. However, they will be saved
+// into the callee-saved registers, so we will search the callee-saved registers for the second
+// argument, which is the pointer to NativeBridgeRuntimeCallbacks.
+// For x86, whose abi uses stack to pass arguments, we can directly get the pointer to
+// NativeBridgeRuntimeCallbacks from the stack.
+static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind_Context *ctx) {
+    // Find the writable memory region of libart.so, where the NativeBridgeRuntimeCallbacks is located.
+    auto [start, end] = []()-> tuple<uintptr_t, uintptr_t> {
+        for (const auto &map : lsplt::MapInfo::Scan()) {
+            if (map.path.ends_with("/libart.so") && map.perms == (PROT_WRITE | PROT_READ)) {
+                ZLOGV("libart.so: start=%p, end=%p\n",
+                      reinterpret_cast<void *>(map.start), reinterpret_cast<void *>(map.end));
+                return {map.start, map.end};
+            }
+        }
+        return {0, 0};
+    }();
+#if defined(__aarch64__)
+    // r19-r28 are callee-saved registers
+    for (int i = 19; i <= 28; ++i) {
+        auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
+        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if (val >= start && val < end)
+            return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
+    }
+#elif defined(__arm__)
+    // r4-r10 are callee-saved registers
+    for (int i = 4; i <= 10; ++i) {
+        auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
+        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if (val >= start && val < end)
+            return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
+    }
+#elif defined(__i386__)
+    // get ebp, which points to the bottom of the stack frame
+    auto ebp = static_cast<uintptr_t>(_Unwind_GetGR(ctx, 5));
+    // 1 pointer size above ebp is the old ebp
+    // 2 pointer sizes above ebp is the return address
+    // 3 pointer sizes above ebp is the 2nd arg
+    auto val = *reinterpret_cast<uintptr_t *>(ebp + 3 * sizeof(void *));
+    ZLOGV("ebp + 3 * ptr_size = %p\n", reinterpret_cast<void *>(val));
+    if (val >= start && val < end)
+        return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
+#elif defined(__x86_64__)
+    // r12-r15 and rbx are callee-saved registers, but the compiler is likely to use them reversely
+    for (int i : {3, 15, 14, 13, 12}) {
+        auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
+        ZLOGV("r%d = %p\n", i, reinterpret_cast<void *>(val));
+        if (val >= start && val < end)
+            return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
+    }
+#else
+#error "Unsupported architecture"
+#endif
+    return nullptr;
+}
+
+static void reload_native_bridge(const string &nb) {
+    // Use unwind to find the address of android::LoadNativeBridge and NativeBridgeRuntimeCallbacks
+    bool (*load_native_bridge)(const char *nb_library_filename,
+            const NativeBridgeRuntimeCallbacks *runtime_cbs) = nullptr;
     _Unwind_Backtrace(+[](struct _Unwind_Context *ctx, void *arg) -> _Unwind_Reason_Code {
         void *fp = unwind_get_region_start(ctx);
         Dl_info info{};
         dladdr(fp, &info);
         ZLOGV("backtrace: %p %s\n", fp, info.dli_fname ? info.dli_fname : "???");
-        if (info.dli_fname && std::string_view(info.dli_fname).ends_with("/libart.so")) {
-            ZLOGV("LoadNativeBridge: %p\n", fp);
+        if (info.dli_fname && std::string_view(info.dli_fname).ends_with("/libnativebridge.so")) {
             *reinterpret_cast<void **>(arg) = fp;
+            runtime_callbacks = find_runtime_callbacks(ctx);
+            ZLOGD("cbs: %p\n", runtime_callbacks);
             return _URC_END_OF_STACK;
         }
         return _URC_NO_REASON;
     }, &load_native_bridge);
-    reinterpret_cast<bool (*)(const string &)>(load_native_bridge)(nb);
+    auto len = sizeof(ZYGISKLDR) - 1;
+    if (nb.size() > len) {
+        load_native_bridge(nb.data() + len, runtime_callbacks);
+    }
 }
 
 static void hook_register(dev_t dev, ino_t inode, const char *symbol, void *new_func, void **old_func) {
