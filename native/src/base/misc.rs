@@ -58,59 +58,21 @@ macro_rules! bfmt_cstr {
     }};
 }
 
-// The cstr! macro is inspired by https://github.com/Nugine/const-str
-
-macro_rules! const_assert {
-    ($s: expr) => {
-        assert!($s)
-    };
-}
-
-pub struct ToCStr<'a>(pub &'a str);
-
-impl ToCStr<'_> {
-    const fn assert_no_nul(&self) {
-        let bytes = self.0.as_bytes();
-        let mut i = 0;
-        while i < bytes.len() {
-            const_assert!(bytes[i] != 0);
-            i += 1;
-        }
-    }
-
-    pub const fn eval_len(&self) -> usize {
-        self.assert_no_nul();
-        self.0.as_bytes().len() + 1
-    }
-
-    pub const fn eval_bytes<const N: usize>(&self) -> [u8; N] {
-        let mut buf = [0; N];
-        let mut pos = 0;
-        let bytes = self.0.as_bytes();
-        let mut i = 0;
-        while i < bytes.len() {
-            const_assert!(bytes[i] != 0);
-            buf[pos] = bytes[i];
-            pos += 1;
-            i += 1;
-        }
-        pos += 1;
-        const_assert!(pos == N);
-        buf
-    }
-}
+// The cstr! macro is copied from https://github.com/bytecodealliance/rustix/blob/main/src/cstr.rs
 
 #[macro_export]
 macro_rules! cstr {
-    ($s:literal) => {{
-        const LEN: usize = $crate::ToCStr($s).eval_len();
-        const BUF: [u8; LEN] = $crate::ToCStr($s).eval_bytes();
-        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&BUF) }
+    ($str:literal) => {{
+        assert!(
+            !$str.bytes().any(|b| b == b'\0'),
+            "cstr argument contains embedded NUL bytes",
+        );
+        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(concat!($str, "\0").as_bytes()) }
     }};
 }
 
 #[macro_export]
-macro_rules! str_ptr {
+macro_rules! raw_cstr {
     ($s:literal) => {{
         cstr!($s).as_ptr()
     }};

@@ -62,12 +62,12 @@ pub fn android_logging() {
         let mut buf: [u8; 4096] = [0; 4096];
         fmt_to_buf(&mut buf, args);
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), buf.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
         }
     }
     fn android_log_write(level: LogLevel, msg: &[u8]) {
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), msg.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
     }
 
@@ -87,13 +87,13 @@ pub fn magisk_logging() {
         let mut buf: [u8; 4096] = [0; 4096];
         let len = fmt_to_buf(&mut buf, args);
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), buf.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
         }
         magisk_log_write(level_to_prio(level), &buf[..len]);
     }
     fn magisk_write(level: LogLevel, msg: &[u8]) {
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), msg.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
         magisk_log_write(level_to_prio(level), &msg);
     }
@@ -114,13 +114,13 @@ pub fn zygisk_logging() {
         let mut buf: [u8; 4096] = [0; 4096];
         let len = fmt_to_buf(&mut buf, args);
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), buf.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
         }
         zygisk_log_write(level_to_prio(level), &buf[..len]);
     }
     fn zygisk_write(level: LogLevel, msg: &[u8]) {
         unsafe {
-            __android_log_write(level_to_prio(level), str_ptr!("Magisk"), msg.as_ptr());
+            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
         zygisk_log_write(level_to_prio(level), &msg);
     }
@@ -312,7 +312,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
                 aux_len = strftime(
                     aux.as_mut_ptr().cast(),
                     aux.len(),
-                    str_ptr!("%m-%d %T"),
+                    raw_cstr!("%m-%d %T"),
                     &tm,
                 );
                 let ms = ts.tv_nsec / 1000000;
