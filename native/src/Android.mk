@@ -176,7 +176,8 @@ LOCAL_SRC_FILES := \
     sepolicy/sepolicy.cpp \
     sepolicy/rules.cpp \
     sepolicy/policydb.cpp \
-    sepolicy/statement.cpp
+    sepolicy/statement.cpp \
+    sepolicy/policy-rs.cpp
 include $(BUILD_STATIC_LIBRARY)
 
 include src/Android-rs.mk

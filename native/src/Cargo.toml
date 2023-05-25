@@ -2,19 +2,23 @@
 exclude = ["external"]
 members = ["base", "boot", "core", "init", "sepolicy"]
 
+[workspace.dependencies]
+cxx = { path = "external/cxx-rs" }
+cxx-gen = { path = "external/cxx-rs/gen/lib" }
+libc = "0.2"
+cfg-if = "1.0"
+anyhow = "1.0"
+num-traits = "0.2"
+num-derive = "0.3"
+
 [profile.dev]
 opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
-strip = true
 
 [profile.release]
 opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
-strip = true
-
-[patch.crates-io]
-cxx = { path = "external/cxx-rs" }

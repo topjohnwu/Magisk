@@ -1,14 +1,12 @@
 use std::cmp::min;
 use std::ffi::CStr;
-use std::fs::File;
 use std::io;
 use std::io::{BufRead, Write};
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
-use std::path::Path;
 
 use libc::{c_char, c_uint, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH};
 
-use crate::{bfmt_cstr, errno, xopen};
+use crate::{bfmt_cstr, errno, error, xopen};
 
 pub mod unsafe_impl {
     use std::ffi::CStr;
@@ -137,9 +135,43 @@ pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
     }
 }
 
-pub fn read_lines<P: AsRef<Path>>(path: P) -> io::Result<io::Lines<io::BufReader<File>>> {
-    let file = File::open(path)?;
-    Ok(io::BufReader::new(file).lines())
+pub trait BufReadExt {
+    fn foreach_lines<F: FnMut(&mut String) -> bool>(&mut self, f: F);
+    fn foreach_props<F: FnMut(&str, &str) -> bool>(&mut self, f: F);
+}
+
+impl<T: BufRead> BufReadExt for T {
+    fn foreach_lines<F: FnMut(&mut String) -> bool>(&mut self, mut f: F) {
+        let mut buf = String::new();
+        loop {
+            match self.read_line(&mut buf) {
+                Ok(0) => break,
+                Ok(_) => {
+                    if !f(&mut buf) {
+                        break;
+                    }
+                }
+                Err(e) => {
+                    error!("{}", e);
+                    break;
+                }
+            };
+            buf.clear();
+        }
+    }
+
+    fn foreach_props<F: FnMut(&str, &str) -> bool>(&mut self, mut f: F) {
+        self.foreach_lines(|line| {
+            let line = line.trim();
+            if line.starts_with('#') {
+                return true;
+            }
+            if let Some((key, value)) = line.split_once('=') {
+                return f(key, value);
+            }
+            return true;
+        });
+    }
 }
 
 pub trait WriteExt {

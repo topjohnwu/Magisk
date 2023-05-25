@@ -8,8 +8,9 @@ crate-type = ["staticlib"]
 path = "lib.rs"
 
 [build-dependencies]
-cxx-gen = { path = "../external/cxx-rs/gen/lib" }
+cxx-gen = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
-cxx = { path = "../external/cxx-rs" }
+magiskpolicy = { path = "../sepolicy" }
+cxx = { workspace = true }

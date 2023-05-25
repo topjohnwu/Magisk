@@ -7,5 +7,10 @@ edition = "2021"
 crate-type = ["staticlib", "rlib"]
 path = "lib.rs"
 
+[build-dependencies]
+cxx-gen = { workspace = true }
+
 [dependencies]
 base = { path = "../base" }
+cxx = { workspace = true }
+anyhow = { workspace = true }

@@ -1,4 +1,6 @@
 pub use logging::*;
+// Has to be pub so all symbols in that crate is included
+pub use magiskpolicy;
 
 mod logging;
 

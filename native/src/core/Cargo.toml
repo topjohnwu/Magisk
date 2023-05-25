@@ -8,10 +8,10 @@ crate-type = ["staticlib"]
 path = "lib.rs"
 
 [build-dependencies]
-cxx-gen = { path = "../external/cxx-rs/gen/lib" }
+cxx-gen = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
-cxx = { path = "../external/cxx-rs" }
-num-traits = "0.2"
-num-derive = "0.3"
+cxx = { workspace = true }
+num-traits = { workspace = true }
+num-derive = { workspace = true }

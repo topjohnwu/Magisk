@@ -1,8 +1,9 @@
 #pragma once
 
 #include <stdlib.h>
-#include <selinux.hpp>
 #include <string>
+
+#include <selinux.hpp>
 
 #define ALL nullptr
 
@@ -17,7 +18,8 @@ struct sepolicy {
 
     // External APIs
     bool to_file(c_str file);
-    void parse_statement(c_str stmt);
+    void parse_statement(c_str stmt, int len);
+    void parse_statement(c_str stmt) { parse_statement(stmt, strlen(stmt)); }
     void load_rules(const std::string &rules);
     void load_rule_file(c_str file);
 

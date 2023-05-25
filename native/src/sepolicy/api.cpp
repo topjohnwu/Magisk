@@ -103,3 +103,13 @@ bool sepolicy::genfscon(const char *fs_name, const char *path, const char *ctx) 
 bool sepolicy::exists(const char *type) {
     return hashtab_search(impl->db->p_types.table, type) != nullptr;
 }
+
+void sepolicy::load_rule_file(const char *file) {
+    rust::load_rule_file(*this, rust::Slice(
+            reinterpret_cast<const uint8_t *>(file), strlen(file)));
+}
+
+void sepolicy::load_rules(const std::string &rules) {
+    rust::load_rules(*this, rust::Slice(
+            reinterpret_cast<const uint8_t *>(rules.data()), rules.length()));
+}

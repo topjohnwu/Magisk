@@ -266,22 +266,22 @@ static bool parse_pattern_9(const Func &fn, const char *action, char *stmt) {
 }
 
 #define add_action_func(name, type, fn) \
-else if (strcmp(name, action) == 0) { \
-    auto __fn = [=](auto && ...args){ return (fn)(args...); };\
-    if (!parse_pattern_##type(__fn, name, remain)) \
-        LOGW("Syntax error in '%s'\n\n%s\n", stmt, type_msg_##type); \
+else if (strcmp(name, action) == 0) {   \
+    auto __fn = [&](auto && ...args){ return (fn)(args...); }; \
+    if (!parse_pattern_##type(__fn, name, remain))             \
+        LOGW("Syntax error in '%.*s'\n\n%s\n", len, stmt, type_msg_##type); \
 }
 
 #define add_action(act, type) add_action_func(#act, type, act)
 
-void sepolicy::parse_statement(const char *stmt) {
+void sepolicy::parse_statement(const char *stmt, int len) {
     // strtok modify strings, create a copy
-    string cpy(stmt);
+    string cpy(stmt, len);
 
     char *remain;
     char *action = strtok_r(cpy.data(), " ", &remain);
     if (remain == nullptr) {
-        LOGW("Syntax error in '%s'\n\n", stmt);
+        LOGW("Syntax error in '%.*s'\n\n", len, stmt);
         return;
     }
 
@@ -309,44 +309,4 @@ void sepolicy::parse_statement(const char *stmt) {
     add_action_func("name_transition", 7, type_transition)
 
     else { LOGW("Unknown action: '%s'\n\n", action); }
-}
-
-void sepolicy::load_rule_file(const char *file) {
-    file_readline(true, file, [&](string_view line) -> bool {
-        if (line.empty() || line[0] == '#')
-            return true;
-        parse_statement(line.data());
-        return true;
-    });
-}
-
-void sepolicy::load_rules(const string &rules) {
-    struct cookie {
-        const string &s;
-        size_t pos;
-    };
-    cookie c{rules, 0};
-    FILE *fp = funopen(&c, /* read */ [](void *v, char *buf, int sz) -> int {
-        auto c = reinterpret_cast<cookie*>(v);
-        if (c->pos == c->s.length())
-            return 0;
-        size_t end = std::min(c->pos + sz, c->s.length());
-        int len = end - c->pos;
-        memcpy(buf, c->s.data() + c->pos, len);
-        c->pos = end;
-        return len;
-    }, /* write */ [](auto, auto, auto) -> int {
-        return 0;
-    }, /* seek */ [](auto, auto, auto) -> fpos_t {
-        return 0;
-    }, /* close */ [](auto) -> int {
-        return 0;
-    });
-
-    file_readline(true, fp, [&](string_view line) -> bool {
-        if (line.empty() || line[0] == '#')
-            return true;
-        parse_statement(line.data());
-        return true;
-    });
 }

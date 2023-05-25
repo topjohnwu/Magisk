@@ -9,7 +9,7 @@ path = "lib.rs"
 
 [build-dependencies]
 protobuf-codegen = "3.2.0"
-cxx-gen = { path = "../external/cxx-rs/gen/lib" }
+cxx-gen = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }

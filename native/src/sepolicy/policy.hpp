@@ -5,6 +5,8 @@
 #include <sepol/policydb/policydb.h>
 #include <sepolicy.hpp>
 
+#include "policy-rs.hpp"
+
 struct sepol_impl : public sepolicy {
     avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
     bool add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert);
