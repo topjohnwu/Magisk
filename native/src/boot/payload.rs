@@ -7,7 +7,7 @@ use byteorder::{BigEndian, ReadBytesExt};
 use protobuf::{EnumFull, Message};
 
 use base::libc::c_char;
-use base::{ptr_to_str_result, StrErr};
+use base::{ptr_to_str_result, ReadSeekExt, StrErr};
 use base::{ResultExt, WriteExt};
 
 use crate::ffi;
@@ -27,7 +27,7 @@ const PAYLOAD_MAGIC: &str = "CrAU";
 
 fn do_extract_boot_from_payload(
     in_path: &str,
-    partition: Option<&str>,
+    partition_name: Option<&str>,
     out_path: Option<&str>,
 ) -> anyhow::Result<()> {
     let mut reader = BufReader::new(if in_path == "-" {
@@ -74,46 +74,52 @@ fn do_extract_boot_from_payload(
 
     let block_size = manifest.block_size() as u64;
 
-    let part = match partition {
+    let partition = match partition_name {
         None => {
             let boot = manifest
                 .partitions
                 .iter()
-                .find(|partition| partition.partition_name() == "init_boot");
+                .find(|p| p.partition_name() == "init_boot");
             let boot = match boot {
                 Some(boot) => Some(boot),
                 None => manifest
                     .partitions
                     .iter()
-                    .find(|partition| partition.partition_name() == "boot"),
+                    .find(|p| p.partition_name() == "boot"),
             };
             boot.ok_or(anyhow!("boot partition not found"))?
         }
-        Some(partition) => manifest
+        Some(name) => manifest
             .partitions
             .iter()
-            .find(|p| p.partition_name() == partition)
-            .ok_or(anyhow!("partition '{partition}' not found"))?,
+            .find(|p| p.partition_name() == name)
+            .ok_or(anyhow!("partition '{name}' not found"))?,
     };
 
     let out_str: String;
     let out_path = match out_path {
         None => {
-            out_str = format!("{}.img", part.partition_name());
+            out_str = format!("{}.img", partition.partition_name());
             out_str.as_str()
         }
-        Some(p) => p,
+        Some(s) => s,
     };
 
-    let mut out_file = if out_path == "-" {
-        unsafe { File::from_raw_fd(1) }
-    } else {
-        File::create(out_path).with_context(|| format!("cannot write to '{out_path}'"))?
-    };
+    let mut out_file =
+        File::create(out_path).with_context(|| format!("cannot write to '{out_path}'"))?;
 
-    let base_offset = reader.stream_position()? + manifest_sig_len as u64;
+    // Skip the manifest signature
+    reader.skip(manifest_sig_len as usize)?;
 
-    for operation in part.operations.iter() {
+    // Sort the install operations with data_offset so we will only ever need to seek forward
+    // This makes it possible to support non-seekable input file descriptors
+    let operations = partition
+        .operations
+        .clone()
+        .sort_by_key(|e| e.data_offset.unwrap_or(0));
+    let mut curr_data_offset: u64 = 0;
+
+    for operation in operations.iter() {
         let data_len = operation
             .data_length
             .ok_or(bad_payload!("data length not found"))? as usize;
@@ -131,8 +137,11 @@ fn do_extract_boot_from_payload(
         buf.resize(data_len, 0u8);
         let data = &mut buf[..data_len];
 
-        reader.seek(SeekFrom::Start(base_offset + data_offset))?;
+        // Skip to the next offset and read data
+        let skip = data_offset - curr_data_offset;
+        reader.skip(skip as usize)?;
         reader.read_exact(data)?;
+        curr_data_offset = data_offset + data_len as u64;
 
         let out_offset = operation
             .dst_extents

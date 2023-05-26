@@ -1,8 +1,9 @@
+use mem::MaybeUninit;
 use std::cmp::min;
 use std::ffi::CStr;
-use std::io;
-use std::io::{BufRead, Write};
+use std::io::{BufRead, Read, Seek, SeekFrom, Write};
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::{io, mem};
 
 use libc::{c_char, c_uint, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH};
 
@@ -132,6 +133,37 @@ pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
             return -1;
         }
         0
+    }
+}
+
+pub trait ReadExt {
+    fn skip(&mut self, len: usize) -> io::Result<()>;
+}
+
+impl<T: Read> ReadExt for T {
+    fn skip(&mut self, mut len: usize) -> io::Result<()> {
+        let mut buf = MaybeUninit::<[u8; 4096]>::uninit();
+        let buf = unsafe { buf.assume_init_mut() };
+        while len > 0 {
+            let l = min(buf.len(), len);
+            self.read_exact(&mut buf[..l])?;
+            len -= l;
+        }
+        Ok(())
+    }
+}
+
+pub trait ReadSeekExt {
+    fn skip(&mut self, len: usize) -> io::Result<()>;
+}
+
+impl<T: Read + Seek> ReadSeekExt for T {
+    fn skip(&mut self, len: usize) -> io::Result<()> {
+        if self.seek(SeekFrom::Current(len as i64)).is_err() {
+            // If the file is not actually seekable, fallback to read
+            ReadExt::skip(self, len)?;
+        }
+        Ok(())
     }
 }
 

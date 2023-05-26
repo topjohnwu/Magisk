@@ -51,7 +51,7 @@ Supported actions:
     If [partition] is not specified, then attempt to extract either
     'init_boot' or 'boot'. Which partition was chosen can be determined
     by whichever 'init_boot.img' or 'boot.img' exists.
-    <payload.bin>/[outfile] can be '-' to be STDIN/STDOUT.
+    <payload.bin> can be '-' to be STDIN.
 
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace it with <hexpattern2>
