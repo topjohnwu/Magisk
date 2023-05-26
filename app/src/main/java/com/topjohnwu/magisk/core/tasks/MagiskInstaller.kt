@@ -180,7 +180,9 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     @Throws(IOException::class)
-    private fun processZip(input: InputStream) {
+    private fun processZip(input: InputStream): ExtendedFile {
+        val boot = installDir.getChildFile("boot.img")
+        val initBoot = installDir.getChildFile("init_boot.img")
         ZipInputStream(input).use { zipIn ->
             lateinit var entry: ZipEntry
             while (zipIn.nextEntry?.also { entry = it } != null) {
@@ -190,27 +192,36 @@ abstract class MagiskInstallImpl protected constructor(
                         console.add("- Extracting payload")
                         val dest = File(installDir, "payload.bin")
                         FileOutputStream(dest).use { zipIn.copyTo(it) }
-                        processPayload(Uri.fromFile(dest))
-                        break
+                        try {
+                            return processPayload(Uri.fromFile(dest))
+                        } catch (e: IOException) {
+                            // No boot image in payload.bin, continue to find boot images
+                        }
                     }
                     "init_boot.img" -> {
                         console.add("- Extracting init_boot image")
-                        FileOutputStream("$installDir/boot.img").use { zipIn.copyTo(it) }
-                        break
+                        initBoot.newOutputStream().use { zipIn.copyTo(it) }
+                        return initBoot
                     }
                     "boot.img" -> {
                         console.add("- Extracting boot image")
-                        FileOutputStream("$installDir/boot.img").use { zipIn.copyTo(it) }
+                        boot.newOutputStream().use { zipIn.copyTo(it) }
                         // no break here since there might be an init_boot.img
                     }
                 }
             }
         }
+        if (boot.exists()) {
+            return boot
+        } else {
+            console.add("! No boot image found")
+            throw IOException()
+        }
     }
 
     @Throws(IOException::class)
     @Synchronized
-    private fun processPayload(input: Uri) {
+    private fun processPayload(input: Uri): ExtendedFile {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             throw IOException("Payload is only supported on Android Oreo or above")
         }
@@ -226,8 +237,7 @@ abstract class MagiskInstallImpl protected constructor(
                         .command(
                             "$installDir/magiskboot",
                             "extract",
-                            "-",
-                            "$installDir/boot.img"
+                            "-"
                         )
                         .start()
                     if (process.waitFor() != 0) {
@@ -239,6 +249,16 @@ abstract class MagiskInstallImpl protected constructor(
                     }
                 } finally {
                     Os.dup2(bk.fileDescriptor, 0)
+                }
+            }
+            val boot = installDir.getChildFile("boot.img")
+            val initBoot = installDir.getChildFile("init_boot.img")
+            return when {
+                initBoot.exists() -> initBoot
+                boot.exists() -> boot
+                else -> {
+                    console.add("! No boot image found")
+                    throw IOException()
                 }
             }
         } catch (e: ErrnoException) {
@@ -356,14 +376,15 @@ abstract class MagiskInstallImpl protected constructor(
                     outFile = MediaStoreUtils.getFile("$filename.tar", true)
                     processTar(src, outFile!!.uri.outputStream())
                 } else {
-                    srcBoot = installDir.getChildFile("boot.img")
-                    if (headMagic.contentEquals("CrAU".toByteArray())) {
+                    srcBoot = if (headMagic.contentEquals("CrAU".toByteArray())) {
                         processPayload(uri)
                     } else if (headMagic.contentEquals("PK\u0003\u0004".toByteArray())) {
                         processZip(src)
                     } else {
+                        val boot = installDir.getChildFile("boot.img")
                         console.add("- Copying image to cache")
-                        src.cleanPump(srcBoot.newOutputStream())
+                        src.cleanPump(boot.newOutputStream())
+                        boot
                     }
                     // raw image
                     outFile = MediaStoreUtils.getFile("$filename.img", true)

@@ -14,5 +14,6 @@ cxx-gen = { workspace = true }
 [dependencies]
 base = { path = "../base" }
 cxx = { path = "../external/cxx-rs" }
-protobuf = "3.2.0"
-byteorder = "1"
+protobuf = { workspace = true }
+byteorder = { workspace = true }
+anyhow = { workspace = true }
