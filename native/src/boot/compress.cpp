@@ -718,16 +718,16 @@ void compress(const char *method, const char *infile, const char *outfile) {
         unlink(infile);
 }
 
-bool decompress(const unsigned char *in, uint64_t in_size, int fd) {
-    format_t type = check_fmt(in, in_size);
+bool decompress(rust::Slice<const uint8_t> buf, int fd) {
+    format_t type = check_fmt(buf.data(), buf.length());
 
     if (!COMPRESSED(type)) {
-        LOGE("Input file is not a supported compressed type!\n");
+        LOGE("Input file is not a supported compression format!\n");
         return false;
     }
 
     auto strm = get_decoder(type, make_unique<fd_channel>(fd));
-    if (!strm->write(in, in_size)) {
+    if (!strm->write(buf.data(), buf.length())) {
         return false;
     }
     return true;

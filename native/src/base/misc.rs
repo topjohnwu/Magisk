@@ -1,7 +1,10 @@
 use std::cmp::min;
 use std::ffi::CStr;
-use std::fmt::Arguments;
+use std::fmt::{Arguments, Debug};
+use std::str::Utf8Error;
 use std::{fmt, slice};
+
+use thiserror::Error;
 
 pub fn copy_str(dest: &mut [u8], src: &[u8]) -> usize {
     let len = min(src.len(), dest.len() - 1);
@@ -76,6 +79,24 @@ macro_rules! raw_cstr {
     ($s:literal) => {{
         cstr!($s).as_ptr()
     }};
+}
+
+#[derive(Debug, Error)]
+pub enum StrErr {
+    #[error(transparent)]
+    Invalid(#[from] Utf8Error),
+    #[error("argument is null")]
+    NullPointer,
+}
+
+pub fn ptr_to_str_result<'a, T>(ptr: *const T) -> Result<&'a str, StrErr> {
+    if ptr.is_null() {
+        Err(StrErr::NullPointer)
+    } else {
+        unsafe { CStr::from_ptr(ptr.cast()) }
+            .to_str()
+            .map_err(|e| StrErr::from(e))
+    }
 }
 
 pub fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {

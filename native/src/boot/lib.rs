@@ -1,5 +1,7 @@
 #![feature(format_args_nl)]
 
+extern crate core;
+
 pub use base;
 pub use payload::*;
 
@@ -8,14 +10,15 @@ mod update_metadata;
 
 #[cxx::bridge]
 pub mod ffi {
-    extern "C++" {
+    unsafe extern "C++" {
         include!("compress.hpp");
-        pub unsafe fn decompress(in_: *const u8, in_size: u64, fd: i32) -> bool;
+        fn decompress(buf: &[u8], fd: i32) -> bool;
     }
 
     #[namespace = "rust"]
     extern "Rust" {
         unsafe fn extract_boot_from_payload(
+            partition: *const c_char,
             in_path: *const c_char,
             out_path: *const c_char,
         ) -> bool;

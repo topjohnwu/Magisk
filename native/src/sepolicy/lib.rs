@@ -44,7 +44,7 @@ pub fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: &[u8]) {
         load_rules_from_reader(sepol, &mut reader);
         Ok(())
     }
-    inner(sepol, filename).ok_or_log();
+    inner(sepol, filename).log().ok();
 }
 
 pub fn load_rules(sepol: Pin<&mut sepolicy>, rules: &[u8]) {

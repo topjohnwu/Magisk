@@ -1,4 +1,5 @@
 #![feature(format_args_nl)]
+#![feature(io_error_more)]
 
 pub use libc;
 

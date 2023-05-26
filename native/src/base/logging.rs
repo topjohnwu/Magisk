@@ -157,32 +157,14 @@ macro_rules! debug {
 }
 
 pub trait ResultExt {
-    fn ok_or_log(&self);
-    fn ok_or_msg(&self, args: Arguments);
-    fn log_on_error(&self) -> &Self;
-    fn msg_on_error(&self, args: Arguments) -> &Self;
+    fn log(self) -> Self;
 }
 
-impl<R, E: Display> ResultExt for Result<R, E> {
-    fn ok_or_log(&self) {
-        if let Err(e) = self {
-            error!("{}", e);
+impl<T, E: Display> ResultExt for Result<T, E> {
+    fn log(self) -> Self {
+        if let Err(e) = &self {
+            error!("{:#}", e);
         }
-    }
-
-    fn ok_or_msg(&self, args: Arguments) {
-        if let Err(e) = self {
-            error!("{}: {}", args, e);
-        }
-    }
-
-    fn log_on_error(&self) -> &Self {
-        self.ok_or_log();
-        self
-    }
-
-    fn msg_on_error(&self, args: Arguments) -> &Self {
-        self.ok_or_msg(args);
         self
     }
 }
