@@ -12,7 +12,7 @@
 using namespace std;
 
 int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_path(dirfd, byte_slice(path, size)) < 0)
+    if (fd_path(dirfd, u8_mut_slice(path, size)) < 0)
         return -1;
     auto len = strlen(path);
     path[len] = '/';

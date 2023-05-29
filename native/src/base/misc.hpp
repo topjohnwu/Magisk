@@ -120,8 +120,13 @@ struct StringCmp {
 };
 
 template<typename T>
-rust::Slice<uint8_t> byte_slice(T *buf, size_t sz) {
+rust::Slice<uint8_t> u8_mut_slice(T *buf, size_t sz) {
     return rust::Slice(reinterpret_cast<uint8_t *>(buf), sz);
+}
+
+template<typename T>
+rust::Slice<const uint8_t> u8_slice(T *buf, size_t sz) {
+    return rust::Slice(reinterpret_cast<const uint8_t *>(buf), sz);
 }
 
 uint64_t parse_uint64_hex(std::string_view s);
