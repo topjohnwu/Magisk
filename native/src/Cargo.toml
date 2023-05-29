@@ -12,6 +12,7 @@ num-traits = "0.2"
 num-derive = "0.3"
 thiserror = "1.0"
 protobuf = "3.2.0"
+protobuf-codegen = "3.2.0"
 byteorder = "1"
 
 [profile.dev]
