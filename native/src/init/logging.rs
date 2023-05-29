@@ -1,4 +1,3 @@
-use std::fmt::Arguments;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -50,14 +49,6 @@ pub fn setup_klog() {
         writeln!(rate, "on").ok();
     }
 
-    fn klog_fmt(_: LogLevel, args: Arguments) {
-        if let Some(kmsg) = KMSG.get().as_mut() {
-            let mut buf: [u8; 4096] = [0; 4096];
-            let len = fmt_to_buf(&mut buf, format_args!("magiskinit: {}", args));
-            kmsg.write_all(&buf[..len]).ok();
-        }
-    }
-
     fn klog_write_impl(_: LogLevel, msg: &[u8]) {
         if let Some(kmsg) = KMSG.get().as_mut() {
             let mut buf: [u8; 4096] = [0; 4096];
@@ -68,7 +59,6 @@ pub fn setup_klog() {
     }
 
     let logger = Logger {
-        fmt: klog_fmt,
         write: klog_write_impl,
         flags: 0,
     };

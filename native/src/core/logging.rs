@@ -1,6 +1,5 @@
 use std::cmp::min;
 use std::ffi::{c_char, c_void};
-use std::fmt::Arguments;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
@@ -58,13 +57,6 @@ fn level_to_prio(level: LogLevel) -> i32 {
 }
 
 pub fn android_logging() {
-    fn android_log_fmt(level: LogLevel, args: Arguments) {
-        let mut buf: [u8; 4096] = [0; 4096];
-        fmt_to_buf(&mut buf, args);
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
-        }
-    }
     fn android_log_write(level: LogLevel, msg: &[u8]) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
@@ -72,7 +64,6 @@ pub fn android_logging() {
     }
 
     let logger = Logger {
-        fmt: android_log_fmt,
         write: android_log_write,
         flags: 0,
     };
@@ -83,14 +74,6 @@ pub fn android_logging() {
 }
 
 pub fn magisk_logging() {
-    fn magisk_fmt(level: LogLevel, args: Arguments) {
-        let mut buf: [u8; 4096] = [0; 4096];
-        let len = fmt_to_buf(&mut buf, args);
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
-        }
-        magisk_log_write(level_to_prio(level), &buf[..len]);
-    }
     fn magisk_write(level: LogLevel, msg: &[u8]) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
@@ -99,7 +82,6 @@ pub fn magisk_logging() {
     }
 
     let logger = Logger {
-        fmt: magisk_fmt,
         write: magisk_write,
         flags: 0,
     };
@@ -110,14 +92,6 @@ pub fn magisk_logging() {
 }
 
 pub fn zygisk_logging() {
-    fn zygisk_fmt(level: LogLevel, args: Arguments) {
-        let mut buf: [u8; 4096] = [0; 4096];
-        let len = fmt_to_buf(&mut buf, args);
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), buf.as_ptr());
-        }
-        zygisk_log_write(level_to_prio(level), &buf[..len]);
-    }
     fn zygisk_write(level: LogLevel, msg: &[u8]) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
@@ -126,7 +100,6 @@ pub fn zygisk_logging() {
     }
 
     let logger = Logger {
-        fmt: zygisk_fmt,
         write: zygisk_write,
         flags: 0,
     };

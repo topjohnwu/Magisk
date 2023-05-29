@@ -3,6 +3,7 @@ use std::io::{stderr, stdout, Write};
 use std::process::exit;
 
 use crate::ffi::LogLevel;
+use crate::fmt_to_buf;
 
 // Ugly hack to avoid using enum
 #[allow(non_snake_case, non_upper_case_globals)]
@@ -17,14 +18,12 @@ mod LogFlag {
 // We don't need to care about thread safety, because all
 // logger changes will only happen on the main thread.
 pub static mut LOGGER: Logger = Logger {
-    fmt: |_, _| {},
     write: |_, _| {},
     flags: 0,
 };
 
 #[derive(Copy, Clone)]
 pub struct Logger {
-    pub fmt: fn(level: LogLevel, args: Arguments),
     pub write: fn(level: LogLevel, msg: &[u8]),
     pub flags: u32,
 }
@@ -78,20 +77,15 @@ pub fn log_impl(level: LogLevel, args: Arguments) {
     if (logger.flags & level.to_disable_flag()) != 0 {
         return;
     }
-    (logger.fmt)(level, args);
+    let mut buf: [u8; 4096] = [0; 4096];
+    let len = fmt_to_buf(&mut buf, args);
+    (logger.write)(level, &buf[..len]);
     if level == LogLevel::Error && (logger.flags & LogFlag::ExitOnError) != 0 {
         exit(1);
     }
 }
 
 pub fn cmdline_logging() {
-    fn cmdline_print(level: LogLevel, args: Arguments) {
-        if level == LogLevel::Info {
-            print!("{}", args);
-        } else {
-            eprint!("{}", args);
-        }
-    }
     fn cmdline_write(level: LogLevel, msg: &[u8]) {
         if level == LogLevel::Info {
             stdout().write_all(msg).ok();
@@ -101,7 +95,6 @@ pub fn cmdline_logging() {
     }
 
     let logger = Logger {
-        fmt: cmdline_print,
         write: cmdline_write,
         flags: LogFlag::ExitOnError,
     };
