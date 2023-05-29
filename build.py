@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import errno
+import glob
 import lzma
 import multiprocessing
 import os
@@ -10,9 +11,9 @@ import shutil
 import stat
 import subprocess
 import sys
+import tarfile
 import textwrap
 import urllib.request
-import tarfile
 from zipfile import ZipFile
 
 
@@ -490,7 +491,9 @@ def cleanup(args):
         rm_rf(op.join("native", "obj"))
         rm_rf(op.join("native", "out"))
         rm_rf(op.join("native", "src", "target"))
-        rm_rf(op.join("native", "src", "external", "cxx-rs", "target"))
+        rm(op.join("native", "src", "boot", "update_metadata.rs"))
+        for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
+            rm(rs_gen)
 
     if "java" in args.target:
         header("* Cleaning java")
