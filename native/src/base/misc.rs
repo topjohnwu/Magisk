@@ -95,7 +95,7 @@ pub fn ptr_to_str_result<'a, T>(ptr: *const T) -> Result<&'a str, StrErr> {
     } else {
         unsafe { CStr::from_ptr(ptr.cast()) }
             .to_str()
-            .map_err(|e| StrErr::from(e))
+            .map_err(StrErr::from)
     }
 }
 

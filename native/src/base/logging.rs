@@ -39,7 +39,7 @@ pub fn exit_on_error(b: bool) {
 }
 
 impl LogLevel {
-    fn to_disable_flag(&self) -> u32 {
+    fn as_disable_flag(&self) -> u32 {
         match *self {
             LogLevel::Error => LogFlag::DisableError,
             LogLevel::Warn => LogFlag::DisableWarn,
@@ -51,7 +51,7 @@ impl LogLevel {
 }
 
 pub fn set_log_level_state(level: LogLevel, enabled: bool) {
-    let flag = level.to_disable_flag();
+    let flag = level.as_disable_flag();
     unsafe {
         if enabled {
             LOGGER.flags &= !flag
@@ -63,7 +63,7 @@ pub fn set_log_level_state(level: LogLevel, enabled: bool) {
 
 pub fn log_with_rs(level: LogLevel, msg: &[u8]) {
     let logger = unsafe { LOGGER };
-    if (logger.flags & level.to_disable_flag()) != 0 {
+    if (logger.flags & level.as_disable_flag()) != 0 {
         return;
     }
     (logger.write)(level, msg);
@@ -74,7 +74,7 @@ pub fn log_with_rs(level: LogLevel, msg: &[u8]) {
 
 pub fn log_impl(level: LogLevel, args: Arguments) {
     let logger = unsafe { LOGGER };
-    if (logger.flags & level.to_disable_flag()) != 0 {
+    if (logger.flags & level.as_disable_flag()) != 0 {
         return;
     }
     let mut buf: [u8; 4096] = [0; 4096];
@@ -108,16 +108,16 @@ macro_rules! perror {
     ($fmt:expr) => {
         $crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!(
             concat!($fmt, " failed with {}: {}"),
-            crate::errno(),
-            crate::error_str()
+            $crate::errno(),
+            $crate::error_str()
         ))
     };
     ($fmt:expr, $($args:tt)*) => {
         $crate::log_impl($crate::ffi::LogLevel::Error, format_args_nl!(
             concat!($fmt, " failed with {}: {}"),
             $($args)*,
-            crate::errno(),
-            crate::error_str()
+            $crate::errno(),
+            $crate::error_str()
         ))
     };
 }

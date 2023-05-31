@@ -7,7 +7,7 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, realpath};
+use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, raw_cstr, realpath};
 
 mod unsafe_impl {
     use std::ffi::CStr;
@@ -45,7 +45,7 @@ mod unsafe_impl {
         if r < 0 {
             perror!("readlink");
         }
-        return r;
+        r
     }
 
     #[no_mangle]
@@ -73,7 +73,7 @@ mod unsafe_impl {
                 }
             }
         }
-        return r;
+        r
     }
 
     #[no_mangle]
@@ -82,7 +82,7 @@ mod unsafe_impl {
         if r < 0 {
             perror!("poll");
         }
-        return r;
+        r
     }
 
     #[no_mangle]
@@ -96,52 +96,49 @@ mod unsafe_impl {
         if r < 0 {
             perror!("sendfile");
         }
-        return r;
+        r
     }
 }
 
 #[no_mangle]
-pub extern "C" fn xfopen(path: *const c_char, mode: *const c_char) -> *mut libc::FILE {
-    unsafe {
-        let fp = libc::fopen(path, mode);
-        if fp.is_null() {
-            perror!("fopen {}", ptr_to_str(path));
-        }
-        return fp;
+pub unsafe extern "C" fn xfopen(path: *const c_char, mode: *const c_char) -> *mut libc::FILE {
+    let fp = libc::fopen(path, mode);
+    if fp.is_null() {
+        perror!("fopen {}", ptr_to_str(path));
     }
+    fp
 }
 
 #[no_mangle]
-pub extern "C" fn xfdopen(fd: RawFd, mode: *const c_char) -> *mut libc::FILE {
-    unsafe {
-        let fp = libc::fdopen(fd, mode);
-        if fp.is_null() {
-            perror!("fdopen");
-        }
-        return fp;
+pub unsafe extern "C" fn xfdopen(fd: RawFd, mode: *const c_char) -> *mut libc::FILE {
+    let fp = libc::fdopen(fd, mode);
+    if fp.is_null() {
+        perror!("fdopen");
     }
+    fp
 }
 
 #[no_mangle]
-pub extern "C" fn xopen(path: *const c_char, flags: i32, mode: mode_t) -> RawFd {
-    unsafe {
-        let r = libc::open(path, flags, mode as c_uint);
-        if r < 0 {
-            perror!("open {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xopen(path: *const c_char, flags: i32, mode: mode_t) -> RawFd {
+    let r = libc::open(path, flags, mode as c_uint);
+    if r < 0 {
+        perror!("open {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xopenat(dirfd: RawFd, path: *const c_char, flags: i32, mode: mode_t) -> RawFd {
-    unsafe {
-        let r = libc::openat(dirfd, path, flags, mode as c_uint);
-        if r < 0 {
-            perror!("openat {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xopenat(
+    dirfd: RawFd,
+    path: *const c_char,
+    flags: i32,
+    mode: mode_t,
+) -> RawFd {
+    let r = libc::openat(dirfd, path, flags, mode as c_uint);
+    if r < 0 {
+        perror!("openat {}", ptr_to_str(path));
     }
+    r
 }
 
 // Fully write data slice
@@ -157,19 +154,19 @@ pub fn xwrite(fd: RawFd, data: &[u8]) -> isize {
                     continue;
                 }
                 perror!("write");
-                return r as isize;
+                return r;
             }
             let r = r as usize;
             write_sz += r;
             remain = &remain[r..];
-            if r == 0 || remain.len() == 0 {
+            if r == 0 || remain.is_empty() {
                 break;
             }
         }
-        if remain.len() != 0 {
+        if !remain.is_empty() {
             error!("write ({} != {})", write_sz, data.len())
         }
-        return write_sz as isize;
+        write_sz as isize
     }
 }
 
@@ -179,7 +176,7 @@ pub fn xread(fd: RawFd, data: &mut [u8]) -> isize {
         if r < 0 {
             perror!("read");
         }
-        return r;
+        r
     }
 }
 
@@ -196,19 +193,19 @@ pub fn xxread(fd: RawFd, data: &mut [u8]) -> isize {
                     continue;
                 }
                 perror!("read");
-                return r as isize;
+                return r;
             }
             let r = r as usize;
             read_sz += r;
             remain = &mut remain[r..];
-            if r == 0 || remain.len() == 0 {
+            if r == 0 || remain.is_empty() {
                 break;
             }
         }
-        if remain.len() != 0 {
+        if !remain.is_empty() {
             error!("read ({} != {})", read_sz, data.len())
         }
-        return read_sz as isize;
+        read_sz as isize
     }
 }
 
@@ -219,7 +216,7 @@ pub extern "C" fn xlseek64(fd: RawFd, offset: i64, whence: i32) -> i64 {
         if r < 0 {
             perror!("lseek64");
         }
-        return r;
+        r
     }
 }
 
@@ -229,7 +226,7 @@ pub fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32 {
         if r < 0 {
             perror!("pipe2");
         }
-        return r;
+        r
     }
 }
 
@@ -240,7 +237,7 @@ pub extern "C" fn xsetns(fd: RawFd, nstype: i32) -> i32 {
         if r < 0 {
             perror!("setns");
         }
-        return r;
+        r
     }
 }
 
@@ -251,19 +248,17 @@ pub extern "C" fn xunshare(flags: i32) -> i32 {
         if r < 0 {
             perror!("unshare");
         }
-        return r;
+        r
     }
 }
 
 #[no_mangle]
-pub extern "C" fn xopendir(path: *const c_char) -> *mut libc::DIR {
-    unsafe {
-        let dp = libc::opendir(path);
-        if dp.is_null() {
-            perror!("opendir {}", ptr_to_str(path));
-        }
-        return dp;
+pub unsafe extern "C" fn xopendir(path: *const c_char) -> *mut libc::DIR {
+    let dp = libc::opendir(path);
+    if dp.is_null() {
+        perror!("opendir {}", ptr_to_str(path));
     }
+    dp
 }
 
 #[no_mangle]
@@ -273,30 +268,27 @@ pub extern "C" fn xfdopendir(fd: RawFd) -> *mut libc::DIR {
         if dp.is_null() {
             perror!("fdopendir");
         }
-        return dp;
+        dp
     }
 }
 
 #[no_mangle]
-pub extern "C" fn xreaddir(dirp: *mut libc::DIR) -> *mut libc::dirent {
-    #[allow(unused_unsafe)]
-    unsafe {
-        *errno() = 0;
-        loop {
-            let e = libc::readdir(dirp);
-            if e.is_null() {
-                if *errno() != 0 {
-                    perror!("readdir")
-                }
-            } else {
-                // Filter out . and ..
-                let s = CStr::from_ptr((*e).d_name.as_ptr());
-                if s == cstr!(".") || s == cstr!("..") {
-                    continue;
-                }
-            };
-            return e;
-        }
+pub unsafe extern "C" fn xreaddir(dirp: *mut libc::DIR) -> *mut libc::dirent {
+    *errno() = 0;
+    loop {
+        let e = libc::readdir(dirp);
+        if e.is_null() {
+            if *errno() != 0 {
+                perror!("readdir")
+            }
+        } else {
+            // Filter out . and ..
+            let s = (*e).d_name.as_ptr();
+            if libc::strcmp(s, raw_cstr!(".")) == 0 || libc::strcmp(s, raw_cstr!("..")) == 0 {
+                continue;
+            }
+        };
+        return e;
     }
 }
 
@@ -307,7 +299,7 @@ pub extern "C" fn xsetsid() -> i32 {
         if r < 0 {
             perror!("setsid");
         }
-        return r;
+        r
     }
 }
 
@@ -318,19 +310,17 @@ pub extern "C" fn xsocket(domain: i32, ty: i32, protocol: i32) -> RawFd {
         if fd < 0 {
             perror!("socket");
         }
-        return fd;
+        fd
     }
 }
 
 #[no_mangle]
-pub extern "C" fn xbind(socket: i32, address: *const sockaddr, len: socklen_t) -> i32 {
-    unsafe {
-        let r = libc::bind(socket, address, len);
-        if r < 0 {
-            perror!("bind");
-        }
-        return r;
+pub unsafe extern "C" fn xbind(socket: i32, address: *const sockaddr, len: socklen_t) -> i32 {
+    let r = libc::bind(socket, address, len);
+    if r < 0 {
+        perror!("bind");
     }
+    r
 }
 
 #[no_mangle]
@@ -340,122 +330,109 @@ pub extern "C" fn xlisten(socket: i32, backlog: i32) -> i32 {
         if r < 0 {
             perror!("listen");
         }
-        return r;
+        r
     }
 }
 
 #[no_mangle]
-pub extern "C" fn xaccept4(
+pub unsafe extern "C" fn xaccept4(
     sockfd: RawFd,
     addr: *mut sockaddr,
     len: *mut socklen_t,
     flg: i32,
 ) -> RawFd {
-    unsafe {
-        let fd = libc::accept4(sockfd, addr, len, flg);
-        if fd < 0 {
-            perror!("accept4");
-        }
-        return fd;
+    let fd = libc::accept4(sockfd, addr, len, flg);
+    if fd < 0 {
+        perror!("accept4");
     }
+    fd
 }
 
 #[no_mangle]
-pub extern "C" fn xsendmsg(fd: RawFd, msg: *const libc::msghdr, flags: i32) -> ssize_t {
-    unsafe {
-        let r = libc::sendmsg(fd, msg, flags);
-        if r < 0 {
-            perror!("sendmsg");
-        }
-        return r;
+pub unsafe extern "C" fn xsendmsg(fd: RawFd, msg: *const libc::msghdr, flags: i32) -> ssize_t {
+    let r = libc::sendmsg(fd, msg, flags);
+    if r < 0 {
+        perror!("sendmsg");
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xrecvmsg(fd: RawFd, msg: *mut libc::msghdr, flags: i32) -> ssize_t {
-    unsafe {
-        let r = libc::recvmsg(fd, msg, flags);
-        if r < 0 {
-            perror!("recvmsg");
-        }
-        return r;
+pub unsafe extern "C" fn xrecvmsg(fd: RawFd, msg: *mut libc::msghdr, flags: i32) -> ssize_t {
+    let r = libc::recvmsg(fd, msg, flags);
+    if r < 0 {
+        perror!("recvmsg");
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xaccess(path: *const c_char, mode: i32) -> i32 {
-    unsafe {
-        let r = libc::access(path, mode);
-        if r < 0 {
-            perror!("access {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xaccess(path: *const c_char, mode: i32) -> i32 {
+    let r = libc::access(path, mode);
+    if r < 0 {
+        perror!("access {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xfaccessat(dirfd: RawFd, path: *const c_char, mode: i32, flags: i32) -> i32 {
-    unsafe {
-        #[allow(unused_mut)]
-        let mut r = libc::faccessat(dirfd, path, mode, flags);
-        if r < 0 {
-            perror!("faccessat {}", ptr_to_str(path));
-        }
-        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-        if r > 0 && *errno() == 0 {
-            r = 0
-        }
-        return r;
+pub unsafe extern "C" fn xfaccessat(
+    dirfd: RawFd,
+    path: *const c_char,
+    mode: i32,
+    flags: i32,
+) -> i32 {
+    #[allow(unused_mut)]
+    let mut r = libc::faccessat(dirfd, path, mode, flags);
+    if r < 0 {
+        perror!("faccessat {}", ptr_to_str(path));
     }
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    if r > 0 && *errno() == 0 {
+        r = 0
+    }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
-    unsafe {
-        let r = libc::stat(path, buf);
-        if r < 0 {
-            perror!("stat {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
+    let r = libc::stat(path, buf);
+    if r < 0 {
+        perror!("stat {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xlstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
-    unsafe {
-        let r = libc::lstat(path, buf);
-        if r < 0 {
-            perror!("lstat {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xlstat(path: *const c_char, buf: *mut libc::stat) -> i32 {
+    let r = libc::lstat(path, buf);
+    if r < 0 {
+        perror!("lstat {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xfstat(fd: RawFd, buf: *mut libc::stat) -> i32 {
-    unsafe {
-        let r = libc::fstat(fd, buf);
-        if r < 0 {
-            perror!("fstat");
-        }
-        return r;
+pub unsafe extern "C" fn xfstat(fd: RawFd, buf: *mut libc::stat) -> i32 {
+    let r = libc::fstat(fd, buf);
+    if r < 0 {
+        perror!("fstat");
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xfstatat(
+pub unsafe extern "C" fn xfstatat(
     dirfd: RawFd,
     path: *const c_char,
     buf: *mut libc::stat,
     flags: i32,
 ) -> i32 {
-    unsafe {
-        let r = libc::fstatat(dirfd, path, buf, flags);
-        if r < 0 {
-            perror!("fstatat {}", ptr_to_str(path));
-        }
-        return r;
+    let r = libc::fstatat(dirfd, path, buf, flags);
+    if r < 0 {
+        perror!("fstatat {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
@@ -465,7 +442,7 @@ pub extern "C" fn xdup(oldfd: RawFd) -> RawFd {
         if fd < 0 {
             perror!("dup");
         }
-        return fd;
+        fd
     }
 }
 
@@ -476,7 +453,7 @@ pub extern "C" fn xdup2(oldfd: RawFd, newfd: RawFd) -> RawFd {
         if fd < 0 {
             perror!("dup2");
         }
-        return fd;
+        fd
     }
 }
 
@@ -487,7 +464,7 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
         if fd < 0 {
             perror!("dup3");
         }
-        return fd;
+        fd
     }
 }
 
@@ -502,127 +479,113 @@ pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
 }
 
 #[no_mangle]
-pub extern "C" fn xsymlink(target: *const c_char, linkpath: *const c_char) -> i32 {
-    unsafe {
-        let r = libc::symlink(target, linkpath);
-        if r < 0 {
-            perror!("symlink {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
-        }
-        return r;
+pub unsafe extern "C" fn xsymlink(target: *const c_char, linkpath: *const c_char) -> i32 {
+    let r = libc::symlink(target, linkpath);
+    if r < 0 {
+        perror!("symlink {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xsymlinkat(target: *const c_char, dirfd: RawFd, linkpath: *const c_char) -> i32 {
-    unsafe {
-        let r = libc::symlinkat(target, dirfd, linkpath);
-        if r < 0 {
-            perror!(
-                "symlinkat {} -> {}",
-                ptr_to_str(target),
-                ptr_to_str(linkpath)
-            );
-        }
-        return r;
+pub unsafe extern "C" fn xsymlinkat(
+    target: *const c_char,
+    dirfd: RawFd,
+    linkpath: *const c_char,
+) -> i32 {
+    let r = libc::symlinkat(target, dirfd, linkpath);
+    if r < 0 {
+        perror!(
+            "symlinkat {} -> {}",
+            ptr_to_str(target),
+            ptr_to_str(linkpath)
+        );
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xlinkat(
+pub unsafe extern "C" fn xlinkat(
     olddirfd: RawFd,
     target: *const c_char,
     newdirfd: RawFd,
     linkpath: *const c_char,
     flags: i32,
 ) -> i32 {
-    unsafe {
-        let r = libc::linkat(olddirfd, target, newdirfd, linkpath, flags);
-        if r < 0 {
-            perror!("linkat {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
-        }
-        return r;
+    let r = libc::linkat(olddirfd, target, newdirfd, linkpath, flags);
+    if r < 0 {
+        perror!("linkat {} -> {}", ptr_to_str(target), ptr_to_str(linkpath));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xmount(
+pub unsafe extern "C" fn xmount(
     src: *const c_char,
     target: *const c_char,
     fstype: *const c_char,
     flags: c_ulong,
     data: *const c_void,
 ) -> i32 {
-    unsafe {
-        let r = libc::mount(src, target, fstype, flags, data);
-        if r < 0 {
-            perror!("mount {} -> {}", ptr_to_str(src), ptr_to_str(target));
-        }
-        return r;
+    let r = libc::mount(src, target, fstype, flags, data);
+    if r < 0 {
+        perror!("mount {} -> {}", ptr_to_str(src), ptr_to_str(target));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xumount(target: *const c_char) -> i32 {
-    unsafe {
-        let r = libc::umount(target);
-        if r < 0 {
-            perror!("umount {}", ptr_to_str(target));
-        }
-        return r;
+pub unsafe extern "C" fn xumount(target: *const c_char) -> i32 {
+    let r = libc::umount(target);
+    if r < 0 {
+        perror!("umount {}", ptr_to_str(target));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xumount2(target: *const c_char, flags: i32) -> i32 {
-    unsafe {
-        let r = libc::umount2(target, flags);
-        if r < 0 {
-            perror!("umount2 {}", ptr_to_str(target));
-        }
-        return r;
+pub unsafe extern "C" fn xumount2(target: *const c_char, flags: i32) -> i32 {
+    let r = libc::umount2(target, flags);
+    if r < 0 {
+        perror!("umount2 {}", ptr_to_str(target));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xrename(oldname: *const c_char, newname: *const c_char) -> i32 {
-    unsafe {
-        let r = libc::rename(oldname, newname);
-        if r < 0 {
-            perror!("rename {} -> {}", ptr_to_str(oldname), ptr_to_str(newname));
-        }
-        return r;
+pub unsafe extern "C" fn xrename(oldname: *const c_char, newname: *const c_char) -> i32 {
+    let r = libc::rename(oldname, newname);
+    if r < 0 {
+        perror!("rename {} -> {}", ptr_to_str(oldname), ptr_to_str(newname));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
-    unsafe {
-        let r = libc::mkdir(path, mode);
-        if r < 0 && *errno() != libc::EEXIST {
-            perror!("mkdir {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
+    let r = libc::mkdir(path, mode);
+    if r < 0 && *errno() != libc::EEXIST {
+        perror!("mkdir {}", ptr_to_str(path));
     }
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
+pub unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
     let r = mkdirs(path, mode);
     if r < 0 {
         perror!("mkdirs {}", ptr_to_str(path));
     }
-    return r;
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i32 {
-    unsafe {
-        let r = libc::mkdirat(dirfd, path, mode);
-        if r < 0 && *errno() != libc::EEXIST {
-            perror!("mkdirat {}", ptr_to_str(path));
-        }
-        return r;
+pub unsafe extern "C" fn xmkdirat(dirfd: RawFd, path: *const c_char, mode: mode_t) -> i32 {
+    let r = libc::mkdirat(dirfd, path, mode);
+    if r < 0 && *errno() != libc::EEXIST {
+        perror!("mkdirat {}", ptr_to_str(path));
     }
+    r
 }
 
 #[inline]
@@ -634,7 +597,7 @@ pub fn xsendfile(out_fd: RawFd, in_fd: RawFd, offset: Option<&mut off_t>, count:
 }
 
 #[no_mangle]
-pub extern "C" fn xmmap(
+pub unsafe extern "C" fn xmmap(
     addr: *mut c_void,
     len: usize,
     prot: i32,
@@ -642,14 +605,12 @@ pub extern "C" fn xmmap(
     fd: RawFd,
     offset: off_t,
 ) -> *mut c_void {
-    unsafe {
-        let r = libc::mmap(addr, len, prot, flags, fd, offset);
-        if r == libc::MAP_FAILED {
-            perror!("mmap");
-            return ptr::null_mut();
-        }
-        return r;
+    let r = libc::mmap(addr, len, prot, flags, fd, offset);
+    if r == libc::MAP_FAILED {
+        perror!("mmap");
+        return ptr::null_mut();
     }
+    r
 }
 
 #[no_mangle]
@@ -659,7 +620,7 @@ pub extern "C" fn xfork() -> i32 {
         if r < 0 {
             perror!("fork");
         }
-        return r;
+        r
     }
 }
 
@@ -673,16 +634,14 @@ pub fn xrealpath(path: &CStr, buf: &mut [u8]) -> isize {
     if r < 0 {
         perror!("realpath {}", path.to_str().unwrap_or(""))
     }
-    return r;
+    r
 }
 
 #[no_mangle]
-pub extern "C" fn xmknod(pathname: *const c_char, mode: mode_t, dev: dev_t) -> i32 {
-    unsafe {
-        let r = libc::mknod(pathname, mode, dev);
-        if r < 0 {
-            perror!("mknod {}", ptr_to_str(pathname));
-        }
-        return r;
+pub unsafe extern "C" fn xmknod(pathname: *const c_char, mode: mode_t, dev: dev_t) -> i32 {
+    let r = libc::mknod(pathname, mode, dev);
+    if r < 0 {
+        perror!("mknod {}", ptr_to_str(pathname));
     }
+    r
 }

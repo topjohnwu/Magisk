@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 use daemon::*;
 use logging::*;
 use std::ffi::CStr;

@@ -21,7 +21,7 @@ pub mod unsafe_impl {
         if r >= 0 {
             *buf.offset(r) = b'\0';
         }
-        return r;
+        r
     }
 
     #[no_mangle]
@@ -42,11 +42,13 @@ pub fn __open_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd> 
 }
 
 pub fn __xopen_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> Option<OwnedFd> {
-    let fd = xopen(path.as_ptr(), flags, mode);
-    if fd >= 0 {
-        unsafe { Some(OwnedFd::from_raw_fd(fd)) }
-    } else {
-        None
+    unsafe {
+        let fd = xopen(path.as_ptr(), flags, mode);
+        if fd >= 0 {
+            Some(OwnedFd::from_raw_fd(fd))
+        } else {
+            None
+        }
     }
 }
 
@@ -87,7 +89,7 @@ pub fn realpath(path: &CStr, buf: &mut [u8]) -> isize {
         let mut st2: libc::stat;
         let mut skip_check = false;
         unsafe {
-            st1 = std::mem::zeroed();
+            st1 = mem::zeroed();
             if libc::fstat(fd.as_raw_fd(), &mut st1) < 0 {
                 // This shall only fail on Linux < 3.6
                 skip_check = true;
@@ -95,7 +97,7 @@ pub fn realpath(path: &CStr, buf: &mut [u8]) -> isize {
         }
         let len = fd_path(fd.as_raw_fd(), buf);
         unsafe {
-            st2 = std::mem::zeroed();
+            st2 = mem::zeroed();
             if libc::stat(buf.as_ptr().cast(), &mut st2) < 0
                 || (!skip_check && (st2.st_dev != st1.st_dev || st2.st_ino != st1.st_ino))
             {
@@ -103,7 +105,7 @@ pub fn realpath(path: &CStr, buf: &mut [u8]) -> isize {
                 return -1;
             }
         }
-        return len;
+        len
     } else {
         *errno() = ENOENT;
         -1
@@ -115,25 +117,23 @@ extern "C" {
 }
 
 #[no_mangle]
-pub extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
-    unsafe {
-        let mut buf = [0 as u8; 4096];
-        let ptr: *mut c_char = buf.as_mut_ptr().cast();
-        let len = strscpy(ptr, path, buf.len());
-        let mut curr = &mut buf[1..len];
-        while let Some(p) = curr.iter().position(|c| *c == b'/') {
-            curr[p] = b'\0';
-            if libc::mkdir(ptr, mode) < 0 && *errno() != EEXIST {
-                return -1;
-            }
-            curr[p] = b'/';
-            curr = &mut curr[(p + 1)..];
-        }
+pub unsafe extern "C" fn mkdirs(path: *const c_char, mode: mode_t) -> i32 {
+    let mut buf = [0_u8; 4096];
+    let ptr: *mut c_char = buf.as_mut_ptr().cast();
+    let len = strscpy(ptr, path, buf.len());
+    let mut curr = &mut buf[1..len];
+    while let Some(p) = curr.iter().position(|c| *c == b'/') {
+        curr[p] = b'\0';
         if libc::mkdir(ptr, mode) < 0 && *errno() != EEXIST {
             return -1;
         }
-        0
+        curr[p] = b'/';
+        curr = &mut curr[(p + 1)..];
     }
+    if libc::mkdir(ptr, mode) < 0 && *errno() != EEXIST {
+        return -1;
+    }
+    0
 }
 
 pub trait ReadExt {
@@ -201,7 +201,7 @@ impl<T: BufRead> BufReadExt for T {
             if let Some((key, value)) = line.split_once('=') {
                 return f(key, value);
             }
-            return true;
+            true
         });
     }
 }
@@ -212,10 +212,10 @@ pub trait WriteExt {
 
 impl<T: Write> WriteExt for T {
     fn write_zeros(&mut self, mut len: usize) -> io::Result<()> {
-        let mut buf = [0 as u8; 4096];
+        let buf = [0_u8; 4096];
         while len > 0 {
             let l = min(buf.len(), len);
-            self.write_all(&mut buf[..l])?;
+            self.write_all(&buf[..l])?;
             len -= l;
         }
         Ok(())

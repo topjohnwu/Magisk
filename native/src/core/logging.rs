@@ -78,7 +78,7 @@ pub fn magisk_logging() {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
-        magisk_log_write(level_to_prio(level), &msg);
+        magisk_log_write(level_to_prio(level), msg);
     }
 
     let logger = Logger {
@@ -96,7 +96,7 @@ pub fn zygisk_logging() {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
-        zygisk_log_write(level_to_prio(level), &msg);
+        zygisk_log_write(level_to_prio(level), msg);
     }
 
     let logger = Logger {
@@ -150,7 +150,7 @@ fn magisk_log_write(prio: i32, msg: &[u8]) {
         Some(s) => s,
     };
 
-    let result = do_magisk_log_write(logd, prio, &msg);
+    let result = do_magisk_log_write(logd, prio, msg);
 
     // If any error occurs, shut down the logd pipe
     if result.is_err() {
@@ -190,7 +190,7 @@ fn zygisk_log_write(prio: i32, msg: &[u8]) {
         pthread_sigmask(SIG_BLOCK, &mask, &mut orig_mask);
     }
 
-    let result = do_magisk_log_write(logd, prio, &msg);
+    let result = do_magisk_log_write(logd, prio, msg);
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
@@ -278,7 +278,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
                 let mut ts: timespec = std::mem::zeroed();
                 let mut tm: tm = std::mem::zeroed();
                 if clock_gettime(CLOCK_REALTIME, &mut ts) < 0
-                    || localtime_r(&ts.tv_sec, &mut tm) == null_mut()
+                    || localtime_r(&ts.tv_sec, &mut tm).is_null()
                 {
                     continue;
                 }
@@ -301,7 +301,9 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
             let io1 = IoSlice::new(&aux[..aux_len]);
             let io2 = IoSlice::new(msg);
-            logfile.as_write().write_vectored(&[io1, io2])?;
+            // We don't need to care the written len because we are writing less than PIPE_BUF
+            // It's guaranteed to always write the whole thing atomically
+            let _ = logfile.as_write().write_vectored(&[io1, io2])?;
         }
     }
 
