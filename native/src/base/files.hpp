@@ -66,7 +66,7 @@ struct heap_data : public byte_data {
     MOVE_ONLY(heap_data)
 
     explicit heap_data(size_t sz) { this->sz = sz; buf = new uint8_t[sz]; }
-    ~heap_data() { free(buf); }
+    ~heap_data() { delete[] buf; }
 };
 
 struct mmap_data : public byte_data {

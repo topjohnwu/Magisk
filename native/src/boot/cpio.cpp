@@ -76,7 +76,7 @@ void cpio::rm(const char *name, bool r) {
     }
 }
 
-void cpio::extract_entry(const entry_map::value_type &e, const char *file) {
+static void extract_entry(const cpio::entry_map::value_type &e, const char *file) {
     fprintf(stderr, "Extract [%s] to [%s]\n", e.first.data(), file);
     unlink(file);
     rmdir(file);

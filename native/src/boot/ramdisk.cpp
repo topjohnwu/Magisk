@@ -18,7 +18,6 @@ class magisk_cpio : public cpio {
 public:
     void patch();
     int test();
-    char *sha1();
     void restore();
     void backup(const char *orig);
 };
@@ -79,35 +78,6 @@ int magisk_cpio::test() {
     if (exists("init.real"))
         ret |= SONY_INIT;
     return ret;
-}
-
-#define for_each_line(line, buf, size) \
-for (char *line = (char *) buf; line < (char *) buf + size && line[0]; line = strchr(line + 1, '\n') + 1)
-
-char *magisk_cpio::sha1() {
-    char sha1[41];
-    for (auto &e : entries) {
-        if (e.first == "init.magisk.rc" || e.first == "overlay/init.magisk.rc") {
-            for_each_line(line, e.second->data, e.second->filesize) {
-                if (strncmp(line, "#STOCKSHA1=", 11) == 0) {
-                    strncpy(sha1, line + 12, 40);
-                    sha1[40] = '\0';
-                    return strdup(sha1);
-                }
-            }
-        } else if (e.first == ".backup/.magisk") {
-            for_each_line(line, e.second->data, e.second->filesize) {
-                if (str_starts(line, "SHA1=")) {
-                    strncpy(sha1, line + 5, 40);
-                    sha1[40] = '\0';
-                    return strdup(sha1);
-                }
-            }
-        } else if (e.first == ".backup/.sha1") {
-            return (char *) e.second->data;
-        }
-    }
-    return nullptr;
 }
 
 #define for_each_str(str, buf, size) \
@@ -263,10 +233,6 @@ int cpio_commands(int argc, char *argv[]) {
             exit(cpio.test());
         } else if (cmdv[0] == "restore"sv) {
             cpio.restore();
-        } else if (cmdv[0] == "sha1"sv) {
-            char *sha1 = cpio.sha1();
-            if (sha1) printf("%s\n", sha1);
-            return 0;
         } else if (cmdv[0] == "patch"sv) {
             cpio.patch();
         } else if (cmdc == 2 && cmdv[0] == "exists"sv) {

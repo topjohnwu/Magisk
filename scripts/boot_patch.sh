@@ -125,9 +125,9 @@ case $((STATUS & 3)) in
     ;;
   1 )  # Magisk patched
     ui_print "- Magisk patched boot image detected"
-    # Find SHA1 of stock boot image
-    [ -z $SHA1 ] && SHA1=$(./magiskboot cpio ramdisk.cpio sha1 2>/dev/null)
-    ./magiskboot cpio ramdisk.cpio restore
+    ./magiskboot cpio ramdisk.cpio \
+    "extract .backup/.magisk config.orig" \
+    "restore"
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img
     ;;
@@ -141,6 +141,17 @@ esac
 INIT=init
 if [ $((STATUS & 4)) -ne 0 ]; then
   INIT=init.real
+fi
+
+if [ -f config.orig ]; then
+  # Read existing configs
+  chmod 0644 config.orig
+  SHA1=$(grep_prop SHA1 config.orig)
+  if ! $BOOTMODE; then
+    # Do not inherit config if not in recovery
+    PREINITDEVICE=$(grep_prop PREINITDEVICE config.orig)
+  fi
+  rm config.orig
 fi
 
 ##################
@@ -169,7 +180,7 @@ echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
 echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 if [ -n "$PREINITDEVICE" ]; then
-  ui_print "- Pre-init storage partition device ID: $PREINITDEVICE"
+  ui_print "- Pre-init storage partition: $PREINITDEVICE"
   echo "PREINITDEVICE=$PREINITDEVICE" >> config
 fi
 [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
