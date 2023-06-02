@@ -73,7 +73,7 @@ default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybo
 support_targets = default_targets + ["resetprop"]
 rust_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 
-sdk_path = op.realpath(os.environ["ANDROID_SDK_ROOT"])
+sdk_path = os.environ["ANDROID_SDK_ROOT"]
 ndk_root = op.join(sdk_path, "ndk")
 ndk_path = op.join(ndk_root, "magisk")
 ndk_build = op.join(ndk_path, "ndk-build")
