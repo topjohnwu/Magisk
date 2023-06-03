@@ -4,8 +4,6 @@
 
 #include <base.hpp>
 
-#include "boot-rs.hpp"
-
 #define HEADER_FILE     "header"
 #define KERNEL_FILE     "kernel"
 #define RAMDISK_FILE    "ramdisk.cpio"

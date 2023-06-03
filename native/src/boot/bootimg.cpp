@@ -9,12 +9,8 @@
 #include "bootimg.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
-#include "boot-rs.hpp"
 
 using namespace std;
-
-uint32_t dyn_img_hdr::j32 = 0;
-uint64_t dyn_img_hdr::j64 = 0;
 
 #define PADDING 15
 
@@ -50,10 +46,10 @@ static size_t restore(int fd, const char *filename) {
     return size;
 }
 
-void dyn_img_hdr::print() {
+void dyn_img_hdr::print() const {
     uint32_t ver = header_version();
     fprintf(stderr, "%-*s [%u]\n", PADDING, "HEADER_VER", ver);
-    if (!is_vendor)
+    if (!is_vendor())
         fprintf(stderr, "%-*s [%u]\n", PADDING, "KERNEL_SZ", kernel_size());
     fprintf(stderr, "%-*s [%u]\n", PADDING, "RAMDISK_SZ", ramdisk_size());
     if (ver < 3)
@@ -62,7 +58,7 @@ void dyn_img_hdr::print() {
         fprintf(stderr, "%-*s [%u]\n", PADDING, "EXTRA_SZ", extra_size());
     if (ver == 1 || ver == 2)
         fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
-    if (ver == 2 || is_vendor)
+    if (ver == 2 || is_vendor())
         fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
 
     if (uint32_t os_ver = os_version()) {
@@ -81,12 +77,12 @@ void dyn_img_hdr::print() {
     }
 
     fprintf(stderr, "%-*s [%u]\n", PADDING, "PAGESIZE", page_size());
-    if (char *n = name()) {
+    if (const char *n = name()) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", n);
     }
     fprintf(stderr, "%-*s [%.*s%.*s]\n", PADDING, "CMDLINE",
             BOOT_ARGS_SIZE, cmdline(), BOOT_EXTRA_ARGS_SIZE, extra_cmdline());
-    if (char *checksum = id()) {
+    if (const char *checksum = id()) {
         fprintf(stderr, "%-*s [", PADDING, "CHECKSUM");
         for (int i = 0; i < SHA256_DIGEST_SIZE; ++i)
             fprintf(stderr, "%02hhx", checksum[i]);
@@ -94,7 +90,7 @@ void dyn_img_hdr::print() {
     }
 }
 
-void dyn_img_hdr::dump_hdr_file() {
+void dyn_img_hdr::dump_hdr_file() const {
     FILE *fp = xfopen(HEADER_FILE, "w");
     if (name())
         fprintf(fp, "name=%s\n", name());
@@ -321,7 +317,7 @@ if (hdr->name##_size()) {                                           \
 }
 
 void boot_img::parse_image(const uint8_t *addr, format_t type) {
-    hdr = create_hdr(addr, type);
+    auto hdr = create_hdr(addr, type);
 
     if (char *id = hdr->id()) {
         for (int i = SHA_DIGEST_SIZE + 4; i < SHA256_DIGEST_SIZE; ++i) {
@@ -401,7 +397,7 @@ void boot_img::parse_image(const uint8_t *addr, format_t type) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
-        if (hdr->is_vendor && hdr->header_version() >= 4) {
+        if (hdr->is_vendor() && hdr->header_version() >= 4) {
             // v4 vendor boot contains multiple ramdisks
             // Do not try to mess with it for now
             r_fmt = UNKNOWN;
@@ -451,6 +447,8 @@ void boot_img::parse_image(const uint8_t *addr, format_t type) {
             }
         }
     }
+
+    this->hdr = hdr;
 }
 
 int split_image_dtb(const char *filename) {
@@ -474,7 +472,7 @@ int split_image_dtb(const char *filename) {
 }
 
 int unpack(const char *image, bool skip_decomp, bool hdr) {
-    boot_img boot(image);
+    const boot_img boot(image);
 
     if (hdr)
         boot.hdr->dump_hdr_file();
@@ -640,7 +638,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     if (access(RAMDISK_FILE, R_OK) == 0) {
         mmap_data m(RAMDISK_FILE);
         auto r_fmt = boot.r_fmt;
-        if (!skip_comp && !hdr->is_vendor && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
+        if (!skip_comp && !hdr->is_vendor() && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
             // A v4 boot image ramdisk will have to be merged with other vendor ramdisks,
             // and they have to use the exact same compression method. v4 GKIs are required to
             // use lz4 (legacy), so hardcode the format here.

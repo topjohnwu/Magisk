@@ -338,27 +338,33 @@ struct vendor_ramdisk_table_entry_v4 {
  * Polymorphic Universal Header
  *******************************/
 
+#define decl_val(name, len) \
+virtual uint##len##_t name() const { return 0; }
+
 #define decl_var(name, len) \
-virtual uint##len##_t &name() { j##len = 0; return j##len; }
-#define decl_val(name, type) \
-virtual type name() { return 0; }
+virtual uint##len##_t &name() { return j##len(); } \
+decl_val(name, len)
+
+#define decl_str(name) \
+virtual char *name() { return nullptr; } \
+virtual const char *name() const { return nullptr; }
 
 struct dyn_img_hdr {
 
-    const bool is_vendor;
+    virtual bool is_vendor() const = 0;
 
     // Standard entries
     decl_var(kernel_size, 32)
     decl_var(ramdisk_size, 32)
     decl_var(second_size, 32)
-    decl_val(page_size, uint32_t)
-    decl_val(header_version, uint32_t)
+    decl_val(page_size, 32)
+    decl_val(header_version, 32)
     decl_var(extra_size, 32)
     decl_var(os_version, 32)
-    decl_val(name, char *)
-    decl_val(cmdline, char *)
-    decl_val(id, char *)
-    decl_val(extra_cmdline, char *)
+    decl_str(name)
+    decl_str(cmdline)
+    decl_str(id)
+    decl_str(extra_cmdline)
     uint32_t kernel_dt_size = 0;
 
     // v1/v2 specific
@@ -368,21 +374,21 @@ struct dyn_img_hdr {
     decl_var(dtb_size, 32)
 
     // v4 specific
-    decl_val(signature_size, uint32_t)
-    decl_val(vendor_ramdisk_table_size, uint32_t)
-    decl_val(bootconfig_size, uint32_t)
+    decl_val(signature_size, 32)
+    decl_val(vendor_ramdisk_table_size, 32)
+    decl_val(bootconfig_size, 32)
 
     virtual ~dyn_img_hdr() {
         free(raw);
     }
 
-    virtual size_t hdr_size() = 0;
-    virtual size_t hdr_space() { return page_size(); }
-    virtual dyn_img_hdr *clone() = 0;
+    virtual size_t hdr_size() const = 0;
+    virtual size_t hdr_space() const { return page_size(); }
+    virtual dyn_img_hdr *clone() const = 0;
 
     const void *raw_hdr() const { return raw; }
-    void print();
-    void dump_hdr_file();
+    void print() const;
+    void dump_hdr_file() const;
     void load_hdr_file();
 
 protected:
@@ -393,16 +399,19 @@ protected:
         boot_img_hdr_pxa *hdr_pxa;   /* Samsung PXA header */
         void *raw;                   /* Raw pointer */
     };
-    dyn_img_hdr(bool b) : is_vendor(b) {}
+
+    static uint32_t &j32() { _j32 = 0; return _j32; }
+    static uint64_t &j64() { _j64 = 0; return _j64; }
 
 private:
     // Junk for references
-    static uint32_t j32;
-    static uint64_t j64;
+    inline static uint32_t _j32 = 0;
+    inline static uint64_t _j64 = 0;
 };
 
 #undef decl_var
 #undef decl_val
+#undef decl_str
 
 #define __impl_cls(name, hdr)           \
 protected: name() = default;            \
@@ -411,91 +420,101 @@ name(const void *ptr) {                 \
     raw = malloc(sizeof(hdr));          \
     memcpy(raw, ptr, sizeof(hdr));      \
 }                                       \
-size_t hdr_size() override {            \
+size_t hdr_size() const override {      \
     return sizeof(hdr);                 \
 }                                       \
-dyn_img_hdr *clone() override {         \
+dyn_img_hdr *clone() const override {   \
     auto p = new name(raw);             \
     p->kernel_dt_size = kernel_dt_size; \
     return p;                           \
 };
 
 #define __impl_val(name, hdr_name) \
-decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_name->name; }
+decltype(std::declval<const dyn_img_hdr>().name()) name() const override { return hdr_name->name; }
 
-struct dyn_img_hdr_boot : public dyn_img_hdr {
-protected:
-    dyn_img_hdr_boot() : dyn_img_hdr(false) {}
-};
+#define __impl_var(name, hdr_name) \
+decltype(std::declval<dyn_img_hdr>().name()) name() override { return hdr_name->name; } \
+__impl_val(name, hdr_name)
 
 #define impl_cls(ver)  __impl_cls(dyn_img_##ver, boot_img_hdr_##ver)
 #define impl_val(name) __impl_val(name, v2_hdr)
+#define impl_var(name) __impl_var(name, v2_hdr)
+
+struct dyn_img_hdr_boot : public dyn_img_hdr {
+    bool is_vendor() const final { return false; }
+};
 
 struct dyn_img_common : public dyn_img_hdr_boot {
-    impl_val(kernel_size)
-    impl_val(ramdisk_size)
-    impl_val(second_size)
+    impl_var(kernel_size)
+    impl_var(ramdisk_size)
+    impl_var(second_size)
 };
 
 struct dyn_img_v0 : public dyn_img_common {
     impl_cls(v0)
 
     impl_val(page_size)
-    impl_val(extra_size)
-    impl_val(os_version)
-    impl_val(name)
-    impl_val(cmdline)
-    impl_val(id)
-    impl_val(extra_cmdline)
+    impl_var(extra_size)
+    impl_var(os_version)
+    impl_var(name)
+    impl_var(cmdline)
+    impl_var(id)
+    impl_var(extra_cmdline)
 };
 
 struct dyn_img_v1 : public dyn_img_v0 {
     impl_cls(v1)
 
     impl_val(header_version)
-    impl_val(recovery_dtbo_size)
-    impl_val(recovery_dtbo_offset)
-    impl_val(header_size)
+    impl_var(recovery_dtbo_size)
+    impl_var(recovery_dtbo_offset)
+    impl_var(header_size)
 
-    uint32_t &extra_size() override { return dyn_img_hdr::extra_size(); }
+    uint32_t &extra_size() override { return j32(); }
+    uint32_t extra_size() const override { return 0; }
 };
 
 struct dyn_img_v2 : public dyn_img_v1 {
     impl_cls(v2)
 
-    impl_val(dtb_size)
+    impl_var(dtb_size)
 };
 
 #undef impl_val
+#undef impl_var
 #define impl_val(name) __impl_val(name, hdr_pxa)
+#define impl_var(name) __impl_var(name, hdr_pxa)
 
 struct dyn_img_pxa : public dyn_img_common {
     impl_cls(pxa)
 
-    impl_val(extra_size)
+    impl_var(extra_size)
     impl_val(page_size)
-    impl_val(name)
-    impl_val(cmdline)
-    impl_val(id)
-    impl_val(extra_cmdline)
+    impl_var(name)
+    impl_var(cmdline)
+    impl_var(id)
+    impl_var(extra_cmdline)
 };
 
 #undef impl_val
+#undef impl_var
 #define impl_val(name) __impl_val(name, v4_hdr)
+#define impl_var(name) __impl_var(name, v4_hdr)
 
 struct dyn_img_v3 : public dyn_img_hdr_boot {
     impl_cls(v3)
 
-    impl_val(kernel_size)
-    impl_val(ramdisk_size)
-    impl_val(os_version)
-    impl_val(header_size)
+    impl_var(kernel_size)
+    impl_var(ramdisk_size)
+    impl_var(os_version)
+    impl_var(header_size)
     impl_val(header_version)
-    impl_val(cmdline)
+    impl_var(cmdline)
 
     // Make API compatible
-    uint32_t page_size() override { return 4096; }
+    uint32_t page_size() const override { return 4096; }
     char *extra_cmdline() override { return &v4_hdr->cmdline[BOOT_ARGS_SIZE]; }
+    const char *extra_cmdline() const override { return &v4_hdr->cmdline[BOOT_ARGS_SIZE]; }
 };
 
 struct dyn_img_v4 : public dyn_img_v3 {
@@ -505,28 +524,30 @@ struct dyn_img_v4 : public dyn_img_v3 {
 };
 
 struct dyn_img_hdr_vendor : public dyn_img_hdr {
-protected:
-    dyn_img_hdr_vendor() : dyn_img_hdr(true) {}
+    bool is_vendor() const final { return true; }
 };
 
 #undef impl_val
+#undef impl_var
 #define impl_val(name) __impl_val(name, v4_vnd)
+#define impl_var(name) __impl_var(name, v4_vnd)
 
 struct dyn_img_vnd_v3 : public dyn_img_hdr_vendor {
     impl_cls(vnd_v3)
 
     impl_val(header_version)
     impl_val(page_size)
-    impl_val(ramdisk_size)
-    impl_val(cmdline)
-    impl_val(name)
-    impl_val(header_size)
-    impl_val(dtb_size)
+    impl_var(ramdisk_size)
+    impl_var(cmdline)
+    impl_var(name)
+    impl_var(header_size)
+    impl_var(dtb_size)
 
-    size_t hdr_space() override { return align_to(hdr_size(), page_size()); }
+    size_t hdr_space() const override { return align_to(hdr_size(), page_size()); }
 
     // Make API compatible
     char *extra_cmdline() override { return &v4_vnd->cmdline[BOOT_ARGS_SIZE]; }
+    const char *extra_cmdline() const override { return &v4_vnd->cmdline[BOOT_ARGS_SIZE]; }
 };
 
 struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
@@ -538,8 +559,10 @@ struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
 
 #undef __impl_cls
 #undef __impl_val
+#undef __impl_var
 #undef impl_cls
 #undef impl_val
+#undef impl_var
 
 /******************
  * Full Boot Image
@@ -564,10 +587,10 @@ enum {
 
 struct boot_img {
     // Memory map of the whole image
-    mmap_data map;
+    const mmap_data map;
 
     // Android image header
-    dyn_img_hdr *hdr;
+    const dyn_img_hdr *hdr;
 
     // Flags to indicate the state of current boot image
     std::bitset<BOOT_FLAGS_MAX> flags;

@@ -1,6 +1,7 @@
 #include <mincrypt/sha.h>
 #include <base.hpp>
 
+#include "boot-rs.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
 
