@@ -433,14 +433,14 @@ sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
 }
 
-int byte_data::patch(bool log, str_pairs list) {
-    if (buf == nullptr)
+int byte_data::patch(str_pairs list) {
+    if (_buf == nullptr)
         return 0;
     int count = 0;
-    for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
-        for (auto [from, to] : list) {
+    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
+        for (auto &[from, to] : list) {
             if (memcmp(p, from.data(), from.length() + 1) == 0) {
-                if (log) LOGD("Replace [%s] -> [%s]\n", from.data(), to.data());
+                LOGD("Patch @ %08X [%s] -> [%s]\n", (unsigned)(p - _buf), from.data(), to.data());
                 memset(p, 0, from.length());
                 memcpy(p, to.data(), to.length());
                 ++count;
@@ -451,31 +451,53 @@ int byte_data::patch(bool log, str_pairs list) {
     return count;
 }
 
-bool byte_data::contains(string_view pattern, bool log) const {
-    if (buf == nullptr)
+int byte_data::patch(byte_pairs list) {
+    if (_buf == nullptr)
+        return 0;
+    int count = 0;
+    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
+        for (auto &[from, to] : list) {
+            if (memcmp(p, from.buf(), from.sz()) == 0) {
+                LOGD("Patch @ %08X\n", (unsigned)(p - _buf));
+                memset(p, 0, from.sz());
+                memcpy(p, to.buf(), to.sz());
+                ++count;
+                p += from.sz();
+            }
+        }
+    }
+    return count;
+}
+
+bool byte_view::contains(string_view pattern) const {
+    if (_buf == nullptr)
         return false;
-    for (uint8_t *p = buf, *eof = buf + sz; p < eof; ++p) {
+    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
         if (memcmp(p, pattern.data(), pattern.length() + 1) == 0) {
-            if (log) LOGD("Found pattern [%s]\n", pattern.data());
+            LOGD("Found pattern [%s]\n", pattern.data());
             return true;
         }
     }
     return false;
 }
 
-bool byte_data::equals(const byte_data &o) const {
-    return sz == o.sz && memcmp(buf, o.buf, sz) == 0;
+bool byte_view::equals(const byte_view &o) const {
+    return _sz == o._sz && memcmp(_buf, o._buf, _sz) == 0;
 }
 
-void byte_data::swap(byte_data &o) {
-    std::swap(buf, o.buf);
-    std::swap(sz, o.sz);
+void byte_view::swap(byte_view &o) {
+    std::swap(_buf, o._buf);
+    std::swap(_sz, o._sz);
 }
 
-heap_data byte_data::clone() const {
-    heap_data copy(sz);
-    memcpy(copy.buf, buf, sz);
+heap_data byte_view::clone() const {
+    heap_data copy(_sz);
+    memcpy(copy._buf, _buf, _sz);
     return copy;
+}
+
+void heap_data::realloc(size_t sz) {
+    _buf = static_cast<uint8_t *>(::realloc(_buf, sz));
 }
 
 mmap_data::mmap_data(const char *name, bool rw) {
@@ -488,15 +510,15 @@ mmap_data::mmap_data(const char *name, bool rw) {
     if (S_ISBLK(st.st_mode)) {
         uint64_t size;
         ioctl(fd, BLKGETSIZE64, &size);
-        sz = size;
+        _sz = size;
     } else {
-        sz = st.st_size;
+        _sz = st.st_size;
     }
-    void *b = sz > 0
-            ? xmmap(nullptr, sz, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0)
+    void *b = _sz > 0
+            ? xmmap(nullptr, _sz, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0)
             : nullptr;
     close(fd);
-    buf = static_cast<uint8_t *>(b);
+    _buf = static_cast<uint8_t *>(b);
 }
 
 string find_apk_path(const char *pkg) {

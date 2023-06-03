@@ -40,21 +40,21 @@ static int skip_encryption_pattern(const char *s) {
 }
 
 static bool remove_pattern(byte_data &data, int(*pattern_skip)(const char *)) {
-    char *src = reinterpret_cast<char *>(data.buf);
-    size_t orig_sz = data.sz;
+    char *src = reinterpret_cast<char *>(data.buf());
+    size_t orig_sz = data.sz();
     int write = 0;
     int read = 0;
     while (read < orig_sz) {
         if (int skip = pattern_skip(src + read); skip > 0) {
             fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
-            data.sz -= skip;
+            data.sz() -= skip;
             read += skip;
         } else {
             src[write++] = src[read++];
         }
     }
     memset(src + write, 0, orig_sz - write);
-    return data.sz != orig_sz;
+    return data.sz() != orig_sz;
 }
 
 bool patch_verity(byte_data &data) {

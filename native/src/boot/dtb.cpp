@@ -95,9 +95,9 @@ static int find_fstab(const void *fdt, int node = 0) {
 
 template<typename Func>
 static void for_each_fdt(const char *file, bool rw, Func fn) {
-    auto m = mmap_data(file, rw);
-    uint8_t *end = m.buf + m.sz;
-    for (uint8_t *fdt = m.buf; fdt < end;) {
+    mmap_data m(file, rw);
+    uint8_t *end = m.buf() + m.sz();
+    for (uint8_t *fdt = m.buf(); fdt < end;) {
         fdt = static_cast<uint8_t*>(memmem(fdt, end - fdt, DTB_MAGIC, sizeof(fdt32_t)));
         if (fdt == nullptr)
             break;
@@ -226,7 +226,7 @@ static bool fdt_patch(void *fdt) {
         heap_data copy(value, len);
         if (patch_verity(copy)) {
             modified = true;
-            fdt_setprop(fdt, node, "fsmgr_flags", copy.buf, copy.sz);
+            fdt_setprop(fdt, node, "fsmgr_flags", copy.buf(), copy.sz());
         }
         if (name == "system"sv) {
             fprintf(stderr, "Setting [mnt_point] to [/system_root]\n");

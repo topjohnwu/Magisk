@@ -159,8 +159,8 @@ int main(int argc, char *argv[]) {
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[SHA_DIGEST_SIZE];
-        auto m = mmap_data(argv[2]);
-        SHA_hash(m.buf, m.sz, sha1);
+        mmap_data m(argv[2]);
+        SHA_hash(m.buf(), m.sz(), sha1);
         for (uint8_t i : sha1)
             printf("%02x", i);
         printf("\n");

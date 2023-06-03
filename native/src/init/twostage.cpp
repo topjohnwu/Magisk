@@ -21,9 +21,9 @@ void LegacySARInit::first_stage_prep() {
     int src = xopen("/init", O_RDONLY);
     int dest = xopen("/data/init", O_CREAT | O_WRONLY, 0);
     {
-        auto init = mmap_data("/init");
+        mmap_data init("/init");
         init.patch({ make_pair(INIT_PATH, REDIR_PATH) });
-        write(dest, init.buf, init.sz);
+        write(dest, init.buf(), init.sz());
         fclone_attr(src, dest);
         close(dest);
         close(src);

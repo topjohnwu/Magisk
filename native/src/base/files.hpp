@@ -45,23 +45,41 @@ struct mount_info {
 
 struct heap_data;
 
-struct byte_data {
-    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+struct byte_view {
+    byte_view() : _buf(nullptr), _sz(0) {}
+    byte_view(const void *buf, size_t sz) : _buf((uint8_t *) buf), _sz(sz) {}
+    byte_view(std::string_view str) : byte_view(str.data(), str.length()) {}
+    byte_view(const std::vector<uint8_t> &v) : byte_view(v.data(), v.size()) {}
 
-    uint8_t *buf;
-    size_t sz;
+    const uint8_t *buf() const { return _buf; }
+    const size_t &sz() const { return _sz; }
 
-    byte_data() : buf(nullptr), sz(0) {}
-    byte_data(void *buf, size_t sz) : buf(static_cast<uint8_t *>(buf)), sz(sz) {}
-    explicit byte_data(std::string_view str) : buf((uint8_t *) str.data()), sz(str.length()) {}
-
-    int patch(str_pairs list) { return patch(true, list); }
-    int patch(bool log, str_pairs list);
-    bool contains(std::string_view pattern, bool log = true) const;
-    bool equals(const byte_data &o) const;
+    bool contains(std::string_view pattern) const;
+    bool equals(const byte_view &o) const;
     heap_data clone() const;
+
 protected:
-    void swap(byte_data &o);
+    uint8_t *_buf;
+    size_t _sz;
+
+    byte_view(uint8_t *buf, size_t sz) : _buf(buf), _sz(sz) {}
+    void swap(byte_view &o);
+};
+
+struct byte_data : public byte_view {
+    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
+    using byte_pairs = std::initializer_list<std::pair<byte_view, byte_view>>;
+
+    byte_data() = default;
+    byte_data(void *buf, size_t sz) : byte_view(static_cast<uint8_t *>(buf), sz) {}
+
+    using byte_view::buf;
+    using byte_view::sz;
+    uint8_t *buf() { return _buf; }
+    size_t &sz() { return _sz; }
+
+    int patch(str_pairs list);
+    int patch(byte_pairs list);
 };
 
 #define MOVE_ONLY(clazz) \
@@ -73,16 +91,18 @@ clazz& operator=(clazz &&o) { swap(o); return *this; }
 struct heap_data : public byte_data {
     MOVE_ONLY(heap_data)
 
-    explicit heap_data(size_t sz) : byte_data(new uint8_t[sz], sz) {}
-    heap_data(const void *buf, size_t sz) : heap_data(sz) { memcpy(this->buf, buf, sz); }
-    ~heap_data() { delete[] buf; }
+    explicit heap_data(size_t sz) : byte_data(malloc(sz), sz) {}
+    heap_data(const void *buf, size_t sz) : heap_data(sz) { memcpy(_buf, buf, sz); }
+    ~heap_data() { free(_buf); }
+
+    void realloc(size_t sz);
 };
 
 struct mmap_data : public byte_data {
     MOVE_ONLY(mmap_data)
 
     mmap_data(const char *name, bool rw = false);
-    ~mmap_data() { if (buf) munmap(buf, sz); }
+    ~mmap_data() { if (_buf) munmap(_buf, _sz); }
 };
 
 extern "C" {

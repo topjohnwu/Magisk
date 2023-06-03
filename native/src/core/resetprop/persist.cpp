@@ -137,8 +137,8 @@ static void pb_get_prop(prop_cb *prop_cb) {
     PersistentProperties props{};
     props.properties.funcs.decode = prop_decode;
     props.properties.arg = prop_cb;
-    auto m = mmap_data(PERSIST_PROP);
-    pb_istream_t stream = pb_istream_from_buffer(m.buf, m.sz);
+    mmap_data m(PERSIST_PROP);
+    pb_istream_t stream = pb_istream_from_buffer(m.buf(), m.sz());
     pb_decode(&stream, &PersistentProperties_msg, &props);
 }
 

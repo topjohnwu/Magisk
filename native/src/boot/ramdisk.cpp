@@ -111,7 +111,7 @@ void magisk_cpio::restore() {
     rm(bk);
     rm(mg);
     if (rl != entries.end()) {
-        for_each_str(file, rl->second->data.buf, rl->second->data.sz) {
+        for_each_str(file, rl->second->data.buf(), rl->second->data.sz()) {
             rm(file);
         }
         rm(rl);
@@ -186,7 +186,7 @@ void magisk_cpio::backup(const char *orig) {
     }
 
     if (!rm_list.empty()) {
-        byte_data rm(rm_list);
+        byte_view rm(rm_list);
         auto rm_list_file = new cpio_entry(S_IFREG, rm);
         backups.emplace(".backup/.rmlist", rm_list_file);
     }

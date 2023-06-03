@@ -213,7 +213,7 @@ bool check_two_stage() {
     if (access("/system/bin/init", F_OK) == 0)
         return true;
     // If we still have no indication, parse the original init and see what's up
-    auto init = mmap_data(backup_init());
+    mmap_data init(backup_init());
     return init.contains("selinux_setup");
 }
 

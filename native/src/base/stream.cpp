@@ -95,9 +95,9 @@ bool chunk_out_stream::write(const void *_in, size_t len) {
             // Enough input for a chunk
             const uint8_t *src;
             if (buf_off) {
-                src = data.buf;
+                src = data.buf();
                 auto copy = chunk_sz - buf_off;
-                memcpy(data.buf + buf_off, in, copy);
+                memcpy(data.buf() + buf_off, in, copy);
                 in += copy;
                 len -= copy;
                 buf_off = 0;
@@ -110,7 +110,7 @@ bool chunk_out_stream::write(const void *_in, size_t len) {
                 return false;
         } else {
             // Buffer internally
-            memcpy(data.buf + buf_off, in, len);
+            memcpy(data.buf() + buf_off, in, len);
             buf_off += len;
             break;
         }
@@ -124,7 +124,7 @@ bool chunk_out_stream::write_chunk(const void *buf, size_t len, bool) {
 
 void chunk_out_stream::finalize() {
     if (buf_off) {
-        if (!write_chunk(data.buf, buf_off, true)) {
+        if (!write_chunk(data.buf(), buf_off, true)) {
             LOGE("Error in finalize, file truncated\n");
         }
         buf_off = 0;
@@ -132,17 +132,17 @@ void chunk_out_stream::finalize() {
 }
 
 ssize_t byte_channel::read(void *buf, size_t len) {
-    len = std::min((size_t) len, _data.sz - _pos);
-    memcpy(buf, _data.buf + _pos, len);
+    len = std::min((size_t) len, _data.sz() - _pos);
+    memcpy(buf, _data.buf() + _pos, len);
     _pos += len;
     return len;
 }
 
 bool byte_channel::write(const void *buf, size_t len) {
     resize(_pos + len);
-    memcpy(_data.buf + _pos, buf, len);
+    memcpy(_data.buf() + _pos, buf, len);
     _pos += len;
-    _data.sz = std::max(_data.sz, _pos);
+    _data.sz() = std::max(_data.sz(), _pos);
     return true;
 }
 
@@ -153,7 +153,7 @@ off_t byte_channel::seek(off_t off, int whence) {
             np = _pos + off;
             break;
         case SEEK_END:
-            np = _data.sz + off;
+            np = _data.sz() + off;
             break;
         case SEEK_SET:
             np = off;
@@ -174,9 +174,9 @@ void byte_channel::resize(size_t new_sz, bool zero) {
         resize = true;
     }
     if (resize) {
-        _data.buf = (uint8_t *) realloc(_data.buf, _cap);
+        _data.realloc(_cap);
         if (zero)
-            memset(_data.buf + old_cap, 0, _cap - old_cap);
+            memset(_data.buf() + old_cap, 0, _cap - old_cap);
     }
 }
 
