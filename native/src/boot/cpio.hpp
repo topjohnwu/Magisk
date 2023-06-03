@@ -6,18 +6,19 @@
 #include <map>
 #include <string_view>
 
+#include <base.hpp>
+
 struct cpio_newc_header;
 
 struct cpio_entry {
     uint32_t mode;
     uint32_t uid;
     uint32_t gid;
-    uint32_t filesize;
-    void *data;
+    heap_data data;
 
-    explicit cpio_entry(uint32_t mode = 0);
+    explicit cpio_entry(uint32_t mode);
+    explicit cpio_entry(uint32_t mode, const byte_data &data);
     explicit cpio_entry(const cpio_newc_header *h);
-    ~cpio_entry() { free(data); }
 };
 
 class cpio {

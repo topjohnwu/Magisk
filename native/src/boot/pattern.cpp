@@ -39,26 +39,28 @@ static int skip_encryption_pattern(const char *s) {
     return skip;
 }
 
-static uint32_t remove_pattern(char *src, uint32_t size, int(*pattern_skip)(const char *)) {
-    int orig_sz = size;
+static bool remove_pattern(byte_data &data, int(*pattern_skip)(const char *)) {
+    char *src = reinterpret_cast<char *>(data.buf);
+    size_t orig_sz = data.sz;
     int write = 0;
-    for (int read = 0; read < orig_sz;) {
+    int read = 0;
+    while (read < orig_sz) {
         if (int skip = pattern_skip(src + read); skip > 0) {
             fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
-            size -= skip;
+            data.sz -= skip;
             read += skip;
         } else {
             src[write++] = src[read++];
         }
     }
     memset(src + write, 0, orig_sz - write);
-    return size;
+    return data.sz != orig_sz;
 }
 
-uint32_t patch_verity(void *buf, uint32_t size) {
-    return remove_pattern(static_cast<char *>(buf), size, skip_verity_pattern);
+bool patch_verity(byte_data &data) {
+    return remove_pattern(data, skip_verity_pattern);
 }
 
-uint32_t patch_encryption(void *buf, uint32_t size) {
-    return remove_pattern(static_cast<char *>(buf), size, skip_encryption_pattern);
+bool patch_encryption(byte_data &data) {
+    return remove_pattern(data, skip_encryption_pattern);
 }

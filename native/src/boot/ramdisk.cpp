@@ -44,16 +44,14 @@ void magisk_cpio::patch() {
         if (!keepverity) {
             if (fstab) {
                 fprintf(stderr, "Found fstab file [%s]\n", cur->first.data());
-                cur->second->filesize = patch_verity(cur->second->data, cur->second->filesize);
+                patch_verity(cur->second->data);
             } else if (cur->first == "verity_key") {
                 rm(cur);
                 continue;
             }
         }
-        if (!keepforceencrypt) {
-            if (fstab) {
-                cur->second->filesize = patch_encryption(cur->second->data, cur->second->filesize);
-            }
+        if (!keepforceencrypt && fstab) {
+            patch_encryption(cur->second->data);
         }
     }
 }
@@ -113,7 +111,7 @@ void magisk_cpio::restore() {
     rm(bk);
     rm(mg);
     if (rl != entries.end()) {
-        for_each_str(file, rl->second->data, rl->second->filesize) {
+        for_each_str(file, rl->second->data.buf, rl->second->data.sz) {
             rm(file);
         }
         rm(rl);
@@ -158,8 +156,7 @@ void magisk_cpio::backup(const char *orig) {
             do_backup = true;
             fprintf(stderr, "Backup missing entry: ");
         } else if (res == 0) {
-            if (lhs->second->filesize != rhs->second->filesize ||
-                memcmp(lhs->second->data, rhs->second->data, lhs->second->filesize) != 0) {
+            if (!lhs->second->data.equals(rhs->second->data)) {
                 // Not the same!
                 do_backup = true;
                 fprintf(stderr, "Backup mismatch entry: ");
@@ -189,10 +186,8 @@ void magisk_cpio::backup(const char *orig) {
     }
 
     if (!rm_list.empty()) {
-        auto rm_list_file = new cpio_entry(S_IFREG);
-        rm_list_file->filesize = rm_list.length();
-        rm_list_file->data = malloc(rm_list.length());
-        memcpy(rm_list_file->data, rm_list.data(), rm_list.length());
+        byte_data rm(rm_list);
+        auto rm_list_file = new cpio_entry(S_IFREG, rm);
         backups.emplace(".backup/.rmlist", rm_list_file);
     }
 

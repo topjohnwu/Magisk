@@ -150,7 +150,8 @@ static bool dtb_patch(const char *file) {
                 fdt_for_each_subnode(node, fdt, fstab) {
                     int len;
                     char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
-                    patched |= patch_verity(value, len) != len;
+                    byte_data data(value, len);
+                    patched |= patch_verity(data);
                 }
             }
         }
@@ -221,12 +222,11 @@ static bool fdt_patch(void *fdt) {
         const char *name = fdt_get_name(fdt, node, nullptr);
         // Force remove AVB for 2SI since it may bootloop some devices
         int len;
-        auto value = (const char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
-        string copy(value, len);
-        uint32_t new_len = patch_verity(copy.data(), len);
-        if (new_len != len) {
+        const void *value = fdt_getprop(fdt, node, "fsmgr_flags", &len);
+        heap_data copy(value, len);
+        if (patch_verity(copy)) {
             modified = true;
-            fdt_setprop(fdt, node, "fsmgr_flags", copy.data(), new_len);
+            fdt_setprop(fdt, node, "fsmgr_flags", copy.buf, copy.sz);
         }
         if (name == "system"sv) {
             fprintf(stderr, "Setting [mnt_point] to [/system_root]\n");

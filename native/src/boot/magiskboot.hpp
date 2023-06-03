@@ -2,6 +2,8 @@
 
 #include <sys/types.h>
 
+#include <base.hpp>
+
 #include "boot-rs.hpp"
 
 #define HEADER_FILE     "header"
@@ -21,6 +23,7 @@ int hexpatch(const char *file, const char *from, const char *to);
 int cpio_commands(int argc, char *argv[]);
 int dtb_commands(int argc, char *argv[]);
 
-uint32_t patch_verity(void *buf, uint32_t size);
-uint32_t patch_encryption(void *buf, uint32_t size);
+bool patch_verity(byte_data &data);
+bool patch_encryption(byte_data &data);
+
 bool check_env(const char *name);

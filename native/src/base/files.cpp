@@ -463,9 +463,19 @@ bool byte_data::contains(string_view pattern, bool log) const {
     return false;
 }
 
+bool byte_data::equals(const byte_data &o) const {
+    return sz == o.sz && memcmp(buf, o.buf, sz) == 0;
+}
+
 void byte_data::swap(byte_data &o) {
     std::swap(buf, o.buf);
     std::swap(sz, o.sz);
+}
+
+heap_data byte_data::clone() const {
+    heap_data copy(sz);
+    memcpy(copy.buf, buf, sz);
+    return copy;
 }
 
 mmap_data::mmap_data(const char *name, bool rw) {

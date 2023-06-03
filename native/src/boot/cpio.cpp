@@ -43,11 +43,13 @@ static uint32_t x8u(const char *hex) {
     return val;
 }
 
-cpio_entry::cpio_entry(uint32_t mode) : mode(mode), uid(0), gid(0), filesize(0), data(nullptr) {}
+cpio_entry::cpio_entry(uint32_t mode) : mode(mode), uid(0), gid(0), data(0) {}
+
+cpio_entry::cpio_entry(uint32_t mode, const byte_data &data) :
+mode(mode), uid(0), gid(0), data(data.clone()) {}
 
 cpio_entry::cpio_entry(const cpio_newc_header *h) :
-mode(x8u(h->mode)), uid(x8u(h->uid)), gid(x8u(h->gid)), filesize(x8u(h->filesize)), data(nullptr)
-{}
+mode(x8u(h->mode)), uid(x8u(h->uid)), gid(x8u(h->gid)), data(x8u(h->filesize)) {}
 
 void cpio::dump(const char *file) {
     fprintf(stderr, "Dump cpio: [%s]\n", file);
@@ -87,13 +89,13 @@ static void extract_entry(const cpio::entry_map::value_type &e, const char *file
         xmkdir(file, e.second->mode & 0777);
     } else if (S_ISREG(e.second->mode)) {
         int fd = xopen(file, O_CREAT | O_WRONLY | O_TRUNC, e.second->mode & 0777);
-        xwrite(fd, e.second->data, e.second->filesize);
+        xwrite(fd, e.second->data.buf, e.second->data.sz);
         fchown(fd, e.second->uid, e.second->gid);
         close(fd);
-    } else if (S_ISLNK(e.second->mode) && e.second->filesize < 4096) {
+    } else if (S_ISLNK(e.second->mode) && e.second->data.sz < 4096) {
         char target[4096];
-        memcpy(target, e.second->data, e.second->filesize);
-        target[e.second->filesize] = '\0';
+        memcpy(target, e.second->data.buf, e.second->data.sz);
+        target[e.second->data.sz] = '\0';
         symlink(target, file);
     }
 }
@@ -132,7 +134,7 @@ void cpio::dump(FILE *out) {
                 e.second->gid,
                 1,          // e->nlink
                 0,          // e->mtime
-                e.second->filesize,
+                (uint32_t) e.second->data.sz,
                 0,          // e->devmajor
                 0,          // e->devminor
                 0,          // e->rdevmajor
@@ -143,8 +145,8 @@ void cpio::dump(FILE *out) {
         do_out(header, 110);
         do_out(e.first.data(), e.first.size() + 1);
         out_align();
-        if (e.second->filesize) {
-            do_out(e.second->data, e.second->filesize);
+        if (e.second->data.sz) {
+            do_out(e.second->data.buf, e.second->data.sz);
             out_align();
         }
     }
@@ -173,11 +175,8 @@ void cpio::insert(string_view name, cpio_entry *e) {
 }
 
 void cpio::add(mode_t mode, const char *name, const char *file) {
-    auto m = mmap_data(file);
-    auto e = new cpio_entry(S_IFREG | mode);
-    e->filesize = m.sz;
-    e->data = malloc(m.sz);
-    memcpy(e->data, m.buf, m.sz);
+    mmap_data m(file);
+    auto e = new cpio_entry(S_IFREG | mode, m);
     insert(name, e);
     fprintf(stderr, "Add entry [%s] (%04o)\n", name, mode);
 }
@@ -188,9 +187,8 @@ void cpio::mkdir(mode_t mode, const char *name) {
 }
 
 void cpio::ln(const char *target, const char *name) {
-    auto e = new cpio_entry(S_IFLNK);
-    e->filesize = strlen(target);
-    e->data = strdup(target);
+    byte_data link(target);
+    auto e = new cpio_entry(S_IFLNK, link);
     insert(name, e);
     fprintf(stderr, "Create symlink [%s] -> [%s]\n", name, target);
 }
@@ -236,9 +234,8 @@ void cpio::load_cpio(const char *buf, size_t sz) {
             continue;
         }
         auto entry = new cpio_entry(hdr);
-        entry->data = malloc(entry->filesize);
-        memcpy(entry->data, buf + pos, entry->filesize);
-        pos += entry->filesize;
+        memcpy(entry->data.buf, buf + pos, entry->data.sz);
+        pos += entry->data.sz;
         insert(name, entry);
         pos_align(pos);
     }

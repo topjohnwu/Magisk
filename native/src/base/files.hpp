@@ -43,15 +43,23 @@ struct mount_info {
     std::string fs_option;
 };
 
+struct heap_data;
+
 struct byte_data {
     using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
 
-    uint8_t *buf = nullptr;
-    size_t sz = 0;
+    uint8_t *buf;
+    size_t sz;
+
+    byte_data() : buf(nullptr), sz(0) {}
+    byte_data(void *buf, size_t sz) : buf(static_cast<uint8_t *>(buf)), sz(sz) {}
+    explicit byte_data(std::string_view str) : buf((uint8_t *) str.data()), sz(str.length()) {}
 
     int patch(str_pairs list) { return patch(true, list); }
     int patch(bool log, str_pairs list);
     bool contains(std::string_view pattern, bool log = true) const;
+    bool equals(const byte_data &o) const;
+    heap_data clone() const;
 protected:
     void swap(byte_data &o);
 };
@@ -65,7 +73,8 @@ clazz& operator=(clazz &&o) { swap(o); return *this; }
 struct heap_data : public byte_data {
     MOVE_ONLY(heap_data)
 
-    explicit heap_data(size_t sz) { this->sz = sz; buf = new uint8_t[sz]; }
+    explicit heap_data(size_t sz) : byte_data(new uint8_t[sz], sz) {}
+    heap_data(const void *buf, size_t sz) : heap_data(sz) { memcpy(this->buf, buf, sz); }
     ~heap_data() { delete[] buf; }
 };
 
