@@ -318,10 +318,12 @@ loop_setup() {
 
 mount_apex() {
   $BOOTMODE || [ ! -d /system/apex ] && return
-  local APEX DEST
+  local APEX APEXJARS DEST FWK PATTERN SHCON
   setup_mntpoint /apex
   mount -t tmpfs tmpfs /apex -o mode=755
-  local PATTERN='s/.*"name":[^"]*"\([^"]*\).*/\1/p'
+  SHCON=$(cat /proc/self/attr/current)
+  echo "u:r:su:s0" > /proc/self/attr/current # work around LOS Recovery not allowing loop mounts in recovery context
+  PATTERN='s/.*"name":[^"]*"\([^"]*\).*/\1/p'
   for APEX in /system/apex/*; do
     if [ -f $APEX ]; then
       # handle CAPEX APKs, extract actual APEX APK first
@@ -354,12 +356,13 @@ mount_apex() {
       mount -o bind $APEX $DEST
     fi
   done
+  echo "$SHCON" > /proc/self/attr/current
+  APEXJARS=$(find /apex -name '*.jar' | sort | tr '\n' ':')
+  FWK=/system/framework
   export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
   export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
   export ANDROID_ART_ROOT=/apex/com.android.art
   export ANDROID_I18N_ROOT=/apex/com.android.i18n
-  local APEXJARS=$(find /apex -name '*.jar' | sort | tr '\n' ':')
-  local FWK=/system/framework
   export BOOTCLASSPATH=${APEXJARS}\
 $FWK/framework.jar:$FWK/ext.jar:$FWK/telephony-common.jar:\
 $FWK/voip-common.jar:$FWK/ims-common.jar:$FWK/telephony-ext.jar
@@ -469,7 +472,7 @@ install_magisk() {
   cd $MAGISKBIN
 
   if [ ! -c $BOOTIMAGE ]; then
-    eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
+    [ -f /system/bin/dalvikvm ] && eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
     $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
   fi
 
