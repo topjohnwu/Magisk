@@ -432,15 +432,16 @@ def find_jdk():
         if not op.exists(jbr):
             jbr = op.join(studio, "Contents", "jbr", "Contents", "Home", "bin")
         if op.exists(jbr):
-            env["PATH"] = f'{jbr}:{env["PATH"]}'
+            env["PATH"] = f'{jbr}{os.pathsep}{env["PATH"]}'
 
     no_jdk = False
     try:
         proc = subprocess.run(
-            ["javac", "-version"],
+            "javac -version",
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             env=env,
+            shell=True
         )
         no_jdk = proc.returncode != 0
     except FileNotFoundError:
@@ -516,7 +517,7 @@ def cleanup(args):
 
     if "java" in args.target:
         header("* Cleaning java")
-        execv([gradlew, "app:clean", "app:shared:clean", "stub:clean"])
+        execv([gradlew, "app:clean", "app:shared:clean", "stub:clean"], env=find_jdk())
         rm_rf(op.join("app", "src", "debug"))
         rm_rf(op.join("app", "src", "release"))
 
