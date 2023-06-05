@@ -380,7 +380,7 @@ umount_apex() {
 
 # After calling this method, the following variables will be set:
 # KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
-# ISENCRYPTED, VBMETAEXIST
+# ISENCRYPTED, VBMETAEXIST, DYNAMIC_PARTITIONS
 get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
@@ -418,6 +418,14 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  if [ -z $DYNAMIC_PARTITIONS ]; then
+    DYNAMIC_PARTITIONS=$(getprop ro.boot.dynamic_partitions)
+    if [ "$DYNAMIC_PARTITIONS" = "true" ]; then
+      ui_print "- Dynamic partitions, don't force ramdisk"
+    else
+      DYNAMIC_PARTITIONS=false
+    fi
+  fi
 }
 
 find_boot_image() {

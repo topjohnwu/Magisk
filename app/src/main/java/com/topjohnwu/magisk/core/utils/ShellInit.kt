@@ -78,6 +78,7 @@ class ShellInit : Shell.Initializer() {
         Info.vbmeta = getBool("VBMETAEXIST")
         Info.isAB = getBool("ISAB")
         Info.crypto = getVar("CRYPTOTYPE")
+        Info.dynamicPartitions = getBool("DYNAMIC_PARTITIONS")
 
         // Default presets
         Config.recovery = getBool("RECOVERYMODE")

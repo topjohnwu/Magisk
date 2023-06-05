@@ -33,6 +33,7 @@ object Info {
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
     @JvmField var vbmeta = false
+    @JvmField var dynamicPartitions = false
     var crypto = ""
     var noDataExec = false
     var isRooted = false

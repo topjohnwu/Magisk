@@ -212,6 +212,7 @@ get_flags() {
   PATCHVBMETAFLAG=false
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  [ "$(getprop ro.boot.dynamic_partitions)" = "true" ] && DYNAMIC_PARTITIONS=true
 }
 
 run_migrations() { return; }
