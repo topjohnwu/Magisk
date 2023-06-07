@@ -20,5 +20,9 @@ int hexpatch(const char *file, string_view from, string_view to) {
     hex2byte(from, pattern.data());
     hex2byte(to, patch.data());
 
-    return m.patch({ make_pair(pattern, patch) }) > 0 ? 0 : 1;
+    auto v = m.patch(pattern, patch);
+    for (size_t off : v) {
+        fprintf(stderr, "Patch @ %08zX [%s] -> [%s]\n", off, from.data(), to.data());
+    }
+    return v.empty() ? 1 : 0;
 }

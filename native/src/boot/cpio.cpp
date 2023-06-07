@@ -45,7 +45,7 @@ static uint32_t x8u(const char *hex) {
 
 cpio_entry::cpio_entry(uint32_t mode) : mode(mode), uid(0), gid(0), data(0) {}
 
-cpio_entry::cpio_entry(uint32_t mode, const byte_view &data) :
+cpio_entry::cpio_entry(uint32_t mode, byte_view data) :
 mode(mode), uid(0), gid(0), data(data.clone()) {}
 
 cpio_entry::cpio_entry(const cpio_newc_header *h) :
@@ -187,8 +187,7 @@ void cpio::mkdir(mode_t mode, const char *name) {
 }
 
 void cpio::ln(const char *target, const char *name) {
-    byte_view link(target);
-    auto e = new cpio_entry(S_IFLNK, link);
+    auto e = new cpio_entry(S_IFLNK, {target, false});
     insert(name, e);
     fprintf(stderr, "Create symlink [%s] -> [%s]\n", name, target);
 }

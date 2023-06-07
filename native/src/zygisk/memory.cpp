@@ -1,3 +1,4 @@
+#include <sys/mman.h>
 #include "memory.hpp"
 
 namespace jni_hook {

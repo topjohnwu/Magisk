@@ -1,8 +1,6 @@
 #pragma once
 
-#include <sys/mman.h>
 #include <sys/stat.h>
-#include <mntent.h>
 #include <functional>
 #include <string_view>
 #include <string>
@@ -48,38 +46,44 @@ struct heap_data;
 struct byte_view {
     byte_view() : _buf(nullptr), _sz(0) {}
     byte_view(const void *buf, size_t sz) : _buf((uint8_t *) buf), _sz(sz) {}
-    byte_view(std::string_view str) : byte_view(str.data(), str.length()) {}
+
+    // byte_view, or any of its sub-type, can be copied as byte_view
+    byte_view(const byte_view &o) : _buf(o._buf), _sz(o._sz) {}
+
+    // String as bytes
+    byte_view(std::string_view s, bool with_nul = true);
+    byte_view(const char *s, bool with_nul = true)
+    : byte_view(std::string_view(s), with_nul) {}
+    byte_view(const std::string &s, bool with_nul = true)
+    : byte_view(std::string_view(s), with_nul) {}
+
+    // Vector as bytes
     byte_view(const std::vector<uint8_t> &v) : byte_view(v.data(), v.size()) {}
 
     const uint8_t *buf() const { return _buf; }
-    const size_t &sz() const { return _sz; }
+    size_t sz() const { return _sz; }
 
-    bool contains(std::string_view pattern) const;
-    bool equals(const byte_view &o) const;
+    bool contains(byte_view pattern) const;
+    bool equals(byte_view o) const;
     heap_data clone() const;
 
 protected:
     uint8_t *_buf;
     size_t _sz;
 
-    byte_view(uint8_t *buf, size_t sz) : _buf(buf), _sz(sz) {}
     void swap(byte_view &o);
 };
 
 struct byte_data : public byte_view {
-    using str_pairs = std::initializer_list<std::pair<std::string_view, std::string_view>>;
-    using byte_pairs = std::initializer_list<std::pair<byte_view, byte_view>>;
-
     byte_data() = default;
-    byte_data(void *buf, size_t sz) : byte_view(static_cast<uint8_t *>(buf), sz) {}
+    byte_data(void *buf, size_t sz) : byte_view(buf, sz) {}
 
     using byte_view::buf;
     using byte_view::sz;
     uint8_t *buf() { return _buf; }
     size_t &sz() { return _sz; }
 
-    int patch(str_pairs list);
-    int patch(byte_pairs list);
+    std::vector<size_t> patch(byte_view from, byte_view to);
 };
 
 #define MOVE_ONLY(clazz) \
@@ -92,7 +96,6 @@ struct heap_data : public byte_data {
     MOVE_ONLY(heap_data)
 
     explicit heap_data(size_t sz) : byte_data(malloc(sz), sz) {}
-    heap_data(const void *buf, size_t sz) : heap_data(sz) { memcpy(_buf, buf, sz); }
     ~heap_data() { free(_buf); }
 
     void realloc(size_t sz);
@@ -101,8 +104,11 @@ struct heap_data : public byte_data {
 struct mmap_data : public byte_data {
     MOVE_ONLY(mmap_data)
 
-    mmap_data(const char *name, bool rw = false);
-    ~mmap_data() { if (_buf) munmap(_buf, _sz); }
+    explicit mmap_data(const char *name, bool rw = false);
+    mmap_data(int fd, size_t sz, bool rw = false) { init(fd, sz, rw); }
+    ~mmap_data();
+private:
+    void init(int fd, size_t sz, bool rw);
 };
 
 extern "C" {

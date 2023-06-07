@@ -17,7 +17,7 @@ struct cpio_entry {
     heap_data data;
 
     explicit cpio_entry(uint32_t mode);
-    explicit cpio_entry(uint32_t mode, const byte_view &data);
+    explicit cpio_entry(uint32_t mode, byte_view data);
     explicit cpio_entry(const cpio_newc_header *h);
 };
 

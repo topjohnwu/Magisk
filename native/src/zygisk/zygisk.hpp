@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sys/mman.h>
 #include <stdint.h>
 #include <jni.h>
 #include <vector>

@@ -186,8 +186,7 @@ void magisk_cpio::backup(const char *orig) {
     }
 
     if (!rm_list.empty()) {
-        byte_view rm(rm_list);
-        auto rm_list_file = new cpio_entry(S_IFREG, rm);
+        auto rm_list_file = new cpio_entry(S_IFREG, {rm_list, false});
         backups.emplace(".backup/.rmlist", rm_list_file);
     }
 
