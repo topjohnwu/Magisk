@@ -174,7 +174,7 @@ void byte_channel::resize(size_t new_sz, bool zero) {
         resize = true;
     }
     if (resize) {
-        _data.realloc(_cap);
+        _data._buf = static_cast<uint8_t *>(::realloc(_data._buf, _cap));
         if (zero)
             memset(_data.buf() + old_cap, 0, _cap - old_cap);
     }

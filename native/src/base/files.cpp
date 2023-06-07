@@ -7,13 +7,12 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <misc.hpp>
 #include <selinux.hpp>
 
 using namespace std;
 
 int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_path(dirfd, u8_mut_slice(path, size)) < 0)
+    if (fd_path(dirfd, byte_data(path, size)) < 0)
         return -1;
     auto len = strlen(path);
     path[len] = '/';
@@ -432,61 +431,6 @@ sDIR make_dir(DIR *dp) {
 
 sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
-}
-
-byte_view::byte_view(string_view s, bool with_nul)
-: byte_view(static_cast<const void *>(s.data()), s.length()) {
-    if (with_nul && s[s.length()] == '\0') {
-        ++_sz;
-    }
-}
-
-bool byte_view::contains(byte_view pattern) const {
-    if (_buf == nullptr)
-        return false;
-    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
-        if (memcmp(p, pattern.buf(), pattern.sz()) == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool byte_view::equals(byte_view o) const {
-    return _sz == o._sz && memcmp(_buf, o._buf, _sz) == 0;
-}
-
-void byte_view::swap(byte_view &o) {
-    std::swap(_buf, o._buf);
-    std::swap(_sz, o._sz);
-}
-
-heap_data byte_view::clone() const {
-    heap_data copy(_sz);
-    memcpy(copy._buf, _buf, _sz);
-    return copy;
-}
-
-vector<size_t> byte_data::patch(byte_view from, byte_view to) {
-    vector<size_t> v;
-    if (_buf == nullptr)
-        return v;
-    auto p = _buf;
-    auto eof = _buf + _sz;
-    while (p < eof) {
-        p = static_cast<uint8_t *>(memmem(p, eof - p, from.buf(), from.sz()));
-        if (p == nullptr)
-            return v;
-        memset(p, 0, from.sz());
-        memcpy(p, to.buf(), to.sz());
-        v.push_back(p - _buf);
-        p += from.sz();
-    }
-    return v;
-}
-
-void heap_data::realloc(size_t sz) {
-    _buf = static_cast<uint8_t *>(::realloc(_buf, sz));
 }
 
 mmap_data::mmap_data(const char *name, bool rw) {
