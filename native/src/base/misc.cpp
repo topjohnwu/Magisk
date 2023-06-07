@@ -14,14 +14,7 @@
 using namespace std;
 
 bool byte_view::contains(byte_view pattern) const {
-    if (_buf == nullptr)
-        return false;
-    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
-        if (memcmp(p, pattern.buf(), pattern.sz()) == 0) {
-            return true;
-        }
-    }
-    return false;
+    return _buf != nullptr && memmem(_buf, _sz, pattern._buf, pattern._sz) != nullptr;
 }
 
 bool byte_view::equals(byte_view o) const {
