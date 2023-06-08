@@ -51,6 +51,7 @@ jobs:
           variant: sccache
           key: ${{ runner.os }}-${{ github.sha }}
           restore-keys: ${{ runner.os }}
+          max-size: 10000M
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
