@@ -15,9 +15,9 @@ type='google_apis'
 # API 26: legacy rootfs with Treble
 # API 28: legacy system-as-root
 # API 29: 2 Stage Init
-# API 33: latest Android
+# API 34: latest Android
 
-api_list='23 26 28 29 33'
+api_list='23 26 28 29 34'
 
 cleanup() {
   echo -e '\n\033[41;30m! An error occurred\033[0m\n'
