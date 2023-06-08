@@ -59,6 +59,11 @@ if not sys.version_info >= (3, 8):
 if "ANDROID_SDK_ROOT" not in os.environ:
     error("Please set Android SDK path to environment variable ANDROID_SDK_ROOT!")
 
+if shutil.which("sccache") is not None:
+    os.environ["RUSTC_WRAPPER"] = "sccache"
+    os.environ["NDK_CCACHE"] = "sccache"
+    os.environ["CARGO_INCREMENTAL"] = "0"
+
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
 
