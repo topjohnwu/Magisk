@@ -188,6 +188,7 @@ RANDOMSEED=$(tr -dc 'a-f0-9' < /dev/urandom | head -c 16)
 echo "RANDOMSEED=0x$RANDOMSEED" >> config
 
 ./magiskboot cpio ramdisk.cpio \
+"rm dev/urandom" \
 "add 0750 $INIT magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \

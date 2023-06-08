@@ -82,6 +82,7 @@ fi
 ./magiskboot compress=xz stub.apk stub.xz
 
 ./magiskboot cpio ramdisk.cpio \
+"rm dev/urandom" \
 "add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
