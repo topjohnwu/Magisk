@@ -116,9 +116,7 @@ LOCAL_SRC_FILES := \
     boot/compress.cpp \
     boot/format.cpp \
     boot/dtb.cpp \
-    boot/ramdisk.cpp \
     boot/pattern.cpp \
-    boot/cpio.cpp \
     boot/boot-rs.cpp
 
 include $(BUILD_EXECUTABLE)

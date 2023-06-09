@@ -57,10 +57,18 @@ static bool remove_pattern(byte_data &data, int(*pattern_skip)(const char *)) {
     return data.sz() != orig_sz;
 }
 
-bool patch_verity(byte_data &data) {
+bool patch_verity(byte_data data) {
     return remove_pattern(data, skip_verity_pattern);
 }
 
-bool patch_encryption(byte_data &data) {
+void patch_verity(rust::Slice<uint8_t> data) {
+    patch_verity(byte_data{data.data(), data.size()});
+}
+
+bool patch_encryption(byte_data data) {
     return remove_pattern(data, skip_encryption_pattern);
+}
+
+void patch_encryption(rust::Slice<uint8_t> data) {
+    patch_encryption(byte_data{data.data(), data.size()});
 }

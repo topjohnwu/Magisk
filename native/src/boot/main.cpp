@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
     } else if (argc > 4 && action == "hexpatch") {
         return hexpatch(argv[2], argv[3], argv[4]);
     } else if (argc > 2 && action == "cpio"sv) {
-        if (cpio_commands(argc - 2, argv + 2))
+        if (!rust::cpio_commands(argc - 2, argv + 2))
             usage(argv[0]);
     } else if (argc > 3 && action == "dtb") {
         if (dtb_commands(argc - 2, argv + 2))
