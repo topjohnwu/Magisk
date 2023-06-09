@@ -62,23 +62,6 @@ static walk_result pre_order_walk(int dirfd, const Func &fn) {
     return CONTINUE;
 }
 
-static void remove_at(int dirfd, struct dirent *entry) {
-    unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
-}
-
-void rm_rf(const char *path) {
-    struct stat st;
-    if (lstat(path, &st) < 0)
-        return;
-    if (S_ISDIR(st.st_mode))
-        frm_rf(xopen(path, O_RDONLY | O_CLOEXEC));
-    remove(path);
-}
-
-void frm_rf(int dirfd) {
-    post_order_walk(dirfd, remove_at);
-}
-
 void mv_path(const char *src, const char *dest) {
     file_attr attr;
     getattr(src, &attr);

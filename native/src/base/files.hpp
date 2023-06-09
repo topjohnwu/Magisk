@@ -55,12 +55,13 @@ extern "C" {
 
 int mkdirs(const char *path, mode_t mode);
 ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
+bool rm_rf(const char *path);
+bool frm_rf(int dirfd);
 
 } // extern "C"
 
 using rust::fd_path;
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
-void rm_rf(const char *path);
 void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);
 void cp_afc(const char *src, const char *dest);
@@ -89,7 +90,6 @@ void file_readline(const char *file, const std::function<bool(std::string_view)>
 void parse_prop_file(FILE *fp, const std::function<bool(std::string_view, std::string_view)> &fn);
 void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
-void frm_rf(int dirfd);
 void clone_dir(int src, int dest);
 std::vector<mount_info> parse_mount_info(const char *pid);
 std::string find_apk_path(const char *pkg);

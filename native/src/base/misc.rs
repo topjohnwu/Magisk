@@ -6,10 +6,18 @@ use std::{fmt, slice};
 
 use thiserror::Error;
 
-pub fn copy_str(dest: &mut [u8], src: &[u8]) -> usize {
+pub fn copy_str<T: AsRef<[u8]>>(dest: &mut [u8], src: T) -> usize {
+    let src = src.as_ref();
     let len = min(src.len(), dest.len() - 1);
     dest[..len].copy_from_slice(&src[..len]);
     dest[len] = b'\0';
+    len
+}
+
+pub fn copy_cstr(dest: &mut [u8], src: &CStr) -> usize {
+    let src = src.to_bytes_with_nul();
+    let len = min(src.len(), dest.len());
+    dest[..len].copy_from_slice(&src[..len]);
     len
 }
 
@@ -31,7 +39,7 @@ impl<'a> fmt::Write for BufFmtWriter<'a> {
             // Silent truncate
             return Ok(());
         }
-        self.used += copy_str(&mut self.buf[self.used..], s.as_bytes());
+        self.used += copy_str(&mut self.buf[self.used..], s);
         // Silent truncate
         Ok(())
     }
@@ -57,6 +65,7 @@ macro_rules! bfmt {
 macro_rules! bfmt_cstr {
     ($buf:expr, $($args:tt)*) => {{
         let len = $crate::fmt_to_buf($buf, format_args!($($args)*));
+        #[allow(unused_unsafe)]
         unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&$buf[..(len + 1)]) }
     }};
 }
@@ -70,7 +79,10 @@ macro_rules! cstr {
             !$str.bytes().any(|b| b == b'\0'),
             "cstr argument contains embedded NUL bytes",
         );
-        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(concat!($str, "\0").as_bytes()) }
+        #[allow(unused_unsafe)]
+        unsafe {
+            std::ffi::CStr::from_bytes_with_nul_unchecked(concat!($str, "\0").as_bytes())
+        }
     }};
 }
 
