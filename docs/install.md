@@ -1,6 +1,6 @@
-# Installation
+# Монтаж
 
-If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
+Если у вас уже установлен Magisk, **настоятельно рекомендуется** особое обновление через приложение Magisk, использующее метод «Прямая установка». Следующее руководство предназначено только для поздней установки.
 
 ## Getting Started
 
@@ -26,10 +26,10 @@ If your device has boot ramdisk, get a copy of the `boot.img` (or `init_boot.img
 If your device does **NOT** have boot ramdisk, get a copy of the `recovery.img`.<br>
 You should be able to extract the file you need from official firmware packages or your custom ROM zip.
 
-Next, we need to know whether your device has a separate `vbmeta` partition.
+Далее нам нужно узнать, есть ли на вашем устройстве отдельный раздел `vbmeta` .
 
-- If your official firmware package contains `vbmeta.img`, then yes, your device **has** a separate `vbmeta` partition
-- You can also check by connecting your device to a PC and run the command:<br>
+- Если ваш официальный пакет прошивки содержит `vbmeta.img` , то да, ваше устройство **имеет** отдельный раздел `vbmeta`
+- Вы также можете проверить, подключив свое устройство к ПК и выполнив команду : <br>
   `adb shell ls -l /dev/block/by-name`
 - If you find `vbmeta`, `vbmeta_a`, or `vbmeta_b`, then yes, your device **has** a separate `vbmeta` partition
 - Otherwise, your device **does not** have a separate `vbmeta` partition.
