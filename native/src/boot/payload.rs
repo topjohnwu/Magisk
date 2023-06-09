@@ -64,7 +64,7 @@ fn do_extract_boot_from_payload(
     let manifest = {
         let manifest = &mut buf[..manifest_len];
         reader.read_exact(manifest)?;
-        DeltaArchiveManifest::parse_from_bytes(&manifest)?
+        DeltaArchiveManifest::parse_from_bytes(manifest)?
     };
     if !manifest.has_minor_version() || manifest.minor_version() != 0 {
         return Err(bad_payload!(
@@ -152,7 +152,7 @@ fn do_extract_boot_from_payload(
         match data_type {
             Type::REPLACE => {
                 out_file.seek(SeekFrom::Start(out_offset))?;
-                out_file.write_all(&data)?;
+                out_file.write_all(data)?;
             }
             Type::ZERO => {
                 for ext in operation.dst_extents.iter() {
