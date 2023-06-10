@@ -20,48 +20,6 @@ int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
     return 0;
 }
 
-template <typename Func>
-static void post_order_walk(int dirfd, const Func &fn) {
-    auto dir = xopen_dir(dirfd);
-    if (!dir) return;
-
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (entry->d_type == DT_DIR)
-            post_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), fn);
-        fn(dirfd, entry);
-    }
-}
-
-enum walk_result {
-    CONTINUE, SKIP, ABORT
-};
-
-template <typename Func>
-static walk_result pre_order_walk(int dirfd, const Func &fn) {
-    auto dir = xopen_dir(dirfd);
-    if (!dir) {
-        close(dirfd);
-        return SKIP;
-    }
-
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        switch (fn(dirfd, entry)) {
-        case CONTINUE:
-            break;
-        case SKIP:
-            continue;
-        case ABORT:
-            return ABORT;
-        }
-        if (entry->d_type == DT_DIR) {
-            int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-            if (pre_order_walk(fd, fn) == ABORT)
-                return ABORT;
-        }
-    }
-    return CONTINUE;
-}
-
 void mv_path(const char *src, const char *dest) {
     file_attr attr;
     getattr(src, &attr);
@@ -445,23 +403,6 @@ void mmap_data::init(int fd, size_t sz, bool rw) {
 mmap_data::~mmap_data() {
     if (_buf)
         munmap(_buf, _sz);
-}
-
-string find_apk_path(const char *pkg) {
-    char buf[PATH_MAX];
-    size_t len = strlen(pkg);
-    pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
-        if (entry->d_type != DT_DIR)
-            return SKIP;
-        if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
-            fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
-            return ABORT;
-        } else if (strncmp(entry->d_name, "~~", 2) == 0) {
-            return CONTINUE;
-        } else return SKIP;
-    });
-    string path(buf);
-    return path.append("/base.apk");
 }
 
 string resolve_preinit_dir(const char *base_dir) {

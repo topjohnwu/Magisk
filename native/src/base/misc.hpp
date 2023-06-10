@@ -202,6 +202,13 @@ struct byte_data : public byte_view {
     std::vector<size_t> patch(byte_view from, byte_view to);
 };
 
+template<size_t N>
+struct byte_array : public byte_data {
+    byte_array() : byte_data(arr, N), arr{0} {}
+private:
+    uint8_t arr[N];
+};
+
 class byte_channel;
 
 struct heap_data : public byte_data {
