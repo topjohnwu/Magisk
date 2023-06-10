@@ -21,6 +21,7 @@ pub mod ffi {
         fn android_logging();
         fn magisk_logging();
         fn zygisk_logging();
+        fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize;
     }
 
     #[namespace = "rust"]

@@ -23,10 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    env:
-      NDK_CCACHE: sccache
-      RUSTC_WRAPPER: sccache
-
     steps:
       - name: Check out
         uses: actions/checkout@v3

@@ -7,77 +7,17 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <misc.hpp>
 #include <selinux.hpp>
 
 using namespace std;
 
 int fd_pathat(int dirfd, const char *name, char *path, size_t size) {
-    if (fd_path(dirfd, u8_mut_slice(path, size)) < 0)
+    if (fd_path(dirfd, byte_data(path, size)) < 0)
         return -1;
     auto len = strlen(path);
     path[len] = '/';
     strscpy(path + len + 1, name, size - len - 1);
     return 0;
-}
-
-template <typename Func>
-static void post_order_walk(int dirfd, const Func &fn) {
-    auto dir = xopen_dir(dirfd);
-    if (!dir) return;
-
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        if (entry->d_type == DT_DIR)
-            post_order_walk(xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC), fn);
-        fn(dirfd, entry);
-    }
-}
-
-enum walk_result {
-    CONTINUE, SKIP, ABORT
-};
-
-template <typename Func>
-static walk_result pre_order_walk(int dirfd, const Func &fn) {
-    auto dir = xopen_dir(dirfd);
-    if (!dir) {
-        close(dirfd);
-        return SKIP;
-    }
-
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        switch (fn(dirfd, entry)) {
-        case CONTINUE:
-            break;
-        case SKIP:
-            continue;
-        case ABORT:
-            return ABORT;
-        }
-        if (entry->d_type == DT_DIR) {
-            int fd = xopenat(dirfd, entry->d_name, O_RDONLY | O_CLOEXEC);
-            if (pre_order_walk(fd, fn) == ABORT)
-                return ABORT;
-        }
-    }
-    return CONTINUE;
-}
-
-static void remove_at(int dirfd, struct dirent *entry) {
-    unlinkat(dirfd, entry->d_name, entry->d_type == DT_DIR ? AT_REMOVEDIR : 0);
-}
-
-void rm_rf(const char *path) {
-    struct stat st;
-    if (lstat(path, &st) < 0)
-        return;
-    if (S_ISDIR(st.st_mode))
-        frm_rf(xopen(path, O_RDONLY | O_CLOEXEC));
-    remove(path);
-}
-
-void frm_rf(int dirfd) {
-    post_order_walk(dirfd, remove_at);
 }
 
 void mv_path(const char *src, const char *dest) {
@@ -434,61 +374,6 @@ sFILE make_file(FILE *fp) {
     return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
 }
 
-byte_view::byte_view(string_view s, bool with_nul)
-: byte_view(static_cast<const void *>(s.data()), s.length()) {
-    if (with_nul && s[s.length()] == '\0') {
-        ++_sz;
-    }
-}
-
-bool byte_view::contains(byte_view pattern) const {
-    if (_buf == nullptr)
-        return false;
-    for (uint8_t *p = _buf, *eof = _buf + _sz; p < eof; ++p) {
-        if (memcmp(p, pattern.buf(), pattern.sz()) == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool byte_view::equals(byte_view o) const {
-    return _sz == o._sz && memcmp(_buf, o._buf, _sz) == 0;
-}
-
-void byte_view::swap(byte_view &o) {
-    std::swap(_buf, o._buf);
-    std::swap(_sz, o._sz);
-}
-
-heap_data byte_view::clone() const {
-    heap_data copy(_sz);
-    memcpy(copy._buf, _buf, _sz);
-    return copy;
-}
-
-vector<size_t> byte_data::patch(byte_view from, byte_view to) {
-    vector<size_t> v;
-    if (_buf == nullptr)
-        return v;
-    auto p = _buf;
-    auto eof = _buf + _sz;
-    while (p < eof) {
-        p = static_cast<uint8_t *>(memmem(p, eof - p, from.buf(), from.sz()));
-        if (p == nullptr)
-            return v;
-        memset(p, 0, from.sz());
-        memcpy(p, to.buf(), to.sz());
-        v.push_back(p - _buf);
-        p += from.sz();
-    }
-    return v;
-}
-
-void heap_data::realloc(size_t sz) {
-    _buf = static_cast<uint8_t *>(::realloc(_buf, sz));
-}
-
 mmap_data::mmap_data(const char *name, bool rw) {
     int fd = xopen(name, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
     if (fd < 0)
@@ -518,23 +403,6 @@ void mmap_data::init(int fd, size_t sz, bool rw) {
 mmap_data::~mmap_data() {
     if (_buf)
         munmap(_buf, _sz);
-}
-
-string find_apk_path(const char *pkg) {
-    char buf[PATH_MAX];
-    size_t len = strlen(pkg);
-    pre_order_walk(xopen("/data/app", O_RDONLY), [&](int dfd, dirent *entry) -> walk_result {
-        if (entry->d_type != DT_DIR)
-            return SKIP;
-        if (strncmp(entry->d_name, pkg, len) == 0 && entry->d_name[len] == '-') {
-            fd_pathat(dfd, entry->d_name, buf, sizeof(buf));
-            return ABORT;
-        } else if (strncmp(entry->d_name, "~~", 2) == 0) {
-            return CONTINUE;
-        } else return SKIP;
-    });
-    string path(buf);
-    return path.append("/base.apk");
 }
 
 string resolve_preinit_dir(const char *base_dir) {

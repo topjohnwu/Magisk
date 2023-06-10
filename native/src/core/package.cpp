@@ -169,8 +169,9 @@ int get_manager(int user_id, string *pkg, bool install) {
                 if (stat(app_path, &st) == 0) {
                     int app_id = to_app_id(st.st_uid);
 
-                    string apk = find_apk_path(str[SU_MANAGER].data());
-                    int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+                    byte_array<PATH_MAX> apk;
+                    find_apk_path(byte_view(str[SU_MANAGER]), apk);
+                    int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
                     string cert = read_certificate(fd);
                     close(fd);
 
@@ -178,7 +179,7 @@ int get_manager(int user_id, string *pkg, bool install) {
                     if (str[SU_MANAGER] == *mgr_pkg) {
                         if (app_id != mgr_app_id || cert != *mgr_cert) {
                             // app ID or cert should never change
-                            LOGE("pkg: repackaged APK signature invalid: %s\n", apk.data());
+                            LOGE("pkg: repackaged APK signature invalid: %s\n", apk.buf());
                             uninstall_pkg(mgr_pkg->data());
                             invalid = true;
                             install = true;
@@ -222,13 +223,14 @@ int get_manager(int user_id, string *pkg, bool install) {
             ssprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
             if (stat(app_path, &st) == 0) {
 #if ENFORCE_SIGNATURE
-                string apk = find_apk_path(JAVA_PACKAGE_NAME);
-                int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+                byte_array<PATH_MAX> apk;
+                find_apk_path(byte_view(str[SU_MANAGER]), apk);
+                int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
                 string cert = read_certificate(fd, MAGISK_VER_CODE);
                 close(fd);
                 if (default_cert && cert != *default_cert) {
                     // Found APK with invalid signature, force replace with stub
-                    LOGE("pkg: APK signature mismatch: %s\n", apk.data());
+                    LOGE("pkg: APK signature mismatch: %s\n", apk.buf());
                     uninstall_pkg(JAVA_PACKAGE_NAME);
                     invalid = true;
                     install = true;

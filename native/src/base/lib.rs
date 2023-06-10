@@ -4,11 +4,13 @@
 
 pub use libc;
 
+use cxx_extern::*;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
 pub use xwrap::*;
 
+mod cxx_extern;
 mod files;
 mod logging;
 mod misc;
@@ -34,6 +36,7 @@ pub mod ffi {
     #[namespace = "rust"]
     extern "Rust" {
         fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
+        #[rust_name = "fd_path_for_cxx"]
         fn fd_path(fd: i32, buf: &mut [u8]) -> isize;
     }
 }

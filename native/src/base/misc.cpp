@@ -13,6 +13,43 @@
 
 using namespace std;
 
+bool byte_view::contains(byte_view pattern) const {
+    return _buf != nullptr && memmem(_buf, _sz, pattern._buf, pattern._sz) != nullptr;
+}
+
+bool byte_view::equals(byte_view o) const {
+    return _sz == o._sz && memcmp(_buf, o._buf, _sz) == 0;
+}
+
+heap_data byte_view::clone() const {
+    heap_data copy(_sz);
+    memcpy(copy._buf, _buf, _sz);
+    return copy;
+}
+
+void byte_data::swap(byte_data &o) {
+    std::swap(_buf, o._buf);
+    std::swap(_sz, o._sz);
+}
+
+vector<size_t> byte_data::patch(byte_view from, byte_view to) {
+    vector<size_t> v;
+    if (_buf == nullptr)
+        return v;
+    auto p = _buf;
+    auto eof = _buf + _sz;
+    while (p < eof) {
+        p = static_cast<uint8_t *>(memmem(p, eof - p, from.buf(), from.sz()));
+        if (p == nullptr)
+            return v;
+        memset(p, 0, from.sz());
+        memcpy(p, to.buf(), to.sz());
+        v.push_back(p - _buf);
+        p += from.sz();
+    }
+    return v;
+}
+
 int fork_dont_care() {
     if (int pid = xfork()) {
         waitpid(pid, nullptr, 0);

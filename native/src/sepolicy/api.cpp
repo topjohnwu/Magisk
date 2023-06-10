@@ -105,9 +105,9 @@ bool sepolicy::exists(const char *type) {
 }
 
 void sepolicy::load_rule_file(const char *file) {
-    rust::load_rule_file(*this, u8_slice(file, strlen(file)));
+    rust::load_rule_file(*this, byte_view(file, false));
 }
 
 void sepolicy::load_rules(const std::string &rules) {
-    rust::load_rules(*this, u8_slice(rules.data(), rules.length()));
+    rust::load_rules(*this, byte_view(rules, false));
 }
