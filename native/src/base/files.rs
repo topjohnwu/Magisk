@@ -193,7 +193,7 @@ impl<T: Write> WriteExt for T {
 pub struct DirEntry<'a> {
     dir: &'a Directory<'a>,
     entry: &'a dirent,
-    name_len: usize,
+    d_name_len: usize,
 }
 
 impl DirEntry<'_> {
@@ -201,7 +201,7 @@ impl DirEntry<'_> {
         unsafe {
             CStr::from_bytes_with_nul_unchecked(slice::from_raw_parts(
                 self.d_name.as_ptr().cast(),
-                self.name_len,
+                self.d_name_len,
             ))
         }
     }
@@ -322,7 +322,7 @@ impl<'a> Directory<'a> {
                 let e = DirEntry {
                     dir: self,
                     entry,
-                    name_len: d_name.to_bytes().len(),
+                    d_name_len: d_name.to_bytes_with_nul().len(),
                 };
                 Ok(Some(e))
             };
