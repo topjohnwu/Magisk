@@ -39,36 +39,28 @@ static int skip_encryption_pattern(const char *s) {
     return skip;
 }
 
-static bool remove_pattern(byte_data &data, int(*pattern_skip)(const char *)) {
+static size_t remove_pattern(byte_data data, int(*pattern_skip)(const char *)) {
     char *src = reinterpret_cast<char *>(data.buf());
-    size_t orig_sz = data.sz();
+    size_t sz = data.sz();
     int write = 0;
     int read = 0;
-    while (read < orig_sz) {
+    while (read < data.sz()) {
         if (int skip = pattern_skip(src + read); skip > 0) {
             fprintf(stderr, "Remove pattern [%.*s]\n", skip, src + read);
-            data.sz() -= skip;
+            sz -= skip;
             read += skip;
         } else {
             src[write++] = src[read++];
         }
     }
-    memset(src + write, 0, orig_sz - write);
-    return data.sz() != orig_sz;
+    memset(src + write, 0, data.sz() - write);
+    return sz;
 }
 
-bool patch_verity(byte_data data) {
+size_t patch_verity(rust::Slice<uint8_t> data) {
     return remove_pattern(data, skip_verity_pattern);
 }
 
-void patch_verity(rust::Slice<uint8_t> data) {
-    patch_verity(byte_data{data.data(), data.size()});
-}
-
-bool patch_encryption(byte_data data) {
+size_t patch_encryption(rust::Slice<uint8_t> data) {
     return remove_pattern(data, skip_encryption_pattern);
-}
-
-void patch_encryption(rust::Slice<uint8_t> data) {
-    patch_encryption(byte_data{data.data(), data.size()});
 }

@@ -179,10 +179,8 @@ struct byte_data : public byte_view {
     byte_data() = default;
     byte_data(void *buf, size_t sz) : byte_view(buf, sz) {}
 
-    // We don't want mutable references to be copied or moved around; pass bytes as byte_view
-    // Subclasses are free to implement their own constructors
-    byte_data(const byte_data &) = delete;
-    byte_data(byte_data &&) = delete;
+    // byte_data, or any of its subclass, can be copied as byte_data
+    byte_data(const byte_data &o) : byte_data(o._buf, o._sz) {}
 
     // Transparent conversion from common C++ types to mutable byte references
     byte_data(std::string &s, bool with_nul = true)
@@ -194,9 +192,7 @@ struct byte_data : public byte_view {
     operator rust::Slice<uint8_t>() { return rust::Slice<uint8_t>(_buf, _sz); }
 
     using byte_view::buf;
-    using byte_view::sz;
     uint8_t *buf() { return _buf; }
-    size_t &sz() { return _sz; }
 
     void swap(byte_data &o);
     std::vector<size_t> patch(byte_view from, byte_view to);

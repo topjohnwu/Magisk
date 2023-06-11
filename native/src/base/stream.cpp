@@ -132,7 +132,7 @@ void chunk_out_stream::finalize() {
 }
 
 ssize_t byte_channel::read(void *buf, size_t len) {
-    len = std::min((size_t) len, _data.sz() - _pos);
+    len = std::min((size_t) len, _data._sz- _pos);
     memcpy(buf, _data.buf() + _pos, len);
     _pos += len;
     return len;
@@ -142,7 +142,7 @@ bool byte_channel::write(const void *buf, size_t len) {
     resize(_pos + len);
     memcpy(_data.buf() + _pos, buf, len);
     _pos += len;
-    _data.sz() = std::max(_data.sz(), _pos);
+    _data._sz= std::max(_data.sz(), _pos);
     return true;
 }
 
@@ -153,7 +153,7 @@ off_t byte_channel::seek(off_t off, int whence) {
             np = _pos + off;
             break;
         case SEEK_END:
-            np = _data.sz() + off;
+            np = _data._sz+ off;
             break;
         case SEEK_SET:
             np = off;
