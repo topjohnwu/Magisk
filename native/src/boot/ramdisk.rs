@@ -99,7 +99,9 @@ impl MagiskCpio for Cpio {
                         rm_list.push_str(data);
                     }
                 } else if name != ".backup/.magisk" {
-                    backups.insert(name[8..].to_string(), entry);
+                    let new_name = &name[8..];
+                    eprintln!("Restore [{}] -> [{}]", name, new_name);
+                    backups.insert(new_name.to_string(), entry);
                 }
             });
         self.rm(".backup", false);
