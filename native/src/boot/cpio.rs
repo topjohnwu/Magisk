@@ -1,13 +1,3 @@
-use crate::ramdisk::MagiskCpio;
-use anyhow::{anyhow, Context};
-use base::libc::{
-    c_char, dev_t, gid_t, major, makedev, minor, mknod, mmap, mode_t, munmap, uid_t, MAP_FAILED,
-    MAP_PRIVATE, PROT_READ, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH,
-    S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
-};
-use base::{ptr_to_str_result, ResultExt, WriteExt};
-use clap::{Parser, Subcommand};
-use size::{Base, Size, Style};
 use std::collections::BTreeMap;
 use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
@@ -18,6 +8,19 @@ use std::os::fd::AsRawFd;
 use std::os::unix::fs::{symlink, DirBuilderExt, FileTypeExt, MetadataExt};
 use std::path::Path;
 use std::process::exit;
+
+use anyhow::{anyhow, Context};
+use clap::{Parser, Subcommand};
+use size::{Base, Size, Style};
+
+use base::libc::{
+    c_char, dev_t, gid_t, major, makedev, minor, mknod, mmap, mode_t, munmap, uid_t, MAP_FAILED,
+    MAP_PRIVATE, PROT_READ, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH,
+    S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
+};
+use base::{ptr_to_str_result, ResultExt, WriteExt};
+
+use crate::ramdisk::MagiskCpio;
 
 #[derive(Parser)]
 struct CpioCli {
@@ -108,6 +111,7 @@ impl Cpio {
             entries: BTreeMap::new(),
         }
     }
+
     fn load_from_data(data: &[u8]) -> anyhow::Result<Self> {
         let mut cpio = Cpio::new();
         let mut pos = 0usize;
@@ -147,6 +151,7 @@ impl Cpio {
         }
         Ok(cpio)
     }
+
     pub(crate) fn load_from_file(path: &str) -> anyhow::Result<Self> {
         eprintln!("Loading cpio: [{}]", path);
         let file = File::open(path)?;
@@ -173,6 +178,7 @@ impl Cpio {
         }
         Ok(cpio)
     }
+
     fn dump(&self, path: &str) -> anyhow::Result<()> {
         eprintln!("Dumping cpio: [{}]", path);
         let mut file = File::create(path)?;
@@ -215,6 +221,7 @@ impl Cpio {
         file.write_zeros(align_4(pos) - pos)?;
         Ok(())
     }
+
     pub(crate) fn rm(&mut self, path: &str, recursive: bool) -> anyhow::Result<()> {
         let path = norm_path(path);
         let entry = self
@@ -242,6 +249,7 @@ impl Cpio {
         }
         Ok(())
     }
+
     fn extract_entry(&self, path: &str, out: &Path) -> anyhow::Result<()> {
         let entry = self.entries.get(path).ok_or(anyhow!("No such file"))?;
         eprintln!("Extracting entry [{}] to [{}]", path, out.to_string_lossy());
@@ -280,6 +288,7 @@ impl Cpio {
         }
         Ok(())
     }
+
     fn extract(&self, path: Option<&str>, out: Option<&str>) -> anyhow::Result<()> {
         let path = path.map(norm_path);
         let out = out.map(Path::new);
@@ -295,9 +304,11 @@ impl Cpio {
         }
         Ok(())
     }
+
     pub(crate) fn exists(&self, path: &str) -> bool {
         self.entries.contains_key(&norm_path(path))
     }
+
     fn add(&mut self, mode: &mode_t, path: &str, file: &str) -> anyhow::Result<()> {
         if path.ends_with('/') {
             return Err(anyhow!("path cannot end with / for add"));
@@ -334,6 +345,7 @@ impl Cpio {
         eprintln!("Add file [{}] ({:04o})", path, mode);
         Ok(())
     }
+
     fn mkdir(&mut self, mode: &mode_t, dir: &str) {
         self.entries.insert(
             norm_path(dir),
@@ -348,6 +360,7 @@ impl Cpio {
         );
         eprintln!("Create directory [{}] ({:04o})", dir, mode);
     }
+
     fn ln(&mut self, src: &str, dst: &str) {
         self.entries.insert(
             norm_path(dst),
@@ -362,6 +375,7 @@ impl Cpio {
         );
         eprintln!("Create symlink [{}] -> [{}]", dst, src);
     }
+
     fn mv(&mut self, from: &str, to: &str) -> anyhow::Result<()> {
         let entry = self
             .entries
@@ -371,6 +385,7 @@ impl Cpio {
         eprintln!("Move [{}] -> [{}]", from, to);
         Ok(())
     }
+
     fn ls(&self, path: Option<&str>, recursive: bool) {
         let path = path
             .map(norm_path)
@@ -489,10 +504,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
         .is_ok()
 }
 
-fn x8u<U>(x: &[u8; 8]) -> anyhow::Result<U>
-where
-    U: TryFrom<u32>,
-{
+fn x8u<U: TryFrom<u32>>(x: &[u8; 8]) -> anyhow::Result<U> {
     // parse hex
     let mut ret = 0u32;
     for i in x {

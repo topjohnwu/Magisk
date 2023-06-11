@@ -151,7 +151,7 @@ static bool dtb_patch(const char *file) {
                     int len;
                     char *value = (char *) fdt_getprop(fdt, node, "fsmgr_flags", &len);
                     byte_data data(value, len);
-                    patched |= patch_verity(data);
+                    patched |= (patch_verity(data) != len);
                 }
             }
         }
@@ -224,9 +224,10 @@ static bool fdt_patch(void *fdt) {
         int len;
         const void *value = fdt_getprop(fdt, node, "fsmgr_flags", &len);
         heap_data copy = byte_view(value, len).clone();
-        if (patch_verity(copy)) {
+        auto patched_sz = patch_verity(copy);
+        if (patched_sz != len) {
             modified = true;
-            fdt_setprop(fdt, node, "fsmgr_flags", copy.buf(), copy.sz());
+            fdt_setprop(fdt, node, "fsmgr_flags", copy.buf(), patched_sz);
         }
         if (name == "system"sv) {
             fprintf(stderr, "Setting [mnt_point] to [/system_root]\n");

@@ -20,8 +20,8 @@ pub mod ffi {
         include!("compress.hpp");
         include!("magiskboot.hpp");
         fn decompress(buf: &[u8], fd: i32) -> bool;
-        fn patch_encryption(buf: &mut [u8]);
-        fn patch_verity(buf: &mut [u8]);
+        fn patch_encryption(buf: &mut [u8]) -> usize;
+        fn patch_verity(buf: &mut [u8]) -> usize;
     }
 
     #[namespace = "rust"]

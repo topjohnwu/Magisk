@@ -1,10 +1,12 @@
-use crate::cpio::{Cpio, CpioEntry};
-use crate::ffi::{patch_encryption, patch_verity};
-use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::env;
 use std::str::from_utf8;
+
+use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
+
+use crate::cpio::{Cpio, CpioEntry};
+use crate::ffi::{patch_encryption, patch_verity};
 
 pub trait MagiskCpio {
     fn patch(&mut self);
@@ -40,17 +42,24 @@ impl MagiskCpio for Cpio {
             if !keep_verity {
                 if fstab {
                     eprintln!("Found fstab file [{}]", name);
-                    patch_verity(entry.data.as_mut_slice());
+                    let len = patch_verity(entry.data.as_mut_slice());
+                    if len != entry.data.len() {
+                        entry.data.resize(len, 0);
+                    }
                 } else if name == "verity_key" {
                     return false;
                 }
             }
             if !keep_force_encrypt && fstab {
-                patch_encryption(entry.data.as_mut_slice());
+                let len = patch_encryption(entry.data.as_mut_slice());
+                if len != entry.data.len() {
+                    entry.data.resize(len, 0);
+                }
             }
             true
         });
     }
+
     fn test(&self) -> i32 {
         let mut ret = 0;
         for file in [
@@ -78,6 +87,7 @@ impl MagiskCpio for Cpio {
         }
         ret
     }
+
     fn restore(&mut self) -> anyhow::Result<()> {
         let mut backups = HashMap::<String, CpioEntry>::new();
         let mut rm_list = String::new();
@@ -106,6 +116,7 @@ impl MagiskCpio for Cpio {
 
         Ok(())
     }
+
     fn backup(&mut self, origin: &str) -> anyhow::Result<()> {
         let mut backups = HashMap::<String, CpioEntry>::new();
         let mut rm_list = String::new();
