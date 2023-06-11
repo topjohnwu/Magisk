@@ -102,14 +102,14 @@ impl MagiskCpio for Cpio {
                     backups.insert(name[8..].to_string(), entry);
                 }
             });
-        self.rm(".backup", false).ok();
+        self.rm(".backup", false);
         if rm_list.is_empty() && backups.is_empty() {
             self.entries.clear();
             return Ok(());
         }
         for rm in rm_list.split('\0') {
             if !rm.is_empty() {
-                self.rm(rm, false)?;
+                self.rm(rm, false);
             }
         }
         self.entries.extend(backups);
@@ -132,8 +132,8 @@ impl MagiskCpio for Cpio {
             },
         );
         let mut o = Cpio::load_from_file(origin)?;
-        o.rm(".backup", true).ok();
-        self.rm(".backup", true).ok();
+        o.rm(".backup", true);
+        self.rm(".backup", true);
 
         let mut lhs = o.entries.drain_filter(|_, _| true).peekable();
         let mut rhs = self.entries.iter().peekable();
@@ -178,6 +178,7 @@ impl MagiskCpio for Cpio {
                     backups.insert(backup, entry);
                 }
                 Action::Record(name) => {
+                    eprintln!("Record new entry: [{}] -> [.backup/.rmlist]", name);
                     rm_list.push_str(&format!("{}\0", name));
                 }
                 Action::Noop => {}

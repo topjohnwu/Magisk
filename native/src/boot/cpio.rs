@@ -222,32 +222,22 @@ impl Cpio {
         Ok(())
     }
 
-    pub(crate) fn rm(&mut self, path: &str, recursive: bool) -> anyhow::Result<()> {
+    pub(crate) fn rm(&mut self, path: &str, recursive: bool) {
         let path = norm_path(path);
-        let entry = self
-            .entries
-            .get(&path)
-            .ok_or(anyhow!("no such entry {}", path))?;
-        if entry.mode & S_IFMT == S_IFDIR && !recursive {
-            return Err(anyhow!("cannot remove directory without -r"));
+        if let Some(_) = self.entries.remove(&path) {
+            eprintln!("Removed entry [{}]", path);
         }
-        if entry.mode & S_IFMT != S_IFDIR && recursive {
-            return Err(anyhow!("cannot remove file with -r"));
-        }
-        self.entries.remove(&path);
-        eprintln!("Removed entry [{}]", path);
         if recursive {
             let path = path + "/";
             self.entries.retain(|k, _| {
                 if k.starts_with(&path) {
                     eprintln!("Removed entry [{}]", k);
-                    true
-                } else {
                     false
+                } else {
+                    true
                 }
             })
         }
-        Ok(())
     }
 
     fn extract_entry(&self, path: &str, out: &Path) -> anyhow::Result<()> {
@@ -481,7 +471,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                     }
                 }
                 CpioCommands::Backup { origin } => cpio.backup(origin)?,
-                CpioCommands::Rm { path, recursive } => cpio.rm(path, *recursive)?,
+                CpioCommands::Rm { path, recursive } => cpio.rm(path, *recursive),
                 CpioCommands::Mv { from, to } => cpio.mv(from, to)?,
                 CpioCommands::Extract { path, out } => {
                     cpio.extract(path.as_deref(), out.as_deref())?
