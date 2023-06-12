@@ -4,7 +4,9 @@ use std::ffi::CStr;
 use std::fs::File;
 use std::io::{BufRead, Read, Seek, SeekFrom, Write};
 use std::ops::Deref;
+use std::os::android::fs::MetadataExt;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
+use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::{io, mem, ptr, slice};
 
@@ -422,69 +424,15 @@ impl Drop for Directory {
 
 pub fn rm_rf(path: &Utf8CStr) -> io::Result<()> {
     unsafe {
-        let mut stat: libc::stat = mem::zeroed();
-        libc::lstat(path.as_ptr(), &mut stat).check_os_err()?;
-        if stat.is_dir() {
-            let mut dir = Directory::open(path)?;
+        let f = File::from(open_fd!(path, O_RDONLY | O_CLOEXEC)?);
+        let st = f.metadata()?;
+        if st.is_dir() {
+            let mut dir = Directory::try_from(OwnedFd::from(f))?;
             dir.remove_all()?;
         }
         libc::remove(path.as_ptr()).check_os_err()?;
     }
     Ok(())
-}
-
-pub trait StatExt {
-    fn get_mode(&self) -> u32;
-    fn get_type(&self) -> u32;
-
-    fn is_dir(&self) -> bool;
-    fn is_blk(&self) -> bool;
-}
-
-impl StatExt for libc::stat {
-    fn get_mode(&self) -> u32 {
-        self.st_mode & libc::S_IFMT as u32
-    }
-
-    fn get_type(&self) -> u32 {
-        self.st_mode & !(libc::S_IFMT as u32)
-    }
-
-    fn is_dir(&self) -> bool {
-        self.get_type() == libc::S_IFDIR as u32
-    }
-
-    fn is_blk(&self) -> bool {
-        self.get_type() == libc::S_IFBLK as u32
-    }
-}
-
-pub trait FdExt {
-    fn size(&self) -> io::Result<usize>;
-}
-
-const BLKGETSIZE64: u32 = 0x80081272;
-
-impl<T: AsRawFd> FdExt for T {
-    fn size(&self) -> io::Result<usize> {
-        unsafe fn inner(fd: RawFd) -> io::Result<usize> {
-            extern "C" {
-                // Don't use the declaration from the libc crate as request should be u32 not i32
-                fn ioctl(fd: RawFd, request: u32, ...) -> i32;
-            }
-            let mut stat: libc::stat = mem::zeroed();
-            libc::fstat(fd, &mut stat).check_os_err()?;
-            if stat.is_blk() {
-                let mut sz = 0_u64;
-                ioctl(fd, BLKGETSIZE64, &mut sz).check_os_err()?;
-                Ok(sz as usize)
-            } else {
-                Ok(stat.st_size as usize)
-            }
-        }
-
-        unsafe { inner(self.as_raw_fd()) }
-    }
 }
 
 pub struct MappedFile(&'static mut [u8]);
@@ -525,9 +473,26 @@ impl Drop for MappedFile {
 
 // We mark the returned slice static because it is valid until explicitly unmapped
 pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8]> {
+    extern "C" {
+        // Don't use the declaration from the libc crate as request should be u32 not i32
+        fn ioctl(fd: RawFd, request: u32, ...) -> i32;
+    }
+
+    const BLKGETSIZE64: u32 = 0x80081272;
+
     let flag = if rw { O_RDWR } else { O_RDONLY };
-    let fd = open_fd!(path, flag | O_CLOEXEC)?;
-    map_fd(fd.as_fd(), fd.size()?, rw)
+    let f = File::from(open_fd!(path, flag | O_CLOEXEC)?);
+
+    let st = f.metadata()?;
+    let sz = if st.file_type().is_block_device() {
+        let mut sz = 0_u64;
+        unsafe { ioctl(f.as_raw_fd(), BLKGETSIZE64, &mut sz) }.check_os_err()?;
+        sz
+    } else {
+        st.st_size()
+    };
+
+    map_fd(f.as_fd(), sz as usize, rw)
 }
 
 pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<&'static mut [u8]> {
