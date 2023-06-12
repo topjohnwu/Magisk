@@ -49,6 +49,7 @@ enum CpioCommands {
         to: String,
     },
     Extract {
+        #[arg(requires("out"))]
         path: Option<String>,
         out: Option<String>,
     },
