@@ -533,7 +533,7 @@ impl Drop for MappedFile {
 
 // We mark the returned slice static because it is valid until explicitly unmapped
 pub(crate) fn map_file(path: &CStr, rw: bool) -> io::Result<&'static mut [u8]> {
-    let flag = if rw { O_RDONLY } else { O_RDWR };
+    let flag = if rw { O_RDWR } else { O_RDONLY };
     let fd = open_fd!(path, flag | O_CLOEXEC)?;
     map_fd(fd.as_fd(), fd.size()?, rw)
 }
