@@ -375,29 +375,19 @@ sFILE make_file(FILE *fp) {
 }
 
 mmap_data::mmap_data(const char *name, bool rw) {
-    int fd = xopen(name, (rw ? O_RDWR : O_RDONLY) | O_CLOEXEC);
-    if (fd < 0)
-        return;
-
-    run_finally g([=] { close(fd); });
-    struct stat st{};
-    if (fstat(fd, &st))
-        return;
-    if (S_ISBLK(st.st_mode)) {
-        uint64_t size;
-        ioctl(fd, BLKGETSIZE64, &size);
-        init(fd, size, rw);
-    } else {
-        init(fd, st.st_size, rw);
+    auto slice = rust::map_file(byte_view(name), rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
     }
 }
 
-void mmap_data::init(int fd, size_t sz, bool rw) {
-    _sz = sz;
-    void *b = sz > 0
-            ? xmmap(nullptr, sz, PROT_READ | PROT_WRITE, rw ? MAP_SHARED : MAP_PRIVATE, fd, 0)
-            : nullptr;
-    _buf = static_cast<uint8_t *>(b);
+mmap_data::mmap_data(int fd, size_t sz, bool rw) {
+    auto slice = rust::map_fd(fd, sz, rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
+    }
 }
 
 mmap_data::~mmap_data() {
