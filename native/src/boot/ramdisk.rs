@@ -4,6 +4,7 @@ use std::env;
 use std::str::from_utf8;
 
 use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
+use base::Utf8CStr;
 
 use crate::cpio::{Cpio, CpioEntry};
 use crate::ffi::{patch_encryption, patch_verity};
@@ -12,7 +13,7 @@ pub trait MagiskCpio {
     fn patch(&mut self);
     fn test(&self) -> i32;
     fn restore(&mut self) -> anyhow::Result<()>;
-    fn backup(&mut self, origin: &str) -> anyhow::Result<()>;
+    fn backup(&mut self, origin: &Utf8CStr) -> anyhow::Result<()>;
 }
 
 const MAGISK_PATCHED: i32 = 1 << 0;
@@ -119,7 +120,7 @@ impl MagiskCpio for Cpio {
         Ok(())
     }
 
-    fn backup(&mut self, origin: &str) -> anyhow::Result<()> {
+    fn backup(&mut self, origin: &Utf8CStr) -> anyhow::Result<()> {
         let mut backups = HashMap::<String, CpioEntry>::new();
         let mut rm_list = String::new();
         backups.insert(

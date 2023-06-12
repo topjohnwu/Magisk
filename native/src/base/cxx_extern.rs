@@ -1,14 +1,18 @@
 // Functions listed here are just to export to C++
 
-use crate::{fd_path, mkdirs, realpath, rm_rf, slice_from_ptr_mut, Directory, ResultExt};
+use std::ffi::CStr;
+use std::io;
+use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
+
 use anyhow::Context;
 use cxx::private::c_char;
 use libc::mode_t;
-use std::ffi::CStr;
-use std::io;
-use std::os::fd::{OwnedFd, RawFd};
 
-pub fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
+use crate::{
+    fd_path, map_fd, map_file, mkdirs, realpath, rm_rf, slice_from_ptr_mut, Directory, ResultExt,
+};
+
+pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
     fd_path(fd, buf)
         .context("fd_path failed")
         .log()
@@ -36,4 +40,20 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
         Directory::try_from(fd)?.remove_all()
     }
     inner(fd).map_or(false, |_| true)
+}
+
+pub(crate) fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8] {
+    unsafe {
+        map_file(CStr::from_bytes_with_nul_unchecked(path), rw)
+            .log()
+            .unwrap_or(&mut [])
+    }
+}
+
+pub(crate) fn map_fd_for_cxx(fd: RawFd, sz: usize, rw: bool) -> &'static mut [u8] {
+    unsafe {
+        map_fd(BorrowedFd::borrow_raw(fd), sz, rw)
+            .log()
+            .unwrap_or(&mut [])
+    }
 }

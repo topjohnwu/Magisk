@@ -4,21 +4,21 @@ use std::fmt::{Display, Formatter};
 use std::fs::{metadata, read, DirBuilder, File};
 use std::io::Write;
 use std::mem::size_of;
-use std::os::fd::AsRawFd;
 use std::os::unix::fs::{symlink, DirBuilderExt, FileTypeExt, MetadataExt};
 use std::path::Path;
 use std::process::exit;
+use std::slice;
 
 use anyhow::{anyhow, Context};
 use clap::{Parser, Subcommand};
 use size::{Base, Size, Style};
 
 use base::libc::{
-    c_char, dev_t, gid_t, major, makedev, minor, mknod, mmap, mode_t, munmap, uid_t, MAP_FAILED,
-    MAP_PRIVATE, PROT_READ, S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH,
-    S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
+    c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, S_IFBLK, S_IFCHR, S_IFDIR,
+    S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
+    S_IXOTH, S_IXUSR,
 };
-use base::{ptr_to_str_result, ResultExt, WriteExt};
+use base::{MappedFile, ResultExt, StrErr, Utf8CStr, WriteExt};
 
 use crate::ramdisk::MagiskCpio;
 
@@ -152,31 +152,10 @@ impl Cpio {
         Ok(cpio)
     }
 
-    pub(crate) fn load_from_file(path: &str) -> anyhow::Result<Self> {
+    pub(crate) fn load_from_file(path: &Utf8CStr) -> anyhow::Result<Self> {
         eprintln!("Loading cpio: [{}]", path);
-        let file = File::open(path)?;
-        let len = file.metadata()?.len() as usize;
-        let mmap = unsafe {
-            mmap(
-                std::ptr::null_mut(),
-                len,
-                PROT_READ,
-                MAP_PRIVATE,
-                file.as_raw_fd(),
-                0,
-            )
-        };
-        if mmap == MAP_FAILED {
-            return Err(anyhow!("mmap failed"));
-        }
-        let data = unsafe { std::slice::from_raw_parts(mmap as *const u8, len) };
-        let cpio = Self::load_from_data(data)?;
-        unsafe {
-            if munmap(mmap, len) != 0 {
-                return Err(anyhow!("munmap failed"));
-            }
-        }
-        Ok(cpio)
+        let data = MappedFile::open(path.as_ref())?;
+        Self::load_from_data(data.as_ref())
     }
 
     fn dump(&self, path: &str) -> anyhow::Result<()> {
@@ -435,19 +414,18 @@ impl Display for CpioEntry {
 
 pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
     fn inner(argc: i32, argv: *const *const c_char) -> anyhow::Result<()> {
-        let mut cmds = Vec::new();
         if argc < 1 {
             return Err(anyhow!("no arguments"));
         }
-        for i in 0..argc {
-            let arg = unsafe { ptr_to_str_result(*argv.offset(i as isize)) };
-            match arg {
-                Ok(arg) => cmds.push(arg),
-                Err(e) => Err(e)?,
-            }
-        }
-        let file = cmds[0];
 
+        let cmds: Result<Vec<&Utf8CStr>, StrErr> =
+            unsafe { slice::from_raw_parts(argv, argc as usize) }
+                .iter()
+                .map(|s| unsafe { Utf8CStr::from_ptr(*s) })
+                .collect();
+        let cmds = cmds?;
+
+        let file = cmds[0];
         let mut cpio = if Path::new(file).exists() {
             Cpio::load_from_file(file)?
         } else {
@@ -458,8 +436,8 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 continue;
             }
             let cmd = "magiskboot ".to_string() + cmd;
-            let cli = CpioCli::try_parse_from(cmd.split(' ').filter(|x| !x.is_empty()))?;
-            match &cli.command {
+            let mut cli = CpioCli::try_parse_from(cmd.split(' ').filter(|x| !x.is_empty()))?;
+            match &mut cli.command {
                 CpioCommands::Test {} => exit(cpio.test()),
                 CpioCommands::Restore {} => cpio.restore()?,
                 CpioCommands::Patch {} => cpio.patch(),
@@ -470,7 +448,9 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                         exit(1);
                     }
                 }
-                CpioCommands::Backup { origin } => cpio.backup(origin)?,
+                CpioCommands::Backup { ref mut origin } => {
+                    cpio.backup(Utf8CStr::from_string(origin))?
+                }
                 CpioCommands::Rm { path, recursive } => cpio.rm(path, *recursive),
                 CpioCommands::Mv { from, to } => cpio.mv(from, to)?,
                 CpioCommands::Extract { path, out } => {

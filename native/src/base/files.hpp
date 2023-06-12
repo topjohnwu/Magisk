@@ -45,10 +45,8 @@ struct mmap_data : public byte_data {
     ALLOW_MOVE_ONLY(mmap_data)
 
     explicit mmap_data(const char *name, bool rw = false);
-    mmap_data(int fd, size_t sz, bool rw = false) { init(fd, sz, rw); }
+    mmap_data(int fd, size_t sz, bool rw = false);
     ~mmap_data();
-private:
-    void init(int fd, size_t sz, bool rw);
 };
 
 extern "C" {

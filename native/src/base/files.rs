@@ -7,20 +7,16 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
-use std::{io, mem, slice};
+use std::{io, mem, ptr, slice};
 
-use libc::{c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH, O_RDONLY};
+use libc::{c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
 
-use crate::{bfmt_cstr, copy_cstr, cstr, errno, error};
+use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, LibcReturn};
 
 pub fn __open_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
     unsafe {
-        let fd = libc::open(path.as_ptr(), flags, mode as c_uint);
-        if fd >= 0 {
-            Ok(OwnedFd::from_raw_fd(fd))
-        } else {
-            Err(io::Error::last_os_error())
-        }
+        let fd = libc::open(path.as_ptr(), flags, mode as c_uint).check_os_err()?;
+        Ok(OwnedFd::from_raw_fd(fd))
     }
 }
 
@@ -43,10 +39,8 @@ pub unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: usize) -
 }
 
 pub fn readlink(path: &CStr, data: &mut [u8]) -> io::Result<usize> {
-    let r = unsafe { readlink_unsafe(path.as_ptr(), data.as_mut_ptr(), data.len()) };
-    if r < 0 {
-        return Err(io::Error::last_os_error());
-    }
+    let r =
+        unsafe { readlink_unsafe(path.as_ptr(), data.as_mut_ptr(), data.len()) }.check_os_err()?;
     Ok(r as usize)
 }
 
@@ -229,9 +223,7 @@ impl DirEntry<'_> {
     pub fn unlink(&self) -> io::Result<()> {
         let flag = if self.is_dir() { libc::AT_REMOVEDIR } else { 0 };
         unsafe {
-            if libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag) < 0 {
-                return Err(io::Error::last_os_error());
-            }
+            libc::unlinkat(self.dir.as_raw_fd(), self.d_name.as_ptr(), flag).check_os_err()?;
         }
         Ok(())
     }
@@ -245,10 +237,8 @@ impl DirEntry<'_> {
                 self.dir.as_raw_fd(),
                 self.d_name.as_ptr(),
                 O_RDONLY | O_CLOEXEC,
-            );
-            if fd < 0 {
-                return Err(io::Error::last_os_error());
-            }
+            )
+            .check_os_err()?;
             Directory::try_from(OwnedFd::from_raw_fd(fd))
         }
     }
@@ -262,10 +252,8 @@ impl DirEntry<'_> {
                 self.dir.as_raw_fd(),
                 self.d_name.as_ptr(),
                 flags | O_CLOEXEC,
-            );
-            if fd < 0 {
-                return Err(io::Error::last_os_error());
-            }
+            )
+            .check_os_err()?;
             Ok(File::from_raw_fd(fd))
         }
     }
@@ -292,10 +280,7 @@ pub enum WalkResult {
 
 impl<'a> Directory<'a> {
     pub fn open(path: &CStr) -> io::Result<Directory> {
-        let dirp = unsafe { libc::opendir(path.as_ptr()) };
-        if dirp.is_null() {
-            return Err(io::Error::last_os_error());
-        }
+        let dirp = unsafe { libc::opendir(path.as_ptr()) }.check_os_err()?;
         Ok(Directory {
             dirp,
             _phantom: PhantomData,
@@ -415,10 +400,7 @@ impl TryFrom<OwnedFd> for Directory<'_> {
     type Error = io::Error;
 
     fn try_from(fd: OwnedFd) -> io::Result<Self> {
-        let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) };
-        if dirp.is_null() {
-            return Err(io::Error::last_os_error());
-        }
+        let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) }.check_os_err()?;
         Ok(Directory {
             dirp,
             _phantom: PhantomData,
@@ -449,16 +431,131 @@ impl Drop for Directory<'_> {
 pub fn rm_rf(path: &CStr) -> io::Result<()> {
     unsafe {
         let mut stat: libc::stat = mem::zeroed();
-        if libc::lstat(path.as_ptr(), &mut stat) < 0 {
-            return Err(io::Error::last_os_error());
-        }
-        if (stat.st_mode & libc::S_IFMT as u32) == libc::S_IFDIR as u32 {
+        libc::lstat(path.as_ptr(), &mut stat).check_os_err()?;
+        if stat.is_dir() {
             let mut dir = Directory::open(path)?;
             dir.remove_all()?;
         }
-        if libc::remove(path.as_ptr()) < 0 {
-            return Err(io::Error::last_os_error());
-        }
+        libc::remove(path.as_ptr()).check_os_err()?;
     }
     Ok(())
+}
+
+pub trait StatExt {
+    fn get_mode(&self) -> u32;
+    fn get_type(&self) -> u32;
+
+    fn is_dir(&self) -> bool;
+    fn is_blk(&self) -> bool;
+}
+
+impl StatExt for libc::stat {
+    fn get_mode(&self) -> u32 {
+        self.st_mode & libc::S_IFMT as u32
+    }
+
+    fn get_type(&self) -> u32 {
+        self.st_mode & !(libc::S_IFMT as u32)
+    }
+
+    fn is_dir(&self) -> bool {
+        self.get_type() == libc::S_IFDIR as u32
+    }
+
+    fn is_blk(&self) -> bool {
+        self.get_type() == libc::S_IFBLK as u32
+    }
+}
+
+pub trait FdExt {
+    fn size(&self) -> io::Result<usize>;
+}
+
+const BLKGETSIZE64: u32 = 0x80081272;
+
+impl<T: AsRawFd> FdExt for T {
+    fn size(&self) -> io::Result<usize> {
+        unsafe fn inner(fd: RawFd) -> io::Result<usize> {
+            extern "C" {
+                // Don't use the declaration from the libc crate as request should be u32 not i32
+                fn ioctl(fd: RawFd, request: u32, ...) -> i32;
+            }
+            let mut stat: libc::stat = mem::zeroed();
+            libc::fstat(fd, &mut stat).check_os_err()?;
+            if stat.is_blk() {
+                let mut sz = 0_u64;
+                ioctl(fd, BLKGETSIZE64, &mut sz).check_os_err()?;
+                Ok(sz as usize)
+            } else {
+                Ok(stat.st_size as usize)
+            }
+        }
+
+        unsafe { inner(self.as_raw_fd()) }
+    }
+}
+
+pub struct MappedFile(&'static mut [u8]);
+
+impl MappedFile {
+    pub fn open(path: &CStr) -> io::Result<MappedFile> {
+        Ok(MappedFile(map_file(path, false)?))
+    }
+
+    pub fn open_rw(path: &CStr) -> io::Result<MappedFile> {
+        Ok(MappedFile(map_file(path, true)?))
+    }
+
+    pub fn create(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<MappedFile> {
+        Ok(MappedFile(map_fd(fd, sz, rw)?))
+    }
+}
+
+impl AsRef<[u8]> for MappedFile {
+    fn as_ref(&self) -> &[u8] {
+        self.0
+    }
+}
+
+impl AsMut<[u8]> for MappedFile {
+    fn as_mut(&mut self) -> &mut [u8] {
+        self.0
+    }
+}
+
+impl Drop for MappedFile {
+    fn drop(&mut self) {
+        unsafe {
+            libc::munmap(self.0.as_mut_ptr().cast(), self.0.len());
+        }
+    }
+}
+
+// We mark the returned slice static because it is valid until explicitly unmapped
+pub(crate) fn map_file(path: &CStr, rw: bool) -> io::Result<&'static mut [u8]> {
+    let flag = if rw { O_RDONLY } else { O_RDWR };
+    let fd = open_fd!(path, flag | O_CLOEXEC)?;
+    map_fd(fd.as_fd(), fd.size()?, rw)
+}
+
+pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<&'static mut [u8]> {
+    let flag = if rw {
+        libc::MAP_SHARED
+    } else {
+        libc::MAP_PRIVATE
+    };
+    unsafe {
+        let ptr = libc::mmap(
+            ptr::null_mut(),
+            sz,
+            libc::PROT_READ | libc::PROT_WRITE,
+            flag,
+            fd.as_raw_fd(),
+            0,
+        );
+        if ptr == libc::MAP_FAILED {
+            return Err(io::Error::last_os_error());
+        }
+        Ok(slice::from_raw_parts_mut(ptr.cast(), sz))
+    }
 }

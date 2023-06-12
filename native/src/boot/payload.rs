@@ -196,12 +196,12 @@ pub fn extract_boot_from_payload(
         let in_path = ptr_to_str_result(in_path)?;
         let partition = match ptr_to_str_result(partition) {
             Ok(s) => Some(s),
-            Err(StrErr::NullPointer) => None,
+            Err(StrErr::NullPointerError) => None,
             Err(e) => Err(e)?,
         };
         let out_path = match ptr_to_str_result(out_path) {
             Ok(s) => Some(s),
-            Err(StrErr::NullPointer) => None,
+            Err(StrErr::NullPointerError) => None,
             Err(e) => Err(e)?,
         };
         do_extract_boot_from_payload(in_path, partition, out_path)
