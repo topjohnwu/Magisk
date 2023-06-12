@@ -3,7 +3,6 @@ use std::cmp::min;
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::{BufRead, Read, Seek, SeekFrom, Write};
-use std::marker::PhantomData;
 use std::ops::Deref;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
@@ -185,7 +184,7 @@ impl<T: Write> WriteExt for T {
 }
 
 pub struct DirEntry<'a> {
-    dir: &'a Directory<'a>,
+    dir: &'a Directory,
     entry: &'a dirent,
     d_name_len: usize,
 }
@@ -267,9 +266,8 @@ impl Deref for DirEntry<'_> {
     }
 }
 
-pub struct Directory<'a> {
+pub struct Directory {
     dirp: *mut libc::DIR,
-    _phantom: PhantomData<&'a libc::DIR>,
 }
 
 pub enum WalkResult {
@@ -278,13 +276,10 @@ pub enum WalkResult {
     Skip,
 }
 
-impl<'a> Directory<'a> {
+impl Directory {
     pub fn open(path: &CStr) -> io::Result<Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) }.check_os_err()?;
-        Ok(Directory {
-            dirp,
-            _phantom: PhantomData,
-        })
+        Ok(Directory { dirp })
     }
 
     pub fn read(&mut self) -> io::Result<Option<DirEntry<'_>>> {
@@ -345,7 +340,7 @@ impl<'a> Directory<'a> {
     }
 }
 
-impl Directory<'_> {
+impl Directory {
     fn post_order_walk_impl<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
         &mut self,
         f: &mut F,
@@ -396,31 +391,28 @@ impl Directory<'_> {
     }
 }
 
-impl TryFrom<OwnedFd> for Directory<'_> {
+impl TryFrom<OwnedFd> for Directory {
     type Error = io::Error;
 
     fn try_from(fd: OwnedFd) -> io::Result<Self> {
         let dirp = unsafe { libc::fdopendir(fd.into_raw_fd()) }.check_os_err()?;
-        Ok(Directory {
-            dirp,
-            _phantom: PhantomData,
-        })
+        Ok(Directory { dirp })
     }
 }
 
-impl AsRawFd for Directory<'_> {
+impl AsRawFd for Directory {
     fn as_raw_fd(&self) -> RawFd {
         unsafe { libc::dirfd(self.dirp) }
     }
 }
 
-impl<'a> AsFd for Directory<'a> {
-    fn as_fd(&self) -> BorrowedFd<'a> {
+impl AsFd for Directory {
+    fn as_fd(&self) -> BorrowedFd {
         unsafe { BorrowedFd::borrow_raw(self.as_raw_fd()) }
     }
 }
 
-impl Drop for Directory<'_> {
+impl Drop for Directory {
     fn drop(&mut self) {
         unsafe {
             libc::closedir(self.dirp);
