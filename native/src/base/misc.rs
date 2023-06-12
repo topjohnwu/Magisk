@@ -199,7 +199,7 @@ impl AsRef<str> for Utf8CStr {
 impl AsRef<OsStr> for Utf8CStr {
     #[inline]
     fn as_ref(&self) -> &OsStr {
-        OsStr::new(self)
+        OsStr::new(self as &str)
     }
 }
 
