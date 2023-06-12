@@ -379,10 +379,10 @@ impl Cpio {
     fn ls(&self, path: Option<&str>, recursive: bool) {
         let path = path
             .map(norm_path)
-            .map(|p| "/".to_owned() + p.as_str())
-            .unwrap_or("".to_string());
+            .filter(|p| !p.is_empty())
+            .map_or("".to_string(), |p| "/".to_string() + p.as_str());
         for (name, entry) in &self.entries {
-            let p = "/".to_owned() + name.as_str();
+            let p = "/".to_string() + name.as_str();
             if !p.starts_with(&path) {
                 continue;
             }
