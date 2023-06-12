@@ -1,8 +1,8 @@
 #![allow(clippy::missing_safety_doc)]
 
+use base::Utf8CStr;
 use daemon::*;
 use logging::*;
-use std::ffi::CStr;
 
 #[path = "../include/consts.rs"]
 mod consts;
@@ -39,6 +39,6 @@ pub mod ffi {
 
 fn rust_test_entry() {}
 
-pub fn get_prop(name: &CStr, persist: bool) -> String {
+pub fn get_prop(name: &Utf8CStr, persist: bool) -> String {
     unsafe { ffi::get_prop_rs(name.as_ptr(), persist) }
 }

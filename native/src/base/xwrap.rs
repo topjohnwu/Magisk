@@ -1,4 +1,3 @@
-use std::ffi::CStr;
 use std::os::unix::io::RawFd;
 use std::ptr;
 
@@ -8,10 +7,9 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, raw_cstr, ResultExt};
+use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, raw_cstr, ResultExt, Utf8CStr};
 
 mod unsafe_impl {
-    use std::ffi::CStr;
     use std::os::unix::io::RawFd;
 
     use anyhow::Context;
@@ -19,8 +17,8 @@ mod unsafe_impl {
     use libc::{c_char, nfds_t, off_t, pollfd};
 
     use crate::{
-        perror, ptr_to_str, readlink, readlink_unsafe, slice_from_ptr, slice_from_ptr_mut,
-        ResultExt,
+        perror, ptr_to_str, readlink_unsafe, realpath, slice_from_ptr, slice_from_ptr_mut,
+        ResultExt, Utf8CStr,
     };
 
     #[no_mangle]
@@ -40,10 +38,13 @@ mod unsafe_impl {
 
     #[no_mangle]
     unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-        readlink(CStr::from_ptr(path), slice_from_ptr_mut(buf, bufsz))
-            .with_context(|| format!("realpath {} failed", ptr_to_str(path)))
-            .log()
-            .map_or(-1, |v| v as isize)
+        match Utf8CStr::from_ptr(path) {
+            Ok(p) => realpath(p, slice_from_ptr_mut(buf, bufsz))
+                .with_context(|| format!("realpath {} failed", p))
+                .log()
+                .map_or(-1, |v| v as isize),
+            Err(_) => -1,
+        }
     }
 
     #[no_mangle]
@@ -475,16 +476,6 @@ pub extern "C" fn xdup3(oldfd: RawFd, newfd: RawFd, flags: i32) -> RawFd {
     }
 }
 
-#[inline]
-pub fn xreadlink(path: &CStr, data: &mut [u8]) -> isize {
-    unsafe { unsafe_impl::xreadlink(path.as_ptr(), data.as_mut_ptr(), data.len()) }
-}
-
-#[inline]
-pub fn xreadlinkat(dirfd: RawFd, path: &CStr, data: &mut [u8]) -> isize {
-    unsafe { unsafe_impl::xreadlinkat(dirfd, path.as_ptr(), data.as_mut_ptr(), data.len()) }
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn xsymlink(target: *const c_char, linkpath: *const c_char) -> i32 {
     let r = libc::symlink(target, linkpath);
@@ -579,10 +570,13 @@ pub unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 
 #[no_mangle]
 pub unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
-    mkdirs(CStr::from_ptr(path), mode)
-        .with_context(|| format!("mkdirs {}", ptr_to_str(path)))
-        .log()
-        .map_or(-1, |_| 0)
+    match Utf8CStr::from_ptr(path) {
+        Ok(p) => mkdirs(p, mode)
+            .with_context(|| format!("mkdirs {} failed", p))
+            .log()
+            .map_or(-1, |_| 0),
+        Err(_) => -1,
+    }
 }
 
 #[no_mangle]

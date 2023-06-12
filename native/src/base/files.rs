@@ -10,9 +10,9 @@ use std::{io, mem, ptr, slice};
 
 use libc::{c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
 
-use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, LibcReturn};
+use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, LibcReturn, Utf8CStr};
 
-pub fn __open_fd_impl(path: &CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
+pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
     unsafe {
         let fd = libc::open(path.as_ptr(), flags, mode as c_uint).check_os_err()?;
         Ok(OwnedFd::from_raw_fd(fd))
@@ -37,7 +37,7 @@ pub unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: usize) -
     r
 }
 
-pub fn readlink(path: &CStr, data: &mut [u8]) -> io::Result<usize> {
+pub fn readlink(path: &Utf8CStr, data: &mut [u8]) -> io::Result<usize> {
     let r =
         unsafe { readlink_unsafe(path.as_ptr(), data.as_mut_ptr(), data.len()) }.check_os_err()?;
     Ok(r as usize)
@@ -50,7 +50,7 @@ pub fn fd_path(fd: RawFd, buf: &mut [u8]) -> io::Result<usize> {
 }
 
 // Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
-pub fn realpath(path: &CStr, buf: &mut [u8]) -> io::Result<usize> {
+pub fn realpath(path: &Utf8CStr, buf: &mut [u8]) -> io::Result<usize> {
     let fd = open_fd!(path, O_PATH | O_CLOEXEC)?;
     let mut st1: libc::stat;
     let mut st2: libc::stat;
@@ -75,7 +75,7 @@ pub fn realpath(path: &CStr, buf: &mut [u8]) -> io::Result<usize> {
     Ok(len)
 }
 
-pub fn mkdirs(path: &CStr, mode: mode_t) -> io::Result<()> {
+pub fn mkdirs(path: &Utf8CStr, mode: mode_t) -> io::Result<()> {
     let mut buf = [0_u8; 4096];
     let len = copy_cstr(&mut buf, path);
     let buf = &mut buf[..len];
@@ -277,7 +277,7 @@ pub enum WalkResult {
 }
 
 impl Directory {
-    pub fn open(path: &CStr) -> io::Result<Directory> {
+    pub fn open(path: &Utf8CStr) -> io::Result<Directory> {
         let dirp = unsafe { libc::opendir(path.as_ptr()) }.check_os_err()?;
         Ok(Directory { dirp })
     }
@@ -420,7 +420,7 @@ impl Drop for Directory {
     }
 }
 
-pub fn rm_rf(path: &CStr) -> io::Result<()> {
+pub fn rm_rf(path: &Utf8CStr) -> io::Result<()> {
     unsafe {
         let mut stat: libc::stat = mem::zeroed();
         libc::lstat(path.as_ptr(), &mut stat).check_os_err()?;
@@ -490,11 +490,11 @@ impl<T: AsRawFd> FdExt for T {
 pub struct MappedFile(&'static mut [u8]);
 
 impl MappedFile {
-    pub fn open(path: &CStr) -> io::Result<MappedFile> {
+    pub fn open(path: &Utf8CStr) -> io::Result<MappedFile> {
         Ok(MappedFile(map_file(path, false)?))
     }
 
-    pub fn open_rw(path: &CStr) -> io::Result<MappedFile> {
+    pub fn open_rw(path: &Utf8CStr) -> io::Result<MappedFile> {
         Ok(MappedFile(map_file(path, true)?))
     }
 
@@ -524,7 +524,7 @@ impl Drop for MappedFile {
 }
 
 // We mark the returned slice static because it is valid until explicitly unmapped
-pub(crate) fn map_file(path: &CStr, rw: bool) -> io::Result<&'static mut [u8]> {
+pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8]> {
     let flag = if rw { O_RDWR } else { O_RDONLY };
     let fd = open_fd!(path, flag | O_CLOEXEC)?;
     map_fd(fd.as_fd(), fd.size()?, rw)

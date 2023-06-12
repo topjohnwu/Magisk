@@ -155,8 +155,8 @@ impl Cpio {
 
     pub(crate) fn load_from_file(path: &Utf8CStr) -> anyhow::Result<Self> {
         eprintln!("Loading cpio: [{}]", path);
-        let data = MappedFile::open(path.as_ref())?;
-        Self::load_from_data(data.as_ref())
+        let file = MappedFile::open(path)?;
+        Self::load_from_data(file.as_ref())
     }
 
     fn dump(&self, path: &str) -> anyhow::Result<()> {

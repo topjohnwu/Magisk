@@ -17,8 +17,8 @@ pub fn copy_str<T: AsRef<[u8]>>(dest: &mut [u8], src: T) -> usize {
     len
 }
 
-pub fn copy_cstr(dest: &mut [u8], src: &CStr) -> usize {
-    let src = src.to_bytes_with_nul();
+pub fn copy_cstr<T: AsRef<CStr> + ?Sized>(dest: &mut [u8], src: &T) -> usize {
+    let src = src.as_ref().to_bytes_with_nul();
     let len = min(src.len(), dest.len());
     dest[..len].copy_from_slice(&src[..len]);
     len
@@ -69,7 +69,9 @@ macro_rules! bfmt_cstr {
     ($buf:expr, $($args:tt)*) => {{
         let len = $crate::fmt_to_buf($buf, format_args!($($args)*));
         #[allow(unused_unsafe)]
-        unsafe { std::ffi::CStr::from_bytes_with_nul_unchecked(&$buf[..(len + 1)]) }
+        unsafe {
+            $crate::Utf8CStr::from_bytes_unchecked($buf.get_unchecked(..(len + 1)))
+        }
     }};
 }
 
@@ -84,7 +86,7 @@ macro_rules! cstr {
         );
         #[allow(unused_unsafe)]
         unsafe {
-            std::ffi::CStr::from_bytes_with_nul_unchecked(concat!($str, "\0").as_bytes())
+            $crate::Utf8CStr::from_bytes_unchecked(concat!($str, "\0").as_bytes())
         }
     }};
 }
@@ -135,6 +137,7 @@ impl Utf8CStr {
         }
     }
 
+    #[inline]
     pub unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
         &*(buf as *const [u8] as *const Utf8CStr)
     }
@@ -146,35 +149,46 @@ impl Utf8CStr {
         Self::from_cstr(unsafe { CStr::from_ptr(ptr) })
     }
 
+    #[inline]
     pub fn as_bytes(&self) -> &[u8] {
         // The length of the slice is at least 1 due to null termination check
         unsafe { self.inner.get_unchecked(..self.inner.len() - 1) }
     }
 
+    #[inline]
     pub fn as_bytes_with_nul(&self) -> &[u8] {
         &self.inner
     }
 
+    #[inline]
     pub fn as_ptr(&self) -> *const c_char {
         self.inner.as_ptr().cast()
+    }
+
+    #[inline]
+    pub fn as_cstr(&self) -> &CStr {
+        self.as_ref()
     }
 }
 
 impl Deref for Utf8CStr {
     type Target = str;
 
+    #[inline]
     fn deref(&self) -> &str {
         self.as_ref()
     }
 }
 
 impl Display for Utf8CStr {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(self.deref(), f)
     }
 }
 
 impl Debug for Utf8CStr {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Debug::fmt(self.deref(), f)
     }
@@ -199,24 +213,42 @@ impl AsRef<str> for Utf8CStr {
 impl AsRef<OsStr> for Utf8CStr {
     #[inline]
     fn as_ref(&self) -> &OsStr {
-        OsStr::new(self as &str)
+        OsStr::new(self.deref())
     }
 }
 
 impl AsRef<Path> for Utf8CStr {
     #[inline]
     fn as_ref(&self) -> &Path {
-        Path::new(self)
+        Path::new(self.deref())
     }
 }
 
-pub fn ptr_to_str_result<'a, T>(ptr: *const T) -> Result<&'a str, StrErr> {
-    if ptr.is_null() {
-        Err(StrErr::NullPointerError)
-    } else {
-        unsafe { CStr::from_ptr(ptr.cast()) }
-            .to_str()
-            .map_err(StrErr::from)
+impl PartialEq<CStr> for Utf8CStr {
+    #[inline]
+    fn eq(&self, other: &CStr) -> bool {
+        self.as_cstr() == other
+    }
+}
+
+impl PartialEq<str> for Utf8CStr {
+    #[inline]
+    fn eq(&self, other: &str) -> bool {
+        self.deref() == other
+    }
+}
+
+impl PartialEq<Utf8CStr> for CStr {
+    #[inline]
+    fn eq(&self, other: &Utf8CStr) -> bool {
+        self == other.as_cstr()
+    }
+}
+
+impl PartialEq<Utf8CStr> for str {
+    #[inline]
+    fn eq(&self, other: &Utf8CStr) -> bool {
+        self == other.deref()
     }
 }
 
