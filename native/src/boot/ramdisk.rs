@@ -90,7 +90,7 @@ impl MagiskCpio for Cpio {
     }
 
     fn restore(&mut self) -> anyhow::Result<()> {
-        let mut backups = HashMap::<String, CpioEntry>::new();
+        let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         self.entries
             .drain_filter(|name, _| name.starts_with(".backup/"))
@@ -121,18 +121,18 @@ impl MagiskCpio for Cpio {
     }
 
     fn backup(&mut self, origin: &Utf8CStr) -> anyhow::Result<()> {
-        let mut backups = HashMap::<String, CpioEntry>::new();
+        let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         backups.insert(
             ".backup".to_string(),
-            CpioEntry {
+            Box::new(CpioEntry {
                 mode: S_IFDIR,
                 uid: 0,
                 gid: 0,
                 rdevmajor: 0,
                 rdevminor: 0,
                 data: vec![],
-            },
+            }),
         );
         let mut o = Cpio::load_from_file(origin)?;
         o.rm(".backup", true);
@@ -143,7 +143,7 @@ impl MagiskCpio for Cpio {
 
         loop {
             enum Action<'a> {
-                Backup(String, CpioEntry),
+                Backup(String, Box<CpioEntry>),
                 Record(&'a String),
                 Noop,
             }
@@ -190,14 +190,14 @@ impl MagiskCpio for Cpio {
         if !rm_list.is_empty() {
             backups.insert(
                 ".backup/.rmlist".to_string(),
-                CpioEntry {
+                Box::new(CpioEntry {
                     mode: S_IFREG,
                     uid: 0,
                     gid: 0,
                     rdevmajor: 0,
                     rdevminor: 0,
                     data: rm_list.as_bytes().to_vec(),
-                },
+                }),
             );
         }
         self.entries.extend(backups);
