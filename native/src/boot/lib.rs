@@ -1,6 +1,5 @@
 #![feature(format_args_nl)]
 #![feature(btree_drain_filter)]
-#![feature(iter_collect_into)]
 
 extern crate core;
 
