@@ -94,7 +94,7 @@ struct CpioHeader {
 }
 
 pub(crate) struct Cpio {
-    pub(crate) entries: BTreeMap<String, CpioEntry>,
+    pub(crate) entries: BTreeMap<String, Box<CpioEntry>>,
 }
 
 pub(crate) struct CpioEntry {
@@ -138,14 +138,14 @@ impl Cpio {
                 continue;
             }
             let file_size = x8u::<usize>(&hdr.filesize)?;
-            let entry = CpioEntry {
+            let entry = Box::new(CpioEntry {
                 mode: x8u(&hdr.mode)?,
                 uid: x8u(&hdr.uid)?,
                 gid: x8u(&hdr.gid)?,
                 rdevmajor: x8u(&hdr.rdevmajor)?,
                 rdevminor: x8u(&hdr.rdevminor)?,
                 data: data[pos..pos + file_size].to_vec(),
-            };
+            });
             pos += file_size;
             cpio.entries.insert(name, entry);
             pos = align_4(pos);
@@ -303,14 +303,14 @@ impl Cpio {
         };
         self.entries.insert(
             norm_path(path),
-            CpioEntry {
+            Box::new(CpioEntry {
                 mode,
                 uid: 0,
                 gid: 0,
                 rdevmajor,
                 rdevminor,
                 data: content,
-            },
+            }),
         );
         eprintln!("Add file [{}] ({:04o})", path, mode);
         Ok(())
@@ -319,14 +319,14 @@ impl Cpio {
     fn mkdir(&mut self, mode: &mode_t, dir: &str) {
         self.entries.insert(
             norm_path(dir),
-            CpioEntry {
+            Box::new(CpioEntry {
                 mode: *mode | S_IFDIR,
                 uid: 0,
                 gid: 0,
                 rdevmajor: 0,
                 rdevminor: 0,
                 data: vec![],
-            },
+            }),
         );
         eprintln!("Create directory [{}] ({:04o})", dir, mode);
     }
@@ -334,14 +334,14 @@ impl Cpio {
     fn ln(&mut self, src: &str, dst: &str) {
         self.entries.insert(
             norm_path(dst),
-            CpioEntry {
+            Box::new(CpioEntry {
                 mode: S_IFLNK,
                 uid: 0,
                 gid: 0,
                 rdevmajor: 0,
                 rdevminor: 0,
                 data: norm_path(src).as_bytes().to_vec(),
-            },
+            }),
         );
         eprintln!("Create symlink [{}] -> [{}]", dst, src);
     }
