@@ -138,7 +138,7 @@ impl MagiskCpio for Cpio {
         o.rm(".backup", true);
         self.rm(".backup", true);
 
-        let mut lhs = o.entries.drain_filter(|_, _| true).peekable();
+        let mut lhs = o.entries.into_iter().peekable();
         let mut rhs = self.entries.iter().peekable();
 
         loop {
