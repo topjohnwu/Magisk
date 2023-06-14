@@ -288,26 +288,29 @@ pub unsafe fn slice_from_ptr_mut<'a, T>(buf: *mut T, len: usize) -> &'a mut [T] 
     }
 }
 
-pub trait FlatData {
-    fn as_raw_bytes(&self) -> &[u8]
-    where
-        Self: Sized,
-    {
+pub trait FlatData
+where
+    Self: Sized,
+{
+    fn as_raw_bytes(&self) -> &[u8] {
         unsafe {
             let self_ptr = self as *const Self as *const u8;
             slice::from_raw_parts(self_ptr, std::mem::size_of::<Self>())
         }
     }
-    fn as_raw_bytes_mut(&mut self) -> &mut [u8]
-    where
-        Self: Sized,
-    {
+    fn as_raw_bytes_mut(&mut self) -> &mut [u8] {
         unsafe {
             let self_ptr = self as *mut Self as *mut u8;
             slice::from_raw_parts_mut(self_ptr, std::mem::size_of::<Self>())
         }
     }
+
+    fn bytes_size(&self) -> usize {
+        std::mem::size_of::<Self>()
+    }
 }
+
+impl<T: Copy> FlatData for T {}
 
 // Check libc return value and map errors to Result
 pub trait LibcReturn: Copy {

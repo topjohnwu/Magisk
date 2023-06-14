@@ -1,9 +1,12 @@
+#![feature(format_args_nl)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
+use cert::*;
 use daemon::*;
 use logging::*;
 
+mod cert;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
@@ -28,6 +31,7 @@ pub mod ffi {
     extern "Rust" {
         fn daemon_entry();
         fn zygisk_entry();
+        fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
 
         type MagiskD;
         fn get_magiskd() -> &'static MagiskD;
