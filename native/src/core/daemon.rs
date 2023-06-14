@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io;
 use std::sync::{Mutex, OnceLock};
 
-use base::{copy_str, cstr, Directory, ResultExt, WalkResult};
+use base::{copy_str, cstr, Directory, ResultExt, Utf8CStr, WalkResult};
 
 use crate::logging::{magisk_logging, zygisk_logging};
 
@@ -38,12 +38,16 @@ pub fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize {
     use WalkResult::*;
     fn inner(pkg: &[u8], data: &mut [u8]) -> io::Result<usize> {
         let mut len = 0_usize;
+        let pkg = match Utf8CStr::from_bytes(pkg) {
+            Ok(pkg) => pkg,
+            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
+        };
         Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
             if !e.is_dir() {
                 return Ok(Skip);
             }
             let d_name = e.d_name().to_bytes();
-            if d_name.starts_with(pkg) && d_name[pkg.len()] == b'-' {
+            if d_name.starts_with(pkg.as_bytes()) && d_name[pkg.len()] == b'-' {
                 // Found the APK path, we can abort now
                 len = e.path(data)?;
                 return Ok(Abort);

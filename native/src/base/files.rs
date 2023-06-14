@@ -378,7 +378,7 @@ impl Directory {
                 None => return Ok(Continue),
                 Some(ref e) => match f(e)? {
                     Abort => return Ok(Abort),
-                    Skip => return Ok(Continue),
+                    Skip => continue,
                     Continue => {
                         if e.is_dir() {
                             let mut dir = e.open_as_dir()?;
