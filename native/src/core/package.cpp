@@ -224,7 +224,7 @@ int get_manager(int user_id, string *pkg, bool install) {
             if (stat(app_path, &st) == 0) {
 #if ENFORCE_SIGNATURE
                 byte_array<PATH_MAX> apk;
-                find_apk_path(byte_view(str[SU_MANAGER]), apk);
+                find_apk_path(byte_view(JAVA_PACKAGE_NAME), apk);
                 int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
                 string cert = read_certificate(fd, MAGISK_VER_CODE);
                 close(fd);
