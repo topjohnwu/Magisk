@@ -306,9 +306,60 @@ def run_cargo_cmd(args):
     if len(args.commands) >= 1 and args.commands[0] == "--":
         args.commands = args.commands[1:]
     os.chdir(op.join("native", "src"))
-    run_cargo(args.commands)
+    out = run_cargo(args.commands)
     os.chdir(op.join("..", ".."))
+    return out.returncode
 
+def run_clippy(args):
+    import json
+    os.chdir(op.join("native", "src"))
+
+    failed = False
+
+    for arch, triple in zip(archs, triples):
+        rust_triple = (
+            "thumbv7neon-linux-androideabi" if triple.startswith("armv7") else triple
+        )
+        cmds = ["clippy", "--no-deps", "--target", rust_triple]
+        if 'CI' in os.environ and os.environ['CI'] == 'true':
+            global STDOUT
+            STDOUT=subprocess.PIPE
+            cmds += ["--message-format", "json"]
+        cmds += ["--", "-Dwarnings", "-Dclippy::all"]
+        out = run_cargo(cmds, triple)
+
+        if out.stdout is not None:
+            for line in out.stdout.decode("utf-8").splitlines():
+                j = json.loads(line)
+                if 'message' not in j:
+                    continue
+                message = j['message']
+                if 'message' not in message:
+                    continue
+                msg = message['message']
+                spans = message['spans']
+                for span in spans:
+                    print('::error ', end='')
+                    if 'file_name' in span:
+                        f = span["file_name"].replace(os.sep, "/")
+                        print(f'file=native/src/{f}', end=',')
+                    if 'line_start' in span:
+                        print(f'line={span["line_start"]}', end=',')
+                    if 'column_start' in span:
+                        print(f'col={span["column_start"]}', end=',')
+                    if 'line_end' in span:
+                        print(f'endLine={span["line_end"]}', end=',')
+                    if 'column_end' in span:
+                        print(f'endColumn={span["column_end"]}', end=',')
+                    print(f'title={msg} on {arch}::', end='')
+                    if 'code' in message:
+                        print(f"[{message['code']['code']}]", end=' ')
+                    print(f'{span["label"] or ""}')
+        if out.returncode != 0:
+            failed = True
+
+    os.chdir(op.join("..", ".."))
+    return 1 if failed else 0
 
 def write_if_diff(file_name, text):
     do_write = True
@@ -672,6 +723,9 @@ cargo_parser = subparsers.add_parser("cargo", help="run cargo with proper enviro
 cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
 cargo_parser.set_defaults(func=run_cargo_cmd)
 
+clippy_parser = subparsers.add_parser("clippy", help="run clippy")
+clippy_parser.set_defaults(func=run_clippy)
+
 app_parser = subparsers.add_parser("app", help="build the Magisk app")
 app_parser.set_defaults(func=build_app)
 
@@ -708,4 +762,4 @@ args = parser.parse_args()
 load_config(args)
 
 # Call corresponding functions
-args.func(args)
+exit(args.func(args) or 0)

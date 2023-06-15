@@ -1,3 +1,4 @@
+#![feature(stmt_expr_attributes)]
 #![feature(format_args_nl)]
 #![feature(btree_drain_filter)]
 

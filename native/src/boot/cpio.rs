@@ -204,7 +204,7 @@ impl Cpio {
 
     pub(crate) fn rm(&mut self, path: &str, recursive: bool) {
         let path = norm_path(path);
-        if let Some(_) = self.entries.remove(&path) {
+        if self.entries.remove(&path).is_some() {
             eprintln!("Removed entry [{}]", path);
         }
         if recursive {
@@ -232,7 +232,10 @@ impl Cpio {
         match entry.mode & S_IFMT {
             S_IFDIR => {
                 DirBuilder::new()
-                    .mode((entry.mode & 0o777).into())
+                    .mode(
+                        #[allow(clippy::useless_conversion)]
+                        (entry.mode & 0o777).try_into()?,
+                    )
                     .create(out)?;
             }
             S_IFREG => {
@@ -243,7 +246,12 @@ impl Cpio {
                 symlink(Path::new(&std::str::from_utf8(entry.data.as_slice())?), out)?;
             }
             S_IFBLK | S_IFCHR => {
-                let dev = makedev(entry.rdevmajor.try_into()?, entry.rdevminor.try_into()?);
+                let dev = makedev(
+                    #[allow(clippy::useless_conversion)]
+                    entry.rdevmajor.try_into()?,
+                    #[allow(clippy::useless_conversion)]
+                    entry.rdevminor.try_into()?,
+                );
                 unsafe {
                     mknod(
                         out.to_str().unwrap().as_ptr() as *const c_char,
@@ -291,8 +299,18 @@ impl Cpio {
         let mode = if metadata.file_type().is_file() {
             mode | S_IFREG
         } else {
-            rdevmajor = unsafe { major(metadata.rdev().try_into()?).try_into()? };
-            rdevminor = unsafe { minor(metadata.rdev().try_into()?).try_into()? };
+            unsafe {
+                rdevmajor = major(
+                    #[allow(clippy::useless_conversion)]
+                    metadata.rdev().try_into()?,
+                )
+                .try_into()?;
+                rdevminor = minor(
+                    #[allow(clippy::useless_conversion)]
+                    metadata.rdev().try_into()?,
+                )
+                .try_into()?
+            }
             if metadata.file_type().is_block_device() {
                 mode | S_IFBLK
             } else if metadata.file_type().is_char_device() {

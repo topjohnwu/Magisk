@@ -70,6 +70,10 @@ jobs:
       - name: Set up NDK
         run: python build.py -v ndk
 
+      - name: Clippy
+        if: runner.os == 'Linux'
+        run: python build.py -v clippy
+
       - name: Build release
         run: |
           python build.py -vr all
