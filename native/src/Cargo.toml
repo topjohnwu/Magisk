@@ -1,6 +1,7 @@
 [workspace]
 exclude = ["external"]
 members = ["base", "boot", "core", "init", "sepolicy"]
+resolver = "2"
 
 [workspace.dependencies]
 cxx = { path = "external/cxx-rs" }

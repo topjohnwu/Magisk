@@ -446,7 +446,7 @@ def find_jdk():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             env=env,
-            shell=True
+            shell=True,
         )
         no_jdk = proc.returncode != 0
     except FileNotFoundError:
@@ -529,12 +529,12 @@ def cleanup(args):
 
 def setup_ndk(args):
     ndk_ver = config["ondkVersion"]
-    url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.gz"
+    url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
 
     header(f"* Downloading and extracting {ndk_archive}")
     with urllib.request.urlopen(url) as response:
-        with tarfile.open(mode="r|gz", fileobj=response) as tar:
+        with tarfile.open(mode="r|xz", fileobj=response) as tar:
             tar.extractall(ndk_root)
 
     rm_rf(ndk_path)
