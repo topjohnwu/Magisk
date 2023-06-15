@@ -22,6 +22,7 @@ impl Default for SuRequest {
             target_pid: -1,
             login: false,
             keep_env: false,
+            drop_cap: false,
             shell: DEFAULT_SHELL.to_string(),
             command: "".to_string(),
             context: "".to_string(),
@@ -168,7 +169,10 @@ impl MagiskD {
             // Before unlocking, refresh the timestamp
             access.refresh();
 
-            // Fail fast
+            if access.settings.policy == SuPolicy::Restrict {
+                req.drop_cap = true;
+            }
+
             if access.settings.policy == SuPolicy::Deny {
                 warn!("su: request rejected ({})", info.uid);
                 client.write_pod(&SuPolicy::Deny.repr).ok();

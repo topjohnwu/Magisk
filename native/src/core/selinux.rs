@@ -1,4 +1,4 @@
-use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MODULEROOT, SECURE_DIR};
+use crate::consts::{DATABIN, LOG_PIPE, MAGISK_LOG_CON, MAGISKDB, MODULEROOT, SECURE_DIR};
 use crate::ffi::get_magisk_tmp;
 use base::libc::{O_CLOEXEC, O_WRONLY};
 use base::{Directory, FsPathBuilder, LoggedResult, ResultExt, Utf8CStr, Utf8CStrBuf, cstr, libc};
@@ -69,6 +69,7 @@ pub(crate) fn restorecon() {
     path.clear();
     path.push_str(DATABIN);
     restore_syscon(&mut path).log_ok();
+    unsafe { libc::chmod(cstr!(MAGISKDB).as_ptr(), 0o000) };
 }
 
 pub(crate) fn restore_tmpcon() -> LoggedResult<()> {
