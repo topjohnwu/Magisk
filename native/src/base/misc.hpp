@@ -175,6 +175,7 @@ rust::Vec<size_t> mut_u8_patch(
         rust::Slice<const uint8_t> from,
         rust::Slice<const uint8_t> to);
 
+uint32_t parse_uint32_hex(std::string_view s);
 int parse_int(std::string_view s);
 
 using thread_entry = void *(*)(void *);
