@@ -117,21 +117,23 @@ def rm(file):
     try:
         os.remove(file)
         vprint(f"rm {file}")
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
+    except FileNotFoundError as e:
+        pass
 
 
 def rm_on_error(func, path, _):
-    # Remove a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
-    # Clear the "read-only" and retry
-    os.chmod(path, stat.S_IWRITE)
-    os.unlink(path)
+    # Removing a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
+    # Clear the "read-only" bit and retry
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        os.unlink(path)
+    except FileNotFoundError as e:
+        pass
 
 
 def rm_rf(path):
     vprint(f"rm -rf {path}")
-    shutil.rmtree(path, ignore_errors=True, onerror=rm_on_error)
+    shutil.rmtree(path, ignore_errors=False, onerror=rm_on_error)
 
 
 def mkdir(path, mode=0o755):
@@ -249,7 +251,7 @@ def run_ndk_build(flags):
 
 def run_cargo(cmds, triple="aarch64-linux-android"):
     env = os.environ.copy()
-    env["PATH"] = f'{rust_bin}:{env["PATH"]}'
+    env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = op.join(rust_bin, "rustc" + EXE_EXT)
     env["RUSTFLAGS"] = "-Clinker-plugin-lto"
     env["TARGET_CC"] = op.join(llvm_bin, "clang" + EXE_EXT)
@@ -531,14 +533,16 @@ def setup_ndk(args):
     ndk_ver = config["ondkVersion"]
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
+    ondk_path = op.join(ndk_root, f"ondk-{ndk_ver}")
 
     header(f"* Downloading and extracting {ndk_archive}")
+    rm_rf(ondk_path)
     with urllib.request.urlopen(url) as response:
         with tarfile.open(mode="r|xz", fileobj=response) as tar:
             tar.extractall(ndk_root)
 
     rm_rf(ndk_path)
-    mv(op.join(ndk_root, f"ondk-{ndk_ver}"), ndk_path)
+    mv(ondk_path, ndk_path)
 
     header("* Patching static libs")
     for target in ["arm-linux-androideabi", "i686-linux-android"]:
