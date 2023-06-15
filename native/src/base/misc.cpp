@@ -70,38 +70,6 @@ int fork_no_orphan() {
     return 0;
 }
 
-mt19937_64 &get_rand(const void *seed_buf) {
-    static mt19937_64 gen([&] {
-        mt19937_64::result_type seed;
-        if (seed_buf == nullptr) {
-            int fd = xopen("/dev/urandom", O_RDONLY | O_CLOEXEC);
-            xxread(fd, &seed, sizeof(seed));
-            close(fd);
-        } else {
-            memcpy(&seed, seed_buf, sizeof(seed));
-        }
-        return seed;
-    }());
-    return gen;
-}
-
-int gen_rand_str(char *buf, int len, bool varlen) {
-    auto gen = get_rand();
-
-    if (len == 0)
-        return 0;
-    if (varlen) {
-        std::uniform_int_distribution<int> len_dist(len / 2, len);
-        len = len_dist(gen);
-    }
-    std::uniform_int_distribution<int> alphabet('a', 'z');
-    for (int i = 0; i < len - 1; ++i) {
-        buf[i] = static_cast<char>(alphabet(gen));
-    }
-    buf[len - 1] = '\0';
-    return len - 1;
-}
-
 int exec_command(exec_t &exec) {
     auto pipefd = array<int, 2>{-1, -1};
     int outfd = -1;

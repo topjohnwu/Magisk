@@ -251,8 +251,6 @@ void init_argv0(int argc, char **argv);
 void set_nice_name(const char *name);
 uint32_t binary_gcd(uint32_t u, uint32_t v);
 int switch_mnt_ns(int pid);
-std::mt19937_64 &get_rand(const void *seed_buf = nullptr);
-int gen_rand_str(char *buf, int len, bool varlen = true);
 std::string &replace_all(std::string &str, std::string_view from, std::string_view to);
 std::vector<std::string> split(std::string_view s, std::string_view delims);
 std::vector<std::string_view> split_view(std::string_view, std::string_view delims);

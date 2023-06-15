@@ -193,16 +193,14 @@ void app_notify(const su_context &ctx) {
 int app_request(const su_context &ctx) {
     // Create FIFO
     char fifo[64];
-    strcpy(fifo, "/dev/socket/");
-    gen_rand_str(fifo + 12, 32);
+    ssprintf(fifo, sizeof(fifo), "/dev/socket/magisk_su_request_%d", ctx.pid);
     mkfifo(fifo, 0600);
     chown(fifo, ctx.info->mgr_uid, ctx.info->mgr_uid);
     setfilecon(fifo, MAGISK_FILE_CON);
 
     // Send request
     vector<Extra> extras;
-    extras.reserve(3);
-    extras.emplace_back("fifo", fifo);
+    extras.reserve(2);
     extras.emplace_back("uid", ctx.info->eval_uid);
     extras.emplace_back("pid", ctx.pid);
     exec_cmd("request", extras, ctx.info, false);

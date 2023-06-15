@@ -190,17 +190,13 @@ static void extract_files(bool sbin) {
 }
 
 void MagiskInit::parse_config_file() {
-    uint64_t seed = 0;
     parse_prop_file("/data/.backup/.magisk", [&](auto key, auto value) -> bool {
         if (key == "PREINITDEVICE") {
             preinit_dev = value;
-        } else if (key == "RANDOMSEED") {
-            value.remove_prefix(2); // 0x
-            seed = parse_uint64_hex(value);
+            return false;
         }
         return true;
     });
-    get_rand(&seed);
 }
 
 #define ROOTMIR     MIRRDIR "/system_root"
