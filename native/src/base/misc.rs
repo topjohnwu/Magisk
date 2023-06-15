@@ -21,7 +21,7 @@ pub fn copy_cstr<T: AsRef<CStr> + ?Sized>(dest: &mut [u8], src: &T) -> usize {
     let src = src.as_ref().to_bytes_with_nul();
     let len = min(src.len(), dest.len());
     dest[..len].copy_from_slice(&src[..len]);
-    len
+    len - 1
 }
 
 struct BufFmtWriter<'a> {
@@ -68,7 +68,7 @@ macro_rules! bfmt {
 macro_rules! bfmt_cstr {
     ($buf:expr, $($args:tt)*) => {{
         let len = $crate::fmt_to_buf($buf, format_args!($($args)*));
-        #[allow(unused_unsafe)]
+        #[allow(unused_unsafe, clippy::unnecessary_mut_passed)]
         unsafe {
             $crate::Utf8CStr::from_bytes_unchecked($buf.get_unchecked(..(len + 1)))
         }
