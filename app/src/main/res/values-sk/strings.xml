@@ -46,7 +46,7 @@
     <string name="install_inactive_slot_msg">Vaše zariadenie bude po reštarte PRINÚTENÉ nabootovať do aktuálne neaktívneho slotu!\nTúto voľbu použite iba po skončení OTA.\nPokračovať?</string>
     <string name="setup_title">Ďalšie nastavenia</string>
     <string name="select_patch_file">Vybrať a zaplátať súbor</string>
-    <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar)</string>
+    <string name="patch_file_msg">Vyberte raw súbor (*.img) alebo tar súbor ODIN (*.tar) alebo payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Reštart o 5 sekúnd…</string>
     <string name="flash_screen_title">Inštalácia</string>
 
