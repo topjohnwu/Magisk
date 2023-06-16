@@ -46,7 +46,7 @@
     <string name="install_inactive_slot_msg">将在重启后强制切换到另一个槽位！注意只能在 OTA 更新完成后的重启之前使用。</string>
     <string name="setup_title">修复安装</string>
     <string name="select_patch_file">选择并修补一个文件</string>
-    <string name="patch_file_msg">选择一个原始映像文件（*.img）或一个 Odin 包（*.tar）</string>
+    <string name="patch_file_msg">选择一个原始映像文件（*.img）、Odin 包（*.tar）或 payload.bin（*.bin）</string>
     <string name="reboot_delay_toast">设备将在 5 秒后重启</string>
     <string name="flash_screen_title">安装</string>
 
