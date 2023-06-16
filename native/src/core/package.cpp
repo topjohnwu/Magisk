@@ -7,6 +7,7 @@
 #include "core.hpp"
 
 using namespace std;
+using rust::Vec;
 
 #define ENFORCE_SIGNATURE (!MAGISK_DEBUG)
 
@@ -21,13 +22,12 @@ static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
 static int mgr_app_id = -1;
 static string *mgr_pkg;
-static string *mgr_cert;
+static Vec<uint8_t> *mgr_cert;
 static int stub_apk_fd = -1;
-static const string *default_cert;
+static const Vec<uint8_t> *default_cert;
 
-static string read_certificate(int fd, int version) {
-    auto cert = rust::read_certificate(fd, version);
-    return string{cert.begin(), cert.end()};
+static bool operator==(const Vec<uint8_t> &a, const Vec<uint8_t> &b) {
+    return a.size() == b.size() && memcmp(a.data(), b.data(), a.size()) == 0;
 }
 
 void check_pkg_refresh() {
@@ -78,7 +78,7 @@ void preserve_stub_apk() {
     unlink(stub_path.data());
     auto cert = read_certificate(stub_apk_fd, -1);
     if (!cert.empty())
-        default_cert = new string(std::move(cert));
+        default_cert = new Vec(std::move(cert));
     lseek(stub_apk_fd, 0, SEEK_SET);
 }
 
