@@ -79,9 +79,9 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
             comment.foreach_props(|k, v| {
                 if k == "versionCode" {
                     apk_ver = v.trim().parse::<i32>().unwrap_or(0);
-                    true
-                } else {
                     false
+                } else {
+                    true
                 }
             });
             if version > apk_ver {
