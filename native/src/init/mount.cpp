@@ -265,7 +265,7 @@ void MagiskInit::setup_tmp(const char *path) {
     LOGD("Setup Magisk tmp at %s\n", path);
     chdir("/data");
 
-    xmkdir(INTLROOT, 0755);
+    xmkdir(INTLROOT, 0711);
     xmkdir(MIRRDIR, 0);
     xmkdir(BLOCKDIR, 0);
     xmkdir(WORKERDIR, 0);
