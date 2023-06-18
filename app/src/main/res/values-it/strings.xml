@@ -16,7 +16,7 @@
     <string name="loading">Caricamento…</string>
     <string name="update">Aggiorna</string>
     <string name="not_available">N/D</string>
-    <string name="hide">Hide</string>
+    <string name="hide">Nascondi</string>
     <string name="home_package">Pacchetto</string>
     <string name="home_app_title">App</string>
 
@@ -46,7 +46,7 @@
     <string name="install_inactive_slot_msg">Questo dispositivo verrà FORZATO ad avviarsi usando lo slot inattivo!\nUsa questo metodo solo dopo che un aggiornamento OTA è stato installato.\nVuoi continuare?</string>
     <string name="setup_title">Configurazione aggiuntiva</string>
     <string name="select_patch_file">Seleziona e aggiorna un file</string>
-    <string name="patch_file_msg">Seleziona un\'immagine in formato .img o un file ODIN .tar</string>
+    <string name="patch_file_msg">Seleziona un\'immagine in formato .img, un file .tar di ODIN o un file payload.bin</string>
     <string name="reboot_delay_toast">Riavvio fra 5 secondi…</string>
     <string name="flash_screen_title">Installazione</string>
 
@@ -113,6 +113,8 @@
     <string name="module_empty">Nessun modulo installato</string>
 
     <!--Settings -->
+    <string name="confirm_install">Vuoi installare il modulo %1$s?</string>
+    <string name="confirm_install_title">Conferma installazione</string>
     <string name="settings_dark_mode_title">Impostazioni tema</string>
     <string name="settings_dark_mode_message">Seleziona il tema che si adatta meglio al tuo stile!</string>
     <string name="settings_dark_mode_light">Chiaro</string>
@@ -217,6 +219,7 @@
     <string name="setup_fail">Configurazione fallita</string>
     <string name="env_fix_title">Configurazione aggiuntiva richiesta</string>
     <string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Vuoi procedere e riavviare il dispositivo?</string>
+    <string name="env_full_fix_msg">È necessario eseguire di nuovo il flash di Magisk per farlo funzionare correttamente. Reinstalla Magisk utilizzando l\'app, in modalità recovery non è possibile ottenere informazioni corrette sul dispositivo.</string>
     <string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
     <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
@@ -228,6 +231,7 @@
     <string name="unsupport_nonroot_stub_msg">Dal momento che i permessi di root sono stati persi, l\'app di Magisk nascosta non può più funzionare. Ripristina l\'APK originale.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Consenti l\'accesso alla memoria del dispositivo per abilitare questa opzione</string>
+    <string name="post_notifications_denied">Consenti l\'invio di notifiche per abilitare questa opzione</string>
     <string name="install_unknown_denied">Consenti l\'installazione di app sconosciute per abilitare questa funzionalità</string>
     <string name="add_shortcut_title">Aggiungi collegamento alla schermata iniziale</string>
     <string name="add_shortcut_msg">Dopo aver nascosto quest\'app, il suo nome e la sua icona potrebbero diventare difficili da riconoscere. Vuoi aggiungere una scorciatoia alla schermata principale?</string>
