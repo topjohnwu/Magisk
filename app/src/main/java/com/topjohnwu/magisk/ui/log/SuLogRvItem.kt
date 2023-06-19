@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.log
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.timeDateFormat
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.model.su.SuLog
@@ -14,7 +15,7 @@ class SuLogRvItem(val log: SuLog) : ObservableRvItem(), DiffItem<SuLogRvItem> {
 
     override val layoutRes = R.layout.item_log_access_md2
 
-    val date = log.time.toTime(timeDateFormat)
+    val info = genInfo()
 
     @get:Bindable
     var isTop = false
@@ -25,4 +26,28 @@ class SuLogRvItem(val log: SuLog) : ObservableRvItem(), DiffItem<SuLogRvItem> {
         set(value) = set(value, field, { field = it }, BR.bottom)
 
     override fun itemSameAs(other: SuLogRvItem) = log.appName == other.log.appName
+
+    private fun genInfo(): String {
+        val res = AppContext.resources
+        val sb = StringBuilder()
+        val date = log.time.toTime(timeDateFormat)
+        val toUid = res.getString(R.string.target_uid, log.toUid)
+        val fromPid = res.getString(R.string.pid, log.fromPid)
+        sb.append("$date\n$toUid  $fromPid")
+        if (log.target != -1) {
+            val pid = if (log.target == 0) "magiskd" else log.target.toString()
+            val target = res.getString(R.string.target_pid, pid)
+            sb.append("  $target")
+        }
+        if (log.context.isNotEmpty()) {
+            val context = res.getString(R.string.selinux_context, log.context)
+            sb.append("\n$context")
+        }
+        if (log.gids.isNotEmpty()) {
+            val gids = res.getString(R.string.supp_group, log.gids)
+            sb.append("\n$gids")
+        }
+        sb.append("\n${log.command}")
+        return sb.toString()
+    }
 }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-@Database(version = 1, entities = [SuLog::class], exportSchema = false)
+@Database(version = 2, entities = [SuLog::class], exportSchema = false)
 abstract class SuLogDatabase : RoomDatabase() {
 
     abstract fun suLogDao(): SuLogDao

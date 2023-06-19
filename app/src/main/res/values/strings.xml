@@ -88,6 +88,9 @@
     <string name="logs_cleared">Log successfully cleared</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_pid">Mount ns target PID: %s</string>
+    <string name="selinux_context">SELinux context: %s</string>
+    <string name="supp_group">Supplementary group: %s</string>
 
     <!--SafetyNet-->
 

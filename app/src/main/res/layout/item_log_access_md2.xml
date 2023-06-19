@@ -25,9 +25,9 @@
 
         <include
             android:id="@+id/log_track_container"
-            bullet="@{item.log.action ? R.drawable.ic_check_md2 : R.drawable.ic_close_md2}"
+            bullet="@{item.log.action == 2 ? R.drawable.ic_check_md2 : R.drawable.ic_close_md2}"
             isBottom="@{item.isBottom}"
-            isSelected="@{!item.log.action}"
+            isSelected="@{item.log.action != 2}"
             isTop="@{item.isTop}"
             layout="@layout/item_log_track_md2"
             android:layout_width="wrap_content"
@@ -54,48 +54,22 @@
                 android:text="@{item.log.appName}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/log_date"
+                app:layout_constraintBottom_toTopOf="@+id/log_info"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="@string/magisk" />
 
             <TextView
-                android:id="@+id/log_date"
+                android:id="@+id/log_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{item.date}"
+                android:text="@{item.info}"
                 android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintBottom_toTopOf="@+id/log_app_details"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/log_app_name"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="06:00 PM, 10 Oct 2019" />
-
-            <TextView
-                android:id="@+id/log_app_details"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@{String.format(`%s  %s`, @string/pid(item.log.fromPid), @string/target_uid(item.log.toUid))}"
-                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintBottom_toTopOf="@id/log_command"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/log_date"
-                tools:text="PID: 7196  Target UID: 0" />
-
-            <TextView
-                android:id="@+id/log_command"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:text="@{item.log.command}"
-                android:textAppearance="@style/AppearanceFoundation.Caption.Variant"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/log_app_details"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="/system/bin/sh" />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
