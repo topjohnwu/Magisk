@@ -32,27 +32,28 @@ class Extra {
     enum {
         INT,
         BOOL,
-        STRING
+        STRING,
+        INTLIST,
     } type;
     union {
         int int_val;
         bool bool_val;
         const char *str_val;
+        const vector<uint32_t> *intlist_val;
     };
     string str;
 public:
     Extra(const char *k, int v): key(k), type(INT), int_val(v) {}
     Extra(const char *k, bool v): key(k), type(BOOL), bool_val(v) {}
     Extra(const char *k, const char *v): key(k), type(STRING), str_val(v) {}
+    Extra(const char *k, const vector<uint32_t> *v): key(k), type(INTLIST), intlist_val(v) {}
 
     void add_intent(vector<const char *> &vec) {
-        char buf[32];
         const char *val;
         switch (type) {
         case INT:
             vec.push_back("--ei");
-            ssprintf(buf, sizeof(buf), "%d", int_val);
-            str = buf;
+            str = to_string(int_val);
             val = str.data();
             break;
         case BOOL:
@@ -62,6 +63,15 @@ public:
         case STRING:
             vec.push_back("--es");
             val = str_val;
+            break;
+        case INTLIST:
+            vec.push_back("--es");
+            for (auto i : *intlist_val) {
+                str += to_string(i);
+                str += ",";
+            }
+            if (!str.empty()) str.pop_back();
+            val = str.data();
             break;
         }
         vec.push_back(key);
@@ -92,6 +102,14 @@ public:
                 str += str_val;
             }
             break;
+        case INTLIST:
+            str += ":s:";
+            for (auto i : *intlist_val) {
+                str += to_string(i);
+                str += ",";
+            }
+            if (str.back() == ',') str.pop_back();
+            break;
         }
         vec.push_back("--extra");
         vec.push_back(str.data());
@@ -102,8 +120,10 @@ static bool check_no_error(int fd) {
     char buf[1024];
     auto out = xopen_file(fd, "r");
     while (fgets(buf, sizeof(buf), out.get())) {
-        if (strncmp(buf, "Error", 5) == 0)
+        if (strncasecmp(buf, "Error", 5) == 0) {
+            LOGD("exec_cmd: %s\n", buf);
             return false;
+        }
     }
     return true;
 }
@@ -163,11 +183,14 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 void app_log(const su_context &ctx) {
     if (fork_dont_care() == 0) {
         vector<Extra> extras;
-        extras.reserve(6);
+        extras.reserve(9);
         extras.emplace_back("from.uid", ctx.info->uid);
         extras.emplace_back("to.uid", static_cast<int>(ctx.req.uid));
         extras.emplace_back("pid", ctx.pid);
         extras.emplace_back("policy", ctx.info->access.policy);
+        extras.emplace_back("target", ctx.req.target);
+        extras.emplace_back("context", ctx.req.context.data());
+        extras.emplace_back("gids", &ctx.req.gids);
         extras.emplace_back("command", get_cmd(ctx.req));
         extras.emplace_back("notify", (bool) ctx.info->access.notify);
 

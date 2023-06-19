@@ -57,17 +57,20 @@ object SuCallbackHandler {
         val toUid = data.getIntComp("to.uid", -1)
         val pid = data.getIntComp("pid", -1)
         val command = data.getString("command", "")
+        val target = data.getIntComp("target", -1)
+        val seContext = data.getString("context", "")
+        val gids = data.getString("gids", "")
 
         val pm = context.packageManager
 
         val log = runCatching {
             pm.getPackageInfo(fromUid, pid)?.let {
-                pm.createSuLog(it, toUid, pid, command, policy)
+                pm.createSuLog(it, toUid, pid, command, policy, target, seContext, gids)
             }
-        }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy)
+        }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy, target, seContext, gids)
 
         if (notify)
-            notify(context, log.action, log.appName)
+            notify(context, log.action == SuPolicy.ALLOW, log.appName)
 
         runBlocking { ServiceLocator.logRepo.insert(log) }
     }
