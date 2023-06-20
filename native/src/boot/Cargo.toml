@@ -16,6 +16,6 @@ base = { path = "../base" }
 cxx = { path = "../external/cxx-rs" }
 byteorder = { workspace = true }
 anyhow = { workspace = true }
-clap = { workspace = true, features = ["derive"] }
 size = { workspace = true }
 quick-protobuf = { workspace = true }
+argh = { workspace = true }
