@@ -93,7 +93,7 @@ fn do_extract_boot_from_payload(
         Some(name) => manifest
             .partitions
             .iter()
-            .find(|p| p.partition_name.as_str() == &*name)
+            .find(|p| p.partition_name.as_str() == name)
             .ok_or(anyhow!("partition '{name}' not found"))?,
     };
 
