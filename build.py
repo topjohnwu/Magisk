@@ -506,19 +506,26 @@ def build_stub(args):
 
 
 def cleanup(args):
-    support_targets = {"native", "java"}
+    support_targets = {"native", "cpp", "rust", "java"}
     if args.target:
         args.target = set(args.target) & support_targets
+        if "native" in args.target:
+            args.target.add("cpp")
+            args.target.add("rust")
     else:
         args.target = support_targets
 
-    if "native" in args.target:
-        header("* Cleaning native")
+    if "cpp" in args.target:
+        header("* Cleaning C++")
         rm_rf(op.join("native", "libs"))
         rm_rf(op.join("native", "obj"))
         rm_rf(op.join("native", "out"))
+
+    if "rust" in args.target:
+        header("* Cleaning Rust")
         rm_rf(op.join("native", "src", "target"))
-        rm(op.join("native", "src", "boot", "update_metadata.rs"))
+        rm(op.join("native", "src", "boot", "proto", "mod.rs"))
+        rm(op.join("native", "src", "boot", "proto", "update_metadata.rs"))
         for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
             rm(rs_gen)
 
@@ -697,7 +704,7 @@ avd_patch_parser.set_defaults(func=patch_avd_ramdisk)
 
 clean_parser = subparsers.add_parser("clean", help="cleanup")
 clean_parser.add_argument(
-    "target", nargs="*", help="native, java, or empty to clean both"
+    "target", nargs="*", help="native, cpp, rust, java, or empty to clean all"
 )
 clean_parser.set_defaults(func=cleanup)
 
