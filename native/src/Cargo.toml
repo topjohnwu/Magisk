@@ -12,11 +12,11 @@ anyhow = "1.0"
 num-traits = "0.2"
 num-derive = "0.3"
 thiserror = "1.0"
-protobuf = "3.2.0"
-protobuf-codegen = "3.2.0"
 byteorder = "1"
 size = "0.4"
 clap = "4.3"
+pb-rs = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9", default-features = false }
+quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9" }
 
 [profile.dev]
 opt-level = "z"
