@@ -14,7 +14,7 @@ num-derive = "0.3"
 thiserror = "1.0"
 byteorder = "1"
 size = "0.4"
-clap = "4.3"
+argh = "0.1.10"
 pb-rs = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9" }
 quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9" }
 
