@@ -1,5 +1,6 @@
-use crate::gen::gen_cxx_binding;
 use pb_rs::{types::FileDescriptor, ConfigBuilder};
+
+use crate::gen::gen_cxx_binding;
 
 #[path = "../include/gen.rs"]
 mod gen;
