@@ -8,14 +8,14 @@ crate-type = ["staticlib"]
 path = "lib.rs"
 
 [build-dependencies]
-protobuf-codegen = { workspace = true }
 cxx-gen = { workspace = true }
+pb-rs = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
 cxx = { path = "../external/cxx-rs" }
-protobuf = { workspace = true }
 byteorder = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
 size = { workspace = true }
+quick-protobuf = { workspace = true }

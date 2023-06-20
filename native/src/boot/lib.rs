@@ -10,8 +10,8 @@ pub use ramdisk::*;
 
 mod cpio;
 mod payload;
+mod proto;
 mod ramdisk;
-mod update_metadata;
 
 #[cxx::bridge]
 pub mod ffi {
