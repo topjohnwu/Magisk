@@ -1,4 +1,3 @@
-use argh::{EarlyExit, FromArgs};
 use std::collections::BTreeMap;
 use std::ffi::CStr;
 use std::fmt::{Display, Formatter};
@@ -13,6 +12,7 @@ use std::slice;
 use anyhow::{anyhow, Context};
 use size::{Base, Size, Style};
 
+use argh::{EarlyExit, FromArgs};
 use base::libc::{
     c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, S_IFBLK, S_IFCHR, S_IFDIR,
     S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
@@ -308,7 +308,7 @@ impl Cpio {
 
     pub(crate) fn rm(&mut self, path: &str, recursive: bool) {
         let path = norm_path(path);
-        if let Some(_) = self.entries.remove(&path) {
+        if self.entries.remove(&path).is_some() {
             eprintln!("Removed entry [{}]", path);
         }
         if recursive {
@@ -462,14 +462,11 @@ impl Cpio {
     }
 
     fn ls(&self, path: &str, recursive: bool) {
-        let path = match norm_path(path) {
-            path => {
-                if path.is_empty() {
-                    path
-                } else {
-                    "/".to_string() + path.as_str()
-                }
-            }
+        let path = norm_path(path);
+        let path = if path.is_empty() {
+            path
+        } else {
+            "/".to_string() + path.as_str()
         };
         for (name, entry) in &self.entries {
             let p = "/".to_string() + name.as_str();
@@ -547,7 +544,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 continue;
             }
             let mut cli = match CpioCli::from_args(
-                &["magiskboot", "cpio", &*file],
+                &["magiskboot", "cpio", file],
                 cmd.split(' ')
                     .filter(|x| !x.is_empty())
                     .collect::<Vec<_>>()
@@ -582,7 +579,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 CpioCommands::Link(Link { src, dst }) => cpio.ln(src, dst),
                 CpioCommands::Add(Add { mode, path, file }) => cpio.add(mode, path, file)?,
                 CpioCommands::Extract(Extract { paths }) => {
-                    if paths.len() != 0 && paths.len() != 2 {
+                    if !paths.is_empty() && paths.len() != 2 {
                         return Err(anyhow!("invalid arguments"));
                     }
                     cpio.extract(
