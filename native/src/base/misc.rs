@@ -9,6 +9,8 @@ use std::{fmt, io, slice, str};
 use libc::c_char;
 use thiserror::Error;
 
+use crate::ffi;
+
 pub fn copy_str<T: AsRef<[u8]>>(dest: &mut [u8], src: T) -> usize {
     let src = src.as_ref();
     let len = min(src.len(), dest.len() - 1);
@@ -344,5 +346,15 @@ impl<T> LibcReturn for *const T {
 impl<T> LibcReturn for *mut T {
     fn is_error(&self) -> bool {
         self.is_null()
+    }
+}
+
+pub trait MutBytesExt {
+    fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize>;
+}
+
+impl<T: AsMut<[u8]>> MutBytesExt for T {
+    fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize> {
+        ffi::mut_u8_patch(self.as_mut(), from, to)
     }
 }

@@ -3,9 +3,11 @@
 
 pub use base;
 use cpio::*;
+use patch::*;
 use payload::*;
 
 mod cpio;
+mod patch;
 mod payload;
 // Suppress warnings in generated code
 #[allow(warnings)]
@@ -31,5 +33,6 @@ pub mod ffi {
         ) -> bool;
 
         unsafe fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool;
+        fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool;
     }
 }

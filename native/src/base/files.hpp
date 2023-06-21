@@ -58,7 +58,6 @@ bool frm_rf(int dirfd);
 
 } // extern "C"
 
-using rust::fd_path;
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
 void mv_path(const char *src, const char *dest);
 void mv_dir(int src, int dest);

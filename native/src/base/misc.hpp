@@ -6,6 +6,7 @@
 #include <string_view>
 #include <bitset>
 #include <random>
+#include <cxx.h>
 
 #include "xwrap.hpp"
 
@@ -195,7 +196,7 @@ struct byte_data : public byte_view {
     uint8_t *buf() { return _buf; }
 
     void swap(byte_data &o);
-    std::vector<size_t> patch(byte_view from, byte_view to);
+    rust::Vec<size_t> patch(byte_view from, byte_view to);
 };
 
 template<size_t N>
@@ -216,6 +217,11 @@ struct heap_data : public byte_data {
     // byte_channel needs to reallocate the internal buffer
     friend byte_channel;
 };
+
+rust::Vec<size_t> mut_u8_patch(
+        rust::Slice<uint8_t> buf,
+        rust::Slice<const uint8_t> from,
+        rust::Slice<const uint8_t> to);
 
 uint64_t parse_uint64_hex(std::string_view s);
 int parse_int(std::string_view s);

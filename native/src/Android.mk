@@ -111,7 +111,6 @@ LOCAL_STATIC_LIBRARIES := \
 LOCAL_SRC_FILES := \
     boot/main.cpp \
     boot/bootimg.cpp \
-    boot/hexpatch.cpp \
     boot/compress.cpp \
     boot/format.cpp \
     boot/dtb.cpp \
