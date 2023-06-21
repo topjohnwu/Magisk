@@ -18,10 +18,7 @@ mod ramdisk;
 pub mod ffi {
     unsafe extern "C++" {
         include!("compress.hpp");
-        include!("magiskboot.hpp");
         fn decompress(buf: &[u8], fd: i32) -> bool;
-        fn patch_encryption(buf: &mut [u8]) -> usize;
-        fn patch_verity(buf: &mut [u8]) -> usize;
     }
 
     #[namespace = "rust"]
@@ -34,5 +31,7 @@ pub mod ffi {
 
         unsafe fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool;
         fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool;
+        fn patch_encryption(buf: &mut [u8]) -> usize;
+        fn patch_verity(buf: &mut [u8]) -> usize;
     }
 }
