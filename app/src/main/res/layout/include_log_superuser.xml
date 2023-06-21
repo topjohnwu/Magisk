@@ -29,8 +29,13 @@
             tools:listitem="@layout/item_log_access_md2"
             tools:paddingTop="24dp" />
 
+        <ProgressBar
+            style="@style/WidgetFoundation.ProgressBar.Indeterminate"
+            goneUnless="@{viewModel.loading}"
+            android:layout_marginTop="@dimen/l1" />
+
         <FrameLayout
-            gone="@{!viewModel.items.empty}"
+            gone="@{viewModel.loading || !viewModel.items.empty}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
