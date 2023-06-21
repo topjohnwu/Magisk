@@ -92,4 +92,10 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
         navigation?.currentDestination?.getAction(actionId)?.let { navigation!!.navigate(this) }
     }
 
+    override fun onStop() {
+        if (this is MenuProvider) {
+            activity?.removeMenuProvider(this)
+        }
+        super.onStop()
+    }
 }
