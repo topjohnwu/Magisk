@@ -2,9 +2,9 @@
 #![feature(btree_drain_filter)]
 
 pub use base;
-use cpio::*;
-use patch::*;
-use payload::*;
+use cpio::cpio_commands;
+use patch::{hexpatch, patch_encryption, patch_verity};
+use payload::extract_boot_from_payload;
 
 mod cpio;
 mod patch;
@@ -21,6 +21,12 @@ pub mod ffi {
         fn decompress(buf: &[u8], fd: i32) -> bool;
     }
 
+    extern "Rust" {
+        fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool;
+        fn patch_encryption(buf: &mut [u8]) -> usize;
+        fn patch_verity(buf: &mut [u8]) -> usize;
+    }
+
     #[namespace = "rust"]
     extern "Rust" {
         unsafe fn extract_boot_from_payload(
@@ -30,8 +36,5 @@ pub mod ffi {
         ) -> bool;
 
         unsafe fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool;
-        fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool;
-        fn patch_encryption(buf: &mut [u8]) -> usize;
-        fn patch_verity(buf: &mut [u8]) -> usize;
     }
 }
