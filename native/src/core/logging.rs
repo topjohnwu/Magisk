@@ -212,11 +212,25 @@ enum LogFile<'a> {
     Actual(File),
 }
 
-impl LogFile<'_> {
-    fn as_write(&mut self) -> &mut dyn Write {
+impl Write for LogFile<'_> {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         match self {
-            Buffer(e) => e,
-            Actual(ref mut e) => e,
+            Buffer(e) => e.write(buf),
+            Actual(e) => e.write(buf),
+        }
+    }
+
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> io::Result<usize> {
+        match self {
+            Buffer(e) => e.write_vectored(bufs),
+            Actual(e) => e.write_vectored(bufs),
+        }
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        match self {
+            Buffer(e) => e.flush(),
+            Actual(e) => e.flush(),
         }
     }
 }
@@ -303,7 +317,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
             let io2 = IoSlice::new(msg);
             // We don't need to care the written len because we are writing less than PIPE_BUF
             // It's guaranteed to always write the whole thing atomically
-            let _ = logfile.as_write().write_vectored(&[io1, io2])?;
+            let _ = logfile.write_vectored(&[io1, io2])?;
         }
     }
 
