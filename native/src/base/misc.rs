@@ -4,7 +4,7 @@ use std::fmt::{Arguments, Debug, Display, Formatter};
 use std::ops::Deref;
 use std::path::Path;
 use std::str::Utf8Error;
-use std::{fmt, io, slice, str};
+use std::{fmt, io, mem, slice, str};
 
 use libc::c_char;
 use thiserror::Error;
@@ -141,7 +141,7 @@ impl Utf8CStr {
 
     #[inline]
     pub unsafe fn from_bytes_unchecked(buf: &[u8]) -> &Utf8CStr {
-        &*(buf as *const [u8] as *const Utf8CStr)
+        mem::transmute(buf)
     }
 
     pub unsafe fn from_ptr<'a>(ptr: *const c_char) -> Result<&'a Utf8CStr, StrErr> {
@@ -169,7 +169,8 @@ impl Utf8CStr {
 
     #[inline]
     pub fn as_cstr(&self) -> &CStr {
-        self.as_ref()
+        // SAFETY: Already validated as null terminated during construction
+        unsafe { CStr::from_bytes_with_nul_unchecked(&self.inner) }
     }
 }
 
@@ -178,7 +179,8 @@ impl Deref for Utf8CStr {
 
     #[inline]
     fn deref(&self) -> &str {
-        self.as_ref()
+        // SAFETY: Already UTF-8 validated during construction
+        unsafe { str::from_utf8_unchecked(self.as_bytes()) }
     }
 }
 
@@ -199,16 +201,14 @@ impl Debug for Utf8CStr {
 impl AsRef<CStr> for Utf8CStr {
     #[inline]
     fn as_ref(&self) -> &CStr {
-        // SAFETY: Already validated as null terminated during construction
-        unsafe { CStr::from_bytes_with_nul_unchecked(&self.inner) }
+        self.as_cstr()
     }
 }
 
 impl AsRef<str> for Utf8CStr {
     #[inline]
     fn as_ref(&self) -> &str {
-        // SAFETY: Already UTF-8 validated during construction
-        unsafe { str::from_utf8_unchecked(self.as_bytes()) }
+        self.deref()
     }
 }
 
@@ -312,38 +312,49 @@ where
     }
 }
 
-impl<T: Copy> FlatData for T {}
+macro_rules! impl_flat_data {
+    ($($t:ty)*) => ($(impl FlatData for $t {})*)
+}
 
-// Check libc return value and map errors to Result
-pub trait LibcReturn: Copy {
+impl_flat_data!(usize u8 u16 u32 u64 isize i8 i16 i32 i64);
+
+// Check libc return value and map to Result
+pub trait LibcReturn
+where
+    Self: Copy,
+{
     fn is_error(&self) -> bool;
     fn check_os_err(self) -> io::Result<Self> {
         if self.is_error() {
-            return Err(io::Error::last_os_error());
+            Err(io::Error::last_os_error())
+        } else {
+            Ok(self)
         }
-        Ok(self)
     }
 }
 
-impl LibcReturn for i32 {
-    fn is_error(&self) -> bool {
-        *self < 0
-    }
+macro_rules! impl_libc_return {
+    ($($t:ty)*) => ($(
+        impl LibcReturn for $t {
+            #[inline]
+            fn is_error(&self) -> bool {
+                *self < 0
+            }
+        }
+    )*)
 }
 
-impl LibcReturn for isize {
-    fn is_error(&self) -> bool {
-        *self < 0
-    }
-}
+impl_libc_return! { i8 i16 i32 i64 isize }
 
 impl<T> LibcReturn for *const T {
+    #[inline]
     fn is_error(&self) -> bool {
         self.is_null()
     }
 }
 
 impl<T> LibcReturn for *mut T {
+    #[inline]
     fn is_error(&self) -> bool {
         self.is_null()
     }
