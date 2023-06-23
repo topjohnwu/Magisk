@@ -299,6 +299,7 @@ abstract class MagiskInstallImpl protected constructor(
             // Enqueue the shell command first, or the subsequent FIFO open will block
             val future = arrayOf(
                 "cd $installDir",
+                "chmod -R 755 .",
                 "./magiskboot extract $fifo",
                 "cd /"
             ).eq()
