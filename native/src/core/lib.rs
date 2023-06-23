@@ -1,9 +1,12 @@
+#![feature(format_args_nl)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
-use daemon::*;
-use logging::*;
+use cert::read_certificate;
+use daemon::{daemon_entry, find_apk_path, get_magiskd, zygisk_entry, MagiskD};
+use logging::{android_logging, magisk_logging, zygisk_logging};
 
+mod cert;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
@@ -22,6 +25,7 @@ pub mod ffi {
         fn magisk_logging();
         fn zygisk_logging();
         fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize;
+        fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
     }
 
     #[namespace = "rust"]

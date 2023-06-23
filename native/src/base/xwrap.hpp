@@ -5,10 +5,6 @@
 #include <poll.h>
 #include <fcntl.h>
 
-#include "base-rs.hpp"
-
-using rust::xpipe2;
-
 extern "C" {
 
 FILE *xfopen(const char *pathname, const char *mode);

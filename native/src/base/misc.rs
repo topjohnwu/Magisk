@@ -9,6 +9,8 @@ use std::{fmt, io, slice, str};
 use libc::c_char;
 use thiserror::Error;
 
+use crate::ffi;
+
 pub fn copy_str<T: AsRef<[u8]>>(dest: &mut [u8], src: T) -> usize {
     let src = src.as_ref();
     let len = min(src.len(), dest.len() - 1);
@@ -288,26 +290,29 @@ pub unsafe fn slice_from_ptr_mut<'a, T>(buf: *mut T, len: usize) -> &'a mut [T] 
     }
 }
 
-pub trait FlatData {
-    fn as_raw_bytes(&self) -> &[u8]
-    where
-        Self: Sized,
-    {
+pub trait FlatData
+where
+    Self: Sized,
+{
+    fn as_raw_bytes(&self) -> &[u8] {
         unsafe {
             let self_ptr = self as *const Self as *const u8;
             slice::from_raw_parts(self_ptr, std::mem::size_of::<Self>())
         }
     }
-    fn as_raw_bytes_mut(&mut self) -> &mut [u8]
-    where
-        Self: Sized,
-    {
+    fn as_raw_bytes_mut(&mut self) -> &mut [u8] {
         unsafe {
             let self_ptr = self as *mut Self as *mut u8;
             slice::from_raw_parts_mut(self_ptr, std::mem::size_of::<Self>())
         }
     }
+
+    fn bytes_size(&self) -> usize {
+        std::mem::size_of::<Self>()
+    }
 }
+
+impl<T: Copy> FlatData for T {}
 
 // Check libc return value and map errors to Result
 pub trait LibcReturn: Copy {
@@ -341,5 +346,15 @@ impl<T> LibcReturn for *const T {
 impl<T> LibcReturn for *mut T {
     fn is_error(&self) -> bool {
         self.is_null()
+    }
+}
+
+pub trait MutBytesExt {
+    fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize>;
+}
+
+impl<T: AsMut<[u8]>> MutBytesExt for T {
+    fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize> {
+        ffi::mut_u8_patch(self.as_mut(), from, to)
     }
 }

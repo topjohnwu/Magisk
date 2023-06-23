@@ -46,7 +46,7 @@
     <string name="install_inactive_slot_msg">Pajisja juaj do të detyrohet të fillojë në folenë aktuale joaktive pas një rindezje!\nPërdoreni këtë opsion vetëm pasi të keni përfunduar OTA.\nVazhdo?</string>
     <string name="setup_title">Konfigurimet shtesë</string>
     <string name="select_patch_file">Zgjidhni dhe Patch një skader</string>
-    <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (*.img) ose një ODIN tar skader (*.tar)</string>
+    <string name="patch_file_msg">Zgjidhni një imazh të papërpunuar (*.img) ose një skedar ODIN (*.tar) ose një payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">Rinisje pas 5 sekondash…</string>
     <string name="flash_screen_title">Instalimi</string>
 

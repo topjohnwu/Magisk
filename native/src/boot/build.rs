@@ -1,4 +1,4 @@
-use protobuf_codegen::Customize;
+use pb_rs::{types::FileDescriptor, ConfigBuilder};
 
 use crate::gen::gen_cxx_binding;
 
@@ -6,14 +6,22 @@ use crate::gen::gen_cxx_binding;
 mod gen;
 
 fn main() {
-    println!("cargo:rerun-if-changed=update_metadata.proto");
-    protobuf_codegen::Codegen::new()
-        .pure()
-        .include(".")
-        .input("update_metadata.proto")
-        .customize(Customize::default().gen_mod_rs(false))
-        .out_dir(".")
-        .run_from_script();
+    println!("cargo:rerun-if-changed=proto/update_metadata.proto");
 
     gen_cxx_binding("boot-rs");
+
+    let cb = ConfigBuilder::new(
+        &["proto/update_metadata.proto"],
+        None,
+        Some(&"proto"),
+        &["."],
+    )
+    .unwrap();
+    FileDescriptor::run(
+        &cb.single_module(true)
+            .dont_use_cow(true)
+            .generate_getters(true)
+            .build(),
+    )
+    .unwrap();
 }

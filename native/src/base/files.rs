@@ -12,7 +12,7 @@ use std::{io, mem, ptr, slice};
 
 use libc::{c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
 
-use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, LibcReturn, Utf8CStr};
+use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, FlatData, LibcReturn, Utf8CStr};
 
 pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
     unsafe {
@@ -101,6 +101,7 @@ pub fn mkdirs(path: &Utf8CStr, mode: mode_t) -> io::Result<()> {
 
 pub trait ReadExt {
     fn skip(&mut self, len: usize) -> io::Result<()>;
+    fn read_flat_data<F: FlatData>(&mut self, data: &mut F) -> io::Result<()>;
 }
 
 impl<T: Read> ReadExt for T {
@@ -113,6 +114,10 @@ impl<T: Read> ReadExt for T {
             len -= l;
         }
         Ok(())
+    }
+
+    fn read_flat_data<F: FlatData>(&mut self, data: &mut F) -> io::Result<()> {
+        self.read_exact(data.as_raw_bytes_mut())
     }
 }
 
@@ -162,7 +167,7 @@ impl<T: BufRead> BufReadExt for T {
                 return true;
             }
             if let Some((key, value)) = line.split_once('=') {
-                return f(key, value);
+                return f(key.trim(), value.trim());
             }
             true
         });

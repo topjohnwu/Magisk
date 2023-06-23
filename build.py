@@ -117,21 +117,23 @@ def rm(file):
     try:
         os.remove(file)
         vprint(f"rm {file}")
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
+    except FileNotFoundError as e:
+        pass
 
 
 def rm_on_error(func, path, _):
-    # Remove a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
-    # Clear the "read-only" and retry
-    os.chmod(path, stat.S_IWRITE)
-    os.unlink(path)
+    # Removing a read-only file on Windows will get "WindowsError: [Error 5] Access is denied"
+    # Clear the "read-only" bit and retry
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        os.unlink(path)
+    except FileNotFoundError as e:
+        pass
 
 
 def rm_rf(path):
     vprint(f"rm -rf {path}")
-    shutil.rmtree(path, ignore_errors=True, onerror=rm_on_error)
+    shutil.rmtree(path, ignore_errors=False, onerror=rm_on_error)
 
 
 def mkdir(path, mode=0o755):
@@ -249,7 +251,7 @@ def run_ndk_build(flags):
 
 def run_cargo(cmds, triple="aarch64-linux-android"):
     env = os.environ.copy()
-    env["PATH"] = f'{rust_bin}:{env["PATH"]}'
+    env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = op.join(rust_bin, "rustc" + EXE_EXT)
     env["RUSTFLAGS"] = "-Clinker-plugin-lto"
     env["TARGET_CC"] = op.join(llvm_bin, "clang" + EXE_EXT)
@@ -555,19 +557,26 @@ def build_stub(args):
 
 
 def cleanup(args):
-    support_targets = {"native", "java"}
+    support_targets = {"native", "cpp", "rust", "java"}
     if args.target:
         args.target = set(args.target) & support_targets
+        if "native" in args.target:
+            args.target.add("cpp")
+            args.target.add("rust")
     else:
         args.target = support_targets
 
-    if "native" in args.target:
-        header("* Cleaning native")
+    if "cpp" in args.target:
+        header("* Cleaning C++")
         rm_rf(op.join("native", "libs"))
         rm_rf(op.join("native", "obj"))
         rm_rf(op.join("native", "out"))
+
+    if "rust" in args.target:
+        header("* Cleaning Rust")
         rm_rf(op.join("native", "src", "target"))
-        rm(op.join("native", "src", "boot", "update_metadata.rs"))
+        rm(op.join("native", "src", "boot", "proto", "mod.rs"))
+        rm(op.join("native", "src", "boot", "proto", "update_metadata.rs"))
         for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
             rm(rs_gen)
 
@@ -582,14 +591,16 @@ def setup_ndk(args):
     ndk_ver = config["ondkVersion"]
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
+    ondk_path = op.join(ndk_root, f"ondk-{ndk_ver}")
 
     header(f"* Downloading and extracting {ndk_archive}")
+    rm_rf(ondk_path)
     with urllib.request.urlopen(url) as response:
         with tarfile.open(mode="r|xz", fileobj=response) as tar:
             tar.extractall(ndk_root)
 
     rm_rf(ndk_path)
-    mv(op.join(ndk_root, f"ondk-{ndk_ver}"), ndk_path)
+    mv(ondk_path, ndk_path)
 
     header("* Patching static libs")
     for target in ["arm-linux-androideabi", "i686-linux-android"]:
@@ -747,7 +758,7 @@ avd_patch_parser.set_defaults(func=patch_avd_ramdisk)
 
 clean_parser = subparsers.add_parser("clean", help="cleanup")
 clean_parser.add_argument(
-    "target", nargs="*", help="native, java, or empty to clean both"
+    "target", nargs="*", help="native, cpp, rust, java, or empty to clean all"
 )
 clean_parser.set_defaults(func=cleanup)
 

@@ -60,32 +60,7 @@ Supported actions:
   cpio <incpio> [commands...]
     Do cpio commands to <incpio> (modifications are done in-place)
     Each command is a single argument, add quotes for each command.
-    Supported commands:
-      exists ENTRY
-        Return 0 if ENTRY exists, else return 1
-      rm [-r] ENTRY
-        Remove ENTRY, specify [-r] to remove recursively
-      mkdir MODE ENTRY
-        Create directory ENTRY in permissions MODE
-      ln TARGET ENTRY
-        Create a symlink to TARGET with the name ENTRY
-      mv SOURCE DEST
-        Move SOURCE to DEST
-      add MODE ENTRY INFILE
-        Add INFILE as ENTRY in permissions MODE; replaces ENTRY if exists
-      extract [ENTRY OUT]
-        Extract ENTRY to OUT, or extract all entries to current directory
-      test
-        Test the cpio's status
-        Return value is 0 or bitwise or-ed of following values:
-        0x1:Magisk    0x2:unsupported    0x4:Sony
-      patch
-        Apply ramdisk patches
-        Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
-      backup ORIG
-        Create ramdisk backups from ORIG
-      restore
-        Restore ramdisk from ramdisk backup stored within incpio
+    See "cpio <incpio> --help" for supported commands.
 
   dtb <file> <action> [args...]
     Do dtb related actions to <file>
@@ -200,7 +175,7 @@ int main(int argc, char *argv[]) {
     } else if (argc > 2 && str_starts(action, "compress")) {
         compress(action[8] == '=' ? &action[9] : "gzip", argv[2], argv[3]);
     } else if (argc > 4 && action == "hexpatch") {
-        return hexpatch(argv[2], argv[3], argv[4]);
+        return hexpatch(byte_view(argv[2]), byte_view(argv[3]), byte_view(argv[4])) ? 0 : 1;
     } else if (argc > 2 && action == "cpio"sv) {
         if (!rust::cpio_commands(argc - 2, argv + 2))
             usage(argv[0]);

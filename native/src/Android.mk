@@ -25,7 +25,6 @@ LOCAL_SRC_FILES := \
     core/socket.cpp \
     core/db.cpp \
     core/package.cpp \
-    core/cert.cpp \
     core/scripting.cpp \
     core/restorecon.cpp \
     core/module.cpp \
@@ -112,11 +111,9 @@ LOCAL_STATIC_LIBRARIES := \
 LOCAL_SRC_FILES := \
     boot/main.cpp \
     boot/bootimg.cpp \
-    boot/hexpatch.cpp \
     boot/compress.cpp \
     boot/format.cpp \
     boot/dtb.cpp \
-    boot/pattern.cpp \
     boot/boot-rs.cpp
 
 include $(BUILD_EXECUTABLE)

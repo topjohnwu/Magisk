@@ -7,6 +7,7 @@
 #include "core.hpp"
 
 using namespace std;
+using rust::Vec;
 
 #define ENFORCE_SIGNATURE (!MAGISK_DEBUG)
 
@@ -21,9 +22,13 @@ static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
 static int mgr_app_id = -1;
 static string *mgr_pkg;
-static string *mgr_cert;
+static Vec<uint8_t> *mgr_cert;
 static int stub_apk_fd = -1;
-static const string *default_cert;
+static const Vec<uint8_t> *default_cert;
+
+static bool operator==(const Vec<uint8_t> &a, const Vec<uint8_t> &b) {
+    return a.size() == b.size() && memcmp(a.data(), b.data(), a.size()) == 0;
+}
 
 void check_pkg_refresh() {
     struct stat st{};
@@ -71,7 +76,9 @@ void preserve_stub_apk() {
     string stub_path = MAGISKTMP + "/stub.apk";
     stub_apk_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
     unlink(stub_path.data());
-    default_cert = new string(read_certificate(stub_apk_fd));
+    auto cert = read_certificate(stub_apk_fd, -1);
+    if (!cert.empty())
+        default_cert = new Vec(std::move(cert));
     lseek(stub_apk_fd, 0, SEEK_SET);
 }
 
@@ -107,7 +114,8 @@ int get_manager(int user_id, string *pkg, bool install) {
             LOGW("pkg: no dyn APK, ignore\n");
             return false;
         }
-        bool mismatch = default_cert && read_certificate(dyn, MAGISK_VER_CODE) != *default_cert;
+        auto cert = read_certificate(dyn, MAGISK_VER_CODE);
+        bool mismatch = default_cert && cert != *default_cert;
         close(dyn);
         if (mismatch) {
             LOGE("pkg: dyn APK signature mismatch: %s\n", app_path);
@@ -172,12 +180,12 @@ int get_manager(int user_id, string *pkg, bool install) {
                     byte_array<PATH_MAX> apk;
                     find_apk_path(byte_view(str[SU_MANAGER]), apk);
                     int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
-                    string cert = read_certificate(fd);
+                    auto cert = read_certificate(fd, -1);
                     close(fd);
 
                     // Verify validity
                     if (str[SU_MANAGER] == *mgr_pkg) {
-                        if (app_id != mgr_app_id || cert != *mgr_cert) {
+                        if (app_id != mgr_app_id || cert.empty() || cert != *mgr_cert) {
                             // app ID or cert should never change
                             LOGE("pkg: repackaged APK signature invalid: %s\n", apk.buf());
                             uninstall_pkg(mgr_pkg->data());
@@ -226,7 +234,7 @@ int get_manager(int user_id, string *pkg, bool install) {
                 byte_array<PATH_MAX> apk;
                 find_apk_path(byte_view(JAVA_PACKAGE_NAME), apk);
                 int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
-                string cert = read_certificate(fd, MAGISK_VER_CODE);
+                auto cert = read_certificate(fd, MAGISK_VER_CODE);
                 close(fd);
                 if (default_cert && cert != *default_cert) {
                     // Found APK with invalid signature, force replace with stub

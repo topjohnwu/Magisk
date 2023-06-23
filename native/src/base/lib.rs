@@ -26,6 +26,11 @@ pub mod ffi {
         Debug,
     }
 
+    unsafe extern "C++" {
+        include!("misc.hpp");
+        fn mut_u8_patch(buf: &mut [u8], from: &[u8], to: &[u8]) -> Vec<usize>;
+    }
+
     extern "Rust" {
         fn log_with_rs(level: LogLevel, msg: &[u8]);
         fn exit_on_error(b: bool);

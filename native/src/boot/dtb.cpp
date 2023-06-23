@@ -8,6 +8,7 @@
 #include "magiskboot.hpp"
 #include "dtb.hpp"
 #include "format.hpp"
+#include "boot-rs.hpp"
 
 using namespace std;
 

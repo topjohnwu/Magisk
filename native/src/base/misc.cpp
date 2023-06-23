@@ -32,8 +32,8 @@ void byte_data::swap(byte_data &o) {
     std::swap(_sz, o._sz);
 }
 
-vector<size_t> byte_data::patch(byte_view from, byte_view to) {
-    vector<size_t> v;
+rust::Vec<size_t> byte_data::patch(byte_view from, byte_view to) {
+    rust::Vec<size_t> v;
     if (_buf == nullptr)
         return v;
     auto p = _buf;
@@ -48,6 +48,14 @@ vector<size_t> byte_data::patch(byte_view from, byte_view to) {
         p += from.sz();
     }
     return v;
+}
+
+rust::Vec<size_t> mut_u8_patch(
+        rust::Slice<uint8_t> buf,
+        rust::Slice<const uint8_t> from,
+        rust::Slice<const uint8_t> to) {
+    byte_data data(buf);
+    return data.patch(from, to);
 }
 
 int fork_dont_care() {

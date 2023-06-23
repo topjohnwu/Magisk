@@ -7,7 +7,7 @@ use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
 use base::Utf8CStr;
 
 use crate::cpio::{Cpio, CpioEntry};
-use crate::ffi::{patch_encryption, patch_verity};
+use crate::patch::{patch_encryption, patch_verity};
 
 pub trait MagiskCpio {
     fn patch(&mut self);

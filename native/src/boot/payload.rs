@@ -4,15 +4,15 @@ use std::os::fd::{AsRawFd, FromRawFd};
 
 use anyhow::{anyhow, Context};
 use byteorder::{BigEndian, ReadBytesExt};
-use protobuf::{EnumFull, Message};
+use quick_protobuf::{BytesReader, MessageRead};
 
 use base::libc::c_char;
 use base::{ReadSeekExt, StrErr, Utf8CStr};
 use base::{ResultExt, WriteExt};
 
 use crate::ffi;
-use crate::update_metadata::install_operation::Type;
-use crate::update_metadata::DeltaArchiveManifest;
+use crate::proto::update_metadata::mod_InstallOperation::Type;
+use crate::proto::update_metadata::DeltaArchiveManifest;
 
 macro_rules! bad_payload {
     ($msg:literal) => {
@@ -64,42 +64,43 @@ fn do_extract_boot_from_payload(
     let manifest = {
         let manifest = &mut buf[..manifest_len];
         reader.read_exact(manifest)?;
-        DeltaArchiveManifest::parse_from_bytes(manifest)?
+        let mut br = BytesReader::from_bytes(manifest);
+        DeltaArchiveManifest::from_reader(&mut br, manifest)?
     };
-    if !manifest.has_minor_version() || manifest.minor_version() != 0 {
+    if manifest.get_minor_version() != 0 {
         return Err(bad_payload!(
             "delta payloads are not supported, please use a full payload file"
         ));
     }
 
-    let block_size = manifest.block_size() as u64;
+    let block_size = manifest.get_block_size() as u64;
 
     let partition = match partition_name {
         None => {
             let boot = manifest
                 .partitions
                 .iter()
-                .find(|p| p.partition_name() == "init_boot");
+                .find(|p| p.partition_name == "init_boot");
             let boot = match boot {
                 Some(boot) => Some(boot),
                 None => manifest
                     .partitions
                     .iter()
-                    .find(|p| p.partition_name() == "boot"),
+                    .find(|p| p.partition_name == "boot"),
             };
             boot.ok_or(anyhow!("boot partition not found"))?
         }
         Some(name) => manifest
             .partitions
             .iter()
-            .find(|p| p.partition_name() == name)
+            .find(|p| p.partition_name.as_str() == name)
             .ok_or(anyhow!("partition '{name}' not found"))?,
     };
 
     let out_str: String;
     let out_path = match out_path {
         None => {
-            out_str = format!("{}.img", partition.partition_name());
+            out_str = format!("{}.img", partition.partition_name);
             out_str.as_str()
         }
         Some(s) => s,
@@ -126,11 +127,7 @@ fn do_extract_boot_from_payload(
             .data_offset
             .ok_or(bad_payload!("data offset not found"))?;
 
-        let data_type = operation
-            .type_
-            .ok_or(bad_payload!("operation type not found"))?
-            .enum_value()
-            .map_err(|_| bad_payload!("operation type not valid"))?;
+        let data_type = operation.type_pb;
 
         buf.resize(data_len, 0u8);
         let data = &mut buf[..data_len];
@@ -171,12 +168,7 @@ fn do_extract_boot_from_payload(
                     return Err(bad_payload!("decompression failed"));
                 }
             }
-            _ => {
-                return Err(bad_payload!(
-                    "unsupported operation type: {}",
-                    data_type.descriptor().name()
-                ));
-            }
+            _ => return Err(bad_payload!("unsupported operation type")),
         };
     }
 
