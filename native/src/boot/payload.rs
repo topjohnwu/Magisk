@@ -171,7 +171,7 @@ fn do_extract_boot_from_payload(
                 if !ffi::decompress(data, out_file.as_raw_fd()) {
                     return Err(bad_payload!("decompression failed"));
                 }
-            }
+            },
             _ => return Err(bad_payload!("unsupported operation type")),
         };
     }

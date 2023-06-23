@@ -424,6 +424,8 @@ dependencies = [
  "cxx-gen",
  "num-derive",
  "num-traits",
+ "pb-rs",
+ "quick-protobuf",
 ]
 
 [[package]]

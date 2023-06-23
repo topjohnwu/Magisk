@@ -17,17 +17,6 @@ LOCAL_SRC_FILES := \
     xz-embedded/xz_dec_stream.c
 include $(BUILD_STATIC_LIBRARY)
 
-# libnanopb.a
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libnanopb
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/nanopb
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_SRC_FILES := \
-    nanopb/pb_common.c \
-    nanopb/pb_decode.c \
-    nanopb/pb_encode.c
-include $(BUILD_STATIC_LIBRARY)
-
 # libfdt.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libfdt

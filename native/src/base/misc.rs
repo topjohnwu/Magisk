@@ -83,14 +83,14 @@ macro_rules! bfmt_cstr {
 
 #[macro_export]
 macro_rules! cstr {
-    ($str:literal) => {{
+    ($($str:tt)*) => {{
         assert!(
-            !$str.bytes().any(|b| b == b'\0'),
+            !($($str)*).bytes().any(|b| b == b'\0'),
             "cstr argument contains embedded NUL bytes",
         );
         #[allow(unused_unsafe)]
         unsafe {
-            $crate::Utf8CStr::from_bytes_unchecked(concat!($str, "\0").as_bytes())
+            $crate::Utf8CStr::from_bytes_unchecked(concat!($($str)*, "\0").as_bytes())
         }
     }};
 }

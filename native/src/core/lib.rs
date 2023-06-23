@@ -5,18 +5,26 @@ use base::Utf8CStr;
 use cert::read_certificate;
 use daemon::{daemon_entry, find_apk_path, get_magiskd, zygisk_entry, MagiskD};
 use logging::{android_logging, magisk_logging, zygisk_logging};
+use resetprop::persist::{
+    persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop,
+};
 
 mod cert;
 #[path = "../include/consts.rs"]
 mod consts;
 mod daemon;
 mod logging;
+mod resetprop;
 
 #[cxx::bridge]
 pub mod ffi {
     extern "C++" {
+        pub type prop_cb;
         include!("resetprop/resetprop.hpp");
-        unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
+        include!("../base/files.hpp");
+        pub unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
+        pub unsafe fn prop_cb_exec(cb: *mut prop_cb, name: *const c_char, value: *const c_char);
+        pub unsafe fn clone_attr(src: *const c_char, dst: *const c_char);
     }
 
     extern "Rust" {
@@ -26,6 +34,10 @@ pub mod ffi {
         fn zygisk_logging();
         fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize;
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
+        unsafe fn persist_get_prop(name: *const c_char, prop_cb: *mut prop_cb);
+        unsafe fn persist_get_props(prop_cb: *mut prop_cb);
+        unsafe fn persist_delete_prop(name: *const c_char) -> bool;
+        unsafe fn persist_set_prop(name: *const c_char, value: *const c_char) -> bool;
     }
 
     #[namespace = "rust"]
