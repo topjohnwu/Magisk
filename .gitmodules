@@ -16,9 +16,6 @@
 [submodule "xz"]
 	path = native/src/external/xz
 	url = https://github.com/xz-mirror/xz.git
-[submodule "nanopb"]
-	path = native/src/external/nanopb
-	url = https://github.com/nanopb/nanopb.git
 [submodule "pcre"]
 	path = native/src/external/pcre
 	url = https://android.googlesource.com/platform/external/pcre

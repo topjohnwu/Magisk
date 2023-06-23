@@ -345,6 +345,27 @@ impl Directory {
         })?;
         Ok(())
     }
+
+    pub fn for_all_file<F: FnMut(&DirEntry) -> io::Result<WalkResult>>(
+        &mut self,
+        mut f: F,
+    ) -> io::Result<WalkResult> {
+        use WalkResult::*;
+        loop {
+            match self.read()? {
+                None => return Ok(Continue),
+                Some(ref e) => {
+                    if e.is_dir() {
+                        return Ok(Continue);
+                    }
+                    match f(e)? {
+                        Abort | Skip => return Ok(Continue),
+                        Continue => {}
+                    }
+                }
+            }
+        }
+    }
 }
 
 impl Directory {
