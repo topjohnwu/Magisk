@@ -483,7 +483,11 @@ pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8
         fn ioctl(fd: RawFd, request: u32, ...) -> i32;
     }
 
+    #[cfg(target_pointer_width = "64")]
     const BLKGETSIZE64: u32 = 0x80081272;
+
+    #[cfg(target_pointer_width = "32")]
+    const BLKGETSIZE64: u32 = 0x80041272;
 
     let flag = if rw { O_RDWR } else { O_RDONLY };
     let f = File::from(open_fd!(path, flag | O_CLOEXEC)?);
