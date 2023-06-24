@@ -19,9 +19,6 @@
 [submodule "nanopb"]
 	path = native/src/external/nanopb
 	url = https://github.com/nanopb/nanopb.git
-[submodule "mincrypt"]
-	path = native/src/external/mincrypt
-	url = https://github.com/topjohnwu/mincrypt.git
 [submodule "pcre"]
 	path = native/src/external/pcre
 	url = https://android.googlesource.com/platform/external/pcre

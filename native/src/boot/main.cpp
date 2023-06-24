@@ -1,4 +1,3 @@
-#include <mincrypt/sha.h>
 #include <base.hpp>
 
 #include "boot-rs.hpp"
@@ -134,10 +133,8 @@ int main(int argc, char *argv[]) {
         unlink(RECV_DTBO_FILE);
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
-        uint8_t sha1[SHA_DIGEST_SIZE];
         mmap_data m(argv[2]);
-        SHA_hash(m.buf(), m.sz(), sha1);
-        for (uint8_t i : sha1)
+        for (auto i : sha_digest(byte_view(m.buf(), m.sz()), true))
             printf("%02x", i);
         printf("\n");
     } else if (argc > 2 && action == "split") {
