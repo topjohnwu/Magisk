@@ -112,9 +112,11 @@ ui_print "- Checking ramdisk status"
 if [ -e ramdisk.cpio ]; then
   ./magiskboot cpio ramdisk.cpio test
   STATUS=$?
+  SKIP_BACKUP=""
 else
   # Stock A only legacy SAR, or some Android 13 GKIs
   STATUS=0
+  SKIP_BACKUP="#"
 fi
 case $((STATUS & 3)) in
   0 )  # Stock boot
@@ -193,7 +195,7 @@ fi
 "$SKIP64 add 0644 overlay.d/sbin/magisk64.xz magisk64.xz" \
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
 "patch" \
-"backup ramdisk.cpio.orig" \
+"$SKIP_BACKUP backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config" \
 || abort "! Unable to patch ramdisk"
