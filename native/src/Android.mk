@@ -14,7 +14,6 @@ LOCAL_STATIC_LIBRARIES := \
     libsystemproperties \
     libphmap \
     liblsplt \
-    libmincrypt \
     libmagisk-rs
 
 LOCAL_SRC_FILES := \
@@ -99,7 +98,6 @@ LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
     libcompat \
-    libmincrypt \
     liblzma \
     liblz4 \
     libbz2 \

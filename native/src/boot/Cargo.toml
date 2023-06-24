@@ -18,3 +18,6 @@ byteorder = { workspace = true }
 size = { workspace = true }
 quick-protobuf = { workspace = true }
 argh = { workspace = true }
+sha1 = { workspace = true }
+sha2 = { workspace = true }
+digest = { workspace = true }

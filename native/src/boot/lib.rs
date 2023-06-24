@@ -5,6 +5,7 @@ pub use base;
 use cpio::cpio_commands;
 use patch::{hexpatch, patch_encryption, patch_verity};
 use payload::extract_boot_from_payload;
+use sha::{get_sha, sha_digest, SHA};
 
 mod cpio;
 mod patch;
@@ -13,6 +14,7 @@ mod payload;
 #[allow(warnings)]
 mod proto;
 mod ramdisk;
+mod sha;
 
 #[cxx::bridge]
 pub mod ffi {
@@ -36,5 +38,13 @@ pub mod ffi {
         ) -> bool;
 
         unsafe fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool;
+    }
+
+    extern "Rust" {
+        type SHA;
+        fn get_sha(use_sha1: bool) -> Box<SHA>;
+        fn finalize(&mut self) -> Vec<u8>;
+        fn update(&mut self, data: &[u8]);
+        fn sha_digest(data: &[u8], use_sha1: bool) -> Vec<u8>;
     }
 }

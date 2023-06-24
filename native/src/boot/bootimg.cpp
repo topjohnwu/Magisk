@@ -2,10 +2,9 @@
 #include <memory>
 
 #include <libfdt.h>
-#include <mincrypt/sha.h>
-#include <mincrypt/sha256.h>
 #include <base.hpp>
 
+#include "boot-rs.hpp"
 #include "bootimg.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
@@ -13,6 +12,8 @@
 using namespace std;
 
 #define PADDING 15
+#define SHA256_DIGEST_SIZE 32
+#define SHA_DIGEST_SIZE 20
 
 static void decompress(format_t type, int fd, const void *in, size_t size) {
     auto ptr = get_decoder(type, make_unique<fd_channel>(fd));
@@ -749,35 +750,35 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
     // Update checksum
     if (char *id = hdr->id()) {
-        HASH_CTX ctx;
-        boot.flags[SHA256_FLAG] ? SHA256_init(&ctx) : SHA_init(&ctx);
+        auto ctx = get_sha(!boot.flags[SHA256_FLAG]);
         uint32_t size = hdr->kernel_size();
-        HASH_update(&ctx, out.buf() + off.kernel, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        ctx->update(byte_view(out.buf() + off.kernel, size));
+        ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->ramdisk_size();
-        HASH_update(&ctx, out.buf() + off.ramdisk, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        ctx->update(byte_view(out.buf() + off.ramdisk, size));
+        ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->second_size();
-        HASH_update(&ctx, out.buf() + off.second, size);
-        HASH_update(&ctx, &size, sizeof(size));
+        ctx->update(byte_view(out.buf() + off.second, size));
+        ctx->update(byte_view(&size, sizeof(size)));
         size = hdr->extra_size();
         if (size) {
-            HASH_update(&ctx, out.buf() + off.extra, size);
-            HASH_update(&ctx, &size, sizeof(size));
+            ctx->update(byte_view(out.buf() + off.extra, size));
+            ctx->update(byte_view(&size, sizeof(size)));
         }
         uint32_t ver = hdr->header_version();
         if (ver == 1 || ver == 2) {
             size = hdr->recovery_dtbo_size();
-            HASH_update(&ctx, out.buf() + hdr->recovery_dtbo_offset(), size);
-            HASH_update(&ctx, &size, sizeof(size));
+            ctx->update(byte_view(out.buf() + hdr->recovery_dtbo_offset(), size));
+            ctx->update(byte_view(&size, sizeof(size)));
         }
         if (ver == 2) {
             size = hdr->dtb_size();
-            HASH_update(&ctx, out.buf() + off.dtb, size);
-            HASH_update(&ctx, &size, sizeof(size));
+            ctx->update(byte_view(out.buf() + off.dtb, size));
+            ctx->update(byte_view(&size, sizeof(size)));
         }
         memset(id, 0, BOOT_ID_SIZE);
-        memcpy(id, HASH_final(&ctx), boot.flags[SHA256_FLAG] ? SHA256_DIGEST_SIZE : SHA_DIGEST_SIZE);
+        auto digest = ctx->finalize();
+        memcpy(id, digest.data(), digest.size());
     }
 
     // Print new header info
@@ -808,7 +809,8 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         auto d_hdr = reinterpret_cast<dhtb_hdr *>(out.buf());
         memcpy(d_hdr, DHTB_MAGIC, 8);
         d_hdr->size = off.total - sizeof(dhtb_hdr);
-        SHA256_hash(out.buf() + sizeof(dhtb_hdr), d_hdr->size, d_hdr->checksum);
+        auto checksum = sha_digest(byte_view(out.buf() + sizeof(dhtb_hdr), d_hdr->size), false);
+        memcpy(d_hdr->checksum, checksum.data(), checksum.size());
     } else if (boot.flags[BLOB_FLAG]) {
         // Blob header
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf());
