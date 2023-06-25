@@ -5,7 +5,7 @@ import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
@@ -34,7 +34,7 @@ class FlashViewModel : BaseViewModel() {
 
     private val _state = MutableLiveData(State.FLASHING)
     val state: LiveData<State> get() = _state
-    val flashing = Transformations.map(state) { it == State.FLASHING }
+    val flashing = state.map { it == State.FLASHING }
 
     @get:Bindable
     var showReboot = Info.isRooted

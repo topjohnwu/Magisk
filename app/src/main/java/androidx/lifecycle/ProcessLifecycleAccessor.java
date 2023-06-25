@@ -7,6 +7,6 @@ import androidx.annotation.NonNull;
 public class ProcessLifecycleAccessor {
     public static void init(@NonNull Context context) {
         LifecycleDispatcher.init(context);
-        ProcessLifecycleOwner.init(context);
+        ProcessLifecycleOwner.init$lifecycle_process_release(context);
     }
 }
