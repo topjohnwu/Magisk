@@ -103,7 +103,7 @@ Unlocking the bootloader on modern Samsung devices have some caveats. The newly 
 
 ### Instructions
 
-- Use either [samfirm.js](https://github.com/jesec/samfirm.js), [Frija](https://forum.xda-developers.com/s10-plus/how-to/tool-frija-samsung-firmware-downloader-t3910594), or [Samloader](https://forum.xda-developers.com/s10-plus/how-to/tool-samloader-samfirm-frija-replacement-t4105929) to download the latest firmware zip of your device directly from Samsung servers.
+- Use either [samfirm.js](https://github.com/jesec/samfirm.js), [Frija](https://forum.xda-developers.com/s10-plus/how-to/tool-frija-samsung-firmware-downloader-t3910594),[Samloader](https://forum.xda-developers.com/s10-plus/how-to/tool-samloader-samfirm-frija-replacement-t4105929) or [Samloader kotlin](https://github.com/zacharee/SamloaderKotlin) to download the latest firmware zip of your device directly from Samsung servers.
 - Unzip the firmware and copy the `AP` tar file to your device. It is normally named as `AP_[device_model_sw_ver].tar.md5`
 - Press the **Install** button in the Magisk card
 - If your device does **NOT** have boot ramdisk, check the **"Recovery Mode"** option
