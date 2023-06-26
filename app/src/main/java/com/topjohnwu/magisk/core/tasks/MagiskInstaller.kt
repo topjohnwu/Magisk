@@ -115,6 +115,7 @@ abstract class MagiskInstallImpl protected constructor(
                     val name = n.substring(3, n.length - 3)
                     val dest = File(installDir, name)
                     zf.getInputStream(it).writeTo(dest)
+                    dest.setExecutable(true)
                 }
             } else {
                 val info = context.applicationInfo
