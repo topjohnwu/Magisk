@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.*
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.ktx.copyAndClose as copyAndCloseBoth
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.withStreams
@@ -117,6 +118,7 @@ abstract class MagiskInstallImpl protected constructor(
                     zf.getInputStream(it).writeTo(dest)
                     dest.setExecutable(true)
                 }
+                zf.close()
             } else {
                 val info = context.applicationInfo
                 var libs = File(info.nativeLibraryDir).listFiles { _, name ->
@@ -442,7 +444,7 @@ abstract class MagiskInstallImpl protected constructor(
                 }
                 outStream.putNextEntry(newTarEntry(name, newBoot.length()))
             }
-            newBoot.newInputStream().copyAndClose(outStream)
+            newBoot.newInputStream().copyAndCloseBoth(outStream)
             newBoot.delete()
 
             console.add("")
