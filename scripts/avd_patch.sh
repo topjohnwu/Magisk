@@ -57,7 +57,7 @@ export KEEPFORCEENCRYPT=true
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
-if [ -e "/system/bin/linker64" ]; then
+if [ -f magisk64 ]; then
   echo "PREINITDEVICE=$(./magisk64 --preinit-device)" >> config
 else
   echo "PREINITDEVICE=$(./magisk32 --preinit-device)" >> config
@@ -73,7 +73,7 @@ if [ -f magisk64 ]; then
   ./magiskboot compress=xz magisk64 magisk64.xz
   unset SKIP64
 fi
-if [ -f magisk32 ]; then
+if [ -e "/system/bin/linker" ]; then
   ./magiskboot compress=xz magisk32 magisk32.xz
   unset SKIP32
 fi
