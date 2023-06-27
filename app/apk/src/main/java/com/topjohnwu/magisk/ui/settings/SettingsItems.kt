@@ -333,3 +333,9 @@ object Reauthenticate : BaseSettingsItem.Toggle() {
         isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Info.showSuperUser
     }
 }
+
+object Restrict : BaseSettingsItem.Toggle() {
+    override val title = CoreR.string.settings_su_restrict_title.asText()
+    override val description = CoreR.string.settings_su_restrict_summary.asText()
+    override var value by Config::suRestrict
+}
