@@ -24,6 +24,7 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.InverseBindingAdapter
 import androidx.databinding.InverseBindingListener
+import androidx.databinding.InverseMethod
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
@@ -33,9 +34,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
+import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.widget.IndeterminateCheckBox
@@ -305,4 +308,39 @@ fun TextView.setText(text: TextHolder) {
 @BindingAdapter("items", "layout")
 fun Spinner.setAdapter(items: Array<Any>, layoutRes: Int) {
     adapter = ArrayAdapter(context, layoutRes, items)
+}
+
+@BindingAdapter("labelFormatter")
+fun Slider.setLabelFormatter(formatter: (Float) -> Int) {
+    setLabelFormatter { value -> resources.getString(formatter(value)) }
+}
+
+@InverseBindingAdapter(attribute = "android:value")
+fun Slider.getValueBinding() = value
+
+@BindingAdapter("android:valueAttrChanged")
+fun Slider.setListener(attrChange: InverseBindingListener) {
+    addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+        override fun onStartTrackingTouch(slider: Slider) = Unit
+        override fun onStopTrackingTouch(slider: Slider) = attrChange.onChange()
+    })
+}
+
+@InverseMethod("sliderValueToPolicy")
+fun policyToSliderValue(policy: Int): Float {
+    return when (policy) {
+        SuPolicy.DENY -> 1f
+        SuPolicy.RESTRICT -> 2f
+        SuPolicy.ALLOW -> 3f
+        else -> 1f
+    }
+}
+
+fun sliderValueToPolicy(value: Float): Int {
+    return when (value) {
+        1f -> SuPolicy.DENY
+        2f -> SuPolicy.RESTRICT
+        3f -> SuPolicy.ALLOW
+        else -> SuPolicy.DENY
+    }
 }

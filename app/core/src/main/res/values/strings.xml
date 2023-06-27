@@ -53,6 +53,7 @@
     <string name="touch_filtered_warning">Because an app is obscuring a Superuser request, Magisk can\'t verify your response.</string>
     <string name="deny">Deny</string>
     <string name="prompt">Prompt</string>
+    <string name="restrict">Restrict</string>
     <string name="grant">Grant</string>
     <string name="su_warning">Grants full access to your device.\nDeny if you\'re not sure!</string>
     <string name="forever">Forever</string>
@@ -170,6 +171,8 @@
     <string name="settings_su_auth_title">User authentication</string>
     <string name="settings_su_auth_summary">Ask for user authentication during Superuser requests</string>
     <string name="settings_su_auth_insecure">No authentication method is configured on the device</string>
+    <string name="settings_su_restrict_title">Restrict root capabilities</string>
+    <string name="settings_su_restrict_summary">Will restrict new superuser apps by default. Warning, this will break most apps, do not enable it.</string>
     <string name="settings_customization">Customization</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
