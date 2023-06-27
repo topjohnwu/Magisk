@@ -322,6 +322,12 @@ object Reauthenticate : BaseSettingsItem.Toggle() {
     override var value by Config::suReAuth
 
     override fun refresh() {
-        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && Info.showSuperUser
+        isEnabled = Build.VERSION.SDK_INT < Build.VERSION_CODES.O
     }
+}
+
+object Restrict : BaseSettingsItem.Toggle() {
+    override val title = CoreR.string.settings_su_restrict_title.asText()
+    override val description = CoreR.string.settings_su_restrict_summary.asText()
+    override var value by Config::suRestrict
 }
