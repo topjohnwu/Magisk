@@ -54,6 +54,7 @@
     <string name="touch_filtered_warning">由于某个应用遮挡了超级用户请求界面，因此 Magisk 无法验证您的回应</string>
     <string name="deny">拒绝</string>
     <string name="prompt">提示</string>
+    <string name="restrict">受限</string>
     <string name="grant">允许</string>
     <string name="su_warning">将授予对该设备的最高权限。\n如果不确定，请拒绝！</string>
     <string name="forever">永久</string>
@@ -173,6 +174,8 @@
     <string name="settings_su_auth_title">身份验证</string>
     <string name="settings_su_auth_summary">对超级用户请求验证身份</string>
     <string name="settings_su_auth_insecure">设备未配置验证方式</string>
+    <string name="settings_su_restrict_title">限制超级用户权能</string>
+    <string name="settings_su_restrict_summary">默认限制新的超级用户应用。警告，这会破坏大多数应用，不建议启用。</string>
     <string name="settings_customization">个性化</string>
     <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
     <string name="settings_doh_title">安全 DNS（DoH）</string>

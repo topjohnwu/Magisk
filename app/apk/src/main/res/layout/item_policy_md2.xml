@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.topjohnwu.magisk.databinding.DataBindingAdaptersKt" />
+
         <variable
             name="item"
             type="com.topjohnwu.magisk.ui.superuser.PolicyRvItem" />
@@ -85,16 +87,32 @@
                         app:layout_constraintVertical_bias="0"
                         tools:text="com.topjohnwu.magisk" />
 
-                    <com.google.android.material.switchmaterial.SwitchMaterial
+                    <FrameLayout
                         android:id="@+id/policy_indicator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="@dimen/l1"
-                        android:checked="@={item.enabled}"
                         android:nextFocusLeft="@id/policy"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            gone="@{item.showSlider}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="@={item.enabled}" />
+
+                        <com.google.android.material.slider.Slider
+                            goneUnless="@{item.showSlider}"
+                            labelFormatter="@{item.sliderValueToPolicyString}"
+                            android:layout_width="96dp"
+                            android:layout_height="wrap_content"
+                            android:stepSize="1"
+                            android:value="@={DataBindingAdaptersKt.policyToSliderValue(item.sliderValue)}"
+                            android:valueFrom="1"
+                            android:valueTo="3" />
+                    </FrameLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
