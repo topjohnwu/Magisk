@@ -220,6 +220,8 @@ abstract class MagiskInstallImpl protected constructor(
                 ByteBuffer.wrap(rawData).putInt(120, 3)
                 tarOut.putNextEntry(newTarEntry("vbmeta.img", rawData.size.toLong()))
                 tarOut.write(rawData)
+            } else if (entry.name.contains("userdata.img")) {
+                continue
             } else {
                 console.add("-- Copying: ${entry.name}")
                 tarOut.putNextEntry(entry)
