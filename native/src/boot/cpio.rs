@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::ffi::CStr;
-use std::fmt::{Display, Formatter};
+use std::fmt::{Display, Formatter, Write as FmtWrite};
 use std::fs::{metadata, read, DirBuilder, File};
 use std::io::Write;
 use std::mem::size_of;
@@ -9,16 +9,15 @@ use std::path::Path;
 use std::process::exit;
 use std::slice;
 
-use anyhow::{anyhow, Context};
+use argh::{EarlyExit, FromArgs};
 use size::{Base, Size, Style};
 
-use argh::{EarlyExit, FromArgs};
 use base::libc::{
     c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, S_IFBLK, S_IFCHR, S_IFDIR,
     S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
     S_IXOTH, S_IXUSR,
 };
-use base::{MappedFile, ResultExt, StrErr, Utf8CStr, WriteExt};
+use base::{log_err, LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr, WriteExt};
 
 use crate::ramdisk::MagiskCpio;
 
@@ -217,13 +216,13 @@ impl Cpio {
         }
     }
 
-    fn load_from_data(data: &[u8]) -> anyhow::Result<Self> {
+    fn load_from_data(data: &[u8]) -> LoggedResult<Self> {
         let mut cpio = Cpio::new();
         let mut pos = 0usize;
         while pos < data.len() {
             let hdr = unsafe { &*(data.as_ptr().add(pos) as *const CpioHeader) };
             if &hdr.magic != b"070701" {
-                return Err(anyhow!("invalid cpio magic"));
+                return Err(log_err!("invalid cpio magic"));
             }
             pos += size_of::<CpioHeader>();
             let name = CStr::from_bytes_until_nul(&data[pos..])?
@@ -257,13 +256,13 @@ impl Cpio {
         Ok(cpio)
     }
 
-    pub(crate) fn load_from_file(path: &Utf8CStr) -> anyhow::Result<Self> {
+    pub(crate) fn load_from_file(path: &Utf8CStr) -> LoggedResult<Self> {
         eprintln!("Loading cpio: [{}]", path);
         let file = MappedFile::open(path)?;
         Self::load_from_data(file.as_ref())
     }
 
-    fn dump(&self, path: &str) -> anyhow::Result<()> {
+    fn dump(&self, path: &str) -> LoggedResult<()> {
         eprintln!("Dumping cpio: [{}]", path);
         let mut file = File::create(path)?;
         let mut pos = 0usize;
@@ -324,8 +323,8 @@ impl Cpio {
         }
     }
 
-    fn extract_entry(&self, path: &str, out: &Path) -> anyhow::Result<()> {
-        let entry = self.entries.get(path).ok_or(anyhow!("No such file"))?;
+    fn extract_entry(&self, path: &str, out: &Path) -> LoggedResult<()> {
+        let entry = self.entries.get(path).ok_or(log_err!("No such file"))?;
         eprintln!("Extracting entry [{}] to [{}]", path, out.to_string_lossy());
         if let Some(parent) = out.parent() {
             DirBuilder::new()
@@ -358,13 +357,13 @@ impl Cpio {
                 };
             }
             _ => {
-                return Err(anyhow!("unknown entry type"));
+                return Err(log_err!("unknown entry type"));
             }
         }
         Ok(())
     }
 
-    fn extract(&self, path: Option<&str>, out: Option<&str>) -> anyhow::Result<()> {
+    fn extract(&self, path: Option<&str>, out: Option<&str>) -> LoggedResult<()> {
         let path = path.map(norm_path);
         let out = out.map(Path::new);
         if let (Some(path), Some(out)) = (&path, &out) {
@@ -384,9 +383,9 @@ impl Cpio {
         self.entries.contains_key(&norm_path(path))
     }
 
-    fn add(&mut self, mode: &mode_t, path: &str, file: &str) -> anyhow::Result<()> {
+    fn add(&mut self, mode: &mode_t, path: &str, file: &str) -> LoggedResult<()> {
         if path.ends_with('/') {
-            return Err(anyhow!("path cannot end with / for add"));
+            return Err(log_err!("path cannot end with / for add"));
         }
         let file = Path::new(file);
         let content = read(file)?;
@@ -403,7 +402,7 @@ impl Cpio {
             } else if metadata.file_type().is_char_device() {
                 mode | S_IFCHR
             } else {
-                return Err(anyhow!("unsupported file type"));
+                return Err(log_err!("unsupported file type"));
             }
         };
         self.entries.insert(
@@ -451,11 +450,11 @@ impl Cpio {
         eprintln!("Create symlink [{}] -> [{}]", dst, src);
     }
 
-    fn mv(&mut self, from: &str, to: &str) -> anyhow::Result<()> {
+    fn mv(&mut self, from: &str, to: &str) -> LoggedResult<()> {
         let entry = self
             .entries
             .remove(&norm_path(from))
-            .ok_or(anyhow!("no such entry {}", from))?;
+            .ok_or(log_err!("no such entry {}", from))?;
         self.entries.insert(norm_path(to), entry);
         eprintln!("Move [{}] -> [{}]", from, to);
         Ok(())
@@ -521,9 +520,9 @@ impl Display for CpioEntry {
 }
 
 pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
-    fn inner(argc: i32, argv: *const *const c_char) -> anyhow::Result<()> {
+    fn inner(argc: i32, argv: *const *const c_char) -> LoggedResult<()> {
         if argc < 1 {
-            return Err(anyhow!("no arguments"));
+            return Err(log_err!("no arguments"));
         }
 
         let cmds: Result<Vec<&Utf8CStr>, StrErr> =
@@ -556,7 +555,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                         eprintln!("{}", output);
                         exit(0)
                     }
-                    Err(_) => return Err(anyhow!(output)),
+                    Err(_) => return Err(log_err!(output)),
                 },
             };
             match &mut cli.command {
@@ -580,7 +579,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 CpioCommands::Add(Add { mode, path, file }) => cpio.add(mode, path, file)?,
                 CpioCommands::Extract(Extract { paths }) => {
                     if !paths.is_empty() && paths.len() != 2 {
-                        return Err(anyhow!("invalid arguments"));
+                        return Err(log_err!("invalid arguments"));
                     }
                     cpio.extract(
                         paths.get(0).map(|x| x.as_str()),
@@ -597,20 +596,19 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
         Ok(())
     }
     inner(argc, argv)
-        .context("Failed to process cpio")
-        .log()
+        .log_with_msg(|w| w.write_str("Failed to process cpio"))
         .is_ok()
 }
 
-fn x8u<U: TryFrom<u32>>(x: &[u8; 8]) -> anyhow::Result<U> {
+fn x8u<U: TryFrom<u32>>(x: &[u8; 8]) -> LoggedResult<U> {
     // parse hex
     let mut ret = 0u32;
     for i in x {
         let c = *i as char;
-        let v = c.to_digit(16).ok_or(anyhow!("bad cpio header"))?;
+        let v = c.to_digit(16).ok_or(log_err!("bad cpio header"))?;
         ret = ret * 16 + v;
     }
-    ret.try_into().map_err(|_| anyhow!("bad cpio header"))
+    ret.try_into().map_err(|_| log_err!("bad cpio header"))
 }
 
 #[inline(always)]

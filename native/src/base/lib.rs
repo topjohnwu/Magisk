@@ -20,6 +20,7 @@ mod xwrap;
 pub mod ffi {
     #[derive(Copy, Clone)]
     pub enum LogLevel {
+        ErrorCxx,
         Error,
         Warn,
         Info,
@@ -32,6 +33,7 @@ pub mod ffi {
     }
 
     extern "Rust" {
+        #[rust_name = "log_from_cxx"]
         fn log_with_rs(level: LogLevel, msg: &[u8]);
         fn exit_on_error(b: bool);
         fn set_log_level_state(level: LogLevel, enabled: bool);

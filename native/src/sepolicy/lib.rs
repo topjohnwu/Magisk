@@ -38,13 +38,13 @@ impl SepolicyExt for sepolicy {
     }
 
     fn load_rule_file(self: Pin<&mut sepolicy>, filename: &[u8]) {
-        fn inner(sepol: Pin<&mut sepolicy>, filename: &[u8]) -> anyhow::Result<()> {
+        fn inner(sepol: Pin<&mut sepolicy>, filename: &[u8]) -> LoggedResult<()> {
             let filename = str::from_utf8(filename)?;
             let mut reader = BufReader::new(File::open(filename)?);
             sepol.load_rules_from_reader(&mut reader);
             Ok(())
         }
-        inner(self, filename).log().ok();
+        inner(self, filename).ok();
     }
 
     fn load_rules_from_reader<T: BufRead>(mut self: Pin<&mut sepolicy>, reader: &mut T) {

@@ -21,12 +21,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.71"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
-
-[[package]]
 name = "argh"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -75,7 +69,6 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 name = "base"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "cfg-if",
  "cxx",
  "cxx-gen",
@@ -222,7 +215,6 @@ dependencies = [
 name = "magiskboot"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "argh",
  "base",
  "byteorder",
@@ -247,7 +239,6 @@ dependencies = [
 name = "magiskpolicy"
 version = "0.0.0"
 dependencies = [
- "anyhow",
  "base",
  "cxx",
  "cxx-gen",

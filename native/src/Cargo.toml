@@ -8,7 +8,6 @@ cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
 libc = "0.2"
 cfg-if = "1.0"
-anyhow = "1.0"
 num-traits = "0.2"
 num-derive = "0.3"
 thiserror = "1.0"

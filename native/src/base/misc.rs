@@ -26,18 +26,18 @@ pub fn copy_cstr<T: AsRef<CStr> + ?Sized>(dest: &mut [u8], src: &T) -> usize {
     len - 1
 }
 
-struct BufFmtWriter<'a> {
+pub struct BufFormatter<'a> {
     buf: &'a mut [u8],
-    used: usize,
+    pub used: usize,
 }
 
-impl<'a> BufFmtWriter<'a> {
-    fn new(buf: &'a mut [u8]) -> Self {
-        BufFmtWriter { buf, used: 0 }
+impl<'a> BufFormatter<'a> {
+    pub fn new(buf: &'a mut [u8]) -> Self {
+        BufFormatter { buf, used: 0 }
     }
 }
 
-impl<'a> fmt::Write for BufFmtWriter<'a> {
+impl<'a> fmt::Write for BufFormatter<'a> {
     // The buffer should always be null terminated
     fn write_str(&mut self, s: &str) -> fmt::Result {
         if self.used >= self.buf.len() - 1 {
@@ -51,7 +51,7 @@ impl<'a> fmt::Write for BufFmtWriter<'a> {
 }
 
 pub fn fmt_to_buf(buf: &mut [u8], args: Arguments) -> usize {
-    let mut w = BufFmtWriter::new(buf);
+    let mut w = BufFormatter::new(buf);
     if let Ok(()) = fmt::write(&mut w, args) {
         w.used
     } else {

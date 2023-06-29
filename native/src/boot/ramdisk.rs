@@ -4,7 +4,7 @@ use std::env;
 use std::str::from_utf8;
 
 use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
-use base::Utf8CStr;
+use base::{LoggedResult, Utf8CStr};
 
 use crate::cpio::{Cpio, CpioEntry};
 use crate::patch::{patch_encryption, patch_verity};
@@ -12,8 +12,8 @@ use crate::patch::{patch_encryption, patch_verity};
 pub trait MagiskCpio {
     fn patch(&mut self);
     fn test(&self) -> i32;
-    fn restore(&mut self) -> anyhow::Result<()>;
-    fn backup(&mut self, origin: &Utf8CStr) -> anyhow::Result<()>;
+    fn restore(&mut self) -> LoggedResult<()>;
+    fn backup(&mut self, origin: &Utf8CStr) -> LoggedResult<()>;
 }
 
 const MAGISK_PATCHED: i32 = 1 << 0;
@@ -89,7 +89,7 @@ impl MagiskCpio for Cpio {
         ret
     }
 
-    fn restore(&mut self) -> anyhow::Result<()> {
+    fn restore(&mut self) -> LoggedResult<()> {
         let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         self.entries
@@ -120,7 +120,7 @@ impl MagiskCpio for Cpio {
         Ok(())
     }
 
-    fn backup(&mut self, origin: &Utf8CStr) -> anyhow::Result<()> {
+    fn backup(&mut self, origin: &Utf8CStr) -> LoggedResult<()> {
         let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         backups.insert(

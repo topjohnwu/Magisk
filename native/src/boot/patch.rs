@@ -1,4 +1,4 @@
-use base::{MappedFile, MutBytesExt, ResultExt, Utf8CStr};
+use base::{LoggedResult, MappedFile, MutBytesExt, Utf8CStr};
 
 // SAFETY: assert(buf.len() >= 1) && assert(len <= buf.len())
 macro_rules! match_patterns {
@@ -102,7 +102,7 @@ fn hex2byte(hex: &[u8]) -> Vec<u8> {
 }
 
 pub fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool {
-    fn inner(file: &[u8], from: &[u8], to: &[u8]) -> anyhow::Result<bool> {
+    fn inner(file: &[u8], from: &[u8], to: &[u8]) -> LoggedResult<bool> {
         let file = Utf8CStr::from_bytes(file)?;
         let from = Utf8CStr::from_bytes(from)?;
         let to = Utf8CStr::from_bytes(to)?;
@@ -118,5 +118,5 @@ pub fn hexpatch(file: &[u8], from: &[u8], to: &[u8]) -> bool {
 
         Ok(!v.is_empty())
     }
-    inner(file, from, to).log().unwrap_or(false)
+    inner(file, from, to).unwrap_or(false)
 }

@@ -1,24 +1,45 @@
+use std::fmt::Write;
 use std::os::unix::io::RawFd;
 use std::ptr;
 
-use anyhow::Context;
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
     ssize_t, SYS_dup3,
 };
 
-use crate::{cstr, errno, error, mkdirs, perror, ptr_to_str, raw_cstr, ResultExt, Utf8CStr};
+use crate::{cstr, errno, mkdirs, ptr_to_str, raw_cstr, ResultExt, Utf8CStr};
+
+macro_rules! error_cxx {
+    ($($args:tt)+) => {
+        ($crate::log_with_args($crate::ffi::LogLevel::ErrorCxx, format_args_nl!($($args)+)))
+    }
+}
+
+macro_rules! perror {
+    ($fmt:expr) => {
+        $crate::log_with_formatter($crate::ffi::LogLevel::ErrorCxx, |w| {
+            w.write_str($fmt)?;
+            w.write_fmt(format_args!(" failed with {}: {}", $crate::errno(), $crate::error_str()))
+        })
+    };
+    ($fmt:expr, $($args:tt)*) => {
+        $crate::log_with_formatter($crate::ffi::LogLevel::ErrorCxx, |w| {
+            w.write_fmt(format_args!($fmt, $($args)*))?;
+            w.write_fmt(format_args!(" failed with {}: {}", $crate::errno(), $crate::error_str()))
+        })
+    };
+}
 
 mod unsafe_impl {
+    use std::fmt::Write;
     use std::os::unix::io::RawFd;
 
-    use anyhow::Context;
     use cfg_if::cfg_if;
     use libc::{c_char, nfds_t, off_t, pollfd};
 
     use crate::{
-        perror, ptr_to_str, readlink_unsafe, realpath, slice_from_ptr, slice_from_ptr_mut,
-        ResultExt, Utf8CStr,
+        ptr_to_str, readlink_unsafe, realpath, slice_from_ptr, slice_from_ptr_mut, ResultExt,
+        Utf8CStr,
     };
 
     #[no_mangle]
@@ -40,8 +61,7 @@ mod unsafe_impl {
     unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
         match Utf8CStr::from_ptr(path) {
             Ok(p) => realpath(p, slice_from_ptr_mut(buf, bufsz))
-                .with_context(|| format!("realpath {} failed", p))
-                .log()
+                .log_cxx_with_msg(|w| w.write_fmt(format_args!("realpath {} failed", p)))
                 .map_or(-1, |v| v as isize),
             Err(_) => -1,
         }
@@ -172,7 +192,7 @@ pub fn xwrite(fd: RawFd, data: &[u8]) -> isize {
             }
         }
         if !remain.is_empty() {
-            error!("write ({} != {})", write_sz, data.len())
+            error_cxx!("write ({} != {})", write_sz, data.len())
         }
         write_sz as isize
     }
@@ -211,7 +231,7 @@ pub fn xxread(fd: RawFd, data: &mut [u8]) -> isize {
             }
         }
         if !remain.is_empty() {
-            error!("read ({} != {})", read_sz, data.len())
+            error_cxx!("read ({} != {})", read_sz, data.len())
         }
         read_sz as isize
     }
@@ -572,8 +592,7 @@ pub unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 pub unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
     match Utf8CStr::from_ptr(path) {
         Ok(p) => mkdirs(p, mode)
-            .with_context(|| format!("mkdirs {} failed", p))
-            .log()
+            .log_cxx_with_msg(|w| w.write_fmt(format_args!("mkdirs {} failed", p)))
             .map_or(-1, |_| 0),
         Err(_) => -1,
     }
