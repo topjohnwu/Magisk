@@ -1,6 +1,7 @@
 use std::fmt;
 use std::fmt::{Arguments, Display, Write as fWrite};
 use std::io::{stderr, stdout, Write};
+use std::panic::Location;
 use std::process::exit;
 
 use crate::ffi::LogLevel;
@@ -161,8 +162,20 @@ pub struct LoggedError {}
 
 // Automatically handle all printable errors
 impl<T: Display> From<T> for LoggedError {
+    #[cfg(not(debug_assertions))]
     fn from(e: T) -> Self {
         log_with_args(LogLevel::Error, format_args_nl!("{:#}", e));
+        LoggedError::default()
+    }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn from(e: T) -> Self {
+        let caller = Location::caller();
+        log_with_args(
+            LogLevel::Error,
+            format_args_nl!("[{}:{}] {:#}", caller.file(), caller.line(), e),
+        );
         LoggedError::default()
     }
 }
@@ -189,44 +202,66 @@ pub trait ResultExt<T>
 where
     Self: Sized,
 {
+    #[cfg(not(debug_assertions))]
     fn log(self) -> LoggedResult<T> {
-        self.log_impl(LogLevel::Error)
+        self.log_impl(LogLevel::Error, None)
     }
-    fn log_cxx(self) -> LoggedResult<T> {
-        self.log_impl(LogLevel::ErrorCxx)
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn log(self) -> LoggedResult<T> {
+        self.log_impl(LogLevel::Error, Some(Location::caller()))
     }
+
+    #[cfg(not(debug_assertions))]
     fn log_with_msg<F: FnOnce(&mut BufFormatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        self.log_with_msg_impl(LogLevel::Error, f)
+        self.log_with_msg_impl(LogLevel::Error, None, f)
     }
+
+    #[track_caller]
+    #[cfg(debug_assertions)]
+    fn log_with_msg<F: FnOnce(&mut BufFormatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        self.log_with_msg_impl(LogLevel::Error, Some(Location::caller()), f)
+    }
+
+    fn log_cxx(self) -> LoggedResult<T> {
+        self.log_impl(LogLevel::ErrorCxx, None)
+    }
+
     fn log_cxx_with_msg<F: FnOnce(&mut BufFormatter) -> fmt::Result>(
         self,
         f: F,
     ) -> LoggedResult<T> {
-        self.log_with_msg_impl(LogLevel::ErrorCxx, f)
+        self.log_with_msg_impl(LogLevel::ErrorCxx, None, f)
     }
 
-    fn log_impl(self, level: LogLevel) -> LoggedResult<T>;
+    fn log_impl(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T>;
     fn log_with_msg_impl<F: FnOnce(&mut BufFormatter) -> fmt::Result>(
         self,
         level: LogLevel,
+        caller: Option<&'static Location>,
         f: F,
     ) -> LoggedResult<T>;
 }
 
 impl<T> ResultExt<T> for LoggedResult<T> {
-    fn log_impl(self, _: LogLevel) -> LoggedResult<T> {
+    fn log_impl(self, _: LogLevel, _: Option<&'static Location>) -> LoggedResult<T> {
         self
     }
 
     fn log_with_msg_impl<F: FnOnce(&mut BufFormatter) -> fmt::Result>(
         self,
         level: LogLevel,
+        caller: Option<&'static Location>,
         f: F,
     ) -> LoggedResult<T> {
         match self {
             Ok(v) => Ok(v),
             Err(_) => {
                 log_with_formatter(level, |w| {
+                    if let Some(caller) = caller {
+                        write!(w, "[{}:{}] ", caller.file(), caller.line())?;
+                    }
                     f(w)?;
                     w.write_char('\n')
                 });
@@ -237,11 +272,18 @@ impl<T> ResultExt<T> for LoggedResult<T> {
 }
 
 impl<T, E: Display> ResultExt<T> for Result<T, E> {
-    fn log_impl(self, level: LogLevel) -> LoggedResult<T> {
+    fn log_impl(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T> {
         match self {
             Ok(v) => Ok(v),
             Err(e) => {
-                log_with_args(level, format_args_nl!("{:#}", e));
+                if let Some(caller) = caller {
+                    log_with_args(
+                        level,
+                        format_args_nl!("[{}:{}] {:#}", caller.file(), caller.line(), e),
+                    );
+                } else {
+                    log_with_args(level, format_args_nl!("{:#}", e));
+                }
                 Err(LoggedError::default())
             }
         }
@@ -250,12 +292,16 @@ impl<T, E: Display> ResultExt<T> for Result<T, E> {
     fn log_with_msg_impl<F: FnOnce(&mut BufFormatter) -> fmt::Result>(
         self,
         level: LogLevel,
+        caller: Option<&'static Location>,
         f: F,
     ) -> LoggedResult<T> {
         match self {
             Ok(v) => Ok(v),
             Err(e) => {
                 log_with_formatter(level, |w| {
+                    if let Some(caller) = caller {
+                        write!(w, "[{}:{}] ", caller.file(), caller.line())?;
+                    }
                     f(w)?;
                     writeln!(w, ": {:#}", e)
                 });
