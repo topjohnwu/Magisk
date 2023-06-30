@@ -2,32 +2,51 @@ use digest::DynDigest;
 use sha1::Sha1;
 use sha2::Sha256;
 
-pub struct SHA {
-    hasher: Box<dyn DynDigest>,
+pub enum SHA {
+    SHA1(Sha1),
+    SHA256(Sha256),
 }
 
 impl SHA {
     pub fn update(&mut self, data: &[u8]) {
-        self.hasher.update(data);
+        match self {
+            SHA::SHA1(h) => h.update(data),
+            SHA::SHA256(h) => h.update(data),
+        }
     }
 
-    pub fn finalize(&mut self) -> Vec<u8> {
-        self.hasher.finalize_reset().to_vec()
+    pub fn output_size(&self) -> usize {
+        match self {
+            SHA::SHA1(h) => h.output_size(),
+            SHA::SHA256(h) => h.output_size(),
+        }
+    }
+
+    pub fn finalize_into(&mut self, out: &mut [u8]) {
+        match self {
+            SHA::SHA1(h) => h.finalize_into_reset(out),
+            SHA::SHA256(h) => h.finalize_into_reset(out),
+        }
+        .ok();
     }
 }
 
 pub fn get_sha(use_sha1: bool) -> Box<SHA> {
-    Box::new(SHA {
-        hasher: if use_sha1 {
-            Box::new(Sha1::default())
-        } else {
-            Box::new(Sha256::default())
-        },
+    Box::new(if use_sha1 {
+        SHA::SHA1(Sha1::default())
+    } else {
+        SHA::SHA256(Sha256::default())
     })
 }
 
-pub fn sha_digest(data: &[u8], use_sha1: bool) -> Vec<u8> {
-    let mut sha = get_sha(use_sha1);
-    sha.update(data);
-    sha.finalize()
+pub fn sha1_hash(data: &[u8], out: &mut [u8]) {
+    let mut h = Sha1::default();
+    h.update(data);
+    DynDigest::finalize_into(h, out).ok();
+}
+
+pub fn sha256_hash(data: &[u8], out: &mut [u8]) {
+    let mut h = Sha256::default();
+    h.update(data);
+    DynDigest::finalize_into(h, out).ok();
 }

@@ -133,8 +133,12 @@ int main(int argc, char *argv[]) {
         unlink(RECV_DTBO_FILE);
         unlink(DTB_FILE);
     } else if (argc > 2 && action == "sha1") {
-        mmap_data m(argv[2]);
-        for (auto i : sha_digest(byte_view(m.buf(), m.sz()), true))
+        uint8_t sha1[20];
+        {
+            mmap_data m(argv[2]);
+            sha1_hash(m, byte_data(sha1, sizeof(sha1)));
+        }
+        for (uint8_t i : sha1)
             printf("%02x", i);
         printf("\n");
     } else if (argc > 2 && action == "split") {

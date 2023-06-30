@@ -777,8 +777,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
             ctx->update(byte_view(&size, sizeof(size)));
         }
         memset(id, 0, BOOT_ID_SIZE);
-        auto digest = ctx->finalize();
-        memcpy(id, digest.data(), digest.size());
+        ctx->finalize_into(byte_data(id, ctx->output_size()));
     }
 
     // Print new header info
@@ -809,8 +808,8 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         auto d_hdr = reinterpret_cast<dhtb_hdr *>(out.buf());
         memcpy(d_hdr, DHTB_MAGIC, 8);
         d_hdr->size = off.total - sizeof(dhtb_hdr);
-        auto checksum = sha_digest(byte_view(out.buf() + sizeof(dhtb_hdr), d_hdr->size), false);
-        memcpy(d_hdr->checksum, checksum.data(), checksum.size());
+        sha256_hash(byte_view(out.buf() + sizeof(dhtb_hdr), d_hdr->size),
+                    byte_data(d_hdr->checksum, 32));
     } else if (boot.flags[BLOB_FLAG]) {
         // Blob header
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf());

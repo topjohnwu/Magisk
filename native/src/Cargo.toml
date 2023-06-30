@@ -14,11 +14,17 @@ thiserror = "1.0"
 byteorder = "1"
 size = "0.4"
 argh = "0.1.10"
-pb-rs = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9" }
-quick-protobuf = { git = "https://github.com/tafia/quick-protobuf.git", rev = "2f37d5a65504de7d716b5b28fd82219501a901a9" }
-sha1 = "0.10.5"
-sha2 = "0.10.7"
-digest = "0.10.7"
+sha1 = "0.10"
+sha2 = "0.10"
+digest = "0.10"
+
+[workspace.dependencies.pb-rs]
+git = "https://github.com/tafia/quick-protobuf.git"
+rev = "2f37d5a65504de7d716b5b28fd82219501a901a9"
+
+[workspace.dependencies.quick-protobuf]
+git = "https://github.com/tafia/quick-protobuf.git"
+rev = "2f37d5a65504de7d716b5b28fd82219501a901a9"
 
 [profile.dev]
 opt-level = "z"
