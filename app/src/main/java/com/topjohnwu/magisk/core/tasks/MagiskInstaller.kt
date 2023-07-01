@@ -250,7 +250,15 @@ abstract class MagiskInstallImpl protected constructor(
             return recovery
         } else {
             return when {
-                initBoot.exists() -> initBoot
+                initBoot.exists() -> {
+                    boot.newInputStream().use {
+                        tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
+                        it.copyTo(tarOut)
+                    }
+                    boot.delete()
+                    // Install to init_boot
+                    initBoot
+                }
                 boot.exists() -> boot
                 else -> {
                     throw NoBootException()
