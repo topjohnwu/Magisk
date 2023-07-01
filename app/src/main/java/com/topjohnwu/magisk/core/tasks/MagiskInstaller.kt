@@ -230,32 +230,37 @@ abstract class MagiskInstallImpl protected constructor(
         val boot = installDir.getChildFile("boot.img")
         val initBoot = installDir.getChildFile("init_boot.img")
         val recovery = installDir.getChildFile("recovery.img")
-        if (Config.recovery && recovery.exists() && boot.exists()) {
+        if (Config.recovery && recovery.exists()) {
             // Repack boot image to prevent auto restore
-            arrayOf(
-                "cd $installDir",
-                "chmod -R 755 .",
-                "./magiskboot unpack boot.img",
-                "./magiskboot repack boot.img",
-                "cat new-boot.img > boot.img",
-                "./magiskboot cleanup",
-                "rm -f new-boot.img",
-                "cd /").sh()
-            boot.newInputStream().use {
-                tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
-                it.copyTo(tarOut)
+            if (boot.exists()) {
+                arrayOf(
+                    "cd $installDir",
+                    "chmod -R 755 .",
+                    "./magiskboot unpack boot.img",
+                    "./magiskboot repack boot.img",
+                    "cat new-boot.img > boot.img",
+                    "./magiskboot cleanup",
+                    "rm -f new-boot.img",
+                    "cd /").sh()
+                boot.newInputStream().use {
+                    tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
+                    it.copyTo(tarOut)
+                }
+                boot.delete()
             }
-            boot.delete()
             // Install to recovery
             return recovery
         } else {
             return when {
                 initBoot.exists() -> {
-                    boot.newInputStream().use {
-                        tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
-                        it.copyTo(tarOut)
+                    // Pack stock boot image
+                    if (boot.exists()) {
+                        boot.newInputStream().use {
+                            tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
+                            it.copyTo(tarOut)
+                        }
+                        boot.delete()
                     }
-                    boot.delete()
                     // Install to init_boot
                     initBoot
                 }
