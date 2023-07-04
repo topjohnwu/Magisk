@@ -7,9 +7,8 @@ use std::mem::size_of;
 use std::os::unix::fs::{symlink, DirBuilderExt, FileTypeExt, MetadataExt};
 use std::path::Path;
 use std::process::exit;
-use std::slice;
 
-use argh::{EarlyExit, FromArgs};
+use argh::FromArgs;
 use size::{Base, Size, Style};
 
 use base::libc::{
@@ -17,7 +16,9 @@ use base::libc::{
     S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
     S_IXOTH, S_IXUSR,
 };
-use base::{log_err, LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr, WriteExt};
+use base::{
+    log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, WriteExt,
+};
 
 use crate::ramdisk::MagiskCpio;
 
@@ -525,12 +526,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
             return Err(log_err!("no arguments"));
         }
 
-        let cmds: Result<Vec<&Utf8CStr>, StrErr> =
-            unsafe { slice::from_raw_parts(argv, argc as usize) }
-                .iter()
-                .map(|s| unsafe { Utf8CStr::from_ptr(*s) })
-                .collect();
-        let cmds = cmds?;
+        let cmds = map_args(argc, argv)?;
 
         let file = cmds[0];
         let mut cpio = if Path::new(file).exists() {
@@ -538,26 +534,20 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
         } else {
             Cpio::new()
         };
+
         for cmd in &cmds[1..] {
             if cmd.starts_with('#') {
                 continue;
             }
-            let mut cli = match CpioCli::from_args(
+            let mut cli = CpioCli::from_args(
                 &["magiskboot", "cpio", file],
                 cmd.split(' ')
                     .filter(|x| !x.is_empty())
                     .collect::<Vec<_>>()
                     .as_slice(),
-            ) {
-                Ok(cli) => cli,
-                Err(EarlyExit { output, status }) => match status {
-                    Ok(_) => {
-                        eprintln!("{}", output);
-                        exit(0)
-                    }
-                    Err(_) => return Err(log_err!(output)),
-                },
-            };
+            )
+            .early_exit();
+
             match &mut cli.command {
                 CpioCommands::Test(Test {}) => exit(cpio.test()),
                 CpioCommands::Restore(Restore {}) => cpio.restore()?,
@@ -590,7 +580,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                     cpio.ls(path.as_str(), *recursive);
                     exit(0);
                 }
-            }
+            };
         }
         cpio.dump(file)?;
         Ok(())
