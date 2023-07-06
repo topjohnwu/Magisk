@@ -319,7 +319,10 @@ impl Cpio {
     }
 
     fn extract_entry(&self, path: &str, out: &Path) -> LoggedResult<()> {
-        let entry = self.entries.get(path).ok_or(log_err!("No such file"))?;
+        let entry = self
+            .entries
+            .get(path)
+            .ok_or_else(|| log_err!("No such file"))?;
         eprintln!("Extracting entry [{}] to [{}]", path, out.to_string_lossy());
         if let Some(parent) = out.parent() {
             DirBuilder::new()
@@ -449,7 +452,7 @@ impl Cpio {
         let entry = self
             .entries
             .remove(&norm_path(from))
-            .ok_or(log_err!("no such entry {}", from))?;
+            .ok_or_else(|| log_err!("no such entry {}", from))?;
         self.entries.insert(norm_path(to), entry);
         eprintln!("Move [{}] -> [{}]", from, to);
         Ok(())
@@ -598,7 +601,7 @@ fn x8u<U: TryFrom<u32>>(x: &[u8; 8]) -> LoggedResult<U> {
     let mut ret = 0u32;
     for i in x {
         let c = *i as char;
-        let v = c.to_digit(16).ok_or(log_err!("bad cpio header"))?;
+        let v = c.to_digit(16).ok_or_else(|| log_err!("bad cpio header"))?;
         ret = ret * 16 + v;
     }
     ret.try_into().map_err(|_| log_err!("bad cpio header"))
