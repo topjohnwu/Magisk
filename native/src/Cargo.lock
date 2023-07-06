@@ -23,6 +23,7 @@ dependencies = [
 [[package]]
 name = "argh"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 dependencies = [
  "argh_derive",
  "argh_shared",
@@ -31,6 +32,7 @@ dependencies = [
 [[package]]
 name = "argh_derive"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 dependencies = [
  "argh_shared",
  "proc-macro2",
@@ -41,6 +43,7 @@ dependencies = [
 [[package]]
 name = "argh_shared"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 
 [[package]]
 name = "atty"
