@@ -31,7 +31,7 @@ macro_rules! open_fd {
     };
 }
 
-pub unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
+pub(crate) unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     let r = libc::readlink(path, buf.cast(), bufsz - 1);
     if r >= 0 {
         *buf.offset(r) = b'\0';

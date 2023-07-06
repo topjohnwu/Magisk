@@ -1,4 +1,4 @@
-// Functions listed here are just to export to C++
+// Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
 use std::fmt::Write;
 use std::io;
@@ -7,6 +7,7 @@ use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 use cxx::private::c_char;
 use libc::mode_t;
 
+pub(crate) use crate::xwrap::*;
 use crate::{
     fd_path, map_fd, map_file, mkdirs, realpath, rm_rf, slice_from_ptr_mut, Directory, ResultExt,
     Utf8CStr,

@@ -256,20 +256,8 @@ impl PartialEq<Utf8CStr> for str {
     }
 }
 
-pub fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
-    if ptr.is_null() {
-        "(null)"
-    } else {
-        unsafe { CStr::from_ptr(ptr.cast()) }.to_str().unwrap_or("")
-    }
-}
-
 pub fn errno() -> &'static mut i32 {
     unsafe { &mut *libc::__errno() }
-}
-
-pub fn error_str() -> &'static str {
-    unsafe { ptr_to_str(libc::strerror(*errno())) }
 }
 
 // When len is 0, don't care whether buf is null or not
