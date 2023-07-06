@@ -6,7 +6,6 @@ resolver = "2"
 [workspace.dependencies]
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
-argh = { path = "external/argh/argh" }
 libc = "0.2"
 cfg-if = "1.0"
 num-traits = "0.2"
@@ -17,6 +16,10 @@ size = "0.4"
 sha1 = "0.10"
 sha2 = "0.10"
 digest = "0.10"
+
+[workspace.dependencies.argh]
+git = "https://github.com/topjohnwu/argh.git"
+rev = "2fecd81d606364a8b07b942ed01697bbd3a62193"
 
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
