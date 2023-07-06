@@ -13,7 +13,7 @@ pb-rs = { workspace = true }
 
 [dependencies]
 base = { path = "../base" }
-cxx = { path = "../external/cxx-rs" }
+cxx = { workspace = true }
 byteorder = { workspace = true }
 size = { workspace = true }
 quick-protobuf = { workspace = true }

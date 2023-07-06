@@ -23,6 +23,7 @@ dependencies = [
 [[package]]
 name = "argh"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 dependencies = [
  "argh_derive",
  "argh_shared",
@@ -31,6 +32,7 @@ dependencies = [
 [[package]]
 name = "argh_derive"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 dependencies = [
  "argh_shared",
  "proc-macro2",
@@ -41,6 +43,7 @@ dependencies = [
 [[package]]
 name = "argh_shared"
 version = "0.1.10"
+source = "git+https://github.com/topjohnwu/argh.git?rev=2fecd81d606364a8b07b942ed01697bbd3a62193#2fecd81d606364a8b07b942ed01697bbd3a62193"
 
 [[package]]
 name = "atty"
@@ -151,6 +154,7 @@ dependencies = [
 [[package]]
 name = "cxx"
 version = "1.0.94"
+source = "git+https://github.com/topjohnwu/cxx.git?rev=f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb#f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -160,6 +164,7 @@ dependencies = [
 [[package]]
 name = "cxx-gen"
 version = "0.7.94"
+source = "git+https://github.com/topjohnwu/cxx.git?rev=f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb#f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb"
 dependencies = [
  "codespan-reporting",
  "proc-macro2",
@@ -170,10 +175,12 @@ dependencies = [
 [[package]]
 name = "cxxbridge-flags"
 version = "1.0.94"
+source = "git+https://github.com/topjohnwu/cxx.git?rev=f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb#f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb"
 
 [[package]]
 name = "cxxbridge-macro"
 version = "1.0.94"
+source = "git+https://github.com/topjohnwu/cxx.git?rev=f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb#f05bbb7c8fa6639685fb6bb8708dc6ea55d9ddbb"
 dependencies = [
  "proc-macro2",
  "quote",
