@@ -360,12 +360,12 @@ impl<T: AsMut<[u8]>> MutBytesExt for T {
     }
 }
 
-// SAFETY: libc guarantees argc and argv is properly setup
+// SAFETY: libc guarantees argc and argv are properly setup and are static
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
-pub fn map_args<'a>(argc: i32, argv: *const *const c_char) -> Result<Vec<&'a Utf8CStr>, StrErr> {
+pub fn map_args(argc: i32, argv: *const *const c_char) -> Result<Vec<&'static str>, StrErr> {
     unsafe { slice::from_raw_parts(argv, argc as usize) }
         .iter()
-        .map(|s| unsafe { Utf8CStr::from_ptr(*s) })
+        .map(|s| unsafe { Utf8CStr::from_ptr(*s) }.map(|s| s.deref()))
         .collect()
 }
 
