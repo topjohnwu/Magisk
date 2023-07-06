@@ -157,9 +157,11 @@ fn do_extract_boot_from_payload(
                 for ext in operation.dst_extents.iter() {
                     let out_seek = ext
                         .start_block
-                        .ok_or(bad_payload!("start block not found"))?
+                        .ok_or_else(|| bad_payload!("start block not found"))?
                         * block_size;
-                    let num_blocks = ext.num_blocks.ok_or(bad_payload!("num blocks not found"))?;
+                    let num_blocks = ext
+                        .num_blocks
+                        .ok_or_else(|| bad_payload!("num blocks not found"))?;
                     out_file.seek(SeekFrom::Start(out_seek))?;
                     out_file.write_zeros(num_blocks as usize)?;
                 }
