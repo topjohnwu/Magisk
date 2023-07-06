@@ -57,9 +57,9 @@ Supported actions:
     Search <hexpattern1> in <file>, and replace it with <hexpattern2>
 
   cpio <incpio> [commands...]
-    Do cpio commands to <incpio> (modifications are done in-place)
-    Each command is a single argument, add quotes for each command.
-    See "cpio <incpio> --help" for supported commands.
+    Do cpio commands to <incpio> (modifications are done in-place).
+    Each command is a single argument; add quotes for each command.
+    See "cpio --help" for supported commands.
 
   dtb <file> <action> [args...]
     Do dtb related actions to <file>

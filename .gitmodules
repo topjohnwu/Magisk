@@ -46,3 +46,6 @@
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git
+[submodule "argh"]
+	path = native/src/external/argh
+	url = https://github.com/topjohnwu/argh.git

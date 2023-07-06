@@ -6,6 +6,7 @@ resolver = "2"
 [workspace.dependencies]
 cxx = { path = "external/cxx-rs" }
 cxx-gen = { path = "external/cxx-rs/gen/lib" }
+argh = { path = "external/argh/argh" }
 libc = "0.2"
 cfg-if = "1.0"
 num-traits = "0.2"
@@ -13,7 +14,6 @@ num-derive = "0.3"
 thiserror = "1.0"
 byteorder = "1"
 size = "0.4"
-argh = "0.1.10"
 sha1 = "0.10"
 sha2 = "0.10"
 digest = "0.10"
