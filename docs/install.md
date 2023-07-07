@@ -117,6 +117,9 @@ Having KnoxGuard active will prevent you from installing/running Magisk regardle
 - Allow bootloader unlocking in **Developer options → OEM unlocking**
 - Reboot to download mode: power off your device and press the download mode key combo for your device
 - Long press volume up to unlock the bootloader. **This will wipe your data and automatically reboot.**
+- Go through the initial setup. Skip through all the steps since data will be wiped again in later steps. **Connect the device to Internet during the setup.**
+- Enable developer options, and **confirm that the OEM unlocking option exists and is grayed out.** This means KnoxGuard hasn't locked your device.
+- Your bootloader now accepts unofficial images in download mode
 
 ### Instructions
 
@@ -144,9 +147,8 @@ Once you have rooted your Samsung device, you can no longer upgrade your Android
 
 ### Important Notes
 
-- **Never, ever** try to restore either `boot`, `recovery`, or `vbmeta` partitions back to stock! You can brick your device by doing so, and the only way to recover from this is to do a full Odin restore with data wipe.
+- **Never, ever** try to restore either `boot`, `init_boot`, `recovery`, or `vbmeta` partitions back to stock! You can brick your device by doing so, and the only way to recover from this is to do a full Odin restore with data wipe.
 - To upgrade your device with a new firmware, **NEVER** directly use the stock `AP` tar file with reasons mentioned above. **Always** patch `AP` in the Magisk app and use that instead.
-- Never just flash only `AP`, or else Odin may shrink your `/data` filesystem size. Flash `AP` + `BL` + `CP` + `HOME_CSC` when upgrading.
 
 ## Custom Recovery
 
