@@ -154,7 +154,7 @@ check_boot_ramdisk() {
   $ISAB && return 0
 
   # If we are using legacy SAR, but not A/B, assume we do not have ramdisk
-  if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
+  if $LEGACYSAR; then
     # Override recovery mode to true
     RECOVERYMODE=true
     return 1
@@ -212,6 +212,11 @@ get_flags() {
   PATCHVBMETAFLAG=false
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
+    LEGACYSAR=true
+  else
+    LEGACYSAR=false
+  fi
 }
 
 run_migrations() { return; }
@@ -224,9 +229,9 @@ grep_prop() { return; }
 
 app_init() {
   mount_partitions
+  get_flags
   RAMDISKEXIST=false
   check_boot_ramdisk && RAMDISKEXIST=true
-  get_flags
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption

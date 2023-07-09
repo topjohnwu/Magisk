@@ -492,7 +492,7 @@ abstract class MagiskInstallImpl protected constructor(
             "KEEPVERITY=${Config.keepVerity} " +
             "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
             "RECOVERYMODE=${Config.recovery} " +
-            "SYSTEM_ROOT=${Info.isSAR} " +
+            "LEGACYSAR=${Info.legacySAR} " +
             "sh boot_patch.sh $srcBoot")
         val isSuccess = cmds.sh().isSuccess
 

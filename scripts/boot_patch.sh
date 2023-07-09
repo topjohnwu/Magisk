@@ -6,7 +6,7 @@
 # Usage: boot_patch.sh <bootimage>
 #
 # The following flags can be set in environment variables:
-# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, SYSTEM_ROOT
+# KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, LEGACYSAR
 #
 # This script should be placed in a directory with the following files:
 #
@@ -73,7 +73,7 @@ fi
 [ -z $KEEPFORCEENCRYPT ] && KEEPFORCEENCRYPT=false
 [ -z $PATCHVBMETAFLAG ] && PATCHVBMETAFLAG=false
 [ -z $RECOVERYMODE ] && RECOVERYMODE=false
-[ -z $SYSTEM_ROOT ] && SYSTEM_ROOT=false
+[ -z $LEGACYSAR ] && LEGACYSAR=false
 export KEEPVERITY
 export KEEPFORCEENCRYPT
 export PATCHVBMETAFLAG
@@ -233,7 +233,7 @@ if [ -f kernel ]; then
 
   # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
-  $SYSTEM_ROOT && ./magiskboot hexpatch kernel \
+  $LEGACYSAR && ./magiskboot hexpatch kernel \
   736B69705F696E697472616D667300 \
   77616E745F696E697472616D667300 \
   && PATCHEDKERNEL=true
