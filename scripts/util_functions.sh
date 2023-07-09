@@ -312,7 +312,7 @@ mount_partitions() {
 
 # After calling this method, the following variables will be set:
 # KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
-# ISENCRYPTED, VBMETAEXIST
+# ISENCRYPTED, VBMETAEXIST, LEGACYSAR
 get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
@@ -350,6 +350,15 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  local IS_DYNAMIC=false
+  grep -q 'androidboot.super_partition' /proc/cmdline && IS_DYNAMIC=true
+  [ -b "/dev/block/by-name/super" ] && IS_DYNAMIC=true
+  if $SYSTEM_ROOT && ! $IS_DYNAMIC; then
+    LEGACYSAR=true
+    ui_print "- legacy SAR, force kernel to load rootfs"
+  else
+    LEGACYSAR=false
+  fi
 }
 
 find_boot_image() {
