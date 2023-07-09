@@ -232,32 +232,40 @@ abstract class MagiskInstallImpl protected constructor(
         val boot = installDir.getChildFile("boot.img")
         val initBoot = installDir.getChildFile("init_boot.img")
         val recovery = installDir.getChildFile("recovery.img")
-        if (Config.recovery && recovery.exists() && boot.exists()) {
-            // Repack boot image to prevent auto restore
-            arrayOf(
-                "cd $installDir",
-                "chmod -R 755 .",
-                "./magiskboot unpack boot.img",
-                "./magiskboot repack boot.img",
-                "cat new-boot.img > boot.img",
-                "./magiskboot cleanup",
-                "rm -f new-boot.img",
-                "cd /").sh()
-            boot.newInputStream().use {
-                tarOut.putNextEntry(newTarEntry("boot.img", boot.length()))
+
+        fun ExtendedFile.copyToTar() {
+            newInputStream().use {
+                tarOut.putNextEntry(newTarEntry(name, length()))
                 it.copyTo(tarOut)
             }
-            boot.delete()
-            // Install to recovery
-            return recovery
-        } else {
-            return when {
-                initBoot.exists() -> initBoot
-                boot.exists() -> boot
-                else -> {
-                    throw NoBootException()
+            delete()
+        }
+
+        // Patch priority: recovery > init_boot > boot
+        return when {
+            recovery.exists() -> {
+                if (boot.exists()) {
+                    // Repack boot image to prevent auto restore
+                    arrayOf(
+                        "cd $installDir",
+                        "chmod -R 755 .",
+                        "./magiskboot unpack boot.img",
+                        "./magiskboot repack boot.img",
+                        "cat new-boot.img > boot.img",
+                        "./magiskboot cleanup",
+                        "rm -f new-boot.img",
+                        "cd /").sh()
+                    boot.copyToTar()
                 }
+                recovery
             }
+            initBoot.exists() -> {
+                if (boot.exists())
+                    boot.copyToTar()
+                initBoot
+            }
+            boot.exists() -> boot
+            else -> throw NoBootException()
         }
     }
 
