@@ -380,7 +380,7 @@ umount_apex() {
 
 # After calling this method, the following variables will be set:
 # KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
-# ISENCRYPTED, VBMETAEXIST
+# ISENCRYPTED, VBMETAEXIST, LEGACYSAR
 get_flags() {
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
@@ -418,6 +418,14 @@ get_flags() {
     fi
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  local CMDLINE_SAR_FLAG=false
+  grep -q 'skip_initramfs' /proc/cmdline && CMDLINE_SAR_FLAG=true
+  if $SYSTEM_ROOT && $CMDLINE_SAR_FLAG && [ ! -b "/dev/block/by-name/super" ]; then
+    ui_print "- Legacy SAR device, force kernel to load rootfs"
+    LEGACYSAR=true
+  else
+    LEGACYSAR=false
+  fi
 }
 
 find_boot_image() {

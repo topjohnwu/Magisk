@@ -212,6 +212,11 @@ get_flags() {
   PATCHVBMETAFLAG=false
   # Make sure RECOVERYMODE has value
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
+  if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
+    LEGACYSAR=true
+  else
+    LEGACYSAR=false
+  fi
 }
 
 run_migrations() { return; }
