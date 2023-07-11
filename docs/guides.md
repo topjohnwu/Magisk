@@ -160,7 +160,7 @@ module.zip
 │
 ```
 
-#### Customization
+#### Customization 
 
 If you need to customize the module installation process, optionally you can create a script in the installer named `customize.sh`. This script will be _sourced_ (not executed!) by the module installer script after all files are extracted and default permissions and secontext are applied. This is very useful if your module require additional setup based on the device ABI, or you need to set special permissions/secontext for some of your module files.
 
