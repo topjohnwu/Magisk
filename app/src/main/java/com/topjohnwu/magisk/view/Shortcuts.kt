@@ -31,7 +31,7 @@ object Shortcuts {
         val info = ShortcutInfoCompat.Builder(context, Const.Nav.HOME)
             .setShortLabel(context.getString(R.string.magisk))
             .setIntent(intent)
-            .setIcon(IconCompat.createFromIcon(context, context.getIcon(R.drawable.ic_launcher)))
+            .setIcon(context.getIconCompat(R.drawable.ic_launcher))
             .build()
         ShortcutManagerCompat.requestPinShortcut(context, info, null)
     }
@@ -44,6 +44,18 @@ object Shortcuts {
                 Icon.createWithBitmap(getBitmap(id))
         } else {
             Icon.createWithResource(this, id)
+        }
+    }
+
+    private fun Context.getIconCompat(id: Int): IconCompat {
+        return if (isRunningAsStub) {
+            val bitmap = getBitmap(id)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                IconCompat.createWithAdaptiveBitmap(bitmap)
+            else
+                IconCompat.createWithBitmap(bitmap)
+        } else {
+            IconCompat.createWithResource(this, id)
         }
     }
 
