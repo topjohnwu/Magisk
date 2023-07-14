@@ -211,7 +211,7 @@ class byte_channel;
 struct heap_data : public byte_data {
     ALLOW_MOVE_ONLY(heap_data)
 
-    explicit heap_data(size_t sz) : byte_data(malloc(sz), sz) {}
+    explicit heap_data(size_t sz) : byte_data(calloc(sz, 1), sz) {}
     ~heap_data() { free(_buf); }
 
     // byte_channel needs to reallocate the internal buffer
