@@ -5,6 +5,23 @@
 #MAGISK_VERSION_STUB
 
 ###################
+# Global Variables
+###################
+
+# True if the script is running on booted Android, not something like recovery
+BOOTMODE=
+
+# The path to store temporary files that don't need to persist
+TMPDIR=
+
+# The path to store files that can be persisted (non-volatile storage)
+# Any modification to this variable should go through the function `set_nvbase`
+NVBASE=
+
+# The non-volatile path where magisk executables are stored
+MAGISKBIN=
+
+###################
 # Helper Functions
 ###################
 
@@ -67,10 +84,9 @@ abort() {
   exit 1
 }
 
-resolve_vars() {
-  MAGISKBIN=$NVBASE/magisk
-  POSTFSDATAD=$NVBASE/post-fs-data.d
-  SERVICED=$NVBASE/service.d
+set_nvbase() {
+  NVBASE="$1"
+  MAGISKBIN="$1/magisk"
 }
 
 print_title() {
@@ -263,9 +279,9 @@ mount_ro_ensure() {
 
 mount_partitions() {
   # Check A/B slot
-  SLOT=`grep_cmdline androidboot.slot_suffix`
+  SLOT=$(grep_cmdline androidboot.slot_suffix)
   if [ -z $SLOT ]; then
-    SLOT=`grep_cmdline androidboot.slot`
+    SLOT=$(grep_cmdline androidboot.slot)
     [ -z $SLOT ] || SLOT=_${SLOT}
   fi
   [ "$SLOT" = "normal" ] && unset SLOT
@@ -575,10 +591,9 @@ check_data() {
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
     $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
   fi
-  NVBASE=/data
-  $DATA || NVBASE=/cache/data_adb
-  $DATA_DE && NVBASE=/data/adb
-  resolve_vars
+  set_nvbase "/data"
+  $DATA || set_nvbase "/cache/data_adb"
+  $DATA_DE && set_nvbase "/data/adb"
 }
 
 find_magisk_apk() {
@@ -813,12 +828,10 @@ install_module() {
 [ -z $BOOTMODE ] && ps -A 2>/dev/null | grep zygote | grep -qv grep && BOOTMODE=true
 [ -z $BOOTMODE ] && BOOTMODE=false
 
-NVBASE=/data/adb
 TMPDIR=/dev/tmp
+set_nvbase "/data/adb"
 
 # Bootsigner related stuff
 BOOTSIGNERCLASS=com.topjohnwu.magisk.signing.SignBoot
 BOOTSIGNER='/system/bin/dalvikvm -Xnoimage-dex2oat -cp $APK $BOOTSIGNERCLASS'
 BOOTSIGNED=false
-
-resolve_vars

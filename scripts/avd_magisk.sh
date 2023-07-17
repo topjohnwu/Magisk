@@ -116,8 +116,8 @@ fi
 mkdir -p $MAGISKBIN 2>/dev/null
 unzip -oj magisk.apk 'assets/*.sh' -d $MAGISKBIN
 mkdir $NVBASE/modules 2>/dev/null
-mkdir $POSTFSDATAD 2>/dev/null
-mkdir $SERVICED 2>/dev/null
+mkdir $NVBASE/post-fs-data.d 2>/dev/null
+mkdir $NVBASE/service.d 2>/dev/null
 
 for file in magisk32 magisk64 magiskpolicy stub.apk; do
   chmod 755 ./$file
