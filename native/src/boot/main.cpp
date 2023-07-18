@@ -45,6 +45,20 @@ Supported actions:
     If env variable PATCHVBMETAFLAG is set to true, all disable flags in
     the boot image's vbmeta header will be set.
 
+  verify <bootimg> [x509.pem]
+    Check whether the boot image is signed with AVB 1.0 signature.
+    Optionally provide a certificate to verify whether the image is
+    signed by the public key certificate.
+    Return value:
+    0:valid    1:error
+
+  sign <bootimg> [name] [x509.pem pk8]
+    Sign <bootimg> with AVB 1.0 signature.
+    Optionally provide the name of the image (default: '/boot').
+    Optionally provide the certificate/private key pair for signing.
+    If the certificate/private key pair is not provided, the AOSP
+    verity key bundled in the executable will be used.
+
   extract <payload.bin> [partition] [outfile]
     Extract [partition] from <payload.bin> to [outfile].
     If [outfile] is not specified, then output to '[partition].img'.
@@ -171,6 +185,15 @@ int main(int argc, char *argv[]) {
         } else {
             repack(argv[2], argv[3] ? argv[3] : NEW_BOOT);
         }
+    } else if (argc > 2 && action == "verify") {
+        return verify(argv[2], argv[3]);
+    } else if (argc > 2 && action == "sign") {
+        if (argc == 5) usage(argv[0]);
+        return sign(
+                argv[2],
+                argc > 3 ? argv[3] : "/boot",
+                argc > 5 ? argv[4] : nullptr,
+                argc > 5 ? argv[5] : nullptr);
     } else if (argc > 2 && action == "decompress") {
         decompress(argv[2], argv[3]);
     } else if (argc > 2 && str_starts(action, "compress")) {

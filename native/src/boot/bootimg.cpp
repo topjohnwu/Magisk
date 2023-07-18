@@ -451,6 +451,12 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
             flags[LG_BUMP_FLAG] = true;
         }
 
+        // Check if the image is signed
+        if (verify()) {
+            fprintf(stderr, "AVB1_SIGNED\n");
+            flags[AVB1_SIGNED_FLAG] = true;
+        }
+
         // Find AVB footer
         const void *footer = tail.buf() + tail.sz() - sizeof(AvbFooter);
         if (BUFFER_MATCH(footer, AVB_FOOTER_MAGIC)) {
@@ -467,6 +473,10 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
 
     this->hdr = hdr;
     return true;
+}
+
+bool boot_img::verify(const char *cert) const {
+    return rust::verify_boot_image(*this, cert);
 }
 
 int split_image_dtb(const char *filename) {
@@ -740,8 +750,6 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         }
     }
 
-    close(fd);
-
     /******************
      * Patch the image
      ******************/
@@ -810,11 +818,11 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     if (boot.flags[AVB_FLAG]) {
         // Copy and patch AVB structures
         auto footer = reinterpret_cast<AvbFooter*>(out.buf() + out.sz() - sizeof(AvbFooter));
-        auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(out.buf() + off.vbmeta);
         memcpy(footer, boot.avb_footer, sizeof(AvbFooter));
         footer->original_image_size = __builtin_bswap64(off.total);
         footer->vbmeta_offset = __builtin_bswap64(off.vbmeta);
         if (check_env("PATCHVBMETAFLAG")) {
+            auto vbmeta = reinterpret_cast<AvbVBMetaImageHeader*>(out.buf() + off.vbmeta);
             vbmeta->flags = __builtin_bswap32(3);
         }
     }
@@ -831,4 +839,45 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         auto b_hdr = reinterpret_cast<blob_hdr *>(out.buf());
         b_hdr->size = off.total - sizeof(blob_hdr);
     }
+
+    // Sign the image after we finish patching the boot image
+    if (boot.flags[AVB1_SIGNED_FLAG]) {
+        byte_view payload(out.buf() + off.header, off.total - off.header);
+        auto sig = rust::sign_boot_image(payload, "/boot", nullptr, nullptr);
+        if (!sig.empty()) {
+            lseek(fd, off.total, SEEK_SET);
+            xwrite(fd, sig.data(), sig.size());
+        }
+    }
+
+    close(fd);
+}
+
+int verify(const char *image, const char *cert) {
+    const boot_img boot(image);
+    if (cert == nullptr) {
+        // Boot image parsing already checks if the image is signed
+        return boot.flags[AVB1_SIGNED_FLAG] ? 0 : 1;
+    } else {
+        // Provide a custom certificate and re-verify
+        return boot.verify(cert) ? 0 : 1;
+    }
+}
+
+int sign(const char *image, const char *name, const char *cert, const char *key) {
+    const boot_img boot(image);
+    auto sig = rust::sign_boot_image(boot.payload, name, cert, key);
+    if (sig.empty())
+        return 1;
+
+    auto eof = boot.tail.buf() - boot.map.buf();
+    int fd = xopen(image, O_WRONLY | O_CLOEXEC);
+    if (lseek(fd, eof, SEEK_SET) != eof || xwrite(fd, sig.data(), sig.size()) != sig.size()) {
+        close(fd);
+        return 1;
+    }
+    // Wipe out rest of tail
+    write_zero(fd, boot.map.sz() - lseek(fd, 0, SEEK_CUR));
+    close(fd);
+    return 0;
 }

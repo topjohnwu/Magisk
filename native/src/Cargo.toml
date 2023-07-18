@@ -16,6 +16,11 @@ size = "0.4"
 sha1 = "0.10"
 sha2 = "0.10"
 digest = "0.10"
+p256 = "0.13"
+p384 = "0.13"
+rsa = "0.9"
+x509-cert = "0.2"
+der = "0.7"
 
 [workspace.dependencies.argh]
 git = "https://github.com/topjohnwu/argh.git"

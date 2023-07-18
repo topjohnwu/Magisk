@@ -140,7 +140,7 @@ struct byte_view {
 
     // Bridging to Rust slice
     byte_view(rust::Slice<const uint8_t> o) : byte_view(o.data(), o.size()) {}
-    operator rust::Slice<const uint8_t>() { return rust::Slice<const uint8_t>(_buf, _sz); }
+    operator rust::Slice<const uint8_t>() const { return rust::Slice<const uint8_t>(_buf, _sz); }
 
     // String as bytes
     byte_view(const char *s, bool with_nul = true)

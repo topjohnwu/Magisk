@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <utility>
 #include <bitset>
+#include <cxx.h>
+
 #include "format.hpp"
 
 /******************
@@ -578,6 +580,7 @@ enum {
     NOOKHD_FLAG,
     ACCLAIM_FLAG,
     AMONET_FLAG,
+    AVB1_SIGNED_FLAG,
     AVB_FLAG,
     ZIMAGE_KERNEL,
     BOOT_FLAGS_MAX
@@ -655,4 +658,9 @@ struct boot_img {
 
     bool parse_image(const uint8_t *addr, format_t type);
     const std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, format_t type);
+
+    // Rust FFI
+    rust::Slice<const uint8_t> get_payload() const { return payload; }
+    rust::Slice<const uint8_t> get_tail() const { return tail; }
+    bool verify(const char *cert = nullptr) const;
 };
