@@ -1,8 +1,6 @@
 #![feature(format_args_nl)]
 #![feature(btree_drain_filter)]
 
-extern crate alloc;
-
 pub use base;
 use cpio::cpio_commands;
 use patch::{hexpatch, patch_encryption, patch_verity};
