@@ -64,19 +64,6 @@ private fun PrintStream.byteField(name: String, bytes: ByteArray) {
     println("}")
 }
 
-fun genKeyData(keysDir: File, outSrc: File) {
-    outSrc.parentFile.mkdirs()
-    PrintStream(outSrc).use {
-        it.println("package com.topjohnwu.magisk.signing;")
-        it.println("public final class KeyData {")
-
-        it.byteField("verityCert", File(keysDir, "verity.x509.pem").readBytes())
-        it.byteField("verityKey", File(keysDir, "verity.pk8").readBytes())
-
-        it.println("}")
-    }
-}
-
 @CacheableTask
 abstract class ManifestUpdater: DefaultTask() {
     @get:Input

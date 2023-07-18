@@ -305,19 +305,6 @@ fun Project.setupApp() {
             }
         }
         mergeAssetsProvider.configure { dependsOn(syncAssets) }
-
-        val keysDir = rootProject.file("tools/keys")
-        val outSrcDir = File(buildDir, "generated/source/keydata/$name")
-        val outSrc = File(outSrcDir, "com/topjohnwu/magisk/signing/KeyData.java")
-
-        val genSrcTask = tasks.register("generate${variantCapped}KeyData") {
-            inputs.dir(keysDir)
-            outputs.file(outSrc)
-            doLast {
-                genKeyData(keysDir, outSrc)
-            }
-        }
-        registerJavaGeneratingTask(genSrcTask, outSrcDir)
     }
 }
 

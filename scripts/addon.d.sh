@@ -109,7 +109,6 @@ main() {
   ui_print "- Device platform: $ABI"
 
   remove_system_su
-  find_magisk_apk
   install_magisk
 
   # Cleanups

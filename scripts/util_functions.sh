@@ -185,7 +185,7 @@ recovery_actions() {
 recovery_cleanup() {
   local DIR
   ui_print "- Unmounting partitions"
-  (umount_apex
+  (
   if [ ! -d /postinstall/tmp ]; then
     umount -l /system
     umount -l /system_root
@@ -199,7 +199,8 @@ recovery_cleanup() {
       mv -f ${DIR}_link $DIR
     fi
   done
-  umount -l /dev/random) 2>/dev/null
+  umount -l /dev/random
+  ) 2>/dev/null
   [ -z $OLD_LD_LIB ] || export LD_LIBRARY_PATH=$OLD_LD_LIB
   [ -z $OLD_LD_PRE ] || export LD_PRELOAD=$OLD_LD_PRE
   [ -z $OLD_LD_CFG ] || export LD_CONFIG_FILE=$OLD_LD_CFG
@@ -306,92 +307,7 @@ mount_partitions() {
     SYSTEM_ROOT=false
     grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM_ROOT=true
   fi
-  # /vendor is used only on some older devices for recovery AVBv1 signing so is not critical if fails
-  [ -L /system/vendor ] && mount_name vendor$SLOT /vendor '-o ro'
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
-
-  # Allow /system/bin commands (dalvikvm) on Android 10+ in recovery
-  $BOOTMODE || mount_apex
-}
-
-# loop_setup <ext4_img>, sets LOOPDEV
-loop_setup() {
-  unset LOOPDEV
-  local LOOP
-  local MINORX=1
-  [ -e /dev/block/loop1 ] && MINORX=$(stat -Lc '%T' /dev/block/loop1)
-  local NUM=0
-  while [ $NUM -lt 64 ]; do
-    LOOP=/dev/block/loop$NUM
-    [ -e $LOOP ] || mknod $LOOP b 7 $((NUM * MINORX))
-    if losetup $LOOP "$1" 2>/dev/null; then
-      LOOPDEV=$LOOP
-      break
-    fi
-    NUM=$((NUM + 1))
-  done
-}
-
-mount_apex() {
-  $BOOTMODE || [ ! -d /system/apex ] && return
-  local APEX DEST
-  setup_mntpoint /apex
-  mount -t tmpfs tmpfs /apex -o mode=755
-  local PATTERN='s/.*"name":[^"]*"\([^"]*\).*/\1/p'
-  for APEX in /system/apex/*; do
-    if [ -f $APEX ]; then
-      # handle CAPEX APKs, extract actual APEX APK first
-      unzip -qo $APEX original_apex -d /apex
-      [ -f /apex/original_apex ] && APEX=/apex/original_apex # unzip doesn't do return codes
-      # APEX APKs, extract and loop mount
-      unzip -qo $APEX apex_payload.img -d /apex
-      DEST=$(unzip -qp $APEX apex_manifest.pb | strings | head -n 1 | tr -dc '[:alnum:].-_\n')
-      [ -z $DEST ] && DEST=$(unzip -qp $APEX apex_manifest.json | sed -n $PATTERN)
-      [ -z $DEST ] && continue
-      DEST=/apex/$DEST
-      mkdir -p $DEST
-      loop_setup /apex/apex_payload.img
-      if [ ! -z $LOOPDEV ]; then
-        ui_print "- Mounting $DEST"
-        mount -t ext4 -o ro,noatime $LOOPDEV $DEST
-      fi
-      rm -f /apex/original_apex /apex/apex_payload.img
-    elif [ -d $APEX ]; then
-      # APEX folders, bind mount directory
-      if [ -f $APEX/apex_manifest.json ]; then
-        DEST=/apex/$(sed -n $PATTERN $APEX/apex_manifest.json)
-      elif [ -f $APEX/apex_manifest.pb ]; then
-        DEST=/apex/$(strings $APEX/apex_manifest.pb | head -n 1 | tr -dc '[:alnum:].-_\n')
-      else
-        continue
-      fi
-      mkdir -p $DEST
-      ui_print "- Mounting $DEST"
-      mount -o bind $APEX $DEST
-    fi
-  done
-  export ANDROID_RUNTIME_ROOT=/apex/com.android.runtime
-  export ANDROID_TZDATA_ROOT=/apex/com.android.tzdata
-  export ANDROID_ART_ROOT=/apex/com.android.art
-  export ANDROID_I18N_ROOT=/apex/com.android.i18n
-  local APEXJARS=$(find /apex -name '*.jar' | sort | tr '\n' ':')
-  local FWK=/system/framework
-  export BOOTCLASSPATH=${APEXJARS}\
-$FWK/framework.jar:$FWK/ext.jar:$FWK/telephony-common.jar:\
-$FWK/voip-common.jar:$FWK/ims-common.jar:$FWK/telephony-ext.jar
-}
-
-umount_apex() {
-  [ -d /apex ] || return
-  umount -l /apex
-  for loop in /dev/block/loop*; do
-    losetup -d $loop 2>/dev/null
-  done
-  unset ANDROID_RUNTIME_ROOT
-  unset ANDROID_TZDATA_ROOT
-  unset ANDROID_ART_ROOT
-  unset ANDROID_I18N_ROOT
-  unset BOOTCLASSPATH
 }
 
 # After calling this method, the following variables will be set:
@@ -452,16 +368,11 @@ find_boot_image() {
 }
 
 flash_image() {
+  local CMD1
   case "$1" in
     *.gz) CMD1="gzip -d < '$1' 2>/dev/null";;
     *)    CMD1="cat '$1'";;
   esac
-  if $BOOTSIGNED; then
-    CMD2="$BOOTSIGNER -sign"
-    ui_print "- Sign image with verity keys"
-  else
-    CMD2="cat -"
-  fi
   if [ -b "$2" ]; then
     local img_sz=$(stat -c '%s' "$1")
     local blk_sz=$(blockdev --getsize64 "$2")
@@ -469,13 +380,13 @@ flash_image() {
     blockdev --setrw "$2"
     local blk_ro=$(blockdev --getro "$2")
     [ "$blk_ro" -eq 1 ] && return 2
-    eval "$CMD1" | eval "$CMD2" | cat - /dev/zero > "$2" 2>/dev/null
+    eval "$CMD1" | cat - /dev/zero > "$2" 2>/dev/null
   elif [ -c "$2" ]; then
     flash_eraseall "$2" >&2
-    eval "$CMD1" | eval "$CMD2" | nandwrite -p "$2" - >&2
+    eval "$CMD1" | nandwrite -p "$2" - >&2
   else
     ui_print "- Not block or char device, storing image"
-    eval "$CMD1" | eval "$CMD2" > "$2" 2>/dev/null
+    eval "$CMD1" > "$2" 2>/dev/null
   fi
   return 0
 }
@@ -483,11 +394,6 @@ flash_image() {
 # Common installation script for flash_script.sh and addon.d.sh
 install_magisk() {
   cd $MAGISKBIN
-
-  if [ ! -c $BOOTIMAGE ]; then
-    eval $BOOTSIGNER -verify < $BOOTIMAGE && BOOTSIGNED=true
-    $BOOTSIGNED && ui_print "- Boot image is signed with AVB 1.0"
-  fi
 
   # Source the boot patcher
   SOURCEDMODE=true
@@ -594,19 +500,6 @@ check_data() {
   set_nvbase "/data"
   $DATA || set_nvbase "/cache/data_adb"
   $DATA_DE && set_nvbase "/data/adb"
-}
-
-find_magisk_apk() {
-  local DBAPK
-  [ -z $APK ] && APK=/data/app/com.topjohnwu.magisk*/base.apk
-  [ -f $APK ] || APK=/data/app/*/com.topjohnwu.magisk*/base.apk
-  if [ ! -f $APK ]; then
-    DBAPK=$(magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2>/dev/null | cut -d= -f2)
-    [ -z $DBAPK ] && DBAPK=$(strings $NVBASE/magisk.db | grep -oE 'requester..*' | cut -c10-)
-    [ -z $DBAPK ] || APK=/data/user_de/0/$DBAPK/dyn/current.apk
-    [ -f $APK ] || [ -z $DBAPK ] || APK=/data/data/$DBAPK/dyn/current.apk
-  fi
-  [ -f $APK ] || ui_print "! Unable to detect Magisk app APK for BootSigner"
 }
 
 run_migrations() {
@@ -830,8 +723,3 @@ install_module() {
 
 TMPDIR=/dev/tmp
 set_nvbase "/data/adb"
-
-# Bootsigner related stuff
-BOOTSIGNERCLASS=com.topjohnwu.magisk.signing.SignBoot
-BOOTSIGNER='/system/bin/dalvikvm -Xnoimage-dex2oat -cp $APK $BOOTSIGNERCLASS'
-BOOTSIGNED=false

@@ -11,7 +11,6 @@
 umask 022
 
 OUTFD=$2
-APK="$3"
 COMMONDIR=$INSTALLER/assets
 CHROMEDIR=$INSTALLER/assets/chromeos
 
