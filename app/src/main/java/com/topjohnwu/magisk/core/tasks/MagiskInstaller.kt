@@ -493,11 +493,12 @@ abstract class MagiskInstallImpl protected constructor(
             "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
             "RECOVERYMODE=${Config.recovery} " +
             "SYSTEM_ROOT=${Info.isSAR} " +
-            "sh boot_patch.sh $srcBoot",
-            "./magiskboot cleanup",
-            "cd /")
+            "sh boot_patch.sh $srcBoot")
+        val isSuccess = cmds.sh().isSuccess
 
-        return cmds.sh().isSuccess
+        shell.newJob().add("./magiskboot cleanup", "cd /").exec()
+
+        return isSuccess
     }
 
     private fun flashBoot() = "direct_install $installDir $srcBoot".sh().isSuccess
