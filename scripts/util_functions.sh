@@ -9,7 +9,7 @@
 ###################
 
 # True if the script is running on booted Android, not something like recovery
-BOOTMODE=
+[ -z "$BOOTMODE" ] && BOOTMODE=
 
 # The path to store temporary files that don't need to persist
 TMPDIR=
