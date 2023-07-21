@@ -5,7 +5,6 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.lifecycle.ProcessLifecycleAccessor
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.DispatcherExecutor
