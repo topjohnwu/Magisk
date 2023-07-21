@@ -9,17 +9,17 @@
 ###################
 
 # True if the script is running on booted Android, not something like recovery
-BOOTMODE=
+# BOOTMODE=
 
 # The path to store temporary files that don't need to persist
-TMPDIR=
+# TMPDIR=
 
 # The path to store files that can be persisted (non-volatile storage)
 # Any modification to this variable should go through the function `set_nvbase`
-NVBASE=
+# NVBASE=
 
 # The non-volatile path where magisk executables are stored
-MAGISKBIN=
+# MAGISKBIN=
 
 ###################
 # Helper Functions
