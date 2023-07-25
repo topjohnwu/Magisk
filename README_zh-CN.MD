@@ -1,3 +1,8 @@
+<div align="right">
+<a href="/README.MD">EN</a> &nbsp;|&nbsp;
+<a href="/README_zh-CN">中文</a>
+</div>
+
 ![](docs/images/logo.png)
 
 [![下载](https://img.shields.io/badge/dynamic/json?color=green&label=Downloads&query=totalString&url=https%3A%2F%2Fraw.githubusercontent.com%2Ftopjohnwu%2Fmagisk-files%2Fcount%2Fcount.json&cacheSeconds=1800)](https://raw.githubusercontent.com/topjohnwu/magisk-files/count/count.json)
