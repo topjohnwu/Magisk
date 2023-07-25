@@ -38,7 +38,7 @@ Magisk 是一套用于定制化 Android 的开源软件，支持高于Android 6.
 对于Magisk问题，请上传 boot logcat 或者是 dmesg 。<br>
 对于Magisk应用闪退，请记录并上传闪退时的日志。
 
-## 翻译贡献
+## 贡献翻译
 
 Magisk 应用及其 APK 的默认根字符串资源位于此处：
 
@@ -47,7 +47,7 @@ Magisk 应用及其 APK 的默认根字符串资源位于此处：
 
 翻译每个信息并将其放入各自对应的位置 (`[module]/src/main/res/values-[lang]/strings.xml`).
 
-## 许可证
+## 许可
 
     Magisk，包括其所有的 git 子模块都是免费软件：
     您可以根据自由软件基金会发布的GNU通用公共许可证条款第3版或由您自由选择的任何更高版本对其进行重新分发、修改或同时分发修改。
