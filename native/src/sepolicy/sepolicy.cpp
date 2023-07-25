@@ -272,6 +272,10 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
             xperms.driver = ioctl_driver(low);
         }
 
+        datum = &get_avtab_node(&key, &xperms)->datum;
+        if (datum->xperms != nullptr)
+            memcpy(xperms.perms, datum->xperms->perms, sizeof(xperms.perms));
+
         if (xperms.specified == AVTAB_XPERMS_IOCTLDRIVER) {
             for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
                 if (invert)
@@ -287,8 +291,6 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt,
                     xperm_set(i, xperms.perms);
             }
         }
-
-        datum = &get_avtab_node(&key, &xperms)->datum;
 
         if (datum->xperms == nullptr)
             datum->xperms = auto_cast(malloc(sizeof(xperms)));
