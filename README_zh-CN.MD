@@ -7,6 +7,7 @@
 ## 介绍
 
 Magisk 是一套用于定制化 Android 的开源软件，支持高于Android 6.0 的设备。<br>
+
 一些亮点功能:
 
 - **MagiskSU**: 为应用程序提供 ROOT 访问权限
@@ -25,9 +26,9 @@ Magisk 是一套用于定制化 Android 的开源软件，支持高于Android 6.
 
 ## 有用的链接
 
-- [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
-- [Building and Development](https://topjohnwu.github.io/Magisk/build.html)
-- [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
+- [安装说明](https://topjohnwu.github.io/Magisk/install.html)
+- [构建与开发](https://topjohnwu.github.io/Magisk/build.html)
+- [Magisk文件](https://topjohnwu.github.io/Magisk/)
 
 ## 漏洞（Bug）报告
 
