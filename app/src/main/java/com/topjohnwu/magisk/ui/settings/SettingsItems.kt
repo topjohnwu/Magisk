@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.BiometricHelper
@@ -289,7 +290,7 @@ object Biometrics : BaseSettingsItem.Toggle() {
     override var value by Config::suBiometric
 
     override fun refresh() {
-        isEnabled = BiometricHelper.isSupported
+        isEnabled = ServiceLocator.biometrics.isSupported
         if (!isEnabled) {
             value = false
             description = R.string.no_biometric.asText()

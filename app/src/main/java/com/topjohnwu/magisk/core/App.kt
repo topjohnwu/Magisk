@@ -8,6 +8,7 @@ import android.os.Bundle
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.DispatcherExecutor
+import com.topjohnwu.magisk.core.utils.ProcessLifecycle
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.magisk.core.utils.refreshLocale
@@ -80,7 +81,7 @@ open class App() : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        ProcessLifecycleAccessor.init(this)
+        ProcessLifecycle.init(this)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

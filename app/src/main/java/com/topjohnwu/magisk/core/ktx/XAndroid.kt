@@ -12,7 +12,6 @@ import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.LayerDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Process
@@ -21,16 +20,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
-import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.APKInstall
-import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
-import kotlin.Array
 import kotlin.String
-import java.lang.reflect.Array as JArray
 
 fun Context.rawResource(id: Int) = resources.openRawResource(id)
 
@@ -55,110 +50,6 @@ val Context.deviceProtectedContext: Context get() =
     if (SDK_INT >= Build.VERSION_CODES.N) {
         createDeviceProtectedStorageContext()
     } else { this }
-
-fun Intent.startActivityWithRoot() {
-    val args = mutableListOf("am", "start", "--user", Const.USER_ID.toString())
-    val cmd = toCommand(args).joinToString(" ")
-    Shell.cmd(cmd).submit()
-}
-
-fun Intent.toCommand(args: MutableList<String> = mutableListOf()): MutableList<String> {
-    action?.also {
-        args.add("-a")
-        args.add(it)
-    }
-    component?.also {
-        args.add("-n")
-        args.add(it.flattenToString())
-    }
-    data?.also {
-        args.add("-d")
-        args.add(it.toString())
-    }
-    categories?.also {
-        for (cat in it) {
-            args.add("-c")
-            args.add(cat)
-        }
-    }
-    type?.also {
-        args.add("-t")
-        args.add(it)
-    }
-    extras?.also {
-        loop@ for (key in it.keySet()) {
-            val v = it[key] ?: continue
-            var value: Any = v
-            val arg: String
-            when {
-                v is String -> arg = "--es"
-                v is Boolean -> arg = "--ez"
-                v is Int -> arg = "--ei"
-                v is Long -> arg = "--el"
-                v is Float -> arg = "--ef"
-                v is Uri -> arg = "--eu"
-                v is ComponentName -> {
-                    arg = "--ecn"
-                    value = v.flattenToString()
-                }
-                v is List<*> -> {
-                    if (v.isEmpty())
-                        continue@loop
-
-                    arg = if (v[0] is Int)
-                        "--eial"
-                    else if (v[0] is Long)
-                        "--elal"
-                    else if (v[0] is Float)
-                        "--efal"
-                    else if (v[0] is String)
-                        "--esal"
-                    else
-                        continue@loop  /* Unsupported */
-
-                    val sb = StringBuilder()
-                    for (o in v) {
-                        sb.append(o.toString().replace(",", "\\,"))
-                        sb.append(',')
-                    }
-                    // Remove trailing comma
-                    sb.deleteCharAt(sb.length - 1)
-                    value = sb
-                }
-                v.javaClass.isArray -> {
-                    arg = if (v is IntArray)
-                        "--eia"
-                    else if (v is LongArray)
-                        "--ela"
-                    else if (v is FloatArray)
-                        "--efa"
-                    else if (v is Array<*> && v.isArrayOf<String>())
-                        "--esa"
-                    else
-                        continue@loop  /* Unsupported */
-
-                    val sb = StringBuilder()
-                    val len = JArray.getLength(v)
-                    for (i in 0 until len) {
-                        sb.append(JArray.get(v, i)!!.toString().replace(",", "\\,"))
-                        sb.append(',')
-                    }
-                    // Remove trailing comma
-                    sb.deleteCharAt(sb.length - 1)
-                    value = sb
-                }
-                else -> continue@loop
-            }  /* Unsupported */
-
-            args.add(arg)
-            args.add(key)
-            args.add(value.toString())
-        }
-    }
-    args.add("-f")
-    args.add(flags.toString())
-    return args
-}
 
 fun Context.cachedFile(name: String) = File(cacheDir, name)
 

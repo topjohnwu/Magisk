@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
@@ -75,7 +76,7 @@ class SuRequestViewModel(
 
     fun grantPressed() {
         cancelTimer()
-        if (BiometricHelper.isEnabled) {
+        if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess {
                     respond(ALLOW)

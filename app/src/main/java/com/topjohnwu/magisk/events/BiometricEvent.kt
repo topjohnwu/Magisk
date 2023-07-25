@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.events
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.BiometricHelper
 
 class BiometricEvent(
@@ -17,7 +18,7 @@ class BiometricEvent(
     }
 
     override fun invoke(activity: UIActivity<*>) {
-        BiometricHelper.authenticate(
+        ServiceLocator.biometrics.authenticate(
             activity,
             onError = listenerOnFailure,
             onSuccess = listenerOnSuccess

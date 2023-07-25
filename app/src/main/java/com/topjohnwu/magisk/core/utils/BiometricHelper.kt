@@ -1,18 +1,19 @@
 package com.topjohnwu.magisk.core.utils
 
+import android.content.Context
 import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.di.AppContext
 
-object BiometricHelper {
+class BiometricHelper(context: Context) {
 
-    private val mgr by lazy { BiometricManager.from(AppContext) }
+    private val mgr = BiometricManager.from(context)
 
-    val isSupported get() = when (mgr.canAuthenticate()) {
+    val isSupported get() = when (mgr.canAuthenticate(Authenticators.BIOMETRIC_WEAK)) {
         BiometricManager.BIOMETRIC_SUCCESS -> true
         else -> false
     }
@@ -48,7 +49,7 @@ object BiometricHelper {
         )
         val info = BiometricPrompt.PromptInfo.Builder()
             .setConfirmationRequired(true)
-            .setDeviceCredentialAllowed(false)
+            .setAllowedAuthenticators(Authenticators.BIOMETRIC_WEAK)
             .setTitle(activity.getString(R.string.authenticate))
             .setNegativeButtonText(activity.getString(android.R.string.cancel))
             .build()

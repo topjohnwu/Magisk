@@ -13,6 +13,7 @@ import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
 import com.topjohnwu.magisk.core.utils.BiometricHelper
@@ -113,7 +114,7 @@ class SuperuserViewModel(
             }
         }
 
-        if (BiometricHelper.isEnabled) {
+        if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
@@ -169,7 +170,7 @@ class SuperuserViewModel(
             }
         }
 
-        if (BiometricHelper.isEnabled) {
+        if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
