@@ -206,7 +206,7 @@ abstract class MagiskInstallImpl protected constructor(
 
                 val extract = installDir.getChildFile(name)
                 decompressedStream().copyAndCloseOut(extract.newOutputStream())
-            } else if (entry.name.contains("vbmeta.img")) {
+            } else if (Config.patchVbmeta && entry.name.contains("vbmeta.img")) {
                 val rawData = decompressedStream().readBytes()
                 // Valid vbmeta.img should be at least 256 bytes
                 if (rawData.size < 256)
@@ -490,7 +490,7 @@ abstract class MagiskInstallImpl protected constructor(
             "cd $installDir",
             "KEEPFORCEENCRYPT=${Config.keepEnc} " +
             "KEEPVERITY=${Config.keepVerity} " +
-            "PATCHVBMETAFLAG=${Config.patchVbmeta} " +
+            "PATCHVBMETAFLAG=${!Info.isSamsung && Config.patchVbmeta} " +
             "RECOVERYMODE=${Config.recovery} " +
             "SYSTEM_ROOT=${Info.isSAR} " +
             "sh boot_patch.sh $srcBoot")

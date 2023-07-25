@@ -37,8 +37,8 @@ import java.io.IOException
 class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() {
 
     val isRooted get() = Info.isRooted
-    val hideVbmeta = Info.vbmeta || Info.isSamsung || Info.isAB
-    val skipOptions = Info.isEmulator || (Info.isSAR && !Info.isFDE && hideVbmeta && Info.ramdisk)
+    val hideVbmeta = !Info.isSamsung && (Info.vbmeta || Info.isAB)
+    val skipOptions = Info.isEmulator || (!Info.isSamsung && Info.isSAR && !Info.isFDE && hideVbmeta && Info.ramdisk)
     val noSecondSlot = !isRooted || !Info.isAB || Info.isEmulator
 
     @get:Bindable
