@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.*
 import com.topjohnwu.magisk.dialog.SuperuserRevokeDialog
@@ -107,7 +106,7 @@ class SuperuserViewModel(
         fun updateState() = viewModelScope.launch {
             db.delete(item.item.uid)
             val list = ArrayList(itemsPolicies)
-            list.removeAll { it.itemSameAs(item) }
+            list.removeAll { it.item.uid == item.item.uid }
             itemsPolicies.update(list)
             if (list.isEmpty() && itemsHelpers.isEmpty()) {
                 itemsHelpers.add(itemNoData)
@@ -156,15 +155,14 @@ class SuperuserViewModel(
     }
 
     fun togglePolicy(item: PolicyRvItem, enable: Boolean) {
+        val items = itemsPolicies.filter { it.item.uid == item.item.uid }
         fun updateState() {
             viewModelScope.launch {
                 val res = if (enable) R.string.su_snack_grant else R.string.su_snack_deny
                 item.item.policy = if (enable) SuPolicy.ALLOW else SuPolicy.DENY
                 db.update(item.item)
-                itemsPolicies.forEach {
-                    if (it.item.uid == item.item.uid) {
-                        it.notifyPropertyChanged(BR.enabled)
-                    }
+                items.forEach {
+                    it.notifyPropertyChanged(BR.enabled)
                 }
                 SnackbarEvent(res.asText(item.appName)).publish()
             }

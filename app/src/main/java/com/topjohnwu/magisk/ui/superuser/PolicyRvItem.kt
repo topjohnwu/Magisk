@@ -73,6 +73,8 @@ class PolicyRvItem(
         viewModel.deletePressed(this)
     }
 
-    override fun itemSameAs(other: PolicyRvItem) = item.uid == other.item.uid
+    override fun itemSameAs(other: PolicyRvItem) = packageName == other.packageName
+
+    override fun contentSameAs(other: PolicyRvItem) = item.policy == other.item.policy
 
 }

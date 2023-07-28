@@ -4,7 +4,6 @@ import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 
 class BiometricEvent(
     builder: Builder.() -> Unit

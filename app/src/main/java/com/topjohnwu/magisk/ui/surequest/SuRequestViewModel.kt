@@ -28,7 +28,6 @@ import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.events.BiometricEvent
 import com.topjohnwu.magisk.events.DieEvent
