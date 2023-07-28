@@ -18,14 +18,7 @@ class BiometricHelper(context: Context) {
         else -> false
     }
 
-    val isEnabled: Boolean get() {
-        val enabled = Config.suBiometric
-        if (enabled && !isSupported) {
-            Config.suBiometric = false
-            return false
-        }
-        return enabled
-    }
+    val isEnabled get() = isSupported && Config.suBiometric
 
     fun authenticate(
         activity: FragmentActivity,
