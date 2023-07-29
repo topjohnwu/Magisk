@@ -1,6 +1,8 @@
 package com.topjohnwu.magisk.core.data
 
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.topjohnwu.magisk.core.model.su.SuLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,6 +12,16 @@ import java.util.*
 abstract class SuLogDatabase : RoomDatabase() {
 
     abstract fun suLogDao(): SuLogDao
+
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) = with(database) {
+                execSQL("ALTER TABLE logs ADD COLUMN target INTEGER NOT NULL DEFAULT -1")
+                execSQL("ALTER TABLE logs ADD COLUMN context TEXT NOT NULL DEFAULT ''")
+                execSQL("ALTER TABLE logs ADD COLUMN gids TEXT NOT NULL DEFAULT ''")
+            }
+        }
+    }
 }
 
 @Dao
