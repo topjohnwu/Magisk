@@ -88,6 +88,9 @@
     <string name="logs_cleared">日志已清空</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目标 UID: %1$d</string>
+    <string name="target_pid">挂载命名空间目标 PID: %s</string>
+    <string name="selinux_context">SELinux 上下文: %s</string>
+    <string name="supp_group">补充组: %s</string>
 
     <!--SafetyNet-->
 
