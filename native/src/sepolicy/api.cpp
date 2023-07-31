@@ -9,7 +9,7 @@ static void dprint(const char *action, Args ...args) {
     std::string s(action);
     for (int i = 0; i < sizeof...(args); ++i) s += " %s";
     s += "\n";
-    LOGD(s.data(), (args ? args : "*")...);
+    LOGD(s.data(), as_str(args)...);
 }
 #else
 #define dprint(...)
@@ -35,19 +35,19 @@ bool sepolicy::dontaudit(const char *s, const char *t, const char *c, const char
     return impl->add_rule(s, t, c, p, AVTAB_AUDITDENY, true);
 }
 
-bool sepolicy::allowxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_ALLOWED, false);
+bool sepolicy::allowxperm(const char *s, const char *t, const char *c, const argument &xperm) {
+    dprint(__FUNCTION__, s, t, c, "ioctl", xperm);
+    return impl->add_xperm_rule(s, t, c, xperm, AVTAB_XPERMS_ALLOWED);
 }
 
-bool sepolicy::auditallowxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_AUDITALLOW, false);
+bool sepolicy::auditallowxperm(const char *s, const char *t, const char *c, const argument &xperm) {
+    dprint(__FUNCTION__, s, t, c, "ioctl", xperm);
+    return impl->add_xperm_rule(s, t, c, xperm, AVTAB_XPERMS_AUDITALLOW);
 }
 
-bool sepolicy::dontauditxperm(const char *s, const char *t, const char *c, const char *range) {
-    dprint(__FUNCTION__, s, t, c, "ioctl", range);
-    return impl->add_xperm_rule(s, t, c, range, AVTAB_XPERMS_DONTAUDIT, false);
+bool sepolicy::dontauditxperm(const char *s, const char *t, const char *c, const argument &xperm) {
+    dprint(__FUNCTION__, s, t, c, "ioctl", xperm);
+    return impl->add_xperm_rule(s, t, c, xperm, AVTAB_XPERMS_DONTAUDIT);
 }
 
 bool sepolicy::type_change(const char *s, const char *t, const char *c, const char *d) {
