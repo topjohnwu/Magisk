@@ -2,6 +2,9 @@
 
 // Internal APIs, do not use directly
 
+#include <map>
+#include <string_view>
+
 #include <sepol/policydb/policydb.h>
 #include <sepolicy.hpp>
 
@@ -11,6 +14,9 @@ struct sepol_impl : public sepolicy {
     avtab_ptr_t find_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
     avtab_ptr_t insert_avtab_node(avtab_key_t *key);
     avtab_ptr_t get_avtab_node(avtab_key_t *key, avtab_extended_perms_t *xperms);
+    void print_type(FILE *fp, type_datum_t *type);
+    void print_avtab(FILE *fp, avtab_ptr_t node);
+    void print_filename_trans(FILE *fp, hashtab_ptr_t node);
 
     bool add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert);
     void add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool invert);
@@ -29,6 +35,9 @@ struct sepol_impl : public sepolicy {
     ~sepol_impl();
 
     policydb *db;
+
+private:
+    std::map<std::string_view, std::array<const char *, 32>> class_perm_names;
 };
 
 #define impl reinterpret_cast<sepol_impl *>(this)

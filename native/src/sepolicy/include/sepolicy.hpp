@@ -29,6 +29,7 @@ struct sepolicy {
     void parse_statement(c_str stmt) { parse_statement(stmt, strlen(stmt)); }
     void load_rules(const std::string &rules);
     void load_rule_file(c_str file);
+    void print_rules();
 
     // Operation on types
     bool type(c_str name, c_str attr);
