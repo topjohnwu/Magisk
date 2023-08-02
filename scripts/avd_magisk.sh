@@ -108,7 +108,7 @@ else
   MAGISKTMP=/dev/avd-magisk
   mkdir /dev/avd-magisk
   # If a file name 'magisk' is in current directory, mount will fail
-  rm magisk 2>/dev/null
+  rm -f magisk
   mount -t tmpfs -o 'mode=0755' magisk /dev/avd-magisk
 fi
 
