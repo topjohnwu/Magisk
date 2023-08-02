@@ -83,15 +83,18 @@ static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
     if (!h || !h->htable)
         return SEPOL_ENOMEM;
     int hvalue = avtab_hash(&node->key, h->mask);
-    avtab_ptr_t prev, cur;
-    for (prev = nullptr, cur = h->htable[hvalue]; cur; prev = cur, cur = cur->next) {
+    avtab_ptr_t prev = nullptr;
+    avtab_ptr_t cur = h->htable[hvalue];
+    while (cur) {
         if (cur == node)
             break;
+        prev = cur;
+        cur = cur->next;
     }
     if (cur == nullptr)
         return SEPOL_ENOENT;
 
-    // Detach from hash table
+    // Detach from link list
     if (prev)
         prev->next = node->next;
     else
@@ -99,8 +102,7 @@ static int avtab_remove_node(avtab_t *h, avtab_ptr_t node) {
     h->nel--;
 
     // Free memory
-    if (node->key.specified & AVTAB_XPERMS)
-        free(node->datum.xperms);
+    free(node->datum.xperms);
     free(node);
     return 0;
 }
@@ -730,32 +732,34 @@ void sepolicy::print_rules() {
 }
 
 void sepol_impl::print_type(FILE *fp, type_datum_t *type) {
+    const char *name = db->p_type_val_to_name[type->s.value - 1];
+    if (name == nullptr)
+        return;
     if (type->flavor == TYPE_ATTRIB) {
-        if (const char *attr = db->p_type_val_to_name[type->s.value - 1]) {
-            fprintf(fp, "attribute %s\n", attr);
-        }
+        fprintf(fp, "attribute %s\n", name);
     } else if (type->flavor == TYPE_TYPE) {
-        if (const char *name = db->p_type_val_to_name[type->s.value - 1]) {
-            bool first = true;
-            ebitmap_t *bitmap = &db->type_attr_map[type->s.value - 1];
-            for (uint32_t i = 0; i <= bitmap->highbit; ++i) {
-                if (ebitmap_get_bit(bitmap, i)) {
-                    auto attr_type = db->type_val_to_struct[i];
-                    if (attr_type->flavor == TYPE_ATTRIB) {
-                        if (const char *attr = db->p_type_val_to_name[i]) {
-                            if (first) {
-                                fprintf(fp, "type %s {", name);
-                                first = false;
-                            }
-                            fprintf(fp, " %s", attr);
+        bool first = true;
+        ebitmap_t *bitmap = &db->type_attr_map[type->s.value - 1];
+        for (uint32_t i = 0; i <= bitmap->highbit; ++i) {
+            if (ebitmap_get_bit(bitmap, i)) {
+                auto attr_type = db->type_val_to_struct[i];
+                if (attr_type->flavor == TYPE_ATTRIB) {
+                    if (const char *attr = db->p_type_val_to_name[i]) {
+                        if (first) {
+                            fprintf(fp, "type %s {", name);
+                            first = false;
                         }
+                        fprintf(fp, " %s", attr);
                     }
                 }
             }
-            if (!first) {
-                fprintf(fp, " }\n");
-            }
         }
+        if (!first) {
+            fprintf(fp, " }\n");
+        }
+    }
+    if (ebitmap_get_bit(&db->permissive_map, type->s.value)) {
+        fprintf(stdout, "permissive %s\n", name);
     }
 }
 
