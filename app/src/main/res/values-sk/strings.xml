@@ -87,7 +87,10 @@
     <string name="menuClearLog">Odstrániť záznam</string>
     <string name="logs_cleared">Záznam úspešne odstránený</string>
     <string name="pid">PID:%1$d</string>
-    <string name="target_uid">Cieľový UID: %1$d</string>
+    <string name="target_uid">Cieľové UID: %1$d</string>
+    <string name="target_pid">Pripojiť ns cieľový PID: %s</string>
+    <string name="selinux_context">SELinux kontext: %s</string>
+    <string name="supp_group">Doplnková skupina: %s</string>
 
     <!--SafetyNet-->
 
