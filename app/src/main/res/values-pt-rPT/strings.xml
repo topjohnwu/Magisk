@@ -86,6 +86,9 @@
     <string name="logs_cleared">Registro limpo com sucesso.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Alvo UID: %1$d</string>
+    <string name="target_pid">Alvo PID: %s</string>
+    <string name="selinux_context">Contexto SELinux: %s</string>
+    <string name="supp_group">Grupo suplementar: %s</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Mostrar apps do Sistema</string>
