@@ -88,6 +88,9 @@
     <string name="logs_cleared">Regjistrat u pastuan me sukses</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_pid">Montoni PID të synuar ns: %s</string>
+    <string name="selinux_context">Konteksti SELinux: %s</string>
+    <string name="supp_group">Grupi suplementar: %s</string>
 
     <!--SafetyNet-->
 
