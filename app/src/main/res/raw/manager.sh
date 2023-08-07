@@ -202,8 +202,7 @@ get_flags() {
   ISENCRYPTED=false
   [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   KEEPFORCEENCRYPT=$ISENCRYPTED
-  # Although this most certainly won't work without root, keep it just in case
-  if [ -e /dev/block/by-name/vbmeta_a ] || [ -e /dev/block/by-name/vbmeta ]; then
+  if [ -n "$(getprop ro.boot.vbmeta.device)" ]; then
     VBMETAEXIST=true
   else
     VBMETAEXIST=false
