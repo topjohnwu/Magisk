@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import errno
 import glob
 import lzma
 import multiprocessing
@@ -388,12 +387,14 @@ def build_binary(args):
     dump_flag_header()
 
     flag = ""
+    clean = False
 
     if "magisk" in args.target or "magiskinit" in args.target:
         flag += " B_PRELOAD=1"
 
     if "magiskpolicy" in args.target:
         flag += " B_POLICY=1"
+        clean = True
 
     if "test" in args.target:
         flag += " B_TEST=1"
@@ -416,6 +417,7 @@ def build_binary(args):
 
     if "magisk" in args.target:
         flag += " B_MAGISK=1"
+        clean = True
 
     if "magiskinit" in args.target:
         flag += " B_INIT=1"
@@ -423,6 +425,8 @@ def build_binary(args):
     if flag:
         dump_bin_header(args)
         run_ndk_build(flag)
+
+    if clean:
         clean_elf()
 
     # BusyBox is built with different libc
