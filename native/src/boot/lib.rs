@@ -5,8 +5,7 @@ pub use base;
 use cpio::cpio_commands;
 use patch::{hexpatch, patch_encryption, patch_verity};
 use payload::extract_boot_from_payload;
-use sha::{get_sha, sha1_hash, sha256_hash, SHA};
-use sign::{sign_boot_image, verify_boot_image};
+use sign::{get_sha, sha1_hash, sha256_hash, sign_boot_image, verify_boot_image, SHA};
 
 mod cpio;
 mod patch;
@@ -15,7 +14,6 @@ mod payload;
 #[allow(warnings)]
 mod proto;
 mod ramdisk;
-mod sha;
 mod sign;
 
 #[cxx::bridge]
