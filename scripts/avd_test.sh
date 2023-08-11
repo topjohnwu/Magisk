@@ -20,7 +20,7 @@ type='google_apis'
 api_list='23 26 28 29 34'
 
 cleanup() {
-  echo -e '\n\033[41;30m! An error occurred\033[0m\n'
+  echo -e '\n\033[41;39m! An error occurred\033[0m\n'
 
   for api in $api_list; do
     set_api_env $api
@@ -65,7 +65,7 @@ run_test() {
   set_api_env $api
 
   # Setup emulator
-  echo -e "\n\033[44;30m* Testing $pkg\033[0m\n"
+  echo -e "\n\033[44;39m* Testing $pkg\033[0m\n"
   "$sdk" $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
 
