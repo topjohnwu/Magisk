@@ -23,12 +23,12 @@ pub mod ffi {
         fn decompress(buf: &[u8], fd: i32) -> bool;
 
         include!("bootimg.hpp");
-        #[rust_name = "BootImage"]
-        type boot_img;
-        #[rust_name = "payload"]
-        fn get_payload(self: &BootImage) -> &[u8];
-        #[rust_name = "tail"]
-        fn get_tail(self: &BootImage) -> &[u8];
+        #[cxx_name = "boot_img"]
+        type BootImage;
+        #[cxx_name = "get_payload"]
+        fn payload(self: &BootImage) -> &[u8];
+        #[cxx_name = "get_tail"]
+        fn tail(self: &BootImage) -> &[u8];
     }
 
     extern "Rust" {

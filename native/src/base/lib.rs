@@ -42,11 +42,11 @@ pub mod ffi {
     #[namespace = "rust"]
     extern "Rust" {
         fn xpipe2(fds: &mut [i32; 2], flags: i32) -> i32;
-        #[rust_name = "fd_path_for_cxx"]
-        fn fd_path(fd: i32, buf: &mut [u8]) -> isize;
-        #[rust_name = "map_file_for_cxx"]
-        fn map_file(path: &[u8], rw: bool) -> &'static mut [u8];
-        #[rust_name = "map_fd_for_cxx"]
-        fn map_fd(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
+        #[cxx_name = "fd_path"]
+        fn fd_path_for_cxx(fd: i32, buf: &mut [u8]) -> isize;
+        #[cxx_name = "map_file"]
+        fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8];
+        #[cxx_name = "map_fd"]
+        fn map_fd_for_cxx(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
     }
 }
