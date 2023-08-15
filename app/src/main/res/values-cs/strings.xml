@@ -88,6 +88,9 @@
     <string name="logs_cleared">Protokol byl smazán</string>
     <string name="pid">PID:%1$d</string>
     <string name="target_uid">Cílové UID: %1$d</string>
+    <string name="target_pid">Připojit PID cílového ns: %s</string>
+    <string name="selinux_context">SELinux kontext: %s</string>
+    <string name="supp_group">Sekundární skupina: %s</string>
 
     <!--SafetyNet-->
 
@@ -179,9 +182,9 @@
     <string name="settings_owner_only">Vlastník zařízení</string>
     <string name="settings_owner_manage">Správce zařízení</string>
     <string name="settings_user_independent">Všichni uživatelé</string>
-    <string name="owner_only_summary">Pouze vlastník má přístup ROOT.</string>
-    <string name="owner_manage_summary">Přístup ROOT má správce zařízení, který přijímá požadavky k přístupu.</string>
-    <string name="user_independent_summary">Každý uživatel má svá vlastní pravidla přístupu ROOT.</string>
+    <string name="owner_only_summary">Pouze vlastník má přístup ROOT</string>
+    <string name="owner_manage_summary">Přístup ROOT má správce zařízení, který přijímá požadavky k přístupu</string>
+    <string name="user_independent_summary">Každý uživatel má svá vlastní pravidla přístupu ROOT</string>
 
     <string name="mount_namespace_mode">Režim připojení jmenného prostoru</string>
     <string name="settings_ns_global">Globální jmenný prostor</string>
