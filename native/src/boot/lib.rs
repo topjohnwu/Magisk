@@ -1,5 +1,5 @@
 #![feature(format_args_nl)]
-#![feature(btree_drain_filter)]
+#![feature(btree_extract_if)]
 
 pub use base;
 use cpio::cpio_commands;

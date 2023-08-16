@@ -694,7 +694,7 @@ bool sepol_impl::add_typeattribute(const char *type, const char *attr) {
 }
 
 void sepol_impl::strip_dontaudit() {
-    avtab_for_each(&db->te_avtab, [=](avtab_ptr_t node) {
+    avtab_for_each(&db->te_avtab, [=, this](avtab_ptr_t node) {
         if (node->key.specified == AVTAB_AUDITDENY || node->key.specified == AVTAB_XPERMS_DONTAUDIT)
             avtab_remove_node(&db->te_avtab, node);
     });

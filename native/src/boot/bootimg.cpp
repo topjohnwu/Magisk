@@ -116,7 +116,7 @@ void dyn_img_hdr::dump_hdr_file() const {
 }
 
 void dyn_img_hdr::load_hdr_file() {
-    parse_prop_file(HEADER_FILE, [=](string_view key, string_view value) -> bool {
+    parse_prop_file(HEADER_FILE, [=, this](string_view key, string_view value) -> bool {
         if (key == "name" && name()) {
             memset(name(), 0, 16);
             memcpy(name(), value.data(), value.length() > 15 ? 15 : value.length());

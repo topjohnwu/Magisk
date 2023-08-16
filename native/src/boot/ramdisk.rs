@@ -93,7 +93,7 @@ impl MagiskCpio for Cpio {
         let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         self.entries
-            .drain_filter(|name, _| name.starts_with(".backup/"))
+            .extract_if(|name, _| name.starts_with(".backup/"))
             .for_each(|(name, entry)| {
                 if name == ".backup/.rmlist" {
                     if let Ok(data) = from_utf8(&entry.data) {
