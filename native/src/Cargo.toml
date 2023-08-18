@@ -24,7 +24,7 @@ der = "0.7"
 
 [workspace.dependencies.argh]
 git = "https://github.com/topjohnwu/argh.git"
-rev = "2fecd81d606364a8b07b942ed01697bbd3a62193"
+rev = "f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8"
 
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
