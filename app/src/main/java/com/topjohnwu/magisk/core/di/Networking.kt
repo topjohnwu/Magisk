@@ -25,17 +25,7 @@ private class DnsResolver(client: OkHttpClient) : Dns {
 
     private val doh by lazy {
         DnsOverHttps.Builder().client(client)
-            .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
-            .bootstrapDnsHosts(listOf(
-                InetAddress.getByName("162.159.36.1"),
-                InetAddress.getByName("162.159.46.1"),
-                InetAddress.getByName("1.1.1.1"),
-                InetAddress.getByName("1.0.0.1"),
-                InetAddress.getByName("2606:4700:4700::1111"),
-                InetAddress.getByName("2606:4700:4700::1001"),
-                InetAddress.getByName("2606:4700:4700::0064"),
-                InetAddress.getByName("2606:4700:4700::6400")
-            ))
+            .url("https://101.101.101.101/dns-query".toHttpUrl())
             .resolvePrivateAddresses(true)  /* To make PublicSuffixDatabase never used */
             .build()
     }
