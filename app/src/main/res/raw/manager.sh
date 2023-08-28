@@ -202,10 +202,11 @@ get_flags() {
   ISENCRYPTED=false
   [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   KEEPFORCEENCRYPT=$ISENCRYPTED
-  if [ -n "$(getprop ro.boot.vbmeta.device)" ]; then
+  VBMETAEXIST=false
+  if [ -n "$(getprop ro.boot.vbmeta.device)" -o -n "$(getprop ro.boot.vbmeta.size)" ]; then
     VBMETAEXIST=true
-  else
-    VBMETAEXIST=false
+  elif getprop ro.product.ab_ota_partitions | grep -wq vbmeta; then
+    VBMETAEXIST=true
   fi
   # Preset PATCHVBMETAFLAG to false in the non-root case
   PATCHVBMETAFLAG=false
