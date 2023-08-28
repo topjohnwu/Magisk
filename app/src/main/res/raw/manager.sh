@@ -203,7 +203,11 @@ get_flags() {
   [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   KEEPFORCEENCRYPT=$ISENCRYPTED
   VBMETAEXIST=false
-  [ -n "$(getprop ro.boot.vbmeta.device)" -o -n "$(getprop ro.boot.vbmeta.size)" ] || getprop ro.product.ab_ota_partitions | grep -wq vbmeta && VBMETAEXIST=true
+  if [ -n "$(getprop ro.boot.vbmeta.device)" -o -n "$(getprop ro.boot.vbmeta.size)" ]; then
+    VBMETAEXIST=true
+  elif getprop ro.product.ab_ota_partitions | grep -wq vbmeta; then
+    VBMETAEXIST=true
+  fi
   # Preset PATCHVBMETAFLAG to false in the non-root case
   PATCHVBMETAFLAG=false
   # Make sure RECOVERYMODE has value
