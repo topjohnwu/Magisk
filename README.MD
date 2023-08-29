@@ -16,7 +16,7 @@ Some highlight features:
 
 ## Downloads
 
-[Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
+[GitHub](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
 
 [![](https://img.shields.io/badge/Magisk-v26.1-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v26.1)
 [![](https://img.shields.io/badge/Magisk%20Beta-v26.2-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v26.2)
