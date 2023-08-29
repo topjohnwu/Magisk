@@ -110,15 +110,6 @@
 
                         <CheckBox
                             style="@style/WidgetFoundation.Checkbox"
-                            gone="@{viewModel.hideVbmeta}"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:checked="@={Config.patchVbmeta}"
-                            android:text="@string/patch_vbmeta"
-                            app:tint="?colorPrimary" />
-
-                        <CheckBox
-                            style="@style/WidgetFoundation.Checkbox"
                             gone="@{Info.ramdisk}"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
