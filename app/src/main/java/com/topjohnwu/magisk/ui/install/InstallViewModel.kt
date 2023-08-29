@@ -104,7 +104,6 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
             step,
             Config.keepVerity,
             Config.keepEnc,
-            Config.patchVbmeta,
             Config.recovery
         ))
     }
@@ -115,7 +114,6 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
             step = it.step
             Config.keepVerity = it.keepVerity
             Config.keepEnc = it.keepEnc
-            Config.patchVbmeta = it.patchVbmeta
             Config.recovery = it.recovery
         }
     }
@@ -136,7 +134,6 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
         val step: Int,
         val keepVerity: Boolean,
         val keepEnc: Boolean,
-        val patchVbmeta: Boolean,
         val recovery: Boolean,
     ) : Parcelable
 

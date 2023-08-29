@@ -5,7 +5,7 @@
 #
 # Usage: boot_patch.sh <bootimage>
 #
-# The following flags can be set in environment variables:
+# The following environment variables can configure the installation:
 # KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, LEGACYSAR
 #
 # This script should be placed in a directory with the following files:
@@ -179,7 +179,6 @@ fi
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
-echo "PATCHVBMETAFLAG=$PATCHVBMETAFLAG" >> config
 echo "RECOVERYMODE=$RECOVERYMODE" >> config
 if [ -n "$PREINITDEVICE" ]; then
   ui_print "- Pre-init storage partition: $PREINITDEVICE"

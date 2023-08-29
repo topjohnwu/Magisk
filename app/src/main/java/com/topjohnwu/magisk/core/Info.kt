@@ -32,7 +32,7 @@ object Info {
     @JvmField val isZygiskEnabled = System.getenv("ZYGISK_ENABLED") == "1"
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
-    @JvmField var vbmeta = false
+    var patchBootVbmeta = false
     var crypto = ""
     var noDataExec = false
     var isRooted = false

@@ -73,18 +73,17 @@ class ShellInit : Shell.Initializer() {
         fun getVar(name: String) = fastCmd("echo \$$name")
         fun getBool(name: String) = getVar(name).toBoolean()
 
-        Info.isSAR = getBool("SYSTEM_ROOT")
+        Info.isSAR = getBool("SYSTEM_AS_ROOT")
         Info.ramdisk = getBool("RAMDISKEXIST")
-        Info.vbmeta = getBool("VBMETAEXIST")
         Info.isAB = getBool("ISAB")
         Info.crypto = getVar("CRYPTOTYPE")
+        Info.patchBootVbmeta = getBool("PATCHVBMETAFLAG")
         Info.legacySAR = getBool("LEGACYSAR")
 
         // Default presets
         Config.recovery = getBool("RECOVERYMODE")
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
-        Config.patchVbmeta = getBool("PATCHVBMETAFLAG")
 
         return true
     }

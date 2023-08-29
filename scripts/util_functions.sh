@@ -279,7 +279,7 @@ mount_ro_ensure() {
 }
 
 # After calling this method, the following variables will be set:
-# SLOT, SYSTEM_ROOT
+# SLOT, SYSTEM_AS_ROOT
 mount_partitions() {
   # Check A/B slot
   SLOT=$(grep_cmdline androidboot.slot_suffix)
@@ -297,7 +297,7 @@ mount_partitions() {
   fi
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init -o -L /system/init ]; then
-    SYSTEM_ROOT=true
+    SYSTEM_AS_ROOT=true
     setup_mntpoint /system_root
     if ! mount --move /system /system_root; then
       umount /system
@@ -307,63 +307,68 @@ mount_partitions() {
     mount -o bind /system_root/system /system
   else
     if grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts; then
-      SYSTEM_ROOT=true
+      SYSTEM_AS_ROOT=true
     else
-      SYSTEM_ROOT=false
+      SYSTEM_AS_ROOT=false
     fi
   fi
-  $SYSTEM_ROOT && ui_print "- Device is system-as-root"
+  $SYSTEM_AS_ROOT && ui_print "- Device is system-as-root"
 }
 
 # After calling this method, the following variables will be set:
-# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
-# ISENCRYPTED, VBMETAEXIST, LEGACYSAR
+# ISENCRYPTED, PATCHVBMETAFLAG, LEGACYSAR,
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
 get_flags() {
+  if grep ' /data ' /proc/mounts | grep -q 'dm-'; then
+    ISENCRYPTED=true
+  elif [ "$(getprop ro.crypto.state)" = "encrypted" ]; then
+    ISENCRYPTED=true
+  elif [ "$DATA" = "false" ]
+    # No data access means unable to decrypt in recovery
+    ISENCRYPTED=true
+  else
+    ISENCRYPTED=false
+  fi
+  if [ -n "$(find_block vbmeta vbmeta_a)" ]; then
+    PATCHVBMETAFLAG=false
+  else
+    PATCHVBMETAFLAG=true
+    ui_print "- No vbmeta partition, patch vbmeta in boot image"
+  fi
+  local IS_DYNAMIC=false
+  if grep -q 'androidboot.super_partition' /proc/cmdline; then
+    IS_DYNAMIC=true
+  elif [ -n "$(find_block super)" ]; then
+    IS_DYNAMIC=true
+  fi
+  if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
+    LEGACYSAR=true
+    ui_print "- Legacy SAR, force kernel to load rootfs"
+  else
+    LEGACYSAR=false
+  fi
+
+  # Overridable config flags with safe defaults
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
-  getvar PATCHVBMETAFLAG
   if [ -z $KEEPVERITY ]; then
-    if $SYSTEM_ROOT; then
+    if $SYSTEM_AS_ROOT; then
       KEEPVERITY=true
-      ui_print "- System-as-root, keep dm/avb-verity"
+      ui_print "- System-as-root, keep dm-verity"
     else
       KEEPVERITY=false
     fi
   fi
-  ISENCRYPTED=false
-  grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
-  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   if [ -z $KEEPFORCEENCRYPT ]; then
-    # No data access means unable to decrypt in recovery
-    if $ISENCRYPTED || ! $DATA; then
+    if $ISENCRYPTED; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data, keep forceencrypt"
     else
       KEEPFORCEENCRYPT=false
     fi
   fi
-  VBMETAEXIST=false
-  local VBMETAIMG=$(find_block vbmeta vbmeta_a)
-  [ -n "$VBMETAIMG" ] && VBMETAEXIST=true
-  if [ -z $PATCHVBMETAFLAG ]; then
-    if $VBMETAEXIST; then
-      PATCHVBMETAFLAG=false
-    else
-      PATCHVBMETAFLAG=true
-      ui_print "- No vbmeta partition, patch vbmeta in boot image"
-    fi
-  fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
-  local IS_DYNAMIC=false
-  grep -q 'androidboot.super_partition' /proc/cmdline && IS_DYNAMIC=true
-  [ -b "/dev/block/by-name/super" ] && IS_DYNAMIC=true
-  if $SYSTEM_ROOT && ! $IS_DYNAMIC; then
-    LEGACYSAR=true
-    ui_print "- legacy SAR, force kernel to load rootfs"
-  else
-    LEGACYSAR=false
-  fi
 }
 
 find_boot_image() {
