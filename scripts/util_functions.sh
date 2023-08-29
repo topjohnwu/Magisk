@@ -112,7 +112,7 @@ setup_flashable() {
   $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
-    for FD in `ls /proc/$$/fd`; do
+    for FD in $(ls /proc/$$/fd); do
       if readlink /proc/$$/fd/$FD | grep -q pipe; then
         if ps | grep -v grep | grep -qE " 3 $FD |status_fd=$FD"; then
           OUTFD=$FD
@@ -214,7 +214,7 @@ recovery_cleanup() {
 find_block() {
   local BLOCK DEV DEVICE DEVNAME PARTNAME UEVENT
   for BLOCK in "$@"; do
-    DEVICE=`find /dev/block \( -type b -o -type c -o -type l \) -iname $BLOCK | head -n 1` 2>/dev/null
+    DEVICE=$(find /dev/block \( -type b -o -type c -o -type l \) -iname $BLOCK | head -n 1) 2>/dev/null
     if [ ! -z $DEVICE ]; then
       readlink -f $DEVICE
       return 0
@@ -222,8 +222,8 @@ find_block() {
   done
   # Fallback by parsing sysfs uevents
   for UEVENT in /sys/dev/block/*/uevent; do
-    DEVNAME=`grep_prop DEVNAME $UEVENT`
-    PARTNAME=`grep_prop PARTNAME $UEVENT`
+    DEVNAME=$(grep_prop DEVNAME $UEVENT)
+    PARTNAME=$(grep_prop PARTNAME $UEVENT)
     for BLOCK in "$@"; do
       if [ "$(toupper $BLOCK)" = "$(toupper $PARTNAME)" ]; then
         echo /dev/block/$DEVNAME
@@ -233,7 +233,7 @@ find_block() {
   done
   # Look just in /dev in case we're dealing with MTD/NAND without /dev/block devices/links
   for DEV in "$@"; do
-    DEVICE=`find /dev \( -type b -o -type c -o -type l \) -maxdepth 1 -iname $DEV | head -n 1` 2>/dev/null
+    DEVICE=$(find /dev \( -type b -o -type c -o -type l \) -maxdepth 1 -iname $DEV | head -n 1) 2>/dev/null
     if [ ! -z $DEVICE ]; then
       readlink -f $DEVICE
       return 0
@@ -278,6 +278,8 @@ mount_ro_ensure() {
   is_mounted $POINT || abort "! Cannot mount $POINT"
 }
 
+# After calling this method, the following variables will be set:
+# SLOT, SYSTEM_ROOT
 mount_partitions() {
   # Check A/B slot
   SLOT=$(grep_cmdline androidboot.slot_suffix)
@@ -304,8 +306,11 @@ mount_partitions() {
     fi
     mount -o bind /system_root/system /system
   else
-    SYSTEM_ROOT=false
-    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM_ROOT=true
+    if grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts; then
+      SYSTEM_ROOT=true
+    else
+      SYSTEM_ROOT=false
+    fi
   fi
   $SYSTEM_ROOT && ui_print "- Device is system-as-root"
 }
@@ -524,7 +529,7 @@ run_migrations() {
   # Legacy backup
   for gz in /data/stock_boot*.gz; do
     [ -f $gz ] || break
-    LOCSHA1=`basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//'`
+    LOCSHA1=$(basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//')
     [ -z $LOCSHA1 ] && break
     mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
     mv $gz /data/magisk_backup_${LOCSHA1}/boot.img.gz
@@ -536,7 +541,7 @@ run_migrations() {
     BACKUP=$MAGISKBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
-      LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`
+      LOCSHA1=$($MAGISKBIN/magiskboot sha1 $BACKUP)
       mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
     fi
     TARGET=/data/magisk_backup_${LOCSHA1}/${name}.img
@@ -597,14 +602,6 @@ mktouch() {
   chmod 644 $1
 }
 
-request_size_check() {
-  reqSizeM=`du -ms "$1" | cut -f1`
-}
-
-request_zip_size_check() {
-  reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int(($1 - 1) / 1048576 + 1) }'`
-}
-
 boot_actions() { return; }
 
 # Require ZIPFILE to be set
@@ -638,9 +635,9 @@ install_module() {
   local MODDIRNAME=modules
   $BOOTMODE && MODDIRNAME=modules_update
   local MODULEROOT=$NVBASE/$MODDIRNAME
-  MODID=`grep_prop id $TMPDIR/module.prop`
-  MODNAME=`grep_prop name $TMPDIR/module.prop`
-  MODAUTH=`grep_prop author $TMPDIR/module.prop`
+  MODID=$(grep_prop id $TMPDIR/module.prop)
+  MODNAME=$(grep_prop name $TMPDIR/module.prop)
+  MODAUTH=$(grep_prop author $TMPDIR/module.prop)
   MODPATH=$MODULEROOT/$MODID
 
   # Create mod paths
