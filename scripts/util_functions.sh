@@ -323,7 +323,7 @@ get_flags() {
     ISENCRYPTED=true
   elif [ "$(getprop ro.crypto.state)" = "encrypted" ]; then
     ISENCRYPTED=true
-  elif [ "$DATA" = "false" ]
+  elif [ "$DATA" = "false" ]; then
     # No data access means unable to decrypt in recovery
     ISENCRYPTED=true
   else
