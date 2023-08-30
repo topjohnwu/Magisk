@@ -322,7 +322,8 @@ abstract class MagiskInstallImpl protected constructor(
 
             val fd = Os.open(fifo.path, O_WRONLY, 0)
             try {
-                val buf = ByteBuffer.allocate(1024 * 1024)
+                val bufSize = 1024 * 1024
+                val buf = ByteBuffer.allocate(bufSize)
                 buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
                 while (buf.hasRemaining()) {
                     try {
@@ -334,6 +335,7 @@ abstract class MagiskInstallImpl protected constructor(
                         break
                     }
                     if (!buf.hasRemaining()) {
+                        buf.limit(bufSize)
                         buf.position(input.read(buf.array()).coerceAtLeast(0)).flip()
                     }
                 }
