@@ -242,6 +242,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/l_50" />
 
+                    <include
+                        item="@{DeveloperItem.Canyie.INSTANCE}"
+                        layout="@layout/item_developer"
+                        viewModel="@{viewModel}"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/l_50" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

@@ -32,8 +32,8 @@ pub mod ffi {
     }
 
     extern "Rust" {
-        #[rust_name = "log_from_cxx"]
-        fn log_with_rs(level: LogLevel, msg: &[u8]);
+        #[cxx_name = "log_with_rs"]
+        fn log_from_cxx(level: LogLevel, msg: &[u8]);
         fn exit_on_error(b: bool);
         fn set_log_level_state(level: LogLevel, enabled: bool);
         fn cmdline_logging();

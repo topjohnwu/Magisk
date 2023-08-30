@@ -114,7 +114,6 @@ object Config : PreferenceConfig, DBConfig {
 
     @JvmField var keepVerity = false
     @JvmField var keepEnc = false
-    @JvmField var patchVbmeta = false
     @JvmField var recovery = false
 
     var bootId by preference(Key.BOOT_ID, "")

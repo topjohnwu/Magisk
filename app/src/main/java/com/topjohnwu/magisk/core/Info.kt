@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core
 
-import android.os.Build
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
@@ -33,13 +32,12 @@ object Info {
     @JvmField val isZygiskEnabled = System.getenv("ZYGISK_ENABLED") == "1"
     @JvmStatic val isFDE get() = crypto == "block"
     @JvmField var ramdisk = false
-    @JvmField var vbmeta = false
+    var patchBootVbmeta = false
     var crypto = ""
     var noDataExec = false
     var isRooted = false
 
     @JvmField var hasGMS = true
-    val isSamsung = Build.MANUFACTURER.equals("samsung", ignoreCase = true)
     @JvmField val isEmulator =
         getProperty("ro.kernel.qemu", "0") == "1" ||
             getProperty("ro.boot.qemu", "0") == "1"

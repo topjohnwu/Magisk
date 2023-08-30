@@ -112,7 +112,7 @@ setup_flashable() {
   $BOOTMODE && return
   if [ -z $OUTFD ] || readlink /proc/$$/fd/$OUTFD | grep -q /tmp; then
     # We will have to manually find out OUTFD
-    for FD in `ls /proc/$$/fd`; do
+    for FD in $(ls /proc/$$/fd); do
       if readlink /proc/$$/fd/$FD | grep -q pipe; then
         if ps | grep -v grep | grep -qE " 3 $FD |status_fd=$FD"; then
           OUTFD=$FD
@@ -214,7 +214,7 @@ recovery_cleanup() {
 find_block() {
   local BLOCK DEV DEVICE DEVNAME PARTNAME UEVENT
   for BLOCK in "$@"; do
-    DEVICE=`find /dev/block \( -type b -o -type c -o -type l \) -iname $BLOCK | head -n 1` 2>/dev/null
+    DEVICE=$(find /dev/block \( -type b -o -type c -o -type l \) -iname $BLOCK | head -n 1) 2>/dev/null
     if [ ! -z $DEVICE ]; then
       readlink -f $DEVICE
       return 0
@@ -222,8 +222,8 @@ find_block() {
   done
   # Fallback by parsing sysfs uevents
   for UEVENT in /sys/dev/block/*/uevent; do
-    DEVNAME=`grep_prop DEVNAME $UEVENT`
-    PARTNAME=`grep_prop PARTNAME $UEVENT`
+    DEVNAME=$(grep_prop DEVNAME $UEVENT)
+    PARTNAME=$(grep_prop PARTNAME $UEVENT)
     for BLOCK in "$@"; do
       if [ "$(toupper $BLOCK)" = "$(toupper $PARTNAME)" ]; then
         echo /dev/block/$DEVNAME
@@ -233,7 +233,7 @@ find_block() {
   done
   # Look just in /dev in case we're dealing with MTD/NAND without /dev/block devices/links
   for DEV in "$@"; do
-    DEVICE=`find /dev \( -type b -o -type c -o -type l \) -maxdepth 1 -iname $DEV | head -n 1` 2>/dev/null
+    DEVICE=$(find /dev \( -type b -o -type c -o -type l \) -maxdepth 1 -iname $DEV | head -n 1) 2>/dev/null
     if [ ! -z $DEVICE ]; then
       readlink -f $DEVICE
       return 0
@@ -278,6 +278,8 @@ mount_ro_ensure() {
   is_mounted $POINT || abort "! Cannot mount $POINT"
 }
 
+# After calling this method, the following variables will be set:
+# SLOT, SYSTEM_AS_ROOT
 mount_partitions() {
   # Check A/B slot
   SLOT=$(grep_cmdline androidboot.slot_suffix)
@@ -295,7 +297,7 @@ mount_partitions() {
   fi
   mount_ro_ensure "system$SLOT app$SLOT" /system
   if [ -f /system/init -o -L /system/init ]; then
-    SYSTEM_ROOT=true
+    SYSTEM_AS_ROOT=true
     setup_mntpoint /system_root
     if ! mount --move /system /system_root; then
       umount /system
@@ -304,61 +306,73 @@ mount_partitions() {
     fi
     mount -o bind /system_root/system /system
   else
-    SYSTEM_ROOT=false
-    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts && SYSTEM_ROOT=true
+    if grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts; then
+      SYSTEM_AS_ROOT=true
+    else
+      SYSTEM_AS_ROOT=false
+    fi
   fi
-  $SYSTEM_ROOT && ui_print "- Device is system-as-root"
+  $SYSTEM_AS_ROOT && ui_print "- Device is system-as-root"
 }
 
 # After calling this method, the following variables will be set:
-# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE, PATCHVBMETAFLAG,
-# ISENCRYPTED, VBMETAEXIST, LEGACYSAR
+# ISENCRYPTED, PATCHVBMETAFLAG, LEGACYSAR,
+# KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
 get_flags() {
+  if grep ' /data ' /proc/mounts | grep -q 'dm-'; then
+    ISENCRYPTED=true
+  elif [ "$(getprop ro.crypto.state)" = "encrypted" ]; then
+    ISENCRYPTED=true
+  elif [ "$DATA" = "false" ]; then
+    # No data access means unable to decrypt in recovery
+    ISENCRYPTED=true
+  else
+    ISENCRYPTED=false
+  fi
+  if [ -n "$(find_block vbmeta vbmeta_a)" ]; then
+    PATCHVBMETAFLAG=false
+  else
+    PATCHVBMETAFLAG=true
+    ui_print "- No vbmeta partition, patch vbmeta in boot image"
+  fi
+  LEGACYSAR=false
+  if $BOOTMODE; then
+    grep ' / ' /proc/mounts | grep -q '/dev/root' && LEGACYSAR=true
+  else
+    # Recovery mode, assume devices that don't use dynamic partitions are legacy SAR
+    local IS_DYNAMIC=false
+    if grep -q 'androidboot.super_partition' /proc/cmdline; then
+      IS_DYNAMIC=true
+    elif [ -n "$(find_block super)" ]; then
+      IS_DYNAMIC=true
+    fi
+    if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
+      LEGACYSAR=true
+      ui_print "- Legacy SAR, force kernel to load rootfs"
+    fi
+  fi
+
+  # Overridable config flags with safe defaults
   getvar KEEPVERITY
   getvar KEEPFORCEENCRYPT
   getvar RECOVERYMODE
-  getvar PATCHVBMETAFLAG
   if [ -z $KEEPVERITY ]; then
-    if $SYSTEM_ROOT; then
+    if $SYSTEM_AS_ROOT; then
       KEEPVERITY=true
-      ui_print "- System-as-root, keep dm/avb-verity"
+      ui_print "- System-as-root, keep dm-verity"
     else
       KEEPVERITY=false
     fi
   fi
-  ISENCRYPTED=false
-  grep ' /data ' /proc/mounts | grep -q 'dm-' && ISENCRYPTED=true
-  [ "$(getprop ro.crypto.state)" = "encrypted" ] && ISENCRYPTED=true
   if [ -z $KEEPFORCEENCRYPT ]; then
-    # No data access means unable to decrypt in recovery
-    if $ISENCRYPTED || ! $DATA; then
+    if $ISENCRYPTED; then
       KEEPFORCEENCRYPT=true
       ui_print "- Encrypted data, keep forceencrypt"
     else
       KEEPFORCEENCRYPT=false
     fi
   fi
-  VBMETAEXIST=false
-  local VBMETAIMG=$(find_block vbmeta vbmeta_a)
-  [ -n "$VBMETAIMG" ] && VBMETAEXIST=true
-  if [ -z $PATCHVBMETAFLAG ]; then
-    if $VBMETAEXIST; then
-      PATCHVBMETAFLAG=false
-    else
-      PATCHVBMETAFLAG=true
-      ui_print "- No vbmeta partition, patch vbmeta in boot image"
-    fi
-  fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
-  local IS_DYNAMIC=false
-  grep -q 'androidboot.super_partition' /proc/cmdline && IS_DYNAMIC=true
-  [ -b "/dev/block/by-name/super" ] && IS_DYNAMIC=true
-  if $SYSTEM_ROOT && ! $IS_DYNAMIC; then
-    LEGACYSAR=true
-    ui_print "- legacy SAR, force kernel to load rootfs"
-  else
-    LEGACYSAR=false
-  fi
 }
 
 find_boot_image() {
@@ -524,7 +538,7 @@ run_migrations() {
   # Legacy backup
   for gz in /data/stock_boot*.gz; do
     [ -f $gz ] || break
-    LOCSHA1=`basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//'`
+    LOCSHA1=$(basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//')
     [ -z $LOCSHA1 ] && break
     mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
     mv $gz /data/magisk_backup_${LOCSHA1}/boot.img.gz
@@ -536,7 +550,7 @@ run_migrations() {
     BACKUP=$MAGISKBIN/stock_${name}.img
     [ -f $BACKUP ] || continue
     if [ $name = 'boot' ]; then
-      LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`
+      LOCSHA1=$($MAGISKBIN/magiskboot sha1 $BACKUP)
       mkdir /data/magisk_backup_${LOCSHA1} 2>/dev/null
     fi
     TARGET=/data/magisk_backup_${LOCSHA1}/${name}.img
@@ -597,14 +611,6 @@ mktouch() {
   chmod 644 $1
 }
 
-request_size_check() {
-  reqSizeM=`du -ms "$1" | cut -f1`
-}
-
-request_zip_size_check() {
-  reqSizeM=`unzip -l "$1" | tail -n 1 | awk '{ print int(($1 - 1) / 1048576 + 1) }'`
-}
-
 boot_actions() { return; }
 
 # Require ZIPFILE to be set
@@ -638,9 +644,9 @@ install_module() {
   local MODDIRNAME=modules
   $BOOTMODE && MODDIRNAME=modules_update
   local MODULEROOT=$NVBASE/$MODDIRNAME
-  MODID=`grep_prop id $TMPDIR/module.prop`
-  MODNAME=`grep_prop name $TMPDIR/module.prop`
-  MODAUTH=`grep_prop author $TMPDIR/module.prop`
+  MODID=$(grep_prop id $TMPDIR/module.prop)
+  MODNAME=$(grep_prop name $TMPDIR/module.prop)
+  MODAUTH=$(grep_prop author $TMPDIR/module.prop)
   MODPATH=$MODULEROOT/$MODID
 
   # Create mod paths
