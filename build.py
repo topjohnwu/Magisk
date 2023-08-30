@@ -259,13 +259,15 @@ def run_cargo(cmds, triple="aarch64-linux-android"):
 
 
 def run_cargo_build(args):
-    os.chdir(op.join("native", "src"))
     native_out = op.join("..", "out")
     mkdir(native_out)
 
     targets = set(args.target) & set(rust_targets)
     if "resetprop" in args.target:
         targets.add("magisk")
+
+    if len(targets) == 0:
+        return
 
     # Start building the actual build commands
     cmds = ["build"]
@@ -297,8 +299,6 @@ def run_cargo_build(args):
             source = op.join("target", rust_triple, rust_out, f"lib{tgt}.a")
             target = op.join(arch_out, f"lib{tgt}-rs.a")
             mv(source, target)
-
-    os.chdir(op.join("..", ".."))
 
 
 def run_cargo_cmd(args):
@@ -382,7 +382,9 @@ def build_binary(args):
 
     header("* Building binaries: " + " ".join(args.target))
 
+    os.chdir(op.join("native", "src"))
     run_cargo_build(args)
+    os.chdir(op.join("..", ".."))
 
     dump_flag_header()
 
