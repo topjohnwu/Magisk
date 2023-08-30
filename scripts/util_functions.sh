@@ -335,17 +335,21 @@ get_flags() {
     PATCHVBMETAFLAG=true
     ui_print "- No vbmeta partition, patch vbmeta in boot image"
   fi
-  local IS_DYNAMIC=false
-  if grep -q 'androidboot.super_partition' /proc/cmdline; then
-    IS_DYNAMIC=true
-  elif [ -n "$(find_block super)" ]; then
-    IS_DYNAMIC=true
-  fi
-  if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
-    LEGACYSAR=true
-    ui_print "- Legacy SAR, force kernel to load rootfs"
+  LEGACYSAR=false
+  if $BOOTMODE; then
+    grep ' / ' /proc/mounts | grep -q '/dev/root' && LEGACYSAR=true
   else
-    LEGACYSAR=false
+    # Recovery mode, assume devices that don't use dynamic partitions are legacy SAR
+    local IS_DYNAMIC=false
+    if grep -q 'androidboot.super_partition' /proc/cmdline; then
+      IS_DYNAMIC=true
+    elif [ -n "$(find_block super)" ]; then
+      IS_DYNAMIC=true
+    fi
+    if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
+      LEGACYSAR=true
+      ui_print "- Legacy SAR, force kernel to load rootfs"
+    fi
   fi
 
   # Overridable config flags with safe defaults
