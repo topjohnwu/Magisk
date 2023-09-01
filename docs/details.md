@@ -4,7 +4,7 @@
 
 ### Paths in "Magisk tmpfs directory"
 
-Magisk will mount a `tmpfs` directory to store some temporary data. For devices with the `/sbin` folder, it will be chosen as it will also act as an overlay to inject binaries into `PATH`. From Android 11 onwards, the `/sbin` folder might not exist, so Magisk will randomly create a folder under `/dev` and use it as the base folder.
+Magisk will mount a `tmpfs` directory to store some temporary data. For devices with the `/sbin` folder, it will be chosen as it will also act as an overlay to inject binaries into `PATH`. From Android 11 onwards, the `/sbin` folder might not exist, so Magisk will use `/debug_ramdisk` as the base folder.
 
 ```
 # In order to get the current base folder Magisk is using,
