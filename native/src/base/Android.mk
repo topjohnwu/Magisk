@@ -34,4 +34,9 @@ LOCAL_SRC_FILES := compat/compat.cpp
 # Fix static variables' ctor/dtor when using LTO
 # See: https://github.com/android/ndk/issues/1461
 LOCAL_EXPORT_LDFLAGS := -static -T src/lto_fix.lds
+# For some reason, using the hacky libc.a with x86 will trigger stack protection violation
+# when mixing Rust and C++ code. Disable stack protector to bypass this issue.
+ifeq ($(TARGET_ARCH), x86)
+LOCAL_EXPORT_CFLAGS := -fno-stack-protector
+endif
 include $(BUILD_STATIC_LIBRARY)
