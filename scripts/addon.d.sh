@@ -72,6 +72,12 @@ initialize() {
 
 main() {
   if ! $backuptool_ab; then
+    # Restore PREINITDEVICE from previous A-only partition
+    if [ -f config.orig ]; then
+      PREINITDEVICE=$(grep_prop PREINITDEVICE config.orig)
+      rm config.orig
+    fi
+
     # Wait for post addon.d-v1 processes to finish
     sleep 5
   fi
@@ -128,7 +134,15 @@ case "$1" in
     # Stub
   ;;
   pre-backup)
-    # Stub
+    # Back up PREINITDEVICE from existing partition before OTA on A-only devices
+    if ! $backuptool_ab; then
+      initialize
+      RECOVERYMODE=false
+      find_boot_image
+      $MAGISKBIN/magiskboot unpack "$BOOTIMAGE"
+      $MAGISKBIN/magiskboot cpio ramdisk.cpio "extract .backup/.magisk config.orig"
+      $MAGISKBIN/magiskboot cleanup
+    fi
   ;;
   post-backup)
     # Stub
