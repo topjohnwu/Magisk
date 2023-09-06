@@ -112,7 +112,25 @@ pub enum StrErr {
     NullPointerError,
 }
 
+pub trait StringExt {
+    fn nul_terminate(&mut self) -> &mut [u8];
+}
+
+impl StringExt for String {
+    fn nul_terminate(&mut self) -> &mut [u8] {
+        self.reserve(1);
+        // SAFETY: the string is reserved to have enough capacity to fit in the null byte
+        // SAFETY: the null byte is explicitly added outside of the string's length
+        unsafe {
+            let buf = slice::from_raw_parts_mut(self.as_mut_ptr(), self.len() + 1);
+            *buf.get_unchecked_mut(self.len()) = b'\0';
+            buf
+        }
+    }
+}
+
 // The better CStr: UTF-8 validated + null terminated buffer
+#[derive(PartialEq)]
 pub struct Utf8CStr {
     inner: [u8],
 }
@@ -129,16 +147,9 @@ impl Utf8CStr {
     }
 
     pub fn from_string(s: &mut String) -> &Utf8CStr {
-        if s.capacity() == s.len() {
-            s.reserve(1);
-        }
-        // SAFETY: the string is reserved to have enough capacity to fit in the null byte
-        // SAFETY: the null byte is explicitly added outside of the string's length
-        unsafe {
-            let buf = slice::from_raw_parts_mut(s.as_mut_ptr(), s.len() + 1);
-            *buf.get_unchecked_mut(s.len()) = b'\0';
-            Self::from_bytes_unchecked(buf)
-        }
+        let buf = s.nul_terminate();
+        // SAFETY: the null byte is explicitly added to the buffer
+        unsafe { Self::from_bytes_unchecked(buf) }
     }
 
     #[inline]

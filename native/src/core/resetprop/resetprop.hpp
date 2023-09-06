@@ -29,11 +29,6 @@ int delete_prop(const char *name, bool persist = false);
 int set_prop(const char *name, const char *value, bool skip_svc = false);
 void load_prop_file(const char *filename, bool skip_svc = false);
 
-inline void prop_cb_exec(prop_cb *cb, const char *name, const char *value) {
-    cb->exec(name, value);
+static inline void prop_cb_exec(prop_cb &cb, const char *name, const char *value) {
+    cb.exec(name, value);
 }
-
-void persist_get_prop(const char *name, prop_cb *prop_cb) noexcept;
-void persist_get_props(prop_cb *prop_cb) noexcept;
-bool persist_delete_prop(const char *name) noexcept;
-bool persist_set_prop(const char *name, const char *value) noexcept;

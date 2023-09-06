@@ -6,6 +6,7 @@
 #include <base.hpp>
 
 #include "resetprop.hpp"
+#include "../core-rs.hpp"
 
 using namespace std;
 
@@ -195,7 +196,7 @@ static StringType get_prop(const char *name, PropFlags flags) {
     }
 
     if (cb.val.empty() && flags.isPersist() && str_starts(name, "persist."))
-        persist_get_prop(name, &cb);
+        persist_get_prop(name, cb);
     if (cb.val.empty())
         LOGD("resetprop: prop [%s] does not exist\n", name);
 
@@ -208,7 +209,7 @@ static void print_props(PropFlags flags) {
     if (!flags.isPersistOnly())
         system_property_foreach(read_prop_with_cb, &collector);
     if (flags.isPersist())
-        persist_get_props(&collector);
+        persist_get_props(collector);
     for (auto &[key, val] : list) {
         const char *v = flags.isContext() ?
                 (__system_property_get_context(key.data()) ?: "") :
@@ -258,7 +259,7 @@ struct Initialize {
 };
 
 static void InitOnce() {
-    struct Initialize init;
+    static struct Initialize init;
 }
 
 #define consume_next(val)    \
@@ -269,6 +270,7 @@ stop_parse = true;           \
 int resetprop_main(int argc, char *argv[]) {
     PropFlags flags;
     char *argv0 = argv[0];
+    set_log_level_state(LogLevel::Debug, false);
 
     const char *prop_file = nullptr;
     const char *prop_to_rm = nullptr;
