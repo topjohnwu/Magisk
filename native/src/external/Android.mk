@@ -6,17 +6,6 @@ LOCAL_MODULE:= libphmap
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/parallel-hashmap
 include $(BUILD_STATIC_LIBRARY)
 
-# libxz.a
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libxz
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/xz-embedded
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_SRC_FILES := \
-    xz-embedded/xz_crc32.c \
-    xz-embedded/xz_dec_lzma2.c \
-    xz-embedded/xz_dec_stream.c
-include $(BUILD_STATIC_LIBRARY)
-
 # libfdt.a
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libfdt

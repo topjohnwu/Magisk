@@ -73,7 +73,6 @@ LOCAL_STATIC_LIBRARIES := \
     libbase \
     libcompat \
     libpolicy \
-    libxz \
     libinit-rs
 
 LOCAL_SRC_FILES := \

@@ -3,8 +3,6 @@
 #include <libgen.h>
 #include <vector>
 
-#include <xz.h>
-
 #include <base.hpp>
 #include <embed.hpp>
 
@@ -12,34 +10,11 @@
 
 using namespace std;
 
-bool unxz(int fd, const uint8_t *buf, size_t size) {
-    uint8_t out[8192];
-    xz_crc32_init();
-    struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
-    struct xz_buf b = {
-        .in = buf,
-        .in_pos = 0,
-        .in_size = size,
-        .out = out,
-        .out_pos = 0,
-        .out_size = sizeof(out)
-    };
-    enum xz_ret ret;
-    do {
-        ret = xz_dec_run(dec, &b);
-        if (ret != XZ_OK && ret != XZ_STREAM_END)
-            return false;
-        write(fd, out, b.out_pos);
-        b.out_pos = 0;
-    } while (b.in_pos != size);
-    return true;
-}
-
 static int dump_bin(const uint8_t *buf, size_t sz, const char *path, mode_t mode) {
     int fd = xopen(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, mode);
     if (fd < 0)
         return 1;
-    if (!unxz(fd, buf, sz))
+    if (!rust::unxz(fd, byte_view(buf, sz)))
         return 1;
     close(fd);
     return 0;
