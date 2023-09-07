@@ -86,8 +86,7 @@ pub fn patch_encryption(buf: &mut [u8]) -> usize {
 }
 
 fn hex2byte(hex: &[u8]) -> Vec<u8> {
-    let mut v = Vec::new();
-    v.reserve(hex.len() / 2);
+    let mut v = Vec::with_capacity(hex.len() / 2);
     for bytes in hex.chunks(2) {
         if bytes.len() != 2 {
             break;

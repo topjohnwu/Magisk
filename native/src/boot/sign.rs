@@ -27,6 +27,7 @@ use base::{log_err, LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr};
 
 use crate::ffi::BootImage;
 
+#[allow(clippy::upper_case_acronyms)]
 pub enum SHA {
     SHA1(Sha1),
     SHA256(Sha256),
@@ -319,5 +320,5 @@ pub fn sign_boot_image(
         };
         sig.to_der().log()
     }
-    inner(payload, name, cert, key).unwrap_or(Vec::new())
+    inner(payload, name, cert, key).unwrap_or_default()
 }

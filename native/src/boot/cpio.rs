@@ -1,3 +1,5 @@
+#![allow(clippy::useless_conversion)]
+
 use std::collections::BTreeMap;
 use std::ffi::CStr;
 use std::fmt::{Display, Formatter, Write as FmtWrite};

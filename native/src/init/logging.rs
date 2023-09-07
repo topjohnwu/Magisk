@@ -17,7 +17,7 @@ pub fn setup_klog() {
     unsafe {
         let mut fd = open(raw_cstr!("/dev/null"), O_RDWR | O_CLOEXEC);
         if fd < 0 {
-            mknod(raw_cstr!("/null"), S_IFCHR | 0666, makedev(1, 3));
+            mknod(raw_cstr!("/null"), S_IFCHR | 0o666, makedev(1, 3));
             fd = open(raw_cstr!("/null"), O_RDWR | O_CLOEXEC);
             fs::remove_file("/null").ok();
         }
@@ -34,7 +34,7 @@ pub fn setup_klog() {
         KMSG.set(kmsg).ok();
     } else {
         unsafe {
-            mknod(raw_cstr!("/kmsg"), S_IFCHR | 0666, makedev(1, 11));
+            mknod(raw_cstr!("/kmsg"), S_IFCHR | 0o666, makedev(1, 11));
             KMSG.set(File::options().write(true).open("/kmsg").unwrap())
                 .ok();
             unlink(raw_cstr!("/kmsg"));
