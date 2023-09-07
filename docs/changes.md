@@ -1,4 +1,4 @@
-# Magisk Changelog
+d# Magisk Changelog
 
 ### v26.3
 
