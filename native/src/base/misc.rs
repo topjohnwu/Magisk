@@ -97,8 +97,8 @@ macro_rules! cstr {
 
 #[macro_export]
 macro_rules! raw_cstr {
-    ($s:literal) => {{
-        cstr!($s).as_ptr()
+    ($($str:tt)*) => {{
+        cstr!($($str)*).as_ptr()
     }};
 }
 
