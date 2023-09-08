@@ -23,7 +23,7 @@
 - [MagiskPolicy] Support more syntax for extended permissions
 - [MagiskPolicy] Support printing out the loaded sepolicy rules
 - [App] Support patching boot image from ROM zips
-- [App] Properly preserve `boot.img` when patching Samsung firmware with `init_boot.img`
+- [App] Properly preserve `boot.img` when patching TECNO-LE6 firmware with `init_boot.img`
 
 ### v26.1
 
