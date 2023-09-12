@@ -83,7 +83,7 @@ jobs:
 
       - name: Set up artifact name
         run: |
-          echo "artifact_name=Magisk_$(cat gradle.properties | grep magisk.versionCode | awk -F '=' '{print $2}')@$(echo ${{ github.sha }} | cut -c-7)" >> $GITHUB_ENV
+          echo "artifact_name=Magisk-$(cat gradle.properties | grep magisk.versionCode | awk -F '=' '{print $2}')@$(echo ${{ github.sha }} | cut -c-7)" >> $GITHUB_ENV
 
       # Only upload artifacts built on Linux
       - name: Upload build artifact
@@ -97,7 +97,7 @@ jobs:
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}-symbols
+          name: ${{ env.artifact_name }}-symbols
           path: app/build/outputs
 
   test:
