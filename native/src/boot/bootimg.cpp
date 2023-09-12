@@ -876,8 +876,10 @@ int sign(const char *image, const char *name, const char *cert, const char *key)
         close(fd);
         return 1;
     }
-    // Wipe out rest of tail
-    write_zero(fd, boot.map.sz() - lseek(fd, 0, SEEK_CUR));
+    if (auto off = lseek(fd, 0, SEEK_CUR); off < boot.map.sz()) {
+        // Wipe out rest of tail
+        write_zero(fd, boot.map.sz() - off);
+    }
     close(fd);
     return 0;
 }
