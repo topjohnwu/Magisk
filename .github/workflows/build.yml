@@ -83,7 +83,7 @@ jobs:
 
       - name: Set up artifact name
         run: |
-          echo "artifact_name=$(echo Magisk_$(cat gradle.properties | grep magisk.versionCode | awk -F '=' '{print $2}')@$(echo ${{ github.sha }} | cut -c-7))" >> $GITHUB_ENV
+          echo "artifact_name=Magisk_$(cat gradle.properties | grep magisk.versionCode | awk -F '=' '{print $2}')@$(echo ${{ github.sha }} | cut -c-7)" >> $GITHUB_ENV
 
       # Only upload artifacts built on Linux
       - name: Upload build artifact
