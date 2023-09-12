@@ -1,7 +1,5 @@
 name: Bug report
-title: ""
-labels: ""
-assignees: ""
+description: Create a report to help us improve
 body:
   - type: markdown
     attributes:
@@ -35,7 +33,7 @@ body:
   - type: input
     attributes:
       label: Android version
-      placeholder: 13
+      placeholder: '13'
 
   - type: input
     attributes:
@@ -45,7 +43,7 @@ body:
   - type: input
     attributes:
       label: Magisk version code
-      placeholder: 26300
+      placeholder: '26300'
 
   - type: textarea
     attributes:
