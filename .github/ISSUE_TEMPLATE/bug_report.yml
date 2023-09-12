@@ -25,6 +25,8 @@ body:
 
         Without following the rules above, your issue will be closed without explanation.
 
+        ---
+
   - type: input
     attributes:
       label: Device
