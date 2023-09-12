@@ -25,7 +25,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
           fetch-depth: 0
@@ -81,12 +81,16 @@ jobs:
       - name: Stop gradle daemon
         run: ./gradlew --stop
 
+      - name: Set up artifact name
+        run: |
+          echo "artifact_name=$(echo Magisk_$(cat gradle.properties | grep magisk.versionCode | awk -F '=' '{print $2}')@$(echo ${{ github.sha }} | cut -c-7))" >> $GITHUB_ENV
+
       # Only upload artifacts built on Linux
       - name: Upload build artifact
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.sha }}
+          name: ${{ env.artifact_name }}
           path: out
 
       - name: Upload mapping and native debug symbols
@@ -107,7 +111,7 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -125,7 +129,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ github.sha }}
+          name: ${{ env.artifact_name }}
           path: out
 
       - name: AVD test
