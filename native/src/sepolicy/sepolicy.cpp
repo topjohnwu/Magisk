@@ -54,6 +54,16 @@ static void list_for_each(Node *node_ptr, const Func &fn) {
 }
 
 template <class Node, class Func>
+static Node *list_find(Node *node_ptr, const Func &fn) {
+    for (auto cur = node_ptr; cur; cur = cur->next) {
+        if (fn(cur)) {
+            return cur;
+        }
+    }
+    return nullptr;
+}
+
+template <class Node, class Func>
 static void hash_for_each(Node **node_ptr, int n_slot, const Func &fn) {
     for (int i = 0; i < n_slot; ++i) {
         list_for_each(node_ptr[i], fn);
@@ -502,8 +512,8 @@ bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c,
     key.tclass = cls->s.value;
     key.name = (char *) o;
 
-    filename_trans_datum_t *last = nullptr;
     filename_trans_datum_t *trans = hashtab_find(db->filename_trans, (hashtab_key_t) &key);
+    filename_trans_datum_t *last = nullptr;
     while (trans) {
         if (ebitmap_get_bit(&trans->stypes, src->s.value - 1)) {
             // Duplicate, overwrite existing data and return
@@ -515,14 +525,17 @@ bool sepol_impl::add_filename_trans(const char *s, const char *t, const char *c,
         last = trans;
         trans = trans->next;
     }
-
     if (trans == nullptr) {
         trans = auto_cast(calloc(sizeof(*trans), 1));
-        filename_trans_key_t *new_key = auto_cast(malloc(sizeof(*new_key)));
-        *new_key = key;
-        new_key->name = strdup(key.name);
-        trans->next = last;
+        ebitmap_init(&trans->stypes);
         trans->otype = def->s.value;
+    }
+    if (last) {
+        last->next = trans;
+    } else {
+        filename_trans_key_t *new_key = auto_cast(malloc(sizeof(*new_key)));
+        memcpy(new_key, &key, sizeof(key));
+        new_key->name = strdup(key.name);
         hashtab_insert(db->filename_trans, (hashtab_key_t) new_key, trans);
     }
 
@@ -538,54 +551,30 @@ bool sepol_impl::add_genfscon(const char *fs_name, const char *path, const char 
         return false;
     }
 
-    // Allocate genfs context
-    ocontext_t *newc = auto_cast(calloc(sizeof(*newc), 1));
-    newc->u.name = strdup(path);
-    memcpy(&newc->context[0], ctx, sizeof(*ctx));
+    // Find genfs node
+    genfs_t *fs = list_find(db->genfs, [&](genfs_t *n) {
+        return strcmp(n->fstype, fs_name) == 0;
+    });
+    if (fs == nullptr) {
+        fs = auto_cast(calloc(sizeof(*fs), 1));
+        fs->fstype = strdup(fs_name);
+        fs->next = db->genfs;
+        db->genfs = fs;
+    }
+
+    // Find context node
+    ocontext_t *o_ctx = list_find(fs->head, [&](ocontext_t *n) {
+        return strcmp(n->u.name, path) == 0;
+    });
+    if (o_ctx == nullptr) {
+        o_ctx = auto_cast(calloc(sizeof(*o_ctx), 1));
+        o_ctx->u.name = strdup(path);
+        o_ctx->next = fs->head;
+        fs->head = o_ctx;
+    }
+    memset(o_ctx->context, 0, sizeof(o_ctx->context));
+    memcpy(&o_ctx->context[0], ctx, sizeof(*ctx));
     free(ctx);
-
-    // Find or allocate genfs
-    genfs_t *last_gen = nullptr;
-    genfs_t *newfs = nullptr;
-    for (genfs_t *node = db->genfs; node; node = node->next) {
-        if (strcmp(node->fstype, fs_name) == 0) {
-            newfs = node;
-            break;
-        }
-        last_gen = node;
-    }
-    if (newfs == nullptr) {
-        newfs = auto_cast(calloc(sizeof(*newfs), 1));
-        newfs->fstype = strdup(fs_name);
-        // Insert
-        if (last_gen)
-            last_gen->next = newfs;
-        else
-            db->genfs = newfs;
-    }
-
-    // Insert or replace genfs context
-    ocontext_t *last_ctx = nullptr;
-    for (ocontext_t *node = newfs->head; node; node = node->next) {
-        if (strcmp(node->u.name, path) == 0) {
-            // Unlink
-            if (last_ctx)
-                last_ctx->next = node->next;
-            else
-                newfs->head = nullptr;
-            // Destroy old node
-            free(node->u.name);
-            context_destroy(&node->context[0]);
-            free(node);
-            break;
-        }
-        last_ctx = node;
-    }
-    // Insert
-    if (last_ctx)
-        last_ctx->next = newc;
-    else
-        newfs->head = newc;
 
     return true;
 }
