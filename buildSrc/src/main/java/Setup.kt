@@ -213,7 +213,7 @@ private fun Project.setupAppCommon() {
             this.comment.set("version=${Config.version}\n" +
                 "versionCode=${Config.versionCode}\n" +
                 "stubVersion=${Config.stubVersion}\n")
-            this.outFolder.set(File(buildDir, "outputs/apk/${variant.name}"))
+            this.outFolder.set(layout.buildDirectory.dir("outputs/apk/${variant.name}"))
         }
     }
 }
@@ -318,8 +318,8 @@ fun Project.setupStub() {
             project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
                 dependsOn("generate${variantCapped}ObfuscatedClass")
                 applicationId.set(variant.applicationId)
-                appClassDir.set(File(buildDir, "generated/source/app/$variantName"))
-                factoryClassDir.set(File(buildDir, "generated/source/factory/$variantName"))
+                appClassDir.set(layout.buildDirectory.dir("generated/source/app/$variantName"))
+                factoryClassDir.set(layout.buildDirectory.dir("generated/source/factory/$variantName"))
             }
         variant.artifacts.use(manifestUpdater)
             .wiredWithFiles(
@@ -331,12 +331,12 @@ fun Project.setupStub() {
     android.applicationVariants.all {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
         val variantLowered = name.lowercase()
-        val outFactoryClassDir = File(buildDir, "generated/source/factory/${variantLowered}")
-        val outAppClassDir = File(buildDir, "generated/source/app/${variantLowered}")
-        val outResDir = File(buildDir, "generated/source/res/${variantLowered}")
+        val outFactoryClassDir = layout.buildDirectory.file("generated/source/factory/${variantLowered}").get().asFile
+        val outAppClassDir = layout.buildDirectory.file("generated/source/app/${variantLowered}").get().asFile
+        val outResDir = layout.buildDirectory.dir("generated/source/res/${variantLowered}").get().asFile
         val aapt = File(android.sdkDirectory, "build-tools/${android.buildToolsVersion}/aapt2")
-        val apk = File(buildDir, "intermediates/processed_res/" +
-            "${variantLowered}/out/resources-${variantLowered}.ap_")
+        val apk = layout.buildDirectory.file("intermediates/processed_res/" +
+            "${variantLowered}/out/resources-${variantLowered}.ap_").get().asFile
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
             inputs.property("seed", RAND_SEED)
@@ -377,10 +377,10 @@ fun Project.setupStub() {
         registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
     // Override optimizeReleaseResources task
-    val apk = File(buildDir, "intermediates/processed_res/" +
-        "release/out/resources-release.ap_")
-    val optRes = File(buildDir, "intermediates/optimized_processed_res/" +
-        "release/resources-release-optimize.ap_")
+    val apk = layout.buildDirectory.file("intermediates/processed_res/" +
+        "release/out/resources-release.ap_").get().asFile
+    val optRes = layout.buildDirectory.file("intermediates/optimized_processed_res/" +
+        "release/resources-release-optimize.ap_").get().asFile
     afterEvaluate {
         tasks.named("optimizeReleaseResources") {
             doLast { apk.copyTo(optRes, true) }
