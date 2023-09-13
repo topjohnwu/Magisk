@@ -10,9 +10,14 @@ use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::{io, mem, ptr, slice};
 
-use libc::{c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
+use libc::{
+    c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR,
+};
 
-use crate::{bfmt_cstr, copy_cstr, cstr, errno, error, FlatData, LibcReturn, Utf8CStr};
+use crate::{
+    copy_cstr, cstr, errno, error, FlatData, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
+    Utf8CStrBuf,
+};
 
 pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
     unsafe {
@@ -39,64 +44,10 @@ pub(crate) unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: u
     r
 }
 
-pub fn readlink(path: &Utf8CStr, data: &mut [u8]) -> io::Result<usize> {
-    let r =
-        unsafe { readlink_unsafe(path.as_ptr(), data.as_mut_ptr(), data.len()) }.check_os_err()?;
-    Ok(r as usize)
-}
-
-pub fn fd_path(fd: RawFd, buf: &mut [u8]) -> io::Result<usize> {
-    let mut fd_buf = [0_u8; 40];
-    let fd_path = bfmt_cstr!(&mut fd_buf, "/proc/self/fd/{}", fd);
-    readlink(fd_path, buf)
-}
-
-// Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
-pub fn realpath(path: &Utf8CStr, buf: &mut [u8]) -> io::Result<usize> {
-    let fd = open_fd!(path, O_PATH | O_CLOEXEC)?;
-    let mut st1: libc::stat;
-    let mut st2: libc::stat;
-    let mut skip_check = false;
-    unsafe {
-        st1 = mem::zeroed();
-        if libc::fstat(fd.as_raw_fd(), &mut st1) < 0 {
-            // This shall only fail on Linux < 3.6
-            skip_check = true;
-        }
-    }
-    let len = fd_path(fd.as_raw_fd(), buf)?;
-    unsafe {
-        st2 = mem::zeroed();
-        if libc::stat(buf.as_ptr().cast(), &mut st2) < 0
-            || (!skip_check && (st2.st_dev != st1.st_dev || st2.st_ino != st1.st_ino))
-        {
-            *errno() = ENOENT;
-            return Err(io::Error::last_os_error());
-        }
-    }
-    Ok(len)
-}
-
-pub fn mkdirs(path: &Utf8CStr, mode: mode_t) -> io::Result<()> {
-    let mut buf = [0_u8; 4096];
-    let len = copy_cstr(&mut buf, path);
-    let buf = &mut buf[..len];
-    let mut off = 1;
-    unsafe {
-        while let Some(p) = buf[off..].iter().position(|c| *c == b'/') {
-            buf[off + p] = b'\0';
-            if libc::mkdir(buf.as_ptr().cast(), mode) < 0 && *errno() != EEXIST {
-                return Err(io::Error::last_os_error());
-            }
-            buf[off + p] = b'/';
-            off += p + 1;
-        }
-        if libc::mkdir(buf.as_ptr().cast(), mode) < 0 && *errno() != EEXIST {
-            return Err(io::Error::last_os_error());
-        }
-    }
-    *errno() = 0;
-    Ok(())
+pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+    let mut arr = Utf8CStrArr::<40>::new();
+    let path = FsPathBuf::new(&mut arr).join("/proc/self/fd").join_fmt(fd);
+    path.read_link(buf)
 }
 
 pub trait ReadExt {
@@ -206,12 +157,11 @@ impl DirEntry<'_> {
         }
     }
 
-    pub fn path(&self, buf: &mut [u8]) -> io::Result<usize> {
-        let mut len = self.dir.path(buf)?;
-        buf[len] = b'/';
-        len += 1;
-        len += copy_cstr(&mut buf[len..], self.d_name());
-        Ok(len)
+    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        self.dir.path(buf)?;
+        buf.append("/");
+        buf.append_lossy(self.d_name().to_bytes());
+        Ok(())
     }
 
     pub fn is_dir(&self) -> bool {
@@ -320,7 +270,7 @@ impl Directory {
         unsafe { libc::rewinddir(self.dirp) }
     }
 
-    pub fn path(&self, buf: &mut [u8]) -> io::Result<usize> {
+    pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         fd_path(self.as_raw_fd(), buf)
     }
 
@@ -448,17 +398,89 @@ impl Drop for Directory {
     }
 }
 
-pub fn rm_rf(path: &Utf8CStr) -> io::Result<()> {
-    unsafe {
-        let f = File::from(open_fd!(path, O_RDONLY | O_CLOEXEC)?);
+impl FsPath {
+    pub fn open(&self, flags: i32) -> io::Result<File> {
+        Ok(File::from(open_fd!(self, flags)?))
+    }
+
+    pub fn create(&self, flags: i32, mode: mode_t) -> io::Result<File> {
+        Ok(File::from(open_fd!(self, flags, mode)?))
+    }
+
+    pub fn exists(&self) -> bool {
+        unsafe { libc::access(self.as_ptr(), F_OK) == 0 }
+    }
+
+    pub fn rename_to<T: AsRef<Utf8CStr>>(&self, name: T) -> io::Result<()> {
+        unsafe { libc::rename(self.as_ptr(), name.as_ref().as_ptr()).as_os_err() }
+    }
+
+    pub fn remove(&self) -> io::Result<()> {
+        unsafe { libc::remove(self.as_ptr()).as_os_err() }
+    }
+
+    pub fn remove_all(&self) -> io::Result<()> {
+        let f = self.open(O_RDONLY | O_CLOEXEC)?;
         let st = f.metadata()?;
         if st.is_dir() {
             let mut dir = Directory::try_from(OwnedFd::from(f))?;
             dir.remove_all()?;
         }
-        libc::remove(path.as_ptr()).check_os_err()?;
+        self.remove()
     }
-    Ok(())
+
+    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        buf.clear();
+        unsafe { readlink_unsafe(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity()) }
+            .as_os_err()
+    }
+
+    pub fn mkdirs(&self, mode: mode_t) -> io::Result<()> {
+        let mut buf = [0_u8; 4096];
+        let len = copy_cstr(&mut buf, self);
+        let buf = &mut buf[..len];
+        let mut off = 1;
+        unsafe {
+            while let Some(p) = buf[off..].iter().position(|c| *c == b'/') {
+                buf[off + p] = b'\0';
+                if libc::mkdir(buf.as_ptr().cast(), mode) < 0 && *errno() != EEXIST {
+                    return Err(io::Error::last_os_error());
+                }
+                buf[off + p] = b'/';
+                off += p + 1;
+            }
+            if libc::mkdir(buf.as_ptr().cast(), mode) < 0 && *errno() != EEXIST {
+                return Err(io::Error::last_os_error());
+            }
+        }
+        *errno() = 0;
+        Ok(())
+    }
+
+    // Inspired by https://android.googlesource.com/platform/bionic/+/master/libc/bionic/realpath.cpp
+    pub fn realpath(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        let fd = open_fd!(self, O_PATH | O_CLOEXEC)?;
+        let mut st1: libc::stat;
+        let mut st2: libc::stat;
+        let mut skip_check = false;
+        unsafe {
+            st1 = mem::zeroed();
+            if libc::fstat(fd.as_raw_fd(), &mut st1) < 0 {
+                // This will only fail on Linux < 3.6
+                skip_check = true;
+            }
+        }
+        fd_path(fd.as_raw_fd(), buf)?;
+        unsafe {
+            st2 = mem::zeroed();
+            libc::stat(buf.as_ptr(), &mut st2).as_os_err()?;
+            if !skip_check && (st2.st_dev != st1.st_dev || st2.st_ino != st1.st_ino) {
+                *errno() = ENOENT;
+                return Err(io::Error::last_os_error());
+            }
+        }
+        Ok(())
+    }
 }
 
 pub struct MappedFile(&'static mut [u8]);
@@ -516,7 +538,7 @@ pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8
     let st = f.metadata()?;
     let sz = if st.file_type().is_block_device() {
         let mut sz = 0_u64;
-        unsafe { ioctl(f.as_raw_fd(), BLKGETSIZE64, &mut sz) }.check_os_err()?;
+        unsafe { ioctl(f.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
         sz
     } else {
         st.st_size()

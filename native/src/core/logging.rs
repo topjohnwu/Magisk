@@ -1,5 +1,6 @@
 use std::cmp::min;
 use std::ffi::{c_char, c_void};
+use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
 use std::os::fd::{AsRawFd, FromRawFd, RawFd};
@@ -244,8 +245,8 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
         let mut logfile: LogFile = Buffer(&mut tmp);
 
         let mut meta = LogMeta::default();
-        let mut buf: [u8; MAX_MSG_LEN] = [0; MAX_MSG_LEN];
-        let mut aux: [u8; 64] = [0; 64];
+        let mut msg_buf = [0u8; MAX_MSG_LEN];
+        let mut aux = Utf8CStrArr::<64>::new();
 
         loop {
             // Read request
@@ -262,16 +263,16 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
                 continue;
             }
 
-            if meta.len < 0 || meta.len > buf.len() as i32 {
+            if meta.len < 0 || meta.len > MAX_MSG_LEN as i32 {
                 continue;
             }
 
             // Read the rest of the message
-            let msg = &mut buf[..(meta.len as usize)];
+            let msg = &mut msg_buf[..(meta.len as usize)];
             pipe.read_exact(msg)?;
 
             // Start building the log string
-
+            aux.clear();
             let prio =
                 ALogPriority::from_i32(meta.prio).unwrap_or(ALogPriority::ANDROID_LOG_UNKNOWN);
             let prio = match prio {
@@ -287,7 +288,6 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
             // Note: the obvious better implementation is to use the rust chrono crate, however
             // the crate cannot fetch the proper local timezone without pulling in a bunch of
             // timezone handling code. To reduce binary size, fallback to use localtime_r in libc.
-            let mut aux_len: usize;
             unsafe {
                 let mut ts: timespec = std::mem::zeroed();
                 let mut tm: tm = std::mem::zeroed();
@@ -296,24 +296,22 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
                 {
                     continue;
                 }
-                aux_len = strftime(
-                    aux.as_mut_ptr().cast(),
-                    aux.len(),
+                let len = strftime(
+                    aux.mut_buf().as_mut_ptr().cast(),
+                    aux.capacity(),
                     raw_cstr!("%m-%d %T"),
                     &tm,
                 );
+                aux.set_len(len);
                 let ms = ts.tv_nsec / 1000000;
-                aux_len += bfmt!(
-                    &mut aux[aux_len..],
+                aux.write_fmt(format_args!(
                     ".{:03} {:5} {:5} {} : ",
-                    ms,
-                    meta.pid,
-                    meta.tid,
-                    prio
-                );
+                    ms, meta.pid, meta.tid, prio
+                ))
+                .ok();
             }
 
-            let io1 = IoSlice::new(&aux[..aux_len]);
+            let io1 = IoSlice::new(aux.as_bytes_with_nul());
             let io2 = IoSlice::new(msg);
             // We don't need to care the written len because we are writing less than PIPE_BUF
             // It's guaranteed to always write the whole thing atomically

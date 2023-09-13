@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 use std::ffi::CStr;
-use std::fmt::{Display, Formatter, Write as FmtWrite};
+use std::fmt::{Display, Formatter};
 use std::fs::{metadata, read, DirBuilder, File};
 use std::io::Write;
 use std::mem::size_of;

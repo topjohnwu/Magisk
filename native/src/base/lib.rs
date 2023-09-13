@@ -1,14 +1,17 @@
 #![allow(clippy::missing_safety_doc)]
 #![feature(format_args_nl)]
 #![feature(io_error_more)]
+#![feature(utf8_chunks)]
 
 pub use libc;
 
+pub use cstr::*;
 use cxx_extern::*;
 pub use files::*;
 pub use logging::*;
 pub use misc::*;
 
+mod cstr;
 mod cxx_extern;
 mod files;
 mod logging;

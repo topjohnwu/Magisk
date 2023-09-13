@@ -51,10 +51,12 @@ pub fn setup_klog() {
 
     fn klog_write_impl(_: LogLevel, msg: &[u8]) {
         if let Some(kmsg) = KMSG.get().as_mut() {
-            let mut buf: [u8; 4096] = [0; 4096];
-            let mut len = copy_str(&mut buf, b"magiskinit: ");
-            len += copy_str(&mut buf[len..], msg);
-            kmsg.write_all(&buf[..len]).ok();
+            let mut buf = Utf8CStrArr::default();
+            buf.append("magiskinit: ");
+            unsafe {
+                buf.append_unchecked(msg);
+            }
+            kmsg.write_all(buf.as_bytes()).ok();
         }
     }
 

@@ -1,7 +1,6 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
 use std::ffi::CStr;
-use std::fmt::Write;
 use std::os::unix::io::RawFd;
 use std::ptr;
 
@@ -11,10 +10,7 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{
-    cstr, errno, mkdirs, raw_cstr, readlink_unsafe, realpath, slice_from_ptr_mut, ResultExt,
-    Utf8CStr,
-};
+use crate::{cstr, errno, raw_cstr, readlink_unsafe, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {
@@ -68,9 +64,13 @@ mod c_export {
 #[no_mangle]
 unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     match Utf8CStr::from_ptr(path) {
-        Ok(p) => realpath(p, slice_from_ptr_mut(buf, bufsz))
-            .log_cxx_with_msg(|w| w.write_fmt(format_args!("realpath {} failed", p)))
-            .map_or(-1, |v| v as isize),
+        Ok(p) => {
+            let mut buf = Utf8CStrSlice::from_ptr(buf, bufsz);
+            FsPath::from(p)
+                .realpath(&mut buf)
+                .log_cxx_with_msg(|w| w.write_fmt(format_args!("realpath {} failed", p)))
+                .map_or(-1, |_| buf.len() as isize)
+        }
         Err(_) => -1,
     }
 }
@@ -566,7 +566,8 @@ unsafe extern "C" fn xmkdir(path: *const c_char, mode: mode_t) -> i32 {
 #[no_mangle]
 unsafe extern "C" fn xmkdirs(path: *const c_char, mode: mode_t) -> i32 {
     match Utf8CStr::from_ptr(path) {
-        Ok(p) => mkdirs(p, mode)
+        Ok(p) => FsPath::from(p)
+            .mkdirs(mode)
             .log_cxx_with_msg(|w| w.write_fmt(format_args!("mkdirs {} failed", p)))
             .map_or(-1, |_| 0),
         Err(_) => -1,

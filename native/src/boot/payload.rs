@@ -1,4 +1,3 @@
-use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom, Write};
 use std::os::fd::{AsRawFd, FromRawFd};

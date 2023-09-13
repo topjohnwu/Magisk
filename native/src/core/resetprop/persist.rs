@@ -1,18 +1,19 @@
 use core::ffi::c_char;
+use std::io::Read;
 use std::{
-    fs::{read_to_string, remove_file, rename, File},
+    fs::File,
     io::{BufWriter, Write},
     ops::{Deref, DerefMut},
     os::fd::FromRawFd,
-    path::{Path, PathBuf},
     pin::Pin,
 };
 
 use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
+use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, debug, libc::mkstemp, raw_cstr, Directory, LoggedError, LoggedResult, MappedFile,
-    StringExt, Utf8CStr, WalkResult,
+    cstr, debug, libc::mkstemp, raw_cstr, Directory, FsPath, FsPathBuf, LibcReturn, LoggedError,
+    LoggedResult, MappedFile, Utf8CStr, Utf8CStrArr, WalkResult,
 };
 
 use crate::ffi::{clone_attr, prop_cb_exec, PropCb};
@@ -76,36 +77,41 @@ impl PropExt for PersistentProperties {
 }
 
 fn check_proto() -> bool {
-    Path::new(PERSIST_PROP!()).exists()
+    FsPath::from(cstr!(PERSIST_PROP!())).exists()
 }
 
 fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
-    let path = PathBuf::new().join(PERSIST_PROP_DIR!()).join(name);
-    let path = path.as_path();
-    debug!("resetprop: read prop from [{}]\n", path.display());
-    Ok(read_to_string(path)?)
+    let mut buf = Utf8CStrArr::default();
+    let path = FsPathBuf::new(&mut buf)
+        .join(PERSIST_PROP_DIR!())
+        .join(name);
+    let mut file = path.open(O_RDONLY | O_CLOEXEC)?;
+    debug!("resetprop: read prop from [{}]\n", path);
+    let mut s = String::new();
+    file.read_to_string(&mut s)?;
+    Ok(s)
 }
 
 fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> {
-    let path = PathBuf::new().join(PERSIST_PROP_DIR!()).join(name);
-    let path = path.as_path();
+    let mut buf = Utf8CStrArr::default();
+    let path = FsPathBuf::new(&mut buf)
+        .join(PERSIST_PROP_DIR!())
+        .join(name);
     if let Some(value) = value {
-        let mut tmp = String::from(concat!(PERSIST_PROP_DIR!(), ".prop.XXXXXX"));
+        let mut buf = Utf8CStrArr::default();
+        let mut tmp = FsPathBuf::new(&mut buf).join(concat!(PERSIST_PROP_DIR!(), ".prop.XXXXXX"));
         {
             let mut f = unsafe {
-                let fd = mkstemp(tmp.as_mut_ptr() as *mut c_char);
-                if fd < 0 {
-                    return Err(Default::default());
-                }
+                let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;
                 File::from_raw_fd(fd)
             };
             f.write_all(value.as_bytes())?;
         }
         debug!("resetprop: write prop to [{}]\n", tmp);
-        rename(tmp, path)?;
+        tmp.rename_to(path)?
     } else {
-        debug!("resetprop: unlink [{}]\n", path.display());
-        remove_file(path)?;
+        debug!("resetprop: unlink [{}]\n", path);
+        path.remove()?;
     }
     Ok(())
 }
@@ -122,23 +128,18 @@ fn proto_read_props() -> LoggedResult<PersistentProperties> {
 }
 
 fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
-    let mut tmp = String::from(concat!(PERSIST_PROP!(), ".XXXXXX"));
-    tmp.nul_terminate();
+    let mut buf = Utf8CStrArr::default();
+    let mut tmp = FsPathBuf::new(&mut buf).join(concat!(PERSIST_PROP!(), ".XXXXXX"));
     {
         let f = unsafe {
-            let fd = mkstemp(tmp.as_mut_ptr().cast());
-            if fd < 0 {
-                return Err(Default::default());
-            }
+            let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;
             File::from_raw_fd(fd)
         };
         debug!("resetprop: encode with protobuf [{}]", tmp);
         props.write_message(&mut Writer::new(BufWriter::new(f)))?;
     }
-    unsafe {
-        clone_attr(raw_cstr!(PERSIST_PROP!()), tmp.as_ptr().cast());
-    }
-    rename(tmp, PERSIST_PROP!())?;
+    unsafe { clone_attr(raw_cstr!(PERSIST_PROP!()), tmp.as_ptr()) };
+    tmp.rename_to(cstr!(PERSIST_PROP!()))?;
     Ok(())
 }
 

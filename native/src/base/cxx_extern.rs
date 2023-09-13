@@ -1,6 +1,5 @@
 // Functions in this file are only for exporting to C++, DO NOT USE IN RUST
 
-use std::fmt::Write;
 use std::io;
 use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 
@@ -8,21 +7,24 @@ use cxx::private::c_char;
 use libc::mode_t;
 
 pub(crate) use crate::xwrap::*;
-use crate::{
-    fd_path, map_fd, map_file, mkdirs, realpath, rm_rf, slice_from_ptr_mut, Directory, ResultExt,
-    Utf8CStr,
-};
+use crate::{fd_path, map_fd, map_file, Directory, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
-    fd_path(fd, buf)
+    let mut buf = Utf8CStrSlice::from(buf);
+    fd_path(fd, &mut buf)
         .log_cxx_with_msg(|w| w.write_str("fd_path failed"))
-        .map_or(-1_isize, |v| v as isize)
+        .map_or(-1_isize, |_| buf.len() as isize)
 }
 
 #[no_mangle]
 unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     match Utf8CStr::from_ptr(path) {
-        Ok(p) => realpath(p, slice_from_ptr_mut(buf, bufsz)).map_or(-1, |v| v as isize),
+        Ok(p) => {
+            let mut buf = Utf8CStrSlice::from_ptr(buf, bufsz);
+            FsPath::from(p)
+                .realpath(&mut buf)
+                .map_or(-1, |_| buf.len() as isize)
+        }
         Err(_) => -1,
     }
 }
@@ -30,7 +32,7 @@ unsafe extern "C" fn canonical_path(path: *const c_char, buf: *mut u8, bufsz: us
 #[export_name = "mkdirs"]
 unsafe extern "C" fn mkdirs_for_cxx(path: *const c_char, mode: mode_t) -> i32 {
     match Utf8CStr::from_ptr(path) {
-        Ok(p) => mkdirs(p, mode).map_or(-1, |_| 0),
+        Ok(p) => FsPath::from(p).mkdirs(mode).map_or(-1, |_| 0),
         Err(_) => -1,
     }
 }
@@ -38,7 +40,7 @@ unsafe extern "C" fn mkdirs_for_cxx(path: *const c_char, mode: mode_t) -> i32 {
 #[export_name = "rm_rf"]
 unsafe extern "C" fn rm_rf_for_cxx(path: *const c_char) -> bool {
     match Utf8CStr::from_ptr(path) {
-        Ok(p) => rm_rf(p).map_or(false, |_| true),
+        Ok(p) => FsPath::from(p).remove_all().is_ok(),
         Err(_) => false,
     }
 }
@@ -48,7 +50,7 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
     fn inner(fd: OwnedFd) -> io::Result<()> {
         Directory::try_from(fd)?.remove_all()
     }
-    inner(fd).map_or(false, |_| true)
+    inner(fd).is_ok()
 }
 
 pub(crate) fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8] {
