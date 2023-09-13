@@ -1,6 +1,6 @@
 use std::fs;
 use std::fs::File;
-use std::io::Write;
+use std::io::{IoSlice, Write};
 use std::sync::OnceLock;
 
 use base::ffi::LogLevel;
@@ -8,7 +8,7 @@ use base::libc::{
     close, makedev, mknod, open, syscall, unlink, SYS_dup3, O_CLOEXEC, O_RDWR, STDERR_FILENO,
     STDIN_FILENO, STDOUT_FILENO, S_IFCHR,
 };
-use base::*;
+use base::{cstr, exit_on_error, raw_cstr, Logger, Utf8CStr, LOGGER};
 
 static KMSG: OnceLock<File> = OnceLock::new();
 
@@ -49,19 +49,16 @@ pub fn setup_klog() {
         writeln!(rate, "on").ok();
     }
 
-    fn klog_write_impl(_: LogLevel, msg: &[u8]) {
+    fn kmsg_log_write(_: LogLevel, msg: &Utf8CStr) {
         if let Some(kmsg) = KMSG.get().as_mut() {
-            let mut buf = Utf8CStrArr::default();
-            buf.append("magiskinit: ");
-            unsafe {
-                buf.append_unchecked(msg);
-            }
-            kmsg.write_all(buf.as_bytes()).ok();
+            let io1 = IoSlice::new("magiskinit: ".as_bytes());
+            let io2 = IoSlice::new(msg.as_bytes());
+            kmsg.write_vectored(&[io1, io2]).ok();
         }
     }
 
     let logger = Logger {
-        write: klog_write_impl,
+        write: kmsg_log_write,
         flags: 0,
     };
     exit_on_error(false);

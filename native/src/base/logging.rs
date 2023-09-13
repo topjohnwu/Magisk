@@ -5,7 +5,7 @@ use std::panic::Location;
 use std::process::exit;
 
 use crate::ffi::LogLevel;
-use crate::Utf8CStrArr;
+use crate::{Utf8CStr, Utf8CStrArr};
 
 // Error handling and logging throughout the Rust codebase in Magisk:
 //
@@ -37,7 +37,7 @@ pub static mut LOGGER: Logger = Logger {
     flags: 0,
 };
 
-type LogWriter = fn(level: LogLevel, msg: &[u8]);
+type LogWriter = fn(level: LogLevel, msg: &Utf8CStr);
 type Formatter<'a> = &'a mut dyn fmt::Write;
 
 #[derive(Copy, Clone)]
@@ -91,6 +91,8 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
 }
 
 pub fn log_from_cxx(level: LogLevel, msg: &[u8]) {
+    // SAFETY: The null termination is handled on the C++ side
+    let msg = unsafe { Utf8CStr::from_bytes_unchecked(msg) };
     log_with_writer(level, |write| write(level, msg));
 }
 
@@ -98,7 +100,7 @@ pub fn log_with_formatter<F: FnOnce(Formatter) -> fmt::Result>(level: LogLevel, 
     log_with_writer(level, |write| {
         let mut buf = Utf8CStrArr::default();
         f(&mut buf).ok();
-        write(level, buf.as_bytes_with_nul());
+        write(level, &buf);
     });
 }
 
@@ -107,11 +109,11 @@ pub fn log_with_args(level: LogLevel, args: Arguments) {
 }
 
 pub fn cmdline_logging() {
-    fn cmdline_write(level: LogLevel, msg: &[u8]) {
+    fn cmdline_write(level: LogLevel, msg: &Utf8CStr) {
         if level == LogLevel::Info {
-            stdout().write_all(msg).ok();
+            stdout().write_all(msg.as_bytes()).ok();
         } else {
-            stderr().write_all(msg).ok();
+            stderr().write_all(msg.as_bytes()).ok();
         }
     }
 

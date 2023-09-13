@@ -40,7 +40,7 @@ enum ALogPriority {
 type ThreadEntry = extern "C" fn(*mut c_void) -> *mut c_void;
 
 extern "C" {
-    fn __android_log_write(prio: i32, tag: *const c_char, msg: *const u8);
+    fn __android_log_write(prio: i32, tag: *const c_char, msg: *const c_char);
     fn strftime(buf: *mut c_char, len: usize, fmt: *const c_char, tm: *const tm) -> usize;
 
     fn zygisk_fetch_logd() -> RawFd;
@@ -58,7 +58,7 @@ fn level_to_prio(level: LogLevel) -> i32 {
 }
 
 pub fn android_logging() {
-    fn android_log_write(level: LogLevel, msg: &[u8]) {
+    fn android_log_write(level: LogLevel, msg: &Utf8CStr) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
@@ -75,15 +75,15 @@ pub fn android_logging() {
 }
 
 pub fn magisk_logging() {
-    fn magisk_write(level: LogLevel, msg: &[u8]) {
+    fn magisk_log_write(level: LogLevel, msg: &Utf8CStr) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
-        magisk_log_write(level_to_prio(level), msg);
+        magisk_log_to_pipe(level_to_prio(level), msg);
     }
 
     let logger = Logger {
-        write: magisk_write,
+        write: magisk_log_write,
         flags: 0,
     };
     exit_on_error(false);
@@ -93,15 +93,15 @@ pub fn magisk_logging() {
 }
 
 pub fn zygisk_logging() {
-    fn zygisk_write(level: LogLevel, msg: &[u8]) {
+    fn zygisk_log_write(level: LogLevel, msg: &Utf8CStr) {
         unsafe {
             __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
         }
-        zygisk_log_write(level_to_prio(level), msg);
+        zygisk_log_to_pipe(level_to_prio(level), msg);
     }
 
     let logger = Logger {
-        write: zygisk_write,
+        write: zygisk_log_write,
         flags: 0,
     };
     exit_on_error(false);
@@ -121,10 +121,10 @@ struct LogMeta {
 
 const MAX_MSG_LEN: usize = PIPE_BUF - std::mem::size_of::<LogMeta>();
 
-fn do_magisk_log_write(logd: &mut File, prio: i32, msg: &[u8]) -> io::Result<usize> {
+fn write_log_to_pipe(logd: &mut File, prio: i32, msg: &Utf8CStr) -> io::Result<usize> {
     // Truncate message if needed
     let len = min(MAX_MSG_LEN, msg.len());
-    let msg = &msg[..len];
+    let msg = &msg.as_bytes()[..len];
 
     let meta = LogMeta {
         prio,
@@ -138,7 +138,7 @@ fn do_magisk_log_write(logd: &mut File, prio: i32, msg: &[u8]) -> io::Result<usi
     logd.write_vectored(&[io1, io2])
 }
 
-fn magisk_log_write(prio: i32, msg: &[u8]) {
+fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     let magiskd = match MAGISKD.get() {
         None => return,
         Some(s) => s,
@@ -151,7 +151,7 @@ fn magisk_log_write(prio: i32, msg: &[u8]) {
         Some(s) => s,
     };
 
-    let result = do_magisk_log_write(logd, prio, msg);
+    let result = write_log_to_pipe(logd, prio, msg);
 
     // If any error occurs, shut down the logd pipe
     if result.is_err() {
@@ -159,7 +159,7 @@ fn magisk_log_write(prio: i32, msg: &[u8]) {
     }
 }
 
-fn zygisk_log_write(prio: i32, msg: &[u8]) {
+fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     let magiskd = match MAGISKD.get() {
         None => return,
         Some(s) => s,
@@ -191,7 +191,7 @@ fn zygisk_log_write(prio: i32, msg: &[u8]) {
         pthread_sigmask(SIG_BLOCK, &mask, &mut orig_mask);
     }
 
-    let result = do_magisk_log_write(logd, prio, msg);
+    let result = write_log_to_pipe(logd, prio, msg);
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
