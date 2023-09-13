@@ -1,13 +1,10 @@
 package com.topjohnwu.magisk.core
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.getProperty
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 
 val isRunningAsStub get() = Info.stub != null
@@ -42,14 +39,7 @@ object Info {
         getProperty("ro.kernel.qemu", "0") == "1" ||
             getProperty("ro.boot.qemu", "0") == "1"
 
-    val isConnected: LiveData<Boolean> by lazy {
-        MutableLiveData(false).also { field ->
-            NetworkObserver.observe(AppContext) {
-                remote = EMPTY_REMOTE
-                field.postValue(it)
-            }
-        }
-    }
+    val isConnected = MutableLiveData(false)
 
     val showSuperUser: Boolean get() {
         return env.isActive && (Const.USER_ID == 0
