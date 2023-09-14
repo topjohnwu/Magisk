@@ -21,6 +21,7 @@ p384 = "0.13"
 rsa = "0.9"
 x509-cert = "0.2"
 der = "0.7"
+bytemuck = "1.14"
 
 [workspace.dependencies.argh]
 git = "https://github.com/topjohnwu/argh.git"

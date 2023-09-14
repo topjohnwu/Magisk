@@ -10,12 +10,13 @@ use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::{io, mem, ptr, slice};
 
+use bytemuck::{bytes_of_mut, Pod};
 use libc::{
     c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR,
 };
 
 use crate::{
-    copy_cstr, cstr, errno, error, FlatData, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
+    copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
     Utf8CStrBuf,
 };
 
@@ -52,7 +53,7 @@ pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
 
 pub trait ReadExt {
     fn skip(&mut self, len: usize) -> io::Result<()>;
-    fn read_flat_data<F: FlatData>(&mut self, data: &mut F) -> io::Result<()>;
+    fn read_pod<F: Pod>(&mut self, data: &mut F) -> io::Result<()>;
 }
 
 impl<T: Read> ReadExt for T {
@@ -67,8 +68,8 @@ impl<T: Read> ReadExt for T {
         Ok(())
     }
 
-    fn read_flat_data<F: FlatData>(&mut self, data: &mut F) -> io::Result<()> {
-        self.read_exact(data.as_raw_bytes_mut())
+    fn read_pod<F: Pod>(&mut self, data: &mut F) -> io::Result<()> {
+        self.read_exact(bytes_of_mut(data))
     }
 }
 

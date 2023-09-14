@@ -216,6 +216,7 @@ pub unsafe fn persist_delete_prop(name: *const c_char) -> bool {
     }
     inner(name).is_ok()
 }
+
 pub unsafe fn persist_set_prop(name: *const c_char, value: *const c_char) -> bool {
     unsafe fn inner(name: *const c_char, value: *const c_char) -> LoggedResult<()> {
         let name = Utf8CStr::from_ptr(name)?;

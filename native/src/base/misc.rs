@@ -1,5 +1,5 @@
 use std::process::exit;
-use std::{io, mem, slice, str};
+use std::{io, slice, str};
 
 use argh::EarlyExit;
 use libc::c_char;
@@ -29,34 +29,6 @@ pub unsafe fn slice_from_ptr_mut<'a, T>(buf: *mut T, len: usize) -> &'a mut [T] 
         slice::from_raw_parts_mut(buf, len)
     }
 }
-
-pub trait FlatData
-where
-    Self: Sized,
-{
-    fn as_raw_bytes(&self) -> &[u8] {
-        unsafe {
-            let self_ptr = self as *const Self as *const u8;
-            slice::from_raw_parts(self_ptr, mem::size_of::<Self>())
-        }
-    }
-    fn as_raw_bytes_mut(&mut self) -> &mut [u8] {
-        unsafe {
-            let self_ptr = self as *mut Self as *mut u8;
-            slice::from_raw_parts_mut(self_ptr, mem::size_of::<Self>())
-        }
-    }
-
-    fn bytes_size(&self) -> usize {
-        mem::size_of::<Self>()
-    }
-}
-
-macro_rules! impl_flat_data {
-    ($($t:ty)*) => ($(impl FlatData for $t {})*)
-}
-
-impl_flat_data!(usize u8 u16 u32 u64 isize i8 i16 i32 i64);
 
 // Check libc return value and map to Result
 pub trait LibcReturn

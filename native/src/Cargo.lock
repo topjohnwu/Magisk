@@ -70,6 +70,7 @@ name = "base"
 version = "0.0.0"
 dependencies = [
  "argh",
+ "bytemuck",
  "cfg-if",
  "cxx",
  "cxx-gen",
@@ -102,6 +103,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3078c7629b62d3f0439517fa394996acacc5cbc91c5a20d8c658e77abd503a71"
 dependencies = [
  "generic-array",
+]
+
+[[package]]
+name = "bytemuck"
+version = "1.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "374d28ec25809ee0e23827c2ab573d729e293f281dfe393500e7ad618baa61c6"
+dependencies = [
+ "bytemuck_derive",
+]
+
+[[package]]
+name = "bytemuck_derive"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "965ab7eb5f8f97d2a083c799f3a1b994fc397b2fe2da5d1da1626ce15a39f2b1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -420,6 +441,7 @@ name = "magisk"
 version = "0.0.0"
 dependencies = [
  "base",
+ "bytemuck",
  "cxx",
  "cxx-gen",
  "num-derive",

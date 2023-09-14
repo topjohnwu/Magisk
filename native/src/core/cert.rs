@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io;
 use std::io::{Cursor, Read, Seek, SeekFrom};
+use std::mem::size_of_val;
 use std::os::fd::{FromRawFd, RawFd};
 
 use base::*;
@@ -45,13 +46,13 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
         // Find EOCD
         for i in 0u16.. {
             let mut comment_sz = 0u16;
-            apk.seek(SeekFrom::End(-(comment_sz.bytes_size() as i64) - i as i64))?;
-            apk.read_flat_data(&mut comment_sz)?;
+            apk.seek(SeekFrom::End(-(size_of_val(&comment_sz) as i64) - i as i64))?;
+            apk.read_pod(&mut comment_sz)?;
 
             if comment_sz == i {
                 apk.seek(SeekFrom::Current(-22))?;
                 let mut magic = 0u32;
-                apk.read_flat_data(&mut magic)?;
+                apk.read_pod(&mut magic)?;
                 if magic == EOCD_MAGIC {
                     break;
                 }
@@ -65,12 +66,12 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
         // Seek and read central_dir_off to find the start of the central directory
         let mut central_dir_off = 0u32;
         apk.seek(SeekFrom::Current(12))?;
-        apk.read_flat_data(&mut central_dir_off)?;
+        apk.read_pod(&mut central_dir_off)?;
 
         // Code for parse APK comment to get version code
         if version >= 0 {
             let mut comment_sz = 0u16;
-            apk.read_flat_data(&mut comment_sz)?;
+            apk.read_pod(&mut comment_sz)?;
             let mut comment = vec![0u8; comment_sz as usize];
             apk.read_exact(&mut comment)?;
             let mut comment = Cursor::new(&comment);
@@ -90,7 +91,7 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
 
         // Next, find the start of the APK signing block
         apk.seek(SeekFrom::Start((central_dir_off - 24) as u64))?;
-        apk.read_flat_data(&mut u64_val)?; // u64_value = block_sz_
+        apk.read_pod(&mut u64_val)?; // u64_value = block_sz_
         let mut magic = [0u8; 16];
         apk.read_exact(&mut magic)?;
         if magic != APK_SIGNING_BLOCK_MAGIC {
@@ -98,38 +99,40 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
         }
         let mut signing_blk_sz = 0u64;
         apk.seek(SeekFrom::Current(
-            -(u64_val as i64) - (signing_blk_sz.bytes_size() as i64),
+            -(u64_val as i64) - (size_of_val(&signing_blk_sz) as i64),
         ))?;
-        apk.read_flat_data(&mut signing_blk_sz)?;
+        apk.read_pod(&mut signing_blk_sz)?;
         if signing_blk_sz != u64_val {
             return Err(bad_apk!("invalid signing block size"));
         }
 
         // Finally, we are now at the beginning of the id-value pair sequence
         loop {
-            apk.read_flat_data(&mut u64_val)?; // id-value pair length
+            apk.read_pod(&mut u64_val)?; // id-value pair length
             if u64_val == signing_blk_sz {
                 break;
             }
 
             let mut id = 0u32;
-            apk.read_flat_data(&mut id)?;
+            apk.read_pod(&mut id)?;
             if id == SIGNATURE_SCHEME_V2_MAGIC {
                 // Skip [signer sequence length] + [1st signer length] + [signed data length]
-                apk.seek(SeekFrom::Current((u32_val.bytes_size() * 3) as i64))?;
+                apk.seek(SeekFrom::Current((size_of_val(&u32_val) * 3) as i64))?;
 
-                apk.read_flat_data(&mut u32_val)?; // digest sequence length
+                apk.read_pod(&mut u32_val)?; // digest sequence length
                 apk.seek(SeekFrom::Current(u32_val as i64))?; // skip all digests
 
-                apk.seek(SeekFrom::Current(u32_val.bytes_size() as i64))?; // cert sequence length
-                apk.read_flat_data(&mut u32_val)?; // 1st cert length
+                apk.seek(SeekFrom::Current(size_of_val(&u32_val) as i64))?; // cert sequence length
+                apk.read_pod(&mut u32_val)?; // 1st cert length
 
                 let mut cert = vec![0; u32_val as usize];
                 apk.read_exact(cert.as_mut())?;
                 return Ok(cert);
             } else {
                 // Skip this id-value pair
-                apk.seek(SeekFrom::Current(u64_val as i64 - (id.bytes_size() as i64)))?;
+                apk.seek(SeekFrom::Current(
+                    u64_val as i64 - (size_of_val(&id) as i64),
+                ))?;
             }
         }
 
