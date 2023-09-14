@@ -86,7 +86,7 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
         .join(PERSIST_PROP_DIR!())
         .join(name);
     let mut file = path.open(O_RDONLY | O_CLOEXEC)?;
-    debug!("resetprop: read prop from [{}]\n", path);
+    debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
     file.read_to_string(&mut s)?;
     Ok(s)
@@ -99,7 +99,9 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
         .join(name);
     if let Some(value) = value {
         let mut buf = Utf8CStrArr::default();
-        let mut tmp = FsPathBuf::new(&mut buf).join(concat!(PERSIST_PROP_DIR!(), ".prop.XXXXXX"));
+        let mut tmp = FsPathBuf::new(&mut buf)
+            .join(PERSIST_PROP_DIR!())
+            .join("prop.XXXXXX");
         {
             let mut f = unsafe {
                 let fd = mkstemp(tmp.as_mut_ptr()).check_os_err()?;
@@ -107,10 +109,10 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
             };
             f.write_all(value.as_bytes())?;
         }
-        debug!("resetprop: write prop to [{}]\n", tmp);
+        debug!("resetprop: write prop to [{}]", tmp);
         tmp.rename_to(path)?
     } else {
-        debug!("resetprop: unlink [{}]\n", path);
+        debug!("resetprop: unlink [{}]", path);
         path.remove()?;
     }
     Ok(())
@@ -180,13 +182,16 @@ pub unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>) {
             });
         } else {
             let mut dir = Directory::open(cstr!(PERSIST_PROP_DIR!()))?;
-            dir.for_all_file(|f| {
-                if let Ok(name) = Utf8CStr::from_bytes(f.d_name().to_bytes()) {
-                    if let Ok(mut value) = file_get_prop(name) {
-                        prop_cb.exec(name, Utf8CStr::from_string(&mut value));
+            dir.pre_order_walk(|e| {
+                if e.is_file() {
+                    if let Ok(name) = Utf8CStr::from_cstr(e.d_name()) {
+                        if let Ok(mut value) = file_get_prop(name) {
+                            prop_cb.exec(name, Utf8CStr::from_string(&mut value));
+                        }
                     }
                 }
-                Ok(WalkResult::Continue)
+                // Do not traverse recursively
+                Ok(WalkResult::Skip)
             })?;
         }
         Ok(())
