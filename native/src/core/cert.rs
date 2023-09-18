@@ -138,6 +138,9 @@ pub fn read_certificate(fd: RawFd, version: i32) -> Vec<u8> {
 
         Err(bad_apk!("cannot find certificate"))
     }
+    if fd == -1 {
+        return vec![];
+    }
     let mut file = unsafe { File::from_raw_fd(fd) };
     let r = inner(&mut file, version).log().unwrap_or(vec![]);
     std::mem::forget(file);
