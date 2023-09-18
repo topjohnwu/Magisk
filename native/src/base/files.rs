@@ -411,8 +411,12 @@ impl FsPath {
 
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         buf.clear();
-        unsafe { readlink_unsafe(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity()) }
-            .as_os_err()
+        unsafe {
+            let c = readlink_unsafe(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity());
+            c.check_os_err()?;
+            buf.set_len(c as usize);
+        }
+        Ok(())
     }
 
     pub fn mkdirs(&self, mode: mode_t) -> io::Result<()> {
