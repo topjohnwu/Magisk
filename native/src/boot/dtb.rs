@@ -1,13 +1,16 @@
-use crate::{check_env, patch::patch_verity};
+use std::{cell::UnsafeCell, process::exit};
+
 use argh::FromArgs;
-use base::{
-    libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
-};
 use fdt::{
     node::{FdtNode, NodeProperty},
     Fdt,
 };
-use std::{cell::UnsafeCell, fmt::Write, process::exit};
+
+use base::{
+    libc::c_char, log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+};
+
+use crate::{check_env, patch::patch_verity};
 
 #[derive(FromArgs)]
 struct DtbCli {
@@ -62,7 +65,7 @@ Supported actions:
 const MAX_PRINT_LEN: usize = 32;
 
 fn print_node(node: &FdtNode) {
-    fn pretty_node(depth_set: &Vec<bool>) {
+    fn pretty_node(depth_set: &[bool]) {
         let mut depth_set = depth_set.iter().peekable();
         while let Some(depth) = depth_set.next() {
             let last = depth_set.peek().is_none();
@@ -72,17 +75,15 @@ fn print_node(node: &FdtNode) {
                 } else {
                     print!("│   ");
                 }
+            } else if last {
+                print!("└── ");
             } else {
-                if last {
-                    print!("└── ");
-                } else {
-                    print!("    ");
-                }
+                print!("    ");
             }
         }
     }
 
-    fn pretty_prop(depth_set: &Vec<bool>) {
+    fn pretty_prop(depth_set: &[bool]) {
         let mut depth_set = depth_set.iter().peekable();
         while let Some(depth) = depth_set.next() {
             let last = depth_set.peek().is_none();
@@ -92,12 +93,10 @@ fn print_node(node: &FdtNode) {
                 } else {
                     print!("│   ");
                 }
+            } else if last {
+                print!("└─ ");
             } else {
-                if last {
-                    print!("└─ ");
-                } else {
-                    print!("    ");
-                }
+                print!("    ");
             }
         }
     }
@@ -130,12 +129,10 @@ fn print_node(node: &FdtNode) {
                         unsafe { Utf8CStr::from_bytes_unchecked(value) }
                     }
                 );
+            } else if size > MAX_PRINT_LEN {
+                println!("[{}]: <bytes>({})", name, size);
             } else {
-                if size > MAX_PRINT_LEN {
-                    println!("[{}]: <bytes>({})", name, size);
-                } else {
-                    println!("[{}]: {:02x?}", name, value);
-                }
+                println!("[{}]: {:02x?}", name, value);
             }
         }
 
@@ -191,12 +188,7 @@ fn for_each_fdt<F: FnMut(usize, Fdt) -> LoggedResult<()>>(
 }
 
 fn find_fstab<'b, 'a: 'b>(fdt: &'b Fdt<'a>) -> Option<FdtNode<'b, 'a>> {
-    for node in fdt.all_nodes() {
-        if node.name == "fstab" {
-            return Some(node);
-        }
-    }
-    None
+    fdt.all_nodes().find(|node| node.name == "fstab")
 }
 
 fn dtb_print(file: &Utf8CStr, fstab: bool) -> LoggedResult<()> {
@@ -206,14 +198,12 @@ fn dtb_print(file: &Utf8CStr, fstab: bool) -> LoggedResult<()> {
                 eprintln!("Found fstab in dtb.{:04}", n);
                 print_node(&fstab);
             }
-        } else {
-            if let Some(mut root) = fdt.find_node("/") {
-                eprintln!("Printing dtb.{:04}", n);
-                if root.name.is_empty() {
-                    root.name = "/";
-                }
-                print_node(&root);
+        } else if let Some(mut root) = fdt.find_node("/") {
+            eprintln!("Printing dtb.{:04}", n);
+            if root.name.is_empty() {
+                root.name = "/";
             }
+            print_node(&root);
         }
         Ok(())
     })
