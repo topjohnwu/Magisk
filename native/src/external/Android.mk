@@ -17,23 +17,6 @@ LOCAL_SRC_FILES := \
     xz-embedded/xz_dec_stream.c
 include $(BUILD_STATIC_LIBRARY)
 
-# libfdt.a
-include $(CLEAR_VARS)
-LOCAL_MODULE:= libfdt
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/dtc/libfdt
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_SRC_FILES := \
-    dtc/libfdt/fdt.c \
-    dtc/libfdt/fdt_addresses.c \
-    dtc/libfdt/fdt_empty_tree.c \
-    dtc/libfdt/fdt_overlay.c \
-    dtc/libfdt/fdt_ro.c \
-    dtc/libfdt/fdt_rw.c \
-    dtc/libfdt/fdt_strerror.c \
-    dtc/libfdt/fdt_sw.c \
-    dtc/libfdt/fdt_wip.c
-include $(BUILD_STATIC_LIBRARY)
-
 # liblz4.a
 include $(CLEAR_VARS)
 LOCAL_MODULE := liblz4

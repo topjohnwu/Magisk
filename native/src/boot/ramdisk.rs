@@ -1,11 +1,11 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::env;
 use std::str::from_utf8;
 
 use base::libc::{S_IFDIR, S_IFMT, S_IFREG};
 use base::{LoggedResult, Utf8CStr};
 
+use crate::check_env;
 use crate::cpio::{Cpio, CpioEntry};
 use crate::patch::{patch_encryption, patch_verity};
 
@@ -19,11 +19,6 @@ pub trait MagiskCpio {
 const MAGISK_PATCHED: i32 = 1 << 0;
 const UNSUPPORTED_CPIO: i32 = 1 << 1;
 const SONY_INIT: i32 = 1 << 2;
-
-#[inline(always)]
-fn check_env(env: &str) -> bool {
-    env::var(env).map_or(false, |var| var == "true")
-}
 
 impl MagiskCpio for Cpio {
     fn patch(&mut self) {

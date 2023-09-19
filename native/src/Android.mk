@@ -99,7 +99,6 @@ LOCAL_STATIC_LIBRARIES := \
     liblzma \
     liblz4 \
     libbz2 \
-    libfdt \
     libz \
     libzopfli \
     libboot-rs
@@ -109,7 +108,6 @@ LOCAL_SRC_FILES := \
     boot/bootimg.cpp \
     boot/compress.cpp \
     boot/format.cpp \
-    boot/dtb.cpp \
     boot/boot-rs.cpp
 
 include $(BUILD_EXECUTABLE)
