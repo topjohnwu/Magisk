@@ -11,9 +11,7 @@ use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
-use libc::{
-    c_char, c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR,
-};
+use libc::{c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
 
 use crate::{
     copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
@@ -35,14 +33,6 @@ macro_rules! open_fd {
     ($path:expr, $flags:expr, $mode:expr) => {
         $crate::__open_fd_impl($path, $flags, $mode)
     };
-}
-
-pub(crate) unsafe fn readlink_unsafe(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-    let r = libc::readlink(path, buf.cast(), bufsz - 1);
-    if r >= 0 {
-        *buf.offset(r) = b'\0';
-    }
-    r
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
@@ -412,9 +402,10 @@ impl FsPath {
     pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         buf.clear();
         unsafe {
-            let c = readlink_unsafe(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity());
-            c.check_os_err()?;
-            buf.set_len(c as usize);
+            let r = libc::readlink(self.as_ptr(), buf.as_mut_ptr().cast(), buf.capacity() - 1)
+                .check_os_err()? as usize;
+            *buf.mut_buf().get_unchecked_mut(r) = b'\0';
+            buf.set_len(r);
         }
         Ok(())
     }

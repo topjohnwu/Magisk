@@ -10,7 +10,7 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{cstr, errno, raw_cstr, readlink_unsafe, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
+use crate::{cstr, errno, raw_cstr, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {
@@ -77,11 +77,16 @@ unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) 
 
 #[no_mangle]
 unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
-    let r = readlink_unsafe(path, buf, bufsz);
-    if r < 0 {
-        perror!("readlink");
+    match Utf8CStr::from_ptr(path) {
+        Ok(p) => {
+            let mut buf = Utf8CStrSlice::from_ptr(buf, bufsz);
+            FsPath::from(p)
+                .read_link(&mut buf)
+                .log_cxx_with_msg(|w| w.write_fmt(format_args!("readlink {} failed", p)))
+                .map_or(-1, |_| buf.len() as isize)
+        }
+        Err(_) => -1,
     }
-    r
 }
 
 #[no_mangle]
