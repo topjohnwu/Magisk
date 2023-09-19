@@ -10,12 +10,12 @@ use crate::{Utf8CStr, Utf8CStrArr};
 // Error handling and logging throughout the Rust codebase in Magisk:
 //
 // All errors should be logged and consumed as soon as possible and converted into LoggedError.
-// Implement `From<ErrorType> for LoggedError` for non-standard error types so that we can
-// directly use the `?` operator to propagate LoggedResult.
+// For `Result` with errors that implement the `Display` trait, use the `?` operator to
+// log and convert to LoggedResult.
 //
 // To log an error with more information, use `ResultExt::log_with_msg()`.
 //
-// The "cxx" method variants in `ResultExt` are only used for C++ interop and
+// The "cxx" method variants in `CxxResultExt` are only used for C++ interop and
 // should not be used directly in any Rust code.
 //
 // For general logging, use the <level>!(...) macros.
@@ -202,10 +202,38 @@ macro_rules! log_err {
     }};
 }
 
-pub trait ResultExt<T>
-where
-    Self: Sized,
-{
+pub trait ResultExt<T> {
+    fn log(self) -> LoggedResult<T>;
+    fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
+}
+
+// Internal C++ bridging logging routines
+pub(crate) trait CxxResultExt<T> {
+    fn log_cxx(self) -> LoggedResult<T>;
+    fn log_cxx_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
+}
+
+trait LogImpl<T> {
+    fn log_impl(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T>;
+    fn log_with_msg_impl<F: FnOnce(Formatter) -> fmt::Result>(
+        self,
+        level: LogLevel,
+        caller: Option<&'static Location>,
+        f: F,
+    ) -> LoggedResult<T>;
+}
+
+impl<T, R: LogImpl<T>> CxxResultExt<T> for R {
+    fn log_cxx(self) -> LoggedResult<T> {
+        self.log_impl(LogLevel::ErrorCxx, None)
+    }
+
+    fn log_cxx_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
+        self.log_with_msg_impl(LogLevel::ErrorCxx, None, f)
+    }
+}
+
+impl<T, R: LogImpl<T>> ResultExt<T> for R {
     #[cfg(not(debug_assertions))]
     fn log(self) -> LoggedResult<T> {
         self.log_impl(LogLevel::Error, None)
@@ -227,25 +255,9 @@ where
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
         self.log_with_msg_impl(LogLevel::Error, Some(Location::caller()), f)
     }
-
-    fn log_cxx(self) -> LoggedResult<T> {
-        self.log_impl(LogLevel::ErrorCxx, None)
-    }
-
-    fn log_cxx_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T> {
-        self.log_with_msg_impl(LogLevel::ErrorCxx, None, f)
-    }
-
-    fn log_impl(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T>;
-    fn log_with_msg_impl<F: FnOnce(Formatter) -> fmt::Result>(
-        self,
-        level: LogLevel,
-        caller: Option<&'static Location>,
-        f: F,
-    ) -> LoggedResult<T>;
 }
 
-impl<T> ResultExt<T> for LoggedResult<T> {
+impl<T> LogImpl<T> for LoggedResult<T> {
     fn log_impl(self, _: LogLevel, _: Option<&'static Location>) -> LoggedResult<T> {
         self
     }
@@ -272,7 +284,7 @@ impl<T> ResultExt<T> for LoggedResult<T> {
     }
 }
 
-impl<T, E: Display> ResultExt<T> for Result<T, E> {
+impl<T, E: Display> LogImpl<T> for Result<T, E> {
     fn log_impl(self, level: LogLevel, caller: Option<&'static Location>) -> LoggedResult<T> {
         match self {
             Ok(v) => Ok(v),

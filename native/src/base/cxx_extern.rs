@@ -6,8 +6,9 @@ use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 use cxx::private::c_char;
 use libc::mode_t;
 
+use crate::logging::CxxResultExt;
 pub(crate) use crate::xwrap::*;
-use crate::{fd_path, map_fd, map_file, Directory, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
+use crate::{fd_path, map_fd, map_file, Directory, FsPath, Utf8CStr, Utf8CStrSlice};
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
     let mut buf = Utf8CStrSlice::from(buf);

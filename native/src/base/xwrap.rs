@@ -10,7 +10,7 @@ use libc::{
     ssize_t, SYS_dup3,
 };
 
-use crate::{cstr, errno, raw_cstr, FsPath, ResultExt, Utf8CStr, Utf8CStrSlice};
+use crate::{cstr, errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrSlice};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {
