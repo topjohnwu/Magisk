@@ -4,9 +4,6 @@
 [submodule "busybox"]
 	path = native/src/external/busybox
 	url = https://github.com/topjohnwu/ndk-busybox.git
-[submodule "dtc"]
-	path = native/src/external/dtc
-	url = https://github.com/dgibson/dtc.git
 [submodule "lz4"]
 	path = native/src/external/lz4
 	url = https://github.com/lz4/lz4.git
