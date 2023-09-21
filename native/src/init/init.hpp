@@ -1,4 +1,5 @@
 #include <base.hpp>
+#include <stream.hpp>
 
 #include "init-rs.hpp"
 
@@ -26,12 +27,11 @@ struct BootConfig {
 extern std::vector<std::string> mount_list;
 
 int magisk_proxy_main(int argc, char *argv[]);
-bool unxz(int fd, const uint8_t *buf, size_t size);
+bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes);
 void load_kernel_info(BootConfig *config);
 bool check_two_stage();
 const char *backup_init();
 void restore_ramdisk_init();
-int dump_preload(const char *path, mode_t mode);
 
 /***************
  * Base classes

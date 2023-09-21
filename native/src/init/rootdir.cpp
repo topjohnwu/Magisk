@@ -167,14 +167,16 @@ static void extract_files(bool sbin) {
         mmap_data magisk(m32);
         unlink(m32);
         int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
-        unxz(fd, magisk.buf(), magisk.sz());
+        fd_channel ch(fd);
+        unxz(ch, magisk);
         close(fd);
     }
     if (access(m64, F_OK) == 0) {
         mmap_data magisk(m64);
         unlink(m64);
         int fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
-        unxz(fd, magisk.buf(), magisk.sz());
+        fd_channel ch(fd);
+        unxz(ch, magisk);
         close(fd);
         xsymlink("./magisk64", "magisk");
     } else {
@@ -184,7 +186,8 @@ static void extract_files(bool sbin) {
         mmap_data stub(stub_xz);
         unlink(stub_xz);
         int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
-        unxz(fd, stub.buf(), stub.sz());
+        fd_channel ch(fd);
+        unxz(ch, stub);
         close(fd);
     }
 }
