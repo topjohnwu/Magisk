@@ -691,9 +691,10 @@ void HookContext::nativeForkAndSpecialize_pre() {
 
     flags[APP_FORK_AND_SPECIALIZE] = true;
     if (args.app->fds_to_ignore == nullptr) {
-        // if fds_to_ignore does not exist and there's no FileDescriptorTable::Create,
-        // we can skip fd sanitization
-        flags[SKIP_FD_SANITIZATION] = !dlsym(RTLD_DEFAULT, "_ZN19FileDescriptorTable6CreateEv");
+        // if fds_to_ignore does not exist, we do not have a good way to determine
+        // whether keeping fd open during fork is allowed, as needed symbols may be
+        // inlined. Better be safe than sorry.
+        flags[SKIP_FD_SANITIZATION] = false;
     } else {
         int logd_fd = magiskd.get_log_pipe();
         if (logd_fd >= 0) {
