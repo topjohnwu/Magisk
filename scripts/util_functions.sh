@@ -279,7 +279,7 @@ mount_ro_ensure() {
 }
 
 # After calling this method, the following variables will be set:
-# SLOT, SYSTEM_AS_ROOT
+# SLOT, SYSTEM_AS_ROOT, LEGACYSAR
 mount_partitions() {
   # Check A/B slot
   SLOT=$(grep_cmdline androidboot.slot_suffix)
@@ -313,10 +313,27 @@ mount_partitions() {
     fi
   fi
   $SYSTEM_AS_ROOT && ui_print "- Device is system-as-root"
+
+  LEGACYSAR=false
+  if $BOOTMODE; then
+    grep ' / ' /proc/mounts | grep -q '/dev/root' && LEGACYSAR=true
+  else
+    # Recovery mode, assume devices that don't use dynamic partitions are legacy SAR
+    local IS_DYNAMIC=false
+    if grep -q 'androidboot.super_partition' /proc/cmdline; then
+      IS_DYNAMIC=true
+    elif [ -n "$(find_block super)" ]; then
+      IS_DYNAMIC=true
+    fi
+    if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
+      LEGACYSAR=true
+      ui_print "- Legacy SAR, force kernel to load rootfs"
+    fi
+  fi
 }
 
 # After calling this method, the following variables will be set:
-# ISENCRYPTED, PATCHVBMETAFLAG, LEGACYSAR,
+# ISENCRYPTED, PATCHVBMETAFLAG,
 # KEEPVERITY, KEEPFORCEENCRYPT, RECOVERYMODE
 get_flags() {
   if grep ' /data ' /proc/mounts | grep -q 'dm-'; then
@@ -334,22 +351,6 @@ get_flags() {
   else
     PATCHVBMETAFLAG=true
     ui_print "- No vbmeta partition, patch vbmeta in boot image"
-  fi
-  LEGACYSAR=false
-  if $BOOTMODE; then
-    grep ' / ' /proc/mounts | grep -q '/dev/root' && LEGACYSAR=true
-  else
-    # Recovery mode, assume devices that don't use dynamic partitions are legacy SAR
-    local IS_DYNAMIC=false
-    if grep -q 'androidboot.super_partition' /proc/cmdline; then
-      IS_DYNAMIC=true
-    elif [ -n "$(find_block super)" ]; then
-      IS_DYNAMIC=true
-    fi
-    if $SYSTEM_AS_ROOT && ! $IS_DYNAMIC; then
-      LEGACYSAR=true
-      ui_print "- Legacy SAR, force kernel to load rootfs"
-    fi
   fi
 
   # Overridable config flags with safe defaults

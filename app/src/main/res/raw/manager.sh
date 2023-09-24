@@ -195,6 +195,9 @@ mount_partitions() {
   # Check whether non rootfs root dir exists
   SYSTEM_AS_ROOT=false
   grep ' / ' /proc/mounts | grep -qv 'rootfs' && SYSTEM_AS_ROOT=true
+
+  LEGACYSAR=false
+  grep ' / ' /proc/mounts | grep -q '/dev/root' && LEGACYSAR=true
 }
 
 get_flags() {
@@ -210,15 +213,6 @@ get_flags() {
     PATCHVBMETAFLAG=true
   fi
   [ -z $RECOVERYMODE ] && RECOVERYMODE=false
-  if $SYSTEM_AS_ROOT; then
-    if grep ' / ' /proc/mounts | grep -q '/dev/root'; then
-      LEGACYSAR=true
-    else
-      LEGACYSAR=false
-    fi
-  else
-    LEGACYSAR=false
-  fi
 }
 
 run_migrations() { return; }
@@ -231,9 +225,9 @@ grep_prop() { return; }
 
 app_init() {
   mount_partitions
-  get_flags
   RAMDISKEXIST=false
   check_boot_ramdisk && RAMDISKEXIST=true
+  get_flags
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
