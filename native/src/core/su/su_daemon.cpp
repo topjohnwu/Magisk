@@ -458,7 +458,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     sigset_t block_set;
     sigemptyset(&block_set);
     sigprocmask(SIG_SETMASK, &block_set, nullptr);
-    if (!ctx.req.context.empty() && selinux_enabled()) {
+    if (!ctx.req.context.empty()) {
         auto f = xopen_file("/proc/self/attr/exec", "we");
         if (f) fprintf(f.get(), "%s", ctx.req.context.data());
     }

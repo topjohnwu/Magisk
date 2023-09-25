@@ -64,8 +64,6 @@ static void restore_syscon(int dirfd) {
 }
 
 void restorecon() {
-    if (!selinux_enabled())
-        return;
     int fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
     if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
         lsetfilecon(SECURE_DIR, ADB_CON);
@@ -76,8 +74,6 @@ void restorecon() {
 }
 
 void restore_tmpcon() {
-    if (!selinux_enabled())
-        return;
     if (MAGISKTMP == "/sbin")
         setfilecon(MAGISKTMP.data(), ROOT_CON);
     else
