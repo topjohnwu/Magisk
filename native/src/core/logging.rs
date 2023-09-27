@@ -245,7 +245,7 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
         let mut meta = LogMeta::zeroed();
         let mut msg_buf = [0u8; MAX_MSG_LEN];
-        let mut aux = Utf8CStrArr::<64>::new();
+        let mut aux = Utf8CStrBufArr::<64>::new();
 
         loop {
             // Read request

@@ -5,7 +5,7 @@ use std::panic::Location;
 use std::process::exit;
 
 use crate::ffi::LogLevel;
-use crate::{Utf8CStr, Utf8CStrArr};
+use crate::{Utf8CStr, Utf8CStrBufArr};
 
 // Error handling and logging throughout the Rust codebase in Magisk:
 //
@@ -98,7 +98,7 @@ pub fn log_from_cxx(level: LogLevel, msg: &[u8]) {
 
 pub fn log_with_formatter<F: FnOnce(Formatter) -> fmt::Result>(level: LogLevel, f: F) {
     log_with_writer(level, |write| {
-        let mut buf = Utf8CStrArr::default();
+        let mut buf = Utf8CStrBufArr::default();
         f(&mut buf).ok();
         write(level, &buf);
     });

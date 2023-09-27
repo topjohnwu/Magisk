@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io;
 use std::sync::{Mutex, OnceLock};
 
-use base::{cstr, Directory, ResultExt, Utf8CStr, Utf8CStrBuf, Utf8CStrSlice, WalkResult};
+use base::{cstr, Directory, ResultExt, Utf8CStr, Utf8CStrBuf, Utf8CStrBufRef, WalkResult};
 
 use crate::logging::{magisk_logging, zygisk_logging};
 
@@ -57,11 +57,11 @@ pub fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize {
             Ok(Skip)
         })?;
         if !buf.is_empty() {
-            buf.append("/base.apk");
+            buf.push_str("/base.apk");
         }
         Ok(buf.len())
     }
-    inner(pkg, &mut Utf8CStrSlice::from(data))
+    inner(pkg, &mut Utf8CStrBufRef::from(data))
         .log()
         .unwrap_or(0)
 }

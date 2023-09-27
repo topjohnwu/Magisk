@@ -10,7 +10,7 @@ use libc::{
 };
 
 use crate::cxx_extern::readlinkat_for_cxx;
-use crate::{cstr, errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrSlice};
+use crate::{cstr, errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrBufRef};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {
@@ -65,7 +65,7 @@ mod c_export {
 unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     match Utf8CStr::from_ptr(path) {
         Ok(p) => {
-            let mut buf = Utf8CStrSlice::from_ptr(buf, bufsz);
+            let mut buf = Utf8CStrBufRef::from_ptr(buf, bufsz);
             FsPath::from(p)
                 .realpath(&mut buf)
                 .log_cxx_with_msg(|w| w.write_fmt(format_args!("realpath {} failed", p)))
@@ -79,7 +79,7 @@ unsafe extern "C" fn xrealpath(path: *const c_char, buf: *mut u8, bufsz: usize) 
 unsafe extern "C" fn xreadlink(path: *const c_char, buf: *mut u8, bufsz: usize) -> isize {
     match Utf8CStr::from_ptr(path) {
         Ok(p) => {
-            let mut buf = Utf8CStrSlice::from_ptr(buf, bufsz);
+            let mut buf = Utf8CStrBufRef::from_ptr(buf, bufsz);
             FsPath::from(p)
                 .read_link(&mut buf)
                 .log_cxx_with_msg(|w| w.write_fmt(format_args!("readlink {} failed", p)))

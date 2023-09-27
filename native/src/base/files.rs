@@ -20,8 +20,8 @@ use num_traits::AsPrimitive;
 
 use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
-    copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
-    Utf8CStrBuf,
+    copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf,
+    Utf8CStrBufArr,
 };
 
 pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
@@ -42,7 +42,7 @@ macro_rules! open_fd {
 }
 
 pub fn fd_path(fd: RawFd, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
-    let mut arr = Utf8CStrArr::<40>::new();
+    let mut arr = Utf8CStrBufArr::<40>::new();
     let path = FsPathBuf::new(&mut arr).join("/proc/self/fd").join_fmt(fd);
     path.read_link(buf)
 }
@@ -140,7 +140,7 @@ impl<T: Write> WriteExt for T {
 
 pub struct FileAttr {
     pub st: libc::stat,
-    pub con: Utf8CStrArr<128>,
+    pub con: Utf8CStrBufArr<128>,
 }
 
 const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
@@ -168,8 +168,8 @@ impl DirEntry<'_> {
 
     pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         self.dir.path(buf)?;
-        buf.append("/");
-        buf.append_lossy(self.d_name().to_bytes());
+        buf.push_str("/");
+        buf.push_lossy(self.d_name().to_bytes());
         Ok(())
     }
 
@@ -227,13 +227,13 @@ impl DirEntry<'_> {
     }
 
     pub fn get_attr(&self) -> io::Result<FileAttr> {
-        let mut path = Utf8CStrArr::default();
+        let mut path = Utf8CStrBufArr::default();
         self.path(&mut path)?;
         FsPath::from(path).get_attr()
     }
 
     pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
-        let mut path = Utf8CStrArr::default();
+        let mut path = Utf8CStrBufArr::default();
         self.path(&mut path)?;
         FsPath::from(path).set_attr(attr)
     }
@@ -367,7 +367,7 @@ impl Directory {
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
             } else if e.is_lnk() {
-                let mut path = Utf8CStrArr::default();
+                let mut path = Utf8CStrBufArr::default();
                 e.read_link(&mut path)?;
                 unsafe {
                     libc::symlinkat(path.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
@@ -629,7 +629,7 @@ impl FsPath {
         unsafe {
             attr = FileAttr {
                 st: mem::zeroed(),
-                con: Utf8CStrArr::new(),
+                con: Utf8CStrBufArr::new(),
             };
             libc::lstat(self.as_ptr(), &mut attr.st).as_os_err()?;
             if SELINUX_ENABLED.load(Ordering::Relaxed) {
@@ -681,7 +681,7 @@ impl FsPath {
                 let mut dest = path.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o777)?;
                 std::io::copy(&mut src, &mut dest)?;
             } else if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFLNK.as_() {
-                let mut buf = Utf8CStrArr::default();
+                let mut buf = Utf8CStrBufArr::default();
                 self.read_link(&mut buf)?;
                 unsafe {
                     libc::symlink(buf.as_ptr(), path.as_ptr()).as_os_err()?;
@@ -725,7 +725,7 @@ pub fn fd_get_attr(fd: RawFd) -> io::Result<FileAttr> {
     unsafe {
         attr = FileAttr {
             st: mem::zeroed(),
-            con: Utf8CStrArr::new(),
+            con: Utf8CStrBufArr::new(),
         };
         libc::fstat(fd, &mut attr.st).as_os_err()?;
         if SELINUX_ENABLED.load(Ordering::Relaxed) {
