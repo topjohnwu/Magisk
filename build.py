@@ -62,6 +62,8 @@ if shutil.which("sccache") is not None:
     os.environ["RUSTC_WRAPPER"] = "sccache"
     os.environ["NDK_CCACHE"] = "sccache"
     os.environ["CARGO_INCREMENTAL"] = "0"
+if shutil.which("ccache") is not None:
+    os.environ["NDK_CCACHE"] = "ccache"
 
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
