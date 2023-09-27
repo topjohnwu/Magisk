@@ -20,11 +20,6 @@ static inline T align_padding(T v, int a) {
     return align_to(v, a) - v;
 }
 
-struct file_attr {
-    struct stat st;
-    char con[128];
-};
-
 struct mount_info {
     unsigned int id;
     unsigned int parent;
@@ -58,27 +53,19 @@ int mkdirs(const char *path, mode_t mode);
 ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 bool rm_rf(const char *path);
 bool frm_rf(int dirfd);
+void cp_afc(const char *src, const char *dest);
+void mv_path(const char *src, const char *dest);
+void link_path(const char *src, const char *dest);
+void clone_attr(const char *src, const char *dest);
+void fclone_attr(int src, int dest);
 
 } // extern "C"
 
 int fd_pathat(int dirfd, const char *name, char *path, size_t size);
-void mv_path(const char *src, const char *dest);
-void mv_dir(int src, int dest);
-void cp_afc(const char *src, const char *dest);
-void link_path(const char *src, const char *dest);
-void link_dir(int src, int dest);
 static inline ssize_t realpath(
         const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz) {
     return canonical_path(path, buf, bufsiz);
 }
-int getattr(const char *path, file_attr *a);
-int getattrat(int dirfd, const char *name, file_attr *a);
-int fgetattr(int fd, file_attr *a);
-int setattr(const char *path, file_attr *a);
-int setattrat(int dirfd, const char *name, file_attr *a);
-int fsetattr(int fd, file_attr *a);
-void fclone_attr(int src, int dest);
-void clone_attr(const char *src, const char *dest);
 void full_read(int fd, std::string &str);
 void full_read(const char *filename, std::string &str);
 std::string full_read(int fd);
@@ -90,7 +77,6 @@ void file_readline(const char *file, const std::function<bool(std::string_view)>
 void parse_prop_file(FILE *fp, const std::function<bool(std::string_view, std::string_view)> &fn);
 void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
-void clone_dir(int src, int dest);
 std::vector<mount_info> parse_mount_info(const char *pid);
 std::string resolve_preinit_dir(const char *base_dir);
 

@@ -12,11 +12,11 @@ use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    cstr, debug, libc::mkstemp, raw_cstr, Directory, FsPath, FsPathBuf, LibcReturn, LoggedError,
+    clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedError,
     LoggedResult, MappedFile, Utf8CStr, Utf8CStrArr, WalkResult,
 };
 
-use crate::ffi::{clone_attr, prop_cb_exec, PropCb};
+use crate::ffi::{prop_cb_exec, PropCb};
 use crate::resetprop::proto::persistent_properties::{
     mod_PersistentProperties::PersistentPropertyRecord, PersistentProperties,
 };
@@ -140,7 +140,7 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
         debug!("resetprop: encode with protobuf [{}]", tmp);
         props.write_message(&mut Writer::new(BufWriter::new(f)))?;
     }
-    unsafe { clone_attr(raw_cstr!(PERSIST_PROP!()), tmp.as_ptr()) };
+    clone_attr(FsPath::from(cstr!(PERSIST_PROP!())), &tmp)?;
     tmp.rename_to(cstr!(PERSIST_PROP!()))?;
     Ok(())
 }

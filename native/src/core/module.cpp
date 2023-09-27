@@ -164,11 +164,11 @@ void module_node::mount() {
 void tmpfs_node::mount() {
     string src = mirror_path();
     const string &dest = node_path();
-    file_attr a{};
+    const char *src_path;
     if (access(src.data(), F_OK) == 0)
-        getattr(src.data(), &a);
+        src_path = src.data();
     else
-        getattr(parent()->node_path().data(), &a);
+        src_path = parent()->node_path().data();
     if (!isa<tmpfs_node>(parent())) {
         auto worker_dir = MAGISKTMP + "/" WORKERDIR + dest;
         mkdirs(worker_dir.data(), 0);
@@ -177,7 +177,7 @@ void tmpfs_node::mount() {
         // We don't need another layer of tmpfs if parent is tmpfs
         mkdir(dest.data(), 0);
     }
-    setattr(dest.data(), &a);
+    clone_attr(src_path, dest.data());
     dir_node::mount();
 }
 

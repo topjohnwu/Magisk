@@ -75,6 +75,7 @@ dependencies = [
  "cxx",
  "cxx-gen",
  "libc",
+ "num-traits",
  "thiserror",
 ]
 

@@ -4,12 +4,12 @@ use std::ffi::CStr;
 use std::os::unix::io::RawFd;
 use std::ptr;
 
-use cfg_if::cfg_if;
 use libc::{
     c_char, c_uint, c_ulong, c_void, dev_t, mode_t, nfds_t, off_t, pollfd, sockaddr, socklen_t,
     ssize_t, SYS_dup3,
 };
 
+use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{cstr, errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrSlice};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
@@ -96,23 +96,9 @@ unsafe extern "C" fn xreadlinkat(
     buf: *mut u8,
     bufsz: usize,
 ) -> isize {
-    // readlinkat() may fail on x86 platform, returning random value
-    // instead of number of bytes placed in buf (length of link)
-    cfg_if! {
-        if #[cfg(any(target_arch = "x86", target_arch = "x86_64"))] {
-            libc::memset(buf.cast(), 0, bufsz);
-            let r = libc::readlinkat(dirfd, path, buf.cast(), bufsz - 1);
-            if r < 0 {
-                perror!("readlinkat {}", ptr_to_str(path))
-            }
-        } else {
-            let r = libc::readlinkat(dirfd, path, buf.cast(), bufsz - 1);
-            if r < 0 {
-                perror!("readlinkat {}", ptr_to_str(path))
-            } else {
-                *buf.offset(r) = b'\0';
-            }
-        }
+    let r = readlinkat_for_cxx(dirfd, path, buf, bufsz);
+    if r < 0 {
+        perror!("readlinkat {}", ptr_to_str(path))
     }
     r
 }

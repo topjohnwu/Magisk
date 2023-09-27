@@ -8,11 +8,17 @@ use std::os::android::fs::MetadataExt;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
 use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
-use libc::{c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_PATH, O_RDONLY, O_RDWR};
+use libc::{
+    c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY, O_RDWR,
+    O_TRUNC, O_WRONLY, S_IFDIR, S_IFLNK, S_IFREG,
+};
+use num_traits::AsPrimitive;
 
+use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
     copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrArr,
     Utf8CStrBuf,
@@ -132,6 +138,18 @@ impl<T: Write> WriteExt for T {
     }
 }
 
+pub struct FileAttr {
+    pub st: libc::stat,
+    pub con: Utf8CStrArr<128>,
+}
+
+const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
+static SELINUX_ENABLED: AtomicBool = AtomicBool::new(false);
+
+pub fn enable_selinux() {
+    SELINUX_ENABLED.store(true, Ordering::Relaxed);
+}
+
 pub struct DirEntry<'a> {
     dir: &'a Directory,
     entry: &'a dirent,
@@ -175,34 +193,49 @@ impl DirEntry<'_> {
         Ok(())
     }
 
+    pub fn read_link(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
+        buf.clear();
+        unsafe {
+            let r = readlinkat_for_cxx(
+                self.dir.as_raw_fd(),
+                self.d_name.as_ptr(),
+                buf.as_mut_ptr().cast(),
+                buf.capacity(),
+            )
+            .check_os_err()? as usize;
+            buf.set_len(r);
+        }
+        Ok(())
+    }
+
+    unsafe fn open_fd(&self, flags: i32) -> io::Result<RawFd> {
+        self.dir.open_fd(self.d_name(), flags, 0)
+    }
+
     pub fn open_as_dir(&self) -> io::Result<Directory> {
         if !self.is_dir() {
             return Err(io::Error::from(io::ErrorKind::NotADirectory));
         }
-        unsafe {
-            let fd = libc::openat(
-                self.dir.as_raw_fd(),
-                self.d_name.as_ptr(),
-                O_RDONLY | O_CLOEXEC,
-            )
-            .check_os_err()?;
-            Directory::try_from(OwnedFd::from_raw_fd(fd))
-        }
+        unsafe { Directory::try_from(OwnedFd::from_raw_fd(self.open_fd(O_RDONLY)?)) }
     }
 
     pub fn open_as_file(&self, flags: i32) -> io::Result<File> {
         if self.is_dir() {
             return Err(io::Error::from(io::ErrorKind::IsADirectory));
         }
-        unsafe {
-            let fd = libc::openat(
-                self.dir.as_raw_fd(),
-                self.d_name.as_ptr(),
-                flags | O_CLOEXEC,
-            )
-            .check_os_err()?;
-            Ok(File::from_raw_fd(fd))
-        }
+        unsafe { Ok(File::from_raw_fd(self.open_fd(flags)?)) }
+    }
+
+    pub fn get_attr(&self) -> io::Result<FileAttr> {
+        let mut path = Utf8CStrArr::default();
+        self.path(&mut path)?;
+        FsPath::from(path).get_attr()
+    }
+
+    pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
+        let mut path = Utf8CStrArr::default();
+        self.path(&mut path)?;
+        FsPath::from(path).set_attr(attr)
     }
 }
 
@@ -261,6 +294,25 @@ impl Directory {
         unsafe { libc::rewinddir(self.dirp) }
     }
 
+    unsafe fn open_fd(&self, name: &CStr, flags: i32, mode: i32) -> io::Result<RawFd> {
+        libc::openat(self.as_raw_fd(), name.as_ptr(), flags | O_CLOEXEC, mode).check_os_err()
+    }
+
+    pub fn contains_path(&self, path: &CStr) -> bool {
+        // WARNING: Using faccessat is incorrect, because the raw linux kernel syscall
+        // does not support the flag AT_SYMLINK_NOFOLLOW until 5.8 with faccessat2.
+        // Use fstatat to check the existence of a file instead.
+        unsafe {
+            let mut st: libc::stat = mem::zeroed();
+            libc::fstatat(
+                self.as_raw_fd(),
+                path.as_ptr(),
+                &mut st,
+                libc::AT_SYMLINK_NOFOLLOW,
+            ) == 0
+        }
+    }
+
     pub fn path(&self, buf: &mut dyn Utf8CStrBuf) -> io::Result<()> {
         fd_path(self.as_raw_fd(), buf)
     }
@@ -284,6 +336,108 @@ impl Directory {
             e.unlink()?;
             Ok(WalkResult::Continue)
         })?;
+        Ok(())
+    }
+
+    pub fn copy_into(&mut self, dir: &Directory) -> io::Result<()> {
+        while let Some(ref e) = self.read()? {
+            let attr = e.get_attr()?;
+            let new_entry = DirEntry {
+                dir,
+                entry: e.entry,
+                d_name_len: e.d_name_len,
+            };
+            if e.is_dir() {
+                unsafe {
+                    libc::mkdirat(dir.as_raw_fd(), e.d_name.as_ptr(), 0o777).as_os_err()?;
+                }
+                let mut src = e.open_as_dir()?;
+                let dest = new_entry.open_as_dir()?;
+                src.copy_into(&dest)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else if e.is_file() {
+                let mut src = e.open_as_file(O_RDONLY)?;
+                let mut dest = unsafe {
+                    File::from_raw_fd(dir.open_fd(
+                        e.d_name(),
+                        O_WRONLY | O_CREAT | O_TRUNC,
+                        0o777,
+                    )?)
+                };
+                std::io::copy(&mut src, &mut dest)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else if e.is_lnk() {
+                let mut path = Utf8CStrArr::default();
+                e.read_link(&mut path)?;
+                unsafe {
+                    libc::symlinkat(path.as_ptr(), dir.as_raw_fd(), e.d_name.as_ptr())
+                        .as_os_err()?;
+                }
+                new_entry.set_attr(&attr)?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn move_into(&mut self, dir: &Directory) -> io::Result<()> {
+        let dir_fd = self.as_raw_fd();
+        while let Some(ref e) = self.read()? {
+            if e.is_dir() && dir.contains_path(e.d_name()) {
+                // Destination folder exists, needs recursive move
+                let mut src = e.open_as_dir()?;
+                let new_entry = DirEntry {
+                    dir,
+                    entry: e.entry,
+                    d_name_len: e.d_name_len,
+                };
+                let dest = new_entry.open_as_dir()?;
+                src.move_into(&dest)?;
+                return e.unlink();
+            }
+
+            unsafe {
+                libc::renameat(
+                    dir_fd,
+                    e.d_name.as_ptr(),
+                    dir.as_raw_fd(),
+                    e.d_name.as_ptr(),
+                )
+                .as_os_err()?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn link_into(&mut self, dir: &Directory) -> io::Result<()> {
+        let dir_fd = self.as_raw_fd();
+        while let Some(ref e) = self.read()? {
+            if e.is_dir() {
+                unsafe {
+                    libc::mkdirat(dir.as_raw_fd(), e.d_name.as_ptr(), 0o777).as_os_err()?;
+                }
+                let attr = e.get_attr()?;
+                let new_entry = DirEntry {
+                    dir,
+                    entry: e.entry,
+                    d_name_len: e.d_name_len,
+                };
+                let mut src = e.open_as_dir()?;
+                let dest = new_entry.open_as_dir()?;
+                src.link_into(&dest)?;
+                fd_set_attr(dest.as_raw_fd(), &attr)?;
+            } else {
+                unsafe {
+                    libc::linkat(
+                        dir_fd,
+                        e.d_name.as_ptr(),
+                        dir.as_raw_fd(),
+                        e.d_name.as_ptr(),
+                        0,
+                    )
+                    .as_os_err()?;
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -410,6 +564,19 @@ impl FsPath {
         Ok(())
     }
 
+    pub fn mkdir(&self, mode: mode_t) -> io::Result<()> {
+        unsafe {
+            if libc::mkdir(self.as_ptr(), mode) < 0 {
+                if *errno() == EEXIST {
+                    libc::chmod(self.as_ptr(), mode).as_os_err()?;
+                } else {
+                    return Err(io::Error::last_os_error());
+                }
+            }
+        }
+        Ok(())
+    }
+
     pub fn mkdirs(&self, mode: mode_t) -> io::Result<()> {
         let mut buf = [0_u8; 4096];
         let len = copy_cstr(&mut buf, self);
@@ -456,6 +623,151 @@ impl FsPath {
         }
         Ok(())
     }
+
+    pub fn get_attr(&self) -> io::Result<FileAttr> {
+        let mut attr: FileAttr;
+        unsafe {
+            attr = FileAttr {
+                st: mem::zeroed(),
+                con: Utf8CStrArr::new(),
+            };
+            libc::lstat(self.as_ptr(), &mut attr.st).as_os_err()?;
+            if SELINUX_ENABLED.load(Ordering::Relaxed) {
+                let sz = libc::lgetxattr(
+                    self.as_ptr(),
+                    XATTR_NAME_SELINUX.as_ptr().cast(),
+                    attr.con.as_mut_ptr().cast(),
+                    attr.con.capacity(),
+                )
+                .check_os_err()?;
+                attr.con.set_len((sz - 1) as usize);
+            }
+        }
+        Ok(attr)
+    }
+
+    pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
+        unsafe {
+            if (attr.st.st_mode & libc::S_IFMT as c_uint) != S_IFLNK.as_() {
+                libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()).as_os_err()?;
+            }
+            libc::lchown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).as_os_err()?;
+            if !attr.con.is_empty() {
+                libc::lsetxattr(
+                    self.as_ptr(),
+                    XATTR_NAME_SELINUX.as_ptr().cast(),
+                    attr.con.as_ptr().cast(),
+                    attr.con.len() + 1,
+                    0,
+                )
+                .as_os_err()?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn copy_to(&self, path: &FsPath) -> io::Result<()> {
+        let attr = self.get_attr()?;
+        if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+            path.mkdir(0o777)?;
+            let mut src = Directory::open(self)?;
+            let dest = Directory::open(path)?;
+            src.copy_into(&dest)?;
+        } else {
+            // It's OK if remove failed
+            path.remove().ok();
+            if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFREG.as_() {
+                let mut src = self.open(O_RDONLY | O_CLOEXEC)?;
+                let mut dest = path.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o777)?;
+                std::io::copy(&mut src, &mut dest)?;
+            } else if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFLNK.as_() {
+                let mut buf = Utf8CStrArr::default();
+                self.read_link(&mut buf)?;
+                unsafe {
+                    libc::symlink(buf.as_ptr(), path.as_ptr()).as_os_err()?;
+                }
+            }
+        }
+        path.set_attr(&attr)?;
+        Ok(())
+    }
+
+    pub fn move_to(&self, path: &FsPath) -> io::Result<()> {
+        if path.exists() {
+            let attr = path.get_attr()?;
+            if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+                let mut src = Directory::open(self)?;
+                let dest = Directory::open(path)?;
+                return src.move_into(&dest);
+            } else {
+                path.remove()?;
+            }
+        }
+        self.rename_to(path)
+    }
+
+    pub fn link_to(&self, path: &FsPath) -> io::Result<()> {
+        let attr = self.get_attr()?;
+        if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+            path.mkdir(0o777)?;
+            path.set_attr(&attr)?;
+            let mut src = Directory::open(self)?;
+            let dest = Directory::open(path)?;
+            src.link_into(&dest)
+        } else {
+            unsafe { libc::link(self.as_ptr(), path.as_ptr()).as_os_err() }
+        }
+    }
+}
+
+pub fn fd_get_attr(fd: RawFd) -> io::Result<FileAttr> {
+    let mut attr: FileAttr;
+    unsafe {
+        attr = FileAttr {
+            st: mem::zeroed(),
+            con: Utf8CStrArr::new(),
+        };
+        libc::fstat(fd, &mut attr.st).as_os_err()?;
+        if SELINUX_ENABLED.load(Ordering::Relaxed) {
+            let sz = libc::fgetxattr(
+                fd,
+                XATTR_NAME_SELINUX.as_ptr().cast(),
+                attr.con.as_mut_ptr().cast(),
+                attr.con.capacity(),
+            )
+            .check_os_err()?;
+            attr.con.set_len((sz - 1) as usize);
+        }
+    }
+    Ok(attr)
+}
+
+pub fn fd_set_attr(fd: RawFd, attr: &FileAttr) -> io::Result<()> {
+    unsafe {
+        libc::fchmod(fd, (attr.st.st_mode & 0o777).as_()).as_os_err()?;
+        libc::fchown(fd, attr.st.st_uid, attr.st.st_gid).as_os_err()?;
+        if !attr.con.is_empty() {
+            libc::fsetxattr(
+                fd,
+                XATTR_NAME_SELINUX.as_ptr().cast(),
+                attr.con.as_ptr().cast(),
+                attr.con.len() + 1,
+                0,
+            )
+            .as_os_err()?;
+        }
+    }
+    Ok(())
+}
+
+pub fn clone_attr(a: &FsPath, b: &FsPath) -> io::Result<()> {
+    let attr = a.get_attr()?;
+    b.set_attr(&attr)
+}
+
+pub fn fclone_attr(a: RawFd, b: RawFd) -> io::Result<()> {
+    let attr = fd_get_attr(a)?;
+    fd_set_attr(b, &attr)
 }
 
 pub struct MappedFile(&'static mut [u8]);
@@ -494,13 +806,13 @@ impl Drop for MappedFile {
     }
 }
 
+extern "C" {
+    // Don't use the declaration from the libc crate as request should be u32 not i32
+    fn ioctl(fd: RawFd, request: u32, ...) -> i32;
+}
+
 // We mark the returned slice static because it is valid until explicitly unmapped
 pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8]> {
-    extern "C" {
-        // Don't use the declaration from the libc crate as request should be u32 not i32
-        fn ioctl(fd: RawFd, request: u32, ...) -> i32;
-    }
-
     #[cfg(target_pointer_width = "64")]
     const BLKGETSIZE64: u32 = 0x80081272;
 

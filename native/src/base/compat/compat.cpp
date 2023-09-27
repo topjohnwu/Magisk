@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/syscall.h>
+#include <sys/xattr.h>
 
 extern "C" {
 
@@ -88,6 +89,16 @@ int faccessat(int dirfd, const char *pathname, int mode, int flags) {
 [[gnu::weak]]
 int mkfifo(const char *path, mode_t mode) {
     return mknod(path, (mode & ~S_IFMT) | S_IFIFO, 0);
+}
+
+[[gnu::weak]]
+int fsetxattr(int fd, const char *name, const void *value, size_t size, int flags) {
+    return syscall(__NR_fsetxattr, fd, name, value, size, flags);
+}
+
+[[gnu::weak]]
+int lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags) {
+    return syscall(__NR_lsetxattr, path, name, value, size, flags);
 }
 
 #define SPLIT_64(v) (unsigned)((v) & 0xFFFFFFFF), (unsigned)((v) >> 32)
