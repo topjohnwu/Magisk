@@ -7,6 +7,8 @@
 #include <socket.hpp>
 #include <base.hpp>
 
+#include "core.hpp"
+
 #define DB_VERSION 12
 
 using namespace std;
@@ -116,7 +118,7 @@ db_settings::db_settings() {
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;
-    data[ZYGISK_CONFIG] = false;
+    data[ZYGISK_CONFIG] = rust::get_magiskd().is_emulator();
 }
 
 int db_settings::get_idx(string_view key) const {

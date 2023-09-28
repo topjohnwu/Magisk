@@ -48,6 +48,7 @@ pub mod ffi {
         fn get_log_pipe(self: &MagiskD) -> i32;
         fn close_log_pipe(self: &MagiskD);
         fn setup_logfile(self: &MagiskD);
+        fn is_emulator(self: &MagiskD) -> bool;
     }
 }
 

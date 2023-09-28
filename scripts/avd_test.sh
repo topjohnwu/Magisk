@@ -35,7 +35,7 @@ cleanup() {
 wait_for_boot() {
   adb wait-for-device
   while true; do
-    if [ "stopped" = "$(adb exec-out getprop init.svc.bootanim)" ]; then
+    if [ "1" = "$(adb exec-out getprop sys.boot_completed)" ]; then
       break
     fi
     sleep 2

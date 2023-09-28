@@ -66,6 +66,9 @@ if [ -d /dev/avd-magisk ]; then
   rm -rf /dev/avd-magisk 2>/dev/null
 fi
 
+# Make sure boot completed props are not set to 1
+setprop sys.boot_completed 0
+
 # Mount /cache if not already mounted
 if ! grep -q ' /cache ' /proc/mounts; then
   mount -t tmpfs -o 'mode=0755' tmpfs /cache

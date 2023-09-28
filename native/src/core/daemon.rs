@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io;
 use std::sync::{Mutex, OnceLock};
 
+use crate::get_prop;
 use base::{cstr, Directory, ResultExt, Utf8CStr, Utf8CStrBuf, Utf8CStrBufRef, WalkResult};
 
 use crate::logging::{magisk_logging, zygisk_logging};
@@ -13,10 +14,20 @@ pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 #[derive(Default)]
 pub struct MagiskD {
     pub logd: Mutex<RefCell<Option<File>>>,
+    is_emulator: bool,
 }
 
 pub fn daemon_entry() {
-    let magiskd = MagiskD::default();
+    let mut qemu = get_prop(cstr!("ro.kernel.qemu"), false);
+    if qemu.is_empty() {
+        qemu = get_prop(cstr!("ro.boot.qemu"), false);
+    }
+    let is_emulator = qemu == "1";
+
+    let magiskd = MagiskD {
+        logd: Default::default(),
+        is_emulator,
+    };
     magiskd.start_log_daemon();
     MAGISKD.set(magiskd).ok();
     magisk_logging();
@@ -29,10 +40,14 @@ pub fn zygisk_entry() {
 }
 
 pub fn get_magiskd() -> &'static MagiskD {
-    MAGISKD.get().unwrap()
+    unsafe { MAGISKD.get().unwrap_unchecked() }
 }
 
-impl MagiskD {}
+impl MagiskD {
+    pub fn is_emulator(&self) -> bool {
+        self.is_emulator
+    }
+}
 
 pub fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize {
     use WalkResult::*;
