@@ -107,7 +107,7 @@ To unlock your bootloader, follow the instructions below. If no OEM Lock value i
 Possible KnoxGuard values are the following:
 
 - `Active`, `Locked`: your device has been remotely locked by your telecom operator or your insurance company.
-- `Prenormal`: your device is temporarely locked, reaching 168h of uptime should trigger unlock.
+- `Prenormal`: your device is temporarily locked, reaching 168h of uptime should trigger unlock.
 - `Checking`, `Completed`, `Broken`: your device is unlocked.
 
 Having KnoxGuard active will prevent you from installing/running Magisk regardless of your bootloader lock state.
