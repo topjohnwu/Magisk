@@ -10,7 +10,7 @@
 - Windows only: Enable [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development). This is required because we need symbolic link support.
 - Install Python 3.8+:
   - On Unix, install python3 using your favorite package manager
-  - On Windows, download and install the latest Python version on the [offcial website](https://www.python.org/downloads/windows/).<br>
+  - On Windows, download and install the latest Python version on the [official website](https://www.python.org/downloads/windows/).<br>
     Make sure to select **"Add Python to PATH"** during installation.
   - (Optional on Windows): Run `pip install colorama` to install the `colorama` python package
 - Install Git:
