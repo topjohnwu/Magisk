@@ -69,7 +69,7 @@ run_test() {
   "$sdk" $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
 
-  # Launch emulator and patch
+  # Launch emulator and patch with debug build
   restore_avd
   "$emu" @test $emu_args &
   pid=$!
@@ -85,9 +85,21 @@ run_test() {
   timeout $boot_timeout bash -c wait_for_boot
 
   adb shell magisk -v
+
+  # Re-patch to test release build
+  ./build.py -r avd_patch -s "$ramdisk"
   kill -INT $pid
   wait $pid
 
+  # Test if it also boots properly
+  "$emu" @test $emu_args &
+  pid=$!
+  timeout $boot_timeout bash -c wait_for_boot
+
+  adb shell magisk -v
+
+  kill -INT $pid
+  wait $pid
   restore_avd
 }
 
