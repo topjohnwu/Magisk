@@ -10,7 +10,7 @@
 - Windows only: Enable [developer mode](https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development). This is required because we need symbolic link support.
 - Install Python 3.8+:
   - On Unix, install python3 using your favorite package manager
-  - On Windows, download and install the latest Python version on the [offical website](https://www.python.org/downloads/windows/).<br>
+  - On Windows, download and install the latest Python version on the [official website](https://www.python.org/downloads/windows/).<br>
     Make sure to select **"Add Python to PATH"** during installation.
   - (Optional on Windows): Run `pip install colorama` to install the `colorama` python package
 - Install Git:
@@ -40,7 +40,7 @@
 
 ### Developing Rust in Android Studio
 
-Because the Magisk NDK package, [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`), contains a fully self contained Clang + Rust toolchain, building the Magisk project alone does not require configuring toolchains. However, due to the way how the Intellij Rust plugin works, you'll have to go through some additional setup to make Android Studio work with Magisk's Rust codebase:
+Because the Magisk NDK package, [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`), contains a fully self contained Clang + Rust toolchain, building the Magisk project alone does not require configuring toolchains. However, due to the way the IntelliJ Rust plugin works, you'll have to go through some additional setup to make Android Studio work with Magisk's Rust codebase:
 
 - Install [rustup](https://rustup.rs/), the official Rust toolchain manager
 - Link the ONDK Rust toolchain and set it as default:
