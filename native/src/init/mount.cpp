@@ -223,10 +223,8 @@ mount_root:
     bool is_two_stage = access("/apex", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
-#if MAGISK_DEBUG
     // For API 28 AVD, it uses legacy SAR setup that requires
-    // special hacks in magiskinit to work properly. We do not
-    // necessarily want this enabled in production builds.
+    // special hacks in magiskinit to work properly.
     if (!is_two_stage && config->emulator) {
         avd_hack = true;
         // These values are hardcoded for API 28 AVD
@@ -236,7 +234,6 @@ mount_root:
         setup_block();
         xmount(blk_info.block_dev, "/vendor", "ext4", MS_RDONLY, nullptr);
     }
-#endif
 
     return is_two_stage;
 }
