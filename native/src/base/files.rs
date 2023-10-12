@@ -229,13 +229,13 @@ impl DirEntry<'_> {
     pub fn get_attr(&self) -> io::Result<FileAttr> {
         let mut path = Utf8CStrBufArr::default();
         self.path(&mut path)?;
-        FsPath::from(path).get_attr()
+        FsPath::from(&path).get_attr()
     }
 
     pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
         let mut path = Utf8CStrBufArr::default();
         self.path(&mut path)?;
-        FsPath::from(path).set_attr(attr)
+        FsPath::from(&path).set_attr(attr)
     }
 }
 
