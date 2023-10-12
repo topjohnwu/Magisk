@@ -568,7 +568,7 @@ macro_rules! impl_str_write {
         impl<$($g)*> AsMut<Utf8CStr> for $t {
             #[inline(always)]
             fn as_mut(&mut self) -> &mut Utf8CStr {
-                self
+                self.as_utf8_cstr_mut()
             }
         }
     )*}
@@ -597,10 +597,8 @@ macro_rules! impl_str_buf {
             }
             #[inline(always)]
             fn clear(&mut self) {
-                unsafe {
-                    self.mut_buf()[0] = b'\0';
-                    self.set_len(0);
-                }
+                self.buf[0] = b'\0';
+                self.used = 0;
             }
         }
     )*}
