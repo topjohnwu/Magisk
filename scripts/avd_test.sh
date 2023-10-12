@@ -5,6 +5,7 @@ avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 emu_args='-no-window -gpu swiftshader_indirect -read-only -no-snapshot -noaudio -no-boot-anim -show-kernel'
 boot_timeout=300
+emu_pid=
 
 # Should be either 'google_apis' or 'default'
 type='google_apis'
@@ -30,12 +31,30 @@ cleanup() {
   "$avd" delete avd -n test
   pkill -INT -P $$
   wait
+  trap - EXIT
+  exit 1
+}
+
+wait_for_bootanim() {
+  adb wait-for-device
+  while true; do
+    local result="$(adb exec-out getprop init.svc.bootanim)"
+    if [ $? -ne 0 ]; then
+      exit 1
+    elif [ "$result" = "stopped" ]; then
+      break
+    fi
+    sleep 2
+  done
 }
 
 wait_for_boot() {
   adb wait-for-device
   while true; do
-    if [ "1" = "$(adb exec-out getprop sys.boot_completed)" ]; then
+    local result="$(adb exec-out getprop sys.boot_completed)"
+    if [ $? -ne 0 ]; then
+      exit 1
+    elif [ "$result" = "1" ]; then
       break
     fi
     sleep 2
@@ -58,8 +77,20 @@ restore_avd() {
   fi
 }
 
+test_emu() {
+  "$emu" @test $emu_args &
+  emu_pid=$!
+  timeout $boot_timeout bash -c wait_for_boot &
+  local wait_pid=$!
+
+  # Handle the case when emulator dies with error
+  wait -n $emu_pid $wait_pid
+
+  adb shell magisk -v
+}
+
+
 run_test() {
-  local pid
   local api=$1
 
   set_api_env $api
@@ -69,43 +100,34 @@ run_test() {
   "$sdk" $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
 
-  # Launch emulator and patch with debug build
+  # Launch stock emulator
   restore_avd
   "$emu" @test $emu_args &
-  pid=$!
-  timeout $boot_timeout bash -c wait_for_boot
+  emu_pid=$!
+  timeout $boot_timeout bash -c wait_for_bootanim
 
+  # Patch and test debug build
   ./build.py avd_patch -s "$ramdisk"
-  kill -INT $pid
-  wait $pid
+  kill -INT $emu_pid
+  wait $emu_pid
+  test_emu
 
-  # Test if it boots properly
-  "$emu" @test $emu_args &
-  pid=$!
-  timeout $boot_timeout bash -c wait_for_boot
-
-  adb shell magisk -v
-
-  # Re-patch to test release build
+  # Re-patch and test release build
   ./build.py -r avd_patch -s "$ramdisk"
-  kill -INT $pid
-  wait $pid
+  kill -INT $emu_pid
+  wait $emu_pid
+  test_emu
 
-  # Test if it also boots properly
-  "$emu" @test $emu_args &
-  pid=$!
-  timeout $boot_timeout bash -c wait_for_boot
-
-  adb shell magisk -v
-
-  kill -INT $pid
-  wait $pid
+  # Cleanup
+  kill -INT $emu_pid
+  wait $emu_pid
   restore_avd
 }
 
 trap cleanup EXIT
 
 export -f wait_for_boot
+export -f wait_for_bootanim
 
 set -xe
 
