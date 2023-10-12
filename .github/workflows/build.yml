@@ -130,5 +130,5 @@ jobs:
 
       - name: AVD test
         run: |
-          brew install coreutils
+          brew install coreutils bash
           scripts/avd_test.sh ${{ matrix.api }}
