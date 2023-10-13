@@ -1,10 +1,12 @@
+use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::FromPrimitive;
 use std::fmt;
 use std::fmt::{Arguments, Display};
 use std::io::{stderr, stdout, Write};
 use std::panic::Location;
 use std::process::exit;
 
-use crate::ffi::LogLevel;
+use crate::ffi::LogLevelCxx;
 use crate::{Utf8CStr, Utf8CStrBufArr};
 
 // Error handling and logging throughout the Rust codebase in Magisk:
@@ -28,6 +30,16 @@ mod LogFlag {
     pub const DisableInfo: u32 = 1 << 2;
     pub const DisableDebug: u32 = 1 << 3;
     pub const ExitOnError: u32 = 1 << 4;
+}
+
+#[derive(Copy, Clone, FromPrimitive, ToPrimitive)]
+#[repr(i32)]
+pub enum LogLevel {
+    ErrorCxx = LogLevelCxx::ErrorCxx.repr,
+    Error = LogLevelCxx::Error.repr,
+    Warn = LogLevelCxx::Warn.repr,
+    Info = LogLevelCxx::Info.repr,
+    Debug = LogLevelCxx::Debug.repr,
 }
 
 // We don't need to care about thread safety, because all
@@ -63,7 +75,6 @@ impl LogLevel {
             LogLevel::Warn => LogFlag::DisableWarn,
             LogLevel::Info => LogFlag::DisableInfo,
             LogLevel::Debug => LogFlag::DisableDebug,
-            _ => 0,
         }
     }
 }
@@ -85,15 +96,17 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
         return;
     }
     f(logger.write);
-    if level == LogLevel::ErrorCxx && (logger.flags & LogFlag::ExitOnError) != 0 {
+    if matches!(level, LogLevel::ErrorCxx) && (logger.flags & LogFlag::ExitOnError) != 0 {
         exit(1);
     }
 }
 
-pub fn log_from_cxx(level: LogLevel, msg: &[u8]) {
-    // SAFETY: The null termination is handled on the C++ side
-    let msg = unsafe { Utf8CStr::from_bytes_unchecked(msg) };
-    log_with_writer(level, |write| write(level, msg));
+pub fn log_from_cxx(level: LogLevelCxx, msg: &[u8]) {
+    if let Some(level) = LogLevel::from_i32(level.repr) {
+        // SAFETY: The null termination is handled on the C++ side
+        let msg = unsafe { Utf8CStr::from_bytes_unchecked(msg) };
+        log_with_writer(level, |write| write(level, msg));
+    }
 }
 
 pub fn log_with_formatter<F: FnOnce(Formatter) -> fmt::Result>(level: LogLevel, f: F) {
@@ -110,7 +123,7 @@ pub fn log_with_args(level: LogLevel, args: Arguments) {
 
 pub fn cmdline_logging() {
     fn cmdline_write(level: LogLevel, msg: &Utf8CStr) {
-        if level == LogLevel::Info {
+        if matches!(level, LogLevel::Info) {
             stdout().write_all(msg.as_bytes()).ok();
         } else {
             stderr().write_all(msg.as_bytes()).ok();
@@ -129,21 +142,21 @@ pub fn cmdline_logging() {
 #[macro_export]
 macro_rules! error {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::ffi::LogLevel::Error, format_args_nl!($($args)+))
+        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!($($args)+))
     }
 }
 
 #[macro_export]
 macro_rules! warn {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::ffi::LogLevel::Warn, format_args_nl!($($args)+))
+        $crate::log_with_args($crate::LogLevel::Warn, format_args_nl!($($args)+))
     }
 }
 
 #[macro_export]
 macro_rules! info {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::ffi::LogLevel::Info, format_args_nl!($($args)+))
+        $crate::log_with_args($crate::LogLevel::Info, format_args_nl!($($args)+))
     }
 }
 
@@ -151,7 +164,7 @@ macro_rules! info {
 #[macro_export]
 macro_rules! debug {
     ($($args:tt)+) => {
-        $crate::log_with_args($crate::ffi::LogLevel::Debug, format_args_nl!($($args)+))
+        $crate::log_with_args($crate::LogLevel::Debug, format_args_nl!($($args)+))
     }
 }
 
@@ -189,15 +202,15 @@ pub type LoggedResult<T> = Result<T, LoggedError>;
 #[macro_export]
 macro_rules! log_err {
     ($msg:literal $(,)?) => {{
-        $crate::log_with_args($crate::ffi::LogLevel::Error, format_args_nl!($msg));
+        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!($msg));
         $crate::LoggedError::default()
     }};
     ($err:expr $(,)?) => {{
-        $crate::log_with_args($crate::ffi::LogLevel::Error, format_args_nl!("{}", $err));
+        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!("{}", $err));
         $crate::LoggedError::default()
     }};
     ($($args:tt)+) => {{
-        $crate::log_with_args($crate::ffi::LogLevel::Error, format_args_nl!($($args)+));
+        $crate::log_with_args($crate::LogLevel::Error, format_args_nl!($($args)+));
         $crate::LoggedError::default()
     }};
 }

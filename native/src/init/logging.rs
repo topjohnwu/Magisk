@@ -3,12 +3,11 @@ use std::fs::File;
 use std::io::{IoSlice, Write};
 use std::sync::OnceLock;
 
-use base::ffi::LogLevel;
 use base::libc::{
     close, makedev, mknod, open, syscall, unlink, SYS_dup3, O_CLOEXEC, O_RDWR, STDERR_FILENO,
     STDIN_FILENO, STDOUT_FILENO, S_IFCHR,
 };
-use base::{cstr, exit_on_error, raw_cstr, Logger, Utf8CStr, LOGGER};
+use base::{cstr, exit_on_error, raw_cstr, LogLevel, Logger, Utf8CStr, LOGGER};
 
 static KMSG: OnceLock<File> = OnceLock::new();
 

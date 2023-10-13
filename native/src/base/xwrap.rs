@@ -26,19 +26,19 @@ fn error_str() -> &'static str {
 
 macro_rules! error_cxx {
     ($($args:tt)+) => {
-        ($crate::log_with_args($crate::ffi::LogLevel::ErrorCxx, format_args_nl!($($args)+)))
+        ($crate::log_with_args($crate::LogLevel::ErrorCxx, format_args_nl!($($args)+)))
     }
 }
 
 macro_rules! perror {
     ($fmt:expr) => {
-        $crate::log_with_formatter($crate::ffi::LogLevel::ErrorCxx, |w| {
+        $crate::log_with_formatter($crate::LogLevel::ErrorCxx, |w| {
             w.write_str($fmt)?;
             w.write_fmt(format_args_nl!(" failed with {}: {}", $crate::errno(), error_str()))
         })
     };
     ($fmt:expr, $($args:tt)*) => {
-        $crate::log_with_formatter($crate::ffi::LogLevel::ErrorCxx, |w| {
+        $crate::log_with_formatter($crate::LogLevel::ErrorCxx, |w| {
             w.write_fmt(format_args!($fmt, $($args)*))?;
             w.write_fmt(format_args_nl!(" failed with {}: {}", $crate::errno(), error_str()))
         })

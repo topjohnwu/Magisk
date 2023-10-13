@@ -17,3 +17,4 @@ thiserror = { workspace = true }
 argh = { workspace = true }
 bytemuck = { workspace = true }
 num-traits = { workspace = true }
+num-derive = { workspace = true }

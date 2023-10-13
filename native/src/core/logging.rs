@@ -11,7 +11,6 @@ use bytemuck::{bytes_of, bytes_of_mut, write_zeroes, Pod, Zeroable};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
-use base::ffi::LogLevel;
 use base::libc::{
     clock_gettime, getpid, gettid, localtime_r, pipe2, pthread_sigmask, sigaddset, sigset_t,
     sigtimedwait, timespec, tm, CLOCK_REALTIME, O_CLOEXEC, PIPE_BUF, SIGPIPE, SIG_BLOCK,
@@ -50,11 +49,10 @@ extern "C" {
 
 fn level_to_prio(level: LogLevel) -> i32 {
     match level {
-        LogLevel::Error => ALogPriority::ANDROID_LOG_ERROR as i32,
+        LogLevel::Error | LogLevel::ErrorCxx => ALogPriority::ANDROID_LOG_ERROR as i32,
         LogLevel::Warn => ALogPriority::ANDROID_LOG_WARN as i32,
         LogLevel::Info => ALogPriority::ANDROID_LOG_INFO as i32,
         LogLevel::Debug => ALogPriority::ANDROID_LOG_DEBUG as i32,
-        _ => 0,
     }
 }
 

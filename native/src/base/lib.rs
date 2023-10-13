@@ -4,6 +4,7 @@
 #![feature(utf8_chunks)]
 
 pub use libc;
+use num_traits::FromPrimitive;
 
 pub use cstr::*;
 use cxx_extern::*;
@@ -21,7 +22,9 @@ mod xwrap;
 #[cxx::bridge]
 pub mod ffi {
     #[derive(Copy, Clone)]
-    pub enum LogLevel {
+    #[repr(i32)]
+    #[cxx_name = "LogLevel"]
+    pub(crate) enum LogLevelCxx {
         ErrorCxx,
         Error,
         Warn,
@@ -36,9 +39,10 @@ pub mod ffi {
 
     extern "Rust" {
         #[cxx_name = "log_with_rs"]
-        fn log_from_cxx(level: LogLevel, msg: &[u8]);
+        fn log_from_cxx(level: LogLevelCxx, msg: &[u8]);
+        #[cxx_name = "set_log_level_state"]
+        fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
         fn exit_on_error(b: bool);
-        fn set_log_level_state(level: LogLevel, enabled: bool);
         fn cmdline_logging();
     }
 
@@ -52,5 +56,11 @@ pub mod ffi {
         #[cxx_name = "map_fd"]
         fn map_fd_for_cxx(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
         fn enable_selinux();
+    }
+}
+
+fn set_log_level_state_cxx(level: ffi::LogLevelCxx, enabled: bool) {
+    if let Some(level) = LogLevel::from_i32(level.repr) {
+        set_log_level_state(level, enabled)
     }
 }
