@@ -12,8 +12,8 @@ use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
-    clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedError,
-    LoggedResult, MappedFile, Utf8CStr, Utf8CStrBufArr, WalkResult,
+    clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult,
+    MappedFile, ResultNoLog, Utf8CStr, Utf8CStrBufArr, WalkResult,
 };
 
 use crate::ffi::{prop_cb_exec, PropCb};
@@ -68,11 +68,8 @@ impl PropExt for PersistentProperties {
     }
 
     fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord> {
-        if let Ok(idx) = self.find_index(name) {
-            Ok(&mut self[idx])
-        } else {
-            Err(LoggedError::default())
-        }
+        let idx = self.find_index(name).no_log()?;
+        Ok(&mut self[idx])
     }
 }
 
@@ -85,7 +82,7 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
     let path = FsPathBuf::new(&mut buf)
         .join(PERSIST_PROP_DIR!())
         .join(name);
-    let mut file = path.open(O_RDONLY | O_CLOEXEC)?;
+    let mut file = path.open(O_RDONLY | O_CLOEXEC).no_log()?;
     debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
     file.read_to_string(&mut s)?;
@@ -112,8 +109,8 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
         debug!("resetprop: write prop to [{}]", tmp);
         tmp.rename_to(path)?
     } else {
+        path.remove().no_log()?;
         debug!("resetprop: unlink [{}]", path);
-        path.remove()?;
     }
     Ok(())
 }
@@ -150,10 +147,11 @@ pub unsafe fn persist_get_prop(name: *const c_char, prop_cb: Pin<&mut PropCb>) {
         let name = unsafe { Utf8CStr::from_ptr(name)? };
         if check_proto() {
             let mut props = proto_read_props()?;
-            if let Ok(PersistentPropertyRecord {
+            let prop = props.find(name)?;
+            if let PersistentPropertyRecord {
                 name: Some(ref mut n),
                 value: Some(ref mut v),
-            }) = props.find(name)
+            } = prop
             {
                 prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
             }
@@ -171,11 +169,11 @@ pub unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>) {
     fn inner(mut prop_cb: Pin<&mut PropCb>) -> LoggedResult<()> {
         if check_proto() {
             let mut props = proto_read_props()?;
-            props.iter_mut().for_each(|p| {
+            props.iter_mut().for_each(|prop| {
                 if let PersistentPropertyRecord {
                     name: Some(ref mut n),
                     value: Some(ref mut v),
-                } = p
+                } = prop
                 {
                     prop_cb.exec(Utf8CStr::from_string(n), Utf8CStr::from_string(v));
                 }
@@ -204,12 +202,9 @@ pub unsafe fn persist_delete_prop(name: *const c_char) -> bool {
         let name = unsafe { Utf8CStr::from_ptr(name)? };
         if check_proto() {
             let mut props = proto_read_props()?;
-            if let Ok(idx) = props.find_index(name) {
-                props.remove(idx);
-                proto_write_props(&props)
-            } else {
-                Err(LoggedError::default())
-            }
+            let idx = props.find_index(name).no_log()?;
+            props.remove(idx);
+            proto_write_props(&props)
         } else {
             file_set_prop(name, None)
         }

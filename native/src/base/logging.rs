@@ -207,6 +207,10 @@ pub trait ResultExt<T> {
     fn log_with_msg<F: FnOnce(Formatter) -> fmt::Result>(self, f: F) -> LoggedResult<T>;
 }
 
+pub trait ResultNoLog<T> {
+    fn no_log(self) -> LoggedResult<T>;
+}
+
 // Internal C++ bridging logging routines
 pub(crate) trait CxxResultExt<T> {
     fn log_cxx(self) -> LoggedResult<T>;
@@ -221,6 +225,24 @@ trait LogImpl<T> {
         caller: Option<&'static Location>,
         f: F,
     ) -> LoggedResult<T>;
+}
+
+impl<T, E> ResultNoLog<T> for Result<T, E> {
+    fn no_log(self) -> LoggedResult<T> {
+        match self {
+            Ok(v) => Ok(v),
+            Err(_) => Err(LoggedError::default()),
+        }
+    }
+}
+
+impl<T> ResultNoLog<T> for Option<T> {
+    fn no_log(self) -> LoggedResult<T> {
+        match self {
+            Some(v) => Ok(v),
+            None => Err(LoggedError::default()),
+        }
+    }
 }
 
 impl<T, R: LogImpl<T>> CxxResultExt<T> for R {
