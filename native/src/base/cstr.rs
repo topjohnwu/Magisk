@@ -284,6 +284,7 @@ pub enum StrErr {
 }
 
 // UTF-8 validated + null terminated string slice
+#[repr(transparent)]
 pub struct Utf8CStr([u8]);
 
 impl Utf8CStr {
@@ -381,6 +382,7 @@ impl DerefMut for Utf8CStr {
 
 // File system path extensions types
 
+#[repr(transparent)]
 pub struct FsPath(Utf8CStr);
 
 impl FsPath {
