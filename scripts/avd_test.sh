@@ -4,7 +4,7 @@ emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 emu_args='-no-window -gpu swiftshader_indirect -read-only -no-snapshot -noaudio -no-boot-anim -show-kernel'
-boot_timeout=300
+boot_timeout=600
 emu_pid=
 
 # Should be either 'google_apis' or 'default'
