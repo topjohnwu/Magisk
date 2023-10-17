@@ -9,61 +9,44 @@
 
 using namespace std;
 
-void freecon(char *s) {
-    free(s);
-}
-
-int setcon(const char *ctx) {
+int setcon(const char *con) {
     int fd = open("/proc/self/attr/current", O_WRONLY | O_CLOEXEC);
     if (fd < 0)
         return fd;
-    size_t len = strlen(ctx) + 1;
-    int rc = write(fd, ctx, len);
+    size_t len = strlen(con) + 1;
+    int rc = write(fd, con, len);
     close(fd);
     return rc != len;
 }
 
-int getfilecon(const char *path, char **ctx) {
-    char buf[1024];
-    int rc = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-    if (rc >= 0)
-        *ctx = strdup(buf);
-    return rc;
+int getfilecon(const char *path, byte_data con) {
+    return syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, con.buf(), con.sz());
 }
 
-int lgetfilecon(const char *path, char **ctx) {
-    char buf[1024];
-    int rc = syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-    if (rc >= 0)
-        *ctx = strdup(buf);
-    return rc;
+int lgetfilecon(const char *path, byte_data con) {
+    return syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, con.buf(), con.sz());
 }
 
-int fgetfilecon(int fd, char **ctx) {
-    char buf[1024];
-    int rc = syscall(__NR_fgetxattr, fd, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
-    if (rc >= 0)
-        *ctx = strdup(buf);
-    return rc;
+int fgetfilecon(int fd, byte_data con) {
+    return syscall(__NR_fgetxattr, fd, XATTR_NAME_SELINUX, con.buf(), con.sz());
 }
 
-int setfilecon(const char *path, const char *ctx) {
-    return syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+int setfilecon(const char *path, const char *con) {
+    return syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, con, strlen(con) + 1, 0);
 }
 
-int lsetfilecon(const char *path, const char *ctx) {
-    return syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+int lsetfilecon(const char *path, const char *con) {
+    return syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, con, strlen(con) + 1, 0);
 }
 
-int fsetfilecon(int fd, const char *ctx) {
-    return syscall(__NR_fsetxattr, fd, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+int fsetfilecon(int fd, const char *con) {
+    return syscall(__NR_fsetxattr, fd, XATTR_NAME_SELINUX, con, strlen(con) + 1, 0);
 }
 
-void getfilecon_at(int dirfd, const char *name, char **con) {
+int getfilecon_at(int dirfd, const char *name, byte_data con) {
     char path[4096];
     fd_pathat(dirfd, name, path, sizeof(path));
-    if (lgetfilecon(path, con))
-        *con = strdup("");
+    return lgetfilecon(path, con);
 }
 
 void setfilecon_at(int dirfd, const char *name, const char *con) {
@@ -79,12 +62,11 @@ void setfilecon_at(int dirfd, const char *name, const char *con) {
 
 static void restore_syscon_from_null(int dirfd) {
     struct dirent *entry;
-    char *con;
+    char con[1024];
 
-    if (fgetfilecon(dirfd, &con) >= 0) {
-        if (strlen(con) == 0 || strcmp(con, UNLABEL_CON) == 0)
+    if (fgetfilecon(dirfd, { con, sizeof(con) }) >= 0) {
+        if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
             fsetfilecon(dirfd, SYSTEM_CON);
-        freecon(con);
     }
 
     auto dir = xopen_dir(dirfd);
@@ -94,16 +76,15 @@ static void restore_syscon_from_null(int dirfd) {
             restore_syscon_from_null(fd);
             continue;
         } else if (entry->d_type == DT_REG) {
-            if (fgetfilecon(fd, &con) >= 0) {
+            if (fgetfilecon(fd, { con, sizeof(con) }) >= 0) {
                 if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
                     fsetfilecon(fd, SYSTEM_CON);
-                freecon(con);
             }
         } else if (entry->d_type == DT_LNK) {
-            getfilecon_at(dirfd, entry->d_name, &con);
-            if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
-                setfilecon_at(dirfd, entry->d_name, con);
-            freecon(con);
+            if (getfilecon_at(dirfd, entry->d_name, { con, sizeof(con) }) >= 0) {
+                if (con[0] == '\0' || strcmp(con, UNLABEL_CON) == 0)
+                    setfilecon_at(dirfd, entry->d_name, SYSTEM_CON);
+            }
         }
         close(fd);
     }
