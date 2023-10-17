@@ -44,7 +44,6 @@ pub mod ffi {
         fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
         fn exit_on_error(b: bool);
         fn cmdline_logging();
-        fn enable_selinux();
     }
 
     #[namespace = "rust"]

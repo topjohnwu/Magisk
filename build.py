@@ -270,10 +270,7 @@ def run_cargo_build(args):
         return
 
     # Start building the actual build commands
-    cmds = ["build"]
-    for target in targets:
-        cmds.append("-p")
-        cmds.append(target)
+    cmds = ["build", "-p", ""]
     rust_out = "debug"
     if args.release:
         cmds.append("-r")
@@ -289,9 +286,12 @@ def run_cargo_build(args):
             "thumbv7neon-linux-androideabi" if triple.startswith("armv7") else triple
         )
         cmds[-1] = rust_triple
-        proc = run_cargo(cmds, triple)
-        if proc.returncode != 0:
-            error("Build binary failed!")
+
+        for target in targets:
+            cmds[2] = target
+            proc = run_cargo(cmds, triple)
+            if proc.returncode != 0:
+                error("Build binary failed!")
 
         arch_out = op.join(native_out, arch)
         mkdir(arch_out)

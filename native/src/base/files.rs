@@ -8,7 +8,6 @@ use std::os::android::fs::MetadataExt;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
 use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
@@ -140,15 +139,22 @@ impl<T: Write> WriteExt for T {
 
 pub struct FileAttr {
     pub st: libc::stat,
+    #[cfg(feature = "selinux")]
     pub con: Utf8CStrBufArr<128>,
 }
 
-const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
-static SELINUX_ENABLED: AtomicBool = AtomicBool::new(false);
-
-pub fn enable_selinux() {
-    SELINUX_ENABLED.store(true, Ordering::Relaxed);
+impl FileAttr {
+    fn new() -> Self {
+        FileAttr {
+            st: unsafe { mem::zeroed() },
+            #[cfg(feature = "selinux")]
+            con: Utf8CStrBufArr::new(),
+        }
+    }
 }
+
+#[cfg(feature = "selinux")]
+const XATTR_NAME_SELINUX: &[u8] = b"security.selinux\0";
 
 pub struct DirEntry<'a> {
     dir: &'a Directory,
@@ -625,14 +631,12 @@ impl FsPath {
     }
 
     pub fn get_attr(&self) -> io::Result<FileAttr> {
-        let mut attr: FileAttr;
+        let mut attr = FileAttr::new();
         unsafe {
-            attr = FileAttr {
-                st: mem::zeroed(),
-                con: Utf8CStrBufArr::new(),
-            };
             libc::lstat(self.as_ptr(), &mut attr.st).as_os_err()?;
-            if SELINUX_ENABLED.load(Ordering::Relaxed) {
+
+            #[cfg(feature = "selinux")]
+            {
                 let sz = libc::lgetxattr(
                     self.as_ptr(),
                     XATTR_NAME_SELINUX.as_ptr().cast(),
@@ -652,6 +656,8 @@ impl FsPath {
                 libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()).as_os_err()?;
             }
             libc::lchown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).as_os_err()?;
+
+            #[cfg(feature = "selinux")]
             if !attr.con.is_empty() {
                 libc::lsetxattr(
                     self.as_ptr(),
@@ -721,14 +727,12 @@ impl FsPath {
 }
 
 pub fn fd_get_attr(fd: RawFd) -> io::Result<FileAttr> {
-    let mut attr: FileAttr;
+    let mut attr = FileAttr::new();
     unsafe {
-        attr = FileAttr {
-            st: mem::zeroed(),
-            con: Utf8CStrBufArr::new(),
-        };
         libc::fstat(fd, &mut attr.st).as_os_err()?;
-        if SELINUX_ENABLED.load(Ordering::Relaxed) {
+
+        #[cfg(feature = "selinux")]
+        {
             let sz = libc::fgetxattr(
                 fd,
                 XATTR_NAME_SELINUX.as_ptr().cast(),
@@ -746,6 +750,8 @@ pub fn fd_set_attr(fd: RawFd, attr: &FileAttr) -> io::Result<()> {
     unsafe {
         libc::fchmod(fd, (attr.st.st_mode & 0o777).as_()).as_os_err()?;
         libc::fchown(fd, attr.st.st_uid, attr.st.st_gid).as_os_err()?;
+
+        #[cfg(feature = "selinux")]
         if !attr.con.is_empty() {
             libc::fsetxattr(
                 fd,

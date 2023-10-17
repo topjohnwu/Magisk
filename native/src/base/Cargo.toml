@@ -6,6 +6,10 @@ edition = "2021"
 [lib]
 path = "lib.rs"
 
+[features]
+selinux = []
+dyn_selinux = []
+
 [build-dependencies]
 cxx-gen = { workspace = true }
 
