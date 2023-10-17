@@ -24,7 +24,7 @@ LOCAL_SRC_FILES := \
     core/db.cpp \
     core/package.cpp \
     core/scripting.cpp \
-    core/restorecon.cpp \
+    core/selinux.cpp \
     core/module.cpp \
     core/thread.cpp \
     core/resetprop/resetprop.cpp \

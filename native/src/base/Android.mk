@@ -17,7 +17,6 @@ LOCAL_SRC_FILES := \
     new.cpp \
     files.cpp \
     misc.cpp \
-    selinux.cpp \
     logging.cpp \
     stream.cpp \
     base-rs.cpp \

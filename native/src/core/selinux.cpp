@@ -1,10 +1,76 @@
-#include <string_view>
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/xattr.h>
 
 #include <magisk.hpp>
-#include <selinux.hpp>
 #include <base.hpp>
+#include <selinux.hpp>
+#include <flags.h>
 
 using namespace std;
+
+void freecon(char *s) {
+    free(s);
+}
+
+int setcon(const char *ctx) {
+    int fd = open("/proc/self/attr/current", O_WRONLY | O_CLOEXEC);
+    if (fd < 0)
+        return fd;
+    size_t len = strlen(ctx) + 1;
+    int rc = write(fd, ctx, len);
+    close(fd);
+    return rc != len;
+}
+
+int getfilecon(const char *path, char **ctx) {
+    char buf[1024];
+    int rc = syscall(__NR_getxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
+    if (rc >= 0)
+        *ctx = strdup(buf);
+    return rc;
+}
+
+int lgetfilecon(const char *path, char **ctx) {
+    char buf[1024];
+    int rc = syscall(__NR_lgetxattr, path, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
+    if (rc >= 0)
+        *ctx = strdup(buf);
+    return rc;
+}
+
+int fgetfilecon(int fd, char **ctx) {
+    char buf[1024];
+    int rc = syscall(__NR_fgetxattr, fd, XATTR_NAME_SELINUX, buf, sizeof(buf) - 1);
+    if (rc >= 0)
+        *ctx = strdup(buf);
+    return rc;
+}
+
+int setfilecon(const char *path, const char *ctx) {
+    return syscall(__NR_setxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+}
+
+int lsetfilecon(const char *path, const char *ctx) {
+    return syscall(__NR_lsetxattr, path, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+}
+
+int fsetfilecon(int fd, const char *ctx) {
+    return syscall(__NR_fsetxattr, fd, XATTR_NAME_SELINUX, ctx, strlen(ctx) + 1, 0);
+}
+
+void getfilecon_at(int dirfd, const char *name, char **con) {
+    char path[4096];
+    fd_pathat(dirfd, name, path, sizeof(path));
+    if (lgetfilecon(path, con))
+        *con = strdup("");
+}
+
+void setfilecon_at(int dirfd, const char *name, const char *con) {
+    char path[4096];
+    fd_pathat(dirfd, name, path, sizeof(path));
+    lsetfilecon(path, con);
+}
 
 #define UNLABEL_CON "u:object_r:unlabeled:s0"
 #define SYSTEM_CON  "u:object_r:system_file:s0"
@@ -64,7 +130,7 @@ static void restore_syscon(int dirfd) {
 }
 
 void restorecon() {
-    int fd = xopen(SELINUX_CONTEXT, O_WRONLY | O_CLOEXEC);
+    int fd = xopen("/sys/fs/selinux/context", O_WRONLY | O_CLOEXEC);
     if (write(fd, ADB_CON, sizeof(ADB_CON)) >= 0)
         lsetfilecon(SECURE_DIR, ADB_CON);
     close(fd);

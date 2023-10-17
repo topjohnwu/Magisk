@@ -44,6 +44,7 @@ pub mod ffi {
         fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
         fn exit_on_error(b: bool);
         fn cmdline_logging();
+        fn enable_selinux();
     }
 
     #[namespace = "rust"]
@@ -55,7 +56,6 @@ pub mod ffi {
         fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8];
         #[cxx_name = "map_fd"]
         fn map_fd_for_cxx(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
-        fn enable_selinux();
     }
 }
 

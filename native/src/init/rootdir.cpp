@@ -2,9 +2,9 @@
 #include <libgen.h>
 #include <sys/sysmacros.h>
 
+#include <sepolicy.hpp>
 #include <magisk.hpp>
 #include <base.hpp>
-#include <selinux.hpp>
 #include <flags.h>
 
 #include "init.hpp"

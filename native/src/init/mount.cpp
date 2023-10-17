@@ -5,7 +5,6 @@
 
 #include <base.hpp>
 #include <flags.h>
-#include <selinux.hpp>
 #include <magisk.hpp>
 
 #include "init.hpp"

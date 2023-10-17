@@ -33,6 +33,13 @@ constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 #define POST_FS_DATA_WAIT_TIME       40
 #define POST_FS_DATA_SCRIPT_MAX_TIME 35
 
+// Unconstrained domain the daemon and root processes run in
+#define SEPOL_PROC_DOMAIN   "magisk"
+#define MAGISK_PROC_CON     "u:r:" SEPOL_PROC_DOMAIN ":s0"
+// Unconstrained file type that anyone can access
+#define SEPOL_FILE_TYPE     "magisk_file"
+#define MAGISK_FILE_CON     "u:object_r:" SEPOL_FILE_TYPE ":s0"
+
 extern int SDK_INT;
 #define APP_DATA_DIR (SDK_INT >= 24 ? "/data/user_de" : "/data/user")
 

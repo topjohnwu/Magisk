@@ -7,7 +7,6 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <selinux.hpp>
 
 using namespace std;
 
