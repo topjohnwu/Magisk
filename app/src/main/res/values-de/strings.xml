@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_tapjack_title">Tapjacking-Schutz aktivieren</string>
     <string name="settings_su_tapjack_summary">Das Dialogfeld der Superuser-Eingabeaufforderung reagiert nicht auf Eingaben, wenn es durch ein anderes Fenster oder Überlagerung verdeckt wird</string>
-    <string name="settings_su_biometric_title">Biometrische Authentifizierung aktivieren</string>
-    <string name="settings_su_biometric_summary">Biometrie verwenden, um Superuser-Anfragen zuzulassen</string>
-    <string name="no_biometric">Gerät unterstützt keine biometrischen Daten oder ist nicht mit diesen konfiguriert</string>
     <string name="settings_customization">Personalisierung</string>
     <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
     <string name="settings_doh_title">DNS über HTTPS</string>

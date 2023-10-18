@@ -143,9 +143,6 @@
     <string name="superuser_notification">ਸੁਪਰਯੂਜ਼ਰ ਸੂਚਨਾ</string>
     <string name="settings_su_reauth_title">ਅਪਗ੍ਰੇਡ ਹੋਣ ਤੋਂ ਬਾਅਦ ਪ੍ਰਮਾਣਿਕਤਾ</string>
     <string name="settings_su_reauth_summary">ਇੱਕ ਐਪ ਦੇ ਅਪਡੇਟ ਹੋਣ ਤੋਂ ਬਾਅਦ ਸੁਪਰਯੂਜ਼ਰ ਆਗਿਆ ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
-    <string name="settings_su_biometric_title">ਬਾਇਓਮੈਟ੍ਰਿਕ ਪ੍ਰਮਾਣਿਕਤਾ ਦਾ ਯੋਗ ਕਰੋ</string>
-    <string name="settings_su_biometric_summary">ਸੁਪਰਯੂਜ਼ਰ ਦੀ ਆਗਿਆ ਦੇਣ ਲਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਪ੍ਰਮਾਣੀਕਰਣ ਦੀ ਵਰਤੋਂ ਕਰੋ</string>
-    <string name="no_biometric">ਅਸਮਰਥਿਤ ਡਿਵਾਈਸ ਜਾਂ ਕੋਈ ਬਾਇਓਮੈਟ੍ਰਿਕ ਸੈਟਿੰਗ ਸਮਰਥਿਤ ਨਹੀਂ ਹੈ</string>
     <string name="settings_customization">ਕਸਟਮਾਈਜੇਸ਼ਨ</string>
     <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>

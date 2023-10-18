@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Повторный запрос прав суперпользователя после обновления приложений</string>
     <string name="settings_su_tapjack_title">Защита от перехвата нажатий</string>
     <string name="settings_su_tapjack_summary">Окно запроса прав суперпользователя будет неактивно пока активированы наложения экрана</string>
-    <string name="settings_su_biometric_title">Биометрическая аутентификация</string>
-    <string name="settings_su_biometric_summary">Принимать запросы прав суперпользователя только после биометрической аутентификации</string>
-    <string name="no_biometric">Функция не поддерживается устройством или не заданы настройки блокировки экрана</string>
     <string name="settings_customization">Персонализация</string>
     <string name="setting_add_shortcut_summary">Добавить ярлык на рабочий стол для удобного восприятия приложения после его скрытия</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>

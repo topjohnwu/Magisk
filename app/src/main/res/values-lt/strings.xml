@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Iš naujo prašyti supernaudotojo teisių po programėlių naujinimo</string>
     <string name="settings_su_tapjack_title">Bakstelėjimų perėmimo apsauga</string>
     <string name="settings_su_tapjack_summary">Supernaudotojo užklausos langas bus neaktyvus, kol jis yra užstotas kito lango</string>
-    <string name="settings_su_biometric_title">Biometrinis autentifikavimas</string>
-    <string name="settings_su_biometric_summary">Naudoti biometrinį autentifikavimą supernaudotojo užklausų patvirtinimui</string>
-    <string name="no_biometric">Nepalaikomas įrenginys arba biometriniai nustatymai neįjungti</string>
     <string name="settings_customization">Tinkinimas</string>
     <string name="setting_add_shortcut_summary">Pridėti nuorodą į pagrindinį ekraną, jei po programėlės paslėpimo yra sunku atpažinti jos pavadinimą ir piktogramą</string>
     <string name="settings_doh_title">DNS virš HTTPS</string>

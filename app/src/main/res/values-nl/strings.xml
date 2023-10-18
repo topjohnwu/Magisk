@@ -141,9 +141,6 @@
     <string name="superuser_notification">Superusermelding</string>
     <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
     <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>
-    <string name="settings_su_biometric_title">Biometrische authenticatie gebruiken</string>
-    <string name="settings_su_biometric_summary">Gebruik biometrische authenticatie om superuserverzoeken goed te keuren.</string>
-    <string name="no_biometric">Niet-ondersteund apparaat of geen biometrische authenticatie ingesteld</string>
     <string name="settings_customization">Aanpassingen</string>
 
     <string name="multiuser_mode">Meerdere gebruikers</string>

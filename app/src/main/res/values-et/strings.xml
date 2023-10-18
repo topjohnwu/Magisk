@@ -163,9 +163,6 @@
     <string name="settings_su_reauth_summary">Pärast rakenduste uuendamist küsi superkasutaja luba uuesti</string>
     <string name="settings_su_tapjack_title">Nupu varjamise kaitse</string>
     <string name="settings_su_tapjack_summary">Superkasutaja taotluse hüpik ei reageeri vajutusele, kui seda katab mõni teine aken või ülekate</string>
-    <string name="settings_su_biometric_title">Luba biomeetriaga autentimine</string>
-    <string name="settings_su_biometric_summary">Kasuta superkasutaja taotluste kinnitamiseks biomeetrilist autentimist</string>
-    <string name="no_biometric">Mittetoetatud seade või ükski biomeetriaseadistus pole lubatud</string>
     <string name="settings_customization">Kohandamine</string>
     <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee juhuks, kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
     <string name="settings_doh_title">DNS üle HTTPSi</string>

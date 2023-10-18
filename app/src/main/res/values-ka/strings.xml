@@ -152,9 +152,6 @@
     <string name="settings_su_reauth_summary">სუპერმომხმარებლის ნებართვის რეაუტენთიფიკაცია აპის განახლების შემდეგ</string>
     <string name="settings_su_tapjack_title">Tapjacking-სგან თავის დაცვა</string> <!-- TODO: tapjacking has no direct translation; must make something up later -->
     <string name="settings_su_tapjack_summary">superuser-ის დიალოგის ღილაკებზე დაჭერა არ იქნება შესაძლებელი თუ სხვა აპი არის მასზე გადახურული</string>
-    <string name="settings_su_biometric_title">ბიომეტრიკული აუტენთიფიკაციის ჩართვა</string>
-    <string name="settings_su_biometric_summary">ბიომეტრიკული აუტენთიფიკაციის გამოყენება სუპერმომხმარებლის ნებართვის გასაცემად</string>
-    <string name="no_biometric">შეუთავსებელი მოწყობილობა ან არასწორად დაყენებული ბიომეტრიკული პარამეტრები</string>
     <string name="settings_customization">პერსონალიზაცია</string>
     <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
     <string name="settings_doh_title">DNS HTTPS-ზე</string>

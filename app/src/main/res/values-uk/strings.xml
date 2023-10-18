@@ -159,9 +159,6 @@
     <string name="settings_su_reauth_summary">Перевидача прав суперкористувача після оновлення застосунку</string>
     <string name="settings_su_tapjack_title">Увімкнути захист від Tapjack</string>
     <string name="settings_su_tapjack_summary">Діалогове вікно суперкористувача не буде отримувати ввід від користувача, коли вікно перекрито іншим застосунком чи вікном</string>
-    <string name="settings_su_biometric_title">Біометрична автентифікація</string>
-    <string name="settings_su_biometric_summary">Використовувати біометричну автентифікацію, щоб підтверджувати запити суперкористувача</string>
-    <string name="no_biometric">Пристрій не підтримується, або не налаштовано біометрику</string>
     <string name="settings_customization">Оформлення</string>
     <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>

@@ -170,9 +170,6 @@
     <string name="settings_su_reauth_summary">Ri-vërtetoni lejet e super-përdoruesit pas azhurnimit të aplikacionit</string>
     <string name="settings_su_tapjack_title">Aktivizo mbrojtjen tapjacking</string>
     <string name="settings_su_tapjack_summary">Dialogu i menjëhershëm i super-përdoruesit nuk do ti përgjigjet hyrjes ndërsa është i errësuar nga ndonjë dritare ose mbivendosje tjetër</string>
-    <string name="settings_su_biometric_title">Aktivizo vërtetimin biometrik</string>
-    <string name="settings_su_biometric_summary">Përdorni vërtetimin biometrik për të lejuar kërkesat e super-përdoruesit</string>
-    <string name="no_biometric">Pajisja e pambështetur ose cilësimet biometrike nuk janë të aktivizuara</string>
     <string name="settings_customization">Personalizimi</string>
     <string name="setting_add_shortcut_summary">Shtoni një shkurtore mjaft të mirë në ekranin fillestar në rast se emri dhe ikona janë të vështira për tu njohur pasi keni fshehur aplikacionin</string>
     <string name="settings_doh_title">DNS mbi HTTPS</string>

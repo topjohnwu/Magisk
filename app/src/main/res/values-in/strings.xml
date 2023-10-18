@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Autentikasi ulang izin akses superuser setelah aplikasi ditingkatkan</string>
     <string name="settings_su_tapjack_title">Aktifkan perlindungan tapjacking</string>
     <string name="settings_su_tapjack_summary">Dialog permintaan superuser tidak akan menanggapi masukan saat terhalangi oleh lapisan atau jendela lainnya</string>
-    <string name="settings_su_biometric_title">Aktifkan autentikasi biometrik</string>
-    <string name="settings_su_biometric_summary">Gunakan autentikasi biometrik untuk mengizinkan permintaan superuser</string>
-    <string name="no_biometric">Perangkat tidak mendukung atau setelan biometrik tidak diaktifkan</string>
     <string name="settings_customization">Personalisasi</string>
     <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik pada layar utama seandainya nama dan ikon sulit untuk dikenali setelah menyembunyikan aplikasi</string>
     <string name="settings_doh_title">DNS melalui HTTPS</string>

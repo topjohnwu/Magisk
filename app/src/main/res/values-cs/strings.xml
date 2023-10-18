@@ -170,9 +170,6 @@
     <string name="settings_su_reauth_summary">Opětovné ověření oprávnění SuperUser po aktualizaci aplikace.</string>
     <string name="settings_su_tapjack_title">Povolit ochranu před TapJack</string>
     <string name="settings_su_tapjack_summary">Okno dialogu SuperUser nebude reagovat na kliknutí v případě, že je zavřené nebo překryté jiným oknem</string>
-    <string name="settings_su_biometric_title">Povolit biometrické ověření</string>
-    <string name="settings_su_biometric_summary">Použije biometrické ověření pro povolení požadavků SuperUser</string>
-    <string name="no_biometric">Nepodporované zařízení, nebo není povolené biometrické ověření</string>
     <string name="settings_customization">Přizpůsobit</string>
     <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
     <string name="settings_doh_title">DNS přes HTTPS</string>

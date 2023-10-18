@@ -166,9 +166,6 @@
     <string name="settings_su_reauth_summary">Reautenticar permissões de SuperUsuário após atualizar aplicativo</string>
     <string name="settings_su_tapjack_title">Ativar Proteção Contra Atividades Sobrepostas</string>
     <string name="settings_su_tapjack_summary">A caixa de diálogo do SuperUsuário não responderá à entrada enquanto estiver obscurecida por qualquer outra janela ou sobreposição</string>
-    <string name="settings_su_biometric_title">Ativar Autenticação Biométrica</string>
-    <string name="settings_su_biometric_summary">Use a autenticação biométrica para permitir solicitações de SuperUsuário</string>
-    <string name="no_biometric">Dispositivo não suportado ou nenhuma configuração biométrica está ativada</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o aplicativo</string>
     <string name="settings_doh_title">Ativar DNS sobre HTTPS</string>

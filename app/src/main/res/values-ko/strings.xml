@@ -163,9 +163,6 @@
     <string name="settings_su_reauth_summary">앱이 업데이트되면 권한 승인 요청을 다시 합니다.</string>
     <string name="settings_su_tapjack_title">탭재킹 보호 활성화</string>
     <string name="settings_su_tapjack_summary">슈퍼유저 프롬프트가 다른 창이나 오버레이로 가려지는 동안의 입력을 무시합니다.</string>
-    <string name="settings_su_biometric_title">생체 인증 활성화</string>
-    <string name="settings_su_biometric_summary">슈퍼유저 요청 허용에 생체 인증을 사용합니다.</string>
-    <string name="no_biometric">지원되지 않는 기기이거나 등록된 생체 정보가 없습니다.</string>
     <string name="settings_customization">커스터마이즈</string>
     <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

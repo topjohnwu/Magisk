@@ -51,7 +51,7 @@ class RecreateEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
-class BiometricEvent(
+class AuthEvent(
     private val callback: () -> Unit
 ) : ViewEvent(), ActivityExecutor {
 

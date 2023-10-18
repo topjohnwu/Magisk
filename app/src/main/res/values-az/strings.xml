@@ -165,9 +165,6 @@
     <string name="settings_su_reauth_summary">Tətbiqləri yüksəltdikdən sonra Superuser icazəsi istə</string>
     <string name="settings_su_tapjack_title">Tapjack Qoruması</string>
     <string name="settings_su_tapjack_summary">Superuser icazə pəncərəsi digər pəncərələr tərəfindən əngəlləndikdə heçbir girişə cavab verməyəcək</string>
-    <string name="settings_su_biometric_title">Biometrik İcazə</string>
-    <string name="settings_su_biometric_summary">Superuser istəkləri üçün biometrik icazədən istifadə et</string>
-    <string name="no_biometric">Cihaz ya dəstəklənmir ya da biometrik ayarlar yoxdur</string>
     <string name="settings_customization">Özəlləşdirmə</string>
     <string name="setting_add_shortcut_summary">Tətbiqi gizlətdikdən sonra tapmaq çətin olmasın deyə ana ekrana qısayol əlavə et</string>
     <string name="settings_doh_title">HTTPS əvəzinə DNS</string>

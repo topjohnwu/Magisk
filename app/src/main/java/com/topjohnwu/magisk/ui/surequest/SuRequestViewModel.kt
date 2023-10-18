@@ -28,7 +28,7 @@ import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.ALLOW
 import com.topjohnwu.magisk.core.model.su.SuPolicy.Companion.DENY
 import com.topjohnwu.magisk.core.su.SuRequestHandler
 import com.topjohnwu.magisk.databinding.set
-import com.topjohnwu.magisk.events.BiometricEvent
+import com.topjohnwu.magisk.events.AuthEvent
 import com.topjohnwu.magisk.events.DieEvent
 import com.topjohnwu.magisk.events.ShowUIEvent
 import com.topjohnwu.magisk.utils.TextHolder
@@ -77,7 +77,7 @@ class SuRequestViewModel(
     fun grantPressed() {
         cancelTimer()
         if (Config.userAuth) {
-            BiometricEvent { respond(ALLOW) }.publish()
+            AuthEvent { respond(ALLOW) }.publish()
         } else {
             respond(ALLOW)
         }

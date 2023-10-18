@@ -170,9 +170,6 @@
     <string name="settings_su_reauth_summary">Opätovne vyzve na udelenie oprávnení Superužívateľa po upgrade aplikácie</string>
     <string name="settings_su_tapjack_title">Ochrana pred tapjackingom</string>
     <string name="settings_su_tapjack_summary">Dialógové okno superužívateľa nebude reagovať na zadanie, ak je zakryté alebo prekryté iným oknom</string>
-    <string name="settings_su_biometric_title">Biometrické overenie</string>
-    <string name="settings_su_biometric_summary">Použije biometrickú autentifikáciu na povolenie žiadostí superužívateľa</string>
-    <string name="no_biometric">Nepodporované zariadenie alebo žiadne biometrické nastavenia nie sú povolené</string>
     <string name="settings_customization">Prispôsobenie</string>
     <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

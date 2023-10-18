@@ -164,9 +164,6 @@
     <string name="settings_su_reauth_summary">অ্যাপগুলি আপগ্রেড করার পরে আবার সুপার ইউজার অনুমতির জন্য জিজ্ঞাসা করুন</string>
     <string name="settings_su_tapjack_title">ট্যাপজ্যাকিং সুরক্ষা</string>
     <string name="settings_su_tapjack_summary">সুপার ইউজার প্রম্পট ডায়ালগ অন্য কোনো উইন্ডো বা ওভারলে দ্বারা অস্পষ্ট থাকাকালীন ইনপুটটিতে সাড়া দেবে না</string>
-    <string name="settings_su_biometric_title">বায়োমেট্রিক প্রমাণীকরণ</string>
-    <string name="settings_su_biometric_summary">সুপার ইউজার অনুরোধের অনুমতি দিতে বায়োমেট্রিক প্রমাণীকরণ ব্যবহার করুন</string>
-    <string name="no_biometric">অসমর্থিত ডিভাইস বা কোনো বায়োমেট্রিক সেটিংস সক্ষম করা নেই৷</string>
     <string name="settings_customization">কাস্টমাইজেশন</string>
     <string name="setting_add_shortcut_summary">অ্যাপটি লুকানোর পরে নাম এবং আইকন সনাক্ত করা কঠিন হলে হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করুন</string>
     <string name="settings_doh_title">HTTPS এর উপর ডিএনএস</string>

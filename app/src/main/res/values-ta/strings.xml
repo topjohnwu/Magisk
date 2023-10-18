@@ -152,9 +152,6 @@
     <string name="settings_su_reauth_summary">பயன்பாட்டு மேம்படுத்தல்களுக்குப் பிறகு சூப்பர் யூசர் அனுமதிகளை மீண்டும் அங்கீகரிக்கவும்</string>
     <string name="settings_su_tapjack_title">டாப்ஜாகிங் பாதுகாப்பை இயக்கு</string>
     <string name="settings_su_tapjack_summary">வேறு எந்த சாளரத்தாலும் அல்லது மேலடுக்கினாலும் மறைக்கப்படும்போது சூப்பர் யூசர் வரியில் உரையாடல் உள்ளீட்டிற்கு பதிலளிக்காது</string>
-    <string name="settings_su_biometric_title">பயோமெட்ரிக் அங்கீகாரத்தை இயக்கு</string>
-    <string name="settings_su_biometric_summary">சூப்பர் யூசர் கோரிக்கைகளை அனுமதிக்க பயோமெட்ரிக் அங்கீகாரத்தைப் பயன்படுத்தவும்</string>
-    <string name="no_biometric">ஆதரிக்கப்படாத சாதனம் அல்லது பயோமெட்ரிக் அமைப்புகள் எதுவும் செயல்படுத்தப்படவில்லை</string>
     <string name="settings_customization">தனிப்பயனாக்கம்</string>
     <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
     <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>

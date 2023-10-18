@@ -165,9 +165,6 @@
     <string name="settings_su_reauth_summary">Xác thực lại quyền Superuser sau khi nâng cấp ứng dụng</string>
     <string name="settings_su_tapjack_title">Bảo vệ khỏi Tapjacking</string>
     <string name="settings_su_tapjack_summary">Hộp thoại nhắc Superuser sẽ không trả lời đầu vào khi bị che khuất bởi bất kỳ cửa sổ hoặc lớp phủ nào khác</string>
-    <string name="settings_su_biometric_title">Bật xác thực sinh trắc học</string>
-    <string name="settings_su_biometric_summary">Sử dụng xác thực sinh trắc học để xác nhận yêu cầu Superuser</string>
-    <string name="no_biometric">Thiết bị của bạn không được hỗ trợ hoặc không có phương pháp xác thực sinh trắc học nào được kích hoạt</string>
     <string name="settings_customization">Tùy biến</string>
     <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó tìm ra tên và biểu tượng sau khi ẩn ứng dụng</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

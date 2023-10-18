@@ -165,9 +165,6 @@
     <string name="settings_su_reauth_summary">Az appok frissítés után kérjenek ismét Superuser engedélyeket</string>
     <string name="settings_su_tapjack_title">Tapjacking védelem</string>
     <string name="settings_su_tapjack_summary">A Superuser kérés párbeszédpanel nem válaszol a bevitelre, ha más ablak vagy átfedés eltakarja</string>
-    <string name="settings_su_biometric_title">Biometrikus azonosítás</string>
-    <string name="settings_su_biometric_summary">Használjon biometrikus hitelesítést a Superuser kérések engedélyezéséhez</string>
-    <string name="no_biometric">Nem támogatott eszköz, vagy nincsenek engedélyezve a biometrikus beállítások</string>
     <string name="settings_customization">Testreszabás</string>
     <string name="setting_add_shortcut_summary">Adjon hozzá egy szép parancsikont a kezdőképernyőhöz arra az esetre, ha a nevet és az ikont nehéz felismerni az alkalmazás elrejtése után</string>
     <string name="settings_doh_title">DNS HTTPS-en keresztül</string>

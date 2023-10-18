@@ -138,9 +138,6 @@
     <string name="superuser_notification">اعلان روت</string>
     <string name="settings_su_reauth_title">احراز هویت دوباره پس از بروز رسانی</string>
     <string name="settings_su_reauth_summary">تأیید کردندوباره مجوزهای روت پس از ارتقاء برنامه</string>
-    <string name="settings_su_biometric_title">فعال کردن احراز هویت بیومتریک</string>
-    <string name="settings_su_biometric_summary">استفاده کردن از احراز هویت بیومتریک برای تأیید درخواست های روت</string>
-    <string name="no_biometric">دستگاه پشتیبانی نمی شود یا تنظیمات بیومتریک فعال نیست</string>
     <string name="settings_customization">سفارشی سازی</string>
     <string name="setting_add_shortcut_summary">اضافه کردن یک میانبر زیبا را در صفحه اصلی در صورت شناسایی نام و نماد پس از پنهان کردن برنامه</string>
 

@@ -142,9 +142,6 @@
     <string name="superuser_notification">إشعارات طلبات الروت</string>
     <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
     <string name="settings_su_reauth_summary">أعد مصادقة صلاحيات الروت بعد إجراء ترقيات للتطبيق</string>
-    <string name="settings_su_biometric_title">تفعيل التحقق بالبصمة</string>
-    <string name="settings_su_biometric_summary">تحقق إضافي بالبصمة لطلبات الروت </string>
-    <string name="no_biometric">جهازك غير مدعوم، أو أنك لم تضبّط البصماتَ بجهازك</string>
     <string name="settings_customization">تخصيص</string>
 
     <string name="multiuser_mode">نمط مستخدمين متعددين</string>

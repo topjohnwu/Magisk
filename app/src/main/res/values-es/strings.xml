@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Las apps volverán a solicitar privilegios de superusuario tras actualizarse</string>
     <string name="settings_su_tapjack_title">Protección contra tapjacking</string>
     <string name="settings_su_tapjack_summary">No podrás interactuar con las solicitudes de superusuario mientras estén tapadas por cualquier otra ventana o superposición</string>
-    <string name="settings_su_biometric_title">Autenticación biométrica</string>
-    <string name="settings_su_biometric_summary">Usa tu rostro, iris o huella digital para conceder privilegios de superusuario</string>
-    <string name="no_biometric">El dispositivo no está soportado o no has configurado ningún dato biométrico</string>
     <string name="settings_customization">Personalización</string>
     <string name="setting_add_shortcut_summary">Añade un atajo a la app con el ícono de Magisk a la pantalla de inicio en caso de que te resulte difícil reconocerla tras haberle cambiado el nombre y el ícono</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>

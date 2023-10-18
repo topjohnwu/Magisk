@@ -142,9 +142,6 @@
     <string name="settings_su_reauth_summary">Паўторна запытваць правы суперкарыстальніка пасля абнаўлення праграмы</string>
     <string name="settings_su_tapjack_title">Уключыць абарону ад перахоплівання ўводу</string>
     <string name="settings_su_tapjack_summary">Дыялог выдачы правоў суперкарыстальніка не будзе адказваць на ўвод, калі па-над ім знаходзяцца іншыя вокны</string>
-    <string name="settings_su_biometric_title">Уключыць біяметрычную аўтэнтыфікацыю</string>
-    <string name="settings_su_biometric_summary">Выкарыстанне біяметрычнай аўтэнтыфікацыі для запытаў правоў суперкарыстальніка</string>
-    <string name="no_biometric">Не падтрымліваецца прыладай альбо не ўключана ў наладах</string>
     <string name="settings_customization">Персаналізацыя</string>
     <string name="setting_add_shortcut_summary">Дадаць на хатні экран прыгожы цэтлік на той выпадак, калі пасля хавання праграмы будзе цяжка разглядзець значок і назву</string>
     <string name="settings_doh_title">DNS паверх HTTPS</string>

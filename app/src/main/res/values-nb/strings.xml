@@ -152,9 +152,6 @@
     <string name="settings_su_reauth_summary">Identitetsbekreft superbrukertilganger etter programoppgraderinger</string>
     <string name="settings_su_tapjack_title">Trykkstjelingsbeskyttelse</string>
     <string name="settings_su_tapjack_summary">Superbrukings-forespørselsdialogen vil ikke svare på inndata mens den dekkes av et annet vindu eller lag</string>
-    <string name="settings_su_biometric_title">Biometrisk identitetsbekreftelse</string>
-    <string name="settings_su_biometric_summary">Bruk biometrisk identitetsbekreftelse for å tillate superbruker-forespørsler</string>
-    <string name="no_biometric">Ustøttet enhet, eller mangel på biometrisk oppsett</string>
     <string name="settings_customization">Tilpasning</string>
     <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

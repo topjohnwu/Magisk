@@ -165,9 +165,6 @@
     <string name="settings_su_reauth_summary">Επαναπιστοποίηση αδειών υπερχρήστη μετά την αναβάθμιση μίας εφαρμογής</string>
     <string name="settings_su_tapjack_title">Ενεργοποίηση προστασίας Tapjacking</string>
     <string name="settings_su_tapjack_summary">Το παράθυρο διαλόγου προτροπής του υπερχρήστη δεν αποκρίνεται στην είσοδο ενώ κρύβεται από οποιοδήποτε άλλο παράθυρο</string>
-    <string name="settings_su_biometric_title">Ενεργοποίηση βιομετρικού ελέγχου ταυτότητας</string>
-    <string name="settings_su_biometric_summary">Χρησιμοποιήστε βιομετρικό έλεγχο ταυτότητας για να επιτρέψετε αιτήματα υπερχρηστών</string>
-    <string name="no_biometric">Δεν υποστηρίζεται η συσκευή ή δεν υπάρχει καμία βιομετρική ρύθμιση</string>
     <string name="settings_customization">Προσαρμογή</string>
     <string name="setting_add_shortcut_summary">Προσθέστε μια όμορφη συντόμευση στην αρχική οθόνη σε περίπτωση που το όνομα και το εικονίδιο είναι δύσκολο να αναγνωριστούν αφού κρύψετε την εφαρμογή</string>
     <string name="settings_doh_title">DNS μέσω HTTPS</string>

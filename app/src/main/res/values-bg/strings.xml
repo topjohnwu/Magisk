@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Повторно запитване за достъп до правата на суперпотребителя след обновяване на приложения</string>
     <string name="settings_su_tapjack_title">Предпазване от измамно докосване</string>
     <string name="settings_su_tapjack_summary">Прозорецът за достъп до суперпотребителя няма да реагира, докато е покрит от друг прозорец или слой</string>
-    <string name="settings_su_biometric_title">Биометрично удостоверяване</string>
-    <string name="settings_su_biometric_summary">За получаване на достъп до суперпотребителя е необходимо биометрично удостоверяване</string>
-    <string name="no_biometric">Устройството не се поддръжа или липсват биометрични настройки</string>
     <string name="settings_customization">Приспособяване</string>
     <string name="setting_add_shortcut_summary">Добавя красив пряк път на началния екран ако името или текущата икона на скритото приложение са трудни за разпознаване</string>
     <string name="settings_doh_title">DNS през HTTPS</string>

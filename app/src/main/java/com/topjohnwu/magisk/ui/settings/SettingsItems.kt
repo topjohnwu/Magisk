@@ -282,15 +282,15 @@ object Tapjack : BaseSettingsItem.Toggle() {
     override var value by Config::suTapjack
 }
 
-object Biometrics : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_biometric_title.asText()
-    override var description = R.string.settings_su_biometric_summary.asText()
+object Authentication : BaseSettingsItem.Toggle() {
+    override val title = R.string.settings_su_auth_title.asText()
+    override var description = R.string.settings_su_auth_summary.asText()
     override var value by Config::userAuth
 
     override fun refresh() {
         isEnabled = Info.isDeviceSecure
         if (!isEnabled) {
-            description = R.string.no_biometric.asText()
+            description = R.string.settings_su_auth_insecure.asText()
         }
     }
 }

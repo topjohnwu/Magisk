@@ -151,9 +151,6 @@
     <string name="settings_su_reauth_summary">Återautentisera superuser-rättigheter efter en applikationsuppdatering</string>
     <string name="settings_su_tapjack_title">Aktivera Tapjacking-skydd</string>
     <string name="settings_su_tapjack_summary">Superuser-dialogrutan kommer inte att lyssna på någon input om den är dold eller övertäckt utav något annat fönster.</string>
-    <string name="settings_su_biometric_title">Aktivera biometriskt autentisering</string>
-    <string name="settings_su_biometric_summary">Använd biometriskt autentisering för att tillåta förfrågan om superuser-tillgång</string>
-    <string name="no_biometric">Denna enhet stöds ej eller så är inte biometrisk autentisering aktiverad</string>
     <string name="settings_customization">Anpassning</string>
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
     <string name="settings_doh_title">DNS över HTTPS</string>

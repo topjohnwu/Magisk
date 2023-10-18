@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
     <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
     <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
-    <string name="settings_su_biometric_title">Autentificare biometrică</string>
-    <string name="settings_su_biometric_summary">Folosește autentificarea biometrică pentru a permite cereri de superutilizator</string>
-    <string name="no_biometric">Dispozitiv nesuportat sau nu sunt activate setări biometrice</string>
     <string name="settings_customization">Personalizare</string>
     <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
     <string name="settings_doh_title">DNS prin HTTPS</string>

@@ -167,9 +167,6 @@
     <string name="settings_su_reauth_summary">Uygulamaları yükselttikten sonra Süper Kullanıcı izinlerini tekrar isteyin</string>
     <string name="settings_su_tapjack_title">Sahte Ekran Koruması</string>
     <string name="settings_su_tapjack_summary">Süper Kullanıcı bilgi istemi iletişim kutusu, herhangi bir başka pencere veya yer paylaşımı tarafından engellendiğinde girişe yanıt vermeyecektir.</string>
-    <string name="settings_su_biometric_title">Biyometrik Kimlik Doğrulama</string>
-    <string name="settings_su_biometric_summary">Süper Kullanıcı isteklerine izin vermek için biyometrik kimlik doğrulamayı kullanın</string>
-    <string name="no_biometric">Desteklenmeyen cihaz veya hiçbir biyometrik ayar etkin değil</string>
     <string name="settings_customization">Özelleştir</string>
     <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra adın ve simgenin tanınmasının zor olması durumunda ana ekrana güzel bir kısayol ekleyin</string>
     <string name="settings_doh_title">HTTPS üzerinden DNS</string>

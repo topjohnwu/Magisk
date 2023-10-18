@@ -23,7 +23,7 @@ import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.databinding.diffList
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.dialog.SuperuserRevokeDialog
-import com.topjohnwu.magisk.events.BiometricEvent
+import com.topjohnwu.magisk.events.AuthEvent
 import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.TextItem
@@ -118,7 +118,7 @@ class SuperuserViewModel(
         }
 
         if (Config.userAuth) {
-            BiometricEvent { updateState() }.publish()
+            AuthEvent { updateState() }.publish()
         } else {
             SuperuserRevokeDialog(item.title) { updateState() }.show()
         }
@@ -171,7 +171,7 @@ class SuperuserViewModel(
         }
 
         if (Config.userAuth) {
-            BiometricEvent { updateState() }.publish()
+            AuthEvent { updateState() }.publish()
         } else {
             updateState()
         }

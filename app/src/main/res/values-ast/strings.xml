@@ -155,9 +155,6 @@
     <string name="settings_su_reauth_summary">Vuelve pidir los permisos de superusuariu dempués d\'anovar les aplicaciones</string>
     <string name="settings_su_tapjack_title">Proteición escontra\'l tapjacking</string>
     <string name="settings_su_tapjack_summary">El diálogu de concesión de permisos de superusuariu nun respuende a la entrada mentanto lu torgue otra ventana o superposición</string>
-    <string name="settings_su_biometric_title">Autenticación biométrica</string>
-    <string name="settings_su_biometric_summary">Usa l\'autenticación biométrica pa permitir les solicitúes de superusuariu</string>
-    <string name="no_biometric">El preséu nun ye compatible o nun s\'activaron los axustes biométricos</string>
     <string name="settings_customization">Personalización</string>
     <string name="setting_add_shortcut_summary">Amiesta un atayu a la pantalla d\'aniciu en casu de que\'l nome y l\'iconu seyan difíciles de reconocer darréu d\'anubrir l\'aplicación</string>
     <string name="settings_doh_title">DNS per HTTPS</string>
