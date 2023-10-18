@@ -188,7 +188,10 @@
     <string name="global_summary">Të gjitha sesionet rrënjë përdorin hapësirën globale të emrave të montimit</string>
     <string name="requester_summary">Seancat rrënjësore do të trashëgojnë hapësirën e emrave të kërkuesit të tyre</string>
     <string name="isolate_summary">Çdo sesion rrënjë do të ketë hapësirën e vet të izoluar të emrave</string>
-
+    <string name="settings_su_auth_title">Vërtetimi i përdoruesit</string>
+    <string name="settings_su_auth_summary">Kërkoni vërtetimin e përdoruesit gjatë kërkesave të Superpërdoruesit</string>
+    <string name="settings_su_auth_insecure">Asnjë metodë vërtetimi nuk është konfiguruar në pajisje</string>
+    
     <!--Notifications-->
     <string name="update_channel">Përditësimet e magisk</string>
     <string name="updated_channel">Përditësimi përfundoi</string>
