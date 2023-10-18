@@ -1,7 +1,9 @@
 package com.topjohnwu.magisk.core
 
+import android.app.KeyguardManager
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.getProperty
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
@@ -45,6 +47,9 @@ object Info {
         return env.isActive && (Const.USER_ID == 0
                 || Config.suMultiuserMode == Config.Value.MULTIUSER_MODE_USER)
     }
+
+    val isDeviceSecure get() =
+        AppContext.getSystemService(KeyguardManager::class.java).isDeviceSecure
 
     private fun loadState(): Env {
         val v = fastCmd("magisk -v").split(":".toRegex())

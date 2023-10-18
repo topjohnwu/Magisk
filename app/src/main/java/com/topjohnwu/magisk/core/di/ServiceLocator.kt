@@ -12,7 +12,6 @@ import com.topjohnwu.magisk.core.data.magiskdb.StringDao
 import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
 import com.topjohnwu.magisk.core.repository.LogRepository
 import com.topjohnwu.magisk.core.repository.NetworkService
-import com.topjohnwu.magisk.core.utils.BiometricHelper
 import io.noties.markwon.Markwon
 import io.noties.markwon.utils.NoCopySpannableFactory
 
@@ -24,7 +23,6 @@ object ServiceLocator {
     lateinit var context: Context
     val deContext by lazy { context.deviceProtectedContext }
     val timeoutPrefs by lazy { deContext.getSharedPreferences("su_timeout", 0) }
-    val biometrics by lazy { BiometricHelper(context) }
 
     // Database
     val policyDB = PolicyDao()

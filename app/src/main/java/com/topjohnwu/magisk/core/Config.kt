@@ -156,7 +156,12 @@ object Config : PreferenceConfig, DBConfig {
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
-    var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    private var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    var userAuth
+        get() = Info.isDeviceSecure && suBiometric
+        set(value) {
+            suBiometric = value
+        }
     var zygisk by dbSettings(Key.ZYGISK, false)
     var denyList by BoolDBPropertyNoWrite(Key.DENYLIST, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)

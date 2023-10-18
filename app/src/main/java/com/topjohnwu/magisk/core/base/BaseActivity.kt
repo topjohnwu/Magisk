@@ -20,6 +20,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.utils.RequestAuthentication
 import com.topjohnwu.magisk.core.utils.RequestInstall
 import com.topjohnwu.magisk.core.wrap
 
@@ -41,6 +42,12 @@ abstract class BaseActivity : AppCompatActivity() {
     private val requestInstall = registerForActivityResult(RequestInstall()) {
         installCallback?.invoke(it)
         installCallback = null
+    }
+
+    var authenticateCallback: ((Boolean) -> Unit)? = null
+    val requestAuthenticate = registerForActivityResult(RequestAuthentication()) {
+        authenticateCallback?.invoke(it)
+        authenticateCallback = null
     }
 
     private var contentCallback: ContentResultCallback? = null

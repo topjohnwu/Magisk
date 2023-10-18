@@ -51,6 +51,16 @@ class RecreateEvent : ViewEvent(), ActivityExecutor {
     }
 }
 
+class BiometricEvent(
+    private val callback: () -> Unit
+) : ViewEvent(), ActivityExecutor {
+
+    override fun invoke(activity: UIActivity<*>) {
+        activity.authenticateCallback = { if (it) callback() }
+        activity.requestAuthenticate.launch(Unit)
+    }
+}
+
 class GetContentEvent(
     private val type: String,
     private val callback: ContentResultCallback

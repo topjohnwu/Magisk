@@ -92,7 +92,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
             UpdateChecker -> withPostNotificationPermission(andThen)
-            Biometrics -> authenticate(andThen)
+            Biometrics -> BiometricEvent(andThen).publish()
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             SystemlessHosts -> createHosts()
@@ -117,13 +117,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         if (UpdateChannelUrl.isEnabled && UpdateChannelUrl.value.isBlank()) {
             UpdateChannelUrl.onPressed(view, this)
         }
-    }
-
-    private fun authenticate(callback: () -> Unit) {
-        BiometricEvent {
-            // allow the change on success
-            onSuccess { callback() }
-        }.publish()
     }
 
     private fun createHosts() {
