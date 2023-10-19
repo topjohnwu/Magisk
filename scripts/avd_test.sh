@@ -8,7 +8,7 @@ boot_timeout=600
 emu_pid=
 
 # Should be either 'google_apis' or 'default'
-type='google_apis'
+type='default'
 
 # We test these API levels for the following reason
 
