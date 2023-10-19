@@ -44,7 +44,7 @@ if [ -z "$FIRST_STAGE" ]; then
   fi
 fi
 
-pm install -r $(pwd)/magisk.apk
+pm install -r -g $(pwd)/magisk.apk
 
 # Extract files from APK
 unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
