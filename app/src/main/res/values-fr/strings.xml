@@ -88,6 +88,9 @@
     <string name="logs_cleared">Le journal a été effacé.</string>
     <string name="pid">PID : %1$d</string>
     <string name="target_uid">UID cible : %1$d</string>
+    <string name="target_pid">Montage ns PID cible: %s</string>
+    <string name="selinux_context">Contexte SELinux: %s</string>
+    <string name="supp_group">Groupe supplémentaire: %s</string>
 
     <!--SafetyNet-->
 
@@ -167,6 +170,9 @@
     <string name="settings_su_reauth_summary">Redemander une authentification pour autoriser l’accès en super‑utilisateur après une mise à jour de l’application</string>
     <string name="settings_su_tapjack_title">Activer la protection contre le détournement du tapotement</string>
     <string name="settings_su_tapjack_summary">Le dialogue d’invite du super‑utilisateur ne répondra pas à la saisie lorsqu’il est masqué par une autre fenêtre ou une surcouche</string>
+    <string name="settings_su_auth_title">Authentification utilisateur</string>
+    <string name="settings_su_auth_summary">Demander l’authentification utilisateur lors de la requête super-utilisateur</string>
+    <string name="settings_su_auth_insecure">Aucun méthode d’authentification utilisateur n’est configurée sur le périphérique</string>
     <string name="settings_customization">Personnalisation</string>
     <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
     <string name="settings_doh_title">DNS sur HTTPS</string>
