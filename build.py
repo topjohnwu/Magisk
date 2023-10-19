@@ -187,15 +187,17 @@ def load_config(args):
 
     # Default values
     config["version"] = commit_hash
+    config["versionCode"] = 1000000
     config["outdir"] = "out"
 
     # Load prop files
     if op.exists(args.config):
         config.update(parse_props(args.config))
 
-    for key, value in parse_props("gradle.properties").items():
-        if key.startswith("magisk."):
-            config[key[7:]] = value
+    if op.exists("gradle.properties"):
+        for key, value in parse_props("gradle.properties").items():
+            if key.startswith("magisk."):
+                config[key[7:]] = value
 
     try:
         config["versionCode"] = int(config["versionCode"])
