@@ -222,26 +222,6 @@ static bool magisk_env() {
     string pkg;
     get_manager(0, &pkg);
 
-    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR,
-            pkg.empty() ? "xxx" /* Ensure non-exist path */ : pkg.data());
-
-    // Alternative binaries paths
-    const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
-    for (auto alt : alt_bin) {
-        struct stat st{};
-        if (lstat(alt, &st) == 0) {
-            if (S_ISLNK(st.st_mode)) {
-                unlink(alt);
-                continue;
-            }
-            rm_rf(DATABIN);
-            cp_afc(alt, DATABIN);
-            rm_rf(alt);
-            break;
-        }
-    }
-    rm_rf("/cache/data_adb");
-
     // Directories in /data/adb
     xmkdir(DATABIN, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
