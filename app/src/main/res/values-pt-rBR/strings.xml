@@ -166,6 +166,9 @@
     <string name="settings_su_reauth_summary">Reautenticar permissões de SuperUsuário após atualizar aplicativo</string>
     <string name="settings_su_tapjack_title">Ativar Proteção Contra Atividades Sobrepostas</string>
     <string name="settings_su_tapjack_summary">A caixa de diálogo do SuperUsuário não responderá à entrada enquanto estiver obscurecida por qualquer outra janela ou sobreposição</string>
+    <string name="settings_su_auth_title">Autenticação de Usuário</string>
+    <string name="settings_su_auth_summary">Solicitar autenticação de usuário durante solicitações de Superusuário</string>
+    <string name="settings_su_auth_insecure">Nenhum método de autenticação foi configurado no dispositivo</string>
     <string name="settings_customization">Personalizações</string>
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o aplicativo</string>
     <string name="settings_doh_title">Ativar DNS sobre HTTPS</string>
