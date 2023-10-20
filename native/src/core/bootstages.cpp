@@ -25,6 +25,18 @@ static bool magisk_env() {
 
     LOGI("* Initializing Magisk environment\n");
 
+    ssprintf(buf, sizeof(buf), "%s/0/%s/install", APP_DATA_DIR, JAVA_PACKAGE_NAME);
+    // Alternative binaries paths
+    const char *alt_bin[] = { "/cache/data_adb/magisk", "/data/magisk", buf };
+    for (auto alt : alt_bin) {
+        if (access(alt, F_OK) == 0) {
+            rm_rf(DATABIN);
+            cp_afc(alt, DATABIN);
+            rm_rf(alt);
+        }
+    }
+    rm_rf("/cache/data_adb");
+
     // Directories in /data/adb
     chmod(SECURE_DIR, 0700);
     xmkdir(DATABIN, 0755);
