@@ -171,7 +171,7 @@
     <string name="settings_su_tapjack_title">点按劫持保护</string>
     <string name="settings_su_tapjack_summary">存在屏幕叠加层时，超级用户请求弹窗不响应允许操作</string>
     <string name="settings_su_auth_title">身份验证</string>
-    <string name="settings_su_auth_summary">超级用户请求时验证身份</string>
+    <string name="settings_su_auth_summary">对超级用户请求验证身份</string>
     <string name="settings_su_auth_insecure">设备未配置验证方式</string>
     <string name="settings_customization">个性化</string>
     <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
