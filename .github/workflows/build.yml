@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-13]
     steps:
       - name: Check out
         uses: actions/checkout@v3
@@ -98,7 +98,7 @@ jobs:
 
   test:
     name: Test on ${{ matrix.api }}
-    runs-on: macos-latest
+    runs-on: macos-13
     needs: build
     strategy:
       fail-fast: false
@@ -110,12 +110,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: "17"
 
       - name: Set up Python 3
         uses: actions/setup-python@v4
