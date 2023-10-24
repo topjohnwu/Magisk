@@ -23,7 +23,7 @@ dependencies = [
 [[package]]
 name = "argh"
 version = "0.1.12"
-source = "git+https://github.com/topjohnwu/argh.git?rev=f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8#f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8"
+source = "git+https://github.com/google/argh.git?rev=1c632b046d084e7bde86b82dfc969b30b4647c8c#1c632b046d084e7bde86b82dfc969b30b4647c8c"
 dependencies = [
  "argh_derive",
  "argh_shared",
@@ -32,7 +32,7 @@ dependencies = [
 [[package]]
 name = "argh_derive"
 version = "0.1.12"
-source = "git+https://github.com/topjohnwu/argh.git?rev=f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8#f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8"
+source = "git+https://github.com/google/argh.git?rev=1c632b046d084e7bde86b82dfc969b30b4647c8c#1c632b046d084e7bde86b82dfc969b30b4647c8c"
 dependencies = [
  "argh_shared",
  "proc-macro2",
@@ -43,7 +43,7 @@ dependencies = [
 [[package]]
 name = "argh_shared"
 version = "0.1.12"
-source = "git+https://github.com/topjohnwu/argh.git?rev=f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8#f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8"
+source = "git+https://github.com/google/argh.git?rev=1c632b046d084e7bde86b82dfc969b30b4647c8c#1c632b046d084e7bde86b82dfc969b30b4647c8c"
 dependencies = [
  "serde",
 ]
