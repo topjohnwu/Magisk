@@ -21,6 +21,7 @@
     <string name="home_package">חבילה</string>
     <string name="home_app_title">יישום</string>
     <string name="home_notice_content">יש להוריד את Magisk רק מהדף הרשמי של GitHub. קבצים ממקורות לא ידועים יכולים להיות זדוניים!</string>
+    <string name="home_support_title">תמיכה בנו</string>
     <string name="home_follow_title">עקבו אחרינו</string>
     <string name="home_item_source">מקור</string>
     <string name="home_support_content">Magisk היה ותמיד יהיה בעל קוד מקור פתוח. עם זאת באפשרותך להראות לנו שאכפת לך על ידי שליחת תרומה קטנה.</string>
