@@ -43,6 +43,7 @@ object TestHandler {
             runBlocking {
                 ServiceLocator.policyDB.delete(2000)
                 Config.suAutoResponse = Config.Value.SU_AUTO_ALLOW
+                Config.prefs.edit().commit()
             }
             return true
         }
