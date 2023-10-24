@@ -58,6 +58,7 @@ class SuRequestHandler(
         val pid = intent.getIntExtra("pid", -1)
         val fifo = intent.getStringExtra("fifo")
         if (uid <= 0 || pid <= 0 || fifo == null) {
+            Timber.e("Unexpected extras: uid=[${uid}], pid=[${pid}], fifo=[${fifo}]")
             return false
         }
         output = File(fifo)
@@ -73,7 +74,11 @@ class SuRequestHandler(
             respond(SuPolicy.DENY, -1)
             return false
         }
-        return output.canWrite()
+        if (!output.canWrite()) {
+            Timber.e("Cannot write to $output")
+            return false
+        }
+        return true
     }
 
     suspend fun respond(action: Int, time: Int) {
