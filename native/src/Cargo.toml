@@ -25,8 +25,9 @@ bytemuck = "1.14"
 fdt = "0.1"
 
 [workspace.dependencies.argh]
-git = "https://github.com/topjohnwu/argh.git"
-rev = "f0ca7d9d7f66b4ff56fbbd44ce19a96c625bffd8"
+git = "https://github.com/google/argh.git"
+rev = "1c632b046d084e7bde86b82dfc969b30b4647c8c"
+default-features = false
 
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
