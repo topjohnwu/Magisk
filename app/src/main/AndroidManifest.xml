@@ -82,11 +82,15 @@
             android:name="androidx.room.MultiInstanceInvalidationService"
             tools:node="remove" />
 
-        <!-- We don't need emoji compat -->
+        <!-- We handle initialization ourselves -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
+            tools:node="remove" />
+
+        <!-- We handle profile installation ourselves  -->
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
             tools:node="remove" />
 
     </application>

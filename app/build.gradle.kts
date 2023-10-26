@@ -65,7 +65,6 @@ setupApp()
 configurations.all {
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
-    exclude("androidx.profileinstaller", "profileinstaller")
 }
 
 dependencies {
@@ -117,5 +116,6 @@ dependencies {
     implementation("androidx.transition:transition:1.4.1")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("com.google.android.material:material:1.10.0")
 }

@@ -144,8 +144,6 @@ abstract class AddCommentTask: DefaultTask() {
             it.eocdComment = comment.get().toByteArray()
             it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
             it.get(JarFile.MANIFEST_NAME)?.delete()
-            it.get("assets/dexopt/baseline.prof")?.delete()
-            it.get("assets/dexopt/baseline.profm")?.delete()
         }
 
         outFile
