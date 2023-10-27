@@ -34,7 +34,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Zorla şifrelemeyi koru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koruyun</string>
-    <string name="patch_vbmeta">Önyükleme görüntüsünde vbmeta yaması</string>
+    <string name="patch_vbmeta">Önyükleme görüntüsünde vbmeta yamasını uygula</string>
     <string name="recovery_mode">Kurtarma Modu</string>
     <string name="install_options_title">Seçenekler</string>
     <string name="install_method_title">Yöntem</string>
@@ -55,24 +55,24 @@
     <string name="touch_filtered_warning">Bir uygulama bir Süper Kullanıcı isteğini engellediği için Magisk yanıtınızı doğrulayamıyor</string>
     <string name="deny">Reddet</string>
     <string name="prompt">Hemen</string>
-    <string name="grant">İzin</string>
-    <string name="su_warning">Cihazınıza tam erişim sağlar.\nEmin değilseniz reddedin!</string>
+    <string name="grant">İzin ver</string>
+    <string name="su_warning">Cihazınıza tam erişim sağlar.\nEğer emin değilseniz reddedin!</string>
     <string name="forever">Daima</string>
     <string name="once">Bir kere</string>
     <string name="tenmin">10 dakika</string>
     <string name="twentymin">20 dakika</string>
     <string name="thirtymin">30 dakika</string>
     <string name="sixtymin">60 dakika</string>
-    <string name="su_allow_toast">%1$s Süper Kullanıcı hakları verildi</string>
-    <string name="su_deny_toast">%1$s Süper Kullanıcı hakları reddedildi</string>
-    <string name="su_snack_grant">%1$s Süper Kullanıcı hakları verildi</string>
-    <string name="su_snack_deny">%1$s Süper Kullanıcı hakları reddedildi</string>
-    <string name="su_snack_notif_on">%1$s bildirimleri etkinleştirildi</string>
-    <string name="su_snack_notif_off">%1$s bildirimleri devre dışı bırakıldı</string>
-    <string name="su_snack_log_on">%1$s günlüğü etkinleştirildi</string>
-    <string name="su_snack_log_off">%1$s günlüğü devre dışı bırakıldı</string>
+    <string name="su_allow_toast">%1$s uygulamasının Süper Kullanıcı izni verildi</string>
+    <string name="su_deny_toast">%1$s uygulamasının Süper Kullanıcı izni reddedildi</string>
+    <string name="su_snack_grant">%1$s uygulamasının Süper Kullanıcı izni verildi</string>
+    <string name="su_snack_deny">%1$s uygulamasının Süper Kullanıcı izni reddedildi</string>
+    <string name="su_snack_notif_on">%1$s uygulamasının bildirimleri etkinleştirildi</string>
+    <string name="su_snack_notif_off">%1$s uygulamasının bildirimleri devre dışı bırakıldı</string>
+    <string name="su_snack_log_on">%1$s uygulamasının günlüğü etkinleştirildi</string>
+    <string name="su_snack_log_off">%1$s uygulamasının günlüğü devre dışı bırakıldı</string>
     <string name="su_revoke_title">İptal et?</string>
-    <string name="su_revoke_msg">%1$s Süper Kullanıcı haklarını iptal etmeyi onaylayın</string>
+    <string name="su_revoke_msg">%1$s uygulamasının Süper Kullanıcı haklarını iptal etmeyi onaylayın</string>
     <string name="toast">Tost</string>
     <string name="none">Hiçbiri</string>
 
@@ -99,11 +99,11 @@
 
     <!--Module-->
     <string name="no_info_provided">(Bilgi verilmedi)</string>
-    <string name="reboot_userspace">Yumuşak yeniden başlatma</string>
-    <string name="reboot_recovery">Kurtarma için Yeniden Başlatın</string>
-    <string name="reboot_bootloader">Bootloader için Yeniden Başlatın</string>
-    <string name="reboot_download">İndirmek için Yeniden Başlatın</string>
-    <string name="reboot_edl">EDL için Yeniden Başlatın</string>
+    <string name="reboot_userspace">Yazılımsal olarak yeniden başlat</string>
+    <string name="reboot_recovery">Kurtarma modunda Yeniden Başlat</string>
+    <string name="reboot_bootloader">Önyükleyici modunda Yeniden Başlat</string>
+    <string name="reboot_download">Download modu için Yeniden Başlat</string>
+    <string name="reboot_edl">EDL modunda Yeniden Başlat</string>
     <string name="module_version_author">%1$s / %2$s</string>
     <string name="module_state_remove">Kaldır</string>
     <string name="module_state_restore">Geri yükle</string>
@@ -119,9 +119,9 @@
     <!--Settings-->
     <string name="settings_dark_mode_title">Tema Modu</string>
     <string name="settings_dark_mode_message">Tarzınıza en uygun modu seçin!</string>
-    <string name="settings_dark_mode_light">Daima Açık</string>
+    <string name="settings_dark_mode_light">Her zaman Açık</string>
     <string name="settings_dark_mode_system">Sistemi Takip Et</string>
-    <string name="settings_dark_mode_dark">Daima Koyu</string>
+    <string name="settings_dark_mode_dark">Her zaman Koyu</string>
     <string name="settings_download_path_title">İndirme yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_hide_app_title">Magisk uygulamasını gizleyin</string>
@@ -131,7 +131,7 @@
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_check_update_title">Güncellemeleri Kontrol Et</string>
-    <string name="settings_check_update_summary">Arka planda güncellemeleri periyodik olarak kontrol edin</string>
+    <string name="settings_check_update_summary">Arka planda güncellemeleri düzenli olarak kontrol edin</string>
     <string name="settings_update_channel_title">Güncelleme Kanalı</string>
     <string name="settings_update_stable">Stabil</string>
     <string name="settings_update_beta">Beta</string>
@@ -165,7 +165,7 @@
     <string name="superuser_notification">Süper Kullanıcı Bildirimi</string>
     <string name="settings_su_reauth_title">Yükseltmeden sonra yeniden kimlik doğrulaması yapın</string>
     <string name="settings_su_reauth_summary">Uygulamaları yükselttikten sonra Süper Kullanıcı izinlerini tekrar isteyin</string>
-    <string name="settings_su_tapjack_title">Sahte Ekran Koruması</string>
+    <string name="settings_su_tapjack_title">Sahte Ekran (Tapjacking) Koruması</string>
     <string name="settings_su_tapjack_summary">Süper Kullanıcı bilgi istemi iletişim kutusu, herhangi bir başka pencere veya yer paylaşımı tarafından engellendiğinde girişe yanıt vermeyecektir.</string>
     <string name="settings_customization">Özelleştir</string>
     <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra adın ve simgenin tanınmasının zor olması durumunda ana ekrana güzel bir kısayol ekleyin</string>
@@ -216,7 +216,7 @@
     <string name="restore_done">Geri yükleme tamamlandı!</string>
     <string name="restore_fail">Stok yedeği mevcut değil!</string>
     <string name="setup_fail">Kurulum başarısız oldu</string>
-    <string name="env_fix_title">Ek Kurulum Gerektirir</string>
+    <string name="env_fix_title">Ek Kurulum Gerekiyor</string>
     <string name="env_fix_msg">Magisk\'in düzgün çalışması için cihazınızın ek kuruluma ihtiyacı var. Devam etmek ve yeniden başlatmak istiyor musunuz?</string>
     <string name="env_full_fix_msg">Cihazınızın düzgün çalışması için Magisk\'in yeniden yüklenmeye ihtiyacı var. Lütfen Magisk\'i uygulama içinde yeniden yükleyin, kurtarma modu doğru cihaz bilgilerini alamıyor.</string>
     <string name="setup_msg">Ortam kurulumu çalıştırılıyor…</string>
@@ -224,18 +224,18 @@
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
     <string name="unsupport_magisk_msg">Uygulamanın bu sürümü, %1$s\'den daha düşük Magisk sürümlerini desteklemiyor.\n\nUygulama, Magisk kurulu değilmiş gibi davranacak, lütfen Magisk\'i mümkün olan en kısa sürede yükseltin.</string>
     <string name="unsupport_general_title">Anormal Durum</string>
-    <string name="unsupport_system_app_msg">Bu uygulamayı bir sistem uygulaması olarak çalıştırmak desteklenmiyor. Lütfen uygulamayı bir kullanıcı uygulamasına geri döndürün.</string>
-    <string name="unsupport_other_su_msg">Magisk\'ten olmayan bir \"su\" ikili dosyası algılandı. Lütfen rakip kök çözümlerini kaldırın ve/veya Magisk\'i yeniden yükleyin.</string>
+    <string name="unsupport_system_app_msg">Bu uygulamayı bir sistem uygulaması olarak çalıştırma desteklenmiyor. Lütfen uygulamayı bir kullanıcı uygulamasına geri döndürün.</string>
+    <string name="unsupport_other_su_msg">Magisk\'ten olmayan bir \"su\" ikili dosyası algılandı. Lütfen başka kök çözümlerini kaldırın ve/veya Magisk\'i yeniden yükleyin.</string>
     <string name="unsupport_external_storage_msg">Magisk, harici depolama birimine kurulur. Lütfen uygulamayı dahili depolamaya taşıyın.</string>
     <string name="unsupport_nonroot_stub_msg">Kök kaybolduğu için gizli Magisk uygulaması çalışmaya devam edemiyor. Lütfen orijinal APK\'yı geri yükleyin.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
-    <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni verin</string>
-    <string name="post_notifications_denied">Bu işlevi etkinleştirmek için bildirim izni verin</string>
-    <string name="install_unknown_denied">Bu işlevi etkinleştirmek için "bilinmeyen uygulamaları yükle"ye izin verin</string>
+    <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni veriniz.</string>
+    <string name="post_notifications_denied">Bu işlevi etkinleştirmek için bildirim izni veriniz.</string>
+    <string name="install_unknown_denied">Bu işlevi etkinleştirmek için "Bilinmeyen uygulamaları yükle" ayarına izin veriniz.</string>
     <string name="add_shortcut_title">Ana ekrana kısayol ekle</string>
     <string name="add_shortcut_msg">Bu uygulamayı gizledikten sonra adını ve simgesini tanımak zorlaşabilir. Ana ekrana hoş bir kısayol eklemek ister misiniz?</string>
     <string name="app_not_found">Bu eylemi gerçekleştirecek uygulama bulunamadı</string>
     <string name="reboot_apply_change">Değişiklikleri uygulamak için yeniden başlatın</string>
-    <string name="restore_app_confirmation">Bu, gizli uygulamayı orijinal uygulamaya geri yükleyecektir. Gerçekten bunu yapmak istiyor musun?</string>
+    <string name="restore_app_confirmation">Bu işlem, gizli uygulamayı orijinal uygulama ile değiştirecektir. Bu işlemi yapmak istediğinizden emin misiniz?</string>
 
 </resources>
