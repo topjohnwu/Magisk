@@ -44,6 +44,7 @@ extern "C" {
     fn strftime(buf: *mut c_char, len: usize, fmt: *const c_char, tm: *const tm) -> usize;
 
     fn zygisk_fetch_logd() -> RawFd;
+    fn zygisk_close_logd();
     fn new_daemon_thread(entry: ThreadEntry, arg: *mut c_void);
 }
 
@@ -159,26 +160,13 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
 }
 
 fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
-    let magiskd = match MAGISKD.get() {
-        None => return,
-        Some(s) => s,
-    };
-
-    let logd_cell = magiskd.logd.lock().unwrap();
-    let mut logd_ref = logd_cell.borrow_mut();
-    if logd_ref.is_none() {
-        android_logging();
-        unsafe {
-            let fd = zygisk_fetch_logd();
-            if fd < 0 {
-                return;
-            }
-            *logd_ref = Some(File::from_raw_fd(fd));
+    let mut logd = unsafe {
+        let fd = zygisk_fetch_logd();
+        if fd < 0 {
+            return;
         }
-        // Only re-enable zygisk logging if success
-        zygisk_logging();
+        File::from_raw_fd(fd)
     };
-    let logd = logd_ref.as_mut().unwrap();
 
     // Block SIGPIPE
     let mut mask: sigset_t;
@@ -190,18 +178,21 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
         pthread_sigmask(SIG_BLOCK, &mask, &mut orig_mask);
     }
 
-    let result = write_log_to_pipe(logd, prio, msg);
+    let result = write_log_to_pipe(&mut logd, prio, msg);
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
         let ts: timespec = std::mem::zeroed();
+
         sigtimedwait(&mask, null_mut(), &ts);
         pthread_sigmask(SIG_SETMASK, &orig_mask, null_mut());
     }
 
     // If any error occurs, shut down the logd pipe
     if result.is_err() {
-        *logd_ref = None;
+        unsafe {
+            zygisk_close_logd();
+        }
     }
 }
 

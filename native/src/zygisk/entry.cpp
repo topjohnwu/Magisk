@@ -62,6 +62,8 @@ extern "C" void zygisk_inject_entry(void *handle) {
 
 // The following code runs in zygote/app process
 
+int zygisk_logd = -1;
+
 extern "C" int zygisk_fetch_logd() {
     // If we don't have the log pipe set, request magiskd for it. This could actually happen
     // multiple times in the zygote daemon (parent process) because we had to close this
@@ -77,18 +79,28 @@ extern "C" int zygisk_fetch_logd() {
     // add this FD into fds_to_ignore to pass the check. For other cases, we accomplish this by
     // hooking __android_log_close and closing it at the same time as the rest of logging FDs.
 
-    if (int fd = zygisk_request(ZygiskRequest::GET_LOG_PIPE); fd >= 0) {
-        int log_pipe = -1;
-        if (read_int(fd) == 0) {
-            log_pipe = recv_fd(fd);
-        }
-        close(fd);
-        if (log_pipe >= 0) {
-            return log_pipe;
+    if (zygisk_logd < 0) {
+        android_logging();
+        if (int fd = zygisk_request(ZygiskRequest::GET_LOG_PIPE); fd >= 0) {
+            int log_pipe = -1;
+            if (read_int(fd) == 0) {
+                log_pipe = recv_fd(fd);
+            }
+            close(fd);
+            if (log_pipe >= 0) {
+                zygisk_logd = log_pipe;
+                // Only re-enable zygisk logging if success
+                zygisk_logging();
+            }
         }
     }
 
-    return -1;
+    return zygisk_logd;
+}
+
+extern "C" void zygisk_close_logd() {
+    close(zygisk_logd);
+    zygisk_logd = -1;
 }
 
 static inline bool should_load_modules(uint32_t flags) {

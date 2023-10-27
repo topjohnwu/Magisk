@@ -20,8 +20,6 @@ using namespace std;
 using jni_hook::hash_map;
 using jni_hook::tree_map;
 using xstring = jni_hook::string;
-using rust::MagiskD;
-using rust::get_magiskd;
 
 // Extreme verbose logging
 //#define ZLOGV(...) ZLOGD(__VA_ARGS__)
@@ -70,7 +68,6 @@ struct HookContext {
         AppSpecializeArgs_v3 *app;
         ServerSpecializeArgs_v1 *server;
     } args;
-    const MagiskD &magiskd;
 
     const char *process;
     list<ZygiskModule> modules;
@@ -97,7 +94,7 @@ struct HookContext {
     vector<IgnoreInfo> ignore_info;
 
     HookContext(JNIEnv *env, void *args) :
-    env(env), args{args}, magiskd(get_magiskd()), process(nullptr), pid(-1), info_flags(0),
+    env(env), args{args}, process(nullptr), pid(-1), info_flags(0),
     hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {
         static bool restored_env = false;
         if (!restored_env) {
@@ -174,7 +171,7 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
 DCL_HOOK_FUNC(void, android_log_close) {
     if (g_ctx == nullptr) {
         // Happens during un-managed fork like nativeForkApp, nativeForkUsap
-        get_magiskd().close_log_pipe();
+        zygisk_close_logd();
     } else {
         g_ctx->sanitize_fds();
     }
@@ -424,8 +421,8 @@ void HookContext::fork_pre() {
         // The dirfd will be closed once out of scope
         allowed_fds[dirfd(dir.get())] = false;
         // logd_fd should be handled separately
-        if (int logd_fd = magiskd.get_log_pipe(); logd_fd >= 0) {
-            allowed_fds[logd_fd] = false;
+        if (zygisk_logd >= 0) {
+            allowed_fds[zygisk_logd] = false;
         }
     }
 
@@ -445,14 +442,14 @@ void HookContext::sanitize_fds() {
         return;
 
     if (!is_child() || g_allowed_fds == nullptr) {
-        magiskd.close_log_pipe();
+        zygisk_close_logd();
         return;
     }
 
     auto &allowed_fds = *g_allowed_fds;
     if (can_exempt_fd()) {
-        if (int logd_fd = magiskd.get_log_pipe(); logd_fd >= 0) {
-            exempted_fds.push_back(logd_fd);
+        if (zygisk_logd >= 0) {
+            exempted_fds.push_back(zygisk_logd);
         }
 
         auto update_fd_array = [&](int old_len) -> jintArray {
@@ -492,7 +489,7 @@ void HookContext::sanitize_fds() {
             update_fd_array(0);
         }
     } else {
-        magiskd.close_log_pipe();
+        zygisk_close_logd();
         // Switch to plain old android logging because we cannot talk
         // to magiskd to fetch our log pipe afterwards anyways.
         android_logging();
@@ -589,7 +586,7 @@ void HookContext::app_specialize_post() {
 
     // Cleanups
     env->ReleaseStringUTFChars(args.app->nice_name, process);
-    magiskd.close_log_pipe();
+    zygisk_close_logd();
     android_logging();
 }
 
