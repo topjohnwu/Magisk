@@ -40,7 +40,6 @@ enum {
     APP_SPECIALIZE,
     SERVER_FORK_AND_SPECIALIZE,
     DO_REVERT_UNMOUNT,
-    SKIP_FD_SANITIZATION,
 
     FLAG_MAX
 };
@@ -170,13 +169,11 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     return res;
 }
 
-// Sanitize file descriptors to prevent crashing
+// Close logd_fd if necessary to prevent crashing
 DCL_HOOK_FUNC(void, android_log_close) {
     if (g_ctx == nullptr) {
         // Happens during un-managed fork like nativeForkApp, nativeForkUsap
         get_magiskd().close_log_pipe();
-    } else {
-        g_ctx->sanitize_fds();
     }
     old_android_log_close();
 }
@@ -441,15 +438,8 @@ void HookContext::fork_post() {
 }
 
 void HookContext::sanitize_fds() {
-    if (flags[SKIP_FD_SANITIZATION])
-        return;
-
-    if (!is_child() || g_allowed_fds == nullptr) {
-        magiskd.close_log_pipe();
-        return;
-    }
-
     auto &allowed_fds = *g_allowed_fds;
+    bool child = is_child();
     if (can_exempt_fd()) {
         if (int logd_fd = magiskd.get_log_pipe(); logd_fd >= 0) {
             exempted_fds.push_back(logd_fd);
@@ -465,23 +455,26 @@ void HookContext::sanitize_fds() {
 
             env->SetIntArrayRegion(
                     array, old_len, static_cast<int>(exempted_fds.size()), exempted_fds.data());
-            for (int fd : exempted_fds) {
-                if (fd >= 0 && fd < MAX_FD_SIZE) {
-                    allowed_fds[fd] = true;
+            if (child) {
+                for (int fd: exempted_fds) {
+                    if (fd >= 0 && fd < MAX_FD_SIZE) {
+                        allowed_fds[fd] = true;
+                    }
                 }
             }
             *args.app->fds_to_ignore = array;
-            flags[SKIP_FD_SANITIZATION] = true;
             return array;
         };
 
         if (jintArray fdsToIgnore = *args.app->fds_to_ignore) {
             int *arr = env->GetIntArrayElements(fdsToIgnore, nullptr);
             int len = env->GetArrayLength(fdsToIgnore);
-            for (int i = 0; i < len; ++i) {
-                int fd = arr[i];
-                if (fd >= 0 && fd < MAX_FD_SIZE) {
-                    allowed_fds[fd] = true;
+            if (child) {
+                for (int i = 0; i < len; ++i) {
+                    int fd = arr[i];
+                    if (fd >= 0 && fd < MAX_FD_SIZE) {
+                        allowed_fds[fd] = true;
+                    }
                 }
             }
             if (jintArray newFdList = update_fd_array(len)) {
@@ -498,13 +491,15 @@ void HookContext::sanitize_fds() {
         android_logging();
     }
 
-    // Close all forbidden fds to prevent crashing
-    auto dir = xopen_dir("/proc/self/fd");
-    int dfd = dirfd(dir.get());
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        int fd = parse_int(entry->d_name);
-        if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd) {
-            close(fd);
+    if (child) {
+        // Close all forbidden fds to prevent crashing
+        auto dir = xopen_dir("/proc/self/fd");
+        int dfd = dirfd(dir.get());
+        for (dirent* entry; (entry = xreaddir(dir.get()));) {
+            int fd = parse_int(entry->d_name);
+            if ((fd < 0 || fd >= MAX_FD_SIZE || !allowed_fds[fd]) && fd != dfd) {
+                close(fd);
+            }
         }
     }
 }
@@ -658,7 +653,7 @@ HookContext::~HookContext() {
 }
 
 bool HookContext::exempt_fd(int fd) {
-    if (flags[POST_SPECIALIZE] || flags[SKIP_FD_SANITIZATION])
+    if (flags[POST_SPECIALIZE])
         return true;
     if (!can_exempt_fd())
         return false;
@@ -671,8 +666,6 @@ bool HookContext::exempt_fd(int fd) {
 void HookContext::nativeSpecializeAppProcess_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  specialize [%s]\n", process);
-    // App specialize does not check FD
-    flags[SKIP_FD_SANITIZATION] = true;
     app_specialize_pre();
 }
 
@@ -689,6 +682,7 @@ void HookContext::nativeForkSystemServer_pre() {
     if (is_child()) {
         server_specialize_pre();
     }
+    sanitize_fds();
 }
 
 void HookContext::nativeForkSystemServer_post() {
@@ -708,6 +702,7 @@ void HookContext::nativeForkAndSpecialize_pre() {
     if (is_child()) {
         app_specialize_pre();
     }
+    sanitize_fds();
 }
 
 void HookContext::nativeForkAndSpecialize_post() {
