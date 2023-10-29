@@ -61,9 +61,8 @@ done
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
 stop
-if [ -d /dev/avd-magisk ]; then
-  umount -l /dev/avd-magisk 2>/dev/null
-  rm -rf /dev/avd-magisk 2>/dev/null
+if [ -d /debug_ramdisk ]; then
+  umount -l /debug_ramdisk 2>/dev/null
 fi
 
 # Make sure boot completed props are not set to 1
@@ -108,11 +107,10 @@ elif [ -e /sbin ]; then
   rm -rf /dev/sysroot
 else
   # Android Q+ without sbin
-  MAGISKTMP=/dev/avd-magisk
-  mkdir /dev/avd-magisk
+  MAGISKTMP=/debug_ramdisk
   # If a file name 'magisk' is in current directory, mount will fail
   rm -f magisk
-  mount -t tmpfs -o 'mode=0755' magisk /dev/avd-magisk
+  mount -t tmpfs -o 'mode=0755' magisk /debug_ramdisk
 fi
 
 # Magisk stuff
@@ -138,7 +136,6 @@ else
 fi
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
-ln -s ./magisk $MAGISKTMP/magiskhide
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
 mkdir -p $MAGISKTMP/.magisk/mirror

@@ -411,27 +411,25 @@ static void daemon_entry() {
     poll_loop();
 }
 
-string find_magisk_tmp() {
-    if (access("/debug_ramdisk/" INTLROOT, F_OK) == 0) {
-        return "/debug_ramdisk";
-    }
-    if (access("/sbin/" INTLROOT, F_OK) == 0) {
-        return "/sbin";
-    }
-    // Fallback to lookup from mountinfo for manual mount, e.g. avd
-    for (const auto &mount: parse_mount_info("self")) {
-        if (mount.source == "magisk" && mount.root == "/") {
-            return mount.target;
+const char *get_magisk_tmp() {
+    static const char *path = nullptr;
+    if (path == nullptr) {
+        if (access("/debug_ramdisk/" INTLROOT, F_OK) == 0) {
+            path = "/debug_ramdisk";
+        } else if (access("/sbin/" INTLROOT, F_OK) == 0) {
+            path = "/sbin";
+        } else {
+            path = "";
         }
     }
-    return "";
+    return path;
 }
 
 int connect_daemon(int req, bool create) {
     int fd = xsocket(AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0);
     sockaddr_un addr = {.sun_family = AF_LOCAL};
-    string tmp = find_magisk_tmp();
-    strcpy(addr.sun_path, (tmp + "/" MAIN_SOCKET).data());
+    const char *tmp = get_magisk_tmp();
+    ssprintf(addr.sun_path, sizeof(addr.sun_path), "%s/" MAIN_SOCKET, tmp);
     if (connect(fd, (sockaddr *) &addr, sizeof(addr))) {
         if (!create || getuid() != AID_ROOT) {
             LOGE("No daemon is currently running!\n");
@@ -441,7 +439,7 @@ int connect_daemon(int req, bool create) {
 
         char buf[64];
         xreadlink("/proc/self/exe", buf, sizeof(buf));
-        if (tmp.empty() || !str_starts(buf, tmp)) {
+        if (tmp[0] == '\0' || !str_starts(buf, tmp)) {
             LOGE("Start daemon on magisk tmpfs\n");
             close(fd);
             return -1;

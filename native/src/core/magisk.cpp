@@ -129,9 +129,9 @@ int magisk_main(int argc, char *argv[]) {
         write_int(fd, do_reboot);
         return read_int(fd);
     } else if (argv[1] == "--path"sv) {
-        string path = find_magisk_tmp();
-        if (!path.empty())  {
-            printf("%s\n", path.data());
+        const char *path = get_magisk_tmp();
+        if (path[0] != '\0')  {
+            printf("%s\n", path);
             return 0;
         }
         return 1;

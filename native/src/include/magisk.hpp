@@ -3,7 +3,6 @@
 #include <string>
 
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
-#define LOGFILE         "/cache/magisk.log"
 #define SECURE_DIR      "/data/adb"
 #define MODULEROOT      SECURE_DIR "/modules"
 #define MODULEUPGRADE   SECURE_DIR "/modules_update"
