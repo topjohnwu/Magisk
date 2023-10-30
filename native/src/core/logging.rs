@@ -3,7 +3,7 @@ use std::ffi::{c_char, c_void};
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
-use std::os::fd::{AsRawFd, FromRawFd, RawFd};
+use std::os::fd::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
 use std::ptr::null_mut;
 use std::{fs, io};
 
@@ -12,15 +12,15 @@ use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
 use base::libc::{
-    clock_gettime, getpid, gettid, localtime_r, pipe2, pthread_sigmask, sigaddset, sigset_t,
-    sigtimedwait, timespec, tm, CLOCK_REALTIME, O_CLOEXEC, PIPE_BUF, SIGPIPE, SIG_BLOCK,
+    clock_gettime, getpid, gettid, localtime_r, pthread_sigmask, sigaddset, sigset_t, sigtimedwait,
+    timespec, tm, CLOCK_REALTIME, O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIGPIPE, SIG_BLOCK,
     SIG_SETMASK,
 };
 use base::*;
 
-use crate::daemon::{MagiskD, MAGISKD};
+use crate::daemon::{get_magisk_tmp, MagiskD, MAGISKD};
 use crate::logging::LogFile::{Actual, Buffer};
-use crate::LOGFILE;
+use crate::{LOGFILE, LOG_PIPE};
 
 #[allow(dead_code, non_camel_case_types)]
 #[derive(FromPrimitive, ToPrimitive)]
@@ -59,9 +59,7 @@ fn level_to_prio(level: LogLevel) -> i32 {
 
 pub fn android_logging() {
     fn android_log_write(level: LogLevel, msg: &Utf8CStr) {
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
-        }
+        write_android_log(level_to_prio(level), msg);
     }
 
     let logger = Logger {
@@ -76,9 +74,7 @@ pub fn android_logging() {
 
 pub fn magisk_logging() {
     fn magisk_log_write(level: LogLevel, msg: &Utf8CStr) {
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
-        }
+        write_android_log(level_to_prio(level), msg);
         magisk_log_to_pipe(level_to_prio(level), msg);
     }
 
@@ -94,9 +90,7 @@ pub fn magisk_logging() {
 
 pub fn zygisk_logging() {
     fn zygisk_log_write(level: LogLevel, msg: &Utf8CStr) {
-        unsafe {
-            __android_log_write(level_to_prio(level), raw_cstr!("Magisk"), msg.as_ptr());
-        }
+        write_android_log(level_to_prio(level), msg);
         zygisk_log_to_pipe(level_to_prio(level), msg);
     }
 
@@ -117,6 +111,19 @@ struct LogMeta {
     len: i32,
     pid: i32,
     tid: i32,
+}
+
+fn print_log_error(msg: &str, e: io::Error) {
+    let mut buf = Utf8CStrBufArr::default();
+    buf.write_fmt(format_args_nl!("Error in {}: {}", msg, e))
+        .ok();
+    write_android_log(level_to_prio(LogLevel::Error), &buf);
+}
+
+fn write_android_log(prio: i32, msg: &Utf8CStr) {
+    unsafe {
+        __android_log_write(prio, raw_cstr!("Magisk"), msg.as_ptr());
+    }
 }
 
 const MAX_MSG_LEN: usize = PIPE_BUF - std::mem::size_of::<LogMeta>();
@@ -154,7 +161,8 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     let result = write_log_to_pipe(logd, prio, msg);
 
     // If any error occurs, shut down the logd pipe
-    if result.is_err() {
+    if let Err(e) = result {
+        print_log_error("magisk_log", e);
         *logd_ref = None;
     }
 }
@@ -179,6 +187,8 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     }
 
     let result = write_log_to_pipe(&mut logd, prio, msg);
+    // Make sure the file descriptor is not closed after out of scope
+    logd.into_raw_fd();
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
@@ -189,7 +199,8 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     }
 
     // If any error occurs, shut down the logd pipe
-    if result.is_err() {
+    if let Err(e) = result {
+        print_log_error("zygisk_log", e);
         unsafe {
             zygisk_close_logd();
         }
@@ -318,13 +329,19 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
 
 impl MagiskD {
     pub fn start_log_daemon(&self) {
-        let mut fds: [i32; 2] = [0; 2];
+        let mut buf = Utf8CStrBufArr::default();
+        let path = FsPathBuf::new(&mut buf)
+            .join(get_magisk_tmp())
+            .join(LOG_PIPE!());
+
         unsafe {
-            if pipe2(fds.as_mut_ptr(), O_CLOEXEC) == 0 {
-                let logd = self.logd.lock().unwrap();
-                *logd.borrow_mut() = Some(File::from_raw_fd(fds[1]));
-                new_daemon_thread(logfile_writer, fds[0] as *mut c_void);
-            }
+            libc::mkfifo(path.as_ptr(), 0o200);
+            libc::chown(path.as_ptr(), 0, 0);
+            let read = libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC);
+            let write = libc::open(path.as_ptr(), O_WRONLY | O_CLOEXEC);
+            let logd = self.logd.lock().unwrap();
+            *logd.borrow_mut() = Some(File::from_raw_fd(write));
+            new_daemon_thread(logfile_writer, read as *mut c_void);
         }
     }
 

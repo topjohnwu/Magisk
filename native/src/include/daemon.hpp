@@ -71,7 +71,7 @@ extern int app_process_32;
 extern int app_process_64;
 extern std::vector<module_info> *module_list;
 
-const char *get_magisk_tmp();
+extern "C" const char *get_magisk_tmp();
 int connect_daemon(int req, bool create = false);
 
 // Poll control

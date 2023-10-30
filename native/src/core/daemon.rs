@@ -17,6 +17,24 @@ pub struct MagiskD {
     is_emulator: bool,
 }
 
+impl MagiskD {
+    pub fn is_emulator(&self) -> bool {
+        self.is_emulator
+    }
+}
+
+mod cxx_extern {
+    use base::libc::c_char;
+
+    extern "C" {
+        pub fn get_magisk_tmp() -> *const c_char;
+    }
+}
+
+pub fn get_magisk_tmp() -> &'static Utf8CStr {
+    unsafe { Utf8CStr::from_ptr(cxx_extern::get_magisk_tmp()).unwrap_unchecked() }
+}
+
 pub fn daemon_entry() {
     let mut qemu = get_prop(cstr!("ro.kernel.qemu"), false);
     if qemu.is_empty() {
@@ -41,12 +59,6 @@ pub fn zygisk_entry() {
 
 pub fn get_magiskd() -> &'static MagiskD {
     unsafe { MAGISKD.get().unwrap_unchecked() }
-}
-
-impl MagiskD {
-    pub fn is_emulator(&self) -> bool {
-        self.is_emulator
-    }
 }
 
 pub fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize {

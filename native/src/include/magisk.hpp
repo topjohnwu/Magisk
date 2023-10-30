@@ -26,6 +26,7 @@ extern std::string    MAGISKTMP;
 #define SELINUXMOCK   INTLROOT "/selinux"
 #define MAIN_CONFIG   INTLROOT "/config"
 #define MAIN_SOCKET   INTLROOT "/socket"
+#define LOG_PIPE      INTLROOT "/log"
 
 constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 

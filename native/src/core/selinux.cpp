@@ -131,4 +131,7 @@ void restore_tmpcon() {
 
     for (dirent *entry; (entry = xreaddir(dir.get()));)
         setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
+
+    string logd = MAGISKTMP + "/" LOG_PIPE;
+    setfilecon(logd.data(), MAGISK_FILE_CON);
 }
