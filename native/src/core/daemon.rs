@@ -1,11 +1,10 @@
-use std::cell::RefCell;
 use std::fs::File;
 use std::io;
 use std::sync::{Mutex, OnceLock};
 
-use crate::get_prop;
 use base::{cstr, Directory, ResultExt, Utf8CStr, Utf8CStrBuf, Utf8CStrBufRef, WalkResult};
 
+use crate::get_prop;
 use crate::logging::{magisk_logging, zygisk_logging};
 
 // Global magiskd singleton
@@ -13,7 +12,7 @@ pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
 
 #[derive(Default)]
 pub struct MagiskD {
-    pub logd: Mutex<RefCell<Option<File>>>,
+    pub logd: Mutex<Option<File>>,
     is_emulator: bool,
 }
 

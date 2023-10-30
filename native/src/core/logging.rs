@@ -151,9 +151,8 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
         Some(s) => s,
     };
 
-    let logd_cell = magiskd.logd.lock().unwrap();
-    let mut logd_ref = logd_cell.borrow_mut();
-    let logd = match logd_ref.as_mut() {
+    let mut guard = magiskd.logd.lock().unwrap();
+    let logd = match guard.as_mut() {
         None => return,
         Some(s) => s,
     };
@@ -163,7 +162,7 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     // If any error occurs, shut down the logd pipe
     if let Err(e) = result {
         print_log_error("magisk_log", e);
-        *logd_ref = None;
+        *guard = None;
     }
 }
 
@@ -339,31 +338,26 @@ impl MagiskD {
             libc::chown(path.as_ptr(), 0, 0);
             let read = libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC);
             let write = libc::open(path.as_ptr(), O_WRONLY | O_CLOEXEC);
-            let logd = self.logd.lock().unwrap();
-            *logd.borrow_mut() = Some(File::from_raw_fd(write));
+            *self.logd.lock().unwrap() = Some(File::from_raw_fd(write));
             new_daemon_thread(logfile_writer, read as *mut c_void);
         }
     }
 
     pub fn get_log_pipe(&self) -> RawFd {
-        let logd_cell = self.logd.lock().unwrap();
-        let logd_ref = logd_cell.borrow();
-        let logd = logd_ref.as_ref();
-        match logd {
-            None => -1,
-            Some(s) => s.as_raw_fd(),
-        }
+        self.logd
+            .lock()
+            .unwrap()
+            .as_ref()
+            .map_or(-1, |s| s.as_raw_fd())
     }
 
     pub fn close_log_pipe(&self) {
-        let guard = self.logd.lock().unwrap();
-        *guard.borrow_mut() = None;
+        *self.logd.lock().unwrap() = None;
     }
 
     pub fn setup_logfile(&self) {
-        let logd_cell = self.logd.lock().unwrap();
-        let mut logd_ref = logd_cell.borrow_mut();
-        let logd = match logd_ref.as_mut() {
+        let mut guard = self.logd.lock().unwrap();
+        let logd = match guard.as_mut() {
             None => return,
             Some(s) => s,
         };
