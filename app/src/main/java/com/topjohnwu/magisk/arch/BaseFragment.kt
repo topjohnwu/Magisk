@@ -1,12 +1,10 @@
 package com.topjohnwu.magisk.arch
 
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior.setTag
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
@@ -15,9 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import timber.log.Timber
 
 abstract class BaseFragment<Binding : ViewDataBinding, NavOptions> : Fragment(), ViewModelHolder {
@@ -104,5 +100,4 @@ abstract class BaseFragment<Binding : ViewDataBinding, NavOptions> : Fragment(),
             Timber.tag("Navigation").e("Invalid navigation action or destination.")
         }
     }
-
 }
