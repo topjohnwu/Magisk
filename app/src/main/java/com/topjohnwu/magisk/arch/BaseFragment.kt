@@ -1,20 +1,26 @@
 package com.topjohnwu.magisk.arch
 
 import android.os.Bundle
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior.setTag
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.OnRebindCallback
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavDirections
+import androidx.navigation.findNavController
 import com.topjohnwu.magisk.BR
+import com.topjohnwu.magisk.R
+import timber.log.Timber
 
-abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHolder {
+abstract class BaseFragment<Binding : ViewDataBinding, NavOptions> : Fragment(), ViewModelHolder {
 
     val activity get() = getActivity() as? NavigationActivity<*>
     protected lateinit var binding: Binding
@@ -54,7 +60,7 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
         activity?.supportActionBar?.subtitle = null
     }
 
-    override fun onEventDispatched(event: ViewEvent) = when(event) {
+    override fun onEventDispatched(event: ViewEvent) = when (event) {
         is ContextExecutor -> event(requireContext())
         is ActivityExecutor -> activity?.let { event(it) } ?: Unit
         is FragmentExecutor -> event(this)
@@ -90,7 +96,13 @@ abstract class BaseFragment<Binding : ViewDataBinding> : Fragment(), ViewModelHo
         (binding.root as? ViewGroup)?.startAnimations()
     }
 
-    fun NavDirections.navigate() {
-        navigation?.currentDestination?.getAction(actionId)?.let { navigation!!.navigate(this) }
+    fun NavController.safeNavigate(directions: NavDirections) {
+        val action = currentDestination?.getAction(directions.actionId)
+        if (action != null && currentDestination?.id == action.destinationId) {
+            navigate(directions)
+        } else {
+            Timber.tag("Navigation").e("Invalid navigation action or destination.")
+        }
     }
+
 }

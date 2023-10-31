@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.MenuProvider
+import androidx.navigation.fragment.findNavController
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
@@ -17,7 +18,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.DownloadService
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 
-class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
+class HomeFragment : BaseFragment<FragmentHomeMd2Binding, Any?>(), MenuProvider {
 
     override val layoutRes = R.layout.fragment_home_md2
     override val viewModel by viewModel<HomeViewModel>()
@@ -31,7 +32,7 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
     private fun checkTitle(text: TextView, icon: ImageView) {
         text.post {
             if (text.layout?.getEllipsisCount(0) != 0) {
-                with (icon) {
+                with(icon) {
                     layoutParams.width = 0
                     layoutParams.height = 0
                     requestLayout()
@@ -66,8 +67,11 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
 
     override fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_settings ->
-                HomeFragmentDirections.actionHomeFragmentToSettingsFragment().navigate()
+            R.id.action_settings -> {
+                findNavController()
+                    .safeNavigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
+            }
+
             R.id.action_reboot -> activity?.let { RebootMenu.inflate(it).show() }
             else -> return super.onOptionsItemSelected(item)
         }
