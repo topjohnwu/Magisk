@@ -38,7 +38,7 @@ enum {
     APP_SPECIALIZE,
     SERVER_FORK_AND_SPECIALIZE,
     DO_REVERT_UNMOUNT,
-    SKIP_FD_SANITIZATION,
+    SKIP_CLOSE_LOG_PIPE,
 
     FLAG_MAX
 };
@@ -167,13 +167,13 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     return res;
 }
 
-// Sanitize file descriptors to prevent crashing
+// Close file descriptors to prevent crashing
 DCL_HOOK_FUNC(void, android_log_close) {
-    if (g_ctx == nullptr) {
-        // Happens during un-managed fork like nativeForkApp, nativeForkUsap
+    if (g_ctx == nullptr || !g_ctx->flags[SKIP_CLOSE_LOG_PIPE]) {
+        // This may happen during un-managed forks like nativeForkApp and nativeForkUsap, or
+        // forks that does not allow exemption like nativeForkSystemServer and
+        // nativeForkAndSpecialize before Android O.
         zygisk_close_logd();
-    } else {
-        g_ctx->sanitize_fds();
     }
     old_android_log_close();
 }
@@ -438,9 +438,6 @@ void HookContext::fork_post() {
 }
 
 void HookContext::sanitize_fds() {
-    if (flags[SKIP_FD_SANITIZATION])
-        return;
-
     if (!is_child() || g_allowed_fds == nullptr) {
         zygisk_close_logd();
         return;
@@ -468,7 +465,7 @@ void HookContext::sanitize_fds() {
                 }
             }
             *args.app->fds_to_ignore = array;
-            flags[SKIP_FD_SANITIZATION] = true;
+            flags[SKIP_CLOSE_LOG_PIPE] = true;
             return array;
         };
 
@@ -490,8 +487,6 @@ void HookContext::sanitize_fds() {
         }
     } else {
         zygisk_close_logd();
-        // Switch to plain old android logging because we cannot talk
-        // to magiskd to fetch our log pipe afterwards anyways.
         android_logging();
     }
 
@@ -586,8 +581,6 @@ void HookContext::app_specialize_post() {
 
     // Cleanups
     env->ReleaseStringUTFChars(args.app->nice_name, process);
-    zygisk_close_logd();
-    android_logging();
 }
 
 void HookContext::server_specialize_pre() {
@@ -626,6 +619,9 @@ HookContext::~HookContext() {
     if (!is_child())
         return;
 
+    zygisk_close_logd();
+    android_logging();
+
     should_unmap_zygisk = true;
 
     // Unhook JNI methods
@@ -655,7 +651,7 @@ HookContext::~HookContext() {
 }
 
 bool HookContext::exempt_fd(int fd) {
-    if (flags[POST_SPECIALIZE] || flags[SKIP_FD_SANITIZATION])
+    if (flags[POST_SPECIALIZE] || flags[SKIP_CLOSE_LOG_PIPE])
         return true;
     if (!can_exempt_fd())
         return false;
@@ -669,7 +665,7 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  specialize [%s]\n", process);
     // App specialize does not check FD
-    flags[SKIP_FD_SANITIZATION] = true;
+    flags[SKIP_CLOSE_LOG_PIPE] = true;
     app_specialize_pre();
 }
 
@@ -686,6 +682,7 @@ void HookContext::nativeForkSystemServer_pre() {
     if (is_child()) {
         server_specialize_pre();
     }
+    sanitize_fds();
 }
 
 void HookContext::nativeForkSystemServer_post() {
@@ -705,6 +702,7 @@ void HookContext::nativeForkAndSpecialize_pre() {
     if (is_child()) {
         app_specialize_pre();
     }
+    sanitize_fds();
 }
 
 void HookContext::nativeForkAndSpecialize_post() {
