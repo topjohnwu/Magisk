@@ -5,7 +5,7 @@ use std::sync::{Mutex, OnceLock};
 use base::{cstr, Directory, ResultExt, Utf8CStr, Utf8CStrBuf, Utf8CStrBufRef, WalkResult};
 
 use crate::get_prop;
-use crate::logging::{magisk_logging, zygisk_logging};
+use crate::logging::magisk_logging;
 
 // Global magiskd singleton
 pub static MAGISKD: OnceLock<MagiskD> = OnceLock::new();
@@ -48,12 +48,6 @@ pub fn daemon_entry() {
     magiskd.start_log_daemon();
     MAGISKD.set(magiskd).ok();
     magisk_logging();
-}
-
-pub fn zygisk_entry() {
-    let magiskd = MagiskD::default();
-    MAGISKD.set(magiskd).ok();
-    zygisk_logging();
 }
 
 pub fn get_magiskd() -> &'static MagiskD {

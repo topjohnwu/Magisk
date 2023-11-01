@@ -3,7 +3,7 @@
 
 use base::Utf8CStr;
 use cert::read_certificate;
-use daemon::{daemon_entry, find_apk_path, get_magiskd, zygisk_entry, MagiskD};
+use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
 use logging::{android_logging, magisk_logging, zygisk_logging};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 
@@ -41,7 +41,6 @@ pub mod ffi {
     #[namespace = "rust"]
     extern "Rust" {
         fn daemon_entry();
-        fn zygisk_entry();
 
         type MagiskD;
         fn get_magiskd() -> &'static MagiskD;

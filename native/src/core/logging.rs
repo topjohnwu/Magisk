@@ -3,8 +3,9 @@ use std::ffi::{c_char, c_void};
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
-use std::os::fd::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+use std::os::fd::{AsRawFd, FromRawFd, RawFd};
 use std::ptr::null_mut;
+use std::sync::atomic::{AtomicI32, Ordering};
 use std::{fs, io};
 
 use bytemuck::{bytes_of, bytes_of_mut, write_zeroes, Pod, Zeroable};
@@ -42,9 +43,6 @@ type ThreadEntry = extern "C" fn(*mut c_void) -> *mut c_void;
 extern "C" {
     fn __android_log_write(prio: i32, tag: *const c_char, msg: *const c_char);
     fn strftime(buf: *mut c_char, len: usize, fmt: *const c_char, tm: *const tm) -> usize;
-
-    fn zygisk_fetch_logd() -> RawFd;
-    fn zygisk_close_logd();
     fn new_daemon_thread(entry: ThreadEntry, arg: *mut c_void);
 }
 
@@ -113,13 +111,6 @@ struct LogMeta {
     tid: i32,
 }
 
-fn print_log_error(msg: &str, e: io::Error) {
-    let mut buf = Utf8CStrBufArr::default();
-    buf.write_fmt(format_args_nl!("Error in {}: {}", msg, e))
-        .ok();
-    write_android_log(level_to_prio(LogLevel::Error), &buf);
-}
-
 fn write_android_log(prio: i32, msg: &Utf8CStr) {
     unsafe {
         __android_log_write(prio, raw_cstr!("Magisk"), msg.as_ptr());
@@ -142,7 +133,14 @@ fn write_log_to_pipe(logd: &mut File, prio: i32, msg: &Utf8CStr) -> io::Result<u
 
     let io1 = IoSlice::new(bytes_of(&meta));
     let io2 = IoSlice::new(msg);
-    logd.write_vectored(&[io1, io2])
+    let result = logd.write_vectored(&[io1, io2]);
+    if let Err(e) = result.as_ref() {
+        let mut buf = Utf8CStrBufArr::default();
+        buf.write_fmt(format_args_nl!("Cannot write_log_to_pipe: {}", e))
+            .ok();
+        write_android_log(level_to_prio(LogLevel::Error), &buf);
+    }
+    result
 }
 
 fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
@@ -160,20 +158,59 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
     let result = write_log_to_pipe(logd, prio, msg);
 
     // If any error occurs, shut down the logd pipe
-    if let Err(e) = result {
-        print_log_error("magisk_log", e);
+    if result.is_err() {
         *guard = None;
     }
 }
 
+static ZYGISK_LOGD: AtomicI32 = AtomicI32::new(-1);
+
+#[no_mangle]
+extern "C" fn zygisk_close_logd() {
+    unsafe {
+        libc::close(ZYGISK_LOGD.swap(-1, Ordering::Relaxed));
+    }
+}
+
+#[no_mangle]
+extern "C" fn zygisk_get_logd() -> i32 {
+    ZYGISK_LOGD.load(Ordering::Relaxed)
+}
+
 fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
-    let mut logd = unsafe {
-        let fd = zygisk_fetch_logd();
-        if fd < 0 {
+    // If we don't have the log pipe set, open the log pipe FIFO. This could actually happen
+    // multiple times in the zygote daemon (parent process) because we had to close this
+    // file descriptor to prevent crashing.
+    //
+    // For some reason, zygote sanitizes and checks FDs *before* forking. This results in the fact
+    // that *every* time before zygote forks, it has to close all logging related FDs in order
+    // to pass FD checks, just to have it re-initialized immediately after any
+    // logging happens ¯\_(ツ)_/¯.
+    //
+    // To be consistent with this behavior, we also have to close the log pipe to magiskd
+    // to make zygote NOT crash if necessary. We accomplish this by hooking __android_log_close
+    // and closing it at the same time as the rest of logging FDs.
+
+    let mut fd = ZYGISK_LOGD.load(Ordering::Relaxed);
+    if fd < 0 {
+        android_logging();
+        let mut buf = Utf8CStrBufArr::default();
+        let path = FsPathBuf::new(&mut buf)
+            .join(get_magisk_tmp())
+            .join(LOG_PIPE!());
+        // Open as RW as sometimes it may block
+        fd = unsafe { libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC) };
+        if fd >= 0 {
+            // Only re-enable zygisk logging if success
+            zygisk_logging();
+            unsafe {
+                libc::close(ZYGISK_LOGD.swap(fd, Ordering::Relaxed));
+            }
+        } else {
+            // Cannot talk to pipe, abort
             return;
         }
-        File::from_raw_fd(fd)
-    };
+    }
 
     // Block SIGPIPE
     let mut mask: sigset_t;
@@ -185,24 +222,24 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
         pthread_sigmask(SIG_BLOCK, &mask, &mut orig_mask);
     }
 
-    let result = write_log_to_pipe(&mut logd, prio, msg);
-    // Make sure the file descriptor is not closed after out of scope
-    logd.into_raw_fd();
+    let result = {
+        let mut logd = unsafe { File::from_raw_fd(fd) };
+        let result = write_log_to_pipe(&mut logd, prio, msg);
+        // Make sure the file descriptor is not closed after out of scope
+        std::mem::forget(logd);
+        result
+    };
 
     // Consume SIGPIPE if exists, then restore mask
     unsafe {
         let ts: timespec = std::mem::zeroed();
-
         sigtimedwait(&mask, null_mut(), &ts);
         pthread_sigmask(SIG_SETMASK, &orig_mask, null_mut());
     }
 
     // If any error occurs, shut down the logd pipe
-    if let Err(e) = result {
-        print_log_error("zygisk_log", e);
-        unsafe {
-            zygisk_close_logd();
-        }
+    if result.is_err() {
+        zygisk_close_logd();
     }
 }
 

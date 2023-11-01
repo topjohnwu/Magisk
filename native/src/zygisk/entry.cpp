@@ -41,7 +41,7 @@ extern "C" void unload_first_stage() {
 }
 
 extern "C" void zygisk_inject_entry(void *handle) {
-    rust::zygisk_entry();
+    zygisk_logging();
     ZLOGD("load success\n");
 
     char *ld = getenv("LD_PRELOAD");
@@ -61,47 +61,6 @@ extern "C" void zygisk_inject_entry(void *handle) {
 }
 
 // The following code runs in zygote/app process
-
-int zygisk_logd = -1;
-
-extern "C" int zygisk_fetch_logd() {
-    // If we don't have the log pipe set, request magiskd for it. This could actually happen
-    // multiple times in the zygote daemon (parent process) because we had to close this
-    // file descriptor to prevent crashing.
-    //
-    // For some reason, zygote sanitizes and checks FDs *before* forking. This results in the fact
-    // that *every* time before zygote forks, it has to close all logging related FDs in order
-    // to pass FD checks, just to have it re-initialized immediately after any
-    // logging happens ¯\_(ツ)_/¯.
-    //
-    // To be consistent with this behavior, we also have to close the log pipe to magiskd
-    // to make zygote NOT crash if necessary. For nativeForkAndSpecialize, we can actually
-    // add this FD into fds_to_ignore to pass the check. For other cases, we accomplish this by
-    // hooking __android_log_close and closing it at the same time as the rest of logging FDs.
-
-    if (zygisk_logd < 0) {
-        android_logging();
-        if (int fd = zygisk_request(ZygiskRequest::GET_LOG_PIPE); fd >= 0) {
-            int log_pipe = -1;
-            if (read_int(fd) == 0) {
-                log_pipe = recv_fd(fd);
-            }
-            close(fd);
-            if (log_pipe >= 0) {
-                zygisk_logd = log_pipe;
-                // Only re-enable zygisk logging if success
-                zygisk_logging();
-            }
-        }
-    }
-
-    return zygisk_logd;
-}
-
-extern "C" void zygisk_close_logd() {
-    close(zygisk_logd);
-    zygisk_logd = -1;
-}
 
 static inline bool should_load_modules(uint32_t flags) {
     return (flags & UNMOUNT_MASK) != UNMOUNT_MASK &&
@@ -332,16 +291,6 @@ static void get_process_info(int client, const sock_cred *cred) {
     }
 }
 
-static void send_log_pipe(int fd) {
-    int logd_fd = rust::get_magiskd().get_log_pipe();
-    if (logd_fd >= 0) {
-        write_int(fd, 0);
-        send_fd(fd, logd_fd);
-    } else {
-        write_int(fd, 1);
-    }
-}
-
 static void get_moddir(int client) {
     int id = read_int(client);
     char buf[4096];
@@ -363,9 +312,6 @@ void zygisk_handler(int client, const sock_cred *cred) {
         break;
     case ZygiskRequest::GET_INFO:
         get_process_info(client, cred);
-        break;
-    case ZygiskRequest::GET_LOG_PIPE:
-        send_log_pipe(client);
         break;
     case ZygiskRequest::CONNECT_COMPANION:
         if (get_exe(cred->pid, buf, sizeof(buf))) {

@@ -421,8 +421,8 @@ void HookContext::fork_pre() {
         // The dirfd will be closed once out of scope
         allowed_fds[dirfd(dir.get())] = false;
         // logd_fd should be handled separately
-        if (zygisk_logd >= 0) {
-            allowed_fds[zygisk_logd] = false;
+        if (int fd = zygisk_get_logd(); fd >= 0) {
+            allowed_fds[fd] = false;
         }
     }
 
@@ -448,8 +448,8 @@ void HookContext::sanitize_fds() {
 
     auto &allowed_fds = *g_allowed_fds;
     if (can_exempt_fd()) {
-        if (zygisk_logd >= 0) {
-            exempted_fds.push_back(zygisk_logd);
+        if (int fd = zygisk_get_logd(); fd >= 0) {
+            exempted_fds.push_back(fd);
         }
 
         auto update_fd_array = [&](int old_len) -> jintArray {
