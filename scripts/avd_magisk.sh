@@ -91,7 +91,7 @@ elif [ -e /sbin ]; then
   mount_sbin
   mkdir -p /dev/sysroot
   block=$(mount | grep ' / ' | awk '{ print $1 }')
-  [ $block = "/dev/root" ] && block=/dev/block/dm-0
+  [ $block = "/dev/root" ] && block=/dev/block/vda1
   mount -o ro $block /dev/sysroot
   for file in /dev/sysroot/sbin/*; do
     [ ! -e $file ] && break
