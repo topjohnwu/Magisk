@@ -342,7 +342,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     if (read_int(client)) {
         string pts;
         string ptmx;
-        auto magiskpts = MAGISKTMP + "/" SHELLPTS;
+        auto magiskpts = get_magisk_tmp() + "/"s SHELLPTS;
         if (access(magiskpts.data(), F_OK)) {
             pts = "/dev/pts";
             ptmx = "/dev/ptmx";

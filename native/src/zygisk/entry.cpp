@@ -52,10 +52,7 @@ extern "C" void zygisk_inject_entry(void *handle) {
         unsetenv("LD_PRELOAD");
     }
 
-    MAGISKTMP = getenv(MAGISKTMP_ENV);
     self_handle = handle;
-
-    unsetenv(MAGISKTMP_ENV);
     sanitize_environ();
     hook_functions();
 }
@@ -128,12 +125,13 @@ static void connect_companion(int client, bool is_64_bit) {
         socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds);
         zygiskd_socket = fds[0];
         if (fork_dont_care() == 0) {
-            string exe = MAGISKTMP + "/magisk" + (is_64_bit ? "64" : "32");
+            char exe[64];
+            ssprintf(exe, sizeof(exe), "%s/magisk%s", get_magisk_tmp(), (is_64_bit ? "64" : "32"));
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
             char buf[16];
             ssprintf(buf, sizeof(buf), "%d", fds[1]);
-            execl(exe.data(), "", "zygisk", "companion", buf, (char *) nullptr);
+            execl(exe, "", "zygisk", "companion", buf, (char *) nullptr);
             exit(-1);
         }
         close(fds[1]);
@@ -170,11 +168,11 @@ static void setup_files(int client, const sock_cred *cred) {
     bool is_64_bit = str_ends(buf, "64");
     if (is_64_bit) {
         hbin = HIJACK_BIN64;
-        mbin = MAGISKTMP + "/" ZYGISKBIN "/loader64.so";
+        mbin = get_magisk_tmp() + "/"s ZYGISKBIN "/loader64.so";
         app_fd = app_process_64;
     } else {
         hbin = HIJACK_BIN32;
-        mbin = MAGISKTMP + "/" ZYGISKBIN "/loader32.so";
+        mbin = get_magisk_tmp() + "/"s ZYGISKBIN "/loader32.so";
         app_fd = app_process_32;
     }
 
@@ -222,7 +220,6 @@ static void setup_files(int client, const sock_cred *cred) {
     xmount(mbin.data(), hbin, nullptr, MS_BIND, nullptr);
 
     send_fd(client, app_fd);
-    write_string(client, MAGISKTMP);
 }
 
 static void magiskd_passthrough(int client) {

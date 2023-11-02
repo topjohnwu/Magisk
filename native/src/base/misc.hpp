@@ -262,9 +262,9 @@ std::vector<std::string> split(std::string_view s, std::string_view delims);
 std::vector<std::string_view> split_view(std::string_view, std::string_view delims);
 
 // Similar to vsnprintf, but the return value is the written number of bytes
-int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);
+__printflike(3, 0) int vssprintf(char *dest, size_t size, const char *fmt, va_list ap);
 // Similar to snprintf, but the return value is the written number of bytes
-int ssprintf(char *dest, size_t size, const char *fmt, ...);
+__printflike(3, 4) int ssprintf(char *dest, size_t size, const char *fmt, ...);
 // This is not actually the strscpy from the Linux kernel.
 // Silently truncates, and returns the number of bytes written.
 extern "C" size_t strscpy(char *dest, const char *src, size_t size);

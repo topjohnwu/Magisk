@@ -170,7 +170,7 @@ void tmpfs_node::mount() {
     else
         src_path = parent()->node_path().data();
     if (!isa<tmpfs_node>(parent())) {
-        auto worker_dir = MAGISKTMP + "/" WORKERDIR + dest;
+        auto worker_dir = get_magisk_tmp() + "/"s WORKERDIR + dest;
         mkdirs(worker_dir.data(), 0);
         create_and_mount(skip_mirror() ? "replace" : "tmpfs", worker_dir);
     } else {
@@ -190,7 +190,7 @@ public:
     explicit magisk_node(const char *name) : node_entry(name, DT_REG, this) {}
 
     void mount() override {
-        const string src = MAGISKTMP + "/" + name();
+        const string src = get_magisk_tmp() + "/"s + name();
         if (access(src.data(), F_OK))
             return;
 
@@ -236,7 +236,7 @@ int app_process_64 = -1;
 if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
     app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
     string zbin = zygisk_bin + "/app_process" #bit;                                     \
-    string mbin = MAGISKTMP + "/magisk" #bit;                                           \
+    string mbin = get_magisk_tmp() + "/magisk"s #bit;                                   \
     int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
     int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
     xsendfile(out, src, nullptr, INT_MAX);                                              \
@@ -247,8 +247,8 @@ if (access("/system/bin/app_process" #bit, F_OK) == 0) {                        
 }
 
 void load_modules() {
-    node_entry::mirror_dir = MAGISKTMP + "/" MIRRDIR;
-    node_entry::module_mnt = MAGISKTMP + "/" MODULEMNT "/";
+    node_entry::mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
+    node_entry::module_mnt =  get_magisk_tmp() + "/"s MODULEMNT "/";
 
     auto root = make_unique<root_node>("");
     auto system = new root_node("system");
@@ -258,7 +258,7 @@ void load_modules() {
     LOGI("* Loading modules\n");
     for (const auto &m : *module_list) {
         const char *module = m.name.data();
-        char *b = buf + sprintf(buf, "%s/" MODULEMNT "/%s/", MAGISKTMP.data(), module);
+        char *b = buf + ssprintf(buf, sizeof(buf), "%s/" MODULEMNT "/%s/", get_magisk_tmp(), module);
 
         // Read props
         strcpy(b, "system.prop");
@@ -284,7 +284,7 @@ void load_modules() {
         system->collect_module_files(module, fd);
         close(fd);
     }
-    if (MAGISKTMP != "/sbin" || !str_contains(getenv("PATH") ?: "", "/sbin")) {
+    if (get_magisk_tmp() != "/sbin"sv || !str_contains(getenv("PATH") ?: "", "/sbin")) {
         // Need to inject our binaries into /system/bin
         inject_magisk_bins(system);
     }
@@ -306,14 +306,14 @@ void load_modules() {
 
     // Mount on top of modules to enable zygisk
     if (zygisk_enabled) {
-        string zygisk_bin = MAGISKTMP + "/" ZYGISKBIN;
+        string zygisk_bin = get_magisk_tmp() + "/"s ZYGISKBIN;
         mkdir(zygisk_bin.data(), 0);
         mount_zygisk(32)
         mount_zygisk(64)
     }
 
-    auto worker_dir = MAGISKTMP + "/" WORKERDIR;
-    xmount(nullptr, worker_dir.data(), nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+    ssprintf(buf, sizeof(buf), "%s/" WORKERDIR, get_magisk_tmp());
+    xmount(nullptr, buf, nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
 }
 
 /************************
@@ -448,7 +448,7 @@ void handle_modules() {
 }
 
 static int check_rules_dir(char *buf, size_t sz) {
-    int off = ssprintf(buf, sz, "%s/%s", MAGISKTMP.data(), PREINITMIRR);
+    int off = ssprintf(buf, sz, "%s/" PREINITMIRR, get_magisk_tmp());
     struct stat st1{};
     struct stat st2{};
     if (xstat(buf, &st1) < 0 || xstat(MODULEROOT, &st2) < 0)

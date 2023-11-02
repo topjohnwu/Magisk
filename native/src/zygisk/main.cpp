@@ -74,7 +74,6 @@ int app_process_main(int argc, char *argv[]) {
             if (app_proc_fd < 0)
                 break;
 
-            string tmp = read_string(socket);
             if (char *ld = getenv("LD_PRELOAD")) {
                 string env = ld;
                 env += ':';
@@ -83,7 +82,6 @@ int app_process_main(int argc, char *argv[]) {
             } else {
                 setenv("LD_PRELOAD", HIJACK_BIN, 1);
             }
-            setenv(MAGISKTMP_ENV, tmp.data(), 1);
 
             close(socket);
 
