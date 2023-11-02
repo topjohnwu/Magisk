@@ -224,7 +224,7 @@
 - [MagiskInit] Rewritten 2SI support from scratch
 - [MagiskInit] Support when no `/sbin` folder exists (Android 11)
 - [MagiskInit] Dump fstab from device-tree to rootfs and force `init` to use it for 2SI devices
-- [MagiskInit] Strip out AVB for 2SI as it may cause bootloop
+- [MagiskInit] recover lost data and rebbot loop #4 
 - [Modules] Rewritten module mounting logic from scratch
 - [MagiskSU] For Android 8.0+, a completely new policy setup is used. This reduces compromises in Android's sandbox, providing more policy isolation and better security for root users.
 - [MagiskSU] Isolated mount namespace will now first inherit from parent process, then isolate itself from the world
