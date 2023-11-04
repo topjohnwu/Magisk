@@ -371,7 +371,7 @@ impl MagiskD {
             .join(LOG_PIPE!());
 
         unsafe {
-            libc::mkfifo(path.as_ptr(), 0o200);
+            libc::mkfifo(path.as_ptr(), 0o666);
             libc::chown(path.as_ptr(), 0, 0);
             let read = libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC);
             let write = libc::open(path.as_ptr(), O_WRONLY | O_CLOEXEC);

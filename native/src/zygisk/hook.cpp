@@ -22,8 +22,8 @@ using jni_hook::tree_map;
 using xstring = jni_hook::string;
 
 // Extreme verbose logging
-//#define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...) (void*)0
+#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+//#define ZLOGV(...) (void*)0
 
 static void hook_unloader();
 static void unhook_functions();
@@ -170,9 +170,8 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
 // Close file descriptors to prevent crashing
 DCL_HOOK_FUNC(void, android_log_close) {
     if (g_ctx == nullptr || !g_ctx->flags[SKIP_CLOSE_LOG_PIPE]) {
-        // This may happen during un-managed forks like nativeForkApp and nativeForkUsap, or
-        // forks that does not allow exemption like nativeForkSystemServer and
-        // nativeForkAndSpecialize before Android O.
+        // This happens during forks like nativeForkApp, nativeForkUsap,
+        // nativeForkSystemServer, and nativeForkAndSpecialize.
         zygisk_close_logd();
     }
     old_android_log_close();
@@ -438,21 +437,15 @@ void HookContext::fork_post() {
 }
 
 void HookContext::sanitize_fds() {
+    zygisk_close_logd();
+
     if (!is_child() || g_allowed_fds == nullptr) {
-        zygisk_close_logd();
         return;
     }
 
     auto &allowed_fds = *g_allowed_fds;
-    if (can_exempt_fd()) {
-        if (int fd = zygisk_get_logd(); fd >= 0) {
-            exempted_fds.push_back(fd);
-        }
-
+    if (can_exempt_fd() && !exempted_fds.empty()) {
         auto update_fd_array = [&](int old_len) -> jintArray {
-            if (exempted_fds.empty())
-                return nullptr;
-
             jintArray array = env->NewIntArray(static_cast<int>(old_len + exempted_fds.size()));
             if (array == nullptr)
                 return nullptr;
@@ -465,7 +458,6 @@ void HookContext::sanitize_fds() {
                 }
             }
             *args.app->fds_to_ignore = array;
-            flags[SKIP_CLOSE_LOG_PIPE] = true;
             return array;
         };
 
@@ -485,9 +477,6 @@ void HookContext::sanitize_fds() {
         } else {
             update_fd_array(0);
         }
-    } else {
-        zygisk_close_logd();
-        android_logging();
     }
 
     // Close all forbidden fds to prevent crashing
