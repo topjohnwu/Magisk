@@ -36,9 +36,6 @@ enum : int {
 #define HIJACK_BIN HIJACK_BIN32
 #endif
 
-extern "C" int zygisk_get_logd();
-extern "C" void zygisk_close_logd();
-
 // Unmap all pages matching the name
 void unmap_all(const char *name);
 

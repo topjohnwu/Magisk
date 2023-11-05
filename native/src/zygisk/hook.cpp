@@ -167,6 +167,14 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
     return res;
 }
 
+// This is the last moment before the secontext of the process changes
+DCL_HOOK_FUNC(int, selinux_android_setcontext,
+              uid_t uid, bool isSystemServer, const char *seinfo, const char *pkgname) {
+    // Pre-fetch logd before secontext transition
+    zygisk_get_logd();
+    return old_selinux_android_setcontext(uid, isSystemServer, seinfo, pkgname);
+}
+
 // Close file descriptors to prevent crashing
 DCL_HOOK_FUNC(void, android_log_close) {
     if (g_ctx == nullptr || !g_ctx->flags[SKIP_CLOSE_LOG_PIPE]) {
@@ -745,6 +753,7 @@ void hook_functions() {
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, androidSetCreateThreadFunc);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
     PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
     hook_commit();
 

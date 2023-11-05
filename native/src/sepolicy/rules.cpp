@@ -19,6 +19,8 @@ void sepolicy::magisk_rules() {
     typeattribute(SEPOL_PROC_DOMAIN, "bluetoothdomain");
     type(SEPOL_FILE_TYPE, "file_type");
     typeattribute(SEPOL_FILE_TYPE, "mlstrustedobject");
+    type(SEPOL_LOG_TYPE, "file_type");
+    typeattribute(SEPOL_LOG_TYPE, "mlstrustedobject");
 
     // Make our root domain unconstrained
     allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
@@ -37,10 +39,17 @@ void sepolicy::magisk_rules() {
     allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
     allow(ALL, SEPOL_FILE_TYPE, "sock_file", ALL);
 
-    // Allow these processes to access MagiskSU
-    const char *clients[]{"zygote", "shell",
-                          "system_app", "platform_app", "priv_app",
-                          "untrusted_app", "untrusted_app_all"};
+    // Only allow zygote to open log pipe
+    allow("zygote", SEPOL_LOG_TYPE, "fifo_file", "open");
+    allow("zygote", SEPOL_LOG_TYPE, "fifo_file", "read");
+    // Allow all processes to output logs
+    allow("domain", SEPOL_LOG_TYPE, "fifo_file", "write");
+
+    // Allow these processes to access MagiskSU and output logs
+    const char *clients[] {
+        "zygote", "shell", "system_app", "platform_app",
+        "priv_app", "untrusted_app", "untrusted_app_all"
+    };
     for (auto type: clients) {
         if (!exists(type))
             continue;

@@ -165,19 +165,13 @@ fn magisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
 
 static ZYGISK_LOGD: AtomicI32 = AtomicI32::new(-1);
 
-#[no_mangle]
-extern "C" fn zygisk_close_logd() {
+pub fn zygisk_close_logd() {
     unsafe {
         libc::close(ZYGISK_LOGD.swap(-1, Ordering::Relaxed));
     }
 }
 
-#[no_mangle]
-extern "C" fn zygisk_get_logd() -> i32 {
-    ZYGISK_LOGD.load(Ordering::Relaxed)
-}
-
-fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
+pub fn zygisk_get_logd() -> i32 {
     // If we don't have the log pipe set, open the log pipe FIFO. This could actually happen
     // multiple times in the zygote daemon (parent process) because we had to close this
     // file descriptor to prevent crashing.
@@ -207,9 +201,17 @@ fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
                 libc::close(ZYGISK_LOGD.swap(fd, Ordering::Relaxed));
             }
         } else {
-            // Cannot talk to pipe, abort
-            return;
+            return -1;
         }
+    }
+    fd
+}
+
+fn zygisk_log_to_pipe(prio: i32, msg: &Utf8CStr) {
+    let fd = zygisk_get_logd();
+    if fd < 0 {
+        // Cannot talk to pipe, abort
+        return;
     }
 
     // Block SIGPIPE

@@ -135,5 +135,5 @@ void restore_tmpcon() {
         setfilecon_at(dfd, entry->d_name, SYSTEM_CON);
 
     string logd = tmp + "/"s LOG_PIPE;
-    setfilecon(logd.data(), MAGISK_FILE_CON);
+    setfilecon(logd.data(), MAGISK_LOG_CON);
 }
