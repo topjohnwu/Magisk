@@ -13,48 +13,68 @@ using namespace std;
 
 static vector<string> rc_list;
 
-static void patch_init_rc(const char *src, const char *dest, const char *tmp_dir) {
-    FILE *rc = xfopen(dest, "we");
-    if (!rc) {
-        PLOGE("%s: open %s failed", __PRETTY_FUNCTION__, src);
-        return;
-    }
-    file_readline(src, [=](string_view line) -> bool {
-        // Do not start vaultkeeper
-        if (str_contains(line, "start vaultkeeper")) {
-            LOGD("Remove vaultkeeper\n");
-            return true;
-        }
-        // Do not run flash_recovery
-        if (str_starts(line, "service flash_recovery")) {
-            LOGD("Remove flash_recovery\n");
-            fprintf(rc, "service flash_recovery /system/bin/xxxxx\n");
-            return true;
-        }
-        // Samsung's persist.sys.zygote.early will cause Zygote to start before post-fs-data
-        if (str_starts(line, "on property:persist.sys.zygote.early=")) {
-            LOGD("Invalidate persist.sys.zygote.early\n");
-            fprintf(rc, "on property:persist.sys.zygote.early.xxxxx=true\n");
-            return true;
-        }
-        // Else just write the line
-        fprintf(rc, "%s", line.data());
-        return true;
-    });
+static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
+    auto src_dir = xopen_dir(src_path);
+    if (!src_dir) return;
+    int src_fd = dirfd(src_dir.get());
 
-    fprintf(rc, "\n");
+    // If writable, directly modify the file in src_path, or else add to rootfs overlay
+    auto dest_dir = writable ? [&] {
+        return xopen_dir(src_path);
+    }() : [&] {
+        char buf[PATH_MAX] = {};
+        ssprintf(buf, sizeof(buf), ROOTOVL "%s", src_path);
+        xmkdirs(buf, 0755);
+        return xopen_dir(buf);
+    }();
+    if (!dest_dir) return;
+    int dest_fd = dirfd(dest_dir.get());
 
-    // Inject custom rc scripts
-    for (auto &script : rc_list) {
-        // Replace template arguments of rc scripts with dynamic paths
-        replace_all(script, "${MAGISKTMP}", tmp_dir);
-        fprintf(rc, "\n%s\n", script.data());
-    }
-    rc_list.clear();
+    // First patch init.rc
+    {
+        auto src = xopen_file(xopenat(src_fd, "init.rc", O_RDONLY | O_CLOEXEC, 0), "re");
+        if (!src) return;
+        if (writable) unlinkat(src_fd, "init.rc", 0);
+        auto dest = xopen_file(
+                xopenat(dest_fd, "init.rc", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
+        if (!dest) return;
+        LOGD("Patching init.rc in %s\n", src_path);
+        file_readline(false, src.get(), [&dest](string_view line) -> bool {
+            // Do not start vaultkeeper
+            if (str_contains(line, "start vaultkeeper")) {
+                LOGD("Remove vaultkeeper\n");
+                return true;
+            }
+            // Do not run flash_recovery
+            if (line.starts_with("service flash_recovery")) {
+                LOGD("Remove flash_recovery\n");
+                fprintf(dest.get(), "service flash_recovery /system/bin/true\n");
+                return true;
+            }
+            // Samsung's persist.sys.zygote.early will cause Zygote to start before post-fs-data
+            if (line.starts_with("on property:persist.sys.zygote.early=")) {
+                LOGD("Invalidate persist.sys.zygote.early\n");
+                fprintf(dest.get(), "on property:persist.sys.zygote.early.xxxxx=true\n");
+                return true;
+            }
+            // Else just write the line
+            fprintf(dest.get(), "%s", line.data());
+            return true;
+        });
 
-    // Inject Magisk rc scripts
-    LOGD("Inject magisk rc\n");
-    fprintf(rc, R"EOF(
+        fprintf(dest.get(), "\n");
+
+        // Inject custom rc scripts
+        for (auto &script : rc_list) {
+            // Replace template arguments of rc scripts with dynamic paths
+            replace_all(script, "${MAGISKTMP}", tmp_path);
+            fprintf(dest.get(), "\n%s\n", script.data());
+        }
+        rc_list.clear();
+
+        // Inject Magisk rc scripts
+        LOGD("Inject magisk rc\n");
+        fprintf(dest.get(), R"EOF(
 on post-fs-data
     start logd
     exec %2$s 0 0 -- %1$s/magisk --post-fs-data
@@ -68,15 +88,37 @@ on nonencrypted
 on property:sys.boot_completed=1
     exec %2$s 0 0 -- %1$s/magisk --boot-complete
 
-on property:init.svc.zygote=restarting
-    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-
 on property:init.svc.zygote=stopped
     exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-)EOF", tmp_dir, MAGISK_PROC_CON);
+)EOF", tmp_path, MAGISK_PROC_CON);
 
-    fclose(rc);
-    clone_attr(src, dest);
+        fclone_attr(fileno(src.get()), fileno(dest.get()));
+    }
+
+    // Then patch init.zygote*.rc
+    for (dirent *entry; (entry = readdir(src_dir.get()));) {
+        auto name = std::string_view(entry->d_name);
+        if (!name.starts_with("init.zygote") || !name.ends_with(".rc")) continue;
+        auto src = xopen_file(xopenat(src_fd, name.data(), O_RDONLY | O_CLOEXEC, 0), "re");
+        if (!src) continue;
+        if (writable) unlinkat(src_fd, name.data(), 0);
+        auto dest = xopen_file(
+                xopenat(dest_fd, name.data(), O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
+        if (!dest) continue;
+        LOGD("Patching %s in %s\n", name.data(), src_path);
+        file_readline(false, src.get(), [&dest, &tmp_path](string_view line) -> bool {
+            if (line.starts_with("service zygote ")) {
+                LOGD("Inject zygote restart\n");
+                fprintf(dest.get(), "%s", line.data());
+                fprintf(dest.get(), "    onrestart exec %2$s 0 0 -- %1$s/magisk --zygote-restart\n",
+                        tmp_path, MAGISK_PROC_CON);
+                return true;
+            }
+            fprintf(dest.get(), "%s", line.data());
+            return true;
+        });
+        fclone_attr(fileno(src.get()), fileno(dest.get()));
+    }
 }
 
 static void load_overlay_rc(const char *overlay) {
@@ -202,8 +244,8 @@ void MagiskInit::parse_config_file() {
     });
 }
 
-#define ROOTMIR     MIRRDIR "/system_root"
-#define NEW_INITRC  "/system/etc/init/hw/init.rc"
+#define ROOTMIR         MIRRDIR "/system_root"
+#define NEW_INITRC_DIR  "/system/etc/init/hw"
 
 void MagiskInit::patch_ro_root() {
     mount_list.emplace_back("/data");
@@ -259,12 +301,11 @@ void MagiskInit::patch_ro_root() {
     }
 
     // Patch init.rc
-    if (access(NEW_INITRC, F_OK) == 0) {
+    if (access(NEW_INITRC_DIR, F_OK) == 0) {
         // Android 11's new init.rc
-        xmkdirs(dirname(ROOTOVL NEW_INITRC), 0755);
-        patch_init_rc(NEW_INITRC, ROOTOVL NEW_INITRC, tmp_dir.data());
+        patch_rc_scripts(NEW_INITRC_DIR, tmp_dir.data(), false);
     } else {
-        patch_init_rc("/init.rc", ROOTOVL "/init.rc", tmp_dir.data());
+        patch_rc_scripts("/", tmp_dir.data(), false);
     }
 
     // Extract magisk
@@ -312,8 +353,7 @@ void MagiskInit::patch_rw_root() {
     rm_rf("/.backup");
 
     // Patch init.rc
-    patch_init_rc("/init.rc", "/init.p.rc", "/sbin");
-    rename("/init.p.rc", "/init.rc");
+    patch_rc_scripts("/", "/sbin", true);
 
     bool treble;
     {
