@@ -222,8 +222,6 @@ static bool magisk_env() {
     LOGI("* Initializing Magisk environment\n");
 
     preserve_stub_apk();
-    string pkg;
-    get_manager(0, &pkg);
 
     // Directories in /data/adb
     xmkdir(DATABIN, 0755);
