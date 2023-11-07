@@ -15,15 +15,14 @@ using namespace std;
 
 #define VLOGD(tag, from, to) LOGD("%-8s: %s <- %s\n", tag, to, from)
 
+static string native_bridge = "0";
+
 static int bind_mount(const char *reason, const char *from, const char *to) {
     int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
         VLOGD(reason, from, to);
     return ret;
 }
-
-string node_entry::module_mnt;
-string node_entry::mirror_dir;
 
 /*************************
  * Node Tree Construction
@@ -211,6 +210,21 @@ public:
     }
 };
 
+class zygisk_node : public node_entry {
+public:
+    explicit zygisk_node(const char *name, bool is64bit) : node_entry(name, DT_REG, this),
+                                                           is64bit(is64bit) {}
+
+    void mount() override {
+        const string src = get_magisk_tmp() + "/magisk"s + (is64bit ? "64" : "32");
+        create_and_mount("zygisk", src);
+        xmount(nullptr, node_path().data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
+    }
+
+private:
+    bool is64bit;
+};
+
 static void inject_magisk_bins(root_node *system) {
     auto bin = system->get_child<inter_node>("bin");
     if (!bin) {
@@ -228,23 +242,27 @@ static void inject_magisk_bins(root_node *system) {
     delete bin->extract("supolicy");
 }
 
-vector<module_info> *module_list;
-int app_process_32 = -1;
-int app_process_64 = -1;
+static void inject_zygisk_libs(root_node *system) {
+    if (access("/system/bin/linker", F_OK) == 0) {
+        auto lib = system->get_child<inter_node>("lib");
+        if (!lib) {
+            lib = new inter_node("lib");
+            system->insert(lib);
+        }
+        lib->insert(new zygisk_node(native_bridge.data(), false));
+    }
 
-#define mount_zygisk(bit)                                                               \
-if (access("/system/bin/app_process" #bit, F_OK) == 0) {                                \
-    app_process_##bit = xopen("/system/bin/app_process" #bit, O_RDONLY | O_CLOEXEC);    \
-    string zbin = zygisk_bin + "/app_process" #bit;                                     \
-    string mbin = get_magisk_tmp() + "/magisk"s #bit;                                   \
-    int src = xopen(mbin.data(), O_RDONLY | O_CLOEXEC);                                 \
-    int out = xopen(zbin.data(), O_CREAT | O_WRONLY | O_CLOEXEC, 0);                    \
-    xsendfile(out, src, nullptr, INT_MAX);                                              \
-    close(out);                                                                         \
-    close(src);                                                                         \
-    clone_attr("/system/bin/app_process" #bit, zbin.data());                            \
-    bind_mount("zygisk", zbin.data(), "/system/bin/app_process" #bit);                  \
+    if (access("/system/bin/linker64", F_OK) == 0) {
+        auto lib64 = system->get_child<inter_node>("lib64");
+        if (!lib64) {
+            lib64 = new inter_node("lib64");
+            system->insert(lib64);
+        }
+        lib64->insert(new zygisk_node(native_bridge.data(), true));
+    }
 }
+
+vector<module_info> *module_list;
 
 void load_modules() {
     node_entry::mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
@@ -289,6 +307,22 @@ void load_modules() {
         inject_magisk_bins(system);
     }
 
+    if (zygisk_enabled) {
+        string native_bridge_orig = get_prop(NBPROP);
+        if (native_bridge_orig.empty()) {
+            native_bridge_orig = "0";
+        }
+        native_bridge = native_bridge_orig != "0" ? ZYGISKLDR + native_bridge_orig : ZYGISKLDR;
+        set_prop(NBPROP, native_bridge.data(), true);
+        // Weather Huawei's Maple compiler is enabled.
+        // If so, system server will be created by a special Zygote which ignores the native bridge
+        // and make system server out of our control. Avoid it by disabling.
+        if (get_prop("ro.maple.enable") == "1") {
+            set_prop("ro.maple.enable", "0", true);
+        }
+        inject_zygisk_libs(system);
+    }
+
     if (!system->is_empty()) {
         // Handle special read-only partitions
         for (const char *part : { "/vendor", "/product", "/system_ext" }) {
@@ -302,14 +336,6 @@ void load_modules() {
         }
         root->prepare();
         root->mount();
-    }
-
-    // Mount on top of modules to enable zygisk
-    if (zygisk_enabled) {
-        string zygisk_bin = get_magisk_tmp() + "/"s ZYGISKBIN;
-        mkdir(zygisk_bin.data(), 0);
-        mount_zygisk(32)
-        mount_zygisk(64)
     }
 
     ssprintf(buf, sizeof(buf), "%s/" WORKERDIR, get_magisk_tmp());
@@ -490,4 +516,24 @@ void exec_module_scripts(const char *stage) {
     std::transform(module_list->begin(), module_list->end(), std::back_inserter(module_names),
         [](const module_info &info) -> string_view { return info.name; });
     exec_module_scripts(stage, module_names);
+}
+
+void reset_zygisk(bool restore) {
+    if (!zygisk_enabled) return;
+    static atomic_uint zygote_start_count{1};
+    if (restore) {
+        zygote_start_count = 1;
+    } else if (zygote_start_count.fetch_add(1) > 3) {
+        LOGW("zygote crashes too many times, rolling-back\n");
+        restore = true;
+    }
+    if (restore) {
+        string native_bridge_orig = "0";
+        if (native_bridge.length() > strlen(ZYGISKLDR)) {
+            native_bridge_orig = native_bridge.substr(strlen(ZYGISKLDR));
+        }
+        set_prop(NBPROP, native_bridge_orig.data(), true);
+    } else {
+        set_prop(NBPROP, native_bridge.data(), true);
+    }
 }

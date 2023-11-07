@@ -49,8 +49,8 @@ public:
 
     virtual void mount() = 0;
 
-    static string module_mnt;
-    static string mirror_dir;
+    inline static string module_mnt;
+    inline static string mirror_dir;
 
 protected:
     template<class T>

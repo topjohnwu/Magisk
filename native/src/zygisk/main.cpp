@@ -7,97 +7,10 @@
 #include <socket.hpp>
 #include <daemon.hpp>
 #include <selinux.hpp>
-#include <embed.hpp>
 
 #include "zygisk.hpp"
 
 using namespace std;
-
-// Entrypoint for app_process overlay
-int app_process_main(int argc, char *argv[]) {
-    android_logging();
-    char buf[PATH_MAX];
-
-    bool zygote = false;
-    if (auto fp = open_file("/proc/self/attr/current", "r")) {
-        fscanf(fp.get(), "%s", buf);
-        zygote = (buf == "u:r:zygote:s0"sv);
-    }
-
-    if (!zygote) {
-        // For the non zygote case, we need to get real app_process via passthrough
-        // We have to connect magiskd via exec-ing magisk due to SELinux restrictions
-
-        // This is actually only relevant for calling app_process via ADB shell
-        // because zygisk shall already have the app_process overlays unmounted
-        // during app process specialization within its private mount namespace.
-
-        int fds[2];
-        socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds);
-        if (fork_dont_care() == 0) {
-            // This fd has to survive exec
-            fcntl(fds[1], F_SETFD, 0);
-            ssprintf(buf, sizeof(buf), "%d", fds[1]);
-#if defined(__LP64__)
-            execlp("magisk", "", "zygisk", "passthrough", buf, "1", (char *) nullptr);
-#else
-            execlp("magisk", "", "zygisk", "passthrough", buf, "0", (char *) nullptr);
-#endif
-            exit(-1);
-        }
-
-        close(fds[1]);
-        if (read_int(fds[0]) != 0) {
-            fprintf(stderr, "Failed to connect magiskd, try umount %s or reboot.\n", argv[0]);
-            return 1;
-        }
-        int app_proc_fd = recv_fd(fds[0]);
-        if (app_proc_fd < 0)
-            return 1;
-        close(fds[0]);
-
-        fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
-        fexecve(app_proc_fd, argv, environ);
-        return 1;
-    }
-
-    if (int socket = zygisk_request(ZygiskRequest::SETUP); socket >= 0) {
-        do {
-            if (read_int(socket) != 0)
-                break;
-
-            // Send over zygisk loader
-            write_int(socket, sizeof(zygisk_ld));
-            xwrite(socket, zygisk_ld, sizeof(zygisk_ld));
-
-            int app_proc_fd = recv_fd(socket);
-            if (app_proc_fd < 0)
-                break;
-
-            if (char *ld = getenv("LD_PRELOAD")) {
-                string env = ld;
-                env += ':';
-                env += HIJACK_BIN;
-                setenv("LD_PRELOAD", env.data(), 1);
-            } else {
-                setenv("LD_PRELOAD", HIJACK_BIN, 1);
-            }
-
-            close(socket);
-
-            fcntl(app_proc_fd, F_SETFD, FD_CLOEXEC);
-            fexecve(app_proc_fd, argv, environ);
-        } while (false);
-
-        close(socket);
-    }
-
-    // If encountering any errors, unmount and execute the original app_process
-    xreadlink("/proc/self/exe", buf, sizeof(buf));
-    xumount2("/proc/self/exe", MNT_DETACH);
-    execve(buf, argv, environ);
-    return 1;
-}
 
 static void zygiskd(int socket) {
     if (getuid() != 0 || fcntl(socket, F_GETFD) < 0)
@@ -177,30 +90,8 @@ static void zygiskd(int socket) {
 // This should only ever be called internally
 int zygisk_main(int argc, char *argv[]) {
     android_logging();
-
     if (argc == 3 && argv[1] == "companion"sv) {
         zygiskd(parse_int(argv[2]));
-    } else if (argc == 4 && argv[1] == "passthrough"sv) {
-        int client = parse_int(argv[2]);
-        int is_64_bit = parse_int(argv[3]);
-        if (fcntl(client, F_GETFD) < 0)
-            return 1;
-        if (int magiskd = connect_daemon(MainRequest::ZYGISK_PASSTHROUGH); magiskd >= 0) {
-            write_int(magiskd, ZygiskRequest::PASSTHROUGH);
-            write_int(magiskd, is_64_bit);
-
-            if (read_int(magiskd) != 0) {
-                write_int(client, 1);
-                return 0;
-            }
-
-            write_int(client, 0);
-            int real_app_fd = recv_fd(magiskd);
-            send_fd(client, real_app_fd);
-        } else {
-            write_int(client, 1);
-            return 0;
-        }
     }
     return 0;
 }

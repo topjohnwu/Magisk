@@ -10,11 +10,11 @@
 using namespace std;
 
 #define CALL_PROVIDER \
-exe, "/system/bin", "com.android.commands.content.Content", \
+"/system/bin/app_process", "/system/bin", "com.android.commands.content.Content", \
 "call", "--uri", target, "--user", user, "--method", action
 
 #define START_ACTIVITY \
-exe, "/system/bin", "com.android.commands.am.Am", \
+"/system/bin/app_process", "/system/bin", "com.android.commands.am.Am", \
 "start", "-p", target, "--user", user, "-a", "android.intent.action.VIEW", \
 "-f", "0x58800020", "--es", "action", action
 
@@ -130,20 +130,9 @@ static bool check_no_error(int fd) {
 
 static void exec_cmd(const char *action, vector<Extra> &data,
                      const shared_ptr<su_info> &info, bool provider = true) {
-    char exe[128];
     char target[128];
     char user[4];
     ssprintf(user, sizeof(user), "%d", to_user_id(info->eval_uid));
-
-    if (zygisk_enabled) {
-#if defined(__LP64__)
-        ssprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_64);
-#else
-        ssprintf(exe, sizeof(exe), "/proc/self/fd/%d", app_process_32);
-#endif
-    } else {
-        strscpy(exe, "/system/bin/app_process", sizeof(exe));
-    }
 
     // First try content provider call method
     if (provider) {

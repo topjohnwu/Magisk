@@ -6,18 +6,11 @@
 #include <vector>
 #include <daemon.hpp>
 
-#define MAGISKTMP_ENV  "MAGISKTMP"
-
-#define HIJACK_BIN64   "/system/bin/appwidget"
-#define HIJACK_BIN32   "/system/bin/bu"
-
 namespace ZygiskRequest {
 enum : int {
-    SETUP,
     GET_INFO,
     CONNECT_COMPANION,
     GET_MODDIR,
-    PASSTHROUGH,
     END
 };
 }
@@ -27,13 +20,11 @@ enum : int {
 #define ZLOGE(...) LOGE("zygisk64: " __VA_ARGS__)
 #define ZLOGI(...) LOGI("zygisk64: " __VA_ARGS__)
 #define ZLOGW(...) LOGW("zygisk64: " __VA_ARGS__)
-#define HIJACK_BIN HIJACK_BIN64
 #else
 #define ZLOGD(...) LOGD("zygisk32: " __VA_ARGS__)
 #define ZLOGE(...) LOGE("zygisk32: " __VA_ARGS__)
 #define ZLOGI(...) LOGI("zygisk32: " __VA_ARGS__)
 #define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
-#define HIJACK_BIN HIJACK_BIN32
 #endif
 
 // Unmap all pages matching the name
