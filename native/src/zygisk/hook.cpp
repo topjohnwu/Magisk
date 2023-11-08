@@ -416,7 +416,7 @@ void HookContext::fork_pre() {
     sigmask(SIG_BLOCK, SIGCHLD);
     pid = old_fork();
 
-    if (pid != 0)
+    if (!is_child())
         return;
 
     // Record all open fds
