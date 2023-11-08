@@ -109,54 +109,53 @@ void *nativeForkAndSpecialize_orig = nullptr;
     ctx.nativeForkAndSpecialize_post();
     return ctx.pid;
 }
-const JNINativeMethod nativeForkAndSpecialize_methods[] = {
-    {
+std::array nativeForkAndSpecialize_methods = {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_l
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_o
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_p
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z)I",
         (void *) &nativeForkAndSpecialize_q_alt
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)I",
         (void *) &nativeForkAndSpecialize_r
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_samsung_m
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;[ILjava/lang/String;Ljava/lang/String;I)I",
         (void *) &nativeForkAndSpecialize_samsung_n
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[ILjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_samsung_o
     },
-    {
+    JNINativeMethod {
         "nativeForkAndSpecialize",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;[I[IZLjava/lang/String;Ljava/lang/String;)I",
         (void *) &nativeForkAndSpecialize_samsung_p
     },
 };
-constexpr int nativeForkAndSpecialize_methods_num = std::size(nativeForkAndSpecialize_methods);
 
 void *nativeSpecializeAppProcess_orig = nullptr;
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_q(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) {
@@ -205,29 +204,28 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     );
     ctx.nativeSpecializeAppProcess_post();
 }
-const JNINativeMethod nativeSpecializeAppProcess_methods[] = {
-    {
+std::array nativeSpecializeAppProcess_methods = {
+    JNINativeMethod {
         "nativeSpecializeAppProcess",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",
         (void *) &nativeSpecializeAppProcess_q
     },
-    {
+    JNINativeMethod {
         "nativeSpecializeAppProcess",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z)V",
         (void *) &nativeSpecializeAppProcess_q_alt
     },
-    {
+    JNINativeMethod {
         "nativeSpecializeAppProcess",
         "(II[II[[IILjava/lang/String;Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;ZZ)V",
         (void *) &nativeSpecializeAppProcess_r
     },
-    {
+    JNINativeMethod {
         "nativeSpecializeAppProcess",
         "(II[II[[IILjava/lang/String;IILjava/lang/String;ZLjava/lang/String;Ljava/lang/String;)V",
         (void *) &nativeSpecializeAppProcess_samsung_q
     },
 };
-constexpr int nativeSpecializeAppProcess_methods_num = std::size(nativeSpecializeAppProcess_methods);
 
 void *nativeForkSystemServer_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkSystemServer_l(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jlong permitted_capabilities, jlong effective_capabilities) {
@@ -250,45 +248,17 @@ void *nativeForkSystemServer_orig = nullptr;
     ctx.nativeForkSystemServer_post();
     return ctx.pid;
 }
-const JNINativeMethod nativeForkSystemServer_methods[] = {
-    {
+std::array nativeForkSystemServer_methods = {
+    JNINativeMethod {
         "nativeForkSystemServer",
         "(II[II[[IJJ)I",
         (void *) &nativeForkSystemServer_l
     },
-    {
+    JNINativeMethod {
         "nativeForkSystemServer",
         "(II[IIII[[IJJ)I",
         (void *) &nativeForkSystemServer_samsung_q
     },
 };
-constexpr int nativeForkSystemServer_methods_num = std::size(nativeForkSystemServer_methods);
 
 } // namespace
-
-static JNINativeMethod *hookAndSaveJNIMethods(const char *className, const JNINativeMethod *methods, int numMethods) {
-    JNINativeMethod *newMethods = nullptr;
-    int clz_id = -1;
-    int hook_cnt = 0;
-    do {
-        if (className == "com/android/internal/os/Zygote"sv) {
-            clz_id = 0;
-            hook_cnt = 3;
-            break;
-        }
-    } while (false);
-    if (hook_cnt) {
-        newMethods = new JNINativeMethod[numMethods];
-        memcpy(newMethods, methods, sizeof(JNINativeMethod) * numMethods);
-    }
-    auto &class_map = (*jni_method_map)[className];
-    for (int i = 0; i < numMethods; ++i) {
-        if (hook_cnt && clz_id == 0) {
-            HOOK_JNI(nativeForkAndSpecialize)
-            HOOK_JNI(nativeSpecializeAppProcess)
-            HOOK_JNI(nativeForkSystemServer)
-        }
-        class_map[methods[i].name][methods[i].signature] = methods[i].fnPtr;
-    }
-    return newMethods;
-}

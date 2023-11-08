@@ -12,14 +12,10 @@
 #include <magisk.hpp>
 
 #include "zygisk.hpp"
-#include "memory.hpp"
 #include "module.hpp"
 #include "deny/deny.hpp"
 
 using namespace std;
-using jni_hook::hash_map;
-using jni_hook::tree_map;
-using xstring = jni_hook::string;
 
 // Extreme verbose logging
 #define ZLOGV(...) ZLOGD(__VA_ARGS__)
@@ -28,7 +24,6 @@ using xstring = jni_hook::string;
 static void hook_unloader();
 static void unhook_functions();
 static void hook_jni_env();
-static void restore_jni_env(JNIEnv *env);
 static void reload_native_bridge(const string &nb);
 
 namespace {
@@ -49,7 +44,6 @@ enum {
 // Global variables
 vector<tuple<dev_t, ino_t, const char *, void **>> *plt_hook_list;
 map<string, vector<JNINativeMethod>, StringCmp> *jni_hook_list;
-hash_map<xstring, tree_map<xstring, tree_map<xstring, void *>>> *jni_method_map;
 bool should_unmap_zygisk = false;
 
 // Current context
@@ -97,14 +91,7 @@ struct HookContext {
 
     HookContext(JNIEnv *env, void *args) :
     env(env), args{args}, process(nullptr), pid(-1), info_flags(0),
-    hook_info_lock(PTHREAD_MUTEX_INITIALIZER) {
-        static bool restored_env = false;
-        if (!restored_env) {
-            restore_jni_env(env);
-            restored_env = true;
-        }
-        g_ctx = this;
-    }
+    hook_info_lock(PTHREAD_MUTEX_INITIALIZER) { g_ctx = this; }
 
     ~HookContext();
 
@@ -224,38 +211,41 @@ DCL_HOOK_FUNC(int, dlclose, void *handle) {
 // -----------------------------------------------------------------
 
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
-    auto class_map = jni_method_map->find(clz);
-    if (class_map == jni_method_map->end()) {
-        for (int i = 0; i < numMethods; ++i) {
+    jclass clazz;
+    if (!runtime_callbacks || !env || !clz || !(clazz = env->FindClass(clz))) {
+        for (auto i = 0; i < numMethods; ++i) {
             methods[i].fnPtr = nullptr;
         }
         return;
     }
 
-    vector<JNINativeMethod> hooks;
-    for (int i = 0; i < numMethods; ++i) {
-        auto method_map = class_map->second.find(methods[i].name);
-        if (method_map != class_map->second.end()) {
-            auto it = method_map->second.find(methods[i].signature);
-            if (it != method_map->second.end()) {
-                // Copy the JNINativeMethod
-                hooks.push_back(methods[i]);
-                // Save the original function pointer
-                methods[i].fnPtr = it->second;
-                // Do not allow double hook, remove method from map
-                method_map->second.erase(it);
-                continue;
+    // Backup existing methods
+    auto total = runtime_callbacks->getNativeMethodCount(env, clazz);
+    vector<JNINativeMethod> old_methods(total);
+    runtime_callbacks->getNativeMethods(env, clazz, old_methods.data(), total);
+
+    // Replace the method
+    for (auto i = 0; i < numMethods; ++i) {
+        auto &method = methods[i];
+        auto res = env->RegisterNatives(clazz, &method, 1);
+        // It's normal that the method is not found
+        if (res == JNI_ERR || env->ExceptionCheck()) {
+            auto exception = env->ExceptionOccurred();
+            if (exception) env->DeleteLocalRef(exception);
+            env->ExceptionClear();
+            method.fnPtr = nullptr;
+        } else {
+            // Find the old function pointer and return to caller
+            for (const auto &old_method : old_methods) {
+                if (strcmp(method.name, old_method.name) == 0 &&
+                    strcmp(method.signature, old_method.signature) == 0) {
+                    ZLOGD("replace %s#%s%s %p -> %p\n", clz,
+                          method.name, method.signature, old_method.fnPtr, method.fnPtr);
+                    method.fnPtr = old_method.fnPtr;
+                }
             }
         }
-        // No matching method found, set fnPtr to null
-        methods[i].fnPtr = nullptr;
     }
-
-    if (hooks.empty())
-        return;
-
-    old_functions->RegisterNatives(
-            env, env->FindClass(clz), hooks.data(), static_cast<int>(hooks.size()));
 }
 
 ZygiskModule::ZygiskModule(int id, void *handle, void *entry)
@@ -643,12 +633,6 @@ HookContext::~HookContext() {
     delete jni_hook_list;
     jni_hook_list = nullptr;
 
-    // Do NOT directly call delete
-    operator delete(jni_method_map);
-    // Directly unmap the whole memory block
-    jni_hook::memory_block::release();
-    jni_method_map = nullptr;
-
     // Strip out all API function pointers
     for (auto &m : modules) {
         m.clearApi();
@@ -844,7 +828,6 @@ static void hook_commit() {
 void hook_functions() {
     default_new(plt_hook_list);
     default_new(jni_hook_list);
-    default_new(jni_method_map);
 
     ino_t android_runtime_inode = 0;
     dev_t android_runtime_dev = 0;
@@ -910,7 +893,8 @@ static void unhook_functions() {
 
 // -----------------------------------------------------------------
 
-static JNINativeMethod *hookAndSaveJNIMethods(const char *, const JNINativeMethod *, int);
+// JNI method hook definitions, auto generated
+#include "jni_hooks.hpp"
 
 static string get_class_name(JNIEnv *env, jclass clazz) {
     static auto class_getName = env->GetMethodID(
@@ -923,13 +907,46 @@ static string get_class_name(JNIEnv *env, jclass clazz) {
     return className;
 }
 
+static void replace_jni_methods(
+        vector<JNINativeMethod> &methods,
+        JNINativeMethod *hook_methods, size_t hook_methods_size,
+        void **orig_function) {
+    for (auto &method : methods) {
+        if (strcmp(method.name, hook_methods[0].name) == 0) {
+            for (auto i = 0; i < hook_methods_size; ++i) {
+                const auto &hook = hook_methods[i];
+                if (strcmp(method.signature, hook.signature) == 0) {
+                    *orig_function = method.fnPtr;
+                    method.fnPtr = hook.fnPtr;
+                    ZLOGI("replace %s\n", method.name);
+                    return;
+                }
+            }
+            ZLOGE("unknown signature of %s%s\n", method.name, method.signature);
+        }
+    }
+}
+
+#define HOOK_JNI(method) \
+replace_jni_methods(newMethods, method##_methods.data(), method##_methods.size(), &method##_orig)
+
 static jint env_RegisterNatives(
         JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
     auto className = get_class_name(env, clazz);
-    ZLOGV("JNIEnv->RegisterNatives [%s]\n", className.data());
-    auto newMethods = unique_ptr<JNINativeMethod[]>(
-            hookAndSaveJNIMethods(className.data(), methods, numMethods));
-    return old_functions->RegisterNatives(env, clazz, newMethods.get() ?: methods, numMethods);
+    if (className == "com/android/internal/os/Zygote") {
+        // Restore JNIEnv as we no longer need to replace anything
+        env->functions = old_functions;
+        delete new_functions;
+        new_functions = nullptr;
+
+        vector<JNINativeMethod> newMethods(methods, methods + numMethods);
+        HOOK_JNI(nativeForkAndSpecialize);
+        HOOK_JNI(nativeSpecializeAppProcess);
+        HOOK_JNI(nativeForkSystemServer);
+        return old_functions->RegisterNatives(env, clazz, newMethods.data(), numMethods);
+    } else {
+        return old_functions->RegisterNatives(env, clazz, methods, numMethods);
+    }
 }
 
 static void hook_jni_env() {
@@ -975,31 +992,3 @@ static void hook_jni_env() {
     old_functions = env->functions;
     env->functions = new_functions;
 }
-
-static void restore_jni_env(JNIEnv *env) {
-    env->functions = old_functions;
-    delete new_functions;
-    new_functions = nullptr;
-}
-
-#define HOOK_JNI(method)                                                                     \
-if (methods[i].name == #method##sv) {                                                        \
-    int j = 0;                                                                               \
-    for (; j < method##_methods_num; ++j) {                                                  \
-        if (strcmp(methods[i].signature, method##_methods[j].signature) == 0) {              \
-            jni_hook_list->try_emplace(className).first->second.push_back(methods[i]);       \
-            method##_orig = methods[i].fnPtr;                                                \
-            newMethods[i] = method##_methods[j];                                             \
-            ZLOGI("replaced %s#" #method "\n", className);                                   \
-            --hook_cnt;                                                                      \
-            break;                                                                           \
-        }                                                                                    \
-    }                                                                                        \
-    if (j == method##_methods_num) {                                                         \
-        ZLOGE("unknown signature of %s#" #method ": %s\n", className, methods[i].signature); \
-    }                                                                                        \
-    continue;                                                                                \
-}
-
-// JNI method hook definitions, auto generated
-#include "jni_hooks.hpp"

@@ -22,9 +22,6 @@
 [submodule "zlib"]
 	path = native/src/external/zlib
 	url = https://android.googlesource.com/platform/external/zlib
-[submodule "parallel-hashmap"]
-	path = native/src/external/parallel-hashmap
-	url = https://github.com/greg7mdp/parallel-hashmap.git
 [submodule "zopfli"]
 	path = native/src/external/zopfli
 	url = https://github.com/google/zopfli.git
