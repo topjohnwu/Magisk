@@ -48,7 +48,6 @@ bool should_unmap_zygisk = false;
 
 // Current context
 HookContext *g_ctx;
-bitset<MAX_FD_SIZE> *g_allowed_fds = nullptr;
 const JNINativeInterface *old_functions = nullptr;
 JNINativeInterface *new_functions = nullptr;
 const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
@@ -71,6 +70,7 @@ struct HookContext {
     int pid;
     bitset<FLAG_MAX> flags;
     uint32_t info_flags;
+    bitset<MAX_FD_SIZE> allowed_fds;
     vector<int> exempted_fds;
 
     struct RegisterInfo {
@@ -411,32 +411,30 @@ int sigmask(int how, int signum) {
 }
 
 void HookContext::fork_pre() {
-    if (g_allowed_fds == nullptr) {
-        default_new(g_allowed_fds);
-
-        auto &allowed_fds = *g_allowed_fds;
-        // Record all open fds
-        auto dir = xopen_dir("/proc/self/fd");
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            int fd = parse_int(entry->d_name);
-            if (fd < 0 || fd >= MAX_FD_SIZE) {
-                close(fd);
-                continue;
-            }
-            allowed_fds[fd] = true;
-        }
-        // The dirfd will be closed once out of scope
-        allowed_fds[dirfd(dir.get())] = false;
-        // logd_fd should be handled separately
-        if (int fd = zygisk_get_logd(); fd >= 0) {
-            allowed_fds[fd] = false;
-        }
-    }
-
     // Do our own fork before loading any 3rd party code
     // First block SIGCHLD, unblock after original fork is done
     sigmask(SIG_BLOCK, SIGCHLD);
     pid = old_fork();
+
+    if (!is_child())
+        return;
+
+    // Record all open fds
+    auto dir = xopen_dir("/proc/self/fd");
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if (fd < 0 || fd >= MAX_FD_SIZE) {
+            close(fd);
+            continue;
+        }
+        allowed_fds[fd] = true;
+    }
+    // The dirfd will be closed once out of scope
+    allowed_fds[dirfd(dir.get())] = false;
+    // logd_fd should be handled separately
+    if (int fd = zygisk_get_logd(); fd >= 0) {
+        allowed_fds[fd] = false;
+    }
 }
 
 void HookContext::fork_post() {
@@ -447,11 +445,10 @@ void HookContext::fork_post() {
 void HookContext::sanitize_fds() {
     zygisk_close_logd();
 
-    if (!is_child() || g_allowed_fds == nullptr) {
+    if (!is_child()) {
         return;
     }
 
-    auto &allowed_fds = *g_allowed_fds;
     if (can_exempt_fd() && !exempted_fds.empty()) {
         auto update_fd_array = [&](int old_len) -> jintArray {
             jintArray array = env->NewIntArray(static_cast<int>(old_len + exempted_fds.size()));
