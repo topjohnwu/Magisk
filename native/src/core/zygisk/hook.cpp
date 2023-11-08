@@ -9,11 +9,10 @@
 #include <lsplt.hpp>
 
 #include <base.hpp>
-#include <magisk.hpp>
+#include <consts.hpp>
 
 #include "zygisk.hpp"
 #include "module.hpp"
-#include "deny/deny.hpp"
 
 using namespace std;
 

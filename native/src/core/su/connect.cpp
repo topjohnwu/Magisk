@@ -3,7 +3,7 @@
 
 #include <base.hpp>
 #include <selinux.hpp>
-#include <magisk.hpp>
+#include <consts.hpp>
 
 #include "su.hpp"
 

@@ -4,9 +4,11 @@
 #include <map>
 
 #include <base.hpp>
+#include <core.hpp>
+#include <resetprop.hpp>
 
-#include "resetprop.hpp"
-#include "../core-rs.hpp"
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <api/_system_properties.h>
 
 using namespace std;
 

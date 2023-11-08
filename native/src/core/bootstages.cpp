@@ -6,13 +6,11 @@
 #include <set>
 #include <string>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <db.hpp>
 #include <base.hpp>
-#include <daemon.hpp>
+#include <core.hpp>
 #include <selinux.hpp>
-
-#include "core.hpp"
 
 using namespace std;
 

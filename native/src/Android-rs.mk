@@ -8,6 +8,7 @@ LIBRARY_PATH = ../out/$(TARGET_ARCH_ABI)/libmagisk-rs.a
 ifneq (,$(wildcard $(LOCAL_PATH)/$(LIBRARY_PATH)))
 include $(CLEAR_VARS)
 LOCAL_MODULE := magisk-rs
+LOCAL_EXPORT_C_INCLUDES := src/core/include
 LOCAL_SRC_FILES := $(LIBRARY_PATH)
 include $(PREBUILT_STATIC_LIBRARY)
 endif

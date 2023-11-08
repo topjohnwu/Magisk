@@ -5,11 +5,10 @@
 #include <utility>
 
 #include <base.hpp>
-#include <magisk.hpp>
-#include <daemon.hpp>
+#include <consts.hpp>
+#include <core.hpp>
 #include <selinux.hpp>
 
-#include "core.hpp"
 #include "node.hpp"
 
 using namespace std;

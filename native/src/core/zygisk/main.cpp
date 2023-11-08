@@ -2,10 +2,9 @@
 #include <android/dlext.h>
 #include <dlfcn.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
-#include <socket.hpp>
-#include <daemon.hpp>
+#include <core.hpp>
 #include <selinux.hpp>
 
 #include "zygisk.hpp"

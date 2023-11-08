@@ -1,4 +1,4 @@
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 
 #include "policy.hpp"

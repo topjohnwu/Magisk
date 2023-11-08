@@ -6,7 +6,7 @@
 #include <map>
 #include <atomic>
 
-#include <daemon.hpp>
+#include <core.hpp>
 
 #define ISOLATED_MAGIC "isolated"
 
@@ -44,9 +44,3 @@ int disable_deny();
 int add_list(int client);
 int rm_list(int client);
 void ls_list(int client);
-
-// Utility functions
-bool is_deny_target(int uid, std::string_view process);
-void revert_unmount();
-
-extern std::atomic<bool> denylist_enforced;

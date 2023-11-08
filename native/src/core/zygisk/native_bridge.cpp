@@ -2,9 +2,10 @@
 #include <dlfcn.h>
 #include <unwind.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
+#include <core.hpp>
+
 #include "zygisk.hpp"
-#include "../core/core.hpp"
 
 static bool is_compatible_with(uint32_t) {
     auto name = get_prop(NBPROP);

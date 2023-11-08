@@ -1,8 +1,9 @@
 #include <set>
 #include <sys/mount.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
+#include <core.hpp>
 
 #include "deny.hpp"
 

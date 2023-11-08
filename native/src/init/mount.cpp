@@ -5,7 +5,7 @@
 
 #include <base.hpp>
 #include <flags.h>
-#include <magisk.hpp>
+#include <consts.hpp>
 
 #include "init.hpp"
 

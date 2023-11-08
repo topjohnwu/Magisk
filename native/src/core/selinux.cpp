@@ -2,10 +2,10 @@
 #include <sys/syscall.h>
 #include <sys/xattr.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <selinux.hpp>
-#include <daemon.hpp>
+#include <core.hpp>
 #include <flags.h>
 
 using namespace std;

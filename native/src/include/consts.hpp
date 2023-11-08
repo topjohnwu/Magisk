@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #define JAVA_PACKAGE_NAME "com.topjohnwu.magisk"
 #define ZYGISKLDR       "libzygisk.so"
 #define NBPROP          "ro.dalvik.vm.native.bridge"
@@ -23,7 +21,6 @@
 #define ROOTOVL       INTLROOT "/rootdir"
 #define SHELLPTS      INTLROOT "/pts"
 #define ROOTMNT       ROOTOVL  "/.mount_list"
-#define ZYGISKBIN     INTLROOT "/zygisk"
 #define SELINUXMOCK   INTLROOT "/selinux"
 #define MAIN_CONFIG   INTLROOT "/config"
 #define MAIN_SOCKET   INTLROOT "/socket"

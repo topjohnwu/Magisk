@@ -7,8 +7,8 @@
 #include <atomic>
 #include <functional>
 
-#include <socket.hpp>
-#include "../core/core-rs.hpp"
+#include "socket.hpp"
+#include "../core-rs.hpp"
 
 #define AID_ROOT   0
 #define AID_SHELL  2000
@@ -65,12 +65,16 @@ struct module_info {
 #endif
 };
 
+extern bool RECOVERY_MODE;
 extern bool zygisk_enabled;
 extern std::vector<module_info> *module_list;
-void reset_zygisk(bool restore);
 
+void reset_zygisk(bool restore);
 extern "C" const char *get_magisk_tmp();
 int connect_daemon(int req, bool create = false);
+std::string find_preinit_device();
+void unlock_blocks();
+void reboot();
 
 // Poll control
 using poll_callback = void(*)(pollfd*);
@@ -88,6 +92,7 @@ void su_daemon_handler(int client, const sock_cred *cred);
 void zygisk_handler(int client, const sock_cred *cred);
 
 // Package
+extern std::atomic<ino_t> pkg_xml_ino;
 void preserve_stub_apk();
 void check_pkg_refresh();
 std::vector<bool> get_app_no_list();
@@ -96,7 +101,26 @@ std::vector<bool> get_app_no_list();
 int get_manager(int user_id = 0, std::string *pkg = nullptr, bool install = false);
 void prune_su_access();
 
+// Module stuffs
+void handle_modules();
+void load_modules();
+void disable_modules();
+void remove_modules();
+void exec_module_scripts(const char *stage);
+
+// Scripting
+void exec_script(const char *script);
+void exec_common_scripts(const char *stage);
+void exec_module_scripts(const char *stage, const std::vector<std::string_view> &modules);
+void install_apk(const char *apk);
+void uninstall_pkg(const char *pkg);
+void clear_pkg(const char *pkg, int user_id);
+[[noreturn]] void install_module(const char *file);
+
 // Denylist
 extern std::atomic_flag skip_pkg_rescan;
-void initialize_denylist();
+extern std::atomic<bool> denylist_enforced;
 int denylist_cli(int argc, char **argv);
+void initialize_denylist();
+bool is_deny_target(int uid, std::string_view process);
+void revert_unmount();

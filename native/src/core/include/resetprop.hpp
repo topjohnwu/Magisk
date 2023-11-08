@@ -4,9 +4,6 @@
 #include <map>
 #include <cxx.h>
 
-#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
-#include <api/_system_properties.h>
-
 struct prop_cb {
     virtual void exec(const char *name, const char *value) = 0;
 };

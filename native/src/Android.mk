@@ -26,19 +26,19 @@ LOCAL_SRC_FILES := \
     core/selinux.cpp \
     core/module.cpp \
     core/thread.cpp \
-    core/resetprop/resetprop.cpp \
     core/core-rs.cpp \
+    core/resetprop/resetprop.cpp \
     core/su/su.cpp \
     core/su/connect.cpp \
     core/su/pts.cpp \
     core/su/su_daemon.cpp \
-    zygisk/entry.cpp \
-    zygisk/main.cpp \
-    zygisk/hook.cpp \
-    zygisk/native_bridge.cpp \
-    zygisk/deny/cli.cpp \
-    zygisk/deny/utils.cpp \
-    zygisk/deny/revert.cpp
+    core/zygisk/entry.cpp \
+    core/zygisk/main.cpp \
+    core/zygisk/hook.cpp \
+    core/zygisk/native_bridge.cpp \
+    core/deny/cli.cpp \
+    core/deny/utils.cpp \
+    core/deny/revert.cpp
 
 LOCAL_LDLIBS := -llog
 LOCAL_LDFLAGS := -Wl,--dynamic-list=src/exported_sym.txt

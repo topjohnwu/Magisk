@@ -6,9 +6,10 @@
 #include <dirent.h>
 #include <set>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <db.hpp>
+#include <core.hpp>
 
 #include "deny.hpp"
 

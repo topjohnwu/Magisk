@@ -2,12 +2,10 @@
 #include <libgen.h>
 
 #include <base.hpp>
-#include <magisk.hpp>
-#include <daemon.hpp>
+#include <consts.hpp>
+#include <core.hpp>
 #include <selinux.hpp>
 #include <flags.h>
-
-#include "core.hpp"
 
 using namespace std;
 

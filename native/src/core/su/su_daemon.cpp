@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <selinux.hpp>
 

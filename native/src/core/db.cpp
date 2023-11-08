@@ -2,12 +2,10 @@
 #include <dlfcn.h>
 #include <sys/stat.h>
 
-#include <magisk.hpp>
-#include <db.hpp>
-#include <socket.hpp>
+#include <consts.hpp>
 #include <base.hpp>
-
-#include "core.hpp"
+#include <db.hpp>
+#include <core.hpp>
 
 #define DB_VERSION 12
 

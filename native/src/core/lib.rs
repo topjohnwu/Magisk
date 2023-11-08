@@ -19,7 +19,7 @@ mod resetprop;
 #[cxx::bridge]
 pub mod ffi {
     extern "C++" {
-        include!("resetprop/resetprop.hpp");
+        include!("include/resetprop.hpp");
 
         #[cxx_name = "prop_cb"]
         type PropCb;

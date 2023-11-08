@@ -3,14 +3,12 @@
 #include <sys/un.h>
 #include <sys/mount.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
-#include <daemon.hpp>
+#include <core.hpp>
 #include <selinux.hpp>
 #include <db.hpp>
 #include <flags.h>
-
-#include "core.hpp"
 
 using namespace std;
 

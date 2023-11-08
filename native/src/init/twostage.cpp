@@ -1,6 +1,6 @@
 #include <sys/mount.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <sys/vfs.h>
 

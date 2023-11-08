@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <jni.h>
 #include <vector>
-#include <daemon.hpp>
+#include <core.hpp>
 
 namespace ZygiskRequest {
 enum : int {

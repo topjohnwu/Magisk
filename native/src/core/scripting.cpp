@@ -2,12 +2,10 @@
 #include <vector>
 #include <sys/wait.h>
 
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <selinux.hpp>
-#include <daemon.hpp>
-
-#include "core.hpp"
+#include <core.hpp>
 
 using namespace std;
 

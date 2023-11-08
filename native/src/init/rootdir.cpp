@@ -3,7 +3,7 @@
 #include <sys/sysmacros.h>
 
 #include <sepolicy.hpp>
-#include <magisk.hpp>
+#include <consts.hpp>
 #include <base.hpp>
 #include <flags.h>
 
