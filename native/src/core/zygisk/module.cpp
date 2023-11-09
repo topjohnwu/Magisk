@@ -98,7 +98,7 @@ void ZygiskModule::setOption(zygisk::Option opt) {
         return;
     switch (opt) {
         case zygisk::FORCE_DENYLIST_UNMOUNT:
-            g_ctx->flags[DO_REVERT_UNMOUNT] = true;
+            g_ctx->flags |= DO_REVERT_UNMOUNT;
             break;
         case zygisk::DLCLOSE_MODULE_LIBRARY:
             unload = true;
@@ -203,45 +203,6 @@ bool HookContext::plt_hook_commit() {
 
 // -----------------------------------------------------------------
 
-static int sigmask(int how, int signum) {
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, signum);
-    return sigprocmask(how, &set, nullptr);
-}
-
-void HookContext::fork_pre() {
-    // Do our own fork before loading any 3rd party code
-    // First block SIGCHLD, unblock after original fork is done
-    sigmask(SIG_BLOCK, SIGCHLD);
-    pid = old_fork();
-
-    if (!is_child())
-        return;
-
-    // Record all open fds
-    auto dir = xopen_dir("/proc/self/fd");
-    for (dirent *entry; (entry = xreaddir(dir.get()));) {
-        int fd = parse_int(entry->d_name);
-        if (fd < 0 || fd >= MAX_FD_SIZE) {
-            close(fd);
-            continue;
-        }
-        allowed_fds[fd] = true;
-    }
-    // The dirfd will be closed once out of scope
-    allowed_fds[dirfd(dir.get())] = false;
-    // logd_fd should be handled separately
-    if (int fd = zygisk_get_logd(); fd >= 0) {
-        allowed_fds[fd] = false;
-    }
-}
-
-void HookContext::fork_post() {
-    // Unblock SIGCHLD in case the original method didn't
-    sigmask(SIG_UNBLOCK, SIGCHLD);
-}
-
 void HookContext::sanitize_fds() {
     zygisk_close_logd();
 
@@ -296,12 +257,55 @@ void HookContext::sanitize_fds() {
 }
 
 bool HookContext::exempt_fd(int fd) {
-    if (flags[POST_SPECIALIZE] || flags[SKIP_CLOSE_LOG_PIPE])
+    if ((flags & POST_SPECIALIZE) || (flags & SKIP_CLOSE_LOG_PIPE))
         return true;
     if (!can_exempt_fd())
         return false;
     exempted_fds.push_back(fd);
     return true;
+}
+
+bool HookContext::can_exempt_fd() const {
+    return (flags & APP_FORK_AND_SPECIALIZE) && args.app->fds_to_ignore;
+}
+
+static int sigmask(int how, int signum) {
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, signum);
+    return sigprocmask(how, &set, nullptr);
+}
+
+void HookContext::fork_pre() {
+    // Do our own fork before loading any 3rd party code
+    // First block SIGCHLD, unblock after original fork is done
+    sigmask(SIG_BLOCK, SIGCHLD);
+    pid = old_fork();
+
+    if (!is_child())
+        return;
+
+    // Record all open fds
+    auto dir = xopen_dir("/proc/self/fd");
+    for (dirent *entry; (entry = xreaddir(dir.get()));) {
+        int fd = parse_int(entry->d_name);
+        if (fd < 0 || fd >= MAX_FD_SIZE) {
+            close(fd);
+            continue;
+        }
+        allowed_fds[fd] = true;
+    }
+    // The dirfd will be closed once out of scope
+    allowed_fds[dirfd(dir.get())] = false;
+    // logd_fd should be handled separately
+    if (int fd = zygisk_get_logd(); fd >= 0) {
+        allowed_fds[fd] = false;
+    }
+}
+
+void HookContext::fork_post() {
+    // Unblock SIGCHLD in case the original method didn't
+    sigmask(SIG_UNBLOCK, SIGCHLD);
 }
 
 void HookContext::run_modules_pre(const vector<int> &fds) {
@@ -312,14 +316,14 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
             continue;
         }
         android_dlextinfo info {
-                .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
-                .library_fd = fds[i],
+            .flags = ANDROID_DLEXT_USE_LIBRARY_FD,
+            .library_fd = fds[i],
         };
         if (void *h = android_dlopen_ext("/jit-cache", RTLD_LAZY, &info)) {
             if (void *e = dlsym(h, "zygisk_module_entry")) {
                 modules.emplace_back(i, h, e);
             }
-        } else if (g_ctx->flags[SERVER_FORK_AND_SPECIALIZE]) {
+        } else if (flags & SERVER_FORK_AND_SPECIALIZE) {
             ZLOGW("Failed to dlopen zygisk module: %s\n", dlerror());
         }
         close(fds[i]);
@@ -335,20 +339,20 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
     }
 
     for (auto &m : modules) {
-        if (flags[APP_SPECIALIZE]) {
+        if (flags & APP_SPECIALIZE) {
             m.preAppSpecialize(args.app);
-        } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
+        } else if (flags & SERVER_FORK_AND_SPECIALIZE) {
             m.preServerSpecialize(args.server);
         }
     }
 }
 
 void HookContext::run_modules_post() {
-    flags[POST_SPECIALIZE] = true;
+    flags |= POST_SPECIALIZE;
     for (const auto &m : modules) {
-        if (flags[APP_SPECIALIZE]) {
+        if (flags & APP_SPECIALIZE) {
             m.postAppSpecialize(args.app);
-        } else if (flags[SERVER_FORK_AND_SPECIALIZE]) {
+        } else if (flags & SERVER_FORK_AND_SPECIALIZE) {
             m.postServerSpecialize(args.server);
         }
         m.tryUnload();
@@ -356,7 +360,7 @@ void HookContext::run_modules_post() {
 }
 
 void HookContext::app_specialize_pre() {
-    flags[APP_SPECIALIZE] = true;
+    flags |= APP_SPECIALIZE;
 
     vector<int> module_fds;
     int fd = remote_get_info(args.app->uid, process, &info_flags, module_fds);
@@ -369,7 +373,7 @@ void HookContext::app_specialize_pre() {
     }
     if ((info_flags & UNMOUNT_MASK) == UNMOUNT_MASK) {
         ZLOGI("[%s] is on the denylist\n", process);
-        flags[DO_REVERT_UNMOUNT] = true;
+        flags |= DO_REVERT_UNMOUNT;
     } else if (fd >= 0) {
         run_modules_pre(module_fds);
     }
@@ -419,7 +423,7 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  specialize [%s]\n", process);
     // App specialize does not check FD
-    flags[SKIP_CLOSE_LOG_PIPE] = true;
+    flags |= SKIP_CLOSE_LOG_PIPE;
     app_specialize_pre();
 }
 
@@ -430,7 +434,7 @@ void HookContext::nativeSpecializeAppProcess_post() {
 
 void HookContext::nativeForkSystemServer_pre() {
     ZLOGV("pre  forkSystemServer\n");
-    flags[SERVER_FORK_AND_SPECIALIZE] = true;
+    flags |= SERVER_FORK_AND_SPECIALIZE;
 
     fork_pre();
     if (is_child()) {
@@ -450,7 +454,7 @@ void HookContext::nativeForkSystemServer_post() {
 void HookContext::nativeForkAndSpecialize_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  forkAndSpecialize [%s]\n", process);
-    flags[APP_FORK_AND_SPECIALIZE] = true;
+    flags |= APP_FORK_AND_SPECIALIZE;
 
     fork_pre();
     if (is_child()) {

@@ -37,7 +37,7 @@ static bool should_unmap_zygisk = false;
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
 
-DCL_HOOK_FUNC(void, androidSetCreateThreadFunc, void *func) {
+DCL_HOOK_FUNC(static void, androidSetCreateThreadFunc, void *func) {
     ZLOGD("androidSetCreateThreadFunc\n");
     hook_jni_env();
     old_androidSetCreateThreadFunc(func);
@@ -49,14 +49,14 @@ DCL_HOOK_FUNC(int, fork) {
 }
 
 // Unmount stuffs in the process's private mount namespace
-DCL_HOOK_FUNC(int, unshare, int flags) {
+DCL_HOOK_FUNC(static int, unshare, int flags) {
     int res = old_unshare(flags);
     if (g_ctx && (flags & CLONE_NEWNS) != 0 && res == 0 &&
         // For some unknown reason, unmounting app_process in SysUI can break.
         // This is reproducible on the official AVD running API 26 and 27.
         // Simply avoid doing any unmounts for SysUI to avoid potential issues.
         (g_ctx->info_flags & PROCESS_IS_SYS_UI) == 0) {
-        if (g_ctx->flags[DO_REVERT_UNMOUNT]) {
+        if (g_ctx->flags & DO_REVERT_UNMOUNT) {
             revert_unmount();
         }
         // Restore errno back to 0
@@ -66,7 +66,7 @@ DCL_HOOK_FUNC(int, unshare, int flags) {
 }
 
 // This is the last moment before the secontext of the process changes
-DCL_HOOK_FUNC(int, selinux_android_setcontext,
+DCL_HOOK_FUNC(static int, selinux_android_setcontext,
               uid_t uid, bool isSystemServer, const char *seinfo, const char *pkgname) {
     // Pre-fetch logd before secontext transition
     zygisk_get_logd();
@@ -74,8 +74,8 @@ DCL_HOOK_FUNC(int, selinux_android_setcontext,
 }
 
 // Close file descriptors to prevent crashing
-DCL_HOOK_FUNC(void, android_log_close) {
-    if (g_ctx == nullptr || !g_ctx->flags[SKIP_CLOSE_LOG_PIPE]) {
+DCL_HOOK_FUNC(static void, android_log_close) {
+    if (g_ctx == nullptr || !(g_ctx->flags & SKIP_CLOSE_LOG_PIPE)) {
         // This happens during forks like nativeForkApp, nativeForkUsap,
         // nativeForkSystemServer, and nativeForkAndSpecialize.
         zygisk_close_logd();
@@ -86,7 +86,7 @@ DCL_HOOK_FUNC(void, android_log_close) {
 // We cannot directly call `dlclose` to unload ourselves, otherwise when `dlclose` returns,
 // it will return to our code which has been unmapped, causing segmentation fault.
 // Instead, we hook `pthread_attr_destroy` which will be called when VM daemon threads start.
-DCL_HOOK_FUNC(int, pthread_attr_destroy, void *target) {
+DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
     int res = old_pthread_attr_destroy((pthread_attr_t *)target);
 
     // Only perform unloading on the main thread
@@ -111,7 +111,7 @@ DCL_HOOK_FUNC(int, pthread_attr_destroy, void *target) {
 }
 
 // it should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
-DCL_HOOK_FUNC(int, dlclose, void *handle) {
+DCL_HOOK_FUNC(static int, dlclose, void *handle) {
     static bool kDone = false;
     if (!kDone) {
         ZLOGV("dlclose zygisk_loader\n");
@@ -126,7 +126,7 @@ DCL_HOOK_FUNC(int, dlclose, void *handle) {
 // -----------------------------------------------------------------
 
 HookContext::HookContext(JNIEnv *env, void *args) :
-    env(env), args{args}, process(nullptr), pid(-1), info_flags(0),
+    env(env), args{args}, process(nullptr), pid(-1), flags(0), info_flags(0),
     hook_info_lock(PTHREAD_MUTEX_INITIALIZER) { g_ctx = this; }
 
 HookContext::~HookContext() {
