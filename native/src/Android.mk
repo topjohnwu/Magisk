@@ -34,8 +34,8 @@ LOCAL_SRC_FILES := \
     core/su/su_daemon.cpp \
     core/zygisk/entry.cpp \
     core/zygisk/main.cpp \
+    core/zygisk/module.cpp \
     core/zygisk/hook.cpp \
-    core/zygisk/native_bridge.cpp \
     core/deny/cli.cpp \
     core/deny/utils.cpp \
     core/deny/revert.cpp

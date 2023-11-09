@@ -27,9 +27,15 @@ enum : int {
 #define ZLOGW(...) LOGW("zygisk32: " __VA_ARGS__)
 #endif
 
+// Extreme verbose logging
+//#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+#define ZLOGV(...) (void*)0
+
 extern void *self_handle;
 
 void hook_functions();
+void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
+
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 
 inline int zygisk_request(int req) {

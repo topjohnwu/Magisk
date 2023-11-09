@@ -1,8 +1,10 @@
 #pragma once
 
-#include "api.hpp"
+#include <regex.h>
+#include <bitset>
+#include <list>
 
-namespace {
+#include "api.hpp"
 
 struct HookContext;
 struct ZygiskModule;
@@ -155,44 +157,23 @@ union ApiTable {
     api_abi_v4 v4;
 };
 
-#define call_app(method)               \
-switch (*mod.api_version) {            \
-case 1:                                \
-case 2: {                              \
-    AppSpecializeArgs_v1 a(args);      \
-    mod.v1->method(mod.v1->impl, &a);  \
-    break;                             \
-}                                      \
-case 3:                                \
-case 4:                                \
-    mod.v1->method(mod.v1->impl, args);\
-    break;                             \
-}
-
 struct ZygiskModule {
 
     void onLoad(void *env) {
         entry.fn(&api, env);
     }
-    void preAppSpecialize(AppSpecializeArgs_v3 *args) const {
-        call_app(preAppSpecialize)
-    }
-    void postAppSpecialize(const AppSpecializeArgs_v3 *args) const {
-        call_app(postAppSpecialize)
-    }
-    void preServerSpecialize(ServerSpecializeArgs_v1 *args) const {
-        mod.v1->preServerSpecialize(mod.v1->impl, args);
-    }
-    void postServerSpecialize(const ServerSpecializeArgs_v1 *args) const {
-        mod.v1->postServerSpecialize(mod.v1->impl, args);
-    }
+
+    void preAppSpecialize(AppSpecializeArgs_v3 *args) const;
+    void postAppSpecialize(const AppSpecializeArgs_v3 *args) const;
+    void preServerSpecialize(ServerSpecializeArgs_v1 *args) const;
+    void postServerSpecialize(const ServerSpecializeArgs_v1 *args) const;
 
     bool valid() const;
     int connectCompanion() const;
     int getModuleDir() const;
     void setOption(zygisk::Option opt);
     static uint32_t getFlags();
-    void tryUnload() const { if (unload) dlclose(handle); }
+    void tryUnload() const;
     void clearApi() { memset(&api, 0, sizeof(api)); }
     int getId() const { return id; }
 
@@ -218,4 +199,82 @@ private:
     } mod;
 };
 
-} // namespace
+extern HookContext *g_ctx;
+extern int (*old_fork)(void);
+
+enum {
+    POST_SPECIALIZE,
+    APP_FORK_AND_SPECIALIZE,
+    APP_SPECIALIZE,
+    SERVER_FORK_AND_SPECIALIZE,
+    DO_REVERT_UNMOUNT,
+    SKIP_CLOSE_LOG_PIPE,
+
+    FLAG_MAX
+};
+
+#define MAX_FD_SIZE 1024
+
+#define DCL_PRE_POST(name) \
+void name##_pre();         \
+void name##_post();
+
+struct HookContext {
+    JNIEnv *env;
+    union {
+        void *ptr;
+        AppSpecializeArgs_v3 *app;
+        ServerSpecializeArgs_v1 *server;
+    } args;
+
+    const char *process;
+    std::list<ZygiskModule> modules;
+
+    int pid;
+    std::bitset<FLAG_MAX> flags;
+    uint32_t info_flags;
+    std::bitset<MAX_FD_SIZE> allowed_fds;
+    std::vector<int> exempted_fds;
+
+    struct RegisterInfo {
+        regex_t regex;
+        std::string symbol;
+        void *callback;
+        void **backup;
+    };
+
+    struct IgnoreInfo {
+        regex_t regex;
+        std::string symbol;
+    };
+
+    pthread_mutex_t hook_info_lock;
+    std::vector<RegisterInfo> register_info;
+    std::vector<IgnoreInfo> ignore_info;
+
+    HookContext(JNIEnv *env, void *args);
+    ~HookContext();
+
+    void run_modules_pre(const std::vector<int> &fds);
+    void run_modules_post();
+    DCL_PRE_POST(fork)
+    DCL_PRE_POST(app_specialize)
+    DCL_PRE_POST(server_specialize)
+    DCL_PRE_POST(nativeForkAndSpecialize)
+    DCL_PRE_POST(nativeSpecializeAppProcess)
+    DCL_PRE_POST(nativeForkSystemServer)
+
+    void sanitize_fds();
+    bool exempt_fd(int fd);
+    bool is_child() const { return pid <= 0; }
+    bool can_exempt_fd() const { return flags[APP_FORK_AND_SPECIALIZE] && args.app->fds_to_ignore; }
+
+    // Compatibility shim
+    void plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup);
+    void plt_hook_exclude(const char *regex, const char *symbol);
+    void plt_hook_process_regex();
+
+    bool plt_hook_commit();
+};
+
+#undef DCL_PRE_POST
