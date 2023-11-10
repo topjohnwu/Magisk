@@ -28,8 +28,8 @@ enum : int {
 #endif
 
 // Extreme verbose logging
-//#define ZLOGV(...) ZLOGD(__VA_ARGS__)
-#define ZLOGV(...) (void*)0
+#define ZLOGV(...) ZLOGD(__VA_ARGS__)
+//#define ZLOGV(...) (void*)0
 
 extern void *self_handle;
 

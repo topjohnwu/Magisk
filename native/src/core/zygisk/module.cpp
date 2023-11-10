@@ -148,7 +148,7 @@ void ZygiskModule::postServerSpecialize(const ServerSpecializeArgs_v1 *args) con
 
 // -----------------------------------------------------------------
 
-void HookContext::plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup) {
+void ZygiskContext::plt_hook_register(const char *regex, const char *symbol, void *fn, void **backup) {
     if (regex == nullptr || symbol == nullptr || fn == nullptr)
         return;
     regex_t re;
@@ -158,7 +158,7 @@ void HookContext::plt_hook_register(const char *regex, const char *symbol, void 
     register_info.emplace_back(RegisterInfo{re, symbol, fn, backup});
 }
 
-void HookContext::plt_hook_exclude(const char *regex, const char *symbol) {
+void ZygiskContext::plt_hook_exclude(const char *regex, const char *symbol) {
     if (!regex) return;
     regex_t re;
     if (regcomp(&re, regex, REG_NOSUB) != 0)
@@ -167,7 +167,7 @@ void HookContext::plt_hook_exclude(const char *regex, const char *symbol) {
     ignore_info.emplace_back(IgnoreInfo{re, symbol ?: ""});
 }
 
-void HookContext::plt_hook_process_regex() {
+void ZygiskContext::plt_hook_process_regex() {
     if (register_info.empty())
         return;
     for (auto &map : lsplt::MapInfo::Scan()) {
@@ -191,7 +191,7 @@ void HookContext::plt_hook_process_regex() {
     }
 }
 
-bool HookContext::plt_hook_commit() {
+bool ZygiskContext::plt_hook_commit() {
     {
         mutex_guard lock(hook_info_lock);
         plt_hook_process_regex();
@@ -203,7 +203,7 @@ bool HookContext::plt_hook_commit() {
 
 // -----------------------------------------------------------------
 
-void HookContext::sanitize_fds() {
+void ZygiskContext::sanitize_fds() {
     zygisk_close_logd();
 
     if (!is_child()) {
@@ -256,7 +256,7 @@ void HookContext::sanitize_fds() {
     }
 }
 
-bool HookContext::exempt_fd(int fd) {
+bool ZygiskContext::exempt_fd(int fd) {
     if ((flags & POST_SPECIALIZE) || (flags & SKIP_CLOSE_LOG_PIPE))
         return true;
     if (!can_exempt_fd())
@@ -265,7 +265,7 @@ bool HookContext::exempt_fd(int fd) {
     return true;
 }
 
-bool HookContext::can_exempt_fd() const {
+bool ZygiskContext::can_exempt_fd() const {
     return (flags & APP_FORK_AND_SPECIALIZE) && args.app->fds_to_ignore;
 }
 
@@ -276,7 +276,7 @@ static int sigmask(int how, int signum) {
     return sigprocmask(how, &set, nullptr);
 }
 
-void HookContext::fork_pre() {
+void ZygiskContext::fork_pre() {
     // Do our own fork before loading any 3rd party code
     // First block SIGCHLD, unblock after original fork is done
     sigmask(SIG_BLOCK, SIGCHLD);
@@ -303,12 +303,12 @@ void HookContext::fork_pre() {
     }
 }
 
-void HookContext::fork_post() {
+void ZygiskContext::fork_post() {
     // Unblock SIGCHLD in case the original method didn't
     sigmask(SIG_UNBLOCK, SIGCHLD);
 }
 
-void HookContext::run_modules_pre(const vector<int> &fds) {
+void ZygiskContext::run_modules_pre(const vector<int> &fds) {
     for (int i = 0; i < fds.size(); ++i) {
         struct stat s{};
         if (fstat(fds[i], &s) != 0 || !S_ISREG(s.st_mode)) {
@@ -347,7 +347,7 @@ void HookContext::run_modules_pre(const vector<int> &fds) {
     }
 }
 
-void HookContext::run_modules_post() {
+void ZygiskContext::run_modules_post() {
     flags |= POST_SPECIALIZE;
     for (const auto &m : modules) {
         if (flags & APP_SPECIALIZE) {
@@ -359,7 +359,7 @@ void HookContext::run_modules_post() {
     }
 }
 
-void HookContext::app_specialize_pre() {
+void ZygiskContext::app_specialize_pre() {
     flags |= APP_SPECIALIZE;
 
     vector<int> module_fds;
@@ -380,7 +380,7 @@ void HookContext::app_specialize_pre() {
     close(fd);
 }
 
-void HookContext::app_specialize_post() {
+void ZygiskContext::app_specialize_post() {
     run_modules_post();
     if (info_flags & PROCESS_IS_MAGISK_APP) {
         setenv("ZYGISK_ENABLED", "1", 1);
@@ -390,7 +390,7 @@ void HookContext::app_specialize_post() {
     env->ReleaseStringUTFChars(args.app->nice_name, process);
 }
 
-void HookContext::server_specialize_pre() {
+void ZygiskContext::server_specialize_pre() {
     vector<int> module_fds;
     int fd = remote_get_info(1000, "system_server", &info_flags, module_fds);
     if (fd >= 0) {
@@ -413,13 +413,13 @@ void HookContext::server_specialize_pre() {
     }
 }
 
-void HookContext::server_specialize_post() {
+void ZygiskContext::server_specialize_post() {
     run_modules_post();
 }
 
 // -----------------------------------------------------------------
 
-void HookContext::nativeSpecializeAppProcess_pre() {
+void ZygiskContext::nativeSpecializeAppProcess_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  specialize [%s]\n", process);
     // App specialize does not check FD
@@ -427,12 +427,12 @@ void HookContext::nativeSpecializeAppProcess_pre() {
     app_specialize_pre();
 }
 
-void HookContext::nativeSpecializeAppProcess_post() {
+void ZygiskContext::nativeSpecializeAppProcess_post() {
     ZLOGV("post specialize [%s]\n", process);
     app_specialize_post();
 }
 
-void HookContext::nativeForkSystemServer_pre() {
+void ZygiskContext::nativeForkSystemServer_pre() {
     ZLOGV("pre  forkSystemServer\n");
     flags |= SERVER_FORK_AND_SPECIALIZE;
 
@@ -443,7 +443,7 @@ void HookContext::nativeForkSystemServer_pre() {
     sanitize_fds();
 }
 
-void HookContext::nativeForkSystemServer_post() {
+void ZygiskContext::nativeForkSystemServer_post() {
     if (is_child()) {
         ZLOGV("post forkSystemServer\n");
         server_specialize_post();
@@ -451,7 +451,7 @@ void HookContext::nativeForkSystemServer_post() {
     fork_post();
 }
 
-void HookContext::nativeForkAndSpecialize_pre() {
+void ZygiskContext::nativeForkAndSpecialize_pre() {
     process = env->GetStringUTFChars(args.app->nice_name, nullptr);
     ZLOGV("pre  forkAndSpecialize [%s]\n", process);
     flags |= APP_FORK_AND_SPECIALIZE;
@@ -463,7 +463,7 @@ void HookContext::nativeForkAndSpecialize_pre() {
     sanitize_fds();
 }
 
-void HookContext::nativeForkAndSpecialize_post() {
+void ZygiskContext::nativeForkAndSpecialize_post() {
     if (is_child()) {
         ZLOGV("post forkAndSpecialize [%s]\n", process);
         app_specialize_post();

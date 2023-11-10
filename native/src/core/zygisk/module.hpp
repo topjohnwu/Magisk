@@ -6,7 +6,7 @@
 
 #include "api.hpp"
 
-struct HookContext;
+struct ZygiskContext;
 struct ZygiskModule;
 
 struct AppSpecializeArgs_v1;
@@ -199,7 +199,7 @@ private:
     } mod;
 };
 
-extern HookContext *g_ctx;
+extern ZygiskContext *g_ctx;
 extern int (*old_fork)(void);
 
 enum : uint32_t {
@@ -217,7 +217,7 @@ enum : uint32_t {
 void name##_pre();         \
 void name##_post();
 
-struct HookContext {
+struct ZygiskContext {
     JNIEnv *env;
     union {
         void *ptr;
@@ -250,8 +250,8 @@ struct HookContext {
     std::vector<RegisterInfo> register_info;
     std::vector<IgnoreInfo> ignore_info;
 
-    HookContext(JNIEnv *env, void *args);
-    ~HookContext();
+    ZygiskContext(JNIEnv *env, void *args);
+    ~ZygiskContext();
 
     void run_modules_pre(const std::vector<int> &fds);
     void run_modules_post();
