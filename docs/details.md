@@ -110,4 +110,4 @@ Before Android 8.0, all allowed su client domains are allowed to directly connec
 
 After Android 8.0, to reduce relaxation of rules in Android's sandbox, a new SELinux model is deployed. The `magisk` binary is labelled with `magisk_exec` file type, and processes running as allowed su client domains executing the `magisk` binary (this includes the `su` command) will transit to `magisk_client` by using a `type_transition` rule. Rules strictly restrict that only `magisk` domain processes are allowed to attribute files to `magisk_exec`. Direct connection to sockets of `magiskd` are not allowed; the only way to access the daemon is through a `magisk_client` process. These changes allow us to keep the sandbox intact, and keep Magisk specific rules separated from the rest of the policies.
 
-The full set of rules can be found in `magiskpolicy/rules.cpp`.
+The full set of rules can be found in `sepolicy/rules.cpp`.

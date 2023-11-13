@@ -49,7 +49,8 @@ fn print_dtb_usage() {
 Do dtb related actions to <file>.
 
 Supported actions:
-  print [-f] Print all contents of dtb for debugging
+  print [-f]
+    Print all contents of dtb for debugging
     Specify [-f] to only print fstab nodes
   patch
     Search for fstab and remove verity/avb
