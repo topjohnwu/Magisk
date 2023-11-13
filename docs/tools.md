@@ -16,7 +16,7 @@ su -> magisk
 
 A tool to unpack / repack boot images, parse / patch / extract cpio, patch dtb, hex patch binaries, and compress / decompress files with multiple algorithms.
 
-`magiskboot` natively supports (which means it does not rely on external tools) common compression formats including `gzip`, `lz4`, `lz4_legacy` ([only used on LG](https://events.static.linuxfound.org/sites/events/files/lcjpcojp13_klee.pdf)), `lzma`, `xz`, and `bzip2`.
+`magiskboot` natively supports (which means it does not rely on external tools) common compression formats including `gzip`, `lz4`, `lz4_legacy` , `lz4_lg` ([the LG edition](https://events.static.linuxfound.org/sites/events/files/lcjpcojp13_klee.pdf) of `lz4_legacy`, only used on LG), `lzma`, `xz`, and `bzip2`.
 
 The concept of `magiskboot` is to make boot image modification simpler. For unpacking, it parses the header and extracts all sections in the image, decompressing on-the-fly if compression is detected in any sections. For repacking, the original boot image is required so the original headers can be used, changing only the necessary entries such as section sizes and checksum. All sections will be compressed back to the original format if required. The tool also supports many CPIO and DTB operations.
 
@@ -51,6 +51,28 @@ Supported actions:
     If env variable PATCHVBMETAFLAG is set to true, all disable flags in
     the boot image's vbmeta header will be set.
 
+  verify <bootimg> [x509.pem]
+    Check whether the boot image is signed with AVB 1.0 signature.
+    Optionally provide a certificate to verify whether the image is
+    signed by the public key certificate.
+    Return value:
+    0:valid    1:error
+
+  sign <bootimg> [name] [x509.pem pk8]
+    Sign <bootimg> with AVB 1.0 signature.
+    Optionally provide the name of the image (default: '/boot').
+    Optionally provide the certificate/private key pair for signing.
+    If the certificate/private key pair is not provided, the AOSP
+    verity key bundled in the executable will be used.
+
+  extract <payload.bin> [partition] [outfile]
+    Extract [partition] from <payload.bin> to [outfile].
+    If [outfile] is not specified, then output to '[partition].img'.
+    If [partition] is not specified, then attempt to extract either
+    'init_boot' or 'boot'. Which partition was chosen can be determined
+    by whichever 'init_boot.img' or 'boot.img' exists.
+    <payload.bin> can be '-' to be STDIN.
+
   hexpatch <file> <hexpattern1> <hexpattern2>
     Search <hexpattern1> in <file>, and replace it with <hexpattern2>
 
@@ -83,8 +105,6 @@ Supported actions:
         Create ramdisk backups from ORIG
       restore
         Restore ramdisk from ramdisk backup stored within incpio
-      sha1
-        Print stock boot SHA1 if previously backed up in ramdisk
 
   dtb <file> <action> [args...]
     Do dtb related actions to <file>
@@ -222,7 +242,7 @@ Options:
    -v                        print running daemon version
    -V                        print running daemon version code
    --list                    list all available applets
-   --remove-modules          remove all modules and reboot
+   --remove-modules [-n]     remove all modules, reboot if -n is not provided
    --install-module ZIP      install a module zip file
 
 Advanced Options (Internal APIs):
@@ -237,6 +257,7 @@ Advanced Options (Internal APIs):
    --sqlite SQL              exec SQL commands to Magisk database
    --path                    print Magisk tmpfs mount path
    --denylist ARGS           denylist config CLI
+   --preinit-device          resolve a device to store preinit files
 
 Available applets:
     su, resetprop
@@ -261,19 +282,23 @@ An applet of `magisk`, the MagiskSU entry point. Good old `su` command.
 Usage: su [options] [-] [user [argument...]]
 
 Options:
-  -c, --command COMMAND         pass COMMAND to the invoked shell
-  -h, --help                    display this help message and exit
-  -, -l, --login                pretend the shell to be a login shell
+  -c, --command COMMAND         Pass COMMAND to the invoked shell
+  -g, --group GROUP             Specify the primary group
+  -G, --supp-group GROUP        Specify a supplementary group.
+                                The first specified supplementary group is also used
+                                as a primary group if the option -g is not specified.
+  -Z, --context CONTEXT         Change SELinux context
+  -t, --target PID              PID to take mount namespace from
+  -h, --help                    Display this help message and exit
+  -, -l, --login                Pretend the shell to be a login shell
   -m, -p,
-  --preserve-environment        preserve the entire environment
-  -s, --shell SHELL             use SHELL instead of the default /system/bin/sh
-  -v, --version                 display version number and exit
-  -V                            display version code and exit
+  --preserve-environment        Preserve the entire environment
+  -s, --shell SHELL             Use SHELL instead of the default /system/bin/sh
+  -v, --version                 Display version number and exit
+  -V                            Display version code and exit
   -mm, -M,
-  --mount-master                force run in the global mount namespace
+  --mount-master                Force run in the global mount namespace
 ```
-
-Note: even though the `-Z, --context` option is not listed above, the option still exists for CLI compatibility with apps designed for SuperSU. However the option is silently ignored since it's no longer relevant.
 
 ### resetprop
 
