@@ -11,11 +11,10 @@
 #include "xwrap.hpp"
 
 #define DISALLOW_COPY_AND_MOVE(clazz) \
-clazz(const clazz &) = delete;        \
+clazz(const clazz&) = delete;        \
 clazz(clazz &&) = delete;
 
 #define ALLOW_MOVE_ONLY(clazz) \
-clazz() = default;             \
 clazz(const clazz&) = delete;  \
 clazz(clazz &&o) { swap(o); }  \
 clazz& operator=(clazz &&o) { swap(o); return *this; }
@@ -211,11 +210,27 @@ class byte_channel;
 struct heap_data : public byte_data {
     ALLOW_MOVE_ONLY(heap_data)
 
+    heap_data() = default;
     explicit heap_data(size_t sz) : byte_data(calloc(sz, 1), sz) {}
     ~heap_data() { free(_buf); }
 
     // byte_channel needs to reallocate the internal buffer
     friend byte_channel;
+};
+
+struct owned_fd {
+    ALLOW_MOVE_ONLY(owned_fd)
+
+    owned_fd() : fd(-1) {}
+    owned_fd(int fd) : fd(fd) {}
+    ~owned_fd() { close(fd); fd = -1; }
+
+    operator int() { return fd; }
+    int release() { int f = fd; fd = -1; return f; }
+    void swap(owned_fd &owned) { std::swap(fd, owned.fd); }
+
+private:
+    int fd;
 };
 
 rust::Vec<size_t> mut_u8_patch(

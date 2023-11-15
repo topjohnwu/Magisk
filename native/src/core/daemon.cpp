@@ -211,7 +211,7 @@ static bool is_client(pid_t pid) {
 }
 
 static void handle_request(pollfd *pfd) {
-    int client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
+    owned_fd client = xaccept4(pfd->fd, nullptr, nullptr, SOCK_CLOEXEC);
 
     // Verify client credentials
     sock_cred cred;
@@ -221,7 +221,7 @@ static void handle_request(pollfd *pfd) {
 
     if (!get_client_cred(client, &cred)) {
         // Client died
-        goto done;
+        return;
     }
     is_root = cred.uid == AID_ROOT;
     is_zygote = cred.context == "u:r:zygote:s0";
@@ -229,7 +229,7 @@ static void handle_request(pollfd *pfd) {
     if (!is_root && !is_zygote && !is_client(cred.pid)) {
         // Unsupported client state
         write_int(client, MainResponse::ACCESS_DENIED);
-        goto done;
+        return;
     }
 
     code = read_int(client);
@@ -237,7 +237,7 @@ static void handle_request(pollfd *pfd) {
         code == MainRequest::_SYNC_BARRIER_ ||
         code == MainRequest::_STAGE_BARRIER_) {
         // Unknown request code
-        goto done;
+        return;
     }
 
     // Check client permissions
@@ -251,20 +251,20 @@ static void handle_request(pollfd *pfd) {
     case MainRequest::STOP_DAEMON:
         if (!is_root) {
             write_int(client, MainResponse::ROOT_REQUIRED);
-            goto done;
+            return;
         }
         break;
     case MainRequest::REMOVE_MODULES:
         if (!is_root && cred.uid != AID_SHELL) {
             write_int(client, MainResponse::ACCESS_DENIED);
-            goto done;
+            return;
         }
         break;
     case MainRequest::ZYGISK:
         if (!is_zygote) {
             // Invalid client context
             write_int(client, MainResponse::ACCESS_DENIED);
-            goto done;
+            return;
         }
         break;
     default:
@@ -275,16 +275,11 @@ static void handle_request(pollfd *pfd) {
 
     if (code < MainRequest::_SYNC_BARRIER_) {
         handle_request_sync(client, code);
-        goto done;
     } else if (code < MainRequest::_STAGE_BARRIER_) {
-        exec_task([=] { handle_request_async(client, code, cred); });
+        exec_task([=, fd = client.release()] { handle_request_async(fd, code, cred); });
     } else {
-        exec_task([=] { boot_stage_handler(client, code); });
+        exec_task([=, fd = client.release()] { boot_stage_handler(fd, code); });
     }
-    return;
-
-done:
-    close(client);
 }
 
 static void switch_cgroup(const char *cgroup, int pid) {
