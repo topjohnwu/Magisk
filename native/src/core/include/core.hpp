@@ -19,6 +19,22 @@
 #define to_app_id(uid)  (uid % AID_USER_OFFSET)
 #define to_user_id(uid) (uid / AID_USER_OFFSET)
 
+struct MagiskD {
+    // Binding to Rust
+    void setup_logfile() const noexcept { impl.setup_logfile(); }
+    bool is_emulator() const noexcept { return impl.is_emulator(); }
+    bool is_recovery() const noexcept { return impl.is_recovery(); }
+
+    // C++ implementation
+    void reboot() const;
+    void post_fs_data() const;
+    void late_start() const;
+    void boot_complete() const;
+
+private:
+    const rust::MagiskD &impl = rust::get_magiskd();
+};
+
 // Daemon command codes
 namespace MainRequest {
 enum : int {
@@ -65,7 +81,6 @@ struct module_info {
 #endif
 };
 
-extern bool RECOVERY_MODE;
 extern bool zygisk_enabled;
 extern std::vector<module_info> *module_list;
 

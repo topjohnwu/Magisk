@@ -52,6 +52,7 @@ pub mod ffi {
         fn close_log_pipe(self: &MagiskD);
         fn setup_logfile(self: &MagiskD);
         fn is_emulator(self: &MagiskD) -> bool;
+        fn is_recovery(self: &MagiskD) -> bool;
     }
 }
 

@@ -14,8 +14,6 @@ using namespace std;
 
 int SDK_INT = -1;
 
-bool RECOVERY_MODE = false;
-
 static struct stat self_st;
 
 static map<int, poll_callback> *poll_map;
@@ -130,6 +128,13 @@ static void poll_ctrl_handler(pollfd *pfd) {
     }
 }
 
+void MagiskD::reboot() const {
+    if (is_recovery())
+        exec_command_sync("/system/bin/reboot", "recovery");
+    else
+        exec_command_sync("/system/bin/reboot");
+}
+
 static void handle_request_async(int client, int code, const sock_cred &cred) {
     switch (code) {
     case MainRequest::DENYLIST:
@@ -153,7 +158,10 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         remove_modules();
         write_int(client, 0);
         close(client);
-        if (do_reboot) reboot();
+        if (do_reboot) {
+            MagiskD daemon;
+            daemon.reboot();
+        }
         break;
     }
     case MainRequest::ZYGISK:
@@ -370,14 +378,6 @@ static void daemon_entry() {
     }
     ssprintf(path, sizeof(path), "%s/" ROOTOVL, tmp);
     rm_rf(path);
-
-    // Load config status
-    ssprintf(path, sizeof(path), "%s/" MAIN_CONFIG, tmp);
-    parse_prop_file(path, [](auto key, auto val) -> bool {
-        if (key == "RECOVERYMODE" && val == "true")
-            RECOVERY_MODE = true;
-        return true;
-    });
 
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {

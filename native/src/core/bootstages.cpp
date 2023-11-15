@@ -243,13 +243,6 @@ static bool magisk_env() {
     return true;
 }
 
-void reboot() {
-    if (RECOVERY_MODE)
-        exec_command_sync("/system/bin/reboot", "recovery");
-    else
-        exec_command_sync("/system/bin/reboot");
-}
-
 static bool check_data() {
     bool mnt = false;
     file_readline("/proc/mounts", [&](string_view s) {
@@ -347,11 +340,11 @@ static bool check_key_combo() {
 
 extern int disable_deny();
 
-static void post_fs_data() {
+void MagiskD::post_fs_data() const {
     if (!check_data())
         return;
 
-    rust::get_magiskd().setup_logfile();
+    setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
 
@@ -390,8 +383,8 @@ early_abort:
     boot_state |= FLAG_POST_FS_DATA_DONE;
 }
 
-static void late_start() {
-    rust::get_magiskd().setup_logfile();
+void MagiskD::late_start() const {
+    setup_logfile();
 
     LOGI("** late_start service mode running\n");
 
@@ -401,9 +394,9 @@ static void late_start() {
     boot_state |= FLAG_LATE_START_DONE;
 }
 
-static void boot_complete() {
+void MagiskD::boot_complete() const {
     boot_state |= FLAG_BOOT_COMPLETE;
-    rust::get_magiskd().setup_logfile();
+    setup_logfile();
 
     LOGI("** boot-complete triggered\n");
 
@@ -422,22 +415,23 @@ void boot_stage_handler(int client, int code) {
     // Make sure boot stage execution is always serialized
     static pthread_mutex_t stage_lock = PTHREAD_MUTEX_INITIALIZER;
     mutex_guard lock(stage_lock);
+    MagiskD daemon;
 
     switch (code) {
     case MainRequest::POST_FS_DATA:
         if ((boot_state & FLAG_POST_FS_DATA_DONE) == 0)
-            post_fs_data();
+            daemon.post_fs_data();
         close(client);
         break;
     case MainRequest::LATE_START:
         close(client);
         if ((boot_state & FLAG_POST_FS_DATA_DONE) && (boot_state & FLAG_SAFE_MODE) == 0)
-            late_start();
+            daemon.late_start();
         break;
     case MainRequest::BOOT_COMPLETE:
         close(client);
         if ((boot_state & FLAG_SAFE_MODE) == 0)
-            boot_complete();
+            daemon.boot_complete();
         break;
     default:
         __builtin_unreachable();

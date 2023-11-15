@@ -20,3 +20,10 @@ macro_rules! LOG_PIPE {
         concat!($crate::INTLROOT!(), "/log")
     };
 }
+
+#[macro_export]
+macro_rules! MAIN_CONFIG {
+    () => {
+        concat!($crate::INTLROOT!(), "/config")
+    };
+}
