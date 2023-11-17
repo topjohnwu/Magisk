@@ -58,12 +58,12 @@ int magisk_main(int argc, char *argv[]) {
 #endif
         return 0;
     } else if (argv[1] == "-v"sv) {
-        int fd = connect_daemon(MainRequest::CHECK_VERSION);
+        int fd = connect_daemon(+RequestCode::CHECK_VERSION);
         string v = read_string(fd);
         printf("%s\n", v.data());
         return 0;
     } else if (argv[1] == "-V"sv) {
-        int fd = connect_daemon(MainRequest::CHECK_VERSION_CODE);
+        int fd = connect_daemon(+RequestCode::CHECK_VERSION_CODE);
         printf("%d\n", read_int(fd));
         return 0;
     } else if (argv[1] == "--list"sv) {
@@ -83,29 +83,29 @@ int magisk_main(int argc, char *argv[]) {
         cp_afc(argv[2], argv[3]);
         return 0;
     } else if (argv[1] == "--daemon"sv) {
-        close(connect_daemon(MainRequest::START_DAEMON, true));
+        close(connect_daemon(+RequestCode::START_DAEMON, true));
         return 0;
     } else if (argv[1] == "--stop"sv) {
-        int fd = connect_daemon(MainRequest::STOP_DAEMON);
+        int fd = connect_daemon(+RequestCode::STOP_DAEMON);
         return read_int(fd);
     } else if (argv[1] == "--post-fs-data"sv) {
-        int fd = connect_daemon(MainRequest::POST_FS_DATA, true);
+        int fd = connect_daemon(+RequestCode::POST_FS_DATA, true);
         struct pollfd pfd = { fd, POLLIN, 0 };
         poll(&pfd, 1, 1000 * POST_FS_DATA_WAIT_TIME);
         return 0;
     } else if (argv[1] == "--service"sv) {
-        close(connect_daemon(MainRequest::LATE_START, true));
+        close(connect_daemon(+RequestCode::LATE_START, true));
         return 0;
     } else if (argv[1] == "--boot-complete"sv) {
-        close(connect_daemon(MainRequest::BOOT_COMPLETE));
+        close(connect_daemon(+RequestCode::BOOT_COMPLETE));
         return 0;
     } else if (argv[1] == "--zygote-restart"sv) {
-        close(connect_daemon(MainRequest::ZYGOTE_RESTART));
+        close(connect_daemon(+RequestCode::ZYGOTE_RESTART));
         return 0;
     } else if (argv[1] == "--denylist"sv) {
         return denylist_cli(argc - 1, argv + 1);
     } else if (argc >= 3 && argv[1] == "--sqlite"sv) {
-        int fd = connect_daemon(MainRequest::SQLITE_CMD);
+        int fd = connect_daemon(+RequestCode::SQLITE_CMD);
         write_string(fd, argv[2]);
         string res;
         for (;;) {
@@ -123,7 +123,7 @@ int magisk_main(int argc, char *argv[]) {
         } else {
             usage();
         }
-        int fd = connect_daemon(MainRequest::REMOVE_MODULES);
+        int fd = connect_daemon(+RequestCode::REMOVE_MODULES);
         write_int(fd, do_reboot);
         return read_int(fd);
     } else if (argv[1] == "--path"sv) {

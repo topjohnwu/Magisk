@@ -39,7 +39,7 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 
 inline int zygisk_request(int req) {
-    int fd = connect_daemon(MainRequest::ZYGISK);
+    int fd = connect_daemon(+RequestCode::ZYGISK);
     if (fd < 0) return fd;
     write_int(fd, req);
     return fd;

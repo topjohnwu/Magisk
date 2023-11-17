@@ -3,7 +3,7 @@ use std::ffi::{c_char, c_void};
 use std::fmt::Write as FmtWrite;
 use std::fs::File;
 use std::io::{IoSlice, Read, Write};
-use std::os::fd::{AsRawFd, FromRawFd, RawFd};
+use std::os::fd::{FromRawFd, RawFd};
 use std::ptr::null_mut;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::{fs, io};
@@ -380,14 +380,6 @@ impl MagiskD {
             *self.logd.lock().unwrap() = Some(File::from_raw_fd(write));
             new_daemon_thread(logfile_writer, read as *mut c_void);
         }
-    }
-
-    pub fn get_log_pipe(&self) -> RawFd {
-        self.logd
-            .lock()
-            .unwrap()
-            .as_ref()
-            .map_or(-1, |s| s.as_raw_fd())
     }
 
     pub fn close_log_pipe(&self) {

@@ -18,6 +18,31 @@ mod resetprop;
 
 #[cxx::bridge]
 pub mod ffi {
+    #[repr(i32)]
+    enum RequestCode {
+        START_DAEMON,
+        CHECK_VERSION,
+        CHECK_VERSION_CODE,
+        STOP_DAEMON,
+
+        _SYNC_BARRIER_,
+
+        SUPERUSER,
+        ZYGOTE_RESTART,
+        DENYLIST,
+        SQLITE_CMD,
+        REMOVE_MODULES,
+        ZYGISK,
+
+        _STAGE_BARRIER_,
+
+        POST_FS_DATA,
+        LATE_START,
+        BOOT_COMPLETE,
+
+        END,
+    }
+
     extern "C++" {
         include!("include/resetprop.hpp");
 
@@ -25,6 +50,16 @@ pub mod ffi {
         type PropCb;
         unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
         unsafe fn prop_cb_exec(cb: Pin<&mut PropCb>, name: *const c_char, value: *const c_char);
+    }
+
+    unsafe extern "C++" {
+        include!("include/core.hpp");
+
+        #[cxx_name = "MagiskD"]
+        type CxxMagiskD;
+        fn post_fs_data(self: &CxxMagiskD);
+        fn late_start(self: &CxxMagiskD);
+        fn boot_complete(self: &CxxMagiskD);
     }
 
     extern "Rust" {
@@ -48,11 +83,11 @@ pub mod ffi {
 
         type MagiskD;
         fn get_magiskd() -> &'static MagiskD;
-        fn get_log_pipe(self: &MagiskD) -> i32;
-        fn close_log_pipe(self: &MagiskD);
         fn setup_logfile(self: &MagiskD);
         fn is_emulator(self: &MagiskD) -> bool;
         fn is_recovery(self: &MagiskD) -> bool;
+        fn boot_stage_handler(self: &MagiskD, client: i32, code: i32);
+        fn enable_safe_mode(self: &MagiskD);
     }
 }
 
