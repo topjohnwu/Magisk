@@ -165,6 +165,9 @@
     <string name="settings_su_reauth_summary">アプリのアップグレード後にスーパーユーザー権限を再認証します</string>
     <string name="settings_su_tapjack_title">タップジャッキング保護を有効にする</string>
     <string name="settings_su_tapjack_summary">他のウィンドウやオーバーレイで表示されている間は、スーパーユーザー権限の要求ダイアログが入力に応答しないようにします</string>
+    <string name="settings_su_auth_title">ユーザー認証</string>
+    <string name="settings_su_auth_summary">スーパーユーザー権限の要求でユーザー認証を行ないます</string>
+    <string name="settings_su_auth_insecure">端末の認証方法が設定されていません</string>
     <string name="settings_customization">カスタマイズ</string>
     <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
