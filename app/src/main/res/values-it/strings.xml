@@ -165,6 +165,9 @@
     <string name="settings_su_reauth_summary">Richiedi nuovamente i permessi di root dopo l\'aggiornamento di un\'app</string>
     <string name="settings_su_tapjack_title">Protezione anti-tapjacking</string>
     <string name="settings_su_tapjack_summary">La schermata di richiesta dei permessi di root non risponderà al tocco mentre è oscurata da altre finestre o elementi in sovraimpressione</string>
+    <string name="settings_su_auth_title">Autenticazione utente</string>
+    <string name="settings_su_auth_summary">Richiedi l\'autenticazione dell\'utente per le richieste di accesso root</string>
+    <string name="settings_su_auth_insecure">Sul dispositivo non è configurato alcun metodo di autenticazione</string>
     <string name="settings_customization">Personalizzazione</string>
     <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
