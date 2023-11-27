@@ -32,7 +32,7 @@ struct MagiskD {
 
     // C++ implementation
     void reboot() const;
-    void post_fs_data() const;
+    bool post_fs_data() const;
     void late_start() const;
     void boot_complete() const;
 

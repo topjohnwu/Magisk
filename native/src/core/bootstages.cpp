@@ -304,7 +304,7 @@ static bool check_key_combo() {
 
 extern int disable_deny();
 
-void MagiskD::post_fs_data() const {
+bool MagiskD::post_fs_data() const {
     as_rust().setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
@@ -312,6 +312,8 @@ void MagiskD::post_fs_data() const {
     unlock_blocks();
     mount_mirrors();
     prune_su_access();
+
+    bool safe_mode = false;
 
     if (access(SECURE_DIR, F_OK) != 0) {
         LOGE(SECURE_DIR " is not present, abort\n");
@@ -325,7 +327,7 @@ void MagiskD::post_fs_data() const {
 
     if (get_prop("persist.sys.safemode", true) == "1" ||
         get_prop("ro.sys.safemode") == "1" || check_key_combo()) {
-        as_rust().enable_safe_mode();
+        safe_mode = true;
         // Disable all modules and denylist so next boot will be clean
         disable_modules();
         disable_deny();
@@ -341,6 +343,7 @@ void MagiskD::post_fs_data() const {
 early_abort:
     // We still do magic mount because root itself might need it
     load_modules();
+    return safe_mode;
 }
 
 void MagiskD::late_start() const {

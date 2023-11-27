@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::BufReader;
-use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Mutex, OnceLock};
 use std::{io, mem};
 
@@ -27,25 +26,22 @@ enum BootState {
 
 #[derive(Default)]
 #[repr(transparent)]
-struct BootStateFlags(AtomicU32);
+struct BootStateFlags(u32);
 
 impl BootStateFlags {
     fn contains(&self, stage: BootState) -> bool {
-        let v = self.0.load(Ordering::Relaxed);
-        (v & stage as u32) != 0
+        (self.0 & stage as u32) != 0
     }
 
-    fn set(&self, stage: BootState) {
-        let v = self.0.load(Ordering::Relaxed);
-        self.0.store(v | stage as u32, Ordering::Relaxed);
+    fn set(&mut self, stage: BootState) {
+        self.0 |= stage as u32;
     }
 }
 
 #[derive(Default)]
 pub struct MagiskD {
     pub logd: Mutex<Option<File>>,
-    boot_stage_lock: Mutex<()>,
-    boot_state_flags: BootStateFlags,
+    boot_stage_lock: Mutex<BootStateFlags>,
     is_emulator: bool,
     is_recovery: bool,
 }
@@ -59,36 +55,33 @@ impl MagiskD {
         self.is_recovery
     }
 
-    pub fn enable_safe_mode(&self) {
-        self.boot_state_flags.set(BootState::SafeMode)
-    }
-
     pub fn boot_stage_handler(&self, client: i32, code: i32) {
         // Make sure boot stage execution is always serialized
-        let _guard = self.boot_stage_lock.lock().unwrap();
+        let mut state = self.boot_stage_lock.lock().unwrap();
 
         let code = RequestCode { repr: code };
         match code {
             RequestCode::POST_FS_DATA => {
-                if check_data() && !self.boot_state_flags.contains(BootState::PostFsDataDone) {
-                    self.as_cxx().post_fs_data();
-                    self.boot_state_flags.set(BootState::PostFsDataDone);
+                if check_data() && !state.contains(BootState::PostFsDataDone) {
+                    if self.as_cxx().post_fs_data() {
+                        state.set(BootState::SafeMode);
+                    }
+                    state.set(BootState::PostFsDataDone);
                 }
                 unsafe { libc::close(client) };
             }
             RequestCode::LATE_START => {
                 unsafe { libc::close(client) };
-                if self.boot_state_flags.contains(BootState::PostFsDataDone)
-                    && !self.boot_state_flags.contains(BootState::SafeMode)
+                if state.contains(BootState::PostFsDataDone) && !state.contains(BootState::SafeMode)
                 {
                     self.as_cxx().late_start();
-                    self.boot_state_flags.set(BootState::LateStartDone);
+                    state.set(BootState::LateStartDone);
                 }
             }
             RequestCode::BOOT_COMPLETE => {
                 unsafe { libc::close(client) };
-                if !self.boot_state_flags.contains(BootState::SafeMode) {
-                    self.boot_state_flags.set(BootState::BootComplete);
+                if !state.contains(BootState::SafeMode) {
+                    state.set(BootState::BootComplete);
                     self.as_cxx().boot_complete()
                 }
             }

@@ -57,7 +57,7 @@ pub mod ffi {
 
         #[cxx_name = "MagiskD"]
         type CxxMagiskD;
-        fn post_fs_data(self: &CxxMagiskD);
+        fn post_fs_data(self: &CxxMagiskD) -> bool;
         fn late_start(self: &CxxMagiskD);
         fn boot_complete(self: &CxxMagiskD);
     }
@@ -87,7 +87,6 @@ pub mod ffi {
         fn is_emulator(self: &MagiskD) -> bool;
         fn is_recovery(self: &MagiskD) -> bool;
         fn boot_stage_handler(self: &MagiskD, client: i32, code: i32);
-        fn enable_safe_mode(self: &MagiskD);
     }
 }
 
