@@ -1,5 +1,6 @@
 #![feature(format_args_nl)]
 #![feature(btree_extract_if)]
+#![feature(iter_intersperse)]
 
 pub use base;
 use cpio::cpio_commands;
