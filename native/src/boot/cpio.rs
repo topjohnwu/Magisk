@@ -620,11 +620,10 @@ fn align_4(x: usize) -> usize {
 
 #[inline(always)]
 fn norm_path(path: &str) -> String {
-    path.strip_prefix('/')
-        .unwrap_or(path)
-        .strip_suffix('/')
-        .unwrap_or(path)
-        .to_string()
+    path.split('/')
+        .filter(|x| !x.is_empty())
+        .intersperse("/")
+        .collect()
 }
 
 fn parse_mode(s: &str) -> Result<mode_t, String> {
