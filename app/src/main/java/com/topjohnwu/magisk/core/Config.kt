@@ -35,6 +35,7 @@ object Config : PreferenceConfig, DBConfig {
         const val ROOT_ACCESS = "root_access"
         const val SU_MULTIUSER_MODE = "multiuser_mode"
         const val SU_MNT_NS = "mnt_ns"
+        const val SU_AUTH = "su_auth"
         const val SU_BIOMETRIC = "su_biometric"
         const val ZYGISK = "zygisk"
         const val DENYLIST = "denylist"
@@ -156,7 +157,8 @@ object Config : PreferenceConfig, DBConfig {
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
-    private var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    var appBiometric by dbSettings(Key.SU_BIOMETRIC, false)
+    private var suBiometric by dbSettings(Key.SU_AUTH, false)
     var userAuth
         get() = Info.isDeviceSecure && suBiometric
         set(value) {
