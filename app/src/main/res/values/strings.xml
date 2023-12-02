@@ -170,12 +170,13 @@
     <string name="settings_su_reauth_summary">Ask for Superuser permissions again after upgrading apps</string>
     <string name="settings_su_tapjack_title">Tapjacking Protection</string>
     <string name="settings_su_tapjack_summary">The Superuser prompt dialog will not respond to input while obscured by any other window or overlay</string>
-    <string name="settings_su_biometric_title">Biometric Authentication</string>
-    <string name="settings_su_biometric_summary">Use biometric authentication to allow Superuser requests ( Magisk )</string>
-    <string name="no_biometric">Unsupported device or no biometric settings are enabled</string>
     <string name="settings_su_auth_title">User Authentication</string>
-    <string name="settings_su_auth_summary">Ask for user authentication during Superuser requests ( System )</string>
+    <string name="settings_su_auth_summary">Ask for user authentication during Superuser requests</string>
     <string name="settings_su_auth_insecure">No authentication method is configured on the device</string>
+    <string name="su_biometric">Authentication Mode</string>
+    <string name="settings_biometric_disabled">Auth Disabled</string>
+    <string name="settings_biometric_system">System Provide</string>
+    <string name="settings_biometric_magisk">Magisk Provide</string>
     <string name="settings_customization">Customization</string>
     <string name="setting_add_shortcut_summary">Add a pretty shortcut to the home screen in case the name and icon are difficult to recognize after hiding the app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>

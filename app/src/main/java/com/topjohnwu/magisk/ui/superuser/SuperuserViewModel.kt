@@ -120,15 +120,12 @@ class SuperuserViewModel(
             }
         }
 
-        if (ServiceLocator.biometrics.isEnabled) {
+        if (Config.userAuth) {
+            AuthEvent { updateState() }.publish()
+        } else if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
-        } else {
-            SuperuserRevokeDialog(item.title) { updateState() }.show()
-        }
-        if (Config.userAuth) {
-            AuthEvent { updateState() }.publish()
         } else {
             SuperuserRevokeDialog(item.title) { updateState() }.show()
         }
@@ -180,15 +177,12 @@ class SuperuserViewModel(
             }
         }
 
-        if (ServiceLocator.biometrics.isEnabled) {
+        if (Config.userAuth) {
+            AuthEvent { updateState() }.publish()
+        } else if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess { updateState() }
             }.publish()
-        } else {
-            updateState()
-        }
-        if (Config.userAuth) {
-            AuthEvent { updateState() }.publish()
         } else {
             updateState()
         }

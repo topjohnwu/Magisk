@@ -283,33 +283,13 @@ object Tapjack : BaseSettingsItem.Toggle() {
     override var value by Config::suTapjack
 }
 
-object Biometrics : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_biometric_title.asText()
-    override var description = R.string.settings_su_biometric_summary.asText()
-    override var value
-        get() = ServiceLocator.biometrics.isEnabled
-        set(value) {
-            Config.appBiometric = value
-        }
-
-    override fun refresh() {
-        isEnabled = ServiceLocator.biometrics.isSupported
-        if (!isEnabled) {
-            description = R.string.no_biometric.asText()
-        }
-    }
-}
-
-object Authentication : BaseSettingsItem.Toggle() {
+object Authentication : BaseSettingsItem.Selector() {
     override val title = R.string.settings_su_auth_title.asText()
-    override var description = R.string.settings_su_auth_summary.asText()
-    override var value by Config::userAuth
+    override val entryRes = R.array.su_biometric
+    override var value by Config::suBiometric
 
     override fun refresh() {
         isEnabled = Info.isDeviceSecure
-        if (!isEnabled) {
-            description = R.string.settings_su_auth_insecure.asText()
-        }
     }
 }
 

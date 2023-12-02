@@ -78,17 +78,14 @@ class SuRequestViewModel(
 
     fun grantPressed() {
         cancelTimer()
-        if (ServiceLocator.biometrics.isEnabled) {
+        if (Config.userAuth) {
+            AuthEvent { respond(ALLOW) }.publish()
+        } else if (ServiceLocator.biometrics.isEnabled) {
             BiometricEvent {
                 onSuccess {
                     respond(ALLOW)
                 }
             }.publish()
-        } else {
-            respond(ALLOW)
-        }
-        if (Config.userAuth) {
-            AuthEvent { respond(ALLOW) }.publish()
         } else {
             respond(ALLOW)
         }

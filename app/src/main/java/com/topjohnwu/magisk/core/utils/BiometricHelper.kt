@@ -18,7 +18,12 @@ class BiometricHelper(context: Context) {
         else -> false
     }
 
-    val isEnabled get() = isSupported && Config.appBiometric
+    private val appBiometric get() = when (Config.suBiometric) {
+        Config.Value.BIOMETRIC_MAGISK -> true
+        else -> false
+    }
+
+    val isEnabled get() = isSupported && appBiometric
 
     fun authenticate(
         activity: FragmentActivity,

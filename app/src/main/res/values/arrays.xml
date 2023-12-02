@@ -36,6 +36,12 @@
         <item>@string/toast</item>
     </string-array>
 
+    <string-array name="su_biometric">
+        <item>@string/settings_biometric_disabled</item>
+        <item>@string/settings_biometric_system</item>
+        <item>@string/settings_biometric_magisk</item>
+    </string-array>
+
     <string-array name="multiuser_mode">
         <item>@string/settings_owner_only</item>
         <item>@string/settings_owner_manage</item>

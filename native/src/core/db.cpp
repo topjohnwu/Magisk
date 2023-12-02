@@ -113,6 +113,7 @@ int db_strings::get_idx(string_view key) const {
 db_settings::db_settings() {
     // Default settings
     data[ROOT_ACCESS] = ROOT_ACCESS_APPS_AND_ADB;
+    data[SU_BIOMETRIC] = BIOMETRIC_DISABLED;
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;

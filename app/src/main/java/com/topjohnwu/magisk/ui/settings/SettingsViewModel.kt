@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.AppContext
+import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.ktx.toast
@@ -73,7 +74,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         if (Info.showSuperUser) {
             list.addAll(listOf(
                 Superuser,
-                Tapjack, Authentication, Biometrics, AccessMode, MultiuserMode, MountNamespaceMode,
+                Tapjack, Authentication, AccessMode, MultiuserMode, MountNamespaceMode,
                 AutomaticResponse, RequestTimeout, SUNotification
             ))
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -93,8 +94,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         when (item) {
             DownloadPath -> withExternalRW(andThen)
             UpdateChecker -> withPostNotificationPermission(andThen)
-            Authentication -> AuthEvent(andThen).publish()
-            Biometrics -> authenticate(andThen)
+            Authentication -> if (ServiceLocator.biometrics.isEnabled) authenticate(andThen) else AuthEvent(andThen).publish()
             Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             SystemlessHosts -> createHosts()
