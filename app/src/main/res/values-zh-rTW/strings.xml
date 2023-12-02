@@ -167,6 +167,12 @@
     <string name="settings_su_reauth_summary">應用程式更新後，重新驗證超級使用者的要求</string>
     <string name="settings_su_tapjack_title">啟用點選攔截保護</string>
     <string name="settings_su_tapjack_summary">發現有其他應用程式重疊在超級使用者視窗上面時，不回應允許操作</string>
+    <string name="settings_su_auth_title">身份驗證</string>
+    <string name="settings_su_auth_summary">對超級使用者要求驗證</string>
+    <string name="settings_su_auth_insecure">裝置未配備驗證方式</string>
+    <string name="settings_biometric_disabled">禁用驗證</string>
+    <string name="settings_biometric_system">系統提供</string>
+    <string name="settings_biometric_magisk">Magisk提供</string>
     <string name="settings_customization">客製化</string>
     <string name="setting_add_shortcut_summary">在主螢幕中新增一個精緻的捷徑。防止隱藏 Magisk 以後，其名稱與圖示將難以辨識</string>
     <string name="settings_doh_title">安全化的網域解析(DoH)</string>
