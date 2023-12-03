@@ -53,7 +53,9 @@ pub mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("include/core.hpp");
+        include!("include/daemon.hpp");
+
+        fn get_magisk_tmp() -> *const c_char;
 
         #[cxx_name = "MagiskD"]
         type CxxMagiskD;

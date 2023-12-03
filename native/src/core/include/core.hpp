@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "socket.hpp"
+#include "../core-rs.hpp"
 
 #define AID_ROOT   0
 #define AID_SHELL  2000
@@ -17,28 +18,6 @@
 
 #define to_app_id(uid)  (uid % AID_USER_OFFSET)
 #define to_user_id(uid) (uid / AID_USER_OFFSET)
-
-namespace rust {
-struct MagiskD;
-}
-
-struct MagiskD {
-    // Make sure only references can exist
-    ~MagiskD() = delete;
-
-    // Binding to Rust
-    static const MagiskD &get();
-    void boot_stage_handler(int client, int code) const;
-
-    // C++ implementation
-    void reboot() const;
-    bool post_fs_data() const;
-    void late_start() const;
-    void boot_complete() const;
-
-private:
-    const rust::MagiskD &as_rust() const;
-};
 
 // Return codes for daemon
 enum class RespondCode : int {
@@ -61,11 +40,9 @@ extern bool zygisk_enabled;
 extern std::vector<module_info> *module_list;
 
 void reset_zygisk(bool restore);
-extern "C" const char *get_magisk_tmp();
 int connect_daemon(int req, bool create = false);
 std::string find_preinit_device();
 void unlock_blocks();
-void reboot();
 
 // Poll control
 using poll_callback = void(*)(pollfd*);
@@ -115,6 +92,3 @@ int denylist_cli(int argc, char **argv);
 void initialize_denylist();
 bool is_deny_target(int uid, std::string_view process);
 void revert_unmount();
-
-// Include last to prevent recursive include issues
-#include "../core-rs.hpp"

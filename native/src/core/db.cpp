@@ -116,7 +116,7 @@ db_settings::db_settings() {
     data[SU_MULTIUSER_MODE] = MULTIUSER_MODE_OWNER_ONLY;
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;
-    data[ZYGISK_CONFIG] = rust::get_magiskd().is_emulator();
+    data[ZYGISK_CONFIG] = MagiskD::get()->is_emulator();
 }
 
 int db_settings::get_idx(string_view key) const {

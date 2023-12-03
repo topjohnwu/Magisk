@@ -132,12 +132,12 @@ const MagiskD &MagiskD::get() {
     return *reinterpret_cast<const MagiskD*>(&rust::get_magiskd());
 }
 
-const rust::MagiskD &MagiskD::as_rust() const {
-    return *reinterpret_cast<const rust::MagiskD*>(this);
+const rust::MagiskD *MagiskD::operator->() const {
+    return reinterpret_cast<const rust::MagiskD*>(this);
 }
 
-void MagiskD::boot_stage_handler(int client, int code) const {
-    as_rust().boot_stage_handler(client, code);
+const rust::MagiskD &MagiskD::as_rust() const {
+    return *operator->();
 }
 
 void MagiskD::reboot() const {
@@ -196,7 +196,7 @@ static void handle_request_sync(int client, int code) {
         write_int(client, MAGISK_VER_CODE);
         break;
     case +RequestCode::START_DAEMON:
-        rust::get_magiskd().setup_logfile();
+        MagiskD::get()->setup_logfile();
         break;
     case +RequestCode::STOP_DAEMON: {
         // Unmount all overlays
@@ -298,7 +298,7 @@ static void handle_request(pollfd *pfd) {
         exec_task([=, fd = client.release()] { handle_request_async(fd, code, cred); });
     } else {
         exec_task([=, fd = client.release()] {
-            MagiskD::get().boot_stage_handler(fd, code);
+            MagiskD::get()->boot_stage_handler(fd, code);
         });
     }
 }

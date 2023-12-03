@@ -97,16 +97,8 @@ impl MagiskD {
     }
 }
 
-mod cxx_extern {
-    use base::libc::c_char;
-
-    extern "C" {
-        pub fn get_magisk_tmp() -> *const c_char;
-    }
-}
-
 pub fn get_magisk_tmp() -> &'static Utf8CStr {
-    unsafe { Utf8CStr::from_ptr(cxx_extern::get_magisk_tmp()).unwrap_unchecked() }
+    unsafe { Utf8CStr::from_ptr(super::ffi::get_magisk_tmp()).unwrap_unchecked() }
 }
 
 pub fn daemon_entry() {
