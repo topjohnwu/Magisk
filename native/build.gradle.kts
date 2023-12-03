@@ -6,7 +6,6 @@ setupCommon()
 
 android {
     namespace = "com.topjohnwu.magisk.native"
-    ndkVersion = "26.1.10909125"
 
     externalNativeBuild {
         ndkBuild {
