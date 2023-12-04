@@ -125,6 +125,7 @@ test_emu() {
 
   "$emu" @test $emu_args &
   emu_pid=$!
+  adb wait-for-device logcat &
   wait_emu wait_for_boot
 
   adb shell magisk -v
