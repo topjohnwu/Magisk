@@ -45,6 +45,8 @@ public:
 
     // Don't call the following two functions before prepare
     const string &node_path();
+    const string worker_path();
+
     string mirror_path() { return mirror_dir + node_path(); }
 
     virtual void mount() = 0;
@@ -67,7 +69,7 @@ protected:
         delete other;
     }
 
-    void create_and_mount(const char *reason, const string &src);
+    void create_and_mount(const char *reason, const string &src, bool ro=false);
 
     // Use bit 7 of _file_type for exist status
     bool exist() const { return static_cast<bool>(_file_type & (1 << 7)); }
@@ -313,4 +315,8 @@ const string &node_entry::node_path() {
     if (_parent && _node_path.empty())
         _node_path = _parent->node_path() + '/' + _name;
     return _node_path;
+}
+
+const string node_entry::worker_path() {
+    return get_magisk_tmp() + "/"s WORKERDIR + node_path();
 }
