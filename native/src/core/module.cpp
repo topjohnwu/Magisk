@@ -15,8 +15,6 @@ using namespace std;
 
 #define VLOGD(tag, from, to) LOGD("%-8s: %s <- %s\n", tag, to, from)
 
-static string native_bridge = "0";
-
 static int bind_mount(const char *reason, const char *from, const char *to) {
     int ret = xmount(from, to, nullptr, MS_BIND | MS_REC, nullptr);
     if (ret == 0)
@@ -516,24 +514,4 @@ void exec_module_scripts(const char *stage) {
     std::transform(module_list->begin(), module_list->end(), std::back_inserter(module_names),
         [](const module_info &info) -> string_view { return info.name; });
     exec_module_scripts(stage, module_names);
-}
-
-void reset_zygisk(bool restore) {
-    if (!zygisk_enabled) return;
-    static atomic_uint zygote_start_count{1};
-    if (restore) {
-        zygote_start_count = 1;
-    } else if (zygote_start_count.fetch_add(1) > 3) {
-        LOGW("zygote crashes too many times, rolling-back\n");
-        restore = true;
-    }
-    if (restore) {
-        string native_bridge_orig = "0";
-        if (native_bridge.length() > strlen(ZYGISKLDR)) {
-            native_bridge_orig = native_bridge.substr(strlen(ZYGISKLDR));
-        }
-        set_prop(NBPROP, native_bridge_orig.data(), true);
-    } else {
-        set_prop(NBPROP, native_bridge.data(), true);
-    }
 }
