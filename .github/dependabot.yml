@@ -4,7 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: daily
-      time: "21:00"
     target-branch: master
     registries:
       - maven-google
@@ -13,7 +12,15 @@ updates:
       maven-dependencies:
         patterns:
           - "*"
-
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: master
+    groups:
+      submodules:
+        patterns:
+          - "*"
 registries:
   maven-google:
     type: maven-repository
