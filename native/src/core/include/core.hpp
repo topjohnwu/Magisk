@@ -38,6 +38,7 @@ struct module_info {
 
 extern bool zygisk_enabled;
 extern std::vector<module_info> *module_list;
+extern std::string native_bridge;
 
 void reset_zygisk(bool restore);
 int connect_daemon(int req, bool create = false);

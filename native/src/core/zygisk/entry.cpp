@@ -14,6 +14,7 @@
 using namespace std;
 
 void *self_handle = nullptr;
+string native_bridge = "0";
 
 extern "C" [[maybe_unused]] void zygisk_inject_entry(void *handle) {
     self_handle = handle;
@@ -223,4 +224,27 @@ void zygisk_handler(int client, const sock_cred *cred) {
         break;
     }
     close(client);
+}
+
+void reset_zygisk(bool restore) {
+    if (!zygisk_enabled) return;
+    static atomic_uint zygote_start_count{1};
+    close(zygiskd_sockets[0]);
+    close(zygiskd_sockets[1]);
+    zygiskd_sockets[0] = zygiskd_sockets[1] = -1;
+    if (restore) {
+        zygote_start_count = 1;
+    } else if (zygote_start_count.fetch_add(1) > 3) {
+        LOGW("zygote crashes too many times, rolling-back\n");
+        restore = true;
+    }
+    if (restore) {
+        string native_bridge_orig = "0";
+        if (native_bridge.length() > strlen(ZYGISKLDR)) {
+            native_bridge_orig = native_bridge.substr(strlen(ZYGISKLDR));
+        }
+        set_prop(NBPROP, native_bridge_orig.data(), true);
+    } else {
+        set_prop(NBPROP, native_bridge.data(), true);
+    }
 }
