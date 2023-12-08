@@ -78,6 +78,21 @@ private:
     void resize(size_t new_sz, bool zero = false);
 };
 
+class rust_vec_channel : public channel {
+public:
+    rust_vec_channel(rust::Vec<uint8_t> &data) : _data(data) {}
+
+    ssize_t read(void *buf, size_t len) override;
+    bool write(const void *buf, size_t len) override;
+    off_t seek(off_t off, int whence) override;
+
+private:
+    rust::Vec<uint8_t> &_data;
+    size_t _pos = 0;
+
+    void ensure_size(size_t sz);
+};
+
 class file_channel : public channel {
 public:
     bool write(const void *buf, size_t len) final;

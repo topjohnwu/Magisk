@@ -180,6 +180,47 @@ void byte_channel::resize(size_t new_sz, bool zero) {
     }
 }
 
+ssize_t rust_vec_channel::read(void *buf, size_t len) {
+    len = std::min<size_t>(len, _data.size() - _pos);
+    memcpy(buf, _data.data() + _pos, len);
+    _pos += len;
+    return len;
+}
+
+bool rust_vec_channel::write(const void *buf, size_t len) {
+    ensure_size(_pos + len);
+    memcpy(_data.data() + _pos, buf, len);
+    _pos += len;
+    return true;
+}
+
+off_t rust_vec_channel::seek(off_t off, int whence) {
+    off_t np;
+    switch (whence) {
+        case SEEK_CUR:
+            np = _pos + off;
+            break;
+        case SEEK_END:
+            np = _data.size() + off;
+            break;
+        case SEEK_SET:
+            np = off;
+            break;
+        default:
+            return -1;
+    }
+    ensure_size(np);
+    _pos = np;
+    return np;
+}
+
+void rust_vec_channel::ensure_size(size_t sz) {
+    size_t old_sz = _data.size();
+    if (sz > old_sz) {
+        resize_vec(_data, sz);
+    }
+}
+
 ssize_t fd_channel::read(void *buf, size_t len) {
     return ::read(fd, buf, len);
 }
