@@ -66,5 +66,10 @@ fn set_log_level_state_cxx(level: ffi::LogLevelCxx, enabled: bool) {
 }
 
 fn resize_vec(vec: &mut Vec<u8>, size: usize) {
-    vec.resize(size, 0);
+    if size > vec.len() {
+        vec.reserve(size - vec.len());
+    }
+    unsafe {
+        vec.set_len(size);
+    }
 }
