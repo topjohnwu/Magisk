@@ -15,6 +15,7 @@ use bytemuck::{from_bytes, Pod, Zeroable};
 use num_traits::cast::AsPrimitive;
 use size::{Base, Size, Style};
 
+use crate::ffi::{unxz, xz};
 use base::libc::{
     c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, S_IFBLK, S_IFCHR, S_IFDIR,
     S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
@@ -81,6 +82,8 @@ struct Exists {
 struct Backup {
     #[argh(positional, arg_name = "orig")]
     origin: String,
+    #[argh(switch, short = 'n')]
+    skip_compress: bool,
 }
 
 #[derive(FromArgs)]
@@ -177,8 +180,8 @@ Supported commands:
   patch
     Apply ramdisk patches
     Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
-  backup ORIG
-    Create ramdisk backups from ORIG
+  backup ORIG [-n]
+    Create ramdisk backups from ORIG, specify [-n] to skip compression
   restore
     Restore ramdisk from ramdisk backup stored within incpio
 "#
@@ -495,6 +498,26 @@ impl Cpio {
     }
 }
 
+impl CpioEntry {
+    pub(crate) fn compress(&mut self) -> LoggedResult<()> {
+        let mut compressed = Vec::new();
+        if !xz(&self.data, &mut compressed) {
+            return Err(log_err!("xz compression failed"));
+        }
+        self.data = compressed;
+        Ok(())
+    }
+
+    pub(crate) fn decompress(&mut self) -> LoggedResult<()> {
+        let mut decompressed = Vec::new();
+        if !unxz(&self.data, &mut decompressed) {
+            return Err(log_err!("xz decompression failed"));
+        }
+        self.data = decompressed;
+        Ok(())
+    }
+}
+
 impl Display for CpioEntry {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -572,9 +595,10 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                         exit(1);
                     }
                 }
-                CpioSubCommand::Backup(Backup { origin }) => {
-                    cpio.backup(Utf8CStr::from_string(origin))?
-                }
+                CpioSubCommand::Backup(Backup {
+                    origin,
+                    skip_compress,
+                }) => cpio.backup(Utf8CStr::from_string(origin), *skip_compress)?,
                 CpioSubCommand::Remove(Remove { path, recursive }) => cpio.rm(path, *recursive),
                 CpioSubCommand::Move(Move { from, to }) => cpio.mv(from, to)?,
                 CpioSubCommand::MakeDir(MakeDir { mode, dir }) => cpio.mkdir(mode, dir),

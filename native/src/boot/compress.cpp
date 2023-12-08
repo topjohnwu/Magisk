@@ -732,3 +732,24 @@ bool decompress(rust::Slice<const uint8_t> buf, int fd) {
     }
     return true;
 }
+
+bool xz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
+    auto strm = get_encoder(XZ, make_unique<rust_vec_channel>(out));
+    if (!strm->write(buf.data(), buf.length())) {
+        return false;
+    }
+    return true;
+}
+
+bool unxz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
+    format_t type = check_fmt(buf.data(), buf.length());
+    if (type != XZ) {
+        LOGE("Input file is not in xz format!\n");
+        return false;
+    }
+    auto strm = get_decoder(XZ, make_unique<rust_vec_channel>(out));
+    if (!strm->write(buf.data(), buf.length())) {
+        return false;
+    }
+    return true;
+}
