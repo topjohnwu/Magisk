@@ -1,0 +1,131 @@
+name: Magisk Build
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "app/**"
+      - "native/**"
+      - "stub/**"
+      - "buildSrc/**"
+      - "build.py"
+      - "gradle.properties"
+      - ".github/workflows/build.yml"
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      SCCACHE_DIRECT: false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-13]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Set up sccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          variant: sccache
+          key: ${{ runner.os }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}
+          max-size: 10000M
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            !~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Cache build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches/build-cache-*
+          key: ${{ runner.os }}-build-cache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-build-cache-
+
+      - name: Set up NDK
+        run: python build.py -v ndk
+
+      - name: Build release
+        run: |
+          python build.py -vr all
+
+      - name: Build debug
+        run: |
+          python build.py -v all
+
+      - name: Stop gradle daemon
+        run: ./gradlew --stop
+
+      # Only upload artifacts built on Linux
+      - name: Upload build artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}
+          path: out
+
+      - name: Upload mapping and native debug symbols
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-symbols
+          path: app/build/outputs
+
+  test:
+    name: Test on ${{ matrix.api }}
+    runs-on: macos-13
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [23, 26, 28, 29, 34]
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.sha }}
+          path: out
+
+      - name: AVD test
+        run: |
+          brew install coreutils bash
+          scripts/avd_test.sh ${{ matrix.api }}
+          
