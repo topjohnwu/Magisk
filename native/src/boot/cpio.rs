@@ -499,22 +499,30 @@ impl Cpio {
 }
 
 impl CpioEntry {
-    pub(crate) fn compress(&mut self) -> LoggedResult<()> {
+    pub(crate) fn compress(&mut self) -> bool {
+        if self.mode & S_IFMT != S_IFREG {
+            return false;
+        }
         let mut compressed = Vec::new();
         if !xz(&self.data, &mut compressed) {
-            return Err(log_err!("xz compression failed"));
+            eprintln!("xz compression failed");
+            return false;
         }
         self.data = compressed;
-        Ok(())
+        true
     }
 
-    pub(crate) fn decompress(&mut self) -> LoggedResult<()> {
+    pub(crate) fn decompress(&mut self) -> bool {
+        if self.mode & S_IFMT != S_IFREG {
+            return false;
+        }
         let mut decompressed = Vec::new();
         if !unxz(&self.data, &mut decompressed) {
-            return Err(log_err!("xz decompression failed"));
+            eprintln!("xz decompression failed");
+            return false;
         }
         self.data = decompressed;
-        Ok(())
+        true
     }
 }
 

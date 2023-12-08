@@ -95,7 +95,7 @@ impl MagiskCpio for Cpio {
                         rm_list.push_str(data);
                     }
                 } else if name != ".backup/.magisk" {
-                    let new_name = if name.ends_with(".xz") && entry.decompress().is_ok() {
+                    let new_name = if name.ends_with(".xz") && entry.decompress() {
                         &name[8..name.len() - 3]
                     } else {
                         &name[8..]
@@ -175,7 +175,7 @@ impl MagiskCpio for Cpio {
             };
             match action {
                 Action::Backup(name, mut entry) => {
-                    let backup = if !skip_compress && entry.compress().is_ok() {
+                    let backup = if !skip_compress && entry.compress() {
                         format!(".backup/{}.xz", name)
                     } else {
                         format!(".backup/{}", name)
