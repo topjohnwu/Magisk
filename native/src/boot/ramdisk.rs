@@ -13,7 +13,7 @@ pub trait MagiskCpio {
     fn patch(&mut self);
     fn test(&self) -> i32;
     fn restore(&mut self) -> LoggedResult<()>;
-    fn backup(&mut self, origin: &Utf8CStr) -> LoggedResult<()>;
+    fn backup(&mut self, origin: &Utf8CStr, skip_compress: bool) -> LoggedResult<()>;
 }
 
 const MAGISK_PATCHED: i32 = 1 << 0;
@@ -89,13 +89,17 @@ impl MagiskCpio for Cpio {
         let mut rm_list = String::new();
         self.entries
             .extract_if(|name, _| name.starts_with(".backup/"))
-            .for_each(|(name, entry)| {
+            .for_each(|(name, mut entry)| {
                 if name == ".backup/.rmlist" {
                     if let Ok(data) = from_utf8(&entry.data) {
                         rm_list.push_str(data);
                     }
                 } else if name != ".backup/.magisk" {
-                    let new_name = &name[8..];
+                    let new_name = if name.ends_with(".xz") && entry.decompress().is_ok() {
+                        &name[8..name.len() - 3]
+                    } else {
+                        &name[8..]
+                    };
                     eprintln!("Restore [{}] -> [{}]", name, new_name);
                     backups.insert(new_name.to_string(), entry);
                 }
@@ -115,7 +119,7 @@ impl MagiskCpio for Cpio {
         Ok(())
     }
 
-    fn backup(&mut self, origin: &Utf8CStr) -> LoggedResult<()> {
+    fn backup(&mut self, origin: &Utf8CStr, skip_compress: bool) -> LoggedResult<()> {
         let mut backups = HashMap::<String, Box<CpioEntry>>::new();
         let mut rm_list = String::new();
         backups.insert(
@@ -170,8 +174,12 @@ impl MagiskCpio for Cpio {
                 }
             };
             match action {
-                Action::Backup(name, entry) => {
-                    let backup = format!(".backup/{}", name);
+                Action::Backup(name, mut entry) => {
+                    let backup = if !skip_compress && entry.compress().is_ok() {
+                        format!(".backup/{}.xz", name)
+                    } else {
+                        format!(".backup/{}", name)
+                    };
                     eprintln!("Backup [{}] -> [{}]", name, backup);
                     backups.insert(backup, entry);
                 }
