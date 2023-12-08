@@ -163,7 +163,7 @@ void module_node::mount() {
 
 void tmpfs_node::mount() {
     string src = mirror_path();
-    const char *src_path = access(src.data(), F_OK) == 0 ? src.data() : parent()->node_path().data();
+    const char *src_path = access(src.data(), F_OK) == 0 ? src.data() : nullptr;
     if (!isa<tmpfs_node>(parent())) {
         const string &dest = node_path();
         auto worker_dir = worker_path();
@@ -172,12 +172,12 @@ void tmpfs_node::mount() {
         dir_node::mount();
         VLOGD(skip_mirror() ? "replace" : "move", worker_dir.data(), dest.data());
         xmount(worker_dir.data(), dest.data(), nullptr, MS_MOVE, nullptr);
-        clone_attr(src_path, dest.data());
+        clone_attr(src_path ?: parent()->node_path().data(), dest.data());
     } else {
         const string dest = worker_path();
         // We don't need another layer of tmpfs if parent is tmpfs
         mkdir(dest.data(), 0);
-        clone_attr(src_path, dest.data());
+        clone_attr(src_path ?: parent()->worker_path().data(), dest.data());
         dir_node::mount();
     }
 }
