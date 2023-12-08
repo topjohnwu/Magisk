@@ -90,7 +90,7 @@ private:
     rust::Vec<uint8_t> &_data;
     size_t _pos = 0;
 
-    void ensure_size(size_t sz);
+    void ensure_size(size_t sz, bool zero = false);
 };
 
 class file_channel : public channel {

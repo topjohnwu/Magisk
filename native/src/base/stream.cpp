@@ -209,15 +209,17 @@ off_t rust_vec_channel::seek(off_t off, int whence) {
         default:
             return -1;
     }
-    ensure_size(np);
+    ensure_size(np, true);
     _pos = np;
     return np;
 }
 
-void rust_vec_channel::ensure_size(size_t sz) {
+void rust_vec_channel::ensure_size(size_t sz, bool zero) {
     size_t old_sz = _data.size();
     if (sz > old_sz) {
         resize_vec(_data, sz);
+        if (zero)
+            memset(_data.data() + old_sz, 0, sz - old_sz);
     }
 }
 
