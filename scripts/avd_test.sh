@@ -13,13 +13,13 @@ emu_pid=
 # API 23: legacy rootfs w/o Treble
 # API 26: legacy rootfs with Treble
 # API 28: legacy system-as-root
-# API 33: 2 Stage Init + latest Android with ATD image
+# API 29: 2 Stage Init
 # API 34: latest Android
 
-api_list='23 26 28 33 34'
+api_list='23 26 28 29 34'
 
 atd_min_api=30
-atd_max_api=33
+atd_max_api=34
 lsposed_min_api=27
 
 print_title() {
