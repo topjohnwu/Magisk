@@ -181,6 +181,10 @@ fas_samsung_p = ForkAndSpec('samsung_p', [uid, gid, gids, runtime_flags, rlimits
     se_info, Anon(jint), Anon(jint), nice_name, fds_to_close, fds_to_ignore, is_child_zygote,
     instruction_set, app_data_dir])
 
+fas_grapheneos_u = ForkAndSpec('grapheneos_u', [uid, gid, gids, runtime_flags, rlimits, mount_external,
+    se_info, nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir, 
+    is_top_app, pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs, Anon(jlongArray)])
+
 spec_q = SpecApp('q', [uid, gid, gids, runtime_flags, rlimits, mount_external, se_info,
     nice_name, is_child_zygote, instruction_set, app_data_dir])
 
@@ -199,25 +203,6 @@ server_l = ForkServer('l', [uid, gid, gids, runtime_flags, rlimits,
 
 server_samsung_q = ForkServer('samsung_q', [uid, gid, gids, runtime_flags, Anon(jint), Anon(jint), rlimits,
     permitted_capabilities, effective_capabilities])
-
-# GrapheneOS Android 14 Support
-
-# int nativeForkAndSpecialize(int uid, int gid, int[] gids,
-#            int runtimeFlags, int[][] rlimits, int mountExternal, String seInfo, String niceName,
-#            int[] fdsToClose, int[] fdsToIgnore, boolean startChildZygote, String instructionSet,
-#            String appDataDir, boolean isTopApp, String[] pkgDataInfoList,
-#            String[] allowlistedDataInfoList, boolean bindMountAppDataDirs,
-#            boolean bindMountAppStorageDirs, long[] extraLongArgs)
-
-fas_grapheneos_u = ForkAndSpec('grapheneos_u', [uid, gid, gids, runtime_flags, rlimits, mount_external,
-    se_info, nice_name, fds_to_close, fds_to_ignore, is_child_zygote, instruction_set, app_data_dir, 
-    is_top_app, pkg_data_info_list, whitelisted_data_info_list, mount_data_dirs, mount_storage_dirs, Anon(jlongArray)])
-
-# void nativeSpecializeAppProcess(int uid, int gid, int[] gids,
-#            int runtimeFlags, int[][] rlimits, int mountExternal, String seInfo, String niceName,
-#            boolean startChildZygote, String instructionSet, String appDataDir, boolean isTopApp,
-#            String[] pkgDataInfoList, String[] allowlistedDataInfoList,
-#            boolean bindMountAppDataDirs, boolean bindMountAppStorageDirs, long[] extraLongArgs)
 
 spec_grapheneos_u = SpecApp('grapheneos_u', [uid, gid, gids, runtime_flags, rlimits, mount_external,
     se_info, nice_name, is_child_zygote, instruction_set, app_data_dir, is_top_app, pkg_data_info_list,
