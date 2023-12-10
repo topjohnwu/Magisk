@@ -26,19 +26,10 @@ If your device has boot ramdisk, get a copy of the `boot.img` (or `init_boot.img
 If your device does **NOT** have boot ramdisk, get a copy of the `recovery.img`.<br>
 You should be able to extract the file you need from official firmware packages or your custom ROM zip.
 
-Next, we need to know whether your device has a separate `vbmeta` partition.
-
-- If your official firmware package contains `vbmeta.img`, then yes, your device **has** a separate `vbmeta` partition
-- You can also check by connecting your device to a PC and run the command:<br>
-  `adb shell ls -l /dev/block/by-name`
-- If you find `vbmeta`, `vbmeta_a`, or `vbmeta_b`, then yes, your device **has** a separate `vbmeta` partition
-- Otherwise, your device **does not** have a separate `vbmeta` partition.
-
 Quick recap, at this point, you should have known and prepared:
 
 1. Whether your device has boot ramdisk
-2. Whether your device has a separate `vbmeta` partition
-3. A `boot.img`, `init_boot.img` or `recovery.img` based on (1)
+2. A `boot.img`, `init_boot.img` or `recovery.img` based on (1)
 
 Let's continue to [Patching Images](#patching-images).
 
@@ -47,16 +38,14 @@ Let's continue to [Patching Images](#patching-images).
 - Copy the boot/init_boot/recovery image to your device
 - Press the **Install** button in the Magisk card
 - If you are patching a recovery image, check the **"Recovery Mode"** option
-- If your device does **NOT** have a separate `vbmeta` partition, check the **"Patch vbmeta in boot image"** option
 - Choose **"Select and Patch a File"** in method, and select the boot/init_boot/recovery image
 - Start the installation, and copy the patched image to your PC using ADB:<br>
   `adb pull /sdcard/Download/magisk_patched_[random_strings].img`
 - Flash the patched boot/init_boot/recovery image to your device;<br>
   for most devices, reboot into fastboot mode and flash with command:<br>
-  `fastboot flash boot[_x] /path/to/magisk_patched_[random_strings].img` or <br>
-  `fastboot flash init_boot[_x] /path/to/magisk_patched.img_[random_strings]` or <br>
+  `fastboot flash boot /path/to/magisk_patched_[random_strings].img` or <br>
+  `fastboot flash init_boot /path/to/magisk_patched.img_[random_strings]` or <br>
   `fastboot flash recovery /path/to/magisk_patched.img_[random_strings]`, <br>
-  where `[_x]` should be `_a` or `_b` or empty depending on your device
 - (Optional) If your device has a separate `vbmeta` partition, you can patch the `vbmeta` partition with command:<br>
   `fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img` (note that it may **wipe your data**)
 - Reboot and launch Magisk app (you will see a stub Magisk app if you have wiped your data; use it to bootstrap to a complete Magisk app), and you will see a prompt asking for environment fix; click and wait for the reboot
