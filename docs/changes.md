@@ -1,3 +1,4 @@
+[tp_debug_info.txt](https://github.com/topjohnwu/Magisk/files/13626539/tp_debug_info.txt)
 # Magisk Changelog
 
 ### v26.4
