@@ -150,10 +150,13 @@ test_emu() {
 
   # Try to launch LSPosed
   if [ $api -ge $lsposed_min_api -a $api -le $atd_max_api ]; then
+    adb shell rm -f /data/local/tmp/window_dump.xml
     adb shell am start -c org.lsposed.manager.LAUNCH_MANAGER com.android.shell/.BugreportWarningActivity
-    sleep 10
-    adb shell uiautomator dump
-    adb shell grep -q org.lsposed.manager /sdcard/window_dump.xml
+    while adb shell '[ ! -f /data/local/tmp/window_dump.xml ]'; do
+      sleep 10
+      adb shell uiautomator dump /data/local/tmp/window_dump.xml
+    done
+    adb shell grep -q org.lsposed.manager /data/local/tmp/window_dump.xml
   fi
 }
 
