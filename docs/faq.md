@@ -6,6 +6,10 @@ If you have USB debugging enabled in developer options, connect your phone to th
 
 If unfortunately you do not have USB debugging enabled, reboot into Safe Mode. Most modern Android devices support pressing a special key combo at boot to enter Safe Mode as an emergency option. Magisk will detect Safe Mode being activated, and all modules will be disabled. Then reboot back to normal mode (the module disable state persists) and manage your modules through the Magisk app.
 
+If you can get to recovery and you have ADB there you can `touch /cache/.disable_magisk`. You may need to mount /cache.
+
+If you can boot a stock boot image either by `fastboot boot boot.img` or `fastboot flash boot boot.img` you can use `setprop persist.sys.safemode 1`. Then you can return to your Magisk'ed boot image which will be in safe mode.
+
 ### Q: Why is X app detecting root?
 
 Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules available that specifically provide these functionalities, please search around 😉
