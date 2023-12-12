@@ -87,7 +87,7 @@ class ForkAndSpec(JNIHook):
         return 'nativeForkAndSpecialize'
 
     def init_args(self):
-        return 'AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
+        return 'AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
 
     def body(self):
         decl = ''

@@ -126,15 +126,16 @@ case 2: {                              \
 }                                      \
 case 3:                                \
 case 4:                                \
+case 5:                                \
     mod.v1->method(mod.v1->impl, args);\
     break;                             \
 }
 
-void ZygiskModule::preAppSpecialize(AppSpecializeArgs_v3 *args) const {
+void ZygiskModule::preAppSpecialize(AppSpecializeArgs_v5 *args) const {
     call_app(preAppSpecialize)
 }
 
-void ZygiskModule::postAppSpecialize(const AppSpecializeArgs_v3 *args) const {
+void ZygiskModule::postAppSpecialize(const AppSpecializeArgs_v5 *args) const {
     call_app(postAppSpecialize)
 }
 

@@ -23,7 +23,7 @@
 
 #include <jni.h>
 
-#define ZYGISK_API_VERSION 4
+#define ZYGISK_API_VERSION 5
 
 /*
 

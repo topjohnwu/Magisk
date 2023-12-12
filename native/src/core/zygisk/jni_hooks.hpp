@@ -4,7 +4,7 @@ namespace {
 
 void *nativeForkAndSpecialize_orig = nullptr;
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_l(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     ZygiskContext ctx(env, &args);
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_l)>(nativeForkAndSpecialize_orig)(
@@ -14,7 +14,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_o(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     ZygiskContext ctx(env, &args);
     ctx.nativeForkAndSpecialize_pre();
@@ -25,7 +25,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_p(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     ZygiskContext ctx(env, &args);
@@ -37,7 +37,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_q_alt(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
@@ -50,7 +50,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_r(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
@@ -67,7 +67,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_u(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
@@ -85,7 +85,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_m(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _0, jint _1, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     ZygiskContext ctx(env, &args);
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_m)>(nativeForkAndSpecialize_orig)(
@@ -95,7 +95,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_n(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _2, jint _3, jstring nice_name, jintArray fds_to_close, jstring instruction_set, jstring app_data_dir, jint _4) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     ZygiskContext ctx(env, &args);
     ctx.nativeForkAndSpecialize_pre();
     reinterpret_cast<decltype(&nativeForkAndSpecialize_samsung_n)>(nativeForkAndSpecialize_orig)(
@@ -105,7 +105,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_o(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _5, jint _6, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     ZygiskContext ctx(env, &args);
     ctx.nativeForkAndSpecialize_pre();
@@ -116,7 +116,7 @@ void *nativeForkAndSpecialize_orig = nullptr;
     return ctx.pid;
 }
 [[clang::no_stack_protector]] jint nativeForkAndSpecialize_samsung_p(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _7, jint _8, jstring nice_name, jintArray fds_to_close, jintArray fds_to_ignore, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.fds_to_ignore = &fds_to_ignore;
     args.is_child_zygote = &is_child_zygote;
     ZygiskContext ctx(env, &args);
@@ -182,7 +182,7 @@ std::array nativeForkAndSpecialize_methods = {
 
 void *nativeSpecializeAppProcess_orig = nullptr;
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_q(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     ZygiskContext ctx(env, &args);
     ctx.nativeSpecializeAppProcess_pre();
@@ -192,7 +192,7 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     ctx.nativeSpecializeAppProcess_post();
 }
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_q_alt(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
     ZygiskContext ctx(env, &args);
@@ -203,7 +203,7 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     ctx.nativeSpecializeAppProcess_post();
 }
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_r(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
     args.pkg_data_info_list = &pkg_data_info_list;
@@ -218,7 +218,7 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     ctx.nativeSpecializeAppProcess_post();
 }
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_u(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir, jboolean is_top_app, jobjectArray pkg_data_info_list, jobjectArray whitelisted_data_info_list, jboolean mount_data_dirs, jboolean mount_storage_dirs, jboolean mount_sysprop_overrides) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     args.is_top_app = &is_top_app;
     args.pkg_data_info_list = &pkg_data_info_list;
@@ -234,7 +234,7 @@ void *nativeSpecializeAppProcess_orig = nullptr;
     ctx.nativeSpecializeAppProcess_post();
 }
 [[clang::no_stack_protector]] void nativeSpecializeAppProcess_samsung_q(JNIEnv *env, jclass clazz, jint uid, jint gid, jintArray gids, jint runtime_flags, jobjectArray rlimits, jint mount_external, jstring se_info, jint _9, jint _10, jstring nice_name, jboolean is_child_zygote, jstring instruction_set, jstring app_data_dir) {
-    AppSpecializeArgs_v3 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
+    AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);
     args.is_child_zygote = &is_child_zygote;
     ZygiskContext ctx(env, &args);
     ctx.nativeSpecializeAppProcess_pre();
