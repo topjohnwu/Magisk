@@ -45,6 +45,7 @@ struct AppSpecializeArgs_v3 {
     jobjectArray *whitelisted_data_info_list = nullptr;
     jboolean *mount_data_dirs = nullptr;
     jboolean *mount_storage_dirs = nullptr;
+    jboolean *mount_sysprop_overrides = nullptr;
 
     AppSpecializeArgs_v3(
             jint &uid, jint &gid, jintArray &gids, jint &runtime_flags,
