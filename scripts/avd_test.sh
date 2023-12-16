@@ -5,6 +5,7 @@ avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 emu_args='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -show-kernel -memory 8192'
 lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
+emu_url='https://github.com/topjohnwu/magisk-files/releases/download/files/emulator-darwin-x86-34.1.14.zip'
 boot_timeout=600
 emu_pid=
 
@@ -212,8 +213,17 @@ case $(uname -m) in
 esac
 
 yes | "$sdk" --licenses > /dev/null
-"$sdk" --channel=3 --update
 curl -L $lsposed_url -o out/lsposed.zip
+
+if [ -n "$GITHUB_ACTIONS" ]; then
+  # Download the specially built emulator to run on GitHub action runners
+  curl -L $emu_url -o emulator.zip
+  unzip emulator.zip
+  emu='./emulator/emulator'
+else
+  # Directly use the official emulator
+  "$sdk" --channel=3 emulator
+fi
 
 if [ -n "$1" ]; then
   run_test $1
