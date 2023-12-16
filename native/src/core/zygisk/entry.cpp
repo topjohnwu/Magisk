@@ -229,9 +229,11 @@ void zygisk_handler(int client, const sock_cred *cred) {
 void reset_zygisk(bool restore) {
     if (!zygisk_enabled) return;
     static atomic_uint zygote_start_count{1};
-    close(zygiskd_sockets[0]);
-    close(zygiskd_sockets[1]);
-    zygiskd_sockets[0] = zygiskd_sockets[1] = -1;
+    if (!restore) {
+        close(zygiskd_sockets[0]);
+        close(zygiskd_sockets[1]);
+        zygiskd_sockets[0] = zygiskd_sockets[1] = -1;
+    }
     if (restore) {
         zygote_start_count = 1;
     } else if (zygote_start_count.fetch_add(1) > 3) {
