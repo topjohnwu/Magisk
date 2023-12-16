@@ -11,6 +11,7 @@
 
 #include "su.hpp"
 #include "pts.hpp"
+#include "flags.h"
 
 using namespace std;
 
@@ -88,6 +89,11 @@ void su_info::check_db() {
 bool uid_granted_root(int uid) {
     if (uid == AID_ROOT)
         return true;
+
+#if MAGISK_DEBUG
+    if (uid == AID_SHELL)
+        return true;
+#endif
 
     db_settings cfg;
     get_db_settings(cfg);
