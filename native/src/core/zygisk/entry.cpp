@@ -245,8 +245,8 @@ void reset_zygisk(bool restore) {
         if (native_bridge.length() > strlen(ZYGISKLDR)) {
             native_bridge_orig = native_bridge.substr(strlen(ZYGISKLDR));
         }
-        set_prop(NBPROP, native_bridge_orig.data(), true);
+        set_prop(NBPROP, native_bridge_orig.data());
     } else {
-        set_prop(NBPROP, native_bridge.data(), true);
+        set_prop(NBPROP, native_bridge.data());
     }
 }

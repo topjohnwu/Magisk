@@ -9,6 +9,7 @@
 
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <api/_system_properties.h>
+#include <system_properties/prop_info.h>
 
 using namespace std;
 
@@ -134,17 +135,20 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
     if (!check_legal_property_name(name))
         return 1;
 
-    const char *msg = flags.isSkipSvc() ? "direct modification" : "property_service";
-
     auto pi = const_cast<prop_info *>(__system_property_find(name));
 
-    // Always delete existing read-only properties, because they could be
-    // long properties and cannot directly go through __system_property_update
-    if (pi != nullptr && str_starts(name, "ro.")) {
-        // Skip pruning nodes as we will add it back ASAP
-        __system_property_delete(name, false);
-        pi = nullptr;
+    // Delete existing read-only properties if they are or will be long properties,
+    // which cannot directly go through __system_property_update
+    if (str_starts(name, "ro.")) {
+        if (pi != nullptr && (pi->is_long() || strlen(value) >= PROP_VALUE_MAX)) {
+            // Skip pruning nodes as we will add it back ASAP
+            __system_property_delete(name, false);
+            pi = nullptr;
+        }
+        flags.setSkipSvc();
     }
+
+    const char *msg = flags.isSkipSvc() ? "direct modification" : "property_service";
 
     int ret;
     if (pi != nullptr) {

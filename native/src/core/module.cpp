@@ -313,12 +313,12 @@ void load_modules() {
             native_bridge_orig = "0";
         }
         native_bridge = native_bridge_orig != "0" ? ZYGISKLDR + native_bridge_orig : ZYGISKLDR;
-        set_prop(NBPROP, native_bridge.data(), true);
+        set_prop(NBPROP, native_bridge.data());
         // Weather Huawei's Maple compiler is enabled.
         // If so, system server will be created by a special Zygote which ignores the native bridge
         // and make system server out of our control. Avoid it by disabling.
         if (get_prop("ro.maple.enable") == "1") {
-            set_prop("ro.maple.enable", "0", true);
+            set_prop("ro.maple.enable", "0");
         }
         inject_zygisk_libs(system);
     }
