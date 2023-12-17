@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
@@ -86,17 +86,19 @@ jobs:
       # Only upload artifacts built on Linux
       - name: Upload build artifact
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}
           path: out
+          compression-level: 9
 
       - name: Upload mapping and native debug symbols
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-symbols
           path: app/build/outputs
+          compression-level: 9
 
   test:
     name: Test on ${{ matrix.api }}
@@ -119,7 +121,7 @@ jobs:
           python-version: "3.x"
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ github.sha }}
           path: out
