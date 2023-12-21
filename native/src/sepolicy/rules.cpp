@@ -114,7 +114,6 @@ void sepolicy::magisk_rules() {
     allow("rootfs", "tmpfs", "filesystem", "associate");
 
     // Zygisk rules
-    allow("zygote", "zygote", "capability", "sys_resource");  // prctl PR_SET_MM
     allow("zygote", "zygote", "process", "execmem");
     allow("zygote", "fs_type", "filesystem", "unmount");
     allow("system_server", "system_server", "process", "execmem");
