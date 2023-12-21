@@ -39,7 +39,7 @@ trait PropCbExec {
 
 impl PropCbExec for Pin<&mut PropCb> {
     fn exec(&mut self, name: &Utf8CStr, value: &Utf8CStr) {
-        unsafe { prop_cb_exec(self.as_mut(), name.as_ptr(), value.as_ptr()) }
+        unsafe { prop_cb_exec(self.as_mut(), name.as_ptr(), value.as_ptr(), u32::MAX) }
     }
 }
 

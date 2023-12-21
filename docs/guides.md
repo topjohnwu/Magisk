@@ -109,7 +109,7 @@ Update JSON format:
 
 #### Shell scripts (`*.sh`)
 
-Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script.
+Please read the [Boot Scripts](#boot-scripts) section to understand the difference between `post-fs-data.sh` and `service.sh`. For most module developers, `service.sh` should be good enough if you just need to run a boot script. If you need to wait for boot completed, you can use `resetprop -w sys.boot_completed 0`.
 
 In all scripts of your module, please use `MODDIR=${0%/*}` to get your module's base directory path; do **NOT** hardcode your module path in scripts.
 If Zygisk is enabled, the environment variable `ZYGISK_ENABLED` will be set to `1`.

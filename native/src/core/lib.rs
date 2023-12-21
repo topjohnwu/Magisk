@@ -49,7 +49,12 @@ pub mod ffi {
         #[cxx_name = "prop_cb"]
         type PropCb;
         unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
-        unsafe fn prop_cb_exec(cb: Pin<&mut PropCb>, name: *const c_char, value: *const c_char);
+        unsafe fn prop_cb_exec(
+            cb: Pin<&mut PropCb>,
+            name: *const c_char,
+            value: *const c_char,
+            serial: u32,
+        );
     }
 
     unsafe extern "C++" {
