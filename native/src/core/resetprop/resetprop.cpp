@@ -33,10 +33,12 @@ struct PropFlags {
     void setPersist() { flags |= (1 << 1); }
     void setContext() { flags |= (1 << 2); }
     void setPersistOnly() { flags |= (1 << 3); setPersist(); }
+    void setWait() { flags |= (1 << 4); }
     bool isSkipSvc() const { return flags & 1; }
     bool isPersist() const { return flags & (1 << 1); }
     bool isContext() const { return flags & (1 << 2); }
     bool isPersistOnly() const { return flags & (1 << 3); }
+    bool isWait() const { return flags & (1 << 4); }
 private:
     uint32_t flags = 0;
 };
@@ -49,7 +51,7 @@ Usage: %s [flags] [arguments...]
 
 Read mode arguments:
    (no arguments)    print all properties
-   NAME              get property
+   NAME [OLD_VALUE]  get property of NAME, optionally with an OLD_VALUE for -w
 
 Write mode arguments:
    NAME VALUE        set property NAME as VALUE
@@ -64,6 +66,8 @@ Read mode flags:
    -p      also read persistent props from storage
    -P      only read persistent props from storage
    -Z      get property context instead of value
+   -w      wait for property change, and if OLD_VALUE is specified, wait for it to change to other value
+           return immediately if persistent
 
 Write mode flags:
    -n      set properties bypassing property_service
@@ -104,8 +108,8 @@ illegal:
 
 static void read_prop_with_cb(const prop_info *pi, void *cb) {
     if (system_property_read_callback) {
-        auto callback = [](void *cb, const char *name, const char *value, uint32_t) {
-            static_cast<prop_cb*>(cb)->exec(name, value);
+        auto callback = [](void *cb, const char *name, const char *value, uint32_t serial) {
+            static_cast<prop_cb*>(cb)->exec(name, value, serial);
         };
         system_property_read_callback(pi, callback, cb);
     } else {
@@ -114,19 +118,21 @@ static void read_prop_with_cb(const prop_info *pi, void *cb) {
         name[0] = '\0';
         value[0] = '\0';
         system_property_read(pi, name, value);
-        static_cast<prop_cb*>(cb)->exec(name, value);
+        static_cast<prop_cb*>(cb)->exec(name, value, pi->serial);
     }
 }
 
 template<class StringType>
 struct prop_to_string : prop_cb {
-    void exec(const char *, const char *value) override {
+    void exec(const char *, const char *value, uint32_t serial) override {
         val = value;
+        s = serial;
     }
     StringType val;
+    uint32_t s;
 };
 
-template<> void prop_to_string<rust::String>::exec(const char *, const char *value) {
+template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t) {
     // We do not want to crash when values are not UTF-8
     val = rust::String::lossy(value);
 }
@@ -181,7 +187,7 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
 }
 
 template<class StringType>
-static StringType get_prop(const char *name, PropFlags flags) {
+static StringType get_prop(const char *name, PropFlags flags, const char *wait_value = nullptr) {
     if (!check_legal_property_name(name))
         return {};
 
@@ -190,15 +196,20 @@ static StringType get_prop(const char *name, PropFlags flags) {
     if (flags.isContext()) {
         auto context = __system_property_get_context(name) ?: "";
         LOGD("resetprop: prop context [%s]: [%s]\n", name, context);
-        cb.exec(name, context);
+        cb.exec(name, context, -1);
         return cb.val;
     }
 
     if (!flags.isPersistOnly()) {
-        if (auto pi = system_property_find(name)) {
+        auto pi = system_property_find(name);
+        if (!pi) return {};
+        read_prop_with_cb(pi, &cb);
+        if (flags.isWait() && (wait_value == nullptr || cb.val == wait_value)) {
+            uint32_t new_serial;
+            __system_property_wait(pi, cb.s, &new_serial, nullptr);
             read_prop_with_cb(pi, &cb);
-            LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
         }
+        LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
     }
 
     if (cb.val.empty() && flags.isPersist() && str_starts(name, "persist."))
@@ -319,6 +330,9 @@ int resetprop_main(int argc, char *argv[]) {
             case 'Z':
                 flags.setContext();
                 continue;
+            case 'w':
+                flags.setWait();
+                continue;
             case '\0':
                 break;
             default:
@@ -355,7 +369,15 @@ int resetprop_main(int argc, char *argv[]) {
         return 0;
     }
     case 2:
-        return set_prop(argv[0], argv[1], flags);
+        if (flags.isWait()) {
+            auto val = get_prop<string>(argv[0], flags, argv[1]);
+            if (val.empty())
+                return 1;
+            printf("%s\n", val.data());
+            return 0;
+        } else {
+            return set_prop(argv[0], argv[1], flags);
+        }
     default:
         usage(argv0);
     }
