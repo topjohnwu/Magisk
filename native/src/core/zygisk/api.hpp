@@ -281,11 +281,8 @@ struct Api {
     // Returns false if an error occurred.
     bool pltHookCommit();
 
-    // Get the version code of Magisk.
-    uint32_t getVersionCode();
-
-    // Get the version name of Magisk.
-    const char *getVersionName();
+    // Get the version of Magisk.
+    const char *getVersion();
 
 private:
     internal::api_table *tbl;
@@ -349,8 +346,7 @@ struct api_table {
     void (*setOption)(void * /* impl */, Option);
     int  (*getModuleDir)(void * /* impl */);
     uint32_t (*getFlags)(void * /* impl */);
-    uint32_t (*getVersionCode)();
-    const char *(*getVersionName)();
+    const char *(*getVersion)();
 };
 
 template <class T>
@@ -390,11 +386,8 @@ inline void Api::pltHookRegister(dev_t dev, ino_t inode, const char *symbol, voi
 inline bool Api::pltHookCommit() {
     return tbl->pltHookCommit != nullptr && tbl->pltHookCommit();
 }
-inline uint32_t Api::getVersionCode() {
-    return tbl->getVersionCode ? tbl->getVersionCode() : -1;
-}
-inline const char *Api::getVersionName() {
-    return tbl->getVersionName ? tbl->getVersionName() : nullptr;
+inline const char *Api::getVersion() {
+    return tbl->getVersion ? tbl->getVersion() : nullptr;
 }
 
 } // namespace zygisk

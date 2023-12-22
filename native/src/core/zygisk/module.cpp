@@ -58,8 +58,7 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
         api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
     }
     if (api_version >= 5) {
-        api->v5.getVersionCode = []() -> uint32_t { return MAGISK_VER_CODE; };
-        api->v5.getVersionName = []() {
+        api->v5.getVersion = []() {
 #if MAGISK_DEBUG
             static constexpr auto ver = MAGISK_VERSION ":MAGISK:D";
 #else

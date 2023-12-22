@@ -163,8 +163,7 @@ struct api_abi_v4 : public api_abi_base {
 };
 
 struct api_abi_v5 : public api_abi_v4 {
-    /* 8 */ uint32_t (*getVersionCode)();
-    /* 9 */ const char *(*getVersionName)();
+    /* 8 */ const char *(*getVersion)();
 };
 
 union ApiTable {
