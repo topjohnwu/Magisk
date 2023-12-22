@@ -165,7 +165,7 @@
     <string name="settings_su_reauth_summary">ആപ്പുകൾ അപ്‌ഗ്രേഡ് ചെയ്‌തതിന് ശേഷം സൂപ്പർയൂസർ അനുമതികൾക്കായി വീണ്ടും ആവശ്യപ്പെടുക</string>
     <string name="settings_su_tapjack_title">ടാപ്പ്ജാക്കിംഗ് സംരക്ഷണം</string>
     <string name="settings_su_tapjack_summary">സൂപ്പർയൂസർ പ്രോംപ്റ്റ് ഡയലോഗ് മറ്റേതെങ്കിലും വിൻഡോയോ ഓവർലേയോ മറയ്ക്കുമ്പോൾ ഇൻപുട്ടിനോട് പ്രതികരിക്കില്</string>
-    <string name="settings_customization">Customization</string>
+    <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>
     <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
     <string name="settings_doh_title">DNS ഓവർ HTTPS</string>
     <string name="settings_doh_description">ചില രാജ്യങ്ങളിലെ DNS പോയ്സണിങിന് പരിഹാരം</string>
