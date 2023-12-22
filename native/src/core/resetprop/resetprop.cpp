@@ -51,23 +51,27 @@ Usage: %s [flags] [arguments...]
 
 Read mode arguments:
    (no arguments)    print all properties
-   NAME [OLD_VALUE]  get property of NAME, optionally with an OLD_VALUE for -w
+   NAME              get property of NAME
 
 Write mode arguments:
    NAME VALUE        set property NAME as VALUE
    -f,--file   FILE  load and set properties from FILE
    -d,--delete NAME  delete property
 
+Wait mode arguments (toggled with -w):
+    NAME             wait until property NAME changes
+    NAME OLD_VALUE   if value of property NAME is not OLD_VALUE, get value
+                     or else wait until property NAME changes
+
 General flags:
    -h,--help         show this message
    -v                print verbose output to stderr
+   -w                switch to wait mode
 
 Read mode flags:
    -p      also read persistent props from storage
    -P      only read persistent props from storage
    -Z      get property context instead of value
-   -w      wait for property change, and if OLD_VALUE is specified, wait for it to change to other value
-           return immediately if persistent
 
 Write mode flags:
    -n      set properties bypassing property_service
@@ -187,7 +191,7 @@ static int set_prop(const char *name, const char *value, PropFlags flags) {
 }
 
 template<class StringType>
-static StringType get_prop(const char *name, PropFlags flags, const char *wait_value = nullptr) {
+static StringType get_prop(const char *name, PropFlags flags) {
     if (!check_legal_property_name(name))
         return {};
 
@@ -201,15 +205,10 @@ static StringType get_prop(const char *name, PropFlags flags, const char *wait_v
     }
 
     if (!flags.isPersistOnly()) {
-        auto pi = system_property_find(name);
-        if (!pi) return {};
-        read_prop_with_cb(pi, &cb);
-        if (flags.isWait() && (wait_value == nullptr || cb.val == wait_value)) {
-            uint32_t new_serial;
-            __system_property_wait(pi, cb.s, &new_serial, nullptr);
+        if (auto pi = system_property_find(name)) {
             read_prop_with_cb(pi, &cb);
+            LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
         }
-        LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
     }
 
     if (cb.val.empty() && flags.isPersist() && str_starts(name, "persist."))
@@ -217,6 +216,30 @@ static StringType get_prop(const char *name, PropFlags flags, const char *wait_v
     if (cb.val.empty())
         LOGD("resetprop: prop [%s] does not exist\n", name);
 
+    return cb.val;
+}
+
+template<class StringType>
+static StringType wait_prop(const char *name, const char *old_value) {
+    if (!check_legal_property_name(name))
+        return {};
+    auto pi = system_property_find(name);
+    if (!pi) {
+        LOGD("resetprop: prop [%s] does not exist\n", name);
+        return {};
+    }
+
+    prop_to_string<StringType> cb;
+    read_prop_with_cb(pi, &cb);
+
+    if (old_value == nullptr || cb.val == old_value) {
+        LOGD("resetprop: waiting for prop [%s]\n", name);
+        uint32_t new_serial;
+        __system_property_wait(pi, pi->serial, &new_serial, nullptr);
+        read_prop_with_cb(pi, &cb);
+    }
+
+    LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
     return cb.val;
 }
 
@@ -357,6 +380,15 @@ int resetprop_main(int argc, char *argv[]) {
         return 0;
     }
 
+    if (flags.isWait()) {
+        if (argc == 0) usage(argv0);
+        auto val = wait_prop<string>(argv[0], argv[1]);
+        if (val.empty())
+            return 1;
+        printf("%s\n", val.data());
+        return 0;
+    }
+
     switch (argc) {
     case 0:
         print_props(flags);
@@ -369,15 +401,7 @@ int resetprop_main(int argc, char *argv[]) {
         return 0;
     }
     case 2:
-        if (flags.isWait()) {
-            auto val = get_prop<string>(argv[0], flags, argv[1]);
-            if (val.empty())
-                return 1;
-            printf("%s\n", val.data());
-            return 0;
-        } else {
-            return set_prop(argv[0], argv[1], flags);
-        }
+        return set_prop(argv[0], argv[1], flags);
     default:
         usage(argv0);
     }
