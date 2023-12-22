@@ -130,12 +130,12 @@ static void read_prop_with_cb(const prop_info *pi, void *cb) {
 
 template<class StringType>
 struct prop_to_string : prop_cb {
-    void exec(const char *, const char *value, uint32_t serial) override {
+    void exec(const char *, const char *value, uint32_t s) override {
         val = value;
-        s = serial;
+        serial = s;
     }
     StringType val;
-    uint32_t s;
+    uint32_t serial;
 };
 
 template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t) {
@@ -237,7 +237,7 @@ static StringType wait_prop(const char *name, const char *old_value) {
     if (old_value == nullptr || cb.val == old_value) {
         LOGD("resetprop: waiting for prop [%s]\n", name);
         uint32_t new_serial;
-        system_property_wait(pi, pi->serial, &new_serial, nullptr);
+        system_property_wait(pi, cb.serial, &new_serial, nullptr);
         read_prop_with_cb(pi, &cb);
     }
 
