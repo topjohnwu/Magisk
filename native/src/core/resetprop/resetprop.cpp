@@ -15,10 +15,11 @@ using namespace std;
 
 #ifdef APPLET_STUB_MAIN
 #define system_property_set             __system_property_set
+#define system_property_read(...)
 #define system_property_find            __system_property_find
 #define system_property_read_callback   __system_property_read_callback
 #define system_property_foreach         __system_property_foreach
-#define system_property_read(...)
+#define system_property_wait            __system_property_wait
 #else
 static int (*system_property_set)(const char*, const char*);
 static int (*system_property_read)(const prop_info*, char*, char*);
@@ -26,6 +27,7 @@ static const prop_info *(*system_property_find)(const char*);
 static void (*system_property_read_callback)(
         const prop_info*, void (*)(void*, const char*, const char*, uint32_t), void*);
 static int (*system_property_foreach)(void (*)(const prop_info*, void*), void*);
+static bool (*system_property_wait)(const prop_info*, uint32_t, uint32_t*, const struct timespec*);
 #endif
 
 struct PropFlags {
@@ -235,7 +237,7 @@ static StringType wait_prop(const char *name, const char *old_value) {
     if (old_value == nullptr || cb.val == old_value) {
         LOGD("resetprop: waiting for prop [%s]\n", name);
         uint32_t new_serial;
-        __system_property_wait(pi, pi->serial, &new_serial, nullptr);
+        system_property_wait(pi, pi->serial, &new_serial, nullptr);
         read_prop_with_cb(pi, &cb);
     }
 
@@ -290,7 +292,12 @@ struct Initialize {
         DLOAD(system_property_find);
         DLOAD(system_property_read_callback);
         DLOAD(system_property_foreach);
+        DLOAD(system_property_wait);
 #undef DLOAD
+        if (system_property_wait == nullptr) {
+            // The platform API only exist on API 26+
+            system_property_wait = __system_property_wait;
+        }
 #endif
         if (__system_properties_init()) {
             LOGE("resetprop: __system_properties_init error\n");
