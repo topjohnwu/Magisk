@@ -7,6 +7,7 @@
 
 #include "zygisk.hpp"
 #include "module.hpp"
+#include "flags.h"
 
 using namespace std;
 
@@ -55,6 +56,17 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
             lsplt::RegisterHook(dev, inode, symbol, fn, backup);
         };
         api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
+    }
+    if (api_version >= 5) {
+        api->v5.getVersionCode = []() -> uint32_t { return MAGISK_VER_CODE; };
+        api->v5.getVersionName = []() {
+#if MAGISK_DEBUG
+            static constexpr auto ver = MAGISK_VERSION ":MAGISK:D";
+#else
+            static constexpr auto ver = MAGISK_VERSION ":MAGISK:R";
+#endif
+            return ver;
+        };
     }
 
     return true;
