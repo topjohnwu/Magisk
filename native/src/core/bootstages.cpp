@@ -343,6 +343,7 @@ bool MagiskD::post_fs_data() const {
 early_abort:
     // We still do magic mount because root itself might need it
     load_modules();
+    xmount(nullptr, (get_magisk_tmp() + "/"s MIRRDIR).data(), nullptr, MS_SHARED | MS_REC, nullptr);
     return safe_mode;
 }
 
