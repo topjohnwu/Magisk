@@ -341,8 +341,12 @@ bool MagiskD::post_fs_data() const {
     }
 
 early_abort:
+    auto mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
     // We still do magic mount because root itself might need it
     load_modules();
+    // make mirror dir as a shared mount to make magisk --stop work for other ns
+    xmount(nullptr, mirror_dir.data(), nullptr, MS_SHARED | MS_REC, nullptr);
+    LOGD("make %s shared\n", mirror_dir.data());
     return safe_mode;
 }
 
