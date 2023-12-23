@@ -138,9 +138,10 @@ struct prop_to_string : prop_cb {
     uint32_t serial;
 };
 
-template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t) {
+template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t s) {
     // We do not want to crash when values are not UTF-8
     val = rust::String::lossy(value);
+    serial = s;
 }
 
 static int set_prop(const char *name, const char *value, PropFlags flags) {
