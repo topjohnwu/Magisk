@@ -79,7 +79,7 @@ triples = [
 # default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybox"]
 default_targets = ["magiskboot", "magiskpolicy", "busybox"]
 support_targets = default_targets + ["resetprop"]
-rust_targets = ["magiskboot", "magiskpolicy"]
+# rust_targets = ["magiskboot", "magiskpolicy"]
 
 sdk_path = os.environ["ANDROID_SDK_ROOT"]
 ndk_root = op.join(sdk_path, "ndk")
