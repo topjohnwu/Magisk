@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest]
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -74,59 +74,20 @@ jobs:
 
       - name: Build release
         run: |
-          python build.py -vr all
-
-      - name: Build debug
-        run: |
-          python build.py -v all
+          python build.py -vr binary
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
 
-      # Only upload artifacts built on Linux
-      - name: Upload build artifact
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+      - name: Release Native
+        uses: ncipollo/release-action@v1.12.0
         with:
-          name: ${{ github.sha }}
-          path: out
-          compression-level: 9
-
-      - name: Upload mapping and native debug symbols
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}-symbols
-          path: app/build/outputs
-          compression-level: 9
-
-  test:
-    name: Test on ${{ matrix.api }}
-    runs-on: macos-13
-    needs: build
-    strategy:
-      fail-fast: false
-      matrix:
-        api: [23, 26, 28, 29, 34]
-
-    steps:
-      - name: Check out
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python 3
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.x"
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ github.sha }}
-          path: out
-
-      - name: AVD test
-        run: |
-          brew install coreutils bash
-          scripts/avd_test.sh ${{ matrix.api }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.parse_version.outputs.VERSION }}
+          artifacts: |
+            native/out/arm64-v8a/busybox
+            native/out/arm64-v8a/magiskboot
+            native/out/arm64-v8a/magiskpolicy
+          allowUpdates: true
+          makeLatest: true
+          replacesArtifacts: true
