@@ -22,7 +22,7 @@
 
     <string name="home_notice_content">ഔദ്യോഗിക ഗിറ്റ്ഹബ് പേജിൽ നിന്ന് മാത്രം മജിസ്‌ക് ഡൗൺലോഡ് ചെയ്യുക. അജ്ഞാത ഉറവിടങ്ങളിൽ നിന്നുള്ള ഫയലുകൾ ക്ഷുദ്രകരമാകാം!</string>
     <string name="home_support_title">ഞങ്ങളെ തുണയ്‌ക്കുക</string>
-    <string name="home_follow_title">ഞങ്ങളെ പിന്തുടരുക</string>
+    <string name="home_follow_title">ഞങ്ങളെ ഫോളോ ചെയ്യുക</string>
     <string name="home_item_source">സോഴ്സ്</string>
     <string name="home_support_content">മജിസ്‌ക് എല്ലായ്പ്പോഴും സ്വതന്ത്രവും ഓപ്പൺ സോഴ്‌സും ആയിരിക്കും. എന്നിരുന്നാലും, ഒരു സംഭാവന നൽകിക്കൊണ്ട് നിങ്ങൾ പിന്തുണയ്ക്കുന്നുവെന്ന് ഞങ്ങളെ കാണിക്കാനാകും.</string>
     <string name="home_installed_version">ഇൻസ്റ്റാൾ ചെയ്ത പതിപ്പ്</string>
@@ -58,7 +58,7 @@
     <string name="grant">അനുവദിക്കുക</string>
     <string name="su_warning">നിങ്ങളുടെ ഉപകരണത്തിലേക്ക് പൂർണ്ണ ആക്‌സസ് നൽകും.\nനിങ്ങൾക്ക് ഉറപ്പില്ലെങ്കിൽ നിരസിക്കുക!</string>
     <string name="forever">എന്നേക്കും</string>
-    <string name="once">ഒരിക്കല്</string>
+    <string name="once">ഒരിക്കൽ</string>
     <string name="tenmin">10 മിനിറ്റ്</string>
     <string name="twentymin">20 മിനിറ്റ്</string>
     <string name="thirtymin">30 മിനിറ്റ്</string>
@@ -133,8 +133,8 @@
     <string name="settings_update_channel_title">അപ്ഡേറ്റിനുള്ള ചാനൽ</string>
     <string name="settings_update_stable">സ്റ്റേബിൾ</string>
     <string name="settings_update_beta">ബീറ്റ</string>
-    <string name="settings_update_custom">കസ്റ്റമ്</string>
-    <string name="settings_update_custom_msg">കസ്റ്റമ് ചാനലിന്റെ URL ചേർക്കുക</string>
+    <string name="settings_update_custom">കസ്റ്റം</string>
+    <string name="settings_update_custom_msg">കസ്റ്റം ചാനലിന്റെ URL ചേർക്കുക</string>
     <string name="settings_zygisk_summary">സൈഗോട്ട് ഡെമണിൽ മജിസ്കിന്റെ ഭാഗങ്ങൾ പ്രവർത്തിപ്പിക്കുക</string>
     <string name="settings_denylist_title">നിഷിദ്ധ പട്ടിക പ്രാബല്യത്തിലാകുക</string>
     <string name="settings_denylist_summary">നിഷിദ്ധ പട്ടികയിലെ പ്രോസസ്സുകൾക്കായി എല്ലാ മജിസ്‌ക് പരിഷ്‌ക്കരണങ്ങളും പഴയപടിയാക്കും</string>
@@ -165,10 +165,10 @@
     <string name="settings_su_reauth_summary">ആപ്പുകൾ അപ്‌ഗ്രേഡ് ചെയ്‌തതിന് ശേഷം സൂപ്പർയൂസർ അനുമതികൾക്കായി വീണ്ടും ആവശ്യപ്പെടുക</string>
     <string name="settings_su_tapjack_title">ടാപ്പ്ജാക്കിംഗ് സംരക്ഷണം</string>
     <string name="settings_su_tapjack_summary">സൂപ്പർയൂസർ പ്രോംപ്റ്റ് ഡയലോഗ് മറ്റേതെങ്കിലും വിൻഡോയോ ഓവർലേയോ മറയ്ക്കുമ്പോൾ ഇൻപുട്ടിനോട് പ്രതികരിക്കില്</string>
-    <string name="settings_customization">Customization</string>
+    <string name="settings_customization">കസ്റ്റമയിസേഷൻ</string>
     <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
     <string name="settings_doh_title">DNS ഓവർ HTTPS</string>
-    <string name="settings_doh_description">ചില രാജ്യങ്ങളിൽ DNS പോയ്സണിങിന് പരിഹാരം</string>
+    <string name="settings_doh_description">ചില രാജ്യങ്ങളിലെ DNS പോയ്സണിങിന് പരിഹാരം</string>
 
     <string name="multiuser_mode">മൾട്ടിയൂസർ മോഡ്</string>
     <string name="settings_owner_only">ഉപകരണ ഉടമ മാത്രം</string>
@@ -229,7 +229,7 @@
     <string name="external_rw_permission_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ സ്റ്റോറജ് ​​അനുമതി നൽകുക</string>
     <string name="post_notifications_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ അറിയിപ്പ്‌ അനുമതി നൽകുക</string>
     <string name="install_unknown_denied">ഈ പ്രവർത്തനം പ്രവർത്തനക്ഷമമാക്കാൻ "install unknown apps" അനുവദിക്കുക</string>
-    <string name="add_shortcut_title">ഹോം സ്ക്രീനിലേക്ക് ഷോർറ്റ്കറ്റ് ചേർക്കുക</string>
+    <string name="add_shortcut_title">ഹോം സ്ക്രീനിലേക്ക് ഷോർട്ട്കട്ട് ചേർക്കുക</string>
     <string name="add_shortcut_msg">ഈ ആപ്പ് മറച്ചതിന് ശേഷം, അതിന്റെ പേരും ഐക്കണും തിരിച്ചറിയാൻ ബുദ്ധിമുട്ടായേക്കാം. ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർറ്റ്കറ്റ ചേർക്കാൻ നിങ്ങൾ ആഗ്രഹിക്കുന്നുണ്ടോ?</string>
     <string name="app_not_found">ഈ പ്രവർത്തനം കൈകാര്യം ചെയ്യാൻ ഒരു ആപ്പും കണ്ടെത്തിയില്ല</string>
     <string name="reboot_apply_change">മാറ്റങ്ങൾ പ്രയോഗിക്കാൻ റീബൂട്ട് ചെയ്യുക</string>
