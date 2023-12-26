@@ -417,19 +417,19 @@ static bool parse_pattern_9(const Func &fn, const char *action, char *stmt) {
 else if (strcmp(name, action) == 0) {   \
     auto __fn = [&](auto && ...args){ return (fn)(args...); }; \
     if (!parse_pattern_##type(__fn, name, remain))             \
-        LOGW("Syntax error in '%.*s'\n\n%s\n", len, stmt, type_msg_##type); \
+        LOGW("Syntax error in '%.*s'\n\n%s\n", (int) stmt.length(), stmt.data(), type_msg_##type); \
 }
 
 #define add_action(act, type) add_action_func(#act, type, act)
 
-void sepolicy::parse_statement(const char *stmt, int len) {
+void sepolicy::parse_statement(rust::Str stmt) {
     // strtok modify strings, create a copy
-    string cpy(stmt, len);
+    string cpy(stmt.data(), stmt.length());
 
     char *remain;
     char *action = strtok_r(cpy.data(), " ", &remain);
     if (remain == nullptr) {
-        LOGW("Syntax error in '%.*s'\n\n", len, stmt);
+        LOGW("Syntax error in '%.*s'\n\n", (int) stmt.length(), stmt.data());
         return;
     }
 

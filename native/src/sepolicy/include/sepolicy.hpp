@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string>
 
+#include <base.hpp>
+
 // sepolicy paths
 #define PLAT_POLICY_DIR     "/system/etc/selinux/"
 #define VEND_POLICY_DIR     "/vendor/etc/selinux/"
@@ -38,8 +40,7 @@ struct sepolicy {
 
     // External APIs
     bool to_file(c_str file);
-    void parse_statement(c_str stmt, int len);
-    void parse_statement(c_str stmt) { parse_statement(stmt, strlen(stmt)); }
+    void parse_statement(rust::Str stmt);
     void load_rules(const std::string &rules);
     void load_rule_file(c_str file);
     void print_rules();

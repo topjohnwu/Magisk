@@ -10,7 +10,8 @@ use libc::mode_t;
 use crate::logging::CxxResultExt;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    clone_attr, fclone_attr, fd_path, map_fd, map_file, Directory, FsPath, Utf8CStr, Utf8CStrBufRef,
+    clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, Directory, FsPath,
+    Utf8CStr, Utf8CStrBufRef,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {
@@ -57,12 +58,8 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
     inner(fd).is_ok()
 }
 
-pub(crate) fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8] {
-    unsafe {
-        map_file(Utf8CStr::from_bytes_unchecked(path), rw)
-            .log_cxx()
-            .unwrap_or(&mut [])
-    }
+pub(crate) fn map_file_for_cxx(path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
+    map_file(path, rw).log_cxx().unwrap_or(&mut [])
 }
 
 pub(crate) fn map_fd_for_cxx(fd: RawFd, sz: usize, rw: bool) -> &'static mut [u8] {
@@ -170,4 +167,19 @@ unsafe extern "C" fn fclone_attr_for_cxx(a: RawFd, b: RawFd) -> bool {
     fclone_attr(a, b)
         .log_cxx_with_msg(|w| w.write_str("fclone_attr failed"))
         .is_ok()
+}
+
+#[export_name = "cxx$utf8str$new"]
+unsafe extern "C" fn str_new(this: &mut &Utf8CStr, s: *const u8, len: usize) {
+    *this = Utf8CStr::from_bytes(slice_from_ptr(s, len)).unwrap_or(cstr!(""));
+}
+
+#[export_name = "cxx$utf8str$ptr"]
+unsafe extern "C" fn str_ptr(this: &&Utf8CStr) -> *const u8 {
+    this.as_ptr().cast()
+}
+
+#[export_name = "cxx$utf8str$len"]
+unsafe extern "C" fn str_len(this: &&Utf8CStr) -> usize {
+    this.len()
 }
