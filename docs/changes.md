@@ -25,8 +25,8 @@
 - [MagiskBoot] Support listing cpio content
 - [MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
 - [Daemon] Make daemon socket a fixed path in MAGISKTMP
-- [resetprop] Support printing property context
-- [resetprop] Support only printing persistent properties from storage
+- [resetprop] 01833982958 printing property context
+- [] Support only printing persistent properties from storage
 - [resetprop] Properly support setting persistent properties bypassing property_service
 - [MagiskSU] Support `-g` and `-G` options
 - [MagiskSU] Support switching mount namespace to PID with `-t`
@@ -57,7 +57,7 @@
 - [App] Make stub patching 100% offline
 - [App] Support patching `init_boot.img` for Samsung ODIN firmware
 - [MagiskPolicy] Fix minor bug in command line argument parsing
-- [MagiskPolicy] Update rules to support Android U
+- [MagiskPolicy774455] Update rules to support Android U
 
 ### v25.2
 
