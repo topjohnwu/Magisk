@@ -13,6 +13,10 @@ using namespace std;
 
 static vector<string> rc_list;
 
+#define ROOTMIR         MIRRDIR "/system_root"
+#define NEW_INITRC_DIR  "/system/etc/init/hw"
+#define INIT_RC         "init.rc"
+
 static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool writable) {
     auto src_dir = xopen_dir(src_path);
     if (!src_dir) return;
@@ -32,13 +36,13 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
 
     // First patch init.rc
     {
-        auto src = xopen_file(xopenat(src_fd, "init.rc", O_RDONLY | O_CLOEXEC, 0), "re");
+        auto src = xopen_file(xopenat(src_fd, INIT_RC, O_RDONLY | O_CLOEXEC, 0), "re");
         if (!src) return;
-        if (writable) unlinkat(src_fd, "init.rc", 0);
+        if (writable) unlinkat(src_fd, INIT_RC, 0);
         auto dest = xopen_file(
-                xopenat(dest_fd, "init.rc", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
+                xopenat(dest_fd, INIT_RC, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0), "we");
         if (!dest) return;
-        LOGD("Patching init.rc in %s\n", src_path);
+        LOGD("Patching " INIT_RC " in %s\n", src_path);
         file_readline(false, src.get(), [&dest](string_view line) -> bool {
             // Do not start vaultkeeper
             if (str_contains(line, "start vaultkeeper")) {
@@ -127,7 +131,7 @@ static void load_overlay_rc(const char *overlay) {
 
     int dfd = dirfd(dir.get());
     // Do not allow overwrite init.rc
-    unlinkat(dfd, "init.rc", 0);
+    unlinkat(dfd, INIT_RC, 0);
 
     // '/' + name + '\0'
     char buf[NAME_MAX + 2];
@@ -244,9 +248,6 @@ void MagiskInit::parse_config_file() {
     });
 }
 
-#define ROOTMIR         MIRRDIR "/system_root"
-#define NEW_INITRC_DIR  "/system/etc/init/hw"
-
 void MagiskInit::patch_ro_root() {
     mount_list.emplace_back("/data");
     parse_config_file();
@@ -301,7 +302,7 @@ void MagiskInit::patch_ro_root() {
     }
 
     // Patch init.rc
-    if (access(NEW_INITRC_DIR, F_OK) == 0) {
+    if (access(NEW_INITRC_DIR "/" INIT_RC, F_OK) == 0) {
         // Android 11's new init.rc
         patch_rc_scripts(NEW_INITRC_DIR, tmp_dir.data(), false);
     } else {
