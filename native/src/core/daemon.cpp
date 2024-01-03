@@ -392,6 +392,12 @@ static void daemon_entry() {
     ssprintf(path, sizeof(path), "%s/" ROOTOVL, tmp);
     rm_rf(path);
 
+    if (access("/vendor/bin/init.ramoops.sh", F_OK) == 0) {
+        // encrypt ramoops
+        // to avoid conflict of magic mount, we manually umount pstore
+        xumount2("/sys/fs/pstore", MNT_DETACH);
+    }
+
     // Unshare magiskd
     xunshare(CLONE_NEWNS);
     // Hide magisk internal mount point
