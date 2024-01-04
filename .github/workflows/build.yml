@@ -98,4 +98,4 @@ jobs:
             native/out/arm64-v8a/magiskboot
             native/out/arm64-v8a/magiskpolicy
           compression-level: 0 # no compression
-          name: release.zip
+          name: binaries
