@@ -88,9 +88,9 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
-
       - name: Stop Gradle daemon
         run: ./gradlew --stop
+
 
       - name: Upload binaries
         uses: actions/upload-artifact@v4

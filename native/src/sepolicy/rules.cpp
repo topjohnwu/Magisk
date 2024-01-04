@@ -63,7 +63,6 @@ void sepolicy::magisk_rules() {
     // Allow all binder transactions
     allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
 
-
 #if 0
     // Remove all dontaudit in debug mode
     impl->strip_dontaudit();
