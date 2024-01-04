@@ -81,27 +81,9 @@ static void mount_mirrors() {
     ssprintf(path, sizeof(path), "%s/" WORKERDIR, get_magisk_tmp());
     xmount("worker", path, "tmpfs", 0, "mode=755");
     xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
-    // Recursively bind mount / to mirror dir
-    // Keep mirror shared so that mounting during post-fs-data will be propagated
-    if (auto mirror_dir = get_magisk_tmp() + "/"s MIRRDIR; !rec_mount("/", mirror_dir)) {
-        LOGI("fallback to mount subtree\n");
-        // create new a bind mount for easy make private
-        xmount(mirror_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
-        // rootfs may fail, fallback to bind mount each mount point
-        set<string, greater<>> mounted_dirs {{ get_magisk_tmp() }};
-        for (const auto &info: self_mount_info) {
-            if (info.type == "rootfs"sv) continue;
-            // the greatest mount point that less than info.target, which is possibly a parent
-            if (auto last_mount = mounted_dirs.upper_bound(info.target);
-                last_mount != mounted_dirs.end() && info.target.starts_with(*last_mount + '/')) {
-                continue;
-            }
-            if (rec_mount(info.target, mirror_dir + info.target)) {
-                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + info.target).data(), info.target.data());
-                mounted_dirs.insert(info.target);
-            }
-        }
-    }
+    // create new a bind mount for easy make private
+    ssprintf(path, sizeof(path), "%s/" MIRRDIR, get_magisk_tmp());
+    xmount(path, path, nullptr, MS_BIND, nullptr);
 }
 
 string find_preinit_device() {
@@ -344,7 +326,7 @@ early_abort:
     auto mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
     // make mirror dir as a private mount so that it won't be affected by magic mount
     LOGD("make %s private\n", mirror_dir.data());
-    xmount(nullptr, mirror_dir.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
+    xmount(nullptr, mirror_dir.data(), nullptr, MS_PRIVATE, nullptr);
     // We still do magic mount because root itself might need it
     load_modules();
     // make mirror dir as a shared mount to make magisk --stop work for other ns

@@ -28,8 +28,7 @@ static int bind_mount(const char *reason, const char *from, const char *to) {
 
 tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
     if (!skip_mirror()) {
-        string mirror = mirror_path();
-        if (auto dir = open_dir(mirror.data())) {
+        if (auto dir = open_dir(node_path().data())) {
             set_exist(true);
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
                 if (entry->d_type == DT_DIR) {
@@ -150,7 +149,7 @@ void module_node::mount() {
     string mnt_src = module_mnt + path;
     {
         string src = MODULEROOT "/" + path;
-        if (exist()) clone_attr(mirror_path().data(), src.data());
+        if (exist()) clone_attr(node_path().data(), src.data());
         // special case for /system/etc/hosts to ensure it is writable
         if (node_path() == "/system/etc/hosts") mnt_src = std::move(src);
     }
@@ -163,11 +162,15 @@ void module_node::mount() {
 
 void tmpfs_node::mount() {
     string src = mirror_path();
-    const char *src_path = access(src.data(), F_OK) == 0 ? src.data() : nullptr;
+    const char *src_path = access(node_path().data(), F_OK) == 0 ? node_path().data() : nullptr;
     if (!isa<tmpfs_node>(parent())) {
         const string &dest = node_path();
         auto worker_dir = worker_path();
         mkdirs(worker_dir.data(), 0);
+        mkdirs(src.data(), 0);
+        VLOGD("mirror", dest.data(), src.data());
+        xmount(dest.data(), src.data(), nullptr, MS_BIND | MS_REC, nullptr);
+        xmount(nullptr, src.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
         bind_mount("tmpfs", worker_dir.data(), worker_dir.data());
         clone_attr(src_path ?: parent()->node_path().data(), worker_dir.data());
         dir_node::mount();
