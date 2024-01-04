@@ -382,11 +382,11 @@ def build_binary(args):
     else:
         args.target = default_targets
 
-    # header("* Building binaries: " + " ".join(args.target))
+    header("* Building binaries: " + " ".join(args.target))
 
-    # os.chdir(op.join("native", "src"))
-    # run_cargo_build(args)
-    # os.chdir(op.join("..", ".."))
+    os.chdir(op.join("native", "src"))
+    run_cargo_build(args)
+    os.chdir(op.join("..", ".."))
 
     dump_flag_header()
 
@@ -413,8 +413,8 @@ def build_binary(args):
     if "magiskboot" in args.target:
         flag += " B_BOOT=1"
 
-    if flag:
-        run_ndk_build(flag)
+    # if flag:
+    #     run_ndk_build(flag)
 
     # magiskinit embeds preload.so
 
@@ -423,9 +423,9 @@ def build_binary(args):
     if "magiskinit" in args.target:
         flag += " B_INIT=1"
 
-    if flag:
-        dump_bin_header(args)
-        run_ndk_build(flag)
+    # if flag:
+    #     dump_bin_header(args)
+    #     run_ndk_build(flag)
 
     if clean:
         clean_elf()
