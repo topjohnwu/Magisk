@@ -27,24 +27,18 @@ static int bind_mount(const char *reason, const char *from, const char *to) {
  *************************/
 
 tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
-    if (!skip_mirror()) {
-        string mirror = mirror_path();
-        if (auto dir = open_dir(mirror.data())) {
+    if (!replace()) {
+        if (auto dir = open_dir(node_path().data())) {
             set_exist(true);
             for (dirent *entry; (entry = xreaddir(dir.get()));) {
-                if (entry->d_type == DT_DIR) {
-                    // create a dummy inter_node to upgrade later
-                    emplace<inter_node>(entry->d_name, entry->d_name);
-                } else {
-                    // Insert mirror nodes
-                    emplace<mirror_node>(entry->d_name, entry);
-                }
+                // create a dummy inter_node to upgrade later
+                emplace<inter_node>(entry->d_name, entry);
             }
         }
     }
 
     for (auto it = children.begin(); it != children.end(); ++it) {
-        // Need to upgrade all inter_node children to tmpfs_node
+        // Upgrade resting inter_node children to tmpfs_node
         if (isa<inter_node>(it->second))
             it = upgrade<tmpfs_node>(it);
     }
@@ -52,7 +46,7 @@ tmpfs_node::tmpfs_node(node_entry *node) : dir_node(node, this) {
 
 bool dir_node::prepare() {
     // If direct replace or not exist, mount ourselves as tmpfs
-    bool upgrade_to_tmpfs = skip_mirror() || !exist();
+    bool upgrade_to_tmpfs = replace() || !exist();
 
     for (auto it = children.begin(); it != children.end();) {
         // We also need to upgrade to tmpfs node if any child:
@@ -77,9 +71,9 @@ bool dir_node::prepare() {
             upgrade_to_tmpfs = true;
         }
         if (auto dn = dyn_cast<dir_node>(it->second)) {
-            if (skip_mirror()) {
+            if (replace()) {
                 // Propagate skip mirror state to all children
-                dn->set_skip_mirror(true);
+                dn->set_replace(true);
             }
             if (dn->prepare()) {
                 // Upgrade child to tmpfs
@@ -98,7 +92,7 @@ void dir_node::collect_module_files(const char *module, int dfd) {
 
     for (dirent *entry; (entry = xreaddir(dir.get()));) {
         if (entry->d_name == ".replace"sv) {
-            set_skip_mirror(true);
+            set_replace(true);
             continue;
         }
 
@@ -141,18 +135,12 @@ void node_entry::create_and_mount(const char *reason, const string &src, bool ro
     }
 }
 
-void mirror_node::mount() {
-    create_and_mount("mirror", mirror_path());
-}
-
 void module_node::mount() {
     std::string path = module + (parent()->root()->prefix + node_path());
     string mnt_src = module_mnt + path;
     {
         string src = MODULEROOT "/" + path;
-        if (exist()) clone_attr(mirror_path().data(), src.data());
-        // special case for /system/etc/hosts to ensure it is writable
-        if (node_path() == "/system/etc/hosts") mnt_src = std::move(src);
+        if (exist()) clone_attr(node_path().data(), src.data());
     }
     if (isa<tmpfs_node>(parent())) {
         create_and_mount("module", mnt_src);
@@ -162,22 +150,23 @@ void module_node::mount() {
 }
 
 void tmpfs_node::mount() {
-    string src = mirror_path();
-    const char *src_path = access(src.data(), F_OK) == 0 ? src.data() : nullptr;
+    if (!is_dir()) {
+        create_and_mount("mirror", node_path());
+        return;
+    }
     if (!isa<tmpfs_node>(parent())) {
-        const string &dest = node_path();
         auto worker_dir = worker_path();
         mkdirs(worker_dir.data(), 0);
         bind_mount("tmpfs", worker_dir.data(), worker_dir.data());
-        clone_attr(src_path ?: parent()->node_path().data(), worker_dir.data());
+        clone_attr(exist() ? node_path().data() : parent()->node_path().data(), worker_dir.data());
         dir_node::mount();
-        VLOGD(skip_mirror() ? "replace" : "move", worker_dir.data(), dest.data());
-        xmount(worker_dir.data(), dest.data(), nullptr, MS_MOVE, nullptr);
+        VLOGD(replace() ? "replace" : "move", worker_dir.data(), node_path().data());
+        xmount(worker_dir.data(), node_path().data(), nullptr, MS_MOVE, nullptr);
     } else {
         const string dest = worker_path();
         // We don't need another layer of tmpfs if parent is tmpfs
         mkdir(dest.data(), 0);
-        clone_attr(src_path ?: parent()->worker_path().data(), dest.data());
+        clone_attr(exist() ? node_path().data() : parent()->worker_path().data(), dest.data());
         dir_node::mount();
     }
 }
@@ -265,7 +254,6 @@ static void inject_zygisk_libs(root_node *system) {
 vector<module_info> *module_list;
 
 void load_modules() {
-    node_entry::mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
     node_entry::module_mnt =  get_magisk_tmp() + "/"s MODULEMNT "/";
 
     auto root = make_unique<root_node>("");

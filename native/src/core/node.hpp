@@ -5,18 +5,16 @@
 
 using namespace std;
 
-#define TYPE_MIRROR  (1 << 0)    /* mount from mirror */
-#define TYPE_INTER   (1 << 1)    /* intermediate node */
-#define TYPE_TMPFS   (1 << 2)    /* replace with tmpfs */
-#define TYPE_MODULE  (1 << 3)    /* mount from module */
-#define TYPE_ROOT    (1 << 4)    /* partition root */
-#define TYPE_CUSTOM  (1 << 5)    /* custom node type overrides all */
+#define TYPE_INTER   (1 << 0)    /* intermediate node */
+#define TYPE_TMPFS   (1 << 1)    /* replace with tmpfs */
+#define TYPE_MODULE  (1 << 2)    /* mount from module */
+#define TYPE_ROOT    (1 << 3)    /* partition root */
+#define TYPE_CUSTOM  (1 << 4)    /* custom node type overrides all */
 #define TYPE_DIR     (TYPE_INTER|TYPE_TMPFS|TYPE_ROOT)
 
 class node_entry;
 class dir_node;
 class inter_node;
-class mirror_node;
 class tmpfs_node;
 class module_node;
 class root_node;
@@ -27,7 +25,6 @@ template<class T> static T *dyn_cast(node_entry *node);
 template<class T> uint8_t type_id() { return TYPE_CUSTOM; }
 template<> uint8_t type_id<dir_node>() { return TYPE_DIR; }
 template<> uint8_t type_id<inter_node>() { return TYPE_INTER; }
-template<> uint8_t type_id<mirror_node>() { return TYPE_MIRROR; }
 template<> uint8_t type_id<tmpfs_node>() { return TYPE_TMPFS; }
 template<> uint8_t type_id<module_node>() { return TYPE_MODULE; }
 template<> uint8_t type_id<root_node>() { return TYPE_ROOT; }
@@ -47,12 +44,9 @@ public:
     const string &node_path();
     const string worker_path();
 
-    string mirror_path() { return mirror_dir + node_path(); }
-
     virtual void mount() = 0;
 
     inline static string module_mnt;
-    inline static string mirror_dir;
 
 protected:
     template<class T>
@@ -175,6 +169,12 @@ protected:
     }
 
     template<class T>
+    dir_node(dirent *entry, T *self) : node_entry(entry->d_name, entry->d_type, self) {
+        if constexpr (std::is_same_v<T, root_node>)
+            _root = self;
+    }
+
+    template<class T>
     dir_node(node_entry *node, T *self) : node_entry(self) {
         if constexpr (std::is_same_v<T, root_node>)
             _root = self;
@@ -192,8 +192,8 @@ protected:
 
     // Use bit 6 of _file_type
     // Skip binding mirror for this directory
-    bool skip_mirror() const { return static_cast<bool>(_file_type & (1 << 6)); }
-    void set_skip_mirror(bool b) { if (b) _file_type |= (1 << 6); else _file_type &= ~(1 << 6); }
+    bool replace() const { return static_cast<bool>(_file_type & (1 << 6)); }
+    void set_replace(bool b) { if (b) _file_type |= (1 << 6); else _file_type &= ~(1 << 6); }
 
     template<class T = node_entry>
     T *iterator_to_node(iterator it) {
@@ -273,6 +273,7 @@ public:
 class inter_node : public dir_node {
 public:
     inter_node(const char *name) : dir_node(name, this) {}
+    inter_node(dirent *entry) : dir_node(entry, this) {}
 };
 
 class module_node : public node_entry {
@@ -289,13 +290,7 @@ private:
     const char *module;
 };
 
-// Don't create the following two nodes before prepare
-class mirror_node : public node_entry {
-public:
-    explicit mirror_node(dirent *entry) : node_entry(entry->d_name, entry->d_type, this) {}
-    void mount() override;
-};
-
+// Don't create tmpfs_node before prepare
 class tmpfs_node : public dir_node {
 public:
     explicit tmpfs_node(node_entry *node);
