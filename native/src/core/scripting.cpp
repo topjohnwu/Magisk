@@ -161,12 +161,9 @@ rm -f $APK
 
 void install_apk(const char *apk) {
     setfilecon(apk, MAGISK_FILE_CON);
-    exec_t exec {
-        .fork = fork_no_orphan
-    };
     char cmds[sizeof(install_script) + 4096];
     ssprintf(cmds, sizeof(cmds), install_script, apk, JAVA_PACKAGE_NAME);
-    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+    exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 constexpr char uninstall_script[] = R"EOF(
@@ -176,12 +173,9 @@ log -t Magisk "pm_uninstall: $(pm uninstall $PKG 2>&1)"
 )EOF";
 
 void uninstall_pkg(const char *pkg) {
-    exec_t exec {
-        .fork = fork_no_orphan
-    };
     char cmds[sizeof(uninstall_script) + 256];
     ssprintf(cmds, sizeof(cmds), uninstall_script, pkg);
-    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+    exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 constexpr char clear_script[] = R"EOF(
@@ -192,12 +186,9 @@ log -t Magisk "pm_clear: $(pm clear --user $USER $PKG 2>&1)"
 )EOF";
 
 void clear_pkg(const char *pkg, int user_id) {
-    exec_t exec {
-        .fork = fork_no_orphan
-    };
     char cmds[sizeof(clear_script) + 288];
     ssprintf(cmds, sizeof(cmds), clear_script, pkg, user_id);
-    exec_command_sync(exec, "/system/bin/sh", "-c", cmds);
+    exec_command_async("/system/bin/sh", "-c", cmds);
 }
 
 [[noreturn]] __printflike(2, 3)
