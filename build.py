@@ -382,11 +382,11 @@ def build_binary(args):
     else:
         args.target = default_targets
 
-    header("* Building binaries: " + " ".join(args.target))
+    # header("* Building binaries: " + " ".join(args.target))
 
-    os.chdir(op.join("native", "src"))
-    run_cargo_build(args)
-    os.chdir(op.join("..", ".."))
+    # os.chdir(op.join("native", "src"))
+    # run_cargo_build(args)
+    # os.chdir(op.join("..", ".."))
 
     dump_flag_header()
 
