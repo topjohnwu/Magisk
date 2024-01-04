@@ -68,17 +68,16 @@ if shutil.which("ccache") is not None:
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
 
-# archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"]
-archs = ["arm64-v8a"]
+archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"]
 triples = [
-#     "armv7a-linux-androideabi",
-#     "i686-linux-android",
+    "armv7a-linux-androideabi",
+    "i686-linux-android",
     "aarch64-linux-android",
-#     "x86_64-linux-android",
+    "x86_64-linux-android",
 ]
-default_targets = ["magiskboot", "magiskpolicy", "busybox"]
+default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybox"]
 support_targets = default_targets + ["resetprop"]
-rust_targets = [ "magiskboot", "magiskpolicy"]
+rust_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 
 sdk_path = os.environ["ANDROID_SDK_ROOT"]
 ndk_root = op.join(sdk_path, "ndk")
@@ -413,8 +412,8 @@ def build_binary(args):
     if "magiskboot" in args.target:
         flag += " B_BOOT=1"
 
-    # if flag:
-    #     run_ndk_build(flag)
+    if flag:
+        run_ndk_build(flag)
 
     # magiskinit embeds preload.so
 
@@ -423,17 +422,17 @@ def build_binary(args):
     if "magiskinit" in args.target:
         flag += " B_INIT=1"
 
-    # if flag:
-    #     dump_bin_header(args)
-    #     run_ndk_build(flag)
+    if flag:
+        dump_bin_header(args)
+        run_ndk_build(flag)
 
     if clean:
         clean_elf()
 
     # BusyBox is built with different libc
 
-    # if "busybox" in args.target:
-    #     run_ndk_build("B_BB=1")
+    if "busybox" in args.target:
+        run_ndk_build("B_BB=1")
 
 
 def find_jdk():
