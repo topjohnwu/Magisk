@@ -13,7 +13,6 @@ using namespace std;
 
 static vector<string> rc_list;
 
-#define ROOTMIR         MIRRDIR "/system_root"
 #define NEW_INITRC_DIR  "/system/etc/init/hw"
 #define INIT_RC         "init.rc"
 
@@ -250,10 +249,10 @@ void MagiskInit::patch_ro_root() {
 
     if (tmp_dir == "/sbin") {
         // Recreate original sbin structure
-        xmkdir(ROOTMIR, 0755);
-        xmount("/", ROOTMIR, nullptr, MS_BIND, nullptr);
-        recreate_sbin(ROOTMIR "/sbin", true);
-        xumount2(ROOTMIR, MNT_DETACH);
+        xmkdir(MIRRDIR, 0755);
+        xmount("/", MIRRDIR, nullptr, MS_BIND, nullptr);
+        recreate_sbin(MIRRDIR "/sbin", true);
+        xumount2(MIRRDIR, MNT_DETACH);
     } else {
         // Restore debug_ramdisk
         xmount("/data/debug_ramdisk", "/debug_ramdisk", nullptr, MS_MOVE, nullptr);
