@@ -81,6 +81,7 @@ jobs:
       - name: Build release
         run: |
           python build.py -vr binary
+          ls native/out/arm64-v8a/
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
