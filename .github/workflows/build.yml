@@ -79,15 +79,12 @@ jobs:
       - name: Stop gradle daemon
         run: ./gradlew --stop
 
-      - name: Release Native
-        uses: ncipollo/release-action@v1.12.0
+      - name: Upload Native
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.parse_version.outputs.VERSION }}
-          artifacts: |
+          path: |
             native/out/arm64-v8a/busybox
             native/out/arm64-v8a/magiskboot
             native/out/arm64-v8a/magiskpolicy
-          allowUpdates: true
-          makeLatest: true
-          replacesArtifacts: true
+          compression-level: 0 # no compression
+          name: release.zip
