@@ -432,8 +432,8 @@ def build_binary(args):
 
     # BusyBox is built with different libc
 
-    if "busybox" in args.target:
-        run_ndk_build("B_BB=1")
+    # if "busybox" in args.target:
+    #     run_ndk_build("B_BB=1")
 
 
 def find_jdk():
