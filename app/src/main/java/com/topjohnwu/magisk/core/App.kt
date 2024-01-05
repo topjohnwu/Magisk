@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.system.Os
 import androidx.profileinstaller.ProfileInstaller
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.StubApk
@@ -46,6 +47,8 @@ open class App() : Application() {
             Timber.e(e)
             exitProcess(1)
         }
+
+        Os.setenv("PATH", "${Os.getenv("PATH")}:/debug_ramdisk:/sbin", true)
     }
 
     override fun attachBaseContext(context: Context) {
