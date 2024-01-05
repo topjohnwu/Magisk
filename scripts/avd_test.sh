@@ -138,7 +138,7 @@ test_emu() {
   emu_pid=$!
   wait_emu wait_for_boot
 
-  adb shell magisk -v
+  adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
 
   # Install the Magisk app
   adb install -r -g out/app-${variant}.apk
@@ -149,7 +149,7 @@ test_emu() {
   # Install LSPosed
   if [ $api -ge $lsposed_min_api -a $api -le $atd_max_api ]; then
     adb push out/lsposed.zip /data/local/tmp/lsposed.zip
-    adb shell echo 'magisk --install-module /data/local/tmp/lsposed.zip' \| /system/xbin/su
+    adb shell echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' \| /system/xbin/su
   fi
 
   adb reboot

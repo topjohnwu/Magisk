@@ -25,16 +25,11 @@ static void setup_mounts() {
     char path[PATH_MAX];
 
     // Bind remount module root to clear nosuid
-    if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
-        ssprintf(path, sizeof(path), "%s/" MODULEMNT, get_magisk_tmp());
-        xmkdir(SECURE_DIR, 0700);
-        xmkdir(MODULEROOT, 0755);
-        xmkdir(path, 0755);
-        xmount(MODULEROOT, path, nullptr, MS_BIND, nullptr);
-        xmount(nullptr, path, nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
-        xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
-        chmod(SECURE_DIR, 0700);
-    }
+    ssprintf(path, sizeof(path), "%s/" MODULEMNT, get_magisk_tmp());
+    xmkdir(path, 0755);
+    xmount(MODULEROOT, path, nullptr, MS_BIND, nullptr);
+    xmount(nullptr, path, nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
+    xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
 
     // Check and mount preinit mirror
     char dev_path[64];
@@ -181,10 +176,10 @@ static bool magisk_env() {
 
     LOGI("* Initializing Magisk environment\n");
 
-    preserve_stub_apk();
-
     // Directories in /data/adb
+    chmod(SECURE_DIR, 0700);
     xmkdir(DATABIN, 0755);
+    xmkdir(MODULEROOT, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
     restorecon();
@@ -275,45 +270,54 @@ static bool check_key_combo() {
  * Boot Stage Handlers *
  ***********************/
 
-extern int disable_deny();
+static void disable_zygisk() {
+    char sql[64];
+    sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
+            DB_SETTING_KEYS[ZYGISK_CONFIG], false);
+    char *err = db_exec(sql);
+    db_err(err);
+}
 
 bool MagiskD::post_fs_data() const {
     as_rust().setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
 
-    unlock_blocks();
-    setup_mounts();
+    preserve_stub_apk();
     prune_su_access();
 
     bool safe_mode = false;
 
     if (access(SECURE_DIR, F_OK) != 0) {
-        LOGE(SECURE_DIR " is not present, abort\n");
-        goto early_abort;
+        if (SDK_INT < 24) {
+            xmkdir(SECURE_DIR, 0700);
+        } else {
+            LOGE(SECURE_DIR " is not present, abort\n");
+            return safe_mode;
+        }
     }
 
     if (!magisk_env()) {
         LOGE("* Magisk environment incomplete, abort\n");
-        goto early_abort;
+        return safe_mode;
     }
 
     if (get_prop("persist.sys.safemode", true) == "1" ||
         get_prop("ro.sys.safemode") == "1" || check_key_combo()) {
         safe_mode = true;
-        // Disable all modules and denylist so next boot will be clean
+        // Disable all modules and zygisk so next boot will be clean
         disable_modules();
-        disable_deny();
-    } else {
-        exec_common_scripts("post-fs-data");
-        db_settings dbs;
-        get_db_settings(dbs, ZYGISK_CONFIG);
-        zygisk_enabled = dbs[ZYGISK_CONFIG];
-        initialize_denylist();
-        handle_modules();
+        disable_zygisk();
+        return safe_mode;
     }
 
-early_abort:
+    exec_common_scripts("post-fs-data");
+    db_settings dbs;
+    get_db_settings(dbs, ZYGISK_CONFIG);
+    zygisk_enabled = dbs[ZYGISK_CONFIG];
+    initialize_denylist();
+    setup_mounts();
+    handle_modules();
     load_modules();
     return safe_mode;
 }
