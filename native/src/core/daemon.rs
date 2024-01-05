@@ -81,7 +81,7 @@ impl MagiskD {
             }
             RequestCode::BOOT_COMPLETE => {
                 unsafe { libc::close(client) };
-                if !state.contains(BootState::SafeMode) {
+                if state.contains(BootState::PostFsDataDone) {
                     state.set(BootState::BootComplete);
                     self.as_cxx().boot_complete()
                 }

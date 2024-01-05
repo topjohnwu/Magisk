@@ -324,14 +324,6 @@ void ls_list(int client) {
     close(client);
 }
 
-static void update_deny_config() {
-    char sql[64];
-    sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-        DB_SETTING_KEYS[DENYLIST_CONFIG], denylist_enforced.load());
-    char *err = db_exec(sql);
-    db_err(err);
-}
-
 int enable_deny() {
     if (denylist_enforced) {
         return DenyResponse::OK;
@@ -368,7 +360,7 @@ int enable_deny() {
         }
     }
 
-    update_deny_config();
+    set_db_settings(DENYLIST_CONFIG, true);
     return DenyResponse::OK;
 }
 
@@ -376,7 +368,7 @@ int disable_deny() {
     if (denylist_enforced.exchange(false)) {
         LOGI("* Disable DenyList\n");
     }
-    update_deny_config();
+    set_db_settings(DENYLIST_CONFIG, false);
     return DenyResponse::OK;
 }
 

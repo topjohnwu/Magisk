@@ -117,6 +117,7 @@ db_settings::db_settings() {
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;
     data[ZYGISK_CONFIG] = MagiskD::get()->is_emulator();
+    data[SAFEMODE_CONFIG] = false;
 }
 
 int db_settings::get_idx(string_view key) const {
@@ -338,6 +339,16 @@ int get_db_settings(db_settings &cfg, int key) {
         err = db_exec("SELECT * FROM settings", settings_cb);
     }
     db_err_cmd(err, return 1);
+    return 0;
+}
+
+int set_db_settings(int key, int value) {
+    char *err;
+    char sql[128];
+    ssprintf(sql, sizeof(sql), "INSERT OR REPLACE INTO settings VALUES ('%s', %d)",
+             DB_SETTING_KEYS[key], value);
+    err = db_exec(sql);
+    db_err_cmd(err, return 1)
     return 0;
 }
 
