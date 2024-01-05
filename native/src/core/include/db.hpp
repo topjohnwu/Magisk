@@ -39,7 +39,8 @@ constexpr const char *DB_SETTING_KEYS[] = {
     "multiuser_mode",
     "mnt_ns",
     "denylist",
-    "zygisk"
+    "zygisk",
+    "safemode",
 };
 
 // Settings key indices
@@ -48,7 +49,8 @@ enum {
     SU_MULTIUSER_MODE,
     SU_MNT_NS,
     DENYLIST_CONFIG,
-    ZYGISK_CONFIG
+    ZYGISK_CONFIG,
+    SAFEMODE_CONFIG,
 };
 
 // Values for root_access
@@ -124,6 +126,7 @@ using db_row = std::map<std::string_view, std::string_view>;
 using db_row_cb = std::function<bool(db_row&)>;
 
 int get_db_settings(db_settings &cfg, int key = -1);
+int set_db_settings(int key, int value);
 int get_db_strings(db_strings &str, int key = -1);
 void rm_db_strings(int key);
 void exec_sql(int client);

@@ -121,17 +121,21 @@ static bool check_key_combo() {
     return true;
 }
 
+static bool check_safe_mode() {
+    int safe_mode;
+    db_settings dbs;
+    get_db_settings(dbs, SAFEMODE_CONFIG);
+    safe_mode = dbs[SAFEMODE_CONFIG];
+
+    set_db_settings(SAFEMODE_CONFIG, safe_mode + 1);
+
+    return safe_mode >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
+           get_prop("ro.sys.safemode") == "1" || check_key_combo();
+}
+
 /***********************
  * Boot Stage Handlers *
  ***********************/
-
-static void disable_zygisk() {
-    char sql[64];
-    sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
-            DB_SETTING_KEYS[ZYGISK_CONFIG], false);
-    char *err = db_exec(sql);
-    db_err(err);
-}
 
 bool MagiskD::post_fs_data() const {
     as_rust().setup_logfile();
@@ -148,21 +152,23 @@ bool MagiskD::post_fs_data() const {
             xmkdir(SECURE_DIR, 0700);
         } else {
             LOGE(SECURE_DIR " is not present, abort\n");
+            safe_mode = true;
             return safe_mode;
         }
     }
 
     if (!magisk_env()) {
         LOGE("* Magisk environment incomplete, abort\n");
+        safe_mode = true;
         return safe_mode;
     }
 
-    if (get_prop("persist.sys.safemode", true) == "1" ||
-        get_prop("ro.sys.safemode") == "1" || check_key_combo()) {
+    if (check_safe_mode()) {
+        LOGI("* Safe mode triggered\n");
         safe_mode = true;
         // Disable all modules and zygisk so next boot will be clean
         disable_modules();
-        disable_zygisk();
+        set_db_settings(ZYGISK_CONFIG, false);
         return safe_mode;
     }
 
@@ -190,6 +196,8 @@ void MagiskD::boot_complete() const {
     as_rust().setup_logfile();
 
     LOGI("** boot-complete triggered\n");
+
+    set_db_settings(SAFEMODE_CONFIG, 0);
 
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)
