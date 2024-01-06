@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">Reboot to Bootloader</string>
     <string name="reboot_download">Reboot to Download</string>
     <string name="reboot_edl">Reboot to EDL</string>
+    <string name="reboot_safe_mode">Safe mode</string>
     <string name="module_version_author">%1$s by %2$s</string>
     <string name="module_state_remove">Remove</string>
     <string name="module_state_restore">Restore</string>

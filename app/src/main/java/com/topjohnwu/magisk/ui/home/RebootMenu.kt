@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.ktx.reboot as systemReboot
 
@@ -20,6 +22,11 @@ object RebootMenu {
             R.id.action_reboot_download -> systemReboot("download")
             R.id.action_reboot_edl -> systemReboot("edl")
             R.id.action_reboot_recovery -> systemReboot("recovery")
+            R.id.action_reboot_safe_mode -> {
+                val status = !item.isChecked
+                item.isChecked = status
+                Config.safemode = if (status) 2 else 0
+            }
             else -> Unit
         }
         return true
@@ -29,10 +36,16 @@ object RebootMenu {
         val themeWrapper = ContextThemeWrapper(activity, R.style.Foundation_PopupMenu)
         val menu = PopupMenu(themeWrapper, activity.findViewById(R.id.action_reboot))
         activity.menuInflater.inflate(R.menu.menu_reboot, menu.menu)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-            activity.getSystemService<PowerManager>()?.isRebootingUserspaceSupported == true)
-            menu.menu.findItem(R.id.action_reboot_userspace).isVisible = true
         menu.setOnMenuItemClickListener(RebootMenu::reboot)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            activity.getSystemService<PowerManager>()?.isRebootingUserspaceSupported == true) {
+            menu.menu.findItem(R.id.action_reboot_userspace).isVisible = true
+        }
+        if (Const.APP_IS_CANARY) {
+            menu.menu.findItem(R.id.action_reboot_safe_mode).isChecked = Config.safemode >= 2
+        } else {
+            menu.menu.findItem(R.id.action_reboot_safe_mode).isVisible = false
+        }
         return menu
     }
 

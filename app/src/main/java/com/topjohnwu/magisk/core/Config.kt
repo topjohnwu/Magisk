@@ -40,6 +40,7 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_MNT_NS = "mnt_ns"
         const val SU_BIOMETRIC = "su_biometric"
         const val ZYGISK = "zygisk"
+        const val SAFEMODE = "safemode"
         const val DENYLIST = "denylist"
         const val SU_MANAGER = "requester"
         const val KEYSTORE = "keystore"
@@ -166,6 +167,7 @@ object Config : PreferenceConfig, DBConfig {
             suBiometric = value
         }
     var zygisk by dbSettings(Key.ZYGISK, false)
+    var safemode by dbSettings(Key.SAFEMODE, 0)
     var denyList by BoolDBPropertyNoWrite(Key.DENYLIST, false)
     var suManager by dbStrings(Key.SU_MANAGER, "", true)
     var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
