@@ -187,6 +187,7 @@ DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
     if (should_unmap_zygisk) {
         g_hook->restore_plt_hook();
         if (should_unmap_zygisk) {
+            ZLOGV("dlclosing self\n");
             delete g_hook;
 
             // Because both `pthread_attr_destroy` and `dlclose` have the same function signature,
@@ -202,13 +203,12 @@ DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
 
 // it should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
 DCL_HOOK_FUNC(static int, dlclose, void *handle) {
-    static bool kDone = false;
-    if (!kDone) {
+    if (!self_handle) {
         ZLOGV("dlclose zygisk_loader\n");
-        kDone = true;
+        self_handle = handle;
         g_hook->post_native_bridge_load();
     }
-    [[clang::musttail]] return old_dlclose(handle);
+    return 0;
 }
 
 #undef DCL_HOOK_FUNC
