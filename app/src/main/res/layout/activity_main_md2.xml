@@ -43,7 +43,6 @@
                 android:layout_width="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_scrollFlags="noScroll"
-                tools:layout_marginTop="24dp"
                 tools:title="Home" />
 
         </com.google.android.material.appbar.AppBarLayout>
