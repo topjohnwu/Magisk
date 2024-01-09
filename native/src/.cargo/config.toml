@@ -7,19 +7,3 @@ target = "aarch64-linux-android"
 build-std = ["std", "panic_abort"]
 build-std-features = ["panic_immediate_abort"]
 profile-rustflags = true
-
-# Workaround bug for undefined symbol errors that occur with the
-# combination of `-Zbuild-std`, `opt-level = "z"`, and `lto = true`.
-# compiler_builtins are expected to be built with special flags.
-# https://github.com/rust-lang/rust/issues/108853
-# https://github.com/rust-lang/wg-cargo-std-aware/issues/62
-
-[profile.release.package.compiler_builtins]
-rustflags = ["-Zshare-generics=off"]
-overflow-checks = false
-debug-assertions = false
-
-[profile.dev.package.compiler_builtins]
-rustflags = ["-Zshare-generics=off"]
-overflow-checks = false
-debug-assertions = false
