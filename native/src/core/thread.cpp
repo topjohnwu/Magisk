@@ -17,6 +17,7 @@ static pthread_cond_t recv_task = PTHREAD_COND_INITIALIZER_MONOTONIC_NP;
 static int idle_threads = 0;
 static int total_threads = 0;
 static function<void()> pending_task;
+static pthread_once_t initialized = PTHREAD_ONCE_INIT;
 
 static void operator+=(timespec &a, const timespec &b) {
     a.tv_sec += b.tv_sec;
@@ -42,8 +43,6 @@ static void reset_pool() {
 }
 
 static void *thread_pool_loop(void * const is_core_pool) {
-    pthread_atfork(nullptr, nullptr, &reset_pool);
-
     // Block all signals
     sigset_t mask;
     sigfillset(&mask);
@@ -85,6 +84,9 @@ static void *thread_pool_loop(void * const is_core_pool) {
 
 void exec_task(function<void()> &&task) {
     mutex_guard g(lock);
+    pthread_once(&initialized, []() -> void {
+        pthread_atfork(nullptr, nullptr, &reset_pool);
+    });
     pending_task.swap(task);
     if (idle_threads == 0) {
         ++total_threads;
