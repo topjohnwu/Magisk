@@ -8,7 +8,7 @@ If unfortunately you do not have USB debugging enabled, reboot into Safe Mode. M
 
 Magisk can detect Safe Mode key combo in a similar way to system and activate 'Magisk Safe Mode' which disables all modules.
 
-Nb. Magisk detects the key combo earlier than system, so it's possible to activate Magisk Safe Mode but not system Safe Mode, and vice versa...
+Please Note: Magisk detects the key combo earlier than system, so it's possible to activate Magisk Safe Mode but not system Safe Mode, and vice versa...
 
 Many online guides for entering Safe Mode say (1) 'when the animated logo appears, press and hold the volume down button until the system boots' or similar... However this may actually be to late for Magisk detection and result in activating system Safe Mode but modules aren't disabled... (2) Further, if user presses vol. down button some seconds earlier but releases it when boot animation appears, activating Magisk Safe Mode may be achieved (modules are disabled) without activating system Safe Mode and device should then simply boot to normal system. Next, manage disabled modules through the Magisk app... (3) If user presses vol. down button some seconds before the animation and holds it until the system boots, both Magisk Safe Mode and system Safe Mode can be activated. Next, reboot back to normal system mode and manage disabled modules through the Magisk app.
 
