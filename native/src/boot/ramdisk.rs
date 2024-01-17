@@ -18,7 +18,6 @@ pub trait MagiskCpio {
 
 const MAGISK_PATCHED: i32 = 1 << 0;
 const UNSUPPORTED_CPIO: i32 = 1 << 1;
-const SONY_INIT: i32 = 1 << 2;
 
 impl MagiskCpio for Cpio {
     fn patch(&mut self) {
@@ -77,9 +76,6 @@ impl MagiskCpio for Cpio {
                 ret |= MAGISK_PATCHED;
                 break;
             }
-        }
-        if self.exists("init.real") {
-            ret |= SONY_INIT;
         }
         ret
     }
