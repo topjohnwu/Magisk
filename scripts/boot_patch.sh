@@ -139,12 +139,6 @@ case $((STATUS & 3)) in
     ;;
 esac
 
-# Workaround custom legacy Sony /init -> /(s)bin/init_sony : /init.real setup
-INIT=init
-if [ $((STATUS & 4)) -ne 0 ]; then
-  INIT=init.real
-fi
-
 if [ -f config.orig ]; then
   # Read existing configs
   chmod 0644 config.orig
@@ -187,7 +181,7 @@ fi
 [ -n "$SHA1" ] && echo "SHA1=$SHA1" >> config
 
 ./magiskboot cpio ramdisk.cpio \
-"add 0750 $INIT magiskinit" \
+"add 0750 init magiskinit" \
 "mkdir 0750 overlay.d" \
 "mkdir 0750 overlay.d/sbin" \
 "$SKIP32 add 0644 overlay.d/sbin/magisk32.xz magisk32.xz" \
