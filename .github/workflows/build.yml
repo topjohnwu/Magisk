@@ -80,7 +80,8 @@ jobs:
 
       - name: Build release
         run: |
-          python build.py -vr binary
+          build.py -rv binary resetprop magiskpolicy busybox magiskboot
+          $ONDK/bin/llvm-strip -s -g resetprop magiskpolicy busybox magiskboot
           mv native/out/arm64-v8a/busybox native/out/arm64-v8a/libbusybox.so
           mv native/out/arm64-v8a/magiskboot native/out/arm64-v8a/libmagiskboot.so
           mv native/out/arm64-v8a/magiskpolicy native/out/arm64-v8a/libmagiskpolicy.so
