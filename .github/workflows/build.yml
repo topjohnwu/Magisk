@@ -80,11 +80,14 @@ jobs:
 
       - name: Build release
         run: |
+          ONDK=/usr/local/lib/android/sdk/ndk/magisk/toolchains/llvm/prebuilt/linux-x86_64
+          OUT=$GITHUB_WORKSPACE/native/out/arm64-v8a
           ./build.py -rv binary resetprop magiskpolicy busybox magiskboot
-          $ONDK/bin/llvm-strip -s -g resetprop magiskpolicy busybox magiskboot
-          mv native/out/arm64-v8a/busybox native/out/arm64-v8a/libbusybox.so
-          mv native/out/arm64-v8a/magiskboot native/out/arm64-v8a/libmagiskboot.so
-          mv native/out/arm64-v8a/magiskpolicy native/out/arm64-v8a/libmagiskpolicy.so
+          $ONDK/bin/llvm-strip -s -g $OUT/resetprop $OUT/magiskpolicy $OUT/busybox $OUT/magiskboot
+          mv $OUT/busybox out/libbusybox.so
+          mv $OUT/resetprop out/libresetprop.so
+          mv $OUT/magiskboot out/libmagiskboot.so
+          mv $OUT/magiskpolicy out/libmagiskpolicy.so
 
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
