@@ -69,16 +69,16 @@ cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
 
 # archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"]
-archs = ["arm64-v8a"]
+archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"]
 triples = [
-#     "armv7a-linux-androideabi",
-#     "i686-linux-android",
+    "armv7a-linux-androideabi",
+    "i686-linux-android",
     "aarch64-linux-android",
-#     "x86_64-linux-android",
+    "x86_64-linux-android",
 ]
-default_targets = ["magiskboot", "magiskpolicy", "busybox"]
+default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybox"]
 support_targets = default_targets + ["resetprop"]
-rust_targets = [ "magiskboot", "magiskpolicy"]
+rust_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 
 sdk_path = os.environ["ANDROID_SDK_ROOT"]
 ndk_root = op.join(sdk_path, "ndk")
