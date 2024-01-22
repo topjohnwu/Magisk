@@ -521,9 +521,10 @@ abstract class MagiskInstallImpl protected constructor(
             return false
         }
 
-        console.add("***************************************")
+        console.add("*************************************************************")
         console.add(" Next reboot will boot to second slot!")
-        console.add("***************************************")
+        console.add(" Go back to System Updates and press Restart to complete OTA")
+        console.add("*************************************************************")
         return true
     }
 
