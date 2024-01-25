@@ -10,7 +10,6 @@
     <string name="section_theme">עיצוב</string>
     <string name="denylist">רשימת דחייה</string>
 
-
     <!--Home-->
     <string name="no_connection">אין חיבור זמין</string>
     <string name="app_changelog">רשימת שינויים</string>
@@ -90,8 +89,6 @@
     <string name="target_pid">מציב ns יעד PID: %s</string>
     <string name="selinux_context">הקשר SELinux: %s</string>
     <string name="supp_group">קבוצה משלימה: %s</string>
-
-    <!--SafetyNet-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">הצגת יישומי מערכת</string>
@@ -240,4 +237,5 @@
     <string name="app_not_found">לא נמצא יישום לטיפול בפעולה זו</string>
     <string name="reboot_apply_change">ייש להפעיל מחדש כדי להחיל שינויים</string>
     <string name="restore_app_confirmation">פעולה זו תשחזר את היישום המוסתר חזרה ליישום המקורי. האם בוודאות ברצונך לעשות את זה?</string>
+
 </resources>
