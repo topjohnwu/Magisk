@@ -1,7 +1,6 @@
 <resources>
-    <!--Universal-->
 
-    <!--Welcome Activity-->
+    <!--Sections-->
     <string name="modules">Moduli</string>
     <string name="superuser">Superuser</string>
     <string name="logs">Zapisnik događaja</string>
@@ -18,7 +17,6 @@
     <string name="not_available">N/A</string>
     <string name="hide">Sakrij</string>
     <string name="home_package">Paket</string>
-
     <string name="home_support_title">Podržite nas</string>
     <string name="home_item_source">Izvor</string>
     <string name="home_support_content">Magisk je i uvijek će biti besplatan i otvoren. Međutim, možete nam pokazati da vam je stalo slanjem male donacije.</string>
@@ -70,7 +68,6 @@
     <string name="su_revoke_msg">Potvrdite da biste opozvali prava za %1$s?</string>
     <string name="toast">Pop-up</string>
     <string name="none">Nijedan</string>
-
     <string name="superuser_toggle_notification">Obavijesti</string>
     <string name="superuser_toggle_revoke">Opozovi</string>
     <string name="superuser_policy_none">Još nijedna aplikacija nije zatražila Superuser prava.</string>
@@ -84,14 +81,12 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ciljani UID: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Prikaži sistemske aplikacije</string>
     <string name="hide_filter_hint">Filtriraj prema nazivu</string>
     <string name="hide_search">Traži</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(Nema podataka)</string>
     <string name="reboot_recovery">Ponovo pokreni u Recovery</string>
     <string name="reboot_bootloader">Ponovo pokreni u Bootloader</string>
@@ -103,7 +98,7 @@
     <string name="module_action_install_external">Instaliraj iz pohrane</string>
     <string name="update_available">Ažuriranje dostupno</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Teme</string>
     <string name="settings_dark_mode_message">Odaberite temu koja najbolje odgovara vašem stilu!</string>
     <string name="settings_dark_mode_light">Uvijek svijetla</string>
@@ -146,7 +141,6 @@
     <string name="setting_add_shortcut_summary">Dodajte lijepi prečac na početni zaslon u slučaju da je naziv i ikonu teško prepoznati nakon skrivanja aplikacije</string>
     <string name="settings_doh_title">DNS preko HTTPS-a</string>
     <string name="settings_doh_description">Zaobilazno trovanje DNS-om u nekim zemljama</string>
-
     <string name="multiuser_mode">Višekorisnički način rada</string>
     <string name="settings_owner_only">Samo vlasnik uređaja</string>
     <string name="settings_owner_manage">Upravljano od strane vlasnika uređaja</string>
@@ -154,7 +148,6 @@
     <string name="owner_only_summary">Samo vlasnik ima root pristup</string>
     <string name="owner_manage_summary">Samo vlasnik može upravljati root pristupom i primati zahtjeve za root pristup</string>
     <string name="user_independent_summary">Svaki korisnik ima vlastita root pravila</string>
-
     <string name="mount_namespace_mode">Postavljanje imenskog prostora</string>
     <string name="settings_ns_global">Globalni imenski prostor</string>
     <string name="settings_ns_requester">Naslijediti imenski prostor</string>
@@ -194,4 +187,5 @@
     <string name="external_rw_permission_denied">Odobrite dopuštenje za pohranu da biste omogućili ovu funkciju</string>
     <string name="add_shortcut_title">Dodaj prečac na početni zaslon</string>
     <string name="app_not_found">Nije pronađena nijedna aplikacijaza obradu ove radnju</string>
+
 </resources>
