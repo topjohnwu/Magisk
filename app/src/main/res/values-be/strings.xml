@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
     <!--Sections-->
     <string name="modules">Модулі</string>
     <string name="superuser">Правы суперкарыстальніка</string>
@@ -8,6 +8,7 @@
     <string name="install">Усталёўка</string>
     <string name="section_home">Хатняя старонка</string>
     <string name="section_theme">Тэмы</string>
+    
     <!--Home-->
     <string name="no_connection">Злучэнне адсутнічае</string>
     <string name="app_changelog">Спіс змен</string>
@@ -26,6 +27,7 @@
     <string name="invalid_update_channel">Хібны канал абнаўлення</string>
     <string name="uninstall_magisk_title">Выдаліць Magisk</string>
     <string name="uninstall_magisk_msg">Усе модулі будуць адключаныя/выдаленыя!\nRoot будзе выдалены!\nВашыя даныя будуць зашыфраваныя!</string>
+    
     <!--Install-->
     <string name="keep_force_encryption">Прымусова захаваць шыфраванне</string>
     <string name="keep_dm_verity">Захаваць AVB 2.0/dm-verity</string>
@@ -43,6 +45,7 @@
     <string name="patch_file_msg">Абярыце файл вобраза (*.img) альбо архіў ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Перазапуск праз 5 секунд…</string>
     <string name="flash_screen_title">Усталёўка</string>
+    
     <!--Superuser-->
     <string name="su_request_title">Запыт правоў суперкарыстальніка</string>
     <string name="touch_filtered_warning">Праграма перакрывае запыт на выдачу правоў суперкарыстальніка, таму Magisk не можа апрацаваць ваш адказ</string>
@@ -71,6 +74,7 @@
     <string name="superuser_toggle_notification">Апавяшчэнні</string>
     <string name="superuser_toggle_revoke">Адклікаць</string>
     <string name="superuser_policy_none">Праграма яшчэ не запытвала правоў суперкарыстальніка.</string>
+    
     <!--Logs-->
     <string name="log_data_none">Журналаў няма. Паспрабуйце даць праграмам правы суперкарыстальніка.</string>
     <string name="log_data_magisk_none">Журналы адсутнічаюць.</string>
@@ -79,12 +83,13 @@
     <string name="logs_cleared">Журнал паспяхова ачышчаны</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Мэтавы UID: %1$d</string>
-    <!--SafetyNet-->
+    
     <!--MagiskHide-->
     <string name="show_system_app">Паказваць сістэмныя праграмы</string>
     <string name="show_os_app">Паказваць сістэмныя праграмы</string>
     <string name="hide_filter_hint">Фільтраваць па назве</string>
     <string name="hide_search">Пошук</string>
+    
     <!--Module-->
     <string name="no_info_provided">(Няма інфармацыі)</string>
     <string name="reboot_userspace">Праграмны перазапуск</string>
@@ -97,6 +102,7 @@
     <string name="module_state_restore">Аднавіць</string>
     <string name="module_action_install_external">Усталяваць са сховішча</string>
     <string name="update_available">Даступныя абнаўленні</string>
+    
     <!--Settings-->
     <string name="settings_dark_mode_title">Рэжым афармлення</string>
     <string name="settings_dark_mode_message">Абярыце рэжым, які вам больш даспадобы!</string>
@@ -160,12 +166,14 @@
     <string name="global_summary">Сеансы суперкарыстальніка выкарыстоўваюць агульную прастору назваў</string>
     <string name="requester_summary">Сеансы суперкарыстальніка выкарыстоўваюць спадкаемную прастору назваў</string>
     <string name="isolate_summary">Сеансы суперкарыстальніка выкарыстоўваюць ізаляваную прастору назваў</string>
+    
     <!--Notifications-->
     <string name="update_channel">Абнаўленні Magisk</string>
     <string name="progress_channel">Апавяшчэнні пра ход выканання</string>
     <string name="download_complete">Спампоўка завершаная</string>
     <string name="download_file_error">Не атрымалася спампаваць файл</string>
     <string name="magisk_update_title">Даступна абнаўленне Magisk!</string>
+    
     <!--Toasts, Dialogs-->
     <string name="yes">Так</string>
     <string name="no">Не</string>
@@ -200,4 +208,5 @@
     <string name="add_shortcut_title">Дадаць цэтлік на хатні экран</string>
     <string name="add_shortcut_msg">Пасля хавання праграмы значок і назву можа быць цяжка знайсці. Хочаце дадаць цэтлік на хатні экран?</string>
     <string name="app_not_found">Не знойдзена праграм для апрацоўкі гэтага дзеяння</string>
+
 </resources>
