@@ -1,5 +1,6 @@
 <resources>
-	<!--Sections-->
+
+    <!--Sections-->
     <string name="modules">Moduler</string>
     <string name="superuser">Superuser</string>
     <string name="logs">Logg</string>
@@ -17,7 +18,6 @@
     <string name="hide">Dölj</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Ladda endast ned magisk från den officiella GitHub-sidan. Filer från okända källor kan innehålla skadlig kod!</string>
     <string name="home_support_title">Stöd oss</string>
     <string name="home_item_source">Källa</string>
@@ -71,7 +71,6 @@
     <string name="su_revoke_msg">Bekräfta återkallning utav %1$s rättigheter?</string>
     <string name="toast">Toast-meddelande</string>
     <string name="none">Inga</string>
-
     <string name="superuser_toggle_notification">Aviseringar</string>
     <string name="superuser_toggle_revoke">Återkalla</string>
     <string name="superuser_policy_none">Inga appar har bett om superuser-rättigheter ännu.</string>
@@ -82,10 +81,8 @@
     <string name="menuSaveLog">Spara loggen</string>
     <string name="menuClearLog">Rensa loggen</string>
     <string name="logs_cleared">Loggrensning lyckades</string>
-    <!-- <string name="pid">PID: %1$d</string> -->
-    <!-- <string name="target_uid">Target UID: %1$d</string> -->
-
-    <!--SafetyNet-->
+    <string name="pid">PID: %1$d</string>
+    <string name="target_uid">Target UID: %1$d</string>
 
     <!--MagiskHide-->
     <string name="show_system_app">Visa system-appar</string>
@@ -155,7 +152,6 @@
     <string name="setting_add_shortcut_summary">Lägg till en snygg genväg på startskärmen om namnet och ikonen är svåra att känna igen efter att appen har döljts</string>
     <string name="settings_doh_title">DNS över HTTPS</string>
     <string name="settings_doh_description">Lösning för DNS-förgiftning i vissa länder</string>
-
     <string name="multiuser_mode">Multiuser-läge</string>
     <string name="settings_owner_only">Endast enhetsägare</string>
     <string name="settings_owner_manage">Enhetsägare hanterar</string>
@@ -163,7 +159,6 @@
     <string name="owner_only_summary">Endast ägare har root-åtkomst</string>
     <string name="owner_manage_summary">Endast ägare kan hantera root-åtkomst och ta emot bägärda förfrågningar</string>
     <string name="user_independent_summary">Varje användare har sina egna separata root-regler</string>
-
     <string name="mount_namespace_mode">Montera namnrymdsläge</string>
     <string name="settings_ns_global">Global namnrymd</string>
     <string name="settings_ns_requester">Ärv namnrymden</string>
@@ -171,7 +166,6 @@
     <string name="global_summary">Alla root-sessioner använder den globala namnrymden</string>
     <string name="requester_summary">Root-sessioner kommer att ärva den sökandes namnrymd</string>
     <string name="isolate_summary">Varje root-session kommer att ha sin egen isolerade namnrymd</string>
-
 
     <!--Notifications-->
     <string name="update_channel">Magisk-uppdatering</string>
@@ -208,4 +202,5 @@
     <string name="add_shortcut_title">Lägg till genväg på hemskärmen</string>
     <string name="add_shortcut_msg">Efter att appen dolts så kan ikonen och namnet vara svårt att känna igen. Vill du lägga till en snygg genväg till din hemskärm?</string>
     <string name="app_not_found">Ingen applikation hittades för att hantera den här åtgärden</string>
+
 </resources>
