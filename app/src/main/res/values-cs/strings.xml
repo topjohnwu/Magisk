@@ -19,7 +19,6 @@
     <string name="hide">Skrýt</string>
     <string name="home_package">Balíček</string>
     <string name="home_app_title">Aplikace</string>
-
     <string name="home_notice_content">Stahujte Magisk POUZE z oficiální stránky GitHub. Soubory z neznámých zdrojů mohou být škodlivé!</string>
     <string name="home_support_title">Podpořte nás</string>
     <string name="home_follow_title">Sledujte nás</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Potvrzením odeberete %1$s oprávnění SuperUser</string>
     <string name="toast">Text</string>
     <string name="none">Žádné</string>
-
     <string name="superuser_toggle_notification">Oznámení</string>
     <string name="superuser_toggle_revoke">Smazat</string>
     <string name="superuser_policy_none">Žádná aplikace nepožádala o oprávnění SuperUser.</string>
@@ -91,8 +89,6 @@
     <string name="target_pid">Připojit PID cílového ns: %s</string>
     <string name="selinux_context">SELinux kontext: %s</string>
     <string name="supp_group">Sekundární skupina: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Zobrazit systémové aplikace</string>
@@ -174,7 +170,6 @@
     <string name="setting_add_shortcut_summary">Přidá odkaz na domovskou obrazovku v případě, že se po skrytí aplikace její název a ikona těžko rozpoznávají.</string>
     <string name="settings_doh_title">DNS přes HTTPS</string>
     <string name="settings_doh_description">Obejde DNS v některých zemích</string>
-
     <string name="multiuser_mode">Režim více uživatelů</string>
     <string name="settings_owner_only">Vlastník zařízení</string>
     <string name="settings_owner_manage">Správce zařízení</string>
@@ -182,7 +177,6 @@
     <string name="owner_only_summary">Pouze vlastník má přístup ROOT</string>
     <string name="owner_manage_summary">Přístup ROOT má správce zařízení, který přijímá požadavky k přístupu</string>
     <string name="user_independent_summary">Každý uživatel má svá vlastní pravidla přístupu ROOT</string>
-
     <string name="mount_namespace_mode">Režim připojení jmenného prostoru</string>
     <string name="settings_ns_global">Globální jmenný prostor</string>
     <string name="settings_ns_requester">Odvozený jmenný prostor</string>
@@ -201,7 +195,7 @@
     <string name="updated_title">Magisk aktualizován</string>
     <string name="updated_text">Klepnutím otevřete aplikaci</string>
 
-<!--Toasts, Dialogs-->
+    <!--Toasts, Dialogs-->
     <string name="yes">Ano</string>
     <string name="no">Ne</string>
     <string name="repo_install_title">Instalovat %1$s %2$s(%3$d)</string>
