@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    
     <!--Sections-->
     <string name="modules">Módulos</string>
     <string name="superuser">Superusuariu</string>
@@ -9,6 +9,7 @@
     <string name="section_home">Aniciu</string>
     <string name="section_theme">Estilos</string>
     <string name="denylist">Llista d\'esclusión</string>
+    
     <!--Home-->
     <string name="no_connection">L\'accesu a internet nun ta disponible</string>
     <string name="app_changelog">Rexistru de cambeos</string>
@@ -28,6 +29,7 @@
     <string name="invalid_update_channel">La canal d\'anovamientu nun ye válida</string>
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">¡Van quitase y desactivase tolos módulos y l\'accesu root!\nCualesquier almacenamientu internu ensin cifrar pente l\'usu de Magisk va volver cifrase.</string>
+    
     <!--Install-->
     <string name="keep_force_encryption">Caltener el cifráu forciáu</string>
     <string name="keep_dm_verity">Caltener l\'AVB 2.0/dm-verity</string>
@@ -46,6 +48,7 @@
     <string name="patch_file_msg">Seleiciona una imaxe en bruto (*.img) o un archivu d\'ODIN (*.tar)</string>
     <string name="reboot_delay_toast">Reaniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
+    
     <!--Superuser-->
     <string name="su_request_title">Solicitú de superusuariu</string>
     <string name="touch_filtered_warning">Como una aplicación torga la solicitú de superusuariu, Magisk nun pue verificar la to rempuesta</string>
@@ -74,6 +77,7 @@
     <string name="superuser_toggle_notification">Avisos</string>
     <string name="superuser_toggle_revoke">Revocar</string>
     <string name="superuser_policy_none">Pel momentu, nenguna aplicación pidió\'l permisu de superusuariu.</string>
+    
     <!--Logs-->
     <string name="log_data_none">El rexistru ta baleru. Prueba a usar más aplicaciones de root</string>
     <string name="log_data_magisk_none">El rexistru de Magisk ta baleru. ¡Qué raro!</string>
@@ -82,12 +86,13 @@
     <string name="logs_cleared">El rexistru borróse correutamente</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de destín: %1$d</string>
-    <!--SafetyNet-->
+
     <!--MagiskHide-->
     <string name="show_system_app">Aplicaciones del sistema</string>
     <string name="show_os_app">Aplicaciones del SO</string>
     <string name="hide_filter_hint">Peñerar pol nome</string>
     <string name="hide_search">Buscar</string>
+    
     <!--Module-->
     <string name="no_info_provided">(Nun s\'apurrió nenguna información)</string>
     <string name="reboot_userspace">Reaniciu del sistema</string>
@@ -104,6 +109,7 @@
     <string name="suspend_text_zygisk">Suspendióse\'l módulu porque nun s\'activó «%1$s»</string>
     <string name="zygisk_module_unloaded">El módulu de Zygisk nun cargó pola mor d\'haber incompatibilidaes</string>
     <string name="module_empty">Nun hai nengún módulu instaláu</string>
+    
     <!--Settings-->
     <string name="settings_dark_mode_title">Mou del estilu</string>
     <string name="settings_dark_mode_message">¡Seleiciona\'l mou que meyor s\'adaute al to estilu!</string>
@@ -173,6 +179,7 @@
     <string name="global_summary">Toles sesiones de root usen l\'espaciu de nomes global</string>
     <string name="requester_summary">Les sesiones de root herieden l\'espaciu de nomes de los solicitantes</string>
     <string name="isolate_summary">Cada sesión de root tien el so espaciu de nomes propiu</string>
+    
     <!--Notifications-->
     <string name="update_channel">Anovamientos de Magisk</string>
     <string name="progress_channel">Avisos de progresos</string>
@@ -182,6 +189,7 @@
     <string name="magisk_update_title">¡Hai un anovamientu pa Magisk!</string>
     <string name="updated_title">Magisk anovóse</string>
     <string name="updated_text">Toca equí p\'abrir l\'aplicación</string>
+    
     <!--Toasts, Dialogs-->
     <string name="yes">Sí</string>
     <string name="no">Non</string>
@@ -219,4 +227,5 @@
     <string name="app_not_found">Nun s\'atopó nenguna aplicación pa remanar esta aición</string>
     <string name="reboot_apply_change">Reanicia p\'aplicar los cambeos</string>
     <string name="restore_app_confirmation">Esta aición va restaurar l\'aplicación orixinal y desanicia la intermedia. ¿De xuru que quies facelo?</string>
+
 </resources>
