@@ -19,7 +19,6 @@
     <string name="hide">Masquer</string>
     <string name="home_package">Paquet</string>
     <string name="home_app_title">Application</string>
-
     <string name="home_notice_content">Ne téléchargez Magisk qu’uniquement depuis la page GitHub officielle. Les fichiers provenant de sources inconnues peuvent être malveillants !</string>
     <string name="home_support_title">Soutenez‑nous</string>
     <string name="home_follow_title">Suivez-nous</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Confirmez‑vous la révocation des droits accordés à %1$s ?</string>
     <string name="toast">Bulle de notification</string>
     <string name="none">Aucune</string>
-
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Révoquer</string>
     <string name="superuser_policy_none">Aucune application n’a encore demandé de droits super‑utilisateur.</string>
@@ -92,15 +90,13 @@
     <string name="selinux_context">Contexte SELinux: %s</string>
     <string name="supp_group">Groupe supplémentaire: %s</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Afficher les applications système</string>
     <string name="show_os_app">Afficher les applications intégrées au système</string>
     <string name="hide_filter_hint">Filtrer par nom</string>
     <string name="hide_search">Rechercher</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(aucune info transmise)</string>
     <string name="reboot_userspace">Redémarrage à chaud</string>
     <string name="reboot_recovery">Redémarrer en mode récupération</string>
@@ -119,7 +115,7 @@
     <string name="confirm_install">Installer le module %1$s?</string>
     <string name="confirm_install_title">Confirmer l’installation</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Mode du thème</string>
     <string name="settings_dark_mode_message">Choisissez le mode qui correspond le mieux à votre style !</string>
     <string name="settings_dark_mode_light">Toujours clair</string>
@@ -177,7 +173,6 @@
     <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
     <string name="settings_doh_title">DNS sur HTTPS</string>
     <string name="settings_doh_description">Contournement de la censure du DNS dans certains pays</string>
-
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
     <string name="settings_owner_manage">Géré par le propriétaire de l’appareil</string>
@@ -185,7 +180,6 @@
     <string name="owner_only_summary">Seul le propriétaire possède un accès super‑utilisateur.</string>
     <string name="owner_manage_summary">Seul le propriétaire peut gérer l’accès super‑utilisateur et recevoir les demandes d’accès.</string>
     <string name="user_independent_summary">Chaque utilisateur a ses propres règles d’accès super‑utilisateur distinctes.</string>
-
     <string name="mount_namespace_mode">Mode d’espace de noms du montage</string>
     <string name="settings_ns_global">Espace de noms global</string>
     <string name="settings_ns_requester">Hériter de l’espace de noms</string>
