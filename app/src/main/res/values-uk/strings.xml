@@ -104,7 +104,7 @@
     <string name="module_action_install_external">Встановити зі сховища</string>
     <string name="update_available">Доступне оновлення</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Режим теми</string>
     <string name="settings_dark_mode_message">Виберіть режим, який вам найбільш до вподоби!</string>
     <string name="settings_dark_mode_light">Завжди світлий</string>
