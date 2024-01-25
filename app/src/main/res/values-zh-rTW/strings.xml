@@ -87,13 +87,13 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目標 UID: %1$d</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">顯示系統應用程式</string>
     <string name="show_os_app">顯示作業系统</string>
     <string name="hide_filter_hint">過濾名稱</string>
     <string name="hide_search">搜尋</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">（未提供資訊）</string>
     <string name="reboot_userspace">快速重新啟動</string>
     <string name="reboot_recovery">重新啟動至 Recovery</string>
@@ -112,7 +112,7 @@
     <string name="confirm_install">安裝模組 %1$s？</string>
     <string name="confirm_install_title">安裝確認</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">主題模式</string>
     <string name="settings_dark_mode_message">選擇最符合您風格的模式！</string>
     <string name="settings_dark_mode_light">淺色模式</string>
