@@ -19,7 +19,6 @@
     <string name="hide">Ascunde</string>
     <string name="home_package">Pachet</string>
     <string name="home_app_title">Aplicație</string>
-
     <string name="home_notice_content">Descarcă Magisk NUMAI de pe pagina oficială GitHub. Fișierele din surse necunoscute pot fi rău intenționate!</string>
     <string name="home_support_title">Sprijină-ne</string>
     <string name="home_follow_title">Urmărește-ne</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Confirmă revocarea drepturilor de superutilizator pentru %1$s</string>
     <string name="toast">Mesaj</string>
     <string name="none">Niciuna</string>
-
     <string name="superuser_toggle_notification">Notificări</string>
     <string name="superuser_toggle_revoke">Revocă</string>
     <string name="superuser_policy_none">Nicio aplicație nu a cerut încă permisiunea de superutilizator.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Jurnal golit cu succes</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID țintă: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Afișează aplicațiile de sistem</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
     <string name="settings_doh_title">DNS prin HTTPS</string>
     <string name="settings_doh_description">Soluție ocolitoare pentru poisoningul DNS în anumite țări</string>
-
     <string name="multiuser_mode">Mod de multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
     <string name="settings_owner_manage">Gestionat de proprietarul dispozitivului</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Numai proprietarul are acces la root</string>
     <string name="owner_manage_summary">Numai proprietarul poate să gestioneze accesul la root și să primească cereri</string>
     <string name="user_independent_summary">Fiecare utilizator are propriile sale reguli separate pentru root</string>
-
     <string name="mount_namespace_mode">Mod de montare a spațiului de nume</string>
     <string name="settings_ns_global">Spațiu de nume global</string>
     <string name="settings_ns_requester">Spațiu de nume moștenit</string>
