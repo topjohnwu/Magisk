@@ -19,7 +19,6 @@
     <string name="hide">隱藏</string>
     <string name="home_package">套件</string>
     <string name="home_app_title">應用程式</string>
-
     <string name="home_notice_content">請從官方的 Github 網頁下載 Magisk。從未知來源下載的檔案可能懷有惡意！</string>
     <string name="home_support_title">支持開發</string>
     <string name="home_follow_title">追蹤我們</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">確定撤銷 %1$s 的權限？</string>
     <string name="toast">快顯通知</string>
     <string name="none">無</string>
-
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤銷</string>
     <string name="superuser_policy_none">目前沒有任何應用程式要求超級使用者的權限。</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">已成功清除紀錄</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">目標 UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">顯示系統應用程式</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">在主螢幕中新增一個精緻的捷徑。防止隱藏 Magisk 以後，其名稱與圖示將難以辨識</string>
     <string name="settings_doh_title">安全化的網域解析(DoH)</string>
     <string name="settings_doh_description">解決某些地區的 DNS 中毒問題</string>
-
     <string name="multiuser_mode">多重使用者模式</string>
     <string name="settings_owner_only">僅限裝置擁有者</string>
     <string name="settings_owner_manage">由裝置擁有者管理</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">僅限裝置擁有者可使用 Root 權限</string>
     <string name="owner_manage_summary">僅限裝置擁有者可管理及接收 Root 權限的要求提示</string>
     <string name="user_independent_summary">每個使用者皆擁有獨立的 Root 權限規則</string>
-
     <string name="mount_namespace_mode">掛接命名空間模式</string>
     <string name="settings_ns_global">全域命名空間</string>
     <string name="settings_ns_requester">繼承命名空間</string>
