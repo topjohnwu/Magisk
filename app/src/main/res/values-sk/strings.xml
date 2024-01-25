@@ -19,7 +19,6 @@
     <string name="hide">Skryť</string>
     <string name="home_package">Balíček</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Magisk sťahujte IBA z oficiálnej stránky na GitHube. Súbory z neznámych zdrojov môžu byť škodlivé!</string>
     <string name="home_support_title">Podporte nás</string>
     <string name="home_follow_title">Sledujte nás</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Potvrdzujete zrušenie práv roota %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nič</string>
-
     <string name="superuser_toggle_notification">Upozornenia</string>
     <string name="superuser_toggle_revoke">Zrušiť</string>
     <string name="superuser_policy_none">Žiadna aplikácia zatiaľ nepožiadala o povolenie Superužívateľa.</string>
@@ -91,8 +89,6 @@
     <string name="target_pid">Pripojiť ns cieľový PID: %s</string>
     <string name="selinux_context">SELinux kontext: %s</string>
     <string name="supp_group">Doplnková skupina: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Zobraziť systémové aplikácie</string>
@@ -177,7 +173,6 @@
     <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
-
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
     <string name="settings_owner_manage">Spravuje majiteľ zariadenia</string>
@@ -185,7 +180,6 @@
     <string name="owner_only_summary">Root prístup má iba majiteľ zariadenia</string>
     <string name="owner_manage_summary">Iba majiteľ zariadenia môže spravovať prístup root a prijímať žiadosti</string>
     <string name="user_independent_summary">Každý používateľ má vlastné pravidlá pre root</string>
-
     <string name="mount_namespace_mode">Režim Mount namespace</string>
     <string name="settings_ns_global">Globálny namespace</string>
     <string name="settings_ns_requester">Zdedený namespace</string>
