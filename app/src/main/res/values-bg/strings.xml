@@ -19,7 +19,6 @@
     <string name="hide">Скриване</string>
     <string name="home_package">Пакет</string>
     <string name="home_app_title">Приложение</string>
-
     <string name="home_notice_content">Изтегляйте Magisk САМО от официалната страница в GitHub. Файловете от неизвестни източници могат да бъдат зловредни!</string>
     <string name="home_support_title">Подкрепете ни</string>
     <string name="home_follow_title">Последвайте ни</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Потвърждавате ли оттегляне на достъпа на %1$s?</string>
     <string name="toast">Тост</string>
     <string name="none">Без</string>
-
     <string name="superuser_toggle_notification">Известия</string>
     <string name="superuser_toggle_revoke">Оттегляне</string>
     <string name="superuser_policy_none">За момента няма приложения, които да са поискали достъп до правата на суперпотребителя.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Дневникът е изчистен</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Целеви UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Показване на системни приложения</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Добавя красив пряк път на началния екран ако името или текущата икона на скритото приложение са трудни за разпознаване</string>
     <string name="settings_doh_title">DNS през HTTPS</string>
     <string name="settings_doh_description">Заобикаля „отравянето“ на DNS в някои държави</string>
-
     <string name="multiuser_mode">Многопотребителски режим</string>
     <string name="settings_owner_only">Само собственика</string>
     <string name="settings_owner_manage">Управление от страна на собственика</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Само собственикът има достъп до суперпотребителя</string>
     <string name="owner_manage_summary">Само собственикът може да управлява достъпа до суперпотребителя и да получава запитвания за достъп</string>
     <string name="user_independent_summary">Всеки потребител има собствени правила за достъп до суперпотребителя</string>
-
     <string name="mount_namespace_mode">Монтиране по пространства от имена</string>
     <string name="settings_ns_global">Общо</string>
     <string name="settings_ns_requester">Наследено</string>
