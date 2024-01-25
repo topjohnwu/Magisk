@@ -19,7 +19,6 @@
     <string name="hide">Tutup</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Aplikasi</string>
-
     <string name="home_notice_content">Unduh Magisk HANYA dari halaman GitHub resmi kami. File dari sumber yang tidak dikenal dapat berbahaya!</string>
     <string name="home_support_title">Dukung kami</string>
     <string name="home_follow_title">Ikuti Kami</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Konfirmasi untuk mencabut hak %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Tidak ada</string>
-
     <string name="superuser_toggle_notification">Notifikasi</string>
     <string name="superuser_toggle_revoke">Cabut</string>
     <string name="superuser_policy_none">Belum ada aplikasi yang meminta izin superuser.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Log berhasil dihapus</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Tampilkan aplikasi sistem</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Tambahkan pintasan yang menarik pada layar utama seandainya nama dan ikon sulit untuk dikenali setelah menyembunyikan aplikasi</string>
     <string name="settings_doh_title">DNS melalui HTTPS</string>
     <string name="settings_doh_description">Solusi untuk DNS poisoning di beberapa negara</string>
-
     <string name="multiuser_mode">Mode multi pengguna</string>
     <string name="settings_owner_only">Pemilik perangkat saja</string>
     <string name="settings_owner_manage">Pemilik perangkat mengelola</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Hanya pemilik yang memiliki akses root</string>
     <string name="owner_manage_summary">Hanya pemilik yang dapat mengelola akses root dan menerima pesan permintaan</string>
     <string name="user_independent_summary">Setiap pengguna memiliki aturan root mereka sendiri</string>
-
     <string name="mount_namespace_mode">Mode ruang-nama mount</string>
     <string name="settings_ns_global">Ruang-nama global</string>
     <string name="settings_ns_requester">Ruang-nama warisan</string>
