@@ -18,7 +18,6 @@
     <string name="hide">დამალვა</string>
     <string name="home_package">პაკეტი</string>
     <string name="home_app_title">აპი</string>
-
     <string name="home_notice_content">გადმოიწერეთ Magisk მხოლოდ ოფიციალური GitHub-ის გვერდიდან. სხვა წყაროებიდან გადმოწერილი ფაილები შესაძლოა სახიფათო იყოს!</string>
     <string name="home_support_title">მხარდაჭერა</string>
     <string name="home_item_source">წყარო</string>
@@ -72,7 +71,6 @@
     <string name="su_revoke_msg">ნამდვილად გსურთ %1$s-ისთვის ნებართვების გაუქმება?</string>
     <string name="toast">ჩვეულებრივი</string>
     <string name="none">არანაირი</string>
-
     <string name="superuser_toggle_notification">შეტყობინებები</string>
     <string name="superuser_toggle_revoke">გაუქმება</string>
     <string name="superuser_policy_none">ჯერ არცერთ აპს არ მოუთხოვია სუპერმომხმარებლის ნებართვები.</string>
@@ -86,15 +84,13 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">სამიზნე UID: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">სისტემის პროგრამების ჩვენება</string>
     <string name="show_os_app">ოპერაციული სისტემის აპების ჩვენება</string>
     <string name="hide_filter_hint">ფილტრაცია სახელის მიხედვით</string>
     <string name="hide_search">ძებნა</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(ინფორმაცია არ არის მითითებული)</string>
     <string name="reboot_userspace">სისტემის გადატვირთვა</string>
     <string name="reboot_recovery">Recovery-ში გადატვირთვა</string>
@@ -156,7 +152,6 @@
     <string name="setting_add_shortcut_summary">ლამაზი ხატულის დამატება საწყისს ეკრანზე, იმ შემთხვევაში თუ აპის ამოცნობა არის რთული დამალვის შემდეგ</string>
     <string name="settings_doh_title">DNS HTTPS-ზე</string>
     <string name="settings_doh_description">DNS-ის ლიმიტების მოხსნა კონკრეტულ სახელმწიფოებში</string>
-
     <string name="multiuser_mode">მრავალმომხმარებლიანი რეჟიმი</string>
     <string name="settings_owner_only">მხოლოდ მოწყობილობის მფლობელი</string>
     <string name="settings_owner_manage">მოწყობილობის მფლობელის მიერ მართვა</string>
@@ -164,7 +159,6 @@
     <string name="owner_only_summary">მხოლოდ მფლობელს ჰქონდეს სუპერმომხმარებელთან წვდომა</string>
     <string name="owner_manage_summary">მხოლოდ მფლობელს ჰქონდეს ნებართვების მართვა</string>
     <string name="user_independent_summary">ყოველ მომხმარებელს თავიანთი ნებართვები ჰქონდეთ</string>
-
     <string name="mount_namespace_mode">Namespace რეჟიმის დამონტაჟება</string>
     <string name="settings_ns_global">გლობალური Namespace-ი</string>
     <string name="settings_ns_requester">მიღებითი Namespace-ი</string>
