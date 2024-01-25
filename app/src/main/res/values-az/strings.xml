@@ -19,7 +19,6 @@
     <string name="hide">Gizlə</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Tətbiq</string>
-
     <string name="home_notice_content">Magiski YALNIZ rəsmi GitHub səhifəsindən endirin. Bilinməyən mənbələrdəki fayllar zərərli ola bilər!</string>
     <string name="home_support_title">Dəstək ol</string>
     <string name="home_follow_title">İzlə</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">%1$s üçün Superuser haqlarının silinməsini təsdiqlə</string>
     <string name="toast">Tost</string>
     <string name="none">Heçnə</string>
-
     <string name="superuser_toggle_notification">bildirişlər</string>
     <string name="superuser_toggle_revoke">Sil</string>
     <string name="superuser_policy_none">Hələ heçbir tətbiq Superusr icazəsi istəməyib.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Qeydlər silindi</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hədəf UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Sistem tətbiqlərini göstər</string>
@@ -169,7 +165,6 @@
     <string name="setting_add_shortcut_summary">Tətbiqi gizlətdikdən sonra tapmaq çətin olmasın deyə ana ekrana qısayol əlavə et</string>
     <string name="settings_doh_title">HTTPS əvəzinə DNS</string>
     <string name="settings_doh_description">Bəzi ölkələrdə DNS problemlərini həll edir</string>
-
     <string name="multiuser_mode">Çox-istifadəçi Modu</string>
     <string name="settings_owner_only">Yalnız Cihazın Yiyəsi</string>
     <string name="settings_owner_manage">Cihaz Yiyəsinin İdarəsində</string>
@@ -177,7 +172,6 @@
     <string name="owner_only_summary">Yalnız cihaz yiyəsində root icazəsi var</string>
     <string name="owner_manage_summary">Yalnız cihaz yiyəsi root icazəsi verə yaxud istəyə bilər</string>
     <string name="user_independent_summary">Hər istifadəçinin öz root icazəsi var</string>
-
     <string name="mount_namespace_mode">Adlarfəzası modunu qoş</string>
     <string name="settings_ns_global">Beynəlxalq Adlarfəzası</string>
     <string name="settings_ns_requester">Adlarfəzası Daxil et</string>
