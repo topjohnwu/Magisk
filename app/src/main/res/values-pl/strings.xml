@@ -19,7 +19,6 @@
     <string name="hide">Ukryj</string>
     <string name="home_package">Pakiet</string>
     <string name="home_app_title">Aplikacja</string>
-
     <string name="home_notice_content">Pobieraj Magisk tylko z oficjalnej strony GitHub. Pliki z nieznanych źródeł mogą być szkodliwe!</string>
     <string name="home_support_title">Wesprzyj nas</string>
     <string name="home_follow_title">Śledź nas</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Potwierdź, aby unieważnić uprawnienia Superusera dla %1$s</string>
     <string name="toast">Wyskakujące powiadomienie</string>
     <string name="none">Brak</string>
-
     <string name="superuser_toggle_notification">Powiadomienia</string>
     <string name="superuser_toggle_revoke">Unieważnij</string>
     <string name="superuser_policy_none">Żadna aplikacja nie poprosiła jeszcze o uprawnienia Superusera.</string>
@@ -91,8 +89,6 @@
     <string name="target_pid">Docelowy PID p.n. montowania: %s</string>
     <string name="selinux_context">Kontekst SELinux: %s</string>
     <string name="supp_group">Grupa uzupełniająca: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide -->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
@@ -177,7 +173,6 @@
     <string name="setting_add_shortcut_summary">Umieść ładny skrót na ekranie głównym na wypadek, gdyby nazwa i ikona były trudne do rozpoznania po ukryciu aplikacji</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Zapobiegaj zatruwaniu DNS (DNS poisoning) w niektórych krajach</string>
-
     <string name="multiuser_mode">Tryb wielu użytkowników (Multiuser)</string>
     <string name="settings_owner_only">Tylko właściciel urządzenia</string>
     <string name="settings_owner_manage">Zarządzanie przez właściciela urządzenia</string>
@@ -185,7 +180,6 @@
     <string name="owner_only_summary">Tylko właściciel ma dostęp do roota</string>
     <string name="owner_manage_summary">Tylko właściciel może zarządzać dostępem do roota i otrzymywać żądania dostępu do roota</string>
     <string name="user_independent_summary">Każdy użytkownik ma niezależne ustawienia dostępu do roota</string>
-
     <string name="mount_namespace_mode">Tryb przestrzeni nazw montowania</string>
     <string name="settings_ns_global">Globalna przestrzeń nazw</string>
     <string name="settings_ns_requester">Dziedziczona przestrzeń nazw</string>
