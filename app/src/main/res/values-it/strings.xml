@@ -19,7 +19,6 @@
     <string name="hide">Nascondi</string>
     <string name="home_package">Pacchetto</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Scarica Magisk SOLTANTO dalla pagina GitHub ufficiale. I file provenienti da fonti sconosciute possono essere dannosi!</string>
     <string name="home_support_title">Supportaci</string>
     <string name="home_follow_title">Seguici</string>												   
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Confermi la revoca dei permessi a %1$s?</string>
     <string name="toast">Toast</string>
     <string name="none">Nessuno</string>
-
     <string name="superuser_toggle_notification">Notifiche</string>
     <string name="superuser_toggle_revoke">Revoca</string>
     <string name="superuser_policy_none">Nessuna app ha ancora chiesto i permessi di root.</string>
@@ -172,7 +170,6 @@
     <string name="setting_add_shortcut_summary">Aggiungi un collegamento alla schermata iniziale se il nome e l\'icona sono difficili da riconoscere dopo aver nascosto l\'app</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Aggira il DNS poisoning in alcune nazioni</string>
-
     <string name="multiuser_mode">Modalità multiutente</string>
     <string name="settings_owner_only">Solo per il proprietario del dispositivo</string>
     <string name="settings_owner_manage">Gestito dal proprietario del dispositivo</string>
@@ -180,7 +177,6 @@
     <string name="owner_only_summary">Solo il proprietario possiede i permessi di root</string>
     <string name="owner_manage_summary">Solo il proprietario può gestire l\'accesso root e ricevere le richieste dalle app</string>
     <string name="user_independent_summary">Ogni utente ha le proprie regole di root indipendenti</string>
-
     <string name="mount_namespace_mode">Modalità mount namespace</string>
     <string name="settings_ns_global">Namespace globale</string>
     <string name="settings_ns_requester">Namespace ereditato</string>
