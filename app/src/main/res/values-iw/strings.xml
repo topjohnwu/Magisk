@@ -90,7 +90,7 @@
     <string name="selinux_context">הקשר SELinux: %s</string>
     <string name="supp_group">קבוצה משלימה: %s</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">הצגת יישומי מערכת</string>
     <string name="show_os_app">הצגת יישומי מערכת הפעלה</string>
     <string name="hide_filter_hint">סינון לפי שם</string>
@@ -115,7 +115,7 @@
     <string name="confirm_install">להתקין מודול %1$s?</string>
     <string name="confirm_install_title">אישור התקנה</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">מצב עיצוב</string>
     <string name="settings_dark_mode_message">נא לבחור מצב המתאים ביותר לסגנון שלך!</string>
     <string name="settings_dark_mode_light">תמיד בהיר</string>
