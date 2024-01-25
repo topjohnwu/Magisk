@@ -103,7 +103,7 @@
     <string name="module_action_install_external">მახსოვრობიდან დაინსტალირება</string>
     <string name="update_available">ხელმისაწვდომია განახლება</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">თემების ჩამონათვალი</string>
     <string name="settings_dark_mode_message">აირჩიეთ ის რაც ყველაზე ძალიან მოგწონთ!</string>
     <string name="settings_dark_mode_light">ღია თემა</string>
