@@ -19,7 +19,6 @@
     <string name="hide">Ẩn</string>
     <string name="home_package">Gói</string>
     <string name="home_app_title">Ứng dụng</string>
-
     <string name="home_notice_content">Chỉ nên tải Magisk từ trang GitHub chính thức. Tải tệp từ các nguồn không rõ có thể gây hại!</string>
     <string name="home_support_title">Hỗ trợ chúng tôi</string>
     <string name="home_item_source">Nguồn</string>
@@ -33,7 +32,7 @@
     <!--Install-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hóa</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-     <string name="patch_vbmeta">Vá vbmeta trong boot image</string>
+    <string name="patch_vbmeta">Vá vbmeta trong boot image</string>
     <string name="recovery_mode">Chế độ Recovery</string>
     <string name="install_options_title">Tùy chọn</string>
     <string name="install_method_title">Phương pháp</string>
@@ -74,7 +73,6 @@
     <string name="su_revoke_msg">Xác nhận thu hồi quyền %1$s?</string>
     <string name="toast">Thông báo nổi</string>
     <string name="none">Không có</string>
-
     <string name="superuser_toggle_notification">Thông báo</string>
     <string name="superuser_toggle_revoke">Thu hồi</string>
     <string name="superuser_policy_none">Chưa có ứng dụng nào yêu cầu Superuser.</string>
@@ -87,8 +85,6 @@
     <string name="logs_cleared">Đã xóa nhật ký thành công</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID mục tiêu: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Hiển thị các ứng dụng hệ thống</string>
@@ -112,7 +108,6 @@
     <string name="suspend_text_zygisk">Mô-đun bị vô hiệu hóa vì %1$s không được bật</string>
     <string name="zygisk_module_unloaded">Không thể tải mô-đun Zygisk vì không tương thích</string>
     <string name="module_empty">Chưa có mô-đun nào được cài đặt!</string>
-
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Chế độ chủ đề</string>
@@ -169,7 +164,6 @@
     <string name="setting_add_shortcut_summary">Thêm một phím tắt đẹp vào màn hình trong trường hợp khó tìm ra tên và biểu tượng sau khi ẩn ứng dụng</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Workaround DNS poisoning in some nations</string>
-
     <string name="multiuser_mode">Chế độ đa người dùng</string>
     <string name="settings_owner_only">Chỉ chủ sở hữu thiết bị</string>
     <string name="settings_owner_manage">Chủ sở hữu thiết bị được quản lý</string>
@@ -177,7 +171,6 @@
     <string name="owner_only_summary">Chỉ chủ sở hữu mới có quyền truy cập root</string>
     <string name="owner_manage_summary">Chỉ chủ sở hữu mới có thể quản lý quyền truy cập root và nhận lời nhắc yêu cầu</string>
     <string name="user_independent_summary">Mỗi người dùng có các quy tắc root riêng biệt của riêng mình</string>
-
     <string name="mount_namespace_mode">Chế độ cho Mount namespace</string>
     <string name="settings_ns_global">Không gian tên chung</string>
     <string name="settings_ns_requester">Không gian tên kế thừa</string>
