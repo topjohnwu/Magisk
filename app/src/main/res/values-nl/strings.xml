@@ -17,7 +17,6 @@
     <string name="not_available">Niet beschikbaar</string>
     <string name="hide">Verbergen</string>
     <string name="home_package">Pakket</string>
-
     <string name="home_support_title">Ondersteun ons</string>
     <string name="home_item_source">Broncode</string>
     <string name="home_support_content">Magisk is en zal altijd gratis en open source blijven, maar als je wilt, kun je een kleine donatie doen.</string>
@@ -26,7 +25,6 @@
     <string name="invalid_update_channel">Ongeldig updatekanaal</string>
     <string name="uninstall_magisk_title">Magisk deïnstalleren</string>
     <string name="uninstall_magisk_msg">Alle modules worden uitgeschakeld/verwijderd!\nRoot wordt verwijderd!\nJe gegevens worden, als ze dat nog niet waren, mogelijk versleuteld!</string>
-
 
     <!--Install-->
     <string name="keep_force_encryption">Afgedwongen versleuteling behouden</string>
@@ -70,7 +68,6 @@
     <string name="su_revoke_msg">Wil je de rechten van %1$s intrekken?</string>
     <string name="toast">Ballon</string>
     <string name="none">Geen</string>
-
     <string name="superuser_toggle_notification">Meldingen</string>
     <string name="superuser_toggle_revoke">Intrekken</string>
     <string name="superuser_policy_none">Er zijn nog geen superuserverzoeken geweest.</string>
@@ -84,14 +81,12 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Doel-uid: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide -->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
     <string name="hide_search">Zoeken</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(geen informatie verstrekt)</string>
     <string name="reboot_recovery">Recovery starten</string>
     <string name="reboot_bootloader">Bootloader starten</string>
@@ -142,7 +137,6 @@
     <string name="settings_su_reauth_title">Opnieuw goedkeuren na update</string>
     <string name="settings_su_reauth_summary">Superuserrechten opnieuw goedkeuren na app-updates.</string>
     <string name="settings_customization">Aanpassingen</string>
-
     <string name="multiuser_mode">Meerdere gebruikers</string>
     <string name="settings_owner_only">Alleen apparaateigenaar</string>
     <string name="settings_owner_manage">Beheerd door apparaateigenaar</string>
@@ -150,7 +144,6 @@
     <string name="owner_only_summary">Alleen de apparaateigenaar heeft roottoegang</string>
     <string name="owner_manage_summary">Alleen de eigenaar kan roottoegang goedkeuren en verzoeken ontvangen</string>
     <string name="user_independent_summary">Elke gebruiker heeft zijn/haar eigen rootregels</string>
-
     <string name="mount_namespace_mode">Naamruimtemodus aankoppelen</string>
     <string name="settings_ns_global">Globale naamruimte</string>
     <string name="settings_ns_requester">Naamruimte overnemen</string>
