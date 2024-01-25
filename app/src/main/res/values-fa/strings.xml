@@ -17,7 +17,6 @@
     <string name="not_available">غیر/قابل دسترسی</string>
     <string name="hide">پنهان کردن</string>
     <string name="home_package">پکیج</string>
-
     <string name="home_support_title">حمایت ما</string>
     <string name="home_item_source">منبع</string>
     <string name="home_support_content">این برنامه (Magisk) رایگان و متن باز است و همیشه خواهد ماند. اگرچه شما میتواند با دونیت خود نشان دهد که به ما اهمیت می دهید.</string>
@@ -68,7 +67,6 @@
     <string name="su_revoke_title">باطل بشه؟</string>
     <string name="su_revoke_msg">تایید کنید که %1$s باطل بشه؟</string>
     <string name="none">هیچ کدام</string>
-
     <string name="superuser_toggle_notification">اعلان ها</string>
     <string name="superuser_toggle_revoke">ابطال</string>
     <string name="superuser_policy_none">هنوز هیچ برنامه ای مجوز روت درخواست نکرده است.</string>
@@ -80,14 +78,12 @@
     <string name="menuClearLog">پاک کردن لاگ</string>
     <string name="logs_cleared">لاگ با موفقیت پاک شد.</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">نشان دادن برنامه های سیستمی</string>
     <string name="hide_filter_hint">فیلتر کردن با نام</string>
     <string name="hide_search">سرچ کردن</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(هیچ اطلاعاتی ارائه نشده است)</string>
     <string name="reboot_recovery">راه اندازی مججد برای رفتن به ریکاوری</string>
     <string name="reboot_bootloader">راه اندازی مججد برای رفتن به بوت لودر</string>
@@ -140,7 +136,6 @@
     <string name="settings_su_reauth_summary">تأیید کردندوباره مجوزهای روت پس از ارتقاء برنامه</string>
     <string name="settings_customization">سفارشی سازی</string>
     <string name="setting_add_shortcut_summary">اضافه کردن یک میانبر زیبا را در صفحه اصلی در صورت شناسایی نام و نماد پس از پنهان کردن برنامه</string>
-
     <string name="multiuser_mode">حالت چند کاربره</string>
     <string name="settings_owner_only">فقط صاحب دستگاه</string>
     <string name="settings_owner_manage">صاحب دستگاه مدیریت شود</string>
@@ -148,7 +143,6 @@
     <string name="owner_only_summary">فقط مالک دسترسی روت دارد</string>
     <string name="owner_manage_summary">فقط مالک می تواند دسترسی روت را مدیریت کرده و درخواست های پرامپت را دریافت کند</string>
     <string name="user_independent_summary">هر کاربر قوانین روت جداگانه خود را دارد</string>
-
     <string name="mount_namespace_mode">نصب کردن Namespace Mode</string>
     <string name="settings_ns_global">سراسری Namespace</string>
     <string name="settings_ns_requester">وراثتی Namespace</string>
