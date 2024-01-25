@@ -19,7 +19,6 @@
     <string name="hide">Απόκρυψη</string>
     <string name="home_package">Πακέτο</string>
     <string name="home_app_title">Εφαρμογή</string>
-
     <string name="home_notice_content">Κάντε λήψη του Magisk ΜΟΝΟ από την επίσημη σελίδα του GitHub. Τα αρχεία από άγνωστες πηγές μπορεί να είναι κακόβουλα!</string>
     <string name="home_support_title">Υποστήριξη</string>
     <string name="home_follow_title">Ακολούθησε μας</string>
@@ -32,7 +31,7 @@
     <string name="uninstall_magisk_msg">Όλα τα modules θα απενεργοποιηθούν/αφαιρεθούν. Το root θα αφαιρεθεί και ενδέχεται να κρυπτογραφηθούν τα δεδομένα σας, εάν δεν είναι κρυπτογραφημένα!</string>
 
     <!--Install-->
-	<string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
+    <string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση AVB 2.0/dm-verity</string>
     <string name="patch_vbmeta">Patch vbmeta στην εικόνα του boot</string>
     <string name="recovery_mode">Μέσω Recovery mode</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Επιβεβαίωση για ανάκληση δικαιωμάτων %1$s;</string>
     <string name="toast">Αναδυόμενο παράθυρο</string>
     <string name="none">Κανένα</string>
-
     <string name="superuser_toggle_notification">Ειδοποιήσεις</string>
     <string name="superuser_toggle_revoke">Ανακάλεσε</string>
     <string name="superuser_policy_none">Καμία εφαρμογή δεν έχει ζητήσει άδεια υπερχρήστη.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Το αρχείο καταγραφής εκκαθαρίστηκε επιτυχώς</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID Στόχος: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Εμφάνιση εφαρμογών συστήματος</string>
@@ -169,7 +165,6 @@
     <string name="setting_add_shortcut_summary">Προσθέστε μια όμορφη συντόμευση στην αρχική οθόνη σε περίπτωση που το όνομα και το εικονίδιο είναι δύσκολο να αναγνωριστούν αφού κρύψετε την εφαρμογή</string>
     <string name="settings_doh_title">DNS μέσω HTTPS</string>
     <string name="settings_doh_description">Λύση DNS poisoning για μερικά έθνη</string>
-
     <string name="multiuser_mode">Λειτουργία Πολλών Χρηστών</string>
     <string name="settings_owner_only">Μόνο Ιδιοκτήτης Συσκευής</string>
     <string name="settings_owner_manage">Διαχειριζόμενη από τον Ιδιοκτήτη</string>
@@ -177,7 +172,6 @@
     <string name="owner_only_summary">Μόνο ο ιδιοκτήτης έχει πρόσβαση root</string>
     <string name="owner_manage_summary">Μόνο ο ιδιοκτήτης μπορεί να διαχειριστεί την πρόσβαση root και να δεχτεί προτροπές αίτημάτων</string>
     <string name="user_independent_summary">Κάθε χρήστης έχει τους δικούς του ξεχωριστούς κανόνες root</string>
-
     <string name="mount_namespace_mode">Λειτουργία προσάρτησης χώρου ονομάτων</string>
     <string name="settings_ns_global">Καθολικός Χώρος Ονομάτων</string>
     <string name="settings_ns_requester">Κληρονόμησε Χώρο Ονομάτων</string>
@@ -225,8 +219,7 @@
     <string name="unsupport_other_su_msg">Εντοπίστηκε ένα \"su\" binary που δεν είναι από το Magisk. Καταργήστε οποιαδήποτε άλλη root μέθοδο και/ή επανεγκαταστήστε το Magisk.</string>
     <string name="unsupport_external_storage_msg">Το Magisk είναι εγκατεστημένο σε εξωτερικό χώρο αποθήκευσης. Μετακινήστε την εφαρμογή στον εσωτερικό χώρο αποθήκευσης.</string>
     <string name="unsupport_nonroot_stub_msg">Η κρυφή εφαρμογή Magisk δεν μπορεί να συνεχίσει να λειτουργεί επειδή χάθηκε το root. Παρακαλώ επαναφέρετε το αρχικό APK.</string>
-    
-	<string name="external_rw_permission_denied">Παραχωρήστε άδεια αποθήκευσης για να ενεργοποιήσετε αυτήν τη λειτουργία</string>
+    <string name="external_rw_permission_denied">Παραχωρήστε άδεια αποθήκευσης για να ενεργοποιήσετε αυτήν τη λειτουργία</string>
     <string name="install_unknown_denied">Επιτρέψτε την "εγκατάσταση άγνωστων εφαρμογών" για να ενεργοποιήσετε αυτήν τη λειτουργία</string>
     <string name="add_shortcut_title">Προσθέστε συντόμευση στην αρχική οθόνη</string>
     <string name="add_shortcut_msg">Μετά την απόκρυψη αυτής της εφαρμογής, το όνομα και το εικονίδιο της ενδέχεται να είναι δύσκολο να αναγνωριστούν. Θέλετε να προσθέσετε μια όμορφη συντόμευση στην αρχική οθόνη;</string>
