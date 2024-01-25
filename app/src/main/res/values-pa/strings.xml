@@ -81,13 +81,13 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ਟੀਚਾ UID: %1$d</string>
 
-    <!-- MagiskHide -->
+    <!-- MagiskHide-->
     <string name="show_system_app">ਸਿਸਟਮ ਐਪਸ ਦਿਖਾਓ</string>
     <string name="show_os_app">OS ਐਪਲੀਕੇਸ਼ਨ ਦਿਖਾਓ</string>
     <string name="hide_filter_hint">ਨਾਮ ਦੁਆਰਾ ਫਿਲਟਰ ਕਰੋ</string>
     <string name="hide_search">ਖੋਜੋ</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(ਕੋਈ ਜਾਣਕਾਰੀ ਨਹੀਂ ਦਿੱਤੀ ਗਈ)</string>
     <string name="reboot_userspace">ਸਾਫਟ ਰੀਬੂਟ</string>
     <string name="reboot_recovery">ਰਿਕਵਰੀ ਰੀਬੂਟ</string>
@@ -100,7 +100,7 @@
     <string name="module_action_install_external">ਸਟੋਰੇਜ ਤੋਂ ਇੰਸਟਾਲ ਕਰੋ</string>
     <string name="update_available">ਅਪਡੇਟ ਉਪਲੱਬਧ ਹੈ</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">ਥੀਮ ਮੋਡ</string>
     <string name="settings_dark_mode_message">ਕੋਈ ਥੀਮ ਚੁਣੋ ਜੋ ਤੁਹਾਡੀ ਸ਼ੈਲੀ ਦੇ ਅਨੁਕੂਲ ਹੋਵੇ!</string>
     <string name="settings_dark_mode_light">ਹਮੇਸ਼ਾਂ ਚਿੱਟੇ ਰੰਗ ਦੀ</string>
