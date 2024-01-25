@@ -52,6 +52,7 @@ void unregister_poll(int fd, bool auto_close);
 void clear_poll();
 
 // Thread pool
+void init_thread_pool();
 void exec_task(std::function<void()> &&task);
 
 // Daemon handlers

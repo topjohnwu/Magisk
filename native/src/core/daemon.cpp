@@ -433,6 +433,7 @@ static void daemon_entry() {
     register_poll(&main_socket_pfd, handle_request);
 
     // Loop forever to listen for requests
+    init_thread_pool();
     poll_loop();
 }
 
