@@ -18,7 +18,6 @@
     <string name="hide">Amagar</string>
     <string name="home_package">Paquet</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Descarregui Magisk NOMÉS des de la pàgina oficial de GitHub. Fitxers d\'altres fonts desconegudes poden ser maliciosos!</string>
     <string name="home_support_title">Doni suport</string>
     <string name="home_item_source">Codi font</string>
@@ -72,7 +71,6 @@
     <string name="su_revoke_msg">Confirmi per revocar drets de %1$s</string>
     <string name="toast">Avís</string>
     <string name="none">Cap</string>
-
     <string name="superuser_toggle_notification">Notificacions</string>
     <string name="superuser_toggle_revoke">Revocar</string>
     <string name="superuser_policy_none">Cap aplicació ha demanat permisos de superusuari.</string>
@@ -86,9 +84,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID de l\'objectiu: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Mostra aplicacions del sistema</string>
     <string name="show_os_app">Mostra aplicacions del SO</string>
     <string name="hide_filter_hint">Filtra per nom</string>
@@ -156,7 +152,6 @@
     <string name="setting_add_shortcut_summary">Afegeix una bonica drecera a la pantalla d\'inici en cas que el nom i la icona siguin difícils de reconèixer després d\'amagar l\'aplicació.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Solució per enverinament de DNS en algunes nacions</string>
-
     <string name="multiuser_mode">Mode Multiusuari</string>
     <string name="settings_owner_only">Només Administrador del Dispositiu</string>
     <string name="settings_owner_manage">Administrador del Dispositiu</string>
@@ -164,7 +159,6 @@
     <string name="owner_only_summary">Només l\'administrador té accés d\'arrel</string>
     <string name="owner_manage_summary">Només l\'administrador pot supervisar l\'accés d\'arrel i rebre sol·licituds d\'altres usuaris</string>
     <string name="user_independent_summary">Tots els usuaris tenen separades les seves pròpies regles d\'arrel</string>
-
     <string name="mount_namespace_mode">Muntar Namespace </string>
     <string name="settings_ns_global">Namespace Global</string>
     <string name="settings_ns_requester">Heretar Namespace</string>
