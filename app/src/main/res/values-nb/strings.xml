@@ -18,7 +18,6 @@
     <string name="hide">Skjul</string>
     <string name="home_package">Pakke</string>
     <string name="home_app_title">Program</string>
-
     <string name="home_notice_content">Kun last ned Magisk fra den offisielle GitHub siden. Filer fra ukjente kilder kan være skadelige!</string>
     <string name="home_support_title">Kronerulling</string>
     <string name="home_item_source">Kildekode</string>
@@ -72,7 +71,6 @@
     <string name="su_revoke_msg">Bekreft tilbaketrekking av %1$s-rettigheter?</string>
     <string name="toast">Oppsprettsmerknad</string>
     <string name="none">Ingen</string>
-
     <string name="superuser_toggle_notification">Merknader</string>
     <string name="superuser_toggle_revoke">Tilbakekall</string>
     <string name="superuser_policy_none">Ingen programmer har forespurt superbrukertilgang enda.</string>
@@ -85,8 +83,6 @@
     <string name="logs_cleared">Loggføring tømt</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Mål-UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Vis systemprogrammer</string>
@@ -156,7 +152,6 @@
     <string name="setting_add_shortcut_summary">Legg til fin snarvei på hjemmeskjermen i fall navnet og ikonet er vanskelig å gjenkjenne etter skjuling av programmet</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Unngåelse av DNS-forgiftelse i noen land</string>
-
     <string name="multiuser_mode">Multibrukermodus</string>
     <string name="settings_owner_only">Kun for enhetseier</string>
     <string name="settings_owner_manage">Enhetseier, håndtert</string>
@@ -164,7 +159,6 @@
     <string name="owner_only_summary">Rot-tilgang kun for eier</string>
     <string name="owner_manage_summary">Kun eier kan håndtere rot-tilgang og motta forespørsler</string>
     <string name="user_independent_summary">Hver bruker har egne rot-regler</string>
-
     <string name="mount_namespace_mode">Modus for montering av navnerom</string>
     <string name="settings_ns_global">Omspennede navnerom</string>
     <string name="settings_ns_requester">Nedarv navnerom</string>
