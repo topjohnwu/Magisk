@@ -81,7 +81,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Doel-uid: %1$d</string>
 
-    <!--MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Systeemapps tonen</string>
     <string name="hide_filter_hint">Filteren op naam</string>
     <string name="hide_search">Zoeken</string>
@@ -98,7 +98,7 @@
     <string name="module_action_install_external">Gedownloade module installeren</string>
     <string name="update_available">Update beschikbaar</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Thema</string>
     <string name="settings_dark_mode_message">Kies het thema dat het best bij je past!</string>
     <string name="settings_dark_mode_light">Licht</string>
