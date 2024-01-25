@@ -124,6 +124,7 @@ private:
 ZygiskContext *g_ctx;
 static HookContext *g_hook;
 static bool should_unmap_zygisk = false;
+static void *self_handle = nullptr;
 
 // -----------------------------------------------------------------
 
@@ -173,6 +174,16 @@ DCL_HOOK_FUNC(static void, android_log_close) {
     old_android_log_close();
 }
 
+// It should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
+DCL_HOOK_FUNC(static int, dlclose, void *handle) {
+    if (!self_handle) {
+        ZLOGV("dlclose zygisk_loader\n");
+        self_handle = handle;
+        g_hook->post_native_bridge_load();
+    }
+    return 0;
+}
+
 // We cannot directly call `dlclose` to unload ourselves, otherwise when `dlclose` returns,
 // it will return to our code which has been unmapped, causing segmentation fault.
 // Instead, we hook `pthread_attr_destroy` which will be called when VM daemon threads start.
@@ -193,22 +204,12 @@ DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
             // Because both `pthread_attr_destroy` and `dlclose` have the same function signature,
             // we can use `musttail` to let the compiler reuse our stack frame and thus
             // `dlclose` will directly return to the caller of `pthread_attr_destroy`.
-            [[clang::musttail]] return dlclose(self_handle);
+            [[clang::musttail]] return old_dlclose(self_handle);
         }
     }
 
     delete g_hook;
     return res;
-}
-
-// it should be safe to assume all dlclose's in libnativebridge are for zygisk_loader
-DCL_HOOK_FUNC(static int, dlclose, void *handle) {
-    if (!self_handle) {
-        ZLOGV("dlclose zygisk_loader\n");
-        self_handle = handle;
-        g_hook->post_native_bridge_load();
-    }
-    return 0;
 }
 
 #undef DCL_HOOK_FUNC
