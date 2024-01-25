@@ -19,7 +19,6 @@
     <string name="hide">숨기기</string>
     <string name="home_package">패키지</string>
     <string name="home_app_title">앱</string>
-
     <string name="home_notice_content">공식 Github 페이지에서 Magisk를 다운로드하십시오. 알 수 없는 소스의 파일이 악의적일 수 있습니다!</string>
     <string name="home_support_title">후원하기</string>
     <string name="home_item_source">소스</string>
@@ -74,7 +73,6 @@
     <string name="su_revoke_msg">정말 %1$s의 권한을 취소하시겠습니까?</string>
     <string name="toast">토스트</string>
     <string name="none">없음</string>
-
     <string name="superuser_toggle_notification">알림</string>
     <string name="superuser_toggle_revoke">권한삭제</string>
     <string name="superuser_policy_none">슈퍼유저 권한을 요청한 앱이 없습니다.</string>
@@ -87,8 +85,6 @@
     <string name="logs_cleared">로그 삭제 완료.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">시스템 앱 표시</string>
@@ -167,7 +163,6 @@
     <string name="setting_add_shortcut_summary">앱을 숨긴 후 아이콘과 이름을 알아보기 힘들 경우를 위해 알아보기 쉬운 바로가기를 홈 화면에 추가합니다.</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">일부 국가에 존재하는 DNS 포이즈닝을 해결합니다.</string>
-
     <string name="multiuser_mode">다중 사용자 모드</string>
     <string name="settings_owner_only">기기 소유자만</string>
     <string name="settings_owner_manage">기기 소유자에 의해 관리됨</string>
@@ -175,7 +170,6 @@
     <string name="owner_only_summary">소유자만 루트 액세스를 갖습니다.</string>
     <string name="owner_manage_summary">소유자만 루트 액세스를 관리하고 요청을 받을 수 있습니다.</string>
     <string name="user_independent_summary">각각의 사용자가 개별적인 권한을 갖습니다.</string>
-
     <string name="mount_namespace_mode">네임스페이스 마운트 모드</string>
     <string name="settings_ns_global">전역 네임스페이스</string>
     <string name="settings_ns_requester">네임스페이스 상속</string>
