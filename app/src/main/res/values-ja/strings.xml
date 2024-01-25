@@ -19,7 +19,6 @@
     <string name="hide">隠す</string>
     <string name="home_package">パッケージ ID </string>
     <string name="home_app_title">アプリ</string>
-
     <string name="home_notice_content">Magisk は必ず公式の GitHub ページからダウンロードしてください。その他の提供元では悪意あるコードを含んでいる可能性があります!</string>
     <string name="home_support_title">サポートする</string>
     <string name="home_follow_title">フォローする</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">%1$s の権限を取り消しますか？</string>
     <string name="toast">トースト通知</string>
     <string name="none">なし</string>
-
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">取り消し</string>
     <string name="superuser_policy_none">スーパーユーザー権限の許可を求めたアプリはまだありません</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">ログを消去しました</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ターゲット UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">システムアプリを表示</string>
@@ -172,7 +168,6 @@
     <string name="setting_add_shortcut_summary">アプリを隠した後に見つけられなくなったときは、ここでホーム画面にショートカットを追加できます</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">一部の国で DNS キャッシュポイズニングから守ります</string>
-
     <string name="multiuser_mode">複数ユーザーモード</string>
     <string name="settings_owner_only">端末の管理者のみ</string>
     <string name="settings_owner_manage">端末の管理者が管理</string>
@@ -180,7 +175,6 @@
     <string name="owner_only_summary">端末の管理者のみスーパーユーザー権限を利用できます</string>
     <string name="owner_manage_summary">端末の管理者のみがスーパーユーザー権限を管理し、要求を受け付けられます</string>
     <string name="user_independent_summary">ユーザー毎にそれぞれスーパーユーザー権限を設定できます</string>
-
     <string name="mount_namespace_mode">名前空間のマウントモード</string>
     <string name="settings_ns_global">グローバル名前空間</string>
     <string name="settings_ns_requester">継承された名前空間</string>
