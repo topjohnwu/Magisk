@@ -19,7 +19,6 @@
     <string name="hide">Verstecken</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Laden Sie Magisk NUR von der offiziellen Github Seite herunter. Dateien aus unbekannten Quellen können bösartig sein!</string>
     <string name="home_support_title">Unterstütze uns</string>
     <string name="home_follow_title">Folge uns</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Bestätigen, dass %1$s-Rechte widerufen werden?</string>
     <string name="toast">Toast</string>
     <string name="none">Keine</string>
-
     <string name="superuser_toggle_notification">Benachrichtigungen</string>
     <string name="superuser_toggle_revoke">Widerruf</string>
     <string name="superuser_policy_none">Bisher hat noch keine App um die Erlaubnis des Superusers gebeten.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Protokoll erfolgreich gelöscht.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ziel-UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">System-Apps anzeigen</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
     <string name="settings_doh_title">DNS über HTTPS</string>
     <string name="settings_doh_description">Umgehung des DNS-Poisoning in einigen Ländern</string>
-
     <string name="multiuser_mode">Mehrbenutzermodus</string>
     <string name="settings_owner_only">Nur der Gerätebesitzer</string>
     <string name="settings_owner_manage">Durch Gerätebesitzer verwaltet</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Nur der Besitzer hat Root-Zugriff</string>
     <string name="owner_manage_summary">Nur der Besitzer verwaltet den Root-Zugriff und erhält Zugriffsanfragen</string>
     <string name="user_independent_summary">Jeder Nutzer hat seine eigenen Root-Regeln</string>
-
     <string name="mount_namespace_mode">Mount Namespace Modus</string>
     <string name="settings_ns_global">Globaler Namespace</string>
     <string name="settings_ns_requester">Geerbter Namespace</string>
