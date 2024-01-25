@@ -19,7 +19,6 @@
     <string name="hide">छिपाएँ</string>
     <string name="home_package">पैकेज</string>
     <string name="home_app_title">ऐप</string>
-
     <string name="home_notice_content">मैजिस्क केवल आधिकारिक गिटहब पृष्ठ पेज से डाउनलोड करें। अज्ञात स्रोतों से फ़ाइलें दुर्भावनापूर्ण हो सकती हैं!</string>
     <string name="home_support_title">हमें सहयोग दीजिये</string>
     <string name="home_follow_title">अनुसरण करें</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg"> %1$s के अधिकारों को रद्द करने की पुष्टि करें?</string>
     <string name="toast">पॉप-अप सूचना</string>
     <string name="none">कोई नहीं</string>
-
     <string name="superuser_toggle_notification">सूचनाएं</string>
     <string name="superuser_toggle_revoke">अधिकार वापस लें</string>
     <string name="superuser_policy_none">किसी भी ऐप ने अभी तक सुपरयूज़र की अनुमति नहीं मांगी है।</string>
@@ -89,15 +87,13 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">लक्षित UID: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">सिस्टम ऐप्स दिखाएं</string>
     <string name="show_os_app">OS एप्लिकेशन दिखाएं</string>
     <string name="hide_filter_hint">नाम से फ़िल्टर करें</string>
     <string name="hide_search">खोजें</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(कोई जानकारी नहीं दी गई)</string>
     <string name="reboot_userspace">सॉफ्ट रिबूट</string>
     <string name="reboot_recovery">रिकवरी रिबूट</string>
@@ -169,7 +165,6 @@
     <string name="setting_add_shortcut_summary">ऐप को छिपाने के बाद नाम और आइकन को पहचानना मुश्किल है, तो होम स्क्रीन में एक सुंदर शॉर्टकट जोड़ें</string>
     <string name="settings_doh_title">HTTPS पर DNS</string>
     <string name="settings_doh_description">कुछ राष्ट्रों में चल रही DNS विषाक्तता का समाधान</string>
-
     <string name="multiuser_mode">बहु उपयोगकर्ता मोड</string>
     <string name="settings_owner_only">केवल डिवाइस का मालिक</string>
     <string name="settings_owner_manage">डिवाइस मालिक द्वारा प्रबंधित</string>
@@ -177,7 +172,6 @@
     <string name="owner_only_summary">केवल मालिक के पास ही रूट की पहुँच है</string>
     <string name="owner_manage_summary">केवल मालिक रूट एक्सेस का प्रबंधन कर सकते हैं और अनुरोध संकेत प्राप्त कर सकते हैं</string>
     <string name="user_independent_summary">प्रत्येक उपयोगकर्ता का अपना अलग रूट नियम होता है</string>
-
     <string name="mount_namespace_mode">माउंट नेमस्पेस मोड</string>
     <string name="settings_ns_global">ग्लोबल नेमस्पेस</string>
     <string name="settings_ns_requester">इनहेरिट नेमस्पेस</string>
