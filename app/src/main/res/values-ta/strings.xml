@@ -18,7 +18,6 @@
     <string name="hide">பார்வையில் இருந்து மறைத்து வை</string>
     <string name="home_package">தொகுப்பு</string>
     <string name="home_app_title">செயலி</string>
-
     <string name="home_notice_content">அதிகாரப்பூர்வ கிட்ஹப் பக்கத்திலிருந்து மட்டுமே மேகிஸ்கை பதிவிறக்கவும். அறியப்படாத மூலங்களிலிருந்து வரும் கோப்புகள் தீங்கிழைக்கும்!</string>
     <string name="home_support_title">எங்களை ஆதரியுங்கள்</string>
     <string name="home_item_source">ஆரம்ப இடம்</string>
@@ -72,7 +71,6 @@
     <string name="su_revoke_msg">%1$s உரிமைகளை ரத்து செய்ய உறுதிப்படுத்தவும்</string>
     <string name="toast">செய்தி</string>
     <string name="none">எதுவும் இல்லை</string>
-
     <string name="superuser_toggle_notification">அறிவிப்புகள்</string>
     <string name="superuser_toggle_revoke">ரத்து செய்</string>
     <string name="superuser_policy_none">எந்த பயன்பாடும் இதுவரை சூப்பர் யூசர் அனுமதி கேட்கவில்லை.</string>
@@ -85,8 +83,6 @@
     <string name="logs_cleared">Lபதிவு வெற்றிகரமாக அழிக்கப்பட்டது</string>
     <string name="pid">பிஐடி: %1$d</string>
     <string name="target_uid">இலக்கு பிஐடி: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">தொலைபேசி பயன்பாடுகளைக் காட்டு</string>
@@ -156,7 +152,6 @@
     <string name="setting_add_shortcut_summary">பயன்பாட்டை மறைத்தபின் பெயர் மற்றும் ஐகான் அடையாளம் காண கடினமாக இருந்தால் முகப்புத் திரையில் அழகான குறுக்குவழியைச் சேர்க்கவும்</string>
     <string name="settings_doh_title">HTTPS வழியாக டி.என்.எஸ்</string>
     <string name="settings_doh_description">சில நாடுகளில் டி.என்.எஸ் பணிபுரியும்</string>
-
     <string name="multiuser_mode">மல்டியூசர் பயன்முறை</string>
     <string name="settings_owner_only">சாதன உரிமையாளர் மட்டுமே</string>
     <string name="settings_owner_manage">சாதன உரிமையாளர் நிர்வகிக்கப்பட்டார்</string>
@@ -164,7 +159,6 @@
     <string name="owner_only_summary">உரிமையாளருக்கு மட்டுமே ரூட் அணுகல் உள்ளது</string>
     <string name="owner_manage_summary">உரிமையாளர் மட்டுமே ரூட் அணுகலை நிர்வகிக்க முடியும்</string>
     <string name="user_independent_summary">ஒவ்வொரு பயனருக்கும் அவரவர் / அவளுக்கு தனித்தனி ரூட் விதிகள் உள்ளன</string>
-
     <string name="mount_namespace_mode">நேம்ஸ்பேஸ் பயன்முறையை சேர்</string>
     <string name="settings_ns_global">உலகளாவிய பெயர்வெளி</string>
     <string name="settings_ns_requester">பெயர்வெளி மரபுரிமை</string>
