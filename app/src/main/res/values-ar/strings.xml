@@ -17,7 +17,6 @@
     <string name="not_available">غير/متوفر</string>
     <string name="hide">إخفاء</string>
     <string name="home_package">الحزمة</string>
-
     <string name="home_support_title">تبرع لنا</string>
     <string name="home_item_source">الكود المصدري للتطبيق</string>
     <string name="home_support_content">مـاجـيسك هي، وستظل دوماً، مجانيةً و مفتوحة المصدر، اظهر اهتمامك لنا لكي نبقيها هكذا بدعم مالي صغير</string>
@@ -69,7 +68,6 @@
     <string name="su_revoke_msg">هل تريد منع صلاحية %1$s?</string>
     <string name="toast">اشعار</string>
     <string name="none">بدون</string>
-
     <string name="superuser_toggle_notification">الإشعارات</string>
     <string name="superuser_toggle_revoke">منع</string>
     <string name="superuser_policy_none">لم يسأل آية تطبيق لصلاحيات الروت</string>
@@ -83,14 +81,12 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID: %1$d</string>
 
-    <!--SafetyNet-->
-
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">إظهار برامج النظام</string>
     <string name="hide_filter_hint">البحث بالإسم</string>
     <string name="hide_search">ابحث</string>
 
-    <!--Module Fragment-->
+    <!--Module-->
     <string name="no_info_provided">(لم توفر معلومات)</string>
     <string name="reboot_recovery">إعادة التشغيل إلى Recovery</string>
     <string name="reboot_bootloader">إعادة التشغيل إلى Bootloader</string>
@@ -103,7 +99,7 @@
     <string name="update_available">التحديث متوفر</string>
     <string name="external_rw_permission_denied">امنحني إذن الولوج للذاكرة الداخلية</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">وضـعية الِسمات</string>
     <string name="settings_dark_mode_message">حدد الوضـع الذي يناسب ذوقك</string>
     <string name="settings_dark_mode_light">الوضـع المضيء</string>
@@ -143,7 +139,6 @@
     <string name="settings_su_reauth_title">إعادة المصادقة بعد الترقية</string>
     <string name="settings_su_reauth_summary">أعد مصادقة صلاحيات الروت بعد إجراء ترقيات للتطبيق</string>
     <string name="settings_customization">تخصيص</string>
-
     <string name="multiuser_mode">نمط مستخدمين متعددين</string>
     <string name="settings_owner_only">مالك الجهاز فقط</string>
     <string name="settings_owner_manage">المالك هو من يحدد</string>
@@ -151,7 +146,6 @@
     <string name="owner_only_summary">للمالك فقط له صلاحيات الروت</string>
     <string name="owner_manage_summary">فقط المالك من يرفض و يمنح صلاحيات الروت</string>
     <string name="user_independent_summary">كل مستخدم له قواعد روت خاصة به</string>
-
     <string name="mount_namespace_mode">نمط Mount Namespace</string>
     <string name="settings_ns_global">نمط Namespace العام</string>
     <string name="settings_ns_requester">نمط NameSpace المتوارث</string>
