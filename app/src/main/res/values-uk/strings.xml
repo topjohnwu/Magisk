@@ -19,7 +19,6 @@
     <string name="hide">Сховати</string>
     <string name="home_package">Пакунок</string>
     <string name="home_app_title">Застосунок</string>
-
     <string name="home_notice_content">Завантажуйте Magisk ЛИШЕ з офіційної сторінки на GitHub. Файли з невідомих джерел можуть містити шкідливий функціонал!</string>
     <string name="home_support_title">Підтримати нас</string>
     <string name="home_item_source">Джерело</string>
@@ -73,7 +72,6 @@
     <string name="su_revoke_msg">Підтвердити відкликання прав для %1$s?</string>
     <string name="toast">Спливаюче сповіщення</string>
     <string name="none">Нічого</string>
-
     <string name="superuser_toggle_notification">Сповіщення</string>
     <string name="superuser_toggle_revoke">Відкликати</string>
     <string name="superuser_policy_none">Досі ніякий застосунок не запитував права суперкористувача</string>
@@ -86,8 +84,6 @@
     <string name="logs_cleared">Журнал успішно очищено</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Цільовий UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Показувати системні застосунки</string>
@@ -163,7 +159,6 @@
     <string name="setting_add_shortcut_summary">Додати ярлик на домашній екран для зручного сприйняття застосунку після його приховування</string>
     <string name="settings_doh_title">DNS поверх HTTPS</string>
     <string name="settings_doh_description">Відключити DoH (при нестабільному підключенні)</string>
-
     <string name="multiuser_mode">Багатокористувацький режим</string>
     <string name="settings_owner_only">Тільки власник</string>
     <string name="settings_owner_manage">Регулювання власником</string>
@@ -171,7 +166,6 @@
     <string name="owner_only_summary">Тільки власник має root-доступ</string>
     <string name="owner_manage_summary">Тільки власник може керувати root-доступом і опрацьовувати запити на надання доступу</string>
     <string name="user_independent_summary">Кожен користувач має власні правила root-доступу</string>
-
     <string name="mount_namespace_mode">Режим монтування простору імен</string>
     <string name="settings_ns_global">Глобальний простір імен</string>
     <string name="settings_ns_requester">Наслідуваний простір імен</string>
