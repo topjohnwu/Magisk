@@ -1,6 +1,6 @@
 <resources>
 
-    <!--Secciones-->
+    <!--Sections-->
     <string name="modules">Módulos</string>
     <string name="superuser">Superusuario</string>
     <string name="logs">Registros</string>
@@ -10,7 +10,7 @@
     <string name="section_theme">Temas</string>
     <string name="denylist">Lista de denegación</string>
 
-    <!--Inicio/Pantalla principal-->
+    <!--Home-->
     <string name="no_connection">Sin conexión disponible</string>
     <string name="app_changelog">Registro de cambios</string>
     <string name="loading">Cargando…</string>
@@ -19,7 +19,6 @@
     <string name="hide">Ocultar</string>
     <string name="home_package">Nombre de paquete:</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Descarga Magisk únicamente desde la página oficial de GitHub. ¡Las descargas desde fuentes desconocidas pueden ser maliciosas!</string>
     <string name="home_support_title">Apóyanos</string>
     <string name="home_follow_title">Síguenos</string>
@@ -31,7 +30,7 @@
     <string name="uninstall_magisk_title">Desinstalar Magisk</string>
     <string name="uninstall_magisk_msg">Antes de desinstalar Magisk, ten en cuenta lo siguiente:\n• Todos los módulos serán desinstalados\n• Perderás el acceso root\n• Tu almacenamiento interno será reencriptado en caso de que no lo esté</string>
 
-    <!--Instalación-->
+    <!--Install-->
     <string name="keep_force_encryption">Mantener FDE (Full-Disk Encryption)</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
     <string name="patch_vbmeta">Parchar vbmeta en el archivo boot.img</string>
@@ -50,7 +49,7 @@
     <string name="reboot_delay_toast">Reiniciando en 5 segundos…</string>
     <string name="flash_screen_title">Instalación</string>
 
-    <!--Superusuario-->
+    <!--Superuser-->
     <string name="su_request_title">Solicitud de superusuario</string>
     <string name="touch_filtered_warning">Hay una app superponiéndose a la solicitud de superusuario, por lo que Magisk no puede verificar tu respuesta.</string>
     <string name="deny">Denegar</string>
@@ -75,12 +74,11 @@
     <string name="su_revoke_msg">Confirma para revocarle los privilegios de superusuario a %1$s</string>
     <string name="toast">Mensaje emergente</string>
     <string name="none">Ninguno</string>
-
     <string name="superuser_toggle_notification">Notificaciones</string>
     <string name="superuser_toggle_revoke">Revocar</string>
     <string name="superuser_policy_none">Ninguna app ha solicitado privilegios de superusuario aún.</string>
 
-    <!--Registros-->
+    <!--Logs-->
     <string name="log_data_none">No hay registros de apps disponibles</string>
     <string name="log_data_magisk_none">No hay registros de Magisk disponibles</string>
     <string name="menuSaveLog">Guardar registro</string>
@@ -89,15 +87,13 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-    <!--SafetyNet/PlayIntegrity-->
-
-    <!--Denylist-->
+    <!--MagiskHide-->
     <string name="show_system_app">Mostrar apps del sistema</string>
     <string name="show_os_app">Mostrar apps del sistema operativo</string>
     <string name="hide_filter_hint">Nombre de la app o del paquete</string>
     <string name="hide_search">Buscar</string>
 
-    <!--Módulos-->
+    <!--Module-->
     <string name="no_info_provided">El creador del módulo no proporcionó ninguna descripción.</string>
     <string name="reboot_userspace">Reinicio suave</string>
     <string name="reboot_recovery">Modo Recovery</string>
@@ -116,7 +112,7 @@
     <string name="confirm_install">¿Quieres instalar el módulo %1$s?</string>
     <string name="confirm_install_title">Confirmar instalación</string>
 
-    <!--Ajustes-->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Modo del tema</string>
     <string name="settings_dark_mode_message">¡Elige el modo que más se adapte a tu estilo!</string>
     <string name="settings_dark_mode_light">Claro</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Añade un atajo a la app con el ícono de Magisk a la pantalla de inicio en caso de que te resulte difícil reconocerla tras haberle cambiado el nombre y el ícono</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Proporciona una solución alternativa (workaround) contra el envenenamiento de DNS en algunos países</string>
-
     <string name="multiuser_mode">Modo multiusuario</string>
     <string name="settings_owner_only">Propietario del dispositivo</string>
     <string name="settings_owner_manage">Administrado por el propietario del dispositivo</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Solo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Solo el administrador puede manipular y recibir solicitudes de superusuario</string>
     <string name="user_independent_summary">Cada usuario tiene sus propias reglas y acceso al root</string>
-
     <string name="mount_namespace_mode">Modo del namespace de montaje</string>
     <string name="settings_ns_global">Namespace global</string>
     <string name="settings_ns_requester">Namespace heredado</string>
@@ -188,7 +182,7 @@
     <string name="requester_summary">Las sesiones de superusuario heredarán el namespace de montaje de quien las solicita</string>
     <string name="isolate_summary">Cada sesión de superusuario tendrá su propio namespace de montaje aislado</string>
 
-    <!--Notificaciones-->
+    <!--Notifications-->
     <string name="update_channel">Actualizaciones de Magisk</string>
     <string name="progress_channel">Notificaciones de progreso</string>
     <string name="updated_channel">Actualización finalizada</string>
@@ -198,7 +192,7 @@
     <string name="updated_title">Se actualizó Magisk</string>
     <string name="updated_text">Pulsa para abrir la app</string>
 
-    <!--Alertas y diálogos-->
+    <!--Toasts, Dialogs-->
     <string name="yes">Sí</string>
     <string name="no">No</string>
     <string name="repo_install_title">Instalar %1$s %2$s(%3$d)</string>
