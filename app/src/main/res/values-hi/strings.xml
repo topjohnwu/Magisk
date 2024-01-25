@@ -110,7 +110,7 @@
     <string name="zygisk_module_unloaded">Zygisk मॉड्यूल असंगतता के कारण लोड होने में असमर्थ</string>
     <string name="module_empty">कोई मॉड्यूल इंस्टॉल्ड नहीं</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">थीम मोड</string>
     <string name="settings_dark_mode_message">ऐसी थीम का चयन करें जो आपकी शैली के अनुकूल हो!</string>
     <string name="settings_dark_mode_light">हमेशा सफेद रंग वाली</string>
