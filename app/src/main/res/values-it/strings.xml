@@ -87,7 +87,7 @@
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Target UID: %1$d</string>
 
-    <!-- MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Mostra app di sistema</string>
     <string name="show_os_app">Mostra app del sistema operativo</string>
     <string name="hide_filter_hint">Filtra per nome</string>
@@ -110,7 +110,7 @@
     <string name="zygisk_module_unloaded">Modulo Zygisk non caricato a causa di incompatibilità</string>
     <string name="module_empty">Nessun modulo installato</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="confirm_install">Vuoi installare il modulo %1$s?</string>
     <string name="confirm_install_title">Conferma installazione</string>
     <string name="settings_dark_mode_title">Impostazioni tema</string>
