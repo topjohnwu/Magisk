@@ -19,7 +19,6 @@
     <string name="hide">Elrejt</string>
     <string name="home_package">Csomag</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">A Magisk-et CSAK a hivatalos GitHub oldalról töltsd le. Az ismeretlen forrásból származó fájlok rosszindulatúak lehetnek!</string>
     <string name="home_support_title">Támogass minket</string>
     <string name="home_follow_title">Kövess minket</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Erősítsd meg %1$s Superuser jogainak visszavonását</string>
     <string name="toast">Felbukkanó</string>
     <string name="none">Egyik sem</string>
-
     <string name="superuser_toggle_notification">Értesítések</string>
     <string name="superuser_toggle_revoke">Visszavonás</string>
     <string name="superuser_policy_none">Még egyetlen alkalmazás sem kért Superuser engedélyt.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">A napló sikeresen törölve</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Cél UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Rendszerappok megjelenítése</string>
@@ -169,7 +165,6 @@
     <string name="setting_add_shortcut_summary">Adjon hozzá egy szép parancsikont a kezdőképernyőhöz arra az esetre, ha a nevet és az ikont nehéz felismerni az alkalmazás elrejtése után</string>
     <string name="settings_doh_title">DNS HTTPS-en keresztül</string>
     <string name="settings_doh_description">Megoldás DNS-mérgezés esetén egyes országokban</string>
-
     <string name="multiuser_mode">Többfelhasználós mód</string>
     <string name="settings_owner_only">Csak az eszköz tulajdonosa</string>
     <string name="settings_owner_manage">Az eszköz tulajdonosa kezeli</string>
@@ -177,7 +172,6 @@
     <string name="owner_only_summary">Csak a tulajdonos rendelkezik root hozzáféréssel</string>
     <string name="owner_manage_summary">Csak a tulajdonos kezelheti a root hozzáférést és fogadhatja a kéréseket</string>
     <string name="user_independent_summary">Minden felhasználónak megvannak a saját, külön root szabályai</string>
-
     <string name="mount_namespace_mode">Névtér felcsatolás módja</string>
     <string name="settings_ns_global">Globális névtér</string>
     <string name="settings_ns_requester">Örökölt névtér</string>
