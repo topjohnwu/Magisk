@@ -19,7 +19,6 @@
     <string name="hide">Peida</string>
     <string name="home_package">Pakett</string>
     <string name="home_app_title">Rakendus</string>
-
     <string name="home_notice_content">Laadi Magisk alla vaid ametlikult GitHubi lehelt. Tundmatutest allikatest laaditud failid võivad olla pahatahtlikud!</string>
     <string name="home_support_title">Toeta meid</string>
     <string name="home_item_source">Lähtekood</string>
@@ -74,7 +73,6 @@
     <string name="su_revoke_msg">Kinnitad rakenduse %1$s õiguste eemaldamise?</string>
     <string name="toast">Hüpik</string>
     <string name="none">Puudub</string>
-
     <string name="superuser_toggle_notification">Teavitused</string>
     <string name="superuser_toggle_revoke">Eemalda</string>
     <string name="superuser_policy_none">Ükski rakendus ei ole veel superkasutaja õigusi küsinud.</string>
@@ -87,8 +85,6 @@
     <string name="logs_cleared">Logi edukalt tühjendatud.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Siht-UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Kuva uuendatavad süsteemirakendused</string>
@@ -167,7 +163,6 @@
     <string name="setting_add_shortcut_summary">Lisa avakuvale ilus otsetee juhuks, kui nime ja ikooni on pärast rakenduse peitmist raske tuvastada</string>
     <string name="settings_doh_title">DNS üle HTTPSi</string>
     <string name="settings_doh_description">Väldi mõnes riigis DNSi mürgitamist</string>
-
     <string name="multiuser_mode">Mitmikkasutaja režiim</string>
     <string name="settings_owner_only">Ainult seadme omanik</string>
     <string name="settings_owner_manage">Seadme omaniku hallatud</string>
@@ -175,7 +170,6 @@
     <string name="owner_only_summary">Ainult omanikul on juurkasutaja õigused</string>
     <string name="owner_manage_summary">Ainult omanik saab hallata juurkasutaja ligipääsu ja saada taotlusküsimusi</string>
     <string name="user_independent_summary">Igal kasutajal on oma isiklikud juurkasutaja reeglid.</string>
-
     <string name="mount_namespace_mode">Nimeruumi monteerimisrežiim</string>
     <string name="settings_ns_global">Globaalne nimeruum</string>
     <string name="settings_ns_requester">Võta nimeruum üle</string>
