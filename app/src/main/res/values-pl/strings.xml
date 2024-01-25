@@ -90,13 +90,13 @@
     <string name="selinux_context">Kontekst SELinux: %s</string>
     <string name="supp_group">Grupa uzupełniająca: %s</string>
 
-    <!--MagiskHide -->
+    <!--MagiskHide-->
     <string name="show_system_app">Pokaż aplikacje systemowe</string>
     <string name="show_os_app">Pokaż aplikacje OS</string>
     <string name="hide_filter_hint">Filtruj według nazwy</string>
     <string name="hide_search">Szukaj</string>
 
-    <!--Module -->
+    <!--Module-->
     <string name="no_info_provided">(Brak informacji)</string>
     <string name="reboot_userspace">Miękki reboot</string>
     <string name="reboot_recovery">Reboot do trybu Recovery</string>
@@ -115,7 +115,7 @@
     <string name="confirm_install">Zainstalować moduł %1$s?</string>
     <string name="confirm_install_title">Potwierdzenie instalacji</string>
 
-    <!--Settings -->
+    <!--Settings-->
     <string name="settings_dark_mode_title">Tryb motywu</string>
     <string name="settings_dark_mode_message">Wybierz tryb, który najbardziej ci odpowiada!</string>
     <string name="settings_dark_mode_light">Zawsze jasny</string>
