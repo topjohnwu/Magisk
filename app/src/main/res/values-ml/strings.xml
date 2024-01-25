@@ -19,7 +19,6 @@
     <string name="hide">മറയ്ക്കൂ</string>
     <string name="home_package">പാക്കേജ്</string>
     <string name="home_app_title">ആപ്പ്</string>
-
     <string name="home_notice_content">ഔദ്യോഗിക ഗിറ്റ്ഹബ് പേജിൽ നിന്ന് മാത്രം മജിസ്‌ക് ഡൗൺലോഡ് ചെയ്യുക. അജ്ഞാത ഉറവിടങ്ങളിൽ നിന്നുള്ള ഫയലുകൾ ക്ഷുദ്രകരമാകാം!</string>
     <string name="home_support_title">ഞങ്ങളെ തുണയ്‌ക്കുക</string>
     <string name="home_follow_title">ഞങ്ങളെ ഫോളോ ചെയ്യുക</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">%1$s-ന്റെ സൂപ്പർയൂസർ അവകാശം അസാധുവാക്കാൻ സ്ഥിരീകരിക്കുക</string>
     <string name="toast">ടോസ്റ്റ്</string>
     <string name="none">ഒന്നുമില്</string>
-
     <string name="superuser_toggle_notification">അറിയിപ്പുകൾ</string>
     <string name="superuser_toggle_revoke">പിന്‍വലിക്കുക</string>
     <string name="superuser_policy_none">ആപ്പുകളൊന്നും ഇതുവരെ സൂപ്പർയൂസർ അനുമതി ചോദിച്ചിട്ടില്ല.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">ലോഗ് മായ്ച്ചു</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ടാർഗെറ്റ് UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">സിസ്റ്റം ആപ്പുകൾ കാണിക്കുക</string>
@@ -169,7 +165,6 @@
     <string name="setting_add_shortcut_summary">ആപ്പ് മറച്ചതിന് ശേഷം പേരും ഐക്കണും തിരിച്ചറിയാൻ പ്രയാസമാണെങ്കിൽ ഹോം സ്‌ക്രീനിലേക്ക് മനോഹരമായ ഒരു ഷോർട്ട്ക്കട് ചേർക്കുക</string>
     <string name="settings_doh_title">DNS ഓവർ HTTPS</string>
     <string name="settings_doh_description">ചില രാജ്യങ്ങളിലെ DNS പോയ്സണിങിന് പരിഹാരം</string>
-
     <string name="multiuser_mode">മൾട്ടിയൂസർ മോഡ്</string>
     <string name="settings_owner_only">ഉപകരണ ഉടമ മാത്രം</string>
     <string name="settings_owner_manage">ഉപകരണ ഉടമ നിയന്ത്രിക്കുന്നു</string>
@@ -177,7 +172,6 @@
     <string name="owner_only_summary">ഉടമയ്ക്ക് മാത്രമേ റൂട്ട് ആക്സസ് ഉള്ളൂ</string>
     <string name="owner_manage_summary">റൂട്ട് ആക്‌സസ് നിയന്ത്രിക്കാനും അഭ്യർത്ഥന നിർദ്ദേശങ്ങൾ സ്വീകരിക്കാനും ഉടമയ്ക്ക് മാത്രമേ കഴിയൂ</string>
     <string name="user_independent_summary">ഓരോ ഉപയോക്താവിനും അവരുടേതായ പ്രത്യേക റൂട്ട് നിയമങ്ങൾ ഉണ്ടാവാം</string>
-
     <string name="mount_namespace_mode">മൗണ്ട് നെയിംസ്പേസ് മോഡ്</string>
     <string name="settings_ns_global">ഗ്ലോബൽ നെയിംസ്പേസ്</string>
     <string name="settings_ns_requester">പൂര്‍വ്വാര്‍ജ്ജിതമായ് നെയിംസ്പേസ്</string>
