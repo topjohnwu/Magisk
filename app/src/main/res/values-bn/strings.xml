@@ -19,7 +19,6 @@
     <string name="hide">লুকান</string>
     <string name="home_package">প্যাকেজ</string>
     <string name="home_app_title">অ্যাপ</string>
-
     <string name="home_notice_content">শুধুমাত্র অফিসিয়াল গিটহাব পেজ থেকে ম্যাজিস্ক ডাউনলোড করুন। অজানা উৎস থেকে ফাইল ক্ষতিকর হতে পারে!</string>
     <string name="home_support_title">আমাদের সমর্থন</string>
     <string name="home_follow_title">আমাদের অনুসরণ করো</string>
@@ -87,8 +86,6 @@
     <string name="logs_cleared">লগ সফলভাবে সাফ করা হয়েছে৷</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">লক্ষ্য UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">সিস্টেম অ্যাপ দেখান</string>
@@ -168,7 +165,6 @@
     <string name="setting_add_shortcut_summary">অ্যাপটি লুকানোর পরে নাম এবং আইকন সনাক্ত করা কঠিন হলে হোম স্ক্রিনে একটি সুন্দর শর্টকাট যোগ করুন</string>
     <string name="settings_doh_title">HTTPS এর উপর ডিএনএস</string>
     <string name="settings_doh_description">কিছু দেশে ডিএনএস বিষক্রিয়ার সমাধান</string>
-
     <string name="multiuser_mode">মাল্টিউজার মোড</string>
     <string name="settings_owner_only">শুধুমাত্র ডিভাইসের মালিক</string>
     <string name="settings_owner_manage">ডিভাইস মালিক পরিচালিত</string>
@@ -176,7 +172,6 @@
     <string name="owner_only_summary">শুধুমাত্র মালিকের রুট অ্যাক্সেস আছে</string>
     <string name="owner_manage_summary">শুধুমাত্র মালিকই রুট অ্যাক্সেস পরিচালনা করতে পারে এবং অনুরোধ প্রম্পট গ্রহণ করতে পারে</string>
     <string name="user_independent_summary">প্রতিটি ব্যবহারকারীর নিজস্ব পৃথক রুট নিয়ম আছে</string>
-
     <string name="mount_namespace_mode">মাউন্ট নেমস্পেস মোড</string>
     <string name="settings_ns_global">গ্লোবাল নেমস্পেস</string>
     <string name="settings_ns_requester">নেমস্পেস ইনহেরিট করুন</string>
