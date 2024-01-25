@@ -19,7 +19,6 @@
     <string name="hide">Slėpti</string>
     <string name="home_package">Paketas</string>
     <string name="home_app_title">Programėlė</string>
-
     <string name="home_notice_content">Magisk siųskites TIK iš oficialiojo GitHub puslapio. Failai iš nežinomų šaltinių gali būti kenkėjiški!</string>
     <string name="home_support_title">Palaikykite mus</string>
     <string name="home_follow_title">Sekite mus</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Patvirtinkite %1$s supernaudotojo teisių atšaukimą</string>
     <string name="toast">Iššokantys pranešimai</string>
     <string name="none">Nėra</string>
-
     <string name="superuser_toggle_notification">Pranešimai</string>
     <string name="superuser_toggle_revoke">Atšaukti</string>
     <string name="superuser_policy_none">Kol kas jokia programėlė neprašė supernaudotojo teisių.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Žurnalas išvalytas</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Tikslinis UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Rodyti sistemos programėles</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Pridėti nuorodą į pagrindinį ekraną, jei po programėlės paslėpimo yra sunku atpažinti jos pavadinimą ir piktogramą</string>
     <string name="settings_doh_title">DNS virš HTTPS</string>
     <string name="settings_doh_description">Aktyvinti DoH (naudokite, jei kyla problemų jungiantis prie tinklo</string>
-
     <string name="multiuser_mode">Daugelio naudotojų režimas</string>
     <string name="settings_owner_only">Tik įrenginio savininkas</string>
     <string name="settings_owner_manage">Valdoma įrenginio savininko</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Tik savininkas turi root prieigą</string>
     <string name="owner_manage_summary">Tik savininkas gali tvarkyti root prieigą ir gauti užklausas</string>
     <string name="user_independent_summary">Kiekvienas naudotojas turi savo atskiras root taisykles</string>
-
     <string name="mount_namespace_mode">Pavadinimų erdvės režimas</string>
     <string name="settings_ns_global">Bendra pavadinimų erdvė</string>
     <string name="settings_ns_requester">Paveldima pavadinimų erdvė</string>
