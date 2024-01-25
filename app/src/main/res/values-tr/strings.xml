@@ -19,7 +19,6 @@
     <string name="hide">Gizle</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Uygulama</string>
-
     <string name="home_notice_content">Magisk\'i YALNIZCA resmi GitHub sayfasından indirin. Bilinmeyen kaynaklardan gelen dosyalar kötü amaçlı olabilir!</string>
     <string name="home_support_title">Bizi Destekleyin</string>
     <string name="home_follow_title">Bizi Takip Edin</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">%1$s uygulamasının Süper Kullanıcı haklarını iptal etmeyi onaylayın</string>
     <string name="toast">Tost</string>
     <string name="none">Hiçbiri</string>
-
     <string name="superuser_toggle_notification">Bildirimler</string>
     <string name="superuser_toggle_revoke">İptal et</string>
     <string name="superuser_policy_none">Henüz hiçbir uygulama Süper Kullanıcı izni istemedi.</string>
@@ -88,8 +86,6 @@
     <string name="logs_cleared">Günlük başarıyla temizlendi</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Hedef UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Sistem uygulamalarını göster</string>
@@ -171,7 +167,6 @@
     <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra adın ve simgenin tanınmasının zor olması durumunda ana ekrana güzel bir kısayol ekleyin</string>
     <string name="settings_doh_title">HTTPS üzerinden DNS</string>
     <string name="settings_doh_description">Bazı ülkelerde DNS zehirlenmesine geçici çözüm</string>
-
     <string name="multiuser_mode">Çok Kullanıcılı Mod</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>
     <string name="settings_owner_manage">Cihaz Sahibi Tarafından Yönetildi</string>
@@ -179,7 +174,6 @@
     <string name="owner_only_summary">Yalnızca sahibinin kök erişimi vardır</string>
     <string name="owner_manage_summary">Yalnızca sahip, kök erişimini yönetebilir ve istek istemleri alabilir</string>
     <string name="user_independent_summary">Her kullanıcının kendi ayrı kök kuralları vardır</string>
-
     <string name="mount_namespace_mode">Bağlama Ad Alanı Modu</string>
     <string name="settings_ns_global">Küresel Ad Alanı</string>
     <string name="settings_ns_requester">Ad Alanını Devral</string>
