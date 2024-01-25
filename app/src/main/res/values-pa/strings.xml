@@ -17,7 +17,6 @@
     <string name="not_available">N/A</string>
     <string name="hide">ਓਹਲੇ</string>
     <string name="home_package">ਪੈਕੇਜ</string>
-
     <string name="home_support_title">ਸਾਡਾ ਸਮਰਥਨ ਕਰੋ</string>
     <string name="home_item_source">ਸਰੋਤ</string>
     <string name="home_support_content">ਮੈਜਿਸਕ ਮੁਫਤ ਅਤੇ ਖੁੱਲਾ ਸਰੋਤ ਹੈ, ਅਤੇ ਹਮੇਸ਼ਾਂ ਰਹੇਗਾ। ਹਾਲਾਂਕਿ, ਤੁਸੀਂ ਦਿਖਾ ਸਕਦੇ ਹੋ ਕਿ ਤੁਸੀਂ ਇੱਕ ਛੋਟਾ ਜਿਹਾ ਦਾਨ ਭੇਜ ਕੇ ਦੇਖਭਾਲ ਕਰਦੇ ਹੋ।</string>
@@ -69,7 +68,6 @@
     <string name="su_revoke_msg"> %1$s ਦੇ ਅਧਿਕਾਰਾਂ ਨੂੰ ਰੱਦ ਕਰਨ ਦੀ ਪੁਸ਼ਟੀ ਕਰਦੇ ਹੋ?</string>
     <string name="toast">ਪੌਪ-ਅੱਪ ਸੂਚਨਾ</string>
     <string name="none">ਕੋਈ ਨਹੀਂ</string>
-
     <string name="superuser_toggle_notification">ਸੂਚਨਾ</string>
     <string name="superuser_toggle_revoke">ਅਧਿਕਾਰ ਵਾਪਸ ਲਓ</string>
     <string name="superuser_policy_none">ਅਜੇ ਤੱਕ ਕਿਸੇ ਵੀ ਐਪ ਨੇ ਸੁਪਰਯੂਜ਼ਰ ਲਈ ਆਗਿਆ ਨਹੀਂ ਮੰਗੀ ਹੈ।</string>
@@ -82,8 +80,6 @@
     <string name="logs_cleared">ਲੌਗ ਸਫਲਤਾਪੂਰਕ ਸਾਫ ਹੋ ਗਏ ਹਨ।</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">ਟੀਚਾ UID: %1$d</string>
-
-    <!--SafetyNet-->
 
     <!-- MagiskHide -->
     <string name="show_system_app">ਸਿਸਟਮ ਐਪਸ ਦਿਖਾਓ</string>
@@ -147,7 +143,6 @@
     <string name="setting_add_shortcut_summary">ਐਪ ਨੂੰ ਲੁਕਾਉਣ ਤੋਂ ਬਾਅਦ ਨਾਮ ਅਤੇ ਆਈਕਾਨ ਨੂੰ ਪਛਾਣਨਾ ਮੁਸ਼ਕਲ ਹੈ, ਤਾਂ ਹੋਮ ਸਕ੍ਰੀਨ ਵਿਚ ਇਕ ਸੁੰਦਰ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>
     <string name="settings_doh_title">DNS ਉੱਤੇ HTTPS</string>
     <string name="settings_doh_description">ਕੁਝ ਦੇਸ਼ਾਂ ਵਿੱਚ ਚੱਲ ਰਹੇ DNS ਵਿਸ਼ਾਕਤਤਾ ਦਾ ਹੱਲ</string>
-
     <string name="multiuser_mode">ਮਲਟੀ ਯੂਜ਼ਰ ਮੋਡ</string>
     <string name="settings_owner_only">ਸਿਰਫ ਡਿਵਾਈਸ ਮਾਲਕ</string>
     <string name="settings_owner_manage">ਡਿਵਾਈਸ ਮਾਲਕ ਦੁਆਰਾ ਪ੍ਰਬੰਧਿਤ</string>
@@ -155,7 +150,6 @@
     <string name="owner_only_summary">ਸਿਰਫ ਮਾਲਕ ਕੋਲ ਰੂਟ ਐਕਸੈਸ ਹੈ</string>
     <string name="owner_manage_summary">ਸਿਰਫ ਮਾਲਕ ਰੂਟ ਐਕਸੈਸ ਦਾ ਪ੍ਰਬੰਧ ਕਰ ਸਕਦੇ ਹਨ ਅਤੇ ਬੇਨਤੀ ਸਿਗਨਲ ਪ੍ਰਾਪਤ ਕਰ ਸਕਦੇ ਹਨ</string>
     <string name="user_independent_summary">ਹਰੇਕ ਉਪਭੋਗਤਾ ਦਾ ਆਪਣਾ ਵੱਖਰਾ ਰੂਟ ਨਿਯਮ ਹੁੰਦਾ ਹੈ</string>
-
     <string name="mount_namespace_mode">ਮਾਉਂਟ ਨੇਮਸਪੇਸ ਮੋਡ</string>
     <string name="settings_ns_global">ਗਲੋਬਲ ਨੇਮਸਪੇਸ</string>
     <string name="settings_ns_requester">ਇਨਹੇਰਟ ਨੇਮਸਪੇਸ</string>
