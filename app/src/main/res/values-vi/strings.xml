@@ -179,7 +179,7 @@
     <string name="requester_summary">Phiên root sẽ kế thừa không gian tên của người yêu cầu của họ</string>
     <string name="isolate_summary">Mỗi phiên root sẽ có không gian tên riêng biệt</string>
 
-    <!--Thông báo-->
+    <!--Notifications-->
     <string name="update_channel">Cập nhật Magisk</string>
     <string name="progress_channel">Thông báo tiến độ</string>
     <string name="updated_channel">Cập nhật hoàn tất</string>
