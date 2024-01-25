@@ -19,7 +19,6 @@
     <string name="hide">Fshih</string>
     <string name="home_package">Paketa</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Shkarkoni Magisk VETEM nga faqja zyrtare e GitHub. Skedarët nga burime të panjohura mund të jenë me qëllim të keq! </string>
     <string name="home_support_title">Na mbështetni</string>
     <string name="home_follow_title">Na ndiqni</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Konfirmo për të hequr të drejtat e %1$s?</string>
     <string name="toast">Dolli</string>
     <string name="none">Asnjë</string>
-
     <string name="superuser_toggle_notification">Njoftimet</string>
     <string name="superuser_toggle_revoke">Të drejtat</string>
     <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar akoma akses për super-përdoruesin.</string>
@@ -91,8 +89,6 @@
     <string name="target_pid">Montoni PID të synuar ns: %s</string>
     <string name="selinux_context">Konteksti SELinux: %s</string>
     <string name="supp_group">Grupi suplementar: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Shfaq aplikacionet e sistemit</string>
@@ -241,4 +237,5 @@
     <string name="app_not_found">Asnjë aplikacion nuk u gjet për të trajtuar këtë veprim</string>
     <string name="reboot_apply_change">Rinisni për të aplikuar ndryshimet</string>
     <string name="restore_app_confirmation">Kjo do të rivendosë aplikacionin e fshehur në aplikacionin origjinal. A dëshironi vërtet ta bëni këtë?</string>
+
 </resources>
