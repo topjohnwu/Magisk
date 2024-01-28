@@ -3,14 +3,14 @@
 emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-emu_args='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -show-kernel -memory 8192'
+emu_args_base='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -show-kernel -memory $memory'
 lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
 boot_timeout=600
 emu_pid=
 
 export PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"
 
-# We test these API levels for the following reason
+# We test at least these API levels for the following reason
 
 # API 23: legacy rootfs w/o Treble
 # API 26: legacy rootfs with Treble
@@ -23,6 +23,7 @@ api_list='23 26 28 29 34'
 atd_min_api=30
 atd_max_api=34
 lsposed_min_api=27
+huge_ram_min_api=26
 
 print_title() {
   echo -e "\n\033[44;39m${1}\033[0m\n"
@@ -74,11 +75,19 @@ wait_for_boot() {
 }
 
 set_api_env() {
+  local memory
   local type='default'
   if [ $1 -ge $atd_min_api -a $1 -le $atd_max_api ]; then
     # Use the lightweight ATD images if possible
     type='aosp_atd'
   fi
+  # Old Linux kernels will not boot with memory larger than 3GB
+  if [ $1 -lt $huge_ram_min_api ]; then
+    memory=3072
+  else
+    memory=8192
+  fi
+  eval emu_args=\"$emu_args_base\"
   pkg="system-images;android-$1;$type;$arch"
   local img_dir="$ANDROID_SDK_ROOT/system-images/android-$1/$type/$arch"
   ramdisk="$img_dir/ramdisk.img"

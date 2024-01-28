@@ -101,13 +101,13 @@ jobs:
           compression-level: 9
 
   test:
-    name: Test on ${{ matrix.api }}
+    name: Test on API ${{ matrix.api }}
     runs-on: ubuntu-latest
     needs: build
     strategy:
       fail-fast: false
       matrix:
-        api: [23, 26, 28, 29, 34]
+        api: [23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
 
     steps:
       - name: Check out
@@ -116,7 +116,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
