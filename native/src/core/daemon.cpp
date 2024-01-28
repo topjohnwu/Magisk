@@ -157,7 +157,6 @@ static void handle_request_async(int client, int code, const sock_cred &cred) {
         break;
     case +RequestCode::ZYGOTE_RESTART:
         LOGI("** zygote restarted\n");
-        pkg_xml_ino = 0;
         prune_su_access();
         reset_zygisk(false);
         close(client);
