@@ -38,7 +38,6 @@ void check_pkg_refresh() {
         memcpy(app_ts, &st.st_mtim, sizeof(timespec));
     }
     skip_mgr_check = false;
-    skip_pkg_rescan.clear();
 }
 
 // app_id = app_no + AID_APP_START
