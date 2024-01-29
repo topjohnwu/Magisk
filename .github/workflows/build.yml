@@ -17,14 +17,12 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Build Magisk artifacts
+    runs-on: ubuntu-latest
     env:
       SCCACHE_DIRECT: false
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -32,22 +30,19 @@ jobs:
           submodules: "recursive"
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup
+      - name: Setup environment
+        uses: ./.github/actions/setup
 
       - name: Build release
-        run: |
-          python build.py -vr all
+        run: ./build.py -vr all
 
       - name: Build debug
-        run: |
-          python build.py -v all
+        run: ./build.py -v all
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
 
-      # Only upload artifacts built on Linux
       - name: Upload build artifact
-        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}
@@ -55,12 +50,36 @@ jobs:
           compression-level: 9
 
       - name: Upload mapping and native debug symbols
-        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-symbols
           path: app/build/outputs
           compression-level: 9
+
+  test-build:
+    name: Test building on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      SCCACHE_DIRECT: false
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-13]
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+          fetch-depth: 0
+
+      - name: Setup environment
+        uses: ./.github/actions/setup
+
+      - name: Build debug
+        run: python build.py -v all
+
+      - name: Stop gradle daemon
+        run: ./gradlew --stop
 
   test:
     name: Test on API ${{ matrix.api }}
