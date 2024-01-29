@@ -15,8 +15,6 @@
 
 using namespace std;
 
-atomic_flag skip_pkg_rescan;
-
 // For the following data structures:
 // If package name == ISOLATED_MAGIC, or app ID == -1, it means isolated service
 
@@ -33,59 +31,48 @@ static pthread_mutex_t data_lock = PTHREAD_MUTEX_INITIALIZER;
 
 atomic<bool> denylist_enforced = false;
 
-static void rescan_apps() {
-    LOGD("denylist: rescanning apps\n");
+static int get_app_id(const vector<int> &users, const string &pkg) {
+    struct stat st{};
+    char buf[PATH_MAX];
+    for (const auto &user_id: users) {
+        ssprintf(buf, sizeof(buf), "%s/%d/%s", APP_DATA_DIR, user_id, pkg.data());
+        if (stat(buf, &st) == 0) {
+            return to_app_id(st.st_uid);
+        }
+    }
+    return 0;
+}
 
-    app_id_to_pkgs.clear();
-
+static void collect_users(vector<int> &users) {
     auto data_dir = xopen_dir(APP_DATA_DIR);
     if (!data_dir)
         return;
     dirent *entry;
     while ((entry = xreaddir(data_dir.get()))) {
-        // For each user
-        int dfd = xopenat(dirfd(data_dir.get()), entry->d_name, O_RDONLY);
-        if (auto dir = xopen_dir(dfd)) {
-            while ((entry = xreaddir(dir.get()))) {
-                struct stat st{};
-                // For each package
-                if (xfstatat(dfd, entry->d_name, &st, 0))
-                    continue;
-                int app_id = to_app_id(st.st_uid);
-                if (auto it = pkg_to_procs.find(entry->d_name); it != pkg_to_procs.end()) {
-                    app_id_to_pkgs[app_id].insert(it->first);
-                }
-            }
-        } else {
-            close(dfd);
-        }
+        users.emplace_back(parse_int(entry->d_name));
     }
 }
 
-static void update_pkg_uid(const string &pkg, bool remove) {
-    auto data_dir = xopen_dir(APP_DATA_DIR);
-    if (!data_dir)
+static int get_app_id(const string &pkg) {
+    if (pkg == ISOLATED_MAGIC)
+        return -1;
+    vector<int> users;
+    collect_users(users);
+    return get_app_id(users, pkg);
+}
+
+static void update_app_id(int app_id, const string &pkg, bool remove) {
+    if (app_id <= 0)
         return;
-    dirent *entry;
-    struct stat st{};
-    char buf[PATH_MAX] = {0};
-    // For each user
-    while ((entry = xreaddir(data_dir.get()))) {
-        ssprintf(buf, sizeof(buf), "%s/%s", entry->d_name, pkg.data());
-        if (fstatat(dirfd(data_dir.get()), buf, &st, 0) == 0) {
-            int app_id = to_app_id(st.st_uid);
-            if (remove) {
-                if (auto it = app_id_to_pkgs.find(app_id); it != app_id_to_pkgs.end()) {
-                    it->second.erase(pkg);
-                    if (it->second.empty()) {
-                        app_id_to_pkgs.erase(it);
-                    }
-                }
-            } else {
-                app_id_to_pkgs[app_id].insert(pkg);
+    if (remove) {
+        if (auto it = app_id_to_pkgs.find(app_id); it != app_id_to_pkgs.end()) {
+            it->second.erase(pkg);
+            if (it->second.empty()) {
+                app_id_to_pkgs.erase(it);
             }
-            break;
         }
+    } else {
+        app_id_to_pkgs[app_id].emplace(pkg);
     }
 }
 
@@ -195,6 +182,34 @@ static bool add_hide_set(const char *pkg, const char *proc) {
     return true;
 }
 
+void scan_deny_apps() {
+    if (!app_id_to_pkgs_)
+        return;
+
+    app_id_to_pkgs.clear();
+
+    char sql[4096];
+    vector<int> users;
+    collect_users(users);
+    for (auto it = pkg_to_procs.begin(); it != pkg_to_procs.end();) {
+        if (it->first == ISOLATED_MAGIC) {
+            it++;
+            continue;
+        }
+        int app_id = get_app_id(users, it->first);
+        if (app_id == 0) {
+            LOGI("denylist rm: [%s]\n", it->first.data());
+            ssprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'",
+                     it->first.data());
+            db_err(db_exec(sql));
+            it = pkg_to_procs.erase(it);
+        } else {
+            update_app_id(app_id, it->first, false);
+            it++;
+        }
+    }
+}
+
 static void clear_data() {
     pkg_to_procs_.reset(nullptr);
     app_id_to_pkgs_.reset(nullptr);
@@ -214,7 +229,7 @@ static bool ensure_data() {
     db_err_cmd(err, goto error)
 
     default_new(app_id_to_pkgs_);
-    rescan_apps();
+    scan_deny_apps();
 
     return true;
 
@@ -234,10 +249,13 @@ static int add_list(const char *pkg, const char *proc) {
         mutex_guard lock(data_lock);
         if (!ensure_data())
             return DenyResponse::ERROR;
+        int app_id = get_app_id(pkg);
+        if (app_id == 0)
+            return DenyResponse::INVALID_PKG;
         if (!add_hide_set(pkg, proc))
             return DenyResponse::ITEM_EXIST;
         auto it = pkg_to_procs.find(pkg);
-        update_pkg_uid(it->first, false);
+        update_app_id(app_id, it->first, false);
     }
 
     // Add to database
@@ -266,7 +284,7 @@ static int rm_list(const char *pkg, const char *proc) {
         auto it = pkg_to_procs.find(pkg);
         if (it != pkg_to_procs.end()) {
             if (proc[0] == '\0') {
-                update_pkg_uid(it->first, true);
+                update_app_id(get_app_id(pkg), it->first, true);
                 pkg_to_procs.erase(it);
                 remove = true;
                 LOGI("denylist rm: [%s]\n", pkg);
@@ -274,7 +292,7 @@ static int rm_list(const char *pkg, const char *proc) {
                 remove = true;
                 LOGI("denylist rm: [%s/%s]\n", pkg, proc);
                 if (it->second.empty()) {
-                    update_pkg_uid(it->first, true);
+                    update_app_id(get_app_id(pkg), it->first, true);
                     pkg_to_procs.erase(it);
                 }
             }
@@ -309,6 +327,7 @@ void ls_list(int client) {
             return;
         }
 
+        scan_deny_apps();
         write_int(client,static_cast<int>(DenyResponse::OK));
 
         for (const auto &[pkg, procs] : pkg_to_procs) {
@@ -385,9 +404,6 @@ bool is_deny_target(int uid, string_view process) {
     mutex_guard lock(data_lock);
     if (!ensure_data())
         return false;
-
-    if (!skip_pkg_rescan.test_and_set())
-        rescan_apps();
 
     int app_id = to_app_id(uid);
     if (app_id >= 90000) {
