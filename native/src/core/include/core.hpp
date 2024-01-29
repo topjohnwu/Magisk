@@ -86,9 +86,9 @@ void clear_pkg(const char *pkg, int user_id);
 [[noreturn]] void install_module(const char *file);
 
 // Denylist
-extern std::atomic_flag skip_pkg_rescan;
 extern std::atomic<bool> denylist_enforced;
 int denylist_cli(int argc, char **argv);
 void initialize_denylist();
+void scan_deny_apps();
 bool is_deny_target(int uid, std::string_view process);
 void revert_unmount(int pid = -1) noexcept;

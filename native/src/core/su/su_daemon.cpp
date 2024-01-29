@@ -159,8 +159,7 @@ void prune_su_access() {
 
     for (int uid : rm_uids) {
         ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
-        // Don't care about errors
-        db_exec(query);
+        db_err(db_exec(query));
     }
 }
 
