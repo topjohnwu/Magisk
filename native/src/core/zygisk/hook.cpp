@@ -204,7 +204,7 @@ DCL_HOOK_FUNC(static int, pthread_attr_destroy, void *target) {
             // Because both `pthread_attr_destroy` and `dlclose` have the same function signature,
             // we can use `musttail` to let the compiler reuse our stack frame and thus
             // `dlclose` will directly return to the caller of `pthread_attr_destroy`.
-            [[clang::musttail]] return old_dlclose(self_handle);
+            [[clang::musttail]] return dlclose(self_handle);
         }
     }
 
