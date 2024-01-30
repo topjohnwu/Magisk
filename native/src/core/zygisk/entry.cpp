@@ -16,7 +16,6 @@ using namespace std;
 string native_bridge = "0";
 
 static bool is_compatible_with(uint32_t) {
-    auto name = get_prop(NBPROP);
     zygisk_logging();
     hook_functions();
     ZLOGD("load success\n");
