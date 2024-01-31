@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <sys/mount.h>
+#include <sys/select.h>
 
 #include <consts.hpp>
 #include <base.hpp>
@@ -249,6 +250,121 @@ static void set_identity(uid_t uid, const std::vector<uid_t> &groups) {
     }
 }
 
+// WK: added on 21/01/2024:
+static void multiplexing(int infd, int outfd, int errfd, int log_fd)
+{
+    struct timeval tv;
+    fd_set fds;
+    int rin;
+    int rout;
+    int rerr;
+    
+    /* Wait 1 second for data arrival, then give up. */
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+	
+	ssize_t inlen;
+        ssize_t outlen;
+	ssize_t errlen;
+	ssize_t written;
+	
+	char input[ARG_MAX];
+	char output[ARG_MAX];
+	char err[ARG_MAX];
+	
+
+       FD_ZERO(&fds);
+       FD_SET(STDIN_FILENO, &fds);
+       FD_SET(outfd, &fds);
+       FD_SET(errfd, &fds);
+   
+	while (1) {
+            
+      FD_ZERO(&fds);
+      FD_SET(STDIN_FILENO, &fds);
+
+      rin = select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+			
+     if (rin >= 1) {
+	 memset(input, 0, sizeof(input));
+		       
+        if ((inlen = read(STDIN_FILENO, input, 4096)) > 0) {
+               LOGD("input:%s", input);
+              written =  write(infd, input, inlen);
+             LOGD("written to infd %d", written);
+             write(log_fd, input, inlen);
+	  }
+    }
+		
+   FD_ZERO(&fds);
+   FD_SET(outfd, &fds);
+
+    rout = select(outfd + 1, &fds, NULL, NULL, &tv);
+		   
+   if (rout >= 1) {
+        LOGD("rout: %d", rout);
+       memset(output, 0, sizeof(output));
+			    
+        if ((outlen = read(outfd, output, 4096)) > 0) {
+	       written = write(STDOUT_FILENO, output, outlen);
+		LOGD(" written to STDOUT_FILENO: %d", written);
+               // tag indicating the init of output  (to be used by Magisk app to show the command output in green color)
+                write(log_fd, "{", strlen("{"));
+                write(log_fd, output, outlen); 
+                write(log_fd, "\n", strlen("\n"));
+                // tag indicating the the end of command's output  (to be used by Magisk app to show the command output in green color)
+                write(log_fd, "}", strlen("}"));
+                write(log_fd, "\n", strlen("\n"));
+
+               // WK: added on 24/01/2024: this fixes the "exit" command issue:
+		continue;				
+        }
+    }
+	 
+   FD_ZERO(&fds);
+   FD_SET(errfd, &fds);
+		
+    rerr = select(errfd + 1, &fds, NULL, NULL, &tv); 
+
+    if (rerr >= 1) {
+         LOGD("reread: %d", rerr);
+
+          memset(err, 0, sizeof(err));
+		        
+	   if ((errlen = read(errfd, err, 4096)) > 0) {
+		  LOGD("error:%s", err);
+	          written = write(STDERR_FILENO, err, errlen);
+                  LOGD("written to STDERR_FILENO: %d", written);
+      
+                 // tag indicating the init of command's error  (to be used by Magisk app to show the command output in red color)
+                 write(log_fd, "!", strlen("!")); 
+                 write(log_fd, err, errlen);
+                 write(log_fd, "\n", strlen("\n"));
+                 // tag indicating the end of command's error  (to be used by Magisk app to show the command output in green color)
+                 write(log_fd, "!", strlen("!")); 
+                 write(log_fd, "\n", strlen("\n"));
+               
+                // WK: added on 24/01/2024: this fixes the "exit" command issue:
+		continue;
+                }
+              
+              // WK: added on 24/01/2024: this fixes the "exit" command issue:
+	     FD_ZERO(&fds);
+             FD_SET(STDIN_FILENO, &fds);
+		
+	    rin = select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
+			    
+	    LOGD ("rin2: %d", rin);
+	     
+          if (rin == 0) {
+	  // WK: added on 24/01/2024: this fixes the "exit" command issue: if there is no data on STDIN_FILENO, break out of the loop so the process continue its normal flow and call waitpid() and exit().
+	   break;
+          }	        
+     }
+  }
+	
+}
+
 void su_daemon_handler(int client, const sock_cred *cred) {
     LOGD("su: request from uid=[%d], pid=[%d], client=[%d]\n", cred->uid, cred->pid, client);
 
@@ -338,8 +454,10 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     int outfd = recv_fd(client);
     int errfd = recv_fd(client);
 
+    int is_tty = read_int(client);
+    
     // App need a PTY
-    if (read_int(client)) {
+    if (is_tty) {
         string pts;
         string ptmx;
         auto magiskpts = get_magisk_tmp() + "/"s SHELLPTS;
@@ -392,8 +510,98 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     close(errfd);
     close(client);
 
+    int inputfd[2];
+    int outputfd[2];
+    int errorfd[2];
+
+    int ptmx = -1;
+    int ptsfd;
+    char pts_slave[PATH_MAX];
+
+    if (is_tty) {
+        // We need a PTY. Get one.
+        ptmx = pts_open(pts_slave, sizeof(pts_slave));
+        
+        if (ptmx < 0) {
+            PLOGE("pts_open");
+            //exit(-1);
+         }
+    } else {
+        //WK: use pipes for normal apps
+        pipe(inputfd);
+        pipe(outputfd);
+        pipe(errorfd);
+    }
+    
+    char log_name[PATH_MAX];
+
+    //TODO: add support for custom package name
+    snprintf(log_name, sizeof(logname), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
+    
+    log_fd = open(log_name, O_CREAT | O_RDWR, 0666);
+    if (log_fd < 0) {
+        PLOGE("Opening log_fd");
+       // return -1;
+    }
+	chmod(log_name, 0666);
+	// WK: Open another for I/O multiplexing
+    pid_t pid = fork();
+
+if (pid == 0) {
+    if(is_tty) {
+        // Opening the TTY has to occur after the
+        // fork() and setsid() so that it becomes
+        // our controlling TTY and not the daemon's
+        ptsfd = open(pts_slave, O_RDWR);
+        if (ptsfd == -1) {
+            PLOGE("open(pts_slave) daemon");
+            exit(-1);
+        }
+        
+        infd  = ptsfd;
+        outfd = ptsfd;
+        errfd = ptsfd;
+        	
+        if (-1 == dup2(infd, STDIN_FILENO)) {
+            PLOGE("dup2 child infd");
+            exit(-1);
+        }
+		if (-1 == dup2(outfd, STDOUT_FILENO)) {
+            PLOGE("dup2 child outfd");
+            exit(-1);
+        }
+		if (-1 == dup2(errfd, STDERR_FILENO)) {
+            PLOGE("dup2 child errfd");
+            exit(-1);
+        }
+
+		close(infd);
+		close(outfd);
+		close(outfd);
+    } else {
+        if (-1 == dup2(inputfd[0], STDIN_FILENO)) {
+            PLOGE("dup2 child infd");
+            exit(-1);
+		}
+	    if (-1 == dup2(outputfd[1], STDOUT_FILENO)) {
+            PLOGE("dup2 child outfd");
+		    exit(-1);
+		}
+		if (-1 == dup2(errorfd[1], STDERR_FILENO)) {
+            PLOGE("dup2 child errfd");
+            exit(-1);
+        }
+		
+		close(inputfd[0]);
+		close(inputfd[1]);
+		close(outputfd[0]);
+		close(output[1]);
+		close(errorfd[0]);
+		close(errorfd[1]);
+    }
+    
     // Handle namespaces
-    if (ctx.req.target == -1)
+     if (ctx.req.target == -1)
         ctx.req.target = ctx.pid;
     else if (ctx.req.target == 0)
         ctx.info->cfg[SU_MNT_NS] = NAMESPACE_MODE_GLOBAL;
@@ -420,9 +628,18 @@ void su_daemon_handler(int client, const sock_cred *cred) {
 
     argv[0] = ctx.req.login ? "-" : ctx.req.shell.data();
 
+    size_t cmd_size;
+    char *cmd;
+    
     if (!ctx.req.command.empty()) {
         argv[1] = "-c";
         argv[2] = ctx.req.command.data();
+
+        cmd = ctx.req.command.data();
+        cmd_size = strlen(cmd) + 1;
+		cmd[cmd_size] = '\n';
+		write(log_fd, cmd, cmd_size);
+		write(log_fd, "\n", 2);  
     }
 
     // Setup environment
@@ -464,4 +681,34 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     execvp(ctx.req.shell.data(), (char **) argv);
     fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell.data(), strerror(errno));
     PLOGE("exec");
+  } else { 
+     if (is_tty) {
+         watch_sigwinch_async(STDOUT_FILENO, ptmx);
+		setup_sighandlers();
+        pump_stdin_async(ptmx);
+        pump_stdout_blocking(ptmx, log_fd);
+         
+        int status, code;
+
+        LOGD("Waiting for pid %d.", pid);
+        waitpid(pid, &status, 0);
+        
+		code = WEXITSTATUS(status);
+        exit(code);
+     } else {
+        close(inputfd[0]);
+		close(outputfd[1]);
+		close(errorfd[1]);
+		multiplexing(inputfd[1], outputfd[0], errorfd[0]);
+        
+		LOGD("Waiting for pid %d.", pid);
+        waitpid(pid, &status, 0);
+        close(inputfd[1]);
+		close(outputfd[0]);
+		close(errorfd[0]);
+        
+		code = WEXITSTATUS(status);
+        exit(code);
+     }
+  }
 }
