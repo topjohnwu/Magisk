@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.AppApkPath
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
@@ -193,7 +194,7 @@ object AppMigration {
         }
 
         Config.suManager = pkg
-        val cmd = "adb_pm_install $repack $pkg"
+        val cmd = "touch $AppApkPath; adb_pm_install $repack $pkg"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
@@ -242,7 +243,7 @@ object AppMigration {
             dialog.dismiss()
         }
         Config.suManager = ""
-        val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
+        val cmd = "touch $AppApkPath; adb_pm_install $apk $APP_PACKAGE_NAME"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {
