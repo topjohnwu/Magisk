@@ -683,13 +683,13 @@ if (pid == 0) {
     fprintf(stderr, "Cannot execute %s: %s\n", ctx.req.shell.data(), strerror(errno));
     PLOGE("exec");
   } else { 
+     int status, code;
+
      if (is_tty) {
          watch_sigwinch_async(STDOUT_FILENO, ptmx);
 		setup_sighandlers();
         pump_stdin_async(ptmx);
         pump_stdout_blocking(ptmx, log_fd);
-         
-        int status, code;
 
         LOGD("Waiting for pid %d.", pid);
         waitpid(pid, &status, 0);
@@ -700,7 +700,7 @@ if (pid == 0) {
         close(inputfd[0]);
 		close(outputfd[1]);
 		close(errorfd[1]);
-		multiplexing(inputfd[1], outputfd[0], errorfd[0]);
+		multiplexing(inputfd[1], outputfd[0], errorfd[0], log_fd);
         
 		LOGD("Waiting for pid %d.", pid);
         waitpid(pid, &status, 0);
