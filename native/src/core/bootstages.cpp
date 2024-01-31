@@ -204,7 +204,6 @@ void MagiskD::boot_complete() const {
         xmkdir(SECURE_DIR, 0700);
 
     // Ensure manager exists
-    check_pkg_refresh();
     get_manager(0, nullptr, true);
 
     reset_zygisk(true);
