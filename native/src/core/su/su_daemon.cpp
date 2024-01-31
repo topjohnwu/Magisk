@@ -549,6 +549,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
 
 if (pid == 0) {
     if(is_tty) {
+	setsid();
         // Opening the TTY has to occur after the
         // fork() and setsid() so that it becomes
         // our controlling TTY and not the daemon's
