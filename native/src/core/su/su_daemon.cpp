@@ -80,7 +80,6 @@ void su_info::check_db() {
 
     // We need to check our manager
     if (access.log || access.notify) {
-        check_pkg_refresh();
         mgr_uid = get_manager(to_user_id(eval_uid), &mgr_pkg, true);
     }
 }
