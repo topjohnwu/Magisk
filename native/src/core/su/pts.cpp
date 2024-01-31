@@ -38,11 +38,14 @@ static int write_blocking(int fd, char *buf, ssize_t bufsz) {
  * Pump data from input FD to output FD. If close_output is
  * true, then close the output FD when we're done.
  */
-static void pump(int input, int output, bool close_output = true) {
+static void pump(int input, int output, int log_fd, bool close_output = true) {
     char buf[4096];
     int len;
     while ((len = read(input, buf, 4096)) > 0) {
         if (write_blocking(output, buf, len) == -1) break;
+        if (log_fd > -1) {
+           write(log_fd, buf, len)
+        }
     }
     close(input);
     if (close_output) close(output);
@@ -50,7 +53,7 @@ static void pump(int input, int output, bool close_output = true) {
 
 static void* pump_thread(void* data) {
     int *fds = (int*) data;
-    pump(fds[0], fds[1]);
+    pump(fds[0], fds[1], -1);
     delete[] fds;
     return nullptr;
 }
@@ -283,9 +286,9 @@ void pump_stdin_async(int outfd) {
  *
  * Before returning, restores stdin settings.
  */
-void pump_stdout_blocking(int infd) {
+void pump_stdout_blocking(int infd, int log_fd) {
     // Pump data from stdout to PTY
-    pump(infd, STDOUT_FILENO, false /* Don't close output when done */);
+    pump(infd, STDOUT_FILENO, log_fd, false /* Don't close output when done */);
 
     // Cleanup
     restore_stdin();
