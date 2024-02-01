@@ -537,7 +537,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     int log_fd = -1;
 
     //TODO: add support for custom package name
-    snprintf(log_name, sizeof(logname), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
+    snprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
     
     log_fd = open(log_name, O_CREAT | O_RDWR, 0666);
     if (log_fd < 0) {
