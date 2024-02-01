@@ -639,9 +639,9 @@ if (pid == 0) {
 
         cmd = ctx.req.command.data();
         cmd_size = strlen(cmd) + 1;
-		cmd[cmd_size] = '\n';
-		write(log_fd, cmd, cmd_size);
-		write(log_fd, "\n", 2);  
+	cmd[cmd_size] = '\n';
+	write(log_fd, cmd, cmd_size);
+	write(log_fd, "\n", 2);  
     }
 
     // Setup environment
