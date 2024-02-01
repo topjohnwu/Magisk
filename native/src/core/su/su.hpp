@@ -66,5 +66,5 @@ void app_notify(const su_context &ctx);
 int app_request(const su_context &ctx);
 
 void sighandler(int sig);
-void setup_sighandlers(void (*handler)(int)) 
+void setup_sighandlers(void (*handler)(int));
 
