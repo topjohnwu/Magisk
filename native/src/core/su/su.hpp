@@ -64,3 +64,7 @@ struct su_context {
 void app_log(const su_context &ctx);
 void app_notify(const su_context &ctx);
 int app_request(const su_context &ctx);
+
+void sighandler(int sig);
+void setup_sighandlers(void (*handler)(int)) 
+
