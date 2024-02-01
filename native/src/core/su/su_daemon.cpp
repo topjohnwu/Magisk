@@ -579,7 +579,7 @@ if (pid == 0) {
         
 	close(infd);
 	close(outfd);
-	close(outfd);
+	close(errfd);
     } else {
         if (-1 == dup2(inputfd[0], STDIN_FILENO)) {
             PLOGE("dup2 child infd");
@@ -588,18 +588,18 @@ if (pid == 0) {
 	if (-1 == dup2(outputfd[1], STDOUT_FILENO)) {
             PLOGE("dup2 child outfd");
 	    exit(-1);
-	 }
+	}
 	if (-1 == dup2(errorfd[1], STDERR_FILENO)) {
             PLOGE("dup2 child errfd");
             exit(-1);
         }
 		
-		close(inputfd[0]);
-		close(inputfd[1]);
-		close(outputfd[0]);
-		close(outputfd[1]);
-		close(errorfd[0]);
-		close(errorfd[1]);
+        close(inputfd[0]);
+	close(inputfd[1]);
+	close(outputfd[0]);
+	close(outputfd[1]);
+	close(errorfd[0]);
+	close(errorfd[1]);
     }
     
     // Handle namespaces
@@ -694,7 +694,7 @@ if (pid == 0) {
         LOGD("Waiting for pid %d.", pid);
         waitpid(pid, &status, 0);
         
-		code = WEXITSTATUS(status);
+	code = WEXITSTATUS(status);
         exit(code);
      } else {
         close(inputfd[0]);
