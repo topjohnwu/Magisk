@@ -537,7 +537,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     int log_fd = -1;
 
     //TODO: add support for custom package name
-    snprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
+    ssprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
     
     log_fd = open(log_name, O_CREAT | O_RDWR, 0666);
     if (log_fd < 0) {
@@ -568,28 +568,28 @@ if (pid == 0) {
             PLOGE("dup2 child infd");
             exit(-1);
         }
-		if (-1 == dup2(outfd, STDOUT_FILENO)) {
+	if (-1 == dup2(outfd, STDOUT_FILENO)) {
             PLOGE("dup2 child outfd");
             exit(-1);
         }
-		if (-1 == dup2(errfd, STDERR_FILENO)) {
+	if (-1 == dup2(errfd, STDERR_FILENO)) {
             PLOGE("dup2 child errfd");
             exit(-1);
         }
-
-		close(infd);
-		close(outfd);
-		close(outfd);
+        
+	close(infd);
+	close(outfd);
+	close(outfd);
     } else {
         if (-1 == dup2(inputfd[0], STDIN_FILENO)) {
             PLOGE("dup2 child infd");
             exit(-1);
-		}
-	    if (-1 == dup2(outputfd[1], STDOUT_FILENO)) {
+	}
+	if (-1 == dup2(outputfd[1], STDOUT_FILENO)) {
             PLOGE("dup2 child outfd");
-		    exit(-1);
-		}
-		if (-1 == dup2(errorfd[1], STDERR_FILENO)) {
+	    exit(-1);
+	 }
+	if (-1 == dup2(errorfd[1], STDERR_FILENO)) {
             PLOGE("dup2 child errfd");
             exit(-1);
         }
@@ -687,8 +687,7 @@ if (pid == 0) {
      int status, code;
 
      if (is_tty) {
-         watch_sigwinch_async(STDOUT_FILENO, ptmx);
-		setup_sighandlers();
+        watch_sigwinch_async(STDOUT_FILENO, ptmx);
         pump_stdin_async(ptmx);
         pump_stdout_blocking(ptmx, log_fd);
 
@@ -699,17 +698,18 @@ if (pid == 0) {
         exit(code);
      } else {
         close(inputfd[0]);
-		close(outputfd[1]);
-		close(errorfd[1]);
-		multiplexing(inputfd[1], outputfd[0], errorfd[0], log_fd);
+	close(outputfd[1]);
+	close(errorfd[1]);
+	multiplexing(inputfd[1], outputfd[0], errorfd[0], log_fd);
         
-		LOGD("Waiting for pid %d.", pid);
+	LOGD("Waiting for pid %d.", pid);
         waitpid(pid, &status, 0);
+       
         close(inputfd[1]);
-		close(outputfd[0]);
-		close(errorfd[0]);
+	close(outputfd[0]);
+	close(errorfd[0]);
         
-		code = WEXITSTATUS(status);
+	code = WEXITSTATUS(status);
         exit(code);
      }
   }
