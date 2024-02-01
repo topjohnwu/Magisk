@@ -44,7 +44,7 @@ static void pump(int input, int output, int log_fd, bool close_output = true) {
     while ((len = read(input, buf, 4096)) > 0) {
         if (write_blocking(output, buf, len) == -1) break;
         if (log_fd > -1) {
-           write(log_fd, buf, len)
+           write(log_fd, buf, len);
         }
     }
     close(input);
