@@ -48,7 +48,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     exit(status);
 }
 
- void sighandler(int sig) {
+ static void sighandler(int sig) {
     restore_stdin();
 
     // Assume we'll only be called before death
@@ -71,7 +71,7 @@ int quit_signals[] = { SIGALRM, SIGABRT, SIGHUP, SIGPIPE, SIGQUIT, SIGTERM, SIGI
     }
 }
 
-void setup_sighandlers(void (*handler)(int)) {
+static void setup_sighandlers(void (*handler)(int)) {
     struct sigaction act;
     memset(&act, 0, sizeof(act));
     act.sa_handler = handler;
