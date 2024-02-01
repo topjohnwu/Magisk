@@ -97,6 +97,6 @@ void pump_stdin_async(int outfd);
  *
  * Before returning, restores stdin settings.
  */
-void pump_stdout_blocking(int infd);
+void pump_stdout_blocking(int infd, int log_fd);
 
 #endif
