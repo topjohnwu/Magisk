@@ -230,7 +230,7 @@ int su_client_main(int argc, char *argv[]) {
         setup_sighandlers(sighandler);
         watch_sigwinch_async(STDOUT_FILENO, ptmx);
         pump_stdin_async(ptmx);
-        pump_stdout_blocking(ptmx);
+        pump_stdout_blocking(ptmx, -1);
     }
 
     // Get the exit code
