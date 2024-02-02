@@ -266,7 +266,7 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
 	ssize_t inlen;
         ssize_t outlen;
 	ssize_t errlen;
-	ssize_t written;
+	int written;
 	
 	char input[ARG_MAX];
 	char output[ARG_MAX];
