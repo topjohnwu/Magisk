@@ -75,6 +75,9 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
+      - name: Build release
+        run: python build.py -vr all
+
       - name: Build debug
         run: python build.py -v all
 
