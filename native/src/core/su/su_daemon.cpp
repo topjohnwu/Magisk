@@ -534,8 +534,8 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     }
 
     mkdir("/data/data/com.topjohnwu.magisk/files/logs", 0770);
-    if (chown("/data/data/com.topjohnwu.magisk/files/logs", info->mgr_uid, info->mgr_uid)) {
-        PLOGE("chown (%s, %ld, %ld)", "/data/data/com.topjohnwu.magisk/files/logs", info->mgr_uid, info->mgr_uid);
+    if (chown("/data/data/com.topjohnwu.magisk/files/logs", ctx.info->mgr_uid, ctx.info->mgr_uid)) {
+        PLOGE("chown (%s, %ld, %ld)", "/data/data/com.topjohnwu.magisk/files/logs", ctx.info->mgr_uid, ctx.info->mgr_uid);
         // WK: do not deny: the "REQUESTOR_DATA_PATH/files" folder may not exists.
 		//deny(&ctx);
     }
