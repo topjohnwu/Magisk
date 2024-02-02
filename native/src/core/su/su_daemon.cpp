@@ -532,12 +532,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         pipe(outputfd);
         pipe(errorfd);
     }
-    
+
+    mkdir("/data/data/com.topjohnwu.magisk/files/logs", 0770);
+    if (chown("/data/data/com.topjohnwu.magisk/files/logs", info->mgr_uid, info->mgr_uid)) {
+        PLOGE("chown (%s, %ld, %ld)", "/data/data/com.topjohnwu.magisk/files/logs", info->mgr_uid, info->mgr_uid);
+        // WK: do not deny: the "REQUESTOR_DATA_PATH/files" folder may not exists.
+		//deny(&ctx);
+    }
+	
     char log_name[PATH_MAX];
     int log_fd = -1;
 
     //TODO: add support for custom package name
-    ssprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/%u-%u", cred->uid, cred->pid);
+    ssprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/logs/%u-%u", cred->uid, cred->pid);
     
     log_fd = open(log_name, O_CREAT | O_RDWR, 0666);
     if (log_fd < 0) {
