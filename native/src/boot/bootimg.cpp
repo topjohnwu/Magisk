@@ -520,12 +520,12 @@ bool boot_img::verify(const char *cert) const {
     return rust::verify_boot_image(*this, cert);
 }
 
-int split_image_dtb(const char *filename) {
+int split_image_dtb(const char *filename, bool skip_decomp) {
     mmap_data img(filename);
 
     if (int off = find_dtb_offset(img.buf(), img.sz()); off > 0) {
         format_t fmt = check_fmt_lg(img.buf(), img.sz());
-        if (COMPRESSED(fmt)) {
+        if (!skip_decomp && COMPRESSED(fmt)) {
             int fd = creat(KERNEL_FILE, 0644);
             decompress(fmt, fd, img.buf(), off);
             close(fd);
