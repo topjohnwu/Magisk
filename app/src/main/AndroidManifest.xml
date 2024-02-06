@@ -61,7 +61,7 @@
         </receiver>
 
         <service
-            android:name=".core.download.DownloadService"
+            android:name=".core.Service"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
