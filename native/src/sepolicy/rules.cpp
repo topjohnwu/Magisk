@@ -13,33 +13,22 @@ void sepolicy::magisk_rules() {
     deny(ALL, "kernel", "security", "load_policy");
 
     type(SEPOL_PROC_DOMAIN, "domain");
-    permissive(SEPOL_PROC_DOMAIN);  /* Just in case something is missing */
+    permissive(SEPOL_PROC_DOMAIN); // When we are subject, we can do anything
     typeattribute(SEPOL_PROC_DOMAIN, "mlstrustedsubject");
     typeattribute(SEPOL_PROC_DOMAIN, "netdomain");
-    typeattribute(SEPOL_PROC_DOMAIN, "bluetoothdomain");
+    typeattribute(SEPOL_PROC_DOMAIN, "appdomain");
     type(SEPOL_FILE_TYPE, "file_type");
     typeattribute(SEPOL_FILE_TYPE, "mlstrustedobject");
     type(SEPOL_LOG_TYPE, "file_type");
     typeattribute(SEPOL_LOG_TYPE, "mlstrustedobject");
 
-    // Make our root domain unconstrained
-    allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
-    // Allow us to do any ioctl
-    if (impl->db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
-        argument all;
-        all.first.push_back(nullptr);
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", all);
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", all);
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "chr_file", all);
-    }
-
     // Create unconstrained file type
-    allow(ALL, SEPOL_FILE_TYPE, "file", ALL);
-    allow(ALL, SEPOL_FILE_TYPE, "dir", ALL);
-    allow(ALL, SEPOL_FILE_TYPE, "fifo_file", ALL);
-    allow(ALL, SEPOL_FILE_TYPE, "chr_file", ALL);
-    allow(ALL, SEPOL_FILE_TYPE, "lnk_file", ALL);
-    allow(ALL, SEPOL_FILE_TYPE, "sock_file", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "file", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "dir", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "fifo_file", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "chr_file", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "lnk_file", ALL);
+    allow("domain", SEPOL_FILE_TYPE, "sock_file", ALL);
 
     // Only allow zygote to open log pipe
     allow("zygote", SEPOL_LOG_TYPE, "fifo_file", "open");
@@ -47,10 +36,60 @@ void sepolicy::magisk_rules() {
     // Allow all processes to output logs
     allow("domain", SEPOL_LOG_TYPE, "fifo_file", "write");
 
+    const char *object_attrs[]{
+            "fs_type", "dev_type", "file_type",
+            "domain", // subject as object
+            "service_manager_type", "hwservice_manager_type", "vndservice_manager_type",
+            "port_type", "node_type", "property_type",
+            // others covered by permissive
+    };
+
+    // To suppress avc logs, explicitly allow us to do anything
+    for (auto type: object_attrs) {
+        if (!exists(type))
+            continue;
+        allow(SEPOL_PROC_DOMAIN, type, ALL, ALL);
+    }
+    // and any ioctl
+    if (impl->db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
+        argument all;
+        all.first.push_back(nullptr);
+        for (int i = 0; i <= 3; i++) {
+            allowxperm(SEPOL_PROC_DOMAIN, object_attrs[i], "blk_file", all);
+            allowxperm(SEPOL_PROC_DOMAIN, object_attrs[i], "fifo_file", all);
+            allowxperm(SEPOL_PROC_DOMAIN, object_attrs[i], "chr_file", all);
+        }
+        allowxperm(SEPOL_PROC_DOMAIN, SEPOL_PROC_DOMAIN, "tcp_socket", all);
+        allowxperm(SEPOL_PROC_DOMAIN, SEPOL_PROC_DOMAIN, "udp_socket", all);
+        allowxperm(SEPOL_PROC_DOMAIN, SEPOL_PROC_DOMAIN, "rawip_socket", all);
+        // others covered by permissive
+    }
+
+    // Let binder IPC work with our processes
+    for (auto type: {"servicemanager", "vndservicemanager", "hwservicemanager"}) {
+        if (!exists(type))
+            continue;
+        allow(type, SEPOL_PROC_DOMAIN, "dir", "search");
+        allow(type, SEPOL_PROC_DOMAIN, "file", "open");
+        allow(type, SEPOL_PROC_DOMAIN, "file", "read");
+        allow(type, SEPOL_PROC_DOMAIN, "file", "map");
+        allow(type, SEPOL_PROC_DOMAIN, "process", "getattr");
+    }
+    allow("domain", SEPOL_PROC_DOMAIN, "binder", "call");
+    allow("domain", SEPOL_PROC_DOMAIN, "binder", "transfer");
+
+    // other common IPC cases
+    allow("domain", SEPOL_PROC_DOMAIN, "process", "sigchld");
+    allow("domain", SEPOL_PROC_DOMAIN, "fd", "use");
+    allow("domain", SEPOL_PROC_DOMAIN, "fifo_file", "write");
+    allow("domain", SEPOL_PROC_DOMAIN, "fifo_file", "read");
+    allow("domain", SEPOL_PROC_DOMAIN, "fifo_file", "open");
+    allow("domain", SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
+
     // Allow these processes to access MagiskSU and output logs
-    const char *clients[] {
-        "zygote", "shell", "system_app", "platform_app",
-        "priv_app", "untrusted_app", "untrusted_app_all"
+    const char *clients[]{
+            "zygote", "shell", "system_app", "platform_app",
+            "priv_app", "untrusted_app", "untrusted_app_all"
     };
     for (auto type: clients) {
         if (!exists(type))
@@ -60,13 +99,14 @@ void sepolicy::magisk_rules() {
     }
 
     // Let everyone access tmpfs files (for SAR sbin overlay)
-    allow(ALL, "tmpfs", "file", ALL);
+    allow("domain", "tmpfs", "file", ALL);
 
     // Allow magiskinit daemon to handle mock selinuxfs
     allow("kernel", "tmpfs", "fifo_file", "write");
 
     // For relabelling files
     allow("rootfs", "labeledfs", "filesystem", "associate");
+    allow("rootfs", "tmpfs", "filesystem", "associate");
     allow(SEPOL_FILE_TYPE, "pipefs", "filesystem", "associate");
     allow(SEPOL_FILE_TYPE, "devpts", "filesystem", "associate");
 
@@ -75,45 +115,13 @@ void sepolicy::magisk_rules() {
     allow("kernel", SEPOL_PROC_DOMAIN, "process", "dyntransition");
 
     // Let init run stuffs
-    allow("kernel", SEPOL_PROC_DOMAIN, "fd", "use");
     allow("init", SEPOL_PROC_DOMAIN, "process", ALL);
 
-    // suRights
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "dir", "read");
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-    allow("servicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-    allow(ALL, SEPOL_PROC_DOMAIN, "process", "sigchld");
-
-    // allowLog
-    allow("logd", SEPOL_PROC_DOMAIN, "dir", "search");
-    allow("logd", SEPOL_PROC_DOMAIN, "file", "read");
-    allow("logd", SEPOL_PROC_DOMAIN, "file", "open");
-    allow("logd", SEPOL_PROC_DOMAIN, "file", "getattr");
-
-    // dumpsys
-    allow(ALL, SEPOL_PROC_DOMAIN, "fd", "use");
-    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "write");
-    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "read");
-    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "open");
-    allow(ALL, SEPOL_PROC_DOMAIN, "fifo_file", "getattr");
-
-    // bootctl
-    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "dir", "search");
-    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "read");
-    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "file", "open");
-    allow("hwservicemanager", SEPOL_PROC_DOMAIN, "process", "getattr");
-
     // For mounting loop devices, mirrors, tmpfs
-    allow("kernel", ALL, "file", "read");
-    allow("kernel", ALL, "file", "write");
-
-    // Allow all binder transactions
-    allow(ALL, SEPOL_PROC_DOMAIN, "binder", ALL);
-
-    // For changing file context
-    allow("rootfs", "tmpfs", "filesystem", "associate");
+    for (int i = 0; i <= 2; i++) {
+        allow("kernel", object_attrs[i], "file", "read");
+        allow("kernel", object_attrs[i], "file", "write");
+    }
 
     // Zygisk rules
     allow("zygote", "zygote", "process", "execmem");
