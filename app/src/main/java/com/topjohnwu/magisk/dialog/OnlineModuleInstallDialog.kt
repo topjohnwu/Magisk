@@ -24,7 +24,7 @@ class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog
             fun download(install: Boolean) {
                 val action = if (install) Action.Flash else Action.Download
                 val subject = Subject.Module(item, action)
-                DownloadManager.start(activity, subject)
+                DownloadManager.startWithActivity(activity, subject)
             }
 
             val title = context.getString(R.string.repo_install_title,

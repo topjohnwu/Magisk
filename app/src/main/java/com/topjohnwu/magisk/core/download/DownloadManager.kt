@@ -4,19 +4,26 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import androidx.collection.SparseArrayCompat
 import androidx.collection.isNotEmpty
+import androidx.core.content.getSystemService
 import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
+import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
@@ -55,7 +62,7 @@ class DownloadManager(
     interface Session {
         val context: Context
 
-        fun attach(id: Int, notification: Notification.Builder)
+        fun attach(id: Int, builder: Notification.Builder)
         fun stop()
     }
 
@@ -79,9 +86,16 @@ class DownloadManager(
         }
 
         private fun createIntent(context: Context, subject: Subject) =
-            context.intent<com.topjohnwu.magisk.core.Service>()
-                .setAction(ACTION)
-                .putExtra(SUBJECT_KEY, subject)
+            if (Build.VERSION.SDK_INT >= 34) {
+                context.intent<com.topjohnwu.magisk.core.Receiver>()
+                    .setAction(ACTION)
+                    .putExtra(SUBJECT_KEY, subject)
+            } else {
+                context.intent<com.topjohnwu.magisk.core.Service>()
+                    .setAction(ACTION)
+                    .putExtra(SUBJECT_KEY, subject)
+            }
+
 
         @SuppressLint("InlinedApi")
         fun getPendingIntent(context: Context, subject: Subject): PendingIntent {
@@ -89,7 +103,13 @@ class DownloadManager(
                 PendingIntent.FLAG_UPDATE_CURRENT or
                 PendingIntent.FLAG_ONE_SHOT
             val intent = createIntent(context, subject)
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return if (Build.VERSION.SDK_INT >= 34) {
+                // On API 34+, download tasks are handled with a user-initiated job.
+                // However, there is no way to schedule a new job directly with a pending intent.
+                // As a workaround, we send the subject to a broadcast receiver and have it
+                // schedule the job for us.
+                PendingIntent.getBroadcast(context, REQUEST_CODE, intent, flag)
+            } else if (Build.VERSION.SDK_INT >= 26) {
                 PendingIntent.getForegroundService(context, REQUEST_CODE, intent, flag)
             } else {
                 PendingIntent.getService(context, REQUEST_CODE, intent, flag)
@@ -97,15 +117,29 @@ class DownloadManager(
         }
 
         @SuppressLint("InlinedApi")
-        fun start(activity: BaseActivity, subject: Subject) {
+        fun startWithActivity(activity: BaseActivity, subject: Subject) {
             activity.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
                 // Always download regardless of notification permission status
-                val app = activity.applicationContext
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    app.startForegroundService(createIntent(app, subject))
-                } else {
-                    app.startService(createIntent(app, subject))
-                }
+                start(activity.applicationContext, subject)
+            }
+        }
+
+        fun start(context: Context, subject: Subject) {
+            if (Build.VERSION.SDK_INT >= 34) {
+                val scheduler = context.getSystemService<JobScheduler>()!!
+                val cmp = JobService::class.java.cmp(context.packageName)
+                val extras = Bundle()
+                extras.putParcelable(SUBJECT_KEY, subject)
+                val info = JobInfo.Builder(Const.ID.DOWNLOAD_JOB_ID, cmp)
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setUserInitiated(true)
+                    .setTransientExtras(extras)
+                    .build()
+                scheduler.schedule(info)
+            } else if (Build.VERSION.SDK_INT >= 26) {
+                context.startForegroundService(createIntent(context, subject))
+            } else {
+                context.startService(createIntent(context, subject))
             }
         }
     }
@@ -138,6 +172,12 @@ class DownloadManager(
                     session.stop()
             }
         }
+    }
+
+    @Synchronized
+    fun reattach() {
+        val builder = notifications[attachedId] ?: return
+        session.attach(attachedId, builder)
     }
 
     private val notifications = SparseArrayCompat<Notification.Builder>()
@@ -205,15 +245,12 @@ class DownloadManager(
                     // There are still remaining notifications, pick one and attach to the session
                     val anotherId = notifications.keyAt(0)
                     val notification = notifications.valueAt(0)
-                    // Attaching a new notification will automatically remove the current one
                     attachNotification(anotherId, notification)
                 } else {
                     // No more notifications left, terminate the session
                     attachedId = -1
                     session.stop()
                 }
-
-                return n
             }
         }
 

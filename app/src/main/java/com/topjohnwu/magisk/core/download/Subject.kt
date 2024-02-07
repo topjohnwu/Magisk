@@ -81,7 +81,7 @@ sealed class Subject : Parcelable {
         override val notifyId: Int = Notifications.nextId(),
         override val title: String = UUID.randomUUID().toString().substring(0, 6)
     ) : Subject() {
-        override val url get() = "http://link.testfile.org/150MB"
+        override val url get() = "https://link.testfile.org/250MB"
         override val file get() = File("/dev/null").toUri()
         override val autoLaunch get() = false
     }
