@@ -15,4 +15,6 @@
 
     <drawable name="ic_launcher">@drawable/ic_logo</drawable>
 
+    <bool name="enable_fg_service">true</bool>
+
 </resources>

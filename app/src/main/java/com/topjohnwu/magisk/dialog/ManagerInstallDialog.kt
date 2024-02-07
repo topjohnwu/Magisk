@@ -4,7 +4,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.MagiskDialog
 import java.io.File
@@ -29,7 +29,7 @@ class ManagerInstallDialog : MarkDownDialog() {
             setCancelable(true)
             setButton(MagiskDialog.ButtonType.POSITIVE) {
                 text = R.string.install
-                onClick { DownloadService.start(activity, Subject.App()) }
+                onClick { DownloadEngine.startWithActivity(activity, Subject.App()) }
             }
             setButton(MagiskDialog.ButtonType.NEGATIVE) {
                 text = android.R.string.cancel

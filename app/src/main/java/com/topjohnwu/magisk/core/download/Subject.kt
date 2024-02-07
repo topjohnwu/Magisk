@@ -17,8 +17,8 @@ import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-
-private fun cachedFile(name: String) = AppContext.cachedFile(name).apply { delete() }.toUri()
+import java.io.File
+import java.util.UUID
 
 enum class Action {
     Flash,
@@ -34,7 +34,7 @@ sealed class Subject : Parcelable {
     open val autoLaunch: Boolean get() = true
     open val postDownload: (() -> Unit)? get() = null
 
-    abstract fun pendingIntent(context: Context): PendingIntent?
+    open fun pendingIntent(context: Context): PendingIntent? = null
 
     @Parcelize
     class Module(
@@ -65,7 +65,7 @@ sealed class Subject : Parcelable {
 
         @IgnoredOnParcel
         override val file by lazy {
-            cachedFile("manager.apk")
+            AppContext.cachedFile("manager.apk").apply { delete() }.toUri()
         }
 
         @IgnoredOnParcel
@@ -74,6 +74,16 @@ sealed class Subject : Parcelable {
         @IgnoredOnParcel
         var intent: Intent? = null
         override fun pendingIntent(context: Context) = intent?.toPending(context)
+    }
+
+    @Parcelize
+    class Test(
+        override val notifyId: Int = Notifications.nextId(),
+        override val title: String = UUID.randomUUID().toString().substring(0, 6)
+    ) : Subject() {
+        override val url get() = "https://link.testfile.org/250MB"
+        override val file get() = File("/dev/null").toUri()
+        override val autoLaunch get() = false
     }
 
     @SuppressLint("InlinedApi")
