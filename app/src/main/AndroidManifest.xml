@@ -63,6 +63,7 @@
         <service
             android:name=".core.Service"
             android:exported="false"
+            android:enabled="@bool/enable_fg_service"
             android:foregroundServiceType="dataSync" />
 
         <service
