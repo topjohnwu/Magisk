@@ -55,10 +55,27 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
-class DownloadManager(
+/**
+ * This class drives the execution of file downloads and notification management.
+ *
+ * Each download engine instance has to be paired with a "session" that is managed by the operating
+ * system. A session is an Android component that allows executing long lasting operations and
+ * have its state tied to a notification to show progress.
+ *
+ * A session can only have one single notification representing its state, and the operating system
+ * also uses the notification to manage the lifecycle of a session. One goal of this class is
+ * to support concurrent download tasks using only one single session, so internally it manages
+ * all active tasks and notifications and properly re-assign notifications to be attached to
+ * the session to make sure all download operations can be completed without the operating system
+ * killing the session.
+ *
+ * For API 23 - 33, we use a foreground service as a session.
+ * For API 34 and higher, we use user-initiated job services as a session.
+ */
+class DownloadEngine(
     private val session: Session
 ) {
-    
+
     interface Session {
         val context: Context
 
@@ -95,7 +112,6 @@ class DownloadManager(
                     .setAction(ACTION)
                     .putExtra(SUBJECT_KEY, subject)
             }
-
 
         @SuppressLint("InlinedApi")
         fun getPendingIntent(context: Context, subject: Subject): PendingIntent {
@@ -167,7 +183,7 @@ class DownloadManager(
                 notifyFail(subject)
             }
 
-            synchronized(this@DownloadManager) {
+            synchronized(this@DownloadEngine) {
                 if (notifications.isEmpty)
                     session.stop()
             }

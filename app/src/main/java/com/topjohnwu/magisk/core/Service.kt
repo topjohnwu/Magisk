@@ -6,24 +6,24 @@ import android.os.Build
 import androidx.core.app.ServiceCompat
 import androidx.core.content.IntentCompat
 import com.topjohnwu.magisk.core.base.BaseService
-import com.topjohnwu.magisk.core.download.DownloadManager
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 
-class Service : BaseService(), DownloadManager.Session {
+class Service : BaseService(), DownloadEngine.Session {
 
-    private lateinit var dm: DownloadManager
+    private lateinit var mEngine: DownloadEngine
     override val context get() = this
 
     override fun onCreate() {
         super.onCreate()
-        dm = DownloadManager(this)
+        mEngine = DownloadEngine(this)
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        if (intent.action == DownloadManager.ACTION) {
+        if (intent.action == DownloadEngine.ACTION) {
             IntentCompat
-                .getParcelableExtra(intent, DownloadManager.SUBJECT_KEY, Subject::class.java)
-                ?.let { dm.download(it) }
+                .getParcelableExtra(intent, DownloadEngine.SUBJECT_KEY, Subject::class.java)
+                ?.let { mEngine.download(it) }
         }
         return START_NOT_STICKY
     }

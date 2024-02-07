@@ -1,12 +1,16 @@
 package com.topjohnwu.magisk.core.data
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.topjohnwu.magisk.core.model.su.SuLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Calendar
 
 @Database(version = 2, entities = [SuLog::class], exportSchema = false)
 abstract class SuLogDatabase : RoomDatabase() {

@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.databinding
 import androidx.databinding.ListChangeRegistry
 import androidx.databinding.ObservableList
 import androidx.databinding.ObservableList.OnListChangedCallback
-import java.util.*
+import java.util.AbstractList
 
 @Suppress("UNCHECKED_CAST")
 class MergeObservableList<T> : AbstractList<T>(), ObservableList<T> {

@@ -12,7 +12,7 @@ import com.topjohnwu.magisk.core.createNewResources
 import com.topjohnwu.magisk.core.di.AppContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Locale
 
 var currentLocale: Locale = Locale.getDefault()
 

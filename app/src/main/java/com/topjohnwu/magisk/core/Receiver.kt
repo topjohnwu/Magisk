@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.core.content.IntentCompat
 import com.topjohnwu.magisk.core.base.BaseReceiver
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.download.DownloadManager
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
@@ -38,10 +38,10 @@ open class Receiver : BaseReceiver() {
         }
 
         when (intent.action ?: return) {
-            DownloadManager.ACTION -> {
+            DownloadEngine.ACTION -> {
                 IntentCompat.getParcelableExtra(
-                    intent, DownloadManager.SUBJECT_KEY, Subject::class.java)?.let {
-                        DownloadManager.start(context, it)
+                    intent, DownloadEngine.SUBJECT_KEY, Subject::class.java)?.let {
+                        DownloadEngine.start(context, it)
                     }
             }
             Intent.ACTION_PACKAGE_REPLACED -> {

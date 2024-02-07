@@ -11,7 +11,7 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.BaseJobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.download.DownloadManager
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +22,12 @@ import java.util.concurrent.TimeUnit
 class JobService : BaseJobService() {
 
     private var mSession: Session? = null
-    private var mDm: DownloadManager? = null
+    private var mEngine: DownloadEngine? = null
 
     @TargetApi(value = 34)
     inner class Session(
         var params: JobParameters
-    ) : DownloadManager.Session {
+    ) : DownloadEngine.Session {
 
         override val context get() = this@JobService
 
@@ -55,7 +55,7 @@ class JobService : BaseJobService() {
     private fun downloadFile(params: JobParameters): Boolean {
         params.transientExtras.classLoader = Subject::class.java.classLoader
         val subject = params.transientExtras
-            .getParcelable(DownloadManager.SUBJECT_KEY, Subject::class.java) ?:
+            .getParcelable(DownloadEngine.SUBJECT_KEY, Subject::class.java) ?:
             return false
 
         val session = mSession?.also {
@@ -64,13 +64,13 @@ class JobService : BaseJobService() {
             Session(params).also { mSession = it }
         }
 
-        val dm = mDm?.also {
+        val engine = mEngine?.also {
             it.reattach()
         } ?: run {
-            DownloadManager(session).also { mDm = it }
+            DownloadEngine(session).also { mEngine = it }
         }
 
-        dm.download(subject)
+        engine.download(subject)
         return true
     }
 

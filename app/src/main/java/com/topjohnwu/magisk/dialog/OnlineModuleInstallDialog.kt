@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.dialog
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.Action
-import com.topjohnwu.magisk.core.download.DownloadManager
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -24,7 +24,7 @@ class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog
             fun download(install: Boolean) {
                 val action = if (install) Action.Flash else Action.Download
                 val subject = Subject.Module(item, action)
-                DownloadManager.startWithActivity(activity, subject)
+                DownloadEngine.startWithActivity(activity, subject)
             }
 
             val title = context.getString(R.string.repo_install_title,

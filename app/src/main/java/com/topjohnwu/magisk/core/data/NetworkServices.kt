@@ -4,7 +4,11 @@ import com.topjohnwu.magisk.core.model.BranchInfo
 import com.topjohnwu.magisk.core.model.ModuleJson
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import okhttp3.ResponseBody
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.Path
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 
 private const val BRANCH = "branch"
 private const val REPO = "repo"
