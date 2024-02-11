@@ -340,39 +340,19 @@ void su_daemon_handler(int client, const sock_cred *cred) {
 
     // App need a PTY
     if (read_int(client)) {
-        string pts;
-        string ptmx;
-        auto magiskpts = get_magisk_tmp() + "/"s SHELLPTS;
-        if (access(magiskpts.data(), F_OK)) {
-            pts = "/dev/pts";
-            ptmx = "/dev/ptmx";
-        } else {
-            pts = magiskpts;
-            ptmx = magiskpts + "/ptmx";
-        }
-        int ptmx_fd = xopen(ptmx.data(), O_RDWR);
-        grantpt(ptmx_fd);
-        unlockpt(ptmx_fd);
-        int pty_num = get_pty_num(ptmx_fd);
-        if (pty_num < 0) {
-            // Kernel issue? Fallback to /dev/pts
-            close(ptmx_fd);
-            pts = "/dev/pts";
-            ptmx_fd = xopen("/dev/ptmx", O_RDWR);
-            grantpt(ptmx_fd);
-            unlockpt(ptmx_fd);
-            pty_num = get_pty_num(ptmx_fd);
-        }
-        send_fd(client, ptmx_fd);
-        close(ptmx_fd);
+        char pts[PATH_MAX;
+        int ptmx; 
+        ptmx = pts_open(pts, sizeof(pts));
+        send_fd(client, ptmx);
+        close(ptmx);
 
-        string pts_slave = pts + "/" + to_string(pty_num);
-        LOGD("su: pts_slave=[%s]\n", pts_slave.data());
+        
+        LOGD("su: pts_slave=[%s]\n", pts);
 
         // Opening the TTY has to occur after the
         // fork() and setsid() so that it becomes
         // our controlling TTY and not the daemon's
-        int ptsfd = xopen(pts_slave.data(), O_RDWR);
+        int ptsfd = xopen(pts, O_RDWR);
 
         if (infd < 0)
             infd = ptsfd;
