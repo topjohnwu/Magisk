@@ -1,5 +1,8 @@
 package com.topjohnwu.magisk.core
 
+import android.annotation.SuppressLint
+import android.annotation.TargetApi
+import android.app.Notification
 import android.app.job.JobInfo
 import android.app.job.JobParameters
 import android.app.job.JobScheduler
@@ -8,38 +11,79 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.BaseJobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.Notifications
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class JobService : BaseJobService() {
 
-    private val job = Job()
-    private val svc get() = ServiceLocator.networkService
+    private var mSession: Session? = null
+    private var mEngine: DownloadEngine? = null
 
-    override fun onStartJob(params: JobParameters): Boolean {
-        val coroutineScope = CoroutineScope(Dispatchers.IO + job)
-        coroutineScope.launch {
-            doWork()
+    @TargetApi(value = 34)
+    inner class Session(
+        var params: JobParameters
+    ) : DownloadEngine.Session {
+
+        override val context get() = this@JobService
+
+        override fun attach(id: Int, builder: Notification.Builder) {
+            setNotification(params, id, builder.build(), JOB_END_NOTIFICATION_POLICY_REMOVE)
+        }
+
+        override fun stop() {
             jobFinished(params, false)
         }
-        return false
     }
 
-    private suspend fun doWork() {
-        svc.fetchUpdate()?.let {
-            Info.remote = it
-            if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
-                Notifications.updateAvailable()
+    @SuppressLint("NewApi")
+    override fun onStartJob(params: JobParameters): Boolean {
+        return when (params.jobId) {
+            Const.ID.CHECK_UPDATE_JOB_ID -> checkUpdate(params)
+            Const.ID.DOWNLOAD_JOB_ID -> downloadFile(params)
+            else -> false
         }
     }
 
-    override fun onStopJob(params: JobParameters): Boolean {
-        job.cancel()
-        return false
+    override fun onStopJob(params: JobParameters?) = false
+
+    @TargetApi(value = 34)
+    private fun downloadFile(params: JobParameters): Boolean {
+        params.transientExtras.classLoader = Subject::class.java.classLoader
+        val subject = params.transientExtras
+            .getParcelable(DownloadEngine.SUBJECT_KEY, Subject::class.java) ?:
+            return false
+
+        val session = mSession?.also {
+            it.params = params
+        } ?: run {
+            Session(params).also { mSession = it }
+        }
+
+        val engine = mEngine?.also {
+            it.reattach()
+        } ?: run {
+            DownloadEngine(session).also { mEngine = it }
+        }
+
+        engine.download(subject)
+        return true
+    }
+
+    private fun checkUpdate(params: JobParameters): Boolean {
+        GlobalScope.launch(Dispatchers.IO) {
+            ServiceLocator.networkService.fetchUpdate()?.let {
+                Info.remote = it
+                if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
+                    Notifications.updateAvailable()
+                jobFinished(params, false)
+            }
+        }
+        return true
     }
 
     companion object {
@@ -47,14 +91,14 @@ class JobService : BaseJobService() {
             val scheduler = context.getSystemService<JobScheduler>() ?: return
             if (Config.checkUpdate) {
                 val cmp = JobService::class.java.cmp(context.packageName)
-                val info = JobInfo.Builder(Const.ID.JOB_SERVICE_ID, cmp)
+                val info = JobInfo.Builder(Const.ID.CHECK_UPDATE_JOB_ID, cmp)
                     .setPeriodic(TimeUnit.HOURS.toMillis(12))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setRequiresDeviceIdle(true)
                     .build()
                 scheduler.schedule(info)
             } else {
-                scheduler.cancel(Const.ID.JOB_SERVICE_ID)
+                scheduler.cancel(Const.ID.CHECK_UPDATE_JOB_ID)
             }
         }
     }

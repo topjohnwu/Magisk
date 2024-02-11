@@ -14,7 +14,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.download.DownloadService
+import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.databinding.FragmentHomeMd2Binding
 
 class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
@@ -25,7 +25,7 @@ class HomeFragment : BaseFragment<FragmentHomeMd2Binding>(), MenuProvider {
     override fun onStart() {
         super.onStart()
         activity?.setTitle(R.string.section_home)
-        DownloadService.observeProgress(this, viewModel::onProgressUpdate)
+        DownloadEngine.observeProgress(this, viewModel::onProgressUpdate)
     }
 
     private fun checkTitle(text: TextView, icon: ImageView) {

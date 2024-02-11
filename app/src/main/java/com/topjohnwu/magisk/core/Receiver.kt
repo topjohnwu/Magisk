@@ -3,8 +3,11 @@ package com.topjohnwu.magisk.core
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.IntentCompat
 import com.topjohnwu.magisk.core.base.BaseReceiver
 import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.download.DownloadEngine
+import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
@@ -35,6 +38,12 @@ open class Receiver : BaseReceiver() {
         }
 
         when (intent.action ?: return) {
+            DownloadEngine.ACTION -> {
+                IntentCompat.getParcelableExtra(
+                    intent, DownloadEngine.SUBJECT_KEY, Subject::class.java)?.let {
+                        DownloadEngine.start(context, it)
+                    }
+            }
             Intent.ACTION_PACKAGE_REPLACED -> {
                 // This will only work pre-O
                 if (Config.suReAuth)
