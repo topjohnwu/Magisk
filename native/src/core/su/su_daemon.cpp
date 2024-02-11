@@ -340,7 +340,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
 
     // App need a PTY
     if (read_int(client)) {
-        char pts[PATH_MAX;
+        char pts[PATH_MAX];
         int ptmx; 
         ptmx = pts_open(pts, sizeof(pts));
         send_fd(client, ptmx);
