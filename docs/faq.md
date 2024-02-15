@@ -6,8 +6,8 @@ If you have USB debugging enabled in developer options, connect your phone to th
 
 If unfortunately you do not have USB debugging enabled, reboot into Safe Mode. Most modern Android devices support a special key combo at boot to enter Safe Mode as an emergency option and Magisk can detect the Safe Mode key combo in a similar way to system to disable Magisk modules.
 
-Please Note: Magisk detects the key combo earlier than system, so it's possible to activate Magisk Safe Mode but not system Safe Mode and vice versa. Key combo detection can therefore be inconsistent but the following details should ensure that modules are properly disabled:
-1) Many online guides for entering Safe Mode say 'When the animated logo appears, press and hold the volume down button until the system boots' or similar. This may actually be too late for Magisk detection however and result in activating system Safe Mode but modules aren't disabled.
+Please Note: Magisk detects the key combo _earlier_ than system, so it's possible to activate Magisk Safe Mode but not system Safe Mode and vice versa. Key combo detection can therefore be inconsistent but the following details should ensure that modules are properly disabled:
+1) Many online guides for entering Safe Mode say 'When the animated logo appears, press and hold the volume down button until the system boots' or similar. This may actually be _too late_ for Magisk detection however and result in activating system Safe Mode but modules are not disabled.
 2) By pressing the volume down button some seconds before the animation and releasing it when the boot animation appears, Magisk Safe Mode should be activated without activating system Safe Mode and the device should then simply boot to normal system with modules disabled.
 3) By pressing the volume down button some seconds before the animation and holding it until the system boots, both Magisk Safe Mode and system Safe Mode should be activated. Next, after rebooting back to normal system modules will be disabled.
 
