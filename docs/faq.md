@@ -11,7 +11,7 @@ Please Note: Magisk detects the key combo earlier than system, so it's possible 
 2) By pressing the volume down button some seconds before the animation and releasing it when the boot animation appears, Magisk Safe Mode should be activated without activating system Safe Mode and the device should then simply boot to normal system with modules disabled.
 3) By pressing the volume down button some seconds before the animation and holding it until the system boots, both Magisk Safe Mode and system Safe Mode should be activated. Next, after rebooting back to normal system modules will be disabled.
 
-Varying the key combo timing that online guides give for entering system Safe Mode is often needed to activate Magisk 'Safe Mode' as described above, but this will add an empty directory named 'disable' to the modules directory to disable modules when next booted with Magisk thereby bypassing module related bootloop conditions.
+Varying the key combo timing that online guides give for entering system Safe Mode is often needed to activate Magisk 'Safe Mode' as described above, but achieving this will cause an empty file named 'disable' to be created in the modules directory to disable modules when next booted with Magisk thereby bypassing module related bootloop conditions.
 
 Further, achieving timing for scenario 2. above may be preferable to 3. since system Safe Mode will also reset many other user preferences. Disabled modules can be managed through the Magisk app.
 
