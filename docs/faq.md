@@ -13,7 +13,7 @@ Please Note: Magisk detects the key combo earlier than system, so it's possible 
 
 Varying the key combo timing that online guides give for entering system Safe Mode is often needed to activate Magisk 'Safe Mode' as described above, but this will add an empty directory named 'disable' to the modules directory to disable modules when next booted with Magisk thereby bypassing module related bootloop conditions.
 
-Further, achieving timing for scenario 2) above may be preferable to 3) since system Safe Mode will also reset many other user preferences. Disabled modules can be managed through the Magisk app.
+Further, achieving timing for scenario 2. above may be preferable to 3. since system Safe Mode will also reset many other user preferences. Disabled modules can be managed through the Magisk app.
 
 ### Q: Why is X app detecting root?
 
