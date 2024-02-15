@@ -13,8 +13,6 @@ Please Note: Magisk detects the key combo earlier than system, so it's possible 
 
 Varying the key combo timing that online guides give for entering system Safe Mode is often needed to activate Magisk 'Safe Mode' as described above, but achieving this will cause an empty file named 'disable' to be created in the modules directory to disable modules when next booted with Magisk thereby bypassing module related bootloop conditions.
 
-Further, achieving timing for scenario 2. above may be preferable to 3. since system Safe Mode will also reset many other user preferences. Disabled modules can be managed through the Magisk app.
-
 ### Q: Why is X app detecting root?
 
 Magisk no longer handles root hiding. There are plenty of Magisk/Zygisk modules available that specifically provide these functionalities, please search around 😉
