@@ -4,14 +4,12 @@
 
 If you have USB debugging enabled in developer options, connect your phone to the PC. If your device is detected (check by `adb devices`), enter ADB shell and run the command `magisk --remove-modules`. This will remove all your modules and automatically reboot the device.
 
-If unfortunately you do not have USB debugging enabled, reboot into Safe Mode. Most modern Android devices support a special key combo at boot to enter Safe Mode as an emergency option and Magisk can detect the Safe Mode key combo in a similar way to system to disable Magisk modules.
+If unfortunately you do not have USB debugging enabled you can boot using the Safe Mode key combo to cause Magisk to create an empty file named 'disable' in modules directories which disables modules when next booted with Magisk. Most modern Android devices support such a special key combo at boot to enter system Safe Mode as an emergency option, but **Please note** that Magisk's key combo detection occurs _earlier_ than system detection so the key combo timing indicated by many online guides may need to be altered to activate Magisk's Safe Mode. (It's possible to activate system Safe Mode but not Magisk Safe Mode and vice versa.)
 
-Please Note: Magisk detects the key combo _earlier_ than system, so it's possible to activate Magisk Safe Mode but not system Safe Mode and vice versa. Key combo detection can therefore be inconsistent but the following details should ensure that modules are properly disabled:
+The following details should ensure that modules are properly disabled:
 1) Many online guides for entering Safe Mode say 'When the animated logo appears, press and hold the volume down button until the system boots' or similar. This may actually be _too late_ for Magisk detection however and result in activating system Safe Mode but modules are not disabled.
-2) By pressing the volume down button some seconds before the animation and releasing it when the boot animation appears, Magisk Safe Mode should be activated without activating system Safe Mode and the device should then simply boot to normal system with modules disabled.
-3) By pressing the volume down button some seconds before the animation and holding it until the system boots, both Magisk Safe Mode and system Safe Mode should be activated. Next, after rebooting back to normal system modules will be disabled.
-
-Varying the key combo timing that online guides give for entering system Safe Mode is often needed to activate Magisk 'Safe Mode' as described above, but achieving this will cause an empty file named 'disable' to be created in the modules directory to disable modules when next booted with Magisk thereby bypassing module related bootloop conditions.
+2) By pressing the volume down button some seconds before the animation and releasing it as soon as the boot animation appears, Magisk's Safe Mode should be activated without activating system Safe Mode (thus avoiding disabling other device and app settings) and the device should then simply boot to normal system with modules disabled.
+3) By pressing the volume down button some seconds before the animation and holding it until the system boots, both Magisk's Safe Mode and system Safe Mode should be activated. Next, after booting back to normal system, modules will be disabled.
 
 ### Q: Why is X app detecting root?
 
