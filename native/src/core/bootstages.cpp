@@ -73,7 +73,7 @@ static void setup_mounts() {
     // Prepare worker
     ssprintf(path, sizeof(path), "%s/" WORKERDIR, get_magisk_tmp());
     xmkdir(path, 0);
-    xmount("worker", path, "tmpfs", 0, "mode=755");
+    xmount(path, path, nullptr, MS_BIND, nullptr);
     xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
 }
 

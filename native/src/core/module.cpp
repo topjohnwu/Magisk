@@ -162,6 +162,7 @@ void tmpfs_node::mount() {
         dir_node::mount();
         VLOGD(replace() ? "replace" : "move", worker_dir.data(), node_path().data());
         xmount(worker_dir.data(), node_path().data(), nullptr, MS_MOVE, nullptr);
+        xmount(nullptr, node_path().data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
     } else {
         const string dest = worker_path();
         // We don't need another layer of tmpfs if parent is tmpfs
@@ -326,8 +327,11 @@ void load_modules() {
         root->mount();
     }
 
+    // cleanup mounts
     ssprintf(buf, sizeof(buf), "%s/" WORKERDIR, get_magisk_tmp());
-    xmount(nullptr, buf, nullptr, MS_REMOUNT | MS_RDONLY, nullptr);
+    xumount2(buf, MNT_DETACH);
+    ssprintf(buf, sizeof(buf), "%s/" MODULEMNT, get_magisk_tmp());
+    xumount2(buf, MNT_DETACH);
 }
 
 /************************
