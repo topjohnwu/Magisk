@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.Info
 
 class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
 
@@ -26,7 +27,8 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
 
     override fun onStart() {
         super.onStart()
-        activity?.setTitle(R.string.denylist)
+        if (Info.sulist) activity?.setTitle(R.string.settings_sulist)
+        else activity?.setTitle(R.string.settings_magiskhide_title)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

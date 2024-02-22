@@ -39,6 +39,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     val isRooted get() = Info.isRooted
     val skipOptions = Info.isEmulator || (Info.isSAR && !Info.isFDE && Info.ramdisk)
     val noSecondSlot = !isRooted || !Info.isAB || Info.isEmulator
+    val allowSystemInstall = isRooted && !Info.isBootPatched 
 
     @get:Bindable
     var step = if (skipOptions) 1 else 0
@@ -92,8 +93,9 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     fun install() {
         when (method) {
             R.id.method_patch -> FlashFragment.patch(data.value!!).navigate(true)
-            R.id.method_direct -> FlashFragment.flash(false).navigate(true)
-            R.id.method_inactive_slot -> FlashFragment.flash(true).navigate(true)
+            R.id.method_direct -> FlashFragment.flash(0).navigate(true)
+            R.id.method_inactive_slot -> FlashFragment.flash(1).navigate(true)
+            R.id.method_direct_system -> FlashFragment.flash(2).navigate(true)
             else -> error("Unknown value")
         }
     }

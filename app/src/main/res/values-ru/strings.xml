@@ -238,4 +238,19 @@
     <string name="reboot_apply_change">Перезагрузите устройство для применения изменений</string>
     <string name="restore_app_confirmation">Это действие восстановит пересобранное для скрытия приложение к исходному состоянию. Вы действительно хотите продолжить?</string>
 
+    <!-- Delta -->
+    <string name="direct_install_system">Прямая установка (модифицировать /system напрямую)</string>
+    <string name="settings_hidelist_config_title">Настроить MagiskHide</string>
+    <string name="settings_hidelist_config_summary">Выберите процессы, которые будут включены в список MagiskHide</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_summary">Magisk не действует для процессов в списке MagiskHide</string>
+    <string name="settings_sulist_title">Использовать SUList</string>
+    <string name="settings_sulist">SUList</string>
+    <string name="settings_sulist_summary">Только процессы из SUList могут получать root-доступ от Magisk</string>
+    <string name="settings_sulist_config_title">Настроить SUList</string>
+    <string name="settings_sulist_config_summary">Выберите процессы, которые должны быть включены в SUList</string>
+    <string name="settings_sulist_enforced">SUList включен</string>
+    <string name="settings_sulist_error_magiskhide">Эта функция требует включения MagiskHide</string>
+    <string name="home_notice_unofficial_magisk">ВНИМАНИЕ! Вы используете неофициальную версию Magisk, которая официально не поддерживается автором Magisk. Эта версия может содержать нестабильные модификации, которые могут нанести вред вашему устройству или поставить под угрозу вашу безопасность. Не сообщайте о проблемах и не обращайтесь за помощью в официальные каналы Magisk. Если вы используете эту версию, но не знаете, что это неофициальная версия, перейдите на официальный Magisk по адресу github.com/topjohnwu/Magisk</string>
+    
 </resources>

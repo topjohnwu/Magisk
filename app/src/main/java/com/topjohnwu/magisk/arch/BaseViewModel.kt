@@ -1,8 +1,6 @@
 package com.topjohnwu.magisk.arch
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.databinding.PropertyChangeRegistry

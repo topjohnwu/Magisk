@@ -35,8 +35,7 @@ object Const {
     }
 
     object ID {
-        const val DOWNLOAD_JOB_ID = 6
-        const val CHECK_UPDATE_JOB_ID = 7
+        const val JOB_SERVICE_ID = 7
     }
 
     object Url {
@@ -46,10 +45,10 @@ object Const {
         val CHANGELOG_URL = if (APP_IS_CANARY) Info.remote.magisk.note
         else "https://topjohnwu.github.io/Magisk/releases/${BuildConfig.VERSION_CODE}.md"
 
-        const val GITHUB_RAW_URL = "https://raw.githubusercontent.com/"
-        const val GITHUB_API_URL = "https://api.github.com/"
+        const val GITHUB_RAW_URL  = "https://raw.githubusercontent.com/"
+        const val GITHUB_API_URL  = "https://api.github.com/"
         const val GITHUB_PAGE_URL = "https://topjohnwu.github.io/magisk-files/"
-        const val JS_DELIVR_URL = "https://cdn.jsdelivr.net/gh/"
+        const val JS_DELIVR_URL   = "https://cdn.jsdelivr.net/gh/"
     }
 
     object Key {
@@ -62,6 +61,7 @@ object Const {
         const val FLASH_ZIP = "flash"
         const val PATCH_FILE = "patch"
         const val FLASH_MAGISK = "magisk"
+        const val FLASH_MAGISK_SYSTEM = "magisk_system"
         const val FLASH_INACTIVE_SLOT = "slot"
         const val UNINSTALL = "uninstall"
     }

@@ -244,4 +244,19 @@
     <string name="reboot_apply_change">Reboot to apply changes</string>
     <string name="restore_app_confirmation">This will restore the hidden app back to the original app. Do you really want to do this?</string>
 
+<!--Re-port of old magisk services with custom mods-->
+    <string name="direct_install_system">Direct Install (modify /system directly)</string>
+    <string name="settings_hidelist_config_title">Configure ProgiskHide</string>
+    <string name="settings_hidelist_config_summary">Select the processes to be included on the hidelist</string>
+    <string name="settings_magiskhide_title">ProgiskHide</string>
+    <string name="settings_magiskhide_summary">Hides Progisk from various detections mechanisms and RASP solutions</string>
+    <string name="settings_sulist_title">Enforce Superuser Isolation</string>
+    <string name="settings_sulist">Superuser Isolation</string>
+    <string name="settings_sulist_summary">Isolate superuser access from apps that will need it</string>
+    <string name="settings_sulist_config_title">Configure Superuser Isolation</string>
+    <string name="settings_sulist_config_summary">Select the processes to be included on the Superuser Isolation</string>
+    <string name="settings_sulist_enforced">Superuser Isolation is enforced</string>
+    <string name="settings_sulist_error_magiskhide">This feature need ProgiskHide to be enabled</string>
+    <string name="home_notice_unofficial_magisk">WARNING! You are using an unofficial version of Magisk by Appknox/electrondefuser and  that is not officially supported by the Magisk author. This version may contain unstable modifications that could harm your device or compromise your security. Do not report any issues or request any help from official Magisk channels. If you use this version but do not know this is an unofficial version, please switch to the official Magisk at github.com/topjohnwu/Magisk</string>
+
 </resources>

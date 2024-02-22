@@ -5,11 +5,7 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.navigation.NavDeepLinkBuilder
@@ -110,12 +106,14 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>(), MenuProvider {
                 .setArguments(args.toBundle())
                 .createPendingIntent()
 
-        private fun flashType(isSecondSlot: Boolean) =
-            if (isSecondSlot) Const.Value.FLASH_INACTIVE_SLOT else Const.Value.FLASH_MAGISK
+        private fun flashType(isSecondSlot: Int) =
+            if (isSecondSlot == 1) Const.Value.FLASH_INACTIVE_SLOT
+            else if (isSecondSlot == 2) Const.Value.FLASH_MAGISK_SYSTEM
+            else Const.Value.FLASH_MAGISK
 
         /* Flashing is understood as installing / flashing magisk itself */
 
-        fun flash(isSecondSlot: Boolean) = MainDirections.actionFlashFragment(
+        fun flash(isSecondSlot: Int) = MainDirections.actionFlashFragment(
             action = flashType(isSecondSlot)
         )
 

@@ -73,7 +73,7 @@ class HomeViewModel(
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
     val managerInstalledVersion
-        get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
+        get() = "MAG49712-vineet_electrondefuser (${BuildConfig.VERSION_CODE})" +
             if (BuildConfig.DEBUG) " (D)" else ""
 
     @get:Bindable

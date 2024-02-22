@@ -35,6 +35,8 @@ object Info {
     var crypto = ""
     var noDataExec = false
     var isRooted = false
+    var sulist = false
+    var isBootPatched = false
 
     @JvmField var hasGMS = true
     @JvmField val isEmulator =

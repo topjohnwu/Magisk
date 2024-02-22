@@ -234,4 +234,18 @@
     <string name="reboot_apply_change">Khởi động lại để áp dụng các thay đổi</string>
     <string name="restore_app_confirmation">Điều này sẽ khôi phục ứng dụng ẩn về nguyên bản. Bạn chắc chắn muốn làm điều này chứ?</string>
 
+    <string name="direct_install_system">Cài đặt trực tiếp (sửa đổi /system trực tiếp)</string>
+    <string name="settings_hidelist_config_title">Định cấu hình MagiskHide</string>
+    <string name="settings_hidelist_config_summary">Chọn các quy trình sẽ được đưa vào danh sách ẩn</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_summary">Các sửa đổi của Magisk được hoàn nguyên đối với các tiến trình trong danh sách ẩn</string>
+    <string name="settings_sulist_title">Thực thi SuList</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_summary">Chỉ các tiến trình trên danh sách trắng mới có thể gọi quyền truy cập root Magisk</string>
+    <string name="settings_sulist_config_title">Định cấu hình SuList</string>
+    <string name="settings_sulist_config_summary">Chọn các quy trình để đưa vào danh sách trắng</string>
+    <string name="settings_sulist_enforced">SuList được thực thi</string>
+    <string name="settings_sulist_error_magiskhide">Tính năng này cần được bật MagiskHide</string>
+    <string name="home_notice_unofficial_magisk">CẢNH BÁO! Bạn đang sử dụng một phiên bản Magisk không chính thức không được tác giả Magisk chính thức hỗ trợ. Phiên bản này có thể chứa các sửa đổi không ổn định có thể gây hại cho thiết bị của bạn hoặc ảnh hưởng đến bảo mật của bạn. Không báo cáo bất kỳ vấn đề nào hoặc yêu cầu bất kỳ sự trợ giúp nào từ các kênh Magisk chính thức. Nếu bạn sử dụng phiên bản nay nhưng không biết đây là phiên bản không chính thức, vui lòng chuyển về Magisk chính thức tại github.com/topjohnwu/Magisk</string>
+
 </resources>

@@ -46,7 +46,7 @@ class DenyListRvItem(
                     .filter { isExpanded || it.defaultSelection }
                     .forEach { it.toggle() }
             } else {
-                Shell.cmd("magisk --denylist rm ${info.packageName}").submit()
+                Shell.cmd("magisk magiskhide rm ${info.packageName}").submit()
                 processes.filter { it.isEnabled }.forEach {
                     if (it.process.isIsolated) {
                         it.toggle()
@@ -112,7 +112,7 @@ class ProcessRvItem(
         set(value) = set(value, process.isEnabled, { process.isEnabled = it }, BR.enabled) {
             val arg = if (it) "add" else "rm"
             val (name, pkg) = process
-            Shell.cmd("magisk --denylist $arg $pkg \'$name\'").submit()
+            Shell.cmd("magisk magiskhide $arg $pkg \'$name\'").submit()
         }
 
     fun toggle() {

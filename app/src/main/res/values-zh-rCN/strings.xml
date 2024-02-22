@@ -244,4 +244,17 @@
     <string name="reboot_apply_change">重启后生效</string>
     <string name="restore_app_confirmation">即将把隐藏的 Magisk 应用恢复回原始应用，是否继续？</string>
 
+    <string name="direct_install_system">直接安装（直接修改/system）</string>
+    <string name="settings_hidelist_config_title">配置 MagiskHide</string>
+    <string name="settings_hidelist_config_summary">选择要包含在隐藏列表中的进程</string>
+    <string name="settings_magiskhide_title">MagiskHide</string>
+    <string name="settings_magiskhide_summary">Magisk 修改已恢复到隐藏列表中的进程</string>
+    <string name="settings_sulist_title">实现 SuList</string>
+    <string name="settings_sulist">SuList</string>
+    <string name="settings_sulist_summary">只有白名单进程才能调用 Magisk root 访问</string>
+    <string name="settings_sulist_config_title">配置 SuList</string>
+    <string name="settings_sulist_config_summary">选择要列入白名单的进程</string>
+    <string name="settings_sulist_enforced">SuList 已强制执行</string>
+    <string name="settings_sulist_error_magiskhide">此功能需要启用 MagiskHide</string>
+    <string name="home_notice_unofficial_magisk">警告！ 您正在使用 Magisk 的非官方版本，该版本未得到 Magisk 作者的正式支持。 此版本可能包含不稳定的修改，可能会损害您的设备或危及您的安全。 请勿报告任何问题或向 Magisk 官方渠道请求任何帮助。 如果您使用此版本但不知道这是非官方版本，请切换到官方 Magisk github.com/topjohnwu/Magisk</string>
 </resources>

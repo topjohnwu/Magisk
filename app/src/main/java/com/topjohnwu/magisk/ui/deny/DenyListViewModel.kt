@@ -52,7 +52,7 @@ class DenyListViewModel : AsyncLoadViewModel() {
         loading = true
         val apps = withContext(Dispatchers.Default) {
             val pm = AppContext.packageManager
-            val denyList = Shell.cmd("magisk --denylist ls").exec().out
+            val denyList = Shell.cmd("magisk magiskhide ls").exec().out
                 .map { CmdlineListItem(it) }
             val apps = pm.getInstalledApplications(MATCH_UNINSTALLED_PACKAGES).run {
                 asFlow()
