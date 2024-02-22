@@ -20,7 +20,7 @@ void revert_unmount() {
     // Unmount dummy skeletons and MAGISKTMP
     // since mirror nodes are always mounted under skeleton, we don't have to specifically unmount
     for (auto &info: parse_mount_info("self")) {
-        if (info.source == "magisk" || info.source == "worker" || // magisktmp tmpfs
+        if (info.source == "magisk" || // magisktmp tmpfs
             info.root.starts_with("/adb/modules")) { // bind mount from data partition
             targets.insert(info.target);
         }
