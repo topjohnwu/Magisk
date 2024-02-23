@@ -9,6 +9,7 @@ LOCAL_compiler_rt := $(shell $(TARGET_CC) -target $(LLVM_TRIPLE)$(TARGET_PLATFOR
 LOCAL_EXPORT_LDFLAGS := -static -nostartfiles -nodefaultlibs $(LOCAL_compiler_rt)
 
 LOCAL_SRC_FILES := \
+	malloc.c \
 	nolibc.c \
 	syscall.c
 
