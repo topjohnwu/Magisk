@@ -241,6 +241,7 @@ def clean_elf():
 def run_ndk_build(flags):
     os.chdir("native")
     flags = "NDK_PROJECT_PATH=. NDK_APPLICATION_MK=src/Application.mk " + flags
+    cpu_count = 1
     proc = system(f"{ndk_build} {flags} -j{cpu_count}")
     if proc.returncode != 0:
         error("Build binary failed!")
