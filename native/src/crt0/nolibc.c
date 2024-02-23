@@ -1,5 +1,6 @@
 #include "nolibc/crt.h"
 #include "nolibc/arch.h"
+#include "nolibc/stdio.h"
 
 // errno
 
