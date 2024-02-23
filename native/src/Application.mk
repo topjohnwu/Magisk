@@ -4,9 +4,19 @@ APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
 APP_LDFLAGS      := -flto
 APP_CPPFLAGS     := -std=c++20
 APP_STL          := none
-APP_PLATFORM     := android-23
+APP_PLATFORM     := android-26
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := none
+
+# magiskinit uses crt0
+ifdef B_INIT
+
+# Disable all security and debugging features
+APP_CFLAGS       +=	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-protector -U_FORTIFY_SOURCE
+# Override output folder to make sure all dependencies are rebuilt with new CFLAGS
+NDK_APP_OUT      := ./obj/init
+
+endif
 
 # Busybox should use stock libc.a
 ifdef B_BB

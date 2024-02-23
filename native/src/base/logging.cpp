@@ -8,6 +8,10 @@
 
 using namespace std;
 
+#ifndef __call_bypassing_fortify
+#define __call_bypassing_fortify(fn) (&fn)
+#endif
+
 #undef vsnprintf
 static int fmt_and_log_with_rs(LogLevel level, const char *fmt, va_list ap) {
     constexpr int sz = 4096;

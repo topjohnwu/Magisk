@@ -59,11 +59,14 @@ endif
 
 ifdef B_INIT
 
+# -lc -lm is hardcoded in this variable, disable it
+TARGET_LDLIBS :=
+
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := \
+    crt0 \
     libbase \
-    libcompat \
     libpolicy \
     libxz \
     libinit-rs
@@ -87,7 +90,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
-    libcompat \
     liblzma \
     liblz4 \
     libbz2 \
@@ -163,6 +165,7 @@ include $(BUILD_STATIC_LIBRARY)
 include src/Android-rs.mk
 include src/base/Android.mk
 include src/external/Android.mk
+include src/crt0/Android.mk
 
 ifdef B_BB
 
