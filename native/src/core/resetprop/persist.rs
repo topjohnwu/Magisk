@@ -1,4 +1,3 @@
-use core::ffi::c_char;
 use std::io::Read;
 use std::{
     fs::File,
@@ -39,7 +38,7 @@ trait PropCbExec {
 
 impl PropCbExec for Pin<&mut PropCb> {
     fn exec(&mut self, name: &Utf8CStr, value: &Utf8CStr) {
-        unsafe { prop_cb_exec(self.as_mut(), name.as_ptr(), value.as_ptr()) }
+        unsafe { prop_cb_exec(self.as_mut(), name.as_ptr(), value.as_ptr(), u32::MAX) }
     }
 }
 
@@ -142,9 +141,8 @@ fn proto_write_props(props: &PersistentProperties) -> LoggedResult<()> {
     Ok(())
 }
 
-pub unsafe fn persist_get_prop(name: *const c_char, prop_cb: Pin<&mut PropCb>) {
-    fn inner(name: *const c_char, mut prop_cb: Pin<&mut PropCb>) -> LoggedResult<()> {
-        let name = unsafe { Utf8CStr::from_ptr(name)? };
+pub unsafe fn persist_get_prop(name: &Utf8CStr, prop_cb: Pin<&mut PropCb>) {
+    fn inner(name: &Utf8CStr, mut prop_cb: Pin<&mut PropCb>) -> LoggedResult<()> {
         if check_proto() {
             let mut props = proto_read_props()?;
             let prop = props.find(name)?;
@@ -197,9 +195,8 @@ pub unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>) {
     inner(prop_cb).ok();
 }
 
-pub unsafe fn persist_delete_prop(name: *const c_char) -> bool {
-    fn inner(name: *const c_char) -> LoggedResult<()> {
-        let name = unsafe { Utf8CStr::from_ptr(name)? };
+pub unsafe fn persist_delete_prop(name: &Utf8CStr) -> bool {
+    fn inner(name: &Utf8CStr) -> LoggedResult<()> {
         if check_proto() {
             let mut props = proto_read_props()?;
             let idx = props.find_index(name).no_log()?;
@@ -212,10 +209,8 @@ pub unsafe fn persist_delete_prop(name: *const c_char) -> bool {
     inner(name).is_ok()
 }
 
-pub unsafe fn persist_set_prop(name: *const c_char, value: *const c_char) -> bool {
-    unsafe fn inner(name: *const c_char, value: *const c_char) -> LoggedResult<()> {
-        let name = Utf8CStr::from_ptr(name)?;
-        let value = Utf8CStr::from_ptr(value)?;
+pub unsafe fn persist_set_prop(name: &Utf8CStr, value: &Utf8CStr) -> bool {
+    unsafe fn inner(name: &Utf8CStr, value: &Utf8CStr) -> LoggedResult<()> {
         if check_proto() {
             let mut props = proto_read_props()?;
             match props.find_index(name) {

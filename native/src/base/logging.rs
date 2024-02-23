@@ -101,10 +101,8 @@ fn log_with_writer<F: FnOnce(LogWriter)>(level: LogLevel, f: F) {
     }
 }
 
-pub fn log_from_cxx(level: LogLevelCxx, msg: &[u8]) {
+pub fn log_from_cxx(level: LogLevelCxx, msg: &Utf8CStr) {
     if let Some(level) = LogLevel::from_i32(level.repr) {
-        // SAFETY: The null termination is handled on the C++ side
-        let msg = unsafe { Utf8CStr::from_bytes_unchecked(msg) };
         log_with_writer(level, |write| write(level, msg));
     }
 }

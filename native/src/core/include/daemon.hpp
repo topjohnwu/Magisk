@@ -1,5 +1,7 @@
 #pragma once
 
+#include <base.hpp>
+
 namespace rust {
 struct MagiskD;
 }
@@ -24,3 +26,4 @@ private:
 };
 
 const char *get_magisk_tmp();
+static inline rust::Utf8CStr get_magisk_tmp_rs() { return get_magisk_tmp(); }

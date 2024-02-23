@@ -34,12 +34,17 @@ pub mod ffi {
 
     unsafe extern "C++" {
         include!("misc.hpp");
+
+        #[namespace = "rust"]
+        #[cxx_name = "Utf8CStr"]
+        type Utf8CStrRef<'a> = &'a crate::cstr::Utf8CStr;
+
         fn mut_u8_patch(buf: &mut [u8], from: &[u8], to: &[u8]) -> Vec<usize>;
     }
 
     extern "Rust" {
         #[cxx_name = "log_with_rs"]
-        fn log_from_cxx(level: LogLevelCxx, msg: &[u8]);
+        fn log_from_cxx(level: LogLevelCxx, msg: Utf8CStrRef);
         #[cxx_name = "set_log_level_state"]
         fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
         fn exit_on_error(b: bool);
@@ -53,7 +58,7 @@ pub mod ffi {
         #[cxx_name = "fd_path"]
         fn fd_path_for_cxx(fd: i32, buf: &mut [u8]) -> isize;
         #[cxx_name = "map_file"]
-        fn map_file_for_cxx(path: &[u8], rw: bool) -> &'static mut [u8];
+        fn map_file_for_cxx(path: Utf8CStrRef, rw: bool) -> &'static mut [u8];
         #[cxx_name = "map_fd"]
         fn map_fd_for_cxx(fd: i32, sz: usize, rw: bool) -> &'static mut [u8];
     }

@@ -15,10 +15,11 @@ using namespace std;
 
 #ifdef APPLET_STUB_MAIN
 #define system_property_set             __system_property_set
+#define system_property_read(...)
 #define system_property_find            __system_property_find
 #define system_property_read_callback   __system_property_read_callback
 #define system_property_foreach         __system_property_foreach
-#define system_property_read(...)
+#define system_property_wait            __system_property_wait
 #else
 static int (*system_property_set)(const char*, const char*);
 static int (*system_property_read)(const prop_info*, char*, char*);
@@ -26,6 +27,7 @@ static const prop_info *(*system_property_find)(const char*);
 static void (*system_property_read_callback)(
         const prop_info*, void (*)(void*, const char*, const char*, uint32_t), void*);
 static int (*system_property_foreach)(void (*)(const prop_info*, void*), void*);
+static bool (*system_property_wait)(const prop_info*, uint32_t, uint32_t*, const struct timespec*);
 #endif
 
 struct PropFlags {
@@ -33,10 +35,12 @@ struct PropFlags {
     void setPersist() { flags |= (1 << 1); }
     void setContext() { flags |= (1 << 2); }
     void setPersistOnly() { flags |= (1 << 3); setPersist(); }
+    void setWait() { flags |= (1 << 4); }
     bool isSkipSvc() const { return flags & 1; }
     bool isPersist() const { return flags & (1 << 1); }
     bool isContext() const { return flags & (1 << 2); }
     bool isPersistOnly() const { return flags & (1 << 3); }
+    bool isWait() const { return flags & (1 << 4); }
 private:
     uint32_t flags = 0;
 };
@@ -49,16 +53,22 @@ Usage: %s [flags] [arguments...]
 
 Read mode arguments:
    (no arguments)    print all properties
-   NAME              get property
+   NAME              get property of NAME
 
 Write mode arguments:
    NAME VALUE        set property NAME as VALUE
    -f,--file   FILE  load and set properties from FILE
    -d,--delete NAME  delete property
 
+Wait mode arguments (toggled with -w):
+    NAME             wait until property NAME changes
+    NAME OLD_VALUE   if value of property NAME is not OLD_VALUE, get value
+                     or else wait until property NAME changes
+
 General flags:
    -h,--help         show this message
    -v                print verbose output to stderr
+   -w                switch to wait mode
 
 Read mode flags:
    -p      also read persistent props from storage
@@ -104,8 +114,8 @@ illegal:
 
 static void read_prop_with_cb(const prop_info *pi, void *cb) {
     if (system_property_read_callback) {
-        auto callback = [](void *cb, const char *name, const char *value, uint32_t) {
-            static_cast<prop_cb*>(cb)->exec(name, value);
+        auto callback = [](void *cb, const char *name, const char *value, uint32_t serial) {
+            static_cast<prop_cb*>(cb)->exec(name, value, serial);
         };
         system_property_read_callback(pi, callback, cb);
     } else {
@@ -114,21 +124,24 @@ static void read_prop_with_cb(const prop_info *pi, void *cb) {
         name[0] = '\0';
         value[0] = '\0';
         system_property_read(pi, name, value);
-        static_cast<prop_cb*>(cb)->exec(name, value);
+        static_cast<prop_cb*>(cb)->exec(name, value, pi->serial);
     }
 }
 
 template<class StringType>
 struct prop_to_string : prop_cb {
-    void exec(const char *, const char *value) override {
+    void exec(const char *, const char *value, uint32_t s) override {
         val = value;
+        serial = s;
     }
     StringType val;
+    uint32_t serial;
 };
 
-template<> void prop_to_string<rust::String>::exec(const char *, const char *value) {
+template<> void prop_to_string<rust::String>::exec(const char *, const char *value, uint32_t s) {
     // We do not want to crash when values are not UTF-8
     val = rust::String::lossy(value);
+    serial = s;
 }
 
 static int set_prop(const char *name, const char *value, PropFlags flags) {
@@ -190,7 +203,7 @@ static StringType get_prop(const char *name, PropFlags flags) {
     if (flags.isContext()) {
         auto context = __system_property_get_context(name) ?: "";
         LOGD("resetprop: prop context [%s]: [%s]\n", name, context);
-        cb.exec(name, context);
+        cb.exec(name, context, -1);
         return cb.val;
     }
 
@@ -206,6 +219,30 @@ static StringType get_prop(const char *name, PropFlags flags) {
     if (cb.val.empty())
         LOGD("resetprop: prop [%s] does not exist\n", name);
 
+    return cb.val;
+}
+
+template<class StringType>
+static StringType wait_prop(const char *name, const char *old_value) {
+    if (!check_legal_property_name(name))
+        return {};
+    auto pi = system_property_find(name);
+    if (!pi) {
+        LOGD("resetprop: prop [%s] does not exist\n", name);
+        return {};
+    }
+
+    prop_to_string<StringType> cb;
+    read_prop_with_cb(pi, &cb);
+
+    if (old_value == nullptr || cb.val == old_value) {
+        LOGD("resetprop: waiting for prop [%s]\n", name);
+        uint32_t new_serial;
+        system_property_wait(pi, cb.serial, &new_serial, nullptr);
+        read_prop_with_cb(pi, &cb);
+    }
+
+    LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
     return cb.val;
 }
 
@@ -256,7 +293,12 @@ struct Initialize {
         DLOAD(system_property_find);
         DLOAD(system_property_read_callback);
         DLOAD(system_property_foreach);
+        DLOAD(system_property_wait);
 #undef DLOAD
+        if (system_property_wait == nullptr) {
+            // The platform API only exist on API 26+
+            system_property_wait = __system_property_wait;
+        }
 #endif
         if (__system_properties_init()) {
             LOGE("resetprop: __system_properties_init error\n");
@@ -319,6 +361,9 @@ int resetprop_main(int argc, char *argv[]) {
             case 'Z':
                 flags.setContext();
                 continue;
+            case 'w':
+                flags.setWait();
+                continue;
             case '\0':
                 break;
             default:
@@ -340,6 +385,15 @@ int resetprop_main(int argc, char *argv[]) {
 
     if (prop_file) {
         load_file(prop_file, flags);
+        return 0;
+    }
+
+    if (flags.isWait()) {
+        if (argc == 0) usage(argv0);
+        auto val = wait_prop<string>(argv[0], argv[1]);
+        if (val.empty())
+            return 1;
+        printf("%s\n", val.data());
         return 0;
     }
 

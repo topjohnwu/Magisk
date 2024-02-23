@@ -274,3 +274,19 @@ int ssprintf(char *dest, size_t size, const char *fmt, ...) {
 size_t strscpy(char *dest, const char *src, size_t size) {
     return std::min(strlcpy(dest, src, size), size - 1);
 }
+
+extern "C" void cxx$utf8str$new(rust::Utf8CStr *self, const void *s, size_t len);
+extern "C" const char *cxx$utf8str$ptr(const rust::Utf8CStr *self);
+extern "C" size_t cxx$utf8str$len(const rust::Utf8CStr *self);
+
+rust::Utf8CStr::Utf8CStr(const char *s, size_t len) {
+    cxx$utf8str$new(this, s, len);
+}
+
+const char *rust::Utf8CStr::data() const {
+    return cxx$utf8str$ptr(this);
+}
+
+size_t rust::Utf8CStr::length() const {
+    return cxx$utf8str$len(this);
+}

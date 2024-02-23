@@ -49,13 +49,23 @@ pub mod ffi {
         #[cxx_name = "prop_cb"]
         type PropCb;
         unsafe fn get_prop_rs(name: *const c_char, persist: bool) -> String;
-        unsafe fn prop_cb_exec(cb: Pin<&mut PropCb>, name: *const c_char, value: *const c_char);
+        unsafe fn prop_cb_exec(
+            cb: Pin<&mut PropCb>,
+            name: *const c_char,
+            value: *const c_char,
+            serial: u32,
+        );
     }
 
     unsafe extern "C++" {
+        #[namespace = "rust"]
+        #[cxx_name = "Utf8CStr"]
+        type Utf8CStrRef<'a> = base::ffi::Utf8CStrRef<'a>;
+
         include!("include/daemon.hpp");
 
-        fn get_magisk_tmp() -> *const c_char;
+        #[cxx_name = "get_magisk_tmp_rs"]
+        fn get_magisk_tmp() -> Utf8CStrRef<'static>;
 
         #[cxx_name = "MagiskD"]
         type CxxMagiskD;
@@ -71,12 +81,12 @@ pub mod ffi {
         fn zygisk_logging();
         fn zygisk_close_logd();
         fn zygisk_get_logd() -> i32;
-        fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize;
+        fn find_apk_path(pkg: Utf8CStrRef, data: &mut [u8]) -> usize;
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
-        unsafe fn persist_get_prop(name: *const c_char, prop_cb: Pin<&mut PropCb>);
+        unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
-        unsafe fn persist_delete_prop(name: *const c_char) -> bool;
-        unsafe fn persist_set_prop(name: *const c_char, value: *const c_char) -> bool;
+        unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;
+        unsafe fn persist_set_prop(name: Utf8CStrRef, value: Utf8CStrRef) -> bool;
     }
 
     #[namespace = "rust"]

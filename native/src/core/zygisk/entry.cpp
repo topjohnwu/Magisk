@@ -16,25 +16,11 @@ using namespace std;
 void *self_handle = nullptr;
 string native_bridge = "0";
 
-extern "C" [[maybe_unused]] void zygisk_inject_entry(void *handle) {
-    self_handle = handle;
-    zygisk_logging();
-    hook_functions();
-    ZLOGD("load success\n");
-}
-
 static bool is_compatible_with(uint32_t) {
     auto name = get_prop(NBPROP);
-    android_dlextinfo info = {
-        .flags = ANDROID_DLEXT_FORCE_LOAD
-    };
-    void *handle = android_dlopen_ext(name.data(), RTLD_LAZY, &info);
-    if (handle) {
-        auto entry = reinterpret_cast<void (*)(void *)>(dlsym(handle, "zygisk_inject_entry"));
-        if (entry) {
-            entry(handle);
-        }
-    }
+    android_logging();
+    hook_functions();
+    ZLOGD("load success\n");
     return false;
 }
 

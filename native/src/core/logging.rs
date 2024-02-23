@@ -19,7 +19,8 @@ use base::libc::{
 };
 use base::*;
 
-use crate::daemon::{get_magisk_tmp, MagiskD, MAGISKD};
+use crate::daemon::{MagiskD, MAGISKD};
+use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
 use crate::{LOGFILE, LOG_PIPE};
 

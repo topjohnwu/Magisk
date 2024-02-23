@@ -6,9 +6,11 @@ use std::path::Path;
 use std::str::{Utf8Chunks, Utf8Error};
 use std::{fmt, mem, slice, str};
 
-use crate::slice_from_ptr_mut;
+use cxx::{type_id, ExternType};
 use libc::c_char;
 use thiserror::Error;
+
+use crate::slice_from_ptr_mut;
 
 // Utf8CStr types are UTF-8 validated and null terminated strings.
 //
@@ -379,6 +381,22 @@ impl DerefMut for Utf8CStr {
         self.as_str_mut()
     }
 }
+
+// Notice that we only implement ExternType on Utf8CStr *reference*
+unsafe impl ExternType for &Utf8CStr {
+    type Id = type_id!("rust::Utf8CStr");
+    type Kind = cxx::kind::Trivial;
+}
+
+macro_rules! const_assert_eq {
+    ($left:expr, $right:expr $(,)?) => {
+        const _: [(); $left] = [(); $right];
+    };
+}
+
+// Assert ABI layout
+const_assert_eq!(mem::size_of::<&Utf8CStr>(), mem::size_of::<[usize; 2]>());
+const_assert_eq!(mem::align_of::<&Utf8CStr>(), mem::align_of::<[usize; 2]>());
 
 // File system path extensions types
 

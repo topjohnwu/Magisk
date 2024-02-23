@@ -331,3 +331,30 @@ constexpr auto operator+(T e) noexcept ->
     std::enable_if_t<std::is_enum<T>::value, std::underlying_type_t<T>> {
     return static_cast<std::underlying_type_t<T>>(e);
 }
+
+namespace rust {
+
+struct Utf8CStr {
+    const char *data() const;
+    size_t length() const;
+    Utf8CStr(const char *s, size_t len);
+
+    Utf8CStr() : Utf8CStr("", 1) {};
+    Utf8CStr(const Utf8CStr &o) = default;
+    Utf8CStr(Utf8CStr &&o) = default;
+    Utf8CStr(const char *s) : Utf8CStr(s, strlen(s) + 1) {};
+    Utf8CStr(std::string_view s) : Utf8CStr(s.data(), s.length() + 1) {};
+    Utf8CStr(std::string s) : Utf8CStr(s.data(), s.length() + 1) {};
+    const char *c_str() const { return this->data(); }
+    size_t size() const { return this->length(); }
+    bool empty() const { return this->length() == 0 ; }
+    operator std::string_view() { return {data(), length()}; }
+
+private:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
+    std::array<std::uintptr_t, 2> repr;
+#pragma clang diagnostic pop
+};
+
+} // namespace rust

@@ -78,7 +78,7 @@ impl MagiskCpio for Cpio {
                 break;
             }
         }
-        if self.exists("init.sony.rc") {
+        if self.exists("init.real") {
             ret |= SONY_INIT;
         }
         ret

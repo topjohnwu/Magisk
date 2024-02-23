@@ -14,6 +14,12 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 jobs:
   build:
@@ -74,20 +80,29 @@ jobs:
 
       - name: Build release
         run: |
-          python build.py -vr binary
+          ONDK=/usr/local/lib/android/sdk/ndk/magisk/toolchains/llvm/prebuilt/linux-x86_64
+          OUT=$GITHUB_WORKSPACE/native/out/arm64-v8a
+          ./build.py -rv binary resetprop magiskpolicy busybox magiskboot
+          $ONDK/bin/llvm-strip -s -g $OUT/resetprop $OUT/magiskpolicy $OUT/busybox $OUT/magiskboot
+          mv $OUT/busybox out/libbusybox.so
+          mv $OUT/resetprop out/libresetprop.so
+          mv $OUT/magiskboot out/libmagiskboot.so
+          mv $OUT/magiskpolicy out/libmagiskpolicy.so
 
-      - name: Stop gradle daemon
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) && (success() || failure()) }}
+      - name: Stop Gradle daemon
         run: ./gradlew --stop
 
-      - name: Release Native
-        uses: ncipollo/release-action@v1.12.0
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.parse_version.outputs.VERSION }}
-          artifacts: |
-            native/out/arm64-v8a/busybox
-            native/out/arm64-v8a/magiskboot
-            native/out/arm64-v8a/magiskpolicy
-          allowUpdates: true
-          makeLatest: true
-          replacesArtifacts: true
+          path: |
+            out/libbusybox.so
+            out/libresetprop.so
+            out/libmagiskboot.so
+            out/libmagiskpolicy.so
+          compression-level: 0 # no compression
+          name: binaries

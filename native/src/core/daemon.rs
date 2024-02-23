@@ -9,7 +9,7 @@ use base::{
     Utf8CStrBufArr, Utf8CStrBufRef, WalkResult,
 };
 
-use crate::ffi::{CxxMagiskD, RequestCode};
+use crate::ffi::{get_magisk_tmp, CxxMagiskD, RequestCode};
 use crate::logging::magisk_logging;
 use crate::{get_prop, MAIN_CONFIG};
 
@@ -97,10 +97,6 @@ impl MagiskD {
     }
 }
 
-pub fn get_magisk_tmp() -> &'static Utf8CStr {
-    unsafe { Utf8CStr::from_ptr(super::ffi::get_magisk_tmp()).unwrap_unchecked() }
-}
-
 pub fn daemon_entry() {
     let mut qemu = get_prop(cstr!("ro.kernel.qemu"), false);
     if qemu.is_empty() {
@@ -170,13 +166,9 @@ pub fn get_magiskd() -> &'static MagiskD {
     unsafe { MAGISKD.get().unwrap_unchecked() }
 }
 
-pub fn find_apk_path(pkg: &[u8], data: &mut [u8]) -> usize {
+pub fn find_apk_path(pkg: &Utf8CStr, data: &mut [u8]) -> usize {
     use WalkResult::*;
-    fn inner(pkg: &[u8], buf: &mut dyn Utf8CStrBuf) -> io::Result<usize> {
-        let pkg = match Utf8CStr::from_bytes(pkg) {
-            Ok(pkg) => pkg,
-            Err(e) => return Err(io::Error::new(io::ErrorKind::Other, e)),
-        };
+    fn inner(pkg: &Utf8CStr, buf: &mut dyn Utf8CStrBuf) -> io::Result<usize> {
         Directory::open(cstr!("/data/app"))?.pre_order_walk(|e| {
             if !e.is_dir() {
                 return Ok(Skip);

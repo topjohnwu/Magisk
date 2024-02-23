@@ -189,7 +189,7 @@ sFILE make_file(FILE *fp) {
 }
 
 mmap_data::mmap_data(const char *name, bool rw) {
-    auto slice = rust::map_file(byte_view(name), rw);
+    auto slice = rust::map_file(name, rw);
     if (!slice.empty()) {
         _buf = slice.data();
         _sz = slice.size();

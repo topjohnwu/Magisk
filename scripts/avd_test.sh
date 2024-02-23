@@ -5,7 +5,7 @@ avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
 emu_args='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -show-kernel -memory 8192'
 lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
-emu_url='https://github.com/topjohnwu/magisk-files/releases/download/files/emulator-darwin-x86-34.1.14.zip'
+emu_url='https://github.com/topjohnwu/magisk-files/releases/download/files/emulator-darwin-x86-34.2.1.zip'
 boot_timeout=600
 emu_pid=
 

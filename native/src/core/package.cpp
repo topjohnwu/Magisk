@@ -176,7 +176,7 @@ int get_manager(int user_id, string *pkg, bool install) {
                     int app_id = to_app_id(st.st_uid);
 
                     byte_array<PATH_MAX> apk;
-                    find_apk_path(byte_view(str[SU_MANAGER]), apk);
+                    find_apk_path(str[SU_MANAGER], apk);
                     int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
                     auto cert = read_certificate(fd, -1);
                     close(fd);
@@ -230,7 +230,7 @@ int get_manager(int user_id, string *pkg, bool install) {
             if (stat(app_path, &st) == 0) {
 #if ENFORCE_SIGNATURE
                 byte_array<PATH_MAX> apk;
-                find_apk_path(byte_view(JAVA_PACKAGE_NAME), apk);
+                find_apk_path(JAVA_PACKAGE_NAME, apk);
                 int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
                 auto cert = read_certificate(fd, MAGISK_VER_CODE);
                 close(fd);
