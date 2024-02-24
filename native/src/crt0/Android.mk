@@ -11,6 +11,8 @@ LOCAL_EXPORT_LDFLAGS := -static -nostartfiles -nodefaultlibs $(LOCAL_compiler_rt
 LOCAL_SRC_FILES := \
 	malloc.c \
 	nolibc.c \
-	syscall.c
+	stdio.c \
+	syscall.c \
+	tinystdio/tinystdio.c
 
 include $(BUILD_STATIC_LIBRARY)
