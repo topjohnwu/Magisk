@@ -9,14 +9,14 @@ LOCAL_compiler_rt := $(shell $(TARGET_CC) -target $(LLVM_TRIPLE)$(TARGET_PLATFOR
 LOCAL_EXPORT_LDFLAGS := -static -nostartfiles -nodefaultlibs $(LOCAL_compiler_rt) -Wl,--error-limit=0
 
 LOCAL_SRC_FILES := \
-    dirent.cpp \
 	malloc.c \
 	mem.c \
 	misc.c \
 	nolibc.c \
 	stdio.c \
 	syscall.c \
-	syscall/syscall-$(TARGET_ARCH).S \
+	bionic/dirent.cpp \
+	bionic/syscall-$(TARGET_ARCH).S \
 	tinystdio/tinystdio.c
 
 include $(BUILD_STATIC_LIBRARY)
