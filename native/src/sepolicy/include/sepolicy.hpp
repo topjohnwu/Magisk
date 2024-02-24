@@ -24,10 +24,7 @@ using token_list = std::vector<const char *>;
 using argument = std::pair<token_list, bool>;
 using argument_list = std::vector<argument>;
 
-const argument &all_xperm();
-
 #define ALL       nullptr
-#define ALL_XPERM all_xperm()
 
 struct sepolicy {
     using c_str = const char *;

@@ -8,13 +8,6 @@
 
 using namespace std;
 
-const argument &all_xperm() {
-    static argument arg;
-    if (arg.first.empty())
-        arg.first.push_back(nullptr);
-    return arg;
-}
-
 static const char *type_msg_1 =
 R"EOF("allow *source_type *target_type *class *perm_set"
 "deny *source_type *target_type *class *perm_set"
