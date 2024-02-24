@@ -66,6 +66,7 @@ EXPORT_SYMBOL(fchownat);
 EXPORT_SYMBOL(readv);
 EXPORT_SYMBOL(lseek);
 EXPORT_SYMBOL(execve);
+EXPORT_SYMBOL(getdents64);
 
 SYMBOL_ALIAS(exit, _exit);
 

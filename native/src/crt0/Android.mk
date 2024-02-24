@@ -9,6 +9,7 @@ LOCAL_compiler_rt := $(shell $(TARGET_CC) -target $(LLVM_TRIPLE)$(TARGET_PLATFOR
 LOCAL_EXPORT_LDFLAGS := -static -nostartfiles -nodefaultlibs $(LOCAL_compiler_rt) -Wl,--error-limit=0
 
 LOCAL_SRC_FILES := \
+    dirent.cpp \
 	malloc.c \
 	mem.c \
 	misc.c \
