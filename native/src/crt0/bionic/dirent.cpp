@@ -36,24 +36,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "private/ErrnoRestorer.h"
+
 extern "C" int sys_getdents64(unsigned int, dirent*, unsigned int);
-
-class ErrnoRestorer {
-public:
-    explicit ErrnoRestorer() : saved_errno_(errno) {
-    }
-
-    ~ErrnoRestorer() {
-        errno = saved_errno_;
-    }
-
-    void override(int new_errno) {
-        saved_errno_ = new_errno;
-    }
-
-private:
-    int saved_errno_;
-};
 
 // Apportable decided to copy the data structure from this file
 // and use it in their own code, but they also call into readdir.
