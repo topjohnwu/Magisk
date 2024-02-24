@@ -161,3 +161,23 @@ void __wrap_abort_message(const char* format, ...) {
 int __cxa_atexit(void (*func) (void *), void * arg, void * dso_handle) {
     return 0;
 }
+
+// Dummy function symbols
+
+long dummy() { return 0; }
+
+#define DUMMY_SYMBOL(name) \
+__asm__(".global " #name " \n " #name " = dummy")
+
+DUMMY_SYMBOL(pthread_setspecific);
+DUMMY_SYMBOL(pthread_key_create);
+DUMMY_SYMBOL(pthread_key_delete);
+DUMMY_SYMBOL(pthread_getspecific);
+
+// Workaround LTO bug: https://github.com/llvm/llvm-project/issues/61101
+#if defined(__i386__)
+extern long *_GLOBAL_OFFSET_TABLE_;
+long unused() {
+    return *_GLOBAL_OFFSET_TABLE_;
+}
+#endif

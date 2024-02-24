@@ -1,6 +1,14 @@
 #include <string.h>
 #include <malloc.h>
 
+void *memset(void *dst, int ch, size_t n) {
+    return __builtin_memset(dst, ch, n);
+}
+
+void *memmove(void *dst, const void *src, size_t n) {
+    return __builtin_memmove(dst, src, n);
+}
+
 void *memcpy(void *dst, const void *src, size_t size) {
     return __builtin_memcpy(dst, src, size);
 }
