@@ -10,6 +10,8 @@ LOCAL_EXPORT_LDFLAGS := -static -nostartfiles -nodefaultlibs $(LOCAL_compiler_rt
 
 LOCAL_SRC_FILES := \
 	malloc.c \
+	mem.c \
+	misc.c \
 	nolibc.c \
 	stdio.c \
 	syscall.c \
