@@ -13,6 +13,7 @@ LOCAL_SRC_FILES := \
 	nolibc.c \
 	stdio.c \
 	syscall.c \
+	syscall/syscall-$(TARGET_ARCH).S \
 	tinystdio/tinystdio.c
 
 include $(BUILD_STATIC_LIBRARY)
