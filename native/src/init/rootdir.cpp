@@ -403,6 +403,6 @@ int magisk_proxy_main(int argc, char *argv[]) {
 
     // Tell magiskd to remount rootfs
     setenv("REMOUNT_ROOT", "1", 1);
-    execv("/sbin/magisk", argv);
+    execve("/sbin/magisk", argv, environ);
     return 1;
 }

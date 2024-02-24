@@ -65,6 +65,7 @@ EXPORT_SYMBOL(fchmodat);
 EXPORT_SYMBOL(fchownat);
 EXPORT_SYMBOL(readv);
 EXPORT_SYMBOL(lseek);
+EXPORT_SYMBOL(execve);
 
 SYMBOL_ALIAS(exit, _exit);
 

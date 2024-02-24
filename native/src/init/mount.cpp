@@ -243,7 +243,7 @@ void BaseInit::exec_init() {
         if (xumount2(p.data(), MNT_DETACH) == 0)
             LOGD("Unmount [%s]\n", p.data());
     }
-    execv("/init", argv);
+    execve("/init", argv, environ);
     exit(1);
 }
 
