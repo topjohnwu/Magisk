@@ -151,3 +151,13 @@ char *basename(const char *path) {
     int rc = __basename_r(path, buf, sizeof(buf));
     return (rc < 0) ? NULL : buf;
 }
+
+// Simply just abort when abort_message is called
+void __wrap_abort_message(const char* format, ...) {
+    abort();
+}
+
+// Don't care about C++ global destructors
+int __cxa_atexit(void (*func) (void *), void * arg, void * dso_handle) {
+    return 0;
+}

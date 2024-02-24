@@ -13,6 +13,7 @@ ifdef B_INIT
 
 # Disable all security and debugging features
 APP_CFLAGS       +=	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-protector -U_FORTIFY_SOURCE
+APP_LDFLAGS		 += -Wl,-wrap,abort_message
 # Override output folder to make sure all dependencies are rebuilt with new CFLAGS
 NDK_APP_OUT      := ./obj/init
 
