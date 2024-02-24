@@ -75,9 +75,14 @@ void file_readline(bool trim, FILE *fp, const function<bool(string_view)> &fn) {
 }
 
 void file_readline(bool trim, const char *file, const function<bool(string_view)> &fn) {
-    if (auto fp = open_file(file, "re"))
-        file_readline(trim, fp.get(), fn);
+    int fd = xopen(file, O_RDONLY | O_CLOEXEC);
+    if (fd >= 0) {
+        auto fp = fdopen(fd, "re");
+        file_readline(trim, fp, fn);
+        fclose(fp);
+    }
 }
+
 void file_readline(const char *file, const function<bool(string_view)> &fn) {
     file_readline(false, file, fn);
 }
@@ -96,8 +101,12 @@ void parse_prop_file(FILE *fp, const function<bool(string_view, string_view)> &f
 }
 
 void parse_prop_file(const char *file, const function<bool(string_view, string_view)> &fn) {
-    if (auto fp = open_file(file, "re"))
-        parse_prop_file(fp.get(), fn);
+    int fd = xopen(file, O_RDONLY | O_CLOEXEC);
+    if (fd >= 0) {
+        auto fp = fdopen(fd, "re");
+        parse_prop_file(fp, fn);
+        fclose(fp);
+    }
 }
 
 std::vector<mount_info> parse_mount_info(const char *pid) {

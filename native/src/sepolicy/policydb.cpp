@@ -103,7 +103,8 @@ sepolicy *sepolicy::from_file(const char *file) {
 
     policy_file_t pf;
     policy_file_init(&pf);
-    auto fp = xopen_file(file, "re");
+    int fd = xopen(file, O_RDONLY | O_CLOEXEC);
+    auto fp = make_file(fdopen(fd, "re"));
     pf.fp = fp.get();
     pf.type = PF_USE_STDIO;
 
@@ -123,6 +124,7 @@ sepolicy *sepolicy::compile_split() {
     cil_db_t *db = nullptr;
     sepol_policydb_t *pdb = nullptr;
     FILE *f;
+    int fd;
     int policy_ver;
     const char *cil_file;
 #if MAGISK_DEBUG
@@ -148,13 +150,15 @@ sepolicy *sepolicy::compile_split() {
     cil_set_target_platform(db, SEPOL_TARGET_SELINUX);
     cil_set_attrs_expand_generated(db, 1);
 
-    f = xfopen(SELINUX_VERSION, "re");
+    fd = xopen(SELINUX_VERSION, O_RDONLY | O_CLOEXEC);
+    f = fdopen(fd, "re");
     fscanf(f, "%d", &policy_ver);
     fclose(f);
     cil_set_policy_version(db, policy_ver);
 
     // Get mapping version
-    f = xfopen(VEND_POLICY_DIR "plat_sepolicy_vers.txt", "re");
+    fd = xopen(VEND_POLICY_DIR "plat_sepolicy_vers.txt", O_RDONLY | O_CLOEXEC);
+    f = fdopen(fd, "re");
     fscanf(f, "%s", plat_ver);
     fclose(f);
 
