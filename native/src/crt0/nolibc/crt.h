@@ -10,6 +10,7 @@
 char **environ;
 const unsigned long *_auxv;
 void _exit(int);
+void __init_stdio(void);
 
 typedef void init_func_t(int, char*[], char*[]);
 typedef void fini_func_t(void);
@@ -68,6 +69,7 @@ void __attribute__((used)) _start_c(long *sp)
 	_auxv = auxv;
 
 	/* call preinit and init */
+    __init_stdio();
 	call_array(__preinit_array_start, __preinit_array_end, argc, argv, envp);
 	call_array(__init_array_start, __init_array_end, argc, argv, envp);
 
