@@ -102,7 +102,7 @@
     <string name="reboot_userspace">Yazılımsal olarak yeniden başlat</string>
     <string name="reboot_recovery">Kurtarma modunda Yeniden Başlat</string>
     <string name="reboot_bootloader">Önyükleyici modunda Yeniden Başlat</string>
-    <string name="reboot_download">Download modu için Yeniden Başlat</string>
+    <string name="reboot_download">Download modunda Yeniden Başlat</string>
     <string name="reboot_edl">EDL modunda Yeniden Başlat</string>
     <string name="module_version_author">%1$s / %2$s</string>
     <string name="module_state_remove">Kaldır</string>
