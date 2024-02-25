@@ -3,6 +3,7 @@
 #include <libgen.h>
 #include <errno.h>
 #include <unistd.h>
+#include <pthread.h>
 
 // Source: bionic/libc/upstream-openbsd/lib/libc/stdlib/getenv.c
 static char *__findenv(const char *name, int len, int *offset) {
@@ -162,17 +163,34 @@ int __cxa_atexit(void (*func) (void *), void * arg, void * dso_handle) {
     return 0;
 }
 
-// Dummy function symbols
+// Emulate pthread functions
 
-long dummy() { return 0; }
+static pthread_key_t g_counter = 0;
+static void **g_key_values = NULL;
 
-#define DUMMY_SYMBOL(name) \
-__asm__(".global " #name " \n " #name " = dummy")
+int pthread_key_create(pthread_key_t *key_ptr, void (*dtor)(void*)) {
+    *key_ptr = g_counter++;
+    g_key_values = realloc(g_key_values, g_counter * sizeof(void*));
+    return 0;
+}
 
-DUMMY_SYMBOL(pthread_setspecific);
-DUMMY_SYMBOL(pthread_key_create);
-DUMMY_SYMBOL(pthread_key_delete);
-DUMMY_SYMBOL(pthread_getspecific);
+int pthread_key_delete(pthread_key_t key) {
+    if (key < g_counter) {
+        g_key_values[key] = NULL;
+    }
+    return 0;
+}
+
+void *pthread_getspecific(pthread_key_t key) {
+    return key < g_counter ? g_key_values[key] : NULL;
+}
+
+int pthread_setspecific(pthread_key_t key, const void *value) {
+    if (key < g_counter) {
+        g_key_values[key] = (void *) value;
+    }
+    return 0;
+}
 
 // Workaround LTO bug: https://github.com/llvm/llvm-project/issues/61101
 #if defined(__i386__)

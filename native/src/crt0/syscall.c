@@ -28,7 +28,6 @@ __asm__(".global " #from " \n " #from " = " #to)
 SYMBOL_ALIAS(name, sys_##name)
 
 EXPORT_SYMBOL(_exit);
-EXPORT_SYMBOL(open);
 EXPORT_SYMBOL(openat);
 EXPORT_SYMBOL(close);
 EXPORT_SYMBOL(read);
@@ -202,4 +201,21 @@ int faccessat(int dirfd, const char *pathname, int mode, int flags) {
     }
 
     return sys_faccessat(dirfd, pathname, mode);
+}
+
+int open(const char *pathname, int flags, ...) {
+    int mode = 0;
+
+    if (((flags & O_CREAT) == O_CREAT) || ((flags & O_TMPFILE) == O_TMPFILE)) {
+        va_list args;
+        va_start(args, flags);
+        mode = va_arg(args, int);
+        va_end(args);
+    }
+
+#if !defined(__LP64__)
+    flags |= O_LARGEFILE;
+#endif
+
+    return sys_openat(AT_FDCWD, pathname, flags, mode);
 }
