@@ -8,14 +8,13 @@ APP_PLATFORM     := android-26
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := none
 
-# magiskinit uses crt0
-ifdef B_INIT
+ifdef B_CRT0
 
 # Disable all security and debugging features
 APP_CFLAGS       +=	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-protector -U_FORTIFY_SOURCE
 APP_LDFLAGS		 += -Wl,-wrap,abort_message
 # Override output folder to make sure all dependencies are rebuilt with new CFLAGS
-NDK_APP_OUT      := ./obj/init
+NDK_APP_OUT      := ./obj/nolibc
 
 endif
 

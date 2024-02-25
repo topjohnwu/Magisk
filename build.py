@@ -421,6 +421,7 @@ def build_binary(args):
 
     if "magiskinit" in args.target:
         flag += " B_INIT=1"
+        flag += " B_CRT0=1"
 
     if flag:
         dump_bin_header(args)

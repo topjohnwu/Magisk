@@ -59,13 +59,9 @@ endif
 
 ifdef B_INIT
 
-# -lc -lm is hardcoded in this variable, disable it
-TARGET_LDLIBS :=
-
 include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := \
-    crt0 \
     libbase \
     libpolicy \
     libxz \
@@ -79,6 +75,14 @@ LOCAL_SRC_FILES := \
     init/twostage.cpp \
     init/selinux.cpp \
     init/init-rs.cpp
+
+LOCAL_LDFLAGS := -static
+
+ifdef B_CRT0
+# -lc -lm is hardcoded in this variable, disable it
+TARGET_LDLIBS :=
+LOCAL_STATIC_LIBRARIES += crt0
+endif
 
 include $(BUILD_EXECUTABLE)
 
