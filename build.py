@@ -556,27 +556,6 @@ def setup_ndk(args):
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
 
-    header("* Patching static libs")
-    for target in ["arm-linux-androideabi", "i686-linux-android"]:
-        arch = target.split("-")[0]
-        lib_dir = op.join(
-            ndk_path,
-            "toolchains",
-            "llvm",
-            "prebuilt",
-            f"{os_name}-x86_64",
-            "sysroot",
-            "usr",
-            "lib",
-            f"{target}",
-            "23",
-        )
-        if not op.exists(lib_dir):
-            continue
-        src_dir = op.join("tools", "ndk-bins", arch)
-        rm(op.join(src_dir, ".DS_Store"))
-        shutil.copytree(src_dir, lib_dir, copy_function=cp, dirs_exist_ok=True)
-
 
 def push_files(args, script):
     abi = cmd_out([adb_path, "shell", "getprop", "ro.product.cpu.abi"])
