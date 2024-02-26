@@ -8,7 +8,6 @@ typedef struct file_ptr_t {
     void *cookie;
     int (*read_fn)(void*, char*, int);
     int (*write_fn)(void*, const char*, int);
-    fpos_t (*seek_fn)(void*, fpos_t, int);
     int (*close_fn)(void*);
 } file_ptr_t;
 
@@ -22,11 +21,6 @@ static int fp_write_fn(void *p, const char *buf, int sz) {
     return write(fd, buf, sz);
 }
 
-static fpos_t fp_seek_fn(void *p, fpos_t pos, int whence) {
-    intptr_t fd = (intptr_t) p;
-    return lseek(fd, pos, whence);
-}
-
 static int fp_close_fn(void *p) {
     intptr_t fd = (intptr_t) p;
     return close(fd);
@@ -37,7 +31,6 @@ static void set_fp_fd(file_ptr_t *fp, int fd) {
     fp->cookie = NULL;
     fp->read_fn = fp_read_fn;
     fp->write_fn = fp_write_fn;
-    fp->seek_fn = fp_seek_fn;
     fp->close_fn = fp_close_fn;
 }
 
@@ -69,17 +62,16 @@ FILE *funopen(const void* cookie,
     fp->cookie = (void *) cookie;
     fp->read_fn = read_fn;
     fp->write_fn = write_fn;
-    fp->seek_fn = seek_fn;
     fp->close_fn = close_fn;
     return (FILE *) fp;
 }
 
-#define fn_arg (fp->fd > 0 ? (void*)(intptr_t) fp->fd : fp->cookie)
+#define fn_arg (fp->fd < 0 ? fp->cookie : ((void*)(intptr_t) fp->fd))
 
 int fclose(FILE *stream) {
     file_ptr_t *fp = (file_ptr_t *) stream;
     int ret = fp->close_fn(fn_arg);
-    free(stream);
+    free(fp);
     return ret;
 }
 
@@ -96,8 +88,9 @@ int fputc(int ch, FILE *stream) {
 
 size_t fwrite(const void* buf, size_t size, size_t count, FILE* stream) {
     file_ptr_t *fp = (file_ptr_t *) stream;
-    int ret = fp->write_fn(fn_arg, buf, size * count);
-    return ret >= 0 ? ret : 0;
+    int len = size * count;
+    int ret = fp->write_fn(fn_arg, buf, len);
+    return ret == len ? count : 0;
 }
 
 int fputs(const char* s, FILE* stream) {
@@ -117,8 +110,9 @@ int fgetc(FILE *stream) {
 
 size_t fread(void *buf, size_t size, size_t count, FILE* stream) {
     file_ptr_t *fp = (file_ptr_t *) stream;
-    int ret = fp->read_fn(fn_arg, buf, size * count);
-    return ret >= 0 ? ret : 0;
+    int len = size * count;
+    int ret = fp->read_fn(fn_arg, buf, len);
+    return ret == len ? count : 0;
 }
 
 void setbuf(FILE* fp, char* buf) {}
