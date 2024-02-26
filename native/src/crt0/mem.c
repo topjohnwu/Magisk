@@ -2,39 +2,78 @@
 #include <malloc.h>
 
 void *memset(void *dst, int ch, size_t n) {
-    return __builtin_memset(dst, ch, n);
+    uint8_t *d = dst;
+    uint8_t c = ch;
+    while (n--)
+        (*d++) = c;
+    return dst;
 }
 
 void *memmove(void *dst, const void *src, size_t n) {
-    return __builtin_memmove(dst, src, n);
+    return memcpy(dst, src, n);
 }
 
-void *memcpy(void *dst, const void *src, size_t size) {
-    return __builtin_memcpy(dst, src, size);
+void *memcpy(void *dst, const void *src, size_t n) {
+    uint8_t *d = dst;
+    const uint8_t *s = src;
+    while (n--)
+        *d++ = *s++;
+    return dst;
 }
 
 int memcmp(const void *lhs, const void *rhs, size_t n) {
-    return __builtin_memcmp(lhs, rhs, n);
+    const uint8_t *l = lhs;
+    const uint8_t *r = rhs;
+    while (n--) {
+        if (*l != *r) {
+            return *l - *r;
+        } else {
+            l++;
+            r++;
+        }
+    }
+    return 0;
 }
 
-void *memchr(const void *ptr, int ch, size_t count) {
-    return __builtin_memchr(ptr, ch, count);
+void *memchr(const void *ptr, int ch, size_t n) {
+    const uint8_t *p = ptr;
+    uint8_t c = ch;
+    while (n--) {
+        if (*p != c)
+            ++p;
+        else
+            return (void *) p;
+    }
+    return NULL;
 }
 
-char *strchr(const char *str, int ch) {
-    return __builtin_strchr(str, ch);
+char *strchr(const char *s, int ch) {
+    char c = ch;
+    while (*s != c)
+        if (!*s++)
+            return NULL;
+    return (char *) s;
 }
 
 int strcmp(const char *lhs, const char *rhs) {
-    return __builtin_strcmp(lhs, rhs);
+    while (*lhs && (*lhs == *rhs)) {
+        ++lhs;
+        ++rhs;
+    }
+    return *(uint8_t *)lhs - *(uint8_t *)rhs;
 }
 
 size_t strlen(const char *str) {
-    return __builtin_strlen(str);
+    size_t l = 0;
+    while (str[l])
+        ++l;
+    return l;
 }
 
 char *strcpy(char *restrict dest, const char *restrict src) {
-    return __builtin_strcpy(dest, src);
+    char *ret = dest;
+    while ((*dest++ = *src++)) {}
+    return ret;
 }
 
 char *strdup(const char *str) {
