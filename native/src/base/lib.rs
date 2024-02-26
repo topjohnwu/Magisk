@@ -32,6 +32,23 @@ pub mod ffi {
         Debug,
     }
 
+    #[cxx_name = "MountInfo"]
+    pub(crate) struct MountInfoCxx {
+        id: u32,
+        parent: u32,
+        device: u64,
+        root: String,
+        target: String,
+        vfs_option: String,
+        shared: u32,
+        master: u32,
+        propagation_from: u32,
+        unbindable: bool,
+        fs_type: String,
+        source: String,
+        fs_option: String,
+    }
+
     unsafe extern "C++" {
         include!("misc.hpp");
 
@@ -47,6 +64,8 @@ pub mod ffi {
         fn log_from_cxx(level: LogLevelCxx, msg: Utf8CStrRef);
         #[cxx_name = "set_log_level_state"]
         fn set_log_level_state_cxx(level: LogLevelCxx, enabled: bool);
+        #[cxx_name = "parse_mount_info"]
+        fn parse_mount_info_for_cxx(path: Utf8CStrRef) -> Vec<MountInfoCxx>;
         fn exit_on_error(b: bool);
         fn cmdline_logging();
         fn resize_vec(vec: &mut Vec<u8>, size: usize);

@@ -20,7 +20,7 @@ bool zygisk_enabled = false;
  * Setup *
  *********/
 
-static bool rec_mount(const std::string_view from, const std::string_view to) {
+static bool rec_mount(const string_view from, const string_view to) {
     return !xmkdirs(to.data(), 0755) &&
            // recursively bind mount to mirror dir, rootfs will fail before 3.12 kernel
            // because of MS_NOUSER
@@ -58,12 +58,13 @@ static void mount_mirrors() {
         ssprintf(path, sizeof(path), "%s/" PREINITMIRR, get_magisk_tmp());
         for (const auto &info: self_mount_info) {
             if (info.root == "/" && info.device == preinit_dev) {
-                auto flags = split_view(info.fs_option, ",");
-                auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+                const string_view fs_option{info.fs_option.data(), info.fs_option.size()};
+                auto flags = split_view(fs_option, ",");
+                auto rw = any_of(flags.begin(), flags.end(), [](const auto &flag) {
                     return flag == "rw"sv;
                 });
                 if (!rw) continue;
-                string preinit_dir = resolve_preinit_dir(info.target.data());
+                string preinit_dir = resolve_preinit_dir(string(info.target).data());
                 xmkdir(preinit_dir.data(), 0700);
                 if ((mounted = rec_mount(preinit_dir, path))) {
                     xmount(nullptr, path, nullptr, MS_UNBINDABLE, nullptr);
@@ -90,15 +91,16 @@ static void mount_mirrors() {
         // rootfs may fail, fallback to bind mount each mount point
         set<string, greater<>> mounted_dirs {{ get_magisk_tmp() }};
         for (const auto &info: self_mount_info) {
-            if (info.type == "rootfs"sv) continue;
+            const string_view target{info.target.data(), info.target.size()};
+            if (info.fs_type == "rootfs") continue;
             // the greatest mount point that less than info.target, which is possibly a parent
             if (auto last_mount = mounted_dirs.upper_bound(info.target);
-                last_mount != mounted_dirs.end() && info.target.starts_with(*last_mount + '/')) {
+                last_mount != mounted_dirs.end() && target.starts_with(*last_mount + '/')) {
                 continue;
             }
-            if (rec_mount(info.target, mirror_dir + info.target)) {
-                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + info.target).data(), info.target.data());
-                mounted_dirs.insert(info.target);
+            if (rec_mount(string(info.target), mirror_dir + string(target))) {
+                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + string(info.target)).data(), string(info.target).data());
+                mounted_dirs.emplace(target);
             }
         }
     }
@@ -125,47 +127,51 @@ string find_preinit_device() {
     dev_t preinit_dev;
 
     for (const auto &info: parse_mount_info("self")) {
-        if (info.target.ends_with(PREINITMIRR))
-            return basename(info.source.data());
-        if (info.root != "/" || info.source[0] != '/' || info.source.find("/dm-") != string::npos)
+        const string_view target{info.target.data(), info.target.size()};
+        const string_view source{info.source.data(), info.source.size()};
+        const string_view fs_option{info.fs_option.data(), info.fs_option.size()};
+        const string_view fs_type{info.fs_type.data(), info.fs_type.size()};
+        if (target.ends_with(PREINITMIRR))
+            return basename(string(info.source).data());
+        if (info.root != "/" || source[0] != '/' || source.find("/dm-") != string::npos)
             continue;
         // Skip all non ext4 partitions once we found a matching ext4 partition
-        if (ext4_type != UNKNOWN && info.type != "ext4")
+        if (ext4_type != UNKNOWN && fs_type != "ext4")
             continue;
-        if (info.type != "ext4" && info.type != "f2fs")
+        if (fs_type != "ext4" && fs_type != "f2fs")
             continue;
-        auto flags = split_view(info.fs_option, ",");
-        auto rw = std::any_of(flags.begin(), flags.end(), [](const auto &flag) {
+        auto flags = split_view(fs_option, ",");
+        auto rw = any_of(flags.begin(), flags.end(), [](const auto &flag) {
             return flag == "rw"sv;
         });
         if (!rw) continue;
-        if (auto base = std::string_view(info.source).substr(0, info.source.find_last_of('/'));
+        if (auto base = source.substr(0, source.find_last_of('/'));
             !base.ends_with("/by-name") && !base.ends_with("/block")) {
             continue;
         }
 
-        part_t &matched = (info.type == "f2fs") ? f2fs_type : ext4_type;
+        part_t &matched = (fs_type == "f2fs") ? f2fs_type : ext4_type;
         switch (matched) {
             case UNKNOWN:
-                if (info.target == "/persist" || info.target == "/mnt/vendor/persist") {
+                if (target == "/persist" || target == "/mnt/vendor/persist") {
                     matched = PERSIST;
                     break;
                 }
                 [[fallthrough]];
             case PERSIST:
-                if (info.target == "/metadata") {
+                if (target == "/metadata") {
                     matched = METADATA;
                     break;
                 }
                 [[fallthrough]];
             case METADATA:
-                if (info.target == "/cache") {
+                if (target == "/cache") {
                     matched = CACHE;
                     break;
                 }
                 [[fallthrough]];
             case CACHE:
-                if (info.target == "/data") {
+                if (target == "/data") {
                     if (!encrypted || access("/data/unencrypted", F_OK) == 0) {
                         matched = DATA;
                         break;
@@ -177,10 +183,10 @@ string find_preinit_device() {
         }
 
         if (mount) {
-            preinit_dir = resolve_preinit_dir(info.target.data());
+            preinit_dir = resolve_preinit_dir(string(info.target).data());
             preinit_dev = info.device;
         }
-        preinit_source = info.source;
+        preinit_source = source;
 
         // Cannot find any better partition, stop finding
         if (ext4_type == DATA)
@@ -276,7 +282,7 @@ static bool check_key_combo() {
     if (events.empty())
         return false;
 
-    run_finally fin([&]{ std::for_each(events.begin(), events.end(), close); });
+    run_finally fin([&]{ for_each(events.begin(), events.end(), close); });
 
     // Check if volume down key is held continuously for more than 3 seconds
     for (int i = 0; i < 300; ++i) {

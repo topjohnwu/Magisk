@@ -107,13 +107,14 @@ static void switch_root(const string &path) {
         if (info.target == "/" || info.target == path)
             continue;
         if (auto last_mount = mounts.upper_bound(info.target);
-                last_mount != mounts.end() && info.target.starts_with(*last_mount + '/')) {
+                last_mount != mounts.end() &&
+                std::string_view{info.target.data(), info.target.size()}.starts_with(*last_mount + '/')) {
             continue;
         }
         mounts.emplace(info.target);
-        auto new_path = path + info.target;
+        auto new_path = path + string(info.target);
         xmkdir(new_path.data(), 0755);
-        xmount(info.target.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
+        xmount(string(info.target).data(), new_path.data(), nullptr, MS_MOVE, nullptr);
     }
     chdir(path.data());
     xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
@@ -140,7 +141,7 @@ static void mount_preinit_dir(string preinit_dev) {
     for (auto &info : parse_mount_info("self")) {
         if (info.root == "/" && info.device == dev) {
             // Already mounted, just bind mount
-            xmount(info.target.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
+            xmount(string(info.target).data(), PREINITMNT, nullptr, MS_BIND, nullptr);
             mounted = true;
             break;
         }

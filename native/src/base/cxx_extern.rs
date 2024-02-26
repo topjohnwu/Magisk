@@ -3,9 +3,16 @@
 use std::io;
 use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 
+use crate::{
+    cxx_extern::io::BufReader,
+    ffi::{MountInfoCxx, Utf8CStrRef},
+    files::BufReadExt,
+    FsPathBuf, Utf8CStrBufArr,
+};
 use cfg_if::cfg_if;
 use cxx::private::c_char;
-use libc::mode_t;
+use libc::{makedev, mode_t, O_CLOEXEC, O_RDONLY};
+use std::{fs::File, os::fd::FromRawFd};
 
 use crate::logging::CxxResultExt;
 pub(crate) use crate::xwrap::*;
@@ -93,6 +100,74 @@ pub(crate) unsafe fn readlinkat_for_cxx(
         }
     }
     r
+}
+
+fn parse_mount_info_line(line: &str) -> Option<MountInfoCxx> {
+    let mut iter = line.split_whitespace();
+    let id = iter.next()?.parse().ok()?;
+    let parent = iter.next()?.parse().ok()?;
+    let (maj, min) = iter.next()?.split_once(":")?;
+    let maj = maj.parse().ok()?;
+    let min = min.parse().ok()?;
+    let device = makedev(maj, min).into();
+    let root = iter.next()?.to_string();
+    let target = iter.next()?.to_string();
+    let vfs_option = iter.next()?.to_string();
+    let mut optional = iter.next()?;
+    let mut shared = 0;
+    let mut master = 0;
+    let mut propagation_from = 0;
+    let mut unbindable = false;
+    while optional != "-" {
+        if let Some(peer) = optional.strip_prefix("master:") {
+            master = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("shared:") {
+            shared = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("propagate_from:") {
+            propagation_from = peer.parse().ok()?;
+        } else if optional == "unbindable" {
+            unbindable = true;
+        }
+        optional = iter.next()?;
+    }
+    let fs_type = iter.next()?.to_string();
+    let source = iter.next()?.to_string();
+    let fs_option = iter.next()?.to_string();
+    Some(MountInfoCxx {
+        id,
+        parent,
+        device,
+        root,
+        target,
+        vfs_option,
+        shared,
+        master,
+        propagation_from,
+        unbindable,
+        fs_type,
+        source,
+        fs_option,
+    })
+}
+
+pub(crate) fn parse_mount_info_for_cxx(path: Utf8CStrRef) -> Vec<MountInfoCxx> {
+    let mut res = vec![];
+    let mut buf = Utf8CStrBufArr::default();
+    let path = FsPathBuf::new(&mut buf)
+        .join("/proc/")
+        .join(path)
+        .join("/mountinfo");
+
+    let fd = unsafe { libc::open(path.as_ptr(), O_RDONLY | O_CLOEXEC) };
+    if fd > 0 {
+        let file = File::from(unsafe { OwnedFd::from_raw_fd(fd) });
+        BufReader::new(file).foreach_lines(|line| {
+            parse_mount_info_line(line)
+                .map(|info| res.push(info))
+                .is_some()
+        });
+    }
+    res
 }
 
 #[export_name = "cp_afc"]

@@ -20,23 +20,6 @@ static inline T align_padding(T v, int a) {
     return align_to(v, a) - v;
 }
 
-struct mount_info {
-    unsigned int id;
-    unsigned int parent;
-    dev_t device;
-    std::string root;
-    std::string target;
-    std::string vfs_option;
-    struct {
-        unsigned int shared;
-        unsigned int master;
-        unsigned int propagate_from;
-    } optional;
-    std::string type;
-    std::string source;
-    std::string fs_option;
-};
-
 struct mmap_data : public byte_data {
     static_assert((sizeof(void *) == 8 && BLKGETSIZE64 == 0x80081272) ||
                   (sizeof(void *) == 4 && BLKGETSIZE64 == 0x80041272));
@@ -77,7 +60,6 @@ void file_readline(const char *file, const std::function<bool(std::string_view)>
 void parse_prop_file(FILE *fp, const std::function<bool(std::string_view, std::string_view)> &fn);
 void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
-std::vector<mount_info> parse_mount_info(const char *pid);
 std::string resolve_preinit_dir(const char *base_dir);
 
 using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
