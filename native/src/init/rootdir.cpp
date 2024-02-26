@@ -77,24 +77,7 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         rc_list.clear();
 
         // Inject Magisk rc scripts
-        LOGD("Inject magisk rc\n");
-        fprintf(dest.get(), R"EOF(
-on post-fs-data
-    start logd
-    exec %2$s 0 0 -- %1$s/magisk --post-fs-data
-
-on property:vold.decrypt=trigger_restart_framework
-    exec %2$s 0 0 -- %1$s/magisk --service
-
-on nonencrypted
-    exec %2$s 0 0 -- %1$s/magisk --service
-
-on property:sys.boot_completed=1
-    exec %2$s 0 0 -- %1$s/magisk --boot-complete
-
-on property:init.svc.zygote=stopped
-    exec %2$s 0 0 -- %1$s/magisk --zygote-restart
-)EOF", tmp_path, MAGISK_PROC_CON);
+        rust::inject_magisk_rc(fileno(dest.get()), tmp_path);
 
         fclone_attr(fileno(src.get()), fileno(dest.get()));
     }
