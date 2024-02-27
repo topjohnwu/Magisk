@@ -100,29 +100,6 @@ static dev_t setup_block() {
     return 0;
 }
 
-static void switch_root(const string &path) {
-    LOGD("Switch root to %s\n", path.data());
-    int root = xopen("/", O_RDONLY);
-    for (set<string, greater<>> mounts; auto &info : parse_mount_info("self")) {
-        if (info.target == "/" || info.target == path)
-            continue;
-        if (auto last_mount = mounts.upper_bound(info.target);
-                last_mount != mounts.end() && info.target.starts_with(*last_mount + '/')) {
-            continue;
-        }
-        mounts.emplace(info.target);
-        auto new_path = path + info.target;
-        xmkdir(new_path.data(), 0755);
-        xmount(info.target.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
-    }
-    chdir(path.data());
-    xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
-    chroot(".");
-
-    LOGD("Cleaning rootfs\n");
-    frm_rf(root);
-}
-
 #define PREINITMNT MIRRDIR "/preinit"
 
 static void mount_preinit_dir(string preinit_dev) {
@@ -137,13 +114,11 @@ static void mount_preinit_dir(string preinit_dev) {
     xmkdir(PREINITMNT, 0);
     bool mounted = false;
     // First, find if it is already mounted
-    for (auto &info : parse_mount_info("self")) {
-        if (info.root == "/" && info.device == dev) {
-            // Already mounted, just bind mount
-            xmount(info.target.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
-            mounted = true;
-            break;
-        }
+    rust::Vec<uint8_t> mnt_point;
+    if (rust::is_device_mounted(dev, mnt_point)) {
+        // Already mounted, just bind mount
+        xmount((const char *) mnt_point.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
+        mounted = true;
     }
 
     // Since we are mounting the block device directly, make sure to ONLY mount the partitions
@@ -212,7 +187,7 @@ mount_root:
         }
     }
 
-    switch_root("/system_root");
+    rust::switch_root("/system_root");
 
     // Make dev writable
     xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
