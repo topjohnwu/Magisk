@@ -1,62 +1,134 @@
-use std::collections::BTreeSet;
-use std::ops::Bound::{Excluded, Unbounded};
-use std::path::{Path, PathBuf};
-use std::{fs, ptr};
-
-use procfs::process::Process;
-
 use base::{
-    cstr, debug, libc, raw_cstr, Directory, LibcReturn, LoggedError, LoggedResult, StringExt,
-    Utf8CStr,
+    cstr, debug,
+    libc::{chdir, chroot, makedev, mount, MS_MOVE},
+    raw_cstr, BufReadExt, Directory, LibcReturn, LoggedResult, StringExt, Utf8CStr,
 };
+use cxx::CxxString;
+use std::{
+    collections::BTreeSet,
+    fs::File,
+    io::BufReader,
+    ops::Bound::{Excluded, Unbounded},
+    pin::Pin,
+    ptr::null as nullptr,
+};
+
+#[allow(dead_code)]
+struct MountInfo {
+    id: u32,
+    parent: u32,
+    device: u64,
+    root: String,
+    target: String,
+    vfs_option: String,
+    shared: u32,
+    master: u32,
+    propagation_from: u32,
+    unbindable: bool,
+    fs_type: String,
+    source: String,
+    fs_option: String,
+}
+
+fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
+    let mut iter = line.split_whitespace();
+    let id = iter.next()?.parse().ok()?;
+    let parent = iter.next()?.parse().ok()?;
+    let (maj, min) = iter.next()?.split_once(":")?;
+    let maj = maj.parse().ok()?;
+    let min = min.parse().ok()?;
+    let device = makedev(maj, min).into();
+    let root = iter.next()?.to_string();
+    let target = iter.next()?.to_string();
+    let vfs_option = iter.next()?.to_string();
+    let mut optional = iter.next()?;
+    let mut shared = 0;
+    let mut master = 0;
+    let mut propagation_from = 0;
+    let mut unbindable = false;
+    while optional != "-" {
+        if let Some(peer) = optional.strip_prefix("master:") {
+            master = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("shared:") {
+            shared = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("propagate_from:") {
+            propagation_from = peer.parse().ok()?;
+        } else if optional == "unbindable" {
+            unbindable = true;
+        }
+        optional = iter.next()?;
+    }
+    let fs_type = iter.next()?.to_string();
+    let source = iter.next()?.to_string();
+    let fs_option = iter.next()?.to_string();
+    Some(MountInfo {
+        id,
+        parent,
+        device,
+        root,
+        target,
+        vfs_option,
+        shared,
+        master,
+        propagation_from,
+        unbindable,
+        fs_type,
+        source,
+        fs_option,
+    })
+}
+
+fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
+    let mut res = vec![];
+
+    if let Ok(file) = File::open(format!("/proc/{}/mountinfo", pid)) {
+        BufReader::new(file).foreach_lines(|line| {
+            parse_mount_info_line(line)
+                .map(|info| res.push(info))
+                .is_some()
+        });
+    }
+    res
+}
 
 pub fn switch_root(path: &Utf8CStr) {
     fn inner(path: &Utf8CStr) -> LoggedResult<()> {
-        debug!("Switching root to {}", path);
+        debug!("Switch root to {}", path);
+        let mut mounts = BTreeSet::new();
         let mut rootfs = Directory::open(cstr!("/"))?;
-
-        let procfs = Process::myself()?;
-        let mut mounts: BTreeSet<PathBuf> = BTreeSet::new();
-        for info in procfs.mountinfo()?.0.into_iter() {
-            let mut target = info.mount_point;
-            if target == Path::new("/") || target == Path::new(path) {
+        for info in parse_mount_info("self") {
+            if info.target == "/" || info.target.as_str() == path.as_str() {
                 continue;
             }
-            let iter = mounts.range::<Path, _>((Unbounded, Excluded(target.as_path())));
-            if let Some(last_mount) = iter.last() {
-                if Path::new(path).starts_with(last_mount) {
+            if let Some(last_mount) = mounts
+                .range::<String, _>((Unbounded, Excluded(&info.target)))
+                .last()
+            {
+                if info.target.starts_with(&format!("{}/", *last_mount)) {
                     continue;
                 }
             }
-            let mut new_path = PathBuf::from(path);
-            new_path.push(target.strip_prefix("/").unwrap());
-            fs::create_dir(&new_path).ok(); /* Error is OK */
+            let mut new_path = format!("{}/{}", path.as_str(), &info.target);
+            std::fs::create_dir(&new_path).ok();
+
             unsafe {
-                libc::mount(
+                let mut target = info.target.clone();
+                mount(
                     target.nul_terminate().as_ptr().cast(),
                     new_path.nul_terminate().as_ptr().cast(),
-                    ptr::null(),
-                    libc::MS_MOVE,
-                    ptr::null(),
+                    nullptr(),
+                    MS_MOVE,
+                    nullptr(),
                 )
                 .as_os_err()?;
             }
 
-            // Record all moved paths
-            mounts.insert(target);
+            mounts.insert(info.target);
         }
-
         unsafe {
-            libc::chdir(path.as_ptr()).as_os_err()?;
-            libc::mount(
-                path.as_ptr(),
-                raw_cstr!("/"),
-                ptr::null(),
-                libc::MS_MOVE,
-                ptr::null(),
-            )
-            .as_os_err()?;
-            libc::chroot(raw_cstr!(".")).as_os_err()?;
+            chdir(path.as_ptr()).as_os_err()?;
+            mount(path.as_ptr(), raw_cstr!("/"), nullptr(), MS_MOVE, nullptr()).as_os_err()?;
+            chroot(raw_cstr!("."));
         }
 
         debug!("Cleaning rootfs");
@@ -66,28 +138,12 @@ pub fn switch_root(path: &Utf8CStr) {
     inner(path).ok();
 }
 
-pub fn is_device_mounted(dev: u64, mnt_point: &mut Vec<u8>) -> bool {
-    fn inner(dev: u64, mount_point: &mut Vec<u8>) -> LoggedResult<()> {
-        let procfs = Process::myself()?;
-        for mut info in procfs.mountinfo()?.0 {
-            if info.root != "/" {
-                continue;
-            }
-            let mut iter = info.majmin.split(':').map(|s| s.parse::<u32>());
-            let maj = match iter.next() {
-                Some(Ok(s)) => s,
-                _ => continue,
-            };
-            let min = match iter.next() {
-                Some(Ok(s)) => s,
-                _ => continue,
-            };
-            if dev == libc::makedev(maj, min).into() {
-                *mount_point = info.mount_point.nul_terminate().to_vec();
-                return Ok(());
-            }
+pub fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool {
+    for mount in parse_mount_info("self") {
+        if mount.root == "/" && mount.device == dev {
+            target.push_str(&mount.target);
+            return true;
         }
-        Err(LoggedError::default())
     }
-    inner(dev, mnt_point).is_ok()
+    false
 }

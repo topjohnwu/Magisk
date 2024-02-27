@@ -114,10 +114,10 @@ static void mount_preinit_dir(string preinit_dev) {
     xmkdir(PREINITMNT, 0);
     bool mounted = false;
     // First, find if it is already mounted
-    rust::Vec<uint8_t> mnt_point;
+    std::string mnt_point;
     if (rust::is_device_mounted(dev, mnt_point)) {
         // Already mounted, just bind mount
-        xmount((const char *) mnt_point.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
+        xmount(mnt_point.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
         mounted = true;
     }
 
