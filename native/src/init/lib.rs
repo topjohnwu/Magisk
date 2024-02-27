@@ -17,7 +17,7 @@ pub mod ffi {
         fn setup_klog();
         fn inject_magisk_rc(fd: i32, tmp_dir: Utf8CStrRef);
         fn switch_root(path: Utf8CStrRef);
-        fn is_device_mounted(dev: u64, mnt_point: &mut Vec<u8>) -> bool;
+        fn is_device_mounted(dev: u64, target: Pin<&mut CxxString>) -> bool;
     }
 
     unsafe extern "C++" {

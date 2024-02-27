@@ -14,4 +14,3 @@ cxx-gen = { workspace = true }
 base = { path = "../base" }
 magiskpolicy = { path = "../sepolicy" }
 cxx = { workspace = true }
-procfs = { workspace = true }

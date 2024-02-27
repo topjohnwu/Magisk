@@ -23,7 +23,6 @@ x509-cert = "0.2"
 der = "0.7"
 bytemuck = "1.14"
 fdt = "0.1"
-procfs = { version = "0.16", default-features = false }
 
 [workspace.dependencies.argh]
 git = "https://github.com/google/argh.git"
