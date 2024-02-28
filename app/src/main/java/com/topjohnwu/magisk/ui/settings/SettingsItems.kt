@@ -228,7 +228,6 @@ object Zygisk : BaseSettingsItem.Toggle() {
         set(value) {
             Config.zygisk = value
             DenyList.isEnabled = value
-            DenyListConfig.isEnabled = value
             notifyPropertyChanged(BR.description)
             DenyList.notifyPropertyChanged(BR.description)
         }
@@ -269,9 +268,6 @@ object DenyList : BaseSettingsItem.Toggle() {
 object DenyListConfig : BaseSettingsItem.Blank() {
     override val title = R.string.settings_denylist_config_title.asText()
     override val description = R.string.settings_denylist_config_summary.asText()
-    override fun refresh() {
-        isEnabled = Zygisk.value
-    }
 }
 
 // --- Superuser
