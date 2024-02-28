@@ -661,7 +661,7 @@ void decompress(char *infile, const char *outfile) {
             }
 
             FILE *out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
-            strm = get_decoder(type, make_unique<fp_channel>(out_fp));
+            strm = get_decoder(type, make_unique<fp_stream>(out_fp));
             if (ext) *ext = '.';
         }
         if (!strm->write(buf, len))
@@ -702,7 +702,7 @@ void compress(const char *method, const char *infile, const char *outfile) {
         out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
     }
 
-    auto strm = get_encoder(fmt, make_unique<fp_channel>(out_fp));
+    auto strm = get_encoder(fmt, make_unique<fp_stream>(out_fp));
 
     char buf[4096];
     size_t len;
@@ -726,7 +726,7 @@ bool decompress(rust::Slice<const uint8_t> buf, int fd) {
         return false;
     }
 
-    auto strm = get_decoder(type, make_unique<fd_channel>(fd));
+    auto strm = get_decoder(type, make_unique<fd_stream>(fd));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }
@@ -734,7 +734,7 @@ bool decompress(rust::Slice<const uint8_t> buf, int fd) {
 }
 
 bool xz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
-    auto strm = get_encoder(XZ, make_unique<rust_vec_channel>(out));
+    auto strm = get_encoder(XZ, make_unique<rust_vec_stream>(out));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }
@@ -747,7 +747,7 @@ bool unxz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
         LOGE("Input file is not in xz format!\n");
         return false;
     }
-    auto strm = get_decoder(XZ, make_unique<rust_vec_channel>(out));
+    auto strm = get_decoder(XZ, make_unique<rust_vec_stream>(out));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }

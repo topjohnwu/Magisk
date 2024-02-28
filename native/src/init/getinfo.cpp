@@ -220,7 +220,7 @@ bool check_two_stage() {
 void unxz_init(const char *init_xz, const char *init) {
     LOGD("unxz %s -> %s\n", init_xz, init);
     int fd = xopen(init, O_WRONLY | O_CREAT, 0777);
-    fd_channel ch(fd);
+    fd_stream ch(fd);
     unxz(ch, mmap_data{init_xz});
     close(fd);
     clone_attr(init_xz, init);

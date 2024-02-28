@@ -53,22 +53,20 @@ struct in_stream {
     virtual ~in_stream() = default;
 };
 
-// A channel is something that is writable, readable, and seekable
-struct channel : public out_stream, public in_stream {
-    virtual off_t seek(off_t off, int whence) = 0;
-    virtual ~channel() = default;
+// A stream is something that is writable and readable
+struct stream : public out_stream, public in_stream {
+    virtual ~stream() = default;
 };
 
-using channel_ptr = std::unique_ptr<channel>;
+using stream_ptr = std::unique_ptr<stream>;
 
-// Byte channel that dynamically allocates memory
-class byte_channel : public channel {
+// Byte stream that dynamically allocates memory
+class byte_stream : public stream {
 public:
-    byte_channel(heap_data &data) : _data(data) {}
+    byte_stream(heap_data &data) : _data(data) {}
 
     ssize_t read(void *buf, size_t len) override;
     bool write(const void *buf, size_t len) override;
-    off_t seek(off_t off, int whence) override;
 
 private:
     heap_data &_data;
@@ -78,13 +76,12 @@ private:
     void resize(size_t new_sz, bool zero = false);
 };
 
-class rust_vec_channel : public channel {
+class rust_vec_stream : public stream {
 public:
-    rust_vec_channel(rust::Vec<uint8_t> &data) : _data(data) {}
+    rust_vec_stream(rust::Vec<uint8_t> &data) : _data(data) {}
 
     ssize_t read(void *buf, size_t len) override;
     bool write(const void *buf, size_t len) override;
-    off_t seek(off_t off, int whence) override;
 
 private:
     rust::Vec<uint8_t> &_data;
@@ -93,21 +90,20 @@ private:
     void ensure_size(size_t sz, bool zero = false);
 };
 
-class file_channel : public channel {
+class file_stream : public stream {
 public:
     bool write(const void *buf, size_t len) final;
 protected:
     virtual ssize_t do_write(const void *buf, size_t len) = 0;
 };
 
-// File channel but does not close the file descriptor at any time
-class fd_channel : public file_channel {
+// File stream but does not close the file descriptor at any time
+class fd_stream : public file_stream {
 public:
-    fd_channel(int fd) : fd(fd) {}
+    fd_stream(int fd) : fd(fd) {}
     ssize_t read(void *buf, size_t len) override;
     ssize_t readv(const iovec *iov, int iovcnt) override;
     ssize_t writev(const iovec *iov, int iovcnt) override;
-    off_t seek(off_t off, int whence) override;
 protected:
     ssize_t do_write(const void *buf, size_t len) override;
 private:
@@ -115,26 +111,25 @@ private:
 };
 
 /* ****************************************
- * Bridge between channel class and C stdio
+ * Bridge between stream class and C stdio
  * ****************************************/
 
-// sFILE -> channel_ptr
-class fp_channel final : public file_channel {
+// sFILE -> stream_ptr
+class fp_stream final : public file_stream {
 public:
-    fp_channel(FILE *fp = nullptr) : fp(fp, fclose) {}
-    fp_channel(sFILE &&fp) : fp(std::move(fp)) {}
+    fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
+    fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
     ssize_t read(void *buf, size_t len) override;
-    off_t seek(off_t off, int whence) override;
 protected:
     ssize_t do_write(const void *buf, size_t len) override;
 private:
     sFILE fp;
 };
 
-// channel_ptr -> sFILE
-sFILE make_channel_fp(channel_ptr &&strm);
+// stream_ptr -> sFILE
+sFILE make_stream_fp(stream_ptr &&strm);
 
 template <class T, class... Args>
-sFILE make_channel_fp(Args &&... args) {
-    return make_channel_fp(channel_ptr(new T(std::forward<Args>(args)...)));
+sFILE make_stream_fp(Args &&... args) {
+    return make_stream_fp(stream_ptr(new T(std::forward<Args>(args)...)));
 }
