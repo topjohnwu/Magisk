@@ -6,9 +6,13 @@
 
 #include "../files.hpp"
 
+#define ENABLE_IOV 0
+
 struct out_stream {
     virtual bool write(const void *buf, size_t len) = 0;
+#if ENABLE_IOV
     virtual ssize_t writev(const iovec *iov, int iovcnt);
+#endif
     virtual ~out_stream() = default;
 };
 
@@ -48,8 +52,10 @@ private:
 
 struct in_stream {
     virtual ssize_t read(void *buf, size_t len) = 0;
-    virtual ssize_t readFully(void *buf, size_t len);
+    ssize_t readFully(void *buf, size_t len);
+#if ENABLE_IOV
     virtual ssize_t readv(const iovec *iov, int iovcnt);
+#endif
     virtual ~in_stream() = default;
 };
 
@@ -102,8 +108,10 @@ class fd_stream : public file_stream {
 public:
     fd_stream(int fd) : fd(fd) {}
     ssize_t read(void *buf, size_t len) override;
+#if ENABLE_IOV
     ssize_t readv(const iovec *iov, int iovcnt) override;
     ssize_t writev(const iovec *iov, int iovcnt) override;
+#endif
 protected:
     ssize_t do_write(const void *buf, size_t len) override;
 private:

@@ -45,27 +45,6 @@ ssize_t in_stream::readFully(void *buf, size_t len) {
     return read_sz;
 }
 
-ssize_t in_stream::readv(const iovec *iov, int iovcnt) {
-    size_t read_sz = 0;
-    for (int i = 0; i < iovcnt; ++i) {
-        auto ret = readFully(iov[i].iov_base, iov[i].iov_len);
-        if (ret < 0)
-            return ret;
-        read_sz += ret;
-    }
-    return read_sz;
-}
-
-ssize_t out_stream::writev(const iovec *iov, int iovcnt) {
-    size_t write_sz = 0;
-    for (int i = 0; i < iovcnt; ++i) {
-        if (!write(iov[i].iov_base, iov[i].iov_len))
-            return write_sz;
-        write_sz += iov[i].iov_len;
-    }
-    return write_sz;
-}
-
 ssize_t fp_stream::read(void *buf, size_t len) {
     auto ret = fread(buf, 1, len, fp.get());
     return ret ? ret : (ferror(fp.get()) ? -1 : 0);
@@ -178,16 +157,8 @@ ssize_t fd_stream::read(void *buf, size_t len) {
     return ::read(fd, buf, len);
 }
 
-ssize_t fd_stream::readv(const iovec *iov, int iovcnt) {
-    return ::readv(fd, iov, iovcnt);
-}
-
 ssize_t fd_stream::do_write(const void *buf, size_t len) {
     return ::write(fd, buf, len);
-}
-
-ssize_t fd_stream::writev(const iovec *iov, int iovcnt) {
-    return ::writev(fd, iov, iovcnt);
 }
 
 bool file_stream::write(const void *buf, size_t len) {
@@ -204,3 +175,36 @@ bool file_stream::write(const void *buf, size_t len) {
     } while (write_sz != len && ret != 0);
     return true;
 }
+
+#if ENABLE_IOV
+
+ssize_t in_stream::readv(const iovec *iov, int iovcnt) {
+    size_t read_sz = 0;
+    for (int i = 0; i < iovcnt; ++i) {
+        auto ret = readFully(iov[i].iov_base, iov[i].iov_len);
+        if (ret < 0)
+            return ret;
+        read_sz += ret;
+    }
+    return read_sz;
+}
+
+ssize_t out_stream::writev(const iovec *iov, int iovcnt) {
+    size_t write_sz = 0;
+    for (int i = 0; i < iovcnt; ++i) {
+        if (!write(iov[i].iov_base, iov[i].iov_len))
+            return write_sz;
+        write_sz += iov[i].iov_len;
+    }
+    return write_sz;
+}
+
+ssize_t fd_stream::readv(const iovec *iov, int iovcnt) {
+    return ::readv(fd, iov, iovcnt);
+}
+
+ssize_t fd_stream::writev(const iovec *iov, int iovcnt) {
+    return ::writev(fd, iov, iovcnt);
+}
+
+#endif // ENABLE_IOV
