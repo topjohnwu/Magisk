@@ -617,7 +617,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                         return Err(log_err!("invalid arguments"));
                     }
                     cpio.extract(
-                        paths.get(0).map(|x| x.as_str()),
+                        paths.first().map(|x| x.as_str()),
                         paths.get(1).map(|x| x.as_str()),
                     )?;
                 }
