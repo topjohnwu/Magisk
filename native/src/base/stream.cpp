@@ -45,15 +45,6 @@ ssize_t in_stream::readFully(void *buf, size_t len) {
     return read_sz;
 }
 
-ssize_t fp_stream::read(void *buf, size_t len) {
-    auto ret = fread(buf, 1, len, fp.get());
-    return ret ? ret : (ferror(fp.get()) ? -1 : 0);
-}
-
-ssize_t fp_stream::do_write(const void *buf, size_t len) {
-    return fwrite(buf, 1, len, fp.get());
-}
-
 bool filter_out_stream::write(const void *buf, size_t len) {
     return base->write(buf, len);
 }

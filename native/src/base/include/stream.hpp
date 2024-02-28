@@ -60,9 +60,7 @@ struct in_stream {
 };
 
 // A stream is something that is writable and readable
-struct stream : public out_stream, public in_stream {
-    virtual ~stream() = default;
-};
+struct stream : public out_stream, public in_stream {};
 
 using stream_ptr = std::unique_ptr<stream>;
 
@@ -121,18 +119,6 @@ private:
 /* ****************************************
  * Bridge between stream class and C stdio
  * ****************************************/
-
-// sFILE -> stream_ptr
-class fp_stream final : public file_stream {
-public:
-    fp_stream(FILE *fp = nullptr) : fp(fp, fclose) {}
-    fp_stream(sFILE &&fp) : fp(std::move(fp)) {}
-    ssize_t read(void *buf, size_t len) override;
-protected:
-    ssize_t do_write(const void *buf, size_t len) override;
-private:
-    sFILE fp;
-};
 
 // stream_ptr -> sFILE
 sFILE make_stream_fp(stream_ptr &&strm);
