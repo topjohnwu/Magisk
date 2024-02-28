@@ -1,95 +1,17 @@
-use base::{
-    cstr, debug,
-    libc::{chdir, chroot, makedev, mount, MS_MOVE},
-    raw_cstr, BufReadExt, Directory, LibcReturn, LoggedResult, StringExt, Utf8CStr,
-};
-use cxx::CxxString;
 use std::{
     collections::BTreeSet,
-    fs::File,
-    io::BufReader,
     ops::Bound::{Excluded, Unbounded},
     pin::Pin,
     ptr::null as nullptr,
 };
 
-#[allow(dead_code)]
-struct MountInfo {
-    id: u32,
-    parent: u32,
-    device: u64,
-    root: String,
-    target: String,
-    vfs_option: String,
-    shared: u32,
-    master: u32,
-    propagation_from: u32,
-    unbindable: bool,
-    fs_type: String,
-    source: String,
-    fs_option: String,
-}
+use cxx::CxxString;
 
-fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
-    let mut iter = line.split_whitespace();
-    let id = iter.next()?.parse().ok()?;
-    let parent = iter.next()?.parse().ok()?;
-    let (maj, min) = iter.next()?.split_once(":")?;
-    let maj = maj.parse().ok()?;
-    let min = min.parse().ok()?;
-    let device = makedev(maj, min).into();
-    let root = iter.next()?.to_string();
-    let target = iter.next()?.to_string();
-    let vfs_option = iter.next()?.to_string();
-    let mut optional = iter.next()?;
-    let mut shared = 0;
-    let mut master = 0;
-    let mut propagation_from = 0;
-    let mut unbindable = false;
-    while optional != "-" {
-        if let Some(peer) = optional.strip_prefix("master:") {
-            master = peer.parse().ok()?;
-        } else if let Some(peer) = optional.strip_prefix("shared:") {
-            shared = peer.parse().ok()?;
-        } else if let Some(peer) = optional.strip_prefix("propagate_from:") {
-            propagation_from = peer.parse().ok()?;
-        } else if optional == "unbindable" {
-            unbindable = true;
-        }
-        optional = iter.next()?;
-    }
-    let fs_type = iter.next()?.to_string();
-    let source = iter.next()?.to_string();
-    let fs_option = iter.next()?.to_string();
-    Some(MountInfo {
-        id,
-        parent,
-        device,
-        root,
-        target,
-        vfs_option,
-        shared,
-        master,
-        propagation_from,
-        unbindable,
-        fs_type,
-        source,
-        fs_option,
-    })
-}
-
-fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
-    let mut res = vec![];
-
-    if let Ok(file) = File::open(format!("/proc/{}/mountinfo", pid)) {
-        BufReader::new(file).foreach_lines(|line| {
-            parse_mount_info_line(line)
-                .map(|info| res.push(info))
-                .is_some()
-        });
-    }
-    res
-}
+use base::{
+    cstr, debug,
+    libc::{chdir, chroot, mount, MS_MOVE},
+    parse_mount_info, raw_cstr, Directory, LibcReturn, LoggedResult, StringExt, Utf8CStr,
+};
 
 pub fn switch_root(path: &Utf8CStr) {
     fn inner(path: &Utf8CStr) -> LoggedResult<()> {
