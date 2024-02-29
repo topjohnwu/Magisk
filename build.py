@@ -400,31 +400,27 @@ def build_binary(args):
         flag += " B_POLICY=1"
         clean = True
 
-    if "test" in args.target:
-        flag += " B_TEST=1"
-
     if "magiskinit" in args.target:
         flag += " B_PRELOAD=1"
 
     if "resetprop" in args.target:
         flag += " B_PROP=1"
 
-    if "magiskboot" in args.target:
-        flag += " B_BOOT=1"
-
     if flag:
         run_ndk_build(flag)
-
-    # magiskinit embeds preload.so
 
     flag = ""
 
     if "magiskinit" in args.target:
+        # magiskinit embeds preload.so
+        dump_bin_header(args)
         flag += " B_INIT=1"
-        flag += " B_CRT0=1"
+
+    if "magiskboot" in args.target:
+        flag += " B_BOOT=1"
 
     if flag:
-        dump_bin_header(args)
+        flag += " B_CRT0=1"
         run_ndk_build(flag)
 
     if clean:

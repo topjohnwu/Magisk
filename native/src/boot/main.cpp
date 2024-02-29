@@ -6,6 +6,11 @@
 
 using namespace std;
 
+#ifdef USE_MUSL_PRINTF
+// Switch to use the musl vfprintf
+__asm__(".global vfprintf \n vfprintf = musl_vfprintf");
+#endif
+
 static void print_formats() {
     for (int fmt = GZIP; fmt < LZOP; ++fmt) {
         fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
