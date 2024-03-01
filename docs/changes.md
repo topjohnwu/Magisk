@@ -10,7 +10,7 @@
 
 ### v26.4
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
+- [MagiskBootdocassemble_base/docassemble/base/functions.py Don't pad zeros if signed boot image is larger
 - [MagiskPolicy] Fix `genfscon` and `filename_trans`
 - [MagiskPolicy] Fix bug in `libsepol`
 - [Zygisk] Fix and simplify file descriptor sanitization logic
