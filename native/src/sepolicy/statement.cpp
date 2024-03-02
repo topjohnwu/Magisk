@@ -416,6 +416,7 @@ else if (strcmp(name, action) == 0) {   \
 #define add_action(act, type) add_action_func(#act, type, act)
 
 void sepolicy::parse_statement(rust::Str stmt) {
+    if (stmt.empty()) return;
     // strtok modify strings, create a copy
     string cpy(stmt.data(), stmt.length());
 
