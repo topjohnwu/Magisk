@@ -97,8 +97,8 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
             if (line.starts_with("service zygote ")) {
                 LOGD("Inject zygote restart\n");
                 fprintf(dest.get(), "%s", line.data());
-                fprintf(dest.get(), "    onrestart exec %2$s 0 0 -- %1$s/magisk --zygote-restart\n",
-                        tmp_path, MAGISK_PROC_CON);
+                fprintf(dest.get(),
+                        "    onrestart exec " MAGISK_PROC_CON " 0 0 -- %s/magisk --zygote-restart\n", tmp_path);
                 return true;
             }
             fprintf(dest.get(), "%s", line.data());
