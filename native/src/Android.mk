@@ -167,7 +167,6 @@ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
 LOCAL_SRC_FILES := \
     sepolicy/api.cpp \
     sepolicy/sepolicy.cpp \
-    sepolicy/rules.cpp \
     sepolicy/policydb.cpp \
     sepolicy/statement.cpp \
     sepolicy/policy-rs.cpp

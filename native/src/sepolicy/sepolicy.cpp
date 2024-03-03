@@ -270,18 +270,18 @@ bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const cha
 #define ioctl_driver(x) (x>>8 & 0xFF)
 #define ioctl_func(x) (x & 0xFF)
 
-void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, const argument &xperm, int effect) {
+void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, uint16_t low, uint16_t high, bool reset, int effect) {
     if (src == nullptr) {
         for_each_attr(db->p_types.table, [&](type_datum_t *type) {
-            add_xperm_rule(type, tgt, cls, xperm, effect);
+            add_xperm_rule(type, tgt, cls, low, high, reset, effect);
         });
     } else if (tgt == nullptr) {
         for_each_attr(db->p_types.table, [&](type_datum_t *type) {
-            add_xperm_rule(src, type, cls, xperm, effect);
+            add_xperm_rule(src, type, cls, low, high, reset, effect);
         });
     } else if (cls == nullptr) {
         hashtab_for_each(db->p_classes.table, [&](hashtab_ptr_t node) {
-            add_xperm_rule(src, tgt, auto_cast(node->datum), xperm, effect);
+            add_xperm_rule(src, tgt, auto_cast(node->datum), low, high, reset, effect);
         });
     } else {
         avtab_key_t key;
@@ -302,35 +302,6 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datu
                 node_list[node->datum.xperms->driver] = node;
             }
             node = avtab_search_node_next(node, key.specified);
-        }
-
-        bool reset = xperm.second;
-        vector<pair<uint16_t, uint16_t>> ranges;
-
-        for (const char *tok : xperm.first) {
-            uint16_t low = 0;
-            uint16_t high = 0;
-            if (tok == nullptr) {
-                low = 0x0000;
-                high = 0xFF00;
-                reset = true;
-            } else if (strchr(tok, '-')) {
-                if (sscanf(tok, "%hx-%hx", &low, &high) != 2) {
-                    // Invalid token, skip
-                    continue;
-                }
-            } else {
-                if (sscanf(tok, "%hx", &low) != 1) {
-                    // Invalid token, skip
-                    continue;
-                }
-                high = low;
-            }
-            if (high == 0) {
-                reset = true;
-            } else {
-                ranges.emplace_back(make_pair(low, high));
-            }
         }
 
         if (reset) {
@@ -361,25 +332,23 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datu
             return node;
         };
 
-        if (!xperm.second) {
-            for (auto [low, high] : ranges) {
-                if (ioctl_driver(low) != ioctl_driver(high)) {
-                    if (driver_node == nullptr) {
-                        driver_node = new_driver_node();
-                    }
-                    for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
-                        xperm_set(i, driver_node->datum.xperms->perms);
-                    }
-                } else {
-                    uint8_t driver = ioctl_driver(low);
-                    auto node = node_list[driver];
-                    if (node == nullptr) {
-                        node = new_func_node(driver);
-                        node_list[driver] = node;
-                    }
-                    for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
-                        xperm_set(i, node->datum.xperms->perms);
-                    }
+        if (!reset) {
+            if (ioctl_driver(low) != ioctl_driver(high)) {
+                if (driver_node == nullptr) {
+                    driver_node = new_driver_node();
+                }
+                for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
+                    xperm_set(i, driver_node->datum.xperms->perms);
+                }
+            } else {
+                uint8_t driver = ioctl_driver(low);
+                auto node = node_list[driver];
+                if (node == nullptr) {
+                    node = new_func_node(driver);
+                    node_list[driver] = node;
+                }
+                for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
+                    xperm_set(i, node->datum.xperms->perms);
                 }
             }
         } else {
@@ -389,31 +358,29 @@ void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datu
             // Fill the driver perms
             memset(driver_node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
 
-            for (auto [low, high] : ranges) {
-                if (ioctl_driver(low) != ioctl_driver(high)) {
-                    for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
-                        xperm_clear(i, driver_node->datum.xperms->perms);
-                    }
-                } else {
-                    uint8_t driver = ioctl_driver(low);
-                    auto node = node_list[driver];
-                    if (node == nullptr) {
-                        node = new_func_node(driver);
-                        // Fill the func perms
-                        memset(node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
-                        node_list[driver] = node;
-                    }
-                    xperm_clear(driver, driver_node->datum.xperms->perms);
-                    for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
-                        xperm_clear(i, node->datum.xperms->perms);
-                    }
+            if (ioctl_driver(low) != ioctl_driver(high)) {
+                for (int i = ioctl_driver(low); i <= ioctl_driver(high); ++i) {
+                    xperm_clear(i, driver_node->datum.xperms->perms);
+                }
+            } else {
+                uint8_t driver = ioctl_driver(low);
+                auto node = node_list[driver];
+                if (node == nullptr) {
+                    node = new_func_node(driver);
+                    // Fill the func perms
+                    memset(node->datum.xperms->perms, ~0, sizeof(avtab_extended_perms_t::perms));
+                    node_list[driver] = node;
+                }
+                xperm_clear(driver, driver_node->datum.xperms->perms);
+                for (int i = ioctl_func(low); i <= ioctl_func(high); ++i) {
+                    xperm_clear(i, node->datum.xperms->perms);
                 }
             }
         }
     }
 }
 
-bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, const argument &xperm, int effect) {
+bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, uint16_t low, uint16_t high, bool reset, int effect) {
     type_datum_t *src = nullptr, *tgt = nullptr;
     class_datum_t *cls = nullptr;
 
@@ -441,7 +408,7 @@ bool sepol_impl::add_xperm_rule(const char *s, const char *t, const char *c, con
         }
     }
 
-    add_xperm_rule(src, tgt, cls, xperm, effect);
+    add_xperm_rule(src, tgt, cls, low, high, reset, effect);
     return true;
 }
 
