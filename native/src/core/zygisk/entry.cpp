@@ -22,7 +22,7 @@ static bool is_compatible_with(uint32_t) {
     return false;
 }
 
-extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf{
+extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .version = 2,
     .padding = {},
     .isCompatibleWith = &is_compatible_with,
