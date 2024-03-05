@@ -290,37 +290,3 @@ const char *rust::Utf8CStr::data() const {
 size_t rust::Utf8CStr::length() const {
     return cxx$utf8str$len(this);
 }
-
-#define elm(i) (p + (i * size))
-
-// An alternative qsort implementation. Only used when linking with crt0
-extern "C"
-void __wrap_qsort(void *ptr, size_t count, size_t size, int (*comp)(const void*, const void*)) {
-    // Create the index array
-    uint8_t *p = (uint8_t *) ptr;
-    vector<int> v(count);
-    std::iota(v.begin(), v.end(), 0);
-
-    // Sort the index array
-    std::sort(v.begin(), v.end(), [=](int a, int b) {
-        return comp(elm(a), elm(b)) < 0;
-    });
-
-    // Reorganize the array with index array
-    void *t = malloc(size);
-    for (int i = 0; i < count; ++i) {
-        if (v[i] != i) {
-            memcpy(t, elm(i), size);
-            int j = i;
-            int k;
-            while (i != (k = v[j])) {
-                memcpy(elm(j), elm(k), size);
-                v[j] = j;
-                j = k;
-            }
-            memcpy(elm(j), t, size);
-            v[j] = j;
-        }
-    }
-    free(t);
-}
