@@ -13,4 +13,3 @@ cxx-gen = { workspace = true }
 [dependencies]
 base = { path = "../base" }
 cxx = { workspace = true }
-pomelo = { workspace = true }

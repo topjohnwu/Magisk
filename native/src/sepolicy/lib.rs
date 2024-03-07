@@ -13,8 +13,6 @@ use crate::ffi::sepolicy;
 
 mod statement;
 
-use crate::statement::{tokenize_statement, Parser};
-
 mod rules;
 
 #[cxx::bridge]
@@ -137,19 +135,8 @@ impl SepolicyExt for sepolicy {
         });
     }
 
-    fn parse_statement(mut self: Pin<&mut Self>, statement: &str) {
-        let mut p = Parser::new(self.as_mut());
-        let tks = tokenize_statement(statement);
-        let mut tks = tks.into_iter();
-
-        while let Some(t) = tks.next() {
-            if let Err(_) = p.parse(t) {
-                error!("sepolicy rule syntax error: {statement}");
-                return;
-            }
-        }
-
-        if let Err(_) = p.end_of_input() {
+    fn parse_statement(self: Pin<&mut Self>, statement: &str) {
+        if let Err(_) = statement::parse_statement(self, statement) {
             error!("sepolicy rule syntax error: {statement}");
         }
     }
