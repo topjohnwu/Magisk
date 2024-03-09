@@ -140,7 +140,7 @@ fn do_extract_boot_from_payload(
 
         let out_offset = operation
             .dst_extents
-            .get(0)
+            .first()
             .ok_or_else(|| bad_payload!("dst extents not found"))?
             .start_block
             .ok_or_else(|| bad_payload!("start block not found"))?

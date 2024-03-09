@@ -116,7 +116,8 @@ public class DynLoad {
         // noinspection InlinedApi
         int flags = PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES
                 | PackageManager.GET_PROVIDERS | PackageManager.GET_RECEIVERS
-                | PackageManager.MATCH_DIRECT_BOOT_AWARE | PackageManager.MATCH_DIRECT_BOOT_UNAWARE;
+                | PackageManager.MATCH_DIRECT_BOOT_AWARE | PackageManager.MATCH_DISABLED_COMPONENTS
+                | PackageManager.MATCH_DIRECT_BOOT_UNAWARE;
         var pm = context.getPackageManager();
 
         final PackageInfo info;

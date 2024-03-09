@@ -34,6 +34,9 @@
 [submodule "system_properties"]
 	path = native/src/external/system_properties
 	url = https://github.com/topjohnwu/system_properties.git
+[submodule "crt0"]
+	path = native/src/external/crt0
+	url = https://github.com/topjohnwu/crt0.git
 [submodule "termux-elf-cleaner"]
 	path = tools/termux-elf-cleaner
 	url = https://github.com/termux/termux-elf-cleaner.git

@@ -400,30 +400,27 @@ def build_binary(args):
         flag += " B_POLICY=1"
         clean = True
 
-    if "test" in args.target:
-        flag += " B_TEST=1"
-
     if "magiskinit" in args.target:
         flag += " B_PRELOAD=1"
 
     if "resetprop" in args.target:
         flag += " B_PROP=1"
 
-    if "magiskboot" in args.target:
-        flag += " B_BOOT=1"
-
     if flag:
         run_ndk_build(flag)
-
-    # magiskinit embeds preload.so
 
     flag = ""
 
     if "magiskinit" in args.target:
+        # magiskinit embeds preload.so
+        dump_bin_header(args)
         flag += " B_INIT=1"
 
+    if "magiskboot" in args.target:
+        flag += " B_BOOT=1"
+
     if flag:
-        dump_bin_header(args)
+        flag += " B_CRT0=1"
         run_ndk_build(flag)
 
     if clean:
@@ -554,27 +551,6 @@ def setup_ndk(args):
 
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
-
-    header("* Patching static libs")
-    for target in ["arm-linux-androideabi", "i686-linux-android"]:
-        arch = target.split("-")[0]
-        lib_dir = op.join(
-            ndk_path,
-            "toolchains",
-            "llvm",
-            "prebuilt",
-            f"{os_name}-x86_64",
-            "sysroot",
-            "usr",
-            "lib",
-            f"{target}",
-            "23",
-        )
-        if not op.exists(lib_dir):
-            continue
-        src_dir = op.join("tools", "ndk-bins", arch)
-        rm(op.join(src_dir, ".DS_Store"))
-        shutil.copytree(src_dir, lib_dir, copy_function=cp, dirs_exist_ok=True)
 
 
 def push_files(args, script):

@@ -13,12 +13,11 @@ using rust::Vec;
 // so performance is absolutely critical. Most operations should either have its result cached
 // or simply skipped unless necessary.
 
-atomic<ino_t> pkg_xml_ino = 0;
-static atomic_flag skip_mgr_check;
-
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
 static int mgr_app_id = -1;
+static bool skip_mgr_check;
+static timespec *app_ts;
 static string *mgr_pkg;
 static Vec<uint8_t> *mgr_cert;
 static int stub_apk_fd = -1;
@@ -29,12 +28,17 @@ static bool operator==(const Vec<uint8_t> &a, const Vec<uint8_t> &b) {
 }
 
 void check_pkg_refresh() {
-    struct stat st{};
-    if (stat("/data/system/packages.xml", &st) == 0 &&
-        pkg_xml_ino.exchange(st.st_ino) != st.st_ino) {
-        skip_mgr_check.clear();
-        skip_pkg_rescan.clear();
+    mutex_guard g(pkg_lock);
+    if (app_ts == nullptr)
+        default_new(app_ts);
+    if (struct stat st{}; stat("/data/app", &st) == 0) {
+        if (memcmp(app_ts, &st.st_mtim, sizeof(timespec)) == 0) {
+            return;
+        }
+        memcpy(app_ts, &st.st_mtim, sizeof(timespec));
     }
+    skip_mgr_check = false;
+    skip_pkg_rescan.clear();
 }
 
 // app_id = app_no + AID_APP_START
@@ -124,7 +128,7 @@ int get_manager(int user_id, string *pkg, bool install) {
         return true;
     };
 
-    if (skip_mgr_check.test_and_set()) {
+    if (skip_mgr_check) {
         if (mgr_app_id >= 0) {
             // Just need to check whether the app is installed in the user
             const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
@@ -143,6 +147,8 @@ int get_manager(int user_id, string *pkg, bool install) {
         // Here, we want to actually find the manager app and cache the results.
         // This means that we check all users, not just the requested user.
         // Certificates are also verified to prevent manipulation.
+
+        skip_mgr_check = true;
 
         db_strings str;
         get_db_strings(str, SU_MANAGER);

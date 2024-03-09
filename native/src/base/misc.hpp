@@ -205,7 +205,7 @@ private:
     uint8_t arr[N];
 };
 
-class byte_channel;
+class byte_stream;
 
 struct heap_data : public byte_data {
     ALLOW_MOVE_ONLY(heap_data)
@@ -214,8 +214,8 @@ struct heap_data : public byte_data {
     explicit heap_data(size_t sz) : byte_data(calloc(sz, 1), sz) {}
     ~heap_data() { free(_buf); }
 
-    // byte_channel needs to reallocate the internal buffer
-    friend byte_channel;
+    // byte_stream needs to reallocate the internal buffer
+    friend byte_stream;
 };
 
 struct owned_fd {

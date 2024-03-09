@@ -13,18 +13,16 @@
 
 using namespace std;
 
-void *self_handle = nullptr;
 string native_bridge = "0";
 
 static bool is_compatible_with(uint32_t) {
-    auto name = get_prop(NBPROP);
-    android_logging();
+    zygisk_logging();
     hook_functions();
     ZLOGD("load success\n");
     return false;
 }
 
-extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf{
+extern "C" [[maybe_unused]] NativeBridgeCallbacks NativeBridgeItf {
     .version = 2,
     .padding = {},
     .isCompatibleWith = &is_compatible_with,

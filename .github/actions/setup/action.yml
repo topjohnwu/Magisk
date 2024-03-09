@@ -1,0 +1,44 @@
+name: Magisk Setup
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: "17"
+
+    - name: Set up Python 3
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+
+    - name: Set up sccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        variant: sccache
+        key: ${{ runner.os }}-${{ github.sha }}
+        restore-keys: ${{ runner.os }}
+        max-size: 10000M
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          !~/.gradle/caches/build-cache-*
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+        restore-keys: ${{ runner.os }}-gradle-
+
+    - name: Cache build cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches/build-cache-*
+        key: ${{ runner.os }}-build-cache-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-build-cache-
+
+    - name: Set up NDK
+      run: python build.py -v ndk
+      shell: bash

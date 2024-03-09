@@ -2,9 +2,10 @@ use std::cmp::min;
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
 use std::fmt::{Arguments, Debug, Display, Formatter, Write};
 use std::ops::{Deref, DerefMut};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::str::{Utf8Chunks, Utf8Error};
 use std::{fmt, mem, slice, str};
+use std::os::unix::ffi::OsStrExt;
 
 use cxx::{type_id, ExternType};
 use libc::c_char;
@@ -105,7 +106,7 @@ trait AsUtf8CStr {
 
 // Implementation for Utf8CString
 
-trait StringExt {
+pub trait StringExt {
     fn nul_terminate(&mut self) -> &mut [u8];
 }
 
@@ -117,6 +118,21 @@ impl StringExt for String {
         unsafe {
             let buf = slice::from_raw_parts_mut(self.as_mut_ptr(), self.len() + 1);
             *buf.get_unchecked_mut(self.len()) = b'\0';
+            buf
+        }
+    }
+}
+
+impl StringExt for PathBuf {
+    #[allow(mutable_transmutes)]
+    fn nul_terminate(&mut self) -> &mut [u8] {
+        self.reserve(1);
+        // SAFETY: the PathBuf is reserved to have enough capacity to fit in the null byte
+        // SAFETY: the null byte is explicitly added outside of the PathBuf's length
+        unsafe {
+            let bytes: &mut [u8] = mem::transmute(self.as_mut_os_str().as_bytes());
+            let buf = slice::from_raw_parts_mut(bytes.as_mut_ptr(), bytes.len() + 1);
+            *buf.get_unchecked_mut(bytes.len()) = b'\0';
             buf
         }
     }

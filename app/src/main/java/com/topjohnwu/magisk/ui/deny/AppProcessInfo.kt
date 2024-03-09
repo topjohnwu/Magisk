@@ -4,7 +4,12 @@ import android.annotation.SuppressLint
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.*
+import android.content.pm.PackageManager.GET_ACTIVITIES
+import android.content.pm.PackageManager.GET_PROVIDERS
+import android.content.pm.PackageManager.GET_RECEIVERS
+import android.content.pm.PackageManager.GET_SERVICES
+import android.content.pm.PackageManager.MATCH_DISABLED_COMPONENTS
+import android.content.pm.PackageManager.MATCH_UNINSTALLED_PACKAGES
 import android.content.pm.ServiceInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -12,7 +17,7 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.utils.currentLocale
-import java.util.*
+import java.util.TreeSet
 
 class CmdlineListItem(line: String) {
     val packageName: String

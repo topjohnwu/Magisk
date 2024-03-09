@@ -78,6 +78,7 @@ void file_readline(bool trim, const char *file, const function<bool(string_view)
     if (auto fp = open_file(file, "re"))
         file_readline(trim, fp.get(), fn);
 }
+
 void file_readline(const char *file, const function<bool(string_view)> &fn) {
     file_readline(false, file, fn);
 }

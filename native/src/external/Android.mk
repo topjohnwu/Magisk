@@ -391,3 +391,7 @@ include $(BUILD_STATIC_LIBRARY)
 CWD := $(LOCAL_PATH)
 include $(CWD)/system_properties/Android.mk
 include $(CWD)/libcxx/Android.mk
+
+ifdef B_CRT0
+include $(CWD)/crt0/Android.mk
+endif

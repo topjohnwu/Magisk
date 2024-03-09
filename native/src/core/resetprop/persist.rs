@@ -12,7 +12,7 @@ use quick_protobuf::{BytesReader, MessageRead, MessageWrite, Writer};
 use base::libc::{O_CLOEXEC, O_RDONLY};
 use base::{
     clone_attr, cstr, debug, libc::mkstemp, Directory, FsPath, FsPathBuf, LibcReturn, LoggedResult,
-    MappedFile, ResultNoLog, Utf8CStr, Utf8CStrBufArr, WalkResult,
+    MappedFile, SilentResultExt, Utf8CStr, Utf8CStrBufArr, WalkResult,
 };
 
 use crate::ffi::{prop_cb_exec, PropCb};
@@ -67,7 +67,7 @@ impl PropExt for PersistentProperties {
     }
 
     fn find(&mut self, name: &Utf8CStr) -> LoggedResult<&mut PersistentPropertyRecord> {
-        let idx = self.find_index(name).no_log()?;
+        let idx = self.find_index(name).silent()?;
         Ok(&mut self[idx])
     }
 }
@@ -81,7 +81,7 @@ fn file_get_prop(name: &Utf8CStr) -> LoggedResult<String> {
     let path = FsPathBuf::new(&mut buf)
         .join(PERSIST_PROP_DIR!())
         .join(name);
-    let mut file = path.open(O_RDONLY | O_CLOEXEC).no_log()?;
+    let mut file = path.open(O_RDONLY | O_CLOEXEC).silent()?;
     debug!("resetprop: read prop from [{}]", path);
     let mut s = String::new();
     file.read_to_string(&mut s)?;
@@ -108,7 +108,7 @@ fn file_set_prop(name: &Utf8CStr, value: Option<&Utf8CStr>) -> LoggedResult<()> 
         debug!("resetprop: write prop to [{}]", tmp);
         tmp.rename_to(path)?
     } else {
-        path.remove().no_log()?;
+        path.remove().silent()?;
         debug!("resetprop: unlink [{}]", path);
     }
     Ok(())
@@ -199,7 +199,7 @@ pub unsafe fn persist_delete_prop(name: &Utf8CStr) -> bool {
     fn inner(name: &Utf8CStr) -> LoggedResult<()> {
         if check_proto() {
             let mut props = proto_read_props()?;
-            let idx = props.find_index(name).no_log()?;
+            let idx = props.find_index(name).silent()?;
             props.remove(idx);
             proto_write_props(&props)
         } else {

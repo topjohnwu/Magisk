@@ -42,8 +42,6 @@ static void reset_pool() {
 }
 
 static void *thread_pool_loop(void * const is_core_pool) {
-    pthread_atfork(nullptr, nullptr, &reset_pool);
-
     // Block all signals
     sigset_t mask;
     sigfillset(&mask);
@@ -81,6 +79,10 @@ static void *thread_pool_loop(void * const is_core_pool) {
         if (getpid() == gettid())
             exit(0);
     }
+}
+
+void init_thread_pool() {
+    pthread_atfork(nullptr, nullptr, &reset_pool);
 }
 
 void exec_task(function<void()> &&task) {

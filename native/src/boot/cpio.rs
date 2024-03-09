@@ -176,7 +176,7 @@ Supported commands:
   test
     Test the cpio's status
     Return value is 0 or bitwise or-ed of following values:
-    0x1:Magisk    0x2:unsupported    0x4:Sony
+    0x1:Magisk    0x2:unsupported
   patch
     Apply ramdisk patches
     Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
@@ -617,7 +617,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                         return Err(log_err!("invalid arguments"));
                     }
                     cpio.extract(
-                        paths.get(0).map(|x| x.as_str()),
+                        paths.first().map(|x| x.as_str()),
                         paths.get(1).map(|x| x.as_str()),
                     )?;
                 }

@@ -15,6 +15,8 @@ static void zygiskd(int socket) {
     if (getuid() != 0 || fcntl(socket, F_GETFD) < 0)
         exit(-1);
 
+    init_thread_pool();
+
 #if defined(__LP64__)
     set_nice_name("zygiskd64");
     LOGI("* Launching zygiskd64\n");

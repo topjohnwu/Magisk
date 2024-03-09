@@ -6,6 +6,11 @@
 
 using namespace std;
 
+#ifdef USE_MUSL_PRINTF
+// Switch to use the musl vfprintf
+__asm__(".global vfprintf \n vfprintf = musl_vfprintf");
+#endif
+
 static void print_formats() {
     for (int fmt = GZIP; fmt < LZOP; ++fmt) {
         fprintf(stderr, "%s ", fmt2name[(format_t) fmt]);
@@ -79,8 +84,10 @@ Supported actions:
     Do dtb related actions to <file>.
     See "dtb --help" for supported actions.
 
-  split <file>
-    Split image.*-dtb into kernel + kernel_dtb
+  split [-n] <file>
+    Split image.*-dtb into kernel + kernel_dtb.
+    If '-n' is provided, decompression operations will be skipped;
+    the kernel will remain untouched, split in its original format.
 
   sha1 <file>
     Print the SHA1 checksum for <file>
@@ -145,7 +152,13 @@ int main(int argc, char *argv[]) {
             printf("%02x", i);
         printf("\n");
     } else if (argc > 2 && action == "split") {
-        return split_image_dtb(argv[2]);
+        if (argv[2] == "-n"sv) {
+            if (argc == 3)
+                usage(argv[0]);
+            return split_image_dtb(argv[3], true);
+        } else {
+            return split_image_dtb(argv[2]);
+        }
     } else if (argc > 2 && action == "unpack") {
         int idx = 2;
         bool nodecomp = false;

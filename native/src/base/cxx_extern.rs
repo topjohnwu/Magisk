@@ -7,11 +7,10 @@ use cfg_if::cfg_if;
 use cxx::private::c_char;
 use libc::mode_t;
 
-use crate::logging::CxxResultExt;
 pub(crate) use crate::xwrap::*;
 use crate::{
-    clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, Directory, FsPath,
-    Utf8CStr, Utf8CStrBufRef,
+    clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, CxxResultExt,
+    Directory, FsPath, Utf8CStr, Utf8CStrBufRef,
 };
 
 pub(crate) fn fd_path_for_cxx(fd: RawFd, buf: &mut [u8]) -> isize {

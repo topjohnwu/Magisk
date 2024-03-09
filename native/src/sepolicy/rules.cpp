@@ -26,9 +26,11 @@ void sepolicy::magisk_rules() {
     allow(SEPOL_PROC_DOMAIN, ALL, ALL, ALL);
     // Allow us to do any ioctl
     if (impl->db->policyvers >= POLICYDB_VERSION_XPERMS_IOCTL) {
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", ALL_XPERM);
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", ALL_XPERM);
-        allowxperm(SEPOL_PROC_DOMAIN, ALL, "chr_file", ALL_XPERM);
+        argument all;
+        all.first.push_back(nullptr);
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "blk_file", all);
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "fifo_file", all);
+        allowxperm(SEPOL_PROC_DOMAIN, ALL, "chr_file", all);
     }
 
     // Create unconstrained file type

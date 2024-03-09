@@ -627,12 +627,13 @@ void decompress(char *infile, const char *outfile) {
     bool in_std = infile == "-"sv;
     bool rm_in = false;
 
-    FILE *in_fp = in_std ? stdin : xfopen(infile, "re");
+    int in_fd = in_std ? STDIN_FILENO : xopen(infile, O_RDONLY);
+    int out_fd = -1;
     out_strm_ptr strm;
 
     char buf[4096];
     size_t len;
-    while ((len = fread(buf, 1, sizeof(buf), in_fp))) {
+    while ((len = read(in_fd, buf, sizeof(buf)))) {
         if (!strm) {
             format_t type = check_fmt(buf, len);
 
@@ -660,8 +661,10 @@ void decompress(char *infile, const char *outfile) {
                 }
             }
 
-            FILE *out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
-            strm = get_decoder(type, make_unique<fp_channel>(out_fp));
+            out_fd = outfile == "-"sv ?
+                    STDOUT_FILENO :
+                    xopen(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            strm = get_decoder(type, make_unique<fd_stream>(out_fd));
             if (ext) *ext = '.';
         }
         if (!strm->write(buf, len))
@@ -669,7 +672,8 @@ void decompress(char *infile, const char *outfile) {
     }
 
     strm.reset(nullptr);
-    fclose(in_fp);
+    if (in_fd != STDIN_FILENO) close(in_fd);
+    if (out_fd != STDOUT_FILENO) close(out_fd);
 
     if (rm_in)
         unlink(infile);
@@ -683,36 +687,39 @@ void compress(const char *method, const char *infile, const char *outfile) {
     bool in_std = infile == "-"sv;
     bool rm_in = false;
 
-    FILE *in_fp = in_std ? stdin : xfopen(infile, "re");
-    FILE *out_fp;
+    int in_fd = in_std ? STDIN_FILENO : xopen(infile, O_RDONLY);
+    int out_fd = -1;
 
     if (outfile == nullptr) {
         if (in_std) {
-            out_fp = stdout;
+            out_fd = STDOUT_FILENO;
         } else {
             /* If user does not provide outfile and infile is not
              * STDIN, output to <infile>.[ext] */
             string tmp(infile);
             tmp += fmt2ext[fmt];
-            out_fp = xfopen(tmp.data(), "we");
+            out_fd = xopen(tmp.data(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
             fprintf(stderr, "Compressing to [%s]\n", tmp.data());
             rm_in = true;
         }
     } else {
-        out_fp = outfile == "-"sv ? stdout : xfopen(outfile, "we");
+        out_fd = outfile == "-"sv ?
+                STDOUT_FILENO :
+                xopen(outfile,  O_WRONLY | O_CREAT | O_TRUNC, 0644);
     }
 
-    auto strm = get_encoder(fmt, make_unique<fp_channel>(out_fp));
+    auto strm = get_encoder(fmt, make_unique<fd_stream>(out_fd));
 
     char buf[4096];
     size_t len;
-    while ((len = fread(buf, 1, sizeof(buf), in_fp))) {
+    while ((len = read(in_fd, buf, sizeof(buf)))) {
         if (!strm->write(buf, len))
             LOGE("Compression error!\n");
     }
 
     strm.reset(nullptr);
-    fclose(in_fp);
+    if (in_fd != STDIN_FILENO) close(in_fd);
+    if (out_fd != STDOUT_FILENO) close(out_fd);
 
     if (rm_in)
         unlink(infile);
@@ -726,7 +733,7 @@ bool decompress(rust::Slice<const uint8_t> buf, int fd) {
         return false;
     }
 
-    auto strm = get_decoder(type, make_unique<fd_channel>(fd));
+    auto strm = get_decoder(type, make_unique<fd_stream>(fd));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }
@@ -734,7 +741,7 @@ bool decompress(rust::Slice<const uint8_t> buf, int fd) {
 }
 
 bool xz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
-    auto strm = get_encoder(XZ, make_unique<rust_vec_channel>(out));
+    auto strm = get_encoder(XZ, make_unique<rust_vec_stream>(out));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }
@@ -747,7 +754,7 @@ bool unxz(rust::Slice<const uint8_t> buf, rust::Vec<uint8_t> &out) {
         LOGE("Input file is not in xz format!\n");
         return false;
     }
-    auto strm = get_decoder(XZ, make_unique<rust_vec_channel>(out));
+    auto strm = get_decoder(XZ, make_unique<rust_vec_stream>(out));
     if (!strm->write(buf.data(), buf.length())) {
         return false;
     }

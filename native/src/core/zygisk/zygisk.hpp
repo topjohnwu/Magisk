@@ -31,8 +31,6 @@ enum : int {
 #define ZLOGV(...) ZLOGD(__VA_ARGS__)
 //#define ZLOGV(...) (void*)0
 
-extern void *self_handle;
-
 void hook_functions();
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
 
