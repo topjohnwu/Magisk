@@ -8,23 +8,30 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.HideAPK
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.io.File
+import java.io.IOException
 
 @SuppressLint("CustomSplashScreen")
 abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
@@ -58,7 +65,7 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                     showInvalidStateMessage()
                     return@getShell
                 }
-                preLoad(savedInstanceState)
+                initialize(savedInstanceState)
             }
         }
     }
@@ -102,7 +109,7 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
         }
     }
 
-    private fun preLoad(savedState: Bundle?) {
+    private fun initialize(savedState: Bundle?) {
         val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)?.let {
             // Make sure the calling package matches (prevent DoS)
             if (it == realCallingPackage)
@@ -112,11 +119,50 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
         }
 
         Config.load(prevPkg)
-        handleRepackage(prevPkg)
+
+        if (packageName != APPLICATION_ID) {
+            runCatching {
+                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
+                packageManager.getApplicationInfo(APPLICATION_ID, 0)
+                Shell.cmd("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
+            }
+        } else {
+            if (Config.suManager.isNotEmpty())
+                Config.suManager = ""
+            if (prevPkg != null) {
+                Shell.cmd("(pm uninstall $prevPkg)& >/dev/null 2>&1").exec()
+            }
+        }
+
         if (prevPkg != null) {
             runOnUiThread {
                 // Relaunch the process after package migration
                 StubApk.restartProcess(this)
+            }
+            return
+        }
+
+        // Validate stub APK
+        if (isRunningAsStub && (
+                // Version mismatch
+                Info.stub!!.version != BuildConfig.STUB_VERSION ||
+                // Not properly patched
+                intent.component!!.className.contains(HideAPK.PLACEHOLDER)
+            )) {
+            withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
+                if (granted) {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val apk = File(cacheDir, "stub.apk")
+                        try {
+                            assets.open("stub.apk").writeTo(apk)
+                            HideAPK.upgrade(this@SplashActivity, apk)?.let {
+                                startActivity(it)
+                            }
+                        } catch (e: IOException) {
+                            Timber.e(e)
+                        }
+                    }
+                }
             }
             return
         }
@@ -142,21 +188,6 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                     needShowMainUI = true
                 }
             }
-        }
-    }
-
-    private fun handleRepackage(pkg: String?) {
-        if (packageName != APPLICATION_ID) {
-            runCatching {
-                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
-                packageManager.getApplicationInfo(APPLICATION_ID, 0)
-                Shell.cmd("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
-            }
-        } else {
-            if (Config.suManager.isNotEmpty())
-                Config.suManager = ""
-            pkg ?: return
-            Shell.cmd("(pm uninstall $pkg)& >/dev/null 2>&1").exec()
         }
     }
 }
