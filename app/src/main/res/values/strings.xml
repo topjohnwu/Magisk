@@ -63,8 +63,8 @@
     <string name="twentymin">20 mins</string>
     <string name="thirtymin">30 mins</string>
     <string name="sixtymin">60 mins</string>
-    <string name="su_allow_toast">%1$s was granted Superuser rights</string>
-    <string name="su_deny_toast">%1$s was denied Superuser rights</string>
+    <string name="su_allow_toast">Superuser granted to %1$s</string>
+    <string name="su_deny_toast">Superuser denied to %1$s</string>
     <string name="su_snack_grant">Superuser rights of %1$s are granted</string>
     <string name="su_snack_deny">Superuser rights of %1$s are denied</string>
     <string name="su_snack_notif_on">Notifications of %1$s are enabled</string>
