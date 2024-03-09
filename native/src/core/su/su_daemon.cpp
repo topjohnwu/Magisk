@@ -400,11 +400,6 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         }
     }
 
-    if (ctx.info->access.log)
-        app_log(ctx);
-    else if (ctx.info->access.notify)
-        app_notify(ctx);
-
     // Fail fast
     if (ctx.info->access.policy == DENY) {
         LOGW("su: request rejected (%u)\n", ctx.info->uid);
@@ -555,7 +550,14 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     }
 	
     ssprintf(log_name, sizeof(log_name), "%s/%u-%u", logs_folder, cred->uid, current_time);
-   
+
+   ctx.req.command = log_name;
+	
+    if (ctx.info->access.log)
+        app_log(ctx);
+    else if (ctx.info->access.notify)
+        app_notify(ctx);
+	
     log_fd = open(log_name, O_CREAT | O_APPEND | O_RDWR, 0666);
     if (log_fd < 0) {
         PLOGE("Open(log_fd)");
