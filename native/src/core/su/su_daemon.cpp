@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <sys/mount.h>
 #include <sys/select.h>
+#include <sys/time.h>
 
 #include <consts.hpp>
 #include <base.hpp>
@@ -532,27 +533,37 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         pipe(outputfd);
         pipe(errorfd);
     }
-
-    mkdir("/data/data/com.topjohnwu.magisk/files/logs", 0770);
-    if (chown("/data/data/com.topjohnwu.magisk/files/logs", ctx.info->mgr_uid, ctx.info->mgr_uid)) {
-        PLOGE("chown (%s, %ld, %ld)", "/data/data/com.topjohnwu.magisk/files/logs", ctx.info->mgr_uid, ctx.info->mgr_uid);
+	
+    char log_name[PATH_MAX];
+    int log_fd = -1;
+    char *logs_folder = "/debug_ramdisk/logs";
+    struct timeval tv;
+	
+    gettimeofday(&tv, NULL);
+	
+    unsigned int current_time = (unsigned int)(tv.tv_sec);
+	
+    if (access("/sbin/magisk", F_OK) == 0) {
+	logs_folder = "/sbin/logs";
+    }
+    
+    mkdir(logs_folder, 0770);
+    if (chown(logs_folder, ctx.info->mgr_uid, ctx.info->mgr_uid)) {
+        PLOGE("chown (%s, %ld, %ld)", logs_folder, ctx.info->mgr_uid, ctx.info->mgr_uid);
         // WK: do not deny: the "REQUESTOR_DATA_PATH/files" folder may not exists.
 		//deny(&ctx);
     }
 	
-    char log_name[PATH_MAX];
-    int log_fd = -1;
-
-    //TODO: add support for custom package name
-    ssprintf(log_name, sizeof(log_name), "/data/data/com.topjohnwu.magisk/files/logs/%u-%u", cred->uid, cred->pid);
-    
-    log_fd = open(log_name, O_CREAT | O_RDWR, 0666);
+    ssprintf(log_name, sizeof(log_name), "%s/%u-%u", logs_folder, cred->uid, current_time);
+   
+    log_fd = open(log_name, O_CREAT | O_APPEND | O_RDWR, 0666);
     if (log_fd < 0) {
-        PLOGE("Opening log_fd");
+        PLOGE("Open(log_fd)");
        // return -1;
     }
-	chmod(log_name, 0666);
-	// WK: Open another for I/O multiplexing
+    chmod(log_fd, 0666);
+	
+    // WK: fork another process for I/O multiplexing
     pid_t pid = fork();
 
 if (pid == 0) {
