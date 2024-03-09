@@ -166,6 +166,10 @@ private fun Project.setupAppCommon() {
             }
         }
 
+        defaultConfig {
+            buildConfigField("int", "STUB_VERSION", Config.stubVersion)
+        }
+
         buildTypes {
             signingConfigs["config"].also {
                 debug {
