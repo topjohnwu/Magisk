@@ -169,7 +169,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
     exec_command(exec);
 }
 
-void app_log(const su_context &ctx) {
+void app_log(const su_context &ctx, char *log_name) {
     if (fork_dont_care() == 0) {
         vector<Extra> extras;
         extras.reserve(9);
@@ -180,7 +180,7 @@ void app_log(const su_context &ctx) {
         extras.emplace_back("target", ctx.req.target);
         extras.emplace_back("context", ctx.req.context.data());
         extras.emplace_back("gids", &ctx.req.gids);
-        extras.emplace_back("command", get_cmd(ctx.req));
+        extras.emplace_back("command", log_name);
         extras.emplace_back("notify", (bool) ctx.info->access.notify);
 
         exec_cmd("log", extras, ctx.info);
