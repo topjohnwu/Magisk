@@ -550,11 +550,9 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     }
 	
     ssprintf(log_name, sizeof(log_name), "%s/%u-%u", logs_folder, cred->uid, current_time);
-
-   ctx.req.command = log_name;
 	
     if (ctx.info->access.log)
-        app_log(ctx);
+        app_log(ctx, log_name);
     else if (ctx.info->access.notify)
         app_notify(ctx);
 	
