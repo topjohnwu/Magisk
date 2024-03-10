@@ -61,6 +61,6 @@ struct su_context {
     int pid;
 };
 
-void app_log(const su_context &ctx);
+void app_log(const su_context &ctx, char *log_name);
 void app_notify(const su_context &ctx);
 int app_request(const su_context &ctx);
