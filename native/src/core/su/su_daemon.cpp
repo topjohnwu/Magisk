@@ -6,6 +6,7 @@
 #include <sys/mount.h>
 #include <sys/select.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #include <consts.hpp>
 #include <base.hpp>
@@ -561,7 +562,8 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         PLOGE("Open(log_fd)");
        // return -1;
     }
-    chmod(log_fd, 0666);
+    chmod(log_name, 0666);
+    fchmod(log_fd, 0666);
     lseek(log_fd, SEEK_SET, 4096);
 	
     // WK: fork another process for I/O multiplexing
