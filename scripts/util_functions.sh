@@ -718,7 +718,7 @@ install_module() {
   # Remove stuff that doesn't belong to modules and clean up any empty directories
   rm -rf \
   $MODPATH/system/placeholder $MODPATH/customize.sh \
-  $MODPATH/README.md $MODPATH/.git*
+  $MODPATH/.git*
   rmdir -p $MODPATH 2>/dev/null
 
   cd /
