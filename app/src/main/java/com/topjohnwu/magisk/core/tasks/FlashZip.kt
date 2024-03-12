@@ -26,7 +26,7 @@ open class FlashZip(
     private lateinit var zipFile: File
 
     @Throws(IOException::class)
-    private fun flash(): Boolean {
+    private suspend fun flash(): Boolean {
         installDir.deleteRecursively()
         installDir.mkdirs()
 
@@ -47,13 +47,13 @@ open class FlashZip(
             }
         }
 
-        val isValid = runCatching {
+        val isValid = try {
             zipFile.unzip(installDir, "META-INF/com/google/android", true)
             val script = File(installDir, "updater-script")
             script.readText().contains("#MAGISK")
-        }.getOrElse {
+        } catch (e: IOException) {
             console.add("! Unzip error")
-            throw it
+            throw e
         }
 
         if (!isValid) {

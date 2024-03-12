@@ -12,8 +12,11 @@ import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.ui.theme.Theme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.io.IOException
 
 object Config : PreferenceConfig, DBConfig {
 
@@ -171,8 +174,14 @@ object Config : PreferenceConfig, DBConfig {
 
     fun load(pkg: String?) {
         // Only try to load prefs when fresh install and a previous package name is set
-        if (pkg != null && prefs.all.isEmpty()) runCatching {
-            context.contentResolver.openInputStream(Provider.preferencesUri(pkg))?.writeTo(prefsFile)
+        if (pkg != null && prefs.all.isEmpty()) {
+            runBlocking {
+                try {
+                    context.contentResolver
+                        .openInputStream(Provider.preferencesUri(pkg))
+                        ?.writeTo(prefsFile, dispatcher = Dispatchers.Unconfined)
+                } catch (ignored: IOException) {}
+            }
             return
         }
 

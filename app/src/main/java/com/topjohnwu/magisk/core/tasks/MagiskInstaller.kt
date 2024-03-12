@@ -18,6 +18,7 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAndClose
+import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
@@ -93,7 +94,7 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun extractFiles(): Boolean {
+    private suspend fun extractFiles(): Boolean {
         console.add("- Device platform: ${Const.CPU_ABI}")
         console.add("- Installing: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
 
@@ -174,7 +175,7 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
-    private fun InputStream.copyAndCloseOut(out: OutputStream) = out.use { copyTo(it) }
+    private suspend fun InputStream.copyAndCloseOut(out: OutputStream) = out.use { copyAll(it) }
 
     private fun newTarEntry(name: String, size: Long): TarEntry {
         console.add("-- Writing: $name")
@@ -191,7 +192,7 @@ abstract class MagiskInstallImpl protected constructor(
     private class NoBootException : IOException()
 
     @Throws(IOException::class)
-    private fun processTar(tarIn: TarInputStream, tarOut: TarOutputStream): ExtendedFile {
+    private suspend fun processTar(tarIn: TarInputStream, tarOut: TarOutputStream): ExtendedFile {
         console.add("- Processing tar file")
         lateinit var entry: TarEntry
 
@@ -228,7 +229,7 @@ abstract class MagiskInstallImpl protected constructor(
             } else {
                 console.add("-- Copying: ${entry.name}")
                 tarOut.putNextEntry(entry)
-                tarIn.copyTo(tarOut, bufferSize = 1024 * 1024)
+                tarIn.copyAll(tarOut, bufferSize = 1024 * 1024)
             }
         }
 
@@ -236,10 +237,10 @@ abstract class MagiskInstallImpl protected constructor(
         val initBoot = installDir.getChildFile("init_boot.img")
         val recovery = installDir.getChildFile("recovery.img")
 
-        fun ExtendedFile.copyToTar() {
+        suspend fun ExtendedFile.copyToTar() {
             newInputStream().use {
                 tarOut.putNextEntry(newTarEntry(name, length()))
-                it.copyTo(tarOut)
+                it.copyAll(tarOut)
             }
             delete()
         }
@@ -273,7 +274,7 @@ abstract class MagiskInstallImpl protected constructor(
     }
 
     @Throws(IOException::class)
-    private fun processZip(zipIn: ZipInputStream): ExtendedFile {
+    private suspend fun processZip(zipIn: ZipInputStream): ExtendedFile {
         console.add("- Processing zip file")
         val boot = installDir.getChildFile("boot.img")
         val initBoot = installDir.getChildFile("init_boot.img")
@@ -373,7 +374,7 @@ abstract class MagiskInstallImpl protected constructor(
         }
     }
 
-    private fun handleFile(uri: Uri): Boolean {
+    private suspend fun handleFile(uri: Uri): Boolean {
         val outStream: OutputStream
         val outFile: MediaStoreUtils.UriFile
 
@@ -510,7 +511,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     private fun flashBoot() = "direct_install $installDir $srcBoot".sh().isSuccess
 
-    private fun postOTA(): Boolean {
+    private suspend fun postOTA(): Boolean {
         try {
             val bootctl = File.createTempFile("bootctl", null, context.cacheDir)
             context.assets.open("bootctl").writeTo(bootctl)
@@ -534,14 +535,14 @@ abstract class MagiskInstallImpl protected constructor(
     private fun String.fsh() = ShellUtils.fastCmd(shell, this)
     private fun Array<String>.fsh() = ShellUtils.fastCmd(shell, *this)
 
-    protected fun patchFile(file: Uri) = extractFiles() && handleFile(file)
+    protected suspend fun patchFile(file: Uri) = extractFiles() && handleFile(file)
 
-    protected fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
+    protected suspend fun direct() = findImage() && extractFiles() && patchBoot() && flashBoot()
 
-    protected fun secondSlot() =
+    protected suspend fun secondSlot() =
         findSecondary() && extractFiles() && patchBoot() && flashBoot() && postOTA()
 
-    protected fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
+    protected suspend fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
     protected fun uninstall() = "run_uninstaller $AppApkPath".sh().isSuccess
 

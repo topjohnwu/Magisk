@@ -15,9 +15,6 @@ import com.topjohnwu.magisk.core.di.AppContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.io.OutputStream
-import java.security.MessageDigest
-import kotlin.experimental.and
 
 @Suppress("DEPRECATION")
 object MediaStoreUtils {
@@ -119,24 +116,6 @@ object MediaStoreUtils {
         }
         return this.toString()
     }
-
-    fun Uri.checkSum(alg: String, reference: String) = runCatching {
-        this.inputStream().use {
-            val digest = MessageDigest.getInstance(alg)
-            it.copyTo(object : OutputStream() {
-                override fun write(b: Int) {
-                    digest.update(b.toByte())
-                }
-
-                override fun write(b: ByteArray, off: Int, len: Int) {
-                    digest.update(b, off, len)
-                }
-            })
-            val sb = StringBuilder()
-            digest.digest().forEach { b -> sb.append("%02x".format(b and 0xff.toByte())) }
-            sb.toString() == reference
-        }
-    }.getOrElse { false }
 
     interface UriFile {
         val uri: Uri

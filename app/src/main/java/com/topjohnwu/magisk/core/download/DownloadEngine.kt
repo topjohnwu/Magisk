@@ -28,6 +28,7 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAndClose
+import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.forEach
 import com.topjohnwu.magisk.core.ktx.selfLaunchIntent
 import com.topjohnwu.magisk.core.ktx.set
@@ -178,7 +179,7 @@ class DownloadEngine(
                     notifyFinish(subject)
                 }
                 subject.postDownload?.invoke()
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Timber.e(e)
                 notifyFail(subject)
             }
@@ -269,8 +270,8 @@ class DownloadEngine(
         return n
     }
 
-    private fun handleApp(stream: InputStream, subject: Subject.App) {
-        fun writeTee(output: OutputStream) {
+    private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
+        suspend fun writeTee(output: OutputStream) {
             val uri = MediaStoreUtils.getFile("${subject.title}.apk").uri
             val external = uri.outputStream()
             stream.copyAndClose(TeeOutputStream(external, output))
@@ -326,7 +327,7 @@ class DownloadEngine(
         }
     }
 
-    private fun handleModule(src: InputStream, file: Uri) {
+    private suspend fun handleModule(src: InputStream, file: Uri) {
         val input = ZipInputStream(src.buffered())
         val output = ZipOutputStream(file.outputStream().buffered())
 
@@ -336,7 +337,7 @@ class DownloadEngine(
             zout.putNextEntry(ZipEntry("META-INF/com/google/"))
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
-            context.assets.open("module_installer.sh").copyTo(zout)
+            context.assets.open("module_installer.sh").copyAll(zout)
 
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
             zout.write("#MAGISK\n".toByteArray())
@@ -346,7 +347,7 @@ class DownloadEngine(
                 if (path.isNotEmpty() && !path.startsWith("META-INF")) {
                     zout.putNextEntry(ZipEntry(path))
                     if (!entry.isDirectory) {
-                        zin.copyTo(zout)
+                        zin.copyAll(zout)
                     }
                 }
             }
