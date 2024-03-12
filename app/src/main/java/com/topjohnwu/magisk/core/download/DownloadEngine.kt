@@ -79,8 +79,8 @@ class DownloadEngine(
     interface Session {
         val context: Context
 
-        fun attach(id: Int, builder: Notification.Builder)
-        fun stop()
+        fun attachNotification(id: Int, builder: Notification.Builder)
+        fun onDownloadComplete()
     }
 
     companion object {
@@ -182,18 +182,13 @@ class DownloadEngine(
                 Timber.e(e)
                 notifyFail(subject)
             }
-
-            synchronized(this@DownloadEngine) {
-                if (notifications.isEmpty)
-                    session.stop()
-            }
         }
     }
 
     @Synchronized
     fun reattach() {
         val builder = notifications[attachedId] ?: return
-        session.attach(attachedId, builder)
+        session.attachNotification(attachedId, builder)
     }
 
     private val notifications = SparseArrayCompat<Notification.Builder>()
@@ -231,7 +226,7 @@ class DownloadEngine(
 
     private fun attachNotification(id: Int, notification: Notification.Builder) {
         attachedId = id
-        session.attach(id, notification)
+        session.attachNotification(id, notification)
     }
 
     @Synchronized
@@ -265,7 +260,7 @@ class DownloadEngine(
                 } else {
                     // No more notifications left, terminate the session
                     attachedId = -1
-                    session.stop()
+                    session.onDownloadComplete()
                 }
             }
         }
