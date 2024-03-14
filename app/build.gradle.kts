@@ -70,7 +70,7 @@ configurations.all {
 dependencies {
     implementation(project(":app:shared"))
 
-    implementation("com.github.topjohnwu:jtar:1.0.0")
+    implementation("com.github.topjohnwu:jtar:1.1.0")
     implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:5.0.1")

@@ -17,8 +17,8 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
-import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.copyAll
+import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
@@ -380,17 +380,16 @@ abstract class MagiskInstallImpl protected constructor(
 
         // Process input file
         try {
-            uri.inputStream().buffered().use { src ->
-                src.mark(500)
-                val magic = ByteArray(4)
-                val tarMagic = ByteArray(5)
-                if (src.read(magic) != magic.size || src.skip(253) != 253L ||
-                    src.read(tarMagic) != tarMagic.size
-                ) {
+            PushbackInputStream(uri.inputStream(), 512).use { src ->
+                val head = ByteArray(512)
+                if (src.read(head) != head.size) {
                     console.add("! Invalid input file")
                     return false
                 }
-                src.reset()
+                src.unread(head)
+
+                val magic = head.copyOf(4)
+                val tarMagic = Arrays.copyOfRange(head, 257, 262)
 
                 val alpha = "abcdefghijklmnopqrstuvwxyz"
                 val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
