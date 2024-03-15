@@ -19,11 +19,11 @@
     <string name="hide">Ocultar</string>
     <string name="home_package">Pacote</string>
     <string name="home_app_title">App</string>
-    <string name="home_notice_content">Baixe o Magisk SOMENTE pela página oficial do GitHub. Arquivos de fontes desconhecidas podem ser maliciosos e podem danificar seu aparelho!</string>
-    <string name="home_support_title">Apoie</string>
-    <string name="home_follow_title">Siga</string>
+    <string name="home_notice_content">Baixe o Magisk SOMENTE pela página oficial do GitHub. Arquivos de fontes desconhecidas podem ser maliciosos!</string>
+    <string name="home_support_title">Apoie-nos</string>
+    <string name="home_follow_title">Siga-nos</string>
     <string name="home_item_source">Fonte</string>
-    <string name="home_support_content">Magisk sempre foi e sempre será, gratuito e de código aberto. No entanto, você pode agradecer enviando uma pequena doação.</string>
+    <string name="home_support_content">Magisk sempre foi e sempre será, gratuito e de código aberto. No entanto, você pode nos ajudar enviando uma pequena doação.</string>
     <string name="home_installed_version">Instalado</string>
     <string name="home_latest_version">Recente</string>
     <string name="invalid_update_channel">Canal de atualização inválido</string>
@@ -64,7 +64,7 @@
     <string name="sixtymin">60 mins</string>
     <string name="su_allow_toast">%1$s foi permitido o acesso de SuperUsuário</string>
     <string name="su_deny_toast">%1$s foi negado o acesso de SuperUsuário</string>
-    <string name="su_snack_grant">Os acessos de SuperUsuário de %1$s foram permitidos</string>
+    <string name="su_snack_grant">Os acessos de SuperUsuário de %1$s foram concedidos</string>
     <string name="su_snack_deny">Os acessos de SuperUsuário de %1$s foram negados</string>
     <string name="su_snack_notif_on">As notificações de %1$s foram ativadas</string>
     <string name="su_snack_notif_off">As notificações de %1$s foram desativadas</string>
@@ -98,7 +98,7 @@
 
     <!--Module-->
     <string name="no_info_provided">(Nenhuma informação fornecida)</string>
-    <string name="reboot_userspace">Reinício rápido</string>
+    <string name="reboot_userspace">Reinicialização suave</string>
     <string name="reboot_recovery">Reiniciar em modo Recovery</string>
     <string name="reboot_bootloader">Reiniciar em modo Bootloader</string>
     <string name="reboot_download">Reiniciar em modo Download</string>
@@ -117,34 +117,34 @@
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Modo do tema</string>
-    <string name="settings_dark_mode_message">Selecione o modo mais adequado ao seu estilo!</string>
+    <string name="settings_dark_mode_message">Selecione o modo mais adequado para você!</string>
     <string name="settings_dark_mode_light">Sempre claro</string>
-    <string name="settings_dark_mode_system">Mesmo do sistema</string>
+    <string name="settings_dark_mode_system">Seguir sistema</string>
     <string name="settings_dark_mode_dark">Sempre escuro</string>
     <string name="settings_download_path_title">Caminho para baixar</string>
     <string name="settings_download_path_message">Os arquivos serão salvos em %1$s</string>
-    <string name="settings_hide_app_title">Ocultar o app do Magisk</string>
+    <string name="settings_hide_app_title">Ocultar app do Magisk</string>
     <string name="settings_hide_app_summary">Instala o app oculto com ID aleatório e nome personalizado</string>
-    <string name="settings_restore_app_title">Restaurar o app do Magisk</string>
+    <string name="settings_restore_app_title">Restaurar app do Magisk</string>
     <string name="settings_restore_app_summary">Desoculta o app do Magisk e restaura o APK original</string>
     <string name="language">Idioma</string>
     <string name="system_default">(Padrão do sistema)</string>
-    <string name="settings_check_update_title">Verificar atualizações</string>
-    <string name="settings_check_update_summary">Verifica periodicamente se há atualizações em segundo plano</string>
+    <string name="settings_check_update_title">Verificar por atualizações</string>
+    <string name="settings_check_update_summary">Verifique automaticamente se há atualizações ao abrir o app</string>
     <string name="settings_update_channel_title">Canal de atualização</string>
     <string name="settings_update_stable">Estável</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Personalizado</string>
     <string name="settings_update_custom_msg">Insira um URL de canal personalizado</string>
     <string name="settings_zygisk_summary">Executa partes do Magisk no Zygote</string>
-    <string name="settings_denylist_title">Aplicar Lista de negação</string>
-    <string name="settings_denylist_summary">Os processos na Lista de negação terão todas as modificações do Magisk revertidas</string>
-    <string name="settings_denylist_error">Isso requer %1$s para ser ativado</string>
-    <string name="settings_denylist_config_title">Configurar Lista de negação</string>
-    <string name="settings_denylist_config_summary">Selecione os processos a serem incluídos na Lista de negação</string>
-    <string name="settings_hosts_title">Hosts fora do sistema</string>
-    <string name="settings_hosts_summary">Suporte de /etc/hosts fora do sistema para apps Adblock</string>
-    <string name="settings_hosts_toast">Adicionado módulo de /etc/hosts fora do sistema</string>
+    <string name="settings_denylist_title">Aplicar lista de negação</string>
+    <string name="settings_denylist_summary">Os processos na lista de negação terão todas as modificações do Magisk revertidas</string>
+    <string name="settings_denylist_error">Este recurso requer que %1$s esteja ativado</string>
+    <string name="settings_denylist_config_title">Configurar lista de negação</string>
+    <string name="settings_denylist_config_summary">Selecione os processos a serem incluídos na lista de negação</string>
+    <string name="settings_hosts_title">Hosts sem sistema</string>
+    <string name="settings_hosts_summary">Suporte de hosts sem sistema para apps AdBlock</string>
+    <string name="settings_hosts_toast">Adicionado módulo de hosts sem sistema</string>
     <string name="settings_app_name_hint">Novo nome</string>
     <string name="settings_app_name_helper">O app do Magisk será reinstalado com este nome</string>
     <string name="settings_app_name_error">Formato inválido</string>
@@ -163,7 +163,7 @@
     <string name="request_timeout">Tempo limite da solicitação</string>
     <string name="superuser_notification">Notificação de SuperUsuário</string>
     <string name="settings_su_reauth_title">Reautenticar após atualização</string>
-    <string name="settings_su_reauth_summary">Reautenticar permissões de SuperUsuário após atualizar os apps</string>
+    <string name="settings_su_reauth_summary">Solicite permissões de SuperUsuário novamente após atualizar os apps</string>
     <string name="settings_su_tapjack_title">Proteção contra atividades sobrepostas</string>
     <string name="settings_su_tapjack_summary">A caixa de diálogo do SuperUsuário não responderá à entrada enquanto estiver oculta por qualquer outra janela ou sobreposição</string>
     <string name="settings_su_auth_title">Autenticação de usuário</string>
@@ -180,13 +180,13 @@
     <string name="owner_only_summary">Somente o proprietário tem acesso root</string>
     <string name="owner_manage_summary">Somente o proprietário pode gerenciar o acesso root e receber pedidos de solicitação</string>
     <string name="user_independent_summary">Cada usuário tem suas próprias regras de root separadas</string>
-    <string name="mount_namespace_mode">Montar modo Namespace</string>
-    <string name="settings_ns_global">Namespace global</string>
-    <string name="settings_ns_requester">Herdar Namespace</string>
-    <string name="settings_ns_isolate">Namespace isolado</string>
+    <string name="mount_namespace_mode">Montar namespace</string>
+    <string name="settings_ns_global">Global</string>
+    <string name="settings_ns_requester">Herdado</string>
+    <string name="settings_ns_isolate">Individual</string>
     <string name="global_summary">Todas as sessões root usam o namespace de montagem global</string>
     <string name="requester_summary">As sessões root herdarão o namespace do solicitante</string>
-    <string name="isolate_summary">Cada sessão root terá seu próprio namespace isolado</string>
+    <string name="isolate_summary">Cada sessão root terá seu próprio namespace individual</string>
 
     <!--Notifications-->
     <string name="update_channel">Atualizações do Magisk</string>
@@ -207,7 +207,7 @@
     <string name="release_notes">Notas da atualização</string>
     <string name="flashing">Flashando…</string>
     <string name="done">Concluído!</string>
-    <string name="failure">Falha!</string>
+    <string name="failure">Falhou!</string>
     <string name="hide_app_title">Ocultando o app do Magisk…</string>
     <string name="open_link_failed_toast">Nenhum app encontrado para abrir o link</string>
     <string name="complete_uninstall">Desinstalação completa</string>
