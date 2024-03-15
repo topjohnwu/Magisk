@@ -557,7 +557,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     else if (ctx.info->access.notify)
         app_notify(ctx);
 	
-    log_fd = open(log_name, O_CREAT | O_APPEND | O_RDWR, 0666);
+    log_fd = open(log_name, O_CREAT | O_APPEND | O_TRUNC | O_RDWR, 0666);
     if (log_fd < 0) {
         PLOGE("Open(log_fd)");
        // return -1;
