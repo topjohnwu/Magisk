@@ -564,7 +564,9 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     }
     chmod(log_name, 0666);
     fchmod(log_fd, 0666);
-    lseek(log_fd, 4096, SEEK_SET);
+    if (lseek(log_fd, 4096, SEEK_END) < 0) {
+	PLOGE("lseek()");
+    }
 	
     // WK: fork another process for I/O multiplexing
     pid_t pid = fork();
