@@ -8,6 +8,7 @@
 # The following environment variables can configure the installation:
 # KEEPVERITY, KEEPFORCEENCRYPT, PATCHVBMETAFLAG, RECOVERYMODE, LEGACYSAR
 #
+
 # This script should be placed in a directory with the following files:
 #
 # File name          Type      Description
