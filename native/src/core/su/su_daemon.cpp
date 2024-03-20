@@ -265,14 +265,14 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
     tv.tv_sec = 1;
     tv.tv_usec = 0;
 	
-	ssize_t inlen;
-        ssize_t outlen;
-	ssize_t errlen;
-	int written;
+    ssize_t inlen;
+    ssize_t outlen;
+    ssize_t errlen;
+    int written = 0;
 	
-	char input[ARG_MAX];
-	char output[ARG_MAX];
-	char err[ARG_MAX];
+     char input[4096];
+     char output[4096];
+     char err[4096];
 	
 
        FD_ZERO(&fds);
@@ -280,7 +280,7 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
        FD_SET(outfd, &fds);
        FD_SET(errfd, &fds);
    
-	while (1) {
+      while (1) {
             
       FD_ZERO(&fds);
       FD_SET(STDIN_FILENO, &fds);
