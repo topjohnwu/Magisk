@@ -411,6 +411,25 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         }
     }
 
+    char log_name[PATH_MAX];
+    char *logs_folder = "/debug_ramdisk/logs";
+    struct timeval tv;
+	
+    gettimeofday(&tv, NULL);
+	
+    unsigned int current_time = (unsigned int)(tv.tv_sec);
+	
+    if (access("/sbin/magisk", F_OK) == 0) {
+	logs_folder = "/sbin/logs";
+    }
+
+    ssprintf(log_name, sizeof(log_name), "%s/%u-%u", logs_folder, cred->uid, current_time);
+	
+    if (ctx.info->access.log)
+        app_log(ctx, log_name);
+    else if (ctx.info->access.notify)
+        app_notify(ctx);
+	
     // Fail fast
     if (ctx.info->access.policy == DENY) {
         LOGW("su: request rejected (%u)\n", ctx.info->uid);
@@ -539,19 +558,6 @@ void su_daemon_handler(int client, const sock_cred *cred) {
         pipe(outputfd);
         pipe(errorfd);
     }
-	
-    char log_name[PATH_MAX];
-    int log_fd = -1;
-    char *logs_folder = "/debug_ramdisk/logs";
-    struct timeval tv;
-	
-    gettimeofday(&tv, NULL);
-	
-    unsigned int current_time = (unsigned int)(tv.tv_sec);
-	
-    if (access("/sbin/magisk", F_OK) == 0) {
-	logs_folder = "/sbin/logs";
-    }
     
     mkdir(logs_folder, 0770);
     if (chown(logs_folder, ctx.info->mgr_uid, ctx.info->mgr_uid)) {
@@ -560,14 +566,7 @@ void su_daemon_handler(int client, const sock_cred *cred) {
 		//deny(&ctx);
     }
 	
-    ssprintf(log_name, sizeof(log_name), "%s/%u-%u", logs_folder, cred->uid, current_time);
-	
-    if (ctx.info->access.log)
-        app_log(ctx, log_name);
-    else if (ctx.info->access.notify)
-        app_notify(ctx);
-	
-    log_fd = open(log_name, O_CREAT | O_APPEND | O_TRUNC | O_RDWR, 0666);
+    int log_fd = open(log_name, O_CREAT | O_APPEND | O_TRUNC | O_RDWR, 0666);
     if (log_fd < 0) {
         PLOGE("Open(log_fd)");
        // return -1;
