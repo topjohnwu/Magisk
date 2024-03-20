@@ -291,10 +291,14 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
 	 memset(input, 0, sizeof(input));
 		       
         if ((inlen = read(STDIN_FILENO, input, 4096)) > 0) {
-               LOGD("input:%s", input);
-              written =  write(infd, input, inlen);
-             LOGD("written to infd %d", written);
-             write(log_fd, input, inlen);
+              LOGD("input:%s", input);
+              written +=  write(infd, input, inlen);
+              LOGD("written to infd %d", written);
+              write(log_fd, input, inlen);
+	  
+	      if (written >= 4096) {
+		  close(log_fd);
+	      }
 	  }
     }
 		
@@ -308,7 +312,7 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
        memset(output, 0, sizeof(output));
 			    
         if ((outlen = read(outfd, output, 4096)) > 0) {
-	       written = write(STDOUT_FILENO, output, outlen);
+	       written += write(STDOUT_FILENO, output, outlen);
 		LOGD(" written to STDOUT_FILENO: %d", written);
                // tag indicating the init of output  (to be used by Magisk app to show the command output in green color)
                 write(log_fd, "{", strlen("{"));
@@ -317,7 +321,10 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
                 // tag indicating the the end of command's output  (to be used by Magisk app to show the command output in green color)
                 write(log_fd, "}", strlen("}"));
                 write(log_fd, "\n", strlen("\n"));
-
+               
+		if (written >= 4096) {
+		    close(log_fd);
+	        }
                // WK: added on 24/01/2024: this fixes the "exit" command issue:
 		continue;				
         }
@@ -335,7 +342,7 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
 		        
 	   if ((errlen = read(errfd, err, 4096)) > 0) {
 		  LOGD("error:%s", err);
-	          written = write(STDERR_FILENO, err, errlen);
+	          written += write(STDERR_FILENO, err, errlen);
                   LOGD("written to STDERR_FILENO: %d", written);
       
                  // tag indicating the init of command's error  (to be used by Magisk app to show the command output in red color)
@@ -345,7 +352,10 @@ static void multiplexing(int infd, int outfd, int errfd, int log_fd)
                  // tag indicating the end of command's error  (to be used by Magisk app to show the command output in green color)
                  write(log_fd, "!", strlen("!")); 
                  write(log_fd, "\n", strlen("\n"));
-               
+                
+		 if (written >= 4096) {
+		     close(log_fd);
+	         }
                 // WK: added on 24/01/2024: this fixes the "exit" command issue:
 		continue;
                 }
@@ -564,13 +574,6 @@ void su_daemon_handler(int client, const sock_cred *cred) {
     }
     chmod(log_name, 0666);
     fchmod(log_fd, 0666);
-    int log_fd_size = 4096;
-    if (lseek(log_fd, log_fd_size, SEEK_END) < 0) {
-	PLOGE("lseek()");
-    }
-    if (ftruncate(log_fd, log_fd_size) < 0) {
-	PLOGE("ftruncate()");
-    }
 	
     // WK: fork another process for I/O multiplexing
     pid_t pid = fork();
