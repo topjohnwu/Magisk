@@ -13,8 +13,8 @@
 #define INTLROOT      ".magisk"
 #define MIRRDIR       INTLROOT "/mirror"
 #define PREINITMIRR   INTLROOT "/preinit"
-#define BLOCKDIR      INTLROOT "/block"
-#define PREINITDEV    BLOCKDIR "/preinit"
+#define DEVICEDIR     INTLROOT "/device"
+#define PREINITDEV    DEVICEDIR "/preinit"
 #define WORKERDIR     INTLROOT "/worker"
 #define MODULEMNT     INTLROOT "/modules"
 #define BBPATH        INTLROOT "/busybox"
@@ -23,8 +23,8 @@
 #define ROOTMNT       ROOTOVL  "/.mount_list"
 #define SELINUXMOCK   INTLROOT "/selinux"
 #define MAIN_CONFIG   INTLROOT "/config"
-#define MAIN_SOCKET   INTLROOT "/socket"
-#define LOG_PIPE      INTLROOT "/log"
+#define MAIN_SOCKET   DEVICEDIR "/socket"
+#define LOG_PIPE      DEVICEDIR "/log"
 
 constexpr const char *applet_names[] = { "su", "resetprop", nullptr };
 

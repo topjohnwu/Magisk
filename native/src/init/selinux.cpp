@@ -42,7 +42,7 @@ static void dump_preload() {
     int fd = xopen("/dev/preload.so", O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0644);
     if (fd < 0)
         return;
-    fd_channel ch(fd);
+    fd_stream ch(fd);
     if (!unxz(ch, byte_view(init_ld_xz, sizeof(init_ld_xz))))
         return;
     close(fd);

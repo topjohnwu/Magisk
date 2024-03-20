@@ -70,7 +70,7 @@ configurations.all {
 dependencies {
     implementation(project(":app:shared"))
 
-    implementation("com.github.topjohnwu:jtar:1.0.0")
+    implementation("com.github.topjohnwu:jtar:1.1.0")
     implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
@@ -104,7 +104,7 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     kapt("androidx.room:room-compiler:${vRoom}")
 
-    val vNav = "2.7.6"
+    val vNav = "2.7.7"
     implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
     implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
 

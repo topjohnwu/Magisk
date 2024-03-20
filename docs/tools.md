@@ -97,7 +97,7 @@ Supported actions:
       test
         Test the cpio's status
         Return value is 0 or bitwise or-ed of following values:
-        0x1:Magisk    0x2:unsupported    0x4:Sony
+        0x1:Magisk    0x2:unsupported
       patch
         Apply ramdisk patches
         Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT

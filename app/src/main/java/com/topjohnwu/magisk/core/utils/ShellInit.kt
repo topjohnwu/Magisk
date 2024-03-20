@@ -13,6 +13,8 @@ import com.topjohnwu.magisk.core.ktx.rawResource
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.jar.JarFile
 
@@ -34,7 +36,9 @@ class ShellInit : Shell.Initializer() {
                 val bb = jar.getJarEntry("lib/${Const.CPU_ABI}/libbusybox.so")
                 localBB = context.deviceProtectedContext.cachedFile("busybox")
                 localBB.delete()
-                jar.getInputStream(bb).writeTo(localBB)
+                runBlocking {
+                    jar.getInputStream(bb).writeTo(localBB, dispatcher = Dispatchers.Unconfined)
+                }
                 localBB.setExecutable(true)
             } else {
                 localBB = File(context.applicationInfo.nativeLibraryDir, "libbusybox.so")

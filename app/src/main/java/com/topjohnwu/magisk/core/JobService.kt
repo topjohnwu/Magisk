@@ -22,20 +22,25 @@ import java.util.concurrent.TimeUnit
 class JobService : BaseJobService() {
 
     private var mSession: Session? = null
-    private var mEngine: DownloadEngine? = null
 
     @TargetApi(value = 34)
     inner class Session(
-        var params: JobParameters
+        private var params: JobParameters
     ) : DownloadEngine.Session {
 
         override val context get() = this@JobService
+        val engine = DownloadEngine(this)
 
-        override fun attach(id: Int, builder: Notification.Builder) {
+        fun updateParams(params: JobParameters) {
+            this.params = params
+            engine.reattach()
+        }
+
+        override fun attachNotification(id: Int, builder: Notification.Builder) {
             setNotification(params, id, builder.build(), JOB_END_NOTIFICATION_POLICY_REMOVE)
         }
 
-        override fun stop() {
+        override fun onDownloadComplete() {
             jobFinished(params, false)
         }
     }
@@ -59,18 +64,12 @@ class JobService : BaseJobService() {
             return false
 
         val session = mSession?.also {
-            it.params = params
+            it.updateParams(params)
         } ?: run {
             Session(params).also { mSession = it }
         }
 
-        val engine = mEngine?.also {
-            it.reattach()
-        } ?: run {
-            DownloadEngine(session).also { mEngine = it }
-        }
-
-        engine.download(subject)
+        session.engine.download(subject)
         return true
     }
 

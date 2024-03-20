@@ -16,14 +16,14 @@ using namespace std;
 #define SHA_DIGEST_SIZE 20
 
 static void decompress(format_t type, int fd, const void *in, size_t size) {
-    auto ptr = get_decoder(type, make_unique<fd_channel>(fd));
+    auto ptr = get_decoder(type, make_unique<fd_stream>(fd));
     ptr->write(in, size);
 }
 
 static off_t compress(format_t type, int fd, const void *in, size_t size) {
     auto prev = lseek(fd, 0, SEEK_CUR);
     {
-        auto strm = get_encoder(type, make_unique<fd_channel>(fd));
+        auto strm = get_encoder(type, make_unique<fd_stream>(fd));
         strm->write(in, size);
     }
     auto now = lseek(fd, 0, SEEK_CUR);
@@ -520,12 +520,12 @@ bool boot_img::verify(const char *cert) const {
     return rust::verify_boot_image(*this, cert);
 }
 
-int split_image_dtb(const char *filename) {
+int split_image_dtb(const char *filename, bool skip_decomp) {
     mmap_data img(filename);
 
     if (int off = find_dtb_offset(img.buf(), img.sz()); off > 0) {
         format_t fmt = check_fmt_lg(img.buf(), img.sz());
-        if (COMPRESSED(fmt)) {
+        if (!skip_decomp && COMPRESSED(fmt)) {
             int fd = creat(KERNEL_FILE, 0644);
             decompress(fmt, fd, img.buf(), off);
             close(fd);

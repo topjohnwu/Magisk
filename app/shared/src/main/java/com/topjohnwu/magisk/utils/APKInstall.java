@@ -67,8 +67,6 @@ public final class APKInstall {
     public interface Session {
         // @WorkerThread
         OutputStream openStream(Context context) throws IOException;
-        // @WorkerThread
-        void install(Context context, File apk) throws IOException;
         // @WorkerThread @Nullable
         Intent waitIntent();
     }
@@ -166,14 +164,6 @@ public final class APKInstall {
                     session.close();
                 }
             };
-        }
-
-        @Override
-        public void install(Context context, File apk) throws IOException {
-            try (var src = new FileInputStream(apk);
-                 var out = openStream(context)) {
-                transfer(src, out);
-            }
         }
     }
 }

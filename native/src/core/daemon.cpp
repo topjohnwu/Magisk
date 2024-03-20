@@ -391,13 +391,6 @@ static void daemon_entry() {
     ssprintf(path, sizeof(path), "%s/" ROOTOVL, tmp);
     rm_rf(path);
 
-    // Unshare magiskd
-    xunshare(CLONE_NEWNS);
-    // Hide magisk internal mount point
-    xmount(nullptr, tmp, nullptr, MS_PRIVATE | MS_REC, nullptr);
-    // Fix sdcardfs bug on old kernel
-    xmount(nullptr, "/mnt", nullptr, MS_SLAVE | MS_REC, nullptr);
-
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {
         ssprintf(path, sizeof(path), "%s/" SHELLPTS, tmp);

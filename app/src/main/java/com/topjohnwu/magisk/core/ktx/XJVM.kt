@@ -2,10 +2,15 @@ package com.topjohnwu.magisk.core.ktx
 
 import androidx.collection.SparseArrayCompat
 import com.topjohnwu.magisk.core.utils.currentLocale
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Field
@@ -35,9 +40,38 @@ inline fun <In : InputStream, Out : OutputStream> withStreams(
     }
 }
 
-fun InputStream.copyAndClose(out: OutputStream) = withStreams(this, out) { i, o -> i.copyTo(o) }
+@Throws(IOException::class)
+suspend fun InputStream.copyAll(
+    out: OutputStream,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
+): Long {
+    return withContext(dispatcher) {
+        var bytesCopied: Long = 0
+        val buffer = ByteArray(bufferSize)
+        var bytes = read(buffer)
+        while (isActive && bytes >= 0) {
+            out.write(buffer, 0, bytes)
+            bytesCopied += bytes
+            bytes = read(buffer)
+        }
+        bytesCopied
+    }
+}
 
-fun InputStream.writeTo(file: File) = copyAndClose(file.outputStream())
+@Throws(IOException::class)
+suspend inline fun InputStream.copyAndClose(
+    out: OutputStream,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
+) = withStreams(this, out) { i, o -> i.copyAll(o, bufferSize, dispatcher) }
+
+@Throws(IOException::class)
+suspend inline fun InputStream.writeTo(
+    file: File,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    dispatcher: CoroutineDispatcher = Dispatchers.IO
+) = copyAndClose(file.outputStream(), bufferSize, dispatcher)
 
 operator fun <E> SparseArrayCompat<E>.set(key: Int, value: E) {
     put(key, value)

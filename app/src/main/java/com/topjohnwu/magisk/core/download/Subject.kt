@@ -20,11 +20,6 @@ import kotlinx.parcelize.Parcelize
 import java.io.File
 import java.util.UUID
 
-enum class Action {
-    Flash,
-    Download
-}
-
 sealed class Subject : Parcelable {
 
     abstract val url: String
@@ -32,19 +27,17 @@ sealed class Subject : Parcelable {
     abstract val title: String
     abstract val notifyId: Int
     open val autoLaunch: Boolean get() = true
-    open val postDownload: (() -> Unit)? get() = null
 
     open fun pendingIntent(context: Context): PendingIntent? = null
 
     @Parcelize
     class Module(
-        val module: OnlineModule,
-        val action: Action,
+        private val module: OnlineModule,
+        override val autoLaunch: Boolean,
         override val notifyId: Int = Notifications.nextId()
     ) : Subject() {
         override val url: String get() = module.zipUrl
         override val title: String get() = module.downloadFilename
-        override val autoLaunch: Boolean get() = action == Action.Flash
 
         @IgnoredOnParcel
         override val file by lazy {
@@ -65,11 +58,8 @@ sealed class Subject : Parcelable {
 
         @IgnoredOnParcel
         override val file by lazy {
-            AppContext.cachedFile("manager.apk").apply { delete() }.toUri()
+            MediaStoreUtils.getFile("${title}.apk").uri
         }
-
-        @IgnoredOnParcel
-        override var postDownload: (() -> Unit)? = null
 
         @IgnoredOnParcel
         var intent: Intent? = null

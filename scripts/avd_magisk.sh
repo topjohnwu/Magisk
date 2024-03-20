@@ -138,9 +138,7 @@ ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magiskpolicy $MAGISKTMP/supolicy
 
-mkdir -p $MAGISKTMP/.magisk/mirror
-mkdir $MAGISKTMP/.magisk/block
-mkdir $MAGISKTMP/.magisk/worker
+mkdir -p $MAGISKTMP/.magisk/device
 touch $MAGISKTMP/.magisk/config
 
 export MAGISKTMP

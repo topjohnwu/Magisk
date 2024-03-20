@@ -63,7 +63,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskinit
 LOCAL_STATIC_LIBRARIES := \
     libbase \
-    libcompat \
     libpolicy \
     libxz \
     libinit-rs
@@ -77,6 +76,13 @@ LOCAL_SRC_FILES := \
     init/selinux.cpp \
     init/init-rs.cpp
 
+LOCAL_LDFLAGS := -static -T src/lto_fix.lds
+
+ifdef B_CRT0
+LOCAL_STATIC_LIBRARIES += crt0
+LOCAL_LDFLAGS :=
+endif
+
 include $(BUILD_EXECUTABLE)
 
 endif
@@ -87,7 +93,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := magiskboot
 LOCAL_STATIC_LIBRARIES := \
     libbase \
-    libcompat \
     liblzma \
     liblz4 \
     libbz2 \
@@ -101,6 +106,14 @@ LOCAL_SRC_FILES := \
     boot/compress.cpp \
     boot/format.cpp \
     boot/boot-rs.cpp
+
+LOCAL_LDFLAGS := -static -T src/lto_fix.lds
+
+ifdef B_CRT0
+LOCAL_STATIC_LIBRARIES += crt0
+LOCAL_CFLAGS += -DUSE_MUSL_PRINTF
+LOCAL_LDFLAGS := -lm
+endif
 
 include $(BUILD_EXECUTABLE)
 

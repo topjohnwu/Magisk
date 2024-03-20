@@ -17,7 +17,7 @@ macro_rules! INTLROOT {
 #[macro_export]
 macro_rules! LOG_PIPE {
     () => {
-        concat!($crate::INTLROOT!(), "/log")
+        concat!($crate::INTLROOT!(), "/device/log")
     };
 }
 

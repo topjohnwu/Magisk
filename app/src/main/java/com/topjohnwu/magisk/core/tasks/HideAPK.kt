@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Provider
 import com.topjohnwu.magisk.core.ktx.await
+import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.AXML
@@ -168,7 +169,7 @@ object HideAPK {
         activity.finish()
     }
 
-    private fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
+    private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
             activity.assets.open("stub.apk").writeTo(stub)
@@ -195,7 +196,7 @@ object HideAPK {
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
-            session.install(activity, repack)
+            repack.inputStream().copyAndClose(session.openStream(activity))
         } catch (e: IOException) {
             Timber.e(e)
             return false
@@ -244,7 +245,7 @@ object HideAPK {
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {
-                session.install(activity, apk)
+                apk.inputStream().copyAndClose(session.openStream(activity))
             } catch (e: IOException) {
                 Timber.e(e)
                 return@withContext false

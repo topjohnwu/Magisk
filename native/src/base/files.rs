@@ -2,7 +2,7 @@ use mem::MaybeUninit;
 use std::cmp::min;
 use std::ffi::CStr;
 use std::fs::File;
-use std::io::{BufRead, Read, Seek, SeekFrom, Write};
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::ops::Deref;
 use std::os::android::fs::MetadataExt;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
@@ -12,8 +12,8 @@ use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
 use libc::{
-    c_uint, dirent, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY, O_RDWR,
-    O_TRUNC, O_WRONLY, S_IFDIR, S_IFLNK, S_IFREG,
+    c_uint, dirent, makedev, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY,
+    O_RDWR, O_TRUNC, O_WRONLY, S_IFDIR, S_IFLNK, S_IFREG,
 };
 use num_traits::AsPrimitive;
 
@@ -860,4 +860,84 @@ pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<&'static
         }
         Ok(slice::from_raw_parts_mut(ptr.cast(), sz))
     }
+}
+
+#[allow(dead_code)]
+pub struct MountInfo {
+    pub id: u32,
+    pub parent: u32,
+    pub device: u64,
+    pub root: String,
+    pub target: String,
+    pub vfs_option: String,
+    pub shared: u32,
+    pub master: u32,
+    pub propagation_from: u32,
+    pub unbindable: bool,
+    pub fs_type: String,
+    pub source: String,
+    pub fs_option: String,
+}
+
+#[allow(clippy::useless_conversion)]
+fn parse_mount_info_line(line: &str) -> Option<MountInfo> {
+    let mut iter = line.split_whitespace();
+    let id = iter.next()?.parse().ok()?;
+    let parent = iter.next()?.parse().ok()?;
+    let (maj, min) = iter.next()?.split_once(':')?;
+    let maj = maj.parse().ok()?;
+    let min = min.parse().ok()?;
+    let device = makedev(maj, min).into();
+    let root = iter.next()?.to_string();
+    let target = iter.next()?.to_string();
+    let vfs_option = iter.next()?.to_string();
+    let mut optional = iter.next()?;
+    let mut shared = 0;
+    let mut master = 0;
+    let mut propagation_from = 0;
+    let mut unbindable = false;
+    while optional != "-" {
+        if let Some(peer) = optional.strip_prefix("master:") {
+            master = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("shared:") {
+            shared = peer.parse().ok()?;
+        } else if let Some(peer) = optional.strip_prefix("propagate_from:") {
+            propagation_from = peer.parse().ok()?;
+        } else if optional == "unbindable" {
+            unbindable = true;
+        }
+        optional = iter.next()?;
+    }
+    let fs_type = iter.next()?.to_string();
+    let source = iter.next()?.to_string();
+    let fs_option = iter.next()?.to_string();
+    Some(MountInfo {
+        id,
+        parent,
+        device,
+        root,
+        target,
+        vfs_option,
+        shared,
+        master,
+        propagation_from,
+        unbindable,
+        fs_type,
+        source,
+        fs_option,
+    })
+}
+
+pub fn parse_mount_info(pid: &str) -> Vec<MountInfo> {
+    let mut res = vec![];
+    let mut path = format!("/proc/{}/mountinfo", pid);
+    if let Ok(fd) = open_fd!(Utf8CStr::from_string(&mut path), O_RDONLY | O_CLOEXEC) {
+        let file = File::from(fd);
+        BufReader::new(file).foreach_lines(|line| {
+            parse_mount_info_line(line)
+                .map(|info| res.push(info))
+                .is_some()
+        });
+    }
+    res
 }

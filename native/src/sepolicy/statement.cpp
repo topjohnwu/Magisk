@@ -8,13 +8,6 @@
 
 using namespace std;
 
-const argument &all_xperm() {
-    static argument arg;
-    if (arg.first.empty())
-        arg.first.push_back(nullptr);
-    return arg;
-}
-
 static const char *type_msg_1 =
 R"EOF("allow *source_type *target_type *class *perm_set"
 "deny *source_type *target_type *class *perm_set"
@@ -423,6 +416,7 @@ else if (strcmp(name, action) == 0) {   \
 #define add_action(act, type) add_action_func(#act, type, act)
 
 void sepolicy::parse_statement(rust::Str stmt) {
+    if (stmt.empty()) return;
     // strtok modify strings, create a copy
     string cpy(stmt.data(), stmt.length());
 

@@ -19,30 +19,17 @@ bool zygisk_enabled = false;
 /*********
  * Setup *
  *********/
-
-static bool rec_mount(const std::string_view from, const std::string_view to) {
-    return !xmkdirs(to.data(), 0755) &&
-           // recursively bind mount to mirror dir, rootfs will fail before 3.12 kernel
-           // because of MS_NOUSER
-           !mount(from.data(), to.data(), nullptr, MS_BIND | MS_REC, nullptr);
-}
-
-static void mount_mirrors() {
-    LOGI("* Mounting mirrors\n");
+static void setup_mounts() {
+    LOGI("* Magic mount setup\n");
     auto self_mount_info = parse_mount_info("self");
-    char path[64];
+    char path[PATH_MAX];
 
     // Bind remount module root to clear nosuid
-    if (access(SECURE_DIR, F_OK) == 0 || SDK_INT < 24) {
-        ssprintf(path, sizeof(path), "%s/" MODULEMNT, get_magisk_tmp());
-        xmkdir(SECURE_DIR, 0700);
-        xmkdir(MODULEROOT, 0755);
-        xmkdir(path, 0755);
-        xmount(MODULEROOT, path, nullptr, MS_BIND, nullptr);
-        xmount(nullptr, path, nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
-        xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
-        chmod(SECURE_DIR, 0700);
-    }
+    ssprintf(path, sizeof(path), "%s/" MODULEMNT, get_magisk_tmp());
+    xmkdir(path, 0755);
+    xmount(MODULEROOT, path, nullptr, MS_BIND, nullptr);
+    xmount(nullptr, path, nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
+    xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
 
     // Check and mount preinit mirror
     char dev_path[64];
@@ -65,8 +52,9 @@ static void mount_mirrors() {
                 if (!rw) continue;
                 string preinit_dir = resolve_preinit_dir(info.target.data());
                 xmkdir(preinit_dir.data(), 0700);
-                if ((mounted = rec_mount(preinit_dir, path))) {
-                    xmount(nullptr, path, nullptr, MS_UNBINDABLE, nullptr);
+                xmkdirs(path, 0755);
+                mounted = xmount(preinit_dir.data(), path, nullptr, MS_BIND, nullptr) == 0;
+                if (mounted) {
                     break;
                 }
             }
@@ -79,29 +67,9 @@ static void mount_mirrors() {
 
     // Prepare worker
     ssprintf(path, sizeof(path), "%s/" WORKERDIR, get_magisk_tmp());
-    xmount("worker", path, "tmpfs", 0, "mode=755");
+    xmkdir(path, 0);
+    xmount(path, path, nullptr, MS_BIND, nullptr);
     xmount(nullptr, path, nullptr, MS_PRIVATE, nullptr);
-    // Recursively bind mount / to mirror dir
-    // Keep mirror shared so that mounting during post-fs-data will be propagated
-    if (auto mirror_dir = get_magisk_tmp() + "/"s MIRRDIR; !rec_mount("/", mirror_dir)) {
-        LOGI("fallback to mount subtree\n");
-        // create new a bind mount for easy make private
-        xmount(mirror_dir.data(), mirror_dir.data(), nullptr, MS_BIND, nullptr);
-        // rootfs may fail, fallback to bind mount each mount point
-        set<string, greater<>> mounted_dirs {{ get_magisk_tmp() }};
-        for (const auto &info: self_mount_info) {
-            if (info.type == "rootfs"sv) continue;
-            // the greatest mount point that less than info.target, which is possibly a parent
-            if (auto last_mount = mounted_dirs.upper_bound(info.target);
-                last_mount != mounted_dirs.end() && info.target.starts_with(*last_mount + '/')) {
-                continue;
-            }
-            if (rec_mount(info.target, mirror_dir + info.target)) {
-                LOGD("%-8s: %s <- %s\n", "rbind", (mirror_dir + info.target).data(), info.target.data());
-                mounted_dirs.insert(info.target);
-            }
-        }
-    }
 }
 
 string find_preinit_device() {
@@ -208,10 +176,10 @@ static bool magisk_env() {
 
     LOGI("* Initializing Magisk environment\n");
 
-    preserve_stub_apk();
-
     // Directories in /data/adb
+    chmod(SECURE_DIR, 0700);
     xmkdir(DATABIN, 0755);
+    xmkdir(MODULEROOT, 0755);
     xmkdir(SECURE_DIR "/post-fs-data.d", 0755);
     xmkdir(SECURE_DIR "/service.d", 0755);
     restorecon();
@@ -302,54 +270,55 @@ static bool check_key_combo() {
  * Boot Stage Handlers *
  ***********************/
 
-extern int disable_deny();
+static void disable_zygisk() {
+    char sql[64];
+    sprintf(sql, "REPLACE INTO settings (key,value) VALUES('%s',%d)",
+            DB_SETTING_KEYS[ZYGISK_CONFIG], false);
+    char *err = db_exec(sql);
+    db_err(err);
+}
 
 bool MagiskD::post_fs_data() const {
     as_rust().setup_logfile();
 
     LOGI("** post-fs-data mode running\n");
 
-    unlock_blocks();
-    mount_mirrors();
+    preserve_stub_apk();
     prune_su_access();
 
     bool safe_mode = false;
 
     if (access(SECURE_DIR, F_OK) != 0) {
-        LOGE(SECURE_DIR " is not present, abort\n");
-        goto early_abort;
+        if (SDK_INT < 24) {
+            xmkdir(SECURE_DIR, 0700);
+        } else {
+            LOGE(SECURE_DIR " is not present, abort\n");
+            return safe_mode;
+        }
     }
 
     if (!magisk_env()) {
         LOGE("* Magisk environment incomplete, abort\n");
-        goto early_abort;
+        return safe_mode;
     }
 
     if (get_prop("persist.sys.safemode", true) == "1" ||
         get_prop("ro.sys.safemode") == "1" || check_key_combo()) {
         safe_mode = true;
-        // Disable all modules and denylist so next boot will be clean
+        // Disable all modules and zygisk so next boot will be clean
         disable_modules();
-        disable_deny();
-    } else {
-        exec_common_scripts("post-fs-data");
-        db_settings dbs;
-        get_db_settings(dbs, ZYGISK_CONFIG);
-        zygisk_enabled = dbs[ZYGISK_CONFIG];
-        initialize_denylist();
-        handle_modules();
+        disable_zygisk();
+        return safe_mode;
     }
 
-early_abort:
-    auto mirror_dir = get_magisk_tmp() + "/"s MIRRDIR;
-    // make mirror dir as a private mount so that it won't be affected by magic mount
-    LOGD("make %s private\n", mirror_dir.data());
-    xmount(nullptr, mirror_dir.data(), nullptr, MS_PRIVATE | MS_REC, nullptr);
-    // We still do magic mount because root itself might need it
+    exec_common_scripts("post-fs-data");
+    db_settings dbs;
+    get_db_settings(dbs, ZYGISK_CONFIG);
+    zygisk_enabled = dbs[ZYGISK_CONFIG];
+    initialize_denylist();
+    setup_mounts();
+    handle_modules();
     load_modules();
-    // make mirror dir as a shared mount to make magisk --stop work for other ns
-    xmount(nullptr, mirror_dir.data(), nullptr, MS_SHARED | MS_REC, nullptr);
-    LOGD("make %s shared\n", mirror_dir.data());
     return safe_mode;
 }
 

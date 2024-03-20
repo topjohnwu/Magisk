@@ -13,28 +13,26 @@ import android.os.Bundle
 import androidx.collection.SparseArrayCompat
 import androidx.collection.isNotEmpty
 import androidx.core.content.getSystemService
-import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.intent
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.cachedFile
+import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.forEach
-import com.topjohnwu.magisk.core.ktx.selfLaunchIntent
 import com.topjohnwu.magisk.core.ktx.set
 import com.topjohnwu.magisk.core.ktx.withStreams
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.utils.APKInstall
@@ -45,11 +43,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import timber.log.Timber
-import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
@@ -79,8 +75,8 @@ class DownloadEngine(
     interface Session {
         val context: Context
 
-        fun attach(id: Int, builder: Notification.Builder)
-        fun stop()
+        fun attachNotification(id: Int, builder: Notification.Builder)
+        fun onDownloadComplete()
     }
 
     companion object {
@@ -168,7 +164,7 @@ class DownloadEngine(
                 when (subject) {
                     is Subject.App -> handleApp(stream, subject)
                     is Subject.Module -> handleModule(stream, subject.file)
-                    is Subject.Test -> stream.copyAndClose(subject.file.outputStream())
+                    else -> stream.copyAndClose(subject.file.outputStream())
                 }
                 val activity = ActivityTracker.foreground
                 if (activity != null && subject.autoLaunch) {
@@ -177,15 +173,9 @@ class DownloadEngine(
                 } else {
                     notifyFinish(subject)
                 }
-                subject.postDownload?.invoke()
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 Timber.e(e)
                 notifyFail(subject)
-            }
-
-            synchronized(this@DownloadEngine) {
-                if (notifications.isEmpty)
-                    session.stop()
             }
         }
     }
@@ -193,7 +183,7 @@ class DownloadEngine(
     @Synchronized
     fun reattach() {
         val builder = notifications[attachedId] ?: return
-        session.attach(attachedId, builder)
+        session.attachNotification(attachedId, builder)
     }
 
     private val notifications = SparseArrayCompat<Notification.Builder>()
@@ -231,7 +221,7 @@ class DownloadEngine(
 
     private fun attachNotification(id: Int, notification: Notification.Builder) {
         attachedId = id
-        session.attach(id, notification)
+        session.attachNotification(id, notification)
     }
 
     @Synchronized
@@ -265,7 +255,7 @@ class DownloadEngine(
                 } else {
                     // No more notifications left, terminate the session
                     attachedId = -1
-                    session.stop()
+                    session.onDownloadComplete()
                 }
             }
         }
@@ -274,51 +264,33 @@ class DownloadEngine(
         return n
     }
 
-    private fun handleApp(stream: InputStream, subject: Subject.App) {
-        fun writeTee(output: OutputStream) {
-            val uri = MediaStoreUtils.getFile("${subject.title}.apk").uri
-            val external = uri.outputStream()
-            stream.copyAndClose(TeeOutputStream(external, output))
-        }
+    private suspend fun handleApp(stream: InputStream, subject: Subject.App) {
+        val external = subject.file.outputStream()
 
         if (isRunningAsStub) {
             val updateApk = StubApk.update(context)
             try {
                 // Download full APK to stub update path
-                writeTee(updateApk.outputStream())
+                stream.copyAndClose(TeeOutputStream(external, updateApk.outputStream()))
 
-                val zf = ZipFile(updateApk)
-                val prop = Properties()
-                prop.load(ByteArrayInputStream(zf.comment.toByteArray()))
-                val stubVersion = prop.getProperty("stubVersion").toIntOrNull() ?: -1
-                if (Info.stub!!.version < stubVersion) {
-                    // Also upgrade stub
-                    notifyUpdate(subject.notifyId) {
-                        it.setProgress(0, 0, true)
-                            .setContentTitle(context.getString(R.string.hide_app_title))
-                            .setContentText("")
-                    }
-
-                    // Extract stub
-                    val apk = subject.file.toFile()
-                    zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
-                    zf.close()
-
-                    // Patch and install
-                    subject.intent = HideAPK.upgrade(context, apk)
-                        ?: throw IOException("HideAPK patch error")
-                    apk.delete()
-                } else {
-                    ActivityTracker.foreground?.let {
-                        // Relaunch the process if we are foreground
-                        StubApk.restartProcess(it)
-                    } ?: run {
-                        // Or else kill the current process after posting notification
-                        subject.intent = context.selfLaunchIntent()
-                        subject.postDownload = { Runtime.getRuntime().exit(0) }
-                    }
-                    return
+                // Also upgrade stub
+                notifyUpdate(subject.notifyId) {
+                    it.setProgress(0, 0, true)
+                        .setContentTitle(context.getString(R.string.hide_app_title))
+                        .setContentText("")
                 }
+
+                // Extract stub
+                val zf = ZipFile(updateApk)
+                val apk = context.cachedFile("stub.apk")
+                apk.delete()
+                zf.getInputStream(zf.getEntry("assets/stub.apk")).writeTo(apk)
+                zf.close()
+
+                // Patch and install
+                subject.intent = HideAPK.upgrade(context, apk)
+                    ?: throw IOException("HideAPK patch error")
+                apk.delete()
             } catch (e: Exception) {
                 // If any error occurred, do not let stub load the new APK
                 updateApk.delete()
@@ -326,14 +298,14 @@ class DownloadEngine(
             }
         } else {
             val session = APKInstall.startSession(context)
-            writeTee(session.openStream(context))
+            stream.copyAndClose(TeeOutputStream(external, session.openStream(context)))
             subject.intent = session.waitIntent()
         }
     }
 
-    private fun handleModule(src: InputStream, file: Uri) {
-        val input = ZipInputStream(src.buffered())
-        val output = ZipOutputStream(file.outputStream().buffered())
+    private suspend fun handleModule(src: InputStream, file: Uri) {
+        val input = ZipInputStream(src)
+        val output = ZipOutputStream(file.outputStream())
 
         withStreams(input, output) { zin, zout ->
             zout.putNextEntry(ZipEntry("META-INF/"))
@@ -341,7 +313,7 @@ class DownloadEngine(
             zout.putNextEntry(ZipEntry("META-INF/com/google/"))
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
-            context.assets.open("module_installer.sh").copyTo(zout)
+            context.assets.open("module_installer.sh").use { it.copyAll(zout) }
 
             zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
             zout.write("#MAGISK\n".toByteArray())
@@ -351,7 +323,7 @@ class DownloadEngine(
                 if (path.isNotEmpty() && !path.startsWith("META-INF")) {
                     zout.putNextEntry(ZipEntry(path))
                     if (!entry.isDirectory) {
-                        zin.copyTo(zout)
+                        zin.copyAll(zout)
                     }
                 }
             }

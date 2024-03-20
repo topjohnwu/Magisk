@@ -100,31 +100,6 @@ static dev_t setup_block() {
     return 0;
 }
 
-static void switch_root(const string &path) {
-    LOGD("Switch root to %s\n", path.data());
-    int root = xopen("/", O_RDONLY);
-    for (set<string, greater<>> mounts; auto &info : parse_mount_info("self")) {
-        if (info.target == "/" || info.target == path)
-            continue;
-        if (auto last_mount = mounts.upper_bound(info.target);
-                last_mount != mounts.end() && info.target.starts_with(*last_mount + '/')) {
-            continue;
-        }
-        mounts.emplace(info.target);
-        auto new_path = path + info.target;
-        xmkdir(new_path.data(), 0755);
-        xmount(info.target.data(), new_path.data(), nullptr, MS_MOVE, nullptr);
-    }
-    chdir(path.data());
-    xmount(path.data(), "/", nullptr, MS_MOVE, nullptr);
-    chroot(".");
-
-    LOGD("Cleaning rootfs\n");
-    frm_rf(root);
-}
-
-#define PREINITMNT MIRRDIR "/preinit"
-
 static void mount_preinit_dir(string preinit_dev) {
     if (preinit_dev.empty()) return;
     strcpy(blk_info.partname, preinit_dev.data());
@@ -134,25 +109,23 @@ static void mount_preinit_dir(string preinit_dev) {
         LOGE("Cannot find preinit %s, abort!\n", preinit_dev.data());
         return;
     }
-    xmkdir(PREINITMNT, 0);
+    xmkdir(MIRRDIR, 0);
     bool mounted = false;
     // First, find if it is already mounted
-    for (auto &info : parse_mount_info("self")) {
-        if (info.root == "/" && info.device == dev) {
-            // Already mounted, just bind mount
-            xmount(info.target.data(), PREINITMNT, nullptr, MS_BIND, nullptr);
-            mounted = true;
-            break;
-        }
+    std::string mnt_point;
+    if (rust::is_device_mounted(dev, mnt_point)) {
+        // Already mounted, just bind mount
+        xmount(mnt_point.data(), MIRRDIR, nullptr, MS_BIND, nullptr);
+        mounted = true;
     }
 
     // Since we are mounting the block device directly, make sure to ONLY mount the partitions
     // as read-only, or else the kernel might crash due to crappy drivers.
     // After the device boots up, magiskd will properly bind mount the correct partition
     // on to PREINITMIRR as writable. For more details, check bootstages.cpp
-    if (mounted || mount(PREINITDEV, PREINITMNT, "ext4", MS_RDONLY, nullptr) == 0 ||
-        mount(PREINITDEV, PREINITMNT, "f2fs", MS_RDONLY, nullptr) == 0) {
-        string preinit_dir = resolve_preinit_dir(PREINITMNT);
+    if (mounted || mount(PREINITDEV, MIRRDIR, "ext4", MS_RDONLY, nullptr) == 0 ||
+        mount(PREINITDEV, MIRRDIR, "f2fs", MS_RDONLY, nullptr) == 0) {
+        string preinit_dir = resolve_preinit_dir(MIRRDIR);
         // Create bind mount
         xmkdirs(PREINITMIRR, 0);
         if (access(preinit_dir.data(), F_OK)) {
@@ -161,7 +134,7 @@ static void mount_preinit_dir(string preinit_dev) {
             LOGD("preinit: %s\n", preinit_dir.data());
             xmount(preinit_dir.data(), PREINITMIRR, nullptr, MS_BIND, nullptr);
         }
-        xumount2(PREINITMNT, MNT_DETACH);
+        xumount2(MIRRDIR, MNT_DETACH);
     } else {
         PLOGE("Failed to mount preinit %s\n", preinit_dev.data());
         unlink(PREINITDEV);
@@ -212,7 +185,7 @@ mount_root:
         }
     }
 
-    switch_root("/system_root");
+    rust::switch_root("/system_root");
 
     // Make dev writable
     xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
@@ -243,7 +216,7 @@ void BaseInit::exec_init() {
         if (xumount2(p.data(), MNT_DETACH) == 0)
             LOGD("Unmount [%s]\n", p.data());
     }
-    execv("/init", argv);
+    execve("/init", argv, environ);
     exit(1);
 }
 
@@ -262,9 +235,7 @@ void MagiskInit::setup_tmp(const char *path) {
     chdir("/data");
 
     xmkdir(INTLROOT, 0711);
-    xmkdir(MIRRDIR, 0);
-    xmkdir(BLOCKDIR, 0);
-    xmkdir(WORKERDIR, 0);
+    xmkdir(DEVICEDIR, 0711);
 
     mount_preinit_dir(preinit_dev);
 

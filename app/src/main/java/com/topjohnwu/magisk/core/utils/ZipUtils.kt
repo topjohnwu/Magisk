@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.core.utils
 
+import com.topjohnwu.magisk.core.ktx.copyAll
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -7,14 +8,14 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
 @Throws(IOException::class)
-fun File.unzip(folder: File, path: String = "", junkPath: Boolean = false) {
+suspend fun File.unzip(folder: File, path: String = "", junkPath: Boolean = false) {
     inputStream().buffered().use {
         it.unzip(folder, path, junkPath)
     }
 }
 
 @Throws(IOException::class)
-fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
+suspend fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
     try {
         val zin = ZipInputStream(this)
         var entry: ZipEntry
@@ -34,7 +35,7 @@ fun InputStream.unzip(folder: File, path: String, junkPath: Boolean) {
                 if (!it.exists())
                     it.mkdirs()
             }
-            dest.outputStream().use { out -> zin.copyTo(out) }
+            dest.outputStream().use { out -> zin.copyAll(out) }
         }
     } catch (e: IllegalArgumentException) {
         throw IOException(e)

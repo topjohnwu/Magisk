@@ -7,30 +7,25 @@
 using namespace std;
 
 static int strm_read(void *v, char *buf, int len) {
-    auto strm = static_cast<channel *>(v);
+    auto strm = static_cast<stream *>(v);
     return strm->read(buf, len);
 }
 
 static int strm_write(void *v, const char *buf, int len) {
-    auto strm = static_cast<channel *>(v);
+    auto strm = static_cast<stream *>(v);
     if (!strm->write(buf, len))
         return -1;
     return len;
 }
 
-static fpos_t strm_seek(void *v, fpos_t off, int whence) {
-    auto strm = static_cast<channel *>(v);
-    return strm->seek(off, whence);
-}
-
 static int strm_close(void *v) {
-    auto strm = static_cast<channel *>(v);
+    auto strm = static_cast<stream *>(v);
     delete strm;
     return 0;
 }
 
-sFILE make_channel_fp(channel_ptr &&strm) {
-    auto fp = make_file(funopen(strm.release(), strm_read, strm_write, strm_seek, strm_close));
+sFILE make_stream_fp(stream_ptr &&strm) {
+    auto fp = make_file(funopen(strm.release(), strm_read, strm_write, nullptr, strm_close));
     setbuf(fp.get(), nullptr);
     return fp;
 }
@@ -48,40 +43,6 @@ ssize_t in_stream::readFully(void *buf, size_t len) {
         read_sz += ret;
     } while (read_sz != len && ret != 0);
     return read_sz;
-}
-
-ssize_t in_stream::readv(const iovec *iov, int iovcnt) {
-    size_t read_sz = 0;
-    for (int i = 0; i < iovcnt; ++i) {
-        auto ret = readFully(iov[i].iov_base, iov[i].iov_len);
-        if (ret < 0)
-            return ret;
-        read_sz += ret;
-    }
-    return read_sz;
-}
-
-ssize_t out_stream::writev(const iovec *iov, int iovcnt) {
-    size_t write_sz = 0;
-    for (int i = 0; i < iovcnt; ++i) {
-        if (!write(iov[i].iov_base, iov[i].iov_len))
-            return write_sz;
-        write_sz += iov[i].iov_len;
-    }
-    return write_sz;
-}
-
-ssize_t fp_channel::read(void *buf, size_t len) {
-    auto ret = fread(buf, 1, len, fp.get());
-    return ret ? ret : (ferror(fp.get()) ? -1 : 0);
-}
-
-ssize_t fp_channel::do_write(const void *buf, size_t len) {
-    return fwrite(buf, 1, len, fp.get());
-}
-
-off_t fp_channel::seek(off_t off, int whence) {
-    return fseek(fp.get(), off, whence);
 }
 
 bool filter_out_stream::write(const void *buf, size_t len) {
@@ -131,14 +92,14 @@ void chunk_out_stream::finalize() {
     }
 }
 
-ssize_t byte_channel::read(void *buf, size_t len) {
+ssize_t byte_stream::read(void *buf, size_t len) {
     len = std::min((size_t) len, _data._sz- _pos);
     memcpy(buf, _data.buf() + _pos, len);
     _pos += len;
     return len;
 }
 
-bool byte_channel::write(const void *buf, size_t len) {
+bool byte_stream::write(const void *buf, size_t len) {
     resize(_pos + len);
     memcpy(_data.buf() + _pos, buf, len);
     _pos += len;
@@ -146,27 +107,7 @@ bool byte_channel::write(const void *buf, size_t len) {
     return true;
 }
 
-off_t byte_channel::seek(off_t off, int whence) {
-    off_t np;
-    switch (whence) {
-        case SEEK_CUR:
-            np = _pos + off;
-            break;
-        case SEEK_END:
-            np = _data._sz+ off;
-            break;
-        case SEEK_SET:
-            np = off;
-            break;
-        default:
-            return -1;
-    }
-    resize(np, true);
-    _pos = np;
-    return np;
-}
-
-void byte_channel::resize(size_t new_sz, bool zero) {
+void byte_stream::resize(size_t new_sz, bool zero) {
     bool resize = false;
     size_t old_cap = _cap;
     while (new_sz > _cap) {
@@ -180,41 +121,21 @@ void byte_channel::resize(size_t new_sz, bool zero) {
     }
 }
 
-ssize_t rust_vec_channel::read(void *buf, size_t len) {
+ssize_t rust_vec_stream::read(void *buf, size_t len) {
     len = std::min<size_t>(len, _data.size() - _pos);
     memcpy(buf, _data.data() + _pos, len);
     _pos += len;
     return len;
 }
 
-bool rust_vec_channel::write(const void *buf, size_t len) {
+bool rust_vec_stream::write(const void *buf, size_t len) {
     ensure_size(_pos + len);
     memcpy(_data.data() + _pos, buf, len);
     _pos += len;
     return true;
 }
 
-off_t rust_vec_channel::seek(off_t off, int whence) {
-    off_t np;
-    switch (whence) {
-        case SEEK_CUR:
-            np = _pos + off;
-            break;
-        case SEEK_END:
-            np = _data.size() + off;
-            break;
-        case SEEK_SET:
-            np = off;
-            break;
-        default:
-            return -1;
-    }
-    ensure_size(np, true);
-    _pos = np;
-    return np;
-}
-
-void rust_vec_channel::ensure_size(size_t sz, bool zero) {
+void rust_vec_stream::ensure_size(size_t sz, bool zero) {
     size_t old_sz = _data.size();
     if (sz > old_sz) {
         resize_vec(_data, sz);
@@ -223,27 +144,15 @@ void rust_vec_channel::ensure_size(size_t sz, bool zero) {
     }
 }
 
-ssize_t fd_channel::read(void *buf, size_t len) {
+ssize_t fd_stream::read(void *buf, size_t len) {
     return ::read(fd, buf, len);
 }
 
-ssize_t fd_channel::readv(const iovec *iov, int iovcnt) {
-    return ::readv(fd, iov, iovcnt);
-}
-
-ssize_t fd_channel::do_write(const void *buf, size_t len) {
+ssize_t fd_stream::do_write(const void *buf, size_t len) {
     return ::write(fd, buf, len);
 }
 
-ssize_t fd_channel::writev(const iovec *iov, int iovcnt) {
-    return ::writev(fd, iov, iovcnt);
-}
-
-off_t fd_channel::seek(off_t off, int whence) {
-    return lseek(fd, off, whence);
-}
-
-bool file_channel::write(const void *buf, size_t len) {
+bool file_stream::write(const void *buf, size_t len) {
     size_t write_sz = 0;
     ssize_t ret;
     do {
@@ -257,3 +166,36 @@ bool file_channel::write(const void *buf, size_t len) {
     } while (write_sz != len && ret != 0);
     return true;
 }
+
+#if ENABLE_IOV
+
+ssize_t in_stream::readv(const iovec *iov, int iovcnt) {
+    size_t read_sz = 0;
+    for (int i = 0; i < iovcnt; ++i) {
+        auto ret = readFully(iov[i].iov_base, iov[i].iov_len);
+        if (ret < 0)
+            return ret;
+        read_sz += ret;
+    }
+    return read_sz;
+}
+
+ssize_t out_stream::writev(const iovec *iov, int iovcnt) {
+    size_t write_sz = 0;
+    for (int i = 0; i < iovcnt; ++i) {
+        if (!write(iov[i].iov_base, iov[i].iov_len))
+            return write_sz;
+        write_sz += iov[i].iov_len;
+    }
+    return write_sz;
+}
+
+ssize_t fd_stream::readv(const iovec *iov, int iovcnt) {
+    return ::readv(fd, iov, iovcnt);
+}
+
+ssize_t fd_stream::writev(const iovec *iov, int iovcnt) {
+    return ::writev(fd, iov, iovcnt);
+}
+
+#endif // ENABLE_IOV
