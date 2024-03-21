@@ -385,7 +385,7 @@ fun Project.setupStub() {
     val apk = layout.buildDirectory.file("intermediates/processed_res/" +
         "release/processReleaseResources/out/resources-release.ap_").get().asFile
     val optRes = layout.buildDirectory.file("intermediates/optimized_processed_res/" +
-        "release/processReleaseResources/resources-release-optimize.ap_").get().asFile
+        "release/optimizeReleaseResources/resources-release-optimize.ap_").get().asFile
     afterEvaluate {
         tasks.named("optimizeReleaseResources") {
             doLast { apk.copyTo(optRes, true) }
