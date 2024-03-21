@@ -25,7 +25,6 @@ pub enum Token<'a> {
     IO,
     LB,
     RB,
-    CM,
     ST,
     TL,
     HP,
@@ -49,7 +48,7 @@ fn parse_id<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<&'a str> {
 }
 
 //     names ::= ID(n) { vec![n] };
-//     names ::= names(mut v) CM ID(n) { v.push(n); v };
+//     names ::= names(mut v) ID(n) { v.push(n); v };
 //     term ::= ID(n) { vec![n] }
 //     term ::= LB names(n) RB { n };
 fn parse_term<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<&'a str>> {
@@ -59,17 +58,11 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<&'a str>> {
             let mut names = Vec::new();
             loop {
                 names.push(parse_id(tokens)?);
-                match tokens.peek() {
-                    Some(Token::CM) => {
-                        tokens.next();
-                    }
-                    _ => break,
+                if matches!(tokens.peek(), Some(Token::RB)) {
+                    tokens.next();
+                    return Ok(names);
                 }
             }
-            if matches!(tokens.next(), Some(Token::RB)) {
-                return Ok(names);
-            }
-            throw!()
         }
         _ => throw!(),
     }
@@ -314,10 +307,6 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
                         continue;
                     } else if let Some(s) = s.strip_prefix('}') {
                         tokens.push(Token::RB);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix(',') {
-                        tokens.push(Token::CM);
                         res = Some(s);
                         continue;
                     } else if let Some(s) = s.strip_prefix('*') {
