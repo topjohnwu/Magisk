@@ -96,7 +96,7 @@ impl SepolicyMagisk for sepolicy {
             allow(["domain"], [proc], ["fifo_file"], ["write", "read", "open", "getattr"]);
 
             // Allow these processes to access MagiskSU and output logs
-            allow(["zygote", "shell",
+            allow(["zygote", "shell", "platform_app",
                 "system_app", "priv_app", "untrusted_app", "untrusted_app_all"],
                 [proc], ["unix_stream_socket"], ["connectto", "getopt"]);
 
