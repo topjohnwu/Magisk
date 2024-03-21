@@ -8,7 +8,7 @@
     <string name="install">Installieren</string>
     <string name="section_home">Startseite</string>
     <string name="section_theme">Themen</string>
-    <string name="denylist">Verweigerungsliste</string>
+    <string name="denylist">Ausnahmeliste</string>
 
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
@@ -141,11 +141,11 @@
     <string name="settings_update_custom">Benutzerdefiniert</string>
     <string name="settings_update_custom_msg">Benutzerdefinierte URL einfügen</string>
     <string name="settings_zygisk_summary">Teile von Magisk im Zygoten-Daemon ausführen</string>
-    <string name="settings_denylist_title">Verweigerungsliste erzwingen</string>
-    <string name="settings_denylist_summary">Bei Prozessen, die auf der Verweigerungsliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
+    <string name="settings_denylist_title">Ausnahmeliste erzwingen</string>
+    <string name="settings_denylist_summary">Bei Prozessen, die auf der Ausnahmeliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
     <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
-    <string name="settings_denylist_config_title">Verweigerungsliste konfigurieren</string>
-    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Verweigerungsliste aufgenommen werden sollen</string>
+    <string name="settings_denylist_config_title">Ausnahmeliste konfigurieren</string>
+    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Ausnahmeliste aufgenommen werden sollen</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemloses Hosts-Modul hinzugefügt</string>
