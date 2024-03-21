@@ -9,6 +9,9 @@ macro_rules! rules {
     (@args xall) => {
         vec![Xperm { low: 0x0000, high: 0xFFFF, reset: false }]
     };
+    (@args svcmgr) => {
+        vec!["servicemanager", "vndservicemanager", "hwservicemanager"]
+    };
     (@args [proc]) => {
         vec!["magisk"]
     };
@@ -51,41 +54,60 @@ impl SepolicyMagisk for sepolicy {
             use self;
             allow(all, ["kernel"], ["security"], ["load_policy"]);
             type_(proc, ["domain"]);
-            permissive([proc]);
-            typeattribute([proc], ["mlstrustedsubject", "netdomain", "bluetoothdomain"]);
+            typeattribute([proc], ["mlstrustedsubject", "netdomain", "appdomain"]);
             type_(file, ["file_type"]);
             typeattribute([file], ["mlstrustedobject"]);
             type_(log, ["file_type"]);
             typeattribute([log], ["mlstrustedobject"]);
 
-            // Make our root domain unconstrained
-            allow([proc], all, all, all);
-
-            // Allow us to do any ioctl
-            allowxperm(["magisk"], all, ["blk_file", "fifo_file", "chr_file"], xall);
-
             // Create unconstrained file type
-            allow(all, [file], ["file", "dir", "fifo_file", "chr_file", "lnk_file", "sock_file"], all);
+            allow(["domain"], [file],
+                ["file", "dir", "fifo_file", "chr_file", "lnk_file", "sock_file"], all);
 
             // Only allow zygote to open log pipe
             allow(["zygote"], [log], ["fifo_file"], ["open", "read"]);
-
             // Allow all processes to output logs
-
             allow(["domain"], [log], ["fifo_file"], ["write"]);
 
+            // Make our root domain unconstrained
+            allow([proc], [
+                "fs_type", "dev_type", "file_type", "domain",
+                "service_manager_type", "hwservice_manager_type", "vndservice_manager_type",
+                "port_type", "node_type", "property_type"
+            ], all, all);
+
+            // Just in case, make the domain permissive
+            permissive([proc]);
+
+            // Allow us to do any ioctl
+            allowxperm([proc], ["fs_type", "dev_type", "file_type", "domain"],
+                ["blk_file", "fifo_file", "chr_file"], xall);
+            allowxperm([proc], [proc], ["tcp_socket", "udp_socket", "rawip_socket"], xall);
+
+            // Let binder work with our processes
+            allow(svcmgr, [proc], ["dir"], ["search"]);
+            allow(svcmgr, [proc], ["file"], ["open", "read", "map"]);
+            allow(svcmgr, [proc], ["process"], ["getattr"]);
+            allow(["domain"], [proc], ["binder"], ["call", "transfer"]);
+
+            // Other common IPC
+            allow(["domain"], [proc], ["process"], ["sigchld"]);
+            allow(["domain"], [proc], ["fd"], ["use"]);
+            allow(["domain"], [proc], ["fifo_file"], ["write", "read", "open", "getattr"]);
+
             // Allow these processes to access MagiskSU and output logs
-            allow(["zygote", "shell", "system_app", "priv_app", "untrusted_app", "untrusted_app_all"],
-                       [proc], ["unix_stream_socket"], ["connectto", "getopt"]);
+            allow(["zygote", "shell",
+                "system_app", "priv_app", "untrusted_app", "untrusted_app_all"],
+                [proc], ["unix_stream_socket"], ["connectto", "getopt"]);
 
             // Let everyone access tmpfs files (for SAR sbin overlay)
-            allow(all, ["tmpfs"], ["file"], all);
+            allow(["domain"], ["tmpfs"], ["file"], all);
 
             // Allow magiskinit daemon to handle mock selinuxfs
             allow(["kernel"], ["tmpfs"], ["fifo_file"], ["write"]);
 
             // For relabelling files
-            allow(["rootfs"], ["labeledfs"], ["filesystem"], ["associate"]);
+            allow(["rootfs"], ["labeledfs", "tmpfs"], ["filesystem"], ["associate"]);
             allow([file], ["pipefs", "devpts"], ["filesystem"], ["associate"]);
 
             // Let init transit to SEPOL_PROC_DOMAIN
@@ -93,36 +115,10 @@ impl SepolicyMagisk for sepolicy {
             allow(["kernel"], [proc], ["process"], ["dyntransition"]);
 
             // Let init run stuffs
-            allow(["kernel"], [proc], ["fd"], ["use"]);
             allow(["init"], [proc], ["process"], all);
 
-            // suRights
-            allow(["servicemanager"], [proc], ["dir"], ["search", "read"]);
-            allow(["servicemanager"], [proc], ["file"], ["open", "read"]);
-            allow(["servicemanager"], [proc], ["process"], ["getattr"]);
-            allow(all, [proc], ["process"], ["sigchld"]);
-
-            // allowLog
-            allow(["logd"], [proc], ["dir"], ["search"]);
-            allow(["logd"], [proc], ["file"], ["read", "open", "getattr"]);
-
-            // dumpsys
-            allow(all, [proc], ["fd"], ["use"]);
-            allow(all, [proc], ["fifo_file"], ["write", "read", "open", "getattr"]);
-
-            // bootctl
-            allow(["hwservicemanager"], [proc], ["dir"], ["search"]);
-            allow(["hwservicemanager"], [proc], ["file"], ["read", "open"]);
-            allow(["hwservicemanager"], [proc], ["process"], ["getattr"]);
-
             // For mounting loop devices, mirrors, tmpfs
-            allow(["kernel"], all, ["file"], ["read", "write"]);
-
-            // Allow all binder transactions
-            allow(all, [proc], ["binder"], all);
-
-            // For changing file context
-            allow(["rootfs"], ["tmpfs"], ["filesystem"], ["associate"]);
+            allow(["kernel"], ["fs_type", "dev_type", "file_type"], ["file"], ["read", "write"]);
 
             // Zygisk rules
             allow(["zygote"], ["zygote"], ["process"], ["execmem"]);
