@@ -20,22 +20,21 @@
 #define SELINUX_LOAD        SELINUX_MNT "/load"
 #define SELINUX_VERSION     SELINUX_MNT "/policyvers"
 
-using token_list = std::vector<const char *>;
-using argument = std::pair<token_list, bool>;
-using argument_list = std::vector<argument>;
-
 struct Xperm;
 
-#define ALL       nullptr
+using StrVec = rust::Vec<rust::Str>;
+using Xperms = rust::Vec<Xperm>;
 
 struct sepolicy {
     using c_str = const char *;
+    using Str = rust::Str;
 
     // Public static factory functions
     static sepolicy *from_data(char *data, size_t len);
     static sepolicy *from_file(c_str file);
     static sepolicy *from_split();
     static sepolicy *compile_split();
+
     // External APIs
     bool to_file(c_str file);
     void load_rules(const std::string &rules);
@@ -44,31 +43,31 @@ struct sepolicy {
     void parse_statement(c_str statement);
 
     // Operation on types
-    void type(rust::Str type, rust::Vec<rust::Str> attrs);
-    void attribute(rust::Str names);
-    void permissive(rust::Vec<rust::Str> types);
-    void enforce(rust::Vec<rust::Str> types);
-    void typeattribute(rust::Vec<rust::Str> types, rust::Vec<rust::Str> attrs);
+    void type(Str type, StrVec attrs);
+    void attribute(Str names);
+    void permissive(StrVec types);
+    void enforce(StrVec types);
+    void typeattribute(StrVec types, StrVec attrs);
     bool exists(c_str type);
 
     // Access vector rules
-    void allow(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<rust::Str> perm);
-    void deny(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<rust::Str> perm);
-    void auditallow(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<rust::Str> perm);
-    void dontaudit(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<rust::Str> perm);
+    void allow(StrVec src, StrVec tgt, StrVec cls, StrVec perm);
+    void deny(StrVec src, StrVec tgt, StrVec cls, StrVec perm);
+    void auditallow(StrVec src, StrVec tgt, StrVec cls, StrVec perm);
+    void dontaudit(StrVec src, StrVec tgt, StrVec cls, StrVec perm);
 
     // Extended permissions access vector rules
-    void allowxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<Xperm> xperm);
-    void auditallowxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<Xperm> xperm);
-    void dontauditxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls, rust::Vec<Xperm> xperm);
+    void allowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm);
+    void auditallowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm);
+    void dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm);
 
     // Type rules
-    void type_transition(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def, rust::Vec<rust::Str> obj);
-    void type_change(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def);
-    void type_member(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def);
+    void type_transition(Str src, Str tgt, Str cls, Str def, StrVec obj);
+    void type_change(Str src, Str tgt, Str cls, Str def);
+    void type_member(Str src, Str tgt, Str cls, Str def);
 
     // File system labeling
-    void genfscon(rust::Str fs_name, rust::Str path, rust::Str ctx);
+    void genfscon(Str fs_name, Str path, Str ctx);
 
     // Magisk
     void magisk_rules();

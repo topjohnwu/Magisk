@@ -1,12 +1,17 @@
 #include <base.hpp>
+
 #include "flags.h"
 #include "policy.hpp"
 
+using Str = rust::Str;
+
 #if MAGISK_DEBUG
 template<typename Arg>
-auto as_str(Arg arg) {
+std::string as_str(const Arg &arg) {
     if constexpr (std::is_same_v<Arg, const char *> || std::is_same_v<Arg, char *>) {
-        return arg == nullptr ? std::string("*") : std::string(arg);
+        return arg == nullptr ? "*" : arg;
+    } else if constexpr (std::is_same_v<Arg, Xperm>) {
+        return std::string(rust::xperm_to_string(arg));
     } else {
         return std::to_string(arg);
     }
@@ -14,13 +19,13 @@ auto as_str(Arg arg) {
 
 // Print out all rules going through public API for debugging
 template<typename ...Args>
-static void dprint(const char *action, Args ...args) {
+static void print_rule(const char *action, Args ...args) {
     std::string s;
     s = (... + (" " + as_str(args)));
-    LOGD("%s%s", action, s.data());
+    LOGD("%s%s\n", action, s.data());
 }
 #else
-#define dprint(...) ((void) 0)
+#define print_rule(...) ((void) 0)
 #endif
 
 bool sepolicy::exists(const char *type) {
@@ -45,107 +50,109 @@ void sepolicy::load_rules(const std::string &rules) {
 
 template<typename F, typename ...T>
 requires(std::invocable<F, T...>)
-inline void expand(F &&f, T &&...args) {
+static inline void expand(F &&f, T &&...args) {
     f(std::forward<T>(args)...);
 }
 
 template<typename ...T>
-inline void expand(const rust::Vec<rust::Str> &vec, T &&...args) {
-    for (auto i = vec.begin(); i != vec.end() || vec.empty(); ++i) {
-        expand(std::forward<T>(args)..., vec.empty() ? nullptr : std::string(*i).data());
-        if (vec.empty()) break;
+static inline void expand(const StrVec &vec, T &&...args) {
+    if (vec.empty()) {
+        expand(std::forward<T>(args)..., (char *) nullptr);
+    } else {
+        char buf[64];
+        for (auto &s : vec) {
+            if (s.length() >= sizeof(buf)) continue;
+            memcpy(buf, s.data(), s.length());
+            buf[s.length()] = '\0';
+            expand(std::forward<T>(args)..., buf);
+        }
     }
 }
 
 template<typename ...T>
-inline void expand(const rust::Vec<Xperm> &vec, T &&...args) {
+static inline void expand(const Xperms &vec, T &&...args) {
     for (auto &p : vec) {
-        expand(std::forward<T>(args)..., p.low, p.high, p.reset);
+        expand(std::forward<T>(args)..., p);
     }
 }
 
 template<typename ...T>
-inline void expand(const rust::Str &s, T &&...args) {
-    expand(std::forward<T>(args)..., std::string(s).data());
+static inline void expand(const Str &s, T &&...args) {
+    char buf[64];
+    if (s.length() >= sizeof(buf)) return;
+    memcpy(buf, s.data(), s.length());
+    buf[s.length()] = '\0';
+    expand(std::forward<T>(args)..., buf);
 }
 
-void
-sepolicy::allow(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls,
-                rust::Vec<rust::Str> perm) {
+void sepolicy::allow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
     expand(src, tgt, cls, perm, [this](auto ...args) {
-        dprint("allow", args...);
+        print_rule("allow", args...);
         impl->add_rule(args..., AVTAB_ALLOWED, false);
     });
 }
 
-void
-sepolicy::deny(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls,
-               rust::Vec<rust::Str> perm) {
+void sepolicy::deny(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
     expand(src, tgt, cls, perm, [this](auto ...args) {
-        dprint("deny", args...);
+        print_rule("deny", args...);
         impl->add_rule(args..., AVTAB_ALLOWED, true);
     });
 }
 
-void sepolicy::auditallow(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt,
-                          rust::Vec<rust::Str> cls,
-                          rust::Vec<rust::Str> perm) {
+void sepolicy::auditallow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
     expand(src, tgt, cls, perm, [this](auto ...args) {
-        dprint("auditallow", args...);
+        print_rule("auditallow", args...);
         impl->add_rule(args..., AVTAB_AUDITALLOW, false);
     });
 }
 
-void sepolicy::dontaudit(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt,
-                         rust::Vec<rust::Str> cls,
-                         rust::Vec<rust::Str> perm) {
+void sepolicy::dontaudit(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
     expand(src, tgt, cls, perm, [this](auto ...args) {
-        dprint("dontaudit", args...);
+        print_rule("dontaudit", args...);
         impl->add_rule(args..., AVTAB_AUDITDENY, true);
     });
 }
 
-void sepolicy::permissive(rust::Vec<rust::Str> types) {
+void sepolicy::permissive(StrVec types) {
     expand(types, [this](auto ...args) {
-        dprint("permissive", args...);
+        print_rule("permissive", args...);
         impl->set_type_state(args..., true);
     });
 }
 
-void sepolicy::enforce(rust::Vec<rust::Str> types) {
+void sepolicy::enforce(StrVec types) {
     expand(types, [this](auto ...args) {
-        dprint("enforce", args...);
+        print_rule("enforce", args...);
         impl->set_type_state(args..., false);
     });
 }
 
-void sepolicy::typeattribute(rust::Vec<rust::Str> types, rust::Vec<rust::Str> attrs) {
+void sepolicy::typeattribute(StrVec types, StrVec attrs) {
     expand(types, attrs, [this](auto ...args) {
-        dprint("typeattribute", args...);
+        print_rule("typeattribute", args...);
         impl->add_typeattribute(args...);
     });
 }
 
-void sepolicy::type(rust::Str type, rust::Vec<rust::Str> attrs) {
+void sepolicy::type(Str type, StrVec attrs) {
     expand(type, attrs, [this](auto name, auto attr) {
-        dprint("type", name, attr);
+        print_rule("type", name, attr);
         impl->add_type(name, TYPE_TYPE) && impl->add_typeattribute(name, attr);
     });
 }
 
-void sepolicy::attribute(rust::Str name) {
+void sepolicy::attribute(Str name) {
     expand(name, [this](auto ...args) {
-        dprint("name", args...);
+        print_rule("name", args...);
         impl->add_type(args..., TYPE_ATTRIB);
     });
 }
 
-void sepolicy::type_transition(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def,
-                               rust::Vec<rust::Str> obj) {
+void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, StrVec obj) {
     auto obj_str = obj.empty() ? std::string() : std::string(obj[0]);
     auto o = obj.empty() ? nullptr : obj_str.data();
     expand(src, tgt, cls, def, [this, &o](auto ...args) {
-        dprint("type_transition", args..., o);
+        print_rule("type_transition", args..., o);
         if (o) {
             impl->add_filename_trans(args..., o);
         } else {
@@ -154,54 +161,44 @@ void sepolicy::type_transition(rust::Str src, rust::Str tgt, rust::Str cls, rust
     });
 }
 
-void sepolicy::type_change(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def) {
+void sepolicy::type_change(Str src, Str tgt, Str cls, Str def) {
     expand(src, tgt, cls, def, [this](auto ...args) {
-        dprint("type_change", args...);
+        print_rule("type_change", args...);
         impl->add_type_rule(args..., AVTAB_CHANGE);
     });
 }
 
-void sepolicy::type_member(rust::Str src, rust::Str tgt, rust::Str cls, rust::Str def) {
+void sepolicy::type_member(Str src, Str tgt, Str cls, Str def) {
     expand(src, tgt, cls, def, [this](auto ...args) {
-        dprint("type_member", args...);
+        print_rule("type_member", args...);
         impl->add_type_rule(args..., AVTAB_MEMBER);
     });
 }
 
-void sepolicy::genfscon(rust::Str fs_name, rust::Str path, rust::Str ctx) {
+void sepolicy::genfscon(Str fs_name, Str path, Str ctx) {
     expand(fs_name, path, ctx, [this](auto ...args) {
-        dprint("genfscon", args...);
+        print_rule("genfscon", args...);
         impl->add_genfscon(args...);
     });
 }
 
-void
-sepolicy::allowxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt, rust::Vec<rust::Str> cls,
-                     rust::Vec<Xperm> xperm) {
+void sepolicy::allowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
-        dprint("allowxperm", args...);
+        print_rule("allowxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_ALLOWED);
     });
 }
 
-void sepolicy::auditallowxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt,
-                               rust::Vec<rust::Str> cls,
-                               rust::Vec<Xperm> xperm) {
+void sepolicy::auditallowxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
-        dprint("auditallowxperm", args...);
+        print_rule("auditallowxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_AUDITALLOW);
     });
 }
 
-void sepolicy::dontauditxperm(rust::Vec<rust::Str> src, rust::Vec<rust::Str> tgt,
-                              rust::Vec<rust::Str> cls,
-                              rust::Vec<Xperm> xperm) {
+void sepolicy::dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm) {
     expand(src, tgt, cls, xperm, [this](auto ...args) {
-        dprint("dontauditxperm", args...);
+        print_rule("dontauditxperm", args...);
         impl->add_xperm_rule(args..., AVTAB_XPERMS_DONTAUDIT);
     });
-}
-
-void sepolicy::strip_dontaudit() {
-    impl->strip_dontaudit();
 }

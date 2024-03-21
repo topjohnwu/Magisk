@@ -20,8 +20,8 @@ struct sepol_impl : public sepolicy {
 
     bool add_rule(const char *s, const char *t, const char *c, const char *p, int effect, bool invert);
     void add_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, perm_datum_t *perm, int effect, bool invert);
-    void add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, uint16_t low, uint16_t high, bool reset, int effect);
-    bool add_xperm_rule(const char *s, const char *t, const char *c, uint16_t low, uint16_t high, bool reset, int effect);
+    void add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, const Xperm &p, int effect);
+    bool add_xperm_rule(const char *s, const char *t, const char *c, const Xperm &p, int effect);
     bool add_type_rule(const char *s, const char *t, const char *c, const char *d, int effect);
     bool add_filename_trans(const char *s, const char *t, const char *c, const char *d, const char *o);
     bool add_genfscon(const char *fs_name, const char *path, const char *context);
@@ -29,7 +29,6 @@ struct sepol_impl : public sepolicy {
     bool set_type_state(const char *type_name, bool permissive);
     void add_typeattribute(type_datum_t *type, type_datum_t *attr);
     bool add_typeattribute(const char *type, const char *attr);
-    void strip_dontaudit();
 
     sepol_impl(policydb *db) : db(db) {}
     ~sepol_impl();
@@ -42,8 +41,4 @@ private:
 
 #define impl reinterpret_cast<sepol_impl *>(this)
 
-const char *as_str(const argument &arg);
-const char *as_str(const char *arg);
-
 void statement_help();
-void test_parse_statements();

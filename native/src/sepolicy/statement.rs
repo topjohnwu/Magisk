@@ -1,7 +1,9 @@
+use std::{iter::Peekable, pin::Pin, vec::IntoIter};
+
+use base::{LoggedError, LoggedResult};
+
 use crate::ffi::Xperm;
 use crate::sepolicy;
-use base::{LoggedError, LoggedResult};
-use std::{iter::Peekable, pin::Pin, vec::IntoIter};
 
 pub enum Token<'a> {
     AL,
@@ -52,7 +54,7 @@ fn parse_id<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<&'a str> {
 //     term ::= LB names(n) RB { n };
 fn parse_term<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<&'a str>> {
     match tokens.next() {
-        Some(Token::ID(name)) => return Ok(vec![name]),
+        Some(Token::ID(name)) => Ok(vec![name]),
         Some(Token::LB) => {
             let mut names = Vec::new();
             loop {
@@ -87,7 +89,7 @@ fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<&'a str>> {
 
 //     xperm ::= HX(low) { Xperm{low, high: 0, reset: false} };
 //     xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
-fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Xperm> {
+fn parse_xperm(tokens: &mut Tokens) -> LoggedResult<Xperm> {
     let low = match tokens.next() {
         Some(Token::HX(low)) => low,
         _ => throw!(),
@@ -116,7 +118,7 @@ fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Xperm> {
 //
 //     xperm_list ::= xperm(p) { vec![p] }
 //     xperm_list ::= xperm_list(mut l) xperm(p) { l.push(p); l }
-fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<Xperm>> {
+fn parse_xperms(tokens: &mut Tokens) -> LoggedResult<Vec<Xperm>> {
     let mut xperms = Vec::new();
     let reset = match tokens.peek() {
         Some(Token::TL) => {
@@ -186,7 +188,7 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<Xperm>> {
 //     statement ::= TC ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_change(s, t, c, d); };
 //     statement ::= TM ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_member(s, t, c, d);};
 //     statement ::= GF ID(s) ID(t) ID(c) { extra.as_mut().genfscon(s, t, c); };
-fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens<'a>) -> LoggedResult<()> {
+fn exec_statement(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens) -> LoggedResult<()> {
     let action = match tokens.next() {
         Some(token) => token,
         _ => throw!(),
@@ -236,7 +238,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens<'a>) -> 
         }
         Token::TY => {
             let t = parse_id(tokens)?;
-            let a = if matches!(tokens.peek(), None) {
+            let a = if tokens.peek().is_none() {
                 vec![]
             } else {
                 parse_term(tokens)?
@@ -254,7 +256,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens<'a>) -> 
             let d = parse_id(tokens)?;
             match action {
                 Token::TT => {
-                    let o = if matches!(tokens.peek(), None) {
+                    let o = if tokens.peek().is_none() {
                         vec![]
                     } else {
                         vec![parse_id(tokens)?]
@@ -274,16 +276,16 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens<'a>) -> 
         }
         _ => throw!(),
     }
-    if matches!(tokens.peek(), None) {
+    if tokens.peek().is_none() {
         Ok(())
     } else {
         throw!()
     }
 }
 
-fn tokenize_statement<'a>(statement: &'a str) -> Vec<Token<'a>> {
+fn tokenize_statement(statement: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
-    for s in statement.trim().split_whitespace() {
+    for s in statement.split_whitespace() {
         let mut res = Some(s);
         while let Some(s) = res {
             match s {
@@ -306,27 +308,27 @@ fn tokenize_statement<'a>(statement: &'a str) -> Vec<Token<'a>> {
                 "ioctl" => tokens.push(Token::IO),
                 "" => {}
                 _ => {
-                    if let Some(s) = s.strip_prefix("{") {
+                    if let Some(s) = s.strip_prefix('{') {
                         tokens.push(Token::LB);
                         res = Some(s);
                         continue;
-                    } else if let Some(s) = s.strip_prefix("}") {
+                    } else if let Some(s) = s.strip_prefix('}') {
                         tokens.push(Token::RB);
                         res = Some(s);
                         continue;
-                    } else if let Some(s) = s.strip_prefix(",") {
+                    } else if let Some(s) = s.strip_prefix(',') {
                         tokens.push(Token::CM);
                         res = Some(s);
                         continue;
-                    } else if let Some(s) = s.strip_prefix("*") {
+                    } else if let Some(s) = s.strip_prefix('*') {
                         tokens.push(Token::ST);
                         res = Some(s);
                         continue;
-                    } else if let Some(s) = s.strip_prefix("~") {
+                    } else if let Some(s) = s.strip_prefix('~') {
                         res = Some(s);
                         tokens.push(Token::TL);
                         continue;
-                    } else if let Some(s) = s.strip_prefix("-") {
+                    } else if let Some(s) = s.strip_prefix('-') {
                         res = Some(s);
                         tokens.push(Token::HP);
                         continue;
@@ -343,7 +345,7 @@ fn tokenize_statement<'a>(statement: &'a str) -> Vec<Token<'a>> {
     tokens
 }
 
-pub fn parse_statement<'a>(sepolicy: Pin<&mut sepolicy>, statement: &'a str) -> LoggedResult<()> {
+pub fn parse_statement(sepolicy: Pin<&mut sepolicy>, statement: &str) -> LoggedResult<()> {
     let mut tokens = tokenize_statement(statement).into_iter().peekable();
     exec_statement(sepolicy, &mut tokens)
 }

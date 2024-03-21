@@ -1,6 +1,7 @@
 #![feature(format_args_nl)]
 
 use io::Cursor;
+use std::fmt::Write;
 use std::io;
 use std::io::{BufRead, BufReader};
 use std::pin::Pin;
@@ -11,9 +12,8 @@ use base::{error, BufReadExt, FsPath, LoggedResult, Utf8CStr};
 
 use crate::ffi::sepolicy;
 
-mod statement;
-
 mod rules;
+mod statement;
 
 #[cxx::bridge]
 mod ffi {
@@ -94,6 +94,7 @@ mod ffi {
         fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: Utf8CStrRef);
         fn parse_statement(sepol: Pin<&mut sepolicy>, statement: Utf8CStrRef);
         fn magisk_rules(sepol: Pin<&mut sepolicy>);
+        fn xperm_to_string(perm: &Xperm) -> String;
     }
 }
 
@@ -102,10 +103,6 @@ trait SepolicyExt {
     fn load_rule_file(self: Pin<&mut Self>, filename: &Utf8CStr);
     fn load_rules_from_reader<T: BufRead>(self: Pin<&mut Self>, reader: &mut T);
     fn parse_statement(self: Pin<&mut Self>, statement: &str);
-}
-
-trait SepolicyMagisk {
-    fn magisk_rules(self: Pin<&mut Self>);
 }
 
 impl SepolicyExt for sepolicy {
@@ -136,24 +133,38 @@ impl SepolicyExt for sepolicy {
     }
 
     fn parse_statement(self: Pin<&mut Self>, statement: &str) {
-        if let Err(_) = statement::parse_statement(self, statement) {
+        if statement::parse_statement(self, statement).is_err() {
             error!("sepolicy rule syntax error: {statement}");
         }
     }
 }
 
-pub fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: &Utf8CStr) {
+fn load_rule_file(sepol: Pin<&mut sepolicy>, filename: &Utf8CStr) {
     sepol.load_rule_file(filename);
 }
 
-pub fn load_rules(sepol: Pin<&mut sepolicy>, rules: &[u8]) {
+fn load_rules(sepol: Pin<&mut sepolicy>, rules: &[u8]) {
     sepol.load_rules(rules);
 }
 
-pub fn parse_statement(sepol: Pin<&mut sepolicy>, statement: &Utf8CStr) {
+fn parse_statement(sepol: Pin<&mut sepolicy>, statement: &Utf8CStr) {
     sepol.parse_statement(statement.as_str());
 }
 
-pub fn magisk_rules(sepol: Pin<&mut sepolicy>) {
+trait SepolicyMagisk {
+    fn magisk_rules(self: Pin<&mut Self>);
+}
+
+fn magisk_rules(sepol: Pin<&mut sepolicy>) {
     sepol.magisk_rules();
+}
+
+fn xperm_to_string(perm: &ffi::Xperm) -> String {
+    let mut s = String::new();
+    if perm.reset {
+        s.push('~');
+    }
+    s.write_fmt(format_args!("{{ {:#06x}-{:#06x} }}", perm.low, perm.high))
+        .ok();
+    s
 }
