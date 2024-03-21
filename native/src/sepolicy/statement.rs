@@ -299,14 +299,11 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
                 "type_member" => tokens.push(Token::TM),
                 "genfscon" => tokens.push(Token::GF),
                 "ioctl" => tokens.push(Token::IO),
+                "}" => tokens.push(Token::RB),
                 "" => {}
                 _ => {
                     if let Some(s) = s.strip_prefix('{') {
                         tokens.push(Token::LB);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix('}') {
-                        tokens.push(Token::RB);
                         res = Some(s);
                         continue;
                     } else if let Some(s) = s.strip_prefix('*') {
@@ -322,9 +319,19 @@ fn tokenize_statement(statement: &str) -> Vec<Token> {
                         tokens.push(Token::HP);
                         continue;
                     } else if let Some(s) = s.strip_prefix("0x") {
-                        tokens.push(Token::HX(s.parse().unwrap_or(0)));
+                        if let Some(s) = s.strip_suffix('}') {
+                            tokens.push(Token::HX(s.parse().unwrap_or(0)));
+                            tokens.push(Token::RB);
+                        } else {
+                            tokens.push(Token::HX(s.parse().unwrap_or(0)));
+                        }
                     } else {
-                        tokens.push(Token::ID(s));
+                        if let Some(s) = s.strip_suffix('}') {
+                            tokens.push(Token::ID(s));
+                            tokens.push(Token::RB);
+                        } else {
+                            tokens.push(Token::ID(s));
+                        };
                     }
                 }
             }
