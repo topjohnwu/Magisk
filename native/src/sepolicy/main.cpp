@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
                 rule_files.emplace_back(argv[i + 1]);
                 ++i;
             } else if (option == "help"sv) {
-                statement_help();
+                rust::print_statement_help();
+                exit(0);
             } else {
                 usage(argv[0]);
             }

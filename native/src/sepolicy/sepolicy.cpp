@@ -715,7 +715,7 @@ void sepol_impl::print_type(FILE *fp, type_datum_t *type) {
         }
     }
     if (ebitmap_get_bit(&db->permissive_map, type->s.value)) {
-        fprintf(stdout, "permissive %s\n", name);
+        fprintf(fp, "permissive %s\n", name);
     }
 }
 

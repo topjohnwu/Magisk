@@ -143,7 +143,7 @@ void sepolicy::type(Str type, StrVec attrs) {
 
 void sepolicy::attribute(Str name) {
     expand(name, [this](auto ...args) {
-        print_rule("name", args...);
+        print_rule("attribute", args...);
         impl->add_type(args..., TYPE_ATTRIB);
     });
 }

@@ -1,5 +1,7 @@
+use std::fmt::Arguments;
+use std::io::Write;
 use std::process::exit;
-use std::{io, slice, str};
+use std::{fmt, io, slice, str};
 
 use argh::EarlyExit;
 use libc::c_char;
@@ -115,5 +117,18 @@ impl<T> EarlyExitExt<T> for Result<T, EarlyExit> {
                 }
             },
         }
+    }
+}
+
+pub struct FmtAdaptor<'a, T>(pub &'a mut T)
+where
+    T: Write;
+
+impl<T: Write> fmt::Write for FmtAdaptor<'_, T> {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.0.write_all(s.as_bytes()).map_err(|_| fmt::Error)
+    }
+    fn write_fmt(&mut self, args: Arguments<'_>) -> fmt::Result {
+        self.0.write_fmt(args).map_err(|_| fmt::Error)
     }
 }

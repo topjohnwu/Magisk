@@ -40,5 +40,3 @@ private:
 };
 
 #define impl reinterpret_cast<sepol_impl *>(this)
-
-void statement_help();
