@@ -36,8 +36,7 @@ pub enum Token<'a> {
 }
 
 type Tokens<'a> = Peekable<IntoIter<Token<'a>>>;
-type SimpleResult<T> = Result<T, ()>;
-type ParseResult<'a> = Result<(), ParseError<'a>>;
+type ParseResult<'a, T> = Result<T, ParseError<'a>>;
 
 enum ParseError<'a> {
     General,
@@ -50,15 +49,17 @@ enum ParseError<'a> {
     NewType,
     NewAttr,
     GenfsCon,
+    ShowHelp,
+    UnknownAction(Token<'a>),
 }
 
 macro_rules! throw {
     () => {
-        Err(())?
+        Err(ParseError::General)?
     };
 }
 
-fn parse_id<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<&'a str> {
+fn parse_id<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, &'a str> {
     match tokens.next() {
         Some(Token::ID(name)) => Ok(name),
         _ => throw!(),
@@ -69,7 +70,7 @@ fn parse_id<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<&'a str> {
 //     names ::= names(mut v) CM ID(n) { v.push(n); v };
 //     term ::= ID(n) { vec![n] }
 //     term ::= LB names(n) RB { n };
-fn parse_term<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<Vec<&'a str>> {
+fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.next() {
         Some(Token::ID(name)) => Ok(vec![name]),
         Some(Token::LB) => {
@@ -94,7 +95,7 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<Vec<&'a str>> {
 
 //     terms ::= ST { vec![] }
 //     terms ::= term(n) { n }
-fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<Vec<&'a str>> {
+fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
     match tokens.peek() {
         Some(Token::ST) => {
             tokens.next();
@@ -106,7 +107,7 @@ fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> SimpleResult<Vec<&'a str>> {
 
 //     xperm ::= HX(low) { Xperm{low, high: low, reset: false} };
 //     xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
-fn parse_xperm(tokens: &mut Tokens) -> SimpleResult<Xperm> {
+fn parse_xperm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Xperm> {
     let low = match tokens.next() {
         Some(Token::HX(low)) => low,
         _ => throw!(),
@@ -135,7 +136,7 @@ fn parse_xperm(tokens: &mut Tokens) -> SimpleResult<Xperm> {
 //
 //     xperm_list ::= xperm(p) { vec![p] }
 //     xperm_list ::= xperm_list(mut l) xperm(p) { l.push(p); l }
-fn parse_xperms(tokens: &mut Tokens) -> SimpleResult<Vec<Xperm>> {
+fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
     let mut xperms = Vec::new();
     let reset = match tokens.peek() {
         Some(Token::TL) => {
@@ -205,18 +206,29 @@ fn parse_xperms(tokens: &mut Tokens) -> SimpleResult<Vec<Xperm>> {
 //     statement ::= TC ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_change(s, t, c, d); };
 //     statement ::= TM ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_member(s, t, c, d);};
 //     statement ::= GF ID(s) ID(t) ID(c) { extra.as_mut().genfscon(s, t, c); };
-fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> ParseResult<'a> {
+fn exec_statement<'a>(
+    sepolicy: Pin<&mut sepolicy>,
+    tokens: &mut Tokens<'a>,
+) -> ParseResult<'a, ()> {
     let action = match tokens.next() {
         Some(token) => token,
-        _ => Err(ParseError::General)?,
+        _ => Err(ParseError::ShowHelp)?,
+    };
+    let check_additional_args = |tokens: &mut Tokens<'a>| {
+        if tokens.peek().is_none() {
+            Ok(())
+        } else {
+            Err(ParseError::General)
+        }
     };
     match action {
         Token::AL | Token::DN | Token::AA | Token::DA => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let s = parse_terms(tokens)?;
                 let t = parse_terms(tokens)?;
                 let c = parse_terms(tokens)?;
                 let p = parse_terms(tokens)?;
+                check_additional_args(tokens)?;
                 match action {
                     Token::AL => sepolicy.allow(s, t, c, p),
                     Token::DN => sepolicy.deny(s, t, c, p),
@@ -230,7 +242,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::AX | Token::AY | Token::DX => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let s = parse_terms(tokens)?;
                 let t = parse_terms(tokens)?;
                 let c = parse_terms(tokens)?;
@@ -239,6 +251,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
                 } else {
                     throw!()
                 };
+                check_additional_args(tokens)?;
                 match action {
                     Token::AX => sepolicy.allowxperm(s, t, c, p),
                     Token::AY => sepolicy.auditallowxperm(s, t, c, p),
@@ -251,8 +264,9 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::PM | Token::EF => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let t = parse_terms(tokens)?;
+                check_additional_args(tokens)?;
                 match action {
                     Token::PM => sepolicy.permissive(t),
                     Token::EF => sepolicy.enforce(t),
@@ -264,9 +278,10 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::TA => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let t = parse_term(tokens)?;
                 let a = parse_term(tokens)?;
+                check_additional_args(tokens)?;
                 sepolicy.typeattribute(t, a)
             };
             if result.is_err() {
@@ -274,13 +289,14 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::TY => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let t = parse_id(tokens)?;
                 let a = if tokens.peek().is_none() {
                     vec![]
                 } else {
                     parse_term(tokens)?
                 };
+                check_additional_args(tokens)?;
                 sepolicy.type_(t, a)
             };
             if result.is_err() {
@@ -288,8 +304,9 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::AT => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let t = parse_id(tokens)?;
+                check_additional_args(tokens)?;
                 sepolicy.attribute(t)
             };
             if result.is_err() {
@@ -297,11 +314,12 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::TC | Token::TM => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let s = parse_id(tokens)?;
                 let t = parse_id(tokens)?;
                 let c = parse_id(tokens)?;
                 let d = parse_id(tokens)?;
+                check_additional_args(tokens)?;
                 match action {
                     Token::TC => sepolicy.type_change(s, t, c, d),
                     Token::TM => sepolicy.type_member(s, t, c, d),
@@ -313,7 +331,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::TT => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let s = parse_id(tokens)?;
                 let t = parse_id(tokens)?;
                 let c = parse_id(tokens)?;
@@ -323,6 +341,7 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
                 } else {
                     parse_id(tokens)?
                 };
+                check_additional_args(tokens)?;
                 sepolicy.type_transition(s, t, c, d, o);
             };
             if result.is_err() {
@@ -330,23 +349,20 @@ fn exec_statement<'a>(sepolicy: Pin<&mut sepolicy>, tokens: &'a mut Tokens) -> P
             }
         }
         Token::GF => {
-            let result: SimpleResult<()> = try {
+            let result: ParseResult<()> = try {
                 let s = parse_id(tokens)?;
                 let t = parse_id(tokens)?;
                 let c = parse_id(tokens)?;
+                check_additional_args(tokens)?;
                 sepolicy.genfscon(s, t, c)
             };
             if result.is_err() {
                 Err(ParseError::GenfsCon)?
             }
         }
-        _ => Err(ParseError::General)?,
+        _ => Err(ParseError::UnknownAction(action))?,
     }
-    if tokens.peek().is_none() {
-        Ok(())
-    } else {
-        Err(ParseError::General)
-    }
+    Ok(())
 }
 
 fn tokenize_statement(statement: &str) -> Vec<Token> {
@@ -456,7 +472,8 @@ impl Display for Token<'_> {
 impl Display for ParseError<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ParseError::General => format_statement_help(f),
+            ParseError::General => Ok(()),
+            ParseError::ShowHelp => format_statement_help(f),
             ParseError::AvtabAv(action) => {
                 write!(f, "{action} *source_type *target_type *class *perm_set")
             }
@@ -479,6 +496,7 @@ impl Display for ParseError<'_> {
             ParseError::NewType => f.write_str("type type_name ^(attribute)"),
             ParseError::NewAttr => f.write_str("attribute attribute_name"),
             ParseError::GenfsCon => f.write_str("genfscon fs_name partial_path fs_context"),
+            ParseError::UnknownAction(action) => write!(f, "Unknown action: \"{action}\""),
         }
     }
 }
