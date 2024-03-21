@@ -62,7 +62,7 @@ struct sepolicy {
     void dontauditxperm(StrVec src, StrVec tgt, StrVec cls, Xperms xperm);
 
     // Type rules
-    void type_transition(Str src, Str tgt, Str cls, Str def, StrVec obj);
+    void type_transition(Str src, Str tgt, Str cls, Str def, Str obj);
     void type_change(Str src, Str tgt, Str cls, Str def);
     void type_member(Str src, Str tgt, Str cls, Str def);
 

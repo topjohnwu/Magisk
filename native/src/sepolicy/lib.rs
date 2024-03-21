@@ -74,14 +74,7 @@ mod ffi {
         #[cxx_name = "type"]
         fn type_(self: Pin<&mut sepolicy>, t: &str, a: Vec<&str>);
         fn attribute(self: Pin<&mut sepolicy>, t: &str);
-        fn type_transition(
-            self: Pin<&mut sepolicy>,
-            s: &str,
-            t: &str,
-            c: &str,
-            d: &str,
-            o: Vec<&str>,
-        );
+        fn type_transition(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str, d: &str, o: &str);
         fn type_change(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str, d: &str);
         fn type_member(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str, d: &str);
         fn genfscon(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str);

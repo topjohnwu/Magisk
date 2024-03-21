@@ -257,9 +257,9 @@ fn exec_statement(sepolicy: Pin<&mut sepolicy>, tokens: &mut Tokens) -> LoggedRe
             match action {
                 Token::TT => {
                     let o = if tokens.peek().is_none() {
-                        vec![]
+                        ""
                     } else {
-                        vec![parse_id(tokens)?]
+                        parse_id(tokens)?
                     };
                     sepolicy.type_transition(s, t, c, d, o)
                 }

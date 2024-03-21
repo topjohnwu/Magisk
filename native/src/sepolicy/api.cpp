@@ -55,16 +55,25 @@ static inline void expand(F &&f, T &&...args) {
 }
 
 template<typename ...T>
+static inline void expand(const Str &s, T &&...args) {
+    char buf[64];
+    if (s.length() >= sizeof(buf)) return;
+    if (s.empty()) {
+        expand(std::forward<T>(args)..., (char *) nullptr);
+    } else {
+        memcpy(buf, s.data(), s.length());
+        buf[s.length()] = '\0';
+        expand(std::forward<T>(args)..., buf);
+    }
+}
+
+template<typename ...T>
 static inline void expand(const StrVec &vec, T &&...args) {
     if (vec.empty()) {
         expand(std::forward<T>(args)..., (char *) nullptr);
     } else {
-        char buf[64];
         for (auto &s : vec) {
-            if (s.length() >= sizeof(buf)) continue;
-            memcpy(buf, s.data(), s.length());
-            buf[s.length()] = '\0';
-            expand(std::forward<T>(args)..., buf);
+            expand(s, std::forward<T>(args)...);
         }
     }
 }
@@ -74,15 +83,6 @@ static inline void expand(const Xperms &vec, T &&...args) {
     for (auto &p : vec) {
         expand(std::forward<T>(args)..., p);
     }
-}
-
-template<typename ...T>
-static inline void expand(const Str &s, T &&...args) {
-    char buf[64];
-    if (s.length() >= sizeof(buf)) return;
-    memcpy(buf, s.data(), s.length());
-    buf[s.length()] = '\0';
-    expand(std::forward<T>(args)..., buf);
 }
 
 void sepolicy::allow(StrVec src, StrVec tgt, StrVec cls, StrVec perm) {
@@ -148,15 +148,14 @@ void sepolicy::attribute(Str name) {
     });
 }
 
-void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, StrVec obj) {
-    auto obj_str = obj.empty() ? std::string() : std::string(obj[0]);
-    auto o = obj.empty() ? nullptr : obj_str.data();
-    expand(src, tgt, cls, def, [this, &o](auto ...args) {
-        print_rule("type_transition", args..., o);
+void sepolicy::type_transition(Str src, Str tgt, Str cls, Str def, Str obj) {
+    expand(src, tgt, cls, def, obj, [this](auto s, auto t, auto c, auto d, auto o) {
         if (o) {
-            impl->add_filename_trans(args..., o);
+            print_rule("type_transition", s, t, c, d, o);
+            impl->add_filename_trans(s, t, c, d, o);
         } else {
-            impl->add_type_rule(args..., AVTAB_TRANSITION);
+            print_rule("type_transition", s, t, c, d);
+            impl->add_type_rule(s, t, c, d, AVTAB_TRANSITION);
         }
     });
 }
