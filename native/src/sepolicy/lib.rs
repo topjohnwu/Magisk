@@ -164,7 +164,11 @@ fn xperm_to_string(perm: &ffi::Xperm) -> String {
     if perm.reset {
         s.push('~');
     }
-    s.write_fmt(format_args!("{{ {:#06x}-{:#06x} }}", perm.low, perm.high))
-        .ok();
+    if perm.low == perm.high {
+        s.write_fmt(format_args!("{{ {:#06X} }}", perm.low)).ok();
+    } else {
+        s.write_fmt(format_args!("{{ {:#06X}-{:#06X} }}", perm.low, perm.high))
+            .ok();
+    }
     s
 }

@@ -87,7 +87,7 @@ fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> LoggedResult<Vec<&'a str>> {
     }
 }
 
-//     xperm ::= HX(low) { Xperm{low, high: 0, reset: false} };
+//     xperm ::= HX(low) { Xperm{low, high: low, reset: false} };
 //     xperm ::= HX(low) HP HX(high) { Xperm{low, high, reset: false} };
 fn parse_xperm(tokens: &mut Tokens) -> LoggedResult<Xperm> {
     let low = match tokens.next() {
@@ -102,7 +102,7 @@ fn parse_xperm(tokens: &mut Tokens) -> LoggedResult<Xperm> {
                 _ => throw!(),
             }
         }
-        _ => 0,
+        _ => low,
     };
     Ok(Xperm {
         low,
@@ -111,7 +111,7 @@ fn parse_xperm(tokens: &mut Tokens) -> LoggedResult<Xperm> {
     })
 }
 
-//     xperms ::= HX(low) { if low > 0 { vec![Xperm{low, high: 0, reset: false}] } else { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: true}] }};
+//     xperms ::= HX(low) { if low > 0 { vec![Xperm{low, high: low, reset: false}] } else { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: true}] }};
 //     xperms ::= LB xperm_list(l) RB { l };
 //     xperms ::= TL LB xperm_list(mut l) RB { l.iter_mut().for_each(|x| { x.reset = true; }); l };
 //     xperms ::= ST { vec![Xperm{low: 0x0000, high: 0xFFFF, reset: false}] };
@@ -154,7 +154,7 @@ fn parse_xperms(tokens: &mut Tokens) -> LoggedResult<Vec<Xperm>> {
             if low > 0 {
                 xperms.push(Xperm {
                     low,
-                    high: 0,
+                    high: low,
                     reset,
                 });
             } else {
