@@ -171,6 +171,7 @@ static void exec_cmd(const char *action, vector<Extra> &data,
 
 void app_log(const su_context &ctx) {
     if (fork_dont_care() == 0) {
+        setsid();
         vector<Extra> extras;
         extras.reserve(9);
         extras.emplace_back("from.uid", ctx.info->uid);
@@ -190,6 +191,7 @@ void app_log(const su_context &ctx) {
 
 void app_notify(const su_context &ctx) {
     if (fork_dont_care() == 0) {
+        setsid();
         vector<Extra> extras;
         extras.reserve(3);
         extras.emplace_back("from.uid", ctx.info->uid);
