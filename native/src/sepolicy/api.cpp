@@ -55,14 +55,10 @@ static inline void expand(F &&f, T &&...args) {
 
 template<typename ...T>
 static inline void expand(const Str &s, T &&...args) {
-    char buf[64];
-    if (s.length() >= sizeof(buf)) return;
     if (s.empty()) {
         expand(std::forward<T>(args)..., (char *) nullptr);
     } else {
-        memcpy(buf, s.data(), s.length());
-        buf[s.length()] = '\0';
-        expand(std::forward<T>(args)..., buf);
+        expand(std::forward<T>(args)..., std::string(s).data());
     }
 }
 
