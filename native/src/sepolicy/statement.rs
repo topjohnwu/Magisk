@@ -67,7 +67,7 @@ fn parse_id<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, &'a str> {
 }
 
 //     names ::= ID(n) { vec![n] };
-//     names ::= names(mut v) CM ID(n) { v.push(n); v };
+//     names ::= names(mut v) ID(n) { v.push(n); v };
 //     term ::= ID(n) { vec![n] }
 //     term ::= LB names(n) RB { n };
 fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
@@ -76,32 +76,46 @@ fn parse_term<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
         Some(Token::LB) => {
             let mut names = Vec::new();
             loop {
-                names.push(parse_id(tokens)?);
-                match tokens.peek() {
-                    Some(Token::CM) => {
-                        tokens.next();
-                    }
-                    _ => break,
+                match tokens.next() {
+                    Some(Token::ID(name)) => names.push(name),
+                    Some(Token::RB) => break,
+                    _ => throw!(),
                 }
             }
-            if matches!(tokens.next(), Some(Token::RB)) {
-                return Ok(names);
-            }
-            throw!()
+            Ok(names)
         }
         _ => throw!(),
     }
 }
 
-//     terms ::= ST { vec![] }
-//     terms ::= term(n) { n }
-fn parse_terms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
-    match tokens.peek() {
-        Some(Token::ST) => {
-            tokens.next();
-            Ok(Vec::new())
+//     names ::= ST { vec![] }
+//     names ::= ID(n) { vec![n] };
+//     names ::= names(mut v) ID(n) { v.push(n); v };
+//     names ::= names(n) ST { vec![] };
+//     sterm ::= ST { vec![] }
+//     sterm ::= ID(n) { vec![n] }
+//     sterm ::= LB names(n) RB { n };
+fn parse_sterm<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<&'a str>> {
+    match tokens.next() {
+        Some(Token::ID(name)) => Ok(vec![name]),
+        Some(Token::ST) => Ok(vec![]),
+        Some(Token::LB) => {
+            let mut names = Some(Vec::new());
+            loop {
+                match tokens.next() {
+                    Some(Token::ID(name)) => {
+                        if let Some(ref mut names) = names {
+                            names.push(name)
+                        }
+                    }
+                    Some(Token::ST) => names = None,
+                    Some(Token::RB) => break,
+                    _ => throw!(),
+                }
+            }
+            Ok(names.unwrap_or(vec![]))
         }
-        _ => parse_term(tokens),
+        _ => throw!(),
     }
 }
 
@@ -188,24 +202,24 @@ fn parse_xperms<'a>(tokens: &mut Tokens<'a>) -> ParseResult<'a, Vec<Xperm>> {
     Ok(xperms)
 }
 
-//     statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { extra.as_mut().allow(s, t, c, p); };
-//     statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { extra.as_mut().deny(s, t, c, p); };
-//     statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { extra.as_mut().auditallow(s, t, c, p); };
-//     statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { extra.as_mut().dontaudit(s, t, c, p); };
-//     statement ::= AX sterm(s) sterm(t) sterm(c) IO xperms(p) { extra.as_mut().allowxperm(s, t, c, p); };
-//     statement ::= AY sterm(s) sterm(t) sterm(c) IO xperms(p) { extra.as_mut().auditallowxperm(s, t, c, p); };
-//     statement ::= DX sterm(s) sterm(t) sterm(c) IO xperms(p) { extra.as_mut().dontauditxperm(s, t, c, p); };
-//     statement ::= PM sterm(t) { extra.as_mut().permissive(t); };
-//     statement ::= EF sterm(t) { extra.as_mut().enforce(t); };
-//     statement ::= TA term(t) term(a) { extra.as_mut().typeattribute(t, a); };
-//     statement ::= TY ID(t) { extra.as_mut().type_(t, vec![]);};
-//     statement ::= TY ID(t) term(a) { extra.as_mut().type_(t, a);};
-//     statement ::= AT ID(t) { extra.as_mut().attribute(t); };
-//     statement ::= TT ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_transition(s, t, c, d, vec![]); };
-//     statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { extra.as_mut().type_transition(s, t, c, d, vec![o]); };
-//     statement ::= TC ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_change(s, t, c, d); };
-//     statement ::= TM ID(s) ID(t) ID(c) ID(d) { extra.as_mut().type_member(s, t, c, d);};
-//     statement ::= GF ID(s) ID(t) ID(c) { extra.as_mut().genfscon(s, t, c); };
+//     statement ::= AL sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.allow(s, t, c, p); };
+//     statement ::= DN sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.deny(s, t, c, p); };
+//     statement ::= AA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.auditallow(s, t, c, p); };
+//     statement ::= DA sterm(s) sterm(t) sterm(c) sterm(p) { sepolicy.dontaudit(s, t, c, p); };
+//     statement ::= AX sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.allowxperm(s, t, c, p); };
+//     statement ::= AY sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.auditallowxperm(s, t, c, p); };
+//     statement ::= DX sterm(s) sterm(t) sterm(c) IO xperms(p) { sepolicy.dontauditxperm(s, t, c, p); };
+//     statement ::= PM sterm(t) { sepolicy.permissive(t); };
+//     statement ::= EF sterm(t) { sepolicy.enforce(t); };
+//     statement ::= TA term(t) term(a) { sepolicy.typeattribute(t, a); };
+//     statement ::= TY ID(t) { sepolicy.type_(t, vec![]);};
+//     statement ::= TY ID(t) term(a) { sepolicy.type_(t, a);};
+//     statement ::= AT ID(t) { sepolicy.attribute(t); };
+//     statement ::= TT ID(s) ID(t) ID(c) ID(d) { sepolicy.type_transition(s, t, c, d, vec![]); };
+//     statement ::= TT ID(s) ID(t) ID(c) ID(d) ID(o) { sepolicy.type_transition(s, t, c, d, vec![o]); };
+//     statement ::= TC ID(s) ID(t) ID(c) ID(d) { sepolicy.type_change(s, t, c, d); };
+//     statement ::= TM ID(s) ID(t) ID(c) ID(d) { sepolicy.type_member(s, t, c, d);};
+//     statement ::= GF ID(s) ID(t) ID(c) { sepolicy.genfscon(s, t, c); };
 fn exec_statement<'a>(
     sepolicy: Pin<&mut sepolicy>,
     tokens: &mut Tokens<'a>,
@@ -224,10 +238,10 @@ fn exec_statement<'a>(
     match action {
         Token::AL | Token::DN | Token::AA | Token::DA => {
             let result: ParseResult<()> = try {
-                let s = parse_terms(tokens)?;
-                let t = parse_terms(tokens)?;
-                let c = parse_terms(tokens)?;
-                let p = parse_terms(tokens)?;
+                let s = parse_sterm(tokens)?;
+                let t = parse_sterm(tokens)?;
+                let c = parse_sterm(tokens)?;
+                let p = parse_sterm(tokens)?;
                 check_additional_args(tokens)?;
                 match action {
                     Token::AL => sepolicy.allow(s, t, c, p),
@@ -243,9 +257,9 @@ fn exec_statement<'a>(
         }
         Token::AX | Token::AY | Token::DX => {
             let result: ParseResult<()> = try {
-                let s = parse_terms(tokens)?;
-                let t = parse_terms(tokens)?;
-                let c = parse_terms(tokens)?;
+                let s = parse_sterm(tokens)?;
+                let t = parse_sterm(tokens)?;
+                let c = parse_sterm(tokens)?;
                 let p = if matches!(tokens.next(), Some(Token::IO)) {
                     parse_xperms(tokens)?
                 } else {
@@ -265,7 +279,7 @@ fn exec_statement<'a>(
         }
         Token::PM | Token::EF => {
             let result: ParseResult<()> = try {
-                let t = parse_terms(tokens)?;
+                let t = parse_sterm(tokens)?;
                 check_additional_args(tokens)?;
                 match action {
                     Token::PM => sepolicy.permissive(t),
@@ -365,64 +379,64 @@ fn exec_statement<'a>(
     Ok(())
 }
 
+fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
+    match s {
+        "allow" => tokens.push(Token::AL),
+        "deny" => tokens.push(Token::DN),
+        "auditallow" => tokens.push(Token::AA),
+        "dontaudit" => tokens.push(Token::DA),
+        "allowxperm" => tokens.push(Token::AX),
+        "auditallowxperm" => tokens.push(Token::AY),
+        "dontauditxperm" => tokens.push(Token::DX),
+        "permissive" => tokens.push(Token::PM),
+        "enforce" => tokens.push(Token::EF),
+        "typeattribute" => tokens.push(Token::TA),
+        "type" => tokens.push(Token::TY),
+        "attribute" => tokens.push(Token::AT),
+        "type_transition" => tokens.push(Token::TT),
+        "type_change" => tokens.push(Token::TC),
+        "type_member" => tokens.push(Token::TM),
+        "genfscon" => tokens.push(Token::GF),
+        "ioctl" => tokens.push(Token::IO),
+        "*" => tokens.push(Token::ST),
+        "" => {}
+        _ => {
+            if let Some(idx) = s.find('{') {
+                let (a, b) = s.split_at(idx);
+                extract_token(a, tokens);
+                tokens.push(Token::LB);
+                extract_token(&b[1..], tokens);
+            } else if let Some(idx) = s.find('}') {
+                let (a, b) = s.split_at(idx);
+                extract_token(a, tokens);
+                tokens.push(Token::RB);
+                extract_token(&b[1..], tokens);
+            } else if let Some(idx) = s.find(',') {
+                let (a, b) = s.split_at(idx);
+                extract_token(a, tokens);
+                tokens.push(Token::CM);
+                extract_token(&b[1..], tokens);
+            } else if let Some(idx) = s.find('-') {
+                let (a, b) = s.split_at(idx);
+                extract_token(a, tokens);
+                tokens.push(Token::HP);
+                extract_token(&b[1..], tokens);
+            } else if let Some(s) = s.strip_prefix('~') {
+                tokens.push(Token::TL);
+                extract_token(s, tokens);
+            } else if let Some(s) = s.strip_prefix("0x") {
+                tokens.push(Token::HX(s.parse().unwrap_or(0)));
+            } else {
+                tokens.push(Token::ID(s));
+            }
+        }
+    }
+}
+
 fn tokenize_statement(statement: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     for s in statement.split_whitespace() {
-        let mut res = Some(s);
-        while let Some(s) = res {
-            match s {
-                "allow" => tokens.push(Token::AL),
-                "deny" => tokens.push(Token::DN),
-                "auditallow" => tokens.push(Token::AA),
-                "dontaudit" => tokens.push(Token::DA),
-                "allowxperm" => tokens.push(Token::AX),
-                "auditallowxperm" => tokens.push(Token::AY),
-                "dontauditxperm" => tokens.push(Token::DX),
-                "permissive" => tokens.push(Token::PM),
-                "enforce" => tokens.push(Token::EF),
-                "typeattribute" => tokens.push(Token::TA),
-                "type" => tokens.push(Token::TY),
-                "attribute" => tokens.push(Token::AT),
-                "type_transition" => tokens.push(Token::TT),
-                "type_change" => tokens.push(Token::TC),
-                "type_member" => tokens.push(Token::TM),
-                "genfscon" => tokens.push(Token::GF),
-                "ioctl" => tokens.push(Token::IO),
-                "" => {}
-                _ => {
-                    if let Some(s) = s.strip_prefix('{') {
-                        tokens.push(Token::LB);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix('}') {
-                        tokens.push(Token::RB);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix(',') {
-                        tokens.push(Token::CM);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix('*') {
-                        tokens.push(Token::ST);
-                        res = Some(s);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix('~') {
-                        res = Some(s);
-                        tokens.push(Token::TL);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix('-') {
-                        res = Some(s);
-                        tokens.push(Token::HP);
-                        continue;
-                    } else if let Some(s) = s.strip_prefix("0x") {
-                        tokens.push(Token::HX(s.parse().unwrap_or(0)));
-                    } else {
-                        tokens.push(Token::ID(s));
-                    }
-                }
-            }
-            break;
-        }
+        extract_token(s, &mut tokens);
     }
     tokens
 }
