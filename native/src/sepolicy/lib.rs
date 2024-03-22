@@ -80,6 +80,7 @@ mod ffi {
         fn type_change(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str, d: &str);
         fn type_member(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str, d: &str);
         fn genfscon(self: Pin<&mut sepolicy>, s: &str, t: &str, c: &str);
+        #[allow(dead_code)]
         fn strip_dontaudit(self: Pin<&mut sepolicy>);
     }
 

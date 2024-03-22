@@ -132,8 +132,8 @@ impl SepolicyMagisk for sepolicy {
             deny(["init"], ["adb_data_file"], ["dir"], ["search"]);
             deny(["vendor_init"], ["adb_data_file"], ["dir"], ["search"]);
         }
-        // Remove all dontaudit in debug mode
-        #[cfg(debug_assertions)]
+
+        #[cfg(any())]
         self.as_mut().strip_dontaudit();
 
         set_log_level_state(LogLevel::Warn, true);

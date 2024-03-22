@@ -1,11 +1,10 @@
 #include <base.hpp>
 
-#include "flags.h"
 #include "policy.hpp"
 
 using Str = rust::Str;
 
-#if MAGISK_DEBUG
+#if 0
 template<typename Arg>
 std::string as_str(const Arg &arg) {
     if constexpr (std::is_same_v<Arg, const char *> || std::is_same_v<Arg, char *>) {
