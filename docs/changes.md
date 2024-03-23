@@ -1,59 +1,59 @@
-# Magisk Changelog
+#修复设备信息检测脚本
 
 ### v27.0
 
-- [Zygisk] Introduce new code injection mechanism
-- [Zygisk] Support new signature introduced in U QPR2
-- [SEPolicy] Update libsepol to properly set some policy config bits
-- [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+query为空
+query为空
+query为空
+query为空
+query为空
 
 ### v26.4
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
-- [MagiskPolicy] Fix `genfscon` and `filename_trans`
-- [MagiskPolicy] Fix bug in `libsepol`
-- [Zygisk] Fix and simplify file descriptor sanitization logic
-- [App] Prevent OOM when patching AP tarfiles
-- [App] Fix bug in device configuration detection
-- [Daemon] Fix certificate parsing of APKs
-- [General] Fix logging errors from C++ code being ignored
+query为空
+query为空
+query为空
+query为空
+query为空
+query为空
+query为空
+query为空
 
 ### v26.3
 
-- [General] Fix device information detection script
-- [General] Update BusyBox to 1.36.1
-- [General] Update toolchain that produces broken arm32 executables
-- [App] Fix root service unable to bind on OnePlus devices
+query为空
+- [修补扩展权限]ResetProp
+- [MagiskBoot]resetprop -w
+- [MagiskPolicy]如果签名启动图像较大，不要填充零
 
 ### v26.2
 
-- [MagiskBoot] Support extracting boot image from `payload.bin`
-- [MagiskBoot] Support cpio files containing character files
-- [MagiskBoot] Support listing cpio content
-- [MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
-- [Daemon] Make daemon socket a fixed path in MAGISKTMP
-- [resetprop] Support printing property context
-- [resetprop] Support only printing persistent properties from storage
-- [resetprop] Properly support setting persistent properties bypassing property_service
-- [MagiskSU] Support `-g` and `-G` options
-- [MagiskSU] Support switching mount namespace to PID with `-t`
-- [MagiskPolicy] Fix patching extended permissions
-- [MagiskPolicy] Support more syntax for extended permissions
-- [MagiskPolicy] Support printing out the loaded sepolicy rules
-- [App] Support patching boot image from ROM zips
-- [App] Properly preserve `boot.img` when patching Samsung firmware with `init_boot.img`
+- [genfscon]固定`payload.bin`
+- [MagiskPolicy]和
+- [MagiskPolicy]修复bug
+- [修正和简化文件描述符消毒逻辑]济吉斯克
+- [修补 AP tarfiles你OOM]应用程序
+- [支持更多扩展权限语法]应用程序
+- [控制+百万]半神半人精灵
+- [支持打印加载的]普遍的
+- [Magisk Changelog]普遍的`-g`修复设备信息检测脚本`-G`使用
+- [应用程序]切换`-t`
+- [MagiskPolicy]按键移动焦点。或者，使用
+- [resetprop -w]然后
+- [Bump最小支持 Android]移动到页面上的下一个交互元素。
+- [libsepol]济吉斯克
+-[因此 Magisk v. V. V. V. V.支持
 
 ### v26.1
 
-- [App] Fix crashing when revoking root permissions
-- [MagiskInit] Always prefer `ext4` partitions over `f2fs` when selecting the pre-init partition
-- [General] Restore module files' context/owner/group from mirror. This is a regression introduced in v26.0
+-[MagiskPolicy]resetprop-w
+-[普遍的]和
+-[修补 AP tarfiles你]修复 bug
 
 ### v26.0
 
-- [General] Bump minimum supported Android version to Android 6.0
-- [General] New magic mount backend. It supports loading modules into system with `overlayfs` files injected
+-[济吉斯克]济吉斯克
+-[新魔术坐骑后端。它支持将模块加载到系统中]
 - [Zygisk] Release new API version 4
 - [Zygisk] Prevent crashing daemon in error
 - [Zygisk] Rewrite zygote code injection with new loader library approach
