@@ -229,6 +229,8 @@ Supported policy statements:
 "genfscon fs_name partial_path fs_context"
 ```
 
+Note: Live patch mode is discouraged because due to a kernel bug, most kernels don't export correct Android specific config bits in `/sys/fs/selinux/policy`. This means Android specific selinux handling for `nlmsg` will get lost after patching. As a result, read access control for MAC address (maybe more) will be broken.
+
 ### magisk
 
 When the magisk binary is called with the name `magisk`, it works as a utility tool with many helper functions and the entry points for several Magisk services.
