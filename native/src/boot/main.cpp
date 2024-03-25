@@ -6,9 +6,9 @@
 
 using namespace std;
 
-#ifdef USE_MUSL_PRINTF
-// Switch to use the musl vfprintf
+#ifdef USE_CRT0
 __asm__(".global vfprintf \n vfprintf = musl_vfprintf");
+__asm__(".global vsscanf \n vsscanf = tfp_vsscanf");
 #endif
 
 static void print_formats() {

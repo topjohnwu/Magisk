@@ -12,6 +12,10 @@
 
 using namespace std;
 
+#ifdef USE_CRT0
+__asm__(".global vfprintf \n vfprintf = tfp_vfprintf");
+#endif
+
 bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
     uint8_t out[8192];
     xz_crc32_init();

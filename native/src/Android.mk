@@ -111,7 +111,6 @@ LOCAL_LDFLAGS := -static -T src/lto_fix.lds
 
 ifdef B_CRT0
 LOCAL_STATIC_LIBRARIES += crt0
-LOCAL_CFLAGS += -DUSE_MUSL_PRINTF
 LOCAL_LDFLAGS := -lm
 endif
 
