@@ -1,29 +1,6 @@
-// Expose constant strings as macros so that we can use concat!() on these values
+use const_format::concatcp;
 
-#[macro_export]
-macro_rules! LOGFILE {
-    () => {
-        "/cache/magisk.log"
-    };
-}
-
-#[macro_export]
-macro_rules! INTLROOT {
-    () => {
-        ".magisk"
-    };
-}
-
-#[macro_export]
-macro_rules! LOG_PIPE {
-    () => {
-        concat!($crate::INTLROOT!(), "/device/log")
-    };
-}
-
-#[macro_export]
-macro_rules! MAIN_CONFIG {
-    () => {
-        concat!($crate::INTLROOT!(), "/config")
-    };
-}
+pub const LOGFILE: &str = "/cache/magisk.log";
+pub const INTLROOT: &str = ".magisk";
+pub const LOG_PIPE: &str = concatcp!(INTLROOT, "/device/log");
+pub const MAIN_CONFIG: &str = concatcp!(INTLROOT, "/config");

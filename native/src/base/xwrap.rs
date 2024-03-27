@@ -10,7 +10,7 @@ use libc::{
 };
 
 use crate::cxx_extern::readlinkat_for_cxx;
-use crate::{cstr, errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrBufRef};
+use crate::{errno, raw_cstr, CxxResultExt, FsPath, Utf8CStr, Utf8CStrBufRef};
 
 fn ptr_to_str<'a, T>(ptr: *const T) -> &'a str {
     if ptr.is_null() {

@@ -23,6 +23,7 @@ x509-cert = "0.2"
 der = "0.7"
 bytemuck = "1.14"
 fdt = "0.1"
+const_format = "0.2"
 
 [workspace.dependencies.argh]
 git = "https://github.com/google/argh.git"

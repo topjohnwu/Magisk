@@ -9,6 +9,7 @@ use std::sync::atomic::{AtomicI32, Ordering};
 use std::{fs, io};
 
 use bytemuck::{bytes_of, bytes_of_mut, write_zeroes, Pod, Zeroable};
+use const_format::concatcp;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
@@ -17,12 +18,15 @@ use base::libc::{
     timespec, tm, CLOCK_REALTIME, O_CLOEXEC, O_RDWR, O_WRONLY, PIPE_BUF, SIGPIPE, SIG_BLOCK,
     SIG_SETMASK,
 };
-use base::*;
+use base::{
+    exit_on_error, libc, raw_cstr, FsPathBuf, LogLevel, Logger, Utf8CStr, Utf8CStrBuf,
+    Utf8CStrBufArr, Utf8CStrWrite, LOGGER,
+};
 
+use crate::consts::{LOGFILE, LOG_PIPE};
 use crate::daemon::{MagiskD, MAGISKD};
 use crate::ffi::get_magisk_tmp;
 use crate::logging::LogFile::{Actual, Buffer};
-use crate::{LOGFILE, LOG_PIPE};
 
 #[allow(dead_code, non_camel_case_types)]
 #[derive(FromPrimitive, ToPrimitive)]
@@ -192,7 +196,7 @@ pub fn zygisk_get_logd() -> i32 {
         let mut buf = Utf8CStrBufArr::default();
         let path = FsPathBuf::new(&mut buf)
             .join(get_magisk_tmp())
-            .join(LOG_PIPE!());
+            .join(LOG_PIPE);
         // Open as RW as sometimes it may block
         fd = unsafe { libc::open(path.as_ptr(), O_RDWR | O_CLOEXEC) };
         if fd >= 0 {
@@ -292,9 +296,9 @@ extern "C" fn logfile_writer(arg: *mut c_void) -> *mut c_void {
             pipe.read_exact(bytes_of_mut(&mut meta))?;
 
             if meta.prio < 0 {
-                if matches!(logfile, LogFile::Buffer(_)) {
-                    fs::rename(LOGFILE!(), concat!(LOGFILE!(), ".bak")).ok();
-                    let mut out = File::create(LOGFILE!())?;
+                if matches!(logfile, Buffer(_)) {
+                    fs::rename(LOGFILE, concatcp!(LOGFILE, ".bak")).ok();
+                    let mut out = File::create(LOGFILE)?;
                     out.write_all(tmp.as_slice())?;
                     tmp = Vec::new();
                     logfile = Actual(out);
@@ -371,7 +375,7 @@ impl MagiskD {
         let mut buf = Utf8CStrBufArr::default();
         let path = FsPathBuf::new(&mut buf)
             .join(get_magisk_tmp())
-            .join(LOG_PIPE!());
+            .join(LOG_PIPE);
 
         unsafe {
             libc::mkfifo(path.as_ptr(), 0o666);

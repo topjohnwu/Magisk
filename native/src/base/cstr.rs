@@ -2,10 +2,10 @@ use std::cmp::min;
 use std::ffi::{CStr, FromBytesWithNulError, OsStr};
 use std::fmt::{Arguments, Debug, Display, Formatter, Write};
 use std::ops::{Deref, DerefMut};
+use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::str::{Utf8Chunks, Utf8Error};
 use std::{fmt, mem, slice, str};
-use std::os::unix::ffi::OsStrExt;
 
 use cxx::{type_id, ExternType};
 use libc::c_char;
@@ -664,6 +664,6 @@ macro_rules! cstr {
 #[macro_export]
 macro_rules! raw_cstr {
     ($($str:tt)*) => {{
-        cstr!($($str)*).as_ptr()
+        $crate::cstr!($($str)*).as_ptr()
     }};
 }
