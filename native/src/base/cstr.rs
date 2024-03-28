@@ -451,6 +451,7 @@ pub struct FsPathBuf<'a>(&'a mut dyn Utf8CStrWrite);
 
 impl<'a> FsPathBuf<'a> {
     pub fn new(value: &'a mut dyn Utf8CStrWrite) -> Self {
+        value.clear();
         FsPathBuf(value)
     }
 
@@ -656,7 +657,8 @@ macro_rules! cstr {
         );
         #[allow(unused_unsafe)]
         unsafe {
-            $crate::Utf8CStr::from_bytes_unchecked(concat!($($str)*, "\0").as_bytes())
+            $crate::Utf8CStr::from_bytes_unchecked($crate::const_format::concatcp!($($str)*, "\0")
+                .as_bytes())
         }
     }};
 }

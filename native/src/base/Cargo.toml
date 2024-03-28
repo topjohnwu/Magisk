@@ -22,3 +22,4 @@ argh = { workspace = true }
 bytemuck = { workspace = true }
 num-traits = { workspace = true }
 num-derive = { workspace = true }
+const_format = { workspace = true }

@@ -72,6 +72,7 @@ dependencies = [
  "argh",
  "bytemuck",
  "cfg-if",
+ "const_format",
  "cxx",
  "cxx-gen",
  "libc",
@@ -467,7 +468,6 @@ version = "0.0.0"
 dependencies = [
  "base",
  "bytemuck",
- "const_format",
  "cxx",
  "cxx-gen",
  "num-derive",

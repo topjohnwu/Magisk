@@ -3,6 +3,7 @@
 #![feature(io_error_more)]
 #![feature(utf8_chunks)]
 
+pub use const_format;
 pub use libc;
 use num_traits::FromPrimitive;
 

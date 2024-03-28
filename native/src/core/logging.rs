@@ -9,7 +9,6 @@ use std::sync::atomic::{AtomicI32, Ordering};
 use std::{fs, io};
 
 use bytemuck::{bytes_of, bytes_of_mut, write_zeroes, Pod, Zeroable};
-use const_format::concatcp;
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
 
@@ -19,8 +18,8 @@ use base::libc::{
     SIG_SETMASK,
 };
 use base::{
-    exit_on_error, libc, raw_cstr, FsPathBuf, LogLevel, Logger, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr, Utf8CStrWrite, LOGGER,
+    const_format::concatcp, exit_on_error, libc, raw_cstr, FsPathBuf, LogLevel, Logger, Utf8CStr,
+    Utf8CStrBuf, Utf8CStrBufArr, Utf8CStrWrite, LOGGER,
 };
 
 use crate::consts::{LOGFILE, LOG_PIPE};

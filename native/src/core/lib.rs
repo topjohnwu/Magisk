@@ -1,4 +1,5 @@
 #![feature(format_args_nl)]
+#![feature(try_blocks)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;
@@ -7,6 +8,7 @@ use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
 use logging::{
     android_logging, magisk_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging,
 };
+use mount::{find_preinit_device, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 
 mod cert;
@@ -14,6 +16,7 @@ mod cert;
 mod consts;
 mod daemon;
 mod logging;
+mod mount;
 mod resetprop;
 
 #[cxx::bridge]
@@ -66,6 +69,8 @@ pub mod ffi {
 
         #[cxx_name = "get_magisk_tmp_rs"]
         fn get_magisk_tmp() -> Utf8CStrRef<'static>;
+        #[cxx_name = "resolve_preinit_dir_rs"]
+        fn resolve_preinit_dir(base_dir: Utf8CStrRef) -> String;
 
         #[cxx_name = "MagiskD"]
         type CxxMagiskD;
@@ -83,6 +88,8 @@ pub mod ffi {
         fn zygisk_get_logd() -> i32;
         fn find_apk_path(pkg: Utf8CStrRef, data: &mut [u8]) -> usize;
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
+        fn setup_mounts();
+        fn find_preinit_device() -> String;
         unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;

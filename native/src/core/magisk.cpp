@@ -137,9 +137,8 @@ int magisk_main(int argc, char *argv[]) {
         install_module(argv[2]);
     } else if (argv[1] == "--preinit-device"sv) {
         auto name = find_preinit_device();
-        LOGD("preinit device: %s\n", name.data());
         if (!name.empty())  {
-            printf("%s\n", name.data());
+            printf("%s\n", name.c_str());
             return 0;
         }
         return 1;

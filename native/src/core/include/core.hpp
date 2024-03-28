@@ -42,7 +42,6 @@ extern std::string native_bridge;
 
 void reset_zygisk(bool restore);
 int connect_daemon(int req, bool create = false);
-std::string find_preinit_device();
 void unlock_blocks();
 
 // Poll control
