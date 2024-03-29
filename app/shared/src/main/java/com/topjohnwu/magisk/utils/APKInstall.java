@@ -116,7 +116,10 @@ public final class APKInstall {
                         if (onFailure != null) {
                             onFailure.run();
                         }
-                        context.getApplicationContext().unregisterReceiver(this);
+                        try {
+                            context.getApplicationContext().unregisterReceiver(this);
+                        } catch (IllegalArgumentException ignored) {
+                        }
                     }
                 }
                 latch.countDown();
@@ -126,7 +129,10 @@ public final class APKInstall {
         private void onSuccess(Context context) {
             if (onSuccess != null)
                 onSuccess.run();
-            context.getApplicationContext().unregisterReceiver(this);
+            try {
+                context.getApplicationContext().unregisterReceiver(this);
+            } catch (IllegalArgumentException ignored) {
+            }
         }
 
         @Override
