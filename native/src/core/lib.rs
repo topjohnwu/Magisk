@@ -8,7 +8,7 @@ use daemon::{daemon_entry, find_apk_path, get_magiskd, MagiskD};
 use logging::{
     android_logging, magisk_logging, zygisk_close_logd, zygisk_get_logd, zygisk_logging,
 };
-use mount::{find_preinit_device, setup_mounts};
+use mount::{find_preinit_device, revert_unmount, setup_mounts};
 use resetprop::{persist_delete_prop, persist_get_prop, persist_get_props, persist_set_prop};
 
 mod cert;
@@ -90,6 +90,7 @@ pub mod ffi {
         fn read_certificate(fd: i32, version: i32) -> Vec<u8>;
         fn setup_mounts();
         fn find_preinit_device() -> String;
+        fn revert_unmount();
         unsafe fn persist_get_prop(name: Utf8CStrRef, prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_get_props(prop_cb: Pin<&mut PropCb>);
         unsafe fn persist_delete_prop(name: Utf8CStrRef) -> bool;

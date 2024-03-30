@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::ptr;
 
 use num_traits::AsPrimitive;
@@ -273,4 +273,40 @@ pub fn find_preinit_device() -> String {
         .to_str()
         .unwrap()
         .to_string()
+}
+
+pub fn revert_unmount() {
+    let mut targets = Vec::new();
+
+    // Unmount Magisk tmpfs and mounts from module files
+    for info in parse_mount_info("self") {
+        if info.source == "magisk" || info.root.starts_with("/adb/modules") {
+            targets.push(info.target);
+        }
+    }
+
+    if targets.is_empty() {
+        return;
+    }
+
+    let mut prev: Option<PathBuf> = None;
+    targets.sort();
+    targets.retain(|target| {
+        if let Some(prev) = &prev {
+            if Path::new(target).starts_with(prev) {
+                return false;
+            }
+        }
+        prev = Some(PathBuf::from(target.clone()));
+        true
+    });
+
+    for mut target in targets {
+        let target = Utf8CStr::from_string(&mut target);
+        unsafe {
+            if libc::umount2(target.as_ptr(), libc::MNT_DETACH) == 0 {
+                debug!("denylist: Unmounted ({})", target);
+            }
+        }
+    }
 }
