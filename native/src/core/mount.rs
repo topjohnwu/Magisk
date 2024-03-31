@@ -24,6 +24,7 @@ pub fn setup_mounts() {
     let dev_path = FsPathBuf::new(&mut dev_buf)
         .join(magisk_tmp)
         .join(PREINITDEV);
+    let mut mounted = false;
     if let Ok(attr) = dev_path.get_attr() {
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
             // DO NOT mount the block device directly, as we do not know the flags and configs
@@ -33,7 +34,6 @@ pub fn setup_mounts() {
             // mount point mounting our desired partition, and then bind mount the target folder.
             let preinit_dev = attr.st.st_rdev;
             let mnt_path = FsPathBuf::new(&mut buf).join(magisk_tmp).join(PREINITMIRR);
-            let mut mounted = false;
             for info in parse_mount_info("self") {
                 if info.root == "/" && info.device == preinit_dev {
                     if !info.fs_option.split(',').any(|s| s == "rw") {
@@ -64,13 +64,13 @@ pub fn setup_mounts() {
                     }
                 }
             }
-            if !mounted {
-                warn!("mount: preinit mirror not mounted");
-                dev_path.remove().ok();
-            } else {
-                debug!("mount: preinit mirror mounted");
-            }
         }
+    }
+    if !mounted {
+        warn!("mount: preinit mirror not mounted");
+        dev_path.remove().ok();
+    } else {
+        debug!("mount: preinit mirror mounted");
     }
 
     // Bind remount module root to clear nosuid

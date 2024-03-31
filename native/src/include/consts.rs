@@ -4,7 +4,7 @@ pub const LOGFILE: &str = "/cache/magisk.log";
 
 // data paths
 const SECURE_DIR: &str = "/data/adb";
-pub const MODULEROOT: &str = concatcp!(SECURE_DIR, "modules");
+pub const MODULEROOT: &str = concatcp!(SECURE_DIR, "/modules");
 
 // tmpfs paths
 const INTERNAL_DIR: &str = ".magisk";
