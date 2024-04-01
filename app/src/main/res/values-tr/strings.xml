@@ -26,7 +26,7 @@
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk ücretsiz ve açık kaynaktır ve her zaman öyle kalacaktır. Ancak bir bağış yaparak bize destek olduğunuzu gösterebilirsiniz.</string>
     <string name="home_installed_version">Yüklendi</string>
-    <string name="home_latest_version">En Son Sürüm</string>
+    <string name="home_latest_version">En son sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacak!\nKök kaldırılacak!\nMagisk kullanılarak şifrelenmemiş herhangi bir dahili depolama yeniden şifrelenecek!</string>
