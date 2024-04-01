@@ -41,6 +41,12 @@ static bool magisk_env() {
     cp_afc(DATABIN "/busybox", buf);
     exec_command_async(buf, "--install", "-s", dirname(buf));
 
+    // magisk32 and magiskpolicy are not installed into ramdisk and has to be copied
+    // from data to magisk tmp
+    if (access(DATABIN "/magisk32", X_OK) == 0) {
+        ssprintf(buf, sizeof(buf), "%s/magisk32", get_magisk_tmp());
+        cp_afc(DATABIN "/magisk32", buf);
+    }
     if (access(DATABIN "/magiskpolicy", X_OK) == 0) {
         ssprintf(buf, sizeof(buf), "%s/magiskpolicy", get_magisk_tmp());
         cp_afc(DATABIN "/magiskpolicy", buf);

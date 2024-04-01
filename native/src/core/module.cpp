@@ -203,11 +203,16 @@ public:
 
 class zygisk_node : public node_entry {
 public:
-    explicit zygisk_node(const char *name, bool is64bit) : node_entry(name, DT_REG, this),
-                                                           is64bit(is64bit) {}
+    explicit zygisk_node(const char *name, bool is64bit)
+    : node_entry(name, DT_REG, this), is64bit(is64bit) {}
 
     void mount() override {
-        const string src = get_magisk_tmp() + "/magisk"s + (is64bit ? "64" : "32");
+#if defined(__LP64__)
+        const string src = get_magisk_tmp() + "/magisk"s + (is64bit ? "" : "32");
+#else
+        const string src = get_magisk_tmp() + "/magisk"s;
+        (void) is64bit;
+#endif
         create_and_mount("zygisk", src, true);
     }
 

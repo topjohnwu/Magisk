@@ -52,11 +52,17 @@ unzip -oj magisk.apk 'assets/util_functions.sh' 'assets/stub.apk'
 
 api_level_arch_detect
 
-unzip -oj magisk.apk "lib/$ABI/*" "lib/$ABI32/libmagisk32.so" -x "lib/$ABI/libbusybox.so"
+unzip -oj magisk.apk "lib/$ABI/*" -x "lib/$ABI/libbusybox.so"
 for file in lib*.so; do
   chmod 755 $file
   mv "$file" "${file:3:${#file}-6}"
 done
+
+if $IS64BIT; then
+  unzip -oj magisk.apk "lib/$ABI32/libmagisk.so"
+  mv libmagisk.so magisk32
+  chmod 755 magisk32
+fi
 
 # Stop zygote (and previous setup if exists)
 magisk --stop 2>/dev/null
@@ -109,8 +115,9 @@ else
   # Android Q+ without sbin
   MAGISKTMP=/debug_ramdisk
   # If a file name 'magisk' is in current directory, mount will fail
-  rm -f magisk
+  mv magisk magisk.tmp
   mount -t tmpfs -o 'mode=0755' magisk /debug_ramdisk
+  mv magisk.tmp magisk
 fi
 
 # Magisk stuff
@@ -120,7 +127,7 @@ mkdir $NVBASE/modules 2>/dev/null
 mkdir $NVBASE/post-fs-data.d 2>/dev/null
 mkdir $NVBASE/service.d 2>/dev/null
 
-for file in magisk32 magisk64 magiskpolicy stub.apk; do
+for file in magisk magisk32 magiskpolicy stub.apk; do
   chmod 755 ./$file
   cp -af ./$file $MAGISKTMP/$file
   cp -af ./$file $MAGISKBIN/$file
@@ -129,11 +136,6 @@ cp -af ./magiskboot $MAGISKBIN/magiskboot
 cp -af ./magiskinit $MAGISKBIN/magiskinit
 cp -af ./busybox $MAGISKBIN/busybox
 
-if $IS64BIT; then
-  ln -s ./magisk64 $MAGISKTMP/magisk
-else
-  ln -s ./magisk32 $MAGISKTMP/magisk
-fi
 ln -s ./magisk $MAGISKTMP/su
 ln -s ./magisk $MAGISKTMP/resetprop
 ln -s ./magiskpolicy $MAGISKTMP/supolicy

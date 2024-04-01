@@ -97,7 +97,11 @@ static void connect_companion(int client, bool is_64_bit) {
         zygiskd_socket = fds[0];
         if (fork_dont_care() == 0) {
             char exe[64];
-            ssprintf(exe, sizeof(exe), "%s/magisk%s", get_magisk_tmp(), (is_64_bit ? "64" : "32"));
+#if defined(__LP64__)
+            ssprintf(exe, sizeof(exe), "%s/magisk%s", get_magisk_tmp(), (is_64_bit ? "" : "32"));
+#else
+            ssprintf(exe, sizeof(exe), "%s/magisk", get_magisk_tmp());
+#endif
             // This fd has to survive exec
             fcntl(fds[1], F_SETFD, 0);
             char buf[16];

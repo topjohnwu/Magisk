@@ -187,28 +187,16 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 }
 
 static void extract_files(bool sbin) {
-    const char *m32 = sbin ? "/sbin/magisk32.xz" : "magisk32.xz";
-    const char *m64 = sbin ? "/sbin/magisk64.xz" : "magisk64.xz";
+    const char *magisk_xz = sbin ? "/sbin/magisk.xz" : "magisk.xz";
     const char *stub_xz = sbin ? "/sbin/stub.xz" : "stub.xz";
 
-    if (access(m32, F_OK) == 0) {
-        mmap_data magisk(m32);
-        unlink(m32);
-        int fd = xopen("magisk32", O_WRONLY | O_CREAT, 0755);
+    if (access(magisk_xz, F_OK) == 0) {
+        mmap_data magisk(magisk_xz);
+        unlink(magisk_xz);
+        int fd = xopen("magisk", O_WRONLY | O_CREAT, 0755);
         fd_stream ch(fd);
         unxz(ch, magisk);
         close(fd);
-    }
-    if (access(m64, F_OK) == 0) {
-        mmap_data magisk(m64);
-        unlink(m64);
-        int fd = xopen("magisk64", O_WRONLY | O_CREAT, 0755);
-        fd_stream ch(fd);
-        unxz(ch, magisk);
-        close(fd);
-        xsymlink("./magisk64", "magisk");
-    } else {
-        xsymlink("./magisk32", "magisk");
     }
     if (access(stub_xz, F_OK) == 0) {
         mmap_data stub(stub_xz);
