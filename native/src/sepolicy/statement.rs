@@ -436,6 +436,9 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
 fn tokenize_statement(statement: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     for s in statement.split_whitespace() {
+        if s.starts_with('#') {
+            break;
+        }
         extract_token(s, &mut tokens);
     }
     tokens
