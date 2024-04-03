@@ -1,7 +1,6 @@
 use der::referenced::OwnedToRef;
 use der::{Decode, DecodePem, Encode, Sequence, SliceReader};
 use digest::DynDigest;
-use ecdsa;
 use p256::ecdsa::{
     Signature as P256Signature, SigningKey as P256SigningKey, VerifyingKey as P256VerifyingKey,
 };
@@ -9,9 +8,8 @@ use p256::pkcs8::DecodePrivateKey;
 use p384::ecdsa::{
     Signature as P384Signature, SigningKey as P384SigningKey, VerifyingKey as P384VerifyingKey,
 };
-use p521::{
-    ecdsa::{Signature as P521Signature, SigningKey as P521SigningKey},
-    NistP521,
+use p521::ecdsa::{
+    Signature as P521Signature, SigningKey as P521SigningKey, VerifyingKey as P521VerifyingKey,
 };
 use rsa::pkcs1v15::{
     Signature as RsaSignature, SigningKey as RsaSigningKey, VerifyingKey as RsaVerifyingKey,
@@ -31,8 +29,6 @@ use base::libc::c_char;
 use base::{log_err, LoggedResult, MappedFile, ResultExt, StrErr, Utf8CStr};
 
 use crate::ffi::BootImage;
-
-type P521VerifyingKey = ecdsa::VerifyingKey<NistP521>;
 
 #[allow(clippy::upper_case_acronyms)]
 pub enum SHA {
@@ -170,9 +166,9 @@ impl Signer {
         } else if let Ok(ec) = P384SigningKey::from_pkcs8_der(key) {
             digest = Box::<Sha384>::default();
             SigningKey::SHA384withECDSA(ec)
-        } else if let Ok(ec) = ecdsa::SigningKey::<NistP521>::from_pkcs8_der(key) {
+        } else if let Ok(ec) = P521SigningKey::from_pkcs8_der(key) {
             digest = Box::<Sha512>::default();
-            SigningKey::SHA521withECDSA(P521SigningKey::from(ec))
+            SigningKey::SHA521withECDSA(ec)
         } else {
             return Err(log_err!("Unsupported private key"));
         };
