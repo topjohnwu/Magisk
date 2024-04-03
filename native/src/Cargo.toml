@@ -13,16 +13,15 @@ num-derive = "0.4"
 thiserror = "1.0"
 byteorder = "1"
 size = "0.4"
-sha1 = "0.10"
-sha2 = "0.10"
-digest = "0.10"
-p256 = "0.13"
-p384 = "0.13"
-p521 = "0.13"
-ecdsa = "0.16"
-rsa = "0.9"
-x509-cert = "0.2"
-der = "0.7"
+sha1 = "0.11.0-pre.3"
+sha2 = "=0.11.0-pre.3"
+digest = "0.11.0-pre.8"
+#p256 = "0.14"
+#p384 = "0.14"
+#p521 = "0.14"
+rsa = "0.10.0-pre.1"
+#x509-cert = "0.3"
+der = "0.8.0-pre.0"
 bytemuck = "1.14"
 fdt = "0.1"
 const_format = "0.2"
@@ -39,6 +38,22 @@ rev = "2f37d5a65504de7d716b5b28fd82219501a901a9"
 [workspace.dependencies.quick-protobuf]
 git = "https://github.com/tafia/quick-protobuf.git"
 rev = "2f37d5a65504de7d716b5b28fd82219501a901a9"
+
+[workspace.dependencies.p256]
+git = "https://github.com/RustCrypto/elliptic-curves.git"
+rev = "5d1c252c2defb5808f55329f3e2955ca72d7f8b5"
+
+[workspace.dependencies.p384]
+git = "https://github.com/RustCrypto/elliptic-curves.git"
+rev = "5d1c252c2defb5808f55329f3e2955ca72d7f8b5"
+
+[workspace.dependencies.p521]
+git = "https://github.com/RustCrypto/elliptic-curves.git"
+rev = "5d1c252c2defb5808f55329f3e2955ca72d7f8b5"
+
+[workspace.dependencies.x509-cert]
+git = "https://github.com/RustCrypto/formats.git"
+rev = "809df65b20d61e88afb7f514b5cfdd3d1958a40f"
 
 [profile.dev]
 opt-level = "z"
