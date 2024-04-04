@@ -418,6 +418,9 @@ static void collect_modules(bool open_zygisk) {
 #elif defined(__x86_64__)
                 info.z32 = openat(modfd, "zygisk/x86.so", O_RDONLY | O_CLOEXEC);
                 info.z64 = openat(modfd, "zygisk/x86_64.so", O_RDONLY | O_CLOEXEC);
+#elif defined(__riscv)
+                info.z32 = -1;
+                info.z64 = openat(modfd, "zygisk/riscv64.so", O_RDONLY | O_CLOEXEC);
 #else
 #error Unsupported ABI
 #endif

@@ -253,8 +253,14 @@ fun Project.setupApp() {
                 rename { "lib$it.so" }
             }
         }
+        into("riscv64") {
+            from(rootProject.file("native/out/riscv64")) {
+                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
+                rename { if (it == "magisk") "libmagisk64.so" else "lib$it.so" }
+            }
+        }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 20)
+            if (inputs.sourceFiles.files.size != 25)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }
