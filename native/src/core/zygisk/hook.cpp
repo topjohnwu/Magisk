@@ -313,6 +313,14 @@ static const NativeBridgeRuntimeCallbacks* find_runtime_callbacks(struct _Unwind
         if (val >= start && val < end)
             return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
     }
+#elif defined(__riscv)
+    // x8-x9, x18-x27 callee-saved registers
+    for (int i : {8, 9, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}) {
+        auto val = static_cast<uintptr_t>(_Unwind_GetGR(ctx, i));
+        ZLOGV("x%d = %p\n", i, reinterpret_cast<void *>(val));
+        if (val >= start && val < end)
+            return reinterpret_cast<const NativeBridgeRuntimeCallbacks*>(val);
+    }
 #else
 #error "Unsupported architecture"
 #endif

@@ -6,6 +6,8 @@
 #include <x86_binaries.h>
 #elif defined(__x86_64__)
 #include <x86_64_binaries.h>
+#elif defined(__riscv)
+#include <riscv64_binaries.h>
 #else
 #error Unsupported ABI
 #endif
