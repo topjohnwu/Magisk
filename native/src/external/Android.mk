@@ -215,6 +215,9 @@ LOCAL_SRC_FILES := \
     selinux/libsepol/cil/src/cil_write_ast.c
 
 LOCAL_CFLAGS := -Wno-unused-but-set-variable
+ifeq ($(TARGET_ARCH),riscv64)
+LOCAL_CFLAGS += -DHAVE_REALLOCARRAY
+endif
 include $(BUILD_STATIC_LIBRARY)
 
 # libselinux.a
