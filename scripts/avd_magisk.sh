@@ -58,7 +58,7 @@ for file in lib*.so; do
   mv "$file" "${file:3:${#file}-6}"
 done
 
-if $IS64BIT; then
+if [ -e "/system/bin/linker" ]; then
   unzip -oj magisk.apk "lib/$ABI32/libmagisk.so"
   mv libmagisk.so magisk32
   chmod 755 magisk32
