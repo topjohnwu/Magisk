@@ -494,11 +494,7 @@ remove_system_su() {
 api_level_arch_detect() {
   API=$(grep_get_prop ro.build.version.sdk)
   ABI=$(grep_get_prop ro.product.cpu.abi)
-  if [ "$ABI" = "x86" ]; then
-    ARCH=x86
-    ABI32=x86
-    IS64BIT=false
-  elif [ "$ABI" = "arm64-v8a" ]; then
+  if [ "$ABI" = "arm64-v8a" ]; then
     ARCH=arm64
     ABI32=armeabi-v7a
     IS64BIT=true
@@ -506,11 +502,18 @@ api_level_arch_detect() {
     ARCH=x64
     ABI32=x86
     IS64BIT=true
-  else
+  elif [ "$ABI" = "armeabi-v7a" ]; then
     ARCH=arm
-    ABI=armeabi-v7a
     ABI32=armeabi-v7a
     IS64BIT=false
+  elif [ "$ABI" = "x86" ]; then
+    ARCH=x86
+    ABI32=x86
+    IS64BIT=false
+  elif [ "$ABI" = "riscv64" ]; then
+    ARCH=riscv64
+    ABI32=riscv32
+    IS64BIT=true
   fi
 }
 

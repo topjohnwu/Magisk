@@ -229,32 +229,16 @@ fun Project.setupApp() {
 
     val syncLibs by tasks.registering(Sync::class) {
         into("src/main/jniLibs")
-        into("armeabi-v7a") {
-            from(rootProject.file("native/out/armeabi-v7a")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { "lib$it.so" }
-            }
-        }
-        into("x86") {
-            from(rootProject.file("native/out/x86")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { "lib$it.so" }
-            }
-        }
-        into("arm64-v8a") {
-            from(rootProject.file("native/out/arm64-v8a")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { "lib$it.so" }
-            }
-        }
-        into("x86_64") {
-            from(rootProject.file("native/out/x86_64")) {
-                include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
-                rename { "lib$it.so" }
+        for (abi in arrayOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64")) {
+            into(abi) {
+                from(rootProject.file("native/out/$abi")) {
+                    include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
+                    rename { "lib$it.so" }
+                }
             }
         }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 20)
+            if (inputs.sourceFiles.files.size != 25)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }
