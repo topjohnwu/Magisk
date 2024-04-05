@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">Zaktualizuj Magisk do pełnej wersji aby ukończyć instalację. Pobrać i zainstalować?</string>
-    <string name="no_internet_msg">Połącz się z Internetem! Wymagane jest uaktualnienie Magisk do pełnej wersji.</string>
-    <string name="dling">Pobieranie</string>
-    <string name="relaunch_app">Proszę ręcznie uruchomić aplikację ponownie.</string>
-</resources>
