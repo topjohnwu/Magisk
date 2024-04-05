@@ -182,7 +182,7 @@
     <string name="settings_ns_isolate">격리된 네임스페이스</string>
     <string name="global_summary">모든 루트 세션이 전역 마운트 네임스페이스를 사용합니다.</string>
     <string name="requester_summary">루트 세션은 요청자의 네임스페이스를 상속합니다.</string>
-    <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 네임스페이를를 사용합니다.</string>
+    <string name="isolate_summary">각각의 루트 세션은 자신만의 독립된 네임스페이스를 사용합니다.</string>
 
     <!--Notifications-->
     <string name="update_channel">Magisk 업데이트</string>
