@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="upgrade_msg">عليك الترقية ماجـيسك Manager لإكمال تهيئة التطبيق.هل اكمل؟</string>
-    <string name="no_internet_msg">يرجى الاتصال بالانترنيت! ترقية ماجـيسك مطلوب...</string>
-    <string name="dling">جارٍ التنزيل</string>
-</resources>
