@@ -204,7 +204,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:enabled="true"
+                    android:enabled="@{item.enabled}"
                     android:focusable="true"
                     android:onClick="@{() -> item.item.executeAction()}"
                     android:text="@string/action"
