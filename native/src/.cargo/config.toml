@@ -1,9 +1,0 @@
-[build]
-# Choose arm64 as the default target to make the IDE happy.
-# The actual compilation will have the target overriden by command-line.
-target = "aarch64-linux-android"
-
-[unstable]
-build-std = ["std", "panic_abort"]
-build-std-features = ["panic_immediate_abort"]
-profile-rustflags = true
