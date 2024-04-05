@@ -53,6 +53,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   ├── post-fs-data.sh     <--- This script will be executed in post-fs-data
 │   ├── service.sh          <--- This script will be executed in late_start service
 |   ├── uninstall.sh        <--- This script will be executed when Magisk removes your module
+|   ├── action.sh           <--- This script will be executed when user click the action button in Magisk app
 │   ├── system.prop         <--- Properties in this file will be loaded as system properties by resetprop
 │   ├── sepolicy.rule       <--- Additional custom sepolicy rules
 │   │

@@ -191,11 +191,31 @@
                     android:textColor="?colorError"
                     app:layout_constraintBottom_toBottomOf="@+id/module_remove"
                     app:layout_constraintEnd_toStartOf="@+id/bottom_bar_barrier"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/module_config"
                     app:layout_constraintTop_toTopOf="@+id/module_remove"
                     tools:lines="2"
                     tools:text="@tools:sample/lorem/random"
                     tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/module_config"
+                    style="@style/WidgetFoundation.Button.Text"
+                    goneUnless="@{item.showAction}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:enabled="true"
+                    android:focusable="true"
+                    android:onClick="@{() -> item.item.executeAction()}"
+                    android:text="@string/action"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_action_md2"
+                    app:iconGravity="textStart"
+                    app:layout_constraintBottom_toBottomOf="@+id/module_remove"
+                    app:layout_constraintTop_toTopOf="@+id/module_remove"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:srcCompat="@drawable/ic_download_md2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
