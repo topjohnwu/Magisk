@@ -208,16 +208,22 @@ uint32_t binary_gcd(uint32_t u, uint32_t v) {
 }
 
 int switch_mnt_ns(int pid) {
-    char mnt[32];
-    ssprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
-    if (access(mnt, R_OK) == -1) return 1; // Maybe process died..
+    int ret = -1;
+    int fd = syscall(__NR_pidfd_open, pid, 0);
+    if (fd > 0) {
+        ret = setns(fd, CLONE_NEWNS);
+        close(fd);
+    }
+    if (ret < 0) {
+        char mnt[32];
+        ssprintf(mnt, sizeof(mnt), "/proc/%d/ns/mnt", pid);
+        fd = open(mnt, O_RDONLY);
+        if (fd < 0) return 1; // Maybe process died..
 
-    int fd, ret;
-    fd = xopen(mnt, O_RDONLY);
-    if (fd < 0) return 1;
-    // Switch to its namespace
-    ret = xsetns(fd, 0);
-    close(fd);
+        // Switch to its namespace
+        ret = xsetns(fd, 0);
+        close(fd);
+    }
     return ret;
 }
 
