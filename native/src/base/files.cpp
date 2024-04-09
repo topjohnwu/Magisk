@@ -101,14 +101,6 @@ void parse_prop_file(const char *file, const function<bool(string_view, string_v
         parse_prop_file(fp.get(), fn);
 }
 
-sDIR make_dir(DIR *dp) {
-    return sDIR(dp, [](DIR *dp){ return dp ? closedir(dp) : 1; });
-}
-
-sFILE make_file(FILE *fp) {
-    return sFILE(fp, [](FILE *fp){ return fp ? fclose(fp) : 1; });
-}
-
 mmap_data::mmap_data(const char *name, bool rw) {
     auto slice = rust::map_file(name, rw);
     if (!slice.empty()) {

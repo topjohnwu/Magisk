@@ -62,31 +62,29 @@ void parse_prop_file(const char *file,
         const std::function<bool(std::string_view, std::string_view)> &fn);
 std::string resolve_preinit_dir(const char *base_dir);
 
-using sFILE = std::unique_ptr<FILE, decltype(&fclose)>;
-using sDIR = std::unique_ptr<DIR, decltype(&closedir)>;
-sDIR make_dir(DIR *dp);
-sFILE make_file(FILE *fp);
+using sFILE = std::unique_ptr<FILE, decltype([](FILE *f) { fclose(f); })>;
+using sDIR = std::unique_ptr<DIR, decltype([](DIR *d) { closedir(d); })>;
 
 static inline sDIR open_dir(const char *path) {
-    return make_dir(opendir(path));
+    return sDIR{opendir(path)};
 }
 
 static inline sDIR xopen_dir(const char *path) {
-    return make_dir(xopendir(path));
+    return sDIR{xopendir(path)};
 }
 
 static inline sDIR xopen_dir(int dirfd) {
-    return make_dir(xfdopendir(dirfd));
+    return sDIR{xfdopendir(dirfd)};
 }
 
 static inline sFILE open_file(const char *path, const char *mode) {
-    return make_file(fopen(path, mode));
+    return sFILE{fopen(path, mode)};
 }
 
 static inline sFILE xopen_file(const char *path, const char *mode) {
-    return make_file(xfopen(path, mode));
+    return sFILE{xfopen(path, mode)};
 }
 
 static inline sFILE xopen_file(int fd, const char *mode) {
-    return make_file(xfdopen(fd, mode));
+    return sFILE{xfdopen(fd, mode)};
 }
