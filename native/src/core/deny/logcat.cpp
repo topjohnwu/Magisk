@@ -9,8 +9,6 @@
 
 using namespace std;
 
-extern "C" {
-
 struct logger_entry {
     uint16_t len;      /* length of the payload */
     uint16_t hdr_size; /* sizeof(struct logger_entry) */
@@ -30,7 +28,7 @@ struct log_msg {
     };
 };
 
-typedef struct AndroidLogEntry_t {
+struct AndroidLogEntry {
     time_t tv_sec;
     long tv_nsec;
     android_LogPriority priority;
@@ -41,36 +39,30 @@ typedef struct AndroidLogEntry_t {
     size_t tagLen;
     size_t messageLen;
     const char *message;
-} AndroidLogEntry;
+};
 
-[[gnu::weak]] struct logger_list *android_logger_list_alloc(int mode, unsigned int tail, pid_t pid);
-[[gnu::weak]] void android_logger_list_free(struct logger_list *list);
-[[gnu::weak]] int android_logger_list_read(struct logger_list *list, struct log_msg *log_msg);
-[[gnu::weak]] struct logger *android_logger_open(struct logger_list *list, log_id_t id);
-[[gnu::weak]] int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry);
-
-typedef struct [[gnu::packed]] {
+struct [[gnu::packed]] android_event_header_t {
     int32_t tag;    // Little Endian Order
-} android_event_header_t;
+};
 
-typedef struct [[gnu::packed]] {
+struct [[gnu::packed]] android_event_int_t {
     int8_t type;    // EVENT_TYPE_INT
     int32_t data;   // Little Endian Order
-} android_event_int_t;
+};
 
-typedef struct [[gnu::packed]] {
+struct [[gnu::packed]] android_event_string_t {
     int8_t type;    // EVENT_TYPE_STRING;
     int32_t length; // Little Endian Order
     char data[];
-} android_event_string_t;
+};
 
-typedef struct [[gnu::packed]] {
+struct [[gnu::packed]] android_event_list_t {
     int8_t type;    // EVENT_TYPE_LIST
     int8_t element_count;
-} android_event_list_t;
+} ;
 
 // 30014 am_proc_start (User|1|5),(PID|1|5),(UID|1|5),(Process Name|3),(Type|3),(Component|3)
-typedef struct [[gnu::packed]] {
+struct [[gnu::packed]] android_event_am_proc_start {
     android_event_header_t tag;
     android_event_list_t list;
     android_event_int_t user;
@@ -79,9 +71,17 @@ typedef struct [[gnu::packed]] {
     android_event_string_t process_name;
 //  android_event_string_t type;
 //  android_event_string_t component;
-} android_event_am_proc_start;
+};
 
 // 3040 boot_progress_ams_ready (time|2|3)
+
+extern "C" {
+
+[[gnu::weak]] struct logger_list *android_logger_list_alloc(int mode, unsigned int tail, pid_t pid);
+[[gnu::weak]] void android_logger_list_free(struct logger_list *list);
+[[gnu::weak]] int android_logger_list_read(struct logger_list *list, struct log_msg *log_msg);
+[[gnu::weak]] struct logger *android_logger_open(struct logger_list *list, log_id_t id);
+[[gnu::weak]] int android_log_processLogBuffer(struct logger_entry *buf, AndroidLogEntry *entry);
 
 }
 
@@ -108,14 +108,12 @@ static int parse_ppid(int pid) {
 
 static void check_zygote() {
     zygote_map.clear();
-    auto proc = open("/proc", O_RDONLY | O_CLOEXEC);
+    int proc = open("/proc", O_RDONLY | O_CLOEXEC);
     auto proc_dir = xopen_dir(proc);
     if (!proc_dir) return;
-    dirent *entry;
-    int pid;
     struct stat st{};
-    while ((entry = readdir(proc_dir.get()))) {
-        pid = parse_int(entry->d_name);
+    for (dirent *entry; (entry = readdir(proc_dir.get()));) {
+        int pid = parse_int(entry->d_name);
         if (pid <= 0) continue;
         if (fstatat(proc, entry->d_name, &st, 0)) continue;
         if (st.st_uid != 0) continue;
@@ -128,41 +126,9 @@ static void check_zygote() {
     }
 }
 
-static void handle_proc(int pid, bool app_zygote = false) {
-    if (fork_dont_care() == 0) {
-        if (app_zygote) {
-            revert_unmount(pid);
-            kill(pid, SIGCONT);
-            _exit(0);
-        }
-
-        int ppid = parse_ppid(pid);
-        auto it = zygote_map.find(ppid);
-        if (it == zygote_map.end()) {
-            LOGW("logcat: skip PID=[%d] PPID=[%d]\n", pid, ppid);
-            _exit(0);
-        }
-
-        char path[16];
-        struct stat st{};
-        sprintf(path, "/proc/%d", pid);
-        while (read_ns(pid, &st) == 0 && it->second.st_ino == st.st_ino) {
-            if (stat(path, &st) == 0 && st.st_uid == 0) {
-                usleep(10 * 1000);
-            } else {
-                LOGW("logcat: skip PID=[%d] UID=[%d]\n", pid, st.st_uid);
-                _exit(0);
-            }
-        }
-
-        revert_unmount(pid);
-        _exit(0);
-    }
-}
-
-static void process_main_buffer(struct logger_entry *buf) {
-    AndroidLogEntry entry;
-    if (android_log_processLogBuffer(buf, &entry) < 0) return;
+static void process_main_buffer(struct log_msg *msg) {
+    AndroidLogEntry entry{};
+    if (android_log_processLogBuffer(&msg->entry, &entry) < 0) return;
     entry.tagLen--;
     auto tag = string_view(entry.tag, entry.tagLen);
 
@@ -178,11 +144,11 @@ static void process_main_buffer(struct logger_entry *buf) {
     }
 
     if (!ready || tag != "AppZygoteInit") return;
-    if (!proc_context_match(buf->pid, "u:r:app_zygote:s0")) return;
+    if (!proc_context_match(msg->entry.pid, "u:r:app_zygote:s0")) return;
     ready = false;
 
     char cmdline[1024];
-    sprintf(cmdline, "/proc/%d/cmdline", buf->pid);
+    sprintf(cmdline, "/proc/%d/cmdline", msg->entry.pid);
     if (auto f = open_file(cmdline, "re")) {
         fgets(cmdline, sizeof(cmdline), f.get());
     } else {
@@ -190,25 +156,62 @@ static void process_main_buffer(struct logger_entry *buf) {
     }
 
     if (is_deny_target(entry.uid, cmdline)) {
-        kill(buf->pid, SIGSTOP);
-        LOGI("logcat: [%s] PID=[%d] UID=[%d]\n", cmdline, buf->pid, entry.uid);
-        handle_proc(buf->pid, true);
+        int pid = msg->entry.pid;
+        kill(pid, SIGSTOP);
+        if (fork_dont_care() == 0) {
+            LOGI("logcat: revert [%s] PID=[%d] UID=[%d]\n", cmdline, pid, entry.uid);
+            revert_unmount(pid);
+            kill(pid, SIGCONT);
+            _exit(0);
+        }
+    } else {
+        LOGD("logcat: skip [%s] PID=[%d] UID=[%d]\n", cmdline, msg->entry.pid, entry.uid);
     }
 }
 
-static void process_events_buffer(struct logger_entry *buf) {
-    if (buf->uid != 1000) return;
-    auto *event_data = reinterpret_cast<const unsigned char *>(buf) + buf->hdr_size;
-    auto *event_header = reinterpret_cast<const android_event_header_t *>(event_data);
+static void process_events_buffer(struct log_msg *msg) {
+    if (msg->entry.uid != 1000) return;
+    auto event_data = &msg->buf[msg->entry.hdr_size];
+    auto event_header = reinterpret_cast<const android_event_header_t *>(event_data);
     if (event_header->tag == 30014) {
-        auto *am_proc_start = reinterpret_cast<const android_event_am_proc_start *>(event_data);
+        auto am_proc_start = reinterpret_cast<const android_event_am_proc_start *>(event_data);
         auto proc = string_view(am_proc_start->process_name.data,
                                 am_proc_start->process_name.length);
         if (is_deny_target(am_proc_start->uid.data, proc)) {
-            LOGI("logcat: [%.*s] PID=[%d] UID=[%d]\n",
-                 am_proc_start->process_name.length, am_proc_start->process_name.data,
+            int pid = am_proc_start->pid.data;
+            if (fork_dont_care() == 0) {
+                int ppid = parse_ppid(pid);
+                auto it = zygote_map.find(ppid);
+                if (it == zygote_map.end()) {
+                    LOGW("logcat: skip [%.*s] PID=[%d] UID=[%d] PPID=[%d]; parent not zygote\n",
+                         (int) proc.length(), proc.data(),
+                         pid, am_proc_start->uid.data, ppid);
+                    _exit(0);
+                }
+
+                char path[16];
+                struct stat st{};
+                sprintf(path, "/proc/%d", pid);
+                while (read_ns(pid, &st) == 0 && it->second.st_ino == st.st_ino) {
+                    if (stat(path, &st) == 0 && st.st_uid == 0) {
+                        usleep(10 * 1000);
+                    } else {
+                        LOGW("logcat: skip [%.*s] PID=[%d] UID=[%d]; namespace not isolated\n",
+                             (int) proc.length(), proc.data(),
+                             pid, am_proc_start->uid.data);
+                        _exit(0);
+                    }
+                }
+
+                LOGI("logcat: revert [%.*s] PID=[%d] UID=[%d]\n",
+                     (int) proc.length(), proc.data(), pid, am_proc_start->uid.data);
+                revert_unmount(pid);
+                _exit(0);
+            }
+        } else {
+            LOGD("logcat: skip [%.*s] PID=[%d] UID=[%d]\n",
+                 (int) proc.length(), proc.data(),
                  am_proc_start->pid.data, am_proc_start->uid.data);
-            handle_proc(am_proc_start->pid.data);
         }
         return;
     }
@@ -230,7 +233,7 @@ static void process_events_buffer(struct logger_entry *buf) {
 
         struct log_msg msg{};
         while (true) {
-            if (logcat_exit) {
+            if (!denylist_enforced) {
                 break;
             }
 
@@ -240,16 +243,16 @@ static void process_events_buffer(struct logger_entry *buf) {
 
             switch (msg.entry.lid) {
                 case LOG_ID_EVENTS:
-                    process_events_buffer(&msg.entry);
+                    process_events_buffer(&msg);
                     break;
                 case LOG_ID_MAIN:
-                    process_main_buffer(&msg.entry);
+                    process_main_buffer(&msg);
                 default:
                     break;
             }
         }
 
-        if (logcat_exit) {
+        if (!denylist_enforced) {
             break;
         }
 

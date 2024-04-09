@@ -348,18 +348,17 @@ int enable_deny() {
 
         LOGI("* Enable DenyList\n");
 
-        if (!ensure_data()) {
-            denylist_enforced = false;
+        if (!ensure_data())
             return DenyResponse::ERROR;
-        }
-
-        if (!zygisk_enabled) {
-            logcat_exit = false;
-            if (new_daemon_thread(&logcat))
-                return DenyResponse::ERROR;
-        }
 
         denylist_enforced = true;
+
+        if (!zygisk_enabled) {
+            if (new_daemon_thread(&logcat)) {
+                denylist_enforced = false;
+                return DenyResponse::ERROR;
+            }
+        }
 
         // On Android Q+, also kill blastula pool and all app zygotes
         if (SDK_INT >= 29) {
@@ -374,13 +373,8 @@ int enable_deny() {
 }
 
 int disable_deny() {
-    if (denylist_enforced) {
-        denylist_enforced = false;
+    if (denylist_enforced.exchange(false)) {
         LOGI("* Disable DenyList\n");
-
-        if (!zygisk_enabled) {
-            logcat_exit = true;
-        }
     }
     update_deny_config();
     return DenyResponse::OK;
