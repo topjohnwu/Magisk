@@ -21,8 +21,8 @@ use base::libc::{
     S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
 };
 use base::{
-    log_err, map_args, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt, Utf8CStr,
-    WriteExt,
+    log_err, map_args, BytesExt, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt,
+    Utf8CStr, WriteExt,
 };
 
 use crate::ffi::{unxz, xz};
@@ -246,7 +246,7 @@ impl Cpio {
                 continue;
             }
             if name == "TRAILER!!!" {
-                match data[pos..].windows(6).position(|x| x == b"070701") {
+                match data[pos..].find(b"070701") {
                     Some(x) => pos += x,
                     None => break,
                 }

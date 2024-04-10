@@ -78,11 +78,40 @@ impl<T> LibcReturn for *mut T {
     }
 }
 
+pub trait BytesExt {
+    fn find(&self, needle: &[u8]) -> Option<usize>;
+    fn contains(&self, needle: &[u8]) -> bool {
+        self.find(needle).is_some()
+    }
+}
+
+impl<T: AsRef<[u8]> + ?Sized> BytesExt for T {
+    fn find(&self, needle: &[u8]) -> Option<usize> {
+        fn inner(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+            unsafe {
+                let ptr: *const u8 = libc::memmem(
+                    haystack.as_ptr().cast(),
+                    haystack.len(),
+                    needle.as_ptr().cast(),
+                    needle.len(),
+                )
+                .cast();
+                if ptr.is_null() {
+                    None
+                } else {
+                    Some(ptr.offset_from(haystack.as_ptr()) as usize)
+                }
+            }
+        }
+        inner(self.as_ref(), needle)
+    }
+}
+
 pub trait MutBytesExt {
     fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize>;
 }
 
-impl<T: AsMut<[u8]>> MutBytesExt for T {
+impl<T: AsMut<[u8]> + ?Sized> MutBytesExt for T {
     fn patch(&mut self, from: &[u8], to: &[u8]) -> Vec<usize> {
         ffi::mut_u8_patch(self.as_mut(), from, to)
     }
