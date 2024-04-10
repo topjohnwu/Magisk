@@ -2,10 +2,10 @@
 
 use std::collections::BTreeMap;
 use std::fmt::{Display, Formatter};
-use std::fs::{metadata, read, DirBuilder, File};
-use std::io::Write;
+use std::fs::{DirBuilder, File};
+use std::io::{Read, Write};
 use std::mem::size_of;
-use std::os::unix::fs::{symlink, DirBuilderExt, FileTypeExt, MetadataExt};
+use std::os::unix::fs::{symlink, DirBuilderExt};
 use std::path::Path;
 use std::process::exit;
 use std::str;
@@ -15,16 +15,17 @@ use bytemuck::{from_bytes, Pod, Zeroable};
 use num_traits::cast::AsPrimitive;
 use size::{Base, Size, Style};
 
-use crate::ffi::{unxz, xz};
 use base::libc::{
-    c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, S_IFBLK, S_IFCHR, S_IFDIR,
-    S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP, S_IWOTH, S_IWUSR, S_IXGRP,
-    S_IXOTH, S_IXUSR,
+    c_char, dev_t, gid_t, major, makedev, minor, mknod, mode_t, uid_t, O_CLOEXEC, O_RDONLY,
+    S_IFBLK, S_IFCHR, S_IFDIR, S_IFLNK, S_IFMT, S_IFREG, S_IRGRP, S_IROTH, S_IRUSR, S_IWGRP,
+    S_IWOTH, S_IWUSR, S_IXGRP, S_IXOTH, S_IXUSR,
 };
 use base::{
-    log_err, map_args, EarlyExitExt, LoggedResult, MappedFile, ResultExt, Utf8CStr, WriteExt,
+    log_err, map_args, EarlyExitExt, FsPath, LoggedResult, MappedFile, ResultExt, Utf8CStr,
+    WriteExt,
 };
 
+use crate::ffi::{unxz, xz};
 use crate::ramdisk::MagiskCpio;
 
 #[derive(FromArgs)]
@@ -397,28 +398,35 @@ impl Cpio {
         self.entries.contains_key(&norm_path(path))
     }
 
-    fn add(&mut self, mode: &mode_t, path: &str, file: &str) -> LoggedResult<()> {
+    fn add(&mut self, mode: mode_t, path: &str, file: &mut String) -> LoggedResult<()> {
         if path.ends_with('/') {
             return Err(log_err!("path cannot end with / for add"));
         }
-        let file = Path::new(file);
-        let content = read(file)?;
-        let metadata = metadata(file)?;
-        let mut rdevmajor: dev_t = 0;
-        let mut rdevminor: dev_t = 0;
-        let mode = if metadata.file_type().is_file() {
+        let file = Utf8CStr::from_string(file);
+        let file = FsPath::from(&file);
+        let attr = file.get_attr()?;
+
+        let mut content = Vec::<u8>::new();
+        let rdevmajor: dev_t;
+        let rdevminor: dev_t;
+
+        let mode = if attr.is_file() {
+            rdevmajor = 0;
+            rdevminor = 0;
+            file.open(O_RDONLY | O_CLOEXEC)?.read_to_end(&mut content)?;
             mode | S_IFREG
         } else {
-            rdevmajor = unsafe { major(metadata.rdev().try_into()?).try_into()? };
-            rdevminor = unsafe { minor(metadata.rdev().try_into()?).try_into()? };
-            if metadata.file_type().is_block_device() {
+            rdevmajor = unsafe { major(attr.st.st_rdev.as_()) }.as_();
+            rdevminor = unsafe { minor(attr.st.st_rdev.as_()) }.as_();
+            if attr.is_block_device() {
                 mode | S_IFBLK
-            } else if metadata.file_type().is_char_device() {
+            } else if attr.is_char_device() {
                 mode | S_IFCHR
             } else {
                 return Err(log_err!("unsupported file type"));
             }
         };
+
         self.entries.insert(
             norm_path(path),
             Box::new(CpioEntry {
@@ -611,7 +619,7 @@ pub fn cpio_commands(argc: i32, argv: *const *const c_char) -> bool {
                 CpioSubCommand::Move(Move { from, to }) => cpio.mv(from, to)?,
                 CpioSubCommand::MakeDir(MakeDir { mode, dir }) => cpio.mkdir(mode, dir),
                 CpioSubCommand::Link(Link { src, dst }) => cpio.ln(src, dst),
-                CpioSubCommand::Add(Add { mode, path, file }) => cpio.add(mode, path, file)?,
+                CpioSubCommand::Add(Add { mode, path, file }) => cpio.add(*mode, path, file)?,
                 CpioSubCommand::Extract(Extract { paths }) => {
                     if !paths.is_empty() && paths.len() != 2 {
                         return Err(log_err!("invalid arguments"));

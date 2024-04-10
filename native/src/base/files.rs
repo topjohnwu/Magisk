@@ -4,16 +4,14 @@ use std::ffi::CStr;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::ops::Deref;
-use std::os::android::fs::MetadataExt;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
-use std::os::unix::fs::FileTypeExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
 use libc::{
     c_uint, dirent, makedev, mode_t, EEXIST, ENOENT, F_OK, O_CLOEXEC, O_CREAT, O_PATH, O_RDONLY,
-    O_RDWR, O_TRUNC, O_WRONLY, S_IFDIR, S_IFLNK, S_IFREG,
+    O_RDWR, O_TRUNC, O_WRONLY,
 };
 use num_traits::AsPrimitive;
 
@@ -151,6 +149,40 @@ impl FileAttr {
             con: Utf8CStrBufArr::new(),
         }
     }
+
+    #[inline(always)]
+    #[allow(clippy::unnecessary_cast)]
+    fn is(&self, mode: mode_t) -> bool {
+        (self.st.st_mode & libc::S_IFMT as u32) as mode_t == mode
+    }
+
+    pub fn is_dir(&self) -> bool {
+        self.is(libc::S_IFDIR)
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.is(libc::S_IFREG)
+    }
+
+    pub fn is_symlink(&self) -> bool {
+        self.is(libc::S_IFLNK)
+    }
+
+    pub fn is_block_device(&self) -> bool {
+        self.is(libc::S_IFBLK)
+    }
+
+    pub fn is_char_device(&self) -> bool {
+        self.is(libc::S_IFCHR)
+    }
+
+    pub fn is_fifo(&self) -> bool {
+        self.is(libc::S_IFIFO)
+    }
+
+    pub fn is_socket(&self) -> bool {
+        self.is(libc::S_IFSOCK)
+    }
 }
 
 #[cfg(feature = "selinux")]
@@ -187,8 +219,24 @@ impl DirEntry<'_> {
         self.d_type == libc::DT_REG
     }
 
-    pub fn is_lnk(&self) -> bool {
+    pub fn is_symlink(&self) -> bool {
         self.d_type == libc::DT_LNK
+    }
+
+    pub fn is_block_device(&self) -> bool {
+        self.d_type == libc::DT_BLK
+    }
+
+    pub fn is_char_device(&self) -> bool {
+        self.d_type == libc::DT_CHR
+    }
+
+    pub fn is_fifo(&self) -> bool {
+        self.d_type == libc::DT_FIFO
+    }
+
+    pub fn is_socket(&self) -> bool {
+        self.d_type == libc::DT_SOCK
     }
 
     pub fn unlink(&self) -> io::Result<()> {
@@ -372,7 +420,7 @@ impl Directory {
                 };
                 std::io::copy(&mut src, &mut dest)?;
                 fd_set_attr(dest.as_raw_fd(), &attr)?;
-            } else if e.is_lnk() {
+            } else if e.is_symlink() {
                 let mut path = Utf8CStrBufArr::default();
                 e.read_link(&mut path)?;
                 unsafe {
@@ -550,10 +598,9 @@ impl FsPath {
     }
 
     pub fn remove_all(&self) -> io::Result<()> {
-        let f = self.open(O_RDONLY | O_CLOEXEC)?;
-        let st = f.metadata()?;
-        if st.is_dir() {
-            let mut dir = Directory::try_from(OwnedFd::from(f))?;
+        let attr = self.get_attr()?;
+        if attr.is_dir() {
+            let mut dir = Directory::try_from(open_fd!(self, O_RDONLY | O_CLOEXEC)?)?;
             dir.remove_all()?;
         }
         self.remove()
@@ -652,7 +699,7 @@ impl FsPath {
 
     pub fn set_attr(&self, attr: &FileAttr) -> io::Result<()> {
         unsafe {
-            if (attr.st.st_mode & libc::S_IFMT as c_uint) != S_IFLNK.as_() {
+            if !attr.is_symlink() {
                 libc::chmod(self.as_ptr(), (attr.st.st_mode & 0o777).as_()).as_os_err()?;
             }
             libc::lchown(self.as_ptr(), attr.st.st_uid, attr.st.st_gid).as_os_err()?;
@@ -674,7 +721,7 @@ impl FsPath {
 
     pub fn copy_to(&self, path: &FsPath) -> io::Result<()> {
         let attr = self.get_attr()?;
-        if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+        if attr.is_dir() {
             path.mkdir(0o777)?;
             let mut src = Directory::open(self)?;
             let dest = Directory::open(path)?;
@@ -682,11 +729,11 @@ impl FsPath {
         } else {
             // It's OK if remove failed
             path.remove().ok();
-            if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFREG.as_() {
+            if attr.is_file() {
                 let mut src = self.open(O_RDONLY | O_CLOEXEC)?;
                 let mut dest = path.create(O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, 0o777)?;
                 std::io::copy(&mut src, &mut dest)?;
-            } else if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFLNK.as_() {
+            } else if attr.is_symlink() {
                 let mut buf = Utf8CStrBufArr::default();
                 self.read_link(&mut buf)?;
                 unsafe {
@@ -701,7 +748,7 @@ impl FsPath {
     pub fn move_to(&self, path: &FsPath) -> io::Result<()> {
         if path.exists() {
             let attr = path.get_attr()?;
-            if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+            if attr.is_dir() {
                 let mut src = Directory::open(self)?;
                 let dest = Directory::open(path)?;
                 return src.move_into(&dest);
@@ -714,7 +761,7 @@ impl FsPath {
 
     pub fn link_to(&self, path: &FsPath) -> io::Result<()> {
         let attr = self.get_attr()?;
-        if (attr.st.st_mode & libc::S_IFMT as c_uint) == S_IFDIR.as_() {
+        if attr.is_dir() {
             path.mkdir(0o777)?;
             path.set_attr(&attr)?;
             let mut src = Directory::open(self)?;
@@ -828,13 +875,13 @@ pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8
     let flag = if rw { O_RDWR } else { O_RDONLY };
     let f = File::from(open_fd!(path, flag | O_CLOEXEC)?);
 
-    let st = f.metadata()?;
-    let sz = if st.file_type().is_block_device() {
+    let attr = FsPath::from(path).get_attr()?;
+    let sz = if attr.is_block_device() {
         let mut sz = 0_u64;
         unsafe { ioctl(f.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
         sz
     } else {
-        st.st_size()
+        attr.st.st_size as u64
     };
 
     map_fd(f.as_fd(), sz as usize, rw)
