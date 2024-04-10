@@ -48,7 +48,7 @@ import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 /*
- * Modified from from AOSP
+ * Modified from AOSP
  * https://android.googlesource.com/platform/build/+/refs/tags/android-7.1.2_r39/tools/signapk/src/com/android/signapk/SignApk.java
  * */
 
