@@ -82,7 +82,7 @@ jobs:
         run: ./gradlew --stop
 
   test:
-    name: Test on API ${{ matrix.api }}
+    name: Test x86_64 on API ${{ matrix.api }}
     runs-on: ubuntu-latest
     needs: build
     strategy:
@@ -114,4 +114,41 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: AVD test
+        run: scripts/avd_test.sh ${{ matrix.api }}
+
+  test-32:
+    name: Test x86 on API ${{ matrix.api }}
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [23, 24, 25, 26, 27, 28, 29, 30]
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.sha }}
+          path: out
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: AVD test
+        env:
+          FORCE_32_BIT: 1
         run: scripts/avd_test.sh ${{ matrix.api }}
