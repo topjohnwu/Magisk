@@ -5,7 +5,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::ops::Deref;
 use std::os::fd::{AsFd, BorrowedFd, IntoRawFd};
+use std::os::unix::ffi::OsStrExt;
 use std::os::unix::io::{AsRawFd, FromRawFd, OwnedFd, RawFd};
+use std::path::Path;
 use std::{io, mem, ptr, slice};
 
 use bytemuck::{bytes_of_mut, Pod};
@@ -17,8 +19,8 @@ use num_traits::AsPrimitive;
 
 use crate::cxx_extern::readlinkat_for_cxx;
 use crate::{
-    copy_cstr, cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf,
-    Utf8CStrBufArr,
+    cstr, errno, error, FsPath, FsPathBuf, LibcReturn, Utf8CStr, Utf8CStrBuf, Utf8CStrBufArr,
+    Utf8CStrWrite,
 };
 
 pub fn __open_fd_impl(path: &Utf8CStr, flags: i32, mode: mode_t) -> io::Result<OwnedFd> {
@@ -631,11 +633,14 @@ impl FsPath {
     }
 
     pub fn mkdirs(&self, mode: mode_t) -> io::Result<()> {
-        let mut buf = [0_u8; 4096];
-        let len = copy_cstr(&mut buf, self);
-        let buf = &mut buf[..len];
+        if self.is_empty() {
+            return Ok(());
+        }
+        let mut arr = Utf8CStrBufArr::default();
+        arr.push_str(self);
         let mut off = 1;
         unsafe {
+            let buf = arr.as_bytes_mut();
             while let Some(p) = buf[off..].iter().position(|c| *c == b'/') {
                 buf[off + p] = b'\0';
                 if libc::mkdir(buf.as_ptr().cast(), mode) < 0 && *errno() != EEXIST {

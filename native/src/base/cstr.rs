@@ -34,13 +34,6 @@ use crate::slice_from_ptr_mut;
 // Utf8CString, Utf8CStrBufRef, and Utf8CStrBufArr<N> implements Utf8CStrWrite.
 // Utf8CStrBufRef and Utf8CStrBufArr<N> implements Utf8CStrBuf.
 
-pub fn copy_cstr<T: AsRef<CStr> + ?Sized>(dest: &mut [u8], src: &T) -> usize {
-    let src = src.as_ref().to_bytes_with_nul();
-    let len = min(src.len(), dest.len());
-    dest[..len].copy_from_slice(&src[..len]);
-    len - 1
-}
-
 fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
     let mut used = buf.len();
     if used >= buf.capacity() - 1 {
@@ -49,7 +42,9 @@ fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
     }
     let dest = unsafe { &mut buf.mut_buf()[used..] };
     let len = min(s.len(), dest.len() - 1);
-    dest[..len].copy_from_slice(&s[..len]);
+    if len > 0 {
+        dest[..len].copy_from_slice(&s[..len]);
+    }
     dest[len] = b'\0';
     used += len;
     unsafe { buf.set_len(used) };
