@@ -17,7 +17,6 @@ mod payload;
 // Suppress warnings in generated code
 #[allow(warnings)]
 mod proto;
-mod ramdisk;
 mod sign;
 
 #[cxx::bridge]

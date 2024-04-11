@@ -776,6 +776,23 @@ impl FsPath {
             unsafe { libc::link(self.as_ptr(), path.as_ptr()).as_os_err() }
         }
     }
+
+    pub fn symlink_to(&self, path: &FsPath) -> io::Result<()> {
+        unsafe { libc::symlink(self.as_ptr(), path.as_ptr()).as_os_err() }
+    }
+
+    pub fn parent(&self, buf: &mut dyn Utf8CStrWrite) -> bool {
+        buf.clear();
+        if let Some(parent) = Path::new(self.as_str()).parent() {
+            let bytes = parent.as_os_str().as_bytes();
+            // SAFETY: all substring of self is valid UTF-8
+            let parent = unsafe { std::str::from_utf8_unchecked(bytes) };
+            buf.push_str(parent);
+            true
+        } else {
+            false
+        }
+    }
 }
 
 pub fn fd_get_attr(fd: RawFd) -> io::Result<FileAttr> {
