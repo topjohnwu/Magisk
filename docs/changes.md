@@ -807,4 +807,4 @@
 
 ### v1
 
-- Initial release
+- IniInitial release
