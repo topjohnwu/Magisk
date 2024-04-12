@@ -278,27 +278,33 @@ abstract class MagiskInstallImpl protected constructor(
         val boot = installDir.getChildFile("boot.img")
         val initBoot = installDir.getChildFile("init_boot.img")
         lateinit var entry: ZipEntry
-        while (zipIn.nextEntry?.also { entry = it } != null) {
-            if (entry.isDirectory) continue
-            when (entry.name.substringAfterLast('/')) {
-                "payload.bin" -> {
-                    try {
-                        return processPayload(zipIn)
-                    } catch (e: IOException) {
-                        // No boot image in payload.bin, continue to find boot images
+        try {
+            while (zipIn.nextEntry?.also { entry = it } != null) {
+                if (entry.isDirectory) continue
+                when (entry.name.substringAfterLast('/')) {
+                    "payload.bin" -> {
+                        try {
+                            return processPayload(zipIn)
+                        } catch (e: IOException) {
+                            // No boot image in payload.bin, continue to find boot images
+                        }
+                    }
+
+                    "init_boot.img" -> {
+                        console.add("- Extracting init_boot.img")
+                        zipIn.copyAndCloseOut(initBoot.newOutputStream())
+                        return initBoot
+                    }
+
+                    "boot.img" -> {
+                        console.add("- Extracting boot.img")
+                        zipIn.copyAndCloseOut(boot.newOutputStream())
+                        // Don't return here since there might be an init_boot.img
                     }
                 }
-                "init_boot.img" -> {
-                    console.add("- Extracting init_boot.img")
-                    zipIn.copyAndCloseOut(initBoot.newOutputStream())
-                    return initBoot
-                }
-                "boot.img" -> {
-                    console.add("- Extracting boot.img")
-                    zipIn.copyAndCloseOut(boot.newOutputStream())
-                    // Don't return here since there might be an init_boot.img
-                }
             }
+        } catch (e: IllegalArgumentException) {
+            throw IOException(e)
         }
         if (boot.exists()) {
             return boot
