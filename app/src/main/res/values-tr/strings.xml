@@ -25,7 +25,7 @@
     <string name="home_follow_title">Bizi Takip Edin</string>
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk ücretsiz ve açık kaynaktır ve her zaman öyle kalacaktır. Ancak bir bağış yaparak bize destek olduğunuzu gösterebilirsiniz.</string>
-    <string name="home_installed_version">Yüklendi</string>
+    <string name="home_installed_version">Yüklenen</string>
     <string name="home_latest_version">En son sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
@@ -205,8 +205,8 @@
     <string name="updated_text">Uygulamayı açmak için dokunun</string>
 
     <!--Toasts, Dialogs-->
-    <string name="yes">Evet</string>
-    <string name="no">Hayır</string>
+    <string name="yes">Etkin</string>
+    <string name="no">Mevcut değil</string>
     <string name="repo_install_title">%1$s %2$s(%3$d) yükle</string>
     <string name="download">İndir</string>
     <string name="reboot">Yeniden başlat</string>
@@ -232,8 +232,8 @@
     <string name="unsupport_general_title">Anormal Durum</string>
     <string name="unsupport_system_app_msg">Bu uygulamanın sistem uygulaması olarak çalıştırılması desteklenmiyor. Lütfen uygulamayı bir kullanıcı uygulamasına geri yükleyin.</string>
     <string name="unsupport_other_su_msg">Magisk\'ten olmayan bir \"su\" ikilisi algılandı. Lütfen rakip kök çözümlerini kaldırın ve/veya Magisk\'i yeniden yükleyin.</string>
-    <string name="unsupport_external_storage_msg">Magisk harici depolamaya yüklendi. Lütfen uygulamayı dahili depolamaya taşıyın.</string>
-    <string name="unsupport_nonroot_stub_msg">Kök kaybolduğu için gizli Magisk uygulaması çalışmaya devam edemiyor. Lütfen orijinal APK\'yı geri yükleyin.</string>
+    <string name="unsupport_external_storage_msg">Magisk harici depolamaya yüklenmiş. Lütfen uygulamayı dahili depolamaya taşıyın.</string>
+    <string name="unsupport_nonroot_stub_msg">Kök (root) kaybolduğu için gizli Magisk uygulaması çalışmaya devam edemiyor. Lütfen orijinal APK\'yı geri yükleyin.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Bu işlevi etkinleştirmek için depolama izni veriniz.</string>
     <string name="post_notifications_denied">Bu işlevi etkinleştirmek için bildirim izni veriniz.</string>
