@@ -15,7 +15,7 @@
     <string name="app_changelog">Değişiklik günlüğü</string>
     <string name="loading">Yükleniyor…</string>
     <string name="update">Güncelle</string>
-    <string name="not_available">Mevcut değil</string>
+    <string name="not_available">Yüklü değil</string>
     <string name="hide">Gizle</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Uygulama</string>
@@ -25,7 +25,7 @@
     <string name="home_follow_title">Bizi Takip Edin</string>
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk ücretsiz ve açık kaynaktır ve her zaman öyle kalacaktır. Ancak bir bağış yaparak bize destek olduğunuzu gösterebilirsiniz.</string>
-    <string name="home_installed_version">Yüklenen</string>
+    <string name="home_installed_version">Durum</string>
     <string name="home_latest_version">En son sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
@@ -198,7 +198,7 @@
     <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="progress_channel">İlerleme Bildirimleri</string>
     <string name="updated_channel">Güncelleme Tamamlandı</string>
-    <string name="download_complete">İndirme tamamlandı</string>
+    <string name="download_complete">İndirme Tamamlandı</string>
     <string name="download_file_error">Dosya indirilirken hata oluştu</string>
     <string name="magisk_update_title">Magisk Güncellemesi Mevcut!</string>
     <string name="updated_title">Magisk Güncellendi</string>
