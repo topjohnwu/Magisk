@@ -205,7 +205,7 @@
     <string name="updated_text">Uygulamayı açmak için dokunun</string>
 
     <!--Toasts, Dialogs-->
-    <string name="yes">Etkin</string>
+    <string name="yes">Mevcut</string>
     <string name="no">Mevcut değil</string>
     <string name="repo_install_title">%1$s %2$s(%3$d) yükle</string>
     <string name="download">İndir</string>
