@@ -175,7 +175,7 @@
     <string name="settings_su_auth_insecure">Cihazda hiçbir kimlik doğrulama yöntemi yapılandırılmamış</string>
     <string name="settings_customization">Özelleştir</string>
     <string name="setting_add_shortcut_summary">Uygulamayı gizledikten sonra adın ve simgenin tanınmasının zor olması durumunda ana ekrana güzel bir kısayol ekle</string>
-    <string name="settings_doh_title">DNS üzerinden HTTPS (DOH)</string>
+    <string name="settings_doh_title">HTTPS üzerinden DNS</string>
     <string name="settings_doh_description">Bazı ülkelerde DNS zehirlenmesine geçici çözüm</string>
 
     <string name="multiuser_mode">Çok Kullanıcılı Mod</string>
