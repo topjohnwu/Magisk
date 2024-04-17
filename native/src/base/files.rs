@@ -155,7 +155,7 @@ impl FileAttr {
     #[inline(always)]
     #[allow(clippy::unnecessary_cast)]
     fn is(&self, mode: mode_t) -> bool {
-        (self.st.st_mode & libc::S_IFMT as u32) as mode_t == mode
+        (self.st.st_mode & libc::S_IFMT as c_uint) as mode_t == mode
     }
 
     pub fn is_dir(&self) -> bool {
@@ -895,18 +895,18 @@ pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8
     const BLKGETSIZE64: u32 = 0x80041272;
 
     let flag = if rw { O_RDWR } else { O_RDONLY };
-    let f = File::from(open_fd!(path, flag | O_CLOEXEC)?);
+    let file = FsPath::from(path).open(flag | O_CLOEXEC)?;
 
-    let attr = FsPath::from(path).get_attr()?;
+    let attr = fd_get_attr(file.as_raw_fd())?;
     let sz = if attr.is_block_device() {
         let mut sz = 0_u64;
-        unsafe { ioctl(f.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
+        unsafe { ioctl(file.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
         sz
     } else {
         attr.st.st_size as u64
     };
 
-    map_fd(f.as_fd(), sz as usize, rw)
+    map_fd(file.as_fd(), sz as usize, rw)
 }
 
 pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<&'static mut [u8]> {

@@ -407,7 +407,8 @@ impl Cpio {
         let rdevmajor: dev_t;
         let rdevminor: dev_t;
 
-        let mode = if attr.is_file() {
+        // Treat symlinks as regular files as symlinks are created by the 'ln TARGET ENTRY' command
+        let mode = if attr.is_file() || attr.is_symlink() {
             rdevmajor = 0;
             rdevminor = 0;
             file.open(O_RDONLY | O_CLOEXEC)?.read_to_end(&mut content)?;
