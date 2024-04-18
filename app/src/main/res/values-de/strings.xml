@@ -8,14 +8,14 @@
     <string name="install">Installieren</string>
     <string name="section_home">Startseite</string>
     <string name="section_theme">Themen</string>
-    <string name="denylist">Verweigerungsliste</string>
+    <string name="denylist">Ausnahmeliste</string>
 
     <!--Home-->
     <string name="no_connection">Keine Verbindung verfügbar</string>
     <string name="app_changelog">Änderungen</string>
     <string name="loading">Laden …</string>
     <string name="update">Aktualisieren</string>
-    <string name="not_available">N/A</string>
+    <string name="not_available">Nicht verfügbar</string>
     <string name="hide">Verstecken</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">App</string>
@@ -88,6 +88,9 @@
     <string name="logs_cleared">Protokoll erfolgreich gelöscht.</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">Ziel-UID: %1$d</string>
+    <string name="target_pid">NS Target PID einbinden: %s</string>
+    <string name="selinux_context">SELinux Kontext: %s</string>
+    <string name="supp_group">Ergänzende Gruppe: %s</string>
 
     <!--SafetyNet-->
 
@@ -138,11 +141,11 @@
     <string name="settings_update_custom">Benutzerdefiniert</string>
     <string name="settings_update_custom_msg">Benutzerdefinierte URL einfügen</string>
     <string name="settings_zygisk_summary">Teile von Magisk im Zygoten-Daemon ausführen</string>
-    <string name="settings_denylist_title">Verweigerungsliste erzwingen</string>
-    <string name="settings_denylist_summary">Bei Prozessen, die auf der Verweigerungsliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
+    <string name="settings_denylist_title">Ausnahmeliste erzwingen</string>
+    <string name="settings_denylist_summary">Bei Prozessen, die auf der Ausnahmeliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
     <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
-    <string name="settings_denylist_config_title">Verweigerungsliste konfigurieren</string>
-    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Verweigerungsliste aufgenommen werden sollen</string>
+    <string name="settings_denylist_config_title">Ausnahmeliste konfigurieren</string>
+    <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Ausnahmeliste aufgenommen werden sollen</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
     <string name="settings_hosts_summary">Systemlose Unterstützung für Werbeblocker</string>
     <string name="settings_hosts_toast">Systemloses Hosts-Modul hinzugefügt</string>
@@ -167,6 +170,9 @@
     <string name="settings_su_reauth_summary">Superuser-Berechtigungen nach App-Aktualisierung erneut authentifizieren</string>
     <string name="settings_su_tapjack_title">Tapjacking-Schutz aktivieren</string>
     <string name="settings_su_tapjack_summary">Das Dialogfeld der Superuser-Eingabeaufforderung reagiert nicht auf Eingaben, wenn es durch ein anderes Fenster oder Überlagerung verdeckt wird</string>
+    <string name="settings_su_auth_title">Benutzerauthentifizierung</string>
+    <string name="settings_su_auth_summary">Nachfrage nach Benutzerauthentifizierung bei Superuser-Anfragen</string>
+    <string name="settings_su_auth_insecure">Auf dem Gerät ist keine Authentifizierungsmethode konfiguriert</string>>
     <string name="settings_customization">Personalisierung</string>
     <string name="setting_add_shortcut_summary">Hinzufügen einer hübschen Startbildschirm-Verknüpfung, falls der Name und das Symbol nach dem Ausblenden der App schwer zu erkennen sind</string>
     <string name="settings_doh_title">DNS über HTTPS</string>
