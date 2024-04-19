@@ -19,7 +19,6 @@
     <string name="hide">Ocultar</string>
     <string name="home_package">Nombre de paquete:</string>
     <string name="home_app_title">App</string>
-
     <string name="home_notice_content">Descarga Magisk únicamente desde la página oficial de GitHub. ¡Las descargas desde fuentes desconocidas pueden ser maliciosas!</string>
     <string name="home_support_title">Apóyanos</string>
     <string name="home_follow_title">Síguenos</string>
@@ -75,7 +74,6 @@
     <string name="su_revoke_msg">Confirma para revocarle los privilegios de superusuario a %1$s</string>
     <string name="toast">Mensaje emergente</string>
     <string name="none">Ninguno</string>
-
     <string name="superuser_toggle_notification">Notificaciones</string>
     <string name="superuser_toggle_revoke">Revocar</string>
     <string name="superuser_policy_none">Ninguna app ha solicitado privilegios de superusuario aún.</string>
@@ -87,7 +85,10 @@
     <string name="menuClearLog">Limpiar registro</string>
     <string name="logs_cleared">Registros limpiados correctamente</string>
     <string name="pid">PID: %1$d</string>
-    <string name="target_uid">Target UID: %1$d</string>
+    <string name="target_uid">Objetivo UID: %1$d</string>
+    <string name="target_pid">Montar ns objetivo PID: %s</string>
+    <string name="selinux_context">Contexto SELinux: %s</string>
+    <string name="supp_group">Grupo suplementario: %s</string>
 
     <!--SafetyNet/PlayIntegrity-->
 
@@ -167,11 +168,13 @@
     <string name="settings_su_reauth_summary">Las apps volverán a solicitar privilegios de superusuario tras actualizarse</string>
     <string name="settings_su_tapjack_title">Protección contra tapjacking</string>
     <string name="settings_su_tapjack_summary">No podrás interactuar con las solicitudes de superusuario mientras estén tapadas por cualquier otra ventana o superposición</string>
+    <string name="settings_su_auth_title">Autenticación de usuario</string>
+    <string name="settings_su_auth_summary">Preguntar por la autenticación de usuario durante las peticiones de Superusuario</string>
+    <string name="settings_su_auth_insecure">No hay método de autenticación configurado en el dispositivo</string>
     <string name="settings_customization">Personalización</string>
     <string name="setting_add_shortcut_summary">Añade un atajo a la app con el ícono de Magisk a la pantalla de inicio en caso de que te resulte difícil reconocerla tras haberle cambiado el nombre y el ícono</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Proporciona una solución alternativa (workaround) contra el envenenamiento de DNS en algunos países</string>
-
     <string name="multiuser_mode">Modo multiusuario</string>
     <string name="settings_owner_only">Propietario del dispositivo</string>
     <string name="settings_owner_manage">Administrado por el propietario del dispositivo</string>
@@ -179,7 +182,6 @@
     <string name="owner_only_summary">Solo el administrador tiene acceso root</string>
     <string name="owner_manage_summary">Solo el administrador puede manipular y recibir solicitudes de superusuario</string>
     <string name="user_independent_summary">Cada usuario tiene sus propias reglas y acceso al root</string>
-
     <string name="mount_namespace_mode">Modo del namespace de montaje</string>
     <string name="settings_ns_global">Namespace global</string>
     <string name="settings_ns_requester">Namespace heredado</string>
