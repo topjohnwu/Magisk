@@ -1,3 +1,4 @@
+use std::cell::UnsafeCell;
 use std::fs::File;
 use std::io::{IoSlice, Write};
 
@@ -8,7 +9,7 @@ use base::libc::{
 use base::{cstr, exit_on_error, open_fd, raw_cstr, FsPath, LogLevel, Logger, Utf8CStr, LOGGER};
 
 // SAFETY: magiskinit is single threaded
-static mut KMSG: Option<File> = None;
+static mut KMSG: UnsafeCell<Option<File>> = UnsafeCell::new(None);
 
 pub fn setup_klog() {
     unsafe {
@@ -32,7 +33,7 @@ pub fn setup_klog() {
             fd = open_fd!(cstr!("/kmsg"), O_WRONLY | O_CLOEXEC);
             FsPath::from(cstr!("/kmsg")).remove().ok();
         }
-        KMSG = fd.map(|fd| fd.into()).ok();
+        *KMSG.get() = fd.map(|fd| fd.into()).ok();
     }
 
     // Disable kmsg rate limiting
@@ -45,7 +46,7 @@ pub fn setup_klog() {
     }
 
     fn kmsg_log_write(_: LogLevel, msg: &Utf8CStr) {
-        if let Some(kmsg) = unsafe { &mut KMSG } {
+        if let Some(kmsg) = unsafe { &mut *KMSG.get() } {
             let io1 = IoSlice::new("magiskinit: ".as_bytes());
             let io2 = IoSlice::new(msg.as_bytes());
             let _ = kmsg.write_vectored(&[io1, io2]).ok();
