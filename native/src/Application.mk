@@ -17,10 +17,9 @@ NDK_APP_OUT      := ./obj/nolibc
 
 endif
 
-# Busybox should use stock libc.a
+# Busybox should use a newer libc.a
 ifdef B_BB
 APP_PLATFORM     := android-26
-APP_LDFLAGS      += -T src/lto_fix.lds
 ifeq ($(OS),Windows_NT)
 APP_SHORT_COMMANDS := true
 endif

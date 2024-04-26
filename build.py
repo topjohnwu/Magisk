@@ -257,8 +257,6 @@ def run_cargo(cmds, triple="aarch64-linux-android"):
     env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = op.join(rust_bin, "rustc" + EXE_EXT)
     env["RUSTFLAGS"] = f"-Clinker-plugin-lto -Zthreads={min(8, cpu_count)}"
-    env["TARGET_CC"] = op.join(llvm_bin, "clang" + EXE_EXT)
-    env["TARGET_CFLAGS"] = f"--target={triple}23"
     return execv([cargo, *cmds], env)
 
 
