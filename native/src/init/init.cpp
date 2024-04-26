@@ -21,6 +21,7 @@ bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes) {
     xz_crc32_init();
     size_t size = bytes.size();
     struct xz_dec *dec = xz_dec_init(XZ_DYNALLOC, 1 << 26);
+    run_finally finally([&] { xz_dec_end(dec); });
     struct xz_buf b = {
         .in = bytes.data(),
         .in_pos = 0,
