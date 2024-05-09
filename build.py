@@ -626,6 +626,25 @@ def build_all(args):
     build_app(args)
 
 
+def setup_rustup(args):
+    wrapper_dir = Path(args.wrapper_dir)
+    rm_rf(wrapper_dir)
+    wrapper_dir.mkdir(mode=0o755, parents=True, exist_ok=True)
+    if "CARGO_HOME" in os.environ:
+        cargo_home = Path(os.environ["CARGO_HOME"])
+    else:
+        cargo_home = Path.home() / ".cargo"
+    cargo_bin = cargo_home / "bin"
+    for src in cargo_bin.iterdir():
+        tgt = wrapper_dir / src.name
+        tgt.symlink_to(src)
+    # Replace rustup with python script
+    wrapper = wrapper_dir / "rustup"
+    wrapper.unlink()
+    cp(Path("scripts", "rustup_wrapper.py"), wrapper)
+    wrapper.chmod(0o755)
+
+
 parser = argparse.ArgumentParser(description="Magisk build script")
 parser.set_defaults(func=lambda x: None)
 parser.add_argument(
@@ -655,6 +674,10 @@ binary_parser.set_defaults(func=build_binary)
 cargo_parser = subparsers.add_parser("cargo", help="run cargo with proper environment")
 cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
 cargo_parser.set_defaults(func=run_cargo_cmd)
+
+rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
+rustup_parser.add_argument("wrapper_dir", help="path to setup rustup wrapper binaries")
+rustup_parser.set_defaults(func=setup_rustup)
 
 app_parser = subparsers.add_parser("app", help="build the Magisk app")
 app_parser.set_defaults(func=build_app)
