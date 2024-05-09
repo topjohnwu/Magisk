@@ -86,7 +86,7 @@ ndk_build = ndk_path / "ndk-build"
 rust_bin = ndk_path / "toolchains" / "rust" / "bin"
 llvm_bin = ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
 cargo = rust_bin / f"cargo{EXE_EXT}"
-gradlew = Path("gradlew" + (".bat" if is_windows else ""))
+gradlew = Path("gradlew" + (".bat" if is_windows else "")).resolve()
 adb_path = sdk_path / "platform-tools" / f"adb{EXE_EXT}"
 native_gen_path = Path("native", "out", "generated").resolve()
 
