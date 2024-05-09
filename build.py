@@ -638,10 +638,16 @@ def setup_rustup(args):
     for src in cargo_bin.iterdir():
         tgt = wrapper_dir / src.name
         tgt.symlink_to(src)
-    # Replace rustup with python script
-    wrapper = wrapper_dir / "rustup"
-    wrapper.unlink()
-    cp(Path("scripts", "rustup_wrapper.py"), wrapper)
+
+    # Build rustup_wrapper
+    wrapper_src = Path("tools", "rustup_wrapper")
+    cargo_toml = wrapper_src / "Cargo.toml"
+    execv([cargo, "build", "--release", f"--manifest-path={cargo_toml}"])
+
+    # Replace rustup with wrapper
+    wrapper = wrapper_dir / (f"rustup{EXE_EXT}")
+    wrapper.unlink(missing_ok=True)
+    cp(wrapper_src / "target" / "release" / (f"rustup_wrapper{EXE_EXT}"), wrapper)
     wrapper.chmod(0o755)
 
 
