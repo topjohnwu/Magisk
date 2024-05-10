@@ -16,7 +16,7 @@ Some highlight features:
 
 ## Downloads
 
-[Github](https://github.com/topjohnwu/Magisk/) is the only source where you can get official Magisk information and downloads.
+[Github](https://github.com/topjohnwu/Magisk) is the only source where you can get official Magisk information and downloads.
 
 [![](https://img.shields.io/badge/Magisk-v27.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v27.0)
 [![](https://img.shields.io/badge/Magisk%20Beta-v27.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v27.0)
@@ -27,7 +27,7 @@ Some highlight features:
 
 - [Installation Instruction](https://topjohnwu.github.io/Magisk/install.html)
 - [Building and Development](https://topjohnwu.github.io/Magisk/build.html)
-- [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
+- [Magisk Documentation](https://topjohnwu.github.io/Magisk)
 
 ## Bug Reports
 
@@ -59,4 +59,4 @@ Translate each and place them in the respective locations (`[module]/src/main/re
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
