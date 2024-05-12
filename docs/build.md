@@ -34,13 +34,15 @@
 
 ## IDE Support
 
-- The repository can be directly opened with Android Studio as a project.
-- The Kotlin, Java, C++, and C code in the project should be properly supported in Android Studio out of the box.
-- Run `./build.py binary` before working on native code, as some generated code is only created during the build process.
+- Kotlin, Java, C++, and C code in the project should be supported in Android Studio out of the box. This repository can be directly opened with Android Studio as a project.
+- For Rust development, see the next section.
+- Before working on any native code, build all native code first with `./build.py binary`, as some generated code is only created during the build process.
 
-### Developing Rust in Android Studio
+### Developing Rust
 
-Because the Magisk NDK package, [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`), contains a fully self contained Clang + Rust toolchain, building the Magisk project alone does not require configuring toolchains. However, due to the way the IntelliJ Rust plugin works, you'll have to go through some additional setup to make Android Studio work with Magisk's Rust codebase:
+The Magisk NDK package [ONDK](https://github.com/topjohnwu/ondk) (the one installed with `./build.py ndk`) bundles a complete Rust toolchain, so *building* the Magisk project itself does not require any further configuration. However, if you'd like to work on the Rust codebase with proper support, you'd need some setup as most development tools are built around `rustup`. 
+
+Let's first setup `rustup` to use our custom ONDK Rust toolchain by default:
 
 - Install [rustup](https://rustup.rs/), the official Rust toolchain manager
 - Link the ONDK Rust toolchain and set it as default:
@@ -48,13 +50,30 @@ Because the Magisk NDK package, [ONDK](https://github.com/topjohnwu/ondk) (the o
 ```bash
 # Link the ONDK toolchain with the name "magisk"
 rustup toolchain link magisk "$ANDROID_SDK_ROOT/ndk/magisk/toolchains/rust"
-# Set as default
+# Set magisk as default
 rustup default magisk
 ```
 
-- Install the [Intellij Rust plugin](https://www.jetbrains.com/rust/) in Android Studio
-- In Preferences > Languages & Frameworks > Rust, set `$ANDROID_SDK_ROOT/ndk/magisk/toolchains/rust/bin` as the toolchain location
-- Open `native/src/Cargo.toml`, and select "Attach" in the "No Cargo projects found" banner
+If you plan to use VSCode, you can then install the [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) plugin and everything should be good to go. If you plan to use Jetbrain IDEs (e.g. [Rustrover](https://www.jetbrains.com/rust/), or its Rust Plugin), due to its poor support with custom toolchains, we need some additional setup:
+
+- Install the official nightly toolchain and add some components. We won't actually use the nightly toolchain for anything other than tricking the IDE to cooperate; the magic happens in the wrapper we setup in the next step.
+
+```bash
+rustup toolchain install nightly
+# Add some components that is also included in ONDK
+rustup +nightly component add rust-src clippy
+```
+
+- Create a wrapper cargo bin directory to workaround `rustup` limitations
+
+```bash
+# We choose ~/.cargo/wrapper here as an example (and a good recommendation)
+# Pick any path you like, you just need to use this path in the next step
+./build.py rustup ~/.cargo/wrapper
+```
+
+- In Settings > Rust > Toolchain location, set this to the path of the wrapper directory we just created.
+- The IDE should now be fully functional, and you are able to enable `rustfmt` and use `Clippy` as the external linter.
 
 ## Signing and Distribution
 
