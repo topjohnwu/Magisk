@@ -1,3 +1,5 @@
+![Screenshot_20240514_050056_com topjohnwu magisk](https://github.com/topjohnwu/Magisk/assets/161837166/49ac2c40-4a04-4720-a51c-101fe4ad2106)
+![Screenshot_20240513_233640_com jecelyin editor v2](https://github.com/topjohnwu/Magisk/assets/161837166/edd8ca75-219a-4e54-a5ea-4cc190d841e7)
 # Installation
 
 If you already have Magisk installed, it is **strongly recommended** to upgrade directly via the Magisk app using its "Direct Install" method. The following tutorial is only for the initial installation.
