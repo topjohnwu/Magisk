@@ -226,20 +226,23 @@ template<class StringType>
 static StringType wait_prop(const char *name, const char *old_value) {
     if (!check_legal_property_name(name))
         return {};
-    auto pi = system_property_find(name);
-    if (!pi) {
-        LOGD("resetprop: prop [%s] does not exist\n", name);
-        return {};
+
+    const prop_info *pi;
+    while (!(pi = system_property_find(name))) {
+        LOGD("resetprop: waiting for prop [%s] to exist\n", name);
+        uint32_t new_serial;
+        system_property_wait(nullptr, 0, &new_serial, nullptr);
     }
 
     prop_to_string<StringType> cb;
     read_prop_with_cb(pi, &cb);
 
-    if (old_value == nullptr || cb.val == old_value) {
+    while (old_value == nullptr || cb.val == old_value) {
         LOGD("resetprop: waiting for prop [%s]\n", name);
         uint32_t new_serial;
         system_property_wait(pi, cb.serial, &new_serial, nullptr);
         read_prop_with_cb(pi, &cb);
+        if (old_value == nullptr) break;
     }
 
     LOGD("resetprop: get prop [%s]: [%s]\n", name, cb.val.c_str());
