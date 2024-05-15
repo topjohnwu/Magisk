@@ -25,7 +25,7 @@ object RebootMenu {
             R.id.action_reboot_safe_mode -> {
                 val status = !item.isChecked
                 item.isChecked = status
-                Config.safemode = if (status) 2 else 0
+                Config.bootloop = if (status) 2 else 0
             }
             else -> Unit
         }
@@ -42,7 +42,7 @@ object RebootMenu {
             menu.menu.findItem(R.id.action_reboot_userspace).isVisible = true
         }
         if (Const.APP_IS_CANARY) {
-            menu.menu.findItem(R.id.action_reboot_safe_mode).isChecked = Config.safemode >= 2
+            menu.menu.findItem(R.id.action_reboot_safe_mode).isChecked = Config.bootloop >= 2
         } else {
             menu.menu.findItem(R.id.action_reboot_safe_mode).isVisible = false
         }

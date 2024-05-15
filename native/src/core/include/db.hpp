@@ -40,7 +40,7 @@ constexpr const char *DB_SETTING_KEYS[] = {
     "mnt_ns",
     "denylist",
     "zygisk",
-    "safemode",
+    "bootloop",
 };
 
 // Settings key indices
@@ -50,7 +50,7 @@ enum {
     SU_MNT_NS,
     DENYLIST_CONFIG,
     ZYGISK_CONFIG,
-    SAFEMODE_CONFIG,
+    BOOTLOOP_COUNT,
 };
 
 // Values for root_access

@@ -122,14 +122,13 @@ static bool check_key_combo() {
 }
 
 static bool check_safe_mode() {
-    int safe_mode;
+    int bootloop_cnt;
     db_settings dbs;
-    get_db_settings(dbs, SAFEMODE_CONFIG);
-    safe_mode = dbs[SAFEMODE_CONFIG];
-
-    set_db_settings(SAFEMODE_CONFIG, safe_mode + 1);
-
-    return safe_mode >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
+    get_db_settings(dbs, BOOTLOOP_COUNT);
+    bootloop_cnt = dbs[BOOTLOOP_COUNT];
+    // Increment the bootloop counter
+    set_db_settings(BOOTLOOP_COUNT, bootloop_cnt + 1);
+    return bootloop_cnt >= 2 || get_prop("persist.sys.safemode", true) == "1" ||
            get_prop("ro.sys.safemode") == "1" || check_key_combo();
 }
 
@@ -197,7 +196,8 @@ void MagiskD::boot_complete() const {
 
     LOGI("** boot-complete triggered\n");
 
-    set_db_settings(SAFEMODE_CONFIG, 0);
+    // Reset the bootloop counter once we have boot-complete
+    set_db_settings(BOOTLOOP_COUNT, 0);
 
     // At this point it's safe to create the folder
     if (access(SECURE_DIR, F_OK) != 0)
