@@ -117,7 +117,7 @@ db_settings::db_settings() {
     data[SU_MNT_NS] = NAMESPACE_MODE_REQUESTER;
     data[DENYLIST_CONFIG] = false;
     data[ZYGISK_CONFIG] = MagiskD::get()->is_emulator();
-    data[SAFEMODE_CONFIG] = false;
+    data[BOOTLOOP_COUNT] = 0;
 }
 
 int db_settings::get_idx(string_view key) const {
