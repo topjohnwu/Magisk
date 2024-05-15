@@ -103,6 +103,7 @@
     <string name="reboot_bootloader">Reiniciar em modo Bootloader</string>
     <string name="reboot_download">Reiniciar em modo Download</string>
     <string name="reboot_edl">Reiniciar em modo EDL</string>
+    <string name="reboot_safe_mode">Modo de segurança</string>
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_state_remove">Remover</string>
     <string name="module_state_restore">Restaurar</string>
