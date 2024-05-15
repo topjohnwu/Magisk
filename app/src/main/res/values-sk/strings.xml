@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">Reštartovať do Bootloader</string>
     <string name="reboot_download">Reštartovať do Download</string>
     <string name="reboot_edl">Reštartovať do EDL</string>
+    <string name="reboot_safe_mode">Núdzový režim</string>
     <string name="module_version_author">%1$s od %2$s</string>
     <string name="module_state_remove">Odstrániť</string>
     <string name="module_state_restore">Obnoviť</string>
