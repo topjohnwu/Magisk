@@ -41,7 +41,7 @@ object RebootMenu {
             activity.getSystemService<PowerManager>()?.isRebootingUserspaceSupported == true) {
             menu.menu.findItem(R.id.action_reboot_userspace).isVisible = true
         }
-        if (Const.APP_IS_CANARY) {
+        if (Const.Version.isCanary()) {
             menu.menu.findItem(R.id.action_reboot_safe_mode).isChecked = Config.bootloop >= 2
         } else {
             menu.menu.findItem(R.id.action_reboot_safe_mode).isVisible = false
