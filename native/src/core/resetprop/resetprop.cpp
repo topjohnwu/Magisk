@@ -228,10 +228,10 @@ static StringType wait_prop(const char *name, const char *old_value) {
         return {};
 
     const prop_info *pi;
+    auto serial = __system_property_area_serial();
     while (!(pi = system_property_find(name))) {
         LOGD("resetprop: waiting for prop [%s] to exist\n", name);
-        uint32_t new_serial;
-        system_property_wait(nullptr, 0, &new_serial, nullptr);
+        system_property_wait(nullptr, serial, &serial, nullptr);
     }
 
     prop_to_string<StringType> cb;
