@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">Rinis te Bootloader</string>
     <string name="reboot_download">Rinis te Download</string>
     <string name="reboot_edl">Rinis te EDL</string>
+    <string name="reboot_safe_mode">Rinis në safe mode</string>
     <string name="module_version_author">%1$s nga %2$s</string>
     <string name="module_state_remove">Hiqe</string>
     <string name="module_state_restore">Rikëthe</string>
