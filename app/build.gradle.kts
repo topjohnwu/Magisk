@@ -74,7 +74,7 @@ dependencies {
     implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
     implementation("com.github.topjohnwu:lz4-java:1.7.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
     implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.3.0")
     implementation("dev.rikka.rikkax.insets:insets:1.3.0")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.2")
@@ -85,7 +85,7 @@ dependencies {
     implementation("com.github.topjohnwu.libsu:service:${vLibsu}")
     implementation("com.github.topjohnwu.libsu:nio:${vLibsu}")
 
-    val vRetrofit = "2.9.0"
+    val vRetrofit = "2.11.0"
     implementation("com.squareup.retrofit2:retrofit:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-moshi:${vRetrofit}")
     implementation("com.squareup.retrofit2:converter-scalars:${vRetrofit}")
@@ -95,7 +95,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:${vOkHttp}")
     implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:${vOkHttp}")
 
-    val vMoshi = "1.15.0"
+    val vMoshi = "1.15.1"
     implementation("com.squareup.moshi:moshi:${vMoshi}")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:${vMoshi}")
 
@@ -112,10 +112,10 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.transition:transition:1.4.1")
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.fragment:fragment-ktx:1.7.1")
+    implementation("androidx.transition:transition:1.5.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
 }
