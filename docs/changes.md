@@ -1,53 +1,53 @@
-# Magisk Changelog
+#Magisk Changelog
 
-### v27.0
+###v27.0
 
-- [Zygisk] Introduce new code injection mechanism
-- [Zygisk] Support new signature introduced in U QPR2
-- [SEPolicy] Update libsepol to properly set some policy config bits
-- [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+- [Zygisk]引入新的代码注入机制
+- [Zygisk]支持U QPR2中引入的新签名
+- [Sepolicy]更新libsepol以正确设置某些策略配置位
+- [MagiskBoot]支架压缩`init`所以Magisk可以安装在引导分区较小的设备上。
+- [ResetProp]添加新的等待属性功能`resetprop-w`
 
-### v26.4
+###v26.4
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
-- [MagiskPolicy] Fix `genfscon` and `filename_trans`
-- [MagiskPolicy] Fix bug in `libsepol`
-- [Zygisk] Fix and simplify file descriptor sanitization logic
-- [App] Prevent OOM when patching AP tarfiles
-- [App] Fix bug in device configuration detection
-- [Daemon] Fix certificate parsing of APKs
-- [General] Fix logging errors from C++ code being ignored
+- [MagiskBoot]如果签名引导映像较大，则不填充0
+- [MagiskPolicy]固定`genfscon`和`filename_trans`
+- [MagiskPolicy]修复中的错误`libsepol`
+- [Zygisk]修复并简化文件描述符清理逻辑
+- [应用程序]在修补AP tarfile时防止OOM
+- [应用程序]修复设备配置检测中的bug
+- [守护程序]修复安装包的证书解析
+- [一般的]修复忽略的C++代码中的日志错误
 
-### v26.3
+###v26.3
 
-- [General] Fix device information detection script
-- [General] Update BusyBox to 1.36.1
-- [General] Update toolchain that produces broken arm32 executables
-- [App] Fix root service unable to bind on OnePlus devices
+- [一般的]修复设备信息检测脚本
+- [一般的]将BusyBox更新为1.36.1
+- [一般的]更新工具链，生成中断的arm32可执行文件
+- [应用程序]修复根服务无法绑定到OnePlus设备
 
-### v26.2
+###v26.2
 
-- [MagiskBoot] Support extracting boot image from `payload.bin`
-- [MagiskBoot] Support cpio files containing character files
-- [MagiskBoot] Support listing cpio content
-- [MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
-- [Daemon] Make daemon socket a fixed path in MAGISKTMP
-- [resetprop] Support printing property context
-- [resetprop] Support only printing persistent properties from storage
-- [resetprop] Properly support setting persistent properties bypassing property_service
-- [MagiskSU] Support `-g` and `-G` options
-- [MagiskSU] Support switching mount namespace to PID with `-t`
-- [MagiskPolicy] Fix patching extended permissions
-- [MagiskPolicy] Support more syntax for extended permissions
-- [MagiskPolicy] Support printing out the loaded sepolicy rules
-- [App] Support patching boot image from ROM zips
-- [App] Properly preserve `boot.img` when patching Samsung firmware with `init_boot.img`
+- [MagiskBoot]支持从提取启动映像`payload.bin`
+- [MagiskBoot]支持包含字符文件的cpio文件
+- [MagiskBoot]支持列出cpio内容
+- [MagiskBoot]直接处理AVB1.0签名和验证，无需经过Java实现
+- [守护程序]在MAGISKTMP中将守护程序套接字设置为固定路径
+- [resetprop]支持打印属性上下文
+- [resetprop]仅支持从存储打印永久属性
+- [resetprop]正确支持设置永久属性绕过property_service
+- [MagiskSU]支持`-g`和`-g`选项
+- [MagiskSU]支持将装载命名空间切换到PID`-t`
+- [MagiskPolicy]修复修补扩展权限
+- [MagiskPolicy]支持更多扩展权限语法
+- [MagiskPolicy]支持打印出加载的sepolicy规则
+- [应用程序]支持从ROM压缩包修补启动映像
+- [应用程序]妥善保存`boot.img`为三星固件打补丁时`init_boot.img`
 
-### v26.1
+###v26.1
 
-- [App] Fix crashing when revoking root permissions
-- [MagiskInit] Always prefer `ext4` partitions over `f2fs` when selecting the pre-init partition
+- [应用程序]修复撤消root权限时崩溃的问题
+- [MagiskInit]总是偏爱`ext4`分区覆盖`F2FS`选择初始化前分区时
 - [General] Restore module files' context/owner/group from mirror. This is a regression introduced in v26.0
 
 ### v26.0
