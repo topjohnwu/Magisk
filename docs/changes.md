@@ -1,27 +1,27 @@
-# Magisk Changelog
+#Magisk Changelog
 
 ### v27.0
 
-- [Zygisk] Introduce new code injection mechanism
-- [Zygisk] Support new signature introduced in U QPR2
-- [SEPolicy] Update libsepol to properly set some policy config bits
-- [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+- [济吉斯克]引入新的代码注入机制
+-[济吉斯克]我想说2
+-[SEPolicy]更新 libsepol you
+- [MagiskBoot]支撑压缩`我`因此Magisk可安装在具有小引导分区的设备上
+- [ResetProp]添加新的等待属性特性`resetprop -w`
 
 ### v26.4
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
-- [MagiskPolicy] Fix `genfscon` and `filename_trans`
-- [MagiskPolicy] Fix bug in `libsepol`
-- [Zygisk] Fix and simplify file descriptor sanitization logic
-- [App] Prevent OOM when patching AP tarfiles
-- [App] Fix bug in device configuration detection
-- [Daemon] Fix certificate parsing of APKs
-- [General] Fix logging errors from C++ code being ignored
+- [MagiskBoot]如果签名启动图像较大，不要填充零
+- [MagiskPolicy]固定`genfscon`和`filename_trans`
+- [MagiskPolicy]修复bug`libsepol`
+- [济吉斯克]修正和简化文件描述符消毒逻辑
+- [应用程序]修补AP tarfiles时防止OOM
+- [应用程序]修复设备配置检测中的bug
+- [半神半人精灵]修复APK的证书解析
+- [普遍的]修正忽略C++代码的日志记录错误
 
 ### v26.3
 
-- [General] Fix device information detection script
+- [普遍的]修复设备信息检测脚本
 - [General] Update BusyBox to 1.36.1
 - [General] Update toolchain that produces broken arm32 executables
 - [App] Fix root service unable to bind on OnePlus devices
@@ -39,23 +39,23 @@
 - [MagiskSU] Support `-g` and `-G` options
 - [MagiskSU] Support switching mount namespace to PID with `-t`
 - [MagiskPolicy] Fix patching extended permissions
-- [MagiskPolicy] Support more syntax for extended permissions
-- [MagiskPolicy] Support printing out the loaded sepolicy rules
-- [App] Support patching boot image from ROM zips
-- [App] Properly preserve `boot.img` when patching Samsung firmware with `init_boot.img`
+- [MagiskPolicy]支持更多扩展权限语法
+- [MagiskPolicy]支持打印加载的sepolicy规则
+- [应用程序]支持从ROM zip修补引导映像
+- [应用程序]妥善保存`boot.img`修补三星固件时`init_boot.img`
 
 ### v26.1
 
-- [App] Fix crashing when revoking root permissions
-- [MagiskInit] Always prefer `ext4` partitions over `f2fs` when selecting the pre-init partition
-- [General] Restore module files' context/owner/group from mirror. This is a regression introduced in v26.0
+- [应用程序]修正撤销根权限时崩溃的问题
+- [MagiskInit]总是喜欢`ext4`隔断`f2fs`选择预初始化分区时
+- [普遍的]从镜像恢复模块文件的上下文/所有者/组。这是在v26. 0中引入的回归
 
 ### v26.0
 
-- [General] Bump minimum supported Android version to Android 6.0
-- [General] New magic mount backend. It supports loading modules into system with `overlayfs` files injected
-- [Zygisk] Release new API version 4
-- [Zygisk] Prevent crashing daemon in error
+- [普遍的]Bump最小支持Android版本到Android 6.0
+- [普遍的]新魔术坐骑后端。它支持将模块加载到系统中`叠置`注入文件
+- [济吉斯克]发布新API版本4
+- [济吉斯克]防止守护进程出错
 - [Zygisk] Rewrite zygote code injection with new loader library approach
 - [Zygisk] Rewrite code unloading implementation
 - [MagiskBoot] Support amonet microloader devices
