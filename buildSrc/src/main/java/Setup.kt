@@ -144,6 +144,7 @@ abstract class AddCommentTask: DefaultTask() {
             SigningExtension(signingOptions).register(it)
             it.eocdComment = comment.get().toByteArray()
             it.get(IncrementalPackager.APP_METADATA_ENTRY_PATH)?.delete()
+            it.get(IncrementalPackager.VERSION_CONTROL_INFO_ENTRY_PATH)?.delete()
             it.get(JarFile.MANIFEST_NAME)?.delete()
         }
 
