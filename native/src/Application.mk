@@ -1,13 +1,12 @@
 APP_BUILD_SCRIPT := src/Android.mk
 APP_ABI          := armeabi-v7a arm64-v8a x86 x86_64
-APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto
-APP_LDFLAGS      := -flto -Wl,--icf=all
+APP_CFLAGS       := -Wall -Oz -fomit-frame-pointer -flto -D__BIONIC_NO_PAGE_SIZE_MACRO
+APP_LDFLAGS      := -flto -Wl,--icf=all -Wl,-z,max-page-size=16384
 APP_CPPFLAGS     := -std=c++23
 APP_STL          := none
 APP_PLATFORM     := android-23
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := none
-APP_SUPPORT_FLEXIBLE_PAGE_SIZES := true
 
 ifdef B_CRT0
 
