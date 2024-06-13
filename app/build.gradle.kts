@@ -27,7 +27,7 @@ android {
         versionName = Config.version
         versionCode = Config.versionCode
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64", "riscv64")
             debugSymbolLevel = "FULL"
         }
     }
