@@ -34,7 +34,7 @@ def header(str):
 
 
 def vprint(str):
-    if args.verbose:
+    if args.verbose > 0:
         print(str)
 
 
@@ -199,7 +199,7 @@ def load_config(args):
 
     config["outdir"].mkdir(mode=0o755, parents=True, exist_ok=True)
     global STDOUT
-    STDOUT = None if args.verbose else subprocess.DEVNULL
+    STDOUT = None if args.verbose > 0 else subprocess.DEVNULL
 
 
 def clean_elf():
@@ -229,9 +229,11 @@ def clean_elf():
     execv(args)
 
 
-def run_ndk_build(flags):
+def run_ndk_build(args, flags):
     os.chdir("native")
     flags = "NDK_PROJECT_PATH=. NDK_APPLICATION_MK=src/Application.mk " + flags
+    if args.verbose > 1:
+        flags = "V=1 " + flags
     proc = system(f"{ndk_build} {flags} -j{cpu_count}")
     if proc.returncode != 0:
         error("Build binary failed!")
@@ -268,8 +270,10 @@ def run_cargo_build(args):
     if args.release:
         cmds.append("-r")
         rust_out = "release"
-    if not args.verbose:
+    if args.verbose == 0:
         cmds.append("-q")
+    elif args.verbose > 1:
+        cmds.append("--verbose")
 
     cmds.append("--target")
     cmds.append("")
@@ -396,7 +400,7 @@ def build_binary(args):
         flag += " B_PROP=1"
 
     if flag:
-        run_ndk_build(flag)
+        run_ndk_build(args, flag)
 
     flag = ""
 
@@ -410,7 +414,7 @@ def build_binary(args):
 
     if flag:
         flag += " B_CRT0=1"
-        run_ndk_build(flag)
+        run_ndk_build(args, flag)
 
     if clean:
         clean_elf()
@@ -418,7 +422,7 @@ def build_binary(args):
     # BusyBox is built with different API level
 
     if "busybox" in args.target:
-        run_ndk_build("B_BB=1")
+        run_ndk_build(args, "B_BB=1")
 
 
 def find_jdk():
@@ -645,7 +649,10 @@ def setup_rustup(args):
     # Build rustup_wrapper
     wrapper_src = Path("tools", "rustup_wrapper")
     cargo_toml = wrapper_src / "Cargo.toml"
-    execv([cargo, "build", "--release", f"--manifest-path={cargo_toml}"])
+    execv(
+        [cargo, "build", "--release", f"--manifest-path={cargo_toml}"]
+        + (["--verbose"] if args.verbose > 1 else [])
+    )
 
     # Replace rustup with wrapper
     wrapper = wrapper_dir / (f"rustup{EXE_EXT}")
@@ -659,7 +666,7 @@ parser.set_defaults(func=lambda x: None)
 parser.add_argument(
     "-r", "--release", action="store_true", help="compile in release mode"
 )
-parser.add_argument("-v", "--verbose", action="store_true", help="verbose output")
+parser.add_argument("-v", "--verbose", action="count", default=0, help="verbose output")
 parser.add_argument(
     "-c",
     "--config",
