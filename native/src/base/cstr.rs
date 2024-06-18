@@ -4,7 +4,7 @@ use std::fmt::{Arguments, Debug, Display, Formatter, Write};
 use std::ops::{Deref, DerefMut};
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
-use std::str::{Utf8Chunks, Utf8Error};
+use std::str::Utf8Error;
 use std::{fmt, mem, slice, str};
 
 use cxx::{type_id, ExternType};
@@ -52,9 +52,8 @@ fn utf8_cstr_buf_append(buf: &mut dyn Utf8CStrBuf, s: &[u8]) -> usize {
 }
 
 fn utf8_cstr_append_lossy(buf: &mut dyn Utf8CStrWrite, s: &[u8]) -> usize {
-    let chunks = Utf8Chunks::new(s);
     let mut len = 0_usize;
-    for chunk in chunks {
+    for chunk in s.utf8_chunks() {
         len += buf.push_str(chunk.valid());
         if !chunk.invalid().is_empty() {
             len += buf.push_str(char::REPLACEMENT_CHARACTER.encode_utf8(&mut [0; 4]));
