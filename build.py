@@ -536,7 +536,10 @@ def setup_ndk(args):
     rm_rf(ondk_path)
     with urllib.request.urlopen(url) as response:
         with tarfile.open(mode="r|xz", fileobj=response) as tar:
-            tar.extractall(ndk_root)
+            if hasattr(tarfile, "data_filter"):
+                tar.extractall(ndk_root, filter="tar")
+            else:
+                tar.extractall(ndk_root)
 
     rm_rf(ndk_path)
     mv(ondk_path, ndk_path)
