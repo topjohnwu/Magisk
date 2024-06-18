@@ -33,7 +33,7 @@ fun PackageManager.createSuLog(
     context: String,
     gids: String,
 ): SuLog {
-    val appInfo = info.applicationInfo
+    val appInfo = info.applicationInfo!!
     return SuLog(
         fromUid = appInfo.uid,
         toUid = toUid,
