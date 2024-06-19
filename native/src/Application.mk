@@ -7,6 +7,7 @@ APP_STL          := none
 APP_PLATFORM     := android-23
 APP_THIN_ARCHIVE := true
 APP_STRIP_MODE   := none
+APP_SUPPORT_FLEXIBLE_PAGE_SIZES := true
 
 ifdef B_CRT0
 
