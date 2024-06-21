@@ -3,7 +3,7 @@
 emu="$ANDROID_SDK_ROOT/emulator/emulator"
 avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-emu_args_base='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -show-kernel'
+emu_args_base='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot'
 lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
 boot_timeout=600
 emu_pid=
@@ -99,8 +99,15 @@ test_emu() {
 
   print_title "* Testing $pkg ($variant)"
 
-  "$emu" @test $emu_args &
-  emu_pid=$!
+  if [ -n "$AVD_TEST_VERBOSE" ]; then
+    "$emu" @test $emu_args &
+    emu_pid=$!
+    adb logcat &
+  else
+    "$emu" @test $emu_args 2>/dev/null &
+    emu_pid=$!
+  fi
+
   wait_emu wait_for_boot
 
   adb shell 'PATH=$PATH:/debug_ramdisk magisk -v'
@@ -118,6 +125,9 @@ test_emu() {
   fi
 
   adb reboot
+  if [ -n "$AVD_TEST_VERBOSE" ]; then
+    adb logcat &
+  fi
   wait_emu wait_for_boot
 
   # Run app tests
@@ -177,17 +187,20 @@ run_test() {
     memory=8192
   fi
 
-  local emu_args="$emu_args_base -memory $memory"
+  emu_args="$emu_args_base -memory $memory"
+  if [ -n "$AVD_TEST_VERBOSE" ]; then
+    emu_args="$emu_args -show-kernel"
+  fi
 
   # Setup emulator
   "$sdk" --channel=3 $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
+  restore_backup $ramdisk
+  restore_backup $features
 
   # Launch stock emulator
   print_title "* Launching $pkg"
-  restore_backup $ramdisk
-  restore_backup $features
-  "$emu" @test $emu_args &
+  "$emu" @test $emu_args 2>/dev/null &
   emu_pid=$!
   wait_emu wait_for_bootanim
 

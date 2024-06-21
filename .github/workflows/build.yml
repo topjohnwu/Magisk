@@ -118,6 +118,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: AVD test
+        env:
+          AVD_TEST_VERBOSE: 1
         run: scripts/avd_test.sh ${{ matrix.version }} ${{ matrix.type }}
 
   test-32:
@@ -155,4 +157,5 @@ jobs:
       - name: AVD test
         env:
           FORCE_32_BIT: 1
+          AVD_TEST_VERBOSE: 1
         run: scripts/avd_test.sh ${{ matrix.version }}
