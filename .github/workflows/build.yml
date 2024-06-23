@@ -93,8 +93,6 @@ jobs:
         include:
           - version: 35
             type: "google_apis"
-          - version: "VanillaIceCream"
-            type: "google_apis_ps16k"
 
     steps:
       - name: Check out
