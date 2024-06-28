@@ -23,13 +23,13 @@ import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.reboot
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
+import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.inputStream
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
-import com.topjohnwu.superuser.internal.NOPList
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.nio.ExtendedFile
 import com.topjohnwu.superuser.nio.FileSystemManager
@@ -51,8 +51,8 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
 abstract class MagiskInstallImpl protected constructor(
-    protected val console: MutableList<String> = NOPList.getInstance(),
-    private val logs: MutableList<String> = NOPList.getInstance()
+    protected val console: MutableList<String>,
+    private val logs: MutableList<String>
 ) {
 
     protected lateinit var installDir: ExtendedFile
@@ -625,7 +625,7 @@ abstract class MagiskInstaller(
         }
     }
 
-    class FixEnv(private val callback: () -> Unit) : MagiskInstallImpl() {
+    class FixEnv(private val callback: () -> Unit) : MagiskInstallImpl(DummyList, DummyList) {
         override suspend fun operations() = fixEnv()
 
         override suspend fun exec(): Boolean {

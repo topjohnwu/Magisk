@@ -68,11 +68,12 @@ open class App() : Application() {
         ServiceLocator.context = base
         app.registerActivityLifecycleCallbacks(ActivityTracker)
 
-        Shell.setDefaultBuilder(Shell.Builder.create()
+        val shellBuilder = Shell.Builder.create()
             .setFlags(Shell.FLAG_MOUNT_MASTER)
             .setInitializers(ShellInit::class.java)
             .setContext(base)
-            .setTimeout(2))
+            .setTimeout(2)
+        Shell.setDefaultBuilder(shellBuilder)
         Shell.EXECUTOR = Dispatchers.IO.asExecutor()
         RootUtils.bindTask = RootService.bindOrTask(
             intent<RootUtils>(),

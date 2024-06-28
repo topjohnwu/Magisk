@@ -6,38 +6,48 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.internal.NOPList
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 object TestHandler {
 
+    object LogList : CallbackList<String>(Runnable::run) {
+        override fun onAddElement(e: String) {
+            Timber.i(e)
+        }
+    }
+
     fun run(method: String): Bundle {
-        val r = Bundle()
+        var reason: String? = null
+
+        fun prerequisite(): Boolean {
+            // Make sure the Magisk app can get root
+            val shell = Shell.getShell()
+            if (!shell.isRoot) {
+                reason = "shell not root"
+                return false
+            }
+
+            // Make sure the root service is running
+            RootUtils.Connection.await()
+            return true
+        }
 
         fun setup(): Boolean {
-            val nop = NOPList.getInstance()
             return runBlocking {
-                MagiskInstaller.Emulator(nop, nop).exec()
+                MagiskInstaller.Emulator(LogList, LogList).exec()
             }
         }
 
         fun test(): Boolean {
             // Make sure Zygisk works correctly
             if (!Info.isZygiskEnabled) {
-                r.putString("reason", "zygisk not enabled")
+                reason = "zygisk not enabled"
                 return false
             }
-
-            // Make sure the Magisk app can get root
-            val shell = Shell.getShell()
-            if (!shell.isRoot) {
-                r.putString("reason", "shell not root")
-                return false
-            }
-
-            // Make sure the root service is running
-            RootUtils.Connection.await()
 
             // Clear existing grant for ADB shell
             runBlocking {
@@ -48,21 +58,23 @@ object TestHandler {
             return true
         }
 
-        val b = runCatching {
+        val result = prerequisite() && runCatching {
             when (method) {
                 "setup" -> setup()
                 "test" -> test()
                 else -> {
-                    r.putString("reason", "unknown method")
+                    reason = "unknown method"
                     false
                 }
             }
         }.getOrElse {
-            r.putString("reason", it.stackTraceToString())
+            reason = it.stackTraceToString()
             false
         }
 
-        r.putBoolean("result", b)
-        return r
+        return Bundle().apply {
+            putBoolean("result", result)
+            if (reason != null) putString("reason", reason)
+        }
     }
 }
