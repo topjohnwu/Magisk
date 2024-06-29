@@ -125,6 +125,10 @@ abstract class ManifestUpdater: DefaultTask() {
             |        <action android:name="android.intent.action.MAIN" />
             |        <category android:name="android.intent.category.LAUNCHER" />
             |    </intent-filter>
+            |    <intent-filter>
+            |        <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+            |        <category android:name="android.intent.category.DEFAULT" />
+            |    </intent-filter>
             |</activity>""".ind(2)
         )
 
