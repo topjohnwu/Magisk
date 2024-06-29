@@ -55,8 +55,8 @@ if is_windows:
 if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
-if "ANDROID_SDK_ROOT" not in os.environ:
-    error("Please set Android SDK path to environment variable ANDROID_SDK_ROOT!")
+if "ANDROID_HOME" not in os.environ:
+    error("Please set Android SDK path to environment variable ANDROID_HOME!")
 
 if shutil.which("sccache") is not None:
     os.environ["RUSTC_WRAPPER"] = "sccache"
@@ -79,7 +79,7 @@ default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybo
 support_targets = default_targets + ["resetprop"]
 rust_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 
-sdk_path = Path(os.environ["ANDROID_SDK_ROOT"])
+sdk_path = Path(os.environ["ANDROID_HOME"])
 ndk_root = sdk_path / "ndk"
 ndk_path = ndk_root / "magisk"
 ndk_build = ndk_path / "ndk-build"
