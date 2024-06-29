@@ -92,7 +92,7 @@
 
     <!--MagiskHide-->
     <string name="show_system_app">Mostrar apps do sistema</string>
-    <string name="show_os_app">Mostrar apps do sistema operacional</string>
+    <string name="show_os_app">Mostrar apps do SO</string>
     <string name="hide_filter_hint">Filtrar pelo nome</string>
     <string name="hide_search">Pesquisar</string>
 
