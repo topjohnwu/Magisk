@@ -16,7 +16,7 @@ gradlePlugin {
 }
 
 dependencies {
-    implementation(embeddedKotlin("gradle-plugin"))
+    implementation(kotlin("gradle-plugin", "2.0.0"))
     implementation("com.android.tools.build:gradle:8.5.0")
     implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7")
     implementation("org.lsposed.lsparanoid:gradle-plugin:0.5.2")
