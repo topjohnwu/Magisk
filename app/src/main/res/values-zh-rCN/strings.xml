@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">重启到 Bootloader</string>
     <string name="reboot_download">重启到 Download</string>
     <string name="reboot_edl">重启到 EDL</string>
+    <string name="reboot_safe_mode">安全模式</string>
     <string name="module_version_author">%1$s，作者 %2$s</string>
     <string name="module_state_remove">移除</string>
     <string name="module_state_restore">还原</string>
