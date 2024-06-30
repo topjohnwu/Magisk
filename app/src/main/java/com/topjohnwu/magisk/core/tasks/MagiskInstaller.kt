@@ -124,7 +124,7 @@ abstract class MagiskInstallImpl protected constructor(
             if (isRunningAsStub) {
                 ZipFile.builder().setFile(StubApk.current(context)).get().use { zf ->
                     zf.entries.asSequence().filter {
-                        !it.isDirectory && it.name.startsWith("/lib/${Const.CPU_ABI}/")
+                        !it.isDirectory && it.name.startsWith("lib/${Const.CPU_ABI}/")
                     }.forEach {
                         val n = it.name.substring(it.name.lastIndexOf('/') + 1)
                         val name = n.substring(3, n.length - 3)
