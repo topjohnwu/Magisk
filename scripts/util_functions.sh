@@ -385,6 +385,9 @@ find_boot_image() {
   else
     BOOTIMAGE=$(find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg init_boot boot lnx boot_a)
   fi
+  if [ "$BOOTIMAGE" = "init_boot$SLOT" ]; then
+    uname -r | grep -q "android12-" && BOOTIMAGE="boot$SLOT"
+  fi
   if [ -z $BOOTIMAGE ]; then
     # Lets see what fstabs tells me
     BOOTIMAGE=$(grep -v '#' /etc/*fstab* | grep -E '/boot(img)?[^a-zA-Z]' | grep -oE '/dev/[a-zA-Z0-9_./-]*' | head -n 1)
