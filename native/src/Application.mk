@@ -21,6 +21,7 @@ endif
 # Busybox should use a newer libc.a
 ifdef B_BB
 APP_PLATFORM     := android-26
+APP_CFLAGS       += -fno-stack-protector
 ifeq ($(OS),Windows_NT)
 APP_SHORT_COMMANDS := true
 endif
