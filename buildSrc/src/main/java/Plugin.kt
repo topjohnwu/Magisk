@@ -1,4 +1,3 @@
-
 import org.eclipse.jgit.internal.storage.file.FileRepository
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -26,7 +25,6 @@ class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
 
     private fun Project.applyPlugin() {
-        initRandom(rootProject.file("dict.txt"))
         props.clear()
         rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by this
@@ -37,5 +35,6 @@ class MagiskPlugin : Plugin<Project> {
         val repo = FileRepository(rootProject.file(".git"))
         val refId = repo.refDatabase.exactRef("HEAD").objectId
         commitHash = repo.newObjectReader().abbreviate(refId, 8).name()
+        initRandom(refId.name.toByteArray(), rootProject.file("dict.txt"))
     }
 }
