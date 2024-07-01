@@ -85,7 +85,7 @@ class AXML(b: ByteArray) {
         baos.align()
 
         val sizeDiff = baos.size() - start - size
-        val newBuffer = ByteBuffer.wrap(baos.buf).order(LITTLE_ENDIAN)
+        val newBuffer = ByteBuffer.wrap(baos.buffer).order(LITTLE_ENDIAN)
 
         // Patch XML size
         newBuffer.putInt(CHUNK_SIZE_OFF, buffer.getInt(CHUNK_SIZE_OFF) + sizeDiff)
@@ -111,7 +111,7 @@ class AXML(b: ByteArray) {
     }
 
     private class RawByteStream : ByteArrayOutputStream() {
-        val buf: ByteArray get() = buf
+        val buffer: ByteArray get() = buf
 
         fun align(alignment: Int = 4) {
             val newCount = (count + alignment - 1) / alignment * alignment
