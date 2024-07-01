@@ -146,7 +146,7 @@ void dyn_img_hdr::load_hdr_file() {
     });
 }
 
-boot_img::boot_img(const char *image) : map(image) {
+boot_img::boot_img(const char *image, bool accept_vendor) : map(image) {
     fprintf(stderr, "Parsing boot image: [%s]\n", image);
     for (const uint8_t *addr = map.buf(); addr < map.buf() + map.sz(); ++addr) {
         format_t fmt = check_fmt(addr, map.sz());
@@ -167,11 +167,11 @@ boot_img::boot_img(const char *image) : map(image) {
             fprintf(stderr, "TEGRA_BLOB\n");
             addr += sizeof(blob_hdr) - 1;
             break;
-        case AOSP:
         case AOSP_VENDOR:
+            if (!accept_vendor) exit(1);
+        case AOSP:
             if (parse_image(addr, fmt))
                 return;
-            // fallthrough
         default:
             break;
         }
@@ -395,11 +395,11 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
     get_block(extra);
     get_block(recovery_dtbo);
     get_block(dtb);
+    get_block(vendor_ramdisk_table);
+    get_block(bootconfig);
 
     auto ignore_addr = base_addr + off;
     get_ignore(signature)
-    get_ignore(vendor_ramdisk_table)
-    get_ignore(bootconfig)
 
     payload = byte_view(base_addr, off);
     auto tail_addr = base_addr + off;
@@ -457,15 +457,24 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
         }
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
+
     if (auto size = hdr->ramdisk_size()) {
         if (hdr->is_vendor() && hdr->header_version() >= 4) {
-            // v4 vendor boot contains multiple ramdisks
-            // Do not try to mess with it for now
-            r_fmt = UNKNOWN;
+            for (int i = 0; i < hdr->vendor_ramdisk_table_entry_num(); ++i) {
+                auto &[entry, fmt] = ramdisk_table_entries.emplace_back(make_unique<vendor_ramdisk_table_entry_v4>(), UNKNOWN);
+                memcpy(entry.get(),
+                       vendor_ramdisk_table + (i * hdr->vendor_ramdisk_table_entry_size()),
+                       hdr->vendor_ramdisk_table_entry_size());
+                fmt = check_fmt_lg(ramdisk + entry->ramdisk_offset, entry->ramdisk_size);
+            }
         } else {
-            r_fmt = check_fmt_lg(ramdisk, size);
+            auto &[entry, fmt] = ramdisk_table_entries.emplace_back(make_unique<vendor_ramdisk_table_entry_v4>(), UNKNOWN);
+            entry->ramdisk_size = hdr->ramdisk_size();
+            entry->ramdisk_offset = 0;
+            entry->ramdisk_name[0] = '\0';
+            fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
         }
-        if (r_fmt == MTK) {
+        if (auto &[entry, fmt] = ramdisk_table_entries.front(); fmt == MTK) {
             fprintf(stderr, "MTK_RAMDISK_HDR\n");
             flags[MTK_RAMDISK] = true;
             r_hdr = reinterpret_cast<const mtk_hdr *>(ramdisk);
@@ -473,9 +482,14 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
             ramdisk += sizeof(mtk_hdr);
             hdr->ramdisk_size() -= sizeof(mtk_hdr);
-            r_fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
+            fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
         }
-        fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
+        for (const auto&[entry, fmt]: ramdisk_table_entries) {
+            char s[45] = {"RAMDISK_FMT"};
+            if (entry->ramdisk_name[0] != '\0')
+                ssprintf(s, sizeof(s), "RAMDISK_FMT_%.*s", VENDOR_RAMDISK_NAME_SIZE, entry->ramdisk_name);
+            fprintf(stderr, "%-*s [%s]\n", PADDING, s, fmt2name[fmt]);
+        }
     }
     if (auto size = hdr->extra_size()) {
         e_fmt = check_fmt_lg(extra, size);
@@ -540,8 +554,8 @@ int split_image_dtb(const char *filename, bool skip_decomp) {
     }
 }
 
-int unpack(const char *image, bool skip_decomp, bool hdr) {
-    const boot_img boot(image);
+int unpack(const char *image, bool skip_decomp, bool hdr, bool vendor) {
+    const boot_img boot(image, vendor);
 
     if (hdr)
         boot.hdr->dump_hdr_file();
@@ -561,14 +575,23 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     dump(boot.kernel_dtb.buf(), boot.kernel_dtb.sz(), KER_DTB_FILE);
 
     // Dump ramdisk
-    if (!skip_decomp && COMPRESSED(boot.r_fmt)) {
-        if (boot.hdr->ramdisk_size() != 0) {
-            int fd = creat(RAMDISK_FILE, 0644);
-            decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
-            close(fd);
+    for (const auto& [entry, fmt]: boot.ramdisk_table_entries) {
+        // change file name only for vendor_boot v4 to keep backwards compatibility with scripts etc.
+        char file_name[PATH_MAX] = {RAMDISK_FILE};
+        if (boot.hdr->header_version() == 4 && boot.hdr->is_vendor()) {
+            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, VENDOR_RAMDISK_NAME_SIZE, entry->ramdisk_name);
         }
-    } else {
-        dump(boot.ramdisk, boot.hdr->ramdisk_size(), RAMDISK_FILE);
+
+        if (!skip_decomp && COMPRESSED(fmt)) {
+            int fd = creat(file_name, 0644);
+            decompress(fmt,
+                       fd,
+                       boot.ramdisk + entry->ramdisk_offset,
+                       entry->ramdisk_size);
+            close(fd);
+        } else {
+            dump(boot.ramdisk + entry->ramdisk_offset, entry->ramdisk_size, file_name);
+        }
     }
 
     // Dump second
@@ -591,6 +614,9 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     // Dump dtb
     dump(boot.dtb, boot.hdr->dtb_size(), DTB_FILE);
 
+    // Dump bootconfig
+    dump(boot.bootconfig, boot.hdr->bootconfig_size(), BOOTCONFIG_FILE);
+
     return boot.flags[CHROMEOS_FLAG] ? 2 : 0;
 }
 
@@ -600,7 +626,7 @@ write_zero(fd, align_padding(lseek(fd, 0, SEEK_CUR) - off.header, page_size))
 #define file_align() file_align_with(boot.hdr->page_size())
 
 void repack(const char *src_img, const char *out_img, bool skip_comp) {
-    const boot_img boot(src_img);
+    const boot_img boot(src_img, true);
     fprintf(stderr, "Repack to boot image: [%s]\n", out_img);
 
     struct {
@@ -610,6 +636,8 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         uint32_t second;
         uint32_t extra;
         uint32_t dtb;
+        uint32_t vendor_ramdisk_table;
+        uint32_t bootconfig;
         uint32_t total;
         uint32_t vbmeta;
     } off{};
@@ -620,6 +648,17 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     hdr->ramdisk_size() = 0;
     hdr->second_size() = 0;
     hdr->dtb_size() = 0;
+    hdr->bootconfig_size() = 0;
+    hdr->vendor_ramdisk_table_size() = 0;
+    hdr->vendor_ramdisk_table_entry_num() = 0;
+
+    std::vector<std::tuple<std::unique_ptr<vendor_ramdisk_table_entry_v4>, format_t>> new_ramdisk_table_entries;
+    for (const auto &[entry, fmt] : boot.ramdisk_table_entries) {
+        auto &[new_entry, new_fmt] = new_ramdisk_table_entries.emplace_back(make_unique<vendor_ramdisk_table_entry_v4>(), fmt);
+        memcpy(new_entry.get(),
+               entry.get(),
+               hdr->vendor_ramdisk_table_entry_size());
+    }
 
     if (access(HEADER_FILE, R_OK) == 0)
         hdr->load_hdr_file();
@@ -699,27 +738,40 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 
     // ramdisk
     off.ramdisk = lseek(fd, 0, SEEK_CUR);
+    if (!hdr->is_vendor() && hdr->header_version() == 4 && boot.ramdisk_table_entries.empty() && access(RAMDISK_FILE, R_OK) == 0) {
+        // Add a ramdisk table entry for v4 GKI boot images with an initially empty ramdisk section
+        new_ramdisk_table_entries.emplace_back(make_unique<vendor_ramdisk_table_entry_v4>(), LZ4_LEGACY);
+    }
     if (boot.flags[MTK_RAMDISK]) {
         // Copy MTK headers
         xwrite(fd, boot.r_hdr, sizeof(mtk_hdr));
     }
-    if (access(RAMDISK_FILE, R_OK) == 0) {
-        mmap_data m(RAMDISK_FILE);
-        auto r_fmt = boot.r_fmt;
-        if (!skip_comp && !hdr->is_vendor() && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
-            // A v4 boot image ramdisk will have to be merged with other vendor ramdisks,
-            // and they have to use the exact same compression method. v4 GKIs are required to
-            // use lz4 (legacy), so hardcode the format here.
-            fprintf(stderr, "RAMDISK_FMT: [%s] -> [%s]\n", fmt2name[r_fmt], fmt2name[LZ4_LEGACY]);
-            r_fmt = LZ4_LEGACY;
+    for (const auto &[entry, fmt] : new_ramdisk_table_entries) {
+        char file_name[PATH_MAX] = {RAMDISK_FILE};
+        if (boot.hdr->header_version() == 4 && boot.hdr->is_vendor())
+            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, VENDOR_RAMDISK_NAME_SIZE, entry->ramdisk_name);
+
+        if (access(file_name, R_OK) == 0) {
+            mmap_data m(file_name);
+            auto r_fmt = fmt;
+            if (!skip_comp && !hdr->is_vendor() && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
+                // A v4 boot image ramdisk will have to be merged with other vendor ramdisks,
+                // and they have to use the exact same compression method. v4 GKIs are required to
+                // use lz4 (legacy), so hardcode the format here.
+                fprintf(stderr, "RAMDISK_FMT: [%s] -> [%s]\n", fmt2name[r_fmt], fmt2name[LZ4_LEGACY]);
+                r_fmt = LZ4_LEGACY;
+            }
+            if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(r_fmt)) {
+                entry->ramdisk_size = compress(r_fmt, fd, m.buf(), m.sz());
+            } else {
+                entry->ramdisk_size = xwrite(fd, m.buf(), m.sz());
+            }
+            entry->ramdisk_offset = hdr->ramdisk_size();
+            hdr->ramdisk_size() += entry->ramdisk_size;
         }
-        if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(r_fmt)) {
-            hdr->ramdisk_size() = compress(r_fmt, fd, m.buf(), m.sz());
-        } else {
-            hdr->ramdisk_size() = xwrite(fd, m.buf(), m.sz());
-        }
-        file_align();
     }
+    if (hdr->ramdisk_size())
+        file_align();
 
     // second
     off.second = lseek(fd, 0, SEEK_CUR);
@@ -751,6 +803,21 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     off.dtb = lseek(fd, 0, SEEK_CUR);
     if (access(DTB_FILE, R_OK) == 0) {
         hdr->dtb_size() = restore(fd, DTB_FILE);
+        file_align();
+    }
+
+    off.vendor_ramdisk_table = lseek(fd, 0, SEEK_CUR);
+    if (hdr->is_vendor() && hdr->header_version() >= 4) {
+        for (const auto &[entry, fmt] : new_ramdisk_table_entries) {
+            hdr->vendor_ramdisk_table_size() += xwrite(fd, entry.get(), hdr->vendor_ramdisk_table_entry_size());
+            hdr->vendor_ramdisk_table_entry_num()++;
+        }
+        file_align();
+    }
+
+    off.bootconfig = lseek(fd, 0, SEEK_CUR);
+    if (access(BOOTCONFIG_FILE, R_OK) == 0) {
+        hdr->bootconfig_size() = restore(fd, BOOTCONFIG_FILE);
         file_align();
     }
 
@@ -895,7 +962,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
 }
 
 int verify(const char *image, const char *cert) {
-    const boot_img boot(image);
+    const boot_img boot(image, true);
     if (cert == nullptr) {
         // Boot image parsing already checks if the image is signed
         return boot.flags[AVB1_SIGNED_FLAG] ? 0 : 1;
@@ -906,7 +973,7 @@ int verify(const char *image, const char *cert) {
 }
 
 int sign(const char *image, const char *name, const char *cert, const char *key) {
-    const boot_img boot(image);
+    const boot_img boot(image, true);
     auto sig = rust::sign_boot_image(boot.payload, name, cert, key);
     if (sig.empty())
         return 1;

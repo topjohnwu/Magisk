@@ -1,3 +1,4 @@
+#include <fnmatch.h>
 #include <base.hpp>
 
 #include "boot-rs.hpp"
@@ -24,7 +25,7 @@ R"EOF(MagiskBoot - Boot Image Modification Tool
 Usage: %s <action> [args...]
 
 Supported actions:
-  unpack [-n] [-h] <bootimg>
+  unpack [-n] [-h] [--vendor] <bootimg>
     Unpack <bootimg> to its individual components, each component to
     a file with its corresponding file name in the current directory.
     Supported components: kernel, kernel_dtb, ramdisk.cpio, second,
@@ -35,6 +36,8 @@ Supported actions:
     If '-h' is provided, the boot image header information will be
     dumped to the file 'header', which can be used to modify header
     configurations during repacking.
+    If '--vendor' is provided, magiskboot will accept vendor boot images.
+    Otherwise, vendor boot images will be rejected.
     Return values:
     0:valid    1:error    2:chromeos
 
@@ -142,6 +145,14 @@ int main(int argc, char *argv[]) {
         unlink(EXTRA_FILE);
         unlink(RECV_DTBO_FILE);
         unlink(DTB_FILE);
+        unlink(BOOTCONFIG_FILE);
+        char file_name[sizeof(VENDOR_RAMDISK_FILE)];
+        ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, 2, "*");
+        sDIR d = xopen_dir(".");
+        while (struct dirent *dir = xreaddir(d.get())) {
+            if (dir->d_type == DT_REG && !fnmatch(file_name, dir->d_name, 0))
+                unlink(dir->d_name);
+        }
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[20];
         {
@@ -163,22 +174,27 @@ int main(int argc, char *argv[]) {
         int idx = 2;
         bool nodecomp = false;
         bool hdr = false;
+        bool vendor = false;
         for (;;) {
             if (idx >= argc)
                 usage(argv[0]);
             if (argv[idx][0] != '-')
                 break;
             for (char *flag = &argv[idx][1]; *flag; ++flag) {
-                if (*flag == 'n')
+                if (*flag == 'n') {
                     nodecomp = true;
-                else if (*flag == 'h')
+                } else if (*flag == 'h') {
                     hdr = true;
-                else
+                } else if (flag == "-vendor"sv) {
+                    vendor = true;
+                    break;
+                } else {
                     usage(argv[0]);
+                }
             }
             ++idx;
         }
-        return unpack(argv[idx], nodecomp, hdr);
+        return unpack(argv[idx], nodecomp, hdr, vendor);
     } else if (argc > 2 && action == "repack") {
         if (argv[2] == "-n"sv) {
             if (argc == 3)
