@@ -8,6 +8,7 @@ import androidx.annotation.WorkerThread
 import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.AppApkPath
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Provider
@@ -192,7 +193,7 @@ object HideAPK {
         }
 
         Config.suManager = pkg
-        val cmd = "adb_pm_install $repack $pkg"
+        val cmd = "touch $AppApkPath; adb_pm_install $repack $pkg"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
@@ -241,7 +242,7 @@ object HideAPK {
             dialog.dismiss()
         }
         Config.suManager = ""
-        val cmd = "adb_pm_install $apk $APPLICATION_ID"
+        val cmd = "touch $AppApkPath; adb_pm_install $apk $APPLICATION_ID"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {

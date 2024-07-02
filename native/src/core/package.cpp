@@ -15,30 +15,20 @@ using rust::Vec;
 
 static pthread_mutex_t pkg_lock = PTHREAD_MUTEX_INITIALIZER;
 // pkg_lock protects all following variables
-static int mgr_app_id = -1;
-static bool skip_mgr_check;
-static timespec *app_ts;
-static string *mgr_pkg;
-static Vec<uint8_t> *mgr_cert;
 static int stub_apk_fd = -1;
-static const Vec<uint8_t> *default_cert;
+static int repackaged_app_id = -1; // Only used by dyn
+static string repackaged_pkg;
+static Vec<uint8_t> repackaged_cert;
+static Vec<uint8_t> trusted_cert;
+static map<int, pair<string, time_t>> user_to_check;
+enum status {
+    INSTALLED,
+    NO_INSTALLED,
+    CERT_MISMATCH,
+};
 
 static bool operator==(const Vec<uint8_t> &a, const Vec<uint8_t> &b) {
     return a.size() == b.size() && memcmp(a.data(), b.data(), a.size()) == 0;
-}
-
-void check_pkg_refresh() {
-    mutex_guard g(pkg_lock);
-    if (app_ts == nullptr)
-        default_new(app_ts);
-    if (struct stat st{}; stat("/data/app", &st) == 0) {
-        if (memcmp(app_ts, &st.st_mtim, sizeof(timespec)) == 0) {
-            return;
-        }
-        memcpy(app_ts, &st.st_mtim, sizeof(timespec));
-    }
-    skip_mgr_check = false;
-    skip_pkg_rescan.clear();
 }
 
 // app_id = app_no + AID_APP_START
@@ -78,9 +68,7 @@ void preserve_stub_apk() {
     string stub_path = get_magisk_tmp() + "/stub.apk"s;
     stub_apk_fd = xopen(stub_path.data(), O_RDONLY | O_CLOEXEC);
     unlink(stub_path.data());
-    auto cert = read_certificate(stub_apk_fd, -1);
-    if (!cert.empty())
-        default_cert = new Vec(std::move(cert));
+    trusted_cert = read_certificate(stub_apk_fd, MAGISK_VER_CODE);
     lseek(stub_apk_fd, 0, SEEK_SET);
 }
 
@@ -97,194 +85,174 @@ static void install_stub() {
     install_apk(apk);
 }
 
-int get_manager(int user_id, string *pkg, bool install) {
+static status check_dyn(int user, string &pkg) {
+    struct stat st{};
+    char apk[PATH_MAX];
+    ssprintf(apk, sizeof(apk),
+             "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, user, pkg.data());
+    int dyn = open(apk, O_RDONLY | O_CLOEXEC);
+    if (dyn < 0) {
+        LOGW("pkg: no dyn APK, ignore\n");
+        return NO_INSTALLED;
+    }
+    auto cert = read_certificate(dyn, MAGISK_VER_CODE);
+    fstat(dyn, &st);
+    close(dyn);
+
+    if (cert.empty() || cert != trusted_cert) {
+        LOGE("pkg: dyn APK signature mismatch: %s\n", apk);
+#if ENFORCE_SIGNATURE
+        clear_pkg(pkg.data(), user);
+        return CERT_MISMATCH;
+#endif
+    }
+
+    repackaged_app_id = to_app_id(st.st_uid);
+    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+    return INSTALLED;
+}
+
+static status check_stub(int user, string &pkg) {
+    struct stat st{};
+    byte_array<PATH_MAX> buf;
+    find_apk_path(pkg, buf);
+    string apk((const char *) buf.buf(), buf.sz());
+    int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+    if (fd < 0)
+        return NO_INSTALLED;
+    auto cert = read_certificate(fd, -1);
+    fstat(fd, &st);
+    close(fd);
+
+    if (cert.empty() || (pkg == repackaged_pkg && cert != repackaged_cert)) {
+        LOGE("pkg: repackaged APK signature invalid: %s\n", apk.data());
+        uninstall_pkg(pkg.data());
+        return CERT_MISMATCH;
+    }
+
+    repackaged_pkg.swap(pkg);
+    repackaged_cert.swap(cert);
+    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+
+    return INSTALLED;
+}
+
+static status check_orig(int user) {
+    struct stat st{};
+    byte_array<PATH_MAX> buf;
+    find_apk_path(JAVA_PACKAGE_NAME, buf);
+    string apk((const char *) buf.buf(), buf.sz());
+    int fd = xopen(apk.data(), O_RDONLY | O_CLOEXEC);
+    if (fd < 0)
+        return NO_INSTALLED;
+    auto cert = read_certificate(fd, MAGISK_VER_CODE);
+    fstat(fd, &st);
+    close(fd);
+
+    if (cert.empty() || cert != trusted_cert) {
+        LOGE("pkg: APK signature mismatch: %s\n", apk.data());
+#if ENFORCE_SIGNATURE
+        uninstall_pkg(JAVA_PACKAGE_NAME);
+        return CERT_MISMATCH;
+#endif
+    }
+
+    user_to_check[user] = make_pair(apk, st.st_ctim.tv_sec);
+    return INSTALLED;
+}
+
+static int get_pkg_uid(int user, const char *pkg) {
+    char path[PATH_MAX];
+    struct stat st{};
+    ssprintf(path, sizeof(path), "%s/%d/%s", APP_DATA_DIR, user, pkg);
+    if (stat(path, &st) == 0) {
+        return st.st_uid;
+    }
+    return -1;
+}
+
+int get_manager(int user, string *pkg, bool install) {
     mutex_guard g(pkg_lock);
 
-    char app_path[128];
     struct stat st{};
-    if (mgr_pkg == nullptr)
-        default_new(mgr_pkg);
-    if (mgr_cert == nullptr)
-        default_new(mgr_cert);
-
-    auto check_dyn = [&](int u) -> bool {
-#if ENFORCE_SIGNATURE
-        ssprintf(app_path, sizeof(app_path),
-            "%s/%d/%s/dyn/current.apk", APP_DATA_DIR, u, mgr_pkg->data());
-        int dyn = open(app_path, O_RDONLY | O_CLOEXEC);
-        if (dyn < 0) {
-            LOGW("pkg: no dyn APK, ignore\n");
-            return false;
+    const auto &[path, time] = user_to_check[user];
+    if (stat(path.data(), &st) == 0 && st.st_ctim.tv_sec == time) {
+        // no APK
+        if (path == "/data/system/packages.xml") {
+            if (install) install_stub();
+            if (pkg) pkg->clear();
+            return -1;
         }
-        auto cert = read_certificate(dyn, MAGISK_VER_CODE);
-        bool mismatch = default_cert && cert != *default_cert;
-        close(dyn);
-        if (mismatch) {
-            LOGE("pkg: dyn APK signature mismatch: %s\n", app_path);
-            clear_pkg(mgr_pkg->data(), u);
-            return false;
+        // dyn APK is still the same
+        if (path.starts_with(APP_DATA_DIR)) {
+            if (pkg) *pkg = repackaged_pkg;
+            return user * AID_USER_OFFSET + repackaged_app_id;
         }
-#endif
-        return true;
-    };
-
-    if (skip_mgr_check) {
-        if (mgr_app_id >= 0) {
-            // Just need to check whether the app is installed in the user
-            const char *name = mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data();
-            ssprintf(app_path, sizeof(app_path), "%s/%d/%s", APP_DATA_DIR, user_id, name);
-            if (access(app_path, F_OK) == 0) {
-                // Always check dyn signature for repackaged app
-                if (!mgr_pkg->empty() && !check_dyn(user_id))
-                    goto ignore;
-                if (pkg) *pkg = name;
-                return user_id * AID_USER_OFFSET + mgr_app_id;
+        // stub APK is still the same
+        if (!repackaged_pkg.empty()) {
+            if (check_dyn(user, repackaged_pkg) == INSTALLED) {
+                if (pkg) *pkg = repackaged_pkg;
+                return user * AID_USER_OFFSET + repackaged_app_id;
             } else {
-                goto not_found;
+                if (pkg) pkg->clear();
+                return -1;
             }
         }
-    } else {
-        // Here, we want to actually find the manager app and cache the results.
-        // This means that we check all users, not just the requested user.
-        // Certificates are also verified to prevent manipulation.
-
-        skip_mgr_check = true;
-
-        db_strings str;
-        get_db_strings(str, SU_MANAGER);
-
-        vector<int> users;
-        bool collected = false;
-
-        auto collect_users = [&] {
-            if (collected)
-                return;
-            collected = true;
-            auto data_dir = xopen_dir(APP_DATA_DIR);
-            if (!data_dir)
-                return;
-            dirent *entry;
-            while ((entry = xreaddir(data_dir.get()))) {
-                // Only collect users not requested as we've already checked it
-                if (int u = parse_int(entry->d_name); u >= 0 && u != user_id)
-                    users.push_back(parse_int(entry->d_name));
-            }
-        };
-
-        if (!str[SU_MANAGER].empty()) {
-            // Check the repackaged package name
-
-            bool invalid = false;
-            auto check_stub_apk = [&](int u) -> bool {
-                ssprintf(app_path, sizeof(app_path),
-                         "%s/%d/%s", APP_DATA_DIR, u, str[SU_MANAGER].data());
-                if (stat(app_path, &st) == 0) {
-                    int app_id = to_app_id(st.st_uid);
-
-                    byte_array<PATH_MAX> apk;
-                    find_apk_path(str[SU_MANAGER], apk);
-                    int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
-                    auto cert = read_certificate(fd, -1);
-                    close(fd);
-
-                    // Verify validity
-                    if (str[SU_MANAGER] == *mgr_pkg) {
-                        if (app_id != mgr_app_id || cert.empty() || cert != *mgr_cert) {
-                            // app ID or cert should never change
-                            LOGE("pkg: repackaged APK signature invalid: %s\n", apk.buf());
-                            uninstall_pkg(mgr_pkg->data());
-                            invalid = true;
-                            install = true;
-                            return false;
-                        }
-                    }
-
-                    mgr_pkg->swap(str[SU_MANAGER]);
-                    mgr_app_id = app_id;
-                    mgr_cert->swap(cert);
-                    return true;
-                }
-                return false;
-            };
-
-            if (check_stub_apk(user_id)) {
-                if (!check_dyn(user_id))
-                    goto ignore;
-                if (pkg) *pkg = *mgr_pkg;
-                return st.st_uid;
-            }
-            if (!invalid) {
-                collect_users();
-                for (int u : users) {
-                    if (check_stub_apk(u)) {
-                        // Found repackaged app, but not installed in the requested user
-                        goto not_found;
-                    }
-                    if (invalid)
-                        break;
-                }
-            }
-
-            // Repackaged app not found, fall through
-        }
-
-        // Check the original package name
-
-        bool invalid = false;
-        auto check_apk = [&](int u) -> bool {
-            ssprintf(app_path, sizeof(app_path), "%s/%d/" JAVA_PACKAGE_NAME, APP_DATA_DIR, u);
-            if (stat(app_path, &st) == 0) {
-#if ENFORCE_SIGNATURE
-                byte_array<PATH_MAX> apk;
-                find_apk_path(JAVA_PACKAGE_NAME, apk);
-                int fd = xopen((const char *) apk.buf(), O_RDONLY | O_CLOEXEC);
-                auto cert = read_certificate(fd, MAGISK_VER_CODE);
-                close(fd);
-                if (default_cert && cert != *default_cert) {
-                    // Found APK with invalid signature, force replace with stub
-                    LOGE("pkg: APK signature mismatch: %s\n", apk.buf());
-                    uninstall_pkg(JAVA_PACKAGE_NAME);
-                    invalid = true;
-                    install = true;
-                    return false;
-                }
-#endif
-                mgr_pkg->clear();
-                mgr_cert->clear();
-                mgr_app_id = to_app_id(st.st_uid);
-                return true;
-            }
-            return false;
-        };
-
-        if (check_apk(user_id)) {
+        // orig APK is still the same
+        int uid = get_pkg_uid(user, JAVA_PACKAGE_NAME);
+        if (uid < 0) {
+            if (pkg) pkg->clear();
+            return -1;
+        } else {
             if (pkg) *pkg = JAVA_PACKAGE_NAME;
-            return st.st_uid;
-        }
-        if (!invalid) {
-            collect_users();
-            for (int u : users) {
-                if (check_apk(u)) {
-                    // Found app, but not installed in the requested user
-                    goto not_found;
-                }
-                if (invalid)
-                    break;
-            }
+            return uid;
         }
     }
 
-    // No manager app is found, clear all cached value
-    mgr_app_id = -1;
-    mgr_pkg->clear();
-    mgr_cert->clear();
-    if (install)
-        install_stub();
+    db_strings str;
+    get_db_strings(str, SU_MANAGER);
 
-not_found:
-    LOGW("pkg: cannot find %s for user=[%d]\n",
-         mgr_pkg->empty() ? JAVA_PACKAGE_NAME : mgr_pkg->data(), user_id);
-ignore:
+    if (!str[SU_MANAGER].empty()) {
+        switch (check_stub(user, str[SU_MANAGER])) {
+            case INSTALLED:
+                if (check_dyn(user, repackaged_pkg) == INSTALLED) {
+                    if (pkg) *pkg = repackaged_pkg;
+                    return user * AID_USER_OFFSET + repackaged_app_id;
+                } else {
+                    if (pkg) pkg->clear();
+                    return -1;
+                }
+            case CERT_MISMATCH:
+                install = true;
+            case NO_INSTALLED:
+                break;
+        }
+    }
+
+    repackaged_pkg.clear();
+    repackaged_cert.clear();
+    switch (check_orig(user)) {
+        case INSTALLED: {
+            int uid = get_pkg_uid(user, JAVA_PACKAGE_NAME);
+            if (uid < 0) {
+                if (pkg) pkg->clear();
+                return -1;
+            } else {
+                if (pkg) *pkg = JAVA_PACKAGE_NAME;
+                return uid;
+            }
+        }
+        case CERT_MISMATCH:
+            install = true;
+        case NO_INSTALLED:
+            break;
+    }
+
+    auto xml = "/data/system/packages.xml";
+    stat(xml, &st);
+    user_to_check[user] = make_pair(xml, st.st_ctim.tv_sec);
+
+    if (install) install_stub();
     if (pkg) pkg->clear();
     return -1;
 }
