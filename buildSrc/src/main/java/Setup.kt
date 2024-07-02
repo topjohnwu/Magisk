@@ -287,8 +287,8 @@ fun Project.setupApp() {
             inputs.property("versionCode", Config.versionCode)
             into("src/${this@all.name}/assets")
             from(rootProject.file("scripts")) {
-                include("util_functions.sh", "boot_patch.sh", "addon.d.sh")
-                include("uninstaller.sh", "module_installer.sh")
+                include("util_functions.sh", "boot_patch.sh", "addon.d.sh",
+                    "app_functions.sh", "uninstaller.sh", "module_installer.sh")
             }
             from(rootProject.file("tools/bootctl"))
             into("chromeos") {

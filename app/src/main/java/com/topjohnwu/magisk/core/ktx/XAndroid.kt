@@ -27,8 +27,6 @@ import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
 import kotlin.String
 
-fun Context.rawResource(id: Int) = resources.openRawResource(id)
-
 fun Context.getBitmap(id: Int): Bitmap {
     var drawable = AppCompatResources.getDrawable(this, id)!!
     if (drawable is BitmapDrawable)

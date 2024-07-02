@@ -1,18 +1,14 @@
 package com.topjohnwu.magisk.core.utils
 
 import android.content.Context
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.ktx.deviceProtectedContext
-import com.topjohnwu.magisk.core.ktx.rawResource
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.superuser.Shell
-import com.topjohnwu.superuser.ShellUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -67,7 +63,7 @@ class ShellInit : Shell.Initializer() {
                 add("exec $localBB sh")
             }
 
-            add(context.rawResource(R.raw.manager))
+            add(context.assets.open("app_functions.sh"))
             if (shell.isRoot) {
                 add(context.assets.open("util_functions.sh"))
             }
