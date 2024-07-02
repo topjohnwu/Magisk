@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
     <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
+    <string name="reboot_safe_mode">Mode sans échec</string>
     <string name="module_version_author">%1$s, par %2$s</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restaurer</string>
