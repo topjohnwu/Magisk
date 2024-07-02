@@ -50,6 +50,7 @@ android {
             excludes += "/META-INF/*"
             excludes += "/META-INF/versions/**"
             excludes += "/org/bouncycastle/**"
+            excludes += "org/apache/commons/**"
             excludes += "/kotlin/**"
             excludes += "/kotlinx/**"
             excludes += "/okhttp3/**"
