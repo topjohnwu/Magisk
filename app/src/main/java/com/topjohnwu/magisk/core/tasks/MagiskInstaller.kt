@@ -71,14 +71,18 @@ abstract class MagiskInstallImpl protected constructor(
     private val localFS get() = FileSystemManager.getLocal()
 
     private val destName: String by lazy {
-        val alpha = "abcdefghijklmnopqrstuvwxyz"
-        val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
-        val random = SecureRandom()
-        StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
-            for (i in 1..5) {
-                append(alphaNum[random.nextInt(alphaNum.length)])
+        if (Config.randName) {
+            val alpha = "abcdefghijklmnopqrstuvwxyz"
+            val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
+            val random = SecureRandom()
+            StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
+                for (i in 1..5) {
+                    append(alphaNum[random.nextInt(alphaNum.length)])
+                }
+                toString()
             }
-            toString()
+        } else {
+            "magisk_patched"
         }
     }
 
@@ -440,7 +444,7 @@ abstract class MagiskInstallImpl protected constructor(
 
                 srcBoot = if (tarMagic.contentEquals("ustar".toByteArray())) {
                     // tar file
-                    outFile = MediaStoreUtils.getFile("$destName.tar", true)
+                    outFile = MediaStoreUtils.getFile("$destName.tar")
                     outStream = TarArchiveOutputStream(outFile.uri.outputStream()).also {
                         it.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR)
                         it.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU)
@@ -456,7 +460,7 @@ abstract class MagiskInstallImpl protected constructor(
                     }
                 } else {
                     // raw image
-                    outFile = MediaStoreUtils.getFile("$destName.img", true)
+                    outFile = MediaStoreUtils.getFile("$destName.img")
                     outStream = outFile.uri.outputStream()
 
                     try {

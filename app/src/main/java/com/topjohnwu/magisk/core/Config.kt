@@ -59,6 +59,7 @@ object Config : PreferenceConfig, DBConfig {
         const val THEME_ORDINAL = "theme_ordinal"
         const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
+        const val RAND_NAME = "rand_name"
     }
 
     object Value {
@@ -125,6 +126,7 @@ object Config : PreferenceConfig, DBConfig {
     var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
     var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
     var downloadDir by preference(Key.DOWNLOAD_DIR, "")
+    var randName by preference(Key.RAND_NAME, true)
     var checkUpdate
         get() = checkUpdatePrefs
         set(value) {

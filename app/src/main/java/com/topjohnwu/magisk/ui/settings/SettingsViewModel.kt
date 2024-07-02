@@ -51,7 +51,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         // Manager
         list.addAll(listOf(
             AppSettings,
-            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath
+            UpdateChannel, UpdateChannelUrl, DoHToggle, UpdateChecker, DownloadPath, RandNameToggle
         ))
         if (Info.env.isActive && Const.USER_ID == 0) {
             if (hidden) list.add(Restore) else list.add(Hide)
