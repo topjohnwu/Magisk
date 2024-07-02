@@ -38,6 +38,7 @@ A Magisk module is a folder placed in `/data/adb/modules` with the structure bel
 │   ├── zygisk              <--- This folder contains the module's Zygisk native libraries
 │   │   ├── arm64-v8a.so
 │   │   ├── armeabi-v7a.so
+│   │   ├── riscv64.so
 │   │   ├── x86.so
 │   │   ├── x86_64.so
 │   │   └── unloaded        <--- If exists, the native libraries are incompatible
@@ -176,8 +177,8 @@ The `customize.sh` script runs in Magisk's BusyBox `ash` shell with "Standalone 
 - `MODPATH` (path): the path where your module files should be installed
 - `TMPDIR` (path): a place where you can temporarily store files
 - `ZIPFILE` (path): your module's installation zip
-- `ARCH` (string): the CPU architecture of the device. Value is either `arm`, `arm64`, `x86`, or `x64`
-- `IS64BIT` (bool): `true` if `$ARCH` is either `arm64` or `x64`
+- `ARCH` (string): the CPU architecture of the device. Value is either `arm`, `arm64`, `x86`, `x64`, or `riscv64`
+- `IS64BIT` (bool): `true` if `$ARCH` is either `arm64`, `x64`, or `riscv64`
 - `API` (int): the API level (Android version) of the device (e.g. `23` for Android 6.0)
 
 ##### Functions
