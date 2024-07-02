@@ -186,6 +186,10 @@ check_encryption() {
   fi
 }
 
+printvar() {
+  eval echo $1=\$$1
+}
+
 ##########################
 # Non-root util_functions
 ##########################
@@ -224,13 +228,25 @@ grep_prop() { return; }
 #############
 
 app_init() {
-  mount_partitions
+  mount_partitions >/dev/null
   RAMDISKEXIST=false
   check_boot_ramdisk && RAMDISKEXIST=true
-  get_flags
+  get_flags >/dev/null
   run_migrations
   SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
+
+  # Dump variables
+  printvar SLOT
+  printvar SYSTEM_AS_ROOT
+  printvar RAMDISKEXIST
+  printvar ISAB
+  printvar CRYPTOTYPE
+  printvar PATCHVBMETAFLAG
+  printvar LEGACYSAR
+  printvar RECOVERYMODE
+  printvar KEEPVERITY
+  printvar KEEPFORCEENCRYPT
 }
 
 export BOOTMODE=true

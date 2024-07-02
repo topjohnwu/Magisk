@@ -20,8 +20,8 @@ import java.util.jar.JarFile
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
-        Info.init(shell)
         if (shell.isRoot) {
+            Info.isRooted = true
             RootUtils.bindTask?.let { shell.execTask(it) }
             RootUtils.bindTask = null
         }
@@ -47,7 +47,8 @@ class ShellInit : Shell.Initializer() {
             if (shell.isRoot) {
                 add("export MAGISKTMP=\$(magisk --path)")
                 // Test if we can properly execute stuff in /data
-                Info.noDataExec = !shell.newJob().add("$localBB sh -c \"$localBB true\"").exec().isSuccess
+                Info.noDataExec = !shell.newJob()
+                    .add("$localBB sh -c '$localBB true'").exec().isSuccess
             }
 
             if (Info.noDataExec) {
@@ -70,26 +71,9 @@ class ShellInit : Shell.Initializer() {
             if (shell.isRoot) {
                 add(context.assets.open("util_functions.sh"))
             }
-            add("app_init")
         }.exec()
 
-        fun fastCmd(cmd: String) = ShellUtils.fastCmd(shell, cmd)
-        fun getVar(name: String) = fastCmd("echo \$$name")
-        fun getBool(name: String) = getVar(name).toBoolean()
-
-        Info.isSAR = getBool("SYSTEM_AS_ROOT")
-        Info.ramdisk = getBool("RAMDISKEXIST")
-        Info.isAB = getBool("ISAB")
-        Info.crypto = getVar("CRYPTOTYPE")
-        Info.patchBootVbmeta = getBool("PATCHVBMETAFLAG")
-        Info.legacySAR = getBool("LEGACYSAR")
-
-        // Default presets
-        Config.recovery = getBool("RECOVERYMODE")
-        Config.keepVerity = getBool("KEEPVERITY")
-        Config.keepEnc = getBool("KEEPFORCEENCRYPT")
-        Config.denyList = shell.newJob().add("magisk --denylist status").exec().isSuccess
-
+        Info.init(shell)
         return true
     }
 }

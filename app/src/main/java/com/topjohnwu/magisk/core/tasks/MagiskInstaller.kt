@@ -82,8 +82,11 @@ abstract class MagiskInstallImpl protected constructor(
         }
     }
 
-    private fun findImage(): Boolean {
-        val bootPath = "RECOVERYMODE=${Config.recovery} find_boot_image; echo \"\$BOOTIMAGE\"".fsh()
+    private fun findImage(slot: String): Boolean {
+        val bootPath = (
+            "(RECOVERYMODE=${Config.recovery} " +
+            "SLOT=$slot find_boot_image; " +
+            "echo \$BOOTIMAGE)").fsh()
         if (bootPath.isEmpty()) {
             console.add("! Unable to detect target image")
             return false
@@ -93,22 +96,14 @@ abstract class MagiskInstallImpl protected constructor(
         return true
     }
 
+    private fun findImage(): Boolean {
+        return findImage(Info.slot)
+    }
+
     private fun findSecondary(): Boolean {
-        val slot = "echo \$SLOT".fsh()
-        val target = if (slot == "_a") "_b" else "_a"
-        console.add("- Target slot: $target")
-        val bootPath = arrayOf(
-            "SLOT=$target",
-            "find_boot_image",
-            "SLOT=$slot",
-            "echo \"\$BOOTIMAGE\"").fsh()
-        if (bootPath.isEmpty()) {
-            console.add("! Unable to detect target image")
-            return false
-        }
-        srcBoot = rootFS.getFile(bootPath)
-        console.add("- Target image: $bootPath")
-        return true
+        val slot = if (Info.slot == "_a") "_b" else "_a"
+        console.add("- Target slot: $slot")
+        return findImage(slot)
     }
 
     private suspend fun extractFiles(): Boolean {
