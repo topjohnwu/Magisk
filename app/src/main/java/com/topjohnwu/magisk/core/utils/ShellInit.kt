@@ -20,8 +20,8 @@ import java.util.jar.JarFile
 
 class ShellInit : Shell.Initializer() {
     override fun onInit(context: Context, shell: Shell): Boolean {
+        Info.init(shell)
         if (shell.isRoot) {
-            Info.isRooted = true
             RootUtils.bindTask?.let { shell.execTask(it) }
             RootUtils.bindTask = null
         }
@@ -88,6 +88,7 @@ class ShellInit : Shell.Initializer() {
         Config.recovery = getBool("RECOVERYMODE")
         Config.keepVerity = getBool("KEEPVERITY")
         Config.keepEnc = getBool("KEEPFORCEENCRYPT")
+        Config.denyList = shell.newJob().add("magisk --denylist status").exec().isSuccess
 
         return true
     }

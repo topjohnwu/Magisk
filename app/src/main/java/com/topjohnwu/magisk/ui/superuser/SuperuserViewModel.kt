@@ -117,7 +117,7 @@ class SuperuserViewModel(
             }
         }
 
-        if (Config.userAuth) {
+        if (Config.suAuth) {
             AuthEvent { updateState() }.publish()
         } else {
             SuperuserRevokeDialog(item.title) { updateState() }.show()
@@ -170,7 +170,7 @@ class SuperuserViewModel(
             }
         }
 
-        if (Config.userAuth) {
+        if (Config.suAuth) {
             AuthEvent { updateState() }.publish()
         } else {
             updateState()

@@ -69,17 +69,6 @@ open class BoolDBProperty(
         base.setValue(thisRef, property, if (value) 1 else 0)
 }
 
-class BoolDBPropertyNoWrite(
-    name: String,
-    default: Boolean
-) : BoolDBProperty(name, default) {
-    override fun setValue(thisRef: DBConfig, property: KProperty<*>, value: Boolean) {
-        synchronized(base) {
-            base.value = if (value) 1 else 0
-        }
-    }
-}
-
 class StringDBProperty(
     private val name: String,
     private val default: String,

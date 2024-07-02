@@ -7,6 +7,7 @@ import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.getProperty
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
+import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils.fastCmd
 
 val isRunningAsStub get() = Info.stub != null
@@ -24,7 +25,8 @@ object Info {
     }
 
     // Device state
-    @JvmStatic val env by lazy { loadState() }
+    @JvmStatic var env = Env()
+        private set
     @JvmField var isSAR = false
     var legacySAR = false
     var isAB = false
@@ -36,8 +38,8 @@ object Info {
     var noDataExec = false
     var isRooted = false
 
-    @JvmField var hasGMS = true
-    @JvmField val isEmulator =
+    var hasGMS = true
+    val isEmulator =
         getProperty("ro.kernel.qemu", "0") == "1" ||
             getProperty("ro.boot.qemu", "0") == "1"
 
@@ -51,14 +53,6 @@ object Info {
     val isDeviceSecure get() =
         AppContext.getSystemService(KeyguardManager::class.java).isDeviceSecure
 
-    private fun loadState(): Env {
-        val v = fastCmd("magisk -v").split(":".toRegex())
-        return Env(
-            v[0], v.size >= 3 && v[2] == "D",
-            runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
-        )
-    }
-
     class Env(
         val versionString: String = "",
         val isDebug: Boolean = false,
@@ -66,10 +60,21 @@ object Info {
     ) {
         val versionCode = when {
             code < Const.Version.MIN_VERCODE -> -1
-            isRooted ->  code
+            isRooted -> code
             else -> -1
         }
         val isUnsupported = code > 0 && code < Const.Version.MIN_VERCODE
         val isActive = versionCode > 0
+    }
+
+    fun init(shell: Shell) {
+        if (shell.isRoot) {
+            isRooted = true
+            val v = fastCmd(shell, "magisk -v").split(":".toRegex())
+            env = Env(
+                v[0], v.size >= 3 && v[2] == "D",
+                runCatching { fastCmd("magisk -V").toInt() }.getOrDefault(-1)
+            )
+        }
     }
 }

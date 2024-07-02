@@ -7,7 +7,6 @@ import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.writeTo
-import com.topjohnwu.magisk.core.repository.BoolDBPropertyNoWrite
 import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.refreshLocale
@@ -41,7 +40,6 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_BIOMETRIC = "su_biometric"
         const val ZYGISK = "zygisk"
         const val BOOTLOOP = "bootloop"
-        const val DENYLIST = "denylist"
         const val SU_MANAGER = "requester"
         const val KEYSTORE = "keystore"
 
@@ -56,12 +54,9 @@ object Config : PreferenceConfig, DBConfig {
         const val CUSTOM_CHANNEL = "custom_channel"
         const val LOCALE = "locale"
         const val DARK_THEME = "dark_theme_extended"
-        const val REPO_ORDER = "repo_order"
-        const val SHOW_SYSTEM_APP = "show_system"
         const val DOWNLOAD_DIR = "download_dir"
         const val SAFETY = "safety_notice"
         const val THEME_ORDINAL = "theme_ordinal"
-        const val BOOT_ID = "boot_id"
         const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
     }
@@ -102,10 +97,6 @@ object Config : PreferenceConfig, DBConfig {
 
         // su timeout
         val TIMEOUT_LIST = intArrayOf(0, -1, 10, 20, 30, 60)
-
-        // repo order
-        const val ORDER_NAME = 0
-        const val ORDER_DATE = 1
     }
 
     private val defaultChannel =
@@ -119,24 +110,21 @@ object Config : PreferenceConfig, DBConfig {
     @JvmField var keepVerity = false
     @JvmField var keepEnc = false
     @JvmField var recovery = false
+    var denyList = false
 
-    var bootId by preference(Key.BOOT_ID, "")
     var askedHome by preference(Key.ASKED_HOME, false)
-
-    var downloadDir by preference(Key.DOWNLOAD_DIR, "")
-    var repoOrder by preference(Key.REPO_ORDER, Value.ORDER_DATE)
-
-    var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
-    var suAutoResponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
-    var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
-    var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
+    var bootloop by dbSettings(Key.BOOTLOOP, 0)
 
     var safetyNotice by preference(Key.SAFETY, true)
     var darkTheme by preference(Key.DARK_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     var themeOrdinal by preference(Key.THEME_ORDINAL, Theme.Piplup.ordinal)
-    var suReAuth by preference(Key.SU_REAUTH, false)
-    var suTapjack by preference(Key.SU_TAPJACK, true)
+
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)
+    private var localePrefs by preference(Key.LOCALE, "")
+    var doh by preference(Key.DOH, false)
+    var updateChannel by preferenceStrInt(Key.UPDATE_CHANNEL, defaultChannel)
+    var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
+    var downloadDir by preference(Key.DOWNLOAD_DIR, "")
     var checkUpdate
         get() = checkUpdatePrefs
         set(value) {
@@ -145,11 +133,6 @@ object Config : PreferenceConfig, DBConfig {
                 JobService.schedule(AppContext)
             }
         }
-    var doh by preference(Key.DOH, false)
-    var showSystemApp by preference(Key.SHOW_SYSTEM_APP, false)
-
-    var customChannelUrl by preference(Key.CUSTOM_CHANNEL, "")
-    private var localePrefs by preference(Key.LOCALE, "")
     var locale
         get() = localePrefs
         set(value) {
@@ -157,20 +140,24 @@ object Config : PreferenceConfig, DBConfig {
             refreshLocale()
         }
 
+    var zygisk by dbSettings(Key.ZYGISK, false)
+    var suManager by dbStrings(Key.SU_MANAGER, "", true)
+    var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
+
+    var suDefaultTimeout by preferenceStrInt(Key.SU_REQUEST_TIMEOUT, 10)
+    var suAutoResponse by preferenceStrInt(Key.SU_AUTO_RESPONSE, Value.SU_PROMPT)
+    var suNotification by preferenceStrInt(Key.SU_NOTIFICATION, Value.NOTIFICATION_TOAST)
     var rootMode by dbSettings(Key.ROOT_ACCESS, Value.ROOT_ACCESS_APPS_AND_ADB)
     var suMntNamespaceMode by dbSettings(Key.SU_MNT_NS, Value.NAMESPACE_MODE_REQUESTER)
     var suMultiuserMode by dbSettings(Key.SU_MULTIUSER_MODE, Value.MULTIUSER_MODE_OWNER_ONLY)
     private var suBiometric by dbSettings(Key.SU_BIOMETRIC, false)
-    var userAuth
+    var suAuth
         get() = Info.isDeviceSecure && suBiometric
         set(value) {
             suBiometric = value
         }
-    var zygisk by dbSettings(Key.ZYGISK, false)
-    var bootloop by dbSettings(Key.BOOTLOOP, 0)
-    var denyList by BoolDBPropertyNoWrite(Key.DENYLIST, false)
-    var suManager by dbStrings(Key.SU_MANAGER, "", true)
-    var keyStoreRaw by dbStrings(Key.KEYSTORE, "", true)
+    var suReAuth by preference(Key.SU_REAUTH, false)
+    var suTapjack by preference(Key.SU_TAPJACK, true)
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 

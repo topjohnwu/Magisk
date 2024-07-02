@@ -267,7 +267,7 @@ object Tapjack : BaseSettingsItem.Toggle() {
 object Authentication : BaseSettingsItem.Toggle() {
     override val title = R.string.settings_su_auth_title.asText()
     override var description = R.string.settings_su_auth_summary.asText()
-    override var value by Config::userAuth
+    override var value by Config::suAuth
 
     override fun refresh() {
         isEnabled = Info.isDeviceSecure

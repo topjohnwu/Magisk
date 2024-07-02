@@ -76,7 +76,7 @@ class SuRequestViewModel(
 
     fun grantPressed() {
         cancelTimer()
-        if (Config.userAuth) {
+        if (Config.suAuth) {
             AuthEvent { respond(ALLOW) }.publish()
         } else {
             respond(ALLOW)
