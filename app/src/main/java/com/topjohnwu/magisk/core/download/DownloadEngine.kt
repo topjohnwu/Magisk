@@ -173,7 +173,7 @@ class DownloadEngine(
                 } else {
                     notifyFinish(subject)
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Timber.e(e)
                 notifyFail(subject)
             }
