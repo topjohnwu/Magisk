@@ -174,7 +174,9 @@
     <string name="setting_add_shortcut_summary">Adicione um atalho na tela inicial, caso o nome e o ícone sejam difíceis de reconhecer logo após ocultar o app.</string>
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Solução alternativa para envenenamento de DNS em alguns países</string>
-    <string name="multiuser_mode">Modo Multiusuário</string>
+    <string name="settings_random_name_title">Randomizar nome de saída</string>
+    <string name="settings_random_name_description">Randomize o nome do arquivo de saída de imagens corrigidas e arquivos tar para evitar a detecção</string>
+    <string name="multiuser_mode">Modo multiusuário</string>
     <string name="settings_owner_only">Somente proprietário do dispositivo</string>
     <string name="settings_owner_manage">Gerenciado pelo proprietário do dispositivo</string>
     <string name="settings_user_independent">Independente do usuário</string>
