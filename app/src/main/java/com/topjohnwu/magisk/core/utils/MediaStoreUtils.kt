@@ -21,10 +21,6 @@ object MediaStoreUtils {
 
     private val cr get() = AppContext.contentResolver
 
-    @get:RequiresApi(api = 29)
-    private val tableUri
-        get() = MediaStore.Downloads.EXTERNAL_CONTENT_URI
-
     private fun relativePath(name: String) =
         if (name.isEmpty()) Environment.DIRECTORY_DOWNLOADS
         else Environment.DIRECTORY_DOWNLOADS + File.separator + name
@@ -32,20 +28,21 @@ object MediaStoreUtils {
     fun fullPath(name: String): String =
         File(Environment.getExternalStorageDirectory(), relativePath(name)).canonicalPath
 
-    private val relativePath get() = relativePath(Config.downloadDir)
+    private val downloadPath get() = relativePath(Config.downloadDir)
 
     @RequiresApi(api = 30)
     @Throws(IOException::class)
     private fun insertFile(displayName: String): MediaStoreFile {
         val values = ContentValues()
-        values.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath)
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, downloadPath)
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
 
         // When a file with the same name exists and was not created by us:
         // - Before Android 11, insert will return null
         // - On Android 11+, the system will automatically create a new name
         // Thus the reason to restrict this method call to API 30+
-        val fileUri = cr.insert(tableUri, values) ?: throw IOException("Can't insert $displayName.")
+        val fileUri = cr.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+            ?: throw IOException("Can't insert $displayName.")
 
         val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
         cr.query(fileUri, projection, null, null, null)?.use { cursor ->
@@ -68,13 +65,16 @@ object MediaStoreUtils {
         val selection = "${MediaStore.MediaColumns.DISPLAY_NAME} == ?"
         val selectionArgs = arrayOf(displayName)
         val sortOrder = "${MediaStore.MediaColumns.DATE_ADDED} DESC"
-        cr.query(tableUri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
+        val query = cr.query(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            projection, selection, selectionArgs, sortOrder)
+        query?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
             val dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
                 val data = cursor.getString(dataColumn)
-                if (data.endsWith(relativePath + File.separator + displayName)) {
+                if (data.endsWith(downloadPath + File.separator + displayName)) {
                     return MediaStoreFile(id, data)
                 }
             }
@@ -83,23 +83,20 @@ object MediaStoreUtils {
     }
 
     @Throws(IOException::class)
-    fun getFile(displayName: String, skipQuery: Boolean = false): UriFile {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+    fun getFile(displayName: String): UriFile {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             // Fallback to file based I/O pre Android 11
-            val parent = File(Environment.getExternalStorageDirectory(), relativePath)
+            val parent = File(Environment.getExternalStorageDirectory(), downloadPath)
             parent.mkdirs()
-            return LegacyUriFile(File(parent, displayName))
+            LegacyUriFile(File(parent, displayName))
+        } else {
+            queryFile(displayName) ?: insertFile(displayName)
         }
-
-        return if (skipQuery) insertFile(displayName)
-        else queryFile(displayName) ?: insertFile(displayName)
     }
 
     fun Uri.inputStream() = cr.openInputStream(this) ?: throw FileNotFoundException()
 
     fun Uri.outputStream() = cr.openOutputStream(this, "rwt") ?: throw FileNotFoundException()
-
-    fun Uri.fileDescriptor(mode: String) = cr.openFileDescriptor(this, mode) ?: throw FileNotFoundException()
 
     val Uri.displayName: String get() {
         if (scheme == "file") {
@@ -130,7 +127,7 @@ object MediaStoreUtils {
 
     @RequiresApi(api = 29)
     private class MediaStoreFile(private val id: Long, private val data: String) : UriFile {
-        override val uri = ContentUris.withAppendedId(tableUri, id)
+        override val uri = ContentUris.withAppendedId(MediaStore.Downloads.EXTERNAL_CONTENT_URI, id)
         override fun toString() = data
         override fun delete(): Boolean {
             val selection = "${MediaStore.MediaColumns._ID} == ?"

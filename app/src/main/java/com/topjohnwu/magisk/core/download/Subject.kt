@@ -8,8 +8,6 @@ import android.net.Uri
 import android.os.Parcelable
 import androidx.core.net.toUri
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.di.AppContext
-import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils

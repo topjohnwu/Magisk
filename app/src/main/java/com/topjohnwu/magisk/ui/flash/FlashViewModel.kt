@@ -105,7 +105,7 @@ class FlashViewModel : BaseViewModel() {
             val name = "magisk_install_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard)
             )
-            val file = MediaStoreUtils.getFile(name, true)
+            val file = MediaStoreUtils.getFile(name)
             file.uri.outputStream().bufferedWriter().use { writer ->
                 synchronized(logItems) {
                     logItems.forEach {

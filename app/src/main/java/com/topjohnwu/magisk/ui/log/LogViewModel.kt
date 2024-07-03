@@ -69,7 +69,7 @@ class LogViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val filename = "magisk_log_%s.log".format(
                 System.currentTimeMillis().toTime(timeFormatStandard))
-            val logFile = MediaStoreUtils.getFile(filename, true)
+            val logFile = MediaStoreUtils.getFile(filename)
             logFile.uri.outputStream().bufferedWriter().use { file ->
                 file.write("---Detected Device Info---\n\n")
                 file.write("isAB=${Info.isAB}\n")
