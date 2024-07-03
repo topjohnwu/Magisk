@@ -178,6 +178,8 @@
     <string name="setting_add_shortcut_summary">V prípade, že sa po skrytí apky názov a ikona ťažko rozpoznávajú, pridať na domovskú obrazovku odkaz</string>
     <string name="settings_doh_title">DNS over HTTPS</string>
     <string name="settings_doh_description">Riešenie otravy DNS v niektorých krajinách</string>
+    <string name="settings_random_name_title">Náhodný názov výstupu</string>
+    <string name="settings_random_name_description">Na zabránenie detekcie sa vygeneruje náhodný názov výstupných zaplátaných obrazov a súborov tar</string>
 
     <string name="multiuser_mode">Režim viacerých používateľov</string>
     <string name="settings_owner_only">Iba majiteľ zariadenia</string>
