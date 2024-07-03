@@ -25,7 +25,6 @@ struct api_abi_v1;
 struct api_abi_v2;
 using  api_abi_v3 = api_abi_v2;
 struct api_abi_v4;
-using  api_abi_v5 = api_abi_v4;
 
 union ApiTable;
 
@@ -153,14 +152,14 @@ struct api_abi_v2 : public api_abi_v1 {
 };
 
 struct api_abi_v4 : public api_abi_base {
-    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    /* 0 */ void *hookJniNativeMethods;
     /* 1 */ void (*pltHookRegister)(dev_t, ino_t, const char *, void *, void **);
     /* 2 */ bool (*exemptFd)(int);
     /* 3 */ bool (*pltHookCommit)();
-    /* 4 */ int (*connectCompanion)(ZygiskModule *);
-    /* 5 */ void (*setOption)(ZygiskModule *, zygisk::Option);
-    /* 6 */ int (*getModuleDir)(ZygiskModule *);
-    /* 7 */ uint32_t (*getFlags)(ZygiskModule *);
+};
+
+struct api_abi_v5 : public api_abi_base {
+    /* 0 */ void (*hookJniNativeMethods)(JNIEnv *, jclass, JNINativeMethod *, int);
 };
 
 union ApiTable {
@@ -168,6 +167,7 @@ union ApiTable {
     api_abi_v1 v1;
     api_abi_v2 v2;
     api_abi_v4 v4;
+    api_abi_v5 v5;
 };
 
 struct ZygiskModule {

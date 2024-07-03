@@ -562,8 +562,11 @@ void hook_functions() {
 }
 
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods) {
-    jclass clazz;
-    if (!g_hook || !g_hook->runtime_callbacks || !env || !clz || !(clazz = env->FindClass(clz))) {
+    hookJniNativeMethods(env, clz ? env->FindClass(clz) : nullptr, methods, numMethods);
+}
+
+void hookJniNativeMethods(JNIEnv *env, jclass clazz, JNINativeMethod *methods, int numMethods) {
+    if (!g_hook || !g_hook->runtime_callbacks || !env || !clazz) {
         for (auto i = 0; i < numMethods; ++i) {
             methods[i].fnPtr = nullptr;
         }
@@ -590,7 +593,7 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
             for (const auto &old_method : old_methods) {
                 if (strcmp(method.name, old_method.name) == 0 &&
                     strcmp(method.signature, old_method.signature) == 0) {
-                    ZLOGD("replace %s#%s%s %p -> %p\n", clz,
+                    ZLOGD("replace %s#%s%s %p -> %p\n", get_class_name(env, clazz).data(),
                           method.name, method.signature, old_method.fnPtr, method.fnPtr);
                     method.fnPtr = old_method.fnPtr;
                 }

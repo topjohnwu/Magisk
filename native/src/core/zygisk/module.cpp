@@ -56,6 +56,9 @@ bool ZygiskModule::RegisterModuleImpl(ApiTable *api, long *module) {
         };
         api->v4.exemptFd = [](int fd) { return g_ctx && g_ctx->exempt_fd(fd); };
     }
+    if (api_version >= 5) {
+        api->v5.hookJniNativeMethods = hookJniNativeMethods;
+    }
 
     return true;
 }
@@ -64,6 +67,7 @@ bool ZygiskModule::valid() const {
     if (mod.api_version == nullptr)
         return false;
     switch (*mod.api_version) {
+        case 5:
         case 4:
         case 3:
         case 2:

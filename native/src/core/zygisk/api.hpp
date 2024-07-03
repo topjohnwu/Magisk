@@ -262,7 +262,7 @@ struct Api {
     // The original function pointer will be saved in each JNINativeMethod's fnPtr.
     // If no matching class, method name, or signature is found, that specific JNINativeMethod.fnPtr
     // will be set to nullptr.
-    void hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods);
+    void hookJniNativeMethods(JNIEnv *env, jclass clazz, JNINativeMethod *methods, int numMethods);
 
     // Hook functions in the PLT (Procedure Linkage Table) of ELFs loaded in memory.
     //
@@ -335,7 +335,7 @@ struct api_table {
     void *impl;
     bool (*registerModule)(api_table *, module_abi *);
 
-    void (*hookJniNativeMethods)(JNIEnv *, const char *, JNINativeMethod *, int);
+    void (*hookJniNativeMethods)(JNIEnv *, jclass, JNINativeMethod *, int);
     void (*pltHookRegister)(dev_t, ino_t, const char *, void *, void **);
     bool (*exemptFd)(int);
     bool (*pltHookCommit)();
@@ -373,8 +373,8 @@ inline uint32_t Api::getFlags() {
 inline bool Api::exemptFd(int fd) {
     return tbl->exemptFd != nullptr && tbl->exemptFd(fd);
 }
-inline void Api::hookJniNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int numMethods) {
-    if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, className, methods, numMethods);
+inline void Api::hookJniNativeMethods(JNIEnv *env, jclass clazz, JNINativeMethod *methods, int numMethods) {
+    if (tbl->hookJniNativeMethods) tbl->hookJniNativeMethods(env, clazz, methods, numMethods);
 }
 inline void Api::pltHookRegister(dev_t dev, ino_t inode, const char *symbol, void *newFunc, void **oldFunc) {
     if (tbl->pltHookRegister) tbl->pltHookRegister(dev, inode, symbol, newFunc, oldFunc);

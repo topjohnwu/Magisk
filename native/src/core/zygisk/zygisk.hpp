@@ -33,6 +33,7 @@ enum : int {
 
 void hook_functions();
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
+void hookJniNativeMethods(JNIEnv *env, jclass clazz, JNINativeMethod *methods, int numMethods);
 
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
 
