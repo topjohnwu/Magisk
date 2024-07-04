@@ -486,14 +486,19 @@ def build_apk(args, module):
 
 def build_app(args):
     header("* Building the Magisk app")
-    build_apk(args, ":app")
+    build_apk(args, ":app:apk")
+
+    build_type = "release" if args.release else "debug"
+
+    # Rename apk-variant.apk to app-variant.apk
+    source = config["outdir"] / f"apk-{build_type}.apk"
+    target = config["outdir"] / f"app-{build_type}.apk"
+    mv(source, target)
 
     # Stub building is directly integrated into the main app
     # build process. Copy the stub APK into output directory.
-    build_type = "release" if args.release else "debug"
-    apk = f"stub-{build_type}.apk"
     source = Path("app", "core", "src", build_type, "assets", "stub.apk")
-    target = config["outdir"] / apk
+    target = config["outdir"] / f"stub-{build_type}.apk"
     cp(source, target)
 
 
@@ -531,7 +536,7 @@ def cleanup(args):
         execv(
             [
                 gradlew,
-                ":app:clean",
+                ":app:apk:clean",
                 ":app:core:clean",
                 ":app:shared:clean",
                 ":app:stub:clean",
