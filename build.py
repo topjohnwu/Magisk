@@ -475,8 +475,10 @@ def build_apk(args, module):
 
     build_type = build_type.lower()
 
-    apk = f"{module}-{build_type}.apk"
-    source = Path(module, "build", "outputs", "apk", build_type, apk)
+    paths = module.split(":")
+
+    apk = f"{paths[-1]}-{build_type}.apk"
+    source = Path(*paths, "build", "outputs", "apk", build_type, apk)
     target = config["outdir"] / apk
     mv(source, target)
     header(f"Output: {target}")
@@ -484,7 +486,7 @@ def build_apk(args, module):
 
 def build_app(args):
     header("* Building the Magisk app")
-    build_apk(args, "app")
+    build_apk(args, ":app")
 
     # Stub building is directly integrated into the main app
     # build process. Copy the stub APK into output directory.
@@ -497,7 +499,7 @@ def build_app(args):
 
 def build_stub(args):
     header("* Building the stub app")
-    build_apk(args, "stub")
+    build_apk(args, ":app:stub")
 
 
 def cleanup(args):
@@ -527,11 +529,15 @@ def cleanup(args):
     if "java" in args.target:
         header("* Cleaning java")
         execv(
-            [gradlew, "app:clean", "app:core:clean", "app:shared:clean", "stub:clean"],
+            [
+                gradlew,
+                ":app:clean",
+                ":app:core:clean",
+                ":app:shared:clean",
+                ":app:stub:clean",
+            ],
             env=find_jdk(),
         )
-        rm_rf(Path("app", "src", "debug"))
-        rm_rf(Path("app", "src", "release"))
 
 
 def setup_ndk(args):
