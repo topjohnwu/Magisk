@@ -107,6 +107,7 @@
     <string name="reboot_bootloader">Redémarrer en mode amorçage</string>
     <string name="reboot_download">Redémarrer en mode téléchargement</string>
     <string name="reboot_edl">Redémarrer en mode secours (EDL)</string>
+    <string name="reboot_safe_mode">Mode sans échec</string>
     <string name="module_version_author">%1$s, par %2$s</string>
     <string name="module_state_remove">Supprimer</string>
     <string name="module_state_restore">Restaurer</string>
@@ -177,6 +178,8 @@
     <string name="setting_add_shortcut_summary">Ajouter un joli raccourci dans l’écran d’accueil au cas où le nom et l’icône seraient difficiles à reconnaître après avoir masqué l’application</string>
     <string name="settings_doh_title">DNS sur HTTPS</string>
     <string name="settings_doh_description">Contournement de la censure du DNS dans certains pays</string>
+    <string name="settings_random_name_title">Nom de sortie aléatoire</string>
+    <string name="settings_random_name_description">Randomiser le nom du fichier de sortie des images modifiées et des fichiers tar afin d’éviter la détection.</string>
 
     <string name="multiuser_mode">Mode multi‑utilisateur</string>
     <string name="settings_owner_only">Propriétaire de l’appareil uniquement</string>
