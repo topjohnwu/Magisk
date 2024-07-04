@@ -3,7 +3,7 @@ package com.topjohnwu.magisk.core.su
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import com.topjohnwu.magisk.BuildConfig
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.getPackageInfo
@@ -34,8 +34,8 @@ class SuRequestHandler(
             return false
 
         // Never allow com.topjohnwu.magisk (could be malware)
-        if (pkgInfo.packageName == BuildConfig.APPLICATION_ID) {
-            Shell.cmd("(pm uninstall ${BuildConfig.APPLICATION_ID} >/dev/null 2>&1)&").exec()
+        if (pkgInfo.packageName == BuildConfig.APP_PACKAGE_NAME) {
+            Shell.cmd("(pm uninstall ${BuildConfig.APP_PACKAGE_NAME} >/dev/null 2>&1)&").exec()
             return false
         }
 

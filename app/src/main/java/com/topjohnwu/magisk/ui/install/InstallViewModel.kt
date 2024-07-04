@@ -11,9 +11,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -69,7 +69,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val file = File(AppContext.cacheDir, "${BuildConfig.VERSION_CODE}.md")
+                val file = File(AppContext.cacheDir, "${BuildConfig.APP_VERSION_CODE}.md")
                 val text = when {
                     file.exists() -> file.readText()
                     Const.Url.CHANGELOG_URL.isEmpty() -> ""

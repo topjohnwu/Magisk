@@ -490,7 +490,7 @@ def build_app(args):
     # build process. Copy the stub APK into output directory.
     build_type = "release" if args.release else "debug"
     apk = f"stub-{build_type}.apk"
-    source = Path("app", "src", build_type, "assets", "stub.apk")
+    source = Path("app", "core", "src", build_type, "assets", "stub.apk")
     target = config["outdir"] / apk
     cp(source, target)
 
@@ -526,7 +526,10 @@ def cleanup(args):
 
     if "java" in args.target:
         header("* Cleaning java")
-        execv([gradlew, "app:clean", "app:shared:clean", "stub:clean"], env=find_jdk())
+        execv(
+            [gradlew, "app:clean", "app:core:clean", "app:shared:clean", "stub:clean"],
+            env=find_jdk(),
+        )
         rm_rf(Path("app", "src", "debug"))
         rm_rf(Path("app", "src", "release"))
 

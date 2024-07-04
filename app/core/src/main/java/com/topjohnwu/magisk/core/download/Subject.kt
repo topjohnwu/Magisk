@@ -11,7 +11,6 @@ import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.model.MagiskJson
 import com.topjohnwu.magisk.core.model.module.OnlineModule
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.view.Notifications
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -42,8 +41,10 @@ sealed class Subject : Parcelable {
             MediaStoreUtils.getFile(title).uri
         }
 
-        override fun pendingIntent(context: Context) =
-            FlashFragment.installIntent(context, file)
+        @IgnoredOnParcel
+        var piCreator: ((Context, Uri) -> PendingIntent)? = null
+
+        override fun pendingIntent(context: Context) = piCreator?.invoke(context, file)
     }
 
     @Parcelize

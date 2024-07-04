@@ -9,13 +9,13 @@ import android.system.OsConstants.O_WRONLY
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.AppApkPath
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAll
@@ -75,7 +75,7 @@ abstract class MagiskInstallImpl protected constructor(
             val alpha = "abcdefghijklmnopqrstuvwxyz"
             val alphaNum = "$alpha${alpha.uppercase(Locale.ROOT)}0123456789"
             val random = SecureRandom()
-            StringBuilder("magisk_patched-${BuildConfig.VERSION_CODE}_").run {
+            StringBuilder("magisk_patched-${BuildConfig.APP_VERSION_CODE}_").run {
                 for (i in 1..5) {
                     append(alphaNum[random.nextInt(alphaNum.length)])
                 }
@@ -112,7 +112,7 @@ abstract class MagiskInstallImpl protected constructor(
 
     private suspend fun extractFiles(): Boolean {
         console.add("- Device platform: ${Const.CPU_ABI}")
-        console.add("- Installing: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+        console.add("- Installing: ${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})")
 
         installDir = localFS.getFile(context.filesDir.parent, "install")
         installDir.deleteRecursively()

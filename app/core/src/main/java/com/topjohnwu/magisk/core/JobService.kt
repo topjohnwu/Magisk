@@ -8,7 +8,6 @@ import android.app.job.JobParameters
 import android.app.job.JobScheduler
 import android.content.Context
 import androidx.core.content.getSystemService
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.core.base.BaseJobService
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
@@ -77,7 +76,7 @@ class JobService : BaseJobService() {
         GlobalScope.launch(Dispatchers.IO) {
             ServiceLocator.networkService.fetchUpdate()?.let {
                 Info.remote = it
-                if (Info.env.isActive && BuildConfig.VERSION_CODE < it.magisk.versionCode)
+                if (Info.env.isActive && BuildConfig.APP_VERSION_CODE < it.magisk.versionCode)
                     Notifications.updateAvailable()
                 jobFinished(params, false)
             }

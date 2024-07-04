@@ -5,8 +5,6 @@
 
     <data>
 
-        <import type="com.topjohnwu.magisk.core.Config" />
-
         <variable
             name="viewModel"
             type="com.topjohnwu.magisk.ui.superuser.SuperuserViewModel" />

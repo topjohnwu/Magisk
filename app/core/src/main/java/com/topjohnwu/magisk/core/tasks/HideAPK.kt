@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.annotation.WorkerThread
-import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Provider
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.toast
@@ -135,8 +135,8 @@ object HideAPK {
                 if (!xml.patchStrings {
                     for (i in it.indices) {
                         val s = it[i]
-                        if (s.contains(APPLICATION_ID)) {
-                            it[i] = s.replace(APPLICATION_ID, pkg)
+                        if (s.contains(APP_PACKAGE_NAME)) {
+                            it[i] = s.replace(APP_PACKAGE_NAME, pkg)
                         } else if (s.contains(PLACEHOLDER)) {
                             it[i] = generator.next()
                         } else if (s == origLabel) {
@@ -236,12 +236,12 @@ object HideAPK {
             activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
         val apk = StubApk.current(activity)
-        val session = APKInstall.startSession(activity, APPLICATION_ID, onFailure) {
-            launchApp(activity, APPLICATION_ID)
+        val session = APKInstall.startSession(activity, APP_PACKAGE_NAME, onFailure) {
+            launchApp(activity, APP_PACKAGE_NAME)
             dialog.dismiss()
         }
         Config.suManager = ""
-        val cmd = "adb_pm_install $apk $APPLICATION_ID"
+        val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {

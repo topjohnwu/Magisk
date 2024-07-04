@@ -6,9 +6,9 @@ import android.widget.Toast
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.di.AppContext
@@ -38,7 +38,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
 
     private fun createItems(): List<BaseSettingsItem> {
         val context = AppContext
-        val hidden = context.packageName != BuildConfig.APPLICATION_ID
+        val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
 
         // Customization
         val list = mutableListOf(

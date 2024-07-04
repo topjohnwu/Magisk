@@ -7,13 +7,13 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.databinding.Bindable
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.ActivityExecutor
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.arch.ContextExecutor
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.download.Subject
@@ -52,7 +52,7 @@ class HomeViewModel(
         get() = when {
             Info.isRooted && Info.env.isUnsupported -> State.OUTDATED
             !Info.env.isActive -> State.INVALID
-            Info.env.versionCode < BuildConfig.VERSION_CODE -> State.OUTDATED
+            Info.env.versionCode < BuildConfig.APP_VERSION_CODE -> State.OUTDATED
             else -> State.UP_TO_DATE
         }
 
@@ -73,7 +73,7 @@ class HomeViewModel(
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
     val managerInstalledVersion
-        get() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
+        get() = "${BuildConfig.APP_VERSION_NAME} (${BuildConfig.APP_VERSION_CODE})" +
             if (BuildConfig.DEBUG) " (D)" else ""
 
     @get:Bindable
@@ -92,7 +92,7 @@ class HomeViewModel(
         appState = State.LOADING
         Info.getRemote(svc)?.apply {
             appState = when {
-                BuildConfig.VERSION_CODE < magisk.versionCode -> State.OUTDATED
+                BuildConfig.APP_VERSION_CODE < magisk.versionCode -> State.OUTDATED
                 else -> State.UP_TO_DATE
             }
 

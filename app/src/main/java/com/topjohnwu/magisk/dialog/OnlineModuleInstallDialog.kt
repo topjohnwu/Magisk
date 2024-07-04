@@ -5,6 +5,7 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject
 import com.topjohnwu.magisk.core.model.module.OnlineModule
+import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.view.MagiskDialog
 
 class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog() {
@@ -21,7 +22,9 @@ class OnlineModuleInstallDialog(private val item: OnlineModule) : MarkDownDialog
         dialog.apply {
 
             fun download(install: Boolean) {
-                DownloadEngine.startWithActivity(activity, Subject.Module(item, install))
+                val module = Subject.Module(item, install)
+                module.piCreator = FlashFragment::installIntent
+                DownloadEngine.startWithActivity(activity, module)
             }
 
             val title = context.getString(R.string.repo_install_title,

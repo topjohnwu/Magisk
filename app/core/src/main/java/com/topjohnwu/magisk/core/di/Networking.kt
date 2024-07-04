@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.core.di
 
 import android.content.Context
 import com.squareup.moshi.Moshi
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.ProviderInstaller
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.utils.currentLocale
@@ -67,7 +67,7 @@ fun createOkHttpClient(context: Context): OkHttpClient {
 
     builder.addInterceptor { chain ->
         val request = chain.request().newBuilder()
-        request.header("User-Agent", "Magisk/${BuildConfig.VERSION_CODE}")
+        request.header("User-Agent", "Magisk/${BuildConfig.APP_VERSION_CODE}")
         request.header("Accept-Language", currentLocale.toLanguageTag())
         chain.proceed(request.build())
     }

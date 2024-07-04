@@ -8,4 +8,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Magisk"
-include(":app", ":app:shared", ":native", ":stub")
+include(":app", ":app:core", ":app:shared", ":native", ":stub")

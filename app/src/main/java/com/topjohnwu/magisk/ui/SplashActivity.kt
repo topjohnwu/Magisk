@@ -8,11 +8,11 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.BuildConfig
-import com.topjohnwu.magisk.BuildConfig.APPLICATION_ID
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.core.BuildConfig
+import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
@@ -120,11 +120,11 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
 
         Config.load(prevPkg)
 
-        if (packageName != APPLICATION_ID) {
+        if (packageName != APP_PACKAGE_NAME) {
             runCatching {
                 // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
-                packageManager.getApplicationInfo(APPLICATION_ID, 0)
-                Shell.cmd("(pm uninstall $APPLICATION_ID)& >/dev/null 2>&1").exec()
+                packageManager.getApplicationInfo(APP_PACKAGE_NAME, 0)
+                Shell.cmd("(pm uninstall $APP_PACKAGE_NAME)& >/dev/null 2>&1").exec()
             }
         } else {
             if (Config.suManager.isNotEmpty())

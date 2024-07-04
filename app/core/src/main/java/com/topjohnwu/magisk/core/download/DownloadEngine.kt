@@ -15,11 +15,11 @@ import androidx.collection.isNotEmpty
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.core.di.ServiceLocator

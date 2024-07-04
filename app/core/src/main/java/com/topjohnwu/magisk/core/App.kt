@@ -7,8 +7,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.system.Os
 import androidx.profileinstaller.ProfileInstaller
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.StubApk
+import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.core.utils.ProcessLifecycle
@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.magisk.core.utils.refreshLocale
 import com.topjohnwu.magisk.core.utils.setConfig
-import com.topjohnwu.magisk.ui.surequest.SuRequestActivity
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -116,12 +115,12 @@ object ActivityTracker : Application.ActivityLifecycleCallbacks {
     private var ref = WeakReference<Activity>(null)
 
     override fun onActivityResumed(activity: Activity) {
-        if (activity is SuRequestActivity) return
+        if (activity is UntrackedActivity) return
         ref = WeakReference(activity)
     }
 
     override fun onActivityPaused(activity: Activity) {
-        if (activity is SuRequestActivity) return
+        if (activity is UntrackedActivity) return
         ref.clear()
     }
 

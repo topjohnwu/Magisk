@@ -9,7 +9,7 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.toIcon
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.download.DownloadEngine
 import com.topjohnwu.magisk.core.download.Subject

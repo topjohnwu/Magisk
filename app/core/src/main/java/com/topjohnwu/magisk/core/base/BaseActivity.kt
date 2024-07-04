@@ -16,7 +16,7 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AppCompatActivity
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.reflectField
 import com.topjohnwu.magisk.core.ktx.toast
@@ -29,6 +29,8 @@ interface ContentResultCallback: ActivityResultCallback<Uri>, Parcelable {
     // Make the result type explicitly non-null
     override fun onActivityResult(result: Uri)
 }
+
+interface UntrackedActivity
 
 abstract class BaseActivity : AppCompatActivity() {
 

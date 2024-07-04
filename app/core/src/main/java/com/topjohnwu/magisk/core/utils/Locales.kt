@@ -5,9 +5,9 @@ package com.topjohnwu.magisk.core.utils
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Config
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.createNewResources
 import com.topjohnwu.magisk.core.di.AppContext
 import kotlinx.coroutines.Dispatchers

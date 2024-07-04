@@ -1,8 +1,8 @@
 package com.topjohnwu.magisk.dialog
 
 import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.BuildConfig
 import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
@@ -40,8 +40,8 @@ class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : Dialo
         }
 
         if (code == 2 || // No rules block, module policy not loaded
-            Info.env.versionCode != BuildConfig.VERSION_CODE ||
-            Info.env.versionString != BuildConfig.VERSION_NAME) {
+            Info.env.versionCode != BuildConfig.APP_VERSION_CODE ||
+            Info.env.versionString != BuildConfig.APP_VERSION_NAME) {
             dialog.setMessage(R.string.env_full_fix_msg)
             dialog.setButton(MagiskDialog.ButtonType.POSITIVE) {
                 text = android.R.string.ok

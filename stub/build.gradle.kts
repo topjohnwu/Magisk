@@ -22,6 +22,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         buildConfigField("String", "APK_URL", url?.let { "\"$it\"" } ?: "null" )
+        buildConfigField("int", "STUB_VERSION", Config.stubVersion)
     }
 
     buildTypes {
@@ -30,6 +31,10 @@ android {
             isShrinkResources = false
             proguardFiles("proguard-rules.pro")
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

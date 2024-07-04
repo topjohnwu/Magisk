@@ -7,8 +7,6 @@
 
         <import type="com.topjohnwu.magisk.R" />
 
-        <import type="com.topjohnwu.magisk.core.Config" />
-
         <variable
             name="item"
             type="com.topjohnwu.magisk.ui.module.LocalModuleRvItem" />
