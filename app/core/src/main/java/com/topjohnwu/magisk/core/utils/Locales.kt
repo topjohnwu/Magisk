@@ -8,6 +8,7 @@ import android.content.res.Resources
 import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
+import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.createNewResources
 import com.topjohnwu.magisk.core.di.AppContext
 import kotlinx.coroutines.Dispatchers
@@ -84,5 +85,5 @@ fun refreshLocale() {
     }
     Locale.setDefault(currentLocale)
     AppContext.resources.syncLocale()
-    ActivityTracker.foreground?.recreate()
+    ActivityTracker.foreground?.relaunch()
 }

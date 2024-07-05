@@ -1,11 +1,13 @@
 package com.topjohnwu.magisk.arch
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.use
 import androidx.core.view.WindowCompat
@@ -18,14 +20,20 @@ import com.google.android.material.snackbar.Snackbar
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.base.ActivityExtension
+import com.topjohnwu.magisk.core.base.IActivityExtension
+import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.reflectField
+import com.topjohnwu.magisk.core.wrap
 import rikka.insets.WindowInsetsHelper
 import rikka.layoutinflater.view.LayoutInflaterFactory
 
-abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModelHolder {
+abstract class UIActivity<Binding : ViewDataBinding>
+    : AppCompatActivity(), ViewModelHolder, IActivityExtension {
 
     protected lateinit var binding: Binding
     protected abstract val layoutRes: Int
+    override val extension = ActivityExtension(this)
 
     protected val binded get() = ::binding.isInitialized
 
@@ -36,9 +44,22 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
         AppCompatDelegate.setDefaultNightMode(Config.darkTheme)
     }
 
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base.wrap())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         layoutInflater.factory2 = LayoutInflaterFactory(delegate)
             .addOnViewCreatedListener(WindowInsetsHelper.LISTENER)
+
+        extension.onCreate(savedInstanceState)
+        if (isRunningAsStub) {
+            // Overwrite private members to avoid nasty "false" stack traces being logged
+            val delegate = delegate
+            val clz = delegate.javaClass
+            clz.reflectField("mActivityHandlesConfigFlagsChecked").set(delegate, true)
+            clz.reflectField("mActivityHandlesConfigFlags").set(delegate, 0)
+        }
 
         super.onCreate(savedInstanceState)
 
@@ -68,6 +89,11 @@ abstract class UIActivity<Binding : ViewDataBinding> : BaseActivity(), ViewModel
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        extension.onSaveInstanceState(outState)
     }
 
     fun setContentView() {

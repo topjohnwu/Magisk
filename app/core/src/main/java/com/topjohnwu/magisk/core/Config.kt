@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
@@ -115,7 +114,7 @@ object Config : PreferenceConfig, DBConfig {
     var bootloop by dbSettings(Key.BOOTLOOP, 0)
 
     var safetyNotice by preference(Key.SAFETY, true)
-    var darkTheme by preference(Key.DARK_THEME, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    var darkTheme by preference(Key.DARK_THEME, -1)
     var themeOrdinal by preference(Key.THEME_ORDINAL, 0)
 
     private var checkUpdatePrefs by preference(Key.CHECK_UPDATES, true)

@@ -92,7 +92,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="400"
                     android:valueFrom="M 332.48 421.18 C 332.48 421.18 336.25 443.63 331.66 493.13 C 325.9 555.19 355.3 653.77 355.3 653.77 C 355.3 653.77 395.4 554.99 388.4 491.18 C 382.65 438.73 391 420.39 389.22 422.85 C 358.41 465.42 332.47 421.18 332.47 421.18 Z"
@@ -100,7 +100,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="400"
                     android:valueFrom="0"
@@ -114,7 +114,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="400"
                     android:valueFrom="M 332.48 421.18 C 332.48 421.18 336.25 443.63 331.66 493.13 C 325.9 555.19 355.3 653.77 355.3 653.77 C 355.3 653.77 395.4 554.99 388.4 491.18 C 382.65 438.73 391 420.39 389.22 422.85 C 358.41 465.42 332.47 421.18 332.47 421.18 Z"
@@ -122,7 +122,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="400"
                     android:valueFrom="0"
@@ -135,7 +135,7 @@
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="400"
-                android:interpolator="@interpolator/fast_out_slow_in"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
                 android:propertyName="pathData"
                 android:valueFrom="M 465 120 C 458 113 451 106 444 99 C 438 93 432 90 423 90 C 381 90 339 90 297 90 C 288 90 282 93 276 99 C 269 106 262 113 255 120 C 230 120 205 120 180 120 C 162 120 150 135 150 150 C 150 165 162 180 180 180 C 300 180 420 180 540 180 C 555 180 570 168 570 150 C 570 132 555 120 540 120 C 540 120 540 120 540 120 L 465 120"
                 android:valueTo="M 402.86 140.35 C 406.2 113.59 418.23 94.03 442.18 77.6 C 421.01 70.52 403.41 64.77 394.21 72.3 C 385.01 79.83 360.01 105 363.36 145.98 C 363.917 152.81 364.293 162.755 364.567 174.573 C 364.84 186.391 365.012 200.083 365.16 214.408 C 365.307 228.732 365.431 243.689 365.609 258.038 C 365.787 272.386 366.019 286.126 366.384 298.016 C 366.749 309.906 367.246 319.946 367.954 326.895 C 368.663 333.845 369.582 337.703 370.79 337.23 C 372.09 302.273 376.644 275.621 381.953 253.329 C 387.262 231.037 393.326 213.104 397.643 195.588 C 401.961 178.071 404.533 160.97 402.86 140.34 L 402.86 140.35"
@@ -147,7 +147,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="600"
                     android:valueFrom="M 397.28 422.02 C 391.2 416.08 404.02 446.74 407.6 474.45 C 407.6 474.45 407.6 474.45 407.6 474.45 C 410.105 493.835 409.962 508.837 408.289 524.181 C 406.615 539.525 403.41 555.21 399.79 575.96 C 396.13 596.95 474.57 512.86 504.65 462.73 C 507.16 458.55 499.967 466.7 487.97 472.239 C 475.973 477.777 459.17 480.705 442.46 466.08 C 419.28 445.8 415.3 439.64 397.28 422.02"
@@ -155,7 +155,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="600"
                     android:valueFrom="0"
@@ -169,7 +169,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="600"
                     android:valueFrom="M 310.981 527.251 C 309.308 511.908 309.165 496.905 311.67 477.52 C 315.25 449.81 328.07 419.15 321.99 425.09 L 321.99 425.09 C 303.97 442.71 299.99 448.87 276.81 469.15 C 260.1 483.775 243.298 480.848 231.3 475.309 C 219.303 469.77 212.11 461.62 214.62 465.8 C 244.7 515.93 323.14 600.02 319.48 579.03 C 315.86 558.28 312.655 542.595 310.981 527.251"
@@ -177,7 +177,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="600"
                     android:valueFrom="0"
@@ -190,7 +190,7 @@
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="400"
-                android:interpolator="@interpolator/fast_out_slow_in"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
                 android:propertyName="pathData"
                 android:valueFrom="M 465 120 C 458 113 451 106 444 99 C 438 93 432 90 423 90 C 381 90 339 90 297 90 C 288 90 282 93 276 99 C 269 106 262 113 255 120 C 230 120 205 120 180 120 C 162 120 150 135 150 150 C 150 165 162 180 180 180 C 300 180 420 180 540 180 C 555 180 570 168 570 150 C 570 132 555 120 540 120 C 540 120 540 120 540 120 L 465 120"
                 android:valueTo="M 349.59 337.24 C 353.21 338.655 354.23 301.087 354.764 258.044 C 355.298 215 355.345 166.48 357.02 145.99 C 360.36 105.01 335.37 79.83 326.17 72.31 C 316.97 64.78 299.37 70.53 278.2 77.61 C 302.15 94.04 314.18 113.59 317.52 140.36 C 315.847 160.99 318.419 178.091 322.737 195.608 C 327.054 213.124 333.118 231.057 338.427 253.349 C 343.736 275.641 348.29 302.293 349.59 337.25 C 349.59 337.249 349.59 337.249 349.59 337.248 C 349.59 337.247 349.59 337.247 349.59 337.246 C 349.59 337.245 349.59 337.245 349.59 337.244 C 349.59 337.243 349.59 337.243 349.59 337.242 L 349.59 337.24"
@@ -202,7 +202,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="800"
                     android:valueFrom="M 375.53 396.64 C 361.1 395.99 360.19 368.47 360.19 368.47 C 360.19 368.47 377.41 349.61 399.15 355.87 C 399.15 355.87 399.15 355.87 399.15 355.87 C 435.82 366.44 450.04 417.37 487.06 423.67 C 494.71 424.97 503.33 427.27 513.37 426.79 C 532.14 425.89 555.88 415.28 587.59 370.29 C 596.97 356.99 564.32 455.95 482.46 457.15 C 422.5 458.03 415.49 398.45 375.53 396.64"
@@ -210,7 +210,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="800"
                     android:valueFrom="0"
@@ -224,7 +224,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="800"
                     android:valueFrom="M 321.51 355.59 C 343.25 349.33 360.47 368.19 360.47 368.19 C 360.47 368.19 359.56 395.71 345.13 396.36 C 305.17 398.17 298.16 457.75 238.2 456.87 C 156.34 455.67 123.69 356.71 133.07 370.01 C 164.78 415 188.52 425.61 207.29 426.51 C 217.33 426.99 225.95 424.69 233.6 423.39 C 270.62 417.09 284.84 366.16 321.51 355.59 C 321.51 355.59 321.51 355.59 321.51 355.59"
@@ -232,7 +232,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="800"
                     android:valueFrom="0"
@@ -245,7 +245,7 @@
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="400"
-                android:interpolator="@interpolator/fast_out_slow_in"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
                 android:propertyName="pathData"
                 android:valueFrom="M 180 270 C 180 370 180 470 180 570 C 180 570 180 570 180 570 C 180 603 207 630 240 630 C 320 630 400 630 480 630 C 513 630 540 603 540 570 C 540 470 540 370 540 270 C 540 237 513 210 480 210 C 400 210 320 210 240 210 C 207 210 180 237 180 270"
                 android:valueTo="M 332.48 421.18 C 332.48 421.18 336.25 443.63 331.66 493.13 C 330.031 510.682 331.214 531.156 333.75 551.494 C 340.179 603.067 355.3 653.77 355.3 653.77 C 355.3 653.77 374.498 606.479 384.008 556.202 C 388.243 533.816 390.557 510.839 388.4 491.18 C 387.14 479.683 386.557 469.826 386.396 461.466 C 385.824 431.689 390.61 420.929 389.22 422.85 C 358.41 465.42 332.47 421.18 332.47 421.18 C 332.473 421.18 332.477 421.18 332.48 421.18"
@@ -257,7 +257,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="400"
                     android:valueFrom="M 357.02 145.99 C 355.345 166.48 355.298 215 354.764 258.044 C 354.23 301.087 353.21 338.655 349.59 337.24 C 349.59 337.241 349.59 337.241 349.59 337.242 C 349.59 337.243 349.59 337.243 349.59 337.244 C 349.59 337.245 349.59 337.245 349.59 337.246 C 349.59 337.247 349.59 337.247 349.59 337.248 C 349.59 337.249 349.59 337.249 349.59 337.25 C 348.29 302.293 343.736 275.641 338.427 253.349 C 333.118 231.057 327.054 213.124 322.737 195.608 C 318.419 178.091 315.847 160.99 317.52 140.36 C 314.18 113.59 302.15 94.04 278.2 77.61 C 299.37 70.53 316.97 64.78 326.17 72.31 C 335.37 79.83 360.36 105.01 357.02 145.99"
@@ -265,7 +265,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="400"
                     android:valueFrom="0"
@@ -279,7 +279,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="400"
                     android:valueFrom="M 367.954 326.895 C 368.663 333.845 369.582 337.703 370.79 337.23 C 372.09 302.273 376.644 275.621 381.953 253.329 C 387.262 231.037 393.326 213.104 397.643 195.588 C 401.961 178.071 404.533 160.97 402.86 140.34 C 402.86 140.343 402.86 140.347 402.86 140.35 C 406.2 113.59 418.23 94.03 442.18 77.6 C 421.01 70.52 403.41 64.77 394.21 72.3 C 385.01 79.83 360.01 105 363.36 145.98 C 363.917 152.81 364.293 162.755 364.567 174.573 C 364.84 186.391 365.012 200.083 365.16 214.408 C 365.307 228.732 365.431 243.689 365.609 258.038 C 365.787 272.386 366.019 286.126 366.384 298.016 C 366.749 309.906 367.246 319.946 367.954 326.895"
@@ -287,7 +287,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="400"
                     android:valueFrom="0"
@@ -301,7 +301,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="600"
                     android:valueFrom="M 292.42 179.39 C 291.51 158.576 286.47 129.373 279.164 108.658 C 273.781 93.395 267.168 82.742 260.07 83.45 C 243.34 85.12 201.03 110.36 208.76 120.82 C 227.553 146.262 243.019 170.697 258.825 193.445 C 277.487 220.301 296.623 244.806 322.27 265.84 C 328.64 271.06 293.87 212.39 292.43 179.39 Z"
@@ -309,7 +309,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="600"
                     android:valueFrom="0"
@@ -323,7 +323,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="600"
                     android:valueFrom="M 398.13 265.85 L 398.12 265.85 C 421.8 246.425 439.933 224.04 457.267 199.576 C 474.603 175.113 491.14 148.57 511.63 120.83 C 519.36 110.37 477.05 85.13 460.32 83.46 C 443.59 81.79 429.55 143.25 427.97 179.4 C 426.53 212.41 391.76 271.08 398.13 265.85"
@@ -331,7 +331,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="600"
                     android:valueFrom="0"
@@ -345,7 +345,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="800"
                     android:valueFrom="M 484.58 235.73 C 519.57 226.15 545.8 202.6 548.72 177.72 C 550.9 159.19 521.67 124.17 521.67 124.17 C 521.67 124.17 501.16 181.07 474.26 209.51 C 444.98 240.47 456.11 236.29 403.42 269.47 C 403.42 269.47 403.42 269.47 403.42 269.47 C 403.42 269.47 447.15 245.97 484.58 235.73"
@@ -353,7 +353,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="800"
                     android:valueFrom="0"
@@ -367,7 +367,7 @@
             <set>
                 <objectAnimator
                     android:duration="200"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="pathData"
                     android:startOffset="800"
                     android:valueFrom="M 246.13 209.51 L 246.13 209.51 C 275.42 240.47 264.28 236.29 316.97 269.47 C 316.97 269.47 273.24 245.98 235.81 235.73 C 200.83 226.15 174.6 202.6 171.67 177.72 C 169.49 159.18 198.72 124.17 198.72 124.17 C 198.72 124.17 203.847 138.395 212.338 156.175 C 220.827 173.955 232.68 195.29 246.13 209.51"
@@ -375,7 +375,7 @@
                     android:valueType="pathType" />
                 <objectAnimator
                     android:duration="10"
-                    android:interpolator="@interpolator/fast_out_slow_in"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
                     android:propertyName="fillAlpha"
                     android:startOffset="800"
                     android:valueFrom="0"

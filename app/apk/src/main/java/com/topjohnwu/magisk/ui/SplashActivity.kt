@@ -17,6 +17,8 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.JobService
+import com.topjohnwu.magisk.core.base.realCallingPackage
+import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.toast

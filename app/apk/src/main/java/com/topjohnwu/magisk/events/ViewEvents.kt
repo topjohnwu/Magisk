@@ -11,6 +11,7 @@ import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.arch.ViewEvent
 import com.topjohnwu.magisk.core.base.ContentResultCallback
+import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
@@ -47,7 +48,7 @@ class ShowUIEvent(private val delegate: View.AccessibilityDelegate?)
 
 class RecreateEvent : ViewEvent(), ActivityExecutor {
     override fun invoke(activity: UIActivity<*>) {
-        activity.recreate()
+        activity.relaunch()
     }
 }
 
@@ -56,8 +57,7 @@ class AuthEvent(
 ) : ViewEvent(), ActivityExecutor {
 
     override fun invoke(activity: UIActivity<*>) {
-        activity.authenticateCallback = { if (it) callback() }
-        activity.requestAuthenticate.launch(Unit)
+        activity.withAuthentication { if (it) callback() }
     }
 }
 

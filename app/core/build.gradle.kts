@@ -15,7 +15,6 @@ android {
     namespace = "com.topjohnwu.magisk.core"
 
     defaultConfig {
-        vectorDrawables.useSupportLibrary = true
         buildConfigField("String", "APP_PACKAGE_NAME", "\"com.topjohnwu.magisk\"")
         buildConfigField("int", "APP_VERSION_CODE", "${Config.versionCode}")
         buildConfigField("String", "APP_VERSION_NAME", "\"${Config.version}\"")
@@ -64,9 +63,8 @@ dependencies {
     implementation("androidx.room:room-ktx:${vRoom}")
     ksp("androidx.room:room-compiler:${vRoom}")
 
-    api("androidx.appcompat:appcompat:1.7.0")
-    api("com.google.android.material:material:1.12.0")
     implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.activity:activity:1.9.0")
     implementation("androidx.collection:collection-ktx:1.4.0")
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
     implementation("androidx.lifecycle:lifecycle-process:2.8.3")

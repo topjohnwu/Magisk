@@ -18,7 +18,6 @@ import android.os.Process
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.currentLocale
@@ -28,7 +27,7 @@ import java.io.File
 import kotlin.String
 
 fun Context.getBitmap(id: Int): Bitmap {
-    var drawable = AppCompatResources.getDrawable(this, id)!!
+    var drawable = getDrawable(id)!!
     if (drawable is BitmapDrawable)
         return drawable.bitmap
     if (SDK_INT >= Build.VERSION_CODES.O && drawable is AdaptiveIconDrawable) {

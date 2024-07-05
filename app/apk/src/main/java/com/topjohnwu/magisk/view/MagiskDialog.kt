@@ -21,7 +21,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.databinding.DialogMagiskBaseBinding
 import com.topjohnwu.magisk.databinding.DiffItem
 import com.topjohnwu.magisk.databinding.ItemWrapper
@@ -42,7 +42,7 @@ class MagiskDialog(
         DialogMagiskBaseBinding.inflate(LayoutInflater.from(context))
     private val data = Data()
 
-    val activity: BaseActivity get() = ownerActivity as BaseActivity
+    val activity: UIActivity<*> get() = ownerActivity as UIActivity<*>
 
     init {
         binding.setVariable(BR.data, data)

@@ -10,6 +10,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.collection.SparseArrayCompat
 import androidx.collection.isNotEmpty
 import androidx.core.content.getSystemService
@@ -20,7 +21,7 @@ import com.topjohnwu.magisk.core.ActivityTracker
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.R
-import com.topjohnwu.magisk.core.base.BaseActivity
+import com.topjohnwu.magisk.core.base.IActivityExtension
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.intent
@@ -129,7 +130,10 @@ class DownloadEngine(
         }
 
         @SuppressLint("InlinedApi")
-        fun startWithActivity(activity: BaseActivity, subject: Subject) {
+        fun <T> startWithActivity(
+            activity: T,
+            subject: Subject
+        ) where T : ComponentActivity, T : IActivityExtension {
             activity.withPermission(Manifest.permission.POST_NOTIFICATIONS) {
                 // Always download regardless of notification permission status
                 start(activity.applicationContext, subject)

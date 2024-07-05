@@ -19,7 +19,7 @@
         <aapt:attr name="android:animation">
             <objectAnimator
                 android:duration="300"
-                android:interpolator="@interpolator/fast_out_slow_in"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
                 android:propertyName="pathData"
                 android:valueFrom="M 9 13 L 9 19 L 6 19 L 6 10 L 12 5.5 L 15 7.75 L 18 10 L 18 19 L 15 19 L 15 13 L 9 13 M 4 21 L 4 9 L 12 3 L 20 9 L 20 21 L 4 21 L 4 21"
                 android:valueTo="M 9 14 L 9 21 L 4 21 L 4 9 L 12 3 L 12 3 L 20 9 L 20 21 L 15 21 L 15 14 L 9 14 M 12 13.4 L 12 13.4 L 12 13.4 L 12 13.4 L 12 13.4 L 12 13.4 L 12 13.4"

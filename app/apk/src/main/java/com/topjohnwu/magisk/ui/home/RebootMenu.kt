@@ -1,5 +1,6 @@
 package com.topjohnwu.magisk.ui.home
 
+import android.app.Activity
 import android.os.Build
 import android.os.PowerManager
 import android.view.ContextThemeWrapper
@@ -9,7 +10,6 @@ import androidx.core.content.getSystemService
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.base.BaseActivity
 import com.topjohnwu.magisk.core.ktx.reboot as systemReboot
 
 object RebootMenu {
@@ -32,7 +32,7 @@ object RebootMenu {
         return true
     }
 
-    fun inflate(activity: BaseActivity): PopupMenu {
+    fun inflate(activity: Activity): PopupMenu {
         val themeWrapper = ContextThemeWrapper(activity, R.style.Foundation_PopupMenu)
         val menu = PopupMenu(themeWrapper, activity.findViewById(R.id.action_reboot))
         activity.menuInflater.inflate(R.menu.menu_reboot, menu.menu)
