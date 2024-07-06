@@ -4,7 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.provideDelegate
 import java.io.File
-import java.util.*
+import java.util.Properties
 
 private val props = Properties()
 private var commitHash = ""
@@ -26,7 +26,7 @@ class MagiskPlugin : Plugin<Project> {
     override fun apply(project: Project) = project.applyPlugin()
 
     private fun Project.applyPlugin() {
-        initRandom(rootProject.file("dict.txt"))
+        initRandom(rootProject.file("app/dict.txt"))
         props.clear()
         rootProject.file("gradle.properties").inputStream().use { props.load(it) }
         val configPath: String? by this

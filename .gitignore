@@ -4,7 +4,7 @@ out
 *.apk
 /config.prop
 /update.sh
-/dict.txt
+/app/dict.txt
 
 # Built binaries
 native/out
