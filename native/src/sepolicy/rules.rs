@@ -52,7 +52,8 @@ impl SepolicyMagisk for sepolicy {
         set_log_level_state(LogLevel::Warn, false);
         rules! {
             use self;
-            allow(all, ["kernel"], ["security"], ["load_policy"]);
+            // Prevent anything to change sepolicy except ourselves
+            deny(all, ["kernel"], ["security"], ["load_policy"]);
             type_(proc, ["domain"]);
             typeattribute([proc], ["mlstrustedsubject", "netdomain", "appdomain"]);
             type_(file, ["file_type"]);
