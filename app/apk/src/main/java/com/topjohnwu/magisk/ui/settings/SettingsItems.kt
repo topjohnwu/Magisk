@@ -26,11 +26,12 @@ import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.topjohnwu.magisk.core.R as CoreR
 
 // --- Customization
 
 object Customization : BaseSettingsItem.Section() {
-    override val title = R.string.settings_customization.asText()
+    override val title = CoreR.string.settings_customization.asText()
 }
 
 object Language : BaseSettingsItem.Selector() {
@@ -41,7 +42,7 @@ object Language : BaseSettingsItem.Selector() {
             Config.locale = entryValues[value]
         }
 
-    override val title = R.string.language.asText()
+    override val title = CoreR.string.language.asText()
 
     private var entries = emptyArray<String>()
     private var entryValues = emptyArray<String>()
@@ -70,18 +71,18 @@ object Language : BaseSettingsItem.Selector() {
 
 object Theme : BaseSettingsItem.Blank() {
     override val icon = R.drawable.ic_paint
-    override val title = R.string.section_theme.asText()
+    override val title = CoreR.string.section_theme.asText()
 }
 
 // --- App
 
 object AppSettings : BaseSettingsItem.Section() {
-    override val title = R.string.home_app_title.asText()
+    override val title = CoreR.string.home_app_title.asText()
 }
 
 object Hide : BaseSettingsItem.Input() {
-    override val title = R.string.settings_hide_app_title.asText()
-    override val description = R.string.settings_hide_app_summary.asText()
+    override val title = CoreR.string.settings_hide_app_title.asText()
+    override val description = CoreR.string.settings_hide_app_summary.asText()
     override var value = ""
 
     override val inputResult
@@ -103,14 +104,14 @@ object Hide : BaseSettingsItem.Input() {
 }
 
 object Restore : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_restore_app_title.asText()
-    override val description = R.string.settings_restore_app_summary.asText()
+    override val title = CoreR.string.settings_restore_app_title.asText()
+    override val description = CoreR.string.settings_restore_app_summary.asText()
 
     override fun onPressed(view: View, handler: Handler) {
         handler.onItemPressed(view, this) {
             MagiskDialog(view.activity).apply {
-                setTitle(R.string.settings_restore_app_title)
-                setMessage(R.string.restore_app_confirmation)
+                setTitle(CoreR.string.settings_restore_app_title)
+                setMessage(CoreR.string.restore_app_confirmation)
                 setButton(MagiskDialog.ButtonType.POSITIVE) {
                     text = android.R.string.ok
                     onClick {
@@ -128,8 +129,8 @@ object Restore : BaseSettingsItem.Blank() {
 }
 
 object AddShortcut : BaseSettingsItem.Blank() {
-    override val title = R.string.add_shortcut_title.asText()
-    override val description = R.string.setting_add_shortcut_summary.asText()
+    override val title = CoreR.string.add_shortcut_title.asText()
+    override val description = CoreR.string.setting_add_shortcut_summary.asText()
 }
 
 object DownloadPath : BaseSettingsItem.Input() {
@@ -140,7 +141,7 @@ object DownloadPath : BaseSettingsItem.Input() {
             notifyPropertyChanged(BR.description)
         }
 
-    override val title = R.string.settings_download_path_title.asText()
+    override val title = CoreR.string.settings_download_path_title.asText()
     override val description get() = MediaStoreUtils.fullPath(value).asText()
 
     override var inputResult: String = value
@@ -161,9 +162,9 @@ object UpdateChannel : BaseSettingsItem.Selector() {
             Info.remote = Info.EMPTY_REMOTE
         }
 
-    override val title = R.string.settings_update_channel_title.asText()
+    override val title = CoreR.string.settings_update_channel_title.asText()
 
-    override val entryRes = R.array.update_channel
+    override val entryRes = CoreR.array.update_channel
     override fun entries(res: Resources): Array<String> {
         return super.entries(res).let {
             if (!Const.APP_IS_CANARY && !BuildConfig.DEBUG)
@@ -174,7 +175,7 @@ object UpdateChannel : BaseSettingsItem.Selector() {
 }
 
 object UpdateChannelUrl : BaseSettingsItem.Input() {
-    override val title = R.string.settings_update_custom.asText()
+    override val title = CoreR.string.settings_update_custom.asText()
     override val description get() = value.asText()
     override var value
         get() = Config.customChannelUrl
@@ -196,39 +197,39 @@ object UpdateChannelUrl : BaseSettingsItem.Input() {
 }
 
 object UpdateChecker : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_check_update_title.asText()
-    override val description = R.string.settings_check_update_summary.asText()
+    override val title = CoreR.string.settings_check_update_title.asText()
+    override val description = CoreR.string.settings_check_update_summary.asText()
     override var value by Config::checkUpdate
 }
 
 object DoHToggle : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_doh_title.asText()
-    override val description = R.string.settings_doh_description.asText()
+    override val title = CoreR.string.settings_doh_title.asText()
+    override val description = CoreR.string.settings_doh_description.asText()
     override var value by Config::doh
 }
 
 object SystemlessHosts : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_hosts_title.asText()
-    override val description = R.string.settings_hosts_summary.asText()
+    override val title = CoreR.string.settings_hosts_title.asText()
+    override val description = CoreR.string.settings_hosts_summary.asText()
 }
 
 object RandNameToggle : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_random_name_title.asText()
-    override val description = R.string.settings_random_name_description.asText()
+    override val title = CoreR.string.settings_random_name_title.asText()
+    override val description = CoreR.string.settings_random_name_description.asText()
     override var value by Config::randName
 }
 
 // --- Magisk
 
 object Magisk : BaseSettingsItem.Section() {
-    override val title = R.string.magisk.asText()
+    override val title = CoreR.string.magisk.asText()
 }
 
 object Zygisk : BaseSettingsItem.Toggle() {
-    override val title = R.string.zygisk.asText()
+    override val title = CoreR.string.zygisk.asText()
     override val description get() =
-        if (mismatch) R.string.reboot_apply_change.asText()
-        else R.string.settings_zygisk_summary.asText()
+        if (mismatch) CoreR.string.reboot_apply_change.asText()
+        else CoreR.string.settings_zygisk_summary.asText()
     override var value
         get() = Config.zygisk
         set(value) {
@@ -239,8 +240,8 @@ object Zygisk : BaseSettingsItem.Toggle() {
 }
 
 object DenyList : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_denylist_title.asText()
-    override val description get() = R.string.settings_denylist_summary.asText()
+    override val title = CoreR.string.settings_denylist_title.asText()
+    override val description get() = CoreR.string.settings_denylist_summary.asText()
 
     override var value = Config.denyList
         set(value) {
@@ -258,45 +259,45 @@ object DenyList : BaseSettingsItem.Toggle() {
 }
 
 object DenyListConfig : BaseSettingsItem.Blank() {
-    override val title = R.string.settings_denylist_config_title.asText()
-    override val description = R.string.settings_denylist_config_summary.asText()
+    override val title = CoreR.string.settings_denylist_config_title.asText()
+    override val description = CoreR.string.settings_denylist_config_summary.asText()
 }
 
 // --- Superuser
 
 object Tapjack : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_tapjack_title.asText()
-    override val description = R.string.settings_su_tapjack_summary.asText()
+    override val title = CoreR.string.settings_su_tapjack_title.asText()
+    override val description = CoreR.string.settings_su_tapjack_summary.asText()
     override var value by Config::suTapjack
 }
 
 object Authentication : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_auth_title.asText()
-    override var description = R.string.settings_su_auth_summary.asText()
+    override val title = CoreR.string.settings_su_auth_title.asText()
+    override var description = CoreR.string.settings_su_auth_summary.asText()
     override var value by Config::suAuth
 
     override fun refresh() {
         isEnabled = Info.isDeviceSecure
         if (!isEnabled) {
-            description = R.string.settings_su_auth_insecure.asText()
+            description = CoreR.string.settings_su_auth_insecure.asText()
         }
     }
 }
 
 object Superuser : BaseSettingsItem.Section() {
-    override val title = R.string.superuser.asText()
+    override val title = CoreR.string.superuser.asText()
 }
 
 object AccessMode : BaseSettingsItem.Selector() {
-    override val title = R.string.superuser_access.asText()
-    override val entryRes = R.array.su_access
+    override val title = CoreR.string.superuser_access.asText()
+    override val entryRes = CoreR.array.su_access
     override var value by Config::rootMode
 }
 
 object MultiuserMode : BaseSettingsItem.Selector() {
-    override val title = R.string.multiuser_mode.asText()
-    override val entryRes = R.array.multiuser_mode
-    override val descriptionRes = R.array.multiuser_summary
+    override val title = CoreR.string.multiuser_mode.asText()
+    override val entryRes = CoreR.array.multiuser_mode
+    override val descriptionRes = CoreR.array.multiuser_summary
     override var value by Config::suMultiuserMode
 
     override fun refresh() {
@@ -305,21 +306,21 @@ object MultiuserMode : BaseSettingsItem.Selector() {
 }
 
 object MountNamespaceMode : BaseSettingsItem.Selector() {
-    override val title = R.string.mount_namespace_mode.asText()
-    override val entryRes = R.array.namespace
-    override val descriptionRes = R.array.namespace_summary
+    override val title = CoreR.string.mount_namespace_mode.asText()
+    override val entryRes = CoreR.array.namespace
+    override val descriptionRes = CoreR.array.namespace_summary
     override var value by Config::suMntNamespaceMode
 }
 
 object AutomaticResponse : BaseSettingsItem.Selector() {
-    override val title = R.string.auto_response.asText()
-    override val entryRes = R.array.auto_response
+    override val title = CoreR.string.auto_response.asText()
+    override val entryRes = CoreR.array.auto_response
     override var value by Config::suAutoResponse
 }
 
 object RequestTimeout : BaseSettingsItem.Selector() {
-    override val title = R.string.request_timeout.asText()
-    override val entryRes = R.array.request_timeout
+    override val title = CoreR.string.request_timeout.asText()
+    override val entryRes = CoreR.array.request_timeout
 
     private val entryValues = listOf(10, 15, 20, 30, 45, 60)
     override var value = entryValues.indexOfFirst { it == Config.suDefaultTimeout }
@@ -330,14 +331,14 @@ object RequestTimeout : BaseSettingsItem.Selector() {
 }
 
 object SUNotification : BaseSettingsItem.Selector() {
-    override val title = R.string.superuser_notification.asText()
-    override val entryRes = R.array.su_notification
+    override val title = CoreR.string.superuser_notification.asText()
+    override val entryRes = CoreR.array.su_notification
     override var value by Config::suNotification
 }
 
 object Reauthenticate : BaseSettingsItem.Toggle() {
-    override val title = R.string.settings_su_reauth_title.asText()
-    override val description = R.string.settings_su_reauth_summary.asText()
+    override val title = CoreR.string.settings_su_reauth_title.asText()
+    override val description = CoreR.string.settings_su_reauth_summary.asText()
     override var value by Config::suReAuth
 
     override fun refresh() {

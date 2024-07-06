@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.set
 import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
+import com.topjohnwu.magisk.core.R as CoreR
 
 object InstallModule : RvItem(), DiffItem<InstallModule> {
     override val layoutRes = R.layout.item_module_download
@@ -36,9 +37,9 @@ class LocalModuleRvItem(
             (!Info.isZygiskEnabled && isZygisk)
         noticeText =
             when {
-                zygiskUnloaded -> R.string.zygisk_module_unloaded.asText()
-                isRiru -> R.string.suspend_text_riru.asText(R.string.zygisk.asText())
-                else -> R.string.suspend_text_zygisk.asText(R.string.zygisk.asText())
+                zygiskUnloaded -> CoreR.string.zygisk_module_unloaded.asText()
+                isRiru -> CoreR.string.suspend_text_riru.asText(CoreR.string.zygisk.asText())
+                else -> CoreR.string.suspend_text_zygisk.asText(CoreR.string.zygisk.asText())
             }
     }
 

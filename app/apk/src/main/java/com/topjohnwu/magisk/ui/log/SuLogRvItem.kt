@@ -10,6 +10,7 @@ import com.topjohnwu.magisk.core.model.su.SuLog
 import com.topjohnwu.magisk.databinding.DiffItem
 import com.topjohnwu.magisk.databinding.ObservableRvItem
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.core.R as CoreR
 
 class SuLogRvItem(val log: SuLog) : ObservableRvItem(), DiffItem<SuLogRvItem> {
 
@@ -31,20 +32,20 @@ class SuLogRvItem(val log: SuLog) : ObservableRvItem(), DiffItem<SuLogRvItem> {
         val res = AppContext.resources
         val sb = StringBuilder()
         val date = log.time.toTime(timeDateFormat)
-        val toUid = res.getString(R.string.target_uid, log.toUid)
-        val fromPid = res.getString(R.string.pid, log.fromPid)
+        val toUid = res.getString(CoreR.string.target_uid, log.toUid)
+        val fromPid = res.getString(CoreR.string.pid, log.fromPid)
         sb.append("$date\n$toUid  $fromPid")
         if (log.target != -1) {
             val pid = if (log.target == 0) "magiskd" else log.target.toString()
-            val target = res.getString(R.string.target_pid, pid)
+            val target = res.getString(CoreR.string.target_pid, pid)
             sb.append("  $target")
         }
         if (log.context.isNotEmpty()) {
-            val context = res.getString(R.string.selinux_context, log.context)
+            val context = res.getString(CoreR.string.selinux_context, log.context)
             sb.append("\n$context")
         }
         if (log.gids.isNotEmpty()) {
-            val gids = res.getString(R.string.supp_group, log.gids)
+            val gids = res.getString(CoreR.string.supp_group, log.gids)
             sb.append("\n$gids")
         }
         sb.append("\n${log.command}")

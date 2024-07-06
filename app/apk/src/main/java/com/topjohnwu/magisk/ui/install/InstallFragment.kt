@@ -4,6 +4,7 @@ import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentInstallMd2Binding
+import com.topjohnwu.magisk.core.R as CoreR
 
 class InstallFragment : BaseFragment<FragmentInstallMd2Binding>() {
 
@@ -12,6 +13,6 @@ class InstallFragment : BaseFragment<FragmentInstallMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        requireActivity().setTitle(R.string.install)
+        requireActivity().setTitle(CoreR.string.install)
     }
 }

@@ -11,6 +11,7 @@ import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addInvalidateItemDecorationsObserver
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.R as CoreR
 
 class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
 
@@ -19,7 +20,7 @@ class ModuleFragment : BaseFragment<FragmentModuleMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        activity?.title = resources.getString(R.string.modules)
+        activity?.title = resources.getString(CoreR.string.modules)
         viewModel.data.observe(this) {
             it ?: return@observe
             val displayName = runCatching { it.displayName }.getOrNull() ?: return@observe

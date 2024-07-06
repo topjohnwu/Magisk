@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.utils.MotionRevealHelper
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.R as CoreR
 
 class LogFragment : BaseFragment<FragmentLogMd2Binding>(), MenuProvider {
 
@@ -41,7 +42,7 @@ class LogFragment : BaseFragment<FragmentLogMd2Binding>(), MenuProvider {
 
     override fun onStart() {
         super.onStart()
-        activity?.setTitle(R.string.logs)
+        activity?.setTitle(CoreR.string.logs)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,7 +1,7 @@
 package com.topjohnwu.magisk.dialog
 
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.download.DownloadEngine

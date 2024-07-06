@@ -2,8 +2,8 @@ package com.topjohnwu.magisk.dialog
 
 import android.net.Uri
 import com.topjohnwu.magisk.MainDirections
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.module.ModuleViewModel
 import com.topjohnwu.magisk.view.MagiskDialog

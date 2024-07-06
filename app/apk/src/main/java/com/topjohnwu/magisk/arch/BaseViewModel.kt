@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDirections
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.databinding.ObservableHost
 import com.topjohnwu.magisk.events.BackPressEvent
 import com.topjohnwu.magisk.events.DialogBuilder

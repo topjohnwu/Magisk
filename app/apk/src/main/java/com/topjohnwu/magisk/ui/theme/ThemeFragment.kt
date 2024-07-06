@@ -12,6 +12,7 @@ import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.databinding.FragmentThemeMd2Binding
 import com.topjohnwu.magisk.databinding.ItemThemeBindingImpl
+import com.topjohnwu.magisk.core.R as CoreR
 
 class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
 
@@ -61,7 +62,7 @@ class ThemeFragment : BaseFragment<FragmentThemeMd2Binding>() {
     override fun onStart() {
         super.onStart()
 
-        activity?.title = getString(R.string.section_theme)
+        activity?.title = getString(CoreR.string.section_theme)
     }
 
 }

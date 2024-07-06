@@ -1,9 +1,9 @@
 package com.topjohnwu.magisk.dialog
 
 import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.home.HomeViewModel

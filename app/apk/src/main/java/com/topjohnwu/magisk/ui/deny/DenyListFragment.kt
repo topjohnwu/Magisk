@@ -16,6 +16,7 @@ import com.topjohnwu.magisk.databinding.FragmentDenyMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.R as CoreR
 
 class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
 
@@ -26,7 +27,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
 
     override fun onStart() {
         super.onStart()
-        activity?.setTitle(R.string.denylist)
+        activity?.setTitle(CoreR.string.denylist)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +59,7 @@ class DenyListFragment : BaseFragment<FragmentDenyMd2Binding>(), MenuProvider {
     override fun onCreateMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_deny_md2, menu)
         searchView = menu.findItem(R.id.action_search).actionView as SearchView
-        searchView.queryHint = searchView.context.getString(R.string.hide_filter_hint)
+        searchView.queryHint = searchView.context.getString(CoreR.string.hide_filter_hint)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.query = query ?: ""

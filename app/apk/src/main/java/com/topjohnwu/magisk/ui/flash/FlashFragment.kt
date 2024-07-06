@@ -21,6 +21,7 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.cmp
 import com.topjohnwu.magisk.databinding.FragmentFlashMd2Binding
 import com.topjohnwu.magisk.ui.MainActivity
+import com.topjohnwu.magisk.core.R as CoreR
 
 class FlashFragment : BaseFragment<FragmentFlashMd2Binding>(), MenuProvider {
 
@@ -39,14 +40,14 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>(), MenuProvider {
 
     override fun onStart() {
         super.onStart()
-        activity?.setTitle(R.string.flash_screen_title)
+        activity?.setTitle(CoreR.string.flash_screen_title)
 
         viewModel.state.observe(this) {
             activity?.supportActionBar?.setSubtitle(
                 when (it) {
-                    FlashViewModel.State.FLASHING -> R.string.flashing
-                    FlashViewModel.State.SUCCESS -> R.string.done
-                    FlashViewModel.State.FAILED -> R.string.failure
+                    FlashViewModel.State.FLASHING -> CoreR.string.flashing
+                    FlashViewModel.State.SUCCESS -> CoreR.string.done
+                    FlashViewModel.State.FAILED -> CoreR.string.failure
                 }
             )
             if (it == FlashViewModel.State.SUCCESS && viewModel.showReboot) {

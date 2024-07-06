@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.databinding.FragmentSuperuserMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.R as CoreR
 
 class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
 
@@ -17,7 +18,7 @@ class SuperuserFragment : BaseFragment<FragmentSuperuserMd2Binding>() {
 
     override fun onStart() {
         super.onStart()
-        activity?.title = resources.getString(R.string.superuser)
+        activity?.title = resources.getString(CoreR.string.superuser)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

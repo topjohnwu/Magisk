@@ -30,6 +30,7 @@ import com.topjohnwu.magisk.events.SnackbarEvent
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.superuser.Shell
 import kotlin.math.roundToInt
+import com.topjohnwu.magisk.core.R as CoreR
 
 class HomeViewModel(
     private val svc: NetworkService
@@ -65,11 +66,11 @@ class HomeViewModel(
             if (isActive)
                 ("$versionString ($versionCode)" + if (isDebug) " (D)" else "").asText()
             else
-                R.string.not_available.asText()
+                CoreR.string.not_available.asText()
         }
 
     @get:Bindable
-    var managerRemoteVersion = R.string.loading.asText()
+    var managerRemoteVersion = CoreR.string.loading.asText()
         set(value) = set(value, field, { field = it }, BR.managerRemoteVersion)
 
     val managerInstalledVersion
@@ -102,7 +103,7 @@ class HomeViewModel(
                     if (isDebug) " (D)" else "").asText()
         } ?: run {
             appState = State.INVALID
-            managerRemoteVersion = R.string.not_available.asText()
+            managerRemoteVersion = CoreR.string.not_available.asText()
         }
         ensureEnv()
     }
@@ -121,7 +122,7 @@ class HomeViewModel(
             try {
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                context.toast(R.string.open_link_failed_toast, Toast.LENGTH_SHORT)
+                context.toast(CoreR.string.open_link_failed_toast, Toast.LENGTH_SHORT)
             }
         }
     }.publish()
@@ -129,8 +130,8 @@ class HomeViewModel(
     fun onDeletePressed() = UninstallDialog().show()
 
     fun onManagerPressed() = when (appState) {
-        State.LOADING -> SnackbarEvent(R.string.loading).publish()
-        State.INVALID -> SnackbarEvent(R.string.no_connection).publish()
+        State.LOADING -> SnackbarEvent(CoreR.string.loading).publish()
+        State.INVALID -> SnackbarEvent(CoreR.string.no_connection).publish()
         else -> withExternalRW {
             withInstallPermission {
                 ManagerInstallDialog().show()

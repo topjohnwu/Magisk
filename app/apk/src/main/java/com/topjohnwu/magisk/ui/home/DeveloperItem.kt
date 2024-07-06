@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.ui.home
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.core.R as CoreR
 
 interface Dev {
     val name: String
@@ -84,8 +85,8 @@ sealed class IconLink : RvItem() {
     override val layoutRes get() = R.layout.item_icon_link
 
     abstract class PayPal : IconLink(), Dev {
-        override val icon get() = R.drawable.ic_paypal
-        override val title get() = R.string.paypal
+        override val icon get() = CoreR.drawable.ic_paypal
+        override val title get() = CoreR.string.paypal
         override val link get() = "https://paypal.me/$name"
 
         object Project : PayPal() {
@@ -94,20 +95,20 @@ sealed class IconLink : RvItem() {
     }
 
     object Patreon : IconLink() {
-        override val icon get() = R.drawable.ic_patreon
-        override val title get() = R.string.patreon
+        override val icon get() = CoreR.drawable.ic_patreon
+        override val title get() = CoreR.string.patreon
         override val link get() = Const.Url.PATREON_URL
     }
 
     abstract class Twitter : IconLink(), Dev {
-        override val icon get() = R.drawable.ic_twitter
-        override val title get() = R.string.twitter
+        override val icon get() = CoreR.drawable.ic_twitter
+        override val title get() = CoreR.string.twitter
         override val link get() = "https://twitter.com/$name"
     }
 
     abstract class Github : IconLink() {
-        override val icon get() = R.drawable.ic_github
-        override val title get() = R.string.github
+        override val icon get() = CoreR.drawable.ic_github
+        override val title get() = CoreR.string.github
 
         abstract class User : Github(), Dev {
             override val link get() = "https://github.com/$name"
@@ -119,8 +120,8 @@ sealed class IconLink : RvItem() {
     }
 
     abstract class Sponsor : IconLink(), Dev {
-        override val icon get() = R.drawable.ic_favorite
-        override val title get() = R.string.github
+        override val icon get() = CoreR.drawable.ic_favorite
+        override val title get() = CoreR.string.github
         override val link get() = "https://github.com/sponsors/$name"
     }
 }

@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.dialog
 
-import com.topjohnwu.magisk.R
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.view.MagiskDialog
 

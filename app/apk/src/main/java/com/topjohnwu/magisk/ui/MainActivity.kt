@@ -28,6 +28,7 @@ import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
 import java.io.File
+import com.topjohnwu.magisk.core.R as CoreR
 
 class MainViewModel : BaseViewModel()
 
@@ -167,8 +168,8 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
     private fun showUnsupportedMessage() {
         if (Info.env.isUnsupported) {
             MagiskDialog(this).apply {
-                setTitle(R.string.unsupport_magisk_title)
-                setMessage(R.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
+                setTitle(CoreR.string.unsupport_magisk_title)
+                setMessage(CoreR.string.unsupport_magisk_msg, Const.Version.MIN_VERSION)
                 setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
@@ -179,8 +180,8 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
                 ?.filterNot { File("$it/magisk").exists() }
                 ?.any { File("$it/su").exists() } == true) {
             MagiskDialog(this).apply {
-                setTitle(R.string.unsupport_general_title)
-                setMessage(R.string.unsupport_other_su_msg)
+                setTitle(CoreR.string.unsupport_general_title)
+                setMessage(CoreR.string.unsupport_other_su_msg)
                 setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
@@ -188,8 +189,8 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
             MagiskDialog(this).apply {
-                setTitle(R.string.unsupport_general_title)
-                setMessage(R.string.unsupport_system_app_msg)
+                setTitle(CoreR.string.unsupport_general_title)
+                setMessage(CoreR.string.unsupport_system_app_msg)
                 setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
@@ -197,8 +198,8 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
         if (applicationInfo.flags and ApplicationInfo.FLAG_EXTERNAL_STORAGE != 0) {
             MagiskDialog(this).apply {
-                setTitle(R.string.unsupport_general_title)
-                setMessage(R.string.unsupport_external_storage_msg)
+                setTitle(CoreR.string.unsupport_general_title)
+                setMessage(CoreR.string.unsupport_external_storage_msg)
                 setButton(MagiskDialog.ButtonType.POSITIVE) { text = android.R.string.ok }
                 setCancelable(false)
             }.show()
@@ -211,8 +212,8 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
             // Ask and show dialog
             Config.askedHome = true
             MagiskDialog(this).apply {
-                setTitle(R.string.add_shortcut_title)
-                setMessage(R.string.add_shortcut_msg)
+                setTitle(CoreR.string.add_shortcut_title)
+                setMessage(CoreR.string.add_shortcut_msg)
                 setButton(MagiskDialog.ButtonType.NEGATIVE) {
                     text = android.R.string.cancel
                 }

@@ -22,6 +22,7 @@ import com.topjohnwu.magisk.events.SnackbarEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
+import com.topjohnwu.magisk.core.R as CoreR
 
 class ModuleViewModel : AsyncLoadViewModel() {
 
@@ -77,7 +78,7 @@ class ModuleViewModel : AsyncLoadViewModel() {
         if (item != null && Info.isConnected.value == true) {
             withExternalRW { OnlineModuleInstallDialog(item).show() }
         } else {
-            SnackbarEvent(R.string.no_connection).publish()
+            SnackbarEvent(CoreR.string.no_connection).publish()
         }
 
     fun installPressed() = withExternalRW {

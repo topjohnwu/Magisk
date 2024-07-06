@@ -8,10 +8,10 @@ import androidx.databinding.Bindable
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.getLabel

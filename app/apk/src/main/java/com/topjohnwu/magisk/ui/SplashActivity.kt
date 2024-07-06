@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
+import com.topjohnwu.magisk.core.R as CoreR
 
 @SuppressLint("CustomSplashScreen")
 abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
@@ -82,14 +83,14 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
     @SuppressLint("InlinedApi")
     private fun showInvalidStateMessage(): Unit = runOnUiThread {
         MagiskDialog(this).apply {
-            setTitle(R.string.unsupport_nonroot_stub_title)
-            setMessage(R.string.unsupport_nonroot_stub_msg)
+            setTitle(CoreR.string.unsupport_nonroot_stub_title)
+            setMessage(CoreR.string.unsupport_nonroot_stub_msg)
             setButton(MagiskDialog.ButtonType.POSITIVE) {
-                text = R.string.install
+                text = CoreR.string.install
                 onClick {
                     withPermission(REQUEST_INSTALL_PACKAGES) {
                         if (!it) {
-                            toast(R.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                            toast(CoreR.string.install_unknown_denied, Toast.LENGTH_SHORT)
                             showInvalidStateMessage()
                         } else {
                             lifecycleScope.launch {

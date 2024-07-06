@@ -33,6 +33,7 @@ import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
+import com.topjohnwu.magisk.core.R as CoreR
 
 class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() {
 
@@ -121,7 +122,7 @@ class InstallViewModel(svc: NetworkService, markwon: Markwon) : BaseViewModel() 
     @Parcelize
     class UriCallback : ContentResultCallback {
         override fun onActivityLaunch() {
-            AppContext.toast(R.string.patch_file_msg, Toast.LENGTH_LONG)
+            AppContext.toast(CoreR.string.patch_file_msg, Toast.LENGTH_LONG)
         }
         override fun onActivityResult(result: Uri) {
             uri.value = result

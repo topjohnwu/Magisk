@@ -3,6 +3,7 @@ package com.topjohnwu.magisk.view
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.databinding.DiffItem
 import com.topjohnwu.magisk.databinding.RvItem
+import com.topjohnwu.magisk.core.R as CoreR
 
 sealed class TappableHeadlineItem : RvItem(), DiffItem<TappableHeadlineItem> {
 
@@ -22,7 +23,7 @@ sealed class TappableHeadlineItem : RvItem(), DiffItem<TappableHeadlineItem> {
     // --- objects
 
     object ThemeMode : TappableHeadlineItem() {
-        override val title = R.string.settings_dark_mode_title
+        override val title = CoreR.string.settings_dark_mode_title
         override val icon = R.drawable.ic_day_night
     }
 

@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.IOException
+import com.topjohnwu.magisk.core.R as CoreR
 
 abstract class MarkDownDialog : DialogBuilder {
 
@@ -30,7 +31,7 @@ abstract class MarkDownDialog : DialogBuilder {
                     ServiceLocator.markwon.setMarkdown(tv, text)
                 } catch (e: IOException) {
                     Timber.e(e)
-                    tv.setText(R.string.download_file_error)
+                    tv.setText(CoreR.string.download_file_error)
                 }
             }
         }

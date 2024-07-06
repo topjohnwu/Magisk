@@ -4,10 +4,10 @@ import android.system.Os
 import androidx.databinding.Bindable
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.AsyncLoadViewModel
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.timeFormatStandard
 import com.topjohnwu.magisk.core.ktx.toTime
 import com.topjohnwu.magisk.core.repository.LogRepository

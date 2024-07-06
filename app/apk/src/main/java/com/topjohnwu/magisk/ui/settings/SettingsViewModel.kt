@@ -6,11 +6,11 @@ import android.widget.Toast
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.lifecycle.viewModelScope
 import com.topjohnwu.magisk.BR
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.activity

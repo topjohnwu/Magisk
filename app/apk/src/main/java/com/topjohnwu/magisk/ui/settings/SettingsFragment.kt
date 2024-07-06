@@ -9,6 +9,7 @@ import com.topjohnwu.magisk.databinding.FragmentSettingsMd2Binding
 import rikka.recyclerview.addEdgeSpacing
 import rikka.recyclerview.addItemSpacing
 import rikka.recyclerview.fixEdgeEffect
+import com.topjohnwu.magisk.core.R as CoreR
 
 class SettingsFragment : BaseFragment<FragmentSettingsMd2Binding>() {
 
@@ -19,7 +20,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsMd2Binding>() {
     override fun onStart() {
         super.onStart()
 
-        activity?.title = resources.getString(R.string.settings)
+        activity?.title = resources.getString(CoreR.string.settings)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
