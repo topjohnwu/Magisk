@@ -6,7 +6,6 @@ on:
     paths:
       - "app/**"
       - "native/**"
-      - "stub/**"
       - "buildSrc/**"
       - "build.py"
       - "gradle.properties"
@@ -53,7 +52,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.sha }}-symbols
-          path: app/build/outputs
+          path: app/apk/build/outputs
           compression-level: 9
 
   test-build:
