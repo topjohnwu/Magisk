@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [23, 24, 25, 26, 27, 28, 29, 30]
+        version: [23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34]
 
     steps:
       - name: Check out

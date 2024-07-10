@@ -12,6 +12,7 @@ export PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"
 
 atd_min_api=30
 atd_max_api=34
+tv_min_api=31
 lsposed_min_api=27
 huge_ram_min_api=26
 
@@ -72,7 +73,7 @@ wait_emu() {
   local wait_fn=$1
   local which_pid
 
-  timeout $boot_timeout bash -c $wait_fn &
+  timeout $boot_timeout bash -xc $wait_fn &
   local wait_pid=$!
 
   # Handle the case when emulator dies earlier than timeout
@@ -165,7 +166,9 @@ run_test() {
 
   # Determine image type
   if [ -z $type ]; then
-    if [ $api -ge $atd_min_api -a $api -le $atd_max_api ]; then
+    if [ "$arch" = "x86" -a $api -ge $tv_min_api ]; then
+      type='android-tv'
+    elif [ $api -ge $atd_min_api -a $api -le $atd_max_api ]; then
       # Use the lightweight ATD images if possible
       type='aosp_atd'
     else
