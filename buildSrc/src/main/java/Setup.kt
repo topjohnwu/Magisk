@@ -16,7 +16,6 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Input
@@ -26,7 +25,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.get
@@ -35,8 +33,9 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.registering
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.security.KeyStore
@@ -53,11 +52,6 @@ private fun Project.androidBase(configure: Action<BaseExtension>) =
 
 private fun Project.android(configure: Action<BaseAppModuleExtension>) =
     extensions.configure("android", configure)
-
-private fun BaseExtension.kotlin(configure: Action<KotlinAndroidProjectExtension>) =
-    (this as ExtensionAware).extensions.findByName("kotlin")?.let {
-        configure.execute(it as KotlinAndroidProjectExtension)
-    }
 
 private val Project.androidApp: BaseAppModuleExtension
     get() = extensions["android"] as BaseAppModuleExtension
@@ -86,22 +80,18 @@ fun Project.setupCommon() {
 
         packagingOptions {
             resources {
-                excludes += "/META-INF/*"
-                excludes += "/META-INF/versions/**"
-                excludes += "/org/bouncycastle/**"
-                excludes += "org/apache/commons/**"
-                excludes += "/kotlin/**"
-                excludes += "/kotlinx/**"
-                excludes += "/okhttp3/**"
-                excludes += "/*.txt"
-                excludes += "/*.bin"
-                excludes += "/*.json"
-            }
-        }
-
-        kotlin {
-            compilerOptions {
-                jvmTarget = JvmTarget.JVM_17
+                excludes += arrayOf(
+                    "/META-INF/*",
+                    "/META-INF/versions/**",
+                    "/org/bouncycastle/**",
+                    "/org/apache/commons/**",
+                    "/kotlin/**",
+                    "/kotlinx/**",
+                    "/okhttp3/**",
+                    "/*.txt",
+                    "/*.bin",
+                    "/*.json",
+                )
             }
         }
     }
@@ -109,6 +99,12 @@ fun Project.setupCommon() {
     configurations.all {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
         exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
+    }
+
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 
