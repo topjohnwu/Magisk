@@ -21,7 +21,9 @@ class RootUtils(stub: Any?) : RootService() {
     private val className: String = stub?.javaClass?.name ?: javaClass.name
     private lateinit var am: ActivityManager
 
-    constructor() : this(null) {
+    constructor() : this(null)
+
+    init {
         Timber.plant(object : Timber.DebugTree() {
             override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
                 super.log(priority, "Magisk", message, t)

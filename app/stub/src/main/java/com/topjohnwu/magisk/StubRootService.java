@@ -9,9 +9,9 @@ import android.util.Log;
 import java.io.File;
 import java.lang.reflect.Constructor;
 
-public class DelegateRootService extends ContextWrapper {
+public class StubRootService extends ContextWrapper {
 
-    public DelegateRootService() {
+    public StubRootService() {
         super(null);
     }
 
@@ -37,7 +37,7 @@ public class DelegateRootService extends ContextWrapper {
             Object service = ctor.newInstance(this);
             DynLoad.attachContext(service, base);
         } catch (Exception e) {
-            Log.e(DelegateRootService.class.getSimpleName(), "", e);
+            Log.e(StubRootService.class.getSimpleName(), "", e);
         }
     }
 }

@@ -60,14 +60,6 @@ public class DownloadActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (DynLoad.activeClassLoader instanceof AppClassLoader) {
-            // For some reason activity is created before Application.attach(),
-            // relaunch the activity using the same intent
-            finishAffinity();
-            startActivity(getIntent());
-            return;
-        }
-
         themed = new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault);
 
         // Only download and dynamic load full APK if hidden
@@ -187,7 +179,7 @@ public class DownloadActivity extends Activity {
         } else {
             File res = new File(getCodeCacheDir(), "res.apk");
             try (var out = new ZipOutputStream(new FileOutputStream(res))) {
-                // AndroidManifest.xml is reuqired on Android 6-, and directory support is broken on Android 9-10
+                // AndroidManifest.xml is required on Android 6-, and directory support is broken on Android 9-10
                 out.putNextEntry(new ZipEntry("AndroidManifest.xml"));
                 try (var stubApk = new ZipFile(getPackageCodePath())) {
                     APKInstall.transfer(stubApk.getInputStream(stubApk.getEntry("AndroidManifest.xml")), out);

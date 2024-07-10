@@ -30,7 +30,7 @@ public class DelegateComponentFactory extends AppComponentFactory {
 
     @Override
     public Application instantiateApplication(ClassLoader cl, String className) {
-        return new DelegateApplication();
+        return new StubApplication();
     }
 
     @Override

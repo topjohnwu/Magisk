@@ -29,4 +29,4 @@
 -allowaccessmodification
 -keepclassmembers class com.topjohnwu.magisk.dummy.* { <init>(); }
 -keepclassmembers class com.topjohnwu.magisk.DownloadActivity { <init>(); }
--keepclassmembers class com.topjohnwu.magisk.DelegateRootService { <init>(); }
+-keepclassmembers class com.topjohnwu.magisk.StubRootService { <init>(); }

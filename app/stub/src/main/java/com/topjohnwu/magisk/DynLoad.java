@@ -4,14 +4,18 @@ import static com.topjohnwu.magisk.BuildConfig.APPLICATION_ID;
 
 import android.app.AppComponentFactory;
 import android.app.Application;
+import android.app.job.JobService;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.util.Log;
 
 import com.topjohnwu.magisk.utils.APKInstall;
+import com.topjohnwu.magisk.utils.DynamicClassLoader;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DynLoad {
@@ -31,7 +36,7 @@ public class DynLoad {
         var data = new StubApk.Data();
         data.setVersion(BuildConfig.STUB_VERSION);
         data.setClassToComponent(new HashMap<>());
-        data.setRootService(DelegateRootService.class);
+        data.setRootService(StubRootService.class);
         return data;
     }
 
@@ -46,7 +51,7 @@ public class DynLoad {
     }
 
     // Dynamically load APK from internal, external storage, or previous app
-    static AppClassLoader loadApk(Context context) {
+    static DynamicClassLoader loadApk(Context context) {
         File apk = StubApk.current(context);
         File update = StubApk.update(context);
 
@@ -82,7 +87,7 @@ public class DynLoad {
 
         if (apk.exists()) {
             apk.setReadOnly();
-            return new AppClassLoader(apk);
+            return new DynamicClassLoader(apk);
         }
 
         // If no APK is loaded, attempt to copy from previous app
@@ -96,7 +101,7 @@ public class DynLoad {
                 try (src; out) {
                     APKInstall.transfer(src, out);
                 }
-                return new AppClassLoader(apk);
+                return new DynamicClassLoader(apk);
             } catch (PackageManager.NameNotFoundException ignored) {
             } catch (IOException e) {
                 Log.e(DynLoad.class.getSimpleName(), "", e);
@@ -107,8 +112,8 @@ public class DynLoad {
         return null;
     }
 
-    // Dynamically load APK and create the Application instance from the loaded APK
-    static Application createAndSetupApp(Application context) {
+    // Dynamically load APK and initialize the application
+    static void loadAndInitializeApp(Application context) {
         // On API >= 29, AppComponentFactory will replace the ClassLoader for us
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
             replaceClassLoader(context);
@@ -120,10 +125,10 @@ public class DynLoad {
                 | PackageManager.MATCH_DIRECT_BOOT_UNAWARE;
         var pm = context.getPackageManager();
 
-        final PackageInfo info;
+        final PackageInfo stubInfo;
         try {
             // noinspection WrongConstant
-            info = pm.getPackageInfo(context.getPackageName(), flags);
+            stubInfo = pm.getPackageInfo(context.getPackageName(), flags);
         } catch (PackageManager.NameNotFoundException e) {
             // Impossible
             throw new RuntimeException(e);
@@ -134,20 +139,19 @@ public class DynLoad {
         final var cl = loadApk(context);
         if (cl != null) try {
             // noinspection WrongConstant
-            var pkgInfo = pm.getPackageArchiveInfo(apk.getPath(), flags);
-            cl.updateComponentMap(info, pkgInfo);
-
-            var appInfo = pkgInfo.applicationInfo;
+            var apkInfo = pm.getPackageArchiveInfo(apk.getPath(), flags);
+            var mapping = generateMapping(stubInfo, apkInfo);
 
             var data = createApkData();
             var map = data.getClassToComponent();
             // Create the inverse mapping (class to component name)
-            for (var e : cl.mapping.entrySet()) {
+            for (var e : mapping.entrySet()) {
                 map.put(e.getValue(), e.getKey());
             }
 
-            // Create the receiver Application
-            var app = (Application) cl.loadClass(appInfo.className)
+            var appInfo = apkInfo.applicationInfo;
+            // Create the receiver Application with proper constructor
+            var app = cl.loadClass(appInfo.className)
                     .getConstructor(Object.class)
                     .newInstance(data.getObject());
 
@@ -162,19 +166,17 @@ public class DynLoad {
                 }
             }
 
-            activeClassLoader = cl;
+            activeClassLoader = new MappingClassLoader(cl, mapping);
 
-            // Send real application to attachBaseContext
+            // Call Application.attachBaseContext
             attachContext(app, context);
-
-            return app;
         } catch (Exception e) {
             Log.e(DynLoad.class.getSimpleName(), "", e);
             apk.delete();
+        } else {
+            // Dynamic loading failed, use normal stub classloader
+            activeClassLoader = new StubClassLoader(stubInfo);
         }
-
-        activeClassLoader = new StubClassLoader(info);
-        return null;
     }
 
     // Replace LoadedApk mClassLoader
@@ -197,5 +199,73 @@ public class DynLoad {
             // and API 23 - 28 do not restrict access to these fields.
             Log.e(DynLoad.class.getSimpleName(), "", e);
         }
+    }
+
+    private static Map<String, String> generateMapping(PackageInfo stub, PackageInfo app) {
+        var mapping = new HashMap<String, String>();
+        {
+            var src = stub.activities;
+            var dest = app.activities;
+
+            final ActivityInfo sa;
+            final ActivityInfo da;
+            final ActivityInfo sb;
+            final ActivityInfo db;
+            if (src[0].exported) {
+                sa = src[0];
+                sb = src[1];
+            } else {
+                sa = src[1];
+                sb = src[0];
+            }
+            if (dest[0].exported) {
+                da = dest[0];
+                db = dest[1];
+            } else {
+                da = dest[1];
+                db = dest[0];
+            }
+            mapping.put(sa.name, da.name);
+            mapping.put(sb.name, db.name);
+        }
+
+        {
+            var src = stub.services;
+            var dest = app.services;
+
+            final ServiceInfo sa;
+            final ServiceInfo da;
+            final ServiceInfo sb;
+            final ServiceInfo db;
+            if (JobService.PERMISSION_BIND.equals(src[0].permission)) {
+                sa = src[0];
+                sb = src[1];
+            } else {
+                sa = src[1];
+                sb = src[0];
+            }
+            if (JobService.PERMISSION_BIND.equals(dest[0].permission)) {
+                da = dest[0];
+                db = dest[1];
+            } else {
+                da = dest[1];
+                db = dest[0];
+            }
+            mapping.put(sa.name, da.name);
+            mapping.put(sb.name, db.name);
+        }
+
+        {
+            var src = stub.receivers;
+            var dest = app.receivers;
+            mapping.put(src[0].name, dest[0].name);
+        }
+
+        {
+            var src = stub.providers;
+            var dest = app.providers;
+            mapping.put(src[0].name, dest[0].name);
+        }
+        return mapping;
     }
 }
