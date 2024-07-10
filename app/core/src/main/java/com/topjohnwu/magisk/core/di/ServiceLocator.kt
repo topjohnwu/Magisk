@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.text.method.LinkMovementMethod
 import androidx.room.Room
+import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.data.SuLogDatabase
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
@@ -15,13 +16,10 @@ import com.topjohnwu.magisk.core.repository.NetworkService
 import io.noties.markwon.Markwon
 import io.noties.markwon.utils.NoCopySpannableFactory
 
-val AppContext: Context inline get() = ServiceLocator.context
-
 @SuppressLint("StaticFieldLeak")
 object ServiceLocator {
 
-    lateinit var context: Context
-    val deContext by lazy { context.deviceProtectedContext }
+    val deContext by lazy { AppContext.deviceProtectedContext }
     val timeoutPrefs by lazy { deContext.getSharedPreferences("su_timeout", 0) }
 
     // Database
@@ -32,9 +30,9 @@ object ServiceLocator {
     val logRepo by lazy { LogRepository(sulogDB) }
 
     // Networking
-    val okhttp by lazy { createOkHttpClient(context) }
+    val okhttp by lazy { createOkHttpClient(AppContext) }
     val retrofit by lazy { createRetrofit(okhttp) }
-    val markwon by lazy { createMarkwon(context) }
+    val markwon by lazy { createMarkwon(AppContext) }
     val networkService by lazy {
         NetworkService(
             createApiService(retrofit, Const.Url.GITHUB_PAGE_URL),

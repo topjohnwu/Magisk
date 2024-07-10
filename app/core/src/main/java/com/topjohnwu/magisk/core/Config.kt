@@ -2,7 +2,6 @@ package com.topjohnwu.magisk.core
 
 import android.annotation.SuppressLint
 import androidx.core.content.edit
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.repository.DBConfig

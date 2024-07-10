@@ -17,7 +17,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.ActivityTracker
+import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.JobService
 import com.topjohnwu.magisk.core.R
@@ -170,7 +170,7 @@ class DownloadEngine(
                     is Subject.Module -> handleModule(stream, subject.file)
                     else -> stream.copyAndClose(subject.file.outputStream())
                 }
-                val activity = ActivityTracker.foreground
+                val activity = AppContext.foregroundActivity
                 if (activity != null && subject.autoLaunch) {
                     notifyRemove(subject.notifyId)
                     subject.pendingIntent(activity)?.send()

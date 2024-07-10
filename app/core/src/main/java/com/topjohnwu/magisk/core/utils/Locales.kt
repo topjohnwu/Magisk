@@ -5,12 +5,11 @@ package com.topjohnwu.magisk.core.utils
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
-import com.topjohnwu.magisk.core.ActivityTracker
+import com.topjohnwu.magisk.core.AppContext
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.createNewResources
-import com.topjohnwu.magisk.core.di.AppContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -72,7 +71,7 @@ withContext(Dispatchers.Default) {
 
 fun Resources.setConfig(config: Configuration) {
     config.setLocale(currentLocale)
-    updateConfiguration(config, displayMetrics)
+    updateConfiguration(config, null)
 }
 
 fun Resources.syncLocale() = setConfig(configuration)
@@ -85,5 +84,5 @@ fun refreshLocale() {
     }
     Locale.setDefault(currentLocale)
     AppContext.resources.syncLocale()
-    ActivityTracker.foreground?.relaunch()
+    AppContext.foregroundActivity?.relaunch()
 }

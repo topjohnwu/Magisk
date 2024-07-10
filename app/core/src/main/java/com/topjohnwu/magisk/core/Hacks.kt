@@ -11,7 +11,6 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.unwrap
 import com.topjohnwu.magisk.core.utils.syncLocale
 

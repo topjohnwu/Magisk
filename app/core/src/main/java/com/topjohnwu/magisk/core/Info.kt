@@ -3,7 +3,6 @@ package com.topjohnwu.magisk.core
 import android.app.KeyguardManager
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.di.AppContext
 import com.topjohnwu.magisk.core.ktx.getProperty
 import com.topjohnwu.magisk.core.model.UpdateInfo
 import com.topjohnwu.magisk.core.repository.NetworkService
