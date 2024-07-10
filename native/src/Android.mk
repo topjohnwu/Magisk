@@ -52,7 +52,7 @@ ifdef B_PRELOAD
 include $(CLEAR_VARS)
 LOCAL_MODULE := init-ld
 LOCAL_SRC_FILES := init/preload.c
-LOCAL_STRIP_MODE := --strip-all
+LOCAL_LDFLAGS := -Wl,--strip-all
 include $(BUILD_SHARED_LIBRARY)
 
 endif
