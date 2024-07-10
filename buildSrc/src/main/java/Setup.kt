@@ -25,6 +25,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.StopExecutionException
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.exclude
 import org.gradle.kotlin.dsl.filter
 import org.gradle.kotlin.dsl.get
@@ -103,7 +104,7 @@ fun Project.setupCommon() {
 
     tasks.withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget = JvmTarget.JVM_17
         }
     }
 }
@@ -302,12 +303,12 @@ fun Project.setupAppCommon() {
             .toTransformMany(SingleArtifact.APK)
         val signingConfig = androidApp.buildTypes.getByName(variant.buildType!!).signingConfig
         commentTask.configure {
-            this.transformationRequest.set(transformationRequest)
-            this.signingConfig.set(signingConfig)
-            this.comment.set("version=${Config.version}\n" +
+            this.transformationRequest = transformationRequest
+            this.signingConfig = signingConfig
+            this.comment = "version=${Config.version}\n" +
                 "versionCode=${Config.versionCode}\n" +
-                "stubVersion=${Config.stubVersion}\n")
-            this.outFolder.set(layout.buildDirectory.dir("outputs/apk/${variant.name}"))
+                "stubVersion=${Config.stubVersion}\n"
+            this.outFolder = layout.buildDirectory.dir("outputs/apk/${variant.name}")
         }
     }
 }
@@ -321,9 +322,9 @@ fun Project.setupStub() {
         val manifestUpdater =
             project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
                 dependsOn("generate${variantCapped}ObfuscatedClass")
-                applicationId.set(variant.applicationId)
-                appClassDir.set(layout.buildDirectory.dir("generated/source/app/$variantName"))
-                factoryClassDir.set(layout.buildDirectory.dir("generated/source/factory/$variantName"))
+                applicationId = variant.applicationId
+                appClassDir = layout.buildDirectory.dir("generated/source/app/$variantName")
+                factoryClassDir = layout.buildDirectory.dir("generated/source/factory/$variantName")
             }
         variant.artifacts.use(manifestUpdater)
             .wiredWithFiles(
