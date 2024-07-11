@@ -11,11 +11,11 @@
     <string name="denylist">Listă de refuzări</string>
 
     <!--Home-->
-    <string name="no_connection">Nu există conexiune disponibilă</string>
+    <string name="no_connection">Nicio conexiune disponibilă</string>
     <string name="app_changelog">Jurnalul modificărilor</string>
     <string name="loading">Se încarcă…</string>
     <string name="update">Actualizează</string>
-    <string name="not_available">N/A</string>
+    <string name="not_available">Indisponibil</string>
     <string name="hide">Ascunde</string>
     <string name="home_package">Pachet</string>
     <string name="home_app_title">Aplicație</string>
@@ -87,6 +87,9 @@
     <string name="logs_cleared">Jurnal golit cu succes</string>
     <string name="pid">PID: %1$d</string>
     <string name="target_uid">UID țintă: %1$d</string>
+    <string name="target_pid">PID țintă pentru ns-ul montat: %s</string>
+    <string name="selinux_context">Context SELinux: %s</string>
+    <string name="supp_group">Grup suplimentar: %s</string>
 
     <!--SafetyNet-->
 
@@ -103,6 +106,7 @@
     <string name="reboot_bootloader">Repornește în modul bootloader</string>
     <string name="reboot_download">Repornește în modul download</string>
     <string name="reboot_edl">Repornește în EDL</string>
+    <string name="reboot_safe_mode">Mod sigur</string>
     <string name="module_version_author">%1$s de %2$s</string>
     <string name="module_state_remove">Elimină</string>
     <string name="module_state_restore">Restaurează</string>
@@ -165,10 +169,15 @@
     <string name="settings_su_reauth_summary">Cere din nou permisiunile de superutilizator după actualizarea aplicațiilor</string>
     <string name="settings_su_tapjack_title">Protecție față de tapjacking</string>
     <string name="settings_su_tapjack_summary">Caseta de dialog pentru solicitarea permisiunilor de superutilizator nu va răspunde la input cât timp este ascunsă de orice altă fereastră sau suprapunere</string>
+    <string name="settings_su_auth_title">Autentificarea utilizatorului</string>
+    <string name="settings_su_auth_summary">Cere autentificarea utilizatorului în timpul cererilor de superutilizator</string>
+    <string name="settings_su_auth_insecure">Nu este configurată nicio metodă de autentificare pe dispozitiv</string>
     <string name="settings_customization">Personalizare</string>
     <string name="setting_add_shortcut_summary">Adaugă o comandă rapidă frumoasă în ecranul de pornire în cazul în care numele și pictograma sunt dificil de recunoscut după ascunderea aplicației</string>
     <string name="settings_doh_title">DNS prin HTTPS</string>
     <string name="settings_doh_description">Soluție ocolitoare pentru poisoningul DNS în anumite țări</string>
+    <string name="settings_random_name_title">Randomizează numele ieșirii</string>
+    <string name="settings_random_name_description">Randomizează numele fișierului de ieșire a imaginilor patchuite și a fișierelor tar pentru a împiedica detectarea</string>
 
     <string name="multiuser_mode">Mod de multiutilizator</string>
     <string name="settings_owner_only">Numai proprietarul dispozitivului</string>
