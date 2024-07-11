@@ -1,17 +1,12 @@
 package com.topjohnwu.magisk.core
 
-import android.annotation.SuppressLint
+import android.os.Bundle
 import androidx.core.content.edit
 import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
 import com.topjohnwu.magisk.core.utils.LocaleSetting
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.io.IOException
 
 object Config : PreferenceConfig, DBConfig {
 
@@ -19,14 +14,6 @@ object Config : PreferenceConfig, DBConfig {
     override val settingsDB get() = ServiceLocator.settingsDB
     override val context get() = ServiceLocator.deContext
     override val coroutineScope get() = GlobalScope
-
-    private val prefsFile = File("${context.filesDir.parent}/shared_prefs", "${fileName}.xml")
-
-    @SuppressLint("ApplySharedPref")
-    fun getPrefsFile(): File {
-        prefs.edit().remove(Key.ASKED_HOME).commit()
-        return prefsFile
-    }
 
     object Key {
         // db configs
@@ -56,6 +43,9 @@ object Config : PreferenceConfig, DBConfig {
         const val ASKED_HOME = "asked_home"
         const val DOH = "doh"
         const val RAND_NAME = "rand_name"
+
+        val NO_MIGRATION = setOf(ASKED_HOME, SU_REQUEST_TIMEOUT,
+            SU_AUTO_RESPONSE, SU_REAUTH, SU_TAPJACK)
     }
 
     object Value {
@@ -159,17 +149,37 @@ object Config : PreferenceConfig, DBConfig {
 
     private const val SU_FINGERPRINT = "su_fingerprint"
 
-    fun load(pkg: String?) {
-        // Only try to load prefs when fresh install and a previous package name is set
-        if (pkg != null && prefs.all.isEmpty()) {
-            runBlocking {
-                try {
-                    context.contentResolver
-                        .openInputStream(Provider.preferencesUri(pkg))
-                        ?.writeTo(prefsFile, dispatcher = Dispatchers.Unconfined)
-                } catch (ignored: IOException) {}
+    fun toBundle(): Bundle {
+        val map = prefs.all - Key.NO_MIGRATION
+        return Bundle().apply {
+            for ((key, value) in map) {
+                when (value) {
+                    is String -> putString(key, value)
+                    is Int -> putInt(key, value)
+                    is Boolean -> putBoolean(key, value)
+                }
             }
-            return
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun fromBundle(bundle: Bundle) {
+        val keys = bundle.keySet().apply { removeAll(Key.NO_MIGRATION) }
+        prefs.edit {
+            for (key in keys) {
+                when (val value = bundle.get(key)) {
+                    is String -> putString(key, value)
+                    is Int -> putInt(key, value)
+                    is Boolean -> putBoolean(key, value)
+                }
+            }
+        }
+    }
+
+    fun init(bundle: Bundle?) {
+        // Only try to load prefs when fresh install
+        if (bundle != null && prefs.all.isEmpty()) {
+            fromBundle(bundle)
         }
 
         prefs.edit {

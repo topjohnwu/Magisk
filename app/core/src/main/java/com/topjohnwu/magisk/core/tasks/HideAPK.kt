@@ -1,15 +1,16 @@
 package com.topjohnwu.magisk.core.tasks
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Provider
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.copyAndClose
@@ -161,11 +162,12 @@ object HideAPK {
 
     private fun launchApp(activity: Activity, pkg: String) {
         val intent = activity.packageManager.getLaunchIntentForPackage(pkg) ?: return
-        val self = activity.packageName
-        val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        activity.grantUriPermission(pkg, Provider.preferencesUri(self), flag)
-        intent.putExtra(Const.Key.PREV_PKG, self)
-        activity.startActivity(intent)
+        intent.putExtra(Const.Key.PREV_CONFIG, Config.toBundle())
+        val options = ActivityOptions.makeBasic()
+        if (Build.VERSION.SDK_INT >= 34) {
+            options.setShareIdentityEnabled(true)
+        }
+        activity.startActivity(intent, options.toBundle())
         activity.finish()
     }
 

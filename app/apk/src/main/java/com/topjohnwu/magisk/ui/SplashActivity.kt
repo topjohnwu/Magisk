@@ -17,7 +17,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.base.realCallingPackage
+import com.topjohnwu.magisk.core.base.launchPackage
 import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
@@ -113,15 +113,11 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
     }
 
     private fun initialize(savedState: Bundle?) {
-        val prevPkg = intent.getStringExtra(Const.Key.PREV_PKG)?.let {
-            // Make sure the calling package matches (prevent DoS)
-            if (it == realCallingPackage)
-                it
-            else
-                null
-        }
+        val prevPkg = launchPackage
+        val prevConfig = intent.getBundleExtra(Const.Key.PREV_CONFIG)
+        val isPackageMigration = prevPkg != null && prevConfig != null
 
-        Config.load(prevPkg)
+        Config.init(prevConfig)
 
         if (packageName != APP_PACKAGE_NAME) {
             runCatching {
@@ -130,14 +126,15 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                 Shell.cmd("(pm uninstall $APP_PACKAGE_NAME)& >/dev/null 2>&1").exec()
             }
         } else {
-            if (Config.suManager.isNotEmpty())
+            if (Config.suManager.isNotEmpty()) {
                 Config.suManager = ""
-            if (prevPkg != null) {
+            }
+            if (isPackageMigration) {
                 Shell.cmd("(pm uninstall $prevPkg)& >/dev/null 2>&1").exec()
             }
         }
 
-        if (prevPkg != null) {
+        if (isPackageMigration) {
             runOnUiThread {
                 // Relaunch the process after package migration
                 StubApk.restartProcess(this)

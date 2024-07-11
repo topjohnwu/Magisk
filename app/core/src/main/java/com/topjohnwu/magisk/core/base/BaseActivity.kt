@@ -125,14 +125,12 @@ class ActivityExtension(private val activity: ComponentActivity) {
     }
 }
 
-private val mReferrerField by lazy(LazyThreadSafetyMode.NONE) {
-    Activity::class.java.reflectField("mReferrer")
-}
-
-val Activity.realCallingPackage: String? get() {
-    callingPackage?.let { return it }
-    mReferrerField.get(this)?.let { return it as String }
-    return null
+val Activity.launchPackage: String? get() {
+    return if (Build.VERSION.SDK_INT >= 34) {
+        launchedFromPackage
+    } else {
+        Activity::class.java.reflectField("mReferrer").get(this) as String?
+    }
 }
 
 fun Activity.relaunch() {
