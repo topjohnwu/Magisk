@@ -19,7 +19,7 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.events.AddHomeIconEvent
@@ -105,8 +105,8 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             SystemlessHosts -> createHosts()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             UpdateChannel -> openUrlIfNecessary(view)
-            is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
-            Restore -> viewModelScope.launch { HideAPK.restore(view.activity) }
+            is Hide -> viewModelScope.launch { AppMigration.hide(view.activity, item.value) }
+            Restore -> viewModelScope.launch { AppMigration.restore(view.activity) }
             Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }

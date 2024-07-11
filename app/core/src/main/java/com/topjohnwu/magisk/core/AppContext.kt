@@ -22,7 +22,7 @@ import com.topjohnwu.magisk.core.base.UntrackedActivity
 import com.topjohnwu.magisk.core.base.launchPackage
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.writeTo
-import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.core.utils.ProcessLifecycle
@@ -178,15 +178,15 @@ where T : ComponentActivity, T : IActivityExtension {
             // Version mismatch
             Info.stub!!.version != BuildConfig.STUB_VERSION ||
             // Not properly patched
-            intent.component!!.className.contains(HideAPK.PLACEHOLDER))
+            intent.component!!.className.contains(AppMigration.PLACEHOLDER))
     ) {
         withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
             if (granted) {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val apk = File(cacheDir, "stub.apk")
                     try {
                         assets.open("stub.apk").writeTo(apk)
-                        HideAPK.upgrade(this@initializeOnSplashScreen, apk)?.let {
+                        AppMigration.upgradeStub(this@initializeOnSplashScreen, apk)?.let {
                             startActivity(it)
                         }
                     } catch (e: IOException) {

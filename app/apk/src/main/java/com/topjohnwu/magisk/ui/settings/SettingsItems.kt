@@ -13,7 +13,7 @@ import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.activity
-import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
@@ -81,7 +81,7 @@ object Hide : BaseSettingsItem.Input() {
         set(value) = set(value, field, { field = it }, BR.result, BR.error)
 
     val maxLength
-        get() = HideAPK.MAX_LABEL_LENGTH
+        get() = AppMigration.MAX_LABEL_LENGTH
 
     @get:Bindable
     val isError

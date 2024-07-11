@@ -33,7 +33,7 @@ import com.topjohnwu.magisk.core.ktx.forEach
 import com.topjohnwu.magisk.core.ktx.set
 import com.topjohnwu.magisk.core.ktx.withStreams
 import com.topjohnwu.magisk.core.ktx.writeTo
-import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils.outputStream
 import com.topjohnwu.magisk.core.utils.ProgressInputStream
 import com.topjohnwu.magisk.utils.APKInstall
@@ -292,7 +292,7 @@ class DownloadEngine(
                 zf.close()
 
                 // Patch and install
-                subject.intent = HideAPK.upgrade(context, apk)
+                subject.intent = AppMigration.upgradeStub(context, apk)
                     ?: throw IOException("HideAPK patch error")
                 apk.delete()
             } catch (e: Exception) {

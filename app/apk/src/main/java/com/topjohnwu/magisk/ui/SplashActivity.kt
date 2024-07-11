@@ -14,7 +14,7 @@ import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.initializeOnSplashScreen
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
@@ -91,7 +91,7 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                             showInvalidStateMessage()
                         } else {
                             lifecycleScope.launch {
-                                HideAPK.restore(this@SplashActivity)
+                                AppMigration.restore(this@SplashActivity)
                             }
                         }
                     }

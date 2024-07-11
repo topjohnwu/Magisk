@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
-import androidx.annotation.WorkerThread
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
 import com.topjohnwu.magisk.core.Config
@@ -33,7 +32,7 @@ import java.io.OutputStream
 import java.security.SecureRandom
 import kotlin.random.asKotlinRandom
 
-object HideAPK {
+object AppMigration {
 
     private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
     private const val ALPHADOTS = "$ALPHA....."
@@ -258,16 +257,17 @@ object HideAPK {
         if (!success) onFailure.run()
     }
 
-    @WorkerThread
-    fun upgrade(context: Context, apk: File): Intent? {
+    suspend fun upgradeStub(context: Context, apk: File): Intent? {
         val label = context.applicationInfo.nonLocalizedLabel
         val pkg = context.packageName
         val session = APKInstall.startSession(context)
-        session.openStream(context).use {
-            if (!patch(context, apk, it, pkg, label)) {
-                return null
+        return withContext(Dispatchers.IO) {
+            session.openStream(context).use {
+                if (!patch(context, apk, it, pkg, label)) {
+                    return@withContext null
+                }
             }
+            session.waitIntent()
         }
-        return session.waitIntent()
     }
 }
