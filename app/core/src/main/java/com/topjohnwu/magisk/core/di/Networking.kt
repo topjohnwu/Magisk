@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.ProviderInstaller
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import okhttp3.Cache
 import okhttp3.ConnectionSpec
 import okhttp3.Dns
@@ -68,7 +68,7 @@ fun createOkHttpClient(context: Context): OkHttpClient {
     builder.addInterceptor { chain ->
         val request = chain.request().newBuilder()
         request.header("User-Agent", "Magisk/${BuildConfig.APP_VERSION_CODE}")
-        request.header("Accept-Language", currentLocale.toLanguageTag())
+        request.header("Accept-Language", LocaleSetting.instance.currentLocale.toLanguageTag())
         chain.proceed(request.build())
     }
 

@@ -14,7 +14,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.circularreveal.CircularRevealCompat
 import com.google.android.material.circularreveal.CircularRevealWidget
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.topjohnwu.magisk.core.utils.currentLocale
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import kotlin.math.hypot
 
 object MotionRevealHelper {
@@ -63,7 +63,9 @@ object MotionRevealHelper {
         it.interpolator = FastOutSlowInInterpolator()
         it.addListener(onStart = { show() }, onEnd = { if (revealInfo.radius != 0f) hide() })
 
-        val rtlMod = if (currentLocale.layoutDirection == View.LAYOUT_DIRECTION_RTL) 1f else -1f
+        val rtlMod =
+            if (LocaleSetting.instance.currentLocale.layoutDirection == View.LAYOUT_DIRECTION_RTL)
+                1f else -1f
         val maxX = revealInfo.centerX - marginEnd - measuredWidth / 2f
         val targetX = if (revealInfo.radius == 0f) 0f else maxX * rtlMod
         val moveX = ObjectAnimator.ofFloat(this, View.TRANSLATION_X, targetX)

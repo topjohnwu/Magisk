@@ -6,7 +6,7 @@ import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.repository.DBConfig
 import com.topjohnwu.magisk.core.repository.PreferenceConfig
-import com.topjohnwu.magisk.core.utils.refreshLocale
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.runBlocking
@@ -135,7 +135,7 @@ object Config : PreferenceConfig, DBConfig {
         get() = localePrefs
         set(value) {
             localePrefs = value
-            refreshLocale()
+            LocaleSetting.instance.setLocale(value)
         }
 
     var zygisk by dbSettings(Key.ZYGISK, false)

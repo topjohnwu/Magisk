@@ -1,7 +1,6 @@
 package com.topjohnwu.magisk.core.ktx
 
 import androidx.collection.SparseArrayCompat
-import com.topjohnwu.magisk.core.utils.currentLocale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +16,7 @@ import java.lang.reflect.Field
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Collections
+import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -98,13 +98,13 @@ fun Long.toTime(format: DateFormat) = format.format(this).orEmpty()
 val timeFormatStandard by lazy {
     SimpleDateFormat(
         "yyyy-MM-dd'T'HH.mm.ss",
-        currentLocale
+        Locale.ROOT
     )
 }
 val timeDateFormat: DateFormat by lazy {
     DateFormat.getDateTimeInstance(
         DateFormat.DEFAULT,
         DateFormat.DEFAULT,
-        currentLocale
+        Locale.ROOT
     )
 }

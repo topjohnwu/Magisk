@@ -14,18 +14,16 @@ import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
-import com.topjohnwu.magisk.core.utils.availableLocales
-import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.DialogSettingsAppNameBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsDownloadPathBinding
 import com.topjohnwu.magisk.databinding.DialogSettingsUpdateChannelBinding
 import com.topjohnwu.magisk.databinding.set
+import com.topjohnwu.magisk.utils.TextHolder
 import com.topjohnwu.magisk.utils.asText
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import com.topjohnwu.magisk.core.R as CoreR
 
 // --- Customization
@@ -35,38 +33,28 @@ object Customization : BaseSettingsItem.Section() {
 }
 
 object Language : BaseSettingsItem.Selector() {
+    private val names: Array<String> get() = LocaleSetting.available.names
+    private val tags: Array<String> get() = LocaleSetting.available.tags
+
     override var value
-        get() = index
+        get() = tags.indexOf(Config.locale)
         set(value) {
-            index = value
-            Config.locale = entryValues[value]
+            Config.locale = tags[value]
         }
 
     override val title = CoreR.string.language.asText()
 
-    private var entries = emptyArray<String>()
-    private var entryValues = emptyArray<String>()
-    private var index = -1
+    override fun entries(res: Resources) = names
+    override fun descriptions(res: Resources) = names
+}
 
-    override fun entries(res: Resources) = entries
-    override fun descriptions(res: Resources) = entries
-
-    override fun onPressed(view: View, handler: Handler) {
-        if (entries.isNotEmpty())
-            super.onPressed(view, handler)
-    }
-
-    suspend fun loadLanguages(scope: CoroutineScope) {
-        scope.launch {
-            availableLocales().let { (names, values) ->
-                entries = names
-                entryValues = values
-                val selectedLocale = currentLocale.getDisplayName(currentLocale)
-                index = names.indexOfFirst { it == selectedLocale }.let { if (it == -1) 0 else it }
-                notifyPropertyChanged(BR.description)
-            }
+object LanguageSystem : BaseSettingsItem.Blank() {
+    override val title = CoreR.string.language.asText()
+    override val description: TextHolder
+        get() {
+            val locale = LocaleSetting.instance.appLocale
+            return locale?.getDisplayName(locale)?.asText() ?: CoreR.string.system_default.asText()
         }
-    }
 }
 
 object Theme : BaseSettingsItem.Blank() {

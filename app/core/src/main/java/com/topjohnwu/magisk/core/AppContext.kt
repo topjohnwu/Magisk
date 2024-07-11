@@ -2,6 +2,7 @@ package com.topjohnwu.magisk.core
 
 import android.app.Activity
 import android.app.Application
+import android.app.LocaleManager
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.ContextWrapper
@@ -13,12 +14,11 @@ import android.system.Os
 import androidx.profileinstaller.ProfileInstaller
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.base.UntrackedActivity
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.core.utils.ProcessLifecycle
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
-import com.topjohnwu.magisk.core.utils.refreshLocale
-import com.topjohnwu.magisk.core.utils.setConfig
 import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
@@ -30,6 +30,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
 import kotlin.system.exitProcess
+
+lateinit var AppApkPath: String
+    private set
 
 object AppContext : ContextWrapper(null),
     Application.ActivityLifecycleCallbacks, ComponentCallbacks2 {
@@ -52,7 +55,7 @@ object AppContext : ContextWrapper(null),
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        resources.setConfig(newConfig)
+        LocaleSetting.instance.updateResource(resources)
     }
 
     override fun onActivityResumed(activity: Activity) {
@@ -79,7 +82,6 @@ object AppContext : ContextWrapper(null),
         } else {
             base.packageResourcePath
         }
-        refreshLocale()
         resources.patch()
 
         val shellBuilder = Shell.Builder.create()
@@ -97,6 +99,11 @@ object AppContext : ContextWrapper(null),
         // Pre-heat the shell ASAP
         Shell.getShell(null) {}
 
+        if (SDK_INT >= 34 && isRunningAsStub) {
+            // Send over the locale config manually
+            val lm = getSystemService(LocaleManager::class.java)
+            lm.overrideLocaleConfig = LocaleSetting.localeConfig
+        }
         Notifications.setup()
         ProcessLifecycle.init(this)
         NetworkObserver.init(this)

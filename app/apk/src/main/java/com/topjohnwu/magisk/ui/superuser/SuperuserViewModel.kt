@@ -16,7 +16,6 @@ import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.data.magiskdb.PolicyDao
 import com.topjohnwu.magisk.core.ktx.getLabel
 import com.topjohnwu.magisk.core.model.su.SuPolicy
-import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.databinding.MergeObservableList
 import com.topjohnwu.magisk.databinding.RvItem
 import com.topjohnwu.magisk.databinding.bindExtra
@@ -30,6 +29,7 @@ import com.topjohnwu.magisk.view.TextItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class SuperuserViewModel(
     private val db: PolicyDao
@@ -92,7 +92,7 @@ class SuperuserViewModel(
                 policies.addAll(map)
             }
             policies.sortWith(compareBy(
-                { it.appName.lowercase(currentLocale) },
+                { it.appName.lowercase(Locale.ROOT) },
                 { it.packageName }
             ))
             itemsPolicies.update(policies)

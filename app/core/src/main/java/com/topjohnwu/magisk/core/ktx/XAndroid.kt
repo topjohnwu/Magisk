@@ -6,7 +6,6 @@ import android.content.*
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.AdaptiveIconDrawable
@@ -19,8 +18,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.getSystemService
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.RootUtils
-import com.topjohnwu.magisk.core.utils.currentLocale
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import java.io.File
@@ -54,9 +53,7 @@ fun ApplicationInfo.getLabel(pm: PackageManager): String {
     runCatching {
         if (labelRes > 0) {
             val res = pm.getResourcesForApplication(this)
-            val config = Configuration()
-            config.setLocale(currentLocale)
-            res.updateConfiguration(config, res.displayMetrics)
+            LocaleSetting.instance.updateResource(res)
             return res.getString(labelRes)
         }
     }

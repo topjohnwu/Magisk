@@ -16,7 +16,7 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.core.os.ProcessCompat
 import com.topjohnwu.magisk.core.ktx.getLabel
-import com.topjohnwu.magisk.core.utils.currentLocale
+import java.util.Locale
 import java.util.TreeSet
 
 class CmdlineListItem(line: String) {
@@ -102,7 +102,7 @@ class AppProcessInfo(
 
     companion object {
         private val comparator = compareBy<AppProcessInfo>(
-            { it.label.lowercase(currentLocale) },
+            { it.label.lowercase(Locale.ROOT) },
             { it.info.packageName }
         )
     }

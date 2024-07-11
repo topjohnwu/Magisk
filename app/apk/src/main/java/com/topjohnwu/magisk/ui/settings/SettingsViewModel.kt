@@ -1,6 +1,10 @@
 package com.topjohnwu.magisk.ui.settings
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.pm.ShortcutManagerCompat
@@ -16,6 +20,7 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.activity
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.HideAPK
+import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.databinding.bindExtra
 import com.topjohnwu.magisk.events.AddHomeIconEvent
 import com.topjohnwu.magisk.events.AuthEvent
@@ -30,12 +35,6 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         it.put(BR.handler, this)
     }
 
-    init {
-        viewModelScope.launch {
-            Language.loadLanguages(this)
-        }
-    }
-
     private fun createItems(): List<BaseSettingsItem> {
         val context = AppContext
         val hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME
@@ -43,7 +42,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         // Customization
         val list = mutableListOf(
             Customization,
-            Theme, Language
+            Theme, if (LocaleSetting.useLocaleManager) LanguageSystem else Language
         )
         if (isRunningAsStub && ShortcutManagerCompat.isRequestPinShortcutSupported(context))
             list.add(AddShortcut)
@@ -98,6 +97,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             SystemlessHosts -> createHosts()
             Hide, Restore -> withInstallPermission(andThen)
             AddShortcut -> AddHomeIconEvent().publish()
+            LanguageSystem -> launchAppLocaleSettings(view.activity)
             else -> andThen()
         }
     }
@@ -110,6 +110,12 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit
         }
+    }
+
+    private fun launchAppLocaleSettings(activity: Activity) {
+        val intent = Intent(Settings.ACTION_APP_LOCALE_SETTINGS)
+        intent.data = Uri.fromParts("package", activity.packageName, null)
+        activity.startActivity(intent)
     }
 
     private fun openUrlIfNecessary(view: View) {
