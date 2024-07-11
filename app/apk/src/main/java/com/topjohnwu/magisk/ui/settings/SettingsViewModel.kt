@@ -87,23 +87,23 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
         return list
     }
 
-    override fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit) {
+    override fun onItemPressed(view: View, item: BaseSettingsItem, doAction: () -> Unit) {
         when (item) {
-            DownloadPath -> withExternalRW(andThen)
-            UpdateChecker -> withPostNotificationPermission(andThen)
-            Authentication -> AuthEvent(andThen).publish()
-            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
-            DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
-            SystemlessHosts -> createHosts()
-            Hide, Restore -> withInstallPermission(andThen)
-            AddShortcut -> AddHomeIconEvent().publish()
-            LanguageSystem -> launchAppLocaleSettings(view.activity)
-            else -> andThen()
+            DownloadPath -> withExternalRW(doAction)
+            UpdateChecker -> withPostNotificationPermission(doAction)
+            Authentication -> AuthEvent(doAction).publish()
+            Hide, Restore -> withInstallPermission(doAction)
+            else -> doAction()
         }
     }
 
     override fun onItemAction(view: View, item: BaseSettingsItem) {
         when (item) {
+            Theme -> SettingsFragmentDirections.actionSettingsFragmentToThemeFragment().navigate()
+            LanguageSystem -> launchAppLocaleSettings(view.activity)
+            AddShortcut -> AddHomeIconEvent().publish()
+            SystemlessHosts -> createHosts()
+            DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             UpdateChannel -> openUrlIfNecessary(view)
             is Hide -> viewModelScope.launch { HideAPK.hide(view.activity, item.value) }
             Restore -> viewModelScope.launch { HideAPK.restore(view.activity) }

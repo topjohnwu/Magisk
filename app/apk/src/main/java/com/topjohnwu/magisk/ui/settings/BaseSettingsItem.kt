@@ -14,29 +14,34 @@ import com.topjohnwu.magisk.view.MagiskDialog
 
 sealed class BaseSettingsItem : ObservableRvItem() {
 
+    interface Handler {
+        fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit)
+        fun onItemAction(view: View, item: BaseSettingsItem)
+    }
+
     override val layoutRes get() = R.layout.item_settings
 
     open val icon: Int get() = 0
     open val title: TextHolder get() = TextHolder.EMPTY
     @get:Bindable
     open val description: TextHolder get() = TextHolder.EMPTY
-    open val showSwitch get() = false
-    @get:Bindable
-    open val isChecked get() = false
     @get:Bindable
     var isEnabled = true
         set(value) = set(value, field, { field = it }, BR.enabled, BR.description)
 
-    open fun onToggle(view: View, handler: Handler, checked: Boolean) {}
     open fun onPressed(view: View, handler: Handler) {
-        handler.onItemPressed(view, this)
+        handler.onItemPressed(view, this) {
+            handler.onItemAction(view, this)
+        }
     }
     open fun refresh() {}
 
-    interface Handler {
-        fun onItemPressed(view: View, item: BaseSettingsItem, andThen: () -> Unit = {})
-        fun onItemAction(view: View, item: BaseSettingsItem)
-    }
+    // Only for toggle
+    open val showSwitch get() = false
+    @get:Bindable
+    open val isChecked get() = false
+    fun onToggle(view: View, handler: Handler, checked: Boolean) =
+        set(checked, isChecked, { onPressed(view, handler) })
 
     abstract class Value<T> : BaseSettingsItem() {
 
@@ -53,9 +58,6 @@ sealed class BaseSettingsItem : ObservableRvItem() {
 
         override val showSwitch get() = true
         override val isChecked get() = value
-
-        override fun onToggle(view: View, handler: Handler, checked: Boolean) =
-            set(checked, value, { onPressed(view, handler) })
 
         override fun onPressed(view: View, handler: Handler) {
             // Make sure the checked state is synced
@@ -140,5 +142,4 @@ sealed class BaseSettingsItem : ObservableRvItem() {
     abstract class Section : BaseSettingsItem() {
         override val layoutRes = R.layout.item_settings_section
     }
-
 }
