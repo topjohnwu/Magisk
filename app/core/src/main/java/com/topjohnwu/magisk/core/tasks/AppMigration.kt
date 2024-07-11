@@ -15,10 +15,10 @@ import com.topjohnwu.magisk.core.ktx.await
 import com.topjohnwu.magisk.core.ktx.copyAndClose
 import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
+import com.topjohnwu.magisk.core.signing.JarMap
+import com.topjohnwu.magisk.core.signing.SignApk
 import com.topjohnwu.magisk.core.utils.AXML
 import com.topjohnwu.magisk.core.utils.Keygen
-import com.topjohnwu.magisk.signing.JarMap
-import com.topjohnwu.magisk.signing.SignApk
 import com.topjohnwu.magisk.utils.APKInstall
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
