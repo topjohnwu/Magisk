@@ -9,31 +9,16 @@ import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.R
-import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.arch.NavigationActivity
-import com.topjohnwu.magisk.core.BuildConfig
-import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
-import com.topjohnwu.magisk.core.Config
-import com.topjohnwu.magisk.core.Const
-import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.JobService
-import com.topjohnwu.magisk.core.base.launchPackage
 import com.topjohnwu.magisk.core.base.relaunch
-import com.topjohnwu.magisk.core.di.ServiceLocator
+import com.topjohnwu.magisk.core.initializeOnSplashScreen
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.toast
-import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.HideAPK
-import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.io.File
-import java.io.IOException
 import com.topjohnwu.magisk.core.R as CoreR
 
 @SuppressLint("CustomSplashScreen")
@@ -68,7 +53,19 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
                     showInvalidStateMessage()
                     return@getShell
                 }
-                initialize(savedInstanceState)
+                initializeOnSplashScreen {
+                    splashShown = true
+                    if (isRunningAsStub) {
+                        // Re-launch main activity without splash theme
+                        relaunch()
+                    } else {
+                        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                            doShowMainUI(savedInstanceState)
+                        } else {
+                            needShowMainUI = true
+                        }
+                    }
+                }
             }
         }
     }
@@ -109,85 +106,6 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
         super.onResume()
         if (needShowMainUI) {
             doShowMainUI(null)
-        }
-    }
-
-    private fun initialize(savedState: Bundle?) {
-        val prevPkg = launchPackage
-        val prevConfig = intent.getBundleExtra(Const.Key.PREV_CONFIG)
-        val isPackageMigration = prevPkg != null && prevConfig != null
-
-        Config.init(prevConfig)
-
-        if (packageName != APP_PACKAGE_NAME) {
-            runCatching {
-                // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
-                packageManager.getApplicationInfo(APP_PACKAGE_NAME, 0)
-                Shell.cmd("(pm uninstall $APP_PACKAGE_NAME)& >/dev/null 2>&1").exec()
-            }
-        } else {
-            if (Config.suManager.isNotEmpty()) {
-                Config.suManager = ""
-            }
-            if (isPackageMigration) {
-                Shell.cmd("(pm uninstall $prevPkg)& >/dev/null 2>&1").exec()
-            }
-        }
-
-        if (isPackageMigration) {
-            runOnUiThread {
-                // Relaunch the process after package migration
-                StubApk.restartProcess(this)
-            }
-            return
-        }
-
-        // Validate stub APK
-        if (isRunningAsStub && (
-                // Version mismatch
-                Info.stub!!.version != BuildConfig.STUB_VERSION ||
-                // Not properly patched
-                intent.component!!.className.contains(HideAPK.PLACEHOLDER)
-            )) {
-            withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
-                if (granted) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val apk = File(cacheDir, "stub.apk")
-                        try {
-                            assets.open("stub.apk").writeTo(apk)
-                            HideAPK.upgrade(this@SplashActivity, apk)?.let {
-                                startActivity(it)
-                            }
-                        } catch (e: IOException) {
-                            Timber.e(e)
-                        }
-                    }
-                }
-            }
-            return
-        }
-
-        JobService.schedule(this)
-        Shortcuts.setupDynamic(this)
-
-        // Pre-fetch network services
-        ServiceLocator.networkService
-
-        // Wait for root service
-        RootUtils.Connection.await()
-
-        runOnUiThread {
-            splashShown = true
-            if (isRunningAsStub) {
-                // Re-launch main activity without splash theme
-                relaunch()
-            } else {
-                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                    doShowMainUI(savedState)
-                } else {
-                    needShowMainUI = true
-                }
-            }
         }
     }
 }
