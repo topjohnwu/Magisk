@@ -164,11 +164,11 @@ abstract class ManifestUpdater: DefaultTask() {
 
         // Shuffle the order of the components
         cmpList.shuffle(RANDOM)
-        val (factoryPkg, factoryClass) = factoryClassDir.asFileTree.first().let {
-            it.parentFile.name to it.name.removeSuffix(".java")
+        val (factoryPkg, factoryClass) = factoryClassDir.asFileTree.firstNotNullOf {
+            it.parentFile!!.name to it.name.removeSuffix(".java")
         }
-        val (appPkg, appClass) = appClassDir.asFileTree.first().let {
-            it.parentFile.name to it.name.removeSuffix(".java")
+        val (appPkg, appClass) = appClassDir.asFileTree.firstNotNullOf {
+            it.parentFile!!.name to it.name.removeSuffix(".java")
         }
         val components = cmpList.joinToString("\n\n")
             .replace("\${applicationId}", applicationId.get())
