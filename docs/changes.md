@@ -6,7 +6,8 @@
 - [Zygisk] Support new signature introduced in U QPR2
 - [SEPolicy] Update libsepol to properly set some policy config bits
 - [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+- [ResetProp] Add n![Screenshot_20240402_235249](https://github.com/user-attachments/assets/574dbf10-b499-460f-a5a7-7c0cfd73f3f5)
+ew wait for property feature `resetprop -w`
 
 ### v26.4
 
