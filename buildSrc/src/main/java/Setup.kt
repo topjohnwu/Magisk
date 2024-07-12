@@ -231,7 +231,7 @@ abstract class AddCommentTask: DefaultTask() {
             noTimestamps = true
             autoSortFiles = true
         }
-        outFile.parentFile.mkdirs()
+        outFile.parentFile?.mkdirs()
         inFile.copyTo(outFile, overwrite = true)
         ZFiles.apk(outFile, options).use {
             SigningExtension(signingOptions).register(it)
