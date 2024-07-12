@@ -33,7 +33,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Säilita sunnitud krüpteering</string>
     <string name="keep_dm_verity">Säilita AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Paika käivitustõmmises vbmeta</string>
     <string name="recovery_mode">Taastusrežiim</string>
     <string name="install_options_title">Valikud</string>
     <string name="install_method_title">Meetod</string>
@@ -136,7 +135,6 @@
     <string name="settings_zygisk_summary">Käivita teatud Magiski osi zygote-protsessis</string>
     <string name="settings_denylist_title">Jõusta keeluloend</string>
     <string name="settings_denylist_summary">Keeluloendis olevatel protsessidel tühistatakse kõik Magiski muudatused</string>
-    <string name="settings_denylist_error">See funktsioon eeldab %1$s lubamist</string>
     <string name="settings_denylist_config_title">Seadista keeluloendit</string>
     <string name="settings_denylist_config_summary">Vali keeluloendisse lisatavad protsessid</string>
     <string name="settings_hosts_title">Süsteemivaba hosts</string>
@@ -212,7 +210,6 @@
     <string name="env_fix_title">Vajab lisaseadistust</string>
     <string name="env_fix_msg">Sinu seade vajab Magiski korralikuks toimimiseks lisaseadistust. Kas soovid jätkata ning seadme taaskäivitada?</string>
     <string name="setup_msg">Käivitan keskkonnaseadistust…</string>
-    <string name="authenticate">Autendi</string>
     <string name="unsupport_magisk_title">Mittetoetatud Magiski versioon</string>
     <string name="unsupport_magisk_msg">See rakenduse versioon ei toeta Magiski versioone, mis on vanemad kui %1$s.\n\nRakendus käitub nii, nagu Magisk ei olekski installitud, palun täienda Magiskit esimesel võimalusel.</string>
     <string name="unsupport_general_title">Ebanormaalne seisund</string>

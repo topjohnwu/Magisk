@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Zorla şifrələməni saxla</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity saxla</string>
-    <string name="patch_vbmeta">vbmeta\'nı boot\'da yamaqla</string>
     <string name="recovery_mode">Xilasetmə Modu</string>
     <string name="install_options_title">Ayarlar</string>
     <string name="install_method_title">Metod</string>
@@ -142,7 +141,6 @@
     <string name="settings_zygisk_summary">Magiskin bəzi hissələrini zygote daemonda aç</string>
     <string name="settings_denylist_title">İstisnaları Məcbur İşlət</string>
     <string name="settings_denylist_summary">İstisnalar siyahısındakı proseslər Magisk əlavələrini tərsinə çevirəcək</string>
-    <string name="settings_denylist_error">Bu özəlliyin işləməsi üçün %1$s açıq olmalıdır</string>
     <string name="settings_denylist_config_title">İstisnaları Ayarla</string>
     <string name="settings_denylist_config_summary">İstisnalara yerləşdiriləcək prosesi seçin</string>
     <string name="settings_hosts_title">Sistemsiz hostlar</string>
@@ -221,7 +219,6 @@
     <string name="env_fix_title">Əlavə yükləməyə ethiyac var</string>
     <string name="env_fix_msg">Cihazınız Magiskin düzgün işləməsi üçün əlavə yükləməyə ehtiyac duyur. Yenidən başlatmaq istəyirsiniz?</string>
     <string name="setup_msg">Yüklənir…</string>
-    <string name="authenticate">Səlahiyətləndirilir</string>
     <string name="unsupport_magisk_title">Bu Magisk versiyası dəstəklənmir</string>
     <string name="unsupport_magisk_msg">Tətbiqin bu versiyası Magiskin %1$s versiyasından aşağıları dəstəkləmir.\n\nTətbiq sanki Magisk heç yoxmuş kimi davranacaq, lütfən Magiski yüksəldin.</string>
     <string name="unsupport_general_title">Anormal Hal</string>

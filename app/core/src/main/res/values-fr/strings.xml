@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Conserver le chiffrement forcé</string>
     <string name="keep_dm_verity">Conserver AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Patch vbmeta dans l’image de démarrage</string>
     <string name="recovery_mode">Mode récupération</string>
     <string name="install_options_title">Options</string>
     <string name="install_method_title">Méthode</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">Exécuter des parties de Magisk dans le service zygote</string>
     <string name="settings_denylist_title">Imposer Liste Exclusion</string>
     <string name="settings_denylist_summary">Les processus figurant sur la liste des exclusions verront toutes les modifications de Magisk annulées.</string>
-    <string name="settings_denylist_error">Cette fonctionnalité requiert %1$s pour être activée</string>
     <string name="settings_denylist_config_title">Configurer Liste Exclusion</string>
     <string name="settings_denylist_config_summary">Sélectionner le processus à inclure dans la liste d’exclusion</string>
     <string name="settings_hosts_title">Fichier d’hôtes hors partition système</string>
@@ -229,7 +227,6 @@
     <string name="env_fix_title">Installation supplémentaire requise</string>
     <string name="env_fix_msg">Votre appareil a besoin d’une installation supplémentaire afin que Magisk fonctionne correctement. Voulez‑vous effectuer cette installation maintenant puis redémarrer ?</string>
     <string name="setup_msg">Configuration de l’environnement en cours…</string>
-    <string name="authenticate">Authentification</string>
     <string name="unsupport_magisk_title">Version de Magisk non prise en charge</string>
     <string name="unsupport_magisk_msg">Cette version de Magisk Manager ne prend pas en charge les versions de Magisk inférieures à %1$s.\n\nL’application se comportera comme si Magisk n’était pas installé. Veuillez mettre à jour Magisk aussi vite que possible.</string>
     <string name="unsupport_general_title">État anormal</string>

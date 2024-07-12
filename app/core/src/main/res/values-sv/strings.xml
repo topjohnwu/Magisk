@@ -201,7 +201,6 @@
     <string name="env_fix_title">Kräver ytterligare installation</string>
     <string name="env_fix_msg">Din enhet behöver ytterligare installation för att Magisk ska fungera korrekt. Vill du fortsätta och starta om enheten?</string>
     <string name="setup_msg">Inställning av körmiljö…</string>
-    <string name="authenticate">Tillåt</string>
     <string name="unsupport_magisk_title">Magisk-versionen stöds ej</string>
     <string name="unsupport_magisk_msg">Denna version utav appen stödjer inte Magisk-versioner lägre än 1$s.\n\nAppen kommer att bete sig som att Magisk inte är installerat. Vänligen uppgradera din Magisk-version så snart som möjligt.</string>
     <string name="external_rw_permission_denied">Tillåt tillgång till externt lagrinsmedia för att aktievera denna funktion</string>

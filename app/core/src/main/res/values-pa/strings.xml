@@ -190,7 +190,6 @@
     <string name="setup_fail">ਸੈਟਅਪ ਅਸਫਲ ਹੋਇਆ</string>
     <string name="env_fix_title">ਵਾਧੂ ਸੈਟਅਪ ਚਾਹੀਦਾ ਹੈ</string>
     <string name="setup_msg">ਵਾਤਾਵਰਣ ਸੈਟਅਪ ਚੱਲ ਰਿਹਾ ਹੈ …</string>
-    <string name="authenticate">ਪ੍ਰਮਾਣਿਤ ਕਰੋ</string>
     <string name="unsupport_magisk_title">ਗ਼ੈਰ ਮੈਜਿਸਕ ਵਰਜਨ</string>
     <string name="external_rw_permission_denied">ਇਸ ਦੀ ਵਰਤੋਂ ਕਰਨ ਲਈ ਸਟੋਰੇਜ ਦੀ ਆਗਿਆ ਦਿਓ</string>
     <string name="add_shortcut_title">ਹੋਮਸਕ੍ਰੀਨ \'ਤੇ ਸ਼ਾਰਟਕੱਟ ਸ਼ਾਮਲ ਕਰੋ</string>

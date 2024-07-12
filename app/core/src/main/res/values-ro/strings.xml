@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Păstrează criptarea forțată</string>
     <string name="keep_dm_verity">Păstrează AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Patchuiește vbmeta în imaginea de boot</string>
     <string name="recovery_mode">Mod de recuperare</string>
     <string name="install_options_title">Opțiuni</string>
     <string name="install_method_title">Metodă</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">Rulează părți ale Magisk în daemonul zygote</string>
     <string name="settings_denylist_title">Impune lista de refuzări</string>
     <string name="settings_denylist_summary">Procesele din lista de refuzări vor avea toate modificările Magisk anulate</string>
-    <string name="settings_denylist_error">Această funcție necesită ca %1$s să fie activat</string>
     <string name="settings_denylist_config_title">Configurează lista de refuzări</string>
     <string name="settings_denylist_config_summary">Selectează procesele care vor fi incluse în lista de refuzări</string>
     <string name="settings_hosts_title">Fișier hosts în afara partiției system</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_msg">Dispozitivul are nevoie de configurare suplimentară pentru ca Magisk să funcționeze corect. Vrei să continui și să repornești?</string>
     <string name="env_full_fix_msg">Dispozitivul are nevoie de rescrierea în memoria flash a Magisk pentru a funcționa corect. Te rugăm să reinstalezi Magisk în cadrul aplicației, modul de recuperare nu poate obține informații corecte despre dispozitiv.</string>
     <string name="setup_msg">Rulează configurarea mediului…</string>
-    <string name="authenticate">Autentificare</string>
     <string name="unsupport_magisk_title">Versiune Magisk nesuportată</string>
     <string name="unsupport_magisk_msg">Această versiune a aplicației nu suportă versiunile Magisk mai mici de %1$s.\n\nAplicația se va comporta ca și cum Magisk nu este instalat, te rugăm să actualizezi Magisk cât mai curând posibil.</string>
     <string name="unsupport_general_title">Stare anormală</string>

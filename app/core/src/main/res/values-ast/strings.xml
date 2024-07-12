@@ -31,7 +31,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Caltener el cifráu forciáu</string>
     <string name="keep_dm_verity">Caltener l\'AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Parchiar el vbmeta de la imaxe d\'arrinque</string>
     <string name="recovery_mode">Mou de recuperación</string>
     <string name="install_options_title">Opciones</string>
     <string name="install_method_title">Métodu</string>
@@ -128,7 +127,6 @@
     <string name="settings_zygisk_summary">Executa partes de Magisk nel degorriu de Zygote</string>
     <string name="settings_denylist_title">Forciar la llista d\'esclusión</string>
     <string name="settings_denylist_summary">Los procesos de la llista d\'esclusión tienen toles modificaciones de Magisk anulaes</string>
-    <string name="settings_denylist_error">Esta función rique l\'activación de: %1$s</string>
     <string name="settings_denylist_config_title">Configurar la llista d\'esclusión</string>
     <string name="settings_denylist_config_summary">Seleiciona los procesos que s\'inclúin na llista d\'esclusión</string>
     <string name="settings_hosts_title">Módulu «Systemless Hosts»</string>
@@ -203,7 +201,6 @@
     <string name="env_fix_title">Configuración adicional</string>
     <string name="env_fix_msg">El preséu precisa una configuración adicional pa que Magisk funcione afayadizamente. ¿Quies siguir y reaniciar?</string>
     <string name="setup_msg">Executando la configuración del entornu…</string>
-    <string name="authenticate">Autenticación</string>
     <string name="unsupport_magisk_title">Versión non compatible</string>
     <string name="unsupport_magisk_msg">Esta versión de l\'aplicación nun ye compatible coles versiones de Magisk anteriores a la %1$s.\n\nL\'aplicación va comportase como si Magisk nun tuviere instaláu, anueva Magisk namás que puedas.</string>
     <string name="unsupport_general_title">Estáu anormal</string>

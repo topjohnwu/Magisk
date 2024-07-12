@@ -8,8 +8,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.base.relaunch
 import com.topjohnwu.magisk.core.initializeOnSplashScreen
 import com.topjohnwu.magisk.core.isRunningAsStub
@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
-import com.topjohnwu.magisk.core.R as CoreR
 
 @SuppressLint("CustomSplashScreen")
 abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Binding>() {
@@ -80,14 +79,14 @@ abstract class SplashActivity<Binding : ViewDataBinding> : NavigationActivity<Bi
     @SuppressLint("InlinedApi")
     private fun showInvalidStateMessage(): Unit = runOnUiThread {
         MagiskDialog(this).apply {
-            setTitle(CoreR.string.unsupport_nonroot_stub_title)
-            setMessage(CoreR.string.unsupport_nonroot_stub_msg)
+            setTitle(R.string.unsupport_nonroot_stub_title)
+            setMessage(R.string.unsupport_nonroot_stub_msg)
             setButton(MagiskDialog.ButtonType.POSITIVE) {
-                text = CoreR.string.install
+                text = R.string.install
                 onClick {
                     withPermission(REQUEST_INSTALL_PACKAGES) {
                         if (!it) {
-                            toast(CoreR.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                            toast(R.string.install_unknown_denied, Toast.LENGTH_SHORT)
                             showInvalidStateMessage()
                         } else {
                             lifecycleScope.launch {

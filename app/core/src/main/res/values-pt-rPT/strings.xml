@@ -33,7 +33,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Manter criptografia forçada</string>
     <string name="keep_dm_verity">Manter AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Corrigir vbmeta na imagem de boot</string>
     <string name="recovery_mode">Modo Recovery</string>
     <string name="install_options_title">Opções</string>
     <string name="install_method_title">Método</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">Executa partes do Magisk no Zygote</string>
     <string name="settings_denylist_title">Aplicar lista de negação</string>
     <string name="settings_denylist_summary">Os processos na lista de negação terão todas as modificações do Magisk revertidas</string>
-    <string name="settings_denylist_error">Este recurso requer que %1$s esteja ativado</string>
     <string name="settings_denylist_config_title">Configurar lista de negação</string>
     <string name="settings_denylist_config_summary">Selecione os processos a serem incluídos na lista de negação</string>
     <string name="settings_hosts_title">Hosts sem sistema</string>
@@ -223,7 +221,6 @@
     <string name="env_fix_msg">Seu dispositivo exige uma configuração adicional para o Magisk funcionar corretamente. Deseja continuar e reiniciar?</string>
     <string name="env_full_fix_msg">Seu dispositivo precisa refazer o flash do Magisk para funcionar corretamente. Por favor, reinstale o Magisk no app, o modo Recovery não pode obter as devidas informações do dispositivo.</string>
     <string name="setup_msg">Executando a configuração do ambiente…</string>
-    <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versão do Magisk não suportada</string>
     <string name="unsupport_magisk_msg">Esta versão do app não suporta a versão do Magisk inferior a %1$s.\n\nO app irá se comportar como se nenhum Magisk estivesse sido instalado. Por favor, atualize o Magisk assim que possível.</string>
     <string name="unsupport_general_title">Estado anormal</string>

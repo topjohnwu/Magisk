@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">保持强制加密</string>
     <string name="keep_dm_verity">保留 AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">修补 boot 镜像中的 vbmeta</string>
     <string name="recovery_mode">安装到 Recovery</string>
     <string name="install_options_title">选项</string>
     <string name="install_method_title">方式</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">在 Zygote 中运行 Magisk</string>
     <string name="settings_denylist_title">遵守排除列表</string>
     <string name="settings_denylist_summary">Magisk 不会修改列表中的进程</string>
-    <string name="settings_denylist_error">此功能需要先启用 %1$s</string>
     <string name="settings_denylist_config_title">配置排除列表</string>
     <string name="settings_denylist_config_summary">选择加入排除列表的进程</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -227,7 +225,6 @@
     <string name="env_fix_msg">需要一些额外的安装才能使 Magisk 正常工作。完成后自动重启，是否继续？</string>
     <string name="env_full_fix_msg">需要重新安装才能使 Magisk 正常工作。请在应用内重新安装，recovery 模式无法正确获取设备信息。</string>
     <string name="setup_msg">正在修复运行环境</string>
-    <string name="authenticate">验证您的身份</string>
     <string name="unsupport_magisk_title">不支持的 Magisk 版本</string>
     <string name="unsupport_magisk_msg">应用不支持低于 %1$s 版本的 Magisk，表现为未安装状态。但升级功能可用，请尽快在应用内升级 Magisk。</string>
     <string name="unsupport_general_title">异常状态</string>

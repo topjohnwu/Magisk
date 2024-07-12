@@ -182,7 +182,6 @@
     <string name="setup_fail">نصب انجام نشد</string>
     <string name="env_fix_title">به تنظیمات اضافی نیاز دارد</string>
     <string name="setup_msg">راه اندازی محیط نصب…</string>
-    <string name="authenticate">اعتبار دادن</string>
     <string name="unsupport_magisk_title">نسخه پشتیبانی نشده Magisk</string>
     <string name="external_rw_permission_denied">برای فعال کردن این قابلیت ، اجازه دسترسی به حافظه بدهید</string>
     <string name="add_shortcut_title">اضافه کردن میانبر را به صفحه</string>

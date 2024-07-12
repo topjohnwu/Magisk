@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">फ़ोर्स एन्क्रिप्शन को संरक्षित रखें</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity को संरक्षित रखें</string>
-    <string name="patch_vbmeta">vbmeta को बूट छवि में पैच करें</string>
     <string name="recovery_mode">रिकवरी मोड</string>
     <string name="install_options_title">विकल्प</string>
     <string name="install_method_title">तरीका</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">मैजिस्क को जाइगोट डेमॉन के कुछ हिस्सों को चलाएं</string>
     <string name="settings_denylist_title">अस्वीकार सूची लागू करें</string>
     <string name="settings_denylist_summary">अस्वीकृत सूची की प्रक्रियाओं में सभी मैजिस्क संशोधन पूर्ववत हो जाएंगे</string>
-    <string name="settings_denylist_error">इस सुविधा के लिए, %1$s सक्रिय होना आवश्यक है</string>
     <string name="settings_denylist_config_title">अस्वीकार सूची कॉन्फ़िगर करें</string>
     <string name="settings_denylist_config_summary">अस्वीकार सूची में शामिल की जाने वाली प्रक्रियाओं का चयन करें</string>
     <string name="settings_hosts_title">सिस्टमलेस होस्ट</string>
@@ -217,7 +215,6 @@
     <string name="env_fix_title">अतिरिक्त सेटअप की आवश्यकता</string>
     <string name="env_fix_msg">मैजिस्क के ठीक से काम करने के लिए आपके डिवाइस को अतिरिक्त सेटअप की आवश्यकता है। क्या आप आगे बढ़ना और रिबूट करना चाहते हैं?</string>
     <string name="setup_msg">वातावरण सेटअप चल रहा है...</string>
-    <string name="authenticate">प्रमाणित करें</string>
     <string name="unsupport_magisk_title">असमर्थित मैजिस्क संस्करण</string>
     <string name="unsupport_magisk_msg">ऐप का यह संस्करण %1$s से कम के मैजिस्क संस्करणों का समर्थन नहीं करता है।\n\nऐप ऐसा व्यवहार करेगा जैसे कोई मैजिस्क इंस्टॉल नहीं है, कृपया जितनी जल्दी हो सके मैजिस्क को अपग्रेड करें।</string>
     <string name="unsupport_general_title">असामान्य अवस्था</string>

@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">שמירה על הצפנה בכח</string>
     <string name="keep_dm_verity">שמירה על AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">תיקון vbmeta בתמונת האתחול</string>
     <string name="recovery_mode">מצב שחזור</string>
     <string name="install_options_title">אפשרויות</string>
     <string name="install_method_title">שיטה</string>
@@ -142,7 +141,6 @@
     <string name="settings_zygisk_summary">הפעל חלקים של Magisk בדמון zygote</string>
     <string name="settings_denylist_title">אכיפת רשימת דחייה</string>
     <string name="settings_denylist_summary">כל השינויים של Magisk יוחזרו לתהליכים ברשימת הדחייה</string>
-    <string name="settings_denylist_error">תכונה זו דורשת הפעלה של %1$s</string>
     <string name="settings_denylist_config_title">הגדרת רשימת הדחייה</string>
     <string name="settings_denylist_config_summary">בחירת התהליכים שייכללו ברשימת הדחייה</string>
     <string name="settings_hosts_title">מארחים חסרי מערכת</string>
@@ -223,7 +221,6 @@
     <string name="env_fix_msg">ההתקן שלך זקוק להתקנה נוספת כדי ש-Magisk יפעל כראוי. האם ברצונך להמשיך ולהפעיל מחדש?</string>
     <string name="env_full_fix_msg">ההתקן שלך זקוק לצריבה מחדש של Magisk כדי לעבוד כראוי. נא להתקין מחדש את Magisk בתוך היישום, מצב השחזור אינו יכול לקבל מידע נכון על ההתקן.</string>
     <string name="setup_msg">הגדרת סביבת ריצה…</string>
-    <string name="authenticate">אימות</string>
     <string name="unsupport_magisk_title">גרסת Magisk אינה נתמכת</string>
     <string name="unsupport_magisk_msg">גרסה זו של היישום אינה תומכת ביישום  Magisk הנמוך מ- %1$s.\n\nהיישום יתנהג כאילו Magisk אינו מותקן,יש לשדרג את Magisk במהירות האפשריות.</string>
     <string name="unsupport_general_title">מצב לא תקין</string>

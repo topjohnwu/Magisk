@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Preserve force encryption</string>
     <string name="keep_dm_verity">Preserve AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Patch vbmeta in boot image</string>
     <string name="recovery_mode">Recovery Mode</string>
     <string name="install_options_title">Options</string>
     <string name="install_method_title">Method</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">Run parts of Magisk in the zygote daemon</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
-    <string name="settings_denylist_error">This feature requires %1$s to be enabled</string>
     <string name="settings_denylist_config_title">Configure DenyList</string>
     <string name="settings_denylist_config_summary">Select the processes to be included on the denylist</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -229,7 +227,6 @@
     <string name="env_fix_msg">Your device needs additional setup for Magisk to work properly. Do you want to proceed and reboot?</string>
     <string name="env_full_fix_msg">Your device needs reflash Magisk to work properly. Please reinstall Magisk within app, recovery mode cannot get correct device info.</string>
     <string name="setup_msg">Running environment setup…</string>
-    <string name="authenticate">Authenticate</string>
     <string name="unsupport_magisk_title">Unsupported Magisk Version</string>
     <string name="unsupport_magisk_msg">This version of the app does not support Magisk versions lower than %1$s.\n\nThe app will behave as if no Magisk is installed, please upgrade Magisk as soon as possible.</string>
     <string name="unsupport_general_title">Abnormal State</string>

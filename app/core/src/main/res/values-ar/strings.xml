@@ -185,7 +185,6 @@
     <string name="setup_fail">فشل التضبيط</string>
     <string name="env_fix_title"> الإعداد الأضافي مطلوب</string>
     <string name="setup_msg">جار تضبيت البيئة</string>
-    <string name="authenticate">تصديق</string>
     <string name="unsupport_magisk_title">إصدار مـاجـيسك غير مدعوم</string>
 
 </resources>

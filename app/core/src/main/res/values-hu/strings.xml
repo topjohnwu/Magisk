@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Az erőltetett titkosítás megőrzése</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity megőrzése</string>
-    <string name="patch_vbmeta">vbmeta javítás a boot image-ben</string>
     <string name="recovery_mode">Recovery mód</string>
     <string name="install_options_title">Lehetőségek</string>
     <string name="install_method_title">Módszer</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">Futtassa a Magisk egyes részeit a zigóta démonban</string>
     <string name="settings_denylist_title">Tiltólista kényszerítés</string>
     <string name="settings_denylist_summary">A tiltólistán lévő folyamatok minden Magisk módosítást visszaállítanak</string>
-    <string name="settings_denylist_error">Ehhez a funkcióhoz %1$s engedélyezése szükséges</string>
     <string name="settings_denylist_config_title">Tiltólista konfigurálás</string>
     <string name="settings_denylist_config_summary">Válaszd ki a tiltólistára felvenni kívánt folyamatokat</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -217,7 +215,6 @@
     <string name="env_fix_title">További beállítást igényel</string>
     <string name="env_fix_msg">A Magisk megfelelő működéséhez az eszközön további beállításokra van szükség. Folytatod és újraindítod?</string>
     <string name="setup_msg">Futási környezet beállítása…</string>
-    <string name="authenticate">Hitelesítés</string>
     <string name="unsupport_magisk_title">Nem támogatott Magisk verzió</string>
     <string name="unsupport_magisk_msg">Az alkalmazás ezen verziója nem támogatja a %1$s-nál régebbi Magisk-verziókat.\n\nAz alkalmazás úgy fog viselkedni, mintha nem lenne telepítve a Magisk. A lehető leghamarabb frissítsd a Magisk-et..</string>
     <string name="unsupport_general_title">Rendellenes állapot</string>

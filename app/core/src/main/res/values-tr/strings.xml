@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Zorla şifrelemeyi koru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
-    <string name="patch_vbmeta">Önyükleme görüntüsünde vbmeta yamasını uygula</string>
     <string name="recovery_mode">Kurtarma Modu</string>
     <string name="install_options_title">Seçenekler</string>
     <string name="install_method_title">Yöntem</string>
@@ -143,7 +142,6 @@
     <string name="settings_zygisk_summary">Zygisk arka plan programında Magisk\'in bazı bölümlerini çalıştır</string>
     <string name="settings_denylist_title">Reddetme Listesini Zorla</string>
     <string name="settings_denylist_summary">Reddetme listesindeki işlemlerde tüm Magisk değişiklikleri geri alınır</string>
-    <string name="settings_denylist_error">Bu özelliğin etkinleştirilmesi için %1$s gerekiyor</string>
     <string name="settings_denylist_config_title">Reddetme Listesini Yapılandır</string>
     <string name="settings_denylist_config_summary">Reddetme listesine dahil edilecek işlemleri seç</string>
     <string name="settings_hosts_title">Sistemsiz ana makineler (systemless hosts)</string>
@@ -226,7 +224,6 @@
     <string name="env_fix_msg">Magisk\'in düzgün çalışması için cihazınızın ek kuruluma ihtiyacı var. Devam etmek ve yeniden başlatmak istiyor musunuz?</string>
     <string name="env_full_fix_msg">Cihazınızın düzgün çalışması için Magisk\'in yeniden başlatılması gerekiyor. Lütfen Magisk\'i uygulama içinden yeniden yükleyin, kurtarma modu doğru cihaz bilgilerini alamıyor.</string>
     <string name="setup_msg">Ortam kurulumu çalıştırılıyor…</string>
-    <string name="authenticate">Kimlik doğrulaması yap</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
     <string name="unsupport_magisk_msg">Uygulamanın bu sürümü %1$s altındaki Magisk sürümlerini desteklemiyor.\n\nUygulama Magisk yüklenmemiş gibi davranacak, lütfen en kısa sürede Magisk\'i yükseltin.</string>
     <string name="unsupport_general_title">Anormal Durum</string>

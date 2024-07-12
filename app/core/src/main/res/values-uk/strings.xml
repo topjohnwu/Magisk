@@ -132,7 +132,6 @@
     <string name="settings_zygisk_summary">Запускати частини Magisk в сервісі zygote</string>
     <string name="settings_denylist_title">Enforce DenyList</string>
     <string name="settings_denylist_summary">Processes on the denylist will have all Magisk modifications reverted</string>
-    <string name="settings_denylist_error">Для цієї функції потрібно увімкнути %1$s</string>
     <string name="settings_denylist_config_title">Налаштувати DenyList</string>
     <string name="settings_denylist_config_summary">Вибрати процеси, які будуть додані до denylist</string>
     <string name="settings_hosts_title">Позасистемні хости</string>
@@ -208,7 +207,6 @@
     <string name="env_fix_title">Потрібне додаткове налаштування</string>
     <string name="env_fix_msg">Для вашого пристрою необхідне додаткове налаштування, щоб Magisk працював як слід. Бажаєте виконати налаштування та перезавантажити пристрій?</string>
     <string name="setup_msg">Налаштування робочого середовища…</string>
-    <string name="authenticate">Автентифікувати</string>
     <string name="unsupport_magisk_title">Версія Magisk не підтримується</string>
     <string name="unsupport_magisk_msg">Ця версія застосунку не підтримує версію Magisk, нижчу за %1$s.\n\nЗастосунок буде працювати так, ніби немає встановленого Magisk. Будь ласка, оновіть Magisk якнайшвидше.</string>
     <string name="unsupport_general_title">Ненормальний стан</string>

@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Шифрлауды сөндірмей қалдыру</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity қалдыру</string>
-    <string name="patch_vbmeta">boot бөліміндегі vbmeta-ны патчтау</string>
     <string name="recovery_mode">Recovery режімі</string>
     <string name="install_options_title">Баптау</string>
     <string name="install_method_title">Тәсіл</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">Magisk кодын zygote процесіне енгізу</string>
     <string name="settings_denylist_title">DenyList-тi қолдану</string>
     <string name="settings_denylist_summary">Magisk жасаған барлық өзгеріс DenyList-тегі процестерден жасырылады.</string>
-    <string name="settings_denylist_error">Бұл мүмкіндікті қолдану үшін %1$s қосу керек</string>
     <string name="settings_denylist_config_title">DenyList-тi баптау</string>
     <string name="settings_denylist_config_summary">DenyList-ке қосқыңыз келетін процестерді таңдаңыз</string>
     <string name="settings_hosts_title">Жүйеден тыс hosts</string>
@@ -227,7 +225,6 @@
     <string name="env_fix_msg">Magisk дұрыс жұмыс істеуі үшін қосымша әрекет қажет. Орнатуды жалғастырып, құрылғыны қайта қосасыз ба?</string>
     <string name="env_full_fix_msg">Magisk дұрыс жұмыс істеуі үшін оны қайта орнату керек. Magisk-ті қолданба арқылы қайта орнатыңыз; Recovery режімі құрылғыңыз туралы дұрыс ақпаратты таба алмайды.</string>
     <string name="setup_msg">Жұмыс ортасын баптауда…</string>
-    <string name="authenticate">Аутентификация</string>
     <string name="unsupport_magisk_title">Үйлеспейтін Magisk нұсқасы</string>
     <string name="unsupport_magisk_msg">Қолданбаның осы нұсқасы Magisk-тің %1$s дейінгі нұсқаларына үйлеспейді.\n\nҚолданба Magisk орнатылмағандай жұмыс істейді; Magisk-ті жақын арада жаңартыңыз.</string>
     <string name="unsupport_general_title">Қалыпты емес жағдай</string>

@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">暗号化を維持する</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity を維持する</string>
-    <string name="patch_vbmeta">boot イメージ中の vbmeta をパッチする</string>
     <string name="recovery_mode">リカバリーモード</string>
     <string name="install_options_title">オプション</string>
     <string name="install_method_title">方法</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">Magisk の一部を Zygote デーモン上で実行します</string>
     <string name="settings_denylist_title">DenyList を適用</string>
     <string name="settings_denylist_summary">DenyList 内のプロセスは Magisk の変更がすべて戻されます</string>
-    <string name="settings_denylist_error">この機能を使用するには %1$s が有効化されている必要があります</string>
     <string name="settings_denylist_config_title">DenyList を構成</string>
     <string name="settings_denylist_config_summary">DenyList に含めるプロセスを選択します</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_title">追加のセットアップが必要です</string>
     <string name="env_fix_msg">Magisk を正常に動作させるためには追加のセットアップが必要です。今すぐ再起動しますか？</string>
     <string name="setup_msg">追加セットアップを実行中…</string>
-    <string name="authenticate">認証</string>
     <string name="unsupport_magisk_title">対応していない Magisk バージョンです</string>
     <string name="unsupport_magisk_msg">このバージョンのアプリではバージョン %1$s 以下の Magisk に対応していません。\n\nアプリで Magisk を使えないため、すぐに Magisk を更新してください</string>
     <string name="unsupport_general_title">異常な状態です</string>

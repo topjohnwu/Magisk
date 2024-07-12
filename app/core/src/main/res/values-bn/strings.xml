@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">এনক্রিপশন সংরক্ষণ করুন</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity সংরক্ষণ করুন</string>
-    <string name="patch_vbmeta">বুট ইমেজে vbmeta প্যাচ করুন</string>
     <string name="recovery_mode">পুনরুদ্ধার অবস্থা</string>
     <string name="install_options_title">অপশন</string>
     <string name="install_method_title">পদ্ধতি</string>
@@ -137,7 +136,6 @@
     <string name="settings_zygisk_summary">জাইগোট ডেমনে ম্যাজিস্কের অংশগুলি চালান</string>
     <string name="settings_denylist_title">তালিকা অস্বীকার করুন প্রয়োগ করুন</string>
     <string name="settings_denylist_summary">ডিনালিস্টের প্রসেসগুলিতে সমস্ত ম্যাজিস্ক পরিবর্তনগুলি ফিরিয়ে দেওয়া হবে</string>
-    <string name="settings_denylist_error">এই বৈশিষ্ট্যটির জন্য %1$s সক্ষম করা প্রয়োজন৷</string>
     <string name="settings_denylist_config_title">অস্বীকার তালিকা কনফিগার করুন</string>
     <string name="settings_denylist_config_summary">অস্বীকৃত তালিকায় অন্তর্ভুক্ত করার জন্য প্রক্রিয়াগুলি নির্বাচন করুন৷</string>
     <string name="settings_hosts_title">সিস্টেমহীন হোস্ট</string>
@@ -216,7 +214,6 @@
     <string name="env_fix_title">অতিরিক্ত সেটআপ প্রয়োজন</string>
     <string name="env_fix_msg">ম্যাজিস্ক সঠিকভাবে কাজ করার জন্য আপনার ডিভাইসের অতিরিক্ত সেটআপ প্রয়োজন। আপনি কি এগিয়ে যেতে এবং রিবুট করতে চান?</string>
     <string name="setup_msg">চলমান পরিবেশ সেটআপ…</string>
-    <string name="authenticate">প্রমাণীকরণ</string>
     <string name="unsupport_magisk_title">অসমর্থিত ম্যাজিস্ক সংস্করণ</string>
     <string name="unsupport_magisk_msg">অ্যাপটির এই সংস্করণটি %1$s-এর চেয়ে কম ম্যাগিস্ক সংস্করণগুলিকে সমর্থন করে না৷\n\nঅ্যাপটি এমন আচরণ করবে যেন কোনও ম্যাজিস্ক ইনস্টল করা নেই, দয়া করে যত তাড়াতাড়ি সম্ভব ম্যাজিস্ক আপগ্রেড করুন।</string>
     <string name="unsupport_general_title">অস্বাভাবিক অবস্থা</string>

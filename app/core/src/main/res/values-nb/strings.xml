@@ -201,7 +201,6 @@
     <string name="env_fix_title">Krever ytterligere oppsett</string>
     <string name="env_fix_msg">Enheten din krever ytterligere oppsett for at Magisk skal fungere rett. Fortsett med omstart?</string>
     <string name="setup_msg">Kjører oppsett av miljø…</string>
-    <string name="authenticate">Identitetsbekreftelse</string>
     <string name="unsupport_magisk_title">Ustøttet Magisk-versjon</string>
     <string name="unsupport_magisk_msg">Denne versjonen av programmet støtter ikke Magisk før versjon %1$s.\n\nProgrammet vil oppføre seg som om Magisk ikke er installert. Oppgrader Magisk så snart som mulig.</string>
     <string name="unsupport_general_title">Unormal tilstand</string>

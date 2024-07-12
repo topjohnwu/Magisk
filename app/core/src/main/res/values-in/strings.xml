@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Pertahankan enkripsi paksa</string>
     <string name="keep_dm_verity">Pertahankan AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Tambal vbmeta dalam boot image</string>
     <string name="recovery_mode">Mode Recovery</string>
     <string name="install_options_title">Opsi</string>
     <string name="install_method_title">Metode</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">Jalankan bagian-bagian Magisk dalam zygote daemon</string>
     <string name="settings_denylist_title">Paksa DenyList</string>
     <string name="settings_denylist_summary">Proses pada denylist akan mengembalikan semua modifikasi Magisk</string>
-    <string name="settings_denylist_error">Fitur ini membutuhkan %1$s untuk diaktifkan</string>
     <string name="settings_denylist_config_title">Konfigurasi DenyList</string>
     <string name="settings_denylist_config_summary">Pilih proses yang akan disertakan pada denylist</string>
     <string name="settings_hosts_title">Host systemless</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_msg">Perangkat Anda membutuhkan pengaturan tambahan untuk Magisk agar berfungsi dengan benar. Apakah Anda ingin melanjutkan dan Menyalakan ulang?</string>
     <string name="env_full_fix_msg">Perangkat Anda membutuhkan pemasangan ulang Magisk agar berfungsi dengan baik. Silakan pasang ulang Magisk dalam aplikasi, mode recovery tidak dapat memperoleh info perangkat yang benar.</string>
     <string name="setup_msg">Memproses penyiapan lingkungan…</string>
-    <string name="authenticate">Autentikasi</string>
     <string name="unsupport_magisk_title">Versi Magisk tidak didukung</string>
     <string name="unsupport_magisk_msg">Versi aplikasi ini tidak mendukung versi Magisk yang lebih rendah dari %1$s.\n\nAplikasi akan berperilaku seolah-olah tidak ada Magisk yang dipasang, harap tingkatkan Magisk sesegera mungkin.</string>
     <string name="unsupport_general_title">Keadaan tidak normal</string>

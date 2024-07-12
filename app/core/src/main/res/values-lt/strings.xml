@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Neišjungti priverstinio šifravimo</string>
     <string name="keep_dm_verity">Neišjungti AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Taisyti vbmeta boot vaizdą</string>
     <string name="recovery_mode">Atkūrimo režimas</string>
     <string name="install_options_title">Parinktys</string>
     <string name="install_method_title">Būdas</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">Vykdyti Magisk dalis zygote tarnyboje</string>
     <string name="settings_denylist_title">Aktyvinti DenyList</string>
     <string name="settings_denylist_summary">Visos procesų, esančių denylist, Magisk modifikacijos bus atkurtos</string>
-    <string name="settings_denylist_error">Šiai funkcijai reikia, kad būtų įjungta %1$s</string>
     <string name="settings_denylist_config_title">Konfigūruoti DenyList</string>
     <string name="settings_denylist_config_summary">Pasirinkite procesus, kuriuos norite įtraukti į denylist</string>
     <string name="settings_hosts_title">Basisteminis hosts</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_msg">Jūsų įrenginiui reikalinga išplėstinė sąranka, kad Magisk veiktų tinkamai. Norite tęsti ir įrenginį paleisti iš naujo?</string>
     <string name="env_full_fix_msg">Jūsų įrenginiui reikia iš naujo įdiegti Magisk, kad jis veiktų tinkamai. Iš naujo įdiekite Magisk su programėle, atkūrimo režimas negali gauti teisingos įrenginio informacijos.</string>
     <string name="setup_msg">Vykdoma Running aplinkos sąranka…</string>
-    <string name="authenticate">Autentifikavimas</string>
     <string name="unsupport_magisk_title">Nepalaikoma Magisk versija</string>
     <string name="unsupport_magisk_msg">Ši programėlės versija nepalaiko Magisk versijų, žemesnių už %1$s.\n\nProgramėlė veiks taip, lyg Magisk yra neįdiegtas. Kuo greičiau atnaujinkite Magisk.</string>
     <string name="unsupport_general_title">Nenormali būsena</string>

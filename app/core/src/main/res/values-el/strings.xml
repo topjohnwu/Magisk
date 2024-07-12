@@ -34,7 +34,6 @@
     <!--Install-->
 	<string name="keep_force_encryption">Διατήρηση επιβεβλημένης κρυπτογράφησης</string>
     <string name="keep_dm_verity">Διατήρηση AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Patch vbmeta στην εικόνα του boot</string>
     <string name="recovery_mode">Μέσω Recovery mode</string>
     <string name="install_options_title">Επιλογές</string>
     <string name="install_method_title">Μέθοδος</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">Εκτέλεση μέρους του Magisk μέσα στο zygote daemon</string>
     <string name="settings_denylist_title">Επιβολή Λίστας Απορρίψεων</string>
     <string name="settings_denylist_summary">Επαναφορά όλων των τροποποιήσεων του Magisk για της διεργασίες στην λίστα απορρίψεων</string>
-    <string name="settings_denylist_error">Αυτή η λειτουργεία απαιτεί τη %1$s να είναι ενεργοποιημένη</string>
     <string name="settings_denylist_config_title">Τροποποίηση της Λίστας Απορρίψεων</string>
     <string name="settings_denylist_config_summary">Επιλογή διεργασίας για να συμπεριληφθεί στη λίστα απορρίψεων</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -217,7 +215,6 @@
     <string name="env_fix_title">Απαιτείται πρόσθετη εγκατάσταση</string>
     <string name="env_fix_msg">Η συσκευή σας χρειάζεται πρόσθετη ρύθμιση για να λειτουργεί σωστά το Magisk. Θέλετε να συνεχίσετε και να επανεκκινήσετε;</string>
     <string name="setup_msg">Τρέχει η εγκατάσταση περιβάλλοντος…</string>
-    <string name="authenticate">Αυθεντικοποίηση</string>
     <string name="unsupport_magisk_title">Μη υποστηριζόμενη έκδοση Magisk</string>
     <string name="unsupport_magisk_msg">Αυτή η έκδοση της εφαρμογής δεν υποστηρίζει έκδοση Magisk χαμηλότερη από %1$s.\n\nΗ εφαρμογή θα συμπεριφέρεται σαν να μην έχει εγκατασταθεί το Magisk, αναβαθμίστε το Magisk το συντομότερο δυνατό.</string>
     <string name="unsupport_general_title">Μη Φυσιολογική Κατάσταση</string>

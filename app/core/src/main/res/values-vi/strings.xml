@@ -33,7 +33,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Giữ bắt buộc mã hóa</string>
     <string name="keep_dm_verity">Giữ AVB 2.0/dm-verity</string>
-     <string name="patch_vbmeta">Vá vbmeta trong boot image</string>
     <string name="recovery_mode">Chế độ Recovery</string>
     <string name="install_options_title">Tùy chọn</string>
     <string name="install_method_title">Phương pháp</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">Khởi chạy các thành phần của Magisk trong tiến trình nền zygote</string>
     <string name="settings_denylist_title">Thực thi danh sách loại trừ</string>
     <string name="settings_denylist_summary">Mọi sửa đổi do Magisk thực hiện sẽ bị loại khỏi các quy trình trong danh sách loại trừ</string>
-    <string name="settings_denylist_error">Tính năng này yêu cầu %1$s được bật</string>
     <string name="settings_denylist_config_title">Cấu hình DenyList</string>
     <string name="settings_denylist_config_summary">Chọn các quy trình được đưa vào DenyList</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -217,7 +215,6 @@
     <string name="env_fix_title">Yêu cầu thiết lập bổ sung</string>
     <string name="env_fix_msg">Thiết bị của bạn cần thiết lập bổ sung để Magisk hoạt động bình thường. Bạn có muốn tiếp tục và khởi động lại không?</string>
     <string name="setup_msg">Đang chạy thiết lập môi trường…</string>
-    <string name="authenticate">Xác thực</string>
     <string name="unsupport_magisk_title">Phiên bản Magisk không được hỗ trợ</string>
     <string name="unsupport_magisk_msg">Phiên bản hiện tại của ứng dụng không hỗ trợ phiên bản Magisk thấp hơn %1$s.\n\nỨng dụng sẽ hoạt động như thể Magisk chưa được cài đặt. Vui lòng nâng cấp lên phiên bản mới nhất.</string>
     <string name="unsupport_general_title">Trạng thái bất thường</string>

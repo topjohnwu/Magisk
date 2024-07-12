@@ -6,8 +6,6 @@
     <string name="zygisk" translatable="false">Zygisk</string>
     <string name="empty" translatable="false"/>
 
-    <string name="topjohnwu" translatable="false">\@topjohnwu</string>
-    <string name="diareuse" translatable="false">\@diareuse</string>
     <string name="paypal" translatable="false">PayPal</string>
     <string name="patreon" translatable="false">Patreon</string>
     <string name="twitter" translatable="false">Twitter</string>

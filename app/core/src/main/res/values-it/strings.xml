@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Mantieni crittografia forzata</string>
     <string name="keep_dm_verity">Mantieni AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Correggi vbmeta nell\'immagine di boot</string>
     <string name="recovery_mode">Modalità recovery</string>
     <string name="install_options_title">Opzioni</string>
     <string name="install_method_title">Metodo</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">Esegui parti di Magisk nel processo zygote</string>
     <string name="settings_denylist_title">Applica lista di blocco</string>
     <string name="settings_denylist_summary">Tutte le modifiche apportate da Magisk verranno annullate per i processi in lista di blocco</string>
-    <string name="settings_denylist_error">Questa funzione richiede che %1$s sia abilitato</string>
     <string name="settings_denylist_config_title">Configura lista di blocco</string>
     <string name="settings_denylist_config_summary">Seleziona i processi da includere nella lista di blocco</string>
     <string name="settings_hosts_title">File hosts systemless</string>
@@ -221,7 +219,6 @@
     <string name="env_fix_msg">Il tuo dispositivo necessita di una configurazione aggiuntiva per far funzionare Magisk correttamente. Vuoi procedere e riavviare il dispositivo?</string>
     <string name="env_full_fix_msg">È necessario eseguire di nuovo il flash di Magisk per farlo funzionare correttamente. Reinstalla Magisk utilizzando l\'app, in modalità recovery non è possibile ottenere informazioni corrette sul dispositivo.</string>
     <string name="setup_msg">Configurazione dell\'ambiente in corso…</string>
-    <string name="authenticate">Autentica</string>
     <string name="unsupport_magisk_title">Versione di Magisk non supportata</string>
     <string name="unsupport_magisk_msg">Questa versione dell\'app non supporta le versioni di Magisk inferiori a %1$s.\n\nL\'app si comporterà come se Magisk non fosse installato: aggiornalo il prima possibile.</string>
     <string name="unsupport_general_title">Stato anomalo rilevato</string>

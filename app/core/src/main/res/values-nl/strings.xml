@@ -185,7 +185,6 @@
     <string name="setup_fail">Installatie mislukt</string>
     <string name="env_fix_title">Installatie nog niet afgerond</string>
     <string name="setup_msg">Bezig met toepassen van omgevingsinstellingen…</string>
-    <string name="authenticate">Goedkeuren</string>
     <string name="unsupport_magisk_title">Niet-ondersteunde Magisk-versie</string>
     <string name="external_rw_permission_denied">Verleen het opslagrecht om deze functie gebruiken</string>
     <string name="add_shortcut_title">Snelkoppeling maken op startscherm</string>

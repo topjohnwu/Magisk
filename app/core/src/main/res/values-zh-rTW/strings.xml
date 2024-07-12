@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">保持強制加密</string>
     <string name="keep_dm_verity">保持 AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">修補 vbmeta 到開機映像檔</string>
     <string name="recovery_mode">安裝至 Recovery</string>
     <string name="install_options_title">選項</string>
     <string name="install_method_title">安裝方式</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">在 Zygote 中執行 Magisk</string>
     <string name="settings_denylist_title">強制黑名單</string>
     <string name="settings_denylist_summary">Magisk 黑名單上的處理程序將復原變更</string>
-    <string name="settings_denylist_error">這個功能需要啟用 %1$s</string>
     <string name="settings_denylist_config_title">設定黑名單</string>
     <string name="settings_denylist_config_summary">選擇要包含在黑名單的處理程序</string>
     <string name="settings_hosts_title">主機（hosts）模組化</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_msg">缺少讓 Magisk 正常執行所需的檔案。請您同意讓 Magisk 額外下載安裝包進行修復安裝，修復完成後將自動重新啟動。請問您是否繼續？</string>
     <string name="env_full_fix_msg">需要重新安裝才能使 Magisk 正常工作。請在應用程式內重新安裝，recovery 模式無法正確獲取設備訊息。</string>
     <string name="setup_msg">正在修復執行環境……</string>
-    <string name="authenticate">驗證</string>
     <string name="unsupport_magisk_title">不支援的 Magisk 版本</string>
     <string name="unsupport_magisk_msg">此應用程式的版本不支援 Magisk %1$s 版或更低的版本。\n\nMagisk 將顯示為未安裝的狀態。不過您仍然可以升級功能，請盡快升級。</string>
     <string name="unsupport_general_title">異常狀態</string>

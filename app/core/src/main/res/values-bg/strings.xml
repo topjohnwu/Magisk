@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Запазване на наложеното шифроване</string>
     <string name="keep_dm_verity">Запазване на AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Закърпване на vbmeta в образ на boot</string>
     <string name="recovery_mode">Режим за възстановяване</string>
     <string name="install_options_title">Настройки</string>
     <string name="install_method_title">Метод</string>
@@ -140,7 +139,6 @@
     <string name="settings_zygisk_summary">Изпълняване на части от Magisk в демон на zygote</string>
     <string name="settings_denylist_title">Налагане на черен списък</string>
     <string name="settings_denylist_summary">На процесите в черния списък ще бъдат възстановени всички модификации, направени от Magisk</string>
-    <string name="settings_denylist_error">Изизква %1$s да бъде включено</string>
     <string name="settings_denylist_config_title">Настройка на черен списък</string>
     <string name="settings_denylist_config_summary">Изберете процесите, които да бъдат включени в черния списък</string>
     <string name="settings_hosts_title">Безсистемни хостове</string>
@@ -220,7 +218,6 @@
     <string name="env_fix_msg">За да работи Magisk нормално, устройството се нуждае от допълнителна настройка. Да бъде ли продължено след рестарт?</string>
     <string name="env_full_fix_msg">За да работи Magisk нормално, е необходимо да бъде инсталиран отново. Преинсталирайте Magisk от приложението, защото режимът за възстановяване не получава необходимата информация за устройството.</string>
     <string name="setup_msg">Надстройка на средата…</string>
-    <string name="authenticate">Удостоверяване</string>
     <string name="unsupport_magisk_title">Неподдържано издание на Magisk</string>
     <string name="unsupport_magisk_msg">Това издание на приложението не поддържа издания на Magisk преди %1$s.\n\nПриложението ще се държи все едно няма инсталиран Magisk. Обновете Magisk възможно най-скоро.</string>
     <string name="unsupport_general_title">Неочаквано състояние</string>

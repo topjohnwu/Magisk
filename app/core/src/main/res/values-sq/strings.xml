@@ -36,7 +36,6 @@
     <string name="keep_dm_verity">Ruaj AVB 2.0/dm-verity</string>
     <string name="recovery_mode">Recovery Mode</string>
     <string name="install_options_title">Opsionet</string>
-    <string name="patch_vbmeta">Arno vbmeta në imazhin e nisjes</string>
     <string name="install_method_title">Metoda</string>
     <string name="install_next">Tjetër</string>
     <string name="install_start">Shkojme</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">Drejtoni pjesë të Magisk në demonin zygote</string>
     <string name="settings_denylist_title">Zbato Listën e Mohimit</string>
     <string name="settings_denylist_summary">Proceset në listën e mohimit do të kenë të gjitha modifikimet e Magisk</string>
-    <string name="settings_denylist_error">Ky funksion kërkon %1$s për tu aktivizuar</string>
     <string name="settings_denylist_config_title">Konfiguro Listën e Mohimit</string>
     <string name="settings_denylist_config_summary">Zgjidhni proceset që do të përfshihen në listën e mohimit</string>
     <string name="settings_hosts_title">Pritësit pa sistem</string>
@@ -225,7 +223,6 @@
     <string name="env_fix_msg">Pajisja juaj ka nevojë për konfigurim shtesë që Magisk të funksionojë siç duhet.  Dëshironi të vazhdoni dhe rindizni?</string>
     <string name="env_full_fix_msg">Pajisja juaj ka nevojë për re-flashuar Magisk që të funksionojë siç duhet. Ju lutemi ri-instaloni Magisk brenda aplikacionit, modaliteti i rikuperimit nuk mund të marrë informacionin e saktë të pajisjes.</string>
     <string name="setup_msg">Konfigurimi i mjedisit të funksionimit…</string>
-    <string name="authenticate">Vërtetoj</string>
     <string name="unsupport_magisk_title">Version Magjik i Pambështetur</string>
     <string name="unsupport_magisk_msg">Ky version i aplikacionit nuk e mbështet versionin Magisk më të ulët se %1$s.\n\nAplikacioni do të sillet sikur të mos jetë i instaluar Magisk, ju lutemi azhurnoni Magisk sa më shpejt të jetë e mundur.</string>
     <string name="unsupport_general_title">Gjendje jonormale</string>

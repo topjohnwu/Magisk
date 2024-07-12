@@ -189,7 +189,6 @@
     <string name="setup_fail">Postavljanje nije uspjelo</string>
     <string name="env_fix_title">Zahtijeva dodatno postavljanje</string>
     <string name="setup_msg">Postavljanje okruženja za pokretanje…</string>
-    <string name="authenticate">Potvrdi</string>
     <string name="unsupport_magisk_title">Nepodržana Magisk verzija</string>
     <string name="external_rw_permission_denied">Odobrite dopuštenje za pohranu da biste omogućili ovu funkciju</string>
     <string name="add_shortcut_title">Dodaj prečac na početni zaslon</string>

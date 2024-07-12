@@ -201,7 +201,6 @@
     <string name="env_fix_title">கூடுதல் அமைப்பு தேவை</string>
     <string name="env_fix_msg">மேகிஸ்க் சரியாக வேலை செய்ய உங்கள் சாதனத்திற்கு கூடுதல் அமைப்பு தேவை. மறுதொடக்கம் செய்ய விரும்புகிறீர்களா??</string>
     <string name="setup_msg">சூழல் அமைப்பை இயக்குகிறது…</string>
-    <string name="authenticate">அங்கீகரிக்கவும்</string>
     <string name="unsupport_magisk_title">ஆதரிக்கப்படாத மேஜிஸ்க் பதிப்பு</string>
     <string name="unsupport_magisk_msg">பயன்பாட்டின் இந்த பதிப்பு மேஜிஸ்க் பதிப்பை %1$s ஐ விடக் குறைவாக ஆதரிக்காது.</string>
     <string name="external_rw_permission_denied">இந்த செயல்பாட்டை இயக்க சேமிப்பக அனுமதி வழங்கவும்</string>

@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">ഫോഴ്‌സ് എൻക്രിപ്ഷൻ സംരക്ഷിക്കുക</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity സംരക്ഷിക്കുക</string>
-    <string name="patch_vbmeta">ബൂട്ട് ഇമേജിൽ vbmeta പാച്ച് ചെയ്യുക</string>
     <string name="recovery_mode">റിക്കവറി മോഡ്</string>
     <string name="install_options_title">ഓപ്ഷനുകൾ</string>
     <string name="install_method_title">രീതി</string>
@@ -138,7 +137,6 @@
     <string name="settings_zygisk_summary">സൈഗോട്ട് ഡെമണിൽ മജിസ്കിന്റെ ഭാഗങ്ങൾ പ്രവർത്തിപ്പിക്കുക</string>
     <string name="settings_denylist_title">നിഷിദ്ധ പട്ടിക പ്രാബല്യത്തിലാകുക</string>
     <string name="settings_denylist_summary">നിഷിദ്ധ പട്ടികയിലെ പ്രോസസ്സുകൾക്കായി എല്ലാ മജിസ്‌ക് പരിഷ്‌ക്കരണങ്ങളും പഴയപടിയാക്കും</string>
-    <string name="settings_denylist_error">ഈ ഫീച്ചറിന് %1$s പ്രവർത്തനക്ഷമമാക്കേണ്ടതുണ്ട്</string>
     <string name="settings_denylist_config_title">നിഷിദ്ധ പട്ടിക കോൺഫിഗർ ചെയ്യുക</string>
     <string name="settings_denylist_config_summary">നിഷിദ്ധ പട്ടികയിൽ ഉൾപ്പെടുത്തേണ്ട പ്രോസസ്സുകൾ തിരഞ്ഞെടുക്കുക</string>
     <string name="settings_hosts_title">സിസ്റ്റംലെസ്സ് ഹോസ്റ്റ്</string>
@@ -217,7 +215,6 @@
     <string name="env_fix_title">കൂടുതൽ സജ്ജീകരണം ആവശ്യമാണ്</string>
     <string name="env_fix_msg">മജിസ്‌ക് ശരിയായി പ്രവർത്തിക്കാൻ നിങ്ങളുടെ ഉപകരണത്തിന് കൂടുതൽ സജ്ജീകരണം ആവശ്യമാണ്. നിങ്ങൾക്ക് തുടരാനും റീബൂട്ട് ചെയ്യാനും താൽപ്പര്യമുണ്ടോ?</string>
     <string name="setup_msg">ഇൻവൈറൻമൻറ്റ് സജ്ജീകരണം പ്രവർത്തിക്കുന്നു...</string>
-    <string name="authenticate">ആധികാരികമാക്കുക</string>
     <string name="unsupport_magisk_title">പിന്തുണയ്ക്കാത്ത മജിസ്‌ക് പതിപ്പ്</string>
     <string name="unsupport_magisk_msg">ആപ്പിന്റെ ഈ പതിപ്പ് %1$s-ൽ താഴെയുള്ള മജിസ്‌ക് പതിപ്പുകളെ പിന്തുണയ്‌ക്കുന്നില്ല.\n\nമജിസ്‌ക് ഇൻസ്റ്റാൾ ചെയ്തിട്ടില്ലെന്ന മട്ടിൽ ആപ്പ് പ്രവർത്തിക്കും, ദയവായി മജിസ്‌ക് എത്രയും വേഗം അപ്‌ഗ്രേഡ് ചെയ്യുക.</string>
     <string name="unsupport_general_title">അസാധാരണമായ നില</string>

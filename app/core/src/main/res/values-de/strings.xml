@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Erzwungene Verschlüsselung beibehalten</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity beibehalten</string>
-    <string name="patch_vbmeta">vbmeta im Boot-Image patchen</string>
     <string name="recovery_mode">Recovery Modus</string>
     <string name="install_options_title">Optionen</string>
     <string name="install_method_title">Methode</string>
@@ -143,7 +142,6 @@
     <string name="settings_zygisk_summary">Teile von Magisk im Zygoten-Daemon ausführen</string>
     <string name="settings_denylist_title">Ausnahmeliste erzwingen</string>
     <string name="settings_denylist_summary">Bei Prozessen, die auf der Ausnahmeliste stehen, werden alle Magisk-Änderungen rückgängig gemacht.</string>
-    <string name="settings_denylist_error">Für diese Funktion muss %1$s aktiviert sein</string>
     <string name="settings_denylist_config_title">Ausnahmeliste konfigurieren</string>
     <string name="settings_denylist_config_summary">Auswahl der Prozesse, die in die Ausnahmeliste aufgenommen werden sollen</string>
     <string name="settings_hosts_title">Systemlose Hosts-Datei</string>
@@ -226,7 +224,6 @@
     <string name="env_fix_msg">Magisk braucht ein zusätzliches Setup, um auf deinem Gerät zu funktionieren. Willst du fortfahren und dein Gerät neustarten?</string>
     <string name="env_full_fix_msg">Dein Gerät benötigt einen Reflash von Magisk, um richtig zu funktionieren. Bitte Magisk innerhalb der App neu installieren, der Wiederherstellungsmodus kann keine korrekten Geräteinformationen abrufen.</string>
     <string name="setup_msg">Laufzeitumgebung einrichten …</string>
-    <string name="authenticate">Authentifizieren</string>
     <string name="unsupport_magisk_title">Nicht unterstützte Magisk-Version</string>
     <string name="unsupport_magisk_msg">Diese App-Version unterstützt keine Magisk-Version kleiner als %1$s.\n\nDie App verhält sich so, als ob kein Magisk installiert wäre. Bitte Magisk so bald wie möglich aktualisieren.</string>
     <string name="unsupport_general_title">Abnormaler Zustand</string>

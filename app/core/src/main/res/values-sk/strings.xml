@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Ponechať vynútené šifrovanie</string>
     <string name="keep_dm_verity">Ponechať AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Zaplátať vbmeta v boot image</string>
     <string name="recovery_mode">Režim Recovery</string>
     <string name="install_options_title">Možnosti</string>
     <string name="install_method_title">Metóda</string>
@@ -144,7 +143,6 @@
     <string name="settings_zygisk_summary">Spustiť časti Magisku v démonovi zygote</string>
     <string name="settings_denylist_title">Vynútiť zoznam zamietnutých</string>
     <string name="settings_denylist_summary">Pre procesy na zozname zamietnutých budú všetky úpravy Magiskom vrátené</string>
-    <string name="settings_denylist_error">Táto funkcia vyžaduje, aby bolo povolené %1$s</string>
     <string name="settings_denylist_config_title">Nastavenie zoznamu zamietnutých</string>
     <string name="settings_denylist_config_summary">Vyberte procesy, ktoré majú byť zahrnuté do zoznamu blokovaných</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -229,7 +227,6 @@
     <string name="env_fix_msg">Aby Magisk fungoval správne, vaše zariadenie potrebuje ďalšie nastavenie. Chcete pokračovať a reštartovať?</string>
     <string name="env_full_fix_msg">Vaše zariadenie potrebuje na správne fungovanie reflash Magisku. Preinštalujte Magisk priamo z aplikácie, režim obnovenia nemôže získať správne informácie o zariadení.</string>
     <string name="setup_msg">Nastavenie je spustené…</string>
-    <string name="authenticate">Autentifikovať</string>
     <string name="unsupport_magisk_title">Nepodporovaná verzia Magisku</string>
     <string name="unsupport_magisk_msg">Táto verzia aplikácie nepodporuje Magisk s verziou nižšou ako %1$s.\n\nAplikácia sa bude správať, akoby Magisk nebol nainštalový, aktualizujte Magisk čo najskôr.</string>
     <string name="unsupport_general_title">Abnormálny stav</string>

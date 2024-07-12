@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Zachowaj force encryption (wymuszenie szyfrowania)</string>
     <string name="keep_dm_verity">Zachowaj AVB 2.0/dm-verity (weryfikację rozruchu)</string>
-    <string name="patch_vbmeta">Załataj vbmeta w obrazie rozruchowym</string>
     <string name="recovery_mode">Tryb Recovery</string>
     <string name="install_options_title">Opcje</string>
     <string name="install_method_title">Metoda</string>
@@ -143,7 +142,6 @@
     <string name="settings_zygisk_summary">Uruchom część Magisk w demonie zygote</string>
     <string name="settings_denylist_title">Egzekwowanie listy odmów (DenyList)</string>
     <string name="settings_denylist_summary">Procesy znajdujące się na liście odmów (DenyList) będą miały cofnięte wszystkie modyfikacje Magisk</string>
-    <string name="settings_denylist_error">Ta funkcja wymaga, aby %1$s było włączone</string>
     <string name="settings_denylist_config_title">Konfiguracja listy odmów (DenyList)</string>
     <string name="settings_denylist_config_summary">Wybierz procesy, które mają się znajdować na liście odmów (DenyList)</string>
     <string name="settings_hosts_title">Hosty Systemless</string>
@@ -226,7 +224,6 @@
     <string name="env_fix_msg">Twoje urządzenie wymaga dodatkowej konfiguracji, aby Magisk działał poprawnie. Czy chcesz kontynuować i uruchomić ponownie?</string>
     <string name="env_full_fix_msg">Twoje urządzenie wymaga ponownej instalacji Magisk, aby działać poprawnie. Zainstaluj ponownie Magisk używając aplikacji, tryb recovery nie może uzyskać prawidłowych informacji o urządzeniu.</string>
     <string name="setup_msg">Uruchamianie środowiska konfiguracji…</string>
-    <string name="authenticate">Uwierzytelnianie</string>
     <string name="unsupport_magisk_title">Nieobsługiwana wersja Magisk</string>
     <string name="unsupport_magisk_msg">Ta wersja aplikacji nie obsługuje Magisk w wersji niższej niż %1$s.\n\nAplikacja będzie zachowywać się tak, jakby Magisk nie był zainstalowany, zaktualizuj Magisk tak szybko, jak to możliwe.</string>
     <string name="unsupport_general_title">Nieprawidłowy stan</string>

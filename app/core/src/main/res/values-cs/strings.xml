@@ -34,7 +34,6 @@
     <!--Install-->
     <string name="keep_force_encryption">Ponechat Force Encryption</string>
     <string name="keep_dm_verity">Ponechat AVB 2.0/DM-Verity</string>
-    <string name="patch_vbmeta">Patchnout vbmeta do boot obrazu</string>
     <string name="recovery_mode">Režim Recovery</string>
     <string name="install_options_title">Možnosti</string>
     <string name="install_method_title">Způsob</string>
@@ -143,7 +142,6 @@
     <string name="settings_zygisk_summary">Spustí části Magisku v démonu Zygote</string>
     <string name="settings_denylist_title">Vynutit DenyList</string>
     <string name="settings_denylist_summary">Na procesy v Denylistu nebudou aplikovány žádné změny, nebo modifikace způsobené Magiskem</string>
-    <string name="settings_denylist_error">Tato funkce vyžaduje povolení %1$s</string>
     <string name="settings_denylist_config_title">Nastavit DenyList</string>
     <string name="settings_denylist_config_summary">Vyberte procesy, které mají být zahrnuty v DenyListu</string>
     <string name="settings_hosts_title">Nesystémoví hostitelé</string>
@@ -223,7 +221,6 @@
     <string name="env_fix_msg">Aby mohl Magisk správně fungovat, je třeba zařízení dodatečně nastavit. Chcete pokračovat a restartovat zařízení?</string>
     <string name="env_full_fix_msg">Aby vaše zařízení správně fungovalo, potřebuje se Magisk znovu flashnout. Nainstalujte znovu Magisk v aplikaci, režim Recovery nemůže získat správné informace o zařízení.</string>
     <string name="setup_msg">Probíhá nastavení prostředí…</string>
-    <string name="authenticate">Ověřit</string>
     <string name="unsupport_magisk_title">Nepodporovaná verze Magisk</string>
     <string name="unsupport_magisk_msg">Tato verze aplikace nepodporuje Magisk ve verzi nižší než %1$s.\n\nAplikace se bude chovat, jako by žádný Magisk nebyl nainstalován. Aktualizujte prosím Magisk co nejdříve.</string>
     <string name="unsupport_general_title">Abnormální stav</string>

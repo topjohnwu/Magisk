@@ -33,7 +33,6 @@
     <!--Instalación-->
     <string name="keep_force_encryption">Mantener FDE (Full-Disk Encryption)</string>
     <string name="keep_dm_verity">Mantener AVB 2.0/dm-verity</string>
-    <string name="patch_vbmeta">Parchar vbmeta en el archivo boot.img</string>
     <string name="recovery_mode">Modo recovery</string>
     <string name="install_options_title">Opciones de instalación:</string>
     <string name="install_method_title">Método de instalación:</string>
@@ -141,7 +140,6 @@
     <string name="settings_zygisk_summary">Ejecuta Magisk en el proceso Zygote de Android</string>
     <string name="settings_denylist_title">Aplicar lista de denegación</string>
     <string name="settings_denylist_summary">Las apps en la lista de denegación no serán modificadas por Magisk</string>
-    <string name="settings_denylist_error">Necesitas activar %1$s para usar esta función</string>
     <string name="settings_denylist_config_title">Configurar lista de denegación</string>
     <string name="settings_denylist_config_summary">Selecciona los procesos de cada app que se incluirán en la lista</string>
     <string name="settings_hosts_title">Systemless hosts</string>
@@ -222,7 +220,6 @@
     <string name="env_fix_msg">Tu dispositivo necesita una configuración adicional para que Magisk funcione correctamente. ¿Quieres continuar y reiniciar?</string>
     <string name="env_full_fix_msg">Tu dispositivo necesita reinstalar Magisk para que este funcione correctamente. Por favor, reinstala Magisk desde la app, el modo recovery no puede obtener la información correcta del dispositivo.</string>
     <string name="setup_msg">Ejecutando configuración de entorno…</string>
-    <string name="authenticate">Autenticar</string>
     <string name="unsupport_magisk_title">Versión de Magisk no soportada</string>
     <string name="unsupport_magisk_msg">La versión actual de la app no soporta versiones de Magisk inferiores a la %1$s.\n\nLa app se comportará como si Magisk no estuviese instalado, por favor, actualízalo tan pronto como puedas</string>
     <string name="unsupport_general_title">Estado anormal</string>

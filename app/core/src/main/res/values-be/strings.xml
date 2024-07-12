@@ -187,7 +187,6 @@
     <string name="env_fix_title">Патрабуецца дадатковая ўсталёўка</string>
     <string name="env_fix_msg">Для карэктнай працы на вашай прыладзе спатрэбіцца ўсталяваць дадатковыя кампаненты. Хочаце працягнуць?</string>
     <string name="setup_msg">Наладка асяроддзя…</string>
-    <string name="authenticate">Аўтэнтыфікацыя</string>
     <string name="unsupport_magisk_title">Непадтрымліваемая версія Magisk</string>
     <string name="unsupport_magisk_msg">Гэтая версія праграмы не падтрымлівае Magisk версіі ніжэй за %1$s.\n\nПраграма будзе працаваць так, як быццам Magisk не ўсталяваны. Як мага хутчэй абнавіце Magisk.</string>
     <string name="unsupport_general_title">Анамальны стан</string>
