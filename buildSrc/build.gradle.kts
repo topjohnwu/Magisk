@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
 }
@@ -13,6 +15,12 @@ gradlePlugin {
             id = "MagiskPlugin"
             implementationClass = "MagiskPlugin"
         }
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        languageVersion = "2.0"
     }
 }
 

@@ -308,7 +308,7 @@ fun Project.setupAppCommon() {
             this.comment = "version=${Config.version}\n" +
                 "versionCode=${Config.versionCode}\n" +
                 "stubVersion=${Config.stubVersion}\n"
-            this.outFolder = layout.buildDirectory.dir("outputs/apk/${variant.name}")
+            this.outFolder.set(layout.buildDirectory.dir("outputs/apk/${variant.name}"))
         }
     }
 }
@@ -323,8 +323,8 @@ fun Project.setupStub() {
             project.tasks.register("${variantName}ManifestProducer", ManifestUpdater::class.java) {
                 dependsOn("generate${variantCapped}ObfuscatedClass")
                 applicationId = variant.applicationId
-                appClassDir = layout.buildDirectory.dir("generated/source/app/$variantName")
-                factoryClassDir = layout.buildDirectory.dir("generated/source/factory/$variantName")
+                appClassDir.set(layout.buildDirectory.dir("generated/source/app/$variantName"))
+                factoryClassDir.set(layout.buildDirectory.dir("generated/source/factory/$variantName"))
             }
         variant.artifacts.use(manifestUpdater)
             .wiredWithFiles(
