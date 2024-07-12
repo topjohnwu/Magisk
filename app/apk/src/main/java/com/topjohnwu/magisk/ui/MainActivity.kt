@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.ui
 
 import android.Manifest
+import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -8,35 +9,45 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.view.forEach
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDirections
 import com.topjohnwu.magisk.MainDirections
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseViewModel
+import com.topjohnwu.magisk.arch.NavigationActivity
 import com.topjohnwu.magisk.arch.startAnimations
 import com.topjohnwu.magisk.arch.viewModel
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
+import com.topjohnwu.magisk.core.base.SplashController
+import com.topjohnwu.magisk.core.base.SplashScreenHost
 import com.topjohnwu.magisk.core.isRunningAsStub
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.model.module.LocalModule
+import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.databinding.ActivityMainMd2Binding
 import com.topjohnwu.magisk.ui.home.HomeFragmentDirections
+import com.topjohnwu.magisk.ui.theme.Theme
 import com.topjohnwu.magisk.view.MagiskDialog
 import com.topjohnwu.magisk.view.Shortcuts
+import kotlinx.coroutines.launch
 import java.io.File
 import com.topjohnwu.magisk.core.R as CoreR
 
 class MainViewModel : BaseViewModel()
 
-class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
+class MainActivity : NavigationActivity<ActivityMainMd2Binding>(), SplashScreenHost {
 
     override val layoutRes = R.layout.activity_main_md2
     override val viewModel by viewModel<MainViewModel>()
     override val navHostId: Int = R.id.main_nav_host
+    override val splashController = SplashController(this)
     override val snackbarView: View
         get() {
             val fragmentOverride = currentFragment?.snackbarView
@@ -54,8 +65,20 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
 
     private var isRootFragment = true
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Theme.selected.themeRes)
+        splashController.preOnCreate()
+        super.onCreate(savedInstanceState)
+        splashController.onCreate(savedInstanceState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        splashController.onResume()
+    }
+
     @SuppressLint("InlinedApi")
-    override fun showMainUI(savedInstanceState: Bundle?) {
+    override fun onCreateUi(savedInstanceState: Bundle?) {
         setContentView()
         showUnsupportedMessage()
         askForHomeShortcut()
@@ -162,6 +185,31 @@ class MainActivity : SplashActivity<ActivityMainMd2Binding>() {
             R.id.superuserFragment -> MainDirections.actionSuperuserFragment()
             R.id.logFragment -> MainDirections.actionLogFragment()
             else -> null
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    override fun showInvalidStateMessage(): Unit = runOnUiThread {
+        MagiskDialog(this).apply {
+            setTitle(CoreR.string.unsupport_nonroot_stub_title)
+            setMessage(CoreR.string.unsupport_nonroot_stub_msg)
+            setButton(MagiskDialog.ButtonType.POSITIVE) {
+                text = CoreR.string.install
+                onClick {
+                    withPermission(REQUEST_INSTALL_PACKAGES) {
+                        if (!it) {
+                            toast(CoreR.string.install_unknown_denied, Toast.LENGTH_SHORT)
+                            showInvalidStateMessage()
+                        } else {
+                            lifecycleScope.launch {
+                                AppMigration.restore(this@MainActivity)
+                            }
+                        }
+                    }
+                }
+            }
+            setCancelable(false)
+            show()
         }
     }
 

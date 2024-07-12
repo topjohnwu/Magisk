@@ -1,6 +1,5 @@
 package com.topjohnwu.magisk.core
 
-import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.app.Activity
 import android.app.Application
 import android.app.LocaleManager
@@ -12,24 +11,15 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import android.system.Os
-import androidx.activity.ComponentActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.profileinstaller.ProfileInstaller
 import com.topjohnwu.magisk.StubApk
-import com.topjohnwu.magisk.core.BuildConfig.APP_PACKAGE_NAME
-import com.topjohnwu.magisk.core.base.IActivityExtension
 import com.topjohnwu.magisk.core.base.UntrackedActivity
-import com.topjohnwu.magisk.core.base.launchPackage
-import com.topjohnwu.magisk.core.di.ServiceLocator
-import com.topjohnwu.magisk.core.ktx.writeTo
-import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.LocaleSetting
 import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.core.utils.ProcessLifecycle
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
 import com.topjohnwu.magisk.view.Notifications
-import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
@@ -38,8 +28,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
-import java.io.IOException
 import java.lang.ref.WeakReference
 import kotlin.system.exitProcess
 
@@ -140,72 +128,4 @@ object AppContext : ContextWrapper(null),
     override fun onActivityDestroyed(activity: Activity) {}
     override fun onLowMemory() {}
     override fun onTrimMemory(level: Int) {}
-}
-
-fun <T> T.initializeOnSplashScreen(launchUi: Runnable)
-where T : ComponentActivity, T : IActivityExtension {
-    val prevPkg = launchPackage
-    val prevConfig = intent.getBundleExtra(Const.Key.PREV_CONFIG)
-    val isPackageMigration = prevPkg != null && prevConfig != null
-
-    Config.init(prevConfig)
-
-    if (packageName != APP_PACKAGE_NAME) {
-        runCatching {
-            // Hidden, remove com.topjohnwu.magisk if exist as it could be malware
-            packageManager.getApplicationInfo(APP_PACKAGE_NAME, 0)
-            Shell.cmd("(pm uninstall $APP_PACKAGE_NAME)& >/dev/null 2>&1").exec()
-        }
-    } else {
-        if (Config.suManager.isNotEmpty()) {
-            Config.suManager = ""
-        }
-        if (isPackageMigration) {
-            Shell.cmd("(pm uninstall $prevPkg)& >/dev/null 2>&1").exec()
-        }
-    }
-
-    if (isPackageMigration) {
-        runOnUiThread {
-            // Relaunch the process after package migration
-            StubApk.restartProcess(this)
-        }
-        return
-    }
-
-    // Validate stub APK
-    if (isRunningAsStub && (
-            // Version mismatch
-            Info.stub!!.version != BuildConfig.STUB_VERSION ||
-            // Not properly patched
-            intent.component!!.className.contains(AppMigration.PLACEHOLDER))
-    ) {
-        withPermission(REQUEST_INSTALL_PACKAGES) { granted ->
-            if (granted) {
-                lifecycleScope.launch {
-                    val apk = File(cacheDir, "stub.apk")
-                    try {
-                        assets.open("stub.apk").writeTo(apk)
-                        AppMigration.upgradeStub(this@initializeOnSplashScreen, apk)?.let {
-                            startActivity(it)
-                        }
-                    } catch (e: IOException) {
-                        Timber.e(e)
-                    }
-                }
-            }
-        }
-        return
-    }
-
-    JobService.schedule(this)
-    Shortcuts.setupDynamic(this)
-
-    // Pre-fetch network services
-    ServiceLocator.networkService
-
-    // Wait for root service
-    RootUtils.Connection.await()
-
-    runOnUiThread(launchUi)
 }
