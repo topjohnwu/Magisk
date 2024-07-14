@@ -572,29 +572,38 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
 
     // Backup existing methods
     auto total = g_hook->runtime_callbacks->getNativeMethodCount(env, clazz);
-    vector<JNINativeMethod> old_methods(total);
-    g_hook->runtime_callbacks->getNativeMethods(env, clazz, old_methods.data(), total);
+    auto old_methods = std::make_unique_for_overwrite<JNINativeMethod[]>(total);
+    g_hook->runtime_callbacks->getNativeMethods(env, clazz, old_methods.get(), total);
+    auto new_methods = std::make_unique_for_overwrite<JNINativeMethod[]>(total);
 
     // Replace the method
     for (auto i = 0; i < numMethods; ++i) {
         auto &method = methods[i];
-        auto res = env->RegisterNatives(clazz, &method, 1);
+        // It's useful to allow nullptr function pointer for restoring hook
+        if (!method.fnPtr) continue;
         // It's normal that the method is not found
-        if (res == JNI_ERR || env->ExceptionCheck()) {
-            auto exception = env->ExceptionOccurred();
-            if (exception) env->DeleteLocalRef(exception);
+        if (env->RegisterNatives(clazz, &method, 1) == JNI_ERR ||
+            env->ExceptionCheck() == JNI_TRUE) {
+            if (auto *exception = env->ExceptionOccurred(); exception) {
+                env->DeleteLocalRef(exception);
+            }
             env->ExceptionClear();
             method.fnPtr = nullptr;
-        } else {
-            // Find the old function pointer and return to caller
-            for (const auto &old_method : old_methods) {
-                if (strcmp(method.name, old_method.name) == 0 &&
-                    strcmp(method.signature, old_method.signature) == 0) {
-                    ZLOGD("replace %s#%s%s %p -> %p\n", clz,
-                          method.name, method.signature, old_method.fnPtr, method.fnPtr);
-                    method.fnPtr = old_method.fnPtr;
-                }
+            continue;
+        }
+        // Find the old function pointer and return to caller
+        g_hook->runtime_callbacks->getNativeMethods(env, clazz, new_methods.get(), total);
+        for (auto j = 0; j < total; ++j) {
+            auto &new_method = new_methods[j];
+            auto &old_method = old_methods[j];
+            if (new_method.fnPtr == method.fnPtr && old_method.fnPtr != new_method.fnPtr &&
+                strcmp(new_method.name, method.name) == 0) {
+                ZLOGD("replace %s#%s%s %p -> %p\n", clz,
+                      method.name, method.signature, old_method.fnPtr, method.fnPtr);
+                method.fnPtr = old_method.fnPtr;
+                break;
             }
         }
+        old_methods.swap(new_methods);
     }
 }
