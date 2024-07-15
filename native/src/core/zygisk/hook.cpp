@@ -52,14 +52,8 @@ using namespace std;
 //                                │                 └───────────────────────┘
 //                                ▼
 //                  ┌──────────────────────────┐
-//                  │androidSetCreateThreadFunc│
+//                  │   strdup("ZygiskInit")   │
 //                  └─────────────┬────┬───────┘
-//                                │    │                 ┌────────────┐
-//                                │    └────────────────►│hook_jni_env│
-//                                ▼                      └────────────┘
-//                       ┌──────────────────┐
-//                       │register_jni_procs│
-//                       └────────┬────┬────┘
 //                                │    │              ┌───────────────────┐
 //                                │    └─────────────►│replace_jni_methods│
 //                                │                   └───────────────────┘     ┌─────────┐
@@ -85,13 +79,11 @@ using namespace std;
 // * NativeBridgeItf: this symbol is the entry point for android::LoadNativeBridge
 // * HookContext::hook_plt(): hook functions like |dlclose| and |androidSetCreateThreadFunc|
 // * dlclose: the final step before android::LoadNativeBridge returns
-// * androidSetCreateThreadFunc: called in AndroidRuntime::startReg before
-//   |register_jni_procs|, which is when most native JNI methods are registered.
+// * strdup: called in AndroidRuntime::start before calling specializations routines
 // * HookContext::hook_jni_env(): replace the |RegisterNatives| function pointer in JNIEnv.
-// * replace_jni_methods: called in the replaced |RegisterNatives| function to filter and replace
-//   the function pointers registered in register_jni_procs, most importantly the process
-//   specialization routines, which are our main targets. This marks the final step
-//   of the code injection bootstrap process.
+// * replace_jni_methods: replace the function pointers registered in register_jni_procs,
+//   most importantly the process specialization routines, which are our main targets.
+//   This marks the final step of the code injection bootstrap process.
 // * pthread_attr_destroy: called whenever the JVM tries to setup threads for itself. We use
 //   this method to cleanup and unload Zygisk from the process.
 
@@ -102,7 +94,7 @@ struct HookContext {
     void hook_plt();
     void hook_unloader();
     void restore_plt_hook();
-    void hook_jni_env();
+    void replace_jni_methods();
     void restore_jni_hook(JNIEnv *env);
     void post_native_bridge_load();
 
@@ -135,7 +127,7 @@ ret new_##func(__VA_ARGS__)
 
 DCL_HOOK_FUNC(char *, strdup, const char * str) {
     if (strcmp(kZygiskInit, str) == 0) {
-        g_hook->hook_jni_env();
+        g_hook->replace_jni_methods();
     }
     return old_strdup(str);
 }
@@ -452,7 +444,7 @@ void HookContext::restore_plt_hook() {
 hookJniNativeMethods(env, kZygote, method##_methods.data(), method##_methods.size()); \
 for (auto m: method##_methods) if (m.fnPtr) { method##_orig = m.fnPtr; break; }
 
-void HookContext::hook_jni_env() {
+void HookContext::replace_jni_methods() {
     using method_sig = jint(*)(JavaVM **, jsize, jsize *);
     auto get_created_vms = reinterpret_cast<method_sig>(
             dlsym(RTLD_DEFAULT, "JNI_GetCreatedJavaVMs"));
