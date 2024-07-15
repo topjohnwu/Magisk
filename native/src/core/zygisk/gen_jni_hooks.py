@@ -54,7 +54,7 @@ class Method:
         args = ''.join(map(lambda x: x.type.jni, self.args))
         return f'({args}){self.ret.type.jni}'
 
-    def body(self):
+    def body(self, name, i):
         return ''
 
 class JNIHook(Method):
@@ -65,8 +65,8 @@ class JNIHook(Method):
     def base_name(self):
         return ''
 
-    def orig_method(self):
-        return f'reinterpret_cast<decltype(&{self.name})>({self.base_name()}_orig)'
+    def orig_method(self, name, i):
+        return f'reinterpret_cast<{self.ret.type.cpp}(*)(JNIEnv *env, jclass clazz, {self.cpp()})>({name}_methods[{i}].fnPtr)'
 
 def ind(i):
     return '\n' + '    ' * i
@@ -89,18 +89,18 @@ class ForkAndSpec(JNIHook):
     def init_args(self):
         return 'AppSpecializeArgs_v5 args(uid, gid, gids, runtime_flags, rlimits, mount_external, se_info, nice_name, instruction_set, app_data_dir);'
 
-    def body(self):
+    def body(self, name, i):
         decl = ''
-        decl += ind(1) + self.init_args()
+        decl += ind(3) + self.init_args()
         for a in self.args:
             if a.set_arg:
-                decl += ind(1) + f'args.{a.name} = &{a.name};'
-        decl += ind(1) + 'ZygiskContext ctx(env, &args);'
-        decl += ind(1) + f'ctx.{self.base_name()}_pre();'
-        decl += ind(1) + self.orig_method() + '('
-        decl += ind(2) + f'env, clazz, {self.name_list()}'
-        decl += ind(1) + ');'
-        decl += ind(1) + f'ctx.{self.base_name()}_post();'
+                decl += ind(3) + f'args.{a.name} = &{a.name};'
+        decl += ind(3) + 'ZygiskContext ctx(env, &args);'
+        decl += ind(3) + f'ctx.{self.base_name()}_pre();'
+        decl += ind(3) + self.orig_method(name, i) + '('
+        decl += ind(4) + f'env, clazz, {self.name_list()}'
+        decl += ind(3) + ');'
+        decl += ind(3) + f'ctx.{self.base_name()}_post();'
         return decl
 
 class SpecApp(ForkAndSpec):
@@ -210,32 +210,22 @@ server_l = ForkServer('l', [uid, gid, gids, runtime_flags, rlimits,
 server_samsung_q = ForkServer('samsung_q', [uid, gid, gids, runtime_flags, Anon(jint), Anon(jint), rlimits,
     permitted_capabilities, effective_capabilities])
 
-hook_map = {}
-
-def gen_jni_def(clz, methods):
-    if clz not in hook_map:
-        hook_map[clz] = []
-
+def gen_jni_def(name, clz, methods):
     decl = ''
-    for m in methods:
-        decl += ind(0) + f'[[clang::no_stack_protector]] {m.ret.type.cpp} {m.name}(JNIEnv *env, jclass clazz, {m.cpp()}) {{'
-        decl += m.body()
-        if m.ret.value:
-            decl += ind(1) + f'return {m.ret.value};'
-        decl += ind(0) + '}'
-
-    decl += ind(0) + f'std::array {m.base_name()}_methods = {{'
-    for m in methods:
-        decl += ind(1) + 'JNINativeMethod {'
+    decl += ind(0) + f'constexpr auto {name}_class = "{clz}";'
+    decl += ind(0) + f'std::array<JNINativeMethod, {len(methods)}> {name}_methods = {{{{'
+    for i, m in enumerate(methods):
+        decl += ind(1) + '{'
         decl += ind(2) + f'"{m.base_name()}",'
         decl += ind(2) + f'"{m.jni()}",'
-        decl += ind(2) + f'(void *) &{m.name}'
+        decl += ind(2) + f'(void *) +[] [[clang::no_stack_protector]] (JNIEnv *env, jclass clazz, {m.cpp()}) static -> {m.ret.type.cpp} {{'
+        decl += m.body(name, i)
+        if m.ret.value:
+            decl += ind(3) + f'return {m.ret.value};'
+        decl += ind(2) + '}'
         decl += ind(1) + '},'
-    decl += ind(0) + '};'
-    decl = ind(0) + f'void *{m.base_name()}_orig = nullptr;' + decl
+    decl += ind(0) + '}};'
     decl += ind(0)
-
-    hook_map[clz].append(m.base_name())
 
     return decl
 
@@ -245,13 +235,8 @@ with open('jni_hooks.hpp', 'w') as f:
 
     zygote = 'com/android/internal/os/Zygote'
 
-    methods = [fas_l, fas_o, fas_p, fas_q_alt, fas_r, fas_u, fas_samsung_m, fas_samsung_n, fas_samsung_o, fas_samsung_p]
-    f.write(gen_jni_def(zygote, methods))
-
-    methods = [spec_q, spec_q_alt, spec_r, spec_u, spec_samsung_q]
-    f.write(gen_jni_def(zygote, methods))
-
-    methods = [server_l, server_samsung_q]
-    f.write(gen_jni_def(zygote, methods))
+    f.write(gen_jni_def('zygote', zygote, [
+        fas_l, fas_o, fas_p, fas_q_alt, fas_r, fas_u, fas_samsung_m, fas_samsung_n, fas_samsung_o,
+        fas_samsung_p, spec_q, spec_q_alt, spec_r, spec_u, spec_samsung_q, server_l, server_samsung_q]))
 
     f.write('\n} // namespace\n')
