@@ -97,9 +97,6 @@ using namespace std;
 
 struct HookContext {
     vector<tuple<dev_t, ino_t, const char *, void **>> plt_backup;
-    map<string, vector<JNINativeMethod>, StringCmp> jni_backup;
-    JNINativeInterface new_env{};
-    const JNINativeInterface *old_env = nullptr;
     const NativeBridgeRuntimeCallbacks *runtime_callbacks = nullptr;
 
     void hook_plt();
@@ -122,9 +119,13 @@ private:
 // features, such as loading modules and customizing process fork/specialization.
 
 ZygiskContext *g_ctx;
-static HookContext *g_hook;
-static bool should_unmap_zygisk = false;
-static void *self_handle = nullptr;
+namespace {
+HookContext *g_hook;
+bool should_unmap_zygisk = false;
+void *self_handle = nullptr;
+constexpr const char *kZygiskInit = "com.android.internal.os.ZygoteInit";
+constexpr const char *kZygote = "com/android/internal/os/Zygote";
+}
 
 // -----------------------------------------------------------------
 
@@ -132,10 +133,11 @@ static void *self_handle = nullptr;
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
 
-DCL_HOOK_FUNC(static void, androidSetCreateThreadFunc, void *func) {
-    ZLOGD("androidSetCreateThreadFunc\n");
-    g_hook->hook_jni_env();
-    old_androidSetCreateThreadFunc(func);
+DCL_HOOK_FUNC(char *, strdup, const char * str) {
+    if (strcmp(kZygiskInit, str) == 0) {
+        g_hook->hook_jni_env();
+    }
+    return old_strdup(str);
 }
 
 // Skip actual fork and return cached result if applicable
@@ -400,8 +402,8 @@ void HookContext::hook_plt() {
     PLT_HOOK_REGISTER(native_bridge_dev, native_bridge_inode, dlclose);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, fork);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, unshare);
-    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, androidSetCreateThreadFunc);
     PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, selinux_android_setcontext);
+    PLT_HOOK_REGISTER(android_runtime_dev, android_runtime_inode, strdup);
     PLT_HOOK_REGISTER_SYM(android_runtime_dev, android_runtime_inode, "__android_log_close", android_log_close);
 
     if (!lsplt::CommitHook())
@@ -446,59 +448,9 @@ void HookContext::restore_plt_hook() {
 }
 
 // -----------------------------------------------------------------
-
-static string get_class_name(JNIEnv *env, jclass clazz) {
-    static auto class_getName = env->GetMethodID(
-            env->FindClass("java/lang/Class"), "getName", "()Ljava/lang/String;");
-    auto nameRef = (jstring) env->CallObjectMethod(clazz, class_getName);
-    const char *name = env->GetStringUTFChars(nameRef, nullptr);
-    string className(name);
-    env->ReleaseStringUTFChars(nameRef, name);
-    std::replace(className.begin(), className.end(), '.', '/');
-    return className;
-}
-
-static void replace_jni_methods(
-        vector<JNINativeMethod> &methods, vector<JNINativeMethod> &backup,
-        const JNINativeMethod *hook_methods, size_t hook_methods_size,
-        void **orig_function) {
-    for (auto &method : methods) {
-        if (strcmp(method.name, hook_methods[0].name) == 0) {
-            for (auto i = 0; i < hook_methods_size; ++i) {
-                const auto &hook = hook_methods[i];
-                if (strcmp(method.signature, hook.signature) == 0) {
-                    backup.push_back(method);
-                    *orig_function = method.fnPtr;
-                    method.fnPtr = hook.fnPtr;
-                    ZLOGI("replace %s\n", method.name);
-                    return;
-                }
-            }
-            ZLOGE("unknown signature of %s%s\n", method.name, method.signature);
-        }
-    }
-}
-
 #define HOOK_JNI(method) \
-replace_jni_methods(newMethods, backup, method##_methods.data(), method##_methods.size(), &method##_orig)
-
-static jint env_RegisterNatives(
-        JNIEnv *env, jclass clazz, const JNINativeMethod *methods, jint numMethods) {
-    auto className = get_class_name(env, clazz);
-    if (className == "com/android/internal/os/Zygote") {
-        // Restore JNIEnv as we no longer need to replace anything
-        env->functions = g_hook->old_env;
-
-        vector<JNINativeMethod> newMethods(methods, methods + numMethods);
-        vector<JNINativeMethod> &backup = g_hook->jni_backup[className];
-        HOOK_JNI(nativeForkAndSpecialize);
-        HOOK_JNI(nativeSpecializeAppProcess);
-        HOOK_JNI(nativeForkSystemServer);
-        return g_hook->old_env->RegisterNatives(env, clazz, newMethods.data(), numMethods);
-    } else {
-        return g_hook->old_env->RegisterNatives(env, clazz, methods, numMethods);
-    }
-}
+hookJniNativeMethods(env, kZygote, method##_methods.data(), method##_methods.size()); \
+for (auto m: method##_methods) if (m.fnPtr) { method##_orig = m.fnPtr; break; }
 
 void HookContext::hook_jni_env() {
     using method_sig = jint(*)(JavaVM **, jsize, jsize *);
@@ -533,25 +485,16 @@ void HookContext::hook_jni_env() {
     res = vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
     if (res != JNI_OK || env == nullptr) {
         ZLOGW("JNIEnv not found\n");
-        return;
     }
-
-    // Replace the function table in JNIEnv to hook RegisterNatives
-    memcpy(&new_env, env->functions, sizeof(*env->functions));
-    new_env.RegisterNatives = &env_RegisterNatives;
-    old_env = env->functions;
-    env->functions = &new_env;
+    HOOK_JNI(nativeForkAndSpecialize);
+    HOOK_JNI(nativeSpecializeAppProcess);
+    HOOK_JNI(nativeForkSystemServer);
 }
 
 void HookContext::restore_jni_hook(JNIEnv *env) {
-    for (const auto &[clz, methods] : jni_backup) {
-        if (!methods.empty() && env->RegisterNatives(
-                env->FindClass(clz.data()), methods.data(),
-                static_cast<int>(methods.size())) != 0) {
-            ZLOGE("Failed to restore JNI hook of class [%s]\n", clz.data());
-            should_unmap_zygisk = false;
-        }
-    }
+    hookJniNativeMethods(env, kZygote, nativeForkAndSpecialize_methods.data(), nativeForkAndSpecialize_methods.size());
+    hookJniNativeMethods(env, kZygote, nativeSpecializeAppProcess_methods.data(), nativeSpecializeAppProcess_methods.size());
+    hookJniNativeMethods(env, kZygote, nativeForkSystemServer_methods.data(), nativeForkSystemServer_methods.size());
 }
 
 // -----------------------------------------------------------------
