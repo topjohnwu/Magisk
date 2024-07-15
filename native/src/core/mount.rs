@@ -209,6 +209,7 @@ pub fn find_preinit_device() -> String {
                 && (!encrypted || FsPath::from(cstr!("/data/unencrypted")).exists())
             {
                 *matched_type = PartId::Data;
+                break 'block;
             }
 
             // No matches, continue through the loop
