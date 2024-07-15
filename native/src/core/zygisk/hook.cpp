@@ -116,7 +116,6 @@ HookContext *g_hook;
 bool should_unmap_zygisk = false;
 void *self_handle = nullptr;
 constexpr const char *kZygiskInit = "com.android.internal.os.ZygoteInit";
-constexpr const char *kZygote = "com/android/internal/os/Zygote";
 }
 
 // -----------------------------------------------------------------
@@ -440,10 +439,6 @@ void HookContext::restore_plt_hook() {
 }
 
 // -----------------------------------------------------------------
-#define HOOK_JNI(method) \
-hookJniNativeMethods(env, kZygote, method##_methods.data(), method##_methods.size()); \
-for (auto m: method##_methods) if (m.fnPtr) { method##_orig = m.fnPtr; break; }
-
 void HookContext::replace_jni_methods() {
     using method_sig = jint(*)(JavaVM **, jsize, jsize *);
     auto get_created_vms = reinterpret_cast<method_sig>(
@@ -478,15 +473,11 @@ void HookContext::replace_jni_methods() {
     if (res != JNI_OK || env == nullptr) {
         ZLOGW("JNIEnv not found\n");
     }
-    HOOK_JNI(nativeForkAndSpecialize);
-    HOOK_JNI(nativeSpecializeAppProcess);
-    HOOK_JNI(nativeForkSystemServer);
+    hookJniNativeMethods(env, zygote_class, zygote_methods.data(), zygote_methods.size());
 }
 
 void HookContext::restore_jni_hook(JNIEnv *env) {
-    hookJniNativeMethods(env, kZygote, nativeForkAndSpecialize_methods.data(), nativeForkAndSpecialize_methods.size());
-    hookJniNativeMethods(env, kZygote, nativeSpecializeAppProcess_methods.data(), nativeSpecializeAppProcess_methods.size());
-    hookJniNativeMethods(env, kZygote, nativeForkSystemServer_methods.data(), nativeForkSystemServer_methods.size());
+    hookJniNativeMethods(env, zygote_class, zygote_methods.data(), zygote_methods.size());
 }
 
 // -----------------------------------------------------------------
