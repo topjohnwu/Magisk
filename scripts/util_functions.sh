@@ -14,10 +14,6 @@
 # The path to store temporary files that don't need to persist
 # TMPDIR=
 
-# The path to store files that can be persisted (non-volatile storage)
-# Any modification to this variable should go through the function `set_nvbase`
-# NVBASE=
-
 # The non-volatile path where magisk executables are stored
 # MAGISKBIN=
 
@@ -82,11 +78,6 @@ abort() {
   [ ! -z $MODPATH ] && rm -rf $MODPATH
   rm -rf $TMPDIR
   exit 1
-}
-
-set_nvbase() {
-  NVBASE="$1"
-  MAGISKBIN="$1/magisk"
 }
 
 print_title() {
@@ -527,9 +518,9 @@ check_data() {
     $DATA && [ -d /data/adb ] && touch /data/adb/.rw && rm /data/adb/.rw && DATA_DE=true
     $DATA_DE && [ -d /data/adb/magisk ] || mkdir /data/adb/magisk || DATA_DE=false
   fi
-  set_nvbase "/data"
-  $DATA || set_nvbase "/cache/data_adb"
-  $DATA_DE && set_nvbase "/data/adb"
+  MAGISKBIN="/data/magisk"
+  $DATA || MAGISKBIN="/cache/data_adb/magisk"
+  $DATA_DE && MAGISKBIN="/data/adb/magisk"
 }
 
 run_migrations() {
@@ -579,7 +570,7 @@ copy_preinit_files() {
   fi
 
   # Copy all enabled sepolicy.rule
-  for r in $NVBASE/modules*/*/sepolicy.rule; do
+  for r in /data/adb/modules*/*/sepolicy.rule; do
     [ -f "$r" ] || continue
     local MODDIR=${r%/*}
     [ -f $MODDIR/disable ] && continue
@@ -650,7 +641,7 @@ install_module() {
 
   local MODDIRNAME=modules
   $BOOTMODE && MODDIRNAME=modules_update
-  local MODULEROOT=$NVBASE/$MODDIRNAME
+  local MODULEROOT=/data/adb/$MODDIRNAME
   MODID=$(grep_prop id $TMPDIR/module.prop)
   MODNAME=$(grep_prop name $TMPDIR/module.prop)
   MODAUTH=$(grep_prop author $TMPDIR/module.prop)
@@ -709,10 +700,10 @@ install_module() {
 
   if $BOOTMODE; then
     # Update info for Magisk app
-    mktouch $NVBASE/modules/$MODID/update
-    rm -rf $NVBASE/modules/$MODID/remove 2>/dev/null
-    rm -rf $NVBASE/modules/$MODID/disable 2>/dev/null
-    cp -af $MODPATH/module.prop $NVBASE/modules/$MODID/module.prop
+    mktouch /data/adb/modules/$MODID/update
+    rm -rf /data/adb/modules/$MODID/remove 2>/dev/null
+    rm -rf /data/adb/modules/$MODID/disable 2>/dev/null
+    cp -af $MODPATH/module.prop /data/adb/modules/$MODID/module.prop
   fi
 
   # Copy over custom sepolicy rules
@@ -744,4 +735,4 @@ install_module() {
 [ -z $BOOTMODE ] && BOOTMODE=false
 
 TMPDIR=/dev/tmp
-set_nvbase "/data/adb"
+MAGISKBIN="/data/adb/magisk"
