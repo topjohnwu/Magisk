@@ -133,6 +133,12 @@ pub fn setup_mounts() {
     };
 }
 
+// when partitions have the same fs type, the order is:
+// - preinit: it's selected previously, so it's always the first
+// - data: it has sufficient space and can be safely written
+// - cache: size is limited, but still can be safely written
+// - metadata: size is limited, and it might cause unexpected behavior if written
+// - persist: it's the last resort, as it's dangerous to write to it
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum PartId {
     PreInit,
@@ -165,6 +171,7 @@ pub fn find_preinit_device() -> String {
     let mut matched_info = parse_mount_info("self")
         .into_iter()
         .filter_map(|info| {
+            // if preinit is already mounted, choose it unconditionally
             if info.target.ends_with(PREINITMIRR) {
                 return Some((PartId::PreInit, info));
             }
@@ -185,6 +192,8 @@ pub fn find_preinit_device() -> String {
             } else {
                 return None;
             }
+            // take data iff it's not encrypted or file-based encrypted without metadata
+            // other partitions are always taken
             match info.target.as_str() {
                 "/persist" | "/mnt/vendor/persist" => Some((PartId::Persist, info)),
                 "/metadata" => Some((PartId::Metadata, info)),
@@ -206,8 +215,10 @@ pub fn find_preinit_device() -> String {
             at.as_str() == "ext4",
             bt.as_str() == "ext4",
         ) {
+            // take ext4 over others (f2fs) because f2fs has a kernel bug that causes kernel panic
             (true, false) => Less,
             (false, true) => Greater,
+            // if both has the same fs type, compare the mount point
             _ => ap.cmp(bp),
         },
     );
