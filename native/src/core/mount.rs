@@ -1,12 +1,15 @@
-use std::path::{Path, PathBuf};
-use std::ptr;
+use std::{
+    cmp::Ordering::{Greater, Less},
+    path::{Path, PathBuf},
+    ptr,
+};
 
 use num_traits::AsPrimitive;
 
 use base::libc::{c_uint, dev_t};
 use base::{
     cstr, debug, info, libc, parse_mount_info, raw_cstr, warn, FsPath, FsPathBuf, LibcReturn,
-    LoggedResult, ResultExt, Utf8CStr, Utf8CStrBufArr,
+    LoggedResult, MountInfo, ResultExt, Utf8CStr, Utf8CStrBufArr,
 };
 
 use crate::consts::{MODULEMNT, MODULEROOT, PREINITDEV, PREINITMIRR, WORKERDIR};
@@ -130,143 +133,124 @@ pub fn setup_mounts() {
     };
 }
 
-#[derive(Ord, PartialOrd, Eq, PartialEq)]
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum PartId {
-    Unknown,
-    Persist,
-    Metadata,
-    Cache,
+    PreInit,
     Data,
+    Cache,
+    Metadata,
+    Persist,
+}
+
+enum EncryptType {
+    None,
+    Block,
+    File,
+    Metadata,
 }
 
 pub fn find_preinit_device() -> String {
-    let encrypted = get_prop(cstr!("ro.crypto.state"), false) == "encrypted";
+    let encrypt_type = if get_prop(cstr!("ro.crypto.state"), false) != "encrypted" {
+        EncryptType::None
+    } else if get_prop(cstr!("ro.crypto.type"), false) != "file" {
+        EncryptType::Block
+    } else if FsPath::from(cstr!("/metadata/vold/metadata_encryption")).exists() {
+        EncryptType::Metadata
+    } else {
+        EncryptType::File
+    };
     let mount = unsafe { libc::getuid() } == 0 && std::env::var("MAGISKTMP").is_ok();
     let make_dev = mount && std::env::var_os("MAKEDEV").is_some();
 
-    let mut ext4_type = PartId::Unknown;
-    let mut f2fs_type = PartId::Unknown;
-
-    let mut preinit_source: String = String::new();
-    let mut preinit_dir: String = String::new();
-    let mut preinit_dev: u64 = 0;
-
-    'info_loop: for info in parse_mount_info("self") {
-        if info.target.ends_with(PREINITMIRR) {
-            return Path::new(&info.source)
-                .file_name()
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_string();
-        }
-        if info.root != "/" || !info.source.starts_with('/') || info.source.contains("/dm-") {
-            continue;
-        }
-        if ext4_type != PartId::Unknown && info.fs_type != "ext4" {
-            // Skip all non ext4 partitions once we found a matching ext4 partition
-            continue;
-        }
-        if info.fs_type != "ext4" && info.fs_type != "f2fs" {
-            // Only care about ext4 and f2fs filesystems
-            continue;
-        }
-        if !info.fs_option.split(',').any(|s| s == "rw") {
-            // Only care about rw mounts
-            continue;
-        }
-        if let Some(path) = Path::new(&info.source).parent() {
-            if !path.ends_with("by-name") && !path.ends_with("block") {
-                continue;
+    let mut matched_info = parse_mount_info("self")
+        .into_iter()
+        .filter_map(|info| {
+            if info.target.ends_with(PREINITMIRR) {
+                return Some((PartId::PreInit, info));
             }
-        } else {
-            continue;
-        }
-
-        let matched_type = if info.fs_type == "f2fs" {
-            &mut f2fs_type
-        } else {
-            &mut ext4_type
-        };
-
-        'block: {
-            if *matched_type <= PartId::Unknown
-                && (info.target == "/persist" || info.target == "/mnt/vendor/persist")
-            {
-                *matched_type = PartId::Persist;
-                break 'block;
+            if info.root != "/" || !info.source.starts_with('/') || info.source.contains("/dm-") {
+                return None;
             }
-            if *matched_type <= PartId::Persist && info.target == "/metadata" {
-                *matched_type = PartId::Metadata;
-                break 'block;
+            match info.fs_type.as_str() {
+                "ext4" | "f2fs" => (),
+                _ => return None,
             }
-            if *matched_type <= PartId::Metadata && info.target == "/cache" {
-                *matched_type = PartId::Cache;
-                break 'block;
+            if !info.fs_option.split(',').any(|s| s == "rw") {
+                return None;
             }
-            if *matched_type <= PartId::Cache
-                && info.target == "/data"
-                && (!encrypted || FsPath::from(cstr!("/data/unencrypted")).exists())
-            {
-                *matched_type = PartId::Data;
+            if let Some(path) = Path::new(&info.source).parent() {
+                if !path.ends_with("by-name") && !path.ends_with("block") {
+                    return None;
+                }
+            } else {
+                return None;
             }
+            match info.target.as_str() {
+                "/persist" | "/mnt/vendor/persist" => Some((PartId::Persist, info)),
+                "/metadata" => Some((PartId::Metadata, info)),
+                "/cache" => Some((PartId::Cache, info)),
+                "/data" => Some((PartId::Data, info))
+                    .take_if(|_| matches!(encrypt_type, EncryptType::None | EncryptType::File)),
+                _ => None,
+            }
+        })
+        .collect::<Vec<_>>();
 
-            // No matches, continue through the loop
-            continue 'info_loop;
-        }
-
-        if mount {
-            let mut target = info.target;
-            preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target));
-            preinit_dev = info.device;
-        }
-        preinit_source = info.source;
-
-        // Cannot find any better partition, stop finding
-        if ext4_type == PartId::Data {
-            break;
-        }
-    }
-
-    if preinit_source.is_empty() {
+    if matched_info.is_empty() {
         return String::new();
     }
 
-    if !preinit_dir.is_empty() {
-        if let Ok(tmp) = std::env::var("MAGISKTMP") {
-            let mut buf = Utf8CStrBufArr::default();
-            let mirror_dir = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITMIRR);
-            let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
-            let _: LoggedResult<()> = try {
-                preinit_dir.mkdirs(0o700)?;
-                mirror_dir.mkdirs(0o700)?;
-                unsafe {
-                    libc::mount(
-                        preinit_dir.as_ptr(),
-                        mirror_dir.as_ptr(),
-                        ptr::null(),
-                        libc::MS_BIND,
-                        ptr::null(),
-                    )
-                    .as_os_err()?;
-                }
-            };
-            if make_dev {
-                let dev_path = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITDEV);
-                unsafe {
-                    libc::mknod(
-                        dev_path.as_ptr(),
-                        libc::S_IFBLK | 0o600,
-                        preinit_dev as dev_t,
-                    )
-                    .as_os_err()
-                    .log()
-                    .ok();
+    let (_, preinit_info, _) = matched_info.select_nth_unstable_by(
+        0,
+        |(ap, MountInfo { fs_type: at, .. }), (bp, MountInfo { fs_type: bt, .. })| match (
+            at.as_str() == "ext4",
+            bt.as_str() == "ext4",
+        ) {
+            (true, false) => Less,
+            (false, true) => Greater,
+            _ => ap.cmp(bp),
+        },
+    );
+    let preinit_source = match preinit_info {
+        (PartId::PreInit, info) => &info.source,
+        (_, info) => {
+            let mut target = info.target.clone();
+            let mut preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target));
+            if mount && let Ok(tmp) = std::env::var("MAGISKTMP") {
+                let mut buf = Utf8CStrBufArr::default();
+                let mirror_dir = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITMIRR);
+                let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
+                let _: LoggedResult<()> = try {
+                    preinit_dir.mkdirs(0o700)?;
+                    mirror_dir.mkdirs(0o700)?;
+                    unsafe {
+                        libc::mount(
+                            preinit_dir.as_ptr(),
+                            mirror_dir.as_ptr(),
+                            ptr::null(),
+                            libc::MS_BIND,
+                            ptr::null(),
+                        )
+                        .as_os_err()?;
+                    }
+                };
+                if make_dev {
+                    let dev_path = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITDEV);
+                    unsafe {
+                        libc::mknod(
+                            dev_path.as_ptr(),
+                            libc::S_IFBLK | 0o600,
+                            info.device as dev_t,
+                        )
+                        .as_os_err()
+                        .log()
+                        .ok();
+                    }
                 }
             }
+            &info.source
         }
-    }
-
+    };
     Path::new(&preinit_source)
         .file_name()
         .unwrap()
