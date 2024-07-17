@@ -172,9 +172,3 @@ include $(BUILD_STATIC_LIBRARY)
 include src/Android-rs.mk
 include src/base/Android.mk
 include src/external/Android.mk
-
-ifdef B_BB
-
-include src/external/busybox/Android.mk
-
-endif

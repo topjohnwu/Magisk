@@ -76,7 +76,7 @@ triples = [
     "x86_64-linux-android",
     "riscv64-linux-android",
 ]
-default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy", "busybox"]
+default_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 support_targets = default_targets + ["resetprop"]
 rust_targets = ["magisk", "magiskinit", "magiskboot", "magiskpolicy"]
 
@@ -246,7 +246,7 @@ def run_ndk_build(args, flags):
             mv(source, target)
 
 
-def run_cargo(cmds, triple="aarch64-linux-android"):
+def run_cargo(cmds):
     env = os.environ.copy()
     env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = str(rust_bin / f"rustc{EXE_EXT}")
@@ -287,7 +287,7 @@ def run_cargo_build(args):
 
         for target in targets:
             cmds[2] = target
-            proc = run_cargo(cmds, triple)
+            proc = run_cargo(cmds)
             if proc.returncode != 0:
                 error("Build binary failed!")
 

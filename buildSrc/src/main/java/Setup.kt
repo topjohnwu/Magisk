@@ -17,6 +17,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -39,8 +40,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URI
 import java.security.KeyStore
+import java.security.MessageDigest
 import java.security.cert.X509Certificate
+import java.util.HexFormat
 import java.util.jar.JarFile
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
@@ -109,6 +113,11 @@ fun Project.setupCommon() {
     }
 }
 
+const val BUSYBOX_DOWNLOAD_URL =
+    "https://github.com/topjohnwu/magisk-files/releases/download/files/busybox-1.36.1.0.zip"
+const val BUSYBOX_ZIP_CHECKSUM =
+    "ea4f3019b0087dcb68130b32ab59dc2db0ee0af11d8396124a94c4231c5ea441"
+
 fun Project.setupCoreLib() {
     setupCommon()
 
@@ -117,16 +126,39 @@ fun Project.setupCoreLib() {
         for (abi in arrayOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64")) {
             into(abi) {
                 from(rootProject.file("native/out/$abi")) {
-                    include("busybox", "magiskboot", "magiskinit", "magiskpolicy", "magisk")
+                    include("magiskboot", "magiskinit", "magiskpolicy", "magisk")
                     rename { "lib$it.so" }
                 }
             }
         }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 25)
+            if (inputs.sourceFiles.files.size != 20)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }
+    }
+
+    val downloadBusybox by tasks.registering(Copy::class) {
+        dependsOn(syncLibs)
+        val bb = layout.buildDirectory.file(BUSYBOX_ZIP_CHECKSUM).get().asFile
+        if (bb.exists()) {
+            val md = MessageDigest.getInstance("SHA-256")
+            bb.inputStream().use { md.update(it.readAllBytes()) }
+            val hash = HexFormat.of().formatHex(md.digest())
+            if (hash != BUSYBOX_ZIP_CHECKSUM) {
+                bb.delete()
+            }
+        }
+        if (!bb.exists()) {
+            bb.parentFile.mkdirs()
+            URI(BUSYBOX_DOWNLOAD_URL).toURL().openStream().use { dl ->
+                bb.outputStream().use {
+                    dl.copyTo(it)
+                }
+            }
+        }
+        from(zipTree(bb))
+        into("src/main/jniLibs")
     }
 
     val syncResources by tasks.registering(Sync::class) {
@@ -142,7 +174,7 @@ fun Project.setupCoreLib() {
     androidLib.libraryVariants.all {
         val variantCapped = name.replaceFirstChar { it.uppercase() }
 
-        tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(syncLibs)
+        tasks.getByPath("merge${variantCapped}JniLibFolders").dependsOn(downloadBusybox)
         processJavaResourcesProvider.configure { dependsOn(syncResources) }
 
         val stubTask = tasks.getByPath(":app:stub:comment$variantCapped")

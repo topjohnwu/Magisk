@@ -1,9 +1,6 @@
 [submodule "selinux"]
 	path = native/src/external/selinux
 	url = https://github.com/topjohnwu/selinux.git
-[submodule "busybox"]
-	path = native/src/external/busybox
-	url = https://github.com/topjohnwu/ndk-busybox.git
 [submodule "lz4"]
 	path = native/src/external/lz4
 	url = https://github.com/lz4/lz4.git
@@ -13,9 +10,6 @@
 [submodule "xz"]
 	path = native/src/external/xz
 	url = https://github.com/xz-mirror/xz.git
-[submodule "pcre"]
-	path = native/src/external/pcre
-	url = https://android.googlesource.com/platform/external/pcre
 [submodule "libcxx"]
 	path = native/src/external/libcxx
 	url = https://github.com/topjohnwu/libcxx.git
