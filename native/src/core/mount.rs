@@ -27,7 +27,7 @@ pub fn setup_mounts() {
     let dev_path = FsPathBuf::new(&mut dev_buf)
         .join(magisk_tmp)
         .join(PREINITDEV);
-    let mut mounted = false;
+    let mut linked = false;
     if let Ok(attr) = dev_path.get_attr() {
         if attr.st.st_mode & libc::S_IFMT as c_uint == libc::S_IFBLK.as_() {
             // DO NOT mount the block device directly, as we do not know the flags and configs
@@ -59,18 +59,18 @@ pub fn setup_mounts() {
                         }
                     };
                     if r.is_ok() {
-                        mounted = true;
+                        linked = true;
                         break;
                     }
                 }
             }
         }
     }
-    if !mounted {
-        warn!("mount: preinit mirror not mounted");
+    if !linked {
+        warn!("mount: preinit dir not found");
         dev_path.remove().ok();
     } else {
-        debug!("mount: preinit mirror mounted");
+        debug!("mount: preinit dir found");
     }
 
     // Bind remount module root to clear nosuid
@@ -153,9 +153,9 @@ enum EncryptType {
 pub fn find_preinit_device() -> String {
     let encrypt_type = if get_prop(cstr!("ro.crypto.state"), false) != "encrypted" {
         EncryptType::None
-    } else if get_prop(cstr!("ro.crypto.type"), false) != "file" {
+    } else if get_prop(cstr!("ro.crypto.type"), false) == "block" {
         EncryptType::Block
-    } else if FsPath::from(cstr!("/metadata/vold/metadata_encryption")).exists() {
+    } else if get_prop(cstr!("ro.crypto.metadata.enabled"), false) == "true" {
         EncryptType::Metadata
     } else {
         EncryptType::File
@@ -227,11 +227,11 @@ pub fn find_preinit_device() -> String {
             if mirror_dir.parent(&mut buf) {
                 FsPath::from(&buf).mkdirs(0o755)?;
             }
-            mirror_dir.remove().ok();
             unsafe {
                 libc::umount2(mirror_dir.as_ptr(), libc::MNT_DETACH)
                     .as_os_err()
                     .ok(); // ignore error
+                mirror_dir.remove().ok();
                 libc::symlink(preinit_dir.as_ptr(), mirror_dir.as_ptr()).as_os_err()?;
             }
         };
