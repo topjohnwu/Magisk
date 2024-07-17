@@ -482,6 +482,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
             fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
             ramdisk += sizeof(mtk_hdr);
             hdr->ramdisk_size() -= sizeof(mtk_hdr);
+            entry->ramdisk_size = hdr->ramdisk_size();
             fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
         }
         for (const auto&[entry, fmt]: ramdisk_table_entries) {
