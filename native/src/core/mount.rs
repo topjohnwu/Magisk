@@ -49,16 +49,13 @@ pub fn setup_mounts() {
                     let preinit_dir = Utf8CStr::from_string(&mut preinit_dir);
                     let r: LoggedResult<()> = try {
                         FsPath::from(preinit_dir).mkdir(0o700)?;
-                        mnt_path.mkdirs(0o755)?;
+                        let mut buf = Utf8CStrBufArr::default();
+                        if mnt_path.parent(&mut buf) {
+                            FsPath::from(&buf).mkdirs(0o755)?;
+                        }
+                        mnt_path.remove().ok();
                         unsafe {
-                            libc::mount(
-                                preinit_dir.as_ptr(),
-                                mnt_path.as_ptr(),
-                                ptr::null(),
-                                libc::MS_BIND,
-                                ptr::null(),
-                            )
-                            .as_os_err()?
+                            libc::symlink(preinit_dir.as_ptr(), mnt_path.as_ptr()).as_os_err()?
                         }
                     };
                     if r.is_ok() {
@@ -134,14 +131,12 @@ pub fn setup_mounts() {
 }
 
 // when partitions have the same fs type, the order is:
-// - preinit: it's selected previously, so it's always the first
 // - data: it has sufficient space and can be safely written
 // - cache: size is limited, but still can be safely written
 // - metadata: size is limited, and it might cause unexpected behavior if written
 // - persist: it's the last resort, as it's dangerous to write to it
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
 enum PartId {
-    PreInit,
     Data,
     Cache,
     Metadata,
@@ -165,16 +160,10 @@ pub fn find_preinit_device() -> String {
     } else {
         EncryptType::File
     };
-    let mount = unsafe { libc::getuid() } == 0 && std::env::var("MAGISKTMP").is_ok();
-    let make_dev = mount && std::env::var_os("MAKEDEV").is_some();
 
     let mut matched_info = parse_mount_info("self")
         .into_iter()
         .filter_map(|info| {
-            // if preinit is already mounted, choose it unconditionally
-            if info.target.ends_with(PREINITMIRR) {
-                return Some((PartId::PreInit, info));
-            }
             if info.root != "/" || !info.source.starts_with('/') || info.source.contains("/dm-") {
                 return None;
             }
@@ -222,47 +211,45 @@ pub fn find_preinit_device() -> String {
             _ => ap.cmp(bp),
         },
     );
-    let preinit_source = match preinit_info {
-        (PartId::PreInit, info) => &info.source,
-        (_, info) => {
-            let mut target = info.target.clone();
-            let mut preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target));
-            if mount && let Ok(tmp) = std::env::var("MAGISKTMP") {
-                let mut buf = Utf8CStrBufArr::default();
-                let mirror_dir = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITMIRR);
-                let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
-                let _: LoggedResult<()> = try {
-                    preinit_dir.mkdirs(0o700)?;
-                    mirror_dir.mkdirs(0o700)?;
-                    unsafe {
-                        libc::mount(
-                            preinit_dir.as_ptr(),
-                            mirror_dir.as_ptr(),
-                            ptr::null(),
-                            libc::MS_BIND,
-                            ptr::null(),
-                        )
-                        .as_os_err()?;
-                    }
-                };
-                if make_dev {
-                    let dev_path = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITDEV);
-                    unsafe {
-                        libc::mknod(
-                            dev_path.as_ptr(),
-                            libc::S_IFBLK | 0o600,
-                            info.device as dev_t,
-                        )
-                        .as_os_err()
-                        .log()
-                        .ok();
-                    }
-                }
+    let info = &preinit_info.1;
+    let mut target = info.target.clone();
+    let mut preinit_dir = resolve_preinit_dir(Utf8CStr::from_string(&mut target));
+    if unsafe { libc::getuid() } == 0
+        && let Ok(tmp) = std::env::var("MAGISKTMP")
+        && !tmp.is_empty()
+    {
+        let mut buf = Utf8CStrBufArr::default();
+        let mirror_dir = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITMIRR);
+        let preinit_dir = FsPath::from(Utf8CStr::from_string(&mut preinit_dir));
+        let _: LoggedResult<()> = try {
+            preinit_dir.mkdirs(0o700)?;
+            let mut buf = Utf8CStrBufArr::default();
+            if mirror_dir.parent(&mut buf) {
+                FsPath::from(&buf).mkdirs(0o755)?;
             }
-            &info.source
+            mirror_dir.remove().ok();
+            unsafe {
+                libc::umount2(mirror_dir.as_ptr(), libc::MNT_DETACH)
+                    .as_os_err()
+                    .ok(); // ignore error
+                libc::symlink(preinit_dir.as_ptr(), mirror_dir.as_ptr()).as_os_err()?;
+            }
+        };
+        if std::env::var_os("MAKEDEV").is_some() {
+            let dev_path = FsPathBuf::new(&mut buf).join(&tmp).join(PREINITDEV);
+            unsafe {
+                libc::mknod(
+                    dev_path.as_ptr(),
+                    libc::S_IFBLK | 0o600,
+                    info.device as dev_t,
+                )
+                .as_os_err()
+                .log()
+                .ok();
+            }
         }
-    };
-    Path::new(&preinit_source)
+    }
+    Path::new(&info.source)
         .file_name()
         .unwrap()
         .to_str()
