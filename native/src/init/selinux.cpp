@@ -15,17 +15,10 @@ void MagiskInit::patch_sepolicy(const char *in, const char *out) {
     sepol->magisk_rules();
 
     // Custom rules
-    if (auto dir = xopen_dir("/data/" PREINITMIRR)) {
-        for (dirent *entry; (entry = xreaddir(dir.get()));) {
-            auto name = "/data/" PREINITMIRR "/"s + entry->d_name;
-            auto rule = name + "/sepolicy.rule";
-            if (xaccess(rule.data(), R_OK) == 0 &&
-                access((name + "/disable").data(), F_OK) != 0 &&
-                access((name + "/remove").data(), F_OK) != 0) {
-                LOGD("Loading custom sepolicy patch: [%s]\n", rule.data());
-                sepol->load_rule_file(rule.data());
-            }
-        }
+    auto rule = "/data/" PREINITMIRR "/sepolicy.rule";
+    if (xaccess(rule, R_OK) == 0) {
+        LOGD("Loading custom sepolicy patch: [%s]\n", rule);
+        sepol->load_rule_file(rule);
     }
 
     LOGD("Dumping sepolicy to: [%s]\n", out);

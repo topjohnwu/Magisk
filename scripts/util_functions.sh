@@ -583,7 +583,7 @@ copy_preinit_files() {
     [ -f $MODDIR/update ] && continue
     cat $r
     echo
-  done > $PREINITDIR/0/sepolicy.rule
+  done > $PREINITDIR/sepolicy.rule
 }
 
 #################
