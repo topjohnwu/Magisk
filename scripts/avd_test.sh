@@ -26,9 +26,7 @@ print_error() {
 cleanup() {
   print_error "! An error occurred when testing $pkg"
 
-  find $ANDROID_SDK_ROOT/system-images -name 'ramdisk.img' -exec cp -v {}.bak {} \; 2>/dev/null
-  find $ANDROID_SDK_ROOT/system-images -name 'advancedFeatures.ini' -exec cp -v {}.bak {} \; 2>/dev/null
-
+  rm -f magisk_patched.img
   "$avd" delete avd -n test
   pkill -INT -P $$
   wait
@@ -60,12 +58,6 @@ wait_for_boot() {
     fi
     sleep 2
   done
-}
-
-restore_backup() {
-  if [ -f "${1}.bak" ]; then
-    cp "${1}.bak" "$1"
-  fi
 }
 
 wait_emu() {
@@ -195,8 +187,6 @@ run_test() {
   # Setup emulator
   "$sdk" --channel=3 $pkg
   echo no | "$avd" create avd -f -n test -k $pkg
-  restore_backup $ramdisk
-  restore_backup $features
 
   # Launch stock emulator
   print_title "* Launching $pkg"
@@ -204,14 +194,17 @@ run_test() {
   emu_pid=$!
   wait_emu wait_for_bootanim
 
+  # Update arguments for Magisk runs
+  emu_args="$emu_args -ramdisk magisk_patched.img -feature -SystemAsRoot"
+
   # Patch and test debug build
-  ./build.py avd_patch -s "$ramdisk"
+  ./build.py avd_patch -s "$ramdisk" magisk_patched.img
   kill -INT $emu_pid
   wait $emu_pid
   test_emu debug $api
 
   # Re-patch and test release build
-  ./build.py -r avd_patch -s "$ramdisk"
+  ./build.py -r avd_patch -s "$ramdisk" magisk_patched.img
   kill -INT $emu_pid
   wait $emu_pid
   test_emu release $api
@@ -219,8 +212,7 @@ run_test() {
   # Cleanup
   kill -INT $emu_pid
   wait $emu_pid
-  restore_backup $ramdisk
-  restore_backup $features
+  rm -f magisk_patched.img
 }
 
 trap cleanup EXIT

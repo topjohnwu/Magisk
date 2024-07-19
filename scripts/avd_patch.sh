@@ -34,7 +34,16 @@ if [ -z "$FIRST_STAGE" ]; then
   export FIRST_STAGE=1
   export ASH_STANDALONE=1
   # Re-exec script with busybox
-  exec ./busybox sh $0
+  exec ./busybox sh $0 "$@"
+fi
+
+TARGET_FILE="$1"
+OUTPUT_FILE="$1.magisk"
+
+if echo "$TARGET_FILE" | grep -q 'ramdisk'; then
+  IS_RAMDISK=true
+else
+  IS_RAMDISK=false
 fi
 
 # Extract files from APK
@@ -49,7 +58,11 @@ for file in lib*.so; do
   mv "$file" "${file:3:${#file}-6}"
 done
 
-./magiskboot decompress ramdisk.cpio.tmp ramdisk.cpio
+if $IS_RAMDISK; then
+  ./magiskboot decompress "$TARGET_FILE" ramdisk.cpio
+else
+  ./magiskboot unpack "$TARGET_FILE"
+fi
 cp ramdisk.cpio ramdisk.cpio.orig
 
 export KEEPVERITY=true
@@ -78,4 +91,9 @@ cat config
 "add 000 .backup/.magisk config"
 
 rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
-./magiskboot compress=gzip ramdisk.cpio ramdisk.cpio.gz
+if $IS_RAMDISK; then
+  ./magiskboot compress=gzip ramdisk.cpio "$OUTPUT_FILE"
+else
+  ./magiskboot repack "$TARGET_FILE" "$OUTPUT_FILE"
+  ./magiskboot cleanup
+fi

@@ -602,45 +602,36 @@ def setup_avd(args):
         error("avd_magisk.sh failed!")
 
 
-def patch_avd_ramdisk(args):
+def patch_avd_file(args):
     if not args.skip:
         args.release = False
         build_all(args)
 
-    args.ramdisk = Path(args.ramdisk)
+    args.target = Path(args.target)
+    src_file = f"/data/local/tmp/{args.target.name}"
+    out_file = f"{src_file}.magisk"
+    if args.output:
+        args.output = Path(args.output)
+    else:
+        args.output = args.target.parent / f"{args.target.name}.magisk"
 
-    header("* Patching emulator ramdisk.img")
-
-    # Create a backup to prevent accidental overwrites
-    backup = args.ramdisk.parent / f"{args.ramdisk.name}.bak"
-    if not backup.exists():
-        cp(args.ramdisk, backup)
-
-    ini = args.ramdisk.parent / "advancedFeatures.ini"
-    with open(ini, "r") as f:
-        adv_ft = f.read()
-
-    # Need to turn off system as root
-    if "SystemAsRoot = on" in adv_ft:
-        # Create a backup
-        cp(ini, ini.parent / f"{ini.name}.bak")
-        adv_ft = adv_ft.replace("SystemAsRoot = on", "SystemAsRoot = off")
-        with open(ini, "w") as f:
-            f.write(adv_ft)
+    header(f"* Patching {args.target.name}")
 
     push_files(args, Path("scripts", "avd_patch.sh"))
 
-    proc = execv([adb_path, "push", backup, "/data/local/tmp/ramdisk.cpio.tmp"])
+    proc = execv([adb_path, "push", args.target, "/data/local/tmp"])
     if proc.returncode != 0:
         error("adb push failed!")
 
-    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh"])
+    proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_patch.sh", src_file])
     if proc.returncode != 0:
         error("avd_patch.sh failed!")
 
-    proc = execv([adb_path, "pull", "/data/local/tmp/ramdisk.cpio.gz", args.ramdisk])
+    proc = execv([adb_path, "pull", out_file, args.output])
     if proc.returncode != 0:
         error("adb pull failed!")
+
+    header(f"Output: {args.output}")
 
 
 def build_all(args):
@@ -722,12 +713,15 @@ avd_parser.add_argument(
 )
 avd_parser.set_defaults(func=setup_avd)
 
-avd_patch_parser = subparsers.add_parser("avd_patch", help="patch AVD ramdisk.img")
-avd_patch_parser.add_argument("ramdisk", help="path to ramdisk.img")
+avd_patch_parser = subparsers.add_parser(
+    "avd_patch", help="patch AVD ramdisk.img or init_boot.img"
+)
+avd_patch_parser.add_argument("target", help="path to ramdisk.img or init_boot.img")
+avd_patch_parser.add_argument("output", help="optional output file name", nargs="?")
 avd_patch_parser.add_argument(
     "-s", "--skip", action="store_true", help="skip building binaries and the app"
 )
-avd_patch_parser.set_defaults(func=patch_avd_ramdisk)
+avd_patch_parser.set_defaults(func=patch_avd_file)
 
 clean_parser = subparsers.add_parser("clean", help="cleanup")
 clean_parser.add_argument(
