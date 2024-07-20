@@ -34,6 +34,7 @@ default-features = false
 [workspace.dependencies.pb-rs]
 git = "https://github.com/tafia/quick-protobuf.git"
 rev = "2f37d5a65504de7d716b5b28fd82219501a901a9"
+default-features = false
 
 [workspace.dependencies.quick-protobuf]
 git = "https://github.com/tafia/quick-protobuf.git"
