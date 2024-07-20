@@ -58,7 +58,6 @@ rev = "809df65b20d61e88afb7f514b5cfdd3d1958a40f"
 [profile.dev]
 opt-level = "z"
 lto = true
-codegen-units = 1
 panic = "abort"
 
 [profile.release]
