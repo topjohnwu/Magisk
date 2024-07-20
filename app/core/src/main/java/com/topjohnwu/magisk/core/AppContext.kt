@@ -19,7 +19,6 @@ import com.topjohnwu.magisk.core.utils.NetworkObserver
 import com.topjohnwu.magisk.core.utils.ProcessLifecycle
 import com.topjohnwu.magisk.core.utils.RootUtils
 import com.topjohnwu.magisk.core.utils.ShellInit
-import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.internal.UiThreadHandler
 import com.topjohnwu.superuser.ipc.RootService
@@ -103,7 +102,6 @@ object AppContext : ContextWrapper(null),
             val lm = getSystemService(LocaleManager::class.java)
             lm.overrideLocaleConfig = LocaleSetting.localeConfig
         }
-        Notifications.setup()
         ProcessLifecycle.init(this)
         NetworkObserver.init(this)
         if (!BuildConfig.DEBUG && !isRunningAsStub) {

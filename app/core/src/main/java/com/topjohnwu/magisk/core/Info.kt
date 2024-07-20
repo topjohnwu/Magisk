@@ -1,6 +1,7 @@
 package com.topjohnwu.magisk.core
 
 import android.app.KeyguardManager
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.topjohnwu.magisk.StubApk
 import com.topjohnwu.magisk.core.ktx.getProperty
@@ -48,8 +49,9 @@ object Info {
 
     var hasGMS = true
     val isEmulator =
-        getProperty("ro.kernel.qemu", "0") == "1" ||
-            getProperty("ro.boot.qemu", "0") == "1"
+        Build.DEVICE.contains("vsoc")
+            || getProperty("ro.kernel.qemu", "0") == "1"
+            || getProperty("ro.boot.qemu", "0") == "1"
 
     val isConnected = MutableLiveData(false)
 

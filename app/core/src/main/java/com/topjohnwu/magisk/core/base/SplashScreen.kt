@@ -19,6 +19,7 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.tasks.AppMigration
 import com.topjohnwu.magisk.core.utils.RootUtils
+import com.topjohnwu.magisk.view.Notifications
 import com.topjohnwu.magisk.view.Shortcuts
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.launch
@@ -147,6 +148,7 @@ class SplashController<T>(private val activity: T)
             return
         }
 
+        Notifications.setup()
         JobService.schedule(this)
         Shortcuts.setupDynamic(this)
 
