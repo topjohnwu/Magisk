@@ -99,11 +99,9 @@ impl MagiskD {
 }
 
 pub fn daemon_entry() {
-    let mut qemu = get_prop(cstr!("ro.kernel.qemu"), false);
-    if qemu.is_empty() {
-        qemu = get_prop(cstr!("ro.boot.qemu"), false);
-    }
-    let is_emulator = qemu == "1";
+    let is_emulator = get_prop(cstr!("ro.kernel.qemu"), false) == "1"
+        || get_prop(cstr!("ro.boot.qemu"), false) == "1"
+        || get_prop(cstr!("ro.product.device"), false).contains("vsoc");
 
     // Load config status
     let mut buf = Utf8CStrBufArr::<64>::new();
