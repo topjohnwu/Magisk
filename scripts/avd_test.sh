@@ -82,7 +82,7 @@ test_emu() {
   # Install LSPosed
   if [ $api -ge $lsposed_min_api -a $api -le $atd_max_api ]; then
     adb push out/lsposed.zip /data/local/tmp/lsposed.zip
-    adb shell echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' \| /system/xbin/su
+    echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' | adb shell /system/xbin/su
   fi
 
   adb reboot

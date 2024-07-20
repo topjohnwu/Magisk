@@ -162,7 +162,7 @@ jobs:
         run: scripts/avd_test.sh ${{ matrix.version }}
 
   cf_test:
-    name: Test on AOSP main Cuttlefish
+    name: Test Cuttlefish on main
     runs-on: ubuntu-24.04
     env:
       CF_HOME: /home/runner/aosp_cf_x86_64_phone
@@ -186,7 +186,7 @@ jobs:
         with:
           ref: ${{ github.ref }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          check-name: 'Build Magisk artifacts'
+          check-name: "Build Magisk artifacts"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4

@@ -13,7 +13,7 @@ print_error() {
 
 run_content_cmd() {
   while true; do
-    local out=$(adb shell echo "'content call --uri content://com.topjohnwu.magisk.provider --method $1'" \| /system/xbin/su | tee /dev/fd/2)
+    local out=$(echo "content call --uri content://com.topjohnwu.magisk.provider --method $1" | adb shell /system/xbin/su | tee /dev/fd/2)
     if ! grep -q 'Bundle\[' <<< "$out"; then
       # The call failed, wait a while and retry later
       sleep 30
@@ -38,5 +38,5 @@ test_setup() {
 test_app() {
   # Run app tests
   run_content_cmd test
-  adb shell echo 'su -c id' \| /system/xbin/su 2000 | tee /dev/fd/2 | grep -q 'uid=0'
+  echo 'su -c id' | adb shell /system/xbin/su 2000 | tee /dev/fd/2 | grep -q 'uid=0'
 }
