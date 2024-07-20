@@ -566,6 +566,9 @@ def setup_ndk(args):
 
 def push_files(args, script):
     abi = cmd_out([adb_path, "shell", "getprop", "ro.product.cpu.abi"])
+    if not abi:
+        error("Cannot detect emulator ABI")
+
     apk = Path(
         config["outdir"], ("app-release.apk" if args.release else "app-debug.apk")
     )

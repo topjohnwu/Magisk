@@ -80,7 +80,7 @@ jobs:
       - name: Stop gradle daemon
         run: ./gradlew --stop
 
-  test:
+  avd-test:
     name: Test x86_64 on API ${{ matrix.version }}
     runs-on: ubuntu-latest
     needs: build
@@ -122,7 +122,7 @@ jobs:
           AVD_TEST_VERBOSE: 1
         run: scripts/avd_test.sh ${{ matrix.version }} ${{ matrix.type }}
 
-  test-32:
+  avd-test-32:
     name: Test x86 on API ${{ matrix.version }}
     runs-on: ubuntu-latest
     needs: build
@@ -160,3 +160,47 @@ jobs:
           FORCE_32_BIT: 1
           AVD_TEST_VERBOSE: 1
         run: scripts/avd_test.sh ${{ matrix.version }}
+
+  cf_test:
+    name: Test on AOSP main Cuttlefish
+    runs-on: ubuntu-24.04
+    env:
+      CF_HOME: /home/runner/aosp_cf_x86_64_phone
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Cuttlefish environment
+        run: |
+          scripts/cuttlefish.sh setup
+          scripts/cuttlefish.sh download
+
+      - name: Wait for build artifacts
+        uses: lewagon/wait-on-check-action@v1.3.4
+        timeout-minutes: 45
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Build Magisk artifacts'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.sha }}
+          path: out
+
+      - name: Run Cuttlefish test
+        run: su $USER -c 'scripts/cuttlefish.sh test'
+
+      - name: Upload logs on error
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "cvd-logs"
+          path: |
+            /home/runner/aosp_cf_x86_64_phone/cuttlefish/instances/cvd-1/logs
+            /home/runner/aosp_cf_x86_64_phone/cuttlefish/instances/cvd-1/cuttlefish_config.json
