@@ -185,6 +185,7 @@ jobs:
         timeout-minutes: 45
         with:
           ref: ${{ github.ref }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           check-name: 'Build Magisk artifacts'
 
       - name: Download build artifacts
