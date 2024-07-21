@@ -3,8 +3,9 @@
 #include <stdint.h>
 #include <utility>
 #include <bitset>
+#include <vector>
 #include <cxx.h>
-#include <memory>
+
 #include "format.hpp"
 
 /******************
@@ -602,6 +603,7 @@ struct boot_img {
 
     // The format of kernel, ramdisk and extra
     format_t k_fmt = UNKNOWN;
+    format_t r_fmt = UNKNOWN;
     format_t e_fmt = UNKNOWN;
 
     /*************************************************************
@@ -652,7 +654,7 @@ struct boot_img {
     const uint8_t *vendor_ramdisk_table;
     const uint8_t *bootconfig;
 
-    std::vector<std::tuple<std::unique_ptr<vendor_ramdisk_table_entry_v4>, format_t>> ramdisk_table_entries;
+    std::vector<std::tuple<vendor_ramdisk_table_entry_v4*, format_t>> ramdisk_table_entries;
 
     // dtb embedded in kernel
     byte_view kernel_dtb;

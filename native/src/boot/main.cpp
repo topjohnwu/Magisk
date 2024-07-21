@@ -3,7 +3,6 @@
 #include "boot-rs.hpp"
 #include "magiskboot.hpp"
 #include "compress.hpp"
-#include <string>
 
 using namespace std;
 
@@ -147,18 +146,14 @@ int main(int argc, char *argv[]) {
         unlink(DTB_FILE);
         unlink(BOOTCONFIG_FILE);
 
-        char file_namen_pattern[sizeof(VENDOR_RAMDISK_FILE)];
-        ssprintf(file_namen_pattern, sizeof(file_namen_pattern), VENDOR_RAMDISK_FILE, 3, ",");
-        string file_name(file_namen_pattern);
-        size_t split_pos = file_name.find(",");
-        string start_match = file_name.substr(0, split_pos);
-        string end_match = file_name.substr(split_pos + 1);
-
         sDIR d = xopen_dir(".");
         while (struct dirent *dir = xreaddir(d.get())) {
-            string s(dir->d_name);
-            if (dir->d_type == DT_REG && s.starts_with(start_match) && s.ends_with(end_match))
+            string_view file_name(dir->d_name);
+            if (dir->d_type == DT_REG &&
+                file_name.starts_with(VENDOR_RAMDISK_FILE_PREFIX) &&
+                file_name.ends_with(VENDOR_RAMDISK_FILE_SUFFIX)) {
                 unlink(dir->d_name);
+            }
         }
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[20];
