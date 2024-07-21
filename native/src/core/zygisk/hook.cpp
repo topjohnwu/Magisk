@@ -77,13 +77,12 @@ using namespace std;
 // Some notes regarding the important functions/symbols during bootstrap:
 //
 // * NativeBridgeItf: this symbol is the entry point for android::LoadNativeBridge
-// * HookContext::hook_plt(): hook functions like |dlclose| and |androidSetCreateThreadFunc|
+// * HookContext::hook_plt(): hook functions like |dlclose| and |strdup|
 // * dlclose: the final step before android::LoadNativeBridge returns
 // * strdup: called in AndroidRuntime::start before calling specializations routines
-// * HookContext::hook_jni_env(): replace the |RegisterNatives| function pointer in JNIEnv.
-// * replace_jni_methods: replace the function pointers registered in register_jni_procs,
-//   most importantly the process specialization routines, which are our main targets.
-//   This marks the final step of the code injection bootstrap process.
+// * HookContext::replace_jni_methods: replace the function pointers registered in
+//   register_jni_procs, most importantly the process specialization routines, which are our
+//   main targets. This marks the final step of the code injection bootstrap process.
 // * pthread_attr_destroy: called whenever the JVM tries to setup threads for itself. We use
 //   this method to cleanup and unload Zygisk from the process.
 
@@ -111,12 +110,11 @@ private:
 // features, such as loading modules and customizing process fork/specialization.
 
 ZygiskContext *g_ctx;
-namespace {
-HookContext *g_hook;
-bool should_unmap_zygisk = false;
-void *self_handle = nullptr;
-constexpr const char *kZygiskInit = "com.android.internal.os.ZygoteInit";
-}
+
+static HookContext *g_hook;
+static bool should_unmap_zygisk = false;
+static void *self_handle = nullptr;
+static constexpr const char *kZygiskInit = "com.android.internal.os.ZygoteInit";
 
 // -----------------------------------------------------------------
 
@@ -124,7 +122,7 @@ constexpr const char *kZygiskInit = "com.android.internal.os.ZygoteInit";
 ret (*old_##func)(__VA_ARGS__);       \
 ret new_##func(__VA_ARGS__)
 
-DCL_HOOK_FUNC(char *, strdup, const char * str) {
+DCL_HOOK_FUNC(static char *, strdup, const char * str) {
     if (strcmp(kZygiskInit, str) == 0) {
         g_hook->replace_jni_methods();
     }
@@ -404,7 +402,7 @@ void HookContext::hook_plt() {
     plt_backup.erase(
             std::remove_if(plt_backup.begin(), plt_backup.end(),
             [](auto &t) { return *std::get<3>(t) == nullptr;}),
-            g_hook->plt_backup.end());
+            plt_backup.end());
 }
 
 void HookContext::hook_unloader() {
@@ -439,6 +437,7 @@ void HookContext::restore_plt_hook() {
 }
 
 // -----------------------------------------------------------------
+
 void HookContext::replace_jni_methods() {
     using method_sig = jint(*)(JavaVM **, jsize, jsize *);
     auto get_created_vms = reinterpret_cast<method_sig>(
@@ -510,7 +509,7 @@ void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods
         // It's normal that the method is not found
         if (env->RegisterNatives(clazz, &method, 1) == JNI_ERR ||
             env->ExceptionCheck() == JNI_TRUE) {
-            if (auto *exception = env->ExceptionOccurred(); exception) {
+            if (auto *exception = env->ExceptionOccurred()) {
                 env->DeleteLocalRef(exception);
             }
             env->ExceptionClear();
