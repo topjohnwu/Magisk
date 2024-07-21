@@ -1,6 +1,13 @@
-export PATH="$PATH:$ANDROID_SDK_ROOT/platform-tools"
+if [ -z $ANDROID_HOME ]; then
+  export ANDROID_HOME=$ANDROID_SDK_ROOT
+fi
 
-sdk="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+export PATH="$PATH:$ANDROID_HOME/platform-tools"
+
+sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+emu="$ANDROID_HOME/emulator/emulator"
+avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+
 boot_timeout=600
 
 print_title() {

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -xe
+. scripts/test_common.sh
+
 cvd_args='-daemon -enable_sandbox=false -memory_mb=8192 -report_anonymous_usage_stats=n'
 magisk_args='-init_boot_image=magisk_patched.img'
 
@@ -95,9 +98,6 @@ run_test() {
   run_cvd_bin stop_cvd || true
   rm -f magisk_patched.img*
 }
-
-set -xe
-. scripts/test_common.sh
 
 if [ -z $CF_HOME ]; then
   print_error "! Environment variable CF_HOME is required"

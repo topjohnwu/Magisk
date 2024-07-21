@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-emu="$ANDROID_SDK_ROOT/emulator/emulator"
-avd="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
+set -xe
+. scripts/test_common.sh
+
 emu_args_base='-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot'
 lsposed_url='https://github.com/LSPosed/LSPosed/releases/download/v1.9.2/LSPosed-v1.9.2-7024-zygisk-release.zip'
 emu_pid=
@@ -134,8 +135,8 @@ run_test() {
 
   # System image variable and paths
   local pkg="system-images;android-$ver;$type;$arch"
-  local img_dir="$ANDROID_SDK_ROOT/system-images/android-$ver/$type/$arch"
-  local ramdisk="$img_dir/ramdisk.img"
+  local sys_img_dir="$ANDROID_HOME/system-images/android-$ver/$type/$arch"
+  local ramdisk="$sys_img_dir/ramdisk.img"
 
   # Old Linux kernels will not boot with memory larger than 3GB
   local memory
@@ -181,10 +182,7 @@ run_test() {
   rm -f magisk_patched.img
 }
 
-set -xe
 trap cleanup EXIT
-. scripts/test_common.sh
-
 export -f wait_for_boot
 export -f wait_for_bootanim
 
