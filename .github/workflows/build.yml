@@ -81,7 +81,7 @@ jobs:
         run: ./gradlew --stop
 
   avd-test:
-    name: Test x86_64 on API ${{ matrix.version }}
+    name: Test API ${{ matrix.version }} (x86_64)
     runs-on: ubuntu-latest
     needs: build
     strategy:
@@ -99,11 +99,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -116,14 +111,14 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: AVD test
+      - name: Run AVD test
         timeout-minutes: 10
         env:
           AVD_TEST_VERBOSE: 1
         run: scripts/avd_test.sh ${{ matrix.version }} ${{ matrix.type }}
 
   avd-test-32:
-    name: Test x86 on API ${{ matrix.version }}
+    name: Test API ${{ matrix.version }} (x86)
     runs-on: ubuntu-latest
     needs: build
     strategy:
@@ -137,11 +132,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python 3
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -154,7 +144,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: AVD test
+      - name: Run AVD test
         timeout-minutes: 10
         env:
           FORCE_32_BIT: 1
@@ -162,12 +152,17 @@ jobs:
         run: scripts/avd_test.sh ${{ matrix.version }}
 
   cf_test:
-    name: Test Cuttlefish on main
+    name: Test ${{ matrix.branch }} (${{ matrix.target }})
     runs-on: ubuntu-24.04
+    needs: build
     env:
-      CF_HOME: /home/runner/aosp_cf_x86_64_phone
+      CF_HOME: /home/runner/aosp_cf_phone
     strategy:
       fail-fast: false
+      matrix:
+        include:
+          - branch: "aosp-main"
+            target: "aosp_cf_x86_64_phone-trunk_staging-userdebug"
 
     steps:
       - name: Check out
@@ -175,26 +170,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Cuttlefish environment
-        run: |
-          scripts/cuttlefish.sh setup
-          scripts/cuttlefish.sh download
-
-      - name: Wait for build artifacts
-        uses: lewagon/wait-on-check-action@v1.3.4
-        timeout-minutes: 45
-        with:
-          ref: ${{ github.ref }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          check-name: "Build Magisk artifacts"
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.sha }}
           path: out
 
+      - name: Setup Cuttlefish environment
+        run: |
+          scripts/cuttlefish.sh setup
+          scripts/cuttlefish.sh download ${{ matrix.branch }} ${{ matrix.target }}
+
       - name: Run Cuttlefish test
+        timeout-minutes: 10
         run: su $USER -c 'scripts/cuttlefish.sh test'
 
       - name: Upload logs on error
@@ -203,5 +191,5 @@ jobs:
         with:
           name: "cvd-logs"
           path: |
-            /home/runner/aosp_cf_x86_64_phone/cuttlefish/instances/cvd-1/logs
-            /home/runner/aosp_cf_x86_64_phone/cuttlefish/instances/cvd-1/cuttlefish_config.json
+            /home/runner/aosp_cf_phone/cuttlefish/instances/cvd-1/logs
+            /home/runner/aosp_cf_phone/cuttlefish/instances/cvd-1/cuttlefish_config.json

@@ -4,11 +4,16 @@ fi
 
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
-sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 emu="$ANDROID_HOME/emulator/emulator"
+sdk="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
 avd="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
 
 boot_timeout=600
+
+core_count=$(nproc)
+if [ $core_count -gt 8 ]; then
+  core_count=8
+fi
 
 print_title() {
   echo -e "\n\033[44;39m${1}\033[0m\n"

@@ -3,7 +3,7 @@
 set -xe
 . scripts/test_common.sh
 
-cvd_args='-daemon -enable_sandbox=false -memory_mb=8192 -report_anonymous_usage_stats=n'
+cvd_args="-daemon -enable_sandbox=false -memory_mb=8192 -report_anonymous_usage_stats=n -cpus=$core_count"
 magisk_args='-init_boot_image=magisk_patched.img'
 
 cleanup() {
@@ -18,26 +18,10 @@ run_cvd_bin() {
   HOME=$CF_HOME $CF_HOME/bin/$exe "$@"
 }
 
-install_bazel() {
-  sudo apt-get install -y apt-transport-https curl gnupg
-  curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-  sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
-  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-  sudo apt-get update && sudo apt-get install bazel zip unzip
-}
-
-build_cf() {
-  git clone https://github.com/google/android-cuttlefish
-  cd android-cuttlefish
-  # We only want to build the base package
-  sed -i '$ d' tools/buildutils/build_packages.sh
-  tools/buildutils/build_packages.sh
-  sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
-  cd ../
-  rm -rf android-cuttlefish
-}
-
 setup_env() {
+  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_0.9.29_amd64.deb
+  sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
+  rm cuttlefish-base_*_*64.deb
   echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
   sudo udevadm control --reload-rules
   sudo udevadm trigger
@@ -47,19 +31,30 @@ setup_env() {
 }
 
 download_cf() {
-  local build_id=$(curl -sL https://ci.android.com/builds/branches/aosp-main/status.json | \
-    jq -r '.targets[] | select(.name == "aosp_cf_x86_64_phone-trunk_staging-userdebug") | .last_known_good_build')
-  local sys_img_url="https://ci.android.com/builds/submitted/${build_id}/aosp_cf_x86_64_phone-trunk_staging-userdebug/latest/raw/aosp_cf_x86_64_phone-img-${build_id}.zip"
-  local host_pkg_url="https://ci.android.com/builds/submitted/${build_id}/aosp_cf_x86_64_phone-trunk_staging-userdebug/latest/raw/cvd-host_package.tar.gz"
+  local branch=$1
+  local target=$2
 
-  print_title "* Download aosp-main ($build_id) system images"
-  curl -L $sys_img_url -o aosp_cf_x86_64_phone-img.zip
+  if [ -z $branch ]; then
+    branch='aosp-main'
+  fi
+  if [ -z $target ]; then
+    target='aosp_cf_x86_64_phone-trunk_staging-userdebug'
+  fi
+  local device=$(echo $target | cut -d '-' -f 1)
+
+  local build_id=$(curl -sL https://ci.android.com/builds/branches/${branch}/status.json | \
+    jq -r ".targets[] | select(.name == \"$target\") | .last_known_good_build")
+  local sys_img_url="https://ci.android.com/builds/submitted/${build_id}/${target}/latest/raw/${device}-img-${build_id}.zip"
+  local host_pkg_url="https://ci.android.com/builds/submitted/${build_id}/${target}/latest/raw/cvd-host_package.tar.gz"
+
+  print_title "* Download $branch ($build_id) $target images"
+  curl -L $sys_img_url -o aosp_cf_phone-img.zip
   curl -LO $host_pkg_url
   rm -rf $CF_HOME
   mkdir -p $CF_HOME
   tar xvf cvd-host_package.tar.gz -C $CF_HOME
-  unzip aosp_cf_x86_64_phone-img.zip -d $CF_HOME
-  rm -f cvd-host_package.tar.gz aosp_cf_x86_64_phone-img.zip
+  unzip aosp_cf_phone-img.zip -d $CF_HOME
+  rm -f cvd-host_package.tar.gz aosp_cf_phone-img.zip
 }
 
 test_cf() {
@@ -106,12 +101,10 @@ fi
 
 case "$1" in
   setup )
-    install_bazel
-    build_cf
     setup_env
     ;;
   download )
-    download_cf
+    download_cf $2 $3
     ;;
   test )
     trap cleanup EXIT
