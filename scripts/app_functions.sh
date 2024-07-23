@@ -66,7 +66,6 @@ direct_install() {
   rm -f $1/new-boot.img
   fix_env $1
   run_migrations
-  copy_preinit_files
 
   return 0
 }
@@ -232,7 +231,7 @@ app_init() {
   RAMDISKEXIST=false
   check_boot_ramdisk && RAMDISKEXIST=true
   get_flags >/dev/null
-  run_migrations
+  run_migrations >/dev/null
   SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
 

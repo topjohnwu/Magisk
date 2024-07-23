@@ -556,6 +556,8 @@ run_migrations() {
     rm -f $BACKUP
     gzip -9f $TARGET
   done
+
+  copy_preinit_files
 }
 
 copy_preinit_files() {
