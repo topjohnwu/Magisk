@@ -31,7 +31,7 @@ enum : int {
 #define ZLOGV(...) ZLOGD(__VA_ARGS__)
 //#define ZLOGV(...) (void*)0
 
-void hook_functions();
+void hook_entry();
 void hookJniNativeMethods(JNIEnv *env, const char *clz, JNINativeMethod *methods, int numMethods);
 
 int remote_get_info(int uid, const char *process, uint32_t *flags, std::vector<int> &fds);
