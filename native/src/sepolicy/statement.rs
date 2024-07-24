@@ -3,7 +3,6 @@ use std::io::stderr;
 use std::{iter::Peekable, pin::Pin, vec::IntoIter};
 
 use base::{error, warn, FmtAdaptor};
-
 use crate::ffi::Xperm;
 use crate::sepolicy;
 
@@ -436,15 +435,16 @@ fn extract_token<'a>(s: &'a str, tokens: &mut Vec<Token<'a>>) {
 fn tokenize_statement(statement: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     for s in statement.split_whitespace() {
-        if s.starts_with('#') {
-            break;
-        }
         extract_token(s, &mut tokens);
     }
     tokens
 }
 
 pub fn parse_statement(sepolicy: Pin<&mut sepolicy>, statement: &str) {
+    let statement = statement.trim();
+    if statement.is_empty() || statement.starts_with('#') {
+        return;
+    }
     let mut tokens = tokenize_statement(statement).into_iter().peekable();
     let result = exec_statement(sepolicy, &mut tokens);
     if let Err(e) = result {
