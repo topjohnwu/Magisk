@@ -1,43 +1,44 @@
-# Magisk Changelog
+![٢٠٢٤٠٦٢٧_١٧٣٧١٨](https://github.com/user-attachments/assets/3abf982d-5ebf-483c-8ef4-5244b302120d)
+#     (ماغيك تشانغلوج)   
 
-### v27.0
+###     v27.0   
 
-- [Zygisk] Introduce new code injection mechanism
-- [Zygisk] Support new signature introduced in U QPR2
-- [SEPolicy] Update libsepol to properly set some policy config bits
-- [MagiskBoot] Support compressing `init` so Magisk is installable on devices with small boot partitions
-- [ResetProp] Add new wait for property feature `resetprop -w`
+- [زيغيسك]     إدخال آلية جديدة للحقن الرمز   
+- [زيغيسك]     دعم التوقيع الجديد الذي تم تقديمه في وحدة استعراض الفضاء الخارجي   
+- [السياسة العامة]     تحديث الليب البيسوبول لتحديد بعض قطع من السياسات   
+- [MagiskBoot]     الضغط الدعم     `(إنيت)`     لذا فإن (ماغيس) منشأ على أجهزة مع تقطيعات صغيرة من الأحذية   
+- [ResetProp]      إضافة إلى إلى قائمة الانتظار الجديدة في مجال الممتلكات      `إعادة etproppulproppromproppulproppulpulproppulproppromproppulproppromproppulproppromproppulpropululpropulpropulproppulpropulpropprompropprompulpulpropprompropulproppromproppromulpropprompropprompulproporopropprompulptpropprompromproporopropprompropprompromproppromproporoptpropululpropulpropulpropPuPupropPupropulpropPupropPupropPuPuPupropPupropPupropulproporopropPurppropPupropPuproppromprompropruptpropruptpropPuproporopropruptpropprompropprompropprompropulpropprompropPurppulproppromproppulproppulpulproppulproppromproppulproppromproppulproppromproppulpropululpropulpropulproppulpropulpropprompropprompulpulpropprompropulproppromproppromulpropprompropprompulproporopropprompulptpropprompromproporopropprompropprompromproppromproporoptpropululpropulpropulpropPuPupropPupropulpropPupropPupropPuPuPupropPupropPupropulproporopropPurppropPupropPuproppromprompropruptpropruptpropPuproporopropruptpropprompropprompropprompropulpropprompropPurppulproppromproppulproppulpulproppulproppromproppulproppromproppulproppromproppulpropululpropulpropulproppulpropulpropprompropprompulpulpropprompropulproppromproppromulpropprompropprompulproporopropprompulptpropprompromproporopropprompropprompromproppromproporoptpropululpropulpropulpropPuPupropPupropulpropPupropPupropPuPuPupropPupropPupropulproporopropPurppropPupropPuproppromprompropruptpropruptpropPuproporopropruptpropprompropprompropprompropulpropprompropPurp`
 
-### v26.4
+###     v26.4   
 
-- [MagiskBoot] Don't pad zeros if signed boot image is larger
-- [MagiskPolicy] Fix `genfscon` and `filename_trans`
-- [MagiskPolicy] Fix bug in `libsepol`
-- [Zygisk] Fix and simplify file descriptor sanitization logic
-- [App] Prevent OOM when patching AP tarfiles
-- [App] Fix bug in device configuration detection
-- [Daemon] Fix certificate parsing of APKs
-- [General] Fix logging errors from C++ code being ignored
+- [MagiskBoot]      لا تَدْ الصفرَ إذا تَوقّعُ صورةَ الأحذيةِ أكبر    
+- [سياسة MagiskkPolicy]      المصلحون      `genfscon` و `الملف /trans`
+- [سياسة MagiskkPolicy]      حشرة أصلح في      `الليبسبول`
+- [زيغيسك]     منطق تصحيح وتبسيط ملف تصفية الملف   
+- [التطبيق]     منع OOM عندما يربط من   
+- [التطبيق]    حشرة أصلحة في الكشف عن تشكيلة الأجهزة  
+- [دايمون]     شهادة إصلاح من أجل استخدام هذه المركبات   
+- [ألف - عام]     خطأ قطع الأشجار المصلحة من رمز C+ يتم تجاهلها   
 
-### v26.3
+###    v26.3  
 
-- [General] Fix device information detection script
-- [General] Update BusyBox to 1.36.1
-- [General] Update toolchain that produces broken arm32 executables
-- [App] Fix root service unable to bind on OnePlus devices
+- [ألف - عام]     سيناريو الكشف عن المعلومات عن الأجهزة المصحة   
+- [ألف - عام]     (ب) تحديث BusyBox) إلى 1.36.1   
+- [ألف - عام]    سلسلة الأدوات الحديثة التي تنتج أجهزة منفذة من طراز مترو 32  
+- [التطبيق]    خدمة الجذور المصلحة غير قادرة على الارتباط على أجهزة أونePlus  
 
-### v26.2
+###  v26.2
 
-- [MagiskBoot] Support extracting boot image from `payload.bin`
-- [MagiskBoot] Support cpio files containing character files
-- [MagiskBoot] Support listing cpio content
-- [MagiskBoot] Directly handle AVB 1.0 signing and verification without going through Java implementation
-- [Daemon] Make daemon socket a fixed path in MAGISKTMP
-- [resetprop] Support printing property context
-- [resetprop] Support only printing persistent properties from storage
-- [resetprop] Properly support setting persistent properties bypassing property_service
-- [MagiskSU] Support `-g` and `-G` options
-- [MagiskSU] Support switching mount namespace to PID with `-t`
+- [MagiskBoot] دعم استخراج صورة الأحذية من `payload.bin`
+- [MagiskBoot] دعم ملفات الكابويو التي تحتوي على ملفات الشخصية
+- [MagiskBoot] دعم إدراج محتوى الـ (سي بي)
+- [MagiskBoot] معالجة مباشرة من طراز AVB 1.0 التوقيع والتحقق من دون أن يمر في تنفيذ جافا
+- [دايمون] Make daemon socket a fixed path in MAGISKTMP
+- [إعادة إستروب] Support printing property context
+- [إعادة إستروب] Support only printing persistent properties from storage
+- [إعادة إستروب] Properly support setting persistent properties bypassing property_service
+- [MagiskSU] Support `ز` and `ز` options
+- [MagiskSU] Support switching mount namespace to PID with `(ر)`
 - [MagiskPolicy] Fix patching extended permissions
 - [MagiskPolicy] Support more syntax for extended permissions
 - [MagiskPolicy] Support printing out the loaded sepolicy rules
