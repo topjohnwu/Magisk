@@ -201,12 +201,16 @@ pub fn find_preinit_device() -> String {
     let (_, preinit_info, _) = matched_info.select_nth_unstable_by(
         0,
         |(ap, MountInfo { fs_type: at, .. }), (bp, MountInfo { fs_type: bt, .. })| match (
+            ap,
+            bp,
             at.as_str() == "ext4",
             bt.as_str() == "ext4",
         ) {
-            // take ext4 over others (f2fs) because f2fs has a kernel bug that causes kernel panic
-            (true, false) => Less,
-            (false, true) => Greater,
+            // metadata is not affected by f2fs kernel bug
+            (PartId::Metadata, _, _, true) | (_, PartId::Metadata, true, _) => ap.cmp(bp),
+            // otherwise, take ext4 f2fs because f2fs has a kernel bug that causes kernel panic
+            (_, _, true, false) => Less,
+            (_, _, false, true) => Greater,
             // if both has the same fs type, compare the mount point
             _ => ap.cmp(bp),
         },
