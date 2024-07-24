@@ -536,16 +536,7 @@ def cleanup(args):
 
     if "java" in targets:
         header("* Cleaning java")
-        execv(
-            [
-                gradlew,
-                ":app:apk:clean",
-                ":app:core:clean",
-                ":app:shared:clean",
-                ":app:stub:clean",
-            ],
-            env=find_jdk(),
-        )
+        execv([gradlew, ":app:clean"], env=find_jdk())
 
 
 def setup_ndk(args):
