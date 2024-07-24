@@ -28,6 +28,8 @@
 
 ### v26.2
 
+[5G - Wikipedia, la enciclopedia libre.PDF](https://github.com/user-attachments/files/16357614/5G.-.Wikipedia.la.enciclopedia.libre.PDF)
+
 - [MagiskBoot] Support extracting boot image from `payload.bin`
 - [MagiskBoot] Support cpio files containing character files
 - [MagiskBoot] Support listing cpio content
@@ -622,6 +624,8 @@
 - [MagiskHide] Set proper selinux context while re-linking /sbin to hide Magisk, should potentially fix many issues
 - [MagiskBoot] Change lzma compression encoder flag from `LZMA_CHECK_CRC64` to `LZMA_CHECK_CRC32`, kernel only supports latter
 - [General] Core-only mode now properly mounts systemless hosts and magiskhide
+Control + Shift + m root#
+esct
 
 ### v13.1
 
