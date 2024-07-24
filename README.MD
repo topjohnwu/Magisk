@@ -22,8 +22,7 @@ Click the icon below to download Magisk apk.
 
 [![](https://img.shields.io/badge/Magisk-v27.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v27.0)
 [![](https://img.shields.io/badge/Magisk%20Beta-v27.0-blue)](https://github.com/topjohnwu/Magisk/releases/tag/v27.0)
-[![](https://img.shields.io/badge/Magisk-Canary-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-release.apk)
-[![](https://img.shields.io/badge/Magisk-Debug-red)](https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-debug.apk)
+[![](https://img.shields.io/badge/Magisk-Canary-red)](https://github.com/topjohnwu/Magisk/releases/tag/canary-27005)
 
 ## Useful Links
 
@@ -32,7 +31,6 @@ Click the icon below to download Magisk apk.
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 - [Zygisk module sample](https://github.com/topjohnwu/zygisk-module-sample)
 - [Canary channel changelog](https://github.com/topjohnwu/magisk-files/blob/canary/notes.md)
-
 
 ## Bug Reports
 
