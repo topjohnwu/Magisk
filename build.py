@@ -12,6 +12,7 @@ import sys
 import tarfile
 import textwrap
 import urllib.request
+from copy import copy
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -612,7 +613,7 @@ def setup_avd(args):
 def patch_avd_file(args):
     if not args.skip:
         args.release = False
-        build_all(args)
+        build_all(copy(args))
 
     args.target = Path(args.target)
     src_file = f"/data/local/tmp/{args.target.name}"
