@@ -3,6 +3,7 @@ out
 *.jks
 *.apk
 /config.prop
+/notes.md
 /update.sh
 /app/dict.txt
 
