@@ -6,7 +6,7 @@ plugins {
 lsparanoid {
     seed = if (RAND_SEED != 0) RAND_SEED else null
     includeDependencies = true
-    global = true
+    classFilter = { true }
 }
 
 android {

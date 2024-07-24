@@ -61,8 +61,8 @@ dependencies {
 
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity:1.9.0")
-    implementation("androidx.collection:collection-ktx:1.4.1")
+    implementation("androidx.activity:activity:1.9.1")
+    implementation("androidx.collection:collection-ktx:1.4.2")
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
-    implementation("androidx.lifecycle:lifecycle-process:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.4")
 }
