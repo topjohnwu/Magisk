@@ -176,6 +176,8 @@
     <string name="setting_add_shortcut_summary">在隐藏后难以识别名称和图标的情况下，添加快捷方式到桌面</string>
     <string name="settings_doh_title">安全 DNS（DoH）</string>
     <string name="settings_doh_description">解决某些地区的 DNS 污染问题</string>
+    <string name="settings_random_name_title">随机文件名</string>
+    <string name="settings_random_name_description">随机修补镜像和 tar 文件的文件名以防止检测</string>
 
     <string name="multiuser_mode">多用户模式</string>
     <string name="settings_owner_only">仅设备所有者</string>
