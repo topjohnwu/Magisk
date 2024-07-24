@@ -118,10 +118,6 @@ impl SepolicyExt for sepolicy {
 
     fn load_rules_from_reader<T: BufRead>(mut self: Pin<&mut sepolicy>, reader: &mut T) {
         reader.foreach_lines(|line| {
-            let line = line.trim();
-            if line.is_empty() {
-                return true;
-            }
             parse_statement(self.as_mut(), line);
             true
         });
