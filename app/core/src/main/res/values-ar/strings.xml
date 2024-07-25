@@ -44,7 +44,7 @@
     <string name="install_inactive_slot">التثبيت على الشريحة غير النشطة (بعد OTA)</string>
     <string name="install_inactive_slot_msg">سيتم إجبار جهازك على التمهيد إلى الشريحة غير النشطة الحالية بعد إعادة التشغيل!\nاستخدم هذا الخيار فقط بعد الانتهاء من OTA.\nهل تود المتابعة؟</string>
     <string name="setup_title">إعداد إضافي</string>
-    <string name="select_patch_file">اختر وقم بعمل باتش ملف</string>
+    <string name="select_patch_file">اختر ملفاً وقم بعمل له باتش</string>
     <string name="patch_file_msg">اختر صورة خام (*.img) أو ملف ODIN tarfile (*.tar) أو payload.bin (*.bin)</string>
     <string name="reboot_delay_toast">سيتم إعادة التشغيل في 5 ثوانٍ...</string>
     <string name="flash_screen_title">التثبيت</string>
