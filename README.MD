@@ -30,7 +30,6 @@ Click the icon below to download Magisk apk.
 - [Building and Development](https://topjohnwu.github.io/Magisk/build.html)
 - [Magisk Documentation](https://topjohnwu.github.io/Magisk/)
 - [Zygisk module sample](https://github.com/topjohnwu/zygisk-module-sample)
-- [Canary channel changelog](https://github.com/topjohnwu/magisk-files/blob/canary/notes.md)
 
 ## Bug Reports
 
