@@ -87,8 +87,6 @@ update_release_json() {
 }
 
 build_canary() {
-  enable_version_config
-
   # Update version code
   local code=$(grep_prop magisk.versionCode $GCONFIG)
   code=$((code + 1))
@@ -119,14 +117,10 @@ build_canary() {
   $BUILDCMD clean
   $BUILDCMD all
   $BUILDCMD -r all
-
-  disable_version_config
 }
 
 # $1 = ver, $2 = stable?
 build_release() {
-  enable_version_config
-
   # Update version configs
   local ver=$1
   local stable=$2
@@ -160,8 +154,6 @@ build_release() {
   # Build
   $BUILDCMD clean
   $BUILDCMD -r all
-
-  disable_version_config
 }
 
 stable() {
@@ -238,6 +230,8 @@ fi
 
 git pull
 
+trap disable_version_config EXIT
+enable_version_config
 case $1 in
   "canary" ) build_canary ;;
   "stable" ) stable $2 ;;
