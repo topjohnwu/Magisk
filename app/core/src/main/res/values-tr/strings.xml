@@ -25,7 +25,7 @@
     <string name="home_follow_title">Bizi Takip Edin</string>
     <string name="home_item_source">Kaynak</string>
     <string name="home_support_content">Magisk her zaman ücretsiz ve açık kaynak olacaktır. Ancak, bir bağış yaparak bize destek olabilirsiniz.</string>
-    <string name="home_installed_version">Durum</string>
+    <string name="home_installed_version">Yüklü Sürüm</string>
     <string name="home_latest_version">En Son Sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
