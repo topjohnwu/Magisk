@@ -114,8 +114,17 @@ jobs:
       - name: Run AVD test
         timeout-minutes: 10
         env:
-          AVD_TEST_VERBOSE: 1
+          AVD_TEST_LOG: 1
         run: scripts/avd_test.sh ${{ matrix.version }} ${{ matrix.type }}
+
+      - name: Upload logs on error
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "avd-logs-${{ matrix.version }}"
+          path: |
+            kernel.log
+            logcat.log
 
   avd-test-32:
     name: Test API ${{ matrix.version }} (x86)
@@ -148,8 +157,17 @@ jobs:
         timeout-minutes: 10
         env:
           FORCE_32_BIT: 1
-          AVD_TEST_VERBOSE: 1
+          AVD_TEST_LOG: 1
         run: scripts/avd_test.sh ${{ matrix.version }}
+
+      - name: Upload logs on error
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: "avd32-logs-${{ matrix.version }}"
+          path: |
+            kernel.log
+            logcat.log
 
   cf_test:
     name: Test ${{ matrix.branch }} (${{ matrix.target }})

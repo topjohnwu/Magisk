@@ -10,6 +10,7 @@ emu_pid=
 atd_min_api=30
 atd_max_api=34
 lsposed_min_api=27
+lsposed_max_api=34
 huge_ram_min_api=26
 
 cleanup() {
@@ -67,29 +68,24 @@ test_emu() {
 
   print_title "* Testing $pkg ($variant)"
 
-  if [ -n "$AVD_TEST_VERBOSE" ]; then
-    "$emu" @test $emu_args &
-    emu_pid=$!
-    adb logcat &
+  if [ -n "$AVD_TEST_LOG" ]; then
+    "$emu" @test $emu_args > kernel.log 2>&1 &
   else
-    "$emu" @test $emu_args 2>/dev/null &
-    emu_pid=$!
+    "$emu" @test $emu_args > /dev/null 2>&1 &
   fi
 
+  emu_pid=$!
   wait_emu wait_for_boot
 
   test_setup $variant
 
   # Install LSPosed
-  if [ $api -ge $lsposed_min_api -a $api -le $atd_max_api ]; then
+  if [ $api -ge $lsposed_min_api -a $api -le $lsposed_max_api ]; then
     adb push out/lsposed.zip /data/local/tmp/lsposed.zip
     echo 'PATH=$PATH:/debug_ramdisk magisk --install-module /data/local/tmp/lsposed.zip' | adb shell /system/xbin/su
   fi
 
   adb reboot
-  if [ -n "$AVD_TEST_VERBOSE" ]; then
-    adb logcat &
-  fi
   wait_emu wait_for_boot
 
   test_app
@@ -147,9 +143,6 @@ run_test() {
   fi
 
   emu_args="$emu_args_base -memory $memory"
-  if [ -n "$AVD_TEST_VERBOSE" ]; then
-    emu_args="$emu_args -show-kernel"
-  fi
 
   # Setup emulator
   "$sdk" --channel=3 $pkg
@@ -157,12 +150,15 @@ run_test() {
 
   # Launch stock emulator
   print_title "* Launching $pkg"
-  "$emu" @test $emu_args 2>/dev/null &
+  "$emu" @test $emu_args >/dev/null 2>&1 &
   emu_pid=$!
   wait_emu wait_for_bootanim
 
   # Update arguments for Magisk runs
   emu_args="$emu_args -ramdisk magisk_patched.img -feature -SystemAsRoot"
+  if [ -n "$AVD_TEST_LOG" ]; then
+    emu_args="$emu_args -show-kernel -logcat '' -logcat-output logcat.log"
+  fi
 
   # Patch and test debug build
   ./build.py avd_patch -s "$ramdisk" magisk_patched.img
