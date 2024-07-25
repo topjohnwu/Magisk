@@ -189,6 +189,7 @@ static void magic_mount(const string &sdir, const string &ddir = "") {
 static void extract_files(bool sbin) {
     const char *magisk_xz = sbin ? "/sbin/magisk.xz" : "magisk.xz";
     const char *stub_xz = sbin ? "/sbin/stub.xz" : "stub.xz";
+    const char *init_ld_xz = sbin ? "/sbin/init-ld.xz" : "init-ld.xz";
 
     if (access(magisk_xz, F_OK) == 0) {
         mmap_data magisk(magisk_xz);
@@ -204,6 +205,14 @@ static void extract_files(bool sbin) {
         int fd = xopen("stub.apk", O_WRONLY | O_CREAT, 0);
         fd_stream ch(fd);
         unxz(ch, stub);
+        close(fd);
+    }
+    if (access(init_ld_xz, F_OK) == 0) {
+        mmap_data init_ld(init_ld_xz);
+        unlink(init_ld_xz);
+        int fd = xopen("init-ld", O_WRONLY | O_CREAT, 0);
+        fd_stream ch(fd);
+        unxz(ch, init_ld);
         close(fd);
     }
 }
@@ -279,16 +288,19 @@ void MagiskInit::patch_ro_root() {
         patch_rc_scripts("/", tmp_dir.data(), false);
     }
 
-    // Extract magisk
+    // Extract overlay archives
     extract_files(false);
 
     // Oculus Go will use a special sepolicy if unlocked
     if (access("/sepolicy.unlocked", F_OK) == 0) {
         patch_sepolicy("/sepolicy.unlocked", ROOTOVL "/sepolicy.unlocked");
-    } else if ((access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0) ||
-               !hijack_sepolicy()) {
-        patch_sepolicy("/sepolicy", ROOTOVL "/sepolicy");
+    } else {
+        bool patch = access(SPLIT_PLAT_CIL, F_OK) != 0 && access("/sepolicy", F_OK) == 0;
+        if (patch || !hijack_sepolicy()) {
+            patch_sepolicy("/sepolicy", ROOTOVL "/sepolicy");
+        }
     }
+    unlink("init-ld");
 
     // Mount rootdir
     magic_mount(ROOTOVL);
@@ -338,12 +350,14 @@ void MagiskInit::patch_rw_root() {
     setup_tmp(PRE_TMPDIR);
     chdir(PRE_TMPDIR);
 
-    // Extract magisk
+    // Extract overlay archives
     extract_files(true);
 
-    if ((!treble && access("/sepolicy", F_OK) == 0) || !hijack_sepolicy()) {
+    bool patch = !treble && access("/sepolicy", F_OK) == 0;
+    if (patch || !hijack_sepolicy()) {
         patch_sepolicy("/sepolicy", "/sepolicy");
     }
+    unlink("init-ld");
 
     chdir("/");
 

@@ -255,39 +255,37 @@ def run_ndk_build(args, flags):
 def build_cpp_src(args, targets: set):
     dump_flag_header()
 
-    flag = ""
+    flags = ""
     clean = False
 
     if "magisk" in targets:
-        flag += " B_MAGISK=1"
+        flags += " B_MAGISK=1"
         clean = True
 
     if "magiskpolicy" in targets:
-        flag += " B_POLICY=1"
+        flags += " B_POLICY=1"
         clean = True
 
     if "magiskinit" in targets:
-        flag += " B_PRELOAD=1"
+        flags += " B_PRELOAD=1"
 
     if "resetprop" in targets:
-        flag += " B_PROP=1"
+        flags += " B_PROP=1"
 
-    if flag:
-        run_ndk_build(args, flag)
+    if flags:
+        run_ndk_build(args, flags)
 
-    flag = ""
+    flags = ""
 
     if "magiskinit" in targets:
-        # magiskinit embeds preload.so
-        dump_bin_header(args)
-        flag += " B_INIT=1"
+        flags += " B_INIT=1"
 
     if "magiskboot" in targets:
-        flag += " B_BOOT=1"
+        flags += " B_BOOT=1"
 
-    if flag:
-        flag += " B_CRT0=1"
-        run_ndk_build(args, flag)
+    if flags:
+        flags += " B_CRT0=1"
+        run_ndk_build(args, flags)
 
     if clean:
         clean_elf()
@@ -369,25 +367,6 @@ def write_if_diff(file_name: Path, text: str):
     if do_write:
         with open(file_name, "w") as f:
             f.write(text)
-
-
-def binary_dump(src, var_name, compressor=xz):
-    out_str = f"constexpr unsigned char {var_name}[] = {{"
-    for i, c in enumerate(compressor(src.read())):
-        if i % 16 == 0:
-            out_str += "\n"
-        out_str += f"0x{c:02X},"
-    out_str += "\n};\n"
-    return out_str
-
-
-def dump_bin_header(args):
-    native_gen_path.mkdir(mode=0o755, parents=True, exist_ok=True)
-    for arch in archs:
-        preload = Path("native", "out", arch, "libinit-ld.so")
-        with open(preload, "rb") as src:
-            text = binary_dump(src, "init_ld_xz")
-        write_if_diff(Path(native_gen_path, f"{arch}_binaries.h"), text)
 
 
 def dump_flag_header():

@@ -221,7 +221,7 @@ else
   # Android 15 Beta
   run_test 35 google_apis
   # Run 16k page tests
-  run_test VanillaIceCream google_apis_ps16k
+  run_test 35 google_apis_ps16k
 fi
 
 "$avd" delete avd -n test

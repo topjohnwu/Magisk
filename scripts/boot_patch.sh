@@ -20,6 +20,7 @@
 # magiskinit         binary    The binary to replace /init.
 # magisk             binary    The magisk binary.
 # magiskboot         binary    A tool to manipulate boot images.
+# init-ld            binary    The library that will be LD_PRELOAD of /init
 # stub.apk           binary    The stub Magisk app to embed into ramdisk.
 # chromeos           folder    This folder includes the utility and keys to sign
 #                  (optional)  chromeos boot images. Only used for Pixel C.
@@ -161,6 +162,7 @@ $BOOTMODE && [ -z "$PREINITDEVICE" ] && PREINITDEVICE=$(./magisk --preinit-devic
 # Compress to save precious ramdisk space
 ./magiskboot compress=xz magisk magisk.xz
 ./magiskboot compress=xz stub.apk stub.xz
+./magiskboot compress=xz init-ld init-ld.xz
 
 echo "KEEPVERITY=$KEEPVERITY" > config
 echo "KEEPFORCEENCRYPT=$KEEPFORCEENCRYPT" >> config
@@ -177,13 +179,14 @@ fi
 "mkdir 0750 overlay.d/sbin" \
 "add 0644 overlay.d/sbin/magisk.xz magisk.xz" \
 "add 0644 overlay.d/sbin/stub.xz stub.xz" \
+"add 0644 overlay.d/sbin/init-ld.xz init-ld.xz" \
 "patch" \
 "$SKIP_BACKUP backup ramdisk.cpio.orig" \
 "mkdir 000 .backup" \
 "add 000 .backup/.magisk config" \
 || abort "! Unable to patch ramdisk"
 
-rm -f ramdisk.cpio.orig config magisk*.xz stub.xz
+rm -f ramdisk.cpio.orig config *.xz
 
 #################
 # Binary Patches

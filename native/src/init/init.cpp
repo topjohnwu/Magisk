@@ -6,7 +6,6 @@
 #include <xz.h>
 
 #include <base.hpp>
-#include <embed.hpp>
 
 #include "init.hpp"
 
