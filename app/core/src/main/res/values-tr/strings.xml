@@ -20,7 +20,7 @@
     <string name="home_package">Paket</string>
     <string name="home_app_title">Uygulama</string>
     
-    <string name="home_notice_content">Magisk'i YALNIZCA resmi GitHub sayfasından indirin. Bilinmeyen kaynaklardan gelen dosyalar zararlı olabilir!</string>
+    <string name="home_notice_content">Magisk\'i YALNIZCA resmi GitHub sayfasından indirin. Bilinmeyen kaynaklardan gelen dosyalar zararlı olabilir!</string>
     <string name="home_support_title">Bizi Destekleyin</string>
     <string name="home_follow_title">Bizi Takip Edin</string>
     <string name="home_item_source">Kaynak</string>
@@ -28,12 +28,12 @@
     <string name="home_installed_version">Durum</string>
     <string name="home_latest_version">En Son Sürüm</string>
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
-    <string name="uninstall_magisk_title">Magisk'i Kaldır</string>
+    <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacak!\nKök kaldırılacak!\nMagisk kullanılarak şifrelenmemiş herhangi bir dahili depolama yeniden şifrelenecek!</string>
     
     <!--Install-->
     <string name="keep_force_encryption">Zorla şifrelemeyi koru</string>
-    <string name="keep_dm_verity">AVB 2.0/dm-verity'yi koru</string>
+    <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
     <string name="recovery_mode">Kurtarma Modu</string>
     <string name="install_options_title">Seçenekler</string>
     <string name="install_method_title">Yöntem</string>
@@ -41,7 +41,7 @@
     <string name="install_start">Hadi başlayalım</string>
     <string name="manager_download_install">İndirmek ve yüklemek için basın</string>
     <string name="direct_install">Doğrudan Yükleme (Önerilir)</string>
-    <string name="install_inactive_slot">Etkin Olmayan Slot'a Yükle (OTA Sonrası)</string>
+    <string name="install_inactive_slot">Etkin Olmayan Slot\'a Yükle (OTA Sonrası)</string>
     <string name="install_inactive_slot_msg">Cihazınız yeniden başlatıldıktan sonra zorunlu olarak mevcut etkin olmayan slota önyükleme yapılacaktır!\nBu seçeneği yalnızca OTA tamamlandıktan sonra kullanın.\nDevam etmek istiyor musunuz?</string>
     <string name="setup_title">Ek Kurulum</string>
     <string name="select_patch_file">Bir Dosya Seç ve Yama Yap</string>
@@ -130,7 +130,7 @@
     <string name="settings_hide_app_title">Magisk uygulamasını gizle</string>
     <string name="settings_hide_app_summary">Rastgele bir paket kimliği ve özel uygulama etiketi olan bir vekil (proxy) uygulaması yükleyin/string>
     <string name="settings_restore_app_title">Magisk uygulamasını geri yükle</string>
-    <string name="settings_restore_app_summary">Uygulamayı göster ve orijinal APK'yı geri yükle</string>
+    <string name="settings_restore_app_summary">Uygulamayı göster ve orijinal APK\'yı geri yükle</string>
     <string name="language">Dil</string>
     <string name="system_default">(Sistem Varsayılanı)</string>
     <string name="settings_check_update_title">Güncellemeleri Kontrol Et</string>
@@ -139,8 +139,8 @@
     <string name="settings_update_stable">Kararlı</string>
     <string name="settings_update_beta">Beta</string>
     <string name="settings_update_custom">Özel</string>
-    <string name="settings_update_custom_msg">Özel kanal URL'si girin</string>
-    <string name="settings_zygisk_summary">Magisk'in bazı bölümlerini zygote daemon'unda çalıştır</string>
+    <string name="settings_update_custom_msg">Özel kanal URL\'si girin</string>
+    <string name="settings_zygisk_summary">Magisk\'in bazı bölümlerini zygote daemon\'unda çalıştır</string>
     <string name="settings_denylist_title">Reddetme Listesini Zorla</string>
     <string name="settings_denylist_summary">Reddetme Listesindeki işlemler tüm Magisk değişikliklerini geri alacak</string>
     <string name="settings_denylist_config_title">Reddetme Listesini Yapılandır</string>
@@ -224,16 +224,16 @@
     <string name="restore_fail">Stok yedeği mevcut değil!</string>
     <string name="setup_fail">Kurulum başarısız oldu</string>
     <string name="env_fix_title">Ek Ayar Gerekiyor</string>
-    <string name="env_fix_msg">Magisk'in düzgün çalışabilmesi için cihazınızın ek ayarlar yapması gerekiyor. Devam etmek ve yeniden başlatmak istiyor musunuz?</string>
-    <string name="env_full_fix_msg">Cihazınızın düzgün çalışabilmesi için Magisk'in yeniden yüklenmesi gerekiyor. Lütfen Magisk'i uygulama içinde yeniden yükleyin, kurtarma modu doğru cihaz bilgilerini alamaz.</string>
+    <string name="env_fix_msg">Magisk\'in düzgün çalışabilmesi için cihazınızın ek ayarlar yapması gerekiyor. Devam etmek ve yeniden başlatmak istiyor musunuz?</string>
+    <string name="env_full_fix_msg">Cihazınızın düzgün çalışabilmesi için Magisk\'in yeniden yüklenmesi gerekiyor. Lütfen Magisk\'i uygulama içinde yeniden yükleyin, kurtarma modu doğru cihaz bilgilerini alamaz.</string>
     <string name="setup_msg">Ortam kurulumu yapılıyor...</string>
     <string name="unsupport_magisk_title">Desteklenmeyen Magisk Sürümü</string>
-    <string name="unsupport_magisk_msg">Bu uygulama sürümü, %1$s altındaki Magisk sürümlerini desteklemiyor.\n\nUygulama, Magisk yüklü değilmiş gibi davranacaktır, lütfen en kısa sürede Magisk'i güncelleyin.</string>
+    <string name="unsupport_magisk_msg">Bu uygulama sürümü, %1$s altındaki Magisk sürümlerini desteklemiyor.\n\nUygulama, Magisk yüklü değilmiş gibi davranacaktır, lütfen en kısa sürede Magisk\'i güncelleyin.</string>
     <string name="unsupport_general_title">Anormal Durum</string>
     <string name="unsupport_system_app_msg">Bu uygulamanın sistem uygulaması olarak çalıştırılması desteklenmiyor. Lütfen uygulamayı kullanıcı uygulamasına geri döndürün.</string>
-    <string name="unsupport_other_su_msg">Magisk'ten gelmeyen bir "su" ikili dosyası tespit edildi. Lütfen herhangi bir rakip kök (root) çözümünü kaldırın ve/veya Magisk'i yeniden yükleyin.</string>
+    <string name="unsupport_other_su_msg">Magisk\'ten gelmeyen bir "su" ikili dosyası tespit edildi. Lütfen herhangi bir rakip kök (root) çözümünü kaldırın ve/veya Magisk\'i yeniden yükleyin.</string>
     <string name="unsupport_external_storage_msg">Magisk harici depolamaya yüklendi. Lütfen uygulamayı dahili depolamaya taşıyın.</string>
-    <string name="unsupport_nonroot_stub_msg">Gizli Magisk uygulaması kök (root) erişimi kaybolduğu için çalışmaya devam edemez. Lütfen orijinal APK'yı geri yükleyin.</string>
+    <string name="unsupport_nonroot_stub_msg">Gizli Magisk uygulaması kök (root) erişimi kaybolduğu için çalışmaya devam edemez. Lütfen orijinal APK\'yı geri yükleyin.</string>
     <string name="unsupport_nonroot_stub_title">@string/settings_restore_app_title</string>
     <string name="external_rw_permission_denied">Bu işlevselliği etkinleştirmek için depolama izni verin</string>
     <string name="post_notifications_denied">Bu işlevselliği etkinleştirmek için bildirim izni verin</string>
