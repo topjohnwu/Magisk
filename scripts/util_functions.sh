@@ -369,15 +369,24 @@ get_flags() {
 
 find_boot_image() {
   BOOTIMAGE=
+
+  # Android 10+
+  if $RECOVERYMODE; then
+    BOOTIMAGE="/dev/block/by-name/recovery$SLOT"
+  elif [ -L "/dev/block/by-name/init_boot$SLOT" ] && uname -r | grep -vq "android12-"; then
+    BOOTIMAGE="/dev/block/by-name/init_boot$SLOT"
+  else
+    BOOTIMAGE="/dev/block/by-name/boot$SLOT"
+  fi
+  [ -L "$BOOTIMAGE" ] && return 0
+
+  # Old devices
   if $RECOVERYMODE; then
     BOOTIMAGE=$(find_block "recovery_ramdisk$SLOT" "recovery$SLOT" "sos")
   elif [ ! -z $SLOT ]; then
     BOOTIMAGE=$(find_block "ramdisk$SLOT" "recovery_ramdisk$SLOT" "init_boot$SLOT" "boot$SLOT")
   else
     BOOTIMAGE=$(find_block ramdisk recovery_ramdisk kern-a android_boot kernel bootimg init_boot boot lnx boot_a)
-  fi
-  if [ "$BOOTIMAGE" = "init_boot$SLOT" ]; then
-    uname -r | grep -q "android12-" && BOOTIMAGE="boot$SLOT"
   fi
   if [ -z $BOOTIMAGE ]; then
     # Lets see what fstabs tells me
