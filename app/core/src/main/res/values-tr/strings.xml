@@ -128,7 +128,7 @@
     <string name="settings_download_path_title">İndirme Yolu</string>
     <string name="settings_download_path_message">Dosyalar %1$s konumuna kaydedilecek</string>
     <string name="settings_hide_app_title">Magisk uygulamasını gizle</string>
-    <string name="settings_hide_app_summary">Rastgele bir paket kimliği ve özel uygulama etiketi olan bir vekil (proxy) uygulaması yükleyin/string>
+    <string name="settings_hide_app_summary">Rastgele bir paket kimliği ve özel uygulama etiketi olan bir vekil (proxy) uygulaması yükleyin</string>
     <string name="settings_restore_app_title">Magisk uygulamasını geri yükle</string>
     <string name="settings_restore_app_summary">Uygulamayı göster ve orijinal APK\'yı geri yükle</string>
     <string name="language">Dil</string>
