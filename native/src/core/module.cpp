@@ -428,7 +428,8 @@ static void collect_modules(bool open_zygisk) {
             }
         } else {
             // Ignore zygisk modules when zygisk is not enabled
-            if (faccessat(modfd, "zygisk", F_OK, 0) == 0) {
+            if (faccessat(modfd, "zygisk", F_OK, 0) == 0 &&
+                    faccessat(modfd, "zygisk/optional", F_OK, 0) != 0) {
                 LOGI("%s: ignore\n", entry->d_name);
                 return;
             }

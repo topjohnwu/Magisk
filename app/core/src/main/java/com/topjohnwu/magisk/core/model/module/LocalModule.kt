@@ -32,11 +32,13 @@ data class LocalModule(
     private val riruFolder = RootUtils.fs.getFile(path, "riru")
     private val zygiskFolder = RootUtils.fs.getFile(path, "zygisk")
     private val unloaded = RootUtils.fs.getFile(zygiskFolder, "unloaded")
+    private val zygiskOptional = RootUtils.fs.getFile(zygiskFolder, "optional")
 
     val updated: Boolean get() = updateFile.exists()
     val isRiru: Boolean get() = (id == "riru-core") || riruFolder.exists()
     val isZygisk: Boolean get() = zygiskFolder.exists()
     val zygiskUnloaded: Boolean get() = unloaded.exists()
+    val isZygiskOptional: Boolean get() = zygiskOptional.exists()
 
     var enable: Boolean
         get() = !disableFile.exists()
