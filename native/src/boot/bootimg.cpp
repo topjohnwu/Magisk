@@ -592,7 +592,7 @@ int unpack(const char *image, bool skip_decomp, bool hdr, bool accept_vendor) {
     if (boot.hdr->is_vendor() && boot.hdr->header_version() == 4 && !boot.ramdisk_table_entries.empty()) {
         char file_name[PATH_MAX] = {};
         for (const auto& [entry, fmt]: boot.ramdisk_table_entries) {
-            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, VENDOR_RAMDISK_NAME_SIZE, entry->ramdisk_name);
+            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, entry->ramdisk_name);
             dump_ramdisk(boot.ramdisk + entry->ramdisk_offset, entry->ramdisk_size, fmt, file_name, skip_decomp);
         }
     } else {
@@ -759,7 +759,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     if (hdr->is_vendor() && hdr->header_version() == 4 && !new_ramdisk_table_entries.empty()) {
         char file_name[PATH_MAX] = {};
         for (auto &[entry, fmt] : new_ramdisk_table_entries) {
-            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, VENDOR_RAMDISK_NAME_SIZE, entry.ramdisk_name);
+            ssprintf(file_name, sizeof(file_name), VENDOR_RAMDISK_FILE, entry.ramdisk_name);
             entry.ramdisk_size = repack_ramdisk(fd, fmt, file_name, skip_comp);
             entry.ramdisk_offset = hdr->ramdisk_size();
             hdr->ramdisk_size() += entry.ramdisk_size;
