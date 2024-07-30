@@ -26,6 +26,7 @@ struct mmap_data : public byte_data {
     ALLOW_MOVE_ONLY(mmap_data)
 
     explicit mmap_data(const char *name, bool rw = false);
+    mmap_data(int dirfd, const char *name, bool rw = false);
     mmap_data(int fd, size_t sz, bool rw = false);
     ~mmap_data();
 };

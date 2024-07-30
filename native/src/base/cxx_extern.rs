@@ -7,6 +7,7 @@ use cfg_if::cfg_if;
 use cxx::private::c_char;
 use libc::mode_t;
 
+use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
 use crate::{
     clone_attr, cstr, fclone_attr, fd_path, map_fd, map_file, slice_from_ptr, CxxResultExt,
@@ -59,6 +60,14 @@ unsafe extern "C" fn frm_rf(fd: OwnedFd) -> bool {
 
 pub(crate) fn map_file_for_cxx(path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
     map_file(path, rw).log_cxx().unwrap_or(&mut [])
+}
+
+pub(crate) fn map_file_at_for_cxx(fd: RawFd, path: &Utf8CStr, rw: bool) -> &'static mut [u8] {
+    unsafe {
+        map_file_at(BorrowedFd::borrow_raw(fd), path, rw)
+            .log_cxx()
+            .unwrap_or(&mut [])
+    }
 }
 
 pub(crate) fn map_fd_for_cxx(fd: RawFd, sz: usize, rw: bool) -> &'static mut [u8] {

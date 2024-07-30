@@ -13,7 +13,7 @@ native/out
 # Android Studio / Gradle
 *.iml
 .gradle
+.idea
 /local.properties
-/.idea
 /build
 /captures

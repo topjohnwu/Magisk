@@ -856,6 +856,14 @@ impl MappedFile {
         Ok(MappedFile(map_file(path, true)?))
     }
 
+    pub fn openat<T: AsFd>(dir: &T, path: &Utf8CStr) -> io::Result<MappedFile> {
+        Ok(MappedFile(map_file_at(dir.as_fd(), path, false)?))
+    }
+
+    pub fn openat_rw<T: AsFd>(dir: &T, path: &Utf8CStr) -> io::Result<MappedFile> {
+        Ok(MappedFile(map_file_at(dir.as_fd(), path, true)?))
+    }
+
     pub fn create(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<MappedFile> {
         Ok(MappedFile(map_fd(fd, sz, rw)?))
     }
@@ -888,6 +896,14 @@ extern "C" {
 
 // We mark the returned slice static because it is valid until explicitly unmapped
 pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8]> {
+    unsafe { map_file_at(BorrowedFd::borrow_raw(libc::AT_FDCWD), path, rw) }
+}
+
+pub(crate) fn map_file_at(
+    dirfd: BorrowedFd,
+    path: &Utf8CStr,
+    rw: bool,
+) -> io::Result<&'static mut [u8]> {
     #[cfg(target_pointer_width = "64")]
     const BLKGETSIZE64: u32 = 0x80081272;
 
@@ -895,18 +911,22 @@ pub(crate) fn map_file(path: &Utf8CStr, rw: bool) -> io::Result<&'static mut [u8
     const BLKGETSIZE64: u32 = 0x80041272;
 
     let flag = if rw { O_RDWR } else { O_RDONLY };
-    let file = FsPath::from(path).open(flag | O_CLOEXEC)?;
+    let fd = unsafe {
+        OwnedFd::from_raw_fd(
+            libc::openat(dirfd.as_raw_fd(), path.as_ptr(), flag | O_CLOEXEC).check_os_err()?,
+        )
+    };
 
-    let attr = fd_get_attr(file.as_raw_fd())?;
+    let attr = fd_get_attr(fd.as_raw_fd())?;
     let sz = if attr.is_block_device() {
         let mut sz = 0_u64;
-        unsafe { ioctl(file.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
+        unsafe { ioctl(fd.as_raw_fd(), BLKGETSIZE64, &mut sz) }.as_os_err()?;
         sz
     } else {
         attr.st.st_size as u64
     };
 
-    map_fd(file.as_fd(), sz as usize, rw)
+    map_fd(fd.as_fd(), sz as usize, rw)
 }
 
 pub(crate) fn map_fd(fd: BorrowedFd, sz: usize, rw: bool) -> io::Result<&'static mut [u8]> {

@@ -1,6 +1,7 @@
 #include <bit>
 #include <functional>
 #include <memory>
+#include <span>
 
 #include <base.hpp>
 
@@ -61,6 +62,8 @@ void dyn_img_hdr::print() const {
         fprintf(stderr, "%-*s [%u]\n", PADDING, "RECOV_DTBO_SZ", recovery_dtbo_size());
     if (ver == 2 || is_vendor())
         fprintf(stderr, "%-*s [%u]\n", PADDING, "DTB_SZ", dtb_size());
+    if (ver == 4 && is_vendor())
+        fprintf(stderr, "%-*s [%u]\n", PADDING, "BOOTCONFIG_SZ", bootconfig_size());
 
     if (uint32_t os_ver = os_version()) {
         int a,b,c,y,m = 0;
@@ -273,8 +276,7 @@ static format_t check_fmt_lg(const uint8_t *buf, unsigned sz) {
 
 #define CMD_MATCH(s) BUFFER_MATCH(h->cmdline, s)
 
-const pair<const uint8_t *, dyn_img_hdr *>
-        boot_img::create_hdr(const uint8_t *addr, format_t type) {
+pair<const uint8_t *, dyn_img_hdr *> boot_img::create_hdr(const uint8_t *addr, format_t type) {
     if (type == AOSP_VENDOR) {
         fprintf(stderr, "VENDOR_BOOT_HDR\n");
         auto h = reinterpret_cast<const boot_img_hdr_vnd_v3*>(addr);
@@ -346,8 +348,21 @@ const pair<const uint8_t *, dyn_img_hdr *>
         addr += ACCLAIM_PRE_HEADER_SZ;
     }
 
-    // addr could be adjusted
     return make_pair(addr, make_hdr(addr));
+}
+
+static const char *vendor_ramdisk_type(int type) {
+    switch (type) {
+    case VENDOR_RAMDISK_TYPE_PLATFORM:
+        return "platform";
+    case VENDOR_RAMDISK_TYPE_RECOVERY:
+        return "recovery";
+    case VENDOR_RAMDISK_TYPE_DLKM:
+        return "dlkm";
+    case VENDOR_RAMDISK_TYPE_NONE:
+    default:
+        return "none";
+    }
 }
 
 #define assert_off() \
@@ -361,14 +376,6 @@ name = base_addr + off;                 \
 off += hdr->name##_size();              \
 off = align_to(off, hdr->page_size());  \
 assert_off();
-
-#define get_ignore(name)                                            \
-if (hdr->name##_size()) {                                           \
-    auto blk_sz = align_to(hdr->name##_size(), hdr->page_size());   \
-    off += blk_sz;                                                  \
-}                                                                   \
-assert_off();
-
 
 bool boot_img::parse_image(const uint8_t *p, format_t type) {
     auto [base_addr, hdr] = create_hdr(p, type);
@@ -395,15 +402,12 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
     get_block(extra);
     get_block(recovery_dtbo);
     get_block(dtb);
-
-    auto ignore_addr = base_addr + off;
-    get_ignore(signature)
-    get_ignore(vendor_ramdisk_table)
-    get_ignore(bootconfig)
+    get_block(signature);
+    get_block(vendor_ramdisk_table);
+    get_block(bootconfig);
 
     payload = byte_view(base_addr, off);
     auto tail_addr = base_addr + off;
-    ignore = byte_view(ignore_addr, tail_addr - ignore_addr);
     tail = byte_view(tail_addr, map.buf() + map.sz() - tail_addr);
 
     if (auto size = hdr->kernel_size()) {
@@ -458,24 +462,40 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
-        if (hdr->is_vendor() && hdr->header_version() >= 4) {
+        if (vendor_ramdisk_table != nullptr) {
             // v4 vendor boot contains multiple ramdisks
-            // Do not try to mess with it for now
-            r_fmt = UNKNOWN;
+            using table_entry = const vendor_ramdisk_table_entry_v4;
+            if (hdr->vendor_ramdisk_table_entry_size() != sizeof(table_entry)) {
+                fprintf(stderr,
+                        "! Invalid vendor image: vendor_ramdisk_table_entry_size != %zu\n",
+                        sizeof(table_entry));
+                exit(1);
+            }
+
+            span<table_entry> table(
+                    reinterpret_cast<table_entry *>(vendor_ramdisk_table),
+                    hdr->vendor_ramdisk_table_entry_num());
+            for (auto &it : table) {
+                format_t fmt = check_fmt_lg(ramdisk + it.ramdisk_offset, it.ramdisk_size);
+                fprintf(stderr,
+                        "%-*s name=[%s] type=[%s] size=[%u] fmt=[%s]\n", PADDING, "VND_RAMDISK",
+                        it.ramdisk_name, vendor_ramdisk_type(it.ramdisk_type),
+                        it.ramdisk_size, fmt2name[fmt]);
+            }
         } else {
             r_fmt = check_fmt_lg(ramdisk, size);
+            if (r_fmt == MTK) {
+                fprintf(stderr, "MTK_RAMDISK_HDR\n");
+                flags[MTK_RAMDISK] = true;
+                r_hdr = reinterpret_cast<const mtk_hdr *>(ramdisk);
+                fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", r_hdr->size);
+                fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
+                ramdisk += sizeof(mtk_hdr);
+                hdr->ramdisk_size() -= sizeof(mtk_hdr);
+                r_fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
+            }
+            fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
         }
-        if (r_fmt == MTK) {
-            fprintf(stderr, "MTK_RAMDISK_HDR\n");
-            flags[MTK_RAMDISK] = true;
-            r_hdr = reinterpret_cast<const mtk_hdr *>(ramdisk);
-            fprintf(stderr, "%-*s [%u]\n", PADDING, "SIZE", r_hdr->size);
-            fprintf(stderr, "%-*s [%s]\n", PADDING, "NAME", r_hdr->name);
-            ramdisk += sizeof(mtk_hdr);
-            hdr->ramdisk_size() -= sizeof(mtk_hdr);
-            r_fmt = check_fmt_lg(ramdisk, hdr->ramdisk_size());
-        }
-        fprintf(stderr, "%-*s [%s]\n", PADDING, "RAMDISK_FMT", fmt2name[r_fmt]);
     }
     if (auto size = hdr->extra_size()) {
         e_fmt = check_fmt_lg(extra, size);
@@ -561,7 +581,30 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     dump(boot.kernel_dtb.buf(), boot.kernel_dtb.sz(), KER_DTB_FILE);
 
     // Dump ramdisk
-    if (!skip_decomp && COMPRESSED(boot.r_fmt)) {
+    if (boot.vendor_ramdisk_table != nullptr) {
+        using table_entry = const vendor_ramdisk_table_entry_v4;
+        span<table_entry> table(
+                reinterpret_cast<table_entry *>(boot.vendor_ramdisk_table),
+                boot.hdr->vendor_ramdisk_table_entry_num());
+
+        xmkdir(VND_RAMDISK_DIR, 0755);
+        owned_fd dirfd = xopen(VND_RAMDISK_DIR, O_RDONLY | O_CLOEXEC);
+        for (auto &it : table) {
+            char file_name[40];
+            if (it.ramdisk_name[0] == '\0') {
+                strscpy(file_name, RAMDISK_FILE, sizeof(file_name));
+            } else {
+                ssprintf(file_name, sizeof(file_name), "%s.cpio", it.ramdisk_name);
+            }
+            owned_fd fd = xopenat(dirfd, file_name, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0644);
+            format_t fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+            if (!skip_decomp && COMPRESSED(fmt)) {
+                decompress(fmt, fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+            } else {
+                xwrite(fd, boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+            }
+        }
+    } else if (!skip_decomp && COMPRESSED(boot.r_fmt)) {
         if (boot.hdr->ramdisk_size() != 0) {
             int fd = creat(RAMDISK_FILE, 0644);
             decompress(boot.r_fmt, fd, boot.ramdisk, boot.hdr->ramdisk_size());
@@ -590,6 +633,9 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
 
     // Dump dtb
     dump(boot.dtb, boot.hdr->dtb_size(), DTB_FILE);
+
+    // Dump bootconfig
+    dump(boot.bootconfig, boot.hdr->bootconfig_size(), BOOTCONFIG_FILE);
 
     return boot.flags[CHROMEOS_FLAG] ? 2 : 0;
 }
@@ -620,6 +666,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     hdr->ramdisk_size() = 0;
     hdr->second_size() = 0;
     hdr->dtb_size() = 0;
+    hdr->bootconfig_size() = 0;
 
     if (access(HEADER_FILE, R_OK) == 0)
         hdr->load_hdr_file();
@@ -703,7 +750,40 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         // Copy MTK headers
         xwrite(fd, boot.r_hdr, sizeof(mtk_hdr));
     }
-    if (access(RAMDISK_FILE, R_OK) == 0) {
+
+    using table_entry = vendor_ramdisk_table_entry_v4;
+    vector<table_entry> ramdisk_table;
+
+    if (boot.vendor_ramdisk_table) {
+        // Create a copy so we can modify it
+        auto entry_start = reinterpret_cast<const table_entry *>(boot.vendor_ramdisk_table);
+        ramdisk_table.insert(
+                ramdisk_table.begin(),
+                entry_start, entry_start + boot.hdr->vendor_ramdisk_table_entry_num());
+
+        owned_fd dirfd = xopen(VND_RAMDISK_DIR, O_RDONLY | O_CLOEXEC);
+        uint32_t ramdisk_offset = 0;
+        for (auto &it : ramdisk_table) {
+            char file_name[64];
+            if (it.ramdisk_name[0] == '\0') {
+                strscpy(file_name, RAMDISK_FILE, sizeof(file_name));
+            } else {
+                ssprintf(file_name, sizeof(file_name), "%s.cpio", it.ramdisk_name);
+            }
+            mmap_data m(dirfd, file_name);
+            format_t fmt = check_fmt_lg(boot.ramdisk + it.ramdisk_offset, it.ramdisk_size);
+            it.ramdisk_offset = ramdisk_offset;
+            if (!skip_comp && !COMPRESSED_ANY(check_fmt(m.buf(), m.sz())) && COMPRESSED(fmt)) {
+                it.ramdisk_size = compress(fmt, fd, m.buf(), m.sz());
+            } else {
+                it.ramdisk_size = xwrite(fd, m.buf(), m.sz());
+            }
+            ramdisk_offset += it.ramdisk_size;
+        }
+
+        hdr->ramdisk_size() = ramdisk_offset;
+        file_align();
+    } else if (access(RAMDISK_FILE, R_OK) == 0) {
         mmap_data m(RAMDISK_FILE);
         auto r_fmt = boot.r_fmt;
         if (!skip_comp && !hdr->is_vendor() && hdr->header_version() == 4 && r_fmt != LZ4_LEGACY) {
@@ -754,10 +834,22 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
         file_align();
     }
 
-    // Directly copy ignored blobs
-    if (boot.ignore.sz()) {
-        // ignore.sz() should already be aligned
-        xwrite(fd, boot.ignore.buf(), boot.ignore.sz());
+    // Copy boot signature
+    if (boot.hdr->signature_size()) {
+        xwrite(fd, boot.signature, boot.hdr->signature_size());
+        file_align();
+    }
+
+    // vendor ramdisk table
+    if (!ramdisk_table.empty()) {
+        xwrite(fd, ramdisk_table.data(), sizeof(table_entry) * ramdisk_table.size());
+        file_align();
+    }
+
+    // bootconfig
+    if (access(BOOTCONFIG_FILE, R_OK) == 0) {
+        hdr->bootconfig_size() = restore(fd, BOOTCONFIG_FILE);
+        file_align();
     }
 
     // Proprietary stuffs

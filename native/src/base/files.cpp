@@ -117,6 +117,14 @@ mmap_data::mmap_data(const char *name, bool rw) {
     }
 }
 
+mmap_data::mmap_data(int dirfd, const char *name, bool rw) {
+    auto slice = rust::map_file_at(dirfd, name, rw);
+    if (!slice.empty()) {
+        _buf = slice.data();
+        _sz = slice.size();
+    }
+}
+
 mmap_data::mmap_data(int fd, size_t sz, bool rw) {
     auto slice = rust::map_fd(fd, sz, rw);
     if (!slice.empty()) {

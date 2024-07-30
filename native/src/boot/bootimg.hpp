@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <utility>
 #include <bitset>
 #include <cxx.h>
@@ -111,15 +111,21 @@ struct AvbVBMetaImageHeader {
 #define VENDOR_RAMDISK_NAME_SIZE 32
 #define VENDOR_RAMDISK_TABLE_ENTRY_BOARD_ID_SIZE 16
 
-/* When the boot image header has a version of 0 - 2, the structure of the boot
+#define VENDOR_RAMDISK_TYPE_NONE 0
+#define VENDOR_RAMDISK_TYPE_PLATFORM 1
+#define VENDOR_RAMDISK_TYPE_RECOVERY 2
+#define VENDOR_RAMDISK_TYPE_DLKM 3
+
+/*
+ * When the boot image header has a version of 0 - 2, the structure of the boot
  * image is as follows:
  *
  * +-----------------+
  * | boot header     | 1 page
  * +-----------------+
- * | kernel          | n pages
+ * | kernel          | m pages
  * +-----------------+
- * | ramdisk         | m pages
+ * | ramdisk         | n pages
  * +-----------------+
  * | second stage    | o pages
  * +-----------------+
@@ -130,8 +136,8 @@ struct AvbVBMetaImageHeader {
  * | dtb             | q pages
  * +-----------------+
  *
- * n = (kernel_size + page_size - 1) / page_size
- * m = (ramdisk_size + page_size - 1) / page_size
+ * m = (kernel_size + page_size - 1) / page_size
+ * n = (ramdisk_size + page_size - 1) / page_size
  * o = (second_size + page_size - 1) / page_size
  * p = (recovery_dtbo_size + page_size - 1) / page_size
  * q = (dtb_size + page_size - 1) / page_size
@@ -211,7 +217,8 @@ struct boot_img_hdr_pxa : public boot_img_hdr_v0_common {
     char extra_cmdline[BOOT_EXTRA_ARGS_SIZE];
 } __attribute__((packed));
 
-/* When the boot image header has a version of 3 - 4, the structure of the boot
+/*
+ * When the boot image header has a version of 3 - 4, the structure of the boot
  * image is as follows:
  *
  * +---------------------+
@@ -329,7 +336,7 @@ struct vendor_ramdisk_table_entry_v4 {
     uint32_t ramdisk_size;   /* size in bytes for the ramdisk image */
     uint32_t ramdisk_offset; /* offset to the ramdisk image in vendor ramdisk section */
     uint32_t ramdisk_type;   /* type of the ramdisk */
-    uint8_t ramdisk_name[VENDOR_RAMDISK_NAME_SIZE]; /* asciiz ramdisk name */
+    char ramdisk_name[VENDOR_RAMDISK_NAME_SIZE]; /* asciiz ramdisk name */
 
     // Hardware identifiers describing the board, soc or platform which this
     // ramdisk is intended to be loaded on.
@@ -376,8 +383,12 @@ struct dyn_img_hdr {
 
     // v4 specific
     decl_val(signature_size, 32)
+
+    // v4 vendor specific
     decl_val(vendor_ramdisk_table_size, 32)
-    decl_val(bootconfig_size, 32)
+    decl_val(vendor_ramdisk_table_entry_num, 32)
+    decl_val(vendor_ramdisk_table_entry_size, 32)
+    decl_var(bootconfig_size, 32)
 
     virtual ~dyn_img_hdr() {
         free(raw);
@@ -554,7 +565,9 @@ struct dyn_img_vnd_v4 : public dyn_img_vnd_v3 {
     impl_cls(vnd_v4)
 
     impl_val(vendor_ramdisk_table_size)
-    impl_val(bootconfig_size)
+    impl_val(vendor_ramdisk_table_entry_num)
+    impl_val(vendor_ramdisk_table_entry_size)
+    impl_var(bootconfig_size)
 };
 
 #undef __impl_cls
@@ -591,7 +604,7 @@ struct boot_img {
     const mmap_data map;
 
     // Android image header
-    const dyn_img_hdr *hdr;
+    const dyn_img_hdr *hdr = nullptr;
 
     // Flags to indicate the state of current boot image
     std::bitset<BOOT_FLAGS_MAX> flags;
@@ -607,9 +620,9 @@ struct boot_img {
 
     // Layout of the memory mapped region
     // +---------+
-    // | head    | Vendor specific. Should be empty for standard AOSP boot images.
+    // | head    | Vendor specific. Should not exist for standard AOSP boot images.
     // +---------+
-    // | payload | The actual boot image, including the AOSP boot image header.
+    // | payload | The actual entire AOSP boot image, including the boot image header.
     // +---------+
     // | tail    | Data after payload. Usually contains signature/AVB information.
     // +---------+
@@ -618,8 +631,8 @@ struct boot_img {
     byte_view tail;
 
     // MTK headers
-    const mtk_hdr *k_hdr;
-    const mtk_hdr *r_hdr;
+    const mtk_hdr *k_hdr = nullptr;
+    const mtk_hdr *r_hdr = nullptr;
 
     // The pointers/values after parse_image
     // +---------------+
@@ -629,23 +642,26 @@ struct boot_img {
     // +---------------+
     // | z_info.tail   | z_info.tail.sz()
     // +---------------+
-    const zimage_hdr *z_hdr;
+    const zimage_hdr *z_hdr = nullptr;
     struct {
         uint32_t hdr_sz;
         byte_view tail;
     } z_info;
 
     // AVB structs
-    const AvbFooter *avb_footer;
-    const AvbVBMetaImageHeader *vbmeta;
+    const AvbFooter *avb_footer = nullptr;
+    const AvbVBMetaImageHeader *vbmeta = nullptr;
 
     // Pointers to blocks defined in header
-    const uint8_t *kernel;
-    const uint8_t *ramdisk;
-    const uint8_t *second;
-    const uint8_t *extra;
-    const uint8_t *recovery_dtbo;
-    const uint8_t *dtb;
+    const uint8_t *kernel = nullptr;
+    const uint8_t *ramdisk = nullptr;
+    const uint8_t *second = nullptr;
+    const uint8_t *extra = nullptr;
+    const uint8_t *recovery_dtbo = nullptr;
+    const uint8_t *dtb = nullptr;
+    const uint8_t *signature = nullptr;
+    const uint8_t *vendor_ramdisk_table = nullptr;
+    const uint8_t *bootconfig = nullptr;
 
     // dtb embedded in kernel
     byte_view kernel_dtb;
@@ -657,7 +673,7 @@ struct boot_img {
     ~boot_img();
 
     bool parse_image(const uint8_t *addr, format_t type);
-    const std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, format_t type);
+    std::pair<const uint8_t *, dyn_img_hdr *> create_hdr(const uint8_t *addr, format_t type);
 
     // Rust FFI
     rust::Slice<const uint8_t> get_payload() const { return payload; }
