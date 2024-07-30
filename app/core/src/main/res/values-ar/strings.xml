@@ -58,20 +58,20 @@
     <string name="su_warning">يمنح حق الوصول الكامل لجهازك.\nارفض إذا لم تكن متأكدًا!</string>
     <string name="forever">دائمًا</string>
     <string name="once">مرة واحدة</string>
-    <string name="tenmin">جار0 دقائق</string>
+    <string name="tenmin">0 دقيقة</string>
     <string name="twentymin">20 دقيقة</string>
     <string name="thirtymin">30 دقيقة</string>
     <string name="sixtymin">60 دقيقة</string>
-    <string name="su_allow_toast">%جار$s تم منحه حقوق المستخدم الخارق</string>
-    <string name="su_deny_toast">%جار$s تم رفض حقوق المستخدم الخارق</string>
-    <string name="su_snack_grant">تم منح حقوق المستخدم الخارق لـ %جار$s</string>
-    <string name="su_snack_deny">تم رفض حقوق المستخدم الخارق لـ %جار$s</string>
-    <string name="su_snack_notif_on">تم تفعيل الإشعارات لـ %جار$s</string>
-    <string name="su_snack_notif_off">تم تعطيل الإشعارات لـ %جار$s</string>
-    <string name="su_snack_log_on">تم تفعيل السجلات لـ %جار$s</string>
-    <string name="su_snack_log_off">تم تعطيل السجلات لـ %جار$s</string>
+    <string name="su_allow_toast">%1$s تم منحه حقوق المستخدم الخارق</string>
+    <string name="su_deny_toast">%1$s تم رفض حقوق المستخدم الخارق</string>
+    <string name="su_snack_grant">تم منح حقوق المستخدم الخارق لـ%1$s</string>
+    <string name="su_snack_deny">تم رفض حقوق المستخدم الخارق لـ%1$s</string>
+    <string name="su_snack_notif_on">تم تفعيل الإشعارات لـ%1$s</string>
+    <string name="su_snack_notif_off">تم تعطيل الإشعارات لـ%1$s</string>
+    <string name="su_snack_log_on">تم تفعيل السجلات لـ%1$s</string>
+    <string name="su_snack_log_off">تم تعطيل السجلات لـ%1$s</string>
     <string name="su_revoke_title">إلغاء؟</string>
-    <string name="su_revoke_msg">تأكيد لإلغاء حقوق المستخدم الخارق لـ %جار$s</string>
+    <string name="su_revoke_msg">تأكيد لإلغاء حقوق المستخدم الخارق لـ%1$s</string>
     <string name="toast">إشعار</string>
     <string name="none">لا شيء</string>
 
@@ -85,8 +85,8 @@
     <string name="menuSaveLog">حفظ السجل</string>
     <string name="menuClearLog">مسح السجل الآن</string>
     <string name="logs_cleared">تم مسح السجل بنجاح</string>
-    <string name="pid">PID: %جار$d</string>
-    <string name="target_uid">UID الهدف: %جار$d</string>
+    <string name="pid">PID: %$d</string>
+    <string name="target_uid">UID الهدف: %$d</string>
     <string name="target_pid">PID هدف النطاق المركب: %s</string>
     <string name="selinux_context">سياق SELinux: %s</string>
     <string name="supp_group">المجموعة التكميلية: %s</string>
@@ -107,16 +107,16 @@
     <string name="reboot_download">إعادة التشغيل إلى وضع التنزيل</string>
     <string name="reboot_edl">إعادة التشغيل إلى وضع EDL</string>
     <string name="reboot_safe_mode">وضع الآمن</string>
-    <string name="module_version_author">%جار$s بواسطة %2$s</string>
+    <string name="module_version_author">%$s بواسطة %2$s</string>
     <string name="module_state_remove">إزالة</string>
     <string name="module_state_restore">استعادة</string>
     <string name="module_action_install_external">التثبيت من التخزين</string>
     <string name="update_available">تحديث متاح</string>
-    <string name="suspend_text_riru">تم تعليق الإضافةة لأن %جار$s مفعّل</string>
-    <string name="suspend_text_zygisk">تم تعليق الإضافةة لأن %جار$s غير مفعّل</string>
+    <string name="suspend_text_riru">تم تعليق الإضافةة لأن %$s مفعّل</string>
+    <string name="suspend_text_zygisk">تم تعليق الإضافةة لأن %$s غير مفعّل</string>
     <string name="zygisk_module_unloaded">لم يتم تحميل إضافة Zygisk بسبب عدم التوافق</string>
     <string name="module_empty">لم يتم تثبيت أي إضافة</string>
-    <string name="confirm_install">هل تريد تثبيت الإضافة %جار$s؟</string>
+    <string name="confirm_install">هل تريد تثبيت الإضافة %$s؟</string>
     <string name="confirm_install_title">تأكيد التثبيت</string>
 
     <!--Settings-->
@@ -126,7 +126,7 @@
     <string name="settings_dark_mode_system">تابع النظام</string>
     <string name="settings_dark_mode_dark">دائمًا داكن</string>
     <string name="settings_download_path_title">مسار التنزيل</string>
-    <string name="settings_download_path_message">سيتم حفظ الملفات في %جار$s</string>
+    <string name="settings_download_path_message">سيتم حفظ الملفات في %$s</string>
     <string name="settings_hide_app_title">إخفاء تطبيق Magisk</string>
     <string name="settings_hide_app_summary">تثبيت تطبيق وكيل بمعرف حزمة عشوائي واسم تطبيق مخصص</string>
     <string name="settings_restore_app_title">استعادة تطبيق Magisk</string>
@@ -155,8 +155,8 @@
     <string name="settings_su_app">التطبيقات فقط</string>
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">معطل</string>
-    <string name="settings_su_request_جار0">جار0 ثوانٍ</string>
-    <string name="settings_su_request_جار5">جار5 ثانية</string>
+    <string name="settings_su_request_10">10 ثوانٍ</string>
+    <string name="settings_su_request_15">20 ثانية</string>
     <string name="settings_su_request_20">20 ثانية</string>
     <string name="settings_su_request_30">30 ثانية</string>
     <string name="settings_su_request_45">45 ثانية</string>
@@ -208,7 +208,7 @@
     <!--Toasts, Dialogs-->
     <string name="yes">نعم</string>
     <string name="no">لا</string>
-    <string name="repo_install_title">تثبيت %جار$s %2$s(%3$d)</string>
+    <string name="repo_install_title">تثبيت %جارٍ$s %2$s(%3$d)</string>
     <string name="download">تنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="release_notes">ملاحظات الإصدار</string>
