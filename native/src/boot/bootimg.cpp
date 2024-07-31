@@ -462,7 +462,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
-        if (vendor_ramdisk_table != nullptr) {
+        if (hdr->vendor_ramdisk_table_size()) {
             // v4 vendor boot contains multiple ramdisks
             using table_entry = const vendor_ramdisk_table_entry_v4;
             if (hdr->vendor_ramdisk_table_entry_size() != sizeof(table_entry)) {
@@ -581,7 +581,7 @@ int unpack(const char *image, bool skip_decomp, bool hdr) {
     dump(boot.kernel_dtb.buf(), boot.kernel_dtb.sz(), KER_DTB_FILE);
 
     // Dump ramdisk
-    if (boot.vendor_ramdisk_table != nullptr) {
+    if (boot.hdr->vendor_ramdisk_table_size()) {
         using table_entry = const vendor_ramdisk_table_entry_v4;
         span<table_entry> table(
                 reinterpret_cast<table_entry *>(boot.vendor_ramdisk_table),
@@ -754,7 +754,7 @@ void repack(const char *src_img, const char *out_img, bool skip_comp) {
     using table_entry = vendor_ramdisk_table_entry_v4;
     vector<table_entry> ramdisk_table;
 
-    if (boot.vendor_ramdisk_table) {
+    if (boot.hdr->vendor_ramdisk_table_size()) {
         // Create a copy so we can modify it
         auto entry_start = reinterpret_cast<const table_entry *>(boot.vendor_ramdisk_table);
         ramdisk_table.insert(
