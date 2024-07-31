@@ -7,8 +7,16 @@
 using namespace std;
 
 #ifdef USE_CRT0
-__asm__(".global vfprintf \n vfprintf = musl_vfprintf");
-__asm__(".global vsscanf \n vsscanf = tfp_vsscanf");
+__BEGIN_DECLS
+int tfp_vsscanf(const char *s, const char *fmt, va_list args);
+int vsscanf(const char *s, const char *fmt, va_list args) {
+    return tfp_vsscanf(s, fmt, args);
+}
+int musl_vfprintf(FILE *stream, const char *format, va_list arg);
+int vfprintf(FILE *stream, const char *format, va_list arg) {
+    return musl_vfprintf(stream, format, arg);
+}
+__END_DECLS
 #endif
 
 static void print_formats() {

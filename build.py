@@ -140,17 +140,13 @@ def rm_rf(path: Path):
     shutil.rmtree(path, ignore_errors=False, onerror=rm_on_error)
 
 
-def execv(cmd, env=None):
-    return subprocess.run(cmd, stdout=STDOUT, env=env)
+def execv(cmds: list, env=None):
+    return subprocess.run(cmds, stdout=STDOUT, env=env)
 
 
-def system(cmd):
-    return subprocess.run(cmd, shell=True, stdout=STDOUT)
-
-
-def cmd_out(cmd, env=None):
+def cmd_out(cmds: list, env=None):
     return (
-        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
+        subprocess.run(cmds, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
         .stdout.strip()
         .decode("utf-8")
     )
@@ -225,21 +221,22 @@ def clean_elf():
                     elf_cleaner,
                 ]
             )
-    args = [elf_cleaner, "--api-level", "23"]
-    args.extend(
-        Path("native", "out", arch, bin)
-        for arch in archs
-        for bin in ["magisk", "magiskpolicy"]
-    )
-    execv(args)
+    cmds = [elf_cleaner, "--api-level", "23"]
+    cmds.extend(glob.glob("native/out/*/magisk"))
+    cmds.extend(glob.glob("native/out/*/magiskpolicy"))
+    execv(cmds)
 
 
-def run_ndk_build(args, flags):
+def run_ndk_build(args, cmds: list):
     os.chdir("native")
-    flags = "NDK_PROJECT_PATH=. NDK_APPLICATION_MK=src/Application.mk " + flags
+    cmds.append("NDK_PROJECT_PATH=.")
+    cmds.append("NDK_APPLICATION_MK=src/Application.mk")
+    cmds.append(f"-j{cpu_count}")
     if args.verbose > 1:
-        flags = "V=1 " + flags
-    proc = system(f"{ndk_build} {flags} -j{cpu_count}")
+        cmds.append("V=1")
+    if not args.release:
+        cmds.append("MAGISK_DEBUG=1")
+    proc = execv([ndk_build, *cmds])
     if proc.returncode != 0:
         error("Build binary failed!")
     os.chdir("..")
@@ -255,37 +252,37 @@ def run_ndk_build(args, flags):
 def build_cpp_src(args, targets: set):
     dump_flag_header()
 
-    flags = ""
+    cmds = []
     clean = False
 
     if "magisk" in targets:
-        flags += " B_MAGISK=1"
+        cmds.append("B_MAGISK=1")
         clean = True
 
     if "magiskpolicy" in targets:
-        flags += " B_POLICY=1"
+        cmds.append("B_POLICY=1")
         clean = True
 
     if "magiskinit" in targets:
-        flags += " B_PRELOAD=1"
+        cmds.append("B_PRELOAD=1")
 
     if "resetprop" in targets:
-        flags += " B_PROP=1"
+        cmds.append("B_PROP=1")
 
-    if flags:
-        run_ndk_build(args, flags)
+    if cmds:
+        run_ndk_build(args, cmds)
 
-    flags = ""
+    cmds.clear()
 
     if "magiskinit" in targets:
-        flags += " B_INIT=1"
+        cmds.append("B_INIT=1")
 
     if "magiskboot" in targets:
-        flags += " B_BOOT=1"
+        cmds.append("B_BOOT=1")
 
-    if flags:
-        flags += " B_CRT0=1"
-        run_ndk_build(args, flags)
+    if cmds:
+        cmds.append("B_CRT0=1")
+        run_ndk_build(args, cmds)
 
     if clean:
         clean_elf()
@@ -295,7 +292,9 @@ def run_cargo(cmds):
     env = os.environ.copy()
     env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = str(rust_bin / f"rustc{EXE_EXT}")
-    env["RUSTFLAGS"] = f"-Clinker-plugin-lto -Zthreads={min(8, cpu_count)}"
+    env["RUSTFLAGS"] = (
+        f"-Z dwarf-version=4 -Clinker-plugin-lto -Z threads={min(8, cpu_count)}"
+    )
     return execv([cargo, *cmds], env)
 
 
@@ -503,7 +502,6 @@ def cleanup(args):
         header("* Cleaning C++")
         rm_rf(Path("native", "libs"))
         rm_rf(Path("native", "obj"))
-        rm_rf(Path("native", "out"))
 
     if "rust" in targets:
         header("* Cleaning Rust")
@@ -512,6 +510,9 @@ def cleanup(args):
         rm(Path("native", "src", "boot", "proto", "update_metadata.rs"))
         for rs_gen in glob.glob("native/**/*-rs.*pp", recursive=True):
             rm(rs_gen)
+
+    if "native" in targets:
+        rm_rf(Path("native", "out"))
 
     if "java" in targets:
         header("* Cleaning java")
