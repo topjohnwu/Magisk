@@ -462,7 +462,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
         fprintf(stderr, "%-*s [%s]\n", PADDING, "KERNEL_FMT", fmt2name[k_fmt]);
     }
     if (auto size = hdr->ramdisk_size()) {
-        if (vendor_ramdisk_table != nullptr) {
+        if (hdr->vendor_ramdisk_table_size()) {
             // v4 vendor boot contains multiple ramdisks
             using table_entry = const vendor_ramdisk_table_entry_v4;
             if (hdr->vendor_ramdisk_table_entry_size() != sizeof(table_entry)) {
