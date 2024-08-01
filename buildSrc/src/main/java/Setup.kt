@@ -121,9 +121,11 @@ const val BUSYBOX_ZIP_CHECKSUM =
 fun Project.setupCoreLib() {
     setupCommon()
 
+    val abiList = Config.abiList
+
     val syncLibs by tasks.registering(Sync::class) {
         into("src/main/jniLibs")
-        for (abi in arrayOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64")) {
+        for (abi in abiList) {
             into(abi) {
                 from(rootProject.file("native/out/$abi")) {
                     include("magiskboot", "magiskinit", "magiskpolicy", "magisk", "libinit-ld.so")
@@ -132,7 +134,7 @@ fun Project.setupCoreLib() {
             }
         }
         onlyIf {
-            if (inputs.sourceFiles.files.size != 25)
+            if (inputs.sourceFiles.files.size != abiList.size * 5)
                 throw StopExecutionException("Please build binaries first! (./build.py binary)")
             true
         }
@@ -158,6 +160,7 @@ fun Project.setupCoreLib() {
             }
         }
         from(zipTree(bb))
+        include(abiList.map { "$it/libbusybox.so" })
         into("src/main/jniLibs")
     }
 

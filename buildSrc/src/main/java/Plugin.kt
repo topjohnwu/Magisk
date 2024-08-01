@@ -8,6 +8,8 @@ import java.util.Properties
 
 private val props = Properties()
 private var commitHash = ""
+private val supportAbis = setOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64")
+private val defaultAbis = setOf("armeabi-v7a", "x86", "arm64-v8a", "x86_64")
 
 object Config {
     operator fun get(key: String): String? {
@@ -20,6 +22,10 @@ object Config {
     val version: String get() = get("version") ?: commitHash
     val versionCode: Int get() = get("magisk.versionCode")!!.toInt()
     val stubVersion: String get() = get("magisk.stubVersion")!!
+    val abiList: Set<String> get() {
+        val abiList = get("abiList") ?: return defaultAbis
+        return abiList.split(Regex("\\s*,\\s*")).toSet() intersect supportAbis
+    }
 }
 
 class MagiskPlugin : Plugin<Project> {

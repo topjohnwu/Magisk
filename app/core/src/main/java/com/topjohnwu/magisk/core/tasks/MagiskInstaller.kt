@@ -134,10 +134,12 @@ abstract class MagiskInstallImpl protected constructor(
 
                     val abi32 = Const.CPU_ABI_32
                     if (Process.is64Bit() && abi32 != null) {
-                        val magisk32 = File(installDir, "magisk32")
                         val entry = zf.getEntry("lib/$abi32/libmagisk.so")
-                        zf.getInputStream(entry).writeTo(magisk32)
-                        magisk32.setExecutable(true)
+                        if (entry != null) {
+                            val magisk32 = File(installDir, "magisk32")
+                            zf.getInputStream(entry).writeTo(magisk32)
+                            magisk32.setExecutable(true)
+                        }
                     }
                 }
             } else {

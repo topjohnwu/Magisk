@@ -5,6 +5,7 @@ import lzma
 import multiprocessing
 import os
 import platform
+import re
 import shutil
 import stat
 import subprocess
@@ -51,7 +52,7 @@ if is_windows:
         # We can't do ANSI color codes in terminal on Windows without colorama
         no_color = True
 
-# Environment checks
+# Environment checks and detection
 if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
@@ -73,18 +74,19 @@ if shutil.which("ccache") is not None:
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
 
-archs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64", "riscv64"]
-triples = [
-    "armv7a-linux-androideabi",
-    "i686-linux-android",
-    "aarch64-linux-android",
-    "x86_64-linux-android",
-    "riscv64-linux-android",
-]
+# Common constants
+support_abis = {
+    "armeabi-v7a": "thumbv7neon-linux-androideabi",
+    "x86": "i686-linux-android",
+    "arm64-v8a": "aarch64-linux-android",
+    "x86_64": "x86_64-linux-android",
+    "riscv64": "riscv64-linux-android",
+}
 default_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 support_targets = default_targets | {"resetprop"}
 rust_targets = {"magisk", "magiskinit", "magiskboot", "magiskpolicy"}
 
+# Common paths
 ndk_root = sdk_path / "ndk"
 ndk_path = ndk_root / "magisk"
 ndk_build = ndk_path / "ndk-build"
@@ -97,8 +99,8 @@ native_gen_path = Path("native", "out", "generated").resolve()
 
 # Global vars
 config = {}
-STDOUT = None
-build_tools = None
+args = {}
+build_abis = {}
 
 
 def mv(source: Path, target: Path):
@@ -137,12 +139,16 @@ def rm_on_error(func, path, _):
 
 def rm_rf(path: Path):
     vprint(f"rm -rf {path}")
-    shutil.rmtree(path, ignore_errors=False, onerror=rm_on_error)
+    if sys.version_info >= (3, 12):
+        shutil.rmtree(path, ignore_errors=False, onexc=rm_on_error)
+    else:
+        shutil.rmtree(path, ignore_errors=False, onerror=rm_on_error)
 
 
 def execv(cmds: list, env=None):
+    out = None if args.force_out or args.verbose > 0 else subprocess.DEVNULL
     # Use shell on Windows to support PATHEXT
-    return subprocess.run(cmds, stdout=STDOUT, env=env, shell=is_windows)
+    return subprocess.run(cmds, stdout=out, env=env, shell=is_windows)
 
 
 def cmd_out(cmds: list, env=None):
@@ -172,10 +178,11 @@ def parse_props(file):
             prop = line.split("=")
             if len(prop) != 2:
                 continue
+            key = prop[0].strip(" \t\r\n")
             value = prop[1].strip(" \t\r\n")
-            if len(value) == 0:
+            if not key or not value:
                 continue
-            props[prop[0].strip(" \t\r\n")] = value
+            props[key] = value
     return props
 
 
@@ -204,10 +211,18 @@ def load_config(args):
         error('Config error: "versionCode" is required to be an integer')
 
     config["outdir"] = Path(config["outdir"])
-
     config["outdir"].mkdir(mode=0o755, parents=True, exist_ok=True)
-    global STDOUT
-    STDOUT = None if args.verbose > 0 else subprocess.DEVNULL
+
+    if "abiList" in config:
+        abiList = re.split("\\s*,\\s*", config["abiList"])
+        archs = set(abiList) & support_abis.keys()
+    else:
+        archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
+
+    triples = map(support_abis.get, archs)
+
+    global build_abis
+    build_abis = dict(zip(archs, triples))
 
 
 def clean_elf():
@@ -238,6 +253,7 @@ def run_ndk_build(args, cmds: list):
     os.chdir("native")
     cmds.append("NDK_PROJECT_PATH=.")
     cmds.append("NDK_APPLICATION_MK=src/Application.mk")
+    cmds.append(f"APP_ABI={' '.join(build_abis.keys())}")
     cmds.append(f"-j{cpu_count}")
     if args.verbose > 1:
         cmds.append("V=1")
@@ -248,12 +264,13 @@ def run_ndk_build(args, cmds: list):
         error("Build binary failed!")
     os.chdir("..")
 
-    for arch in archs:
+    for arch in support_abis.keys():
         arch_dir = Path("native", "libs", arch)
-        out_dir = Path("native", "out", arch)
-        for source in arch_dir.iterdir():
-            target = out_dir / source.name
-            mv(source, target)
+        if arch_dir.exists():
+            out_dir = Path("native", "out", arch)
+            for source in arch_dir.iterdir():
+                target = out_dir / source.name
+                mv(source, target)
 
 
 def build_cpp_src(args, targets: set):
@@ -332,11 +349,8 @@ def build_rust_src(args, targets: set):
     cmds.append("--target")
     cmds.append("")
 
-    for arch, triple in zip(archs, triples):
-        rust_triple = (
-            "thumbv7neon-linux-androideabi" if triple.startswith("armv7") else triple
-        )
-        cmds[-1] = rust_triple
+    for arch, triple in build_abis.items():
+        cmds[-1] = triple
 
         for tgt in targets:
             cmds[2] = tgt
@@ -347,16 +361,15 @@ def build_rust_src(args, targets: set):
         arch_out = native_out / arch
         arch_out.mkdir(mode=0o755, exist_ok=True)
         for tgt in targets:
-            source = Path("target", rust_triple, rust_out, f"lib{tgt}.a")
+            source = Path("target", triple, rust_out, f"lib{tgt}.a")
             target = arch_out / f"lib{tgt}-rs.a"
             mv(source, target)
 
     os.chdir(Path("..", ".."))
 
 
-def run_cargo_cmd(args):
-    global STDOUT
-    STDOUT = None
+def cargo_cli(args):
+    args.force_out = True
     if len(args.commands) >= 1 and args.commands[0] == "--":
         args.commands = args.commands[1:]
     os.chdir(Path("native", "src"))
@@ -677,9 +690,11 @@ binary_parser.add_argument(
 )
 binary_parser.set_defaults(func=build_binary)
 
-cargo_parser = subparsers.add_parser("cargo", help="run cargo with proper environment")
+cargo_parser = subparsers.add_parser(
+    "cargo", help="call 'cargo' commands against the project"
+)
 cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
-cargo_parser.set_defaults(func=run_cargo_cmd)
+cargo_parser.set_defaults(func=cargo_cli)
 
 rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
 rustup_parser.add_argument("wrapper_dir", help="path to setup rustup wrapper binaries")
@@ -722,6 +737,7 @@ if len(sys.argv) == 1:
 
 args = parser.parse_args()
 load_config(args)
+vars(args)["force_out"] = False
 
 # Call corresponding functions
 args.func(args)

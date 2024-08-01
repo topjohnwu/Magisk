@@ -63,6 +63,6 @@ panic = "abort"
 
 [profile.release]
 opt-level = "z"
-lto = true
+lto = "fat"
 codegen-units = 1
 panic = "abort"

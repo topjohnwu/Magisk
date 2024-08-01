@@ -9,6 +9,10 @@ version=string
 # Output path. Default: out
 outdir=string
 
+# List of ABIs to build, separated with ','
+# Default: armeabi-v7a,x86,arm64-v8a,x86_64
+abiList=[string]
+
 #####################################################
 # Signing configs for signing zips and APKs
 # These 4 variables has to be either all set or not
