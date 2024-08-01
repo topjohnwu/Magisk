@@ -90,9 +90,9 @@ ndk_path = ndk_root / "magisk"
 ndk_build = ndk_path / "ndk-build"
 rust_bin = ndk_path / "toolchains" / "rust" / "bin"
 llvm_bin = ndk_path / "toolchains" / "llvm" / "prebuilt" / f"{os_name}-x86_64" / "bin"
-cargo = rust_bin / f"cargo{EXE_EXT}"
-gradlew = Path("gradlew" + (".bat" if is_windows else "")).resolve()
-adb_path = sdk_path / "platform-tools" / f"adb{EXE_EXT}"
+cargo = rust_bin / "cargo"
+gradlew = Path.cwd() / "gradlew"
+adb_path = sdk_path / "platform-tools" / "adb"
 native_gen_path = Path("native", "out", "generated").resolve()
 
 # Global vars
@@ -141,12 +141,19 @@ def rm_rf(path: Path):
 
 
 def execv(cmds: list, env=None):
-    return subprocess.run(cmds, stdout=STDOUT, env=env)
+    # Use shell on Windows to support PATHEXT
+    return subprocess.run(cmds, stdout=STDOUT, env=env, shell=is_windows)
 
 
 def cmd_out(cmds: list, env=None):
     return (
-        subprocess.run(cmds, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env)
+        subprocess.run(
+            cmds,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            env=env,
+            shell=is_windows,
+        )
         .stdout.strip()
         .decode("utf-8")
     )
