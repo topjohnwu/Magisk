@@ -29,6 +29,8 @@ enable_version_config() {
   if ! grep -qE '^version=' $CONFIG; then
     echo 'version=' >> $CONFIG
   fi
+  # Make sure abiList is not set when building for release
+  sed -i "s:^abiList=:# abiList=:g" $CONFIG
 }
 
 disable_version_config() {
