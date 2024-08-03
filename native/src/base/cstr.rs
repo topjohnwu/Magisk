@@ -108,7 +108,7 @@ impl StringExt for String {
     fn nul_terminate(&mut self) -> &mut [u8] {
         self.reserve(1);
         // SAFETY: the string is reserved to have enough capacity to fit in the null byte
-        // SAFETY: the null byte is explicitly added outside of the string's length
+        // SAFETY: the null byte is explicitly added outside the string's length
         unsafe {
             let buf = slice::from_raw_parts_mut(self.as_mut_ptr(), self.len() + 1);
             *buf.get_unchecked_mut(self.len()) = b'\0';
@@ -122,7 +122,7 @@ impl StringExt for PathBuf {
     fn nul_terminate(&mut self) -> &mut [u8] {
         self.reserve(1);
         // SAFETY: the PathBuf is reserved to have enough capacity to fit in the null byte
-        // SAFETY: the null byte is explicitly added outside of the PathBuf's length
+        // SAFETY: the null byte is explicitly added outside the PathBuf's length
         unsafe {
             let bytes: &mut [u8] = mem::transmute(self.as_mut_os_str().as_bytes());
             let buf = slice::from_raw_parts_mut(bytes.as_mut_ptr(), bytes.len() + 1);
@@ -314,7 +314,7 @@ impl Utf8CStr {
         CStr::from_bytes_with_nul(buf)?;
         str::from_utf8(buf)?;
         // Both condition checked
-        unsafe { Ok(mem::transmute(buf)) }
+        unsafe { Ok(mem::transmute::<&mut [u8], &mut Utf8CStr>(buf)) }
     }
 
     pub fn from_string(s: &mut String) -> &mut Utf8CStr {
