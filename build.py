@@ -39,6 +39,7 @@ def vprint(str):
         print(str)
 
 
+# Environment checks and detection
 is_windows = os.name == "nt"
 EXE_EXT = ".exe" if is_windows else ""
 
@@ -52,7 +53,6 @@ if is_windows:
         # We can't do ANSI color codes in terminal on Windows without colorama
         no_color = True
 
-# Environment checks and detection
 if not sys.version_info >= (3, 8):
     error("Requires Python 3.8+")
 
@@ -63,13 +63,6 @@ except KeyError:
         sdk_path = Path(os.environ["ANDROID_SDK_ROOT"])
     except KeyError:
         error("Please set Android SDK path to environment variable ANDROID_HOME")
-
-if shutil.which("sccache") is not None:
-    os.environ["RUSTC_WRAPPER"] = "sccache"
-    os.environ["NDK_CCACHE"] = "sccache"
-    os.environ["CARGO_INCREMENTAL"] = "0"
-if shutil.which("ccache") is not None:
-    os.environ["NDK_CCACHE"] = "ccache"
 
 cpu_count = multiprocessing.cpu_count()
 os_name = platform.system().lower()
@@ -101,6 +94,10 @@ native_gen_path = Path("native", "out", "generated").resolve()
 config = {}
 args = {}
 build_abis = {}
+
+###################
+# Helper functions
+###################
 
 
 def mv(source: Path, target: Path):
@@ -169,60 +166,9 @@ def xz(data):
     return lzma.compress(data, preset=9, check=lzma.CHECK_NONE)
 
 
-def parse_props(file):
-    props = {}
-    with open(file, "r") as f:
-        for line in [l.strip(" \t\r\n") for l in f]:
-            if line.startswith("#") or len(line) == 0:
-                continue
-            prop = line.split("=")
-            if len(prop) != 2:
-                continue
-            key = prop[0].strip(" \t\r\n")
-            value = prop[1].strip(" \t\r\n")
-            if not key or not value:
-                continue
-            props[key] = value
-    return props
-
-
-def load_config(args):
-    commit_hash = cmd_out(["git", "rev-parse", "--short=8", "HEAD"])
-
-    # Default values
-    config["version"] = commit_hash
-    config["versionCode"] = 1000000
-    config["outdir"] = "out"
-
-    args.config = Path(args.config)
-
-    # Load prop files
-    if args.config.exists():
-        config.update(parse_props(args.config))
-
-    if Path("gradle.properties").exists():
-        for key, value in parse_props("gradle.properties").items():
-            if key.startswith("magisk."):
-                config[key[7:]] = value
-
-    try:
-        config["versionCode"] = int(config["versionCode"])
-    except ValueError:
-        error('Config error: "versionCode" is required to be an integer')
-
-    config["outdir"] = Path(config["outdir"])
-    config["outdir"].mkdir(mode=0o755, parents=True, exist_ok=True)
-
-    if "abiList" in config:
-        abiList = re.split("\\s*,\\s*", config["abiList"])
-        archs = set(abiList) & support_abis.keys()
-    else:
-        archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
-
-    triples = map(support_abis.get, archs)
-
-    global build_abis
-    build_abis = dict(zip(archs, triples))
+###############
+# Build Native
+###############
 
 
 def clean_elf():
@@ -249,7 +195,7 @@ def clean_elf():
     execv(cmds)
 
 
-def run_ndk_build(args, cmds: list):
+def run_ndk_build(cmds: list):
     os.chdir("native")
     cmds.append("NDK_PROJECT_PATH=.")
     cmds.append("NDK_APPLICATION_MK=src/Application.mk")
@@ -273,7 +219,7 @@ def run_ndk_build(args, cmds: list):
                 mv(source, target)
 
 
-def build_cpp_src(args, targets: set):
+def build_cpp_src(targets: set):
     dump_flag_header()
 
     cmds = []
@@ -294,7 +240,7 @@ def build_cpp_src(args, targets: set):
         cmds.append("B_PROP=1")
 
     if cmds:
-        run_ndk_build(args, cmds)
+        run_ndk_build(cmds)
 
     cmds.clear()
 
@@ -306,7 +252,7 @@ def build_cpp_src(args, targets: set):
 
     if cmds:
         cmds.append("B_CRT0=1")
-        run_ndk_build(args, cmds)
+        run_ndk_build(cmds)
 
     if clean:
         clean_elf()
@@ -322,7 +268,7 @@ def run_cargo(cmds):
     return execv([cargo, *cmds], env)
 
 
-def build_rust_src(args, targets: set):
+def build_rust_src(targets: set):
     targets = targets.copy()
     if "resetprop" in targets:
         targets.add("magisk")
@@ -368,15 +314,6 @@ def build_rust_src(args, targets: set):
     os.chdir(Path("..", ".."))
 
 
-def cargo_cli(args):
-    args.force_out = True
-    if len(args.commands) >= 1 and args.commands[0] == "--":
-        args.commands = args.commands[1:]
-    os.chdir(Path("native", "src"))
-    run_cargo(args.commands)
-    os.chdir(Path("..", ".."))
-
-
 def write_if_diff(file_name: Path, text: str):
     do_write = True
     if file_name.exists():
@@ -406,7 +343,7 @@ def dump_flag_header():
     write_if_diff(Path(native_gen_path, "flags.h"), flag_txt)
 
 
-def build_binary(args):
+def build_native():
     # Verify NDK install
     try:
         with open(Path(ndk_path, "ONDK_VERSION"), "r") as ondk_ver:
@@ -421,10 +358,22 @@ def build_binary(args):
         if not targets:
             return
 
-    header("* Building binaries: " + " ".join(targets))
+    header("* Building: " + " ".join(targets))
 
-    build_rust_src(args, targets)
-    build_cpp_src(args, targets)
+    if sccache := shutil.which("sccache"):
+        os.environ["RUSTC_WRAPPER"] = sccache
+        os.environ["NDK_CCACHE"] = sccache
+        os.environ["CARGO_INCREMENTAL"] = "0"
+    if ccache := shutil.which("ccache"):
+        os.environ["NDK_CCACHE"] = ccache
+
+    build_rust_src(targets)
+    build_cpp_src(targets)
+
+
+############
+# Build App
+############
 
 
 def find_jdk():
@@ -459,7 +408,7 @@ def find_jdk():
     return env
 
 
-def build_apk(args, module):
+def build_apk(module: str):
     env = find_jdk()
 
     build_type = "Release" if args.release else "Debug"
@@ -485,9 +434,9 @@ def build_apk(args, module):
     header(f"Output: {target}")
 
 
-def build_app(args):
+def build_app():
     header("* Building the Magisk app")
-    build_apk(args, ":app:apk")
+    build_apk(":app:apk")
 
     build_type = "release" if args.release else "debug"
 
@@ -503,13 +452,18 @@ def build_app(args):
     cp(source, target)
 
 
-def build_stub(args):
+def build_stub():
     header("* Building the stub app")
-    build_apk(args, ":app:stub")
+    build_apk(":app:stub")
 
 
-def cleanup(args):
-    support_targets = {"native", "cpp", "rust", "java"}
+################
+# Build General
+################
+
+
+def cleanup():
+    support_targets = {"native", "cpp", "rust", "app"}
     if args.targets:
         targets = set(args.targets) & support_targets
         if "native" in targets:
@@ -534,12 +488,31 @@ def cleanup(args):
     if "native" in targets:
         rm_rf(Path("native", "out"))
 
-    if "java" in targets:
-        header("* Cleaning java")
+    if "app" in targets:
+        header("* Cleaning app")
         execv([gradlew, ":app:clean"], env=find_jdk())
 
 
-def setup_ndk(args):
+def build_all():
+    build_native()
+    build_app()
+
+
+############
+# Utilities
+############
+
+
+def cargo_cli():
+    args.force_out = True
+    if len(args.commands) >= 1 and args.commands[0] == "--":
+        args.commands = args.commands[1:]
+    os.chdir(Path("native", "src"))
+    run_cargo(args.commands)
+    os.chdir(Path("..", ".."))
+
+
+def setup_ndk():
     ndk_ver = config["ondkVersion"]
     url = f"https://github.com/topjohnwu/ondk/releases/download/{ndk_ver}/ondk-{ndk_ver}-{os_name}.tar.xz"
     ndk_archive = url.split("/")[-1]
@@ -558,7 +531,7 @@ def setup_ndk(args):
     mv(ondk_path, ndk_path)
 
 
-def push_files(args, script):
+def push_files(script):
     abi = cmd_out([adb_path, "shell", "getprop", "ro.product.cpu.abi"])
     if not abi:
         error("Cannot detect emulator ABI")
@@ -586,22 +559,22 @@ def push_files(args, script):
         error("adb push failed!")
 
 
-def setup_avd(args):
+def setup_avd():
     if not args.skip:
-        build_all(args)
+        build_all()
 
     header("* Setting up emulator")
 
-    push_files(args, Path("scripts", "avd_magisk.sh"))
+    push_files(Path("scripts", "avd_magisk.sh"))
 
     proc = execv([adb_path, "shell", "sh", "/data/local/tmp/avd_magisk.sh"])
     if proc.returncode != 0:
         error("avd_magisk.sh failed!")
 
 
-def patch_avd_file(args):
+def patch_avd_file():
     if not args.skip:
-        build_all(args)
+        build_all()
 
     input = Path(args.image)
     if args.output:
@@ -614,7 +587,7 @@ def patch_avd_file(args):
 
     header(f"* Patching {input.name}")
 
-    push_files(args, Path("scripts", "avd_patch.sh"))
+    push_files(Path("scripts", "avd_patch.sh"))
 
     proc = execv([adb_path, "push", input, "/data/local/tmp"])
     if proc.returncode != 0:
@@ -631,12 +604,7 @@ def patch_avd_file(args):
     header(f"Output: {output}")
 
 
-def build_all(args):
-    build_binary(args)
-    build_app(args)
-
-
-def setup_rustup(args):
+def setup_rustup():
     wrapper_dir = Path(args.wrapper_dir)
     rm_rf(wrapper_dir)
     wrapper_dir.mkdir(mode=0o755, parents=True, exist_ok=True)
@@ -664,80 +632,149 @@ def setup_rustup(args):
     wrapper.chmod(0o755)
 
 
-parser = argparse.ArgumentParser(description="Magisk build script")
-parser.set_defaults(func=lambda x: None)
-parser.add_argument(
-    "-r", "--release", action="store_true", help="compile in release mode"
-)
-parser.add_argument("-v", "--verbose", action="count", default=0, help="verbose output")
-parser.add_argument(
-    "-c",
-    "--config",
-    default="config.prop",
-    help="custom config file (default: config.prop)",
-)
-subparsers = parser.add_subparsers(title="actions")
+##################
+# Config and args
+##################
 
-all_parser = subparsers.add_parser("all", help="build everything")
-all_parser.set_defaults(func=build_all)
 
-binary_parser = subparsers.add_parser("binary", help="build binaries")
-binary_parser.add_argument(
-    "targets",
-    nargs="*",
-    help=f"{', '.join(support_targets)}, \
-    or empty for defaults ({', '.join(default_targets)})",
-)
-binary_parser.set_defaults(func=build_binary)
+def parse_props(file):
+    props = {}
+    with open(file, "r") as f:
+        for line in [l.strip(" \t\r\n") for l in f]:
+            if line.startswith("#") or len(line) == 0:
+                continue
+            prop = line.split("=")
+            if len(prop) != 2:
+                continue
+            key = prop[0].strip(" \t\r\n")
+            value = prop[1].strip(" \t\r\n")
+            if not key or not value:
+                continue
+            props[key] = value
+    return props
 
-cargo_parser = subparsers.add_parser(
-    "cargo", help="call 'cargo' commands against the project"
-)
-cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
-cargo_parser.set_defaults(func=cargo_cli)
 
-rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
-rustup_parser.add_argument("wrapper_dir", help="path to setup rustup wrapper binaries")
-rustup_parser.set_defaults(func=setup_rustup)
+def load_config():
+    commit_hash = cmd_out(["git", "rev-parse", "--short=8", "HEAD"])
 
-app_parser = subparsers.add_parser("app", help="build the Magisk app")
-app_parser.set_defaults(func=build_app)
+    # Default values
+    config["version"] = commit_hash
+    config["versionCode"] = 1000000
+    config["outdir"] = "out"
 
-stub_parser = subparsers.add_parser("stub", help="build the stub app")
-stub_parser.set_defaults(func=build_stub)
+    args.config = Path(args.config)
 
-avd_parser = subparsers.add_parser("emulator", help="setup AVD for development")
-avd_parser.add_argument(
-    "-s", "--skip", action="store_true", help="skip building binaries and the app"
-)
-avd_parser.set_defaults(func=setup_avd)
+    # Load prop files
+    if args.config.exists():
+        config.update(parse_props(args.config))
 
-avd_patch_parser = subparsers.add_parser(
-    "avd_patch", help="patch AVD ramdisk.img or init_boot.img"
-)
-avd_patch_parser.add_argument("image", help="path to ramdisk.img or init_boot.img")
-avd_patch_parser.add_argument("output", help="optional output file name", nargs="?")
-avd_patch_parser.add_argument(
-    "-s", "--skip", action="store_true", help="skip building binaries and the app"
-)
-avd_patch_parser.set_defaults(func=patch_avd_file)
+    if Path("gradle.properties").exists():
+        for key, value in parse_props("gradle.properties").items():
+            if key.startswith("magisk."):
+                config[key[7:]] = value
 
-clean_parser = subparsers.add_parser("clean", help="cleanup")
-clean_parser.add_argument(
-    "targets", nargs="*", help="native, cpp, rust, java, or empty to clean all"
-)
-clean_parser.set_defaults(func=cleanup)
+    try:
+        config["versionCode"] = int(config["versionCode"])
+    except ValueError:
+        error('Config error: "versionCode" is required to be an integer')
 
-ndk_parser = subparsers.add_parser("ndk", help="setup Magisk NDK")
-ndk_parser.set_defaults(func=setup_ndk)
+    config["outdir"] = Path(config["outdir"])
+    config["outdir"].mkdir(mode=0o755, parents=True, exist_ok=True)
 
-if len(sys.argv) == 1:
-    parser.print_help()
-    sys.exit(1)
+    if "abiList" in config:
+        abiList = re.split("\\s*,\\s*", config["abiList"])
+        archs = set(abiList) & support_abis.keys()
+    else:
+        archs = {"armeabi-v7a", "x86", "arm64-v8a", "x86_64"}
 
-args = parser.parse_args()
-load_config(args)
+    triples = map(support_abis.get, archs)
+
+    global build_abis
+    build_abis = dict(zip(archs, triples))
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Magisk build script")
+    parser.set_defaults(func=lambda x: None)
+    parser.add_argument(
+        "-r", "--release", action="store_true", help="compile in release mode"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="count", default=0, help="verbose output"
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        default="config.prop",
+        help="custom config file (default: config.prop)",
+    )
+    subparsers = parser.add_subparsers(title="actions")
+
+    all_parser = subparsers.add_parser("all", help="build everything")
+
+    native_parser = subparsers.add_parser("native", help="build native binaries")
+    native_parser.add_argument(
+        "targets",
+        nargs="*",
+        help=f"{', '.join(support_targets)}, \
+        or empty for defaults ({', '.join(default_targets)})",
+    )
+
+    app_parser = subparsers.add_parser("app", help="build the Magisk app")
+
+    stub_parser = subparsers.add_parser("stub", help="build the stub app")
+
+    clean_parser = subparsers.add_parser("clean", help="cleanup")
+    clean_parser.add_argument(
+        "targets", nargs="*", help="native, cpp, rust, java, or empty to clean all"
+    )
+
+    ndk_parser = subparsers.add_parser("ndk", help="setup Magisk NDK")
+
+    emu_parser = subparsers.add_parser("emulator", help="setup AVD for development")
+    emu_parser.add_argument(
+        "-s", "--skip", action="store_true", help="skip building binaries and the app"
+    )
+
+    avd_patch_parser = subparsers.add_parser(
+        "avd_patch", help="patch AVD ramdisk.img or init_boot.img"
+    )
+    avd_patch_parser.add_argument("image", help="path to ramdisk.img or init_boot.img")
+    avd_patch_parser.add_argument("output", help="optional output file name", nargs="?")
+    avd_patch_parser.add_argument(
+        "-s", "--skip", action="store_true", help="skip building binaries and the app"
+    )
+
+    cargo_parser = subparsers.add_parser(
+        "cargo", help="call 'cargo' commands against the project"
+    )
+    cargo_parser.add_argument("commands", nargs=argparse.REMAINDER)
+
+    rustup_parser = subparsers.add_parser("rustup", help="setup rustup wrapper")
+    rustup_parser.add_argument(
+        "wrapper_dir", help="path to setup rustup wrapper binaries"
+    )
+
+    # Set callbacks
+    all_parser.set_defaults(func=build_all)
+    native_parser.set_defaults(func=build_native)
+    cargo_parser.set_defaults(func=cargo_cli)
+    rustup_parser.set_defaults(func=setup_rustup)
+    app_parser.set_defaults(func=build_app)
+    stub_parser.set_defaults(func=build_stub)
+    emu_parser.set_defaults(func=setup_avd)
+    avd_patch_parser.set_defaults(func=patch_avd_file)
+    clean_parser.set_defaults(func=cleanup)
+    ndk_parser.set_defaults(func=setup_ndk)
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    return parser.parse_args()
+
+
+args = parse_args()
+load_config()
 vars(args)["force_out"] = False
-
-# Call corresponding functions
-args.func(args)
+args.func()
