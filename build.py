@@ -148,13 +148,12 @@ def execv(cmds: list, env=None):
     return subprocess.run(cmds, stdout=out, env=env, shell=is_windows)
 
 
-def cmd_out(cmds: list, env=None):
+def cmd_out(cmds: list):
     return (
         subprocess.run(
             cmds,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            env=env,
             shell=is_windows,
         )
         .stdout.strip()
@@ -210,13 +209,12 @@ def run_ndk_build(cmds: list):
         error("Build binary failed!")
     os.chdir("..")
 
-    for arch in support_abis.keys():
+    for arch in build_abis.keys():
         arch_dir = Path("native", "libs", arch)
-        if arch_dir.exists():
-            out_dir = Path("native", "out", arch)
-            for source in arch_dir.iterdir():
-                target = out_dir / source.name
-                mv(source, target)
+        out_dir = Path("native", "out", arch)
+        for source in arch_dir.iterdir():
+            target = out_dir / source.name
+            mv(source, target)
 
 
 def build_cpp_src(targets: set):
@@ -262,9 +260,7 @@ def run_cargo(cmds):
     env = os.environ.copy()
     env["PATH"] = f'{rust_bin}{os.pathsep}{env["PATH"]}'
     env["CARGO_BUILD_RUSTC"] = str(rust_bin / f"rustc{EXE_EXT}")
-    env["RUSTFLAGS"] = (
-        f"-Z dwarf-version=4 -Clinker-plugin-lto -Z threads={min(8, cpu_count)}"
-    )
+    env["CARGO_BUILD_RUSTFLAGS"] = f"-Z threads={min(8, cpu_count)}"
     return execv([cargo, *cmds], env)
 
 
@@ -278,40 +274,39 @@ def build_rust_src(targets: set):
 
     os.chdir(Path("native", "src"))
 
-    native_out = Path("..", "out")
-    native_out.mkdir(mode=0o755, exist_ok=True)
-
-    # Start building the actual build commands
+    # Start building the build commands
     cmds = ["build", "-p", ""]
-    rust_out = "debug"
     if args.release:
         cmds.append("-r")
-        rust_out = "release"
+        profile = "release"
+    else:
+        profile = "debug"
     if args.verbose == 0:
         cmds.append("-q")
     elif args.verbose > 1:
         cmds.append("--verbose")
 
-    cmds.append("--target")
-    cmds.append("")
+    for triple in build_abis.values():
+        cmds.append("--target")
+        cmds.append(triple)
 
+    for tgt in targets:
+        cmds[2] = tgt
+        proc = run_cargo(cmds)
+        if proc.returncode != 0:
+            error("Build binary failed!")
+
+    os.chdir(Path("..", ".."))
+
+    native_out = Path("native", "out")
+    rust_out = native_out / "rust"
     for arch, triple in build_abis.items():
-        cmds[-1] = triple
-
-        for tgt in targets:
-            cmds[2] = tgt
-            proc = run_cargo(cmds)
-            if proc.returncode != 0:
-                error("Build binary failed!")
-
         arch_out = native_out / arch
         arch_out.mkdir(mode=0o755, exist_ok=True)
         for tgt in targets:
-            source = Path("target", triple, rust_out, f"lib{tgt}.a")
+            source = rust_out / triple / profile / f"lib{tgt}.a"
             target = arch_out / f"lib{tgt}-rs.a"
             mv(source, target)
-
-    os.chdir(Path("..", ".."))
 
 
 def write_if_diff(file_name: Path, text: str):
@@ -620,10 +615,10 @@ def setup_rustup():
     # Build rustup_wrapper
     wrapper_src = Path("tools", "rustup_wrapper")
     cargo_toml = wrapper_src / "Cargo.toml"
-    execv(
-        [cargo, "build", "--release", f"--manifest-path={cargo_toml}"]
-        + (["--verbose"] if args.verbose > 1 else [])
-    )
+    cmds = ["build", "--release", f"--manifest-path={cargo_toml}"]
+    if args.verbose > 1:
+        cmds.append("--verbose")
+    run_cargo(cmds)
 
     # Replace rustup with wrapper
     wrapper = wrapper_dir / (f"rustup{EXE_EXT}")

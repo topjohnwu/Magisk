@@ -1,7 +1,10 @@
 [build]
-# Choose arm64 as the default target to make the IDE happy.
+# Set arm64 as the default target
 # The actual compilation will have the target overriden by command-line.
 target = "aarch64-linux-android"
+# Enable cross language LTO, and explicitly set dwarf-version for ThinLTO
+rustflags = ["-Z", "dwarf-version=4", "-C", "linker-plugin-lto"]
+target-dir = "../out/rust"
 
 [unstable]
 build-std = ["std", "panic_abort"]
