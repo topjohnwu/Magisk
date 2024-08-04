@@ -107,7 +107,6 @@
     <string name="reboot_download">إعادة التشغيل إلى وضع التنزيل</string>
     <string name="reboot_edl">إعادة التشغيل إلى وضع EDL</string>
     <string name="reboot_safe_mode">وضع الآمن</string>
-    <string name="module_version_author">%جار$s بواسطة %2$s</string>
     <string name="module_state_remove">إزالة</string>
     <string name="module_state_restore">استعادة</string>
     <string name="module_action_install_external">التثبيت من التخزين</string>
@@ -155,8 +154,8 @@
     <string name="settings_su_app">التطبيقات فقط</string>
     <string name="settings_su_adb">ADB فقط</string>
     <string name="settings_su_disable">معطل</string>
-    <string name="settings_su_request_جار0">جار0 ثوانٍ</string>
-    <string name="settings_su_request_جار5">جار5 ثانية</string>
+    <string name="settings_su_request_10">10 ثواني</string>
+    <string name="settings_su_request_15">15 ثانية</string>
     <string name="settings_su_request_20">20 ثانية</string>
     <string name="settings_su_request_30">30 ثانية</string>
     <string name="settings_su_request_45">45 ثانية</string>
@@ -208,7 +207,6 @@
     <!--Toasts, Dialogs-->
     <string name="yes">نعم</string>
     <string name="no">لا</string>
-    <string name="repo_install_title">تثبيت %جار$s %2$s(%3$d)</string>
     <string name="download">تنزيل</string>
     <string name="reboot">إعادة التشغيل</string>
     <string name="release_notes">ملاحظات الإصدار</string>
