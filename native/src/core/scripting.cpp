@@ -222,6 +222,7 @@ void install_module(const char *file) {
     setenv("OUTFD", "1", 1);
     setenv("ZIPFILE", zip, 1);
     setenv("ASH_STANDALONE", "1", 1);
+    setenv("MAGISKTMP", get_magisk_tmp(), 0);
     free(zip);
 
     int fd = xopen("/dev/null", O_RDONLY);
