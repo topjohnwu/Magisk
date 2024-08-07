@@ -37,11 +37,11 @@ int mkdirs(const char *path, mode_t mode);
 ssize_t canonical_path(const char * __restrict__ path, char * __restrict__ buf, size_t bufsiz);
 bool rm_rf(const char *path);
 bool frm_rf(int dirfd);
-void cp_afc(const char *src, const char *dest);
-void mv_path(const char *src, const char *dest);
-void link_path(const char *src, const char *dest);
-void clone_attr(const char *src, const char *dest);
-void fclone_attr(int src, int dest);
+bool cp_afc(const char *src, const char *dest);
+bool mv_path(const char *src, const char *dest);
+bool link_path(const char *src, const char *dest);
+bool clone_attr(const char *src, const char *dest);
+bool fclone_attr(int src, int dest);
 
 } // extern "C"
 
