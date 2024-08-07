@@ -207,6 +207,42 @@ void load_kernel_info(BootConfig *config) {
     config->print();
 }
 
+// `androidboot.partition_map` allows associating a partition name for a raw block device
+// through a comma separated and semicolon deliminated list. For example,
+// `androidboot.partition_map=vdb,metadata;vdc,userdata` maps `vdb` to `metadata` and `vdc` to
+// `userdata`.
+// https://android.googlesource.com/platform/system/core/+/refs/heads/android13-release/init/devices.cpp#191
+
+kv_pairs load_partition_map() {
+    kv_pairs partition_map;
+    auto fn = [&partition_map](const kv_pairs &kv) {
+        for (const auto &[key, value] : kv) {
+            if (key != "androidboot.partition_map")
+                continue; 
+            for (const auto &map : split(value, ";")) {
+                auto map_pieces = split(map, ",");
+                if (map_pieces.size() != 2) {
+                    LOGE("Expected a comma separated device,partition mapping, but found '%s'", map.c_str());
+                    continue;
+                }
+                partition_map.emplace_back(map_pieces[0], map_pieces[1]);
+            }
+        }
+    };
+
+    fn(parse_cmdline(full_read("/proc/cmdline")));
+    fn(parse_bootconfig(full_read("/proc/bootconfig")));
+    return partition_map;
+}
+
+std::string get_partition_name_for_device(const kv_pairs &partition_map, const std::string &query_device){
+    for (const auto &[device, partition] : partition_map) {
+        if (query_device == device)
+            return partition;
+    }
+    return {};
+}
+
 bool check_two_stage() {
     if (access("/apex", F_OK) == 0)
         return true;
