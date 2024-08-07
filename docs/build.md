@@ -25,6 +25,22 @@
 - Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
 - Run `./build.py ndk` to let the script download and install NDK for you
 
+## Building in docker
+
+- Clone sources: `git clone --recurse-submodules https://github.com/topjohnwu/Magisk.git`
+- Change directory to cloned repository `Magisk`
+- Run `docker build -t magisk:latest .`
+- Run build coomand
+
+```bash
+docker run \
+    --rm \
+    -v "$PWD":/home/gradle/Magisk \
+    -w /home/gradle/Magisk \
+    magisk:latest \
+   bash -c './build.py -v ndk && ./build.py -v all'
+```
+
 ## Building
 
 - To build everything and create the final Magisk APK, run `./build.py all`.
