@@ -24,7 +24,7 @@ endif
 ifdef B_CRT0
 
 # Disable all security and debugging features
-APP_CFLAGS       +=	-fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-protector -U_FORTIFY_SOURCE
+APP_CFLAGS       += -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-stack-protector -fno-threadsafe-statics -U_FORTIFY_SOURCE
 # Override output folder to make sure all dependencies are rebuilt with new CFLAGS
 NDK_APP_OUT      := $(NDK_APP_OUT)-nolibc
 
