@@ -29,21 +29,23 @@ bool avd_hack = false;
 static void parse_device(devinfo *dev, const char *uevent) {
     dev->partname[0] = '\0';
     dev->devpath[0] = '\0';
+    dev->dmname[0] = '\0';
+    dev->devname[0] = '\0';
     parse_prop_file(uevent, [=](string_view key, string_view value) -> bool {
         if (key == "MAJOR")
             dev->major = parse_int(value.data());
         else if (key == "MINOR")
             dev->minor = parse_int(value.data());
         else if (key == "DEVNAME")
-            strcpy(dev->devname, value.data());
+            strscpy(dev->devname, value.data(), sizeof(dev->devname));
         else if (key == "PARTNAME")
-            strcpy(dev->partname, value.data());
+            strscpy(dev->partname, value.data(), sizeof(dev->devname));
 
         return true;
     });
 }
 
-static void collect_devices() {
+static void collect_devices(const auto &partition_map) {
     char path[PATH_MAX];
     devinfo dev{};
     if (auto dir = xopen_dir("/sys/dev/block"); dir) {
@@ -55,9 +57,13 @@ static void collect_devices() {
             sprintf(path, "/sys/dev/block/%s/dm/name", entry->d_name);
             if (access(path, F_OK) == 0) {
                 auto name = rtrim(full_read(path));
-                strcpy(dev.dmname, name.data());
-            } else {
-                dev.dmname[0] = '\0';
+                strscpy(dev.dmname, name.data(), sizeof(dev.dmname));
+            }
+            if (auto it = std::ranges::find_if(partition_map, [&](const auto &i) {
+                return i.first == dev.devname;
+            }); dev.partname[0] == '\0' && it != partition_map.end()) {
+                // use androidboot.partition_map as partname fallback.
+                strscpy(dev.partname, it->second.data(), sizeof(dev.partname));
             }
             sprintf(path, "/sys/dev/block/%s", entry->d_name);
             xrealpath(path, dev.devpath, sizeof(dev.devpath));
@@ -74,15 +80,10 @@ static struct {
 static dev_t setup_block() {
     const auto partition_map = load_partition_map();
     if (dev_list.empty())
-        collect_devices();
+        collect_devices(partition_map);
 
     for (int tries = 0; tries < 3; ++tries) {
         for (auto &dev : dev_list) {
-            // use androidboot.partition_map as partname fallback.
-            if (dev.partname[0] == '\0') {
-                auto partname = get_partition_name_for_device(partition_map, dev.devname);
-                strcpy(dev.partname, partname.c_str());
-            }
             if (strcasecmp(dev.partname, blk_info.partname) == 0)
                 LOGD("Setup %s: [%s] (%d, %d)\n", dev.partname, dev.devname, dev.major, dev.minor);
             else if (strcasecmp(dev.dmname, blk_info.partname) == 0)
@@ -101,7 +102,7 @@ static dev_t setup_block() {
         // Wait 10ms and try again
         usleep(10000);
         dev_list.clear();
-        collect_devices();
+        collect_devices(partition_map);
     }
 
     // The requested partname does not exist
