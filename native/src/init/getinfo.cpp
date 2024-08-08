@@ -229,14 +229,6 @@ kv_pairs load_partition_map() {
     return {};
 }
 
-std::string get_partition_name_for_device(const kv_pairs &partition_map, const std::string &query_device){
-    for (const auto &[device, partition] : partition_map) {
-        if (query_device == device)
-            return partition;
-    }
-    return {};
-}
-
 bool check_two_stage() {
     if (access("/apex", F_OK) == 0)
         return true;
