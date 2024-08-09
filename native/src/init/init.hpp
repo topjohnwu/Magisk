@@ -29,6 +29,7 @@ extern std::vector<std::string> mount_list;
 int magisk_proxy_main(int argc, char *argv[]);
 bool unxz(out_stream &strm, rust::Slice<const uint8_t> bytes);
 void load_kernel_info(BootConfig *config);
+kv_pairs load_partition_map();
 bool check_two_stage();
 const char *backup_init();
 void restore_ramdisk_init();

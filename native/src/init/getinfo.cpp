@@ -41,16 +41,16 @@ static string extract_quoted_str_until(chars<escapes...>, chars<breaks...>,
 }
 
 // Parse string into key value pairs.
-// The string format: [delim][key][padding]=[padding][value][delim]
-template<char delim, char... padding>
+// The string format: [delim][key][padding][eq][padding][value][delim]
+template<char delim, char eq, char... padding>
 static kv_pairs parse_impl(chars<padding...>, string_view str) {
     kv_pairs kv;
-    char skip_array[] = {'=', padding...};
+    char skip_array[] = {eq, padding...};
     string_view skip(skip_array, std::size(skip_array));
     bool quoted = false;
     for (size_t pos = 0u; pos < str.size(); pos = str.find_first_not_of(delim, pos)) {
         auto key = extract_quoted_str_until(
-                chars<padding..., delim>{}, chars<'='>{}, str, pos, quoted);
+                chars<padding..., delim>{}, chars<eq>{}, str, pos, quoted);
         pos = str.find_first_not_of(skip, pos);
         if (pos == string_view::npos || str[pos] == delim) {
             kv.emplace_back(key, "");
@@ -63,10 +63,13 @@ static kv_pairs parse_impl(chars<padding...>, string_view str) {
 }
 
 static kv_pairs parse_cmdline(string_view str) {
-    return parse_impl<' '>(chars<>{}, str);
+    return parse_impl<' ', '='>(chars<>{}, str);
 }
 static kv_pairs parse_bootconfig(string_view str) {
-    return parse_impl<'\n'>(chars<' '>{}, str);
+    return parse_impl<'\n', '='>(chars<' '>{}, str);
+}
+static kv_pairs parse_partition_map(std::string_view str) {
+    return parse_impl<';', ','>(chars<>{}, str);
 }
 
 #define test_bit(bit, array) (array[bit / 8] & (1 << (bit % 8)))
@@ -205,6 +208,25 @@ void load_kernel_info(BootConfig *config) {
 
     LOGD("Device config:\n");
     config->print();
+}
+
+// `androidboot.partition_map` allows associating a partition name for a raw block device
+// through a comma separated and semicolon deliminated list. For example,
+// `androidboot.partition_map=vdb,metadata;vdc,userdata` maps `vdb` to `metadata` and `vdc` to
+// `userdata`.
+// https://android.googlesource.com/platform/system/core/+/refs/heads/android13-release/init/devices.cpp#191
+
+kv_pairs load_partition_map() {
+    const string_view kPartitionMapKey = "androidboot.partition_map";
+    for (const auto &[key, value] : parse_cmdline(full_read("/proc/cmdline"))) {
+        if (key == kPartitionMapKey)
+            return parse_partition_map(value);
+    }
+    for (const auto &[key, value] : parse_bootconfig(full_read("/proc/bootconfig"))) {
+        if (key == kPartitionMapKey)
+            return parse_partition_map(value);
+    }
+    return {};
 }
 
 bool check_two_stage() {
