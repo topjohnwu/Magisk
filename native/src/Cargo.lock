@@ -182,7 +182,7 @@ dependencies = [
 
 [[package]]
 name = "cxx"
-version = "1.0.115"
+version = "1.0.124"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -191,7 +191,7 @@ dependencies = [
 
 [[package]]
 name = "cxx-gen"
-version = "0.7.115"
+version = "0.7.124"
 dependencies = [
  "codespan-reporting",
  "proc-macro2",
@@ -201,11 +201,11 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.115"
+version = "1.0.124"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.115"
+version = "1.0.124"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -1,7 +1,6 @@
 #![feature(format_args_nl)]
 #![feature(try_blocks)]
 #![feature(let_chains)]
-#![feature(option_take_if)]
 #![allow(clippy::missing_safety_doc)]
 
 use base::Utf8CStr;

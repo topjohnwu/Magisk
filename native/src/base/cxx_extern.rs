@@ -4,8 +4,7 @@ use std::io;
 use std::os::fd::{BorrowedFd, OwnedFd, RawFd};
 
 use cfg_if::cfg_if;
-use cxx::private::c_char;
-use libc::mode_t;
+use libc::{c_char, mode_t};
 
 use crate::files::map_file_at;
 pub(crate) use crate::xwrap::*;
