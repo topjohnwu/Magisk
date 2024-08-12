@@ -371,9 +371,9 @@ find_boot_image() {
   BOOTIMAGE=
   if $RECOVERYMODE; then
     BOOTIMAGE=$(find_block "recovery$SLOT" "sos")
-  elif [ -e "/dev/block/by-name/init_boot$SLOT" ] && uname -r | grep -vq "android12-"; then
+  elif [ -e "/dev/block/by-name/init_boot$SLOT" ] && [ "$(uname -r | cut -d. -f1)" -ge 5 ] && uname -r | grep -vq "android12-"; then
     # init_boot is only used with GKI 13+. It is possible that some devices with init_boot
-    # partition still uses Android 12 GKI, so we need to explicitly detect that scenario.
+    # partition still uses Android 12 GKI or previous kernels, so we need to explicitly detect that scenario.
     BOOTIMAGE="/dev/block/by-name/init_boot$SLOT"
   elif [ -e "/dev/block/by-name/boot$SLOT" ]; then
     # Standard location since AOSP Android 10+
