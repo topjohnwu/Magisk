@@ -78,7 +78,7 @@ static struct {
 } blk_info;
 
 static dev_t setup_block() {
-    const auto partition_map = load_partition_map();
+    static const auto partition_map = load_partition_map();
     if (dev_list.empty())
         collect_devices(partition_map);
 
