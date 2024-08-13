@@ -249,5 +249,18 @@ void MagiskInit::setup_tmp(const char *path) {
 
     xmount(".", path, nullptr, MS_BIND, nullptr);
 
+    chdir(path);
+
+    // Use isolated devpts if kernel support
+    if (access("/dev/pts/ptmx", F_OK) == 0) {
+        xmkdirs(SHELLPTS, 0755);
+        xmount("devpts", SHELLPTS, "devpts", MS_NOSUID | MS_NOEXEC, "newinstance");
+        xmount(nullptr, SHELLPTS, nullptr, MS_PRIVATE, nullptr);
+        if (access(SHELLPTS "/ptmx", F_OK)) {
+            umount2(SHELLPTS, MNT_DETACH);
+            rmdir(SHELLPTS);
+        }
+    }
+
     chdir("/");
 }
