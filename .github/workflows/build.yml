@@ -17,7 +17,7 @@ on:
 jobs:
   build:
     name: Build Magisk artifacts
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     env:
       SCCACHE_DIRECT: false
     strategy:
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-14]
+        os: [windows-latest, ubuntu-latest]
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -74,8 +74,8 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      - name: Build debug
-        run: python build.py -v all
+      - name: Test build
+        run: python build.py -v -c .github/ci.prop all
 
       - name: Stop gradle daemon
         run: ./gradlew --stop
