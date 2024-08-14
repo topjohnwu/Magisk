@@ -24,20 +24,12 @@ static sqlite3 *mDB = nullptr;
 #define SQLITE_OPEN_CREATE           0x00000004  /* Ok for sqlite3_open_v2() */
 #define SQLITE_OPEN_FULLMUTEX        0x00010000  /* Ok for sqlite3_open_v2() */
 
-static int (*sqlite3_open_v2)(
-        const char *filename,
-        sqlite3 **ppDb,
-        int flags,
-        const char *zVfs);
+using sqlite3_callback = int (*)(void*, int, char**, char**);
+static int (*sqlite3_open_v2)(const char *filename, sqlite3 **ppDb, int flags, const char *zVfs);
 static const char *(*sqlite3_errmsg)(sqlite3 *db);
 static int (*sqlite3_close)(sqlite3 *db);
 static void (*sqlite3_free)(void *v);
-static int (*sqlite3_exec)(
-        sqlite3 *db,
-        const char *sql,
-        int (*callback)(void*, int, char**, char**),
-        void *v,
-        char **errmsg);
+static int (*sqlite3_exec)(sqlite3 *db, const char *sql, sqlite3_callback fn, void *v, char **errmsg);
 
 // Internal Android linker APIs
 
@@ -135,51 +127,69 @@ static int ver_cb(void *ver, int, char **data, char **) {
     return 0;
 }
 
-#define err_ret(e) if (e) return e;
+bool db_result::check_err() {
+    if (!err.empty()) {
+        LOGE("sqlite3_exec: %s\n", err.data());
+        return true;
+    }
+    return false;
+}
 
-static char *open_and_init_db(sqlite3 *&db) {
+static db_result sql_exec(sqlite3 *db, const char *sql, sqlite3_callback fn, void *v) {
+    char *err = nullptr;
+    sqlite3_exec(db, sql, fn, v, &err);
+    if (err) {
+        db_result r = err;
+        sqlite3_free(err);
+        return r;
+    }
+    return {};
+}
+
+#define sql_exe_ret(...) if (auto r = sql_exec(__VA_ARGS__); !r) return r
+#define fn_run_ret(fn) if (auto r = fn(); !r) return r
+
+static db_result open_and_init_db(sqlite3 *&db) {
     if (!dload_sqlite())
-        return strdup("Cannot load libsqlite.so");
+        return "Cannot load libsqlite.so";
 
     int ret = sqlite3_open_v2(MAGISKDB, &db,
             SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
     if (ret)
-        return strdup(sqlite3_errmsg(db));
+        return sqlite3_errmsg(db);
     int ver = 0;
     bool upgrade = false;
-    char *err = nullptr;
-    sqlite3_exec(db, "PRAGMA user_version", ver_cb, &ver, &err);
-    err_ret(err);
+    sql_exe_ret(db, "PRAGMA user_version", ver_cb, &ver);
     if (ver > DB_VERSION) {
         // Don't support downgrading database
         sqlite3_close(db);
-        return strdup("Downgrading database is not supported");
+        return "Downgrading database is not supported";
     }
 
     auto create_policy = [&] {
-        sqlite3_exec(db,
+        return sql_exec(db,
                 "CREATE TABLE IF NOT EXISTS policies "
                 "(uid INT, policy INT, until INT, logging INT, "
                 "notification INT, PRIMARY KEY(uid))",
-                nullptr, nullptr, &err);
+                nullptr, nullptr);
     };
     auto create_settings = [&] {
-        sqlite3_exec(db,
+        return sql_exec(db,
                 "CREATE TABLE IF NOT EXISTS settings "
                 "(key TEXT, value INT, PRIMARY KEY(key))",
-                nullptr, nullptr, &err);
+                nullptr, nullptr);
     };
     auto create_strings = [&] {
-        sqlite3_exec(db,
+        return sql_exec(db,
                 "CREATE TABLE IF NOT EXISTS strings "
                 "(key TEXT, value TEXT, PRIMARY KEY(key))",
-                nullptr, nullptr, &err);
+                nullptr, nullptr);
     };
     auto create_denylist = [&] {
-        sqlite3_exec(db,
+        return sql_exec(db,
                 "CREATE TABLE IF NOT EXISTS denylist "
                 "(package_name TEXT, process TEXT, PRIMARY KEY(package_name, process))",
-                nullptr, nullptr, &err);
+                nullptr, nullptr);
     };
 
     // Database changelog:
@@ -194,21 +204,17 @@ static char *open_and_init_db(sqlite3 *&db) {
     // 12: rebuild table `policies` to drop column `package_name`
 
     if (/* 0, 1, 2, 3, 4, 5, 6 */ ver <= 6) {
-        create_policy();
-        err_ret(err);
-        create_settings();
-        err_ret(err);
-        create_strings();
-        err_ret(err);
-        create_denylist();
-        err_ret(err);
+        fn_run_ret(create_policy);
+        fn_run_ret(create_settings);
+        fn_run_ret(create_strings);
+        fn_run_ret(create_denylist);
 
         // Directly jump to latest
         ver = DB_VERSION;
         upgrade = true;
     }
     if (ver == 7) {
-        sqlite3_exec(db,
+        sql_exe_ret(db,
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
                 "CREATE TABLE IF NOT EXISTS hidelist "
@@ -216,14 +222,13 @@ static char *open_and_init_db(sqlite3 *&db) {
                 "INSERT INTO hidelist SELECT process as package_name, process FROM hidelist_tmp;"
                 "DROP TABLE hidelist_tmp;"
                 "COMMIT;",
-                nullptr, nullptr, &err);
-        err_ret(err);
+                nullptr, nullptr);
         // Directly jump to version 9
         ver = 9;
         upgrade = true;
     }
     if (ver == 8) {
-        sqlite3_exec(db,
+        sql_exe_ret(db,
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE hidelist RENAME TO hidelist_tmp;"
                 "CREATE TABLE IF NOT EXISTS hidelist "
@@ -231,30 +236,26 @@ static char *open_and_init_db(sqlite3 *&db) {
                 "INSERT INTO hidelist SELECT * FROM hidelist_tmp;"
                 "DROP TABLE hidelist_tmp;"
                 "COMMIT;",
-                nullptr, nullptr, &err);
-        err_ret(err);
+                nullptr, nullptr);
         ver = 9;
         upgrade = true;
     }
     if (ver == 9) {
-        sqlite3_exec(db, "DROP TABLE IF EXISTS logs", nullptr, nullptr, &err);
-        err_ret(err);
+        sql_exe_ret(db, "DROP TABLE IF EXISTS logs", nullptr, nullptr);
         ver = 10;
         upgrade = true;
     }
     if (ver == 10) {
-        sqlite3_exec(db,
+        sql_exe_ret(db,
                 "DROP TABLE IF EXISTS hidelist;"
                 "DELETE FROM settings WHERE key='magiskhide';",
-                nullptr, nullptr, &err);
-        err_ret(err);
-        create_denylist();
-        err_ret(err);
+                nullptr, nullptr);
+        fn_run_ret(create_denylist);
         ver = 11;
         upgrade = true;
     }
     if (ver == 11) {
-        sqlite3_exec(db,
+        sql_exe_ret(db,
                 "BEGIN TRANSACTION;"
                 "ALTER TABLE policies RENAME TO policies_tmp;"
                 "CREATE TABLE IF NOT EXISTS policies "
@@ -264,8 +265,7 @@ static char *open_and_init_db(sqlite3 *&db) {
                 "SELECT uid, policy, until, logging, notification FROM policies_tmp;"
                 "DROP TABLE policies_tmp;"
                 "COMMIT;",
-                nullptr, nullptr, &err);
-        err_ret(err);
+                nullptr, nullptr);
         ver = 12;
         upgrade = true;
     }
@@ -274,28 +274,25 @@ static char *open_and_init_db(sqlite3 *&db) {
         // Set version
         char query[32];
         sprintf(query, "PRAGMA user_version=%d", ver);
-        sqlite3_exec(db, query, nullptr, nullptr, &err);
-        err_ret(err);
+        sql_exe_ret(db, query, nullptr, nullptr);
     }
-    return nullptr;
+    return {};
 }
 
-char *db_exec(const char *sql) {
-    char *err = nullptr;
+db_result db_exec(const char *sql) {
     if (mDB == nullptr) {
-        err = open_and_init_db(mDB);
-        db_err_cmd(err,
+        auto res = open_and_init_db(mDB);
+        if (res.check_err()) {
             // Open fails, remove and reconstruct
             unlink(MAGISKDB);
-            err = open_and_init_db(mDB);
-            err_ret(err);
-        );
+            res = open_and_init_db(mDB);
+            if (!res) return res;
+        }
     }
     if (mDB) {
-        sqlite3_exec(mDB, sql, nullptr, nullptr, &err);
-        return err;
+        sql_exe_ret(mDB, sql, nullptr, nullptr);
     }
-    return nullptr;
+    return {};
 }
 
 static int sqlite_db_row_callback(void *cb, int col_num, char **data, char **col_name) {
@@ -306,26 +303,24 @@ static int sqlite_db_row_callback(void *cb, int col_num, char **data, char **col
     return func(row) ? 0 : 1;
 }
 
-char *db_exec(const char *sql, const db_row_cb &fn) {
-    char *err = nullptr;
+db_result db_exec(const char *sql, const db_row_cb &fn) {
     if (mDB == nullptr) {
-        err = open_and_init_db(mDB);
-        db_err_cmd(err,
+        auto res = open_and_init_db(mDB);
+        if (res.check_err()) {
             // Open fails, remove and reconstruct
             unlink(MAGISKDB);
-            err = open_and_init_db(mDB);
-            err_ret(err);
-        );
+            res = open_and_init_db(mDB);
+            if (!res) return res;
+        }
     }
     if (mDB) {
-        sqlite3_exec(mDB, sql, sqlite_db_row_callback, (void *) &fn, &err);
-        return err;
+        sql_exe_ret(mDB, sql, sqlite_db_row_callback, (void *) &fn);
     }
-    return nullptr;
+    return {};
 }
 
 int get_db_settings(db_settings &cfg, int key) {
-    char *err = nullptr;
+    db_result res;
     auto settings_cb = [&](db_row &row) -> bool {
         cfg[row["key"]] = parse_int(row["value"]);
         DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
@@ -334,26 +329,22 @@ int get_db_settings(db_settings &cfg, int key) {
     if (key >= 0) {
         char query[128];
         ssprintf(query, sizeof(query), "SELECT * FROM settings WHERE key='%s'", DB_SETTING_KEYS[key]);
-        err = db_exec(query, settings_cb);
+        res = db_exec(query, settings_cb);
     } else {
-        err = db_exec("SELECT * FROM settings", settings_cb);
+        res = db_exec("SELECT * FROM settings", settings_cb);
     }
-    db_err_cmd(err, return 1);
-    return 0;
+    return res.check_err() ? 1 : 0;
 }
 
 int set_db_settings(int key, int value) {
-    char *err;
     char sql[128];
     ssprintf(sql, sizeof(sql), "INSERT OR REPLACE INTO settings VALUES ('%s', %d)",
              DB_SETTING_KEYS[key], value);
-    err = db_exec(sql);
-    db_err_cmd(err, return 1)
-    return 0;
+    return db_exec(sql).check_err() ? 1 : 0;
 }
 
 int get_db_strings(db_strings &str, int key) {
-    char *err = nullptr;
+    db_result res;
     auto string_cb = [&](db_row &row) -> bool {
         str[row["key"]] = row["value"];
         DBLOGV("query %s=[%s]\n", row["key"].data(), row["value"].data());
@@ -362,26 +353,22 @@ int get_db_strings(db_strings &str, int key) {
     if (key >= 0) {
         char query[128];
         ssprintf(query, sizeof(query), "SELECT * FROM strings WHERE key='%s'", DB_STRING_KEYS[key]);
-        err = db_exec(query, string_cb);
+        res = db_exec(query, string_cb);
     } else {
-        err = db_exec("SELECT * FROM strings", string_cb);
+        res = db_exec("SELECT * FROM strings", string_cb);
     }
-    db_err_cmd(err, return 1);
-    return 0;
+    return res.check_err() ? 1 : 0;
 }
 
 void rm_db_strings(int key) {
-    char *err;
     char query[128];
     ssprintf(query, sizeof(query), "DELETE FROM strings WHERE key == '%s'", DB_STRING_KEYS[key]);
-    err = db_exec(query);
-    db_err_cmd(err, return);
+    db_exec(query).check_err();
 }
 
-void exec_sql(int client) {
-    run_finally f([=]{ close(client); });
+void exec_sql(owned_fd client) {
     string sql = read_string(client);
-    char *err = db_exec(sql.data(), [client](db_row &row) -> bool {
+    auto res = db_exec(sql.data(), [fd = (int) client](db_row &row) -> bool {
         string out;
         bool first = true;
         for (auto it : row) {
@@ -391,18 +378,9 @@ void exec_sql(int client) {
             out += '=';
             out += it.second;
         }
-        write_string(client, out);
+        write_string(fd, out);
         return true;
     });
     write_int(client, 0);
-    db_err_cmd(err, return; );
-}
-
-bool db_err(char *e) {
-    if (e) {
-        LOGE("sqlite3_exec: %s\n", e);
-        sqlite3_free(e);
-        return true;
-    }
-    return false;
+    res.check_err();
 }

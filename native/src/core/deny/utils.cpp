@@ -201,7 +201,7 @@ void scan_deny_apps() {
             LOGI("denylist rm: [%s]\n", it->first.data());
             ssprintf(sql, sizeof(sql), "DELETE FROM denylist WHERE package_name='%s'",
                      it->first.data());
-            db_err(db_exec(sql));
+            db_exec(sql).check_err();
             it = pkg_to_procs.erase(it);
         } else {
             update_app_id(app_id, it->first, false);
@@ -222,11 +222,12 @@ static bool ensure_data() {
     LOGI("denylist: initializing internal data structures\n");
 
     default_new(pkg_to_procs_);
-    char *err = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
+    auto res = db_exec("SELECT * FROM denylist", [](db_row &row) -> bool {
         add_hide_set(row["package_name"].data(), row["process"].data());
         return true;
     });
-    db_err_cmd(err, goto error)
+    if (res.check_err())
+        goto error;
 
     default_new(app_id_to_pkgs_);
     scan_deny_apps();
@@ -262,9 +263,7 @@ static int add_list(const char *pkg, const char *proc) {
     char sql[4096];
     ssprintf(sql, sizeof(sql),
             "INSERT INTO denylist (package_name, process) VALUES('%s', '%s')", pkg, proc);
-    char *err = db_exec(sql);
-    db_err_cmd(err, return DenyResponse::ERROR)
-    return DenyResponse::OK;
+    return db_exec(sql).check_err() ? DenyResponse::ERROR : DenyResponse::OK;
 }
 
 int add_list(int client) {
@@ -308,9 +307,7 @@ static int rm_list(const char *pkg, const char *proc) {
     else
         ssprintf(sql, sizeof(sql),
                 "DELETE FROM denylist WHERE package_name='%s' AND process='%s'", pkg, proc);
-    char *err = db_exec(sql);
-    db_err_cmd(err, return DenyResponse::ERROR)
-    return DenyResponse::OK;
+    return db_exec(sql).check_err() ? DenyResponse::ERROR : DenyResponse::OK;
 }
 
 int rm_list(int client) {

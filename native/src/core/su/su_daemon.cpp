@@ -63,11 +63,11 @@ void su_info::check_db() {
     }
 
     if (eval_uid > 0) {
-        char query[256], *err;
+        char query[256];
         ssprintf(query, sizeof(query),
             "SELECT policy, logging, notification FROM policies "
             "WHERE uid=%d AND (until=0 OR until>%li)", eval_uid, time(nullptr));
-        err = db_exec(query, [&](db_row &row) -> bool {
+        auto res = db_exec(query, [&](db_row &row) -> bool {
             access.policy = (policy_t) parse_int(row["policy"]);
             access.log = parse_int(row["logging"]);
             access.notify = parse_int(row["notification"]);
@@ -75,7 +75,8 @@ void su_info::check_db() {
                  access.policy, access.log, access.notify);
             return true;
         });
-        db_err_cmd(err, return);
+        if (res.check_err())
+            return;
     }
 
     // We need to check our manager
@@ -123,15 +124,16 @@ bool uid_granted_root(int uid) {
 
     bool granted = false;
 
-    char query[256], *err;
+    char query[256];
     ssprintf(query, sizeof(query),
         "SELECT policy FROM policies WHERE uid=%d AND (until=0 OR until>%li)",
         uid, time(nullptr));
-    err = db_exec(query, [&](db_row &row) -> bool {
+    auto res = db_exec(query, [&](db_row &row) -> bool {
         granted = parse_int(row["policy"]) == ALLOW;
         return true;
     });
-    db_err_cmd(err, return false);
+    if (res.check_err())
+        return false;
 
     return granted;
 }
@@ -140,9 +142,7 @@ void prune_su_access() {
     cached.reset();
     vector<bool> app_no_list = get_app_no_list();
     vector<int> rm_uids;
-    char query[256], *err;
-    strscpy(query, "SELECT uid FROM policies", sizeof(query));
-    err = db_exec(query, [&](db_row &row) -> bool {
+    auto res = db_exec("SELECT uid FROM policies", [&](db_row &row) -> bool {
         int uid = parse_int(row["uid"]);
         int app_id = to_app_id(uid);
         if (app_id >= AID_APP_START && app_id <= AID_APP_END) {
@@ -154,11 +154,13 @@ void prune_su_access() {
         }
         return true;
     });
-    db_err_cmd(err, return);
+    if (res.check_err())
+        return;
 
     for (int uid : rm_uids) {
+        char query[256];
         ssprintf(query, sizeof(query), "DELETE FROM policies WHERE uid == %d", uid);
-        db_err(db_exec(query));
+        db_exec(query).check_err();
     }
 }
 

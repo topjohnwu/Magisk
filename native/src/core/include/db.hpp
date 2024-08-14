@@ -124,14 +124,21 @@ struct su_access {
 
 using db_row = std::map<std::string_view, std::string_view>;
 using db_row_cb = std::function<bool(db_row&)>;
+struct owned_fd;
+
+struct db_result {
+    db_result() = default;
+    db_result(const char *s) : err(s) {}
+    bool check_err();
+    operator bool() { return err.empty(); }
+private:
+    std::string err;
+};
 
 int get_db_settings(db_settings &cfg, int key = -1);
 int set_db_settings(int key, int value);
 int get_db_strings(db_strings &str, int key = -1);
 void rm_db_strings(int key);
-void exec_sql(int client);
-char *db_exec(const char *sql);
-char *db_exec(const char *sql, const db_row_cb &fn);
-bool db_err(char *e);
-
-#define db_err_cmd(e, cmd) if (db_err(e)) { cmd; }
+void exec_sql(owned_fd client);
+db_result db_exec(const char *sql);
+db_result db_exec(const char *sql, const db_row_cb &fn);
