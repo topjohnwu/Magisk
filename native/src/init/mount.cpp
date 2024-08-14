@@ -236,6 +236,7 @@ void MagiskInit::setup_tmp(const char *path) {
 
     xmkdir(INTLROOT, 0711);
     xmkdir(DEVICEDIR, 0711);
+    xmkdir(WORKERDIR, 0);
 
     mount_preinit_dir(preinit_dev);
 
@@ -250,6 +251,9 @@ void MagiskInit::setup_tmp(const char *path) {
     xmount(".", path, nullptr, MS_BIND, nullptr);
 
     chdir(path);
+
+    // Prepare worker
+    xmount(WORKERDIR, WORKERDIR, nullptr, MS_BIND, nullptr);
 
     // Use isolated devpts if kernel support
     if (access("/dev/pts/ptmx", F_OK) == 0) {

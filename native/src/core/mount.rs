@@ -94,36 +94,40 @@ pub fn setup_mounts() {
                 ptr::null(),
             )
             .as_os_err()?;
-            libc::mount(
-                ptr::null(),
+        }
+    };
+}
+
+pub fn clean_mounts() {
+    let magisk_tmp = get_magisk_tmp();
+
+    let mut buf = Utf8CStrBufArr::default();
+
+    let module_mnt = FsPathBuf::new(&mut buf).join(magisk_tmp).join(MODULEMNT);
+    let _: LoggedResult<()> = try {
+        unsafe {
+            libc::umount2(
                 module_mnt.as_ptr(),
-                ptr::null(),
-                libc::MS_PRIVATE,
-                ptr::null(),
+                libc::MNT_DETACH,
             )
             .as_os_err()?;
         }
     };
 
-    // Prepare worker
     let worker_dir = FsPathBuf::new(&mut buf).join(magisk_tmp).join(WORKERDIR);
     let _: LoggedResult<()> = try {
-        worker_dir.mkdir(0)?;
         unsafe {
             libc::mount(
-                worker_dir.as_ptr(),
+                ptr::null(),
                 worker_dir.as_ptr(),
                 ptr::null(),
-                libc::MS_BIND,
+                libc::MS_PRIVATE | libc::MS_REC,
                 ptr::null(),
             )
             .as_os_err()?;
-            libc::mount(
-                ptr::null(),
+            libc::umount2(
                 worker_dir.as_ptr(),
-                ptr::null(),
-                libc::MS_PRIVATE,
-                ptr::null(),
+                libc::MNT_DETACH,
             )
             .as_os_err()?;
         }

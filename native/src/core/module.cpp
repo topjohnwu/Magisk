@@ -157,11 +157,9 @@ void tmpfs_node::mount() {
     if (!isa<tmpfs_node>(parent())) {
         auto worker_dir = worker_path();
         mkdirs(worker_dir.data(), 0);
-        bind_mount("tmpfs", worker_dir.data(), worker_dir.data());
         clone_attr(exist() ? node_path().data() : parent()->node_path().data(), worker_dir.data());
         dir_node::mount();
-        VLOGD(replace() ? "replace" : "move", worker_dir.data(), node_path().data());
-        xmount(worker_dir.data(), node_path().data(), nullptr, MS_MOVE, nullptr);
+        bind_mount(replace() ? "replace" : "move", worker_dir.data(), node_path().data());
         xmount(nullptr, node_path().data(), nullptr, MS_REMOUNT | MS_BIND | MS_RDONLY, nullptr);
     } else {
         const string dest = worker_path();
@@ -333,10 +331,7 @@ void load_modules() {
     }
 
     // cleanup mounts
-    ssprintf(buf, sizeof(buf), "%s/" WORKERDIR, get_magisk_tmp());
-    xumount2(buf, MNT_DETACH);
-    ssprintf(buf, sizeof(buf), "%s/" MODULEMNT, get_magisk_tmp());
-    xumount2(buf, MNT_DETACH);
+    clean_mounts();
 }
 
 /************************
