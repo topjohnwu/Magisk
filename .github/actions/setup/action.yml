@@ -21,6 +21,13 @@ runs:
         restore-keys: ${{ runner.os }}
         max-size: 10000M
 
+    - name: Set up GNU make
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install make
+        echo 'GNUMAKE=gmake' >> "$GITHUB_ENV"
+
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
       with:
