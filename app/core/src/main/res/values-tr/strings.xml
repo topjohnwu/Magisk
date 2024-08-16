@@ -9,7 +9,7 @@
     <string name="section_home">Ana Sayfa</string>
     <string name="section_theme">Temalar</string>
     <string name="denylist">Reddetme Listesi</string>
-    
+
     <!--Home-->
     <string name="no_connection">Bağlantı yok</string>
     <string name="app_changelog">Değişiklik Günlüğü</string>
@@ -19,7 +19,7 @@
     <string name="hide">Gizle</string>
     <string name="home_package">Paket</string>
     <string name="home_app_title">Uygulama</string>
-    
+
     <string name="home_notice_content">Magisk\'i YALNIZCA resmi GitHub sayfasından indirin. Bilinmeyen kaynaklardan gelen dosyalar zararlı olabilir!</string>
     <string name="home_support_title">Bizi Destekleyin</string>
     <string name="home_follow_title">Bizi Takip Edin</string>
@@ -30,7 +30,7 @@
     <string name="invalid_update_channel">Geçersiz Güncelleme Kanalı</string>
     <string name="uninstall_magisk_title">Magisk\'i Kaldır</string>
     <string name="uninstall_magisk_msg">Tüm modüller devre dışı bırakılacak/kaldırılacak!\nKök kaldırılacak!\nMagisk kullanılarak şifrelenmemiş herhangi bir dahili depolama yeniden şifrelenecek!</string>
-    
+
     <!--Install-->
     <string name="keep_force_encryption">Zorla şifrelemeyi koru</string>
     <string name="keep_dm_verity">AVB 2.0/dm-verity\'yi koru</string>
@@ -48,7 +48,7 @@
     <string name="patch_file_msg">Ham bir görüntü (*.img) veya bir ODIN tar dosyası (*.tar) veya bir payload.bin (*.bin) seçin</string>
     <string name="reboot_delay_toast">5 saniye içinde yeniden başlatılıyor…</string>
     <string name="flash_screen_title">Yükleniyor</string>
-    
+
     <!--Superuser-->
     <string name="su_request_title">Süper Kullanıcı İsteği</string>
     <string name="touch_filtered_warning">Bir uygulama bir Süper Kullanıcı isteğini engellediği için Magisk yanıtınızı doğrulayamıyor</string>
@@ -74,11 +74,11 @@
     <string name="su_revoke_msg">%1$s uygulamasının süper kullanıcı haklarını iptal etmek istediğinize emin misiniz?</string>
     <string name="toast">Bildirim</string>
     <string name="none">Yok</string>
-    
+
     <string name="superuser_toggle_notification">Bildirimler</string>
     <string name="superuser_toggle_revoke">İptal Et</string>
     <string name="superuser_policy_none">Henüz hiçbir uygulama Süper Kullanıcı izni istemedi.</string>
-    
+
     <!--Logs-->
     <string name="log_data_none">Günlük kullanmıyorsunuz, root (kök) uygulamalarınızı daha çok kullanmayı deneyin</string>
     <string name="log_data_magisk_none">Magisk günlükleri boş, bu tuhaf</string>
@@ -90,15 +90,15 @@
     <string name="target_pid">Mount ns hedef PID: %s</string>
     <string name="selinux_context">SELinux bağlamı: %s</string>
     <string name="supp_group">Ek grup: %s</string>
-    
+
     <!--SafetyNet-->
-    
+
     <!--MagiskHide-->
     <string name="show_system_app">Sistem uygulamalarını göster</string>
     <string name="show_os_app">İşletim sistemi uygulamalarını göster</string>
     <string name="hide_filter_hint">İsme göre filtrele</string>
     <string name="hide_search">Ara</string>
-    
+
     <!--Module-->
     <string name="no_info_provided">(Bilgi verilmedi)</string>
     <string name="reboot_userspace">Hızlı yeniden başlat</string>
@@ -118,7 +118,7 @@
     <string name="module_empty">Yüklü modül yok</string>
     <string name="confirm_install">%1$s modülü yüklensin mi?</string>
     <string name="confirm_install_title">Yükleme Onayı</string>
-    
+
     <!--Settings-->
     <string name="settings_dark_mode_title">Tema Modu</string>
     <string name="settings_dark_mode_message">Tarzınıza en uygun modu seçin!</string>
@@ -178,7 +178,7 @@
     <string name="settings_doh_description">Bazı ülkelerde DNS zehirlemesine karşı geçici çözüm</string>
     <string name="settings_random_name_title">Çıkış adını rastgele seç</string>
     <string name="settings_random_name_description">Algılamayı önlemek için yamalı resimlerin ve tar dosyalarının çıkış dosya adını rastgele seç</string>
-    
+
     <string name="multiuser_mode">Çok Kullanıcılı Mod</string>
     <string name="settings_owner_only">Yalnızca Cihaz Sahibi</string>
     <string name="settings_owner_manage">Cihaz Sahibi Yönetiminde</string>
@@ -186,7 +186,7 @@
     <string name="owner_only_summary">Yalnızca sahip kök (root) erişimine sahiptir</string>
     <string name="owner_manage_summary">Yalnızca sahip kök (root) erişimini yönetebilir ve istek uyarılarını alabilir</string>
     <string name="user_independent_summary">Her kullanıcının kendi ayrı kök (root) kuralları vardır</string>
-    
+
     <string name="mount_namespace_mode">Bağlama Ad Alanı Modu</string>
     <string name="settings_ns_global">Küresel Ad Alanı</string>
     <string name="settings_ns_requester">Ad Alanını Devral</string>
@@ -194,7 +194,7 @@
     <string name="global_summary">Tüm kök (root) oturumları küresel bağlama ad alanını kullanır</string>
     <string name="requester_summary">Kök (root) oturumları isteyicisinin ad alanını devralacak</string>
     <string name="isolate_summary">Her kök (root) oturumu kendi izole ad alanına sahip olacak</string>
-    
+
     <!--Notifications-->
     <string name="update_channel">Magisk Güncellemeleri</string>
     <string name="progress_channel">İlerleme Bildirimleri</string>
@@ -204,7 +204,7 @@
     <string name="magisk_update_title">Magisk Güncellemesi Mevcut!</string>
     <string name="updated_title">Magisk Güncellendi</string>
     <string name="updated_text">Uygulamayı açmak için dokunun</string>
-    
+
     <!--Toasts, Dialogs-->
     <string name="yes">Mevcut</string>
     <string name="no">Mevcut Değil</string>
@@ -243,5 +243,5 @@
     <string name="app_not_found">Bu işlemi gerçekleştirecek uygulama bulunamadı</string>
     <string name="reboot_apply_change">Değişiklikleri uygulamak için yeniden başlatın</string>
     <string name="restore_app_confirmation">Bu, gizli uygulamayı orijinal uygulamaya geri yükleyecektir. Gerçekten bunu yapmak istiyor musunuz?</string>
-    
+
 </resources>
