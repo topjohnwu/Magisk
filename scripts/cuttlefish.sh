@@ -19,7 +19,7 @@ run_cvd_bin() {
 }
 
 setup_env() {
-  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_0.9.29_amd64.deb
+  curl -LO https://github.com/topjohnwu/magisk-files/releases/download/files/cuttlefish-base_0.9.30_amd64.deb
   sudo dpkg -i ./cuttlefish-base_*_*64.deb || sudo apt-get install -f
   rm cuttlefish-base_*_*64.deb
   echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
