@@ -32,22 +32,22 @@ setup_env() {
 
 download_cf() {
   local branch=$1
-  local target=$2
+  local device=$2
 
   if [ -z $branch ]; then
     branch='aosp-main'
   fi
-  if [ -z $target ]; then
-    target='aosp_cf_x86_64_phone-trunk_staging-userdebug'
+  if [ -z $device ]; then
+    device='aosp_cf_x86_64_phone'
   fi
-  local device=$(echo $target | cut -d '-' -f 1)
+  local target="${device}-trunk_staging-userdebug"
 
   local build_id=$(curl -sL https://ci.android.com/builds/branches/${branch}/status.json | \
     jq -r ".targets[] | select(.name == \"$target\") | .last_known_good_build")
   local sys_img_url="https://ci.android.com/builds/submitted/${build_id}/${target}/latest/raw/${device}-img-${build_id}.zip"
   local host_pkg_url="https://ci.android.com/builds/submitted/${build_id}/${target}/latest/raw/cvd-host_package.tar.gz"
 
-  print_title "* Download $branch ($build_id) $target images"
+  print_title "* Download $target ($build_id) images"
   curl -L $sys_img_url -o aosp_cf_phone-img.zip
   curl -LO $host_pkg_url
   rm -rf $CF_HOME

@@ -170,7 +170,7 @@ jobs:
             logcat.log
 
   cf_test:
-    name: Test ${{ matrix.branch }} (${{ matrix.target }})
+    name: Test ${{ matrix.device }}
     runs-on: ubuntu-24.04
     needs: build
     env:
@@ -180,7 +180,9 @@ jobs:
       matrix:
         include:
           - branch: "aosp-main"
-            target: "aosp_cf_x86_64_phone-trunk_staging-userdebug"
+            device: "aosp_cf_x86_64_phone"
+          - branch: "aosp-main-throttled"
+            device: "aosp_cf_x86_64_phone_pgagnostic"
 
     steps:
       - name: Check out
@@ -197,7 +199,7 @@ jobs:
       - name: Setup Cuttlefish environment
         run: |
           scripts/cuttlefish.sh setup
-          scripts/cuttlefish.sh download ${{ matrix.branch }} ${{ matrix.target }}
+          scripts/cuttlefish.sh download ${{ matrix.branch }} ${{ matrix.device }}
 
       - name: Run Cuttlefish test
         timeout-minutes: 10
@@ -207,7 +209,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: "cvd-logs"
+          name: "cvd-logs-${{ matrix.device }}"
           path: |
             /home/runner/aosp_cf_phone/cuttlefish/instances/cvd-1/logs
             /home/runner/aosp_cf_phone/cuttlefish/instances/cvd-1/cuttlefish_config.json
