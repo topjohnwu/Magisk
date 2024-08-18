@@ -25,10 +25,10 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", "2.0.0"))
-    implementation("com.android.tools.build:gradle:8.5.2")
-    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:2.0.0-1.0.23")
-    implementation("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7")
-    implementation("org.lsposed.lsparanoid:gradle-plugin:0.6.0")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:6.10.0.202406032230-r")
+    implementation(kotlin("gradle-plugin", libs.versions.kotlin.get()))
+    implementation(libs.android.gradle.plugin)
+    implementation(libs.ksp.plugin)
+    implementation(libs.navigation.safe.args.plugin)
+    implementation(libs.lsparanoid.plugin)
+    implementation(libs.jgit)
 }

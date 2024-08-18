@@ -35,7 +35,7 @@ runs:
           ~/.gradle/caches
           ~/.gradle/wrapper
           !~/.gradle/caches/build-cache-*
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/**') }}
         restore-keys: ${{ runner.os }}-gradle-
 
     - name: Cache build cache

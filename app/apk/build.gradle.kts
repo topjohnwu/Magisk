@@ -47,22 +47,21 @@ android {
 dependencies {
     implementation(project(":app:core"))
 
-    implementation("com.github.topjohnwu:indeterminate-checkbox:1.0.7")
-    implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.3.0")
-    implementation("dev.rikka.rikkax.insets:insets:1.3.0")
-    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.2")
+    implementation(libs.indeterminate.checkbox)
+    implementation(libs.rikka.layoutinflater)
+    implementation(libs.rikka.insets)
+    implementation(libs.rikka.recyclerview)
 
-    val vNav = "2.7.7"
-    implementation("androidx.navigation:navigation-fragment-ktx:${vNav}")
-    implementation("androidx.navigation:navigation-ui-ktx:${vNav}")
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.transition:transition:1.5.1")
-    implementation("androidx.fragment:fragment-ktx:1.8.2")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.constraintlayout)
+    implementation(libs.swiperefreshlayout)
+    implementation(libs.recyclerview)
+    implementation(libs.transition)
+    implementation(libs.fragment.ktx)
+    implementation(libs.appcompat)
+    implementation(libs.material)
 
     // Make sure kapt runs with a proper kotlin-stdlib
     kapt(kotlin("stdlib"))
