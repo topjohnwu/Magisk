@@ -31,6 +31,8 @@ jobs:
 
       - name: Setup environment
         uses: ./.github/actions/setup
+        with:
+          is-asset-build: true
 
       - name: Build release
         run: ./build.py -vr all

@@ -1,4 +1,8 @@
 name: Magisk Setup
+inputs:
+  is-asset-build:
+    required: false
+    default: false
 runs:
   using: "composite"
   steps:
@@ -30,21 +34,43 @@ runs:
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
+      if: inputs.is-asset-build == 'true'
       with:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
           !~/.gradle/caches/build-cache-*
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/**') }}
-        restore-keys: ${{ runner.os }}-gradle-
+        key: gradle-cache-${{ hashFiles('gradle/**') }}
+        restore-keys: gradle-cache-
 
-    - name: Cache build cache
+    - name: Restore Gradle dependencies
+      uses: actions/cache/restore@v4
+      if: inputs.is-asset-build == 'false'
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          !~/.gradle/caches/build-cache-*
+        key: gradle-cache-${{ hashFiles('gradle/**') }}
+        restore-keys: gradle-cache-
+
+    - name: Cache Gradle build cache
       uses: actions/cache@v4
+      if: inputs.is-asset-build == 'true'
       with:
         path: |
           ~/.gradle/caches/build-cache-*
-        key: ${{ runner.os }}-build-cache-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-build-cache-
+        key: gradle-build-cache-${{ github.sha }}
+        restore-keys: gradle-build-cache-
+
+    - name: Restore Gradle build cache
+      uses: actions/cache/restore@v4
+      if: inputs.is-asset-build == 'false'
+      with:
+        path: |
+          ~/.gradle/caches/build-cache-*
+        key: gradle-build-cache-${{ github.sha }}
+        restore-keys: gradle-build-cache-
 
     - name: Set up NDK
       run: python build.py -v ndk
