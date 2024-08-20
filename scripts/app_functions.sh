@@ -78,7 +78,7 @@ run_uninstaller() {
 }
 
 restore_imgs() {
-  [ -z $SHA1 ] && return 1
+  local SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   local BACKUPDIR=/data/magisk_backup_$SHA1
   [ -d $BACKUPDIR ] || return 1
 
@@ -232,7 +232,6 @@ app_init() {
   check_boot_ramdisk && RAMDISKEXIST=true
   get_flags >/dev/null
   run_migrations >/dev/null
-  SHA1=$(grep_prop SHA1 $MAGISKTMP/.magisk/config)
   check_encryption
 
   # Dump variables
