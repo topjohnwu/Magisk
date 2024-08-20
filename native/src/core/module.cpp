@@ -211,6 +211,8 @@ public:
         const string src = get_magisk_tmp() + "/magisk"s;
         (void) is64bit;
 #endif
+        if (access(src.data(), F_OK))
+            return;
         create_and_mount("zygisk", src, true);
     }
 
