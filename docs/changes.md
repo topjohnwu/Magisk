@@ -60,12 +60,12 @@
 - [Zygisk] Rewrite code unloading implementation
 - [MagiskBoot] Support amonet microloader devices
 - [MagiskBoot] Always use lz4_legacy compression on v4 boot images. This fixes boot image patching issues on Android U preview.
-- [MagiskInit] Support replacing existing \*.rc files in `overlay.d`
+- [app] Support replacing existing \*.rc files in `overlay.d`
 - [MagiskInit] Rewrite sepolicy.rules mounting and loading implementation
 - [App] Make stub patching 100% offline
 - [App] Support patching `init_boot.img` for Samsung ODIN firmware
-- [MagiskPolicy] Fix minor bug in command line argument parsing
-- [MagiskPolicy] Update rules to support Android U
+- [App] Fix minor bug in command line argument parsing
+-[ App] Update rules to support Android U
 
 ### v25.2
 
