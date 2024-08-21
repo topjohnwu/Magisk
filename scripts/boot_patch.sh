@@ -119,14 +119,16 @@ else
   STATUS=0
   SKIP_BACKUP="#"
 fi
-case $((STATUS & 3)) in
-  0 )  # Stock boot
+case $STATUS in
+  0 )
+    # Stock boot
     ui_print "- Stock boot image detected"
     SHA1=$(./magiskboot sha1 "$BOOTIMAGE" 2>/dev/null)
     cat $BOOTIMAGE > stock_boot.img
     cp -af ramdisk.cpio ramdisk.cpio.orig 2>/dev/null
     ;;
-  1 )  # Magisk patched
+  1 )
+    # Magisk patched
     ui_print "- Magisk patched boot image detected"
     ./magiskboot cpio ramdisk.cpio \
     "extract .backup/.magisk config.orig" \
@@ -134,7 +136,8 @@ case $((STATUS & 3)) in
     cp -af ramdisk.cpio ramdisk.cpio.orig
     rm -f stock_boot.img
     ;;
-  2 )  # Unsupported
+  2 )
+    # Unsupported
     ui_print "! Boot image patched by unsupported programs"
     abort "! Please restore back to stock boot image"
     ;;

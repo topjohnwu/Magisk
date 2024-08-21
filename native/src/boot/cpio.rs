@@ -175,9 +175,8 @@ Supported commands:
   extract [ENTRY OUT]
     Extract ENTRY to OUT, or extract all entries to current directory
   test
-    Test the cpio's status
-    Return value is 0 or bitwise or-ed of following values:
-    0x1:Magisk    0x2:unsupported
+    Test the cpio's status. Return values:
+    0:stock    1:Magisk    2:unsupported
   patch
     Apply ramdisk patches
     Configure with env variables: KEEPVERITY KEEPFORCEENCRYPT
@@ -544,7 +543,6 @@ impl Cpio {
     }
 
     fn test(&self) -> i32 {
-        let mut ret = 0;
         for file in [
             "sbin/launch_daemonsu.sh",
             "sbin/su",
@@ -561,11 +559,10 @@ impl Cpio {
             "overlay/init.magisk.rc",
         ] {
             if self.exists(file) {
-                ret |= MAGISK_PATCHED;
-                break;
+                return MAGISK_PATCHED;
             }
         }
-        ret
+        0
     }
 
     fn restore(&mut self) -> LoggedResult<()> {
