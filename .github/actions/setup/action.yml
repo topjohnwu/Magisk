@@ -17,20 +17,37 @@ runs:
       with:
         python-version: "3.x"
 
-    - name: Set up sccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-        variant: sccache
-        key: ${{ runner.os }}-${{ github.sha }}
-        restore-keys: ${{ runner.os }}
-        max-size: 10000M
-
-    - name: Set up GNU make
+    - name: Install GNU make
       if: runner.os == 'macOS'
       shell: bash
       run: |
         brew install make
         echo 'GNUMAKE=gmake' >> "$GITHUB_ENV"
+
+    - name: Cache sccache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/.sccache
+        key: sccache-${{ runner.os }}-${{ github.sha }}
+        restore-keys: sccache-${{ runner.os }}-
+
+    - name: Set up sccache
+      shell: bash
+      env:
+        SCCACHE_DIRECT: false
+        SCCACHE_DIR: ${{ github.workspace }}/.sccache
+        SCCACHE_CACHE_SIZE: 2G
+        SCCACHE_IDLE_TIMEOUT: 0
+      run: |
+        bash $GITHUB_ACTION_PATH/sccache.sh
+        sccache --start-server
+        sccache -z
+
+    - name: Show sccache stats
+      uses: gacts/run-and-post-run@v1
+      with:
+        run: sccache -s
+        post: sccache -s
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
@@ -73,5 +90,5 @@ runs:
         restore-keys: gradle-build-cache-
 
     - name: Set up NDK
-      run: python build.py -v ndk
       shell: bash
+      run: python build.py -v ndk
