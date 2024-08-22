@@ -27,7 +27,7 @@ runs:
     - name: Cache sccache
       uses: actions/cache@v4
       with:
-        path: ${{ github.workspace }}/.sccache
+        path: .sccache
         key: sccache-${{ runner.os }}-${{ github.sha }}
         restore-keys: sccache-${{ runner.os }}-
 
@@ -49,14 +49,18 @@ runs:
         run: sccache -s
         post: sccache -s
 
+    - name: Set GRADLE_USER_HOME
+      shell: bash
+      run: echo "GRADLE_USER_HOME=$GITHUB_WORKSPACE/.gradle" >> "$GITHUB_ENV"
+
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
       if: inputs.is-asset-build == 'true'
       with:
         path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          !~/.gradle/caches/build-cache-*
+          .gradle/caches
+          .gradle/wrapper
+          !.gradle/caches/build-cache-*
         key: gradle-cache-${{ hashFiles('gradle/**') }}
         restore-keys: gradle-cache-
 
@@ -65,18 +69,19 @@ runs:
       if: inputs.is-asset-build == 'false'
       with:
         path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          !~/.gradle/caches/build-cache-*
+          .gradle/caches
+          .gradle/wrapper
+          !.gradle/caches/build-cache-*
         key: gradle-cache-${{ hashFiles('gradle/**') }}
         restore-keys: gradle-cache-
+        enableCrossOsArchive: true
 
     - name: Cache Gradle build cache
       uses: actions/cache@v4
       if: inputs.is-asset-build == 'true'
       with:
         path: |
-          ~/.gradle/caches/build-cache-*
+          .gradle/caches/build-cache-*
         key: gradle-build-cache-${{ github.sha }}
         restore-keys: gradle-build-cache-
 
@@ -85,9 +90,10 @@ runs:
       if: inputs.is-asset-build == 'false'
       with:
         path: |
-          ~/.gradle/caches/build-cache-*
+          .gradle/caches/build-cache-*
         key: gradle-build-cache-${{ github.sha }}
         restore-keys: gradle-build-cache-
+        enableCrossOsArchive: true
 
     - name: Set up NDK
       shell: bash
