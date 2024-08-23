@@ -1,6 +1,6 @@
 package com.topjohnwu.magisk.core.model.su
 
-import android.content.pm.PackageInfo
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -24,7 +24,7 @@ class SuLog(
 }
 
 fun PackageManager.createSuLog(
-    info: PackageInfo,
+    info: ApplicationInfo,
     toUid: Int,
     fromPid: Int,
     command: String,
@@ -33,13 +33,12 @@ fun PackageManager.createSuLog(
     context: String,
     gids: String,
 ): SuLog {
-    val appInfo = info.applicationInfo
     return SuLog(
-        fromUid = appInfo.uid,
+        fromUid = info.uid,
         toUid = toUid,
         fromPid = fromPid,
-        packageName = getNameForUid(appInfo.uid)!!,
-        appName = appInfo.getLabel(this),
+        packageName = getNameForUid(info.uid)!!,
+        appName = info.getLabel(this),
         command = command,
         action = policy,
         target = target,

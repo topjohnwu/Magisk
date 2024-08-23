@@ -64,7 +64,7 @@ object SuCallbackHandler {
         val pm = context.packageManager
 
         val log = runCatching {
-            pm.getPackageInfo(fromUid, pid)?.let {
+            pm.getPackageInfo(fromUid, pid)?.applicationInfo?.let {
                 pm.createSuLog(it, toUid, pid, command, policy, target, seContext, gids)
             }
         }.getOrNull() ?: createSuLog(fromUid, toUid, pid, command, policy, target, seContext, gids)

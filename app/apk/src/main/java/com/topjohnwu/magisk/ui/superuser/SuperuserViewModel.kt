@@ -78,8 +78,8 @@ class SuperuserViewModel(
                             this@SuperuserViewModel, policy,
                             info.packageName,
                             info.sharedUserId != null,
-                            info.applicationInfo.loadIcon(pm),
-                            info.applicationInfo.getLabel(pm)
+                            info.applicationInfo?.loadIcon(pm) ?: pm.defaultActivityIcon,
+                            info.applicationInfo?.getLabel(pm) ?: info.packageName
                         )
                     } catch (e: PackageManager.NameNotFoundException) {
                         null

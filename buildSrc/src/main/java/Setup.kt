@@ -69,7 +69,7 @@ private val Project.androidComponents
 
 fun Project.setupCommon() {
     androidBase {
-        compileSdkVersion(34)
+        compileSdkVersion(35)
         buildToolsVersion = "34.0.0"
         ndkPath = "$sdkDirectory/ndk/magisk"
         ndkVersion = "27.0.12077973"
@@ -79,8 +79,8 @@ fun Project.setupCommon() {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+            sourceCompatibility = JavaVersion.VERSION_21
+            targetCompatibility = JavaVersion.VERSION_21
         }
 
         packagingOptions {
@@ -108,7 +108,7 @@ fun Project.setupCommon() {
 
     tasks.withType<KotlinCompile> {
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_17
+            jvmTarget = JvmTarget.JVM_21
         }
     }
 }
@@ -296,7 +296,7 @@ fun Project.setupAppCommon() {
         }
 
         defaultConfig {
-            targetSdk = 34
+            targetSdk = 35
         }
 
         buildTypes {
