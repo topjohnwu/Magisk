@@ -200,8 +200,7 @@ mount_root:
     xmount("tmpfs", "/dev", "tmpfs", 0, "mode=755");
     mount_list.emplace_back("/dev");
 
-    // Use the apex folder to determine whether 2SI (Android 10+)
-    bool is_two_stage = access("/apex", F_OK) == 0;
+    bool is_two_stage = access("/system/bin/init", F_OK) == 0;
     LOGD("is_two_stage: [%d]\n", is_two_stage);
 
     // For API 28 AVD, it uses legacy SAR setup that requires
