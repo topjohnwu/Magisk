@@ -230,7 +230,9 @@ kv_pairs load_partition_map() {
 }
 
 bool check_two_stage() {
-    if (access("/apex", F_OK) == 0)
+    if (access("/first_stage_ramdisk", F_OK) == 0)
+        return true;
+    if (access("/second_stage_resources", F_OK) == 0)
         return true;
     if (access("/system/bin/init", F_OK) == 0)
         return true;
