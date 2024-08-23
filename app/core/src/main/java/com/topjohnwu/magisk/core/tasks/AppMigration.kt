@@ -125,8 +125,9 @@ object AppMigration {
         apk: File, out: OutputStream,
         pkg: String, label: CharSequence
     ): Boolean {
-        val info = context.packageManager.getPackageArchiveInfo(apk.path, 0) ?: return false
-        val origLabel = info.applicationInfo.nonLocalizedLabel.toString()
+        val pm = context.packageManager
+        val info = pm.getPackageArchiveInfo(apk.path, 0)?.applicationInfo ?: return false
+        val origLabel = info.nonLocalizedLabel.toString()
         try {
             JarMap.open(apk, true).use { jar ->
                 val je = jar.getJarEntry(ANDROID_MANIFEST)

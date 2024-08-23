@@ -111,7 +111,7 @@ class SuRequestViewModel(
             // shared UID. We have no way to know where this request comes from.
             icon = pm.defaultActivityIcon
             title = "[SharedUID] ${info.sharedUserId}"
-            packageName = info.sharedUserId
+            packageName = info.sharedUserId.toString()
         } else {
             val prefix = if (info.sharedUserId == null) "" else "[SharedUID] "
             icon = app.loadIcon(pm)
