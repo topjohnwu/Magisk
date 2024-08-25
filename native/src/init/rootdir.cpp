@@ -64,12 +64,7 @@ static void patch_rc_scripts(const char *src_path, const char *tmp_path, bool wr
         if (!dest) return;
         LOGD("Patching " INIT_RC " in %s\n", src_path);
         file_readline(false, src.get(), [&dest](string_view line) -> bool {
-            // Do not start vaultkeeper
-            if (str_contains(line, "start vaultkeeper")) {
-                LOGD("Remove vaultkeeper\n");
-                return true;
-            }
-            // Do not run flash_recovery
+            // Do not run flash_recovery on Android 10 and below
             if (line.starts_with("service flash_recovery")) {
                 LOGD("Remove flash_recovery\n");
                 fprintf(dest.get(), "service flash_recovery /system/bin/true\n");
