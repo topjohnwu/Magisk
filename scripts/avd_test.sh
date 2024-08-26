@@ -206,7 +206,7 @@ fi
 
 yes | "$sdk" --licenses > /dev/null
 curl -L $lsposed_url -o out/lsposed.zip
-"$sdk" --channel=3 tools platform-tools emulator
+"$sdk" --channel=3 platform-tools emulator
 
 if [ -n "$1" ]; then
   run_test $1 $2
