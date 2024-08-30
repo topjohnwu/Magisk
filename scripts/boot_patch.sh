@@ -220,6 +220,13 @@ if [ -f kernel ]; then
   # After:  [mov w2, #-32768]
   ./magiskboot hexpatch kernel 821B8012 E2FF8F12 && PATCHEDKERNEL=true
 
+  # Disable Samsung PROCA
+  # proca_config -> proca_magisk
+  ./magiskboot hexpatch kernel \
+  70726F63615F636F6E66696700 \
+  70726F63615F6D616769736B00 \
+  && PATCHEDKERNEL=true
+
   # Force kernel to load rootfs for legacy SAR devices
   # skip_initramfs -> want_initramfs
   $LEGACYSAR && ./magiskboot hexpatch kernel \
