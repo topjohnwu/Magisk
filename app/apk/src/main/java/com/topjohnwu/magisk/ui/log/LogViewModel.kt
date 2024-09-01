@@ -74,6 +74,7 @@ class LogViewModel(
                 file.write("---Detected Device Info---\n\n")
                 file.write("isAB=${Info.isAB}\n")
                 file.write("isSAR=${Info.isSAR}\n")
+                file.write("legacySAR=${Info.legacySAR}\n")
                 file.write("ramdisk=${Info.ramdisk}\n")
                 val uname = Os.uname()
                 file.write("kernel=${uname.sysname} ${uname.machine} ${uname.release} ${uname.version}\n")
