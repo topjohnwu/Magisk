@@ -192,8 +192,10 @@ printvar() {
 run_action() {
   local MODID="$1"
   cd "/data/adb/modules/$MODID"
-  ASH_STANDALONE=1 sh ./action.sh
+  sh ./action.sh
+  local RES=$?
   cd /
+  return $RES
 }
 
 ##########################
