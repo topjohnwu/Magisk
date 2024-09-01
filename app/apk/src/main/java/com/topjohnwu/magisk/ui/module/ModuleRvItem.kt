@@ -25,6 +25,7 @@ class LocalModuleRvItem(
     override val layoutRes = R.layout.item_module_md2
 
     val showNotice: Boolean
+    val showAction: Boolean
     val noticeText: TextHolder
 
     init {
@@ -35,6 +36,7 @@ class LocalModuleRvItem(
         showNotice = zygiskUnloaded ||
             (Info.isZygiskEnabled && isRiru) ||
             (!Info.isZygiskEnabled && isZygisk)
+        showAction = item.hasAction && !showNotice
         noticeText =
             when {
                 zygiskUnloaded -> CoreR.string.zygisk_module_unloaded.asText()

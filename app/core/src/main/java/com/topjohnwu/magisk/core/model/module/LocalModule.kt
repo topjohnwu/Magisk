@@ -37,6 +37,7 @@ data class LocalModule(
     val isRiru: Boolean get() = (id == "riru-core") || riruFolder.exists()
     val isZygisk: Boolean get() = zygiskFolder.exists()
     val zygiskUnloaded: Boolean get() = unloaded.exists()
+    val hasAction: Boolean;
 
     var enable: Boolean
         get() = !disableFile.exists()
@@ -100,6 +101,8 @@ data class LocalModule(
         if (name.isEmpty()) {
             name = id
         }
+
+        hasAction = RootUtils.fs.getFile(path, "action.sh").exists()
     }
 
     suspend fun fetch(): Boolean {

@@ -54,6 +54,21 @@
     </fragment>
 
     <fragment
+        android:id="@+id/actionFragment"
+        android:name="com.topjohnwu.magisk.ui.module.ActionFragment"
+        android:label="ActionFragment"
+        tools:layout="@layout/fragment_action_md2" >
+
+        <argument
+            android:name="id"
+            app:argType="string" />
+
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
         android:id="@+id/installFragment"
         android:name="com.topjohnwu.magisk.ui.install.InstallFragment"
         android:label="InstallFragment"
@@ -147,6 +162,14 @@
     <action
         android:id="@+id/action_flashFragment"
         app:destination="@id/flashFragment"
+        app:enterAnim="@anim/fragment_enter"
+        app:exitAnim="@anim/fragment_exit"
+        app:popEnterAnim="@anim/fragment_enter_pop"
+        app:popExitAnim="@anim/fragment_exit_pop" />
+
+    <action
+        android:id="@+id/action_actionFragment"
+        app:destination="@id/actionFragment"
         app:enterAnim="@anim/fragment_enter"
         app:exitAnim="@anim/fragment_exit"
         app:popEnterAnim="@anim/fragment_enter_pop"
