@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sysinfo_app_title">System</string>
+    <string name="sysinfo_apiversion">API Version</string>
+    <string name="sysinfo_manufactor">Manufactor</string>
+    <string name="sysinfo_codename">Codename</string>
+</resources>

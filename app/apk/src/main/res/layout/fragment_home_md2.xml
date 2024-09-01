@@ -107,6 +107,17 @@
                 android:layout_marginEnd="@dimen/l1"
                 app:layout_constraintTop_toBottomOf="@+id/home_magisk_wrapper" />
 
+            <include
+                android:id="@+id/home_sysinfo_wrapper"
+                layout="@layout/include_home_sysinfo"
+                viewModel="@{viewModel}"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:layout_marginTop="@dimen/l1"
+                android:layout_marginEnd="@dimen/l1"
+                app:layout_constraintTop_toBottomOf="@+id/home_manager_wrapper" />
+
             <Space
                 goneUnless="@{Info.env.isActive}"
                 android:layout_width="match_parent"

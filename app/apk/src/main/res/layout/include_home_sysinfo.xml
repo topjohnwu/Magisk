@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.topjohnwu.magisk.ui.home.HomeViewModel.State" />
+
+        <variable
+            name="viewModel"
+            type="com.topjohnwu.magisk.ui.home.HomeViewModel" />
+
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/WidgetFoundation.Card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/l1"
+            android:paddingTop="@dimen/l_50"
+            android:paddingEnd="@dimen/l1"
+            android:paddingBottom="@dimen/l_50"
+            tools:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/sysinfo_manager_icon"
+                style="@style/WidgetFoundation.Icon.Primary"
+                android:padding="@dimen/l_50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_superuser" />
+
+            <TextView
+                android:id="@+id/sysinfo_manager_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/l1"
+                android:text="@string/sysinfo_app_title"
+                android:textAppearance="@style/AppearanceFoundation.Title"
+                android:textColor="?colorPrimary"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toBottomOf="@+id/sysinfo_manager_icon"
+                app:layout_constraintEnd_toStartOf="@+id/sysinfo_manager_button"
+                app:layout_constraintStart_toEndOf="@+id/sysinfo_manager_icon"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="@string/home_app_title" />
+
+            <FrameLayout
+                android:id="@+id/sysinfo_manager_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/sysinfo_manager_title"
+                app:layout_constraintTop_toTopOf="@+id/sysinfo_manager_title">
+
+
+
+            </FrameLayout>
+
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/sysinfo_manager_title_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:referencedIds="@{viewModel.appTitleBarrierIds}"
+                tools:constraint_referenced_ids="sysinfo_manager_icon,sysinfo_manager_title,sysinfo_manager_button" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fadingEdgeLength="@dimen/l1"
+                android:requiresFadingEdge="horizontal"
+                android:scrollbars="none"
+                app:layout_constraintTop_toBottomOf="@+id/sysinfo_manager_title_barrier">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="45dp" >
+
+                        <LinearLayout
+                            android:id="@+id/sysinfo_apiversion"
+                            style="@style/W.Home.Item.Top"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/sysinfo_apiversion" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{String.valueOf(android.os.Build.VERSION.SDK_INT)}"
+                                tools:text="Unknown" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/sysinfo_manufactor"
+                            style="@style/W.Home.Item"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/sysinfo_apiversion">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/sysinfo_manufactor" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{android.os.Build.MANUFACTURER}"
+                                tools:text="Unknown" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/sysinfo_codename"
+                            style="@style/W.Home.Item.Bottom"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/sysinfo_manufactor">
+
+                            <TextView
+                                style="@style/W.Home.ItemContent"
+                                android:text="@string/sysinfo_codename" />
+
+                            <TextView
+                                style="@style/W.Home.ItemContent.Right"
+                                android:text="@{android.os.Build.VERSION.CODENAME}"
+                                tools:text="Unknown" />
+
+                        </LinearLayout>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>
