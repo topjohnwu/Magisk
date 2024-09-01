@@ -8,11 +8,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.arch.BaseFragment
 import com.topjohnwu.magisk.arch.viewModel
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.databinding.FragmentActionMd2Binding
 import com.topjohnwu.magisk.ui.flash.FlashViewModel
 import timber.log.Timber
@@ -46,11 +48,27 @@ class ActionFragment : BaseFragment<FragmentActionMd2Binding>(), MenuProvider {
                     ActionViewModel.State.FAILED -> CoreR.string.failure
                 }
             )
-            if (it != ActionViewModel.State.RUNNING) {
-                binding.closeBtn.apply {
-                    if (!this.isVisible) this.show()
-                    if (!this.isFocused) this.requestFocus()
+            when (it) {
+                ActionViewModel.State.SUCCESS -> {
+                    activity?.apply {
+                        toast(
+                            getString(
+                                com.topjohnwu.magisk.core.R.string.done_action,
+                                this@ActionFragment.viewModel.args.name
+                            ), Toast.LENGTH_LONG
+                        )
+                        onBackPressed()
+                    }
                 }
+
+                ActionViewModel.State.FAILED -> {
+                    binding.closeBtn.apply {
+                        if (!this.isVisible) this.show()
+                        if (!this.isFocused) this.requestFocus()
+                    }
+                }
+
+                else -> {}
             }
         }
     }
@@ -90,7 +108,7 @@ class ActionFragment : BaseFragment<FragmentActionMd2Binding>(), MenuProvider {
     }
 
     override fun onBackPressed(): Boolean {
-        if (!binding.closeBtn.isVisible) return true
+        if (viewModel.state.value == ActionViewModel.State.RUNNING) return true
         return super.onBackPressed()
     }
 
