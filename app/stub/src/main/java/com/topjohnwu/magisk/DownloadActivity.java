@@ -22,6 +22,10 @@ import android.system.Os;
 import android.system.OsConstants;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.content.ContentValues;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 
 import com.topjohnwu.magisk.net.Networking;
 import com.topjohnwu.magisk.net.Request;
@@ -128,10 +132,39 @@ public class DownloadActivity extends Activity {
         });
     }
 
+
     private void dlAPK() {
-        dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
-        // Download and upgrade the app
-        var request = request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    dialog = ProgressDialog.show(themed, getString(dling), getString(dling) + " " + APP_NAME, true);
+
+    var request = request(apkLink).setExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        request.getAsInputStream(input -> {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, "app-release.apk");
+            values.put(MediaStore.Downloads.MIME_TYPE, "application/vnd.android.package-archive");
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+            Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+
+            if (uri != null) {
+                try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+                    if (out != null) {
+                        APKInstall.transfer(input, out);
+                        out.flush();
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(intent);
+                    }
+                } catch (IOException e) {
+                    error(e);
+                }
+            } else {
+                error(new IOException("Failed to create download entry in MediaStore."));
+            }
+        });
+    } else {
         if (dynLoad) {
             request.getAsFile(StubApk.current(this), file -> StubApk.restartProcess(this));
         } else {
@@ -149,6 +182,9 @@ public class DownloadActivity extends Activity {
             });
         }
     }
+}
+
+    
 
     private void decryptResources(OutputStream out) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
