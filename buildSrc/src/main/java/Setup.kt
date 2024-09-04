@@ -375,8 +375,8 @@ fun Project.setupStub() {
         val outAppClassDir = layout.buildDirectory.file("generated/source/app/${variantLowered}").get().asFile
         val outResDir = layout.buildDirectory.dir("generated/source/res/${variantLowered}").get().asFile
         val aapt = File(androidApp.sdkDirectory, "build-tools/${androidApp.buildToolsVersion}/aapt2")
-        val apk = layout.buildDirectory.file("intermediates/processed_res/" +
-            "${variantLowered}/process${variantCapped}Resources/out/resources-${variantLowered}.ap_").get().asFile
+        val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
+            "${variantLowered}/process${variantCapped}Resources/linked-resources-binary-format-${variantLowered}.ap_").get().asFile
 
         val genManifestTask = tasks.register("generate${variantCapped}ObfuscatedClass") {
             inputs.property("seed", RAND_SEED)
@@ -417,8 +417,8 @@ fun Project.setupStub() {
         registerJavaGeneratingTask(processResourcesTask, outResDir)
     }
     // Override optimizeReleaseResources task
-    val apk = layout.buildDirectory.file("intermediates/processed_res/" +
-        "release/processReleaseResources/out/resources-release.ap_").get().asFile
+    val apk = layout.buildDirectory.file("intermediates/linked_resources_binary_format/" +
+        "release/processReleaseResources/linked-resources-binary-format-release.ap_").get().asFile
     val optRes = layout.buildDirectory.file("intermediates/optimized_processed_res/" +
         "release/optimizeReleaseResources/resources-release-optimize.ap_").get().asFile
     afterEvaluate {
