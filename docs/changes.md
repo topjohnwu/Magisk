@@ -317,7 +317,8 @@
 - [MagiskHide] All random strings now also have random length
 - [MagiskBoot] Allow no recompression for ramdisk.cpio
 - [MagiskBoot] Support some weird Huawei boot images
-- [General] Add new `--remove-modules` command to remove modules without root in ADB shell
+- [General] Add new `--remove-modules`![1000020266](https://github.com/user-attachments/assets/a6278b51-82d4-4ab5-9bd7-9f8b9d509655)
+ command to remove modules without root in ADB shell
 - [General] Support Android 10 new APEX libraries (Project Mainline)
 
 ### v19.3
