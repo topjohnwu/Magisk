@@ -13,6 +13,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Collections
@@ -85,6 +86,9 @@ fun <K, V> MutableMap<K, V>.synchronized(): MutableMap<K, V> = Collections.synch
 
 fun Class<*>.reflectField(name: String): Field =
     getDeclaredField(name).apply { isAccessible = true }
+
+fun Class<*>.reflectMethod(name: String, vararg types: Class<*>): Method =
+    getDeclaredMethod(name, *types).apply { isAccessible = true }
 
 inline fun <T, R> Flow<T>.concurrentMap(crossinline transform: suspend (T) -> R): Flow<R> {
     return flatMapMerge { value ->
