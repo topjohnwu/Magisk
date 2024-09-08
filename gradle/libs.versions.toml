@@ -24,6 +24,7 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.10.0.202406032230-r" }
+desugar_nio = { module = "com.android.tools:desugar_jdk_libs_nio", version = "2.1.2" }
 
 # AndroidX
 activity = { module = "androidx.activity:activity", version = "1.9.2" }

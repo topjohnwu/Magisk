@@ -13,7 +13,7 @@ kapt {
     useBuildCache = true
     mapDiagnosticLocations = true
     javacOptions {
-        option("-Xmaxerrs", 1000)
+        option("-Xmaxerrs", "1000")
     }
 }
 
@@ -29,6 +29,10 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64", "riscv64")
             debugSymbolLevel = "FULL"
         }
+    }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
     }
 
     buildTypes {
@@ -62,6 +66,8 @@ dependencies {
     implementation(libs.fragment.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+
+    coreLibraryDesugaring(libs.desugar.nio)
 
     // Make sure kapt runs with a proper kotlin-stdlib
     kapt(kotlin("stdlib"))
