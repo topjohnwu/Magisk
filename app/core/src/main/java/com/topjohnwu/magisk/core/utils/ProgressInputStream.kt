@@ -20,7 +20,7 @@ class ProgressInputStream(
     }
 
     override fun read(): Int {
-        val b = read()
+        val b = super.read()
         if (b >= 0) {
             bytesRead++
             emitProgress()

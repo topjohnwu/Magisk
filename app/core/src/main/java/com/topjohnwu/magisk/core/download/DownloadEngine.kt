@@ -29,7 +29,6 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.copyAndClose
-import com.topjohnwu.magisk.core.ktx.forEach
 import com.topjohnwu.magisk.core.ktx.set
 import com.topjohnwu.magisk.core.ktx.withStreams
 import com.topjohnwu.magisk.core.ktx.writeTo
@@ -43,14 +42,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 /**
  * This class drives the execution of file downloads and notification management.
@@ -308,26 +308,49 @@ class DownloadEngine(
     }
 
     private suspend fun handleModule(src: InputStream, file: Uri) {
-        val input = ZipInputStream(src)
-        val output = ZipOutputStream(file.outputStream())
+        val input = ZipArchiveInputStream(src)
+        val output = ZipArchiveOutputStream(file.outputStream())
 
         withStreams(input, output) { zin, zout ->
-            zout.putNextEntry(ZipEntry("META-INF/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/update-binary"))
             context.assets.open("module_installer.sh").use { it.copyAll(zout) }
 
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
+            zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/updater-script"))
             zout.write("#MAGISK\n".toByteArray())
 
-            zin.forEach { entry ->
+            val entryField = zout.javaClass.getDeclaredField("entry").also { it.isAccessible = true }
+            val hasWrittenField = entryField.type.getDeclaredField("hasWritten").also { it.isAccessible = true }
+            val closeEntryMethod = zout.javaClass.getDeclaredMethod("closeCopiedEntry", Boolean::class.java).apply { isAccessible = true }
+            val streamCompressorField = zout.javaClass.getDeclaredField("streamCompressor").apply { isAccessible = true }
+            val resetMethod = streamCompressorField.type.getDeclaredMethod("reset").apply { isAccessible = true }
+
+            for (entry in zin) {
                 val path = entry.name
                 if (path.isNotEmpty() && !path.startsWith("META-INF")) {
-                    zout.putNextEntry(ZipEntry(path))
+                    val method = entry.method
+                    val size = entry.size
+                    // Force STORED method to avoid decompression for better performance
+                    if (entry.method != ZipEntry.STORED) {
+                        entry.method = ZipEntry.STORED
+                        entry.size = entry.compressedSize
+                    }
+                    val archiveEntry = ZipArchiveEntry(path)
+                    archiveEntry.method = method
+                    archiveEntry.crc = entry.crc
+                    zout.putArchiveEntry(archiveEntry)
                     if (!entry.isDirectory) {
+                        archiveEntry.method = ZipEntry.STORED
                         zin.copyAll(zout)
+                        hasWrittenField.set(entryField.get(zout), true)
+                        archiveEntry.compressedSize = entry.compressedSize
+                        archiveEntry.size = size
+                        archiveEntry.method = method
+                        closeEntryMethod(zout, false)
+                        resetMethod(streamCompressorField.get(zout))
                     }
                 }
             }
