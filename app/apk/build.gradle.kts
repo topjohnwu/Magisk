@@ -42,10 +42,15 @@ android {
     buildFeatures {
         dataBinding = true
     }
+
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 }
 
 dependencies {
     implementation(project(":app:core"))
+    coreLibraryDesugaring(libs.jdk.libs)
 
     implementation(libs.indeterminate.checkbox)
     implementation(libs.rikka.layoutinflater)

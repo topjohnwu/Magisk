@@ -44,6 +44,7 @@ transition = { module = "androidx.transition:transition", version = "1.5.1" }
 collection-ktx = { module = "androidx.collection:collection-ktx", version = "1.4.3" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version = "2.8.5" }
 material = { module = "com.google.android.material:material", version = "1.12.0" }
+jdk-libs = { module = "com.android.tools:desugar_jdk_libs_nio", version = "2.1.2" }
 
 # topjohnwu
 indeterminate-checkbox = { module = "com.github.topjohnwu:indeterminate-checkbox", version = "1.0.7" }
