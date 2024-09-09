@@ -1,4 +1,4 @@
-# Magisk Changelog
+# Magisk Chang hielog
 
 ### v27.0
 
