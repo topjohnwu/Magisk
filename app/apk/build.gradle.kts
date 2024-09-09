@@ -13,7 +13,7 @@ kapt {
     useBuildCache = true
     mapDiagnosticLocations = true
     javacOptions {
-        option("-Xmaxerrs", 1000)
+        option("-Xmaxerrs", "1000")
     }
 }
 
