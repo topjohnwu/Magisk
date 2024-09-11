@@ -4,14 +4,12 @@
 
 pub use base;
 use cpio::cpio_commands;
-use dtb::dtb_commands;
 use patch::hexpatch;
 use payload::extract_boot_from_payload;
 use sign::{get_sha, sha1_hash, sha256_hash, sign_boot_image, verify_boot_image, SHA};
 use std::env;
 
 mod cpio;
-mod dtb;
 mod patch;
 mod payload;
 // Suppress warnings in generated code
@@ -63,7 +61,6 @@ pub mod ffi {
             cert: *const c_char,
             key: *const c_char,
         ) -> Vec<u8>;
-        unsafe fn dtb_commands(argc: i32, argv: *const *const c_char) -> bool;
     }
 }
 

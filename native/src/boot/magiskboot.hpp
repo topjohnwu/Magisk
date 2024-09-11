@@ -21,7 +21,6 @@ void repack(const char *src_img, const char *out_img, bool skip_comp = false);
 int verify(const char *image, const char *cert);
 int sign(const char *image, const char *name, const char *cert, const char *key);
 int split_image_dtb(const char *filename, bool skip_decomp = false);
-int dtb_commands(int argc, char *argv[]);
 
 static inline bool check_env(const char *name) {
     using namespace std::string_view_literals;

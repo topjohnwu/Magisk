@@ -90,10 +90,6 @@ Supported actions:
     Each command is a single argument; add quotes for each command.
     See "cpio --help" for supported commands.
 
-  dtb <file> <action> [args...]
-    Do dtb related actions to <file>.
-    See "dtb --help" for supported actions.
-
   split [-n] <file>
     Split image.*-dtb into kernel + kernel_dtb.
     If '-n' is provided, decompression operations will be skipped;
@@ -214,8 +210,6 @@ int main(int argc, char *argv[]) {
         return hexpatch(byte_view(argv[2]), byte_view(argv[3]), byte_view(argv[4])) ? 0 : 1;
     } else if (argc > 2 && action == "cpio") {
         return rust::cpio_commands(argc - 2, argv + 2) ? 0 : 1;
-    } else if (argc > 2 && action == "dtb") {
-        return rust::dtb_commands(argc - 2, argv + 2) ? 0 : 1;
     } else if (argc > 2 && action == "extract") {
         return rust::extract_boot_from_payload(
                 argv[2],

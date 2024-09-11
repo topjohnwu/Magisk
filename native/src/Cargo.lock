@@ -284,12 +284,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fdt"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "784a4df722dc6267a04af36895398f59d21d07dce47232adf31ec0ff2fa45e67"
-
-[[package]]
 name = "ff"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -408,7 +402,6 @@ dependencies = [
  "cxx-gen",
  "der",
  "digest",
- "fdt",
  "num-traits",
  "p256",
  "p384",
