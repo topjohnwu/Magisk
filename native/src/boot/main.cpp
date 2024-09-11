@@ -152,6 +152,8 @@ int main(int argc, char *argv[]) {
         unlink(EXTRA_FILE);
         unlink(RECV_DTBO_FILE);
         unlink(DTB_FILE);
+        unlink(BOOTCONFIG_FILE);
+        rm_rf(VND_RAMDISK_DIR);
     } else if (argc > 2 && action == "sha1") {
         uint8_t sha1[20];
         {
