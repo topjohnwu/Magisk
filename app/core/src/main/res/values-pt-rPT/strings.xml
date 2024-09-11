@@ -105,6 +105,7 @@
     <string name="reboot_safe_mode">Modo de segurança</string>
     <string name="module_version_author">%1$s por %2$s</string>
     <string name="module_state_remove">Remover</string>
+    <string name="module_action">Ação</string>
     <string name="module_state_restore">Restaurar</string>
     <string name="module_action_install_external">Instalar a partir do armazenamento</string>
     <string name="update_available">Atualização disponível</string>
@@ -173,7 +174,7 @@
     <string name="settings_doh_title">DNS sobre HTTPS</string>
     <string name="settings_doh_description">Solução alternativa para envenenamento de DNS em alguns países</string>
     <string name="settings_random_name_title">Randomizar nome de saída</string>
-    <string name="settings_random_name_description">Randomize o nome do arquivo de saída de imagens corrigidas e arquivos tar para evitar a detecção</string>
+    <string name="settings_random_name_description">Randomize o nome do arquivo de saída de imagens corrigidas e arquivos tar (*.tar) para evitar a detecção</string>
     <string name="multiuser_mode">Modo multiusuário</string>
     <string name="settings_owner_only">Somente proprietário do dispositivo</string>
     <string name="settings_owner_manage">Gerenciado pelo proprietário do dispositivo</string>
@@ -205,9 +206,12 @@
     <string name="repo_install_title">Instalar %1$s %2$s(%3$d)</string>
     <string name="download">Baixar</string>
     <string name="reboot">Reiniciar</string>
+    <string name="close">Fechar</string>
     <string name="release_notes">Notas da atualização</string>
     <string name="flashing">Flashando…</string>
+    <string name="running">Executando…</string>
     <string name="done">Concluído!</string>
+    <string name="done_action">Ação de execução de %1$s concluída</string>
     <string name="failure">Falhou!</string>
     <string name="hide_app_title">Ocultando o app do Magisk…</string>
     <string name="open_link_failed_toast">Nenhum app encontrado para abrir o link</string>
