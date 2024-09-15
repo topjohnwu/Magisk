@@ -74,7 +74,6 @@
     <string name="su_revoke_msg">Konfirmo për të hequr të drejtat e %1$s?</string>
     <string name="toast">Dolli</string>
     <string name="none">Asnjë</string>
-
     <string name="superuser_toggle_notification">Njoftimet</string>
     <string name="superuser_toggle_revoke">Të drejtat</string>
     <string name="superuser_policy_none">Asnjë aplikacion nuk ka kërkuar akoma akses për super-përdoruesin.</string>
@@ -90,8 +89,6 @@
     <string name="target_pid">Montoni PID të synuar ns: %s</string>
     <string name="selinux_context">Konteksti SELinux: %s</string>
     <string name="supp_group">Grupi suplementar: %s</string>
-
-    <!--SafetyNet-->
 
     <!--MagiskHide-->
     <string name="show_system_app">Shfaq aplikacionet e sistemit</string>
@@ -109,6 +106,7 @@
     <string name="reboot_safe_mode">Rinis në safe mode</string>
     <string name="module_version_author">%1$s nga %2$s</string>
     <string name="module_state_remove">Hiqe</string>
+    <string name="module_action">Veprim</string>
     <string name="module_state_restore">Rikëthe</string>
     <string name="module_action_install_external">Instaloni nga sdcard</string>
     <string name="update_available">Përditësimi në dispozicion</string>
@@ -207,9 +205,12 @@
     <string name="repo_install_title">Instalo %1$s %2$s(%3$d)</string>
     <string name="download">Shkarko</string>
     <string name="reboot">Rinis</string>
+    <string name="close">Mbylle</string>
     <string name="release_notes">Shënimet e lëshimit</string>
     <string name="flashing">Duke flashuar…</string>
+    <string name="running">Duke vepruar...</string>
     <string name="done">U krye!</string>
+    <string name="done_action">Veprimi i ekzekutimit të %1$s u krye</string>
     <string name="failure">Dështoi!</string>
     <string name="hide_app_title">Fshehja e aplikacionit Magisk…</string>
     <string name="open_link_failed_toast">Nuk u gjet asnjë aplikacion për të hapur lidhjen</string>
