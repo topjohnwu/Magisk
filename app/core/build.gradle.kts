@@ -33,7 +33,10 @@ dependencies {
     api(libs.timber)
     api(libs.markwon.core)
     implementation(libs.bcpkix)
-    implementation(libs.commons.compress)
+    implementation(libs.commons.io)
+    implementation(libs.commons.codec)
+    implementation(libs.commons.lang)
+    implementation(files("libs/commons-compress-1.27.2-SNAPSHOT.jar"))
 
     api(libs.libsu.core)
     api(libs.libsu.service)

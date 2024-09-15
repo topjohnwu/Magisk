@@ -29,8 +29,6 @@ import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.cachedFile
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.copyAndClose
-import com.topjohnwu.magisk.core.ktx.reflectField
-import com.topjohnwu.magisk.core.ktx.reflectMethod
 import com.topjohnwu.magisk.core.ktx.set
 import com.topjohnwu.magisk.core.ktx.withStreams
 import com.topjohnwu.magisk.core.ktx.writeTo
@@ -324,35 +322,17 @@ class DownloadEngine(
             zout.putArchiveEntry(ZipArchiveEntry("META-INF/com/google/android/updater-script"))
             zout.write("#MAGISK\n".toByteArray())
 
-            val entryField = zout.javaClass.reflectField("entry")
-            val hasWrittenField = entryField.type.reflectField("hasWritten")
-            val closeEntryMethod = zout.javaClass.reflectMethod("closeCopiedEntry", Boolean::class.java)
-            val streamCompressorField = zout.javaClass.reflectField("streamCompressor")
-            val resetMethod = streamCompressorField.type.reflectMethod("reset")
-
             for (entry in zin) {
                 val path = entry.name
                 if (path.isNotEmpty() && !path.startsWith("META-INF")) {
-                    val method = entry.method
-                    val size = entry.size
-                    // Force STORED method to avoid decompression for better performance
-                    if (entry.method != ZipEntry.STORED) {
+                    if (!entry.isDirectory) {
+                        // Force STORED method to avoid decompression for better performance
+                        val archiveEntry = ZipArchiveEntry(entry)
                         entry.method = ZipEntry.STORED
                         entry.size = entry.compressedSize
-                    }
-                    val archiveEntry = ZipArchiveEntry(path)
-                    archiveEntry.method = method
-                    archiveEntry.crc = entry.crc
-                    zout.putArchiveEntry(archiveEntry)
-                    if (!entry.isDirectory) {
-                        archiveEntry.method = ZipEntry.STORED
-                        zin.copyAll(zout)
-                        hasWrittenField.set(entryField.get(zout), true)
-                        archiveEntry.compressedSize = entry.compressedSize
-                        archiveEntry.size = size
-                        archiveEntry.method = method
-                        closeEntryMethod(zout, false)
-                        resetMethod(streamCompressorField.get(zout))
+                        zout.addRawArchiveEntry(archiveEntry, zin)
+                    } else {
+                        zout.putArchiveEntry(entry)
                     }
                 }
             }

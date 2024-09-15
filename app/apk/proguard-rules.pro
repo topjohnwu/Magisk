@@ -22,20 +22,6 @@
   int mActivityHandlesConfigFlags;
 }
 
--keepclassmembernames class org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream {
-  private org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream$CurrentEntry entry;
-  private void closeCopiedEntry(boolean);
-  private final org.apache.commons.compress.archivers.zip.StreamCompressor streamCompressor;
-}
-
--keepclassmembernames class org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream$CurrentEntry {
-  private boolean hasWritten;
-}
-
--keepclassmembernames class org.apache.commons.compress.archivers.zip.StreamCompressor {
-  void reset();
-}
-
 # main
 -keep,allowoptimization public class com.topjohnwu.magisk.signing.SignBoot {
     public static void main(java.lang.String[]);

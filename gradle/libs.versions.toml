@@ -12,7 +12,9 @@ room = "2.6.1"
 
 [libraries]
 bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version = "1.78.1" }
-commons-compress = { module = "org.apache.commons:commons-compress", version = "1.27.1" }
+commons-io = { module = "commons-io:commons-io", version = "2.16.1" }
+commons-codec = { module = "commons-codec:commons-codec", version = "1.17.1" }
+commons-lang = { module = "org.apache.commons:commons-lang3", version = "3.17.0" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
 retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
