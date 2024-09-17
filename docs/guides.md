@@ -232,7 +232,7 @@ The list above will result in the following files being created: `$MODPATH/syste
 In Magisk, you can run boot scripts in 2 different modes: **post-fs-data** and **late_start service** mode.
 
 - post-fs-data mode
-  - This stage is BLOCKING. The boot process is paused before execution is done, or 10 seconds have passed.
+  - This stage is BLOCKING. The boot process is paused before execution is done, or 40 seconds have passed.
   - Scripts run before any modules are mounted. This allows a module developer to dynamically adjust their modules before it gets mounted.
   - This stage happens before Zygote is started, which pretty much means everything in Android
   - **WARNING:** using `setprop` will deadlock the boot process! Please use `resetprop -n <prop_name> <prop_value>` instead.
