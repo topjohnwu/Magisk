@@ -109,6 +109,7 @@
     <string name="reboot_safe_mode">安全模式</string>
     <string name="module_version_author">%1$s，作者 %2$s</string>
     <string name="module_state_remove">移除</string>
+    <string name="module_action">操作</string>
     <string name="module_state_restore">还原</string>
     <string name="module_action_install_external">从本地安装</string>
     <string name="update_available">可更新</string>
@@ -211,9 +212,12 @@
     <string name="repo_install_title">安装 %1$s %2$s(%3$d)</string>
     <string name="download">下载</string>
     <string name="reboot">重启</string>
+    <string name="close">关闭</string>
     <string name="release_notes">发布说明</string>
     <string name="flashing">正在刷入</string>
+    <string name="running">运行中……</string>
     <string name="done">完成！</string>
+    <string name="done_action">%1$s 操作运行完成</string>
     <string name="failure">失败</string>
     <string name="hide_app_title">正在隐藏 Magisk 应用</string>
     <string name="open_link_failed_toast">找不到能打开此链接的应用</string>
