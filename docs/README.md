@@ -12,3 +12,4 @@ The following sections are for developers
 - [Magisk Tools](tools.md)
 - [Internal Details](details.md)
 - [Android Booting Shenanigans](boot.md)
+resetprop -w
