@@ -271,6 +271,10 @@ bool sepol_impl::add_rule(const char *s, const char *t, const char *c, const cha
 #define ioctl_func(x) (x & 0xFF)
 
 void sepol_impl::add_xperm_rule(type_datum_t *src, type_datum_t *tgt, class_datum_t *cls, const Xperm &p, int effect) {
+    if (db->policyvers < POLICYDB_VERSION_XPERMS_IOCTL) {
+        LOGE("policy version %u does not support ioctl extended permissions rules\n", db->policyvers);
+        return;
+    }
     if (src == nullptr) {
         for_each_attr(db->p_types.table, [&](type_datum_t *type) {
             add_xperm_rule(type, tgt, cls, p, effect);
