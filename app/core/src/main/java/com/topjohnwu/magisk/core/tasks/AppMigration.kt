@@ -191,11 +191,12 @@ object AppMigration {
 
         // Install and auto launch app
         val session = APKInstall.startSession(activity, pkg, onFailure) {
+            Config.suManager = pkg
+            Shell.cmd("touch $AppApkPath").exec()
             launchApp(activity, pkg)
         }
 
-        Config.suManager = pkg
-        val cmd = "touch $AppApkPath; adb_pm_install $repack $pkg"
+        val cmd = "adb_pm_install $repack $pkg"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
@@ -240,11 +241,12 @@ object AppMigration {
         }
         val apk = StubApk.current(activity)
         val session = APKInstall.startSession(activity, APP_PACKAGE_NAME, onFailure) {
+            Config.suManager = ""
+            Shell.cmd("touch $AppApkPath").exec()
             launchApp(activity, APP_PACKAGE_NAME)
             dialog.dismiss()
         }
-        Config.suManager = ""
-        val cmd = "touch $AppApkPath; adb_pm_install $apk $APP_PACKAGE_NAME"
+        val cmd = "adb_pm_install $apk $APP_PACKAGE_NAME"
         if (Shell.cmd(cmd).await().isSuccess) return
         val success = withContext(Dispatchers.IO) {
             try {
