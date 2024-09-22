@@ -1,3 +1,4 @@
+![Screenshot_٢٠٢٤-٠٩-٢١-١٣-٣٨-٣٢-٢٣٦_com whatsapp](https://github.com/user-attachments/assets/16bf2fcd-fde2-4da8-90ae-5a366da93465)
 # Magisk Changelog
 
 ### v27.0
