@@ -66,6 +66,8 @@ $BOOTMODE || remove_system_su
 
 ui_print "- Constructing environment"
 
+[ -z $MAGISKBIN ] && abort "! The MAGISKBIN variable is not configured correctly"
+
 # Copy required files
 rm -rf $MAGISKBIN/* 2>/dev/null
 mkdir -p $MAGISKBIN 2>/dev/null
