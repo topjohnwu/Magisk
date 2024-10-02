@@ -13,9 +13,9 @@ using namespace std;
 
 #ifdef USE_CRT0
 __BEGIN_DECLS
-int tfp_vfprintf(FILE *stream, const char *format, va_list arg);
+int tiny_vfprintf(FILE *stream, const char *format, va_list arg);
 int vfprintf(FILE *stream, const char *format, va_list arg) {
-    return tfp_vfprintf(stream, format, arg);
+    return tiny_vfprintf(stream, format, arg);
 }
 __END_DECLS
 #endif
