@@ -783,7 +783,8 @@
 - Mods are now installed independently in their own subfolder. This paves the way for future Magisk Manager versions to manage mods, **just like how Xposed Modules are handled**
 - Support small boot partition devices (Huawei devices)
 - Use minimal sepolicy patch in boot image for smaller ramdisk size. Live patch policies after bootup
-- Include updated open source sepolicy injection tool (source code available), support nearly all SuperSU supolicy tool's functionality
+- Include updated open source![logo](https://github.com/user-attachments/assets/d60b1c36-175d-4741-9b94-c412bb93cfc8)
+ sepolicy injection tool (source code available), support nearly all SuperSU supolicy tool's functionality
 
 ### v3
 
