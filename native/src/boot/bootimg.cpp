@@ -366,7 +366,7 @@ static const char *vendor_ramdisk_type(int type) {
 }
 
 #define assert_off() \
-if ((base_addr + off) > (map.buf() + map.sz())) { \
+if ((base_addr + off) > (map.buf() + map_end)) {  \
     fprintf(stderr, "Corrupted boot image!\n");   \
     return false;    \
 }
@@ -395,6 +395,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
 
     hdr->print();
 
+    size_t map_end = align_to(map.sz(), getpagesize());
     size_t off = hdr->hdr_space();
     get_block(kernel);
     get_block(ramdisk);
@@ -408,7 +409,7 @@ bool boot_img::parse_image(const uint8_t *p, format_t type) {
 
     payload = byte_view(base_addr, off);
     auto tail_addr = base_addr + off;
-    tail = byte_view(tail_addr, map.buf() + map.sz() - tail_addr);
+    tail = byte_view(tail_addr, map.buf() + map_end - tail_addr);
 
     if (auto size = hdr->kernel_size()) {
         if (int dtb_off = find_dtb_offset(kernel, size); dtb_off > 0) {
