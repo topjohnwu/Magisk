@@ -114,9 +114,9 @@ fun Project.setupCommon() {
 }
 
 const val BUSYBOX_DOWNLOAD_URL =
-    "https://github.com/topjohnwu/magisk-files/releases/download/files/busybox-1.36.1.0.zip"
+    "https://github.com/topjohnwu/magisk-files/releases/download/files/busybox-1.36.1.1.zip"
 const val BUSYBOX_ZIP_CHECKSUM =
-    "ea4f3019b0087dcb68130b32ab59dc2db0ee0af11d8396124a94c4231c5ea441"
+    "b4d0551feabaf314e53c79316c980e8f66432e9fb91a69dbbf10a93564b40951"
 
 fun Project.setupCoreLib() {
     setupCommon()
