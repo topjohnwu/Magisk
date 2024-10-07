@@ -1,15 +1,17 @@
 package com.topjohnwu.magisk.dialog
 
 import android.app.ProgressDialog
-import android.content.Context
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.arch.NavigationActivity
+import com.topjohnwu.magisk.arch.UIActivity
 import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.ktx.toast
+import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.flash.FlashFragment
 import com.topjohnwu.magisk.view.MagiskDialog
-import com.topjohnwu.superuser.Shell
+import kotlinx.coroutines.launch
 
 class UninstallDialog : DialogBuilder {
 
@@ -19,7 +21,7 @@ class UninstallDialog : DialogBuilder {
             setMessage(R.string.uninstall_magisk_msg)
             setButton(MagiskDialog.ButtonType.POSITIVE) {
                 text = R.string.restore_img
-                onClick { restore(dialog.context) }
+                onClick { restore(dialog.activity) }
             }
             setButton(MagiskDialog.ButtonType.NEGATIVE) {
                 text = R.string.complete_uninstall
@@ -29,18 +31,20 @@ class UninstallDialog : DialogBuilder {
     }
 
     @Suppress("DEPRECATION")
-    private fun restore(context: Context) {
-        val dialog = ProgressDialog(context).apply {
-            setMessage(context.getString(R.string.restore_img_msg))
+    private fun restore(activity: UIActivity<*>) {
+        val dialog = ProgressDialog(activity).apply {
+            setMessage(activity.getString(R.string.restore_img_msg))
             show()
         }
 
-        Shell.cmd("restore_imgs").submit { result ->
-            dialog.dismiss()
-            if (result.isSuccess) {
-                context.toast(R.string.restore_done, Toast.LENGTH_SHORT)
-            } else {
-                context.toast(R.string.restore_fail, Toast.LENGTH_LONG)
+        activity.lifecycleScope.launch {
+            MagiskInstaller.Restore().exec { success ->
+                dialog.dismiss()
+                if (success) {
+                    activity.toast(R.string.restore_done, Toast.LENGTH_SHORT)
+                } else {
+                    activity.toast(R.string.restore_fail, Toast.LENGTH_LONG)
+                }
             }
         }
     }

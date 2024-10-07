@@ -6,7 +6,6 @@ import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.system.OsConstants.O_WRONLY
-import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.os.postDelayed
 import com.topjohnwu.magisk.StubApk
@@ -15,13 +14,10 @@ import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Config
 import com.topjohnwu.magisk.core.Const
 import com.topjohnwu.magisk.core.Info
-import com.topjohnwu.magisk.core.R
 import com.topjohnwu.magisk.core.di.ServiceLocator
 import com.topjohnwu.magisk.core.isRunningAsStub
 import com.topjohnwu.magisk.core.ktx.copyAll
 import com.topjohnwu.magisk.core.ktx.copyAndClose
-import com.topjohnwu.magisk.core.ktx.reboot
-import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.ktx.writeTo
 import com.topjohnwu.magisk.core.utils.DummyList
 import com.topjohnwu.magisk.core.utils.MediaStoreUtils
@@ -585,6 +581,8 @@ abstract class MagiskInstallImpl protected constructor(
 
     protected suspend fun fixEnv() = extractFiles() && "fix_env $installDir".sh().isSuccess
 
+    protected fun restore() = findImage() && "restore_imgs $srcBoot".sh().isSuccess
+
     protected fun uninstall() = "run_uninstaller $AppApkPath".sh().isSuccess
 
     @WorkerThread
@@ -608,11 +606,10 @@ abstract class MagiskInstallImpl protected constructor(
     }
 }
 
-abstract class MagiskInstaller(
+abstract class ConsoleInstaller(
     console: MutableList<String>,
     logs: MutableList<String>
 ) : MagiskInstallImpl(console, logs) {
-
     override suspend fun exec(): Boolean {
         val success = super.exec()
         if (success) {
@@ -622,40 +619,51 @@ abstract class MagiskInstaller(
         }
         return success
     }
+}
+
+abstract class CallBackInstaller : MagiskInstallImpl(DummyList, DummyList) {
+    suspend fun exec(callback: (Boolean) -> Unit): Boolean {
+        val success = exec()
+        callback(success)
+        return success
+    }
+}
+
+class MagiskInstaller {
 
     class Patch(
         private val uri: Uri,
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(console, logs) {
+    ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = patchFile(uri)
     }
 
     class SecondSlot(
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(console, logs) {
+    ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = secondSlot()
     }
 
     class Direct(
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(console, logs) {
+    ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = direct()
     }
 
     class Emulator(
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstaller(console, logs) {
+    ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = fixEnv()
     }
 
     class Uninstall(
         console: MutableList<String>,
         logs: MutableList<String>
-    ) : MagiskInstallImpl(console, logs) {
+    ) : ConsoleInstaller(console, logs) {
         override suspend fun operations() = uninstall()
 
         override suspend fun exec(): Boolean {
@@ -669,19 +677,11 @@ abstract class MagiskInstaller(
         }
     }
 
-    class FixEnv(private val callback: () -> Unit) : MagiskInstallImpl(DummyList, DummyList) {
-        override suspend fun operations() = fixEnv()
+    class Restore : CallBackInstaller() {
+        override suspend fun operations() = restore()
+    }
 
-        override suspend fun exec(): Boolean {
-            val success = super.exec()
-            callback()
-            context.toast(
-                if (success) R.string.reboot_delay_toast else R.string.setup_fail,
-                Toast.LENGTH_LONG
-            )
-            if (success)
-                UiThreadHandler.handler.postDelayed(5000) { reboot() }
-            return success
-        }
+    class FixEnv : CallBackInstaller() {
+        override suspend fun operations() = fixEnv()
     }
 }

@@ -1,13 +1,18 @@
 package com.topjohnwu.magisk.dialog
 
+import android.widget.Toast
+import androidx.core.os.postDelayed
 import androidx.lifecycle.lifecycleScope
 import com.topjohnwu.magisk.core.BuildConfig
 import com.topjohnwu.magisk.core.Info
 import com.topjohnwu.magisk.core.R
+import com.topjohnwu.magisk.core.ktx.reboot
+import com.topjohnwu.magisk.core.ktx.toast
 import com.topjohnwu.magisk.core.tasks.MagiskInstaller
 import com.topjohnwu.magisk.events.DialogBuilder
 import com.topjohnwu.magisk.ui.home.HomeViewModel
 import com.topjohnwu.magisk.view.MagiskDialog
+import com.topjohnwu.superuser.internal.UiThreadHandler
 import kotlinx.coroutines.launch
 
 class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : DialogBuilder {
@@ -27,9 +32,15 @@ class EnvFixDialog(private val vm: HomeViewModel, private val code: Int) : Dialo
                         setCancelable(false)
                     }
                     dialog.activity.lifecycleScope.launch {
-                        MagiskInstaller.FixEnv {
+                        MagiskInstaller.FixEnv().exec { success ->
                             dialog.dismiss()
-                        }.exec()
+                            context.toast(
+                                if (success) R.string.reboot_delay_toast else R.string.setup_fail,
+                                Toast.LENGTH_LONG
+                            )
+                            if (success)
+                                UiThreadHandler.handler.postDelayed(5000) { reboot() }
+                        }
                     }
                 }
             }
