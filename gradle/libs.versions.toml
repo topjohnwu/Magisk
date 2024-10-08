@@ -1,9 +1,9 @@
 [versions]
 kotlin = "2.0.20"
-android = "8.6.1"
+android = "8.7.0"
 ksp = "2.0.20-1.0.25"
 rikka = "1.3.0"
-navigation = "2.8.1"
+navigation = "2.8.2"
 libsu = "6.0.0"
 moshi = "1.15.1"
 okhttp = "4.12.0"
@@ -31,10 +31,10 @@ appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
 core-ktx = { module = "androidx.core:core-ktx", version = "1.13.1" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version = "2.1.4" }
-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.3" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version = "1.8.4" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.0" }
+profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
