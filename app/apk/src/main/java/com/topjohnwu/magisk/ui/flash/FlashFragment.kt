@@ -71,7 +71,7 @@ class FlashFragment : BaseFragment<FragmentFlashMd2Binding>(), MenuProvider {
         super.onViewCreated(view, savedInstanceState)
 
         defaultOrientation = activity?.requestedOrientation ?: -1
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
         if (savedInstanceState == null) {
             viewModel.startFlashing()
         }
