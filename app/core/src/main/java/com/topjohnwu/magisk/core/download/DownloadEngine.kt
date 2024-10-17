@@ -167,7 +167,6 @@ class DownloadEngine(
                 val stream = network.fetchFile(subject.url).toProgressStream(subject)
                 when (subject) {
                     is Subject.App -> handleApp(stream, subject)
-                    is Subject.Module -> handleModule(stream, subject.file)
                     else -> stream.copyAndClose(subject.file.outputStream())
                 }
                 val activity = AppContext.foregroundActivity
@@ -304,33 +303,6 @@ class DownloadEngine(
             val session = APKInstall.startSession(context)
             stream.copyAndClose(TeeOutputStream(external, session.openStream(context)))
             subject.intent = session.waitIntent()
-        }
-    }
-
-    private suspend fun handleModule(src: InputStream, file: Uri) {
-        val input = ZipInputStream(src)
-        val output = ZipOutputStream(file.outputStream())
-
-        withStreams(input, output) { zin, zout ->
-            zout.putNextEntry(ZipEntry("META-INF/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/"))
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/update-binary"))
-            context.assets.open("module_installer.sh").use { it.copyAll(zout) }
-
-            zout.putNextEntry(ZipEntry("META-INF/com/google/android/updater-script"))
-            zout.write("#MAGISK\n".toByteArray())
-
-            zin.forEach { entry ->
-                val path = entry.name
-                if (path.isNotEmpty() && !path.startsWith("META-INF")) {
-                    zout.putNextEntry(ZipEntry(path))
-                    if (!entry.isDirectory) {
-                        zin.copyAll(zout)
-                    }
-                }
-            }
         }
     }
 
