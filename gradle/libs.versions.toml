@@ -1,9 +1,9 @@
 [versions]
 kotlin = "2.0.20"
-android = "8.7.0"
+android = "8.7.1"
 ksp = "2.0.20-1.0.25"
 rikka = "1.3.0"
-navigation = "2.8.2"
+navigation = "2.8.3"
 libsu = "6.0.0"
 moshi = "1.15.1"
 okhttp = "4.12.0"
@@ -26,7 +26,7 @@ timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version = "6.10.0.202406032230-r" }
 
 # AndroidX
-activity = { module = "androidx.activity:activity", version = "1.9.2" }
+activity = { module = "androidx.activity:activity", version = "1.9.3" }
 appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
 core-ktx = { module = "androidx.core:core-ktx", version = "1.13.1" }
 core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
