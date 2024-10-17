@@ -40,7 +40,8 @@ object AppMigration {
     private const val ANDROID_MANIFEST = "AndroidManifest.xml"
 
     // Some arbitrary limit
-    const val MAX_LABEL_LENGTH = 32
+    const val MAX_LABEL_LENGTH = 30
+    const val MAX_PKG_LENGTH = 255
     const val PLACEHOLDER = "COMPONENT_PLACEHOLDER"
 
     private fun genPackageName(): String {
@@ -135,17 +136,17 @@ object AppMigration {
                 val generator = classNameGenerator()
 
                 if (!xml.patchStrings {
-                    for (i in it.indices) {
-                        val s = it[i]
-                        if (s.contains(APP_PACKAGE_NAME)) {
-                            it[i] = s.replace(APP_PACKAGE_NAME, pkg)
-                        } else if (s.contains(PLACEHOLDER)) {
-                            it[i] = generator.next()
-                        } else if (s == origLabel) {
-                            it[i] = label.toString()
+                        for (i in it.indices) {
+                            val s = it[i]
+                            if (s.contains(APP_PACKAGE_NAME)) {
+                                it[i] = s.replace(APP_PACKAGE_NAME, pkg)
+                            } else if (s.contains(PLACEHOLDER)) {
+                                it[i] = generator.next()
+                            } else if (s == origLabel) {
+                                it[i] = label.toString()
+                            }
                         }
-                    }
-                }) {
+                    }) {
                     return false
                 }
 
@@ -172,7 +173,11 @@ object AppMigration {
         activity.finish()
     }
 
-    private suspend fun patchAndHide(activity: Activity, label: String, onFailure: Runnable): Boolean {
+    private suspend fun patchAndHide(
+        activity: Activity,
+        label: String,
+        pkg: String?,
+        onFailure: Runnable): Boolean {
         val stub = File(activity.cacheDir, "stub.apk")
         try {
             activity.assets.open("stub.apk").writeTo(stub)
@@ -181,22 +186,23 @@ object AppMigration {
             return false
         }
 
-        // Generate a new random package name and signature
+        // Generate a new package name and signature
         val repack = File(activity.cacheDir, "patched.apk")
-        val pkg = genPackageName()
+        // TODO: Add some checks that a non-null pkg is a valid package name!
+        val pkgToUse = pkg ?: genPackageName()
         Config.keyStoreRaw = ""
 
-        if (!patch(activity, stub, FileOutputStream(repack), pkg, label))
+        if (!patch(activity, stub, FileOutputStream(repack), pkgToUse, label))
             return false
 
         // Install and auto launch app
-        val session = APKInstall.startSession(activity, pkg, onFailure) {
-            Config.suManager = pkg
+        val session = APKInstall.startSession(activity, pkgToUse, onFailure) {
+            Config.suManager = pkgToUse
             Shell.cmd("touch $AppApkPath").exec()
-            launchApp(activity, pkg)
+            launchApp(activity, pkgToUse)
         }
 
-        val cmd = "adb_pm_install $repack $pkg"
+        val cmd = "adb_pm_install $repack $pkgToUse"
         if (Shell.cmd(cmd).exec().isSuccess) return true
 
         try {
@@ -210,7 +216,7 @@ object AppMigration {
     }
 
     @Suppress("DEPRECATION")
-    suspend fun hide(activity: Activity, label: String) {
+    suspend fun hide(activity: Activity, label: String, pkg: String?) {
         val dialog = android.app.ProgressDialog(activity).apply {
             setTitle(activity.getString(R.string.hide_app_title))
             isIndeterminate = true
@@ -222,7 +228,7 @@ object AppMigration {
             activity.toast(R.string.failure, Toast.LENGTH_LONG)
         }
         val success = withContext(Dispatchers.IO) {
-            patchAndHide(activity, label, onFailure)
+            patchAndHide(activity, label = label, pkg = pkg, onFailure)
         }
         if (!success) onFailure.run()
     }

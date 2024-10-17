@@ -22,25 +22,57 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_generic"
-            android:hint="@string/settings_app_name_hint"
+            android:hint="@string/settings_app_name_label_hint"
             app:boxStrokeColor="?colorOnSurfaceVariant"
             app:counterEnabled="true"
-            app:counterMaxLength="@{data.maxLength}"
+            app:counterMaxLength="@{data.maxLabelLength}"
             app:counterOverflowTextColor="?colorError"
-            app:error="@{data.error ? @string/settings_app_name_error : @string/empty}"
+            app:error="@{data.labelError ? @string/settings_app_name_error : @string/empty}"
             app:errorEnabled="true"
             app:errorTextColor="?colorError"
-            app:helperText="@string/settings_app_name_helper"
+            app:helperText="@string/settings_app_name_label_helper"
             app:hintEnabled="true"
             app:hintTextAppearance="@style/AppearanceFoundation.Tiny"
             app:hintTextColor="?colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/dialog_custom_download_text"
+                android:id="@+id/dialog_app_name_label_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:text="@={data.result}"
+                android:text="@={data.label}"
+                android:textAppearance="@style/AppearanceFoundation.Body"
+                android:textColor="?colorOnSurface"
+                tools:text="@tools:sample/lorem" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- TODO Fix the label/hint to say what the field is, not just (random) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dialog_app_name_pkg_textinputlayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_generic"
+            android:hint="@{data.pkgFocused ? @string/settings_app_name_pkg_hint_focused : @string/settings_app_name_pkg_hint}"
+            app:boxStrokeColor="?colorOnSurfaceVariant"
+            app:counterEnabled="true"
+            app:counterMaxLength="@{data.maxPkgLength}"
+            app:counterOverflowTextColor="?colorError"
+            app:error="@{data.pkgError ? @string/settings_app_name_error : @string/empty}"
+            app:errorEnabled="true"
+            app:errorTextColor="?colorError"
+            app:helperText="@string/settings_app_name_pkg_helper"
+            app:hintEnabled="true"
+            app:hintTextAppearance="@style/AppearanceFoundation.Tiny"
+            app:hintTextColor="?colorOnSurfaceVariant">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/dialog_app_name_pkg_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:text="@={data.pkg}"
                 android:textAppearance="@style/AppearanceFoundation.Body"
                 android:textColor="?colorOnSurface"
                 tools:text="@tools:sample/lorem" />

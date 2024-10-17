@@ -105,7 +105,7 @@ class SettingsViewModel : BaseViewModel(), BaseSettingsItem.Handler {
             SystemlessHosts -> createHosts()
             DenyListConfig -> SettingsFragmentDirections.actionSettingsFragmentToDenyFragment().navigate()
             UpdateChannel -> openUrlIfNecessary(view)
-            is Hide -> viewModelScope.launch { AppMigration.hide(view.activity, item.value) }
+            is Hide -> viewModelScope.launch { AppMigration.hide(view.activity, label = item.value.label, pkg = item.value.pkg) }
             Restore -> viewModelScope.launch { AppMigration.restore(view.activity) }
             Zygisk -> if (Zygisk.mismatch) SnackbarEvent(R.string.reboot_apply_change).publish()
             else -> Unit

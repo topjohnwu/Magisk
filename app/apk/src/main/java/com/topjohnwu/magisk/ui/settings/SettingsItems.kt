@@ -5,7 +5,10 @@ import android.content.res.Resources
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import androidx.databinding.Bindable
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.topjohnwu.magisk.BR
 import com.topjohnwu.magisk.R
 import com.topjohnwu.magisk.core.BuildConfig
@@ -68,28 +71,93 @@ object AppSettings : BaseSettingsItem.Section() {
     override val title = CoreR.string.home_app_title.asText()
 }
 
-object Hide : BaseSettingsItem.Input() {
+object Hide : BaseSettingsItem.Value<HideValue>() {
     override val title = CoreR.string.settings_hide_app_title.asText()
     override val description = CoreR.string.settings_hide_app_summary.asText()
-    override var value = ""
+    override var value = HideValue("", null)
 
-    override val inputResult
-        get() = if (isError) null else result
+    private val validPackageRegex = "^[a-z][a-z\\d_]*(\\.[a-z][a-z\\d_]*)*$".toRegex()
+
+    val result
+        get() = if(isLabelError || isPkgError) {
+            null
+        } else {
+            HideValue(
+                label = label,
+                pkg = pkg.ifBlank { null }
+            )
+        }
 
     @get:Bindable
-    var result = "Settings"
-        set(value) = set(value, field, { field = it }, BR.result, BR.error)
+    var label = "Settings"
+        set(value) = set(value, field, { field = it }, BR.label, BR.labelError)
 
-    val maxLength
+    @get:Bindable
+    var pkg: String = ""
+        set(value) = set(value, field, { field = it }, BR.pkg, BR.pkgError)
+
+    val maxLabelLength
         get() = AppMigration.MAX_LABEL_LENGTH
 
-    @get:Bindable
-    val isError
-        get() = result.length > maxLength || result.isBlank()
+    val maxPkgLength
+        get() = AppMigration.MAX_PKG_LENGTH
 
-    override fun getView(context: Context) = DialogSettingsAppNameBinding
+    @get:Bindable
+    val isLabelError: Boolean
+        get() = label.length > maxLabelLength || label.isBlank()
+
+    @get:Bindable
+    var isPkgFocused: Boolean = false
+        private set(value) = set(value, field, { field = it }, BR.pkgFocused)
+
+    @get:Bindable
+    val isPkgError: Boolean
+        get() {
+            val isValid = pkg.isBlank() || (pkg.length <= maxPkgLength && isValidPackageFormat(pkg))
+            return !isValid
+        }
+
+    private fun isValidPackageFormat(pkgName: String): Boolean =
+        validPackageRegex.matches(pkgName)
+
+    private fun getView(context: Context) = DialogSettingsAppNameBinding
         .inflate(LayoutInflater.from(context)).also { it.data = this }.root
+
+    override fun onPressed(view: View, handler: Handler) {
+        handler.onItemPressed(view, this) {
+            MagiskDialog(view.activity).apply {
+                setTitle(title.getText(view.resources))
+                setView(
+                    getView(view.context).also {
+                        val pkgEditText = it.findViewById<TextInputEditText>(R.id.dialog_app_name_pkg_text)
+                        pkgEditText.onFocusChangeListener =
+                            OnFocusChangeListener { _, hasFocus -> isPkgFocused = hasFocus }
+                    }
+                )
+                setButton(MagiskDialog.ButtonType.POSITIVE) {
+                    text = android.R.string.ok
+                    onClick {
+                        result?.let { result ->
+                            doNotDismiss = false
+                            value = result
+                            handler.onItemAction(view, this@Hide)
+                            return@onClick
+                        }
+                        doNotDismiss = true
+                    }
+                }
+                setButton(MagiskDialog.ButtonType.NEGATIVE) {
+                    text = android.R.string.cancel
+                }
+            }.show()
+        }
+    }
 }
+
+data class HideValue(
+    val label: String,
+    val pkg: String?
+)
 
 object Restore : BaseSettingsItem.Blank() {
     override val title = CoreR.string.settings_restore_app_title.asText()

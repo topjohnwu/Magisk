@@ -129,7 +129,7 @@
     <string name="settings_download_path_title">Download path</string>
     <string name="settings_download_path_message">Files will be saved to %1$s</string>
     <string name="settings_hide_app_title">Hide the Magisk app</string>
-    <string name="settings_hide_app_summary">Install a proxy app with a random package ID and custom app label</string>
+    <string name="settings_hide_app_summary">Install a proxy app with a custom package ID and app label</string>
     <string name="settings_restore_app_title">Restore the Magisk app</string>
     <string name="settings_restore_app_summary">Unhide the app and restore the original APK</string>
     <string name="language">Language</string>
@@ -149,8 +149,11 @@
     <string name="settings_hosts_title">Systemless hosts</string>
     <string name="settings_hosts_summary">Systemless hosts support for ad blocking apps</string>
     <string name="settings_hosts_toast">Added systemless hosts module</string>
-    <string name="settings_app_name_hint">New name</string>
-    <string name="settings_app_name_helper">App will be repackaged with this name</string>
+    <string name="settings_app_name_label_hint">New name</string>
+    <string name="settings_app_name_label_helper">Name for hidden app in your launcher</string>
+    <string name="settings_app_name_pkg_hint_focused">Package Name</string>
+    <string name="settings_app_name_pkg_hint">(random)</string>
+    <string name="settings_app_name_pkg_helper">App will be repackaged with this package name. Leave blank to randomly generate. DO NOT use the name of another package in the system!</string>
     <string name="settings_app_name_error">Invalid format</string>
     <string name="settings_su_app_adb">Apps and ADB</string>
     <string name="settings_su_app">Apps only</string>
