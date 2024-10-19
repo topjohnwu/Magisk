@@ -1,5 +1,5 @@
 # Magisk Changelog
-
+#
 ### v28.0
 
 - [General] Support 16k page size
