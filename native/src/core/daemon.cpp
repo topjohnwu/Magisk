@@ -372,6 +372,11 @@ static void daemon_entry() {
         }
     }
     LOGI("* Device API level: %d\n", SDK_INT);
+    
+    // Samsung workaround  #7887
+    if (access("/system_ext/app/mediatek-res/mediatek-res.apk", F_OK) == 0) {
+        set_prop("ro.vendor.mtk_model", "0");
+    }
 
     restore_tmpcon();
 
